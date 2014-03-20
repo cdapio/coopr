@@ -33,7 +33,9 @@ REST endpoint are documented at http://continuuity.com/docs/loom/0.9.5/en/rest/i
 Javadocs can be seen at http://continuuity.github.io/loom/apidocs/index.html or can be
 built locally by running:
 
+```
 mvn javadoc:javadoc
+```
 
 License
 =======
