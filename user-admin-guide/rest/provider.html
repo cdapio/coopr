@@ -1,0 +1,392 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>REST API: Provider &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="rest-api-provider">
+<h1>REST API: Provider<a class="headerlink" href="#rest-api-provider" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="index.html"><em>REST Overview</em></a> |
+<a class="reference internal" href=""><em>Providers</em></a> |
+<a class="reference internal" href="hardware.html"><em>Hardware Types</em></a> |
+<a class="reference internal" href="image.html"><em>Image Types</em></a> |
+<a class="reference internal" href="services.html"><em>Services</em></a> |
+<a class="reference internal" href="templates.html"><em>Cluster Template</em></a> |
+<a class="reference internal" href="entities.html"><em>Importing &amp; Exporting</em></a> |
+<a class="reference internal" href="clusters.html"><em>Clusters</em></a> |
+<a class="reference internal" href="tasks.html"><em>Tasks</em></a></p>
+<p>Using the Loom REST API, you can manage providers as well as query available flavors of hardware or instance sizes.
+(This API call is also used during the provisioning of instances of machines.) Even though new providers are automatically
+registered, the APIs are available if administrators desire to configure them manually. By default, Loom system supports
+Openstack out of the box.</p>
+<p>Each provider configured in the system has a unique name, a short description, and a list of key-value pairs that are required by the backend hardware provisioner.</p>
+<div class="section" id="create-a-provider">
+<h2>Create a Provider<a class="headerlink" href="#create-a-provider" title="Permalink to this headline">¶</a></h2>
+<p>To create a new provider, make a HTTP POST request to URI:</p>
+<div class="highlight-python"><div class="highlight"><pre>/providers
+</pre></div>
+</div>
+<div class="section" id="post-parameters">
+<h3>POST Parameters<a class="headerlink" href="#post-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Required Parameters</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>name</td>
+<td>Specifies the name for the provider. The assigned name must have only
+alphanumeric, dash(-), dot(.), or underscore(_) characters.</td>
+</tr>
+<tr class="row-odd"><td>description</td>
+<td>Provides a description for the provider type.</td>
+</tr>
+<tr class="row-even"><td>providertype</td>
+<td>Specifies the type of provider from the configured and available types.</td>
+</tr>
+<tr class="row-odd"><td>provisioner</td>
+<td>Specifies the configuration that will be used by the provisioners. Currently, it&#8217;s been specified
+as map of map of strings.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="http-responses">
+<h3>HTTP Responses<a class="headerlink" href="#http-responses" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successfully created</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD_REQUEST)</td>
+<td>Bad request, server is unable to process the request or a provider with the name already exists
+in the system.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X POST
+       -H <span class="s1">&#39;X-Loom-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;X-Loom-ApiKey:&lt;apikey&gt;&#39;</span>
+       -d <span class="s1">&#39;{&quot;name&quot;:&quot;example&quot;, &quot;providertype&quot;:&quot;openstack&quot;, &quot;description&quot;: &quot;Example&quot;}&#39;</span>
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/providers
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="retrieve-a-provider">
+<h2>Retrieve a Provider<a class="headerlink" href="#retrieve-a-provider" title="Permalink to this headline">¶</a></h2>
+<p>To retrieve details about a provider type, make a GET HTTP request to URI:</p>
+<div class="highlight-python"><div class="highlight"><pre>/providers/{name}
+</pre></div>
+</div>
+<p>This resource request represents an individual provider for viewing.</p>
+<div class="section" id="id1">
+<h3>HTTP Responses<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>404 (NOT FOUND)</td>
+<td>If the resource requested is not configured or available in system.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id2">
+<h3>Example<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;X-Loom-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;X-Loom-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/providers/example
+<span class="nv">$ </span><span class="o">{</span><span class="s2">&quot;name&quot;</span>:<span class="s2">&quot;example&quot;</span>,<span class="s2">&quot;description&quot;</span>:<span class="s2">&quot;Example&quot;</span>,<span class="s2">&quot;providertype&quot;</span>:<span class="s2">&quot;openstack&quot;</span>,<span class="s2">&quot;provisioner&quot;</span>:<span class="o">{}}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="delete-a-provider">
+<h2>Delete a Provider<a class="headerlink" href="#delete-a-provider" title="Permalink to this headline">¶</a></h2>
+<p>To delete a provider type, make a DELETE HTTP request to URI:</p>
+<div class="highlight-python"><div class="highlight"><pre>/providers/{name}
+</pre></div>
+</div>
+<p>This resource request represents an individual provider for deletion.</p>
+<div class="section" id="id3">
+<h3>HTTP Responses<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>If delete was successful</td>
+</tr>
+<tr class="row-odd"><td>404 (NOT FOUND)</td>
+<td>If the resource requested is not found.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id4">
+<h3>Example<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X DELETE
+       -H <span class="s1">&#39;X-Loom-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;X-Loom-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/providers/example
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="update-a-provider">
+<h2>Update a Provider<a class="headerlink" href="#update-a-provider" title="Permalink to this headline">¶</a></h2>
+<p>To update a provider type, make a PUT HTTP request to URI:</p>
+<div class="highlight-python"><div class="highlight"><pre>/providers/{name}
+</pre></div>
+</div>
+<p>Resource specified above respresents an individual provider that is being updated.
+Currently, the update of provider resource requires complete provider object to be
+returned back rather than individual fields.</p>
+<div class="section" id="put-parameters">
+<h3>PUT Parameters<a class="headerlink" href="#put-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Required Parameters</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>name</td>
+<td>Name of the resource to be updated. The name should match.</td>
+</tr>
+<tr class="row-odd"><td>description</td>
+<td>New description to be updated or old if not specified.</td>
+</tr>
+<tr class="row-even"><td>providertype</td>
+<td>New provider type to be updated or old if not specified.</td>
+</tr>
+<tr class="row-odd"><td>provisioner</td>
+<td>New provisioner configurations or else retain the previous configuration.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id5">
+<h3>HTTP Responses<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>If update was successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource requested is not found or the fields of the PUT body doesn&#8217;t specify all the required fields.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id6">
+<h3>Example<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X PUT
+       -H <span class="s1">&#39;X-Loom-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;X-Loom-ApiKey:&lt;apikey&gt;&#39;</span>
+       -d <span class="s1">&#39;{&quot;name&quot;: &quot;example&quot;, &quot;description&quot;: &quot;Updated example&quot;, &quot;providertype&quot;:&quot;openstack&quot;}&#39;</span>
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/providers/example
+<span class="nv">$ </span>curl -H <span class="s1">&#39;X-Loom-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;X-Loom-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/providers/example
+<span class="nv">$ </span>curl -H <span class="s1">&#39;X-Loom-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;X-Loom-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/providers/example
+<span class="nv">$ </span><span class="o">{</span><span class="s2">&quot;name&quot;</span>:<span class="s2">&quot;example&quot;</span>,<span class="s2">&quot;description&quot;</span>:<span class="s2">&quot;Updated example&quot;</span>,<span class="s2">&quot;providertype&quot;</span>:<span class="s2">&quot;openstack&quot;</span>,<span class="s2">&quot;provisioner&quot;</span>:<span class="o">{}}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="list-all-providers">
+<h2>List All Providers<a class="headerlink" href="#list-all-providers" title="Permalink to this headline">¶</a></h2>
+<p>A configured provider represents a resource used for querying resource types as well as for provisioning the
+resources. The list of all configured providers are available for you to retrieve. The provider list resource represents
+the comprehensive set of providers configured within the Loom system.</p>
+<p>To list all the providers configured within in Loom, make GET HTTP request to URI:</p>
+<div class="highlight-python"><div class="highlight"><pre>/providers
+</pre></div>
+</div>
+<div class="section" id="id7">
+<h3>HTTP Responses<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource uri is specified incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id8">
+<h3>Example<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;X-Loom-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;X-Loom-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/providers
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

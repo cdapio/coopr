@@ -1,0 +1,572 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Installation Guide &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../../index.html" />
+    <link rel="up" title="Administration Guide" href="../admin/index.html" />
+    <link rel="next" title="Server Configuration" href="../admin/server-config.html" />
+    <link rel="prev" title="Overview" href="../admin/overview.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../admin/server-config.html" title="Server Configuration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../admin/overview.html" title="Overview"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li>
+          <li><a href="../admin/index.html" accesskey="U">Administration Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="guide-installation-toplevel"></span><div class="section" id="installation-guide">
+<h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This document will guide you through the process of installing Continuuity Loom
+on your own cluster with the official installation image.</p>
+</div>
+<div class="section" id="system-requirements">
+<h2>System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="supported-operating-system">
+<span id="id1"></span><h3>Supported Operating System<a class="headerlink" href="#supported-operating-system" title="Permalink to this headline">¶</a></h3>
+<p>Various systems of Loom have been tested against the following platforms:</p>
+<ul class="simple">
+<li><strong>Loom Server</strong></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>CentOS 6.4</li>
+<li>Ubuntu 12.04</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><strong>Loom Provisioner</strong></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>CentOS 6.4</li>
+<li>Ubuntu 12.04</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><strong>Loom UI</strong></li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>CentOS 6.4</li>
+<li>Ubuntu 12.04</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="supported-databases">
+<h3>Supported Databases<a class="headerlink" href="#supported-databases" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>(Default) Derby</li>
+<li>MySQL version 5.1 or above</li>
+<li>Oracle DB</li>
+<li>SQLite</li>
+<li>PostgreSQL version 8.4 or above</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="supported-zookeeper-versions">
+<h3>Supported Zookeeper Versions<a class="headerlink" href="#supported-zookeeper-versions" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Apache Zookeeper version 3.4 or above</li>
+<li>CDH4 or CDH5 Zookeeper</li>
+<li>HDP1 or HDP2 Zookeeper</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="supported-openstack-versions">
+<h3>Supported OpenStack Versions<a class="headerlink" href="#supported-openstack-versions" title="Permalink to this headline">¶</a></h3>
+<p>Loom has been extensively tested on Havana, but it also supports Grizzly out of the box.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click here for more information on how <a class="reference internal" href="openstack-config.html"><em>Openstack should be configured</em></a> currently to support provisioning with Loom. Several limitations that exist will be eliminated in future releases of Loom.</p>
+</div>
+</div>
+<div class="section" id="supported-internet-protocols">
+<h3>Supported Internet Protocols<a class="headerlink" href="#supported-internet-protocols" title="Permalink to this headline">¶</a></h3>
+<p>Loom requires IPv4. IPv6 is currently not supported.</p>
+</div>
+<div class="section" id="supported-browsers">
+<h3>Supported Browsers<a class="headerlink" href="#supported-browsers" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Mozilla Firefox version 26 or above</li>
+<li>Google Chrome version 31 or above</li>
+<li>Safari version 5.1 or above</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="supported-node-js-versions">
+<h3>Supported Node.js Versions<a class="headerlink" href="#supported-node-js-versions" title="Permalink to this headline">¶</a></h3>
+<p>Loom supports Node.js version 0.10.26 or above.</p>
+</div>
+</div>
+<div class="section" id="software-prerequisites">
+<h2>Software Prerequisites<a class="headerlink" href="#software-prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>Loom requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Loom is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.</p>
+<p><a class="reference external" href="http://www.java.com/en/download/manual.jsp">Click here</a> to download the Java Runtime for Linux and Solaris. Following installation, please set the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable.</p>
+<p>On Mac OS X, the JVM is bundled with the operating system. Following installation, please set the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable.</p>
+</div>
+<div class="section" id="installing-from-file">
+<h2>Installing from File<a class="headerlink" href="#installing-from-file" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Installation of Loom packages creates a user with the username &#8216;loom&#8217;. If the user &#8216;loom&#8217; already exists on the system, then that user account will be used to run all Loom services. The username can also be externally created using LDAP.</p>
+</div>
+<div class="section" id="yum">
+<h3>Yum<a class="headerlink" href="#yum" title="Permalink to this headline">¶</a></h3>
+<p>To install each of the Loom components locally from a Yum package:</p>
+<pre class="literal-block">
+$ sudo yum localinstall loom-server-0.9.5-1.el6.x86_64.rpm
+$ sudo yum localinstall loom-provisioner-0.9.5-1.el6.x86_64.rpm
+$ sudo yum localinstall loom-ui-0.9.5-1.el6.x86_64.rpm
+</pre>
+</div>
+<div class="section" id="debian">
+<h3>Debian<a class="headerlink" href="#debian" title="Permalink to this headline">¶</a></h3>
+<p>To install each of the Loom components locally from a Debian package:</p>
+<pre class="literal-block">
+$ sudo dpkg -i loom-server_0.9.5-1.ubuntu.12.04_amd64.deb
+$ sudo dpkg -i loom-provisioner_0.9.5-1.ubuntu.12.04_amd64.deb
+$ sudo dpkg -i loom-ui_0.9.5-1.ubuntu.12.04_amd64.deb
+</pre>
+</div>
+</div>
+<div class="section" id="installing-from-repository">
+<h2>Installing from Repository<a class="headerlink" href="#installing-from-repository" title="Permalink to this headline">¶</a></h2>
+<p>Access to the Continuuity private repository is required for package installation.</p>
+<div class="section" id="id2">
+<h3>Yum<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>To add the Continuuity Yum repository, add the following content to the file <tt class="docutils literal"><span class="pre">/etc/yum.repos.d/continuuity.repo</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre>[continuuity]
+name=Continuuity Loom Releases
+baseurl=https://&lt;username&gt;:&lt;password&gt;@repository.continuuity.com/content/repositories/loom
+enabled=1
+protect=0
+gpgcheck=0
+metadata_expire=30s
+autorefresh=1
+type=rpm-md
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Username and password are URL encoded. Please request login credentials from Continuuity support.</p>
+</div>
+<p>Instructions for installing each of the Loom components are as below:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo yum install loom-server
+$ sudo yum install loom-provisioner
+$ sudo yum install loom-ui
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>Debian<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>To add the Continuuity Debian repository, add the following content to the file <tt class="docutils literal"><span class="pre">/etc/apt/sources.list.d/continuuity.list</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre>deb     [arch=amd64] https://&lt;username&gt;:&lt;password&gt;@repository.continuuity.com/content/sites/apt-loom precise release
+</pre></div>
+</div>
+<p>Instructions for installing each of the Loom components are as below:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo apt-get update
+$ sudo apt-get install loom-server
+$ sudo apt-get install loom-provisioner
+$ sudo apt-get install loom-ui
+</pre></div>
+</div>
+</div>
+<div class="section" id="database-configuration">
+<h3>Database Configuration<a class="headerlink" href="#database-configuration" title="Permalink to this headline">¶</a></h3>
+<p>By default, Loom uses an embedded Derby database. However, you can optionally choose to enable remote database for Loom server.
+Additional steps are required to configure this setting.</p>
+<div class="section" id="sample-mysql-setup">
+<h4>Sample MySQL setup<a class="headerlink" href="#sample-mysql-setup" title="Permalink to this headline">¶</a></h4>
+<p><strong>Download and add the database connector JAR</strong></p>
+<p>Execute the following command on the Loom server machine:</p>
+<p>For RHEL/CentOS/Oracle Linux:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo yum install mysql-connector-java*
+</pre></div>
+</div>
+<p>For Ubuntu:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo apt-get install libmysql-java*
+</pre></div>
+</div>
+<p>After the install, the MySQL JAR is placed in <tt class="docutils literal"><span class="pre">/usr/share/java/</span></tt>. Copy the installed JAR files to the
+<tt class="docutils literal"><span class="pre">/opt/loom/server/lib/</span></tt> directory on your Loom server machine. Verify that the JAR file has appropriate permissions.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>After installing the MySQL connector, the Java version may change.  Make sure you are using Java 1.6 or 1.7 from Oracle.  You may need to run <tt class="docutils literal"><span class="pre">update-alternatives</span> <span class="pre">--config</span> <span class="pre">java</span></tt> to do this.</li>
+<li>The minimum required version of MySQL connector is 5.1.6.</li>
+<li>You can also download MySQL JDBC driver JAR (mysql-connector-java) from <a class="reference external" href="http://dev.mysql.com/downloads/connector/j">MySQL website</a>.</li>
+</ul>
+</div>
+<p><strong>Setup database</strong></p>
+<p>You will need to set up an account and a database in MySQL. An example schema file (for MySQL) for this can be found at
+<tt class="docutils literal"><span class="pre">/opt/loom/server/docs/sql</span></tt>.</p>
+<p>If you are setting up a MySQL database from scratch you can run the following on your mysql machine to complete the database setup:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mysql -u root -p -e &#39;create database loom;&#39;
+$ mysql -u root -p -e &#39;grant all privileges on loom.* to &quot;loom&quot;@&quot;&lt;loom-server&gt;&quot; identified by &quot;&lt;password&gt;&quot;;&#39;
+$ mysql -u loom -p loom &lt; /opt/loom/server/config/sql/loom-create-tables-mysql.sql
+$ mysql -u loom -p loom -e &#39;show tables;&#39;
++------------------+
+| Tables_in_loom   |
++------------------+
+| clusterTemplates |
+| clusters         |
+| hardwareTypes    |
+| imageTypes       |
+| jobs             |
+| nodes            |
+| providers        |
+| services         |
+| tasks            |
++------------------+
+</pre></div>
+</div>
+<p>where loom.sql is the example schema file at <tt class="docutils literal"><span class="pre">/opt/loom/server/config/sql</span></tt>, and where passwords are replaced and entered as needed.</p>
+</div>
+</div>
+<div class="section" id="loom-server-configuration">
+<h3>Loom Server Configuration<a class="headerlink" href="#loom-server-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Loom server settings can be changed under the <tt class="docutils literal"><span class="pre">/etc/loom/conf/loom-site.xml</span></tt> configuration file. For a list of
+available configurations, see the <a class="reference internal" href="../admin/server-config.html"><em>Server Configuration</em></a> page.</p>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>Setting Environmental Variables<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>Several environmental variables can be set in Loom Provisioner and Loom UI.</p>
+<div class="section" id="loom-server">
+<h3>Loom Server<a class="headerlink" href="#loom-server" title="Permalink to this headline">¶</a></h3>
+<p>The Server environmental variables can be set at <tt class="docutils literal"><span class="pre">/etc/default/loom-server</span></tt>. The configurable variables are as below:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Variable</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">LOOM_LOG_DIR</span></tt></td>
+<td>/var/log/loom</td>
+<td>Path for the log directory</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">LOOM_JMX_OPTS</span></tt></td>
+<td>&nbsp;</td>
+<td>JMX options for monitoring the Loom Server</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">LOOM_GC_OPTS</span></tt></td>
+<td>&nbsp;</td>
+<td>java garbage collection options to use when running the Loom Server</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">LOOM_JAVA_OPTS</span></tt></td>
+<td>-XX:+UseConcMarkSweepGC -XX:+UseParNewGC</td>
+<td>java options to use when running the Loom Server</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="loom-provisioner">
+<h3>Loom Provisioner<a class="headerlink" href="#loom-provisioner" title="Permalink to this headline">¶</a></h3>
+<p>The Provisioner environmental variables can be set at <tt class="docutils literal"><span class="pre">/etc/default/loom-provisioner</span></tt>. The configurable variables are as below:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Variable</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">LOOM_NUM_WORKERS</span></tt></td>
+<td>5</td>
+<td>The number of provisioner workers spawned</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">LOOM_LOG_DIR</span></tt></td>
+<td>/var/log/loom</td>
+<td>Path for the log directory</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">LOOM_SERVER_URI</span></tt></td>
+<td><a class="reference external" href="http://localhost:55054">http://localhost:55054</a></td>
+<td>The URI for Loom Server</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">LOOM_LOG_LEVEL</span></tt></td>
+<td>info</td>
+<td>Logging level</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="loom-ui">
+<h3>Loom UI<a class="headerlink" href="#loom-ui" title="Permalink to this headline">¶</a></h3>
+<p>The UI environmental variables can be set at <tt class="docutils literal"><span class="pre">/etc/default/loom-ui</span></tt>. The configurable variables are as below:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Variable</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">LOOM_LOG_DIR</span></tt></td>
+<td>/var/log/loom</td>
+<td>Path for the log directory</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">LOOM_SERVER_URI</span></tt></td>
+<td><a class="reference external" href="http://localhost:55054">http://localhost:55054</a></td>
+<td>The URI for Loom Server</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">LOOM_UI_PORT</span></tt></td>
+<td>8100</td>
+<td>The port number that hosts the UI</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="starting-and-stopping-loom-services">
+<h2>Starting and Stopping Loom Services<a class="headerlink" href="#starting-and-stopping-loom-services" title="Permalink to this headline">¶</a></h2>
+<p>By default, the Loom&#8217;s installation RPMs and PKGs do not configure auto start of the services in the <tt class="docutils literal"><span class="pre">init.d</span></tt>. We leave
+that privilege to the administrator. For each Loom component and its related service (such as the Server, Provisioner, and UI),
+there is a launch script, which you may use to execute a desired operation. For example, to start, stop, or check status
+for a Loom Provisioner, you can use:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo /etc/init.d/loom-server start|stop
+$ sudo /etc/init.d/loom-provisioner start|stop|status
+$ sudo /etc/init.d/loom-ui start|stop
+</pre></div>
+</div>
+</div>
+<div class="section" id="loading-default-templates">
+<h2>Loading Default Templates<a class="headerlink" href="#loading-default-templates" title="Permalink to this headline">¶</a></h2>
+<p>Loom provides a set of useful default templates that covers most supported use cases. For new users and administrators of Loom, we
+recommend installing these defaults as a starting point for template definition. These defaults are required for running
+the example in the <a class="reference internal" href="../quickstart/index.html"><em>Quick Start Guide</em></a>. To load these templates, run:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ export LOOM_SERVER_URI=http://&lt;loom-server&gt;:&lt;loom-port&gt;/v1/loom
+$ /opt/loom/server/config/defaults/load-defaults.sh
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Setting the <tt class="docutils literal"><span class="pre">LOOM_SERVER_URI</span></tt> environment variable is only required if you have configured the Loom Server to
+bind to an address other than localhost.</p>
+</div>
+</div>
+<div class="section" id="log-management">
+<h2>Log Management<a class="headerlink" href="#log-management" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="location">
+<h3>Location<a class="headerlink" href="#location" title="Permalink to this headline">¶</a></h3>
+<p>By default, Loom logs are located at <tt class="docutils literal"><span class="pre">/var/log/loom</span></tt>.  This can be changed by editing the corresponding <tt class="docutils literal"><span class="pre">/etc/default/loom-server</span></tt>,
+<tt class="docutils literal"><span class="pre">/etc/default/loom-ui</span></tt>, or <tt class="docutils literal"><span class="pre">/etc/default/loom-provisioner</span></tt> file.</p>
+</div>
+<div class="section" id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<p>Log options for the server, such as log level, can be changed by editing the <tt class="docutils literal"><span class="pre">/etc/loom/conf/logback.xml</span></tt> file.  Log level for
+the provisioner can be changed by editing the <tt class="docutils literal"><span class="pre">/etc/default/loom-provisioner</span></tt> file.</p>
+</div>
+<div class="section" id="rotation">
+<h3>Rotation<a class="headerlink" href="#rotation" title="Permalink to this headline">¶</a></h3>
+<p>Loom depends on the external Linux utility logrotate to rotate its logs. Loom
+packages contain logrotate configurations in <tt class="docutils literal"><span class="pre">/etc/logrotate.d</span></tt> but it does not perform the rotations itself.
+Please ensure logrotate is enabled on your Loom hosts.</p>
+</div>
+</div>
+<div class="section" id="common-installation-issues">
+<h2>Common Installation Issues<a class="headerlink" href="#common-installation-issues" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">A common issue is installing Loom on machines that have Open JDK installed rather than Oracle JDK.</p>
+</li>
+<li><p class="first">If you see JDBC exceptions in the Loom Server log like:</p>
+<div class="highlight-python"><div class="highlight"><pre>Caused by: java.lang.AbstractMethodError: com.mysql.jdbc.PreparedStatement.setBlob(ILjava/io/InputStream;)
+</pre></div>
+</div>
+<p>it means your JDBC connector version is too old.  Upgrade to a newer version to solve the problem.</p>
+</li>
+<li><p class="first">If you are running your mysql server on the same machine as the Loom Server and are seeing connection issues in the Loom Server logs, you may need to explicitly grant access to &#8220;loom&#8221;&#64;&#8221;localhost&#8221; instead of relying on the wildcard.</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../admin/index.html">Administration Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../admin/overview.html">Overview</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Installation Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#system-requirements">System Requirements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#supported-operating-system">Supported Operating System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-databases">Supported Databases</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-zookeeper-versions">Supported Zookeeper Versions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-openstack-versions">Supported OpenStack Versions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-internet-protocols">Supported Internet Protocols</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-browsers">Supported Browsers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-node-js-versions">Supported Node.js Versions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#software-prerequisites">Software Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-from-file">Installing from File</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#yum">Yum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debian">Debian</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-from-repository">Installing from Repository</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Yum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Debian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database-configuration">Database Configuration</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#sample-mysql-setup">Sample MySQL setup</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#loom-server-configuration">Loom Server Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Setting Environmental Variables</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#loom-server">Loom Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#loom-provisioner">Loom Provisioner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#loom-ui">Loom UI</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#starting-and-stopping-loom-services">Starting and Stopping Loom Services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-default-templates">Loading Default Templates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#log-management">Log Management</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#location">Location</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#options">Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rotation">Rotation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#common-installation-issues">Common Installation Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/ui.html">Administration User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/macros.html">Macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/plugins.html">Provisioner Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/monitoring.html">Monitoring and Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bcp/index.html">Business Continuity Plan (BCP)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../admin/overview.html"
+                        title="previous chapter">Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../admin/server-config.html"
+                        title="next chapter">Server Configuration</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../admin/server-config.html" title="Server Configuration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../admin/overview.html" title="Overview"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li>
+          <li><a href="../admin/index.html" >Administration Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

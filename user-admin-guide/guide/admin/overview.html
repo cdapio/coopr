@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Overview &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../../index.html" />
+    <link rel="up" title="Administration Guide" href="index.html" />
+    <link rel="next" title="Installation Guide" href="../installation/index.html" />
+    <link rel="prev" title="Administration Guide" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../installation/index.html" title="Installation Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Administration Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Administration Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="guide-admin-toplevel"></span><div class="section" id="overview">
+<span id="index-0"></span><h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>In this page, we explore various concepts behind Loom administration and explain various tools used in Loom for
+administrators to configure and manage their clusters. At the core of a Loom cluster is the notion of a <strong>Template</strong>, which
+is the blueprint or the primordial stuff of what Loom clusters are comprised of—it is the essence or the DNA of how different
+parts and components come together to materialize into a cluster.</p>
+<div class="section" id="concepts">
+<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned above, Loom works through the use of <strong>Templates</strong>, which dictate the configuration of the
+clusters that users can spin up. An administrator can specify any number of such templates to put into
+their <strong>Catalog</strong> for users.</p>
+<p>Several concepts central to cluster configuration are definable in Loom. These aspects are:</p>
+<ul class="simple">
+<li><strong>Providers</strong> - Infrastructure providers (such as Amazon or OpenStack) that supply machines.</li>
+<li><strong>Hardware types</strong> - Type of hardware (such as small, medium, or large) that can be used for the nodes of a cluster.</li>
+<li><strong>Image types</strong> - Basic disk images installed on the nodes of a cluster.</li>
+<li><strong>Services</strong> - Bundled software services that can be placed on a cluster.</li>
+<li><strong>Cluster Template</strong> - Blueprint describing show hardware, images, and services should be laid out to form a cluster.</li>
+</ul>
+<p>Templates are defined by specifying hardware types, image types, and services that can be used in a cluster, as well
+as a set of constraints that describes how those hardware types, image types, and services should be laid out in a cluster.
+Template creation can be done in
+two ways: 1) <a class="reference internal" href="ui.html"><em>Admin UI</em></a> and 2) <a class="reference internal" href="../../rest/templates.html"><em>Web Services REST Cluster API</em></a>.</p>
+<p>Because the notion of <strong>Templates</strong> is central to the Loom cluster creation, please read the <a class="reference internal" href="../../rest/templates.html"><em>Web Services REST Cluster
+API</em></a> or <a class="reference internal" href="ui.html"><em>Admin UI</em></a> carefully to design templates that meet your needs.</p>
+</div>
+<div class="section" id="tools">
+<h2>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h2>
+<p>Loom includes several tools for administrators to simplify their administrative tasks. Apart from the
+<a class="reference internal" href="ui.html"><em>Admin UI</em></a>, Loom provides several additional <a class="reference internal" href="monitoring.html"><em>metrics and monitoring</em></a> tools.
+Loom allows administrators to <a class="reference internal" href="server-config.html"><em>configure their servers</em></a>
+and  <a class="reference internal" href="plugins.html"><em>write custom plugins</em></a> for allocating machines with your providers or to implement custom services.
+Administrators who are more command line driven, or who wish to write quick administrative scripts,
+can employ the <a class="reference internal" href="../../rest/index.html"><em>Web services API</em></a>.</p>
+<p>Please refer to the following pages for more details:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="ui.html"><em>Administration User Interface</em></a></li>
+<li><a class="reference internal" href="server-config.html"><em>Server Configuration</em></a></li>
+<li><a class="reference internal" href="monitoring.html"><em>Monitoring and Metrics</em></a></li>
+<li><a class="reference internal" href="macros.html"><em>Macros</em></a></li>
+<li><a class="reference internal" href="plugins.html"><em>Provisioner Plugins</em></a></li>
+<li><a class="reference internal" href="../../rest/index.html"><em>REST Web Service Interface</em></a></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Administration Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#concepts">Concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tools">Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">Administration User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="macros.html">Macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html">Provisioner Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="monitoring.html">Monitoring and Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bcp/index.html">Business Continuity Plan (BCP)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Administration Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../installation/index.html"
+                        title="next chapter">Installation Guide</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../installation/index.html" title="Installation Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Administration Guide"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >Administration Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

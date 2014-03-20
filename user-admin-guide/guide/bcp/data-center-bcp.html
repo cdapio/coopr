@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Datacenter High Availability &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../../index.html" />
+    <link rel="up" title="Business Continuity Plan (BCP)" href="index.html" />
+    <link rel="next" title="Multi-Datacenter High Availability" href="multi-data-center-bcp.html" />
+    <link rel="prev" title="Business Continuity Plan (BCP)" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="multi-data-center-bcp.html" title="Multi-Datacenter High Availability"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Business Continuity Plan (BCP)"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li>
+          <li><a href="../admin/index.html" >Administration Guide</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Business Continuity Plan (BCP)</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="overview-single-data-center"></span><div class="section" id="datacenter-high-availability">
+<h1>Datacenter High Availability<a class="headerlink" href="#datacenter-high-availability" title="Permalink to this headline">¶</a></h1>
+<p>Loom can be configured to be resilient to machine or component failures. This document describes the recommended configuration
+for setting up Loom for HA within a single datacenter. Please refer to <a class="reference internal" href="multi-data-center-bcp.html"><em>multi-datacenter HA</em></a> documentation
+for configuring HA across multiple datacenters.</p>
+<p>In order to support resiliency against machine or component failures within a datacenter, Loom components can be configured to
+run with redundancies on multiple machines. Each machine running Loom can have a maximum of -</p>
+<ul class="simple">
+<li>One loom-ui process</li>
+<li>One loom-server process</li>
+<li>Multiple loom-provisioner processes (See config LOOM_NUM_WORKERS in <a class="reference internal" href="../installation/index.html"><em>installation guide</em></a>)</li>
+<li>One ZooKeeper process</li>
+<li>One database process</li>
+</ul>
+<p>The diagram below shows the logical deployment diagram of Loom for HA in a datacenter-</p>
+<div class="figure align-center" id="single-dc">
+<img alt="Within Datacenter Architecture Diagram" src="../../_images/ha_within_colo.png" />
+</div>
+<div class="section" id="loom-ui">
+<h2>Loom UI<a class="headerlink" href="#loom-ui" title="Permalink to this headline">¶</a></h2>
+<p>Loom UI (loom-ui) is stateless, and communicates with Loom Server using REST endpoints. Hence Loom UI can be easily run on multiple machines. User traffic is routed to multiple instances of Loom UI using load balancers (such as HAproxy or Varnish or VIP).</p>
+</div>
+<div class="section" id="loom-provisioner">
+<h2>Loom Provisioner<a class="headerlink" href="#loom-provisioner" title="Permalink to this headline">¶</a></h2>
+<p>Loom Provisioner (loom-provisioner) is also stateless, and communicates with Loom Server using REST endpoints. Hence Loom Provisioner can be easily run on multiple machines.</p>
+</div>
+<div class="section" id="loom-server">
+<h2>Loom Server<a class="headerlink" href="#loom-server" title="Permalink to this headline">¶</a></h2>
+<p>Loom Server (loom-server) can be run on multiple machines too. When run in this mode, there will be a load balancer fronting the Loom Servers. Loom UI and Loom Provisioners will be configured to communicate via a load balancer with the Loom Server. Also, all Loom Servers in a datacenter should connect to the same ZooKeeper quorum.</p>
+</div>
+<div class="section" id="zookeeper">
+<h2>ZooKeeper<a class="headerlink" href="#zookeeper" title="Permalink to this headline">¶</a></h2>
+<p>A ZooKeeper quorum of at least 3 machines is required for redundancy. Note that ZooKeeper needs to run with an odd number of total machines for redundancy.</p>
+</div>
+<div class="section" id="database">
+<h2>Database<a class="headerlink" href="#database" title="Permalink to this headline">¶</a></h2>
+<p>Database needs to be replicated with automatic failover in case the master database goes down. Database is also fronted by a proxy that directs all operations to master database, and Loom Server connects to database using the proxy.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../admin/index.html">Administration Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../admin/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/ui.html">Administration User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/macros.html">Macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/plugins.html">Provisioner Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../admin/monitoring.html">Monitoring and Metrics</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Business Continuity Plan (BCP)</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="">Datacenter High Availability</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#loom-ui">Loom UI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#loom-provisioner">Loom Provisioner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#loom-server">Loom Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zookeeper">ZooKeeper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database">Database</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="multi-data-center-bcp.html">Multi-Datacenter High Availability</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Business Continuity Plan (BCP)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="multi-data-center-bcp.html"
+                        title="next chapter">Multi-Datacenter High Availability</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="multi-data-center-bcp.html" title="Multi-Datacenter High Availability"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Business Continuity Plan (BCP)"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li>
+          <li><a href="../admin/index.html" >Administration Guide</a> &raquo;</li>
+          <li><a href="index.html" >Business Continuity Plan (BCP)</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

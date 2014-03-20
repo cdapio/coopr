@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Provisioner Plugins &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../../index.html" />
+    <link rel="up" title="Administration Guide" href="index.html" />
+    <link rel="next" title="Chef Automator Plugin" href="chef-automator-plugin.html" />
+    <link rel="prev" title="Macros" href="macros.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="chef-automator-plugin.html" title="Chef Automator Plugin"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="macros.html" title="Macros"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Administration Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="plugin-reference"></span><div class="section" id="provisioner-plugins">
+<h1>Provisioner Plugins<a class="headerlink" href="#provisioner-plugins" title="Permalink to this headline">¶</a></h1>
+<p>The Loom provisioner allows you to create custom plugins for allocating machines on your providers or to custom
+implement your services. This document provides the necessary information to build a custom plugin for Loom.</p>
+<div class="section" id="types-of-plugins">
+<h2>Types of Plugins<a class="headerlink" href="#types-of-plugins" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="provider-plugins">
+<h3>Provider plugins<a class="headerlink" href="#provider-plugins" title="Permalink to this headline">¶</a></h3>
+<p>Provider plugins interact with various provider APIs to allocate machines. As such, they must be able to request machines,
+confirm/validate when they are ready, and delete machines. Provider plugins are also responsible for returning the ssh credentials
+to be used in subsequent tasks.</p>
+</div>
+<div class="section" id="automator-plugins">
+<h3>Automator plugins<a class="headerlink" href="#automator-plugins" title="Permalink to this headline">¶</a></h3>
+<p>Automator plugins are responsible for implementing the various services defined on a cluster. For example, a Chef
+automator plugin could be used to invoke Chef recipes that install, configure, start or stop your application. Alternatively,
+you may choose to implement with a Puppet plugin, or even Shell commands.</p>
+</div>
+</div>
+<div class="section" id="task-types">
+<h2>Task Types<a class="headerlink" href="#task-types" title="Permalink to this headline">¶</a></h2>
+<p>In order to build plugins for Loom, it is first necessary to understand the tasks each plugin will be responsible for
+executing. To bring up a cluster, Loom issues the following tasks:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Task name</th>
+<th class="head">Description</th>
+<th class="head">Possible return values</th>
+<th class="head">Handled by plugin</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>CREATE</td>
+<td>sends a request to the provider to initiate the provisioning of a machine. Typically, it should return as soon as the request is made</td>
+<td>status, provider-id, root password</td>
+<td>Provider</td>
+</tr>
+<tr class="row-odd"><td>CONFIRM</td>
+<td>polls/waits for the machine to be ready and does any required provider-specific validation/preparation</td>
+<td>status, routable ip address</td>
+<td>Provider</td>
+</tr>
+<tr class="row-even"><td>DELETE</td>
+<td>sends a request to the provider to destroy a machine</td>
+<td>status</td>
+<td>Provider</td>
+</tr>
+<tr class="row-odd"><td>BOOTSTRAP</td>
+<td>plugin can perform any operation it needs to carry out further tasks, for example, copy Chef cookbooks to the machine. This operation should be idempotent and safe to run together with multiple plugins</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-even"><td>INSTALL</td>
+<td>run the specified install service action script/data</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-odd"><td>CONFIGURE</td>
+<td>run the specified configure service action script/data</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-even"><td>INITIALIZE</td>
+<td>run the specified initialize service action script/data</td>
+<td>status</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>START</td>
+<td>run the specified start service action script/data</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-even"><td>STOP</td>
+<td>run the specified stop service action script/data</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-odd"><td>REMOVE</td>
+<td>run the specified remove service action script/data</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+</tbody>
+</table>
+<p>Note that status is the only required return value, since it indicates success or failure. For information such
+as the IP address, any task can write an arbitrary key-value pair which will then be included in subsequent
+requests. This allows for different providers to have different values.</p>
+</div>
+<div class="section" id="writing-a-plugin">
+<h2>Writing a Plugin<a class="headerlink" href="#writing-a-plugin" title="Permalink to this headline">¶</a></h2>
+<p>Currently, a plugin must be written in Ruby and extend from the Loom base plugin classes.</p>
+<div class="section" id="writing-a-provider-plugin">
+<h3>Writing a Provider plugin<a class="headerlink" href="#writing-a-provider-plugin" title="Permalink to this headline">¶</a></h3>
+<p>A provider plugin must extend from the base <tt class="docutils literal"><span class="pre">Provider</span></tt> class and implement three methods: <tt class="docutils literal"><span class="pre">create</span></tt>, <tt class="docutils literal"><span class="pre">confirm</span></tt>, and <tt class="docutils literal"><span class="pre">delete</span></tt>.
+Each of these methods are called with a hash of key-value pairs.
+Note that your implementation can also refer to the <tt class="docutils literal"><span class="pre">&#64;task</span></tt> instance variable, which contains the entire
+input for this task.</p>
+<p>Below is a skeleton for a provider plugin:</p>
+<div class="highlight-python"><div class="highlight"><pre>#!/usr/bin/env ruby
+
+class MyProvider &lt; Provider
+
+  def create(inputmap)
+    flavor = inputmap[&#39;flavor&#39;]
+    image = inputmap[&#39;image&#39;]
+    hostname = inputmap[&#39;hostname&#39;]
+    #
+    # implement requesting a machine from provider
+    #
+    @result[&#39;status&#39;] = 0
+    @result[&#39;result&#39;][&#39;foo&#39;] = &quot;bar&quot;
+  end
+
+  def confirm(inputmap)
+    providerid = inputmap[&#39;providerid&#39;]
+    #
+    # implement confirmation/validation of this machine from provider
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def delete(inputmap)
+    providerid = inputmap[&#39;providerid&#39;]
+    #
+    # implement deletion of machine from provider
+    #
+    @result[&#39;status&#39;] = 0
+  end
+</pre></div>
+</div>
+<p>When the task is complete, your implementation should simply write the results back to the <tt class="docutils literal"><span class="pre">&#64;result</span></tt> instance variable.
+The only required return value is <tt class="docutils literal"><span class="pre">status</span></tt>, where <tt class="docutils literal"><span class="pre">'status':</span> <span class="pre">0</span></tt> represents success and any other value returned
+represents failure. A raised exception will also result in failure.</p>
+<p>Additionally, your provider plugin will likely need to return information such as a machine&#8217;s ID, SSH credentials and
+public IP, so that it can be used in subsequent tasks. For these cases, simply write the results as key-value pairs underneath
+the line <tt class="docutils literal"><span class="pre">&#64;result['result']['key']</span> <span class="pre">=</span> <span class="pre">'value'</span></tt>. Subsequent tasks will then contain this information in <tt class="docutils literal"><span class="pre">config</span></tt>, for
+example <tt class="docutils literal"><span class="pre">&#64;task['config']['key']</span> <span class="pre">=</span> <span class="pre">'value'</span></tt>. By convention, most plugins should reuse the following fields:</p>
+<div class="highlight-python"><div class="highlight"><pre>@result[&#39;result&#39;][&#39;providerid&#39;]
+@result[&#39;result&#39;][&#39;ssh-auth&#39;][&#39;user&#39;]
+@result[&#39;result&#39;][&#39;ssh-auth&#39;][&#39;password&#39;]
+@result[&#39;result&#39;][&#39;ipaddress&#39;]
+</pre></div>
+</div>
+</div>
+<div class="section" id="writing-an-automator-plugin">
+<h3>Writing an Automator plugin<a class="headerlink" href="#writing-an-automator-plugin" title="Permalink to this headline">¶</a></h3>
+<p>An automator plugin must extend from the base <tt class="docutils literal"><span class="pre">Automator</span></tt> class and implement seven methods: <tt class="docutils literal"><span class="pre">bootstrap</span></tt>, <tt class="docutils literal"><span class="pre">install</span></tt>,
+<tt class="docutils literal"><span class="pre">configure</span></tt>, <tt class="docutils literal"><span class="pre">init</span></tt>, <tt class="docutils literal"><span class="pre">start</span></tt>, <tt class="docutils literal"><span class="pre">stop</span></tt>, and <tt class="docutils literal"><span class="pre">remove</span></tt>. Each of these methods are called with a hash of key-value pairs.
+Note that your implementation can also refer to the <tt class="docutils literal"><span class="pre">&#64;task</span></tt> instance variable, which contains the entire input for this task.</p>
+<p>Below is a skeleton for an automator plugin:</p>
+<div class="highlight-python"><div class="highlight"><pre>#!/usr/bin/env ruby
+
+class MyAutomator &lt; Automator
+
+  def bootstrap(ssh_auth_hash)
+    #
+    # implement any preparation work required by this plugin (copy cookbooks, etc.)
+    # this should be idempotent and unintrusive to any other registered plugins
+    @result[&#39;status&#39;] = 0
+  end
+
+  def install(ssh_auth_hash, script_string, data_string)
+    #
+    # implement installing a service as specified by script_string, data_string
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def configure(ssh_auth_hash, script_string, data_string)
+    #
+    # implement configuring a service as specified by script_string, data_string
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def init(ssh_auth_hash, script_string, data_string)
+    #
+    # implement initializing a service as specified by script_string, data_string
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def start(ssh_auth_hash, script_string, data_string)
+    #
+    # implement starting a service as specified by script_string, data_string
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def stop(ssh_auth_hash, script_string, data_string)
+    #
+    # implement stopping a service as specified by script_string, data_string
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def remove(ssh_auth_hash, script_string, data_string)
+    #
+    # implement removing a service as specified by script_string, data_string
+    #
+    @result[&#39;status&#39;] = 0
+  end
+</pre></div>
+</div>
+<p>Note that the bootstrap step is unique in that a bootstrap task is not tied to a service. The bootstrap task will
+actually run the bootstrap implementation for all registered automator plugins, and may be run multiple times
+throughout the cluster lifecycle. Therefore, bootstrap implementations should be idempotent and not interfere with
+one another.</p>
+<p><strong>Logging and Capturing Output</strong></p>
+<p>During execution, a plugin can write to the provisioner&#8217;s instance of the Ruby standard logger using the &#8216;log&#8217; method:</p>
+<div class="highlight-python"><div class="highlight"><pre>log.debug &quot;my message&quot;
+log.info &quot;my message&quot;
+log.warn &quot;my warning message&quot;
+log.error &quot;my error message&quot;
+</pre></div>
+</div>
+<p>Additionally, each task can return strings representing <tt class="docutils literal"><span class="pre">stdout</span></tt> and <tt class="docutils literal"><span class="pre">stderr</span></tt> to be displayed on the Loom UI. Simply return the values:</p>
+<div class="highlight-python"><div class="highlight"><pre>@result[&#39;stdout&#39;] = &quot;my captured stdout message&quot;
+@result[&#39;stderr&#39;] = &quot;my captured stderr message&quot;
+</pre></div>
+</div>
+<p><strong>Registering your plugin</strong></p>
+<p>To register your plugin, you simply need to put it in the right directory, and provide a JSON file specifying your main
+class. On startup, the Loom provisioner will scan the appropriate directories looking for JSON definition files. Your
+plugin simply has to adhere to the following directory structure:</p>
+<p>Below is an example directory structure:</p>
+<div class="highlight-python"><div class="highlight"><pre>$LOOM_HOME/
+    provisioner/
+        daemon/
+            plugins/
+                providers/
+                    my_provider/
+                        my_provider.json
+                        my_provider.rb
+                        [any additional data or lib directories]
+                automators/
+                    my-automator/
+                        my_provider.json
+                        my_provider.rb
+                        [any additional data or lib directories]
+</pre></div>
+</div>
+<p>The content of the plugin definition <a href="#id1"><span class="problematic" id="id2">*</span></a>.json files simply need to specify the main class of your plugin as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s">&quot;my_provider&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s">&quot;classname&quot;</span><span class="p">:</span> <span class="s">&quot;MyProvider&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Given the above definition, Loom provisioner would expect the <tt class="docutils literal"><span class="pre">MyProvider</span></tt> class to be defined in
+<tt class="docutils literal"><span class="pre">$LOOM_HOME/provisioner/daemon/plugins/providers/my_provider/*.rb</span></tt>. If the plugin is registered correctly, a
+log message will be displayed upon starting the provisioner.</p>
+</div>
+</div>
+<div class="section" id="included-plugins">
+<h2>Included Plugins<a class="headerlink" href="#included-plugins" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chef-automator-plugin.html">Chef Automator Plugin</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Administration Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">Administration User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="macros.html">Macros</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Provisioner Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#types-of-plugins">Types of Plugins</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#provider-plugins">Provider plugins</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#automator-plugins">Automator plugins</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#task-types">Task Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#writing-a-plugin">Writing a Plugin</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#writing-a-provider-plugin">Writing a Provider plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#writing-an-automator-plugin">Writing an Automator plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#included-plugins">Included Plugins</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="chef-automator-plugin.html">Chef Automator Plugin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="monitoring.html">Monitoring and Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bcp/index.html">Business Continuity Plan (BCP)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="macros.html"
+                        title="previous chapter">Macros</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="chef-automator-plugin.html"
+                        title="next chapter">Chef Automator Plugin</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="chef-automator-plugin.html" title="Chef Automator Plugin"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="macros.html" title="Macros"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >Administration Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

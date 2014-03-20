@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Architecture &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../index.html" />
+    <link rel="next" title="Administration Guide" href="../guide/admin/index.html" />
+    <link rel="prev" title="Features" href="features.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../guide/admin/index.html" title="Administration Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="overview-architecture"></span><div class="section" id="architecture">
+<h1>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h1>
+<div class="align-center figure" id="id1">
+<a class="reference internal image-reference" href="../_images/Loom-Architecture.png"><img alt="Loom Architecture" src="../_images/Loom-Architecture.png" style="width: 700px;" /></a>
+</div>
+<div class="section" id="loom-server">
+<h2>Loom Server<a class="headerlink" href="#loom-server" title="Permalink to this headline">¶</a></h2>
+<p>Loom Server is responsible for storing and managing metadata around providers, services, and cluster templates. It materializes
+a cluster template into an execution plan by solving the service placement problem using complex constraints. Additionally,
+the server exposes and manages all the web services supported by Loom.</p>
+</div>
+<div class="section" id="loom-provisioner">
+<h2>Loom Provisioner<a class="headerlink" href="#loom-provisioner" title="Permalink to this headline">¶</a></h2>
+<p>Once the execution plan is materialized, the Loom Server creates tasks that are executed as a DAG plan. These tasks are then
+queued for Provisioners to execute. After completing a task, the provisioners report the tasks&#8217; status back to the Loom Server.</p>
+<p>Provisioners support a pluggable architecture for integrating different infrastructure providers (e.g. OpenStack, Rackspace, Amazon Web Services, Google App Engine, and Joyent)
+and automators (e.g. Chef, Puppet, Shell scripts). Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Loom&#8217;s architecture simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent tasks to render scalability.</p>
+</div>
+<div class="section" id="loom-web-ui">
+<h2>Loom Web UI<a class="headerlink" href="#loom-web-ui" title="Permalink to this headline">¶</a></h2>
+<p>Loom Web UI exposes two major functionalities: an Admin view and a User view. The Admin view allows system administrators or server administrators to configure
+providers, disk images, machine hardware types, and software services. The UI also supports the construction of cluster templates that
+can be accessed and executed by users. Cluster templates are blueprints that administrators expose
+to their users that enable their users to instantiate clusters.</p>
+<p>Using the user UI, end users are able to see all the cluster templates available to them and use them to create
+instances of clusters. The end user can retrieve details of their own clusters, (including the cluster&#8217;s metadata)
+and execute the following operations to their clusters: create, delete, amend, update, and monitor.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#loom-server">Loom Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loom-provisioner">Loom Provisioner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loom-web-ui">Loom Web UI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="features.html"
+                        title="previous chapter">Features</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../guide/admin/index.html"
+                        title="next chapter">Administration Guide</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../guide/admin/index.html" title="Administration Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             >previous</a> |</li>
+        <li><a href="../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

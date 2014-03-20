@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>User Guide &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../../index.html" />
+    <link rel="next" title="Web Services" href="../../rest/index.html" />
+    <link rel="prev" title="Hot-Hot : With Custom Replication" href="../bcp/option4/index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../rest/index.html" title="Web Services"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../bcp/option4/index.html" title="Hot-Hot : With Custom Replication"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="guide-user-toplevel"></span><div class="section" id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<p>This page describes the different interfaces and functions that end users can use to manage their own set of clusters within Loom.
+As mentioned earlier in the administration guide, all clusters and nodes within clusters are dictated by templates created by
+the administrator, made accessible to individual users (or developers), and displayed in the Catalog. These accessible templates
+are users&#8217; blueprint for their individual cluster instantiation.</p>
+<div class="section" id="the-user-home-screen">
+<h2>The User Home Screen<a class="headerlink" href="#the-user-home-screen" title="Permalink to this headline">¶</a></h2>
+<p>Login to the Loom UI using your user credentials at <tt class="docutils literal"><span class="pre">http://&lt;loom-host&gt;:&lt;loom-ui-port&gt;/</span></tt>.
+This will take you to the user home screen, which shows a list of all clusters provisioned by a user. This page displays basic information for each cluster owned
+by the user, such as current clusters, clusters under construction, and deleted clusters. Active and deleted clusters, however,
+are shown separately in this interface. Clicking on each of these items launches a separate screen with individual cluster
+description and detailed cluster information.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/user-screenshot-1.png"><img alt="User home screen" src="../../_images/user-screenshot-1.png" style="width: 800px;" /></a>
+</div>
+</div>
+<div class="section" id="provisioning-a-new-cluster">
+<h2>Provisioning a new Cluster<a class="headerlink" href="#provisioning-a-new-cluster" title="Permalink to this headline">¶</a></h2>
+<p>Users can provision a machine by selecting &#8216;Create a cluster&#8217; on the top menu bar. Through this page, a user
+can create a cluster with a given name and template setting (as defined by the system administrator), and specify the
+number of nodes to allocate to the cluster.</p>
+<p>For more information on how administrators can set templates for provisioning a cluster, see the <a class="reference internal" href="../admin/index.html"><em>Administration
+Guide</em></a>).</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/user-screenshot-2.png"><img alt="Cluster creation screen" src="../../_images/user-screenshot-2.png" style="width: 800px;" /></a>
+</div>
+<div class="section" id="advanced-settings">
+<h3>Advanced Settings<a class="headerlink" href="#advanced-settings" title="Permalink to this headline">¶</a></h3>
+<p>The Loom user interface has a number of advanced configuration options.
+To access the advanced options, Click on the gray triangle next to the label &#8216;Advanced&#8217;. This exposes the options to
+explicitly specify the provider and image type to be used for the current cluster. The &#8216;Config&#8217; field allows the user
+to specify additional custom configurations in a JSON-formatted input (for more information, see
+<a class="reference internal" href="../admin/macros.html"><em>Macros</em></a>). In addition, the &#8216;Lease Duration&#8217; field allows the user to specify the duration,
+in days, hours and minutes, that they want to lease the cluster for.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/user-screenshot-3.png"><img alt="Cluster creation screen - advanced settings" src="../../_images/user-screenshot-3.png" style="width: 800px;" /></a>
+</div>
+<p>To start creating the cluster, click the &#8216;Create&#8217; button at the bottom on the page.</p>
+</div>
+</div>
+<div class="section" id="the-cluster-description-screen">
+<h2>The Cluster Description Screen<a class="headerlink" href="#the-cluster-description-screen" title="Permalink to this headline">¶</a></h2>
+<p>A user can view more details of a cluster by clicking on the cluster name on the Home screen, or by selecting
+&#8216;Clusters&#8217; -&gt; &lt;name of the cluster&gt; on the top-left of the screen. The cluster description page provides an up-to-date
+status report of a cluster as well as a description of a cluster, including the template used
+to create the cluster, the infrastructure provider, and the list of services installed.</p>
+<p>To abort a cluster that is currently being created, click on &#8216;Abort&#8217; next to the progress bar on this screen.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/user-screenshot-4.png"><img alt="Cluster description screen" src="../../_images/user-screenshot-4.png" style="width: 800px;" /></a>
+</div>
+</div>
+<div class="section" id="examining-and-accessing-the-cluster">
+<h2>Examining and Accessing the Cluster<a class="headerlink" href="#examining-and-accessing-the-cluster" title="Permalink to this headline">¶</a></h2>
+<p>On the cluster description screen, nodes are grouped together by the set of services that are available on them.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/user-screenshot-5.png"><img alt="Cluster description screen" src="../../_images/user-screenshot-5.png" style="width: 800px;" /></a>
+</div>
+<p>To view the individual nodes under each service set, click on the white triangle next to the services. From the expanded
+list, a user can obtain attributes about each node, including its hostname and ID. For certain providers, the list may
+also show authentication credentials for accessing the nodes, through a service such as SSH.</p>
+<p>To view the actions that have been performed on a particular node, click on the &#8216;Show actions&#8217; button.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../../_images/user-screenshot-6.png"><img alt="Show actions" src="../../_images/user-screenshot-6.png" style="width: 800px;" /></a>
+</div>
+<p>The expanded list shows a list of attributes for each node. These nodes can now be
+accessed using the corresponding IP addresses, usernames and passwords (through a service such as SSH).</p>
+<div class="section" id="deleting-a-cluster">
+<h3>Deleting a Cluster<a class="headerlink" href="#deleting-a-cluster" title="Permalink to this headline">¶</a></h3>
+<p>The &#8216;Delete&#8217; button on the cluster description page deletes the data on the cluster and decommissions the associated
+nodes. Clusters that are successfully deleted are moved from the &#8216;Live clusters&#8217; list to &#8216;Inactive clusters&#8217; on the
+user&#8217;s home screen.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-user-home-screen">The User Home Screen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#provisioning-a-new-cluster">Provisioning a new Cluster</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#advanced-settings">Advanced Settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-cluster-description-screen">The Cluster Description Screen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examining-and-accessing-the-cluster">Examining and Accessing the Cluster</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#deleting-a-cluster">Deleting a Cluster</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../bcp/option4/index.html"
+                        title="previous chapter">Hot-Hot : With Custom Replication</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../rest/index.html"
+                        title="next chapter">Web Services</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../rest/index.html" title="Web Services"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../bcp/option4/index.html" title="Hot-Hot : With Custom Replication"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

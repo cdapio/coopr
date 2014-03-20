@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Openstack Configuration &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="guide-installation-toplevel"></span><div class="section" id="openstack-configuration">
+<h1>Openstack Configuration<a class="headerlink" href="#openstack-configuration" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Admin:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>There must be a user in OpenStack which is a member of all projects which will have hosts provisioned by Loom.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Networking:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Instance networks must be routable from Loom provisioners.</li>
+<li>If multiple networks, any network named &#8220;public&#8221; becomes network Loom Provisioner uses for SSH.</li>
+<li>If there is only one network, loom provisioner will use it for SSH.</li>
+<li>Loom currently does not support specifying a network.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>SSH Keys:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>OpenStack must be configured with <tt class="docutils literal"><span class="pre">libvirt_inject_key</span> <span class="pre">true</span></tt> for key-based authentication to instances.</li>
+<li>The key must be present in OpenStack and <tt class="docutils literal"><span class="pre">openstack_ssh_key_id</span></tt> must be configured in the provider.</li>
+<li>The private key file must be present on the Loom provisioner machines in the path specified in <tt class="docutils literal"><span class="pre">identity_file</span></tt> for the provider.</li>
+<li>The private key file must be used when using SSH to connect to the instance, rather than a password.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Passwords:</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>OpenStack must be configured with <tt class="docutils literal"><span class="pre">libvirt_inject_password</span> <span class="pre">true</span></tt> for password-based authentication to instances.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Operating Systems</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Linux instances are currently supported.</li>
+</ul>
+</div></blockquote>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

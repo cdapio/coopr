@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Release Notes &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../index.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="FAQs" href="../faq/index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../faq/index.html" title="FAQs"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="overview-release-notes"></span><div class="section" id="release-notes">
+<h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
+<p id="id1">Welcome to Loom 0.9.5 Beta Release. In today&#8217;s release, we have updated Loom Server, Loom Provisioners, and Loom UI. Loom overall has new and improved functionality and ton of bug fixes.</p>
+<p>We hope you enjoy this release.  If you encounter any issues, please don&#8217;t hesitate to post on our <a class="reference external" href="https://continuuity.uservoice.com/clients/widgets/classic_widget?mode=support&amp;link_color=162e52&amp;primary_color=42afcf&amp;embed_type=lightbox&amp;trigger_method=custom_trigger&amp;contact_enabled=true&amp;feedback_enabled=false&amp;smartvote=true&amp;referrer=http%3A%2F%2Fcontinuuity.com%2F#contact_us">Continuuity support portal</a>.</p>
+<div class="section" id="fixed-issues">
+<h2>Fixed Issues<a class="headerlink" href="#fixed-issues" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Layout solver used to take minutes for solving large (&gt; 400) node clusters</li>
+<li>Resistance to transient zookeeper connection loss</li>
+<li>Provisioner was made more resilient to transient issues.</li>
+</ul>
+</div>
+<div class="section" id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>On-demand cluster provisioning</li>
+<li>Support for any type of cluster with constraint based templates</li>
+<li>Pre-defined templates for clusters like Hadoop and LAMP</li>
+<li>Integration with OpenStack and IaaS providers</li>
+<li>Pluggable automation platform (e.g. Chef, Puppet)</li>
+<li>Scalability to hundreds of clusters</li>
+<li>Modular approach to configuration and service management</li>
+<li>Out of the box startup with in-memory zookeeper and embedded DB</li>
+<li>User defineable configuration for cluster creation</li>
+<li>Uses Chef solo as SCM engine, hence not dependent on a Chef server</li>
+<li>Push model for provisioning and installing, hence can provision clusters outside firewall</li>
+<li>UI for administrators to create and manage configuration, and for users to customize and create clusters.</li>
+<li>Fully driven by REST APIs</li>
+</ul>
+</div>
+<div class="section" id="released-versions">
+<h2>Released Versions<a class="headerlink" href="#released-versions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>0.9.5 Beta</li>
+<li>0.5.0 Alpha</li>
+<li>0.1.0</li>
+</ul>
+</div>
+<div class="section" id="known-issues">
+<h2>Known Issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Potential for node data to grow beyond persistent store cell limit</li>
+<li>Minimal authentication</li>
+<li>Key files must be stored in plugin</li>
+<li>Provisioner does not enforce timeouts</li>
+</ul>
+</div>
+<div class="section" id="licenses">
+<h2>Licenses<a class="headerlink" href="#licenses" title="Permalink to this headline">¶</a></h2>
+<p>This section specifies all the components and their respective <a class="reference internal" href="licenses.html"><em>licenses</em></a> that are used in Loom Server, Loom UI and Loom Provisioner</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Release Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fixed-issues">Fixed Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#new-features">New Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#released-versions">Released Versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#known-issues">Known Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#licenses">Licenses</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../faq/index.html"
+                        title="previous chapter">FAQs</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="glossary.html"
+                        title="next chapter">Glossary</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="glossary.html" title="Glossary"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../faq/index.html" title="FAQs"
+             >previous</a> |</li>
+        <li><a href="../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27787617-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>REST API: Tasks &mdash; Loom 0.9.5 Beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.5 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Loom 0.9.5 Beta documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="rest-api-tasks">
+<h1>REST API: Tasks<a class="headerlink" href="#rest-api-tasks" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="index.html"><em>REST Overview</em></a> |
+<a class="reference internal" href="provider.html"><em>Providers</em></a> |
+<a class="reference internal" href="hardware.html"><em>Hardware Types</em></a> |
+<a class="reference internal" href="image.html"><em>Image Types</em></a> |
+<a class="reference internal" href="services.html"><em>Services</em></a> |
+<a class="reference internal" href="templates.html"><em>Cluster Template</em></a> |
+<a class="reference internal" href="entities.html"><em>Importing &amp; Exporting</em></a> |
+<a class="reference internal" href="clusters.html"><em>Clusters</em></a> |
+<a class="reference internal" href=""><em>Tasks</em></a></p>
+<p>The Loom task APIs for taking and finishing tasks are used by the Provisioners to execute node level tasks. Provisioners poll
+a REST API, looking for tasks to take and execute. Upon completion of the task, Provisioners call another REST API to tell the server
+whether or not execution of the task was successful. These APIs are only of interest to those who want to add or extend Provisioner
+plugins.</p>
+<div class="section" id="taking-a-task">
+<h2>Taking a Task<a class="headerlink" href="#taking-a-task" title="Permalink to this headline">¶</a></h2>
+<p>To take a task from the Server, make a HTTP POST request to URI:</p>
+<div class="highlight-python"><div class="highlight"><pre>/tasks/take
+</pre></div>
+</div>
+<p>The response will be a JSON object describing the task to perform. Each task will contain <tt class="docutils literal"><span class="pre">taskId</span></tt>, <tt class="docutils literal"><span class="pre">jobId</span></tt>, <tt class="docutils literal"><span class="pre">clusterId</span></tt>, <tt class="docutils literal"><span class="pre">taskName</span></tt>,
+<tt class="docutils literal"><span class="pre">nodeId</span></tt>, and <tt class="docutils literal"><span class="pre">config</span></tt> keys. The task name describes what type of task it is. It will be one of CREATE, CONFIRM, BOOTSTRAP, DELETE,
+INSTALL, CONFIGURE, INITIALIZE, START, STOP, or REMOVE. The config section contains all the information a Provisioner may need to
+execute the task. Based on the task name and config section, the Provisioner will use the appropriate plugin to actually execute the task.
+The config section is a JSON object. It has a &#8220;cluster&#8221; section containing the cluster config taken straight from the cluster template
+, with macros expanded where applicable. If the task is a service task, the config section will also contain a &#8220;service&#8221;
+section containing the action to perform on the service. This comes straight from the service definition defined by the admin.
+There is also a &#8220;provider&#8221; section that comes straight from the provider defined by the admin and in use for the cluster. Similarly,
+there are &#8220;imagetype&#8221; and &#8220;hardwaretype&#8221; sections which come straight from the respective admin defined entities. In addition, an
+array of &#8220;automators&#8221; is given. This describes what automators will be used to perform tasks on the node and is useful for certain tasks,
+such as BOOTSTRAP tasks, in order to figure out what automators need to be bootstrapped on the node. There is also a &#8220;nodes&#8221; section which
+lists all other nodes in the cluster as well as some of their properties. In addition, the config section may contain other arbitrary
+key-value pairs that have been passed through by Provisioners earlier on. For example, upon finishing a CONFRIM task, Provisioners pass the
+IP address of the node back to the Server, which then attaches the IP address to the node and passes it on to any future task.</p>
+<div class="section" id="post-parameters">
+<h3>POST Parameters<a class="headerlink" href="#post-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Required Parameters</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>workerId</td>
+<td>Id of the worker. Must be unique across all workers. Only the worker that took the task will be
+able to finish the task.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="http-responses">
+<h3>HTTP Responses<a class="headerlink" href="#http-responses" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Task successfully given to worker.</td>
+</tr>
+<tr class="row-odd"><td>204 (NO CONTENT)</td>
+<td>No tasks to hand out.</td>
+</tr>
+<tr class="row-even"><td>400 (BAD REQUEST)</td>
+<td>Bad request, no workerId specified.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre>$ curl -X POST
+       -d &#39;{ &quot;workerId&quot;: &quot;worker1&quot; }&#39;
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/tasks/take
+$
+   {
+       &quot;taskId&quot;: &quot;00000001-002-071&quot;,
+       &quot;jobId&quot;: &quot;00000001-002&quot;,
+       &quot;clusterId&quot;: &quot;00000001&quot;,
+       &quot;taskName&quot;: &quot;START&quot;,
+       &quot;nodeId&quot;: &quot;edbafd4c-191a-42e7-9f8b-6625a74fa04e&quot;,
+       &quot;config&quot;: {
+           &quot;cluster&quot;: {
+               &quot;hadoop&quot;: {
+                   &quot;core_site&quot;: {
+                       &quot;fs.defaultFS&quot;: &quot;hdfs://test1-1000.local&quot;
+                   },
+                   &quot;hdfs_site&quot;: {
+                       &quot;dfs.datanode.max.xcievers&quot;: &quot;4096&quot;
+                   },
+                   &quot;mapred_site&quot;: {
+                       &quot;mapreduce.framework.name&quot;: &quot;yarn&quot;
+                   },
+                   &quot;yarn_site&quot;: {
+                       &quot;yarn.resourcemanager.hostname&quot;: &quot;test1-1000.local&quot;
+                   }
+               },
+               &quot;hbase&quot;: {
+                   &quot;hbase_site&quot;: {
+                       &quot;hbase.rootdir&quot;: &quot;hdfs://test1-1000.local/hbase&quot;,
+                       &quot;hbase.cluster.distributed&quot;: &quot;true&quot;,
+                       &quot;hbase.zookeeper.quorum&quot;: &quot;test1-1000.local:2181&quot;
+                   }
+               }
+           },
+           &quot;service&quot;: {
+               &quot;name&quot;: &quot;hbase-regionserver&quot;,
+               &quot;action&quot;: {
+                   &quot;type&quot;: &quot;chef&quot;,
+                   &quot;script&quot;: &quot;recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]&quot;,
+                   &quot;data&quot;: &quot;{\&quot;loom\&quot;: { \&quot;node\&quot;: { \&quot;services\&quot;: { \&quot;hbase-regionserver\&quot;: \&quot;start\&quot; } } } }&quot;
+               }
+           },
+           &quot;nodenum&quot;: &quot;1001&quot;,
+           &quot;hostname&quot;: &quot;test1-1001.local&quot;,
+           &quot;ipaddress&quot;: &quot;123.456.0.1&quot;,
+           &quot;hardwaretype&quot;: {
+               &quot;name&quot;: &quot;medium&quot;,
+               &quot;flavor&quot;: &quot;5&quot;
+           },
+           &quot;imagetype&quot;: {
+               &quot;name&quot;: &quot;ubuntu12&quot;,
+               &quot;image&quot;: &quot;80fbcb55-b206-41f9-9bc2-2dd7aac6c061&quot;
+           },
+           &quot;automators&quot;: [ &quot;chef&quot; ],
+           &quot;provider&quot;: {
+               &quot;name&quot;: &quot;rackspace&quot;,
+               &quot;description&quot;: &quot;Rackspace Public Cloud&quot;,
+               &quot;providertype&quot;: &quot;rackspace&quot;,
+               &quot;provisioner&quot;: {
+                   &quot;auth&quot;: {
+                       &quot;rackspace_username&quot;: &quot;USERNAME&quot;,
+                       &quot;rackspace_api_key&quot;: &quot;API_KEY&quot;
+                   }
+               }
+           },
+           &quot;nodes&quot;: {
+               &quot;39aad219-3bc8-4be3-a594-e1eb19d1c6a6&quot;: {
+                   &quot;hostname&quot;: &quot;test1-1000.local&quot;,
+                   &quot;nodenum&quot;: &quot;1000&quot;,
+                   &quot;ipaddress&quot;: &quot;123.456.0.100&quot;,
+                   &quot;hardwaretype&quot;: {
+                       &quot;name&quot;: &quot;medium&quot;,
+                       &quot;flavor&quot;: &quot;5&quot;
+                   },
+                   &quot;imagetype&quot;: {
+                       &quot;name&quot;: &quot;ubuntu12&quot;,
+                       &quot;image&quot;: &quot;80fbcb55-b206-41f9-9bc2-2dd7aac6c061&quot;
+                   },
+                   &quot;automators&quot;: [ &quot;chef&quot; ]
+               },
+               &quot;9b167e5d-02a9-4a64-afba-cf4806ca0d71&quot;: {
+                   &quot;hostname&quot;: &quot;test1-1001.local&quot;,
+                   &quot;nodenum&quot;: &quot;1001&quot;,
+                   &quot;ipaddress&quot;: &quot;123.456.0.101&quot;,
+                   &quot;hardwaretype&quot;: {
+                       &quot;name&quot;: &quot;medium&quot;,
+                       &quot;flavor&quot;: &quot;5&quot;
+                   },
+                   &quot;imagetype&quot;: {
+                       &quot;name&quot;: &quot;ubuntu12&quot;,
+                       &quot;image&quot;: &quot;80fbcb55-b206-41f9-9bc2-2dd7aac6c061&quot;
+                   },
+                   &quot;automators&quot;: [ &quot;chef&quot; ]
+               }
+           }
+       }
+   }
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="finish-a-task">
+<h2>Finish a Task<a class="headerlink" href="#finish-a-task" title="Permalink to this headline">¶</a></h2>
+<p>After a provisioner finishes executing the task, it sends a POST request to URI:</p>
+<div class="highlight-python"><div class="highlight"><pre>/tasks/finish
+</pre></div>
+</div>
+<p>The POST body is a JSON object that must contain at least <tt class="docutils literal"><span class="pre">workerId</span></tt>, <tt class="docutils literal"><span class="pre">taskId</span></tt>, and <tt class="docutils literal"><span class="pre">status</span></tt>. It can also optionally contain
+<tt class="docutils literal"><span class="pre">stdout</span></tt> and <tt class="docutils literal"><span class="pre">stderr</span></tt> for storing logs on task failures, and a <tt class="docutils literal"><span class="pre">result</span></tt> key with a JSON object as its value to pass on any
+information that may be needed to complete future tasks on the node. A non-zero status indicates failure of the task. stdout
+and stderr values will be trimmed by the Server if they are too long. The log length is a configurable Server setting. The
+contents of the result block will be included for the node in all future requests. This is to enable provisioners to pass
+information to each other that cannot be provided by the Server. For example, most providers return a provider specific id
+upon creation of a node. This id is needed for other tasks such as node deletion, so the Provisioner plugin that creates a
+node will pass back the id in the result block. Another example is IP address. The IP address of a node is often required
+during configuration of services and can be reference through macros. However, the IP address is not usually available until
+after the CONFIRM task has run on a node. Therefore, the Provisioner plugin will return the IP address in its result block
+after successfully confirming a node so that it can be used down the line.</p>
+<div class="section" id="id1">
+<h3>HTTP Responses<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Task successfully finished.</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>Bad request, workerId, taskId, or status was missing in POST body.</td>
+</tr>
+<tr class="row-even"><td>417 (EXPECTATION FAILED)</td>
+<td>Specified worker did not own the task it was trying to finish. Can happen if
+the Server timed out the task before the worker sent the finish request.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id2">
+<h3>Example<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -d <span class="s1">&#39;{</span>
+<span class="s1">           &quot;workerId&quot;: &quot;worker1&quot;,</span>
+<span class="s1">           &quot;taskId&quot;: &quot;&quot;,</span>
+<span class="s1">           &quot;status&quot;: 1,</span>
+<span class="s1">           &quot;stdout&quot;: &quot;&quot;,</span>
+<span class="s1">           &quot;stderr&quot;: &quot;some error logs&quot;,</span>
+<span class="s1">       }&#39;</span>
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/tasks/finish
+
+<span class="nv">$ </span>curl -d <span class="s1">&#39;{</span>
+<span class="s1">           &quot;workerId&quot;: &quot;worker2&quot;,</span>
+<span class="s1">           &quot;taskId&quot;: &quot;&quot;,</span>
+<span class="s1">           &quot;status&quot;: 0,</span>
+<span class="s1">           &quot;result&quot;: {</span>
+<span class="s1">               &quot;ipaddress&quot;:&quot;123.456.0.1&quot;</span>
+<span class="s1">           }</span>
+<span class="s1">       }&#39;</span>
+       http://&lt;loom-server&gt;:&lt;loom-port&gt;/&lt;version&gt;/loom/tasks/finish
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Loom 0.9.5 Beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Continuuity Inc..
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>
