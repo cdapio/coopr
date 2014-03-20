@@ -1,0 +1,75 @@
+{
+  "name": "lamp",
+  "description": "LAMP stack (Linux, Apache, MySQL, PHP) with HAproxy support",
+  "defaults": {
+    "services": [
+      "base",
+      "apache-httpd",
+      "php",
+      "mysql-server"
+    ],
+    "provider": "rackspace",
+    "hardwaretype": "medium",
+    "imagetype": "centos6",
+    "config": {
+      "apache": {
+        "default_site_enabled": "true"
+      },
+      "mysql": {
+        "server_debian_password": "somedefaultpassword",
+        "server_root_password": "somedefaultpassword",
+        "server_repl_password": "somedefaultpassword",
+        "bind_address": "%ip.service.mysql-server%"
+      },
+      "php": {
+        "directives": {
+          "mysql.default_host": "%host.service.mysql-server%"
+        }
+      }
+    }
+  },
+  "compatibility": {
+    "hardwaretypes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "imagetypes": [
+      "centos6",
+      "ubuntu12"
+    ],
+    "services": [
+      "base",
+      "haproxy",
+      "apache-httpd",
+      "php",
+      "mysql-server"
+    ]
+  },
+  "constraints": {
+    "layout": {
+      "mustcoexist": [
+        [ "apache-httpd", "php" ]
+      ]
+    },
+    "services": {
+      "haproxy": {
+        "quantities": {
+          "max": "1"
+        }
+      },
+      "mysql-server": {
+        "quantities": {
+          "max": "1"
+        }
+      }
+    }
+  },
+  "administration": {
+    "leaseduration": {
+      "initial":0,
+      "max":0,
+      "step":0
+    }
+  }
+}

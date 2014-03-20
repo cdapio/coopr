@@ -1,0 +1,11 @@
+# Don't edit this file manually
+# File managed by Chef
+
+<% if node['haproxy']['daemon']['enable'] -%>
+ENABLED=1
+<% else -%>
+ENABLED=0
+<% end -%>
+<% if node['haproxy']['daemon']['extra_options'] -%>
+EXTRAOPTS="<%= node['haproxy']['daemon']['extra_options'] %>"
+<% end -%>

@@ -1,0 +1,12 @@
+{
+  "name": "centos6",
+  "description": "CentOS 6",
+  "providermap": {
+    "joyent": {
+      "image": "30e9e4c8-bbf2-11e2-ac3b-3b598ee13393"
+    },
+    "rackspace": {
+      "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85"
+    }
+  }
+}

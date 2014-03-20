@@ -1,0 +1,176 @@
+{% extends 'index.html' %}
+
+{% block title %}{% if service %} Edit service: {{service.name}} {% else %}Create a service{% endif %}{% endblock %}
+
+{% block header %}
+    {% include "page-header.html" %}
+{% endblock %}
+
+{% block content %}
+    <div id="header">
+      <div id="global">
+        {% include "services/topmenu.html" %}
+      </div>
+    </div>
+    <div id="content-body">
+      <div id="title">
+        <div><div class="pull-right" style="margin-top: 2px;position: relative; width: 150px;text-align: center;">
+      </div></div>
+        <h1>Services</h1>
+      </div>
+
+      <div id="panels">
+
+        <div class="panel" style="clear: both;">
+          <div class="panel-head clearfix">
+            <div class="panel-title"><h3 class="pull-left">{% if service %} Edit service: {{service.name}} {% else %}Create a service{% endif %}</h3>
+            <div class="pull-right">
+              {% if service %}
+              <form role="form" method="POST" action="/services/delete/{{service.name}}" class="service-delete-form">
+                <input type="hidden" value="{{service.name}}" name="name" />
+                <button type="submit" class="btn-spl btn-danger">Delete</button>
+              </form>
+              {% endif %}
+            </div>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <form class="form-horizontal" role="form" id="create-service-form" action="{% if service %}/services/update{% else %}/services/create{% endif %}">
+              <div class="form-group">
+                <label for="inputName" class="col-sm-2 control-label">Name</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name" value="{{service.name}}" {% if service %} disabled {% endif %}>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputDescription" class="col-sm-2 control-label">Description</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="inputDescription" name="inputDescription" placeholder="Description" value="{{service.description}}">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="inputDependsOn" class="col-sm-2 control-label">Depends on</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="inputDependsOn" id="inputDependsOn">
+                    <option></option>
+                    {% for itr in services %}
+                      <option>{{itr.name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" id="add-service">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                  {% for item in service.dependson %}
+                    <div class="form-control"><span class="service-name">{{item}}</span><span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus"></span></div>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">Actions</label>
+                <div class="col-sm-8">
+                  <button type="button" class="btn-spl btn-default" id="add-action">Add</button>
+                </div>
+              </div>
+              <div class="form-group action-entries">
+                {% if service.provisioner.actions %}
+                  {% for item in service.provisioner.actions %}
+                  <div class="action-entry">
+                    <div class="col-sm-offset-2 col-sm-8">
+                      <div class="form-group">
+                        <label for="inputCategory" class="col-sm-2 control-label">Category</label>
+                        <div class="col-sm-8">
+                          <select class="form-control inputCategory" name="inputCategory">
+                            <option {% if loop.key === 'install' %}selected="selected"{% endif %}>install</option>
+                            <option {% if loop.key === 'remove' %}selected="selected"{% endif %}>remove</option>
+                            <option {% if loop.key === 'initialize' %}selected="selected"{% endif %}>initialize</option>
+                            <option {% if loop.key === 'configure' %}selected="selected"{% endif %}>configure</option>
+                            <option {% if loop.key === 'start' %}selected="selected"{% endif %}>start</option>
+                            <option {% if loop.key === 'stop' %}selected="selected"{% endif %}>stop</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="inputType" class="col-sm-2 control-label">Type</label>
+                        <div class="col-sm-8">
+                          <select class="form-control inputType" name="inputType">
+                            <option {% if item.type === 'chef' %}selected="selected"{% endif %}>chef</option>
+                            <option {% if item.type === 'shell' %}selected="selected"{% endif %}>shell</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="inputScript" class="col-sm-2 control-label">Script</label>
+                        <div class="col-sm-8">
+                          <input type="text" class="form-control inputScript" name="inputScript" value="{{item.script}}">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="inputData" class="col-sm-2 control-label">Data</label>
+                        <div class="col-sm-8">
+                          <input type="text" class="form-control inputData" name="inputData" value="{{item.data}}">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                {% else %}
+                <div class="action-entry">
+                  <div class="col-sm-offset-2 col-sm-8">
+                    <div class="form-group">
+                      <label for="inputCategory" class="col-sm-2 control-label">Category</label>
+                      <div class="col-sm-8">
+                        <select class="form-control inputCategory" name="inputCategory">
+                          <option>install</option>
+                          <option>remove</option>
+                          <option>initialize</option>
+                          <option>configure</option>
+                          <option>start</option>
+                          <option>stop</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="inputType" class="col-sm-2 control-label">Type</label>
+                      <div class="col-sm-8">
+                        <select class="form-control inputType" name="inputType">
+                          <option>chef</option>
+                          <option>shell</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="inputScript" class="col-sm-2 control-label">Script</label>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control inputScript" name="inputScript">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="inputData" class="col-sm-2 control-label">Data</label>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control inputData" name="inputData">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-8">
+                  <button type="submit" class="btn-spl btn-info">{% if service %} Save{% else %}Create{% endif %}</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+<script data-main="/static/js/createservice" src="/static/third_party/require.js"></script>
+{% endblock %}

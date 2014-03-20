@@ -1,0 +1,8 @@
+/var/log/loom/loom-ui*.log {
+    rotate 7
+    daily
+    missingok
+    notifempty
+    copytruncate
+    compress
+}

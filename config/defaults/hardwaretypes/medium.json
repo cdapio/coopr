@@ -1,0 +1,12 @@
+{
+  "name": "medium",
+  "description": "2+ vCPU, 4 GB RAM, 120+ GB Disk",
+  "providermap": {
+    "joyent": {
+      "flavor": "Medium 4GB"
+    },
+    "rackspace": {
+      "flavor": 5
+    }
+  }
+}

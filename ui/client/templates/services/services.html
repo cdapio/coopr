@@ -1,0 +1,62 @@
+{% extends 'index.html' %}
+
+{% block title %}Services{% endblock %}
+
+{% block header %}
+    {% include "page-header.html" %}
+{% endblock %}
+
+{% block content %}
+  <div id="header">
+    <div id="global">
+      {% include "services/topmenu.html" %}
+    </div>
+  </div>
+  <div id="content-body">
+    <div id="title">
+      <div><div class="pull-right" style="margin-top: 2px;position: relative; width: 150px;text-align: center;">
+    </div></div>
+      <h1>Services</h1>
+    </div>
+
+    <div id="panels">
+
+      <div class="panel" style="clear: both;">
+
+        <div class="panel-body">
+          {% if services and services.length %}
+            <table class="table table-striped tablesorter">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Depends on</th>
+                  <th class="no-sort"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in services %}
+                  <tr>
+                    <td><a href="/services/service/{{entry.name}}">{{ entry.name }}</a></td>
+                    <td>{{ entry.description }}</td>
+                    <td>{{ entry.dependson }}</td>
+                    <td>
+                      <form role="form" method="POST" action="/services/delete/{{entry.name}}" class="delete-form">
+                        <input type="hidden" value="{{entry.name}}" name="name" />
+                        <button type="submit" class="btn-spl btn-danger">Delete</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+              
+            </table>
+            {% else %}
+              <p>You haven't configured any services.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+<script data-main="/static/js/generic-form-control" src="/static/third_party/require.js"></script>
+{% endblock %}

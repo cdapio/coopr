@@ -1,0 +1,67 @@
+{% extends "index.html" %}
+{% block title %}Login{% endblock %}
+{% block header %}
+    {% include "page-header.html" %}
+{% endblock %}
+
+{% block body %}
+  {% block nav %}
+    <div id="nav">
+      <a href="/user" id="logo"></a>
+      <a href="/user" id="product-name">Enterprise Loom</a>
+      <ul>
+        <li class="overview active"><a class="nav-link nav-login" id="nav-login" href="/login">{% if authenticated %}Logout{% else %}Login{% endif %}</a></li>
+      </ul>
+    </div>
+  {% endblock %}
+  <div id="content">
+    <div id="notification-div">
+      <div id="notification">{{ err }}</div>
+    </div>
+  {% block content %}
+      <div id="header">
+      <div id="global">
+      </div>
+    </div>
+    <div id="content-body">
+      <div id="title">
+        <h1>Login</h1>
+      </div>
+
+      <div id="panels">
+
+        <div class="panel" style="clear: both;">
+          <div class="panel-body">
+            <form class="form-horizontal" role="form" id="create-provider-form" method="POST" action="/login">
+            <div class="form-group">
+              <label for="inputName" class="col-sm-2 control-label">Username</label>
+              <div class="col-sm-4">
+                <input type="text" class="form-control" id="username" name="username" placeholder="username" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputName" class="col-sm-2 control-label">Password</label>
+              <div class="col-sm-4">
+                <input type="password" class="form-control" id="password" name="password" placeholder="password" />
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-8">
+                <button type="submit" class="btn-spl btn-default">Login</button>
+              </div>
+            </div>
+          </form>
+          </div>
+        </div>
+      </div>
+  {% endblock %}
+  <div id="footer" style="clear: both;"><span id="copyright">COPYRIGHT © 2014 CONTINUUITY INC. ALL RIGHTS RESERVED.</span><br>
+
+    <a href="http://www.continuuity.com/terms-and-privacy" id="footer-terms" target="blank">Terms and Privacy</a>
+    <span>&nbsp;·&nbsp;</`span>
+    <a href="http://www.continuuity.com/contact-us" id="footer-contact" target="blank">Contact</a>
+    <span>&nbsp;·&nbsp;</span>
+    <a href="http://support.continuuity.com/" id="footer-support" target="blank">Support</a>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+.vagrant
+Berksfile.lock
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+/cookbooks
+.DS_Store
+
+# Bundler
+Gemfile.lock
+.bundle/*
+
+.kitchen/
+.kitchen.local.yml
+
+*.iml
+.idea/
+
+/server/target/
+/server/build/
+/ui/client-built/
+/web-app/client-built/
+/ui/build/
+/build
+/integration-testing/target
+.gradle
+
+# Gem builds
+/provisioner/plugins/*/pkg/
+# Cookbooks tarball
+/provisioner/daemon/plugins/chef_handler/cookbooks.tar.gz
+
+# Environment
+.bash*
+.chef
+.gem
+.lesshst
+.m2
+.profile
+.ssh
+.viminfo

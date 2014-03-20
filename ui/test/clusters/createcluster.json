@@ -1,0 +1,67 @@
+{
+    "name": "sample",
+    "clusterTemplate": "reactor-distributed",
+    "numMachines": "5",
+    "provider": "rackspace",
+    "hardwaretype": "medium",
+    "imagetype": "ubuntu12",
+    "services": [
+        "firewall",
+        "hosts",
+        "hadoop-hdfs-namenode",
+        "hadoop-hdfs-datanode",
+        "hadoop-yarn-resourcemanager",
+        "hadoop-yarn-nodemanager",
+        "zookeeper-server",
+        "hbase-master",
+        "hbase-regionserver",
+        "reactor"
+    ],
+    "administration": {
+        "leaseduration": {
+            "initial": 172800000
+        }
+    },
+    "config": {
+        "hadoop": {
+            "core_site": {
+                "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%"
+            },
+            "hdfs_site": {
+                "dfs.datanode.max.xcievers": "4096"
+            },
+            "mapred_site": {
+                "mapreduce.framework.name": "yarn"
+            },
+            "yarn_site": {
+                "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+                "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
+                "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+                "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
+                "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+            }
+        },
+        "hbase": {
+            "hbase_site": {
+                "hbase.rootdir": "hdfs://%host.service.hadoop-hdfs-namenode%/hbase",
+                "hbase.cluster.distributed": "true",
+                "hbase.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
+            }
+        },
+        "hive": {
+            "hive_site": {
+                "javax.jdo.option.ConnectionURL": "jdbc:mysql://%host.service.mysql-server%:3306/hive?createDatabaseIfNotExist=true",
+                "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
+                "javax.jdo.option.ConnectionUserName": "dbuser",
+                "javax.jdo.option.ConnectionPassword": "dbuserpassword",
+                "hive.metastore.uris": "thrift://%host.service.hive-metastore%:9083"
+            }
+        },
+        "reactor": {
+            "repo": {
+                "user": "EXAMPLE_USERNAME",
+                "password": "EXAMPLE_PASSWORD"
+            }
+        }
+    }
+}

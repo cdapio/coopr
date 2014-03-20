@@ -1,0 +1,114 @@
+{
+  "name": "hadoop-hbase-singlenode",
+  "description": "Hadoop stack with HBase on a single node",
+  "defaults": {
+    "services": [
+      "base",
+      "hadoop-hdfs-namenode",
+      "hadoop-hdfs-datanode",
+      "hadoop-yarn-resourcemanager",
+      "hadoop-yarn-nodemanager",
+      "zookeeper-server",
+      "hbase-master",
+      "hbase-regionserver"
+    ],
+    "provider": "rackspace",
+    "hardwaretype": "large",
+    "imagetype": "ubuntu12",
+    "config": {
+      "hadoop": {
+        "core_site": {
+          "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%"
+        },
+        "hdfs_site": {
+          "dfs.datanode.max.xcievers": "4096",
+          "dfs.replication": "1"
+        },
+        "mapred_site": {
+          "mapreduce.framework.name": "yarn"
+        },
+        "yarn_site": {
+          "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+          "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
+          "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+          "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
+          "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+
+        }
+      },
+      "hbase": {
+        "hbase_site": {
+          "hbase.rootdir": "hdfs://%host.service.hadoop-hdfs-namenode%/hbase",
+          "hbase.cluster.distributed": "true",
+          "hbase.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
+        }
+      }
+    }
+  },
+  "compatibility": {
+    "hardwaretypes": [
+      "large"
+    ],
+    "imagetypes": [
+      "centos6",
+      "ubuntu12"
+    ],
+    "services": [
+      "base",
+      "hadoop-hdfs-namenode",
+      "hadoop-hdfs-datanode",
+      "hadoop-yarn-resourcemanager",
+      "hadoop-yarn-nodemanager",
+      "zookeeper-server",
+      "hbase-master",
+      "hbase-regionserver"
+    ]
+  },
+  "constraints": {
+    "layout": {
+      "mustcoexist": [
+        [
+          "hadoop-hdfs-datanode",
+          "hadoop-yarn-nodemanager",
+          "hbase-regionserver",
+          "hadoop-hdfs-namenode",
+          "hadoop-yarn-resourcemanager",
+          "zookeeper-server",
+          "hbase-master"
+        ]
+      ]
+    },
+    "services": {
+      "hadoop-hdfs-namenode": {
+        "quantities": {
+          "min": "1",
+          "max": "1"
+        }
+      },
+      "hadoop-yarn-resourcemanager": {
+        "quantities": {
+          "min": "1",
+          "max": "1"
+        }
+      },
+      "zookeeper-server": {
+        "quantities": {
+          "min": "1",
+          "max": "1"
+        }
+      },
+      "hbase-master": {
+        "quantities": {
+          "max": "1"
+        }
+      }
+    }
+  },
+  "administration": {
+    "leaseduration": {
+      "initial": "0",
+      "max": "0",
+      "step": "0"
+    }
+  }
+}

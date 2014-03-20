@@ -1,0 +1,16 @@
+{% extends "user/index.html" %}
+
+{% block content %}
+    <div id="header">
+      <div id="global">
+        {% include "user/clusters/topmenu.html" %}
+      </div>
+    </div>
+    <div id="content-body">
+      <div id="title">
+        <h1>Clusters</h1>
+      </div>
+      {% include "user/clusters/clusters-panel.html" %}
+    </div>
+<script data-main="/static/js/user/clusters" src="/static/third_party/require.js"></script>
+{% endblock %}

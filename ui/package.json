@@ -1,0 +1,14 @@
+{
+  "name": "web-site",
+  "description": "Continuuity Loom UI",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "3.x",
+    "log4js": "0.6.5",
+    "consolidate": "0.9.1",
+    "swig": "0.13.5",
+    "winston": "0.7.1",
+    "express-useragent": "0.0.7-1",
+    "request": "~2.33.0"
+  }
+}

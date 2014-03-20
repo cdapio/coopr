@@ -1,0 +1,6 @@
+{
+  "openstack" : {
+    "classname": "OpenstackProvider"
+  }
+}
+
