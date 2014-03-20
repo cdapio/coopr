@@ -17,19 +17,19 @@ and follow the instructions in the README to start up a demo version of Loom on 
 comes pre-packaged with templates for Hadoop and LAMP. In order to create an actual 
 cluster, you will need an account with a supported provider (Rackspace, Openstack, AWS), and to perform 
 a couple steps to setup up Loom to use the right credentials to integrate with your provider. Follow 
-the Quickstart Guide (http://continuuity.github.io/loom/user-admin-guide/guide/quickstart/index.html#getting-started),
+the Quickstart Guide (http://continuuity.com/docs/loom/0.9.5/en/guide/quickstart/index.html#getting-started),
 which steps through an example of creating a Hadoop cluster using Rackspace.
 
 Learning More
 =============
-The User Guide (http://continuuity.github.io/loom/user-admin-guide/overview/index.html) describes what Loom is and how
+The User Guide (http://continuuity.com/docs/loom/0.9.5/en/overview/index.html) describes what Loom is and how
 to use it, from the point of view of an end user and of an administrator. The Tech Guide 
 (http://continuuity.github.io/loom/tech-docs/index.html) describes how Loom is implemented, and is a good 
 overview for those interested in contributing to Loom.
 
 API
 ===
-REST endpoint are documented at http://continuuity.github.io/loom/user-admin-guide/rest/index.html.
+REST endpoint are documented at http://continuuity.com/docs/loom/0.9.5/en/rest/index.html.
 Javadocs can be seen at http://continuuity.github.io/loom/apidocs/index.html or can be
 built locally by running:
 
