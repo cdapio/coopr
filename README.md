@@ -1,41 +1,11 @@
-Continuuity Loom: Modern Cluster Management
-================
-Loom is used to provision cloud-based clusters using templates.
+[Continuuity](http://www.continuuity.com) Loom : Modern Cluster Management
+------------
+Loom is cluster management software that manages clusters on public, private clouds. Clusters created with Loom utilize templates of any hardware and software stack, from simple standalone LAMP-stack servers and traditional application servers like JBoss, to full Apache Hadoop clusters comprised of thousands of nodes. Clusters can be deployed across many cloud providers (Rackspace, Joyent, and OpenStack) while utilizing common SCM tools (Chef and scripts).
 
-Take it for a spin
-==================
-To build Loom:
+Documentation
+--------------
+Please visit the [Loom page on github](http://continuuity.github.io/loom/) to learn more.
 
-```
-  $ git clone http://github.com/continuuity/loom.git
-  $ cd loom
-  $ mvn clean package assembly:single
-```
-
-This will create a zip in the target directory that can be used to run Loom on your machine. Unzip it 
-and follow the instructions in the README to start up a demo version of Loom on your own machine. It 
-comes pre-packaged with templates for Hadoop and LAMP. In order to create an actual 
-cluster, you will need an account with a supported provider (Rackspace, Openstack, AWS), and to perform 
-a couple steps to setup up Loom to use the right credentials to integrate with your provider. Follow 
-the [Quickstart Guide](http://continuuity.com/docs/loom/0.9.5/en/guide/quickstart/index.html#getting-started),
-which steps through an example of creating a Hadoop cluster using Rackspace.
-
-Learning More
-=============
-The [User Guide](http://continuuity.com/docs/loom/0.9.5/en/overview/index.html) describes what Loom is and how
-to use it, from the point of view of an end user and of an administrator. The 
-[Tech Guide](http://continuuity.github.io/loom/tech-docs/index.html) describes how Loom is implemented, and is a good 
-overview for those interested in contributing to Loom.
-
-API
-===
-REST endpoint are documented at [here](http://continuuity.com/docs/loom/0.9.5/en/rest/index.html).
-Javadocs can be seen at [here](http://continuuity.github.io/loom/apidocs/index.html) or can be
-built locally by running:
-
-```
-mvn javadoc:javadoc
-```
 
 License
 =======
