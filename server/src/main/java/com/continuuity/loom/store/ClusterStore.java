@@ -189,6 +189,16 @@ public interface ClusterStore {
   Set<Node> getClusterNodes(String clusterId) throws Exception;
 
   /**
+   * Get all nodes belonging to a specific cluster owned by a specific user.
+   * @param clusterId Id of the cluster whose nodes will be fetched.
+   * @param userId Id of the owner of the cluster.
+   * @return Set of all nodes belonging to specified cluster owned by the specified user.
+   *         Empty if no cluster or cluster nodes exist.
+   * @throws Exception if there was a problem getting the cluster nodes.
+   */
+  Set<Node> getClusterNodes(String clusterId, String userId) throws Exception;
+
+  /**
    * Get all nodes specified in the input set.
    * @param nodeIds Set of ids of all nodes to fetch.
    * @return Set of nodes matching the input node ids. Values may include nulls if the node did not exist.

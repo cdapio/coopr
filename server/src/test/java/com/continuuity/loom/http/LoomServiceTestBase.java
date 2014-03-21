@@ -21,6 +21,9 @@ import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
+import com.google.common.base.Charsets;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -37,10 +40,15 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
 /**
  *
  */
 public class LoomServiceTestBase extends BaseTest {
+  private static final Gson GSON = new Gson();
   protected static final String USER1 = "user1";
   protected static final String USER2 = "user2";
   protected static final String ADMIN_USERID = "admin";

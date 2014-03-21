@@ -15,10 +15,13 @@
  */
 package com.continuuity.loom;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -56,4 +59,20 @@ public class TestHelper {
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
   }
 
+  public static JsonObject jsonObjectOf(String... keyvalues) {
+    Preconditions.checkArgument(keyvalues.length % 2 == 0, "must have a value for each key");
+    JsonObject output = new JsonObject();
+    for (int i = 0; i < keyvalues.length; i += 2) {
+      output.addProperty(keyvalues[i], keyvalues[i + 1]);
+    }
+    return output;
+  }
+
+  public static JsonArray jsonArrayOf(String... values) {
+    JsonArray output = new JsonArray();
+    for (String value : values) {
+      output.add(new JsonPrimitive(value));
+    }
+    return output;
+  }
 }

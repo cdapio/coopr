@@ -700,6 +700,35 @@ public class SQLClusterStore extends BaseClusterStore {
   }
 
   @Override
+  public Set<Node> getClusterNodes(String clusterId, String userId) throws Exception {
+    Set<Node> nodes = Sets.newHashSet();
+    Connection conn = dbConnectionPool.getConnection();
+    try {
+      PreparedStatement statement = conn.prepareStatement(
+        "SELECT N.node FROM nodes N, clusters C WHERE C.id=? AND C.owner_id=? AND N.cluster_id=C.id");
+      statement.setLong(1, Long.valueOf(clusterId));
+      statement.setString(2, userId);
+      try {
+        ResultSet rs = statement.executeQuery();
+        try {
+          while (rs.next()) {
+            Blob blob = rs.getBlob(1);
+            Node node = deserializeBlob(blob, Node.class);
+            nodes.add(node);
+          }
+        } finally {
+          rs.close();
+        }
+      } finally {
+        statement.close();
+      }
+    } finally {
+      conn.close();
+    }
+    return nodes;
+  }
+
+  @Override
   public Set<Node> getNodes(Set<String> nodeIds) throws Exception {
     Set<Node> nodes = Sets.newHashSet();
     // TODO: Find a better way to pass an array of ids

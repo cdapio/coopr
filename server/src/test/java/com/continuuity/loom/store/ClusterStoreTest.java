@@ -188,6 +188,11 @@ public abstract class ClusterStoreTest {
     Set<Node> nodes =  store.getClusterNodes(cluster.getId());
     Assert.assertEquals(ImmutableSet.of(node1, node2), nodes);
 
+    nodes = store.getClusterNodes(cluster.getId(), cluster.getOwnerId());
+    Assert.assertEquals(ImmutableSet.of(node1, node2), nodes);
+
+    Assert.assertTrue(store.getClusterNodes(cluster.getId(), "not" + cluster.getOwnerId()).isEmpty());
+
     store.deleteNode(node1.getId());
     Assert.assertNull(store.getNode(node1.getId()));
 

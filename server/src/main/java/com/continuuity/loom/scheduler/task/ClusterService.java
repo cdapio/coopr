@@ -16,6 +16,7 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service for performing operations on clusters.
@@ -162,5 +164,21 @@ public class ClusterService {
       clusters = store.getAllClusters(userId);
     }
     return clusters;
+  }
+
+  /**
+   * Get all the nodes in a cluster that the user has permission to get.
+   *
+   * @param clusterId Id of the cluster.
+   * @param userId Id of the user.
+   * @return Set of all nodes in the cluster owned by the user or the user is the admin.
+   * @throws Exception
+   */
+  public Set<Node> getClusterNodes(String clusterId, String userId) throws Exception {
+    if (userId.equals(Constants.ADMIN_USER) || userId.equals(Constants.SYSTEM_USER)) {
+      return store.getClusterNodes(clusterId);
+    } else {
+      return store.getClusterNodes(clusterId, userId);
+    }
   }
 }

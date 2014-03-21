@@ -16,28 +16,39 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.store.ClusterStore;
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handler for RPCs.
  */
 @Path("/v1/loom")
 public class LoomRPCHandler extends LoomAuthHandler {
-
+  private final static Gson GSON = new Gson();
   private final ClusterStore store;
   private ClusterService clusterService;
 
@@ -89,5 +100,106 @@ public class LoomRPCHandler extends LoomAuthHandler {
     }
 
     responder.sendJson(HttpResponseStatus.OK, response);
+  }
+
+  /**
+   * Get properties of nodes from a specific cluster visible to the user. POST body is a JSON object that
+   * must contain "clusterId", and may contain "properties" and "services". The "properties" key maps to an array
+   * of node properties like "ipaddress" and "hostname" to return in the response. The "services" key maps to an
+   * array of service names, indicating that all nodes returned by have all services given in the array. The response
+   * is a JSON object with node ids as keys and JSON objects as values, where the value contains the properties passed
+   * in, or all properties if none were passed in.
+   *
+   * @param request Request for node properties in a cluster.
+   * @param responder Responder for sending the response.
+   * @throws Exception
+   */
+  @POST
+  @Path("/getNodeProperties")
+  public void getClusterNodes(HttpRequest request, HttpResponder responder) throws Exception {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
+    JsonObject body;
+    try {
+      body = GSON.fromJson(reader, JsonObject.class);
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid request body. Must be a valid JSON Object.");
+      return;
+    }
+
+    if (!body.has("clusterId") || !body.get("clusterId").isJsonPrimitive()) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "clusterId must be in request body as a primitive.");
+      return;
+    }
+    String clusterId = body.get("clusterId").getAsString();
+
+    Set<String> properties;
+    Set<String> requiredServices;
+    try {
+      properties = getSet(body, "properties");
+      requiredServices = getSet(body, "services");
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+      return;
+    }
+
+    JsonObject output = new JsonObject();
+    Set<Node> clusterNodes = clusterService.getClusterNodes(clusterId, userId);
+    if (clusterNodes.isEmpty()) {
+      responder.sendJson(HttpResponseStatus.OK, output);
+      return;
+    }
+
+    for (Node node : clusterNodes) {
+      Set<String> nodeServices = Sets.newHashSet();
+      for (Service service : node.getServices()) {
+        nodeServices.add(service.getName());
+      }
+
+      // if the node has all services needed
+      if (nodeServices.containsAll(requiredServices)) {
+        JsonObject outputProperties;
+        // if the request contains a list of properties, just include those properties
+        if (properties.size() > 0) {
+          outputProperties = new JsonObject();
+          JsonObject nodeProperties = node.getProperties();
+          // add all requested node properties
+          for (String property : properties) {
+            if (nodeProperties.has(property)) {
+              outputProperties.add(property, nodeProperties.get(property));
+            }
+          }
+        } else {
+          // request did not contain a list of properties, include them all
+          outputProperties = node.getProperties();
+        }
+        output.add(node.getId(), outputProperties);
+      }
+    }
+
+    responder.sendJson(HttpResponseStatus.OK, output);
+  }
+
+  private Set<String> getSet(JsonObject object, String key) {
+    Set<String> output = Sets.newHashSet();
+    if (!object.has(key)) {
+      return output;
+    }
+
+    JsonElement array = object.get(key);
+    if (!array.isJsonArray()) {
+      throw new IllegalArgumentException(key + " must be an array");
+    }
+
+    for (JsonElement element : array.getAsJsonArray()) {
+      if (!element.isJsonPrimitive()) {
+        throw new IllegalArgumentException("array values must be primitives");
+      }
+      output.add(element.getAsString());
+    }
+    return output;
   }
 }
