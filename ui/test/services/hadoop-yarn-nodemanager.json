@@ -1,0 +1,30 @@
+{
+  "name": "hadoop-yarn-nodemanager",
+  "description": "Hadoop YARN NodeManager",
+  "dependson": [
+    "base",
+    "hadoop-yarn-resourcemanager"
+  ],
+  "provisioner": {
+    "actions": {
+      "install": {
+        "type":"chef",
+        "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
+      },
+      "configure": {
+        "type": "chef",
+        "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+      },
+      "start": {
+        "type": "chef",
+        "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
+        "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }" 
+      },
+      "stop": {
+        "type": "chef",
+        "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
+        "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }" 
+      }
+    }
+  }
+}

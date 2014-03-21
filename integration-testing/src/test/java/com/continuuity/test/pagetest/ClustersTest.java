@@ -51,8 +51,7 @@ public class ClustersTest extends GenericTest {
   private static final By TABLE = By.cssSelector(".table.table-striped");
 
   @BeforeClass
-  public static void setUp(){
-    Global.getDriver();
+  public static void runInitial() throws  Exception {
     globalDriver.get(Constants.CLUSTERS_URL);
     Global.driverWait(1);
   }

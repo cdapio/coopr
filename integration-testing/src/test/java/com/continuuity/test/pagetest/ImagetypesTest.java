@@ -19,7 +19,6 @@ import com.continuuity.loom.admin.ImageType;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;
-import com.continuuity.test.drivers.Global;
 import com.continuuity.test.input.ExampleReader;
 import com.google.common.collect.ImmutableSet;
 import org.junit.AfterClass;
@@ -44,8 +43,7 @@ public class ImagetypesTest extends GenericTest {
   private static final ExampleReader EXAMPLE_READER = new ExampleReader();
 
   @BeforeClass
-  public static void setUp(){
-    Global.getDriver();
+  public static void runInitial() throws  Exception {
     globalDriver.get(Constants.IMAGETYPES_URL);
   }
 

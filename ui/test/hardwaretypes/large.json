@@ -1,0 +1,15 @@
+{
+  "name": "large",
+  "description": "4+ vCPU, 8 GB RAM, 240+ GB Disk",
+  "providermap": {
+    "joyent": {
+      "flavor": "Large 8GB"
+    },
+    "rackspace": {
+      "flavor": 6
+    },
+    "openstack": {
+      "flavor": "m1.large"
+    }
+  }
+}

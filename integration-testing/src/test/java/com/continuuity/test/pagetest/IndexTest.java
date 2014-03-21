@@ -19,7 +19,6 @@ import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;
-import com.continuuity.test.drivers.Global;
 import com.continuuity.test.input.ExampleReader;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -45,8 +44,7 @@ public class IndexTest extends GenericTest {
   private static final String CLUSTERTEMPLATE = "Catalog";
 
   @BeforeClass
-  public static void setUp(){
-    Global.getDriver();
+  public static void runInitial() throws  Exception {
     globalDriver.get(Constants.INDEX_URL);
   }
 

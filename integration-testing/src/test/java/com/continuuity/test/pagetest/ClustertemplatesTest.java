@@ -19,7 +19,6 @@ import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;
-import com.continuuity.test.drivers.Global;
 import com.continuuity.test.input.ExampleReader;
 import com.google.common.collect.ImmutableSet;
 import org.junit.AfterClass;
@@ -44,8 +43,7 @@ public class ClustertemplatesTest extends GenericTest {
   private static final ExampleReader EXAMPLE_READER = new ExampleReader();
 
   @BeforeClass
-  public static void setUp(){
-    Global.getDriver();
+  public static void runInitial() throws Exception {
     globalDriver.get(Constants.CLUSTERTEMPLATES_URL);
   }
 
@@ -82,7 +80,7 @@ public class ClustertemplatesTest extends GenericTest {
   @Test
   public void test_04_topmenu() {
     ImmutableSet<String> expectedServiceSet = ImmutableSet.of("hadoop-hbase-distributed", "lamp", "hadoop-distributed",
-                 "hadoop-singlenode");
+                 "hadoop-singlenode", "reactor-singlenode");
     String uriPrefix = Constants.CLUSTERTEMPLATES_URL + "/clustertemplate/";
     assertEquals("The list of the topmenu is not correct.", expectedServiceSet,
                  TEST_UTIL.getTopList(globalDriver));
