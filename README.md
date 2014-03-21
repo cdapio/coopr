@@ -3,7 +3,10 @@
 Loom is cluster management software that manages clusters on public, private clouds. Clusters created with Loom utilize templates of any hardware and software stack, from simple standalone LAMP-stack servers and traditional application servers like JBoss, to full Apache Hadoop clusters comprised of thousands of nodes. Clusters can be deployed across many cloud providers (Rackspace, Joyent, and OpenStack) while utilizing common SCM tools (Chef and scripts).
 
 ## Documentation
-Please visit the [Loom documentation](http://continuuity.github.io/loom/) to learn more.
+To learn more about Loom following are the resources available:
+   * [Introduction](http://continuuity.github.io/loom/) to Loom. 
+   * Loom [User Guide](www.continuuity.com/docs/loom/0.9.5/en/index.html)
+   * [Technical Document](http://continuuity.github.io/loom/tech-docs/index.html) describing internals of Loom.
 
 ## Contributing to Loom
 
