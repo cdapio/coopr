@@ -162,6 +162,12 @@ Instructions for installing each of the Loom components are as below:
   $ sudo apt-get install loom-provisioner
   $ sudo apt-get install loom-ui
 
+Update-Alternatives
+-------------------
+Loom packages by default use the ``alternatives`` system to initialize a configuration directory which will not be overwritten on subsequent package upgrades.  This directory is ``/etc/loom/conf.loom/`` and is pointed to by the symlink ``/etc/loom/conf/``.  The ``/etc/loom/conf.dist/`` directory is owned by the Loom packages and should not be customized.  To doublecheck that ``/etc/loom/conf.loom/`` is the active configuration, simply run:
+::
+  $  update-alternatives --display loom-conf
+
 Database Configuration
 ----------------------
 By default, Loom uses an embedded Derby database. However, you can optionally choose to enable remote database for Loom server.
