@@ -5,7 +5,7 @@ Loom is cluster management software that manages clusters on public, private clo
 ## Documentation
 To learn more about Loom following are the resources available:
    * [Introduction](http://continuuity.github.io/loom/) to Loom. 
-   * Loom [User Guide](www.continuuity.com/docs/loom/0.9.5/en/index.html)
+   * Loom [User Guide](http://www.continuuity.com/docs/loom/0.9.5/en/index.html)
    * [Technical Document](http://continuuity.github.io/loom/tech-docs/index.html) describing internals of Loom.
 
 ## Contributing to Loom
