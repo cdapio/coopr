@@ -24,7 +24,7 @@
     <script type="text/javascript" src="third_party/syntaxhighlighter_3.0.83/scripts/shBrushJava.js"></script>
     <script type="text/javascript" src="third_party/syntaxhighlighter_3.0.83/scripts/shBrushBash.js"></script>
 
-    <title>Loom by Continuuity</title>
+    <title>Continuuity Loom by Continuuity</title>
 
     <script type="text/javascript" src="http://www.google-analytics.com/ga.js"></script>
     
@@ -53,7 +53,7 @@
       <div class="inner clearfix">
         <section id="main-content" class="markdown-body entry-content" itemprop="mainContentOfPage">
 
-          <h3><a name="history-of-loom-" class="anchor" href="#history-of-loom-"><span class="octicon octicon-link"></span></a>History of Loom</h3>
+          <h3><a name="history-of-loom-" class="anchor" href="#history-of-loom-"><span class="octicon octicon-link"></span></a>History of Continuuity Loom</h3>
           <p>
             At <a href="http://continuuity.com/">Continuuity</a>, we needed a fast, self-service way to provision clusters because 
             testing against real clusters is such a critical and frequent component of our development 
@@ -77,38 +77,38 @@
             designing a complete production system while still providing an easy and flexible solution for our 
             developers. We wrote a combination of scripts and Chef recipes, designed a system that can templatize 
             the Hadoop cluster, added capabilities to make it extendable to other services and providers, and 
-            made it very developer and ops friendly - that’s when Loom was born.
+            made it very developer and ops friendly - that’s when Continuuity Loom was born.
           </p>
 
           <p>
-            Today, Loom is used to provision Sandbox Reactors on the Continuuity Cloud and as an internal 
+            Today, Continuuity Loom is used to provision Sandbox Reactors on the Continuuity Cloud and as an internal 
             DevOps tool to test new and incremental features on an ongoing basis. We’ve been developing and 
-            using Loom for almost a year and we’re noticing the benefits: our developer and DevOps productivity 
+            using Continuuity Loom for almost a year and we’re noticing the benefits: our developer and DevOps productivity 
             have doubled, and our development and test cycles have become faster. 
           </p>
 
           <p>
-            We built Loom for ourselves. But we believe that the broader developer community can benefit from it, 
+            We built Continuuity Loom for ourselves. But we believe that the broader developer community can benefit from it, 
             so we're making it available for everyone to use.
           </p>
 
-          <h3><a name="what-is-loom-" class="anchor" href="#what-is-loom-"><span class="octicon octicon-link"></span></a>What is Loom?</h3>
+          <h3><a name="what-is-loom-" class="anchor" href="#what-is-loom-"><span class="octicon octicon-link"></span></a>What is Continuuity Loom?</h3>
 
           <p>
-            Loom is cluster management software that manages clusters on public and private clouds. 
-            Clusters created with Loom utilize templates of any hardware and software stack, from simple 
+            Continuuity Loom is cluster management software that manages clusters on public and private clouds. 
+            Clusters created with Continuuity Loom utilize templates of any hardware and software stack, from simple 
             standalone LAMP-stack servers and traditional application servers like JBoss, to full Apache 
             Hadoop clusters comprised of thousands of nodes. Clusters can be deployed across many cloud 
             providers (Rackspace, Joyent, and OpenStack) while utilizing common SCM tools (Chef and scripts).
-            Loom is pluggable so integration with new providers like AWS and new SCM tools like Puppet can
+            Continuuity Loom is pluggable so integration with new providers like AWS and new SCM tools like Puppet can
             be added by implementing plugins.
           </p>
 
-          <h3><a name="why-do-i-need-loom-" class="anchor" href="#why-do-i-need-loom-"><span class="octicon octicon-link"></span></a>Why do I need Loom?</h3>
+          <h3><a name="why-do-i-need-loom-" class="anchor" href="#why-do-i-need-loom-"><span class="octicon octicon-link"></span></a>Why do I need Continuuity Loom?</h3>
 
             <h4>Worry-Free Provisioning</h4>
             <p>
-              Loom simplifies the installation and configuration of any software stack, including Hadoop, 
+              Continuuity Loom simplifies the installation and configuration of any software stack, including Hadoop, 
               and ensures that all installations are verified before a cluster is made available. Developers 
               can create custom cluster types ranging from single VM application servers to large-scale, 
               distributed, heterogeneous clusters at the push of a button. 
@@ -116,9 +116,9 @@
 
             <h4>Automation</h4>
             <p>
-              Loom enables the creation of custom cluster templates ranging from Hadoop to LAMP to Solr search clusters. 
+              Continuuity Loom enables the creation of custom cluster templates ranging from Hadoop to LAMP to Solr search clusters. 
               Templates define rules describing how hardware, images, and services should be laid out in a 
-              cluster, leaving Loom to solve and coordinate what tasks need to be done in what order to create a 
+              cluster, leaving Continuuity Loom to solve and coordinate what tasks need to be done in what order to create a 
               cluster. Services are automatically placed on the correct nodes and are configured, initialized, and
               started in the correct order. In this way, the template used to create a 3 node Hadoop cluster with only
               hdfs and YARN can also be used to create a 300 node cluster with hdfs, YARN, and HBase. 
@@ -126,18 +126,18 @@
 
             <h4>Flexibility</h4>
             <p>
-              Loom integrates with various IaaS providers (currently Rackspace, Joyent and OpenStack) and 
-              SCM tools (currently just Chef) out of the box. Loom has a pluggable architecture, so adding 
+              Continuuity Loom integrates with various IaaS providers (currently Rackspace, Joyent and OpenStack) and 
+              SCM tools (currently just Chef) out of the box. Continuuity Loom has a pluggable architecture, so adding 
               a provider or SCM tool can be done by writing a plugin. If your provider or SCM tool is not 
               supported out of the box, simply implement a plugin for it (and contribute back!).  
               Switching between supported providers is even simpler; you simply select a different
               provider from a drop down menu.
             </p>
 
-            <h4>Loom from your laptop</h4>
+            <h4>Continuuity Loom from your laptop</h4>
             <p>
-              Loom has been tested on Linux and Mac. It uses little resources and can be used to provision 
-              and decommission a cluster directly from a laptop. Loom creates a very simple user API that 
+              Continuuity Loom has been tested on Linux and Mac. It uses little resources and can be used to provision 
+              and decommission a cluster directly from a laptop. Continuuity Loom creates a very simple user API that 
               allows the developer to choose the type of cluster, how many nodes, and which cloud. Any developer 
               can go from zero to Hadoop, from their laptop to any cloud, in minutes.
             </p> 
@@ -148,10 +148,10 @@
           <p>
             A standalone version of the current snapshot can be downloaded <a href="http://repository.continuuity.com/loom/loom-0.9.5-SNAPSHOT-standalone.zip">here</a>, or built 
             from the source code as described further below. After downloading it, 
-            unzip it and follow the instructions in standalone/README.md to start up Loom on 
+            unzip it and follow the instructions in standalone/README.md to start up Continuuity Loom on 
             your own machine. It comes pre-packaged with templates for Hadoop and LAMP. 
             In order to create an actual cluster, you will need an account with a supported provider 
-            (Rackspace, Openstack, or Joyent), and to perform a couple steps to setup up Loom to use the right 
+            (Rackspace, Openstack, or Joyent), and to perform a couple steps to setup up Continuuity Loom to use the right 
             credentials to integrate with your provider. Follow the 
             <a href="http://continuuity.com/docs/loom/0.9.5/en/guide/quickstart/index.html#getting-started" title="Quickstart">Quickstart Guide</a>, 
             which steps through an example of creating a Hadoop cluster.
@@ -160,22 +160,22 @@
           <!--h4>Run it from Linux</h4>
           <p>
             The <a href="http://continuuity.com/docs/loom/0.9.5/en/guide/installation/index.html" title="Installation">Installation Guide</a>
-            describes how to install Loom in a Linux environment.
+            describes how to install Continuuity Loom in a Linux environment.
             In order to create an actual cluster, you will need an account with a supported provider 
-            (Rackspace, Openstack, or Joyent), and to perform a couple steps to setup up Loom to use the right 
+            (Rackspace, Openstack, or Joyent), and to perform a couple steps to setup up Continuuity Loom to use the right 
             credentials to integrate with your provider. Follow the 
             <a href="http://continuuity.com/docs/loom/0.9.5/en/guide/quickstart/index.html#getting-started" title="Quickstart">Quickstart Guide</a>, 
             which steps through an example of creating a Hadoop cluster.
           </p-->
 
-          <h3><a name="build-loom" class="anchor" href="#build-loom"><span class="octicon octicon-link"></span></a>Build Loom</h3>
+          <h3><a name="build-loom" class="anchor" href="#build-loom"><span class="octicon octicon-link"></span></a>Build Continuuity Loom</h3>
 
           <pre class="brush: bash">
 $ git clone http://github.com/continuuity/loom.git
 $ cd loom/standalone
 $ mvn clean package assembly:single</pre>
 
-          <p>The build places a zip of the standalone version of Loom into the target directory.</p>
+          <p>The build places a zip of the standalone version of Continuuity Loom into the target directory.</p>
 
           <h3><a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h3>
 
@@ -188,31 +188,31 @@ $ mvn clean package assembly:single</pre>
 
           <p>
             The <a href="http://continuuity.com/docs/loom/0.9.5/en/index.html">User Guide</a> 
-            describes what Loom is and how to use it from the point of view of an end user and of 
+            describes what Continuuity Loom is and how to use it from the point of view of an end user and of 
             an administrator. The <a href="http://continuuity.github.io/loom/tech-docs/index.html">Tech Guide</a> 
-            describes how Loom is implemented, and is a good overview for those who wish to contribute to the project.
+            describes how Continuuity Loom is implemented, and is a good overview for those who wish to contribute to the project.
           </p>
 
           <h2><a name="community" class="anchor" href="#community"><span class="octicon octicon-link"></span></a>Community</h2>
           
           <h3><a name="issues" class="anchor" href="#issues"><span class="octicon octicon-link"></span></a>How to report an Issue</h3>
           <p>
-            For reporting issues with Loom server, Loom UI or Loom provisioner please look at  <a href="https://github.com/continuuity/loom/issues">issue list</a> first before 
+            For reporting issues with Continuuity Loom server, Continuuity Loom UI or Continuuity Loom provisioner please look at  <a href="https://github.com/continuuity/loom/issues">issue list</a> first before 
             opening a <a href="https://github.com/continuuity/loom/issues/new">new issue.</a>
           </p>
           
           <h3><a name="how-to-contribute" class="anchor" href="#how-to-contribute"><span class="octicon octicon-link"></span></a>How to Contribute</h3>
 
           <p>
-            Are you interested in making Loom better? Our development model is a simple pull-based model 
+            Are you interested in making Continuuity Loom better? Our development model is a simple pull-based model 
             with a consensus building phase, similar to the 
             <a href="http://www.apache.org/foundation/voting.html" title="Apache Voting Process">Apache's voting process</a>. 
-            If you want to help make Loom better, by adding new features, fixing bugs, or even suggesting improvements 
+            If you want to help make Continuuity Loom better, by adding new features, fixing bugs, or even suggesting improvements 
             to something that's already there, here's how you can contribute: 
           </p>
 
           <ul>
-            <li>Fork <a href="https://github.com/continuuity/loom" title="loom">Loom</a> into your own GitHub repository</li>
+            <li>Fork <a href="https://github.com/continuuity/loom" title="loom">Continuuity Loom</a> into your own GitHub repository</li>
             <li>Create a topic branch with an appropriate name </li>
             <li>Work on your favorite feature to your content</li>
             <li>Once you are satisifed, create a pull request by going to the <a href="https://github.com/continuuity/loom" title="continuuity/loom">continuuity/loom</a> project. </li>
@@ -249,16 +249,16 @@ $ mvn clean package assembly:single</pre>
         </section>
 
         <aside id="sidebar">
-          <a href="https://github.com/continuuity/loom/zipball/develop" onClick="_gaq.push(['_trackEvent', 'Loom', 'Download', 'undefined']);" class="button">
+          <a href="https://github.com/continuuity/loom/zipball/develop" onClick="_gaq.push(['_trackEvent', 'Continuuity Loom', 'Download', 'undefined']);" class="button">
             <small>Download</small>
             .zip file
           </a>
-          <a href="https://github.com/continuuity/loom/tarball/develop" onClick="_gaq.push(['_trackEvent', 'Loom', 'Download', 'undefined']);" class="button">
+          <a href="https://github.com/continuuity/loom/tarball/develop" onClick="_gaq.push(['_trackEvent', 'Continuuity Loom', 'Download', 'undefined']);" class="button">
             <small>Download</small>
             .tar.gz file
           </a>
 
-          <p class="repo-owner"><a href="https://github.com/continuuity/loom">Loom</a> is maintained by <a href="https://github.com/continuuity">Continuuity</a>.</p>
+          <p class="repo-owner"><a href="https://github.com/continuuity/loom">Continuuity Loom</a> is maintained by <a href="https://github.com/continuuity">Continuuity</a>.</p>
 
           <p>This page was generated by <a href="http://pages.github.com">GitHub Pages</a> using the Architect theme by Jason Long.</p>
         </aside>
