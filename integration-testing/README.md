@@ -10,7 +10,7 @@ Chrome: https://www.google.com/intl/en/chrome/browser/
 Phantomjs: http://phantomjs.org/ (for headless testing)
 
 ###Steps
-First build server:
+#####First build server:
 
 $ cd server
 
@@ -30,7 +30,7 @@ mvn org.apache.maven.plugins:maven-install-plugin:2.5.1:install-file \
 
 -Dversion=<version>
 
-Run tests:
+#####Run tests:
 
 mvn -Dtest=SuiteOrder test
 
