@@ -30,23 +30,36 @@ class PluginManager
     # enforces directory structure from top-level: ./plugins/['providers']/[plugin-name]/*.json
     Dir["#{File.expand_path(File.dirname(__FILE__))}/plugins/*/*/*.json"].each do |jsonfile| 
       log.debug "pluginmanager loading #{jsonfile}"
-      jsondata =  JSON.parse( IO.read(jsonfile) ) 
-      jsondata.each do |k, v|
-        if (v.has_key? 'classname')
-          log.debug "loading plugin class: #{File.dirname(jsonfile)}/#{v['classname']}"
-          # require every .rb file in the plugin top-level directory
-          Dir["#{File.dirname(jsonfile)}/*.rb"].each {|file| require file }
-          # check ancestor to determine plugin type and store in maps
-          klass = Object.const_get(v['classname'])
-          if klass.ancestors.include? Object.const_get('Provider')
-            @providermap.merge!({k => v})
-            log.info "registered provider plugin: #{k}"
-          elsif klass.ancestors.include? Object.const_get('Automator')
-            @automatormap.merge!({k => v})
-            log.info "registered automator plugin: #{k}"
-          else
-            log.error "Unknown plugin type for plugin: #{jsondata}" 
+      jsondata =  JSON.parse( IO.read(jsonfile) )
+      ### New
+      # { name: name, type: type, classname: class }
+      if (jsondata.has_key? 'classname')
+        log.debug "loading plugin class: #{File.dirname(jsonfile)}/#{jsondata['classname']}"
+        # require every .rb file in the plugin top-level directory
+        Dir["#{File.dirname(jsonfile)}/*.rb"].each {|file| require file }
+        # check ancestor to determine plugin type
+        klass = Object.const_get(jsondata['classname'])
+        if klass.ancestors.include? Object.const_get('Provider')
+          ptype = "provider"
+        elsif klass.ancestors.include? Object.const_get('Automator')
+          ptype = "automator"
+        else
+          ptype = "unknown"
+        end
+        # Defined type
+        if (jsondata.has_key? 'type' && jsondata['type'] == ptype)
+          case ptype
+          when 'automator'
+            @automatormap.merge!({jsondata['name'] => jsondata})
+          when 'provider'
+            @providermap.merge!({jsondata['name'] => jsondata})
+          when 'unknown'
+            log.error "Unknown plugin type for plugin: #{jsonfile}"
+            next
           end
+          log.info "registered #{ptype} plugin: #{jsondata['name']}"
+        else
+          log.error "Plugin type #{jsondata['type']} does not match extended class type #{ptype} in #{jsonfile}"
         end
       end
     end
