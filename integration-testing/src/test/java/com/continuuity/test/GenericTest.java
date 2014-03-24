@@ -16,6 +16,9 @@
 package com.continuuity.test;
 
 
+import com.continuuity.test.drivers.Global;
+import org.junit.BeforeClass;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -30,6 +33,16 @@ import static com.continuuity.test.drivers.Global.waitForLoading;
  *
  */
 public class GenericTest {
+
+  @BeforeClass
+  public static void setUp() throws Exception {
+    Global.getDriver();
+    globalDriver.get(Constants.LOGIN_URL);
+    Global.driverWait(1);
+    globalDriver.findElement(By.cssSelector("#username")).sendKeys("admin");
+    globalDriver.findElement(By.cssSelector("#password")).sendKeys("L0omProd!23");
+    globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
+  }
 
   public String switchToNewTab(WebElement elemForClick, String url) {
     String oldTab = globalDriver.getWindowHandle();

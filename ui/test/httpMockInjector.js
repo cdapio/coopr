@@ -19,45 +19,42 @@
  */
 
 var providers = {};
-providers.joyent = require('../../examples/providers/joyent.json');
-providers.openstack = require('../../examples/providers/openstack.json');
-providers.rackspace = require('../../examples/providers/rackspace.json');
+providers.joyent = require('./providers/joyent.json');
+providers.openstack = require('./providers/openstack.json');
+providers.rackspace = require('./providers/rackspace.json');
 
 var hardwaretypes = {};
-hardwaretypes.small = require('../../examples/hardwaretypes/small.json');
-hardwaretypes.medium = require('../../examples/hardwaretypes/medium.json');
-hardwaretypes.large = require('../../examples/hardwaretypes/large.json');
+hardwaretypes.small = require('./hardwaretypes/small.json');
+hardwaretypes.medium = require('./hardwaretypes/medium.json');
+hardwaretypes.large = require('./hardwaretypes/large.json');
 
 var imagetypes = {};
-imagetypes.centos6 = require('../../examples/imagetypes/centos6.json');
-imagetypes.ubuntu12 = require('../../examples/imagetypes/ubuntu12.json');
+imagetypes.centos6 = require('./imagetypes/centos6.json');
+imagetypes.ubuntu12 = require('./imagetypes/ubuntu12.json');
 
 var services = {};
-services['apache-httpd'] = require('../../examples/services/apache-httpd.json');
-services['fail2ban'] = require('../../examples/services/fail2ban.json');
-services['firewall'] = require('../../examples/services/firewall.json');
-services['hadoop-hdfs-datanode'] = require('../../examples/services/hadoop-hdfs-datanode.json');
-services['hadoop-hdfs-journalnode'] = require('../../examples/services/hadoop-hdfs-journalnode.json');
-services['hadoop-hdfs-namenode'] = require('../../examples/services/hadoop-hdfs-namenode.json');
-services['hadoop-yarn-nodemanager'] = require('../../examples/services/hadoop-yarn-nodemanager.json');
-services['hadoop-yarn-resourcemanager'] = require('../../examples/services/hadoop-yarn-resourcemanager.json');
-services['haproxy'] = require('../../examples/services/haproxy.json');
-services['hbase-master'] = require('../../examples/services/hbase-master.json');
-services['hbase-regionserver'] = require('../../examples/services/hbase-regionserver.json');
-services['hive-metastore'] = require('../../examples/services/hive-metastore.json');
-services['hosts'] = require('../../examples/services/hosts.json');
-services['mysql-server'] = require('../../examples/services/mysql-server.json');
-services['nodejs'] = require('../../examples/services/nodejs.json');
-services['oozie'] = require('../../examples/services/oozie.json');
-services['php'] = require('../../examples/services/php.json');
-services['reactor'] = require('../../examples/services/reactor.json');
-services['zookeeper-server'] = require('../../examples/services/zookeeper-server.json');
+services['apache-httpd'] = require('./services/apache-httpd.json');
+services['base'] = require('./services/base.json');
+services['fail2ban'] = require('./services/fail2ban.json');
+services['hadoop-hdfs-datanode'] = require('./services/hadoop-hdfs-datanode.json');
+services['hadoop-hdfs-namenode'] = require('./services/hadoop-hdfs-namenode.json');
+services['hadoop-yarn-nodemanager'] = require('./services/hadoop-yarn-nodemanager.json');
+services['hadoop-yarn-resourcemanager'] = require('./services/hadoop-yarn-resourcemanager.json');
+services['haproxy'] = require('./services/haproxy.json');
+services['hbase-master'] = require('./services/hbase-master.json');
+services['hbase-regionserver'] = require('./services/hbase-regionserver.json');
+services['mysql-server'] = require('./services/mysql-server.json');
+services['nodejs'] = require('./services/nodejs.json');
+services['php'] = require('./services/php.json');
+services['zookeeper-server'] = require('./services/zookeeper-server.json');
+services['reactor'] = require('./services/reactor.json');
 
 var clustertemplates = {};
-clustertemplates['hadoop-distributed'] = require('../../examples/clustertemplates/hadoop-distributed.json');
-clustertemplates['hadoop-hbase-distributed'] = require('../../examples/clustertemplates/hadoop-hbase-distributed.json');
-clustertemplates['hadoop-singlenode'] = require('../../examples/clustertemplates/hadoop-singlenode.json');
-clustertemplates['lamp'] = require('../../examples/clustertemplates/lamp.json');
+clustertemplates['hadoop-distributed'] = require('./clustertemplates/hadoop-distributed.json');
+clustertemplates['hadoop-hbase-distributed'] = require('./clustertemplates/hadoop-hbase-distributed.json');
+clustertemplates['hadoop-singlenode'] = require('./clustertemplates/hadoop-singlenode.json');
+clustertemplates['lamp'] = require('./clustertemplates/lamp.json');
+clustertemplates['reactor-singlenode'] = require('./clustertemplates/reactor-singlenode.json');
 
 var clusters = require('./clusters/clusters.json');
 var clusterDefinitions = require('./clusters/clusterdefinitions.json');

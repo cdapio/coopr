@@ -41,8 +41,7 @@ public class CreateClusterTest extends GenericTest {
   private static final ClusterReader CLUSTER_READER = new ClusterReader();
 
   @BeforeClass
-  public static void setUp(){
-    Global.getDriver();
+  public static void runInitial() throws Exception{
     globalDriver.get(Constants.CLUSTER_CREATE_URL);
   }
 
@@ -55,7 +54,7 @@ public class CreateClusterTest extends GenericTest {
       By.cssSelector("#inputConfiguration"))).selectByVisibleText(cluster.get("clusterTemplate").getAsString());
     globalDriver.findElement(By.cssSelector(".toggle-advanced-header")).click();
     globalDriver.findElement(By.cssSelector(".initial-days")).clear();
-    globalDriver.findElement(By.cssSelector(".initial-days")).sendKeys("2");
+    globalDriver.findElement(By.cssSelector(".initial-days")).sendKeys("0");
     globalDriver.findElement(By.cssSelector("#create-cluster-form")).submit();
     Global.driverWait(1);
     assertEquals(Constants.USER_CLUSTERS, globalDriver.getCurrentUrl());

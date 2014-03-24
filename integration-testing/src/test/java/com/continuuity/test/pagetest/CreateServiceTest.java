@@ -22,7 +22,6 @@ import com.continuuity.test.GenericTest;
 import com.continuuity.test.drivers.Global;
 import com.continuuity.test.input.ExampleReader;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -44,11 +43,6 @@ import static org.junit.Assert.assertTrue;
 public class CreateServiceTest extends GenericTest {
   private static final ExampleReader EXAMPLE_READER = new ExampleReader();
 
-  @BeforeClass
-  public static void setUp(){
-    Global.getDriver();
-  }
-
   @Test
   public void test_01_submitHadoopHdfsDatanode() throws Exception {
     globalDriver.get(Constants.SERVICE_CREATE_URI);
@@ -60,7 +54,7 @@ public class CreateServiceTest extends GenericTest {
 
     Select dependsOn = new Select(globalDriver.findElement(By.cssSelector("#inputDependsOn")));
     WebElement addService = globalDriver.findElement(By.cssSelector("#add-service"));
-    dependsOn.selectByVisibleText("hosts");
+    dependsOn.selectByVisibleText("base");
     addService.click();
 
     dependsOn.selectByVisibleText("hadoop-hdfs-namenode");

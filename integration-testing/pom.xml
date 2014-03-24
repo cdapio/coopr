@@ -31,6 +31,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <surefire.redirectTestOutputToFile>true</surefire.redirectTestOutputToFile>
     </properties>
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <url>https://repository.continuuity.com/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>continuuity-snapshots</id>
+            <url>https://repository.continuuity.com/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>continuuity-release</id>
+            <url>https://repository.continuuity.com/content/repositories/releases-public/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -62,6 +76,30 @@
             <artifactId>loom</artifactId>
             <version>0.9.5-SNAPSHOT</version>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>16.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.continuuity</groupId>
+            <artifactId>http</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.6</version>
         </dependency>
 
 

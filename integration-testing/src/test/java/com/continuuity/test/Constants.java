@@ -27,6 +27,7 @@ public class Constants {
   // URI
   public static final String ROOT_URL = "http://localhost:8100";
   public static final String INDEX_URL = ROOT_URL;
+  public static final String LOGIN_URL = ROOT_URL + "/login";
   public static final String PROVIDERS_URL = ROOT_URL + "/providers";
   public static final String HARDWARETYPES_URL = ROOT_URL + "/hardwaretypes";
   public static final String IMAGETYPES_URL = ROOT_URL + "/imagetypes";
@@ -50,11 +51,11 @@ public class Constants {
 
   // Canonical paths for test examples
   public static final String PARENT_PATH = new File(System.getProperty("user.dir")).getParent();
-  public static final String IMAGETYPES_PATH = PARENT_PATH + "/examples/imagetypes";
-  public static final String HARDWARETYPES_PATH = PARENT_PATH + "/examples/hardwaretypes";
-  public static final String PROVIDERS_PATH = PARENT_PATH + "/examples/providers";
-  public static final String SERVICES_PATH = PARENT_PATH + "/examples/services";
-  public static final String CLUSTERTEMPLATE_PATH = PARENT_PATH + "/examples/clustertemplates";
+  public static final String IMAGETYPES_PATH = PARENT_PATH + "/ui/test/imagetypes";
+  public static final String HARDWARETYPES_PATH = PARENT_PATH + "/ui/test/hardwaretypes";
+  public static final String PROVIDERS_PATH = PARENT_PATH + "/ui/test/providers";
+  public static final String SERVICES_PATH = PARENT_PATH + "/ui/test/services";
+  public static final String CLUSTERTEMPLATE_PATH = PARENT_PATH + "/ui/test/clustertemplates";
 
   // Location properties in /
   public static final String CLUSTERTEMPLATE_TABLE = ".clustertemplates-table";

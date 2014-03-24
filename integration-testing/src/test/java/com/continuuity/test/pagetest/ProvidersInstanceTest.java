@@ -19,7 +19,6 @@ import com.continuuity.loom.admin.Provider;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;
-import com.continuuity.test.drivers.Global;
 import com.continuuity.test.input.ExampleReader;
 import com.continuuity.test.page.CreatePage.ProvidersInstancePage;
 import com.google.common.collect.ImmutableSet;
@@ -49,8 +48,7 @@ public class ProvidersInstanceTest extends GenericTest {
   private static final String VERSION = "joyent_version";
 
   @BeforeClass
-  public static void setUp(){
-    Global.getDriver();
+  public static void runInitial() throws Exception {
     globalDriver.get(Constants.PROVIDER_INSTANCE_URI);
   }
 

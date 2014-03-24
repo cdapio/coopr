@@ -19,7 +19,6 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;
-import com.continuuity.test.drivers.Global;
 import com.continuuity.test.input.ExampleReader;
 import com.continuuity.test.page.CreatePage.ServicesInstancePage;
 import com.google.common.collect.ImmutableSet;
@@ -44,8 +43,7 @@ public class ServicesInstanceTest extends GenericTest {
   private static final String IMAGE = "image";
 
   @BeforeClass
-  public static void setUp(){
-    Global.getDriver();
+  public static void runInitial() throws  Exception {
     globalDriver.get(Constants.SERVICES_INSTANCE_URI);
   }
 
@@ -73,10 +71,10 @@ public class ServicesInstanceTest extends GenericTest {
 
   @Test
   public void test_06_topmenu() {
-    ImmutableSet<String> expectedServiceSet = ImmutableSet.of("reactor", "oozie", "haproxy", "firewall",
-                "mysql-server", "hive-metastore", "zookeeper-server", "hadoop-hdfs-journalnode", "apache-httpd",
-                "hadoop-yarn-resourcemanager", "php", "hosts", "hbase-regionserver", "hadoop-yarn-nodemanager",
-                "hadoop-hdfs-datanode", "hadoop-hdfs-namenode", "hbase-master", "fail2ban", "nodejs");
+    ImmutableSet<String> expectedServiceSet = ImmutableSet.of(
+      "reactor", "haproxy", "fail2ban", "mysql-server", "zookeeper-server", "apache-httpd",
+      "hadoop-yarn-resourcemanager", "php", "base", "hbase-regionserver", "hadoop-yarn-nodemanager",
+      "hadoop-hdfs-datanode", "hadoop-hdfs-namenode", "hbase-master", "nodejs");
     String uriPrefix = Constants.SERVICES_URL + "/service/";
     assertEquals("The list of the topmenu is not correct.", expectedServiceSet, TEST_UTIL.getTopList(globalDriver));
     assertEquals("The uri of top list is not correct.", TEST_UTIL.getTopListUri(expectedServiceSet, uriPrefix),
