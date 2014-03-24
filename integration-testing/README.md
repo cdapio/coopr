@@ -3,11 +3,9 @@
 Runs with the test environment of loom UI.
 
 ### Dependencies:
-Nodejs: http://nodejs.org/
-
-Chrome: https://www.google.com/intl/en/chrome/browser/
-
-Phantomjs: http://phantomjs.org/ (for headless testing)
+   * Nodejs: http://nodejs.org/
+   * Chrome: https://www.google.com/intl/en/chrome/browser/
+   * Phantomjs: http://phantomjs.org/ (for headless testing)
 
 ###Steps
 #####First build server:
