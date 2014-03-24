@@ -1,7 +1,13 @@
-Selenium testing for Loom.
+# Selenium web testing for Loom
 
-Runs with the test environment of loom ui server.
+Runs with the test environment of loom.
 
+### Dependencies:
+Nodejs: http://nodejs.org/
+Chrome: https://www.google.com/intl/en/chrome/browser/
+Phantomjs: http://phantomjs.org/ (for headless testing)
+
+###Steps
 First build server:
 $ cd server
 $ mvn clean package
