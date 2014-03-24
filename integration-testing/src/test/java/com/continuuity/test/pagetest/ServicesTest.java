@@ -19,7 +19,6 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;
-import com.continuuity.test.drivers.Global;
 import com.continuuity.test.input.ExampleReader;
 import com.google.common.collect.ImmutableSet;
 import org.junit.AfterClass;
@@ -44,8 +43,7 @@ public class ServicesTest extends GenericTest {
   private static final ExampleReader EXAMPLE_READER = new ExampleReader();
 
   @BeforeClass
-  public static void setUp(){
-    Global.getDriver();
+  public static void runInitial() throws  Exception {
     globalDriver.get(Constants.SERVICES_URL);
   }
 
@@ -82,9 +80,9 @@ public class ServicesTest extends GenericTest {
 
   @Test
   public void test_04_topmenu() {
-    ImmutableSet<String> expectedServiceSet = ImmutableSet.of("reactor", "oozie", "haproxy", "fail2ban", "firewall",
-                "mysql-server", "hive-metastore", "zookeeper-server", "hadoop-hdfs-journalnode", "apache-httpd",
-                "hadoop-yarn-resourcemanager", "php", "hosts", "hbase-regionserver", "hadoop-yarn-nodemanager",
+    ImmutableSet<String> expectedServiceSet = ImmutableSet.of("reactor", "haproxy", "fail2ban",
+                "mysql-server", "zookeeper-server", "apache-httpd",
+                "hadoop-yarn-resourcemanager", "php", "base", "hbase-regionserver", "hadoop-yarn-nodemanager",
                 "hadoop-hdfs-datanode", "hadoop-hdfs-namenode", "hbase-master", "nodejs");
     String uriPrefix = Constants.SERVICES_URL + "/service/";
     assertEquals("The list of the topmenu is not correct.", expectedServiceSet, TEST_UTIL.getTopList(globalDriver));

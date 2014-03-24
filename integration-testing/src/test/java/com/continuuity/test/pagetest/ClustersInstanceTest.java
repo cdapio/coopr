@@ -19,7 +19,6 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;
-import com.continuuity.test.drivers.Global;
 import com.continuuity.test.input.ClusterReader;
 import com.continuuity.test.input.TestNode;
 import com.google.common.collect.ImmutableSet;
@@ -61,9 +60,8 @@ public class ClustersInstanceTest extends GenericTest {
   private static JsonObject cluster;
 
   @BeforeClass
-  public static void setUp() throws Exception {
+  public static void runInitial() throws Exception {
     cluster= new ClusterReader().getCluster();
-    Global.getDriver();
     globalDriver.get(Constants.CLUSTERS_INSTANCE_URL);
     table = globalDriver.findElement(TABLE);
   }
