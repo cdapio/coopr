@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-/** resetTests package is for testing Reset link and removing all preconditions.
- * @author elmira
- * 
- *
+/**
+ * resetTests package is for removing all preconditions.
  */
 package com.continuuity.test.resetTests;

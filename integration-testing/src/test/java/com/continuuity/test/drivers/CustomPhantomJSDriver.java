@@ -20,7 +20,6 @@ import org.openqa.selenium.remote.UnreachableBrowserException;
 
 /**
  * Custom driver for avoiding exception.
- * @author elmira
  *
  */
   public class CustomPhantomJSDriver extends PhantomJSDriver {

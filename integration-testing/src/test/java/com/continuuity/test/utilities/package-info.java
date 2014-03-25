@@ -16,8 +16,4 @@
 /**Package for helper classes.
  * 
  */
-/**
- * @author elmira
- *
- */
 package com.continuuity.test.utilities;
