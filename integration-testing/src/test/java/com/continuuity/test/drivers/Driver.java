@@ -17,11 +17,7 @@ package com.continuuity.test.drivers;
 
 import org.openqa.selenium.WebDriver;
 
-/** Driver is a parent class for all type of Drivers.
- * 
- * @author elmira
- *
- */
+/** Driver is a parent class for all type of Drivers. */
 public class Driver {
 protected WebDriver driver = null;
 }

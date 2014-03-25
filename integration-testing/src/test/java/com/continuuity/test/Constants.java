@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableSet;
 import org.openqa.selenium.By;
 
 import java.io.File;
+import java.net.ServerSocket;
 
 /**
  *
@@ -26,7 +27,8 @@ import java.io.File;
 public class Constants {
 
   // URI
-  public static final String ROOT_URL = "http://localhost:56974";
+  public static final int PORT = getPort();
+  public static final String ROOT_URL = "http://localhost:" + PORT;
   public static final String INDEX_URL = ROOT_URL;
   public static final String LOGIN_URL = ROOT_URL + "/login";
   public static final String PROVIDERS_URL = ROOT_URL + "/providers";
@@ -94,4 +96,16 @@ public class Constants {
   public static final String CLUSTER_CREATE_FILE_NAME = PARENT_PATH + "/ui/test/clusters/createcluster.json";
 
   public static final String ACTION_TABLE_CLASSNAME = ".node-actions-table";
+
+  public static int getPort() {
+    int port = -1;
+    try {
+      ServerSocket s = new ServerSocket(0);
+      port = s.getLocalPort();
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("Could not find port");
+    }
+    return port;
+  }
 }

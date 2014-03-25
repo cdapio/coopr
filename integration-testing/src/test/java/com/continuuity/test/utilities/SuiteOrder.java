@@ -19,6 +19,7 @@ package com.continuuity.test.utilities;
  *
  */
 
+import com.continuuity.test.Constants;
 import com.continuuity.test.pagetest.ClustersInstanceTest;
 import com.continuuity.test.pagetest.ClustersTest;
 import com.continuuity.test.pagetest.ClustertemplatesInstanceTest;
@@ -47,12 +48,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-/**
- * JUnit Suite Test.
- * @author elmira
- *
- */
  
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
@@ -71,12 +66,12 @@ public class SuiteOrder {
   public static void setUpClass() throws Exception {
     ProcessBuilder builder = new ProcessBuilder();
     builder.directory(new File("../ui"));
-    builder.command("/bin/sh","-c","node server.js --env=test --port=56974");
+    builder.command("/bin/sh","-c","node server.js --env=test --port=" + Constants.PORT);
 
     builder.redirectErrorStream(true);
 
     process = builder.start();
-    System.out.println("Starting nodejs on port 56974");
+    System.out.println("Starting nodejs on port " + Constants.PORT);
     final BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(process.getInputStream()));
     Thread loggingThread = new Thread(new Runnable() {
       @Override

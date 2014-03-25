@@ -23,7 +23,6 @@ import org.openqa.selenium.WebDriver;
  * if it throw mistake that is not executable check for mode of the file
  * and chmod it to be executable 
  * chmod a+x file
- * @author elmira
  *
  */
 public class PhantomDriver extends Driver {
