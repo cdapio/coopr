@@ -47,6 +47,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ServerSocket;
 
 /**
  * JUnit Suite Test.
@@ -71,12 +72,14 @@ public class SuiteOrder {
   public static void setUpClass() throws Exception {
     ProcessBuilder builder = new ProcessBuilder();
     builder.directory(new File("../ui"));
-    builder.command(new String[]{"/bin/sh","-c","node server.js --env=test"});
+    ServerSocket s = new ServerSocket(0);
+    int port = s.getLocalPort();
+    builder.command("/bin/sh","-c","node server.js --env=test --port=56974");
 
     builder.redirectErrorStream(true);
 
     process = builder.start();
-    System.out.println("Starting nodejs");
+    System.out.println("Starting nodejs on port " + port);
     final BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(process.getInputStream()));
     Thread loggingThread = new Thread(new Runnable() {
       @Override
