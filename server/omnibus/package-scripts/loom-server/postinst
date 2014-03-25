@@ -44,7 +44,7 @@ for i in $(cd /etc/loom/conf.dist ; ls -1) ; do
 done
 
 update-alternatives --install /etc/loom/conf loom-conf /etc/loom/conf.dist 10
-update-alternatives --install /etc/loom/conf loom-conf /etc/loom/conf.loom 10
+update-alternatives --install /etc/loom/conf loom-conf /etc/loom/conf.loom 20
 ln -sf /opt/loom/server/bin/init-loom-server /etc/init.d/loom-server
 ln -sf /opt/loom/server/etc/logrotate.d/loom-server /etc/logrotate.d/loom-server
 
