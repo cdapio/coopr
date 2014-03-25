@@ -25,6 +25,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
 import static com.continuuity.test.drivers.Global.globalDriver;
@@ -52,21 +53,24 @@ public class CreateProviderTest extends GenericTest {
 
     WebElement inputProvisioner = globalDriver.findElement(By.cssSelector("#provisioner-select"));
     inputProvisioner.sendKeys(joyent.getProviderType().toString().toLowerCase());
+    Global.driverWait(1);
+    JavascriptExecutor executor = (JavascriptExecutor) globalDriver;
+    executor.executeScript("document.getElementById('joyent_username').value = '"
+      + joyent.getProvisionerData().get("auth").get("joyent_username") + "'");
 
-    WebElement joyentUsername = globalDriver.findElement(By.cssSelector("#joyent_username"));
-    joyentUsername.sendKeys(joyent.getProvisionerData().get("auth").get("joyent_username"));
+    executor.executeScript("document.getElementById('joyent_keyname').value = '"
+      + joyent.getProvisionerData().get("auth").get("joyent_keyname") + "'");
 
-    WebElement joyentKeyname = globalDriver.findElement(By.cssSelector("#joyent_keyname"));
-    joyentKeyname.sendKeys(joyent.getProvisionerData().get("auth").get("joyent_keyname"));
+    executor.executeScript("document.getElementById('joyent_keyfile').value = '"
+      + joyent.getProvisionerData().get("auth").get("joyent_keyfile") + "'");
 
-    WebElement joyentKeyfile = globalDriver.findElement(By.cssSelector("#joyent_keyfile"));
-    joyentKeyfile.sendKeys(joyent.getProvisionerData().get("auth").get("joyent_keyfile"));
 
-    WebElement joyentApiurl = globalDriver.findElement(By.cssSelector("#joyent_api_url"));
-    joyentApiurl.sendKeys(joyent.getProvisionerData().get("auth").get("joyent_api_url"));
+    executor.executeScript("document.getElementById('joyent_api_url').value = '"
+      + joyent.getProvisionerData().get("auth").get("joyent_api_url") + "'");
 
-    WebElement joyentVersion = globalDriver.findElement(By.cssSelector("#joyent_version"));
-    joyentVersion.sendKeys(joyent.getProvisionerData().get("auth").get("joyent_version"));
+    executor.executeScript("document.getElementById('joyent_version').value = '"
+      + joyent.getProvisionerData().get("auth").get("joyent_version") + "'");
+
 
     globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
     Global.driverWait(1);
@@ -74,35 +78,7 @@ public class CreateProviderTest extends GenericTest {
   }
 
   @Test
-  public void test_02_submitOpenstack() throws Exception {
-    globalDriver.get(Constants.PROVIDER_CREATE_URI);
-    Provider openstack = EXAMPLE_READER.getProviders(Constants.PROVIDERS_PATH).get("openstack");
-    WebElement inputName = globalDriver.findElement(By.cssSelector("#inputName"));
-    inputName.sendKeys(openstack.getName());
-    WebElement inputDescription = globalDriver.findElement(By.cssSelector("#inputDescription"));
-    inputDescription.sendKeys(openstack.getDescription());
-    WebElement inputProvisioner = globalDriver.findElement(By.cssSelector("#provisioner-select"));
-    inputProvisioner.sendKeys(openstack.getProviderType().toString().toLowerCase());
-
-    WebElement username = globalDriver.findElement(By.cssSelector("#openstack_username"));
-    username.sendKeys(openstack.getProvisionerData().get("auth").get("openstack_username"));
-    WebElement password = globalDriver.findElement(By.cssSelector("#openstack_password"));
-    password.sendKeys(openstack.getProvisionerData().get("auth").get("openstack_password"));
-    WebElement tenant = globalDriver.findElement(By.cssSelector("#openstack_tenant"));
-    tenant.sendKeys(openstack.getProvisionerData().get("auth").get("openstack_tenant"));
-    WebElement apiurl = globalDriver.findElement(By.cssSelector("#openstack_auth_url"));
-    apiurl.sendKeys(openstack.getProvisionerData().get("auth").get("openstack_auth_url"));
-    WebElement keyid = globalDriver.findElement(By.cssSelector("#openstack_ssh_key_id"));
-    keyid.sendKeys(openstack.getProvisionerData().get("auth").get("openstack_ssh_key_id"));
-    WebElement identityfile = globalDriver.findElement(By.cssSelector("#openstack-auth-fields #identity_file"));
-    identityfile.sendKeys(openstack.getProvisionerData().get("auth").get("identity_file"));
-    globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
-    Global.driverWait(1);
-    assertEquals(Constants.PROVIDERS_URL, globalDriver.getCurrentUrl());
-  }
-
-  @Test
-  public void test_03_submitRacksapce() throws Exception {
+  public void test_02_submitRacksapce() throws Exception {
     globalDriver.get(Constants.PROVIDER_CREATE_URI);
     Provider rackspace = EXAMPLE_READER.getProviders(Constants.PROVIDERS_PATH).get("rackspace");
     WebElement inputName = globalDriver.findElement(By.cssSelector("#inputName"));
@@ -111,11 +87,13 @@ public class CreateProviderTest extends GenericTest {
     inputDescription.sendKeys(rackspace.getDescription());
     WebElement inputProvisioner = globalDriver.findElement(By.cssSelector("#provisioner-select"));
     inputProvisioner.sendKeys(rackspace.getProviderType().toString().toLowerCase());
+    Global.driverWait(1);
 
-    WebElement username = globalDriver.findElement(By.cssSelector("#rackspace_username"));
-    username.sendKeys(rackspace.getProvisionerData().get("auth").get("rackspace_username"));
-    WebElement password = globalDriver.findElement(By.cssSelector("#rackspace_api_key"));
-    password.sendKeys(rackspace.getProvisionerData().get("auth").get("rackspace_api_key"));
+    JavascriptExecutor executor = (JavascriptExecutor) globalDriver;
+    executor.executeScript("document.getElementById('rackspace_username').value = '"
+                             + rackspace.getProvisionerData().get("auth").get("rackspace_username") + "'");
+    executor.executeScript("document.getElementById('rackspace_api_key').value = '"
+                             + rackspace.getProvisionerData().get("auth").get("rackspace_api_key") + "'");
 
     globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
     Global.driverWait(1);
@@ -123,7 +101,7 @@ public class CreateProviderTest extends GenericTest {
   }
 
   @Test
-  public void test_04_submitProviderError() throws Exception {
+  public void test_03_submitProviderError() throws Exception {
     globalDriver.get(Constants.PROVIDER_CREATE_URI);
     assertFalse(globalDriver.findElement(By.cssSelector("#notification")).isDisplayed());
     WebElement inputName = globalDriver.findElement(By.cssSelector("#inputName"));
