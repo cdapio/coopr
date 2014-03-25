@@ -28,7 +28,6 @@ import static com.continuuity.test.drivers.Global.globalDriver;
 
 /** Generic Test is parent object for all tests classes
  * Created for common helpers methods
- * @author elmira
  *
  */
 public class GenericTest {
