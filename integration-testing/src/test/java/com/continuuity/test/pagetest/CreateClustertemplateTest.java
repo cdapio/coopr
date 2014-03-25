@@ -21,6 +21,7 @@ import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.drivers.Global;
 import com.continuuity.test.input.ExampleReader;
+import com.google.common.collect.Sets;
 import org.junit.AfterClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -96,16 +97,49 @@ public class CreateClustertemplateTest extends GenericTest {
 
     new Select(globalDriver.findElement(By.cssSelector("#defaults .provider-select"))).selectByVisibleText(
       clusterTemplate.getClusterDefaults().getProvider());
-    new Select(globalDriver.findElement(By.cssSelector("#defaults .hardwaretype-select"))).selectByVisibleText(
-      clusterTemplate.getClusterDefaults().getHardwaretype());
-    new Select(globalDriver.findElement(By.cssSelector("#defaults .imagetype-select"))).selectByVisibleText(
-      clusterTemplate.getClusterDefaults().getImagetype());
+
+    Select defaulthardwaretype = new Select(globalDriver.findElement(By.cssSelector("#defaults .hardwaretype-select")));
+    Select defaultimagetype = new Select(globalDriver.findElement(By.cssSelector("#defaults .imagetype-select")));
+    List<WebElement> defaultHardwareOptions = defaulthardwaretype.getOptions();
+    List<WebElement> defaultImageOptions = defaultimagetype.getOptions();
+
+    Set<String> defaultHardwareItems = Sets.newHashSet();
+    for (WebElement item : defaultHardwareOptions) {
+      if (item.getText().length() != 0) {
+        defaultHardwareItems.add(item.getText());
+      }
+
+    }
+
+    Set<String> defaultImageItems = Sets.newHashSet();
+    for (WebElement item : defaultImageOptions) {
+      if (item.getText().length() != 0) {
+        defaultImageItems.add(item.getText());
+      }
+    }
+
+    defaulthardwaretype.selectByVisibleText(clusterTemplate.getClusterDefaults().getHardwaretype());
+    defaultimagetype.selectByVisibleText(clusterTemplate.getClusterDefaults().getImagetype());
 
     globalDriver.findElement(By.cssSelector("#inputConfig")).sendKeys(
       clusterTemplate.getClusterDefaults().getConfig().toString());
 
     Set<String> defaultServices = clusterTemplate.getClusterDefaults().getServices();
+
     Select defaultServiceSelect = new Select(globalDriver.findElement(By.cssSelector("#defaults .service-select")));
+    List<WebElement> defaultServiceSelectOptions = defaultServiceSelect.getOptions();
+
+    Set<String> defaultServiceSelectItems = Sets.newHashSet();
+    for (WebElement item : defaultServiceSelectOptions) {
+      if (item.getText().length() != 0) {
+        defaultServiceSelectItems.add(item.getText());
+      }
+    }
+
+    assertEquals(compatibleHardwaretypes, defaultHardwareItems);
+    assertEquals(compatibleImagetypes, defaultImageItems);
+    assertEquals(defaultServices, defaultServiceSelectItems);
+
     WebElement addServicebtn = globalDriver.findElement(By.cssSelector("#defaults .add-service-btn"));
     for (String service : defaultServices) {
       defaultServiceSelect.selectByVisibleText(service);

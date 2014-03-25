@@ -119,7 +119,7 @@
                     <div class="form-group">
                       <label for="inputHardwaretype" class="col-sm-2 control-label">Hardware type</label>
                       <div class="col-sm-8">
-                        <select class="form-control hardwaretype-select" name="inputHardwaretype" ng-model="clustertemplate.defaults.hardwaretype" ng-options="item for item in hardwaretypes">
+                        <select class="form-control hardwaretype-select" name="inputHardwaretype" ng-model="clustertemplate.defaults.hardwaretype" ng-options="item for item in clustertemplate.compatibility.hardwaretypes">
                            <option></option>
                         </select>
                       </div>
@@ -127,7 +127,7 @@
                     <div class="form-group">
                       <label for="inputImagetype" class="col-sm-2 control-label">Image type</label>
                       <div class="col-sm-8">
-                        <select class="form-control imagetype-select" name="inputImagetype" ng-model="clustertemplate.defaults.imagetype" ng-options="item for item in imagetypes">
+                        <select class="form-control imagetype-select" name="inputImagetype" ng-model="clustertemplate.defaults.imagetype" ng-options="item for item in clustertemplate.compatibility.imagetypes">
                            <option></option>
                         </select>
                       </div>
@@ -141,7 +141,7 @@
                     <div class="form-group">
                       <label for="inputDefaultServices" class="col-sm-2 control-label">Default services</label>
                       <div class="col-sm-4">
-                        <select class="form-control service-select" name="inputService" ng-model="defaultServiceEntry" ng-options="item for item in services">
+                        <select class="form-control service-select" name="inputService" ng-model="defaultServiceEntry" ng-options="item for item in clustertemplate.compatibility.services">
                            <option selected="selected"></option>
                         </select>
                       </div>
