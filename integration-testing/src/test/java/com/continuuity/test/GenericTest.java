@@ -25,7 +25,6 @@ import java.util.ArrayList;
 
 import static com.continuuity.test.drivers.Global.driverWait;
 import static com.continuuity.test.drivers.Global.globalDriver;
-import static com.continuuity.test.drivers.Global.waitForLoading;
 
 /** Generic Test is parent object for all tests classes
  * Created for common helpers methods
@@ -56,7 +55,6 @@ public class GenericTest {
     globalDriver.close();
     // change focus back to old tab
     globalDriver.switchTo().window(oldTab);
-    waitForLoading(url);
 
     return newUrl;
   }
