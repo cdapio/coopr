@@ -260,9 +260,10 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     expected = new JsonObject();
     expectedNodes = ImmutableSet.of(nodeA, nodeAB, nodeABC);
     for (Node expectedNode : expectedNodes) {
-      expected.add(expectedNode.getId(), TestHelper.jsonObjectOf(
-        hostnameProperty, expectedNode.getProperties().get(hostnameProperty).getAsString(),
-        ipProperty, expectedNode.getProperties().get(ipProperty).getAsString()));
+      JsonObject value = new JsonObject();
+      value.addProperty(hostnameProperty, expectedNode.getProperties().get(hostnameProperty).getAsString());
+      value.addProperty(ipProperty, expectedNode.getProperties().get(ipProperty).getAsString());
+      expected.add(expectedNode.getId(), value);
     }
     Assert.assertEquals(expected, responseBody);
   }

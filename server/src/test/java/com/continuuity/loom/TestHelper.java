@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -57,15 +56,6 @@ public class TestHelper {
     DefaultHttpClient httpClient = new DefaultHttpClient();
     HttpResponse response = httpClient.execute(httpPost);
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-  }
-
-  public static JsonObject jsonObjectOf(String... keyvalues) {
-    Preconditions.checkArgument(keyvalues.length % 2 == 0, "must have a value for each key");
-    JsonObject output = new JsonObject();
-    for (int i = 0; i < keyvalues.length; i += 2) {
-      output.addProperty(keyvalues[i], keyvalues[i + 1]);
-    }
-    return output;
   }
 
   public static JsonArray jsonArrayOf(String... values) {
