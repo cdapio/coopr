@@ -72,7 +72,7 @@ action_mwl = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(proto
 # Choose default action.  To change, just override value of 'action' with the
 # interpolation to the chosen action shortcut (e.g.  action_mw, action_mwl, etc) in jail.local
 # globally (section [DEFAULT]) or per specific section
-action = %(action_)s
+action = %(<%= node['fail2ban']['action'] %>)s
 
 #
 # JAILS
@@ -101,6 +101,9 @@ logpath = <%= param['logpath'] %>
 maxretry = <%= param['maxretry'] %>
 <% if param['protocol'] %>
 protocol = <%= param['protocol'] %>
+<% end %>
+<% if param['action'] %>
+action = %(<%= param['action'] %>)s
 <% end %>
 <% if param['banaction'] %>
 banaction = <%= param['banaction'] %>
