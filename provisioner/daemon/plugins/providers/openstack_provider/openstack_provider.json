@@ -63,7 +63,10 @@
           "type" : "checkbox",
           "tip" : "Request a floating IP address for each node"
         }
-      }
+      },
+      "required" : [
+        [ "security_groups" ]
+      ]
     }
   }
 }
