@@ -49,7 +49,7 @@ import java.util.Set;
  */
 @Path("/v1/loom")
 public class LoomRPCHandler extends LoomAuthHandler {
-  private final static Gson GSON = new GsonBuilder()
+  private static final Gson GSON = new GsonBuilder()
     .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec()).create();
   private final ClusterStore store;
   private ClusterService clusterService;
