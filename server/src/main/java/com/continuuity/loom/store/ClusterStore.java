@@ -61,14 +61,14 @@ public interface ClusterStore {
   TaskId getNewTaskId(JobId jobId);
 
   /**
-   * Get a list of all clusters in the store.
+   * Get an immutable list of all clusters in the store.
    * @return All clusters in the store.
    * @throws Exception if there was a problem getting the clusters.
    */
   List<Cluster> getAllClusters() throws Exception;
 
   /**
-   * Get a list of all clusters owned by the given user.
+   * Get an immutable list of all clusters owned by the given user.
    * @param ownerId Id of the user that owns the clusters.
    * @return List of all clusters owned by the user.
    * @throws Exception if there was a problem getting the clusters.
@@ -181,7 +181,7 @@ public interface ClusterStore {
   void deleteNode(String nodeId) throws Exception;
 
   /**
-   * Get all nodes belonging to a specific cluster.
+   * Get an immutable set of all nodes belonging to a specific cluster.
    * @param clusterId Id of the cluster whose nodes will be fetched.
    * @return Set of all nodes belonging to specified cluster. Empty if no cluster or cluster nodes exist.
    * @throws Exception if there was a problem getting the cluster nodes.
@@ -189,7 +189,7 @@ public interface ClusterStore {
   Set<Node> getClusterNodes(String clusterId) throws Exception;
 
   /**
-   * Get all nodes belonging to a specific cluster owned by a specific user.
+   * Get an immutable set of all nodes belonging to a specific cluster owned by a specific user.
    * @param clusterId Id of the cluster whose nodes will be fetched.
    * @param userId Id of the owner of the cluster.
    * @return Set of all nodes belonging to specified cluster owned by the specified user.
@@ -199,15 +199,7 @@ public interface ClusterStore {
   Set<Node> getClusterNodes(String clusterId, String userId) throws Exception;
 
   /**
-   * Get all nodes specified in the input set.
-   * @param nodeIds Set of ids of all nodes to fetch.
-   * @return Set of nodes matching the input node ids. Values may include nulls if the node did not exist.
-   * @throws Exception if there was a problem getting the nodes.
-   */
-  Set<Node> getNodes(Set<String> nodeIds) throws Exception;
-
-  /**
-   * Returns all IN_PROGRESS tasks that were submitted before timestamp.
+   * Returns an immutable set of all IN_PROGRESS tasks that were submitted before timestamp.
    * @param timestamp timestamp in milliseconds.
    * @return set of tasks.
    * @throws Exception
@@ -215,7 +207,7 @@ public interface ClusterStore {
   Set<ClusterTask> getRunningTasks(long timestamp) throws Exception;
 
   /**
-   * Returns all ACTIVE or INCOMPLETE clusters that expire before timestamp.
+   * Returns an immutable set of all ACTIVE or INCOMPLETE clusters that expire before timestamp.
    * @param timestamp timestamp in milliseconds.
    * @return set of clusters.
    * @throws Exception

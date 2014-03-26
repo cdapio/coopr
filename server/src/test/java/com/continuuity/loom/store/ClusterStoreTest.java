@@ -211,9 +211,6 @@ public abstract class ClusterStoreTest {
     Node node2 = GSON.fromJson(SchedulerTest.NODE2, Node.class);
     store.writeNode(node2);
 
-    Set<Node> nodes =  store.getNodes(ImmutableSet.of(node1.getId(), node2.getId()));
-    Assert.assertEquals(ImmutableSet.of(node1, node2), nodes);
-
     store.deleteNode(node1.getId());
     Assert.assertNull(store.getNode(node1.getId()));
 

@@ -27,6 +27,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -48,7 +49,8 @@ import java.util.Set;
  */
 @Path("/v1/loom")
 public class LoomRPCHandler extends LoomAuthHandler {
-  private final static Gson GSON = new Gson();
+  private final static Gson GSON = new GsonBuilder()
+    .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec()).create();
   private final ClusterStore store;
   private ClusterService clusterService;
 
@@ -116,42 +118,27 @@ public class LoomRPCHandler extends LoomAuthHandler {
    */
   @POST
   @Path("/getNodeProperties")
-  public void getClusterNodes(HttpRequest request, HttpResponder responder) throws Exception {
+  public void getNodeProperties(HttpRequest request, HttpResponder responder) throws Exception {
     String userId = getAndAuthenticateUser(request, responder);
     if (userId == null) {
       return;
     }
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    JsonObject body;
+    NodePropertiesRequest nodeRequest;
     try {
-      body = GSON.fromJson(reader, JsonObject.class);
-    } catch (Exception e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid request body. Must be a valid JSON Object.");
-      return;
-    }
-
-    if (!body.has("clusterId") || !body.get("clusterId").isJsonPrimitive()) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "clusterId must be in request body as a primitive.");
-      return;
-    }
-    String clusterId = body.get("clusterId").getAsString();
-
-    Set<String> properties;
-    Set<String> requiredServices;
-    try {
-      properties = getSet(body, "properties");
-      requiredServices = getSet(body, "services");
+      nodeRequest = GSON.fromJson(reader, NodePropertiesRequest.class);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
       return;
-    }
-
-    JsonObject output = new JsonObject();
-    Set<Node> clusterNodes = clusterService.getClusterNodes(clusterId, userId);
-    if (clusterNodes.isEmpty()) {
-      responder.sendJson(HttpResponseStatus.OK, output);
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body. Must be a valid JSON Object.");
       return;
     }
+
+    Map<String, JsonObject> output = Maps.newHashMap();
+    Set<Node> clusterNodes = clusterService.getClusterNodes(nodeRequest.getClusterId(), userId);
+    Set<String> properties = nodeRequest.getProperties();
+    Set<String> requiredServices = nodeRequest.getServices();
 
     for (Node node : clusterNodes) {
       Set<String> nodeServices = Sets.newHashSet();
@@ -176,30 +163,10 @@ public class LoomRPCHandler extends LoomAuthHandler {
           // request did not contain a list of properties, include them all
           outputProperties = node.getProperties();
         }
-        output.add(node.getId(), outputProperties);
+        output.put(node.getId(), outputProperties);
       }
     }
 
     responder.sendJson(HttpResponseStatus.OK, output);
-  }
-
-  private Set<String> getSet(JsonObject object, String key) {
-    Set<String> output = Sets.newHashSet();
-    if (!object.has(key)) {
-      return output;
-    }
-
-    JsonElement array = object.get(key);
-    if (!array.isJsonArray()) {
-      throw new IllegalArgumentException(key + " must be an array");
-    }
-
-    for (JsonElement element : array.getAsJsonArray()) {
-      if (!element.isJsonPrimitive()) {
-        throw new IllegalArgumentException("array values must be primitives");
-      }
-      output.add(element.getAsString());
-    }
-    return output;
   }
 }
