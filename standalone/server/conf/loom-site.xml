@@ -4,6 +4,6 @@
 <configuration>
   <property>
     <name>loom.local.data.dir</name>
-    <value>/Users/ashau/dev/loom/standalone/data</value>
+    <value>LOOM_DATA_DIR</value>
   </property>
 </configuration>
