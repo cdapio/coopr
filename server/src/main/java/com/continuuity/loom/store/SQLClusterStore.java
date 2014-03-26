@@ -130,7 +130,7 @@ public class SQLClusterStore extends BaseClusterStore {
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("SELECT cluster FROM clusters ORDER BY create_time DESC");
-      return ImmutableList.copyOf(getQueryList(statement, Cluster.class));
+      return getQueryList(statement, Cluster.class);
     } finally {
       conn.close();
     }
@@ -143,7 +143,7 @@ public class SQLClusterStore extends BaseClusterStore {
       PreparedStatement statement =
         conn.prepareStatement("SELECT cluster FROM clusters WHERE owner_id=? ORDER BY create_time DESC");
       statement.setString(1, ownerId);
-      return ImmutableList.copyOf(getQueryList(statement, Cluster.class));
+      return getQueryList(statement, Cluster.class);
     } finally {
       conn.close();
     }
@@ -631,12 +631,36 @@ public class SQLClusterStore extends BaseClusterStore {
     }
   }
 
+  /**
+   * Queries the store for a set of items, deserializing the items and returning an immutable set of them. If no items
+   * exist, the set will be empty.
+   *
+   * @param statement PreparedStatement of the query, ready for execution. Will be closed by this method.
+   * @param clazz Class of the items being queried.
+   * @param <T> Type of the items being queried.
+   * @return
+   * @throws SQLException
+   */
   private <T> ImmutableSet<T> getQuerySet(PreparedStatement statement, Class<T> clazz) throws SQLException {
-    return ImmutableSet.copyOf(getQueryList(statement, clazz));
+    try {
+      ResultSet rs = statement.executeQuery();
+      try {
+        Set<T> results = Sets.newHashSet();
+        while (rs.next()) {
+          Blob blob = rs.getBlob(1);
+          results.add(deserializeBlob(blob, clazz));
+        }
+        return ImmutableSet.copyOf(results);
+      } finally {
+        rs.close();
+      }
+    } finally {
+      statement.close();
+    }
   }
 
   /**
-   * Queries the store for a list of items, deserializing the items and returning a List of them. If no items
+   * Queries the store for a list of items, deserializing the items and returning an immutable list of them. If no items
    * exist, the list will be empty.
    *
    * @param statement PreparedStatement of the query, ready for execution. Will be closed by this method.
@@ -645,7 +669,7 @@ public class SQLClusterStore extends BaseClusterStore {
    * @return
    * @throws SQLException
    */
-  private <T> List<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
+  private <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
     try {
       ResultSet rs = statement.executeQuery();
       try {
@@ -654,7 +678,7 @@ public class SQLClusterStore extends BaseClusterStore {
           Blob blob = rs.getBlob(1);
           results.add(deserializeBlob(blob, clazz));
         }
-        return results;
+        return ImmutableList.copyOf(results);
       } finally {
         rs.close();
       }
