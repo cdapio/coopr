@@ -8,9 +8,11 @@ This cookbook may work on earlier versions, but these are the minimal tested ver
 * CentOS 6.4+
 * Ubuntu 12.04+
 
-This cookbook assumes that you have a working Java installation. It has been tested using version 1.13.0 of the java cookbook, using Oracle Java 6. If you plan on using Hive with a database other than the embedded Derby, you will need to provide it and set it up prior to starting Hive Metastore service.
+This cookbook assumes that you have a working Java installation. It has been tested using version 1.21.2 of the java cookbook, using Oracle Java 6. If you plan on using Hive with a database other than the embedded Derby, you will need to provide it and set it up prior to starting Hive Metastore service.
 
 # Usage
+
+This cookbook is designed to be used with a wrapper cookbook or a role with settings for configuring Hadoop. The services should work out of the box on a single host, but little validation is done that you have made a working Hadoop configuration. The cookbook is attribute-driven and is suitable for use via either `chef-client` or `chef-solo` since it does not use any server-based functionality. The cookbook defines service definitions for each Hadoop service, but it does not enable or start them, by default.
 
 # Attributes
 
@@ -81,3 +83,10 @@ Author:: Continuuity, Inc. (<ops@continuuity.com>)
 # Testing
 
 This cookbook requires the `vagrant-omnibus` and `vagrant-berkshelf` Vagrant plugins to be installed.
+
+# License
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this software except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
