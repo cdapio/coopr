@@ -3,6 +3,19 @@ fail2ban Cookbook CHANGELOG
 This file is used to list changes made in each version of the fail2ban cookbook.
 
 
+v2.1.2
+------
+### Improvement
+- **[COOK-3899](https://tickets.opscode.com/browse/COOK-3899)** - Allow action override in service block
+
+
+v2.1.0
+------
+Updating for cookbook yum ~> 3.0
+Fixing style or rubocop
+Updating test bits
+
+
 v2.0.4
 ------
 fixing metadata version error. locking to 3.0
