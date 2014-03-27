@@ -1161,8 +1161,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   protected static String getIdFromResponse(HttpResponse response) throws IOException {
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonObject responseJson = GSON.fromJson(reader, JsonObject.class);
-    return responseJson.get("id").getAsString();
+    return GSON.fromJson(reader, JsonObject.class).get("id").getAsString();
   }
 
   protected static JsonObject createClusterRequest(String name, String description, String template, int numMachines) {

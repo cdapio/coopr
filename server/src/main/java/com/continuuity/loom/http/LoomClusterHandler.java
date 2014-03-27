@@ -268,7 +268,8 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
 
     try {
-      JsonObject clusterRequest = codec.getGson().fromJson(reader, JsonObject.class); if (clusterRequest == null) {
+      JsonObject clusterRequest = codec.getGson().fromJson(reader, JsonObject.class);
+      if (clusterRequest == null) {
         responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid cluster request");
         return;
       }
