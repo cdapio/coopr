@@ -37,3 +37,13 @@ pkg =
 package pkg do
   action :install
 end
+
+# Enable kerberos security
+if node.has_key? 'hadoop' and node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key? 'hadoop.security.authorization'
+  and node['hadoop']['core_site'].has_key? 'hadoop.security.authentication'
+  if node['hadoop']['core_site']['hadoop.security.authorization'] == 'true' and node['hadoop']['core_site']['hadoop.security.authentication'].downcase == 'kerberos'
+    node.default['krb5_utils']['krb5_service_keytabs'] = %w[HTTP hdfs hbase yarn zookeeper]
+    include_recipe 'krb5'
+    include_recipe 'krb5_utils'
+  end
+end
