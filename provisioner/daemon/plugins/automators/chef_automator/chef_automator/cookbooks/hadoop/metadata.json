@@ -21,6 +21,15 @@
   "suggestions": {
   },
   "conflicting": {
+    "hadoop_cluster": ">= 0.0.0",
+    "hadoop_cluster_rpm": ">= 0.0.0",
+    "hadoop_for_hbase": ">= 0.0.0",
+    "hbase": ">= 0.0.0",
+    "hbase_cluster": ">= 0.0.0",
+    "hive": ">= 0.0.0",
+    "pig": ">= 0.0.0",
+    "zookeeper": ">= 0.0.0",
+    "zookeeper_cluster": ">= 0.0.0"
   },
   "providing": {
   },
@@ -32,5 +41,5 @@
   },
   "recipes": {
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
