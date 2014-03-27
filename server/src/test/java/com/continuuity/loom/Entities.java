@@ -338,7 +338,7 @@ public class Entities {
         new ClusterDefaults(
           ImmutableSet.<String>of("hosts", "namenode", "datanode"),
           "joyent",
-          null, null, null
+          null, null, null, null
         ),
         new Compatibilities(null, null, ImmutableSet.<String>of("hosts", "namenode", "datanode")),
         new Constraints(
@@ -415,7 +415,7 @@ public class Entities {
           ImmutableSet.<String>of("hosts", "namenode", "datanode", "resourcemanager", "nodemanager",
                                   "hbasemaster", "regionserver", "zookeeper", "reactor"),
           "joyent",
-          null, null, null
+          null, null, null, null
         ),
         new Compatibilities(null, null,
                             ImmutableSet.<String>of("hosts", "namenode", "datanode", "resourcemanager", "nodemanager",

@@ -12,11 +12,7 @@
         "hadoop-yarn-resourcemanager",
         "hadoop-yarn-nodemanager"
     ],
-    "administration": {
-        "leaseduration": {
-            "initial": "0"
-        }
-    },
+    "initialLeaseDuration": "0",
     "config": {
         "hadoop": {
             "core_site": {

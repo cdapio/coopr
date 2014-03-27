@@ -66,6 +66,7 @@ TemplateView.app.controller('TemplateCtrl', ['$scope', '$interval', 'dataFactory
       provider: '',
       hardwaretype: '',
       imagetype: '',
+      dnsSuffix: '',
       config: ''
     },
     compatibility: {

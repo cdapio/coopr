@@ -16,13 +16,14 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
 import com.continuuity.loom.admin.LeaseDuration;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.layout.ClusterRequest;
+import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -58,7 +59,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     smallTemplate =  new ClusterTemplate("one-machine",
                                          "one machine cluster template",
                                          new ClusterDefaults(ImmutableSet.of("zookeeper"), "rackspace", null, null,
-                                                             defaultClusterConfig),
+                                                             null, defaultClusterConfig),
                                          new Compatibilities(null, null, ImmutableSet.of("zookeeper")),
                                          null, new Administration(new LeaseDuration(10000, 30000, 5000)));
 
@@ -75,9 +76,9 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
   @Test
   public void testGetAllStatusesFunction() throws Exception {
     // create the clusters
-    JsonObject clusterRequest = LoomClusterHandlerTest.createClusterRequest("cluster1", "my 1st cluster",
-                                                                            smallTemplate.getName(), 5);
-    HttpResponse creationResponse = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = LoomClusterHandlerTest.createClusterRequest("cluster1", "my 1st cluster",
+                                                                                 smallTemplate.getName(), 5);
+    HttpResponse creationResponse = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(creationResponse, HttpResponseStatus.OK);
     String cluster1Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
     LoomClusterHandlerTest.assertStatus(cluster1Id, Cluster.Status.PENDING, "NOT_SUBMITTED",
@@ -86,7 +87,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     clusterRequest = LoomClusterHandlerTest.createClusterRequest("cluster2", "my 2nd cluster",
                                                                  smallTemplate.getName(), 6);
 
-    creationResponse = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    creationResponse = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(creationResponse, HttpResponseStatus.OK);
     String cluster2Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
     LoomClusterHandlerTest.assertStatus(cluster2Id, Cluster.Status.PENDING, "NOT_SUBMITTED",
@@ -95,7 +96,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     clusterRequest = LoomClusterHandlerTest.createClusterRequest("cluster3", "my 3rd cluster",
                                                                  smallTemplate.getName(), 6);
 
-    creationResponse = doPost("/v1/loom/clusters", clusterRequest.toString(), USER2_HEADERS);
+    creationResponse = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER2_HEADERS);
     assertResponseStatus(creationResponse, HttpResponseStatus.OK);
     String cluster3Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
 

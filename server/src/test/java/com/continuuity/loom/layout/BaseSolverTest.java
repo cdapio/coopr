@@ -53,7 +53,7 @@ public class BaseSolverTest extends BaseTest {
     reactorTemplate = new ClusterTemplate(
       "reactor-medium",
       "medium reactor cluster template",
-      new ClusterDefaults(services, "joyent", null, null, Entities.ClusterTemplateExample.clusterConf),
+      new ClusterDefaults(services, "joyent", null, null, null, Entities.ClusterTemplateExample.clusterConf),
       new Compatibilities(null, null, services),
       new Constraints(
         ImmutableMap.<String, ServiceConstraint>of(
