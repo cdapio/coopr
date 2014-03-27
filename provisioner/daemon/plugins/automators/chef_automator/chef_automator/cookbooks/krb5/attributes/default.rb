@@ -37,6 +37,7 @@ default['krb5']['default_logging'] = 'FILE:/var/log/krb5libs.log'
 default['krb5']['default_realm'] = node['domain']
 default['krb5']['realms'] = [node['domain']]
 default['krb5']['default_realm_kdcs'] = []
+default['krb5']['default_realm_admin_server'] = '' 
 default['krb5']['lookup_kdc'] = 'true'
 default['krb5']['ticket_lifetime'] = '24h'
 default['krb5']['renew_lifetime'] = '24h'
