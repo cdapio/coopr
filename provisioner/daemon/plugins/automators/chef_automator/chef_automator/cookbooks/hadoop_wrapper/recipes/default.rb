@@ -44,15 +44,14 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   node['hadoop']['core_site']['hadoop.security.authorization'] == 'true' and
   node['hadoop']['core_site']['hadoop.security.authentication'].downcase == 'kerberos')
 
-    node.default['krb5_utils']['krb5_service_keytabs'] = {
-      "HTTP" => { "owner" => "hdfs", "group" => "hadoop", "mode" => "0640" },
-      "hdfs" => { "owner" => "hdfs", "group" => "hadoop", "mode" => "0640" },
-      "hbase" => { "owner" => "hbase", "group" => "hadoop", "mode" => "0640" },
-      "yarn" => { "owner" => "yarn", "group" => "hadoop", "mode" => "0640" },
-      "zookeeper" => { "owner" => "zookeeper", "group" => "hadoop", "mode" => "0640" }
-    }
+  node.default['krb5_utils']['krb5_service_keytabs'] = {
+    "HTTP" => { "owner" => "hdfs", "group" => "hadoop", "mode" => "0640" },
+    "hdfs" => { "owner" => "hdfs", "group" => "hadoop", "mode" => "0640" },
+    "hbase" => { "owner" => "hbase", "group" => "hadoop", "mode" => "0640" },
+    "yarn" => { "owner" => "yarn", "group" => "hadoop", "mode" => "0640" },
+    "zookeeper" => { "owner" => "zookeeper", "group" => "hadoop", "mode" => "0640" }
+  }
 
-    include_recipe 'krb5'
-    include_recipe 'krb5_utils'
-  end
+  include_recipe 'krb5'
+  include_recipe 'krb5_utils'
 end
