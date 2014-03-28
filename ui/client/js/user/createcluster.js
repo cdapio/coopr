@@ -110,11 +110,7 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
       hardwaretype: $scope.defaultHardwareType,
       imagetype: $scope.defaultImageType,
       services: $scope.selectedServices,
-      administration: {
-        leaseduration: {
-          initial: null
-        }
-      }
+      initialLeaseDuration: $scope.leaseDuration.initial
     };
     if ($scope.defaultConfig) {
       if (!Helpers.isValidJSON($scope.defaultConfig)) {
@@ -123,11 +119,11 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
       }
       postJson.config = $.extend({}, JSON.parse($scope.defaultConfig));
     }
-    postJson.administration.leaseduration.initial = Helpers.concatMilliseconds(
+    postJson.initialLeaseDuration = Helpers.concatMilliseconds(
       $scope.leaseDuration.initial);
     if ($scope.template.administration.leaseduration.initial !== 0 &&
       $scope.template.administration.leaseduration.initial 
-      < postJson.administration.leaseduration.initial) {
+      < postJson.initialLeaseDuration) {
       $("#notification").text('You cannot initially request a longer lease.');
       $("html, body").animate({ scrollTop: 0 }, "slow");
       return;

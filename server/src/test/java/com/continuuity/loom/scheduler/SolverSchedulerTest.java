@@ -76,7 +76,7 @@ public class SolverSchedulerTest extends BaseTest {
     clusterStore.writeCluster(cluster);
     clusterStore.writeClusterJob(job);
     ClusterRequest request = new ClusterRequest(cluster.getName(), cluster.getDescription(),
-                                                reactorTemplate.getName(), 5, null, null, null, null, 0);
+                                                reactorTemplate.getName(), 5, null, null, null, null, 0L, null, null);
     solverQueue.add(new Element(cluster.getId(), new Gson().toJson(request)));
 
     solverScheduler.run();
@@ -127,7 +127,7 @@ public class SolverSchedulerTest extends BaseTest {
     reactorTemplate = new ClusterTemplate(
       "reactor-medium",
       "medium reactor cluster template",
-      new ClusterDefaults(services, "joyent", null, null, new JsonObject()),
+      new ClusterDefaults(services, "joyent", null, null, null, new JsonObject()),
       new Compatibilities(
         ImmutableSet.<String>of("large-mem", "large-cpu", "large", "medium", "small"),
         null,

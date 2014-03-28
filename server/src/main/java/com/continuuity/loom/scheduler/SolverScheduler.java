@@ -145,7 +145,7 @@ public class SolverScheduler implements Runnable {
           if (clusterNodes == null || clusterNodes.isEmpty()) {
             LOG.error(
               String.format("Could not solve cluster id %s named %s with template %s and %d machines", clusterId,
-                            request.getName(), request.getClusterTemplateName(), request.getNumMachines()));
+                            request.getName(), request.getClusterTemplate(), request.getNumMachines()));
 
             // Fail job updates loom stats
             taskService.failJobAndTerminateCluster(solverJob, cluster, errorMessage);
