@@ -1,6 +1,6 @@
-==================================
-Loom - A Cluster Management System 
-==================================
+==============================================
+Continuuity Loom - A Cluster Management System 
+==============================================
 
 Continuuity Loom is a software system that enables end users to provision clusters based on templates and settings defined by
 administrators. Loom exposes simple interfaces to administrators and allows easy customization of the properties of provisioned
