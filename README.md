@@ -19,12 +19,6 @@ Are you interested in making Continuuity Loom better? Our development model is a
  * Address all the review comments
  * Once addressed, the changes will be committed to the continuuity/loom repo.
 
-## Contributor License Agreement ("CLA")
-In order to accept your pull request, we need you to submit a CLA. You only need to do this once, so if you've done this for another Continuuity open source project, you're good to go. If you are submitting a pull request for the first time, just let us know that you have completed the CLA and we can cross-check with your GitHub username. 
-
-Email cla@continuuity.com for a copy of the CLA, fill out the form, and send it back to cla@continuuity.com
-
-
 ## License
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this software except in compliance with the License. You may obtain a copy of the License at
 
