@@ -26,7 +26,7 @@ end
 
 include_recipe 'hadoop::default'
 
-# HACK HACK HACK
+# HBase needs snappy
 pkg =
   case node['platform_family']
   when 'debian'
