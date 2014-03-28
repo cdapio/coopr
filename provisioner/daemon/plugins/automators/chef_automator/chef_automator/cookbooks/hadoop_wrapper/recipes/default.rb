@@ -64,7 +64,7 @@ if (node['hbase'].has_key? 'hbase_site' and node['hbase']['hbase_site'].has_key?
   node['hbase']['hbase_site']['hbase.security.authorization'] == 'true' and
   node['hbase']['hbase_site']['hbase.security.authentication'].downcase == 'kerberos')
 
-  if secure_hadoop_enabled.nil
+  if secure_hadoop_enabled.nil?
     Chef::Application.fatal!("You must enable kerberos in Hadoop or disable kerberos for HBase!")
   end
 end
