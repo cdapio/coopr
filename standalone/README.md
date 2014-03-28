@@ -22,11 +22,11 @@ bin/loom.sh stop
 
 Create a cluster
 ================
-Once Loom is running, follow the instructions in the quickstart guide at 
+Once Continuuity Loom is running, follow the instructions in the quickstart guide at 
 http://continuuity.com/docs/loom/0.9.5/en/guide/quickstart/index.html#getting-started.
 It contains step by step instructions for creating a Hadoop cluster with different providers.
 
 Known Issues
 ============
  * XCode Command Line Developer Tools 5.1 (Mar 2014) will cause compilation failure of the knife plugins
- * Loom standalone invocations of knife plugins are not isolated from any existing chef environment settings.  Please ensure there are no active knife.rb files before running Loom standalone.
+ * Continuuity Loom standalone invocations of knife plugins are not isolated from any existing chef environment settings.  Please ensure there are no active knife.rb files before running Loom standalone.
