@@ -19,6 +19,8 @@ import com.google.common.collect.ImmutableSet;
 import org.openqa.selenium.By;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 
 /**
@@ -27,7 +29,7 @@ import java.net.ServerSocket;
 public class Constants {
 
   // URI
-  public static final int PORT = getPort();
+  public static final int PORT = findFreePort();
   public static final String ROOT_URL = "http://localhost:" + PORT;
   public static final String INDEX_URL = ROOT_URL;
   public static final String LOGIN_URL = ROOT_URL + "/login";
@@ -97,15 +99,44 @@ public class Constants {
 
   public static final String ACTION_TABLE_CLASSNAME = ".node-actions-table";
 
-  public static int getPort() {
-    int port = -1;
-    try {
-      ServerSocket s = new ServerSocket(0);
-      port = s.getLocalPort();
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.out.println("Could not find port");
+  // the ports below 1024 are system ports
+  private static final int MIN_PORT_NUMBER = 1024;
+
+  // the ports above 49151 are dynamic and/or private
+  private static final int MAX_PORT_NUMBER = 49151;
+
+  public static int findFreePort() {
+    for (int i = MIN_PORT_NUMBER; i <= MAX_PORT_NUMBER; i++) {
+      if (available(i)) {
+        return i;
+      }
     }
-    return port;
+    throw new RuntimeException("Could not find an available port between " +
+                                 MIN_PORT_NUMBER + " and " + MAX_PORT_NUMBER);
+  }
+
+  private static boolean available(final int port) {
+    ServerSocket serverSocket = null;
+    DatagramSocket dataSocket = null;
+    try {
+      serverSocket = new ServerSocket(port);
+      serverSocket.setReuseAddress(true);
+      dataSocket = new DatagramSocket(port);
+      dataSocket.setReuseAddress(true);
+      return true;
+    } catch (final IOException e) {
+      return false;
+    } finally {
+      if (dataSocket != null) {
+        dataSocket.close();
+      }
+      if (serverSocket != null) {
+        try {
+          serverSocket.close();
+        } catch (final IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
   }
 }
