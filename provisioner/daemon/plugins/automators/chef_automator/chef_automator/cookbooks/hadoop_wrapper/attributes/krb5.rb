@@ -7,6 +7,20 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   include_attribute 'krb5'
   include_attribute 'krb5_utils'
 
+  # container-executor.cfg
+  default['hadoop']['container_executor']['banned.users'] = 'hdfs,yarn,mapred,bin'
+  default['hadoop']['container_executor']['min.user.id'] = 500
+  default['hadoop']['container_executor']['yarn.nodemanager.linux-container-executor.group'] = 'yarn'
+  default['hadoop']['container_executor']['yarn.nodemanager.local-dirs'] =
+    if node['hadoop'].has_key? 'yarn_site' and node['hadoop']['yarn_site'].has_key? 'yarn.nodemanager.local-dirs'
+      node['hadoop']['yarn_site']['yarn.nodemanager.local-dirs']
+    elsif node['hadoop'].has_key? 'hadoop.tmp.dir'
+      "#{node['hadoop']['hadoop.tmp.dir']}/nm-local-dir"
+    else
+      "/tmp/hadoop-yarn/nm-local-dir
+    end
+  default['hadoop']['container_executor']['yarn.nodemanager.log-dirs'] = '/var/log/hadoop-yarn/userlogs'
+
   # hadoop-env.sh
   default['hadoop']['hadoop_env']['jsvc_home'] = '/usr/libexec/bigtop-utils'
   default['hadoop']['hadoop_env']['hadoop_secure_dn_user'] = 'hdfs'
