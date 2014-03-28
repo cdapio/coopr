@@ -24,3 +24,23 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   default['hadoop']['hdfs_site']['dfs.datanode.http.address'] = "0.0.0.0:1006"
 
 end
+
+# HBase
+if (node['hbase'].has_key? 'hbase_site' and node['hbase']['hbase_site'].has_key? 'hbase.security.authorization' and
+  node['hbase']['hbase_site'].has_key? 'hbase.security.authentication' and
+  node['hbase']['hbase_site']['hbase.security.authorization'] == 'true' and
+  node['hbase']['hbase_site']['hbase.security.authentication'].downcase == 'kerberos')
+
+  include_attribute 'krb5'
+  include_attribute 'krb5_utils'
+
+  # hbase-site.xml
+  default['hbase']['hbase_site']['hbase.master.keytab.file'] = "#{node['krb5_utils']['keytabs_dir']}/hbase.service.keytab"
+  default['hbase']['hbase_site']['hbase.regionserver.keytab.file'] = "#{node['krb5_utils']['keytabs_dir']}/hbase.service.keytab"
+  default['hbase']['hbase_site']['hbase.master.kerberos.principal'] = "hbase/_HOST@#{node['krb5']['default_realm']}"
+  default['hbase']['hbase_site']['hbase.regionserver.kerberos.principal'] = "hbase/_HOST@#{node['krb5']['default_realm']}"
+  default['hbase']['hbase_site']['hbase.coprocessor.region.classes'] = 'org.apache.hadoop.hbase.security.token.TokenProvider,org.apache.hadoop.hbase.security.access.SecureBulkLoadEndpoint,org.apache.hadoop.hbase.security.access.AccessController'
+  default['hbase']['hbase_site']['hbase.coprocessor.master.classes'] = 'org.apache.hadoop.hbase.security.access.AccessController'
+  default['hbase']['hbase_site']['hbase.bulkload.staging.dir'] = '/tmp/hbase-staging'
+
+end
