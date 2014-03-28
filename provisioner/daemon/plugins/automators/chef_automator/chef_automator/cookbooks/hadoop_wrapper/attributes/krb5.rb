@@ -17,7 +17,7 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
     elsif node['hadoop'].has_key? 'hadoop.tmp.dir'
       "#{node['hadoop']['hadoop.tmp.dir']}/nm-local-dir"
     else
-      "/tmp/hadoop-yarn/nm-local-dir
+      "/tmp/hadoop-yarn/nm-local-dir"
     end
   default['hadoop']['container_executor']['yarn.nodemanager.log-dirs'] = '/var/log/hadoop-yarn/userlogs'
 
@@ -28,7 +28,7 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   default['hadoop']['hadoop_env']['hadoop_secure_dn_log_dir'] = '/var/log/hadoop-hdfs'
 
   # hdfs-site.xml
-  default['hadoop']['hdfs_site']['dfs.block.access.token.enable'] = true
+  default['hadoop']['hdfs_site']['dfs.block.access.token.enable'] = 'true'
   default['hadoop']['hdfs_site']['dfs.datanode.kerberos.principal'] = "hdfs/_HOST@#{node['krb5']['default_realm']}"
   default['hadoop']['hdfs_site']['dfs.namenode.kerberos.principal'] = "hdfs/_HOST@#{node['krb5']['default_realm']}"
   default['hadoop']['hdfs_site']['dfs.web.authentication.kerberos.principal'] = "HTTP/_HOST@#{node['krb5']['default_realm']}"
