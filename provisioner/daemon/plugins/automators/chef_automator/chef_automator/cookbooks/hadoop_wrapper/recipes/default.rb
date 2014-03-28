@@ -39,8 +39,8 @@ package pkg do
 end
 
 # Enable kerberos security
-if node.has_key? 'hadoop' and node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key? 'hadoop.security.authorization'
-  and node['hadoop']['core_site'].has_key? 'hadoop.security.authentication'
+if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key? 'hadoop.security.authorization'
+  and node['hadoop']['core_site'].has_key? 'hadoop.security.authentication')
   if node['hadoop']['core_site']['hadoop.security.authorization'] == 'true' and node['hadoop']['core_site']['hadoop.security.authentication'].downcase == 'kerberos'
     node.default['krb5_utils']['krb5_service_keytabs'] = {
       "HTTP": { "owner":"hdfs", "group":"hadoop", "mode":"0640" },
