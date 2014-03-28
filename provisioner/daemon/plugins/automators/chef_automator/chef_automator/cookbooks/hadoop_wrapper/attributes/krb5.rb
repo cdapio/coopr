@@ -31,9 +31,11 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   default['hadoop']['hdfs_site']['dfs.block.access.token.enable'] = 'true'
   default['hadoop']['hdfs_site']['dfs.datanode.kerberos.principal'] = "hdfs/_HOST@#{node['krb5']['default_realm']}"
   default['hadoop']['hdfs_site']['dfs.namenode.kerberos.principal'] = "hdfs/_HOST@#{node['krb5']['default_realm']}"
+  default['hadoop']['hdfs_site']['dfs.secondary.namenode.kerberos.principal'] = "hdfs/_HOST@#{node['krb5']['default_realm']}"
   default['hadoop']['hdfs_site']['dfs.web.authentication.kerberos.principal'] = "HTTP/_HOST@#{node['krb5']['default_realm']}"
   default['hadoop']['hdfs_site']['dfs.datanode.keytab.file'] = "#{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab"
   default['hadoop']['hdfs_site']['dfs.namenode.keytab.file'] = "#{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab"
+  default['hadoop']['hdfs_site']['dfs.secondary.namenode.keytab.file'] = "#{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab"
   default['hadoop']['hdfs_site']['dfs.datanode.address'] = "0.0.0.0:1004"
   default['hadoop']['hdfs_site']['dfs.datanode.http.address'] = "0.0.0.0:1006"
 
