@@ -1,4 +1,8 @@
-if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key? 'hadoop.security.authorization' and node['hadoop']['core_site'].has_key? 'hadoop.security.authentication')
+# Hadoop
+if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key? 'hadoop.security.authorization' and
+  node['hadoop']['core_site'].has_key? 'hadoop.security.authentication' and
+  node['hadoop']['core_site']['hadoop.security.authorization'] == 'true' and
+  node['hadoop']['core_site']['hadoop.security.authentication'].downcase == 'kerberos')
 
   include_attribute 'krb5'
   include_attribute 'krb5_utils'
