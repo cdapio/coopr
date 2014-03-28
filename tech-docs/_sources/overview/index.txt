@@ -28,7 +28,7 @@ services on each node in the cluster, and may also involve stop and starting tho
 A task is an action that is performed on a node.  Some examples are creation and deletion of the node, and the installation,
 initialization, configuration, start, stop, or removal of a service on the node.  
 
-Loom is a system that allows users to manage clusters as single entities. 
+Continuuity Loom is a system that allows users to manage clusters as single entities.
 It consists of two major pieces: the server and the provisioners.  The server is responsible for determining what needs to be 
 done for different cluster management operations.  It breaks down cluster level operations into node level tasks, coordinating 
 which tasks should be performed at what time.  It also stores the state of all provisioned clusters as well as a history of all
@@ -61,6 +61,6 @@ are used to allocate, delete, and manage machines using different infrastructure
 Google App Engine, and Joyent. Automator plugins are responsible for implementing the various services defined on a cluster.  For example, a 
 Chef automator plugin could be used to invoke Chef recipes that install, configure, initialize, start or stop your application.  Various plugins may be 
 implemented to support desired technologies, such as a Puppet plugin, or even shell commands.  
-Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Loom's architecture 
+Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Continuuity Loom's architecture
 simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent
 tasks.
