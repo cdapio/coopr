@@ -23,8 +23,8 @@ Web Services
 
 REST by far is the most efficient and seamless way for disparate and distributed systems to exchange or communicate information. Most 
 interactions are characterized as request-response-action-based exchange. And invariably, there is a client (requesting an action or resource)
-and the server (providing the response or resource) to complete an exchange between two endpoints over HTTP protocol. In that manner, the Loom REST API, then, allows you to interact 
-with the Loom system from an administrative and user perspective. You can pretty much do everything that a UI can do using these 
+and the server (providing the response or resource) to complete an exchange between two endpoints over HTTP protocol. In that manner, the Loom REST API, then, allows you to interact
+with the Continuuity Loom system from an administrative and user perspective. You can pretty much do everything that a UI can do using these
 REST interfaces. 
 
 Since the API is based on REST principles, it's very easy to write and test applications. You can use your browser to access URLs, 

@@ -14,7 +14,7 @@ are required to perform cluster management operations.
 
 Providers
 ^^^^^^^^^
-Loom can create and delete machines, real or virtual, through different providers. A provider can be an instance of an Infrastructure
+Continuuity Loom can create and delete machines, real or virtual, through different providers. A provider can be an instance of an Infrastructure
 as a Service provider, such as Openstack, Rackspace, Joyent, or Amazon Web Services. It can also be a custom provider created by the 
 user that manages bare metal, or really any system that can provide a machine to run services on. The Loom server is not concerned with
 how to create and delete machines. An administrator creates a provider by specifying a unique name, a description, and a list of key-value
@@ -27,7 +27,7 @@ Administrators specify a unique name, a description, and a mapping of provider n
 an administrator can define a "small" hardware type.  In it, the admin maps the "amazon" provider to have a key-value pair with "flavor" 
 as a key and "m1.small" as a value.  The "amazon" provider understands what a flavor is, and understands what the "m1.small" flavor refers
 to. Similarly, the admin maps the "rackspace" provider to have a key-value pair with "flavor" as key and "2" as value.  The "rackspace" 
-provider understands what a flavor is and what the "2" flavor refers to.  Now, elsewhere in Loom, the administrator can simply refer to 
+provider understands what a flavor is and what the "2" flavor refers to.  Now, elsewhere in Continuuity Loom, the administrator can simply refer to
 the "small" hardware type instead of referring to different flavors identifies that depend on what provider is in use.  
 
 Image Type
@@ -36,7 +36,7 @@ An image type is an entity that it unifies images from different providers into 
 Administrators specify a unique name, a description, and a mapping of provider name to provider specific key-value pairs.  For example,
 an administrator can create a "centos6" image type that maps
 the "amazon" provider to some identifier for an image that uses centos6 as its operating system, and that maps the "rackspace" provider
-to some other identifier for an image that uses centos6 as its operating system.  Now, elsewhere in Loom, the administrator can simply 
+to some other identifier for an image that uses centos6 as its operating system.  Now, elsewhere in Continuuity Loom, the administrator can simply
 refer to the "centos6" image type instead of referring to different image identifies that depend on what provider is in use.
 
 Services
@@ -57,7 +57,7 @@ Template Compatibilities
 ^^^^^^^^^^^^^^^^^^^^^^^^
 A cluster template defines 3 things in its compatibility section. The first is a set of services that are compatible with the template. 
 This means that when a user goes to create a cluster with this template, the user is allowed to specify any service from this set as 
-services to place on the cluster. Loom will not automatically pull in service dependencies, so the full set of compatible services must be defined.
+services to place on the cluster. Continuuity Loom will not automatically pull in service dependencies, so the full set of compatible services must be defined.
 Next, a set of compatible hardware types is defined. This means only hardware types in the compatible set can be used to create a cluster. 
 Similarly, the compatible image types are defined, where only image types in the compatible set can be used to create a cluster.
 
@@ -73,7 +73,7 @@ different configuration settings for the services that will be placed on the clu
 
 Template Constraints
 ^^^^^^^^^^^^^^^^^^^^
-Currently, Loom supports two classes of constraints – layout and service.  However, the general idea of a constraint based template is
+Currently, Continuuity Loom supports two classes of constraints – layout and service.  However, the general idea of a constraint based template is
 not restricted to just these types of constraints. Many additional types of constraints can be thought of and potentially added.
 
 Layout constraints define which services must and can’t coexist on the same node. For example, in a hadoop cluster, you generally want 
@@ -103,7 +103,7 @@ of nodes across the entire cluster. Other types of constraints are possible. For
 always be an odd number of nodes with the specified service, or the service is only allowed if there are at least y nodes that have another
 service.
 
-Cluster templates differentiate Loom from other systems. Templates make it so that administrators dont have to specify every single detail
+Cluster templates differentiate Continuuity Loom from other systems. Templates make it so that administrators do not have to specify every single detail
 for every cluster. Normally, an administrator find out that a certain type of cluster needs to be created. The admin gets some hardware,
 installs some operating system on it, then installs the necessary software on each node. The admin then goes and configures the services on 
 each node, then starts and initializes the services in the correct order, depending on which services depend on which others. Everything is 

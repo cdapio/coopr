@@ -46,8 +46,8 @@ you may choose to implement with a Puppet plugin, or even Shell commands.
 
 Task Types
 ==========
-In order to build plugins for Loom, it is first necessary to understand the tasks each plugin will be responsible for
-executing. To bring up a cluster, Loom issues the following tasks:
+In order to build plugins for Continuuity Loom, it is first necessary to understand the tasks each plugin will be responsible for
+executing. To bring up a cluster, Continuuity Loom issues the following tasks:
 
 .. list-table::
    :header-rows: 1
@@ -104,7 +104,7 @@ requests. This allows for different providers to have different values.
 Writing a Plugin
 ================
 
-Currently, a plugin must be written in Ruby and extend from the Loom base plugin classes.
+Currently, a plugin must be written in Ruby and extend from the Continuuity Loom base plugin classes.
 
 Writing a Provider plugin
 -------------------------

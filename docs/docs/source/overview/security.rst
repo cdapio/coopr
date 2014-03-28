@@ -25,9 +25,9 @@ Security
 ===================
 
 At Continuuity, we take security very seriously and invest a lot of time to make sure we secure communication between 
-different aspects of any system that we build. Loom beta release does not include a lot of much needed security features, 
-but upcoming releases of Loom will make it secure and more reliable for provisioning clusters. This document describes how 
-we are planning to secure different aspects of Loom.
+different aspects of any system that we build. Continuuity Loom beta release does not include a lot of much needed security features,
+but upcoming releases of Continuuity Loom will make it secure and more reliable for provisioning clusters. This document describes how
+we are planning to secure different aspects of Continuuity Loom.
 
 .. figure:: security-diagram.png
     :align: right
@@ -70,8 +70,8 @@ Data Stores
   * Encryption of sensitive data.
 
 
-Loom Components
-===============
+Continuuity Loom Components
+===========================
 
  * Loom Server
   * Database password encryption in configuration file.

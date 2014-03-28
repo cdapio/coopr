@@ -24,19 +24,19 @@ Overview
 
 .. include:: /guide/admin/admin-links.rst
 
-In this page, we explore various concepts behind Loom administration and explain various tools used in Loom for
-administrators to configure and manage their clusters. At the core of a Loom cluster is the notion of a **Template**, which 
-is the blueprint or the primordial stuff of what Loom clusters are comprised of—it is the essence or the DNA of how different 
+In this page, we explore various concepts behind Loom administration and explain various tools used in Continuuity Loom for
+administrators to configure and manage their clusters. At the core of a Loom cluster is the notion of a **Template**, which
+is the blueprint or the primordial stuff of what Loom clusters are comprised of—it is the essence or the DNA of how different
 parts and components come together to materialize into a cluster.
 
 Concepts
 ========
 
-As mentioned above, Loom works through the use of **Templates**, which dictate the configuration of the
+As mentioned above, Continuuity Loom works through the use of **Templates**, which dictate the configuration of the
 clusters that users can spin up. An administrator can specify any number of such templates to put into
 their **Catalog** for users. 
 
-Several concepts central to cluster configuration are definable in Loom. These aspects are:
+Several concepts central to cluster configuration are definable in Continuuity Loom. These aspects are:
 
 * **Providers** - Infrastructure providers (such as Amazon or OpenStack) that supply machines.
 
@@ -60,9 +60,9 @@ API</rest/templates>` or :doc:`Admin UI </guide/admin/ui>` carefully to design t
 .. _provision-templates2:
 Tools
 =====
-Loom includes several tools for administrators to simplify their administrative tasks. Apart from the
-:doc:`Admin UI </guide/admin/ui>`, Loom provides several additional :doc:`metrics and monitoring </guide/admin/monitoring>` tools.
-Loom allows administrators to :doc:`configure their servers </guide/admin/server-config>`
+Continuuity Loom includes several tools for administrators to simplify their administrative tasks. Apart from the
+:doc:`Admin UI </guide/admin/ui>`, Continuuity Loom provides several additional :doc:`metrics and monitoring </guide/admin/monitoring>` tools.
+Continuuity Loom allows administrators to :doc:`configure their servers </guide/admin/server-config>`
 and  :doc:`write custom plugins </guide/admin/plugins>` for allocating machines with your providers or to implement custom services.
 Administrators who are more command line driven, or who wish to write quick administrative scripts,
 can employ the :doc:`Web services API </rest/index>`.

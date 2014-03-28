@@ -27,7 +27,7 @@ Macros
 
 Often at template creation time, certain parameters cannot be set because their values are unknown or their values can
 be only ascertained during runtime. For instance, at the time of configuring a cluster template, it is impossible to know the 
-hostnames or IP addresses of other nodes within a cluster. For this reason, Loom supports several macros that allow administrators
+hostnames or IP addresses of other nodes within a cluster. For this reason, Continuuity Loom supports several macros that allow administrators
 to programmatically set these values ahead of time as place holders, which later can be substituted with actual values. 
 
 Basic Macros
@@ -65,7 +65,7 @@ on the first node that has zookeeper, and expanded to '2' on the second node tha
 Macro Functions
 ===============
 
-Two macro functions are also supported in Loom: join and map.
+Two macro functions are also supported in Continuuity Loom: join and map.
 ::
   %join(map(host.service.<service name>,'<format string>'),'<delimiter>')%
   %join(host.service.<service name>,'<delimiter>')%
@@ -81,7 +81,7 @@ Examples
 Macros are best described with examples, and they are very common during installation, automation and configuration tasks.
 
 Suppose you are configuring a HDFS + HBase cluster that uses three Zookeeper
-nodes. A user creates a cluster from this template, and Loom decides to place the namenode and
+nodes. A user creates a cluster from this template, and Continuuity Loom decides to place the namenode and
 hbase-master services on a node with hostname ``hadoop-dev-1001.local`` and IP address ``123.456.0.1``. It then decides to place
 the three Zookeeper services on their own nodes with hostnames ``hadoop-dev-[1002-1004].local`` with IP addresses ``123.456.0.[2-4]``.
 One configuration setting each datanode needs is called ``fs.defaultFS``, and it needs to be set to a value that contains
@@ -89,7 +89,7 @@ the hostname of the namenode. This can be achieved with the following basic macr
 ::
   "fs.defaultFS":"hdfs://%host.service.hadoop-hdfs-namenode%"
 
-Loom will see the macro ``%host.service.hadoop-hdfs-namenode%`` and replace it with a comma separated list of all the hosts
+Continuuity Loom will see the macro ``%host.service.hadoop-hdfs-namenode%`` and replace it with a comma separated list of all the hosts
 that contain the ``hadoop-hdfs-namenode`` service. Since the namenode service is only installed on one node, it will become:
 ::
   "fs.defaultFS":"hdfs://hadoop-dev-1001.local"

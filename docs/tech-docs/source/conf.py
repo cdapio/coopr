@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Loom documentation build configuration file, created by
+# Continuuity Loom documentation build configuration file, created by
 # sphinx-quickstart on Thu Dec  5 11:56:37 2013. Modified manually 02/01/2014
 #
 # This file is execfile()d with the current directory set to its
@@ -50,7 +50,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Loom'
+project = u'Continuuity Loom'
 copyright = u'2014, Continuuity Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
