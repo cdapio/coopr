@@ -49,6 +49,11 @@ if node.has_key? 'hadoop' and node['hadoop'].has_key? 'core_site' and node['hado
       "yarn": { "owner":"yarn", "group":"hadoop", "mode":"0640" },
       "zookeeper": { "owner":"zookeeper", "group":"hadoop", "mode":"0640" }
     }
+    node.default['hadoop']['hadoop_env']['jsvc_home'] = '/usr/libexec/bigtop-utils'
+    node.default['hadoop']['hadoop_env']['hadoop_secure_dn_user'] = 'hdfs'
+    node.default['hadoop']['hadoop_env']['hadoop_secure_dn_pid_dir'] = '/var/run/hadoop-hdfs'
+    node.default['hadoop']['hadoop_env']['hadoop_secure_dn_log_dir'] = '/var/log/hadoop-hdfs'
+
     include_recipe 'krb5'
     include_recipe 'krb5_utils'
   end
