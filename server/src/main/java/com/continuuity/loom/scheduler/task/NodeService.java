@@ -120,16 +120,24 @@ public class NodeService {
   }
 
 
-  // creates a unique hostname from the cluster name, cluster id, and node number. Hostnames are of the format
-  // <clustername><clusterid>-<nodenum>.<dnsSuffix>, with underscores and dots replaced by dashes, and with whole
-  // hostname trimmed to 255 characters if it would otherwise have been too long.
+  /**
+   * Creates a unique hostname from the cluster name, cluster id, and node number. Hostnames are of the format
+   * <clustername><clusterid>-<nodenum>.<dnsSuffix>, with underscores and dots replaced by dashes, and with whole
+   * hostname trimmed to 255 characters if it would otherwise have been too long.
+   *
+   * @param clusterName Name of the cluster the node is a part of.
+   * @param clusterId Id of the cluster the node is a part of.
+   * @param nodeNum Number of the node in the cluster. Must be unique across the cluster.
+   * @param dnsSuffix DNS suffix to use.
+   * @return Unique hostname (at least across Loom managed nodes).
+   */
   public static String createHostname(String clusterName, String clusterId, int nodeNum, String dnsSuffix) {
     String actualSuffix = (dnsSuffix == null || dnsSuffix.isEmpty()) ? "local" : dnsSuffix;
     if (actualSuffix.startsWith(".")) {
       actualSuffix = actualSuffix.substring(1);
     }
 
-    long clusterIdNum = Long.valueOf(clusterId);
+    long clusterIdNum = Long.parseLong(clusterId);
     String cleaned = clusterName.replace("_", "-");
     cleaned = cleaned.replace(".", "-");
     StringBuilder postfixBuilder = new StringBuilder();
