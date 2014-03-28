@@ -42,6 +42,7 @@ end
 if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key? 'hadoop.security.authorization' and
   node['hadoop']['core_site'].has_key? 'hadoop.security.authentication')
   if node['hadoop']['core_site']['hadoop.security.authorization'] == 'true' and node['hadoop']['core_site']['hadoop.security.authentication'].downcase == 'kerberos'
+
     node.default['krb5_utils']['krb5_service_keytabs'] = {
       "HTTP" => { "owner" => "hdfs", "group" => "hadoop", "mode" => "0640" },
       "hdfs" => { "owner" => "hdfs", "group" => "hadoop", "mode" => "0640" },
@@ -49,10 +50,6 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
       "yarn" => { "owner" => "yarn", "group" => "hadoop", "mode" => "0640" },
       "zookeeper" => { "owner" => "zookeeper", "group" => "hadoop", "mode" => "0640" }
     }
-    node.default['hadoop']['hadoop_env']['jsvc_home'] = '/usr/libexec/bigtop-utils'
-    node.default['hadoop']['hadoop_env']['hadoop_secure_dn_user'] = 'hdfs'
-    node.default['hadoop']['hadoop_env']['hadoop_secure_dn_pid_dir'] = '/var/run/hadoop-hdfs'
-    node.default['hadoop']['hadoop_env']['hadoop_secure_dn_log_dir'] = '/var/log/hadoop-hdfs'
 
     include_recipe 'krb5'
     include_recipe 'krb5_utils'
