@@ -23,9 +23,9 @@
 Licensing and Open Source 
 ============================
 
-What type of license is Loom open sourced under?
-------------------------------------------------
-Loom is licensed under an `Apache 2.0 license <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
+What type of license is Continuuity Loom open sourced under?
+-------------------------------------------------------------
+Continuuity Loom is licensed under an `Apache 2.0 license <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
 
 How can I contribute?
 ---------------------

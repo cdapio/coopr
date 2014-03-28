@@ -92,7 +92,7 @@ to clusters created using this template, as well as a step size for use when ext
 
 The **Compatibility** tab defines sets of services, hardware types, and image types that are allowed for use in a cluster.
 Services not in the list specified in this section cannot be placed on the cluster.
-Loom will not automatically pull in service dependencies, so the full set of compatible services must be defined.
+Continuuity Loom will not automatically pull in service dependencies, so the full set of compatible services must be defined.
 Hardware types not in the list specified in this section cannot be used in the cluster. Similarly, image types 
 not in the list specified in this section cannot to be used in the cluster.
 Services, hardware types, and image types can all be added by selecting an element from the drop down menu and clicking the 
@@ -134,7 +134,7 @@ The 'Must coexist' is used to specify services that must be placed together on t
 cluster, you generally want datanodes, regionservers, and nodemanagers to all be placed together, so
 you would put all 3 services in the same 'Must coexist' constraint. The 'Must coexist' constraints are not transitive. 
 If there is one constraint saying service A must coexist with service B, and another constraint saying service B must
-coexist with service C, this does not mean that service A must coexist with service C. Loom was designed to
+coexist with service C, this does not mean that service A must coexist with service C. Continuuity Loom was designed to
 prevent unintended links between services, especially as the number of 'Must coexist' constraints increase. If a 'Must
 coexist' rule contains a service that is not on the cluster, it is shrunk to ignore the service not on the
 cluster. For example, your template may be compatible with datanodes, nodemanagers, and regionservers. However, by
@@ -218,8 +218,8 @@ template can be modified and deleted accordingly.
 Managing Infrastructure Providers
 =================================
 
-Loom provides functionality to provision servers across a number of infrastructure providers, including but not
-limited to Amazon Web Services, Rackspace, and Joyent. Loom also supports OpenStack to enable integration with
+Continuuity Loom provides functionality to provision servers across a number of infrastructure providers, including but not
+limited to Amazon Web Services, Rackspace, and Joyent. Continuuity Loom also supports OpenStack to enable integration with
 custom infrastructures for both public and private cloud.
 
 The Providers interface allows administrators to add available cloud providers and manage their credentials.

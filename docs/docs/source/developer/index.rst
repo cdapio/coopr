@@ -17,24 +17,24 @@
 Developers
 ======================
 
-What is Loom ?
-==============
-Loom is a cluster provisioning system where the smallest entity that is managed by Loom is a cluster. Loom allows the user
+What is Continuuity Loom ?
+==========================
+Continuuity Loom is a cluster provisioning system where the smallest entity that is managed by Continuuity Loom is a cluster. Continuuity Loom allows the user
 to provision clusters: be a cluster of JBoss Application Servers or a Hadoop Cluster. It does so using templates that are 
-designed by devops or administrators. Loom exposes developer friendly REST interfaces to manage configurations of clusters
+designed by devops or administrators. Continuuity Loom exposes developer friendly REST interfaces to manage configurations of clusters
 and as well as for provisioning clusters. Templates allow developers and devops to create a repeatable process for deploying
 complex infrastructure components and also allows them scale up or scale down as required. 
 
-This documentation describes what Loom is, as well as how it works. This section of Loom documentation is mainly for developers
-who would like to understand the internals of Loom.
+This documentation describes what Continuuity Loom is, as well as how it works. This section of Continuuity Loom documentation is mainly for developers
+who would like to understand the internals of Continuuity Loom.
 
 Getting started
 ===============
-This section will help you understand how to checkout and build Loom. 
+This section will help you understand how to checkout and build Continuuity Loom.
 
-Build Loom
-==========
-It's easy to build and run Loom.
+Build Continuuity Loom
+=======================
+It's easy to build and run Continuuity Loom.
 ::
   $ git clone http://github.com/continuuity/loom.git
   $ cd loom

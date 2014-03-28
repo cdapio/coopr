@@ -40,7 +40,7 @@ The zookeeper quorum, a collection of nodes running instances of Zookeeper, is s
 
 Database
 ^^^^^^^^
-Loom uses JDBC for database access. To provide your own database, and for Loom to access it, you must specify a driver, a connection string, 
+Continuuity Loom uses JDBC for database access. To provide your own database, and for Continuuity Loom to access it, you must specify a driver, a connection string,
 a user, and a password, as shown in the following example.  We also recommend specifying a validation query to be used with jdbc connection 
 pooling.  The query will change based on which database you are using.  
 ::

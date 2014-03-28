@@ -36,7 +36,7 @@ System Requirements
 Supported Operating System
 --------------------------
 
-Various systems of Loom have been tested against the following platforms:
+Various systems of Continuuity Loom have been tested against the following platforms:
 
 * **Loom Server**
  * CentOS 6.4
@@ -64,13 +64,13 @@ Supported Zookeeper Versions
 
 Supported OpenStack Versions
 ----------------------------
-Loom has been extensively tested on Havana, but it also supports Grizzly out of the box. 
+Continuuity Loom has been extensively tested on Havana, but it also supports Grizzly out of the box.
 
 .. note:: Click here for more information on how :doc:`Openstack should be configured <openstack-config>` currently to support provisioning with Loom. Several limitations that exist will be eliminated in future releases of Loom.
 
 Supported Internet Protocols
 ----------------------------
-Loom requires IPv4. IPv6 is currently not supported.
+Continuuity Loom requires IPv4. IPv6 is currently not supported.
 
 Supported Browsers
 ------------------
@@ -80,13 +80,13 @@ Supported Browsers
 
 Supported Node.js Versions
 ----------------------------
-Loom supports Node.js version 0.10.26 or above.
+Continuuity Loom supports Node.js version 0.10.26 or above.
 
 .. _prerequisites:
 Software Prerequisites
 ======================
 
-Loom requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Loom is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.
+Continuuity Loom requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Continuuity Loom is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.
 
 Linux
 ^^^^^
@@ -170,7 +170,7 @@ Loom packages by default use the ``alternatives`` system to initialize a configu
 
 Database Configuration
 ----------------------
-By default, Loom uses an embedded Derby database. However, you can optionally choose to enable remote database for Loom server.
+By default, Continuuity Loom uses an embedded Derby database. However, you can optionally choose to enable remote database for Loom server.
 Additional steps are required to configure this setting.
 
 Sample MySQL setup
@@ -318,7 +318,7 @@ for a Loom Provisioner, you can use:
 Loading Default Templates
 =========================
 
-Loom provides a set of useful default templates that covers most supported use cases. For new users and administrators of Loom, we
+Loom provides a set of useful default templates that covers most supported use cases. For new users and administrators of Continuuity Loom, we
 recommend installing these defaults as a starting point for template definition. These defaults are required for running
 the example in the :doc:`Quick Start Guide </guide/quickstart/index>`. To load these templates, run:
 ::
@@ -353,7 +353,7 @@ Please ensure logrotate is enabled on your Loom hosts.
 Common Installation Issues
 ==========================
 
-* A common issue is installing Loom on machines that have Open JDK installed rather than Oracle JDK.
+* A common issue is installing Continuuity Loom on machines that have Open JDK installed rather than Oracle JDK.
 
 * If you see JDBC exceptions in the Loom Server log like:
   ::
