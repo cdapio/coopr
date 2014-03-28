@@ -30,5 +30,3 @@ if node['hbase']['hbase_site'].has_key? 'hbase.bulkload.staging.dir'
     group "hbase"
   end
 end 
-
-
