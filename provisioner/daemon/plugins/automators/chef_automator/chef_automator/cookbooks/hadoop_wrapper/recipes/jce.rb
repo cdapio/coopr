@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: krb5_utils
+# Cookbook Name:: hadoop_wrapper
 # Recipe:: jce
 #
 # Copyright (C) 2013 Continuuity, Inc.
@@ -16,9 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-require 'chef/mixin/shell_out'
-::Chef::Recipe.send(:include, Chef::Mixin::ShellOut)
 
 # node['java']['jdk_version']
 # download_direct_from_oracle(tarball_name, new_resource)
