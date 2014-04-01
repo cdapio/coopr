@@ -36,7 +36,7 @@ execute "kinit-as-admin-user" do
   action :nothing
 end
 
-admin_server = node['krb5']['default_realm_kdcs'].first
+keytab_dir = node['krb5_utils']['keytabs_dir']
 
 # Generate execute blocks
 %w[ krb5_service_keytabs krb5_user_keytabs ].each do |kt|
@@ -44,22 +44,22 @@ admin_server = node['krb5']['default_realm_kdcs'].first
     case kt
     when 'krb5_service_keytabs'
       principal = "#{name}/#{node['fqdn']}@#{node['krb5']['default_realm']}"
-      keytab_file = "#{node['krb5_utils']['keytabs_dir']}/#{name}.service.keytab"
+      keytab_file = "#{name}.service.keytab"
     when 'krb5_user_keytabs'
       principal = "#{name}@#{node['krb5']['default_realm']}"
-      keytab_file = "#{node['krb5_utils']['keytabs_dir']}/#{name}.keytab"
+      keytab_file = "#{name}.keytab"
     end
 
     execute "krb5-addprinc-#{principal}" do
-      command "kadmin -s #{admin_server} -w #{node['krb5_utils']['admin_password']} -q 'addprinc -randkey #{principal}'"
+      command "kadmin -w #{node['krb5_utils']['admin_password']} -q 'addprinc -randkey #{principal}'"
       action :nothing
-      not_if "kadmin -s #{admin_server} -w #{node['krb5_utils']['admin_password']} -q 'list_principals' | grep -v Auth | grep '#{principal}'"
+      not_if "kadmin -w #{node['krb5_utils']['admin_password']} -q 'list_principals' | grep -v Auth | grep '#{principal}'"
     end
 
     execute "krb5-generate-keytab-#{keytab_file}" do
-      command "kadmin -s #{admin_server} -w #{node['krb5_utils']['admin_password']} -q 'xst -kt #{keytab_file} #{principal}'"
+      command "kadmin -w #{node['krb5_utils']['admin_password']} -q 'xst -kt #{keytab_dir}/#{keytab_file} #{principal}'"
       action :nothing
-      not_if "test -e #{keytab_file}"
+      not_if "test -e #{keytab_dir}/#{keytab_file}"
     end
 
     file keytab_file do
@@ -82,10 +82,10 @@ ruby_block "generate-keytabs" do
         case kt
         when 'krb5_service_keytabs'
           principal = "#{name}/#{node['fqdn']}@#{node['krb5']['default_realm']}"
-          keytab_file = "#{node['krb5_utils']['keytabs_dir']}/#{name}.service.keytab"
+          keytab_file = "#{name}.service.keytab"
         when 'krb5_user_keytabs'
           principal = "#{name}@#{node['krb5']['default_realm']}"
-          keytab_file = "#{node['krb5_utils']['keytabs_dir']}/#{name}.keytab"
+          keytab_file = "#{name}.keytab"
         end
         Chef::Log.info("Creating #{principal} and generating #{keytab_file}")
 
@@ -94,4 +94,4 @@ ruby_block "generate-keytabs" do
       end
     end
   end
-end 
+end
