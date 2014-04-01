@@ -4,13 +4,13 @@
 #
 # Specify targets for Ticktick's parsing in args instead of using caller
 #
-# Loom wrapper must source TickTick with first arg as the target user script
+# loomwrapper sources TickTick with Loom-specific first and second args
+
+# Hack: first arg is the Loom task.json used in loomwrapper tickParse(). ignore here.
+shift
+# second argument is the user-specified script we want TickTick to do its magic on
 LOOMUSERSCRIPT=$1
 shift
-## Loom wrapper must source TickTick with second arg as the loom wrapper itself
-## this is a hack to include tickParse(json data) which is included in the wrapper in the TickTick generated code
-#LOOMWRAPPER=$1
-#shift
 # remaining args passed as is
 
 ARGV=$@
@@ -345,6 +345,10 @@ __tick_fun_tokenize() {
   # Using bash's caller function, which is for debugging, we
   # can find out the name of the program that called us. We 
   # then cat the calling program and push it through our parser
+  #
+  # Customization for Loom:
+  # include the user-specified script as well as the caller (loomwrapper)
+
   #local code=$(cat `caller 1 | cut -d ' ' -f 3` | __tick_fun_parse)
   local code=$(cat `caller 1 | cut -d ' ' -f 3` $LOOMUSERSCRIPT | __tick_fun_parse)
 
