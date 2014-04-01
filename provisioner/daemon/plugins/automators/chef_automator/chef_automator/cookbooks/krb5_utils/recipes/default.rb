@@ -60,13 +60,14 @@ keytab_dir = node['krb5_utils']['keytabs_dir']
       command "kadmin -w #{node['krb5_utils']['admin_password']} -q 'xst -kt #{keytab_dir}/#{keytab_file} #{principal}'"
       action :nothing
       not_if "test -s #{keytab_dir}/#{keytab_file}"
+      notifies :touch, "file[#{keytab_dir}/#{keytab_file}]", :immediately
     end
 
     file "#{keytab_dir}/#{keytab_file}" do
       owner opts.owner
       group opts.group
       mode opts.mode
-      action :touch
+      action :none
     end
   end
 end
