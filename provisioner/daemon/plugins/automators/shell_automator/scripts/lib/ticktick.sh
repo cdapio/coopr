@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+# Customizations for Loom
+#
+# Specify targets for Ticktick's parsing in args instead of using caller
+#
+# Loom wrapper must source TickTick with first arg as the target user script
+LOOMUSERSCRIPT=$1
+shift
+## Loom wrapper must source TickTick with second arg as the loom wrapper itself
+## this is a hack to include tickParse(json data) which is included in the wrapper in the TickTick generated code
+#LOOMWRAPPER=$1
+#shift
+# remaining args passed as is
+
 ARGV=$@
 GREP=grep
 EGREP=egrep
@@ -332,7 +345,8 @@ __tick_fun_tokenize() {
   # Using bash's caller function, which is for debugging, we
   # can find out the name of the program that called us. We 
   # then cat the calling program and push it through our parser
-  local code=$(cat `caller 1 | cut -d ' ' -f 3` | __tick_fun_parse)
+  #local code=$(cat `caller 1 | cut -d ' ' -f 3` | __tick_fun_parse)
+  local code=$(cat `caller 1 | cut -d ' ' -f 3` $LOOMUSERSCRIPT | __tick_fun_parse)
 
   # Before the execution we search to see if we emitted any parsing errors
   hasError=`echo "$code" | $GREP "TICKTICK PARSING ERROR" | wc -l`
