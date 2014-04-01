@@ -33,7 +33,7 @@ To create a new cluster, make a HTTP POST request to URI:
 ::
  /clusters
 
-The request body must contain name, numMachines, and clusterTemplate.  Optionally, it can contain imagetype, hardwaretype, provider, services, and config.  If the user specifies any optional value, it will override the corresponding default value in the cluster template.
+The request body must contain name, numMachines, and clusterTemplate.  Optionally, it can contain imagetype, hardwaretype, provider, services, initialLeaseDuration, dnsSuffix, and config.  If the user specifies any optional value, it will override the corresponding default value in the cluster template.
 
 POST Parameters
 ^^^^^^^^^^^^^^^^
@@ -62,6 +62,10 @@ Required Parameters
      - Optional provider to use to create nodes. Overrides default in the given cluster template.
    * - services 
      - Optional array of services to place on the cluster.  Overrides default in the given cluster template.  Must be a subset of compatible services specified in cluster template.
+   * - initialLeaseDuration
+     - Initial lease duration in milliseconds to use for the cluster. Can only be equal to or less than the initial lease duration specified in the template.
+   * - dnsSuffix
+     - DNS suffix to use for suggested hostnames for nodes in the cluster.
    * - config 
      - Optional JSON Object to use during cluster creation.  Overrides default in the given cluster template.
 
@@ -241,66 +245,6 @@ of today, it is one of SOLVE_LAYOUT, CLUSTER_CREATE, and CLUSTER_DELETE. The act
 describes the status of the action being performed on the cluster, and is one of 
 NOT_SUBMITTED, RUNNING, COMPLETE, and FAILED.  
 
-In addition to the standard REST endpoints, Loom also provides a RPC function to obtain
-the statuses of all clusters belonging to the active user. To get the statuses of the
-clusters, make a POST HTTP request to URI:
-::
- /getClusterStatuses
-
-HTTP Responses
-^^^^^^^^^^^^^^
-
-.. list-table::
-   :widths: 15 10
-   :header-rows: 1
-
-   * - Status Code
-     - Description
-   * - 200 (OK)
-     - If update was successful
-   * - 401 (UNAUTHORIZED)
-     - If the user is unauthorized to make this request.
-   * - 404 (NOT FOUND)
-     - If the resource requested is not found.
-
-Example
-^^^^^^^^
-.. code-block:: bash
-
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/status
- $ {
-       "clusterid":"00000079",
-       "stepstotal":109,
-       "stepscompleted":8,
-       "status":"PENDING",
-       "actionStatus":"RUNNING",
-       "action":"CLUSTER_CREATE"
-   }
-
- $ curl -X POST
-        -H 'X-Loom-UserID:<userid>'
-        -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/getClusterStatuses
- $ [
-       {
-           "action": "CLUSTER_DELETE",
-           "actionstatus": "COMPLETE",
-           "clusterid": "00000051",
-           "status": "TERMINATED",
-           "stepscompleted": 3,
-           "stepstotal": 3
-       },
-       {
-           "action": "CLUSTER_DELETE",
-           "actionstatus": "COMPLETE",
-           "clusterid": "00000021",
-           "status": "TERMINATED",
-           "stepscompleted": 4,
-           "stepstotal": 4
-       }
-   ]
 
 .. _cluster-plan:
 Get an Action Plan for a Cluster
@@ -414,3 +358,4 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/plans
+
