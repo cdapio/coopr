@@ -5,7 +5,7 @@ RUNSCRIPT=$1
 
 # if ticktick enabled
   # pass all args, including runscript
-  . ticktick.sh $@
+  . loomticktick.sh $@
 
 #. tickwrapper.sh userscript.sh
 TASKDATA=`cat install.json`
