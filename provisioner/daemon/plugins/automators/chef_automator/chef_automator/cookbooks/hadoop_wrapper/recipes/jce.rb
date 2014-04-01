@@ -17,23 +17,58 @@
 # limitations under the License.
 #
 
+require 'chef/mixin/shell_out'
+::Chef::Recipe.send(:include, Chef::Mixin::ShellOut)
+
 # node['java']['jdk_version']
 # download_direct_from_oracle(tarball_name, new_resource)
 
 include_recipe 'java'
 
-if node['java'].has_key 'jdk_version'
+if node['java'].has_key? 'jdk_version'
   case node['java']['jdk_version']
-  when "6"
-    jdk => {
-      url => "http://download.oracle.com/otn-pub/java/jce_policy/6/jce_policy-6.zip"
-      checksum => "d0c2258c3364120b4dbf7dd1655c967eee7057ac6ae6334b5ea8ceb8bafb9262"
-    }
-  when "7"
-    jdk => {
-      url => "http://download.oracle.com/otn-pub/java/jce/7/UnlimitedJCEPolicyJDK7.zip"
-      checksum => "7a8d790e7bd9c2f82a83baddfae765797a4a56ea603c9150c87b7cdb7800194d"
-    }
+  when "6", 6
+    tarball_url = "http://download.oracle.com/otn-pub/java/jce_policy/6/jce_policy-6.zip"
+    tarball_checksum = "d0c2258c3364120b4dbf7dd1655c967eee7057ac6ae6334b5ea8ceb8bafb9262"
+  when "7", 7
+    tarball_url = "http://download.oracle.com/otn-pub/java/jce/7/UnlimitedJCEPolicyJDK7.zip"
+    tarball_checksum = "7a8d790e7bd9c2f82a83baddfae765797a4a56ea603c9150c87b7cdb7800194d"
   end
-  download_direct_from_oracle "jce#{node['java']['jdk_version']}.zip" jdk
+
+  package "unzip" do
+    action :install
+  end
+  package "curl" do
+    action :install
+  end
+
+  tarball_name = "jce#{node['java']['jdk_version']}.zip"
+  download_path = "#{Chef::Config[:file_cache_path]}/#{tarball_name}"
+  cookie = "oraclelicense=accept-securebackup-cookie"
+
+  bash "download-jce-zipfile" do
+    code "curl --create-dirs -L --cookie #{cookie} #{tarball_url} -o #{download_path}"
+    not_if "echo '#{tarball_checksum}  #{download_path}' | sha256sum -c - >/dev/null"
+  end
+
+  jce_tmp = "/tmp/jce#{node['java']['jdk_version']}"
+
+  bash "unzip-jce-zipfile" do
+    code <<-CODE
+      mkdir -p #{jce_tmp}
+      cd #{jce_tmp}
+      unzip -o #{download_path}
+    CODE
+    not_if "test -e #{jce_tmp}/jce/US_export_policy.jar"
+#    subscribes :run, "bash[download-jce-zipfile]", :immediately
+  end
+
+  jce_dir = "#{node['java']['java_home']}/jre/lib/security"
+
+  bash "copy-jce-files" do
+    code <<-CODE
+      find -name '*.jar' -exec cp '{}' #{jce_dir} \\;  
+    CODE
+    not_if { ::FileUtils.compare_file("#{jce_tmp}/jce/US_export_policy.jar", "#{jce_dir}/US_export_policy.jar") }
+  end
 end
