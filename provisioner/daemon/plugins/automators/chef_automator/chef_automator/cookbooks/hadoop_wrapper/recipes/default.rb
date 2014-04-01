@@ -57,6 +57,9 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
     "zookeeper" => { "owner" => "zookeeper", "group" => "hadoop", "mode" => "0640" }
   }
   include_recipe 'krb5_utils'
+  if node['java']['install_flavor'] == "oracle"
+    include_recipe 'hadoop_wrapper::jce'
+  end
 end
 
 if (node['hbase'].has_key? 'hbase_site' and node['hbase']['hbase_site'].has_key? 'hbase.security.authorization' and
