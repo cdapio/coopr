@@ -62,7 +62,7 @@ keytab_dir = node['krb5_utils']['keytabs_dir']
       not_if "test -e #{keytab_dir}/#{keytab_file}"
     end
 
-    file keytab_file do
+    file "#{keytab_dir}/#{keytab_file}" do
       owner opts.owner
       group opts.group
       mode opts.mode
