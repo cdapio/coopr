@@ -56,6 +56,12 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
     "yarn" => { "owner" => "yarn", "group" => "hadoop", "mode" => "0640" },
     "zookeeper" => { "owner" => "zookeeper", "group" => "hadoop", "mode" => "0640" }
   }
+  node.default['krb5_utils']['krb5_user_keytabs'] = {
+    "hdfs" => { "owner" => "hdfs", "group" => "hadoop", "mode" => "0640" },
+    "hbase" => { "owner" => "hbase", "group" => "hadoop", "mode" => "0640" },
+    "yarn" => { "owner" => "yarn", "group" => "hadoop", "mode" => "0640" },
+    "zookeeper" => { "owner" => "zookeeper", "group" => "hadoop", "mode" => "0640" }
+  }
   include_recipe 'krb5_utils'
   if node['java']['install_flavor'] == "oracle"
     include_recipe 'hadoop_wrapper::jce'
