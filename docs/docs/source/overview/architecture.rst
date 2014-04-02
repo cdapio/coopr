@@ -24,7 +24,7 @@ Architecture
 .. figure:: /_images/Loom-Architecture.png
     :width: 700px
     :align: center
-    :alt: Loom Architecture
+    :alt: Continuuity Loom Architecture
     :figclass: align-center
 
 Loom Server

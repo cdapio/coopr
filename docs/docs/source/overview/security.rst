@@ -32,7 +32,7 @@ we are planning to secure different aspects of Continuuity Loom.
 .. figure:: security-diagram.png
     :align: right
     :width: 800px
-    :alt: Loom architecture and security
+    :alt: Continuuity Loom architecture and security
     :figclass: align-center
 
 Communication Channels

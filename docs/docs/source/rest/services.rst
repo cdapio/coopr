@@ -258,7 +258,7 @@ Example
 List all Services
 =============================
 
-To list all the services configured within Loom, make a GET HTTP request to URI:
+To list all the services configured within Continuuity Loom, make a GET HTTP request to URI:
 ::
  /services
 

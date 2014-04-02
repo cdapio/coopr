@@ -66,7 +66,7 @@ Supported OpenStack Versions
 ----------------------------
 Continuuity Loom has been extensively tested on Havana, but it also supports Grizzly out of the box.
 
-.. note:: Click here for more information on how :doc:`Openstack should be configured <openstack-config>` currently to support provisioning with Loom. Several limitations that exist will be eliminated in future releases of Loom.
+.. note:: Click here for more information on how :doc:`Openstack should be configured <openstack-config>` currently to support provisioning with Loom. Several limitations that exist will be eliminated in future releases of Continuuity Loom.
 
 Supported Internet Protocols
 ----------------------------
@@ -305,7 +305,7 @@ The UI environmental variables can be set at ``/etc/default/loom-ui``. The confi
 .. _starting_stopping:
 Starting and Stopping Loom Services
 ===================================
-By default, the Loom's installation RPMs and PKGs do not configure auto start of the services in the ``init.d``. We leave
+By default, Continuuity Loom's installation RPMs and PKGs do not configure auto start of the services in the ``init.d``. We leave
 that privilege to the administrator. For each Loom component and its related service (such as the Server, Provisioner, and UI),
 there is a launch script, which you may use to execute a desired operation. For example, to start, stop, or check status
 for a Loom Provisioner, you can use:
@@ -345,7 +345,7 @@ the provisioner can be changed by editing the ``/etc/default/loom-provisioner`` 
 
 Rotation
 --------
-Loom depends on the external Linux utility logrotate to rotate its logs. Loom
+Continuuity Loom depends on the external Linux utility logrotate to rotate its logs. Continuuity Loom
 packages contain logrotate configurations in ``/etc/logrotate.d`` but it does not perform the rotations itself.
 Please ensure logrotate is enabled on your Loom hosts.
 

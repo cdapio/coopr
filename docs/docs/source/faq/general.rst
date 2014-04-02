@@ -39,7 +39,7 @@ Even though Continuuity Loom may seem similar to Apache Ambari and Savanna in so
 .. figure:: loom-ambari-comparision.png
     :align: center
     :width: 800px
-    :alt: Loom Ambari Comparision
+    :alt: Continuuity Loom Ambari Comparision
     :figclass: align-center
 
 
@@ -50,7 +50,7 @@ The graph above depicts Continuuity Loom's management capabilities on the horizo
    :header-rows: 1
 
    * - Feature
-     - Loom
+     - Continuuity Loom
      - Ambari/Savanna
      - Description
    * - Multi Cluster support

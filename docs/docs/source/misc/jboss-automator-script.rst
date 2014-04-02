@@ -17,7 +17,7 @@
 JBoss Application Server
 ===========================
 
-This document describes how to install and configure JBoss Application Server (AS) and template with Loom in less than 10 minutes.
+This document describes how to install and configure JBoss Application Server (AS) and template with Continuuity Loom in less than 10 minutes.
 JBoss AS is an open source Java Application Server. For more information please visit the `JBoss AS site <http://www.jboss.org/jbossas>`_
 
 Prerequisite
@@ -53,17 +53,17 @@ After the JBoss bundle is installed, you should see the following directory stru
 
 .. note:: More JBoss applications can be added to the 'jboss-apps' directory and will be installed into the '$JBOSS_HOME/standalone/deployments' directory by default.
 
-Configure Oracle Java 7 Service in Loom
--------------------------------------------------
-JBoss AS requires Oracle Java 7. The following will add a service to Loom for installing and configuring Java:
+Configure Oracle Java 7 Service in Continuuity Loom
+---------------------------------------------------
+JBoss AS requires Oracle Java 7. The following will add a service to Continuuity Loom for installing and configuring Java:
 ::
  $ curl -o /tmp/oracle-java-7 $REMOTE_LOOM_PLUGINS/jboss/services/oracle-java-7
  $ curl -X POST -H "X-Loom-UserId:admin"\
      -d @/tmp/oracle-java-7 http://$LOOM_SERVER:$LOOM_PORT/v1/loom/services
 
-Configure JBoss AS Service in Loom
---------------------------------------------
-Now that we have installed the scripts and dependent services, we must configure the JBoss AS service within Loom and then define a cluster template to enable Loom provisioning of JBoss AS clusters.
+Configure JBoss AS Service in Continuuity Loom
+----------------------------------------------
+Now that we have installed the scripts and dependent services, we must configure the JBoss AS service within Continuuity Loom and then define a cluster template to enable Loom provisioning of JBoss AS clusters.
 This configuration can be achieved using either the Loom Admin UI or Webservices.
 
 The following adds service 'jboss' to the service list.
@@ -72,10 +72,10 @@ The following adds service 'jboss' to the service list.
  $ curl -X POST -H "X-Loom-UserId:admin"\
      -d @/tmp/jboss http://$LOOM_SERVER:$LOOM_PORT/v1/loom/services
 
-Create JBoss AS Cluster Template in Loom
---------------------------------------------------
-Once the 'jboss' service has been added to Loom, you are ready to create a cluster template or even add this service to an existing cluster template.
-The easiest way to get started running JBoss AS is to use the Webservices to add a new JBoss cluster template to Loom.
+Create JBoss AS Cluster Template in Continuuity Loom
+-----------------------------------------------------
+Once the 'jboss' service has been added to Continuuity Loom, you are ready to create a cluster template or even add this service to an existing cluster template.
+The easiest way to get started running JBoss AS is to use the Webservices to add a new JBoss cluster template to Continuuity Loom.
 
 .. sidebar:: Cluster template details
 
@@ -90,8 +90,8 @@ Use the following command to create the 'jboss-application-server' cluster templ
  $ curl -X POST -H "X-Loom-UserId:admin"\
      -d @/tmp/jboss-application-server http://$LOOM_SERVER:$LOOM_PORT/v1/loom/clustertemplates
 
-Provision an instance of 'jboss-application-cluster' with Loom
---------------------------------------------------------------
+Provision an instance of 'jboss-application-cluster' with Continuuity Loom
+--------------------------------------------------------------------------
 Once the cluster template has been created, you are now ready to create a cluster. Please
 follow the cluster creation procedure from the main Loom documentation. You can either choose
 a singlenode or multi-node JBoss AS cluster. Once the cluster has been successfully provisioned

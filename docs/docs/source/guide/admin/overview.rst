@@ -24,7 +24,7 @@ Overview
 
 .. include:: /guide/admin/admin-links.rst
 
-In this page, we explore various concepts behind Loom administration and explain various tools used in Continuuity Loom for
+In this page, we explore various concepts behind Continuuity Loom administration and explain various tools used in Continuuity Loom for
 administrators to configure and manage their clusters. At the core of a Loom cluster is the notion of a **Template**, which
 is the blueprint or the primordial stuff of what Loom clusters are comprised of—it is the essence or the DNA of how different
 parts and components come together to materialize into a cluster.

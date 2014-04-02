@@ -33,7 +33,7 @@ has been designed to offer a comprehensive self-service provisioning system.
 
 .. figure:: /_images/loom-diagram.png
     :align: center
-    :alt: What is Loom?
+    :alt: What is Continuuity Loom?
     :figclass: align-center
 
 Within Continuuity Loom, a cluster is the basic indivisible element that supports create, delete, amend, update, and
