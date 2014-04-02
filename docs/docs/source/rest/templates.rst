@@ -78,6 +78,7 @@ The defaults section describes what will be used to create a cluster if the user
 this section can be overwritten by the user, though it is likely only advanced users will want to do so.  Templates must contain a set of default services, a default provider, and a 
 default config.  Optionally, a hardware type to use across the entire cluster, and an image type to use across the entire cluster, may be specified.  The default services must be a subset 
 of the services defined in the compatibility section.  Similarly, if a hardwaretype or imagetype is specified, it must be one of the types given in the compatibility section.  
+A default DNS suffix can also be provided for suggested hostnames. If none is specified, the Server will use "local" as the DNS suffix.
 Lastly, the config is a JSON Object that gets passed straight through to provisioners, usually describing different configuration settings for the services that will be placed on the cluster. 
 
 Example Default Section
@@ -94,6 +95,7 @@ Example Default Section
         "provider": "rackspace",
         "hardwaretype": "medium",
         "imagetype": "ubuntu12",
+        "dnsSuffix": "dev.company.com",
         "config": {
             "hadoop": {
                 "core_site": {

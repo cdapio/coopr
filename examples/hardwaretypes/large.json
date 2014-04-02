@@ -7,9 +7,6 @@
     },
     "rackspace": {
       "flavor": 6
-    },
-    "openstack": {
-      "flavor": "m1.large"
     }
   }
 }

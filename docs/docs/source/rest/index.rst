@@ -104,6 +104,15 @@ Clusters
   * :ref:`Getting Status of a Cluster <cluster-status>`
   * :ref:`Getting a Cluster Action Plan <cluster-plan>`
 
+RPC Calls
+=========
+In addition to the standard REST endpoints, a few RPC functions are available to obtain cluster information. 
+
+RPC
+---
+  * :ref:`Getting Status of All Clusters <rpc-statuses>`
+  * :ref:`Getting Properties of Nodes in a Cluster <rpc-properties>`
+
 Provisioner APIs
 ================
 The Server communicates with Provisioners through these APIs. At a high level, there are two types of methods:
