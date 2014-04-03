@@ -61,5 +61,5 @@ The default admin password is L0omProd!23.
 Any user password works. What are the user passwords for?
 ---------------------------------------------------------
 
-Currently, Loom will allow any user to login through the UI. Authentication has not been implemented yet so the usernames
+Currently, Continuuity Loom will allow any user to login through the UI. Authentication has not been implemented yet so the usernames
 and passwords are simply placeholders at this time. Authentication will be added in a future release.

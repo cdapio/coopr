@@ -211,7 +211,7 @@ Example
 List All Hardware Type
 =============================
 
-To list all the hardware types configured within in Loom, make GET HTTP request to URI:
+To list all the hardware types configured within Continuuity Loom, make GET HTTP request to URI:
 ::
  /hardwaretypes
 

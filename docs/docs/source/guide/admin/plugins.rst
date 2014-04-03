@@ -27,7 +27,7 @@ Provisioner Plugins
 .. include:: /guide/admin/admin-links.rst
 
 The Loom provisioner allows you to create custom plugins for allocating machines on your providers or to custom
-implement your services. This document provides the necessary information to build a custom plugin for Loom.
+implement your services. This document provides the necessary information to build a custom plugin for Continuuity Loom.
 
 Types of Plugins
 ================

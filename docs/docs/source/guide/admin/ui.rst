@@ -435,7 +435,7 @@ When adding a service, an administrator specifies the dependencies of the servic
 DataNode requires a working Hadoop HDFS NameNode.
 
 The administrator then defines the list of actions to occur or execute in order to make the service available
-and operational on a cluster. Such actions may include install, remove, initialize, start, and stop. Loom currently supports
+and operational on a cluster. Such actions may include install, remove, initialize, start, and stop. Continuuity Loom currently supports
 actions being performed through Chef recipes and shell scripts. You enter the location/name of the script or recipe 
 in the text field labeled 'Script,' including any parameters script expects in the text field labeled 'Data'.
 To add another action, click on 'Add,' and an additional section will be added below. Follow the same steps.

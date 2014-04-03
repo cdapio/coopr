@@ -29,7 +29,7 @@ General
 #. :doc:`What are the differences between Continuuity Loom and Amazon EMR?<general>`
 #. :doc:`Will Continuuity Loom support docker based clusters ?<general>`
 #. :doc:`Does Continuuity Loom support bare metal ?<general>`
-#. :doc:`What providers are supported by Loom ?<general>`
+#. :doc:`What providers are supported by Continuuity Loom ?<general>`
 #. :doc:`Does Continuuity Loom make it easy for me to move from one cloud to another ?<general>`
 #. :doc:`Can Continuuity Loom work on my laptop ?<general>`
 #. :doc:`How long has Continuuity Loom been used in a production enviroment and where is it being used?<general>`

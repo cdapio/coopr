@@ -213,7 +213,7 @@ Example
 List All Image Type
 =============================
 
-To list all the image types configured within Loom, make a GET HTTP request to URI:
+To list all the image types configured within Continuuity Loom, make a GET HTTP request to URI:
 ::
  /imagetypes
 

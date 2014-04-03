@@ -129,7 +129,7 @@ Layout constraints define which services must and can't coexist on the same node
 Each inner array is a set of services that must all coexist together on the same node.  For example, in a hadoop cluster, you generally want datanodes, regionservers, 
 and nodemanagers to all be placed together. To achieve this cloistered coexistancy, you would put all 3 services in the same "must coexist" constraint.  Must coexist constraints 
 are not transitive. If there is one constraint saying serviceA must coexist with serviceB, and another constraint saying serviceB must coexist with serviceC, this does NOT mean 
-that serviceA must coexist with serviceC. Loom was designed this way to prevent unintended links between services, especially as the number of must coexist constraints increase.
+that serviceA must coexist with serviceC. Continuuity Loom was designed this way to prevent unintended links between services, especially as the number of must coexist constraints increase.
 If a must coexist rule contains a service that is not on the cluster, it is shrunk to ignore the service that is not on the cluster. For example, your template may be compatible with 
 datanodes, nodemanagers, and regionservers. However, by default, you only put datanodes and nodemanagers on the cluster. A constraint stating that datanodes, nodemanagers, and 
 regionservers must coexist on the same node will get transformed into a constraint that just says datanodes and nodemanagers must coexist on the same node.
@@ -646,7 +646,7 @@ Example
 List all Cluster Templates
 =============================
 
-To list all the services configured within in Loom, make GET HTTP request to URI:
+To list all the services configured within Continuuity Loom, make GET HTTP request to URI:
 ::
  /clustertemplates
 
