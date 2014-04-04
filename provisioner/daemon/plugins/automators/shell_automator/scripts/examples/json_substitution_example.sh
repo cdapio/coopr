@@ -17,7 +17,7 @@
 
 # to use this script, define a Loom service as follows:
 #  type: shell
-#  script: json_substitution_example.sh
+#  script: examples/json_substitution_example.sh
 #  data: taskId config/automators [any additional keys from cluster configuration]
 
 echo "--- example json parsing ---"
