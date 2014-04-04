@@ -46,9 +46,13 @@ public final class Cluster extends NamedEntity {
      */
     ACTIVE,
     /**
-     * Previous job on cluster failed, cluster may not be ready to use.
+     * Cluster creation did not complete, cluster may not be ready to use.
      */
     INCOMPLETE,
+    /**
+     * Cluster used to be ACTIVE, but a previous operation failed leaving it in an inconsistent state.
+     */
+    INCONSISTENT,
     /**
      * The cluster no longer exists.
      */
@@ -66,7 +70,7 @@ public final class Cluster extends NamedEntity {
   private final List<String> jobs;
   private String ownerId;
   private Status status;
-  private final JsonObject config;
+  private JsonObject config;
 
   public Cluster(String id, String ownerId, String name, long createTime, String description, Provider provider,
                  ClusterTemplate clusterTemplate, Set<String> nodes, Set<String> services, JsonObject config) {
@@ -293,6 +297,16 @@ public final class Cluster extends NamedEntity {
    */
   public void setServices(Set<String> services) {
     this.services = ImmutableSet.copyOf(services);
+  }
+
+  /**
+   * Set the config for the cluster. Only sets the config in this Java object.
+   * A separate call must be made to persistently store changes in config.
+   *
+   * @param config Cluster configuration to use.
+   */
+  public void setConfig(JsonObject config) {
+    this.config = config;
   }
 
   @Override

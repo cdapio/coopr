@@ -151,7 +151,7 @@ public class SQLClusterStore extends BaseClusterStore {
 
   @Override
   public Cluster getCluster(String clusterId) throws Exception {
-    long clusterNum = Long.valueOf(clusterId);
+    long clusterNum = Long.parseLong(clusterId);
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("SELECT cluster FROM clusters WHERE id=? ");
@@ -164,7 +164,7 @@ public class SQLClusterStore extends BaseClusterStore {
 
   @Override
   public Cluster getCluster(String clusterId, String ownerId) throws Exception {
-    long clusterNum = Long.valueOf(clusterId);
+    long clusterNum = Long.parseLong(clusterId);
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("SELECT cluster FROM clusters WHERE id=? AND owner_id=?");
@@ -177,10 +177,37 @@ public class SQLClusterStore extends BaseClusterStore {
   }
 
   @Override
+  public boolean clusterExists(String clusterId) throws Exception {
+    long clusterNum = Long.parseLong(clusterId);
+    Connection conn = dbConnectionPool.getConnection();
+    try {
+      PreparedStatement statement = conn.prepareStatement("SELECT id FROM clusters WHERE id=?");
+      statement.setLong(1, clusterNum);
+      return hasResults(statement);
+    } finally {
+      conn.close();
+    }
+  }
+
+  @Override
+  public boolean clusterExists(String clusterId, String userId) throws Exception {
+    long clusterNum = Long.parseLong(clusterId);
+    Connection conn = dbConnectionPool.getConnection();
+    try {
+      PreparedStatement statement = conn.prepareStatement("SELECT id FROM clusters WHERE id=? AND owner_id=?");
+      statement.setLong(1, clusterNum);
+      statement.setString(2, userId);
+      return hasResults(statement);
+    } finally {
+      conn.close();
+    }
+  }
+
+  @Override
   public void writeCluster(Cluster cluster) throws Exception {
     // sticking with standard sql... this could be done in one step with replace, or with
     // insert ... on duplicate key update with mysql.
-    long clusterNum = Long.valueOf(cluster.getId());
+    long clusterNum = Long.parseLong(cluster.getId());
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement checkStatement = conn.prepareStatement("SELECT id FROM clusters WHERE id=?");
@@ -230,7 +257,7 @@ public class SQLClusterStore extends BaseClusterStore {
 
   @Override
   public void deleteCluster(String clusterId) throws Exception {
-    long clusterNum = Long.valueOf(clusterId);
+    long clusterNum = Long.parseLong(clusterId);
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("DELETE FROM clusters WHERE id=? ");
@@ -252,7 +279,7 @@ public class SQLClusterStore extends BaseClusterStore {
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT job FROM jobs WHERE job_num=? AND cluster_id=?");
         statement.setLong(1, jobId.getJobNum());
-        statement.setLong(2, Long.valueOf(jobId.getClusterId()));
+        statement.setLong(2, Long.parseLong(jobId.getClusterId()));
         return getQueryItem(statement, ClusterJob.class);
       } finally {
         conn.close();
@@ -274,7 +301,7 @@ public class SQLClusterStore extends BaseClusterStore {
 
     Map<Long, JobId> clusterIdToJobId = Maps.newHashMap();
     for (JobId jobId : jobIds) {
-      clusterIdToJobId.put(Long.valueOf(jobId.getClusterId()), jobId);
+      clusterIdToJobId.put(Long.parseLong(jobId.getClusterId()), jobId);
     }
 
     ClusterJob job;
@@ -332,14 +359,14 @@ public class SQLClusterStore extends BaseClusterStore {
   @Override
   public void writeClusterJob(ClusterJob clusterJob) throws TaskException {
     JobId jobId = JobId.fromString(clusterJob.getJobId());
-    long clusterId = Long.valueOf(jobId.getClusterId());
+    long clusterId = Long.parseLong(jobId.getClusterId());
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement checkStatement =
           conn.prepareStatement("SELECT job_num FROM jobs WHERE job_num=? AND cluster_id=?");
         checkStatement.setLong(1, jobId.getJobNum());
-        checkStatement.setLong(2, Long.valueOf(jobId.getClusterId()));
+        checkStatement.setLong(2, Long.parseLong(jobId.getClusterId()));
         PreparedStatement writeStatement;
         try {
           ResultSet rs = checkStatement.executeQuery();
@@ -389,7 +416,7 @@ public class SQLClusterStore extends BaseClusterStore {
       try {
         PreparedStatement statement = conn.prepareStatement("DELETE FROM jobs WHERE job_num=? AND cluster_id=?");
         statement.setLong(1, jobId.getJobNum());
-        statement.setLong(2, Long.valueOf(jobId.getClusterId()));
+        statement.setLong(2, Long.parseLong(jobId.getClusterId()));
         try {
           statement.executeUpdate();
         } finally {
@@ -411,7 +438,7 @@ public class SQLClusterStore extends BaseClusterStore {
         PreparedStatement statement =
           conn.prepareStatement("SELECT task FROM tasks WHERE task_num=? AND cluster_id=? AND job_num=?");
         statement.setLong(1, taskId.getTaskNum());
-        statement.setLong(2, Long.valueOf(taskId.getClusterId()));
+        statement.setLong(2, Long.parseLong(taskId.getClusterId()));
         statement.setLong(3, taskId.getJobNum());
         return getQueryItem(statement, ClusterTask.class);
       } finally {
@@ -426,7 +453,7 @@ public class SQLClusterStore extends BaseClusterStore {
   @Override
   public void writeClusterTask(ClusterTask clusterTask) throws TaskException {
     TaskId taskId = TaskId.fromString(clusterTask.getTaskId());
-    long clusterId = Long.valueOf(taskId.getClusterId());
+    long clusterId = Long.parseLong(taskId.getClusterId());
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -491,7 +518,7 @@ public class SQLClusterStore extends BaseClusterStore {
         PreparedStatement statement =
           conn.prepareStatement("DELETE FROM tasks WHERE task_num=? AND cluster_id=? AND job_num=?");
         statement.setLong(1, taskId.getTaskNum());
-        statement.setLong(2, Long.valueOf(taskId.getClusterId()));
+        statement.setLong(2, Long.parseLong(taskId.getClusterId()));
         statement.setLong(3, taskId.getJobNum());
         try {
           statement.executeUpdate();
@@ -540,7 +567,7 @@ public class SQLClusterStore extends BaseClusterStore {
             writeStatement = conn.prepareStatement(
               "INSERT INTO nodes (id, cluster_id, node) VALUES (?, ?, ?)");
             writeStatement.setString(1, node.getId());
-            writeStatement.setLong(2, Long.valueOf(node.getClusterId()));
+            writeStatement.setLong(2, Long.parseLong(node.getClusterId()));
             writeStatement.setBlob(3, new ByteArrayInputStream(codec.serialize(node, Node.class)));
           }
         } finally {
@@ -581,7 +608,7 @@ public class SQLClusterStore extends BaseClusterStore {
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("SELECT node FROM nodes WHERE cluster_id=? ");
-      statement.setLong(1, Long.valueOf(clusterId));
+      statement.setLong(1, Long.parseLong(clusterId));
       return getQuerySet(statement, Node.class);
     } finally {
       conn.close();
@@ -594,7 +621,7 @@ public class SQLClusterStore extends BaseClusterStore {
     try {
       PreparedStatement statement = conn.prepareStatement(
         "SELECT N.node FROM nodes N, clusters C WHERE C.id=? AND C.owner_id=? AND N.cluster_id=C.id");
-      statement.setLong(1, Long.valueOf(clusterId));
+      statement.setLong(1, Long.parseLong(clusterId));
       statement.setString(2, userId);
       return getQuerySet(statement, Node.class);
     } finally {
@@ -706,6 +733,26 @@ public class SQLClusterStore extends BaseClusterStore {
         } else {
           return null;
         }
+      } finally {
+        rs.close();
+      }
+    } finally {
+      statement.close();
+    }
+  }
+
+  /**
+   * Performs the query and returns whether or not there are results.
+   *
+   * @param statement PreparedStatement of the query, ready for execution. Will be closed by this method.
+   * @return True if the query has results, false if not.
+   * @throws SQLException
+   */
+  private boolean hasResults(PreparedStatement statement) throws SQLException {
+    try {
+      ResultSet rs = statement.executeQuery();
+      try {
+        return rs.next();
       } finally {
         rs.close();
       }

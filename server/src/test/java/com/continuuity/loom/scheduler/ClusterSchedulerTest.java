@@ -310,6 +310,123 @@ public class ClusterSchedulerTest {
   }
 
   @Test
+  public void testConfigureTaskDag() {
+    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data")));
+    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data")));
+    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data")));
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), Collections.EMPTY_MAP);
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), Collections.EMPTY_MAP);
+
+    Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
+    Multimap<String, Node> serviceNodeMap = HashMultimap.create();
+    serviceNodeMap.put(s1.getName(), node1);
+    serviceNodeMap.put(s1.getName(), node2);
+    serviceNodeMap.put(s2.getName(), node2);
+    serviceNodeMap.put(s3.getName(), node2);
+    Map<String, Service> serviceMap = ImmutableMap.of(s1.getName(), s1, s2.getName(), s2, s3.getName(), s3);
+
+    TaskDag expected = new TaskDag();
+    // node1 has bootstrap -> configure s1
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), s1.getName()));
+    // node2 has bootstrap -> configure s1, bootstrap -> configure s3
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node2.getId(), ProvisionerAction.CONFIGURE.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node2.getId(), ProvisionerAction.CONFIGURE.name(), s3.getName()));
+
+    TaskDag dag = ClusterScheduler.createTaskDag(ClusterAction.CLUSTER_CONFIGURE,
+                                                 new Actions(), clusterNodes, serviceNodeMap, serviceMap);
+    Assert.assertEquals(expected, dag);
+  }
+
+  @Test
+  public void testConfigureWithRestartTaskDag() {
+    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), Collections.EMPTY_MAP);
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), Collections.EMPTY_MAP);
+
+    Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
+    Multimap<String, Node> serviceNodeMap = HashMultimap.create();
+    serviceNodeMap.put(s1.getName(), node1);
+    serviceNodeMap.put(s1.getName(), node2);
+    serviceNodeMap.put(s2.getName(), node2);
+    serviceNodeMap.put(s3.getName(), node2);
+    Map<String, Service> serviceMap = ImmutableMap.of(s1.getName(), s1, s2.getName(), s2, s3.getName(), s3);
+
+    TaskDag expected = new TaskDag();
+    // stop of each service on each node depends on bootstrap
+    // node1 only has service s1
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node1.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()));
+    // stop s3 -> stop s2 -> stop s1
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    // stop s1 on node1 depends on stop s2 on node2
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node1.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    // configure of each service depends on stop of that service. no configure s2 since it has no configure action.
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.STOP.name(), s1.getName()),
+                           new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.CONFIGURE.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.CONFIGURE.name(), s3.getName()));
+    // start of each service depends on configure of that service.
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), s1.getName()),
+                           new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.CONFIGURE.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.CONFIGURE.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
+    // except for s2. since it has no configure, start should depend on stop.
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    // start s2 depends on start s1 on each node
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    // start s3 depends on start s2
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
+
+
+    TaskDag dag = ClusterScheduler.createTaskDag(ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART,
+                                                 new Actions(), clusterNodes, serviceNodeMap, serviceMap);
+
+    Assert.assertEquals(expected, dag);
+  }
+
+  @Test
   public void testNoEdgeNodesInDag() {
     Service s1 = new Service("s1", "", Collections.EMPTY_SET, Collections.EMPTY_MAP);
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), Collections.EMPTY_MAP);

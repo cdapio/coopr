@@ -57,7 +57,9 @@ Helpers.READABLE_ACTIONS = {
   CLUSTER_CREATE: "Creation",
   CLUSTER_DELETE: "Deletion",
   SOLVE_LAYOUT: "Solve layout",
-  CLUSTER_EXPIRE: "Deletion on expiry"
+  CLUSTER_EXPIRE: "Deletion on expiry",
+  CLUSTER_CONFIGURE: "Configure",
+  CLUSTER_CONFIGURE_WITH_RESTART: "Configure and restart"
 };
 
 /**
