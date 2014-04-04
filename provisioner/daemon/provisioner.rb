@@ -99,7 +99,7 @@ def delegate_task(task, pluginmanager)
     result = object.runTask
   when 'bootstrap'
     combinedresult = Hash.new  
-    if task['config'].has_key? 'automators'
+    if task['config'].has_key? 'automators' and !task['config']['automators'].empty?
       # server has specified which bootstrap handlers need to run
       log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
       task['config']['automators'].each do |automatorName|
