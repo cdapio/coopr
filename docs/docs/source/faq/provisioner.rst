@@ -91,5 +91,5 @@ before a provisioner shuts itself down after receiving a kill signal.
 
 Can the chef-automator use a Chef server ?
 ------------------------------------------
-Currently, it does not. The current version uses only chef-solo, however, future version of Loom will support both chef-solo and
+Currently, it does not. The current version uses only chef-solo, however, future version of Continuuity Loom will support both chef-solo and
 chef-client. 

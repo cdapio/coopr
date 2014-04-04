@@ -121,6 +121,9 @@ public class CreateClustertemplateTest extends GenericTest {
     defaulthardwaretype.selectByVisibleText(clusterTemplate.getClusterDefaults().getHardwaretype());
     defaultimagetype.selectByVisibleText(clusterTemplate.getClusterDefaults().getImagetype());
 
+    globalDriver.findElement(By.cssSelector("#inputDnsSuffix")).sendKeys(
+      clusterTemplate.getClusterDefaults().getDnsSuffix().toString());
+
     globalDriver.findElement(By.cssSelector("#inputConfig")).sendKeys(
       clusterTemplate.getClusterDefaults().getConfig().toString());
 

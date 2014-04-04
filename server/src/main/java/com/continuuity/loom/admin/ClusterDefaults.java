@@ -30,16 +30,18 @@ public class ClusterDefaults {
   private final String provider;
   private final String hardwaretype;
   private final String imagetype;
+  private final String dnsSuffix;
   private final JsonObject config;
 
   public ClusterDefaults(Set<String> services, String provider, String hardwaretype,
-                         String imagetype, JsonObject config) {
+                         String imagetype, String dnsSuffix, JsonObject config) {
     Preconditions.checkArgument(services != null, "default services must be specified");
     Preconditions.checkArgument(provider != null, "default provider must be specified");
     this.services = services;
     this.provider = provider;
     this.hardwaretype = hardwaretype;
     this.imagetype = imagetype;
+    this.dnsSuffix = dnsSuffix;
     this.config = config == null ? new JsonObject() : config;
   }
 
@@ -84,6 +86,15 @@ public class ClusterDefaults {
   }
 
   /**
+   * Get the dns suffix to use for hostnames of nodes in the cluster.
+   *
+   * @return DNS suffix to use for hostnames of nodes in the cluster.
+   */
+  public String getDnsSuffix() {
+    return dnsSuffix;
+  }
+
+  /**
    * Get the admin defined config for the cluster.
    *
    * @return Config for the cluster.
@@ -99,6 +110,7 @@ public class ClusterDefaults {
       .add("provider", provider)
       .add("hardwaretype", hardwaretype)
       .add("imagetype", imagetype)
+      .add("dnsSuffix", dnsSuffix)
       .add("config", config)
       .toString();
   }

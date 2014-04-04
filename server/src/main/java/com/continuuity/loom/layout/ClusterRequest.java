@@ -17,6 +17,7 @@ package com.continuuity.loom.layout;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
 
 import java.util.Set;
 
@@ -26,31 +27,36 @@ import java.util.Set;
 public class ClusterRequest {
   private final String name;
   private final String description;
-  private final String clusterTemplateName;
+  private final String clusterTemplate;
   private final int numMachines;
   private final String provider;
   private final Set<String> services;
-  private final String hardwareType;
-  private final String imageType;
-  private final long leaseDuration;
+  private final String hardwaretype;
+  private final String imagetype;
+  private final long initialLeaseDuration;
+  private final String dnsSuffix;
+  private final JsonObject config;
 
-  public ClusterRequest(String name, String description, String clusterTemplateName,
+  public ClusterRequest(String name, String description, String clusterTemplate,
                         int numMachines, String provider, Set<String> services,
-                        String hardwareType, String imageType, long leaseDuration) {
+                        String hardwareType, String imageType, Long initialLeaseDuration,
+                        String dnsSuffix, JsonObject config) {
     // check that the arguments that don't have defaults are not null.
     Preconditions.checkArgument(name != null && !name.isEmpty(), "cluster name must be specified");
-    Preconditions.checkArgument(clusterTemplateName != null && !clusterTemplateName.isEmpty(),
+    Preconditions.checkArgument(clusterTemplate != null && !clusterTemplate.isEmpty(),
                                 "cluster template must be specified");
     Preconditions.checkArgument(numMachines > 0, "cluster size must be greater than 0");
     this.name = name;
-    this.description = description;
-    this.clusterTemplateName = clusterTemplateName;
+    this.description = description == null ? "" : description;
+    this.clusterTemplate = clusterTemplate;
     this.numMachines = numMachines;
     this.provider = provider;
     this.services = services;
-    this.hardwareType = hardwareType;
-    this.imageType = imageType;
-    this.leaseDuration = leaseDuration;
+    this.hardwaretype = hardwareType;
+    this.imagetype = imageType;
+    this.initialLeaseDuration = initialLeaseDuration == null ? -1 : initialLeaseDuration;
+    this.dnsSuffix = dnsSuffix;
+    this.config = config == null ? new JsonObject() : config;
   }
 
   /**
@@ -106,8 +112,8 @@ public class ClusterRequest {
    *
    * @return Name of the cluster template to use for cluster creation.
    */
-  public String getClusterTemplateName() {
-    return clusterTemplateName;
+  public String getClusterTemplate() {
+    return clusterTemplate;
   }
 
   /**
@@ -117,7 +123,7 @@ public class ClusterRequest {
    * @return Name of the hardware type to use across the entire cluster or null if the template default should be used.
    */
   public String getHardwareType() {
-    return hardwareType;
+    return hardwaretype;
   }
 
   /**
@@ -127,7 +133,7 @@ public class ClusterRequest {
    * @return Name of the image type to use across the entire cluster or null if the template default should be used.
    */
   public String getImageType() {
-    return imageType;
+    return imagetype;
   }
 
   /**
@@ -135,8 +141,26 @@ public class ClusterRequest {
    *
    * @return Lease duration to use for the cluster, with 0 meaning no lease.
    */
-  public long getLeaseDuration() {
-    return leaseDuration;
+  public long getInitialLeaseDuration() {
+    return initialLeaseDuration;
+  }
+
+  /**
+   * Get the DNS suffix to use for hostnames of nodes in the cluster, with null meaning to use the template defaults.
+   *
+   * @return DNS suffix to use for hostnames of nodes in the cluster, with null meaning to use the template defaults.
+   */
+  public String getDnsSuffix() {
+    return dnsSuffix;
+  }
+
+  /**
+   * Get the configuration to use for the cluster, with null meaning to use the template defaults.
+   *
+   * @return Configuration to use for the cluster, with null meaning to use the template defaults.
+   */
+  public JsonObject getConfig() {
+    return config;
   }
 
   @Override
@@ -147,19 +171,21 @@ public class ClusterRequest {
     ClusterRequest other = (ClusterRequest) o;
     return Objects.equal(name, other.name) &&
       Objects.equal(description, other.description) &&
-      Objects.equal(clusterTemplateName, other.clusterTemplateName) &&
+      Objects.equal(clusterTemplate, other.clusterTemplate) &&
       Objects.equal(numMachines, other.numMachines) &&
       Objects.equal(provider, other.provider) &&
       Objects.equal(services, other.services) &&
-      Objects.equal(hardwareType, other.hardwareType) &&
-      Objects.equal(imageType, other.imageType) &&
-      Objects.equal(leaseDuration, other.leaseDuration);
+      Objects.equal(hardwaretype, other.hardwaretype) &&
+      Objects.equal(imagetype, other.imagetype) &&
+      Objects.equal(initialLeaseDuration, other.initialLeaseDuration) &&
+      Objects.equal(dnsSuffix, other.dnsSuffix) &&
+      Objects.equal(config, other.config);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, clusterTemplateName, numMachines, provider, services,
-                            hardwareType, imageType, leaseDuration);
+    return Objects.hashCode(name, description, clusterTemplate, numMachines, provider, services,
+                            hardwaretype, imagetype, initialLeaseDuration, dnsSuffix, config);
   }
 
   @Override
@@ -167,13 +193,15 @@ public class ClusterRequest {
     return Objects.toStringHelper(this)
       .add("name", name)
       .add("description", description)
-      .add("clusterTemplateName", clusterTemplateName)
+      .add("clusterTemplate", clusterTemplate)
       .add("numMachines", numMachines)
       .add("provider", provider)
       .add("services", services)
-      .add("hardwareType", hardwareType)
-      .add("imageType", imageType)
-      .add("leaseDuration", leaseDuration)
+      .add("hardwareType", hardwaretype)
+      .add("imageType", imagetype)
+      .add("initialLeaseDuration", initialLeaseDuration)
+      .add("dnsSuffix", dnsSuffix)
+      .add("config", config)
       .toString();
   }
 }

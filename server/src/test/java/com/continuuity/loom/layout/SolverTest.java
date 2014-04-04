@@ -50,24 +50,12 @@ import java.util.Set;
 public class SolverTest extends BaseSolverTest {
   private static Solver solver;
 
-  @Test
-  public void testCreateHostname() {
-    String clusterId = "00000001";
-    Assert.assertEquals("i-am-a-cluster1-1002.local",
-                        solver.createHostname("i.am-a_cluster", clusterId, 1002));
-
-    StringBuilder longName = new StringBuilder();
-    for (int i = 0; i < 243; i++) {
-      longName.append("a");
-    }
-    String bigName = longName.toString();
-    Assert.assertEquals(bigName + "1-" + "1002.local", solver.createHostname(bigName + "bcde", clusterId, 1002));
-  }
 
   @Test
   public void testEndToEnd() throws Exception {
     ClusterRequest request =
-      new ClusterRequest("mycluster", "my reactor cluster", reactorTemplate.getName(), 5, null, null, null, null, 0);
+      new ClusterRequest("mycluster", "my reactor cluster", reactorTemplate.getName(),
+                         5, null, null, null, null, 0L, null, null);
     Map<String, Node> nodes = solver.solveClusterNodes(
       new Cluster("1", "owner1", request.getName(), System.currentTimeMillis(), request.getDescription(),
                   null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of()),
@@ -94,7 +82,7 @@ public class SolverTest extends BaseSolverTest {
   @Test(expected = IllegalArgumentException.class)
   public void testUnknownTemplateThrowsException() throws Exception {
     ClusterRequest request =
-      new ClusterRequest("mycluster", "my cluster", "bad template name", 5, null, null, null, null, -1);
+      new ClusterRequest("mycluster", "my cluster", "bad template name", 5, null, null, null, null, -1L, null, null);
     solver.solveClusterNodes(
       new Cluster("1", "owner1", request.getName(), System.currentTimeMillis(), request.getDescription(),
                   null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of()),
@@ -105,7 +93,7 @@ public class SolverTest extends BaseSolverTest {
   public void testDisallowedServicesThrowsException() throws Exception {
     ClusterRequest request =
       new ClusterRequest("mycluster", "my cluster", reactorTemplate.getName(), 5, "joyent",
-                         ImmutableSet.of("namenode", "datanode", "mysql", "httpd"), null, null, -1);
+                         ImmutableSet.of("namenode", "datanode", "mysql", "httpd"), null, null, -1L, null, null);
     solver.solveClusterNodes(
       new Cluster("1", "owner1", request.getName(), System.currentTimeMillis(), request.getDescription(),
                   null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of()),
@@ -116,7 +104,7 @@ public class SolverTest extends BaseSolverTest {
   public void testMissingServiceDependenciesThrowsException() throws Exception {
     ClusterRequest request =
       new ClusterRequest("mycluster", "my cluster", reactorTemplate.getName(), 5, "joyent",
-                         ImmutableSet.of("reactor", "datanode"), null, null, -1);
+                         ImmutableSet.of("reactor", "datanode"), null, null, -1L, null, null);
     solver.solveClusterNodes(
       new Cluster("1", "owner1", request.getName(), System.currentTimeMillis(), request.getDescription(),
                   null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of()),
@@ -127,7 +115,7 @@ public class SolverTest extends BaseSolverTest {
   public void testNoAvailableHardwareTypesThrowsException() throws Exception {
     ClusterRequest request =
       new ClusterRequest("mycluster", "my cluster", reactorTemplate.getName(), 5, "rackspace",
-                         ImmutableSet.of("namenode", "datanode"), null, null, -1);
+                         ImmutableSet.of("namenode", "datanode"), null, null, -1L, null, null);
     solver.solveClusterNodes(
       new Cluster("1", "owner1", request.getName(), System.currentTimeMillis(), request.getDescription(),
                   null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of()),
@@ -144,6 +132,7 @@ public class SolverTest extends BaseSolverTest {
           "joyent",
           "medium",
           "ubuntu12",
+          null,
           new JsonObject()
         ),
         new Compatibilities(
@@ -156,7 +145,8 @@ public class SolverTest extends BaseSolverTest {
     entityStore.writeClusterTemplate(simpleTemplate);
 
     // check required hardware types
-    ClusterRequest request = new ClusterRequest("abc", "desc", "simple", 5, "joyent", null, "medium", null, 0);
+    ClusterRequest request =
+      new ClusterRequest("abc", "desc", "simple", 5, "joyent", null, "medium", null, 0L, null, null);
     Map<String, Node> nodes = solver.solveClusterNodes(
       new Cluster("1", "owner1", request.getName(), System.currentTimeMillis(), request.getDescription(),
                   null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of()),
@@ -166,7 +156,7 @@ public class SolverTest extends BaseSolverTest {
       Assert.assertEquals("medium", node.getProperties().get("hardwaretype").getAsString());
     }
 
-    request = new ClusterRequest("abc", "desc", "simple", 5, "joyent", null, "large-mem", null, 0);
+    request = new ClusterRequest("abc", "desc", "simple", 5, "joyent", null, "large-mem", null, 0L, null, null);
     nodes = solver.solveClusterNodes(
       new Cluster("1", "owner1", request.getName(), System.currentTimeMillis(), request.getDescription(),
                   null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of()),
@@ -177,7 +167,7 @@ public class SolverTest extends BaseSolverTest {
     }
 
     // check required image types
-    request = new ClusterRequest("abc", "desc", "simple", 5, "joyent", null, null, "ubuntu12", 0);
+    request = new ClusterRequest("abc", "desc", "simple", 5, "joyent", null, null, "ubuntu12", 0L, null, null);
     nodes = solver.solveClusterNodes(
       new Cluster("1", "owner1", request.getName(), System.currentTimeMillis(), request.getDescription(),
                   null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of()),
@@ -188,7 +178,7 @@ public class SolverTest extends BaseSolverTest {
     }
 
     // test both
-    request = new ClusterRequest("abc", "desc", "simple", 5, "joyent", null, "small", "centos6", 0);
+    request = new ClusterRequest("abc", "desc", "simple", 5, "joyent", null, "small", "centos6", 0L, null, null);
     nodes = solver.solveClusterNodes(
       new Cluster("1", "owner1", request.getName(), System.currentTimeMillis(), request.getDescription(),
                   null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of()),
@@ -216,7 +206,7 @@ public class SolverTest extends BaseSolverTest {
     }
 
     Map<String, Node> nodes = Solver.solveConstraints("1", template, "name", 3,
-                                                      hwTypeMap, imgTypeMap, services, serviceMap);
+                                                      hwTypeMap, imgTypeMap, services, serviceMap, null);
     Multiset<Set<String>> serviceSetCounts = HashMultiset.create();
     for (Map.Entry<String, Node> entry : nodes.entrySet()) {
       Node node = entry.getValue();
@@ -254,7 +244,7 @@ public class SolverTest extends BaseSolverTest {
                                               ImmutableMap.<ProvisionerAction, ServiceAction>of()));
     }
     Map<String, Node> nodes = Solver.solveConstraints("1", reactorTemplate2, "name", 200,
-                                                      hwmap, imgmap, services, serviceMap);
+                                                      hwmap, imgmap, services, serviceMap, null);
     Multiset<Set<String>> serviceSetCounts = HashMultiset.create();
     for (Map.Entry<String, Node> entry : nodes.entrySet()) {
       Node node = entry.getValue();

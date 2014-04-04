@@ -113,8 +113,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   @Test
   public void testAddCluster() throws Exception {
     String clusterName = "my-cluster";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "my cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest(clusterName, "my cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String clusterId = getIdFromResponse(response);
 
@@ -122,7 +122,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Element element = solverQueue.take("0");
     Assert.assertEquals(clusterId, element.getId());
     ClusterRequest expected =
-      new ClusterRequest(clusterName, "my cluster", reactorTemplate.getName(), 5, null, null, null, null, -1);
+      new ClusterRequest(clusterName, "my cluster", reactorTemplate.getName(),
+                         5, null, null, null, null, -1L, null, null);
     Assert.assertEquals(expected, GSON.fromJson(element.getValue(), ClusterRequest.class));
 
   }
@@ -130,16 +131,11 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   @Test
   public void testAddClusterWithOptionalArgs() throws Exception {
     String clusterName = "my-cluster";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "my cluster", reactorTemplate.getName(), 5);
-    clusterRequest.addProperty("provider", "providerA");
-    clusterRequest.addProperty("imagetype", "imageB");
-    clusterRequest.addProperty("hardwaretype", "hardwareC");
-    JsonArray services = new JsonArray();
-    services.add(new JsonPrimitive("service1"));
-    services.add(new JsonPrimitive("service2"));
-    clusterRequest.add("services", services);
+    ClusterRequest clusterRequest =
+      new ClusterRequest(clusterName, "my cluster", reactorTemplate.getName(), 5, "providerA",
+                         ImmutableSet.of("service1", "service2"), "hardwareC", "imageB", -1L, null, null);
 
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     // check there was an element added to the cluster queue for creating this cluster
@@ -160,9 +156,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     userConfig.addProperty("userconfig1", "value1");
     userConfig.addProperty("userconfig2", "value1");
 
-    JsonObject clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1,
-                                                     userConfig);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1,
+                                                         userConfig);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -196,8 +192,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     //Create cluster
     String clusterName = "test-cluster-should-be-provisioned";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -338,8 +334,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testFailedClusterStatus() throws Exception {
     //Test Failed Status
     String clusterName = "test-cluster-should-be-failed";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -379,8 +375,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testFailedRetryClusterStatus() throws Exception {
     //Test Failed Status
     String clusterName = "test-cluster-retry-failed";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -454,8 +450,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testUnsolvableCluster() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-unsolvable";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "unsolvable cluster", reactorTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest =
+      createClusterRequest(clusterName, "unsolvable cluster", reactorTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -490,8 +487,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testCancelClusterJobWithTasks() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-should-be-canceled-with-tasks";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 2);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest =
+      createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 2);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -547,8 +545,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testCancelClusterJobNotAllowed1() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-should-be-canceled-after-solving";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest =
+      createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -598,8 +597,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testCancelClusterJobNotAllowed2() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-should-be-canceled-after-solving";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest =
+      createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -643,8 +643,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testCancelClusterNotRunningJob() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-should-be-canceled-after-solving";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest =
+      createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -719,15 +720,15 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       clusterStore.deleteCluster(cluster.getId());
     }
 
-    JsonObject clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String cluster1 = getIdFromResponse(response);
 
     solverScheduler.run();
 
     clusterRequest = createClusterRequest("cluster2", "my 2nd cluster", reactorTemplate.getName(), 6);
-    response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String cluster2 = getIdFromResponse(response);
 
@@ -769,8 +770,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testGetClusterNotOwnedByUserReturns404() throws Exception {
-    JsonObject clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String clusterId = getIdFromResponse(response);
 
@@ -779,8 +780,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testAdminCanGetClustersOwnedByOthers() throws Exception {
-    JsonObject clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String clusterId = getIdFromResponse(response);
 
@@ -789,8 +790,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testDeleteOnClusterNotOwnedByUserReturns404() throws Exception {
-    JsonObject clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String clusterId = getIdFromResponse(response);
 
@@ -813,13 +814,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testGetAllClustersReturnsOnlyThoseOwnedByUser() throws Exception {
-    JsonObject clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String cluster1 = getIdFromResponse(response);
 
     clusterRequest = createClusterRequest("cluster2", "my 2nd cluster", reactorTemplate.getName(), 6);
-    response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER2_HEADERS);
+    response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER2_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String cluster2 = getIdFromResponse(response);
 
@@ -887,8 +888,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testGetPlanForJob() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-for-plan-job";
-    JsonObject clusterRequest = createClusterRequest(clusterName, "test cluster plan job", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    ClusterRequest clusterRequest =
+      createClusterRequest(clusterName, "test cluster plan job", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -926,9 +928,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testMaxClusterSize() throws Exception {
-    JsonObject clusterRequest = createClusterRequest("cluster", "desc", smallTemplate.getName(),
-                                                     Constants.DEFAULT_MAX_CLUSTER_SIZE + 1);
-    assertResponseStatus(doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS),
+    ClusterRequest clusterRequest =
+      createClusterRequest("cluster", "desc", smallTemplate.getName(), Constants.DEFAULT_MAX_CLUSTER_SIZE + 1);
+    assertResponseStatus(doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 
@@ -950,12 +952,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   private void verifyInitialLeaseDuration(long expectedExpireTime, Cluster.Status expectedStatus,
                                           long requestedLeaseDuration,
                                           String clusterTemplate) throws Exception {
-    JsonObject clusterRequest = createClusterRequest("test-lease", "test cluster initial lease", clusterTemplate, 4);
-    clusterRequest.add("administration",
-                       GSON.fromJson(String.format("{\"leaseduration\":{\"initial\":%d}}", requestedLeaseDuration),
-                                     JsonObject.class));
+    ClusterRequest clusterRequest = new ClusterRequest("test-lease", "test cluster initial lease", clusterTemplate, 4,
+                                                       null, null, null, null, requestedLeaseDuration, null, null);
 
-    HttpResponse response = doPost("/v1/loom/clusters", clusterRequest.toString(), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     solverScheduler.run();
@@ -981,7 +981,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testClusterProlongForever() throws Exception {
     ClusterTemplate foreverTemplate =
       new ClusterTemplate("forever-template", "",
-                          new ClusterDefaults(ImmutableSet.<String>of(), "", "", "", new JsonObject()),
+                          new ClusterDefaults(ImmutableSet.<String>of(), "", "", "", null, new JsonObject()),
                           Compatibilities.EMPTY_COMPATIBILITIES,
                           Constraints.EMPTY_CONSTRAINTS, Administration.EMPTY_ADMINISTRATION);
 
@@ -1006,7 +1006,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testClusterProlong() throws Exception {
     ClusterTemplate template =
       new ClusterTemplate("limited-template", "",
-                          new ClusterDefaults(ImmutableSet.<String>of(), "", "", "", new JsonObject()),
+                          new ClusterDefaults(ImmutableSet.<String>of(), "", "", "", null, new JsonObject()),
                           Compatibilities.EMPTY_COMPATIBILITIES,
                           Constraints.EMPTY_CONSTRAINTS, new Administration(new LeaseDuration(1000, 12000, 1000)));
 
@@ -1131,19 +1131,6 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals(21000, cluster.getExpireTime());
   }
 
-  @Test
-  public void testGetInitialLeaseDuration() throws Exception {
-    verifyLeaseParsing(0, "{\"administration\":{\"leaseduration\":{\"initial\":0,\"max\":0,\"step\":0}}}");
-    verifyLeaseParsing(110, "{\"administration\":{\"leaseduration\":{\"initial\":110,\"max\":20,\"step\":10}}}");
-    verifyLeaseParsing(210, "{\"administration\":{\"leaseduration\":{\"initial\":210}}}");
-    verifyLeaseParsing(-1, "{}");
-    verifyLeaseParsing(-1, "{\"imagetypes\":[\"centos6\",\"ubuntu12\"]}");
-  }
-
-  private void verifyLeaseParsing(long expected, String json) {
-    Assert.assertEquals(expected, LoomClusterHandler.getInitialLeaseDuration(GSON.fromJson(json, JsonObject.class)));
-  }
-
   private void verifyPlanJson(JsonObject expected, JsonObject actual) {
     // Fix ids before comparing
     int nodeId = 0;
@@ -1161,24 +1148,21 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   protected static String getIdFromResponse(HttpResponse response) throws IOException {
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonObject responseJson = GSON.fromJson(reader, JsonObject.class);
-    return responseJson.get("id").getAsString();
+    return GSON.fromJson(reader, JsonObject.class).get("id").getAsString();
   }
 
-  protected static JsonObject createClusterRequest(String name, String description, String template, int numMachines) {
-    JsonObject clusterRequest = new JsonObject();
-    clusterRequest.addProperty("name", name);
-    clusterRequest.addProperty("description", description);
-    clusterRequest.addProperty("clusterTemplate", template);
-    clusterRequest.addProperty("numMachines", String.valueOf(numMachines));
-    return clusterRequest;
+  protected static ClusterRequest createClusterRequest(String name, String description,
+                                                       String template, int numMachines) {
+    ClusterRequest request =
+      new ClusterRequest(name, description, template, numMachines, null, null, null, null, -1L, null, null);
+    return request;
   }
 
-  protected static JsonObject createClusterRequest(String name, String description, String template, int numMachines,
+  protected static ClusterRequest createClusterRequest(String name, String description, String template, int numMachines,
                                           JsonObject userConfig) {
-    JsonObject clusterRequest = createClusterRequest(name, description, template, numMachines);
-    clusterRequest.add("config", userConfig);
-    return clusterRequest;
+    ClusterRequest request =
+      new ClusterRequest(name, description, template, numMachines, null, null, null, null, -1L, null, userConfig);
+    return request;
   }
 
   @BeforeClass
@@ -1188,7 +1172,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     reactorTemplate = new ClusterTemplate(
       "reactor-medium",
       "medium reactor cluster template",
-      new ClusterDefaults(services, "joyent", null, null, new JsonObject()),
+      new ClusterDefaults(services, "joyent", null, null, null, new JsonObject()),
       new Compatibilities(
         ImmutableSet.<String>of("large-mem", "large-cpu", "large", "medium", "small"),
         null,
@@ -1236,7 +1220,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     smallTemplate =  new ClusterTemplate("one-machine",
                                          "one machine cluster template",
                                          new ClusterDefaults(ImmutableSet.of("zookeeper"), "joyent", null, null,
-                                                             defaultClusterConfig),
+                                                             null, defaultClusterConfig),
                                          new Compatibilities(null, null, ImmutableSet.of("zookeeper")),
                                          null, new Administration(new LeaseDuration(10000, 30000, 5000)));
 

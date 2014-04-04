@@ -17,8 +17,10 @@ package com.continuuity.loom;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -56,4 +58,11 @@ public class TestHelper {
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
   }
 
+  public static JsonArray jsonArrayOf(String... values) {
+    JsonArray output = new JsonArray();
+    for (String value : values) {
+      output.add(new JsonPrimitive(value));
+    }
+    return output;
+  }
 }

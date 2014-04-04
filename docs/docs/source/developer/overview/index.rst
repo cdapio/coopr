@@ -43,8 +43,8 @@ services on each node in the cluster, and may also involve stop and starting tho
 A **task** is an action that is performed on a node.  Some examples are creation and deletion of the node, and the installation,
 initialization, configuration, start, stop, or removal of a service on the node.  
 
-Loom is a system allows users to manage cluster as single entity; users no longer have to know about nodes. 
-Loom consists of two major components: the **server** and the **provisioner**.  The server is responsible for determining what needs to be 
+Continuuity Loom is a system allows users to manage cluster as single entity; users no longer have to know about nodes.
+Continuuity Loom consists of two major components: the **server** and the **provisioner**.  The server is responsible for determining what needs to be
 done for different cluster management operations.  It breaks down cluster level operations into node level tasks, coordinating 
 which tasks should be performed at what time.  It also stores the state of all provisioned clusters as well as a history of all
 operations performed.  The server does not perform any of the tasks, but places tasks onto a queue for the provisioners to 

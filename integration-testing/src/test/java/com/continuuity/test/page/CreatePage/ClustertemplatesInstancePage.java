@@ -46,6 +46,7 @@ public class ClustertemplatesInstancePage extends GenericPage {
   private static final By PROVIDER = By.name("inputProvider");
   private static final By HARDWARETYPE = By.name("inputHardwaretype");
   private static final By IMAGETYPE = By.name("inputImagetype");
+  private static final By DNS_SUFFIX = By.cssSelector("#inputDnsSuffix");
   private static final By CONFIG = By.cssSelector("#inputConfig");
   private static final By DEFAULT_SERVICE = By.cssSelector(".default-service-entries");
   private static final By DEFAULT_SERVIE_ENTRY = By.cssSelector(".default-service-entry");
@@ -77,6 +78,8 @@ public class ClustertemplatesInstancePage extends GenericPage {
     select = new Select(globalDriver.findElement(IMAGETYPE));
     String imagetype = select.getFirstSelectedOption().getAttribute(Constants.TEXT);
 
+    String dnsSuffix = globalDriver.findElement(DNS_SUFFIX).getAttribute(Constants.VALUE);
+
     String config = globalDriver.findElement(CONFIG).getAttribute(Constants.VALUE);
     JsonObject configJson = GSON.fromJson(config, JsonObject.class);
 
@@ -85,7 +88,7 @@ public class ClustertemplatesInstancePage extends GenericPage {
       services.add(element.getAttribute(Constants.INNER_HTML));
     }
 
-    return new ClusterDefaults(services, provider, hardwaretype, imagetype, configJson);
+    return new ClusterDefaults(services, provider, hardwaretype, imagetype, dnsSuffix, configJson);
   }
 
   public Compatibilities getCompatibility() {

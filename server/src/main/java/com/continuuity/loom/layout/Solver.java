@@ -22,6 +22,7 @@ import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.scheduler.task.NodeService;
 import com.continuuity.loom.store.EntityStore;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
@@ -65,7 +66,7 @@ public class Solver {
    */
   public Map<String, Node> solveClusterNodes(Cluster cluster, ClusterRequest request) throws Exception {
     // make sure the template exists
-    String clusterTemplateName = request.getClusterTemplateName();
+    String clusterTemplateName = request.getClusterTemplate();
     ClusterTemplate template = entityStore.getClusterTemplate(clusterTemplateName);
     if (template == null) {
       throw new IllegalArgumentException("cluster template " + clusterTemplateName + " does not exist.");
@@ -118,13 +119,14 @@ public class Solver {
     // Determine valid lease duration for the cluster. It has to be less than the initial lease duration set in
     // template.
     long initialLeaseDuration = template.getAdministration().getLeaseDuration().getInitial();
-    long effectiveRequestLeaseDuration = request.getLeaseDuration() == 0 ? Long.MAX_VALUE : request.getLeaseDuration();
+    long effectiveRequestLeaseDuration = request.getInitialLeaseDuration() == 0
+      ? Long.MAX_VALUE : request.getInitialLeaseDuration();
     long leaseDuration;
 
-    if (request.getLeaseDuration() == -1) {
+    if (request.getInitialLeaseDuration() == -1) {
       leaseDuration = initialLeaseDuration;
     } else if (initialLeaseDuration == 0 || initialLeaseDuration >= effectiveRequestLeaseDuration) {
-      leaseDuration = request.getLeaseDuration();
+      leaseDuration = request.getInitialLeaseDuration();
     } else {
       throw new IllegalArgumentException("lease duration cannot be greater than specified in template");
     }
@@ -165,9 +167,15 @@ public class Solver {
     }
     cluster.setServices(serviceNames);
 
+    // TODO: move building of node properties to NodeService or Node or some place more sensible
+    String dnsSuffix = request.getDnsSuffix();
+    if (dnsSuffix == null || dnsSuffix.isEmpty()) {
+      dnsSuffix = template.getClusterDefaults().getDnsSuffix();
+    }
+
     Map<String, Node> nodes =
       solveConstraints(cluster.getId(), template, request.getName(), request.getNumMachines(), hardwareTypeFlavors,
-                       imageTypeMap, serviceNames, serviceMap);
+                       imageTypeMap, serviceNames, serviceMap, dnsSuffix);
 
     // Update cluster object
     // TODO: this should happen outside Solver.
@@ -268,7 +276,8 @@ public class Solver {
                                             Map<String, String> hardwareTypeMap,
                                             Map<String, String> imageTypeMap,
                                             Set<String> serviceNames,
-                                            Map<String, Service> serviceMap) throws Exception {
+                                            Map<String, Service> serviceMap,
+                                            String dnsSuffix) throws Exception {
     NodeLayoutGenerator nodeLayoutGenerator =
       new NodeLayoutGenerator(clusterTemplate, serviceNames, hardwareTypeMap.keySet(), imageTypeMap.keySet());
 
@@ -293,7 +302,6 @@ public class Solver {
       NodeLayout nodeLayout = traversalOrder.get(i);
       for (int j = 0; j < clusterlayout[i]; j++) {
         String nodeId = UUID.randomUUID().toString();
-        // TODO: add any data that the node should have.
         Set<Service> nodeServices = Sets.newHashSet();
         for (String serviceName : nodeLayout.getServiceNames()) {
           nodeServices.add(serviceMap.get(serviceName));
@@ -309,25 +317,11 @@ public class Solver {
         // the nodenum should be greater than any other nodenum in the cluster.
         nodeProperties.put(Node.Properties.NODENUM.name().toLowerCase(), String.valueOf(nodeNum));
         nodeProperties.put(Node.Properties.HOSTNAME.name().toLowerCase(),
-                           createHostname(clusterName, clusterId, nodeNum));
+                           NodeService.createHostname(clusterName, clusterId, nodeNum, dnsSuffix));
         nodeNum++;
         clusterNodes.put(nodeId, new Node(nodeId, clusterId, nodeServices, nodeProperties));
       }
     }
     return clusterNodes;
-  }
-
-  // creates a unique hostname from the cluster name, cluster id, and node number. Hostnames are of the format
-  // <clustername><clusterid>-<nodenum>.local, with underscores and dots replaced by dashes, and with whole hostname
-  // trimmed to 255 characters if it would otherwise have been too long.
-  static String createHostname(String clusterName, String clusterId, int nodeNum) {
-    long clusterIdNum = Long.valueOf(clusterId);
-    String cleaned = clusterName.replace("_", "-");
-    cleaned = cleaned.replace(".", "-");
-    String postfix = clusterIdNum + "-" + nodeNum + ".local";
-    if (cleaned.length() + postfix.length() > 255) {
-      cleaned = cleaned.substring(0, 255 - postfix.length());
-    }
-    return cleaned + postfix;
   }
 }

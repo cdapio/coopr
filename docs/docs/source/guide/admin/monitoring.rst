@@ -26,14 +26,14 @@ Monitoring and Metrics
 Overview
 ========
 
-This section outlines the tools that Loom provides to enable an administrator to monitor the system. Since the 
+This section outlines the tools that Continuuity Loom provides to enable an administrator to monitor the system. Since the
 output from these tools and checks are easily parseable and since the output is written to standard out, writing a simple
 parsing script and integrating with Nagios are relatively easy. 
 
 Process Monitoring
 ==================
 
-Loom provides HTTP endpoints to check for the status of the running processes. 
+Continuuity Loom provides HTTP endpoints to check for the status of the running processes.
 
 Loom Server
 -----------
@@ -77,7 +77,7 @@ The UI should respond with "OK" and HTTP return code 200.
 
 Provisioning Metrics
 ====================
-Loom provides a number of cluster provisioning metrics through the use of
+Continuuity Loom provides a number of cluster provisioning metrics through the use of
 `Java Management Extensions (JMX) <http://docs.oracle.com/javase/7/docs/technotes/guides/jmx/>`_.
 
 By default, JMX support is disabled. To enable JMX, the administrator will need to uncomment out the following line in
