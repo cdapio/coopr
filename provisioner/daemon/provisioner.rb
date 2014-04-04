@@ -99,27 +99,27 @@ def delegate_task(task, pluginmanager)
     result = object.runTask
   when 'bootstrap'
     combinedresult = Hash.new  
+    classes = Array.new
     if task['config'].has_key? 'automators' and !task['config']['automators'].empty?
       # server has specified which bootstrap handlers need to run
-      log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
       task['config']['automators'].each do |automatorName|
-        clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
-        object = clazz.new(task)
-        result = object.runTask
-        combinedresult.merge!(result)
+        log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
+        classes.push(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
       end
     else
       # default to running all registered bootstrap handlers
       classes = pluginmanager.getAllHandlerActionObjectsForAutomators()
-      raise "No bootstrappers configured" if classes.empty?
       log.debug "Task #{task_id} running bootstrap handlers: #{classes}"
-      classes.each do |clazz|
-        clazz = Object.const_get(clazz)
-        object = clazz.new(task)
-        result = object.runTask
-        combinedresult.merge!(result)
-      end
     end
+    raise "No bootstrappers configured" if classes.empty?
+
+    classes.each do |clazz|
+      clazz = Object.const_get(clazz)
+      object = clazz.new(task)
+      result = object.runTask
+      combinedresult.merge!(result)
+    end
+
     result = combinedresult
   else
     log.error "Unhandled task of type #{task['taskName']}"
