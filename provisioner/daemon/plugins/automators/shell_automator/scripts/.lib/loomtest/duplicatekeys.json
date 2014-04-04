@@ -1,0 +1,12 @@
+{
+    "foo": "first",
+    "bar": "first",
+    "baz": "first",
+    "xbazx": "first",
+    "config": {
+        "cluster": {
+            "foo": "nested",
+            "xbarx": "nested"
+        }
+    }
+}

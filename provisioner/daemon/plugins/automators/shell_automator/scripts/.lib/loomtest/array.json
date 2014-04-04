@@ -1,0 +1,11 @@
+{
+    "simple_array": [ "foo", "bar" ],
+    "nonunique_array": ["a", "b" ],
+    "config": {
+        "cluster": {
+            "nonunique_array": "name conflict",
+            "nested_array": [ "a", "b", "c" ],
+        }
+    }
+}
+
