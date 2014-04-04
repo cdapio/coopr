@@ -38,7 +38,8 @@ loom_lookup_key () {
     # check if each match also matches the key plus numerical index: $_key/[0-9]
     while read -r match; do
       local _arrkey
-      _arrkey=`echo ${match} | awk -v key=${_key}/[0-9] '{ if ($1 ~ key) print $NF ; else exit 1 }'`
+      # HACK HACK HACK - using a backspace to get rid of the extra OFS whenever the array element has spaces
+      _arrkey=`echo ${match} | awk -v key=${_key}/[0-9] '{ if ($1 ~ key) { if ( NF>3) {ORS=" "; printf "\""} ; for(i=3;i<=NF;++i) print $i ; if ( NF>3) { printf "\b\""} } else exit 1 }'`
       if [ $? == 0 ]; then
         local _retarray=( "${_retarray[@]}" "$_arrkey" )
       else

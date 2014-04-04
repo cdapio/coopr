@@ -22,3 +22,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $DIR/_expect_failure.sh nonunique_array
 . $DIR/_expect_success.sh ^/nonunique_array "a b"
 . $DIR/_expect_success.sh /config/cluster/nonunique_array "name conflict"
+. $DIR/_expect_success.sh array_spaces
