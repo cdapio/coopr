@@ -17,6 +17,7 @@
     "provider": "rackspace",
     "hardwaretype": "large",
     "imagetype": "ubuntu12",
+    "dnsSuffix": "dev.company.net",
     "config": {
       "hadoop": {
         "core_site": {

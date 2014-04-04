@@ -23,8 +23,8 @@
 Loom Server
 ============================
 
-How many concurrent provisioning jobs can Loom handle?
-------------------------------------------------------
+How many concurrent provisioning jobs can Continuuity Loom handle?
+------------------------------------------------------------------
 Loom Server is built upon Netty. It's highly asynchronous. We have tested it to handle tens of thousands of concurrent requests.
 However, we believe that there is lot of room for improvement. We are committed on improving its performance in the future releases.
 
@@ -41,8 +41,8 @@ Where are the configurations of cluster template and it's metadata stored?
 ----------------------------------------------------------------------------
 Cluster templates and their associated metadata are stored in a database.
 
-How do I setup a database for Loom to use?
-------------------------------------------
+How do I setup a database for Continuuity Loom to use?
+------------------------------------------------------
 Loom Server persists runtime information of provisioned clusters in a relational database. 
 If you are running Loom Server in the default mode, it's using the embedded Derby DB for storing all 
 the runtime metadata. We don't recommend running an embedded derby DB in production. 
@@ -80,7 +80,7 @@ Currently not but it is planned for a future release.
 
 What is node pooling?
 -----------------------
-Node pooling is an advanced feature that allows the clusters to be provisoned instantenously from a pool 
+Node pooling is an advanced feature that allows the clusters to be provisioned instantaneously from a pool
 of pre-provisioned nodes. Pre-provisioning includes creation and installation of software components. 
 Steps for configuring the cluster and its node are done once the user has requested a cluster to be materialized. 
 Administrators will have the ability to enable this feature on a template by template basis. 
@@ -111,7 +111,7 @@ that are executed on the node. Actions are divided into stages. An action in eac
 Loom server implements a distributed barrier at each stage ensuring that the planned stage actions are all completed
 before proceeding to the next stage. This ensures the actions are executed in the right dependency order.
 
-Following is an example web service call along with the output returned from the Loom Sever provisioning a web server
+Following is an example web service call along with the output returned from the Loom Server provisioning a web server
 on a single node.:
 ::
   $ curl -H 'X-Loom-UserID:<user id>' http://<loom-host-name>:<loom-host-port>/v1/loom/clusters/<cluster-id>/plans

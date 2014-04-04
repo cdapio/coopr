@@ -25,7 +25,7 @@ REST API: Provider
 
 Using the Loom REST API, you can manage providers as well as query available flavors of hardware or instance sizes.
 (This API call is also used during the provisioning of instances of machines.) Even though new providers are automatically 
-registered, the APIs are available if administrators desire to configure them manually. By default, Loom system supports 
+registered, the APIs are available if administrators desire to configure them manually. By default, the Loom system supports
 Openstack out of the box.
 
 Each provider configured in the system has a unique name, a short description, and a list of key-value pairs that are required by the backend hardware provisioner.
@@ -223,7 +223,7 @@ A configured provider represents a resource used for querying resource types as 
 resources. The list of all configured providers are available for you to retrieve. The provider list resource represents 
 the comprehensive set of providers configured within the Loom system.
 
-To list all the providers configured within in Loom, make GET HTTP request to URI:
+To list all the providers configured within Continuuity Loom, make GET HTTP request to URI:
 ::
  /providers
 

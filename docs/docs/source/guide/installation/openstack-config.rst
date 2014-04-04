@@ -22,12 +22,12 @@ Openstack Configuration
 =======================
 
 * Admin:
- * There must be a user in OpenStack which is a member of all projects which will have hosts provisioned by Loom.
+ * There must be a user in OpenStack which is a member of all projects which will have hosts provisioned by Continuuity Loom.
 * Networking:
  * Instance networks must be routable from Loom provisioners.
  * If multiple networks, any network named "public" becomes network Loom Provisioner uses for SSH.
  * If there is only one network, loom provisioner will use it for SSH.
- * Loom currently does not support specifying a network.
+ * Continuuity Loom currently does not support specifying a network.
 * SSH Keys:
  * OpenStack must be configured with ``libvirt_inject_key true`` for key-based authentication to instances.
  * The key must be present in OpenStack and ``openstack_ssh_key_id`` must be configured in the provider.

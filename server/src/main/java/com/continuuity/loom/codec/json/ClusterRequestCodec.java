@@ -15,49 +15,42 @@
  */
 package com.continuuity.loom.codec.json;
 
-import com.continuuity.loom.admin.ClusterDefaults;
+import com.continuuity.loom.layout.ClusterRequest;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Codec for serializing/deserializing a {@link com.continuuity.loom.admin.ClusterTemplate}.
+ * Codec for deserializing a {@link com.continuuity.loom.layout.ClusterRequest}, used so some validation is done
+ * on required fields.
  */
-public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
+public class ClusterRequestCodec implements JsonDeserializer<ClusterRequest> {
 
   @Override
-  public JsonElement serialize(ClusterDefaults clusterDefaults, Type type, JsonSerializationContext context) {
-    JsonObject jsonObj = new JsonObject();
-
-    jsonObj.add("services", context.serialize(clusterDefaults.getServices()));
-    jsonObj.add("provider", context.serialize(clusterDefaults.getProvider()));
-    jsonObj.add("hardwaretype", context.serialize(clusterDefaults.getHardwaretype()));
-    jsonObj.add("imagetype", context.serialize(clusterDefaults.getImagetype()));
-    jsonObj.add("dnsSuffix", context.serialize(clusterDefaults.getDnsSuffix()));
-    jsonObj.add("config", context.serialize(clusterDefaults.getConfig()));
-
-    return jsonObj;
-  }
-
-  @Override
-  public ClusterDefaults deserialize(JsonElement json, Type type, JsonDeserializationContext context)
+  public ClusterRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
+    String name = context.deserialize(jsonObj.get("name"), String.class);
+    String description = context.deserialize(jsonObj.get("description"), String.class);
+    String clusterTemplate = context.deserialize(jsonObj.get("clusterTemplate"), String.class);
+    Integer numMachines = context.deserialize(jsonObj.get("numMachines"), Integer.class);
+    String provider = context.deserialize(jsonObj.get("provider"), String.class);
     Set<String> services = context.deserialize(jsonObj.get("services"),
                                                new TypeToken<Set<String>>() {}.getType());
-    String provider = context.deserialize(jsonObj.get("provider"), String.class);
     String hardwaretype = context.deserialize(jsonObj.get("hardwaretype"), String.class);
     String imagetype = context.deserialize(jsonObj.get("imagetype"), String.class);
+    Long initialLeaseDuration = context.deserialize(jsonObj.get("initialLeaseDuration"), Long.class);
     String dnsSuffix = context.deserialize(jsonObj.get("dnsSuffix"), String.class);
     JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
 
-    return new ClusterDefaults(services, provider, hardwaretype, imagetype, dnsSuffix, config);
+    return new ClusterRequest(name, description, clusterTemplate, numMachines, provider, services, hardwaretype,
+                              imagetype, initialLeaseDuration, dnsSuffix, config);
   }
 }

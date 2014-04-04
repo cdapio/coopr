@@ -77,7 +77,7 @@ the run-list to use. The data field is any additional JSON data we wish to inclu
 later). When the Chef Solo Automator plugin executes any of these actions for the apache-httpd service, it performs
 the following actions:
 
-        1. generate a task-specific JSON file containing any attributes defined in the data field, as well as base cluster attributes defined elsewhere in Loom.
+        1. generate a task-specific JSON file containing any attributes defined in the data field, as well as base cluster attributes defined elsewhere in Continuuity Loom.
         2. invoke chef-solo using the script field as the run-list using  ``chef-solo -o [script] -j [task-specific json]``
 
 
@@ -101,7 +101,7 @@ corresponding Chef service resource, and invokes the specified action.
 JSON Attributes
 ================
 
-Loom maintains significant JSON data for a cluster, and makes it available for each task. This JSON data includes:
+Continuuity Loom maintains significant JSON data for a cluster, and makes it available for each task. This JSON data includes:
     * cluster-wide configuration defined in cluster templates (Catalog -> cluster template -> defaults -> config)
     * node data for each node of the cluster: hostname, ip, etc
     * service data, specified in the actions for each service
@@ -183,10 +183,10 @@ definition with the following parameters:
 Then simply add your service to a cluster template.
 
 
-Loom Helper Cookbooks
-=====================
+Helper Cookbooks
+================
 
-Loom ships with several helper cookbooks.
+Continuuity Loom ships with several helper cookbooks.
 
 **loom_hosts**
 ---------------
@@ -232,7 +232,7 @@ If this recipe is included in the run-list and no attributes specified, the defa
 Best Practices
 ==============
 
-* Loom is designed to use attribute-driven cookbooks. All user-defined attributes are specified in Loom primitives. Recipes that use Chef server capabilities like discovery and such do not operate well with Loom.
-* Separate the install, configuration, initialization, starting/stopping, and deletion logic of your cookbooks into granular recipes. This way Loom services can often be defined with a 1:1 mapping to recipes. Remember that Loom will need to install, configure, initialize, start, stop, and remove your services, each independently through a combination of run-list and attributes.
+* Continuuity Loom is designed to use attribute-driven cookbooks. All user-defined attributes are specified in Loom primitives. Recipes that use Chef server capabilities like discovery and such do not operate well with Continuuity Loom.
+* Separate the install, configuration, initialization, starting/stopping, and deletion logic of your cookbooks into granular recipes. This way Loom services can often be defined with a 1:1 mapping to recipes. Remember that Continuuity Loom will need to install, configure, initialize, start, stop, and remove your services, each independently through a combination of run-list and attributes.
 * Use wrapper cookbooks in order to customize community cookbooks to suit your needs.
 * Remember to declare cookbook dependencies in metadata.

@@ -34,7 +34,6 @@ import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -51,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -268,51 +268,22 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
 
     try {
-      JsonObject clusterRequest = codec.getGson().fromJson(reader, JsonObject.class); if (clusterRequest == null) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid cluster request");
-        return;
-      }
-      if (!clusterRequest.has("name")) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, "cluster must have a name");
-        return;
-      }
-      if (!clusterRequest.has("numMachines")) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, "numMachines must be specified");
-        return;
-      }
-      if (!clusterRequest.has("clusterTemplate")) {
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, "clusterTemplate must be specified");
-        return;
-      }
+      ClusterRequest clusterRequest = codec.getGson().fromJson(reader, ClusterRequest.class);
 
-      // required user input
-      String name = clusterRequest.get("name").getAsString();
-      String description = clusterRequest.has("description") ? clusterRequest.get("description").getAsString() : "";
-      String templateName = clusterRequest.get("clusterTemplate").getAsString();
-      int numMachines = clusterRequest.get("numMachines").getAsInt();
-
-      if (numMachines > maxClusterSize) {
+      if (clusterRequest.getNumMachines() > maxClusterSize) {
         responder.sendError(HttpResponseStatus.BAD_REQUEST, "numMachines above max cluster size " + maxClusterSize);
         return;
       }
-      // optional user input
-      String requiredImageType =
-        clusterRequest.has("imagetype") ? clusterRequest.get("imagetype").getAsString() : null;
-      String requiredHardwareType =
-        clusterRequest.has("hardwaretype") ? clusterRequest.get("hardwaretype").getAsString() : null;
-      String provider = clusterRequest.has("provider") ? clusterRequest.get("provider").getAsString() : null;
-      Set<String> services = clusterRequest.has("services") ?
-        codec.getGson().<Set<String>>fromJson(clusterRequest.get("services"),
-                                              new TypeToken<Set<String>>() {}.getType()) : null;
-      JsonObject config =
-        clusterRequest.has("config") ? clusterRequest.get("config").getAsJsonObject() : new JsonObject();
-      long leaseDuration = getInitialLeaseDuration(clusterRequest);
 
+      String name = clusterRequest.getName();
+      int numMachines = clusterRequest.getNumMachines();
+      String templateName = clusterRequest.getClusterTemplate();
       LOG.debug(String.format("Received a request to create cluster %s with %d machines from template %s", name,
                              numMachines, templateName));
       String clusterId = store.getNewClusterId();
-      Cluster cluster = new Cluster(clusterId, userId, name, System.currentTimeMillis(), description, null, null,
-                                    ImmutableSet.<String>of(), ImmutableSet.<String>of(), config);
+      Cluster cluster = new Cluster(clusterId, userId, name, System.currentTimeMillis(),
+                                    clusterRequest.getDescription(), null, null,
+                                    ImmutableSet.<String>of(), ImmutableSet.<String>of(), clusterRequest.getConfig());
       JobId clusterJobId = store.getNewJobId(clusterId);
       ClusterJob clusterJob = new ClusterJob(clusterJobId, ClusterAction.SOLVE_LAYOUT);
       cluster.addJob(clusterJob.getJobId());
@@ -328,10 +299,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
       }
 
       LOG.debug("adding create cluster element to solverQueue");
-      ClusterRequest queueRequest =
-        new ClusterRequest(name, description, templateName, numMachines, provider, services, requiredHardwareType,
-                           requiredImageType, leaseDuration);
-      solverQueue.add(new Element(cluster.getId(), codec.getGson().toJson(queueRequest)));
+      solverQueue.add(new Element(cluster.getId(), codec.getGson().toJson(clusterRequest)));
 
       loomStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
 
@@ -601,20 +569,6 @@ public class LoomClusterHandler extends LoomAuthHandler {
       LOG.error("Got exception: ", e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
     }
-  }
-
-  static long getInitialLeaseDuration(JsonObject request) {
-    long leaseDuration = -1;
-    if (request.has("administration")) {
-      JsonObject admin = request.get("administration").getAsJsonObject();
-      if (admin.has("leaseduration")) {
-        JsonObject lease = admin.get("leaseduration").getAsJsonObject();
-        if (lease.has("initial")) {
-          leaseDuration = lease.get("initial").getAsLong();
-        }
-      }
-    }
-    return leaseDuration;
   }
 
   private JsonObject formatJobPlan(ClusterJob job) throws Exception {

@@ -24,30 +24,30 @@ FAQs
 General
 =======
 
-#. :doc:`What are the differences between Loom and Ambari/Savanna?<general>`
-#. :doc:`Does Loom work with Ambari?<general>`
-#. :doc:`What are the differences between Loom and Amazon EMR?<general>`
-#. :doc:`Will Loom support docker based clusters ?<general>`
-#. :doc:`Does Loom support bare metal ?<general>`
-#. :doc:`What providers are supported by Loom ?<general>`
-#. :doc:`Does Loom make it easy for me to move from one cloud to another ?<general>`
-#. :doc:`Can Loom work on my laptop ?<general>`
-#. :doc:`How long has Loom been used in a production enviroment and where is it being used?<general>`
-#. :doc:`Is Loom designed only for provisioning compute and storage?<general>`
-#. :doc:`What is the recommended setup for Loom in terms of hardware and configuration?<general>`
-#. :doc:`Does Loom support monitoring and alerting of services deployed ?<general>`
-#. :doc:`Does Loom support metering ?<general>`
-#. :doc:`I use puppet will I be able to use puppet with Loom ?<general>`
-#. :doc:`Can Loom support approval workflows or ability to pause provisioning for approval ?<general>`
+#. :doc:`What are the differences between Continuuity Loom and Ambari/Savanna?<general>`
+#. :doc:`Does Continuuity Loom work with Ambari?<general>`
+#. :doc:`What are the differences between Continuuity Loom and Amazon EMR?<general>`
+#. :doc:`Will Continuuity Loom support docker based clusters ?<general>`
+#. :doc:`Does Continuuity Loom support bare metal ?<general>`
+#. :doc:`What providers are supported by Continuuity Loom ?<general>`
+#. :doc:`Does Continuuity Loom make it easy for me to move from one cloud to another ?<general>`
+#. :doc:`Can Continuuity Loom work on my laptop ?<general>`
+#. :doc:`How long has Continuuity Loom been used in a production enviroment and where is it being used?<general>`
+#. :doc:`Is Continuuity Loom designed only for provisioning compute and storage?<general>`
+#. :doc:`What is the recommended setup for Continuuity Loom in terms of hardware and configuration?<general>`
+#. :doc:`Does Continuuity Loom support monitoring and alerting of services deployed ?<general>`
+#. :doc:`Does Continuuity Loom support metering ?<general>`
+#. :doc:`I use puppet will I be able to use puppet with Continuuity Loom ?<general>`
+#. :doc:`Can Continuuity Loom support approval workflows or ability to pause provisioning for approval ?<general>`
 
 Loom Server
 ===========
 
-#. :doc:`How many concurrent provisioning jobs can Loom handle?<server>`
+#. :doc:`How many concurrent provisioning jobs can Continuuity Loom handle?<server>`
 #. :doc:`Can I scale-up or scale-down a cluster?<server>`
 #. :doc:`Do I have the ability to import and export configurations from one cluster to another?<server>`
 #. :doc:`Where are the configurations of cluster template and it's metadata stored?<server>`
-#. :doc:`How do I setup a database for Loom to use it?<server>`
+#. :doc:`How do I setup a database for Continuuity Loom to use it?<server>`
 #. :doc:`Is node pooling supported?<server>`
 #. :doc:`What is node pooling?<server>`
 #. :doc:`Can I run multiple servers concurrently for HA?<server>`
@@ -81,13 +81,13 @@ Loom Administration
 
 Security
 ========
-#. :doc:`Does Loom support authentication?<security>`
+#. :doc:`Does Continuuity Loom support authentication?<security>`
 #. :doc:`Are all the communication between Loom Server and Loom Provisioners secure?<security>`
-#. :doc:`Can Loom integrate with any authentication system?<security>`
-#. :doc:`Will Loom support authorization and granular control in the future?<security>`
+#. :doc:`Can Continuuity Loom integrate with any authentication system?<security>`
+#. :doc:`Will Continuuity Loom support authorization and granular control in the future?<security>`
 
 Licensing and Open Source
 =========================
 
-#. :doc:`What type of license is Loom open sourced under?<oss>`
+#. :doc:`What type of license is Continuuity Loom open sourced under?<oss>`
 #. :doc:`How can I contribute?<oss>`

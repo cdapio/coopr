@@ -59,7 +59,7 @@ public class TaskConfigTest {
       "development hadoop cluster template",
       new ClusterDefaults(
         ImmutableSet.of("namenode", "datanode", "resourcemanager", "nodemanager"),
-        "openstack1", null, null, conf),
+        "openstack1", null, null, null, conf),
       new Compatibilities(
         null,
         null,

@@ -30,8 +30,13 @@ Gemfile.lock
 
 # Gem builds
 /provisioner/plugins/*/pkg/
+
 # Cookbooks tarball
-/provisioner/daemon/plugins/chef_handler/cookbooks.tar.gz
+/provisioner/daemon/plugins/automators/chef_automator/chef_automator/*.tar.gz
+/provisioner/daemon/plugins/automators/shell_automator/*.tar.gz
+
+# Chef client validator
+/provisioner/daemon/plugins/automators/shell_automator/scripts/validation.pem
 
 # Environment
 .bash*

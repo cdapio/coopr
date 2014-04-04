@@ -102,6 +102,7 @@ public class Constants {
     try {
       ServerSocket s = new ServerSocket(0);
       port = s.getLocalPort();
+      s.close();
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println("Could not find port");
