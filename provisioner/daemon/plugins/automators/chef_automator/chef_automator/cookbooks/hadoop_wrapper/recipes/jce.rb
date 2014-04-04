@@ -30,6 +30,9 @@ if node['java'].has_key? 'jdk_version'
   when "7", 7
     tarball_url = "http://download.oracle.com/otn-pub/java/jce/7/UnlimitedJCEPolicyJDK7.zip"
     tarball_checksum = "7a8d790e7bd9c2f82a83baddfae765797a4a56ea603c9150c87b7cdb7800194d"
+  when "8", 8
+    tarball_url = "http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip"
+    tarball_checksum = "f3020a3922efd6626c2fff45695d527f34a8020e938a49292561f18ad1320b59"
   end
 
   package "unzip" do
