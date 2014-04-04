@@ -1,9 +1,7 @@
 #
 # Cookbook Name:: krb5
-# Recipe:: default
+# Recipe:: kdc
 #
-# Copyright 2012, Eric G. Wolfe
-# Copyright 2013, Gerald L. Hevener Jr., M.S.
 # Copyright 2014, Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,20 +17,27 @@
 # limitations under the License.
 #
 
-node['krb5']['client']['packages'].each do |krb5_package|
+node['krb5']['kdc']['packages'].each do |krb5_package|
   package krb5_package
 end
 
-execute 'krb5-authconfig' do
-  command node['krb5']['client']['authconfig']
-  not_if { 'grep pam_krb5 /etc/pam.d/system-auth' || 'grep pam_krb5 /etc/pam.d/common-auth' }
-  action :nothing
+case node['platform_family']
+when 'rhel'
+  kdc_dir = '/var/kerberos/krb5kdc'
+  etc_dir = kdc_dir
+  kdc_svc = 'krb5kdc'
+when 'debian'
+  etc_dir = '/etc/krb5kdc'
+  kdc_svc = 'krb5-kdc'
 end
 
-template '/etc/krb5.conf' do
+template "#{etc_dir}/kdc.conf" do
   owner 'root'
   group 'root'
   mode '0644'
-  variables node['krb5']['krb5_conf']
-  notifies :run, 'execute[krb5-authconfig]'
+  variables node['krb5']['kdc_conf']
+end
+
+service kdc_svc do
+  action :start
 end

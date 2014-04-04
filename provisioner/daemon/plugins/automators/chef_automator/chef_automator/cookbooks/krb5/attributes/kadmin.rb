@@ -1,9 +1,7 @@
 #
 # Cookbook Name:: krb5
-# Recipe:: default
+# Attributes:: kadmin
 #
-# Copyright 2012, Eric G. Wolfe
-# Copyright 2013, Gerald L. Hevener Jr., M.S.
 # Copyright 2014, Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,20 +17,24 @@
 # limitations under the License.
 #
 
-node['krb5']['client']['packages'].each do |krb5_package|
-  package krb5_package
+# Admin Server packages
+case node['platform_family']
+when 'rhel'
+  default['krb5']['kadmin']['packages'] = %w(krb5-server)
+when 'debian'
+  default['krb5']['kadmin']['packages'] = %w(krb5-admin-server)
+else
+  default['krb5']['kadmin']['packages'] = []
 end
 
-execute 'krb5-authconfig' do
-  command node['krb5']['client']['authconfig']
-  not_if { 'grep pam_krb5 /etc/pam.d/system-auth' || 'grep pam_krb5 /etc/pam.d/common-auth' }
-  action :nothing
-end
+# Master password
+default['krb5']['master_password'] = 'password'
 
-template '/etc/krb5.conf' do
-  owner 'root'
-  group 'root'
-  mode '0644'
-  variables node['krb5']['krb5_conf']
-  notifies :run, 'execute[krb5-authconfig]'
-end
+# Admin user
+default['krb5']['admin_principal'] = 'admin/admin'
+default['krb5']['admin_password'] = 'password'
+
+# kadm5.acl
+default['krb5']['kadm5_acl'] = {
+  "*/admin@#{node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase}" => ['*']
+}

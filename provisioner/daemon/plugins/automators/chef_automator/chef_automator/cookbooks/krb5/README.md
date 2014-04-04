@@ -28,13 +28,72 @@ clocks, change the metadata according to your needs.
 Attributes
 ----------
 
- * `krb5['packages']` - Packages and libraries needed for Kerberos v5 authentication, detected for Redhat/Debian family systems.
- * `krb5['authconfig']` - Configuration script for PAM, detected for RedHat and Debian family systems.
- * `krb5['default_realm']` - The default realm, defaults to OHAI's domain attribute.
- * `krb5['realms']` - Array of all realms, including the default.  Defaults to OHAI's domain attribute.
- * `krb5['default_realm_kdcs']` - Array of Kerberos servers, this is optional, and default empty.  
- * `krb5['lookup_kdcs']` - Set to true if you have SRV records for KDC discovery.  Default is true.
- * `krb5['default_logging']` - Default log location.  Default, 'FILE:/var/log/krb5libs.log'
+This cookbook has changed the attribute format, but is backwards compatible with `0.2.0` attributes. The new format used for template variables consists of `krb5[file][section][key] = 'value'` where file is one of `krb5_conf`, `kadm5_acl`, or `kdc_conf`.
+
+## Client / Libs
+
+ * `krb5['client']['packages']` - Packages and libraries needed for Kerberos v5 authentication, detected for Redhat/Debian family systems.
+ * `krb5['client']['authconfig']` - Configuration script for PAM, detected for RedHat and Debian family systems.
+
+### Section: logging
+
+ * `krb5['krb5_conf']['logging']['default']` - Default log location.  Default, 'FILE:/var/log/krb5libs.log'
+
+### Section: libdefaults
+
+ * `krb5['krb5_conf']['libdefaults']['default_realm']` - The default realm, defaults to OHAI's domain attribute.
+ * `krb5['krb5_conf']['libdefaults']['dns_lookup_kdc']` - Set to true if you have SRV records for KDC discovery.  Default is true.
+ * `krb5['krb5_conf']['libdefaults']['dns_lookup_realm']` - Set to true if you have TXT records for realm discovery.  Default is false.
+ * `krb5['krb5_conf']['libdefaults']['forwardable']` - Set to true to make initial credentials forwardable.  Default is true.
+ * `krb5['krb5_conf']['libdefaults']['renew_lifetime']` - Default renewable ticket lifetime.  Default is `24h`.
+ * `krb5['krb5_conf']['libdefaults']['ticket_lifetime']` - Default ticket lifetime.  Default is `24h`.
+
+### Section: realms
+
+ * `krb5['krb5_conf']['realms']['default_realm']` - The default realm, defaults to `krb5['krb5_conf']['libdefaults']['default_realm']`
+ * `krb5['krb5_conf']['realms']['default_realm_kdcs']` - Array of Kerberos servers for default realm.  Default is empty.
+ * `krb5['krb5_conf']['realms']['default_realm_admin_server']` - Address of Kerberos admin server.  Defaults to empty.
+ * `krb5['krb5_conf']['realms']['realms']` - Array of all realms, including the default.  Defaults to OHAI's domain attribute.
+
+### Section: appdefaults
+
+ * `krb5['krb5_conf']['appdefaults']['pam']['debug']` = Set to true to enable PAM/Kerberos debugging.  Defaults to false.
+ * `krb5['krb5_conf']['appdefaults']['pam']['forwardable']` - Instruct PAM to create forwardable tickets.  Defaults to `krb5['krb5_conf']['libdefaults']['forwardable']`
+ * `krb5['krb5_conf']['appdefaults']['pam']['renew_lifetime']` - Defaults to `krb5['krb5_conf']['libdefaults']['renew_lifetime']`
+ * `krb5['krb5_conf']['appdefaults']['pam']['ticket_lifetime']` - Defaults to `krb5['krb5_conf']['libdefaults']['ticket_lifetime']`
+ * `krb5['krb5_conf']['appdefaults']['pam']['krb4_convert']` - Set to true to use the Kerberos conversion daemon to get V4 tickets.  Default is false.
+
+## Kerberos Admin Server (kadmind)
+
+ * `krb5['kadmin']['packages']` - Packages for Kerberos Admin Server, detected on Redhat/Debian family systems.
+ * `krb5['master_password']` - Master password for Kerberos database.  Default is `password`. (Please, change this!)
+ * `krb5['admin_principal']` - Principal to create for administration.  Default is `admin/admin`.
+ * `krb5['admin_password']` - Password for admin principal.  Default is `password`. (Please, change this!)
+
+### Section: logging
+
+ * `krb5['krb5_conf']['logging']['admin_server']` - Kerberos Admin Server log location.  Default, 'FILE:/var/log/kadmind.log'
+
+### kadm5.acl
+
+  * `krb5['kadm5_acl'][principal]` - Sets up ACLs for `principal`.  Default is `"*/admin@#{node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase}" => ['*']`
+
+## KDC and kdc.conf
+
+ * `krb5['kdc']['packages']` - Packages needed for a KDC, detected for Redhat/Debian family systems.
+
+### Section: logging
+
+ * `krb5['krb5_conf']['logging']['kdc']` - KDC log location.  Default, 'FILE:/var/log/krb5kdc.log'
+
+### Section: kdcdefaults
+
+ * `krb5['kdc_conf']['kdcdefaults']['kdc_ports']` - Set KDC listen ports.  Default is `88`.
+
+### Section: realms
+
+ * `krb5['kdc_conf']['realms'][realm]['acl_file']` - Location of kadmind ACL file for `realm`.  Defaults to `default_realm`.
+ * `krb5['kdc_conf']['realms'][realm]['admin_keytab']` - Location of admin keytab file for `realm`.  Defaults to `default_realm`.
 
 Usage
 -----
