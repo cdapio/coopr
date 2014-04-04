@@ -40,13 +40,12 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   default['hadoop']['hdfs_site']['dfs.datanode.http.address'] = "0.0.0.0:1006"
 
   # yarn-site.xml
-  default['hadoop']['hdfs_site']['yarn.resourcemanager.keytab'] = "#{node['krb5_utils']['keytabs_dir']}/yarn.service.keytab"
-  default['hadoop']['hdfs_site']['yarn.nodemanager.keytab'] = "#{node['krb5_utils']['keytabs_dir']}/yarn.service.keytab"
-  default['hadoop']['hdfs_site']['yarn.resourcemanager.principal'] = "yarn/_HOST@#{node['krb5']['default_realm']}"
-  default['hadoop']['hdfs_site']['yarn.nodemanager.principal'] = "yarn/_HOST@#{node['krb5']['default_realm']}"
-  default['hadoop']['hdfs_site']['yarn.nodemanager.container-executor.class'] = 'org.apache.hadoop.yarn.server.nodemanager.LinuxContainerExecutor'
-  default['hadoop']['hdfs_site']['yarn.nodemanager.linux-container-executor.group'] = 'yarn'
-  default['hadoop']['hdfs_site']['yarn.nodemanager.resource.memory-mb'] = (node[:memory][:total].to_i / 1024) / 2
+  default['hadoop']['yarn_site']['yarn.resourcemanager.keytab'] = "#{node['krb5_utils']['keytabs_dir']}/yarn.service.keytab"
+  default['hadoop']['yarn_site']['yarn.nodemanager.keytab'] = "#{node['krb5_utils']['keytabs_dir']}/yarn.service.keytab"
+  default['hadoop']['yarn_site']['yarn.resourcemanager.principal'] = "yarn/_HOST@#{node['krb5']['default_realm']}"
+  default['hadoop']['yarn_site']['yarn.nodemanager.principal'] = "yarn/_HOST@#{node['krb5']['default_realm']}"
+  default['hadoop']['yarn_site']['yarn.nodemanager.container-executor.class'] = 'org.apache.hadoop.yarn.server.nodemanager.LinuxContainerExecutor'
+  default['hadoop']['yarn_site']['yarn.nodemanager.linux-container-executor.group'] = 'yarn'
 
 end
 
