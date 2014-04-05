@@ -1,7 +1,0 @@
-#!/bin/bash
-#
-# Perform necessary loom-provisioner removal steps
-# after package is uninstalled.
-#
-
-exit 0
