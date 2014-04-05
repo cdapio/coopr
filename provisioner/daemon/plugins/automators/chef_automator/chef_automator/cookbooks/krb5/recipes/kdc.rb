@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+include_recipe 'krb5::default'
+
 node['krb5']['kdc']['packages'].each do |krb5_package|
   package krb5_package
 end

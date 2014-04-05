@@ -34,6 +34,7 @@ default_realm = node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase
 
 # kdcdefaults
 default['krb5']['kdc_conf']['kdcdefaults']['kdc_ports'] = '88'
+default['krb5']['kdc_conf']['kdcdefaults']['kdc_tcp_ports'] = '88'
 
 # realms
 default['krb5']['kdc_conf']['realms'][default_realm]['acl_file'] = "#{etc_dir}/kadm5.acl"
