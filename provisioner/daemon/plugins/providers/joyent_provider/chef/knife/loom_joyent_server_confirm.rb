@@ -54,12 +54,37 @@ class Chef
         puts "\n"
         puts ui.color("Bootstrap IP Address #{bootstrap_ip}", :cyan)
 
+        if config[:tags]
+          tags = [ ui.color('Name', :bold), ui.color('Value', :bold) ]
+
+          server.add_tags(config[:tags]).each do |k,v|
+            tags << k
+            tags << v
+          end
+
+          puts ui.color("Updated tags for #{@node_name}", :cyan)
+          puts ui.list(tags, :uneven_columns_across, 2)
+        end
+
+        if Chef::Config[:knife][:provisioner]
+          tags = [ ui.color('Name', :bold), ui.color('Value', :bold) ]
+          # tag the provision with 'provisioner'
+          server.add_tags({'provisioner' => Chef::Config[:knife][:provisioner]}).each do |k, v|
+            tags << k
+            tags << v
+          end
+          puts ui.color("Updated tags for #{@node_name}", :cyan)
+          puts ui.list(tags, :uneven_columns_across, 2)
+        else
+          puts ui.color("No user defined in knife config for provision tagging -- continuing", :magenta)
+        end
+
         puts ui.color("Waiting for server to fully initialize...", :cyan)
         sleep 20
 
         puts ui.color("Waiting for SSH to come up on: #{bootstrap_ip}", :cyan)
         tcp_test_ssh(bootstrap_ip)
-
+        sleep 10
 
         return { "status" => 0, "ipaddress" => bootstrap_ip }
 
