@@ -43,9 +43,11 @@ keytab_dir = node['krb5_utils']['keytabs_dir']
   node['krb5_utils'][kt].each do |name, opts|
     case kt
     when 'krb5_service_keytabs'
+      http_principal = "HTTP/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm']}"
       principal = "#{name}/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm']}"
       keytab_file = "#{name}.service.keytab"
     when 'krb5_user_keytabs'
+      http_principal = ''
       principal = "#{name}@#{node['krb5']['krb5_conf']['realms']['default_realm']}"
       keytab_file = "#{name}.keytab"
     end
@@ -57,7 +59,7 @@ keytab_dir = node['krb5_utils']['keytabs_dir']
     end
 
     execute "krb5-generate-keytab-#{keytab_file}" do
-      command "kadmin -w #{node['krb5_utils']['admin_password']} -q 'xst -kt #{keytab_dir}/#{keytab_file} #{principal}'"
+      command "kadmin -w #{node['krb5_utils']['admin_password']} -q 'xst -kt #{keytab_dir}/#{keytab_file} #{principal} #{http_principal}'"
       action :nothing
       not_if "test -s #{keytab_dir}/#{keytab_file}"
     end
