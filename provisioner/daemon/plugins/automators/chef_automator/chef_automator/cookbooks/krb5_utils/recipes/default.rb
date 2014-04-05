@@ -81,10 +81,10 @@ ruby_block "generate-keytabs" do
       node['krb5_utils'][kt].each do |name, opts|
         case kt
         when 'krb5_service_keytabs'
-          principal = "#{name}/#{node['fqdn']}@#{node['krb5']['default_realm']}"
+          principal = "#{name}/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm']}"
           keytab_file = "#{name}.service.keytab"
         when 'krb5_user_keytabs'
-          principal = "#{name}@#{node['krb5']['default_realm']}"
+          principal = "#{name}@#{node['krb5']['krb5_conf']['realms']['default_realm']}"
           keytab_file = "#{name}.keytab"
         end
         Chef::Log.info("Creating #{principal} and generating #{keytab_file}")
