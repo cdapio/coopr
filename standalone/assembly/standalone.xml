@@ -13,9 +13,6 @@
         <fileSet>
             <directory>${project.basedir}/../ui</directory>
             <outputDirectory>/ui</outputDirectory>
-            <excludes>
-                <exclude>**/omnibus/**</exclude>
-            </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../server/target</directory>
