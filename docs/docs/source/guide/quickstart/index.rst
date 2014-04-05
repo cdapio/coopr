@@ -71,7 +71,7 @@ provider you are using.
 
 Rackspace
 ^^^^^^^^^
-An API key and username are required for using Rackspace (for more information on how to obtain your personalized API key, see
+An API key, username, and region are required for using Rackspace (for more information on how to obtain your personalized API key, see
 `this page <http://www.rackspace.com/knowledge_center/article/rackspace-cloud-essentials-1-generating-your-api-key>`_ ).
 
 .. figure:: /guide/quickstart/rackspace.png
