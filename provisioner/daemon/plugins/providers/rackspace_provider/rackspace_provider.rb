@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-gem 'knife-rackspace', '= 0.8.4'
+gem 'knife-rackspace', '= 0.9.1'
 
 require 'json'
 require_relative 'chef/knife/loom_rackspace_server_create'
@@ -39,6 +39,7 @@ class RackspaceProvider < Provider
 
       Chef::Config[:knife][:rackspace_username] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_username"]
       Chef::Config[:knife][:rackspace_api_key] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_api_key"]
+      Chef::Config[:knife][:rackspace_region] =  @task["config"]["provider"]["provisioner"]["auth"]["rackspace_region"]
 
       # invoke knife
       log.debug "Invoking server create"
