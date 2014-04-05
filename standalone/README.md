@@ -7,8 +7,8 @@ XCode Command Line Developer Tools (Mac only)
 
 Install
 ======
-sudo gem install knife-joyent --version 0.3.2
-sudo gem install knife-rackspace --version 0.8.4
+sudo gem install knife-joyent --version 0.4.8
+sudo gem install knife-rackspace --version 0.9.1
 sudo gem install knife-openstack --version 0.8.1
 
 Start
