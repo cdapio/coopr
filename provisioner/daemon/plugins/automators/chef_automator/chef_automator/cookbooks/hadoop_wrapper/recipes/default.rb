@@ -45,7 +45,7 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   node['hadoop']['core_site']['hadoop.security.authentication'].downcase == 'kerberos')
 
   include_recipe 'krb5'
-  Chef::Log.info("Secure Hadoop Enabled: Kerberos Realm #{node['krb5']['default_realm']}")
+  Chef::Log.info("Secure Hadoop Enabled: Kerberos Realm '#{node['krb5']['krb5_conf']['realms']['default_realm']}'")
   secure_hadoop_enabled = true
 
   # Create users for services not in base Hadoop
@@ -60,6 +60,7 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
     "HTTP" => { "owner" => "hdfs", "group" => "hadoop", "mode" => "0640" },
     "hdfs" => { "owner" => "hdfs", "group" => "hadoop", "mode" => "0640" },
     "hbase" => { "owner" => "hbase", "group" => "hadoop", "mode" => "0640" },
+    "mapred" => { "owner" => "mapred", "group" => "hadoop", "mode" => "0640" },
     "yarn" => { "owner" => "yarn", "group" => "hadoop", "mode" => "0640" },
     "zookeeper" => { "owner" => "zookeeper", "group" => "hadoop", "mode" => "0640" }
   }
