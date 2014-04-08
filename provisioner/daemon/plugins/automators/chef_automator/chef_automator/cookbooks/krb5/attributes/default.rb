@@ -43,6 +43,16 @@ default['krb5']['ticket_lifetime'] = '24h'
 default['krb5']['renew_lifetime'] = '24h'
 default['krb5']['forwardable'] = 'true'
 
+default_realm =
+  if node['krb5']['default_realm']
+    node['krb5']['default_realm'].upcase
+  elsif node['krb5']['krb5_conf']['libdefaults']['default_realm']
+    ['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase
+  else
+    "LOCAL"
+  end
+
+
 # Client Packages
 default['krb5']['client']['packages'] = node['krb5']['packages']
 default['krb5']['client']['authconfig'] = node['krb5']['authconfig']
@@ -53,7 +63,7 @@ default['krb5']['krb5_conf']['logging']['kdc'] = 'FILE:/var/log/krb5kdc.log'
 default['krb5']['krb5_conf']['logging']['admin_server'] = 'FILE:/var/log/kadmind.log'
 
 # libdefaults
-default['krb5']['krb5_conf']['libdefaults']['default_realm'] = node['krb5']['default_realm']
+default['krb5']['krb5_conf']['libdefaults']['default_realm'] = default_realm
 default['krb5']['krb5_conf']['libdefaults']['dns_lookup_realm'] = false
 default['krb5']['krb5_conf']['libdefaults']['dns_lookup_kdc'] = node['krb5']['lookup_kdc']
 default['krb5']['krb5_conf']['libdefaults']['forwardable'] = node['krb5']['forwardable']
