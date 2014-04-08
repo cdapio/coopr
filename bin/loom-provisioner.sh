@@ -31,7 +31,7 @@ die ( ) {
 PROVISIONER_PATH="${LOOM_HOME}/provisioner/daemon"
 
 APP_NAME="loom-provisioner"
-LOOM_RUBY=${LOOM_RUBY:-"${LOOM_HOME}/provisioner/embedded/bin/ruby"}
+LOOM_RUBY=${LOOM_RUBY:-"${LOOM_HOME}/embedded/bin/ruby"}
 PID_DIR=${PID_DIR:-/var/run/loom}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
