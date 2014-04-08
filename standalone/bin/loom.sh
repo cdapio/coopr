@@ -155,7 +155,7 @@ function load_defaults () {
         fi 
 
         echo "Loading default configuration..."
-        $LOOM_HOME/config/defaults/load-defaults.sh && \
+        $LOOM_HOME/server/config/defaults/load-defaults.sh && \
         touch $LOOM_DATA_DIR/.load_defaults
 
         echo
