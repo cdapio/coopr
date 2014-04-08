@@ -74,6 +74,11 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   if node['java']['install_flavor'] == "oracle"
     include_recipe 'hadoop_wrapper::jce'
   end
+  # Hack up /etc/default/hadoop-hdfs-datanode
+  execute 'modify-etc-default-files' do
+    command 'sed -i -e "/HADOOP_SECURE_DN/ s/^#//g" /etc/default/hadoop-hdfs-datanode'
+    only_if 'test -e /etc/default/hadoop-hdfs-datanode'
+  end
 end
 
 if (node['hbase'].has_key? 'hbase_site' and node['hbase']['hbase_site'].has_key? 'hbase.security.authorization' and
