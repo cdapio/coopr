@@ -16,6 +16,7 @@ default['hadoop']['yarn_site']['yarn.scheduler.minimum-allocation-mb'] = 512
 default['hadoop']['yarn_site']['yarn.nodemanager.vmem-check-enabled'] = 'false'
 default['hadoop']['yarn_site']['yarn.nodemanager.vmem-pmem-ratio'] = '5.1'
 default['hadoop']['yarn_site']['yarn.nodemanager.delete.debug-delay-sec'] = 86400
+default['hadoop']['yarn_site']['yarn.nodemanager.resource.memory-mb'] = (node[:memory][:total].to_i / 1024) / 2
 # Do the right thing, based on distribution
 case node['hadoop']['distribution']
 when 'cdh'

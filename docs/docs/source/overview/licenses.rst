@@ -157,6 +157,8 @@ The Loom Provisioner uses and depends on the following licenses:
      - MIT
    * - ipaddress
      - MIT
+   * - json.sh
+     - BSD
    * - knife-joyent
      - Apache License, Version 2.0
    * - knife-openstack

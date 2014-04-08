@@ -32,6 +32,8 @@ class ShellAutomator < Automator
     @remote_cache_dir = "/var/cache/loom"
     # remote script location to be exported in $PATH
     @remote_scripts_dir = "#{@remote_cache_dir}/#{@scripts_parent_dir}"
+    # loom wrapper for common functions
+    @wrapper_script = "#{@remote_scripts_dir}/.lib/loom_wrapper.sh"
   end
 
   def generate_scripts_tar
@@ -65,10 +67,35 @@ class ShellAutomator < Automator
     shellargs = inputmap['actiondata']
     set_credentials(sshauth)
 
+    jsondata = JSON.generate(task)
+
+    # copy the task json data to the cache dir on the remote machine
+    begin
+      # write json task data to a local tmp file
+      tmpjson = Tempfile.new("loom")
+      tmpjson.write(jsondata)
+      tmpjson.close
+
+      # scp task.json to remote
+      log.debug "Copying json attributes to remote"
+      begin
+        Net::SCP.upload!(ipaddress, inputmap['sshauth']['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
+          @credentials)
+      rescue Net::SSH::AuthenticationFailed => e
+        raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
+      end
+      log.debug "Copy json attributes complete"
+
+    ensure
+      tmpjson.close
+      tmpjson.unlink
+    end
+
+    # execute the defined shell script
     begin
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
         log.debug "Running shell command: #{shellscript} #{shellargs}"
-        output = ssh_exec!(ssh, "cd #{@remote_scripts_dir}; export PATH=$PATH:#{@remote_scripts_dir}; #{shellscript} #{shellargs}")
+        output = ssh_exec!(ssh, "cd #{@remote_scripts_dir}; export PATH=$PATH:#{@remote_scripts_dir}; #{@wrapper_script} #{@remote_cache_dir}/#{@task['taskId']}.json #{shellscript} #{shellargs}")
         if (output[2] != 0 )
           log.error "Shell command did not complete successfully: #{output}"
           raise "Shell command did not complete successfully: #{output}"
