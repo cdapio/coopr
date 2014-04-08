@@ -22,6 +22,12 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   default['hadoop']['container_executor']['yarn.nodemanager.log-dirs'] = '/var/log/hadoop-yarn/userlogs'
 
   # hadoop-env.sh
+  default['hadoop']['hadoop_env']['jsvc_home'] =
+    if node['platform_family'] == 'debian'
+      '/usr/lib/bigtop-utils'
+    elsif node['platform_family'] == 'rhel'
+      '/usr/libexec/bigtop-utils'
+    end
   default['hadoop']['hadoop_env']['hadoop_secure_dn_user'] = 'hdfs'
   default['hadoop']['hadoop_env']['hadoop_secure_dn_pid_dir'] = '/var/run/hadoop-hdfs'
   default['hadoop']['hadoop_env']['hadoop_secure_dn_log_dir'] = '/var/log/hadoop-hdfs'
