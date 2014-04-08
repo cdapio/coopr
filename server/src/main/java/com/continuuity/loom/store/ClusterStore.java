@@ -93,6 +93,28 @@ public interface ClusterStore {
   Cluster getCluster(String clusterId, String ownerId) throws Exception;
 
   /**
+   * Return whether or not the cluster with the given id exists or not, where existence is determined by whether or not
+   * the cluster is in the store, and not by whether or not there is an active cluster with the given id.
+   *
+   * @param clusterId Id of the cluster.
+   * @return True if the cluster exists, False if not.
+   * @throws Exception
+   */
+  boolean clusterExists(String clusterId) throws Exception;
+
+  /**
+   * Return whether or not a cluster with the given id owned by the given user exists or not, where existence is
+   * determined by whether or not the cluster is in the store, and not by whether or not there is an active cluster
+   * with the given id owned by the given user.
+   *
+   * @param clusterId Id of the cluster.
+   * @param ownerId Id of the owner of the cluster.
+   * @return True if the cluster exists and is owned by the user, False if not.
+   * @throws Exception
+   */
+  boolean clusterExists(String clusterId, String ownerId) throws Exception;
+
+  /**
    * Write a cluster to the store using its id.
    * @param cluster Cluster to write.
    * @throws Exception if there was a problem writing the cluster.

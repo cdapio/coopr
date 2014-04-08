@@ -74,7 +74,7 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
         $scope.defaultProvider = template.defaults.provider;
         $scope.defaultHardwareType = template.defaults.hardwaretype;
         $scope.defaultImageType = template.defaults.imagetype;
-        $scope.defaultConfig = JSON.stringify(template.defaults.config);
+        $scope.defaultConfig = JSON.stringify(template.defaults.config, undefined, 4);
         if ('administration' in template) {
           $scope.leaseDuration.initial = Helpers.parseMilliseconds(
             template.administration.leaseduration.initial);

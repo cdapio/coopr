@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.scheduler;
-
-import com.continuuity.loom.cluster.Cluster;
+package com.continuuity.loom.scheduler.task;
 
 /**
- * Actions that can be performed on a cluster.
+ * Thrown to indicate that there was a problem creating a cluster job or task.
  */
-public enum ClusterAction {
-  SOLVE_LAYOUT(Cluster.Status.TERMINATED),
-  CLUSTER_CREATE(Cluster.Status.INCOMPLETE),
-  CLUSTER_DELETE(Cluster.Status.INCOMPLETE),
-  CLUSTER_CONFIGURE(Cluster.Status.INCONSISTENT),
-  CLUSTER_CONFIGURE_WITH_RESTART(Cluster.Status.INCONSISTENT);
-  private final Cluster.Status failureStatus;
+public class MissingClusterException extends Exception {
 
-  ClusterAction(Cluster.Status status) {
-    failureStatus = status;
+  /**
+   * New exception with error message.
+   * @param message the error message
+   */
+  public MissingClusterException(String message) {
+    super(message);
   }
 
-  public Cluster.Status getFailureStatus() {
-    return failureStatus;
+  public MissingClusterException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public MissingClusterException(Throwable cause) {
+    super(cause);
   }
 }

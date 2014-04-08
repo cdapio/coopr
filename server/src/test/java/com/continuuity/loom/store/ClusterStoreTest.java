@@ -55,8 +55,12 @@ public abstract class ClusterStoreTest {
     );
     String clusterId = cluster.getId();
     Assert.assertNull(store.getCluster(clusterId));
+    Assert.assertFalse(store.clusterExists(clusterId));
 
     store.writeCluster(cluster);
+    Assert.assertTrue(store.clusterExists(clusterId));
+    Assert.assertTrue(store.clusterExists(clusterId, cluster.getOwnerId()));
+    Assert.assertFalse(store.clusterExists(clusterId, "not" + cluster.getOwnerId()));
     Assert.assertEquals(cluster, store.getCluster(clusterId));
     // check overwrite
     store.writeCluster(cluster);

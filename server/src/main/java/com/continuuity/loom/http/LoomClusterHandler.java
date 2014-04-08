@@ -30,6 +30,7 @@ import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.scheduler.task.MissingClusterException;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Charsets;
@@ -52,6 +53,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import java.io.IOException;
@@ -170,6 +172,31 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
 
     responder.sendJson(HttpResponseStatus.OK, jsonObject);
+  }
+
+  /**
+   * Get the config used by the cluster.
+   *
+   * @param request Request for config of a cluster.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster containing the config to get.
+   * @throws Exception
+   */
+  @GET
+  @Path("/{cluster-id}/config")
+  public void getClusterConfig(HttpRequest request, HttpResponder responder,
+                               @PathParam("cluster-id") String clusterId) throws Exception {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    Cluster cluster = clusterService.getUserCluster(clusterId, userId);
+    if (cluster == null) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
+      return;
+    }
+    responder.sendJson(HttpResponseStatus.OK, cluster.getConfig());
   }
 
   /**
@@ -568,6 +595,49 @@ public class LoomClusterHandler extends LoomAuthHandler {
     } catch (IllegalArgumentException e) {
       LOG.error("Got exception: ", e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    }
+  }
+
+  /**
+   * Overwrite the config used by an active cluster. The POST body should contain a "config" key containing the new
+   * cluster config. Additionally, the body can contain a "restart" key whose value is true or false, indicating
+   * whether or not cluster services should be restarted along with being reconfigured. If restart is not specified,
+   * it defaults to true.
+   *
+   * @param request Request for config of a cluster.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster containing the config to get.
+   * @throws Exception
+   */
+  @PUT
+  @Path("/{cluster-id}/config")
+  public void putClusterConfig(HttpRequest request, HttpResponder responder,
+                               @PathParam("cluster-id") String clusterId) throws Exception {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    ClusterConfigureRequest configRequest;
+    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
+    try {
+      configRequest = GSON.fromJson(reader, ClusterConfigureRequest.class);
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body.");
+      return;
+    }
+
+    try {
+      clusterService.requestClusterReconfigure(clusterId, userId,
+                                               configRequest.getRestart(), configRequest.getConfig());
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (MissingClusterException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT, "Cluster is not in a configurable state.");
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Internal error while requesting cluster reconfigure");
     }
   }
 

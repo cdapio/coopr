@@ -146,7 +146,7 @@ TemplateView.app.controller('TemplateCtrl', ['$scope', '$interval', 'dataFactory
     // Get cluster template and map to model.
     dataFactory.getTemplate(function (clustertemplate) {
       if ('config' in clustertemplate.defaults) {
-        $scope.defaultConfig = JSON.stringify(clustertemplate.defaults.config);
+        $scope.defaultConfig = JSON.stringify(clustertemplate.defaults.config, undefined, 4);
       }
       if ('services' in clustertemplate.constraints) {
         for (var item in clustertemplate.constraints.services) {
