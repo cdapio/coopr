@@ -11,8 +11,8 @@ include_recipe 'hadoop_wrapper::default'
 include_recipe 'hadoop::hadoop_yarn_resourcemanager'
 
 execute "initaction-create-hdfs-tmp" do
-  not_if        "hadoop fs -test -d /tmp", :user => "hdfs"
-  command       "hadoop fs -mkdir /tmp && hadoop fs -chmod -R 1777 /tmp"
+  not_if        "hdfs dfs -test -d /tmp", :user => "hdfs"
+  command       "hdfs dfs -mkdir /tmp && hadoop fs -chmod -R 1777 /tmp"
   timeout 300
   user "hdfs"
   group "hdfs"

@@ -13,8 +13,8 @@ include_recipe 'hadoop::hbase_master'
 if node['hbase']['hbase_site']['hbase.rootdir'] =~ /^\/|^hdfs:\/\//i
   # bootstrap hdfs for hbase
   execute "initaction-create-hdfs-rootdir" do
-    not_if        "hadoop fs -test -d #{node['hbase']['hbase_site']['hbase.rootdir']}", :user => "hbase"
-    command       "hadoop fs -mkdir -p #{node['hbase']['hbase_site']['hbase.rootdir']} && hadoop fs -chown hbase #{node['hbase']['hbase_site']['hbase.rootdir']}"
+    not_if        "hdfs dfs -test -d #{node['hbase']['hbase_site']['hbase.rootdir']}", :user => "hbase"
+    command       "hdfs dfs -mkdir -p #{node['hbase']['hbase_site']['hbase.rootdir']} && hdfs dfs -chown hbase #{node['hbase']['hbase_site']['hbase.rootdir']}"
     timeout 300
     user "hdfs"
     group "hdfs"
