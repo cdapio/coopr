@@ -59,7 +59,7 @@ APP_HOME="`pwd -P`"
 
 export PID_DIR=/var/tmp
 export LOOM_HOME=$APP_HOME
-export LOOM_SERVER_HOME=$APP_HOME
+export LOOM_SERVER_HOME=$APP_HOME/server
 export LOOM_SERVER_CONF=$LOOM_HOME/server/conf/
 export LOOM_LOG_DIR=$LOOM_HOME/logs
 export LOOM_DATA_DIR=$LOOM_HOME/data
