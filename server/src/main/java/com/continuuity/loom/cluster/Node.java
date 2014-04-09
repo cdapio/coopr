@@ -49,7 +49,11 @@ public final class Node implements Comparable<Node> {
     IPADDRESS,
     HOSTNAME,
     NODENUM,
-    AUTOMATORS
+    AUTOMATORS,
+    HARDWARETYPE,
+    IMAGETYPE,
+    FLAVOR,
+    IMAGE
   }
 
   /**

@@ -48,10 +48,16 @@ import java.util.UUID;
 public class Solver {
   private static final Logger LOG  = LoggerFactory.getLogger(Solver.class);
   private final EntityStore entityStore;
+  private final ClusterLayoutUpdater updater;
 
   @Inject
-  Solver(EntityStore entityStore) {
+  Solver(EntityStore entityStore, ClusterLayoutUpdater updater) {
     this.entityStore = entityStore;
+    this.updater = updater;
+  }
+
+  public ClusterLayout addServiceToCluster(String clusterId, Set<String> servicesToAdd) throws Exception {
+    return updater.addServicesToCluster(clusterId, servicesToAdd);
   }
 
   /**
@@ -309,10 +315,11 @@ public class Solver {
         String hardwaretype = nodeLayout.getHardwareTypeName();
         String imagetype = nodeLayout.getImageTypeName();
         Map<String, String> nodeProperties = Maps.newHashMap();
-        nodeProperties.put("hardwaretype", hardwaretype);
-        nodeProperties.put("imagetype", imagetype);
-        nodeProperties.put("flavor", hardwareTypeMap.get(hardwaretype));
-        nodeProperties.put("image", imageTypeMap.get(imagetype));
+        // TODO: these should be proper fields and logic for populating node properties should not be in the solver.
+        nodeProperties.put(Node.Properties.HARDWARETYPE.name().toLowerCase(), hardwaretype);
+        nodeProperties.put(Node.Properties.IMAGETYPE.name().toLowerCase(), imagetype);
+        nodeProperties.put(Node.Properties.FLAVOR.name().toLowerCase(), hardwareTypeMap.get(hardwaretype));
+        nodeProperties.put(Node.Properties.IMAGE.name().toLowerCase(), imageTypeMap.get(imagetype));
         // used for macro expansion and when expanding service numbers.  For every new node added to the cluster,
         // the nodenum should be greater than any other nodenum in the cluster.
         nodeProperties.put(Node.Properties.NODENUM.name().toLowerCase(), String.valueOf(nodeNum));

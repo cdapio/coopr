@@ -54,6 +54,34 @@ public class NodeLayoutGenerator {
   }
 
   /**
+   * Returns whether or not the service set based on the given layout constraint.
+   *
+   * @param serviceSet Service set to validate.
+   * @param layoutConstraint Layout constraint to use for validation.
+   * @param clusterServices Services on the cluster, used to prune the layout constraint.
+   * @return True if the service set is valid, false if not.
+   */
+  static boolean isValidServiceSet(Set<String> serviceSet, LayoutConstraint layoutConstraint,
+                                   Set<String> clusterServices) {
+    // a valid service set must not be a superset of any of the cant coexist constraints
+    for (Set<String> cantCoexist : layoutConstraint.getServicesThatMustNotCoexist()) {
+      if (serviceSet.containsAll(cantCoexist)) {
+        return false;
+      }
+    }
+
+    // if the service set contains at least one service in a must coexist constraint, but not all clusterServices in the
+    // constraint, then it is invalid.  Ignore clusterServices that are not on the cluster.
+    for (Set<String> mustCoexist : layoutConstraint.getServicesThatMustCoexist()) {
+      Set<String> trueMustCoexist = Sets.intersection(mustCoexist, clusterServices);
+      if (containsOne(serviceSet, trueMustCoexist) && !serviceSet.containsAll(trueMustCoexist)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Get an ordered list of possible {@link NodeLayout}s to use in the cluster. If earlier a node layout appears in the
    * list, the more preferred it is. Only one {@link NodeLayout} per valid service set will be returned.
    *
@@ -145,8 +173,9 @@ public class NodeLayoutGenerator {
     for (String hardwareType : allowedHardwareTypes) {
       for (String imageType : allowedImageTypes) {
         for (Set<String> serviceSet : validServiceSets) {
-          if (isValidNodeLayout(hardwareType, imageType, serviceSet, serviceConstraints)) {
-            validNodeLayouts.add(new NodeLayout(hardwareType, imageType, serviceSet));
+          NodeLayout nodeLayout = new NodeLayout(hardwareType, imageType, serviceSet);
+          if (nodeLayout.satisfiesServiceConstraints(serviceConstraints)) {
+            validNodeLayouts.add(nodeLayout);
           }
         }
       }
@@ -181,56 +210,6 @@ public class NodeLayoutGenerator {
 
     Collections.sort(output, comparator);
     return output;
-  }
-
-  // returns whether or not the service set is valid given the must coexist and cant coexist rules in the
-  // given layout constraint.
-  // TODO: refactor constraints.
-  // constraints should take a service set and a set of cluster services and return whether or not they satisfy that
-  // constraint.  Then we could just loop through all the constraints and make sure everything is satisfied, and
-  // allow people to add their own types of constraints.
-  static boolean isValidServiceSet(Set<String> serviceSet, LayoutConstraint layoutConstraint,
-                                   Set<String> clusterServices) {
-    // a valid service set must not be a superset of any of the cant coexist constraints
-    for (Set<String> cantCoexist : layoutConstraint.getServicesThatMustNotCoexist()) {
-      if (serviceSet.containsAll(cantCoexist)) {
-        return false;
-      }
-    }
-
-    // if the service set contains at least one service in a must coexist constraint, but not all clusterServices in the
-    // constraint, then it is invalid.  Ignore clusterServices that are not on the cluster.
-    for (Set<String> mustCoexist : layoutConstraint.getServicesThatMustCoexist()) {
-      Set<String> trueMustCoexist = Sets.intersection(mustCoexist, clusterServices);
-      if (containsOne(serviceSet, trueMustCoexist) && !serviceSet.containsAll(trueMustCoexist)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  // given a hardware type, image type and set of clusterServices, determine if this is a valid node layout given
-  // the constraints of what clusterServices require which hardware and image types.
-  static boolean isValidNodeLayout(String hardwareType, String imageType, Set<String> services,
-                                   Map<String, ServiceConstraint> serviceConstraints) {
-    for (String service : services) {
-      ServiceConstraint constraint = serviceConstraints.get(service);
-      if (constraint != null) {
-        // check that no required hardware rules are broken
-        Set<String> requiredHardwareTypes = constraint.getRequiredHardwareTypes();
-        if (requiredHardwareTypes != null && !requiredHardwareTypes.isEmpty() &&
-          !requiredHardwareTypes.contains(hardwareType)) {
-          return false;
-        }
-        // check that no required image rules are broken
-        Set<String> requiredImageTypes = constraint.getRequiredImageTypes();
-        if (requiredImageTypes != null && !requiredImageTypes.isEmpty() &&
-          !requiredImageTypes.contains(imageType)) {
-          return false;
-        }
-      }
-    }
-    return true;
   }
 
   static boolean inSetOfSets(String element, Set<Set<String>> setOfSets) {
