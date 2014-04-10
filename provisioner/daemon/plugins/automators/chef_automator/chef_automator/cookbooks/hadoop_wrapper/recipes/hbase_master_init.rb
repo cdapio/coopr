@@ -26,7 +26,7 @@ if node['hbase']['hbase_site'].has_key? 'hbase.bulkload.staging.dir'
     not_if   "hadoop fs -test -d #{node['hbase']['hbase_site']['hbase.bulkload.staging.dir']}", :user => "hbase"
     command  "hadoop fs -mkdir -p #{node['hbase']['hbase_site']['hbase.bulkload.staging.dir']} && hadoop fs -chown hbase #{node['hbase']['hbase_site']['hbase.bulkload.staging.dir']} && hadoop fs -chmod 711 #{node['hbase']['hbase_site']['hbase.bulkload.staging.dir']}"
     timeout 300
-    user "hbase"
-    group "hbase"
+    user "hdfs"
+    group "hdfs"
   end
 end 
