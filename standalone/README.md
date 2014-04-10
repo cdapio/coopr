@@ -23,7 +23,7 @@ bin/loom.sh stop
 Create a cluster
 ================
 Once Continuuity Loom is running, follow the instructions in the quickstart guide at 
-http://continuuity.com/docs/loom/0.9.5/en/guide/quickstart/index.html#getting-started.
+http://continuuity.com/docs/loom/0.9.6/en/guide/quickstart/index.html#getting-started.
 It contains step by step instructions for creating a Hadoop cluster with different providers.
 
 Known Issues

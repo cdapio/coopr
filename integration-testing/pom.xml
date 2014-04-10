@@ -24,7 +24,7 @@
     <groupId>com.continuuity</groupId>
     <artifactId>integration-testing</artifactId>
     <packaging>jar</packaging>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>0.9.6</version>
     <name>Loom UI testing</name>
 
     <properties>
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.continuuity</groupId>
             <artifactId>loom</artifactId>
-            <version>0.9.5-SNAPSHOT</version>
+            <version>0.9.6</version>
             <scope>compile</scope>
         </dependency>
 
