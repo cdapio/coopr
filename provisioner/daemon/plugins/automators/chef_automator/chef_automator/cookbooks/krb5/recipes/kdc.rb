@@ -40,6 +40,7 @@ template "#{etc_dir}/kdc.conf" do
   variables node['krb5']['kdc_conf']
 end
 
-service kdc_svc do
+service 'krb5-kdc' do
+  service_name kdc_svc
   action :start
 end

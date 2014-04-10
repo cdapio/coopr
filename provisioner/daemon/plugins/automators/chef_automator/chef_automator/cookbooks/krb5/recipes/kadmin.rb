@@ -57,6 +57,7 @@ end
 
 include_recipe 'krb5::kdc'
 
-service kadm_svc do
+service 'krb5-admin-server' do
+  service_name kadm_svc
   action :start
 end

@@ -20,7 +20,7 @@
 # KDC Packages
 case node['platform_family']
 when 'rhel'
-  default['krb5']['kdc']['packages'] = %w(krb5-server)
+  default['krb5']['kdc']['packages'] = %w(krb5-server krb5-server-ldap)
   kdc_dir = '/var/kerberos/krb5kdc'
   etc_dir = kdc_dir
 when 'debian'

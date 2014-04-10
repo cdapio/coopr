@@ -52,7 +52,6 @@ default_realm =
     "LOCAL"
   end
 
-
 # Client Packages
 default['krb5']['client']['packages'] = node['krb5']['packages']
 default['krb5']['client']['authconfig'] = node['krb5']['authconfig']
