@@ -27,6 +27,8 @@ end
 dfs_data_dirs =
   if (node['hadoop'].has_key? 'hdfs_site' and node['hadoop']['hdfs_site'].has_key? 'dfs.data.dir')
     node['hadoop']['hdfs_site']['dfs.data.dir']
+  elsif (node['hadoop'].has_key? 'hdfs_site' and node['hadoop']['hdfs_site'].has_key? 'dfs.datanode.data.dir')
+    node['hadoop']['hdfs_site']['dfs.datanode.data.dir']
   else
     "/tmp/hadoop-hdfs/dfs/data"
   end
@@ -38,7 +40,8 @@ dfs_data_dir_perm =
     "0700"
   end
 
-node.default['hadoop']['hdfs_site']['dfs.data.dir'] = dfs_data_dirs
+node.default['hadoop']['hdfs_site']['dfs.datanode.data.dir'] = dfs_data_dirs
+node.default['hadoop']['hdfs_site']['dfs.datanode.data.dir.perm'] = dfs_data_dir_perm
 
 dfs_data_dirs.split(',').each do |dir|
   directory dir do
@@ -51,5 +54,6 @@ dfs_data_dirs.split(',').each do |dir|
 end
 
 service "hadoop-hdfs-datanode" do
+  supports [ :restart => true, :reload => false, :status => true ]
   action :nothing
 end

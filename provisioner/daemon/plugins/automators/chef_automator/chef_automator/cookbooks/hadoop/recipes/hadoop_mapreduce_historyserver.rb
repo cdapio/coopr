@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: hadoop
-# Recipe:: hadoop_yarn_resourcemanager
+# Recipe:: hadoop_mapreduce_historyserver
 #
 # Copyright (C) 2013 Continuuity, Inc.
 # 
@@ -19,17 +19,11 @@
 
 include_recipe 'hadoop::default'
 
-package "hadoop-yarn-resourcemanager" do
+package "hadoop-mapreduce-historyserver" do
   action :install
 end
 
-# TODO: check for these and set them up
-# mapreduce.cluster.local.dir = #{hadoop_tmp_dir}/mapred/local
-# mapreduce.jobtracker.system.dir = #{hadoop_tmp_dir}/mapred/system
-# mapreduce.jobtracker.staging.root.dir = #{hadoop_tmp_dir}/mapred/staging
-# mapreduce.cluster.temp.dir = #{hadoop_tmp_dir}/mapred/temp
-
-service "hadoop-yarn-resourcemanager" do
+service "hadoop-mapreduce-historyserver" do
   supports [ :restart => true, :reload => false, :status => true ]
   action :nothing
 end

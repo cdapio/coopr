@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: hadoop
-# Recipe:: hadoop_yarn_resourcemanager
+# Recipe:: hbase_rest
 #
 # Copyright (C) 2013 Continuuity, Inc.
 # 
@@ -17,19 +17,13 @@
 # limitations under the License.
 #
 
-include_recipe 'hadoop::default'
+include_recipe 'hadoop::hbase'
 
-package "hadoop-yarn-resourcemanager" do
+package "hbase-rest" do
   action :install
 end
 
-# TODO: check for these and set them up
-# mapreduce.cluster.local.dir = #{hadoop_tmp_dir}/mapred/local
-# mapreduce.jobtracker.system.dir = #{hadoop_tmp_dir}/mapred/system
-# mapreduce.jobtracker.staging.root.dir = #{hadoop_tmp_dir}/mapred/staging
-# mapreduce.cluster.temp.dir = #{hadoop_tmp_dir}/mapred/temp
-
-service "hadoop-yarn-resourcemanager" do
+service "hbase-rest" do
   supports [ :restart => true, :reload => false, :status => true ]
   action :nothing
 end
