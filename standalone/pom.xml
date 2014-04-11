@@ -23,7 +23,7 @@
 
     <groupId>com.continuuity</groupId>
     <artifactId>loom-parent</artifactId>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>0.9.6</version>
     <packaging>pom</packaging>
     <name>Continuuity Loom Parent POM</name>
 

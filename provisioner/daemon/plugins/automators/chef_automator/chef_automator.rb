@@ -152,7 +152,7 @@ class ChefAutomator < Automator
 
     # upload tarballs to target machine
     %w[cookbooks data_bags roles].each do |chef_primitive|
-      log.debug "Uploading cookbooks from #{@chef_primitives_path}/#{chef_primitive}.tar.gz to #{ipaddress}:#{@remote_cache_dir}/#{chef_primitive}.tar.gz"
+      log.debug "Uploading #{chef_primitive} from #{@chef_primitives_path}/#{chef_primitive}.tar.gz to #{ipaddress}:#{@remote_cache_dir}/#{chef_primitive}.tar.gz"
       begin
         Net::SCP.upload!(ipaddress, sshauth["user"], "#{@chef_primitives_path}/#{chef_primitive}.tar.gz", "#{@remote_cache_dir}/#{chef_primitive}.tar.gz", :ssh =>
             @credentials)

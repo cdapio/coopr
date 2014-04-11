@@ -24,7 +24,7 @@
     <groupId>com.continuuity</groupId>
     <artifactId>loom</artifactId>
     <packaging>jar</packaging>
-    <version>0.9.5-SNAPSHOT</version>
+    <version>0.9.6</version>
     <name>Continuuity Loom</name>
 
     <properties>

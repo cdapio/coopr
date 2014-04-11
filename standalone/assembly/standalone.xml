@@ -42,7 +42,7 @@
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../config/defaults</directory>
-            <outputDirectory>/config/defaults</outputDirectory>
+            <outputDirectory>/server/config/defaults</outputDirectory>
         </fileSet>
     </fileSets>
         <files>
