@@ -16,30 +16,17 @@
 package com.continuuity.loom.layout;
 
 import com.continuuity.loom.Entities;
-import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -97,6 +84,21 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
     // reactor is forced onto its own node, should not be possible to add it.
     Assert.assertNull(updater.addServicesToCluster(clusterId, ImmutableSet.of(
       resourcemanager.getName(), nodemanager.getName(), zookeeper.getName())));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testDependencyMissingThrowsException() throws Exception {
+    updater.addServicesToCluster(clusterId, ImmutableSet.of(nodemanager.getName()));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidServiceThrowsException() throws Exception {
+    updater.addServicesToCluster(clusterId, ImmutableSet.of("fakeservice"));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testIncompatibleServiceThrowsException() throws Exception {
+    updater.addServicesToCluster(clusterId, ImmutableSet.of(mysql.getName()));
   }
 
   @Before

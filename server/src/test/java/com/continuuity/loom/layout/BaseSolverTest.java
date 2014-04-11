@@ -53,6 +53,7 @@ public class BaseSolverTest extends BaseTest {
   protected static Service regionserver;
   protected static Service zookeeper;
   protected static Service reactor;
+  protected static Service mysql;
 
   @BeforeClass
   public static void setupBaseSolverTests() throws Exception {
@@ -160,7 +161,7 @@ public class BaseSolverTest extends BaseTest {
                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
     nodemanager = new Service("nodemanager", "", ImmutableSet.<String>of("resourcemanager"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    hbasemaster = new Service("hbasemaster", "", ImmutableSet.<String>of("zookeeper", "datanode"),
+    hbasemaster = new Service("hbasemaster", "", ImmutableSet.<String>of("datanode"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
     regionserver = new Service("regionserver", "", ImmutableSet.<String>of("hbasemaster"),
                                ImmutableMap.<ProvisionerAction, ServiceAction>of());
@@ -168,6 +169,7 @@ public class BaseSolverTest extends BaseTest {
                             ImmutableMap.<ProvisionerAction, ServiceAction>of());
     reactor = new Service("reactor", "", ImmutableSet.<String>of("zookeeper", "regionserver", "nodemanager"),
                           ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    mysql = new Service("mysql", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
 
     entityStore.writeService(namenode);
     entityStore.writeService(datanode);
@@ -177,6 +179,7 @@ public class BaseSolverTest extends BaseTest {
     entityStore.writeService(regionserver);
     entityStore.writeService(zookeeper);
     entityStore.writeService(reactor);
+    entityStore.writeService(mysql);
     entityStore.writeClusterTemplate(reactorTemplate);
   }
 }

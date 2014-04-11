@@ -22,6 +22,8 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.EntityStore;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
@@ -94,8 +96,40 @@ public class ClusterLayoutUpdater {
     return addServicesToCluster(clusterLayout, sortedServices);
   }
 
-  private void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd) {
+  private void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd) throws Exception {
+    Preconditions.checkArgument(servicesToAdd != null && !servicesToAdd.isEmpty(),
+                                "At least one service to add must be specified.");
 
+    // check compatibility
+    Set<String> compatibleServices = cluster.getClusterTemplate().getCompatibilities().getServices();
+    Set<String> incompatibleServices = Sets.difference(servicesToAdd, compatibleServices);
+    if (!incompatibleServices.isEmpty()) {
+      String incompatibleStr = Joiner.on(',').join(incompatibleServices).toString();
+      throw new IllegalArgumentException(incompatibleStr + " are incompatible with the cluster");
+    }
+
+    // check dependencies
+    boolean dependenciesSatisfied = true;
+    StringBuilder errMsg = new StringBuilder();
+    Set<String> existingClusterServices = cluster.getServices();
+    for (String serviceName : servicesToAdd) {
+      Service service = entityStore.getService(serviceName);
+      if (service == null) {
+        throw new IllegalArgumentException(serviceName + " does not exist");
+      }
+      for (String serviceDependency : service.getDependsOn()) {
+        if (!existingClusterServices.contains(serviceDependency) && !servicesToAdd.contains(serviceDependency)) {
+          dependenciesSatisfied = false;
+          errMsg.append(serviceName);
+          errMsg.append(" requires ");
+          errMsg.append(serviceDependency);
+          errMsg.append(", which is not on the cluster or in the list of services to add.");
+        }
+      }
+    }
+    if (!dependenciesSatisfied) {
+      throw new IllegalArgumentException(errMsg.toString());
+    }
   }
 
   private ClusterLayout addServicesToCluster(ClusterLayout clusterLayout, Queue<String> servicesToAdd) {
