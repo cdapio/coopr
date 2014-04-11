@@ -49,8 +49,10 @@ CreateCluster.app.factory('dataFactory', ['$http', '$q', 'fetchUrl',
  
 CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataFactory',
   function ($scope, $interval, dataFactory) {
+
   $scope.configDiv = $('#inputConfig')[0];
-  PP.registerPrettifier($scope.configDiv);
+  $scope.jsonValidEl = $('#is-json-valid')[0];
+
   $scope.clusterId = dataFactory.getClusterId();
 
   $scope.showAdvanced = false;
@@ -181,8 +183,8 @@ CreateCluster.addTemplateToScope = function (template, scope) {
       template.administration.leaseduration.initial);
   }
 
-  // Prettify the json config
-  PP.prettify(scope.configDiv, 1000);
+  // Prettify the json config manually since PP doesn't recognize angular change event.
+  PP.prettify(scope.configDiv, scope.jsonValidEl, 1000, true);
 
   return scope;
 };

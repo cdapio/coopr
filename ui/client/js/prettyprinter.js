@@ -29,24 +29,41 @@ PP.elTypes = {
   'INPUT': 'INPUT'
 };
 
-PP.registerPrettifier = function (el) {
-  $(el).keyup(function() {
-    PP.prettify(el);
+PP.registerPrettifier = function (el, displayEl, rewrite) {
+  $(el).bind('input propertychange', function() {
+    PP.prettify(el, displayEl, 0, rewrite);
+  });
+  $(displayEl).click(function () {
+    PP.makePretty(el, displayEl, true);
   });
 };
 
-PP.prettify = function (el, delay) {
+PP.prettify = function (el, displayEl, delay, rewrite) {
   if (delay) {
     setTimeout(function () {
-      PP.makePretty(el);
+      PP.makePretty(el, displayEl, rewrite);
     }, delay);
   } else {
-    PP.makePretty(el);
+    PP.makePretty(el, displayEl, rewrite);
   }
   
 };
 
-PP.makePretty = function (el) {
+PP.getIndicies = function (searchStr, str, caseSensitive) {
+  var startIndex = 0, searchStrLen = searchStr.length;
+  var index, indices = [];
+  if (!caseSensitive) {
+      str = str.toLowerCase();
+      searchStr = searchStr.toLowerCase();
+  }
+  while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+      indices.push(index);
+      startIndex = index + searchStrLen;
+  }
+  return indices;
+}
+
+PP.makePretty = function (el, displayEl, rewrite) {
   var content, type;
   if ($(el).text()) {
     content = $(el).text();
@@ -59,25 +76,66 @@ PP.makePretty = function (el) {
   }
 
   if (!content) {
+    $(displayEl).addClass('valid-json-icon');
+    $(displayEl).removeClass('invalid-json-icon');
     return;
   }
 
+  var curCursor = $(el).textrange('get').position;
+  if (curCursor) {
+    var textRangeStart = curCursor - 10;
+    var textCriteria = content.substring(textRangeStart, curCursor - 1);
+  }
 
   try {
-    var result = jsonlint.parse(content);  
+    var result = jsonlint.parse(content);
+    var trailingDiff = Infinity;
+    var curPos = curCursor;
     $(el).addClass('valid-json');
     $(el).removeClass('invalid-json');
+    $(displayEl).addClass('valid-json-icon');
+    $(displayEl).removeClass('invalid-json-icon');
     var parsedContent = JSON.stringify(result, null, PP.tabSpace);
-  
-    if (type === PP.elTypes.DIV) {
-      $(el).text(parsedContent)
+
+    if (curCursor) {
+      var positioning = PP.getIndicies(textCriteria, parsedContent, true);
+      for (var j = 0; j < positioning.length; j++) {
+        var diff = Math.abs(positioning[j] - curCursor);
+        if (diff < trailingDiff) {
+          trailingDiff = diff;
+          curPos = positioning[j];
+        }
+      }
+      if (curPos > curCursor) {
+        curPos -= 10;
+      } else {
+        curPos += 10;
+      }
     }
 
-    if (type === PP.elTypes.INPUT) {
-      $(el).val(parsedContent)
-    }
+    
+    if (rewrite) {
+      if (type === PP.elTypes.DIV) {
+        $(el).text(parsedContent)
+      }
+
+      if (type === PP.elTypes.INPUT) {
+        $(el).val(parsedContent);
+      }
+      $(el).textrange('setcursor', curPos);  
+    }  
+
   } catch (e) {
     $(el).addClass('invalid-json');
     $(el).removeClass('valid-json');
+    $(displayEl).addClass('invalid-json-icon');
+    $(displayEl).removeClass('valid-json-icon');
   }
 };
+
+$(document).ready(function () {
+  // Set up json validation on page load.
+  var configDiv = $('#inputConfig')[0];
+  var jsonValidEl = $('#is-json-valid')[0];
+  PP.registerPrettifier(configDiv, jsonValidEl, false);
+});

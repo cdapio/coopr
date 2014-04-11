@@ -221,6 +221,11 @@ progress::-moz-progress-bar {
 	width: 36px;
 	padding: 10px 0px 10px 14px !important;
 }
+
+a, a:visited {
+	color: #505050;
+}
+
 .list-health-box {
 	float: left;
 	width: 36px;
@@ -1371,7 +1376,7 @@ a strong {
 }
 
 .btn-success, .btn-danger, .btn-info, .btn-warning {
-	color: #fff;
+	color: #fff !important;
 	border: 1px solid transparent;
 }
 
@@ -3007,7 +3012,7 @@ div.tooltip {
 
 #inputConfig {
 	height: 500px;
-	
+
 }
 
 .table tr:first-child td {
@@ -3131,18 +3136,37 @@ div.tooltip {
 	width: 50px;
 }
 
+#is-json-valid {
+	margin-top: 10px;
+	background-position: 65px 7px;
+	padding-right: 24px;
+	background-size: 9px;
+}
+
 .valid-json {
 	border: 1px solid green;
+	box-shadow: 0px 0px 1px rgb(15, 173, 15);
 }
 
 .valid-json:focus {
 	border: 1px solid green !important;
+	box-shadow: 0px 0px 1px rgb(15, 173, 15);
+}
+
+.valid-json-icon {
+	background: url("/static/img/checkmark-24.png") no-repeat;
+}
+
+.invalid-json-icon {
+	background: url("/static/img/cross-24.png") no-repeat;
 }
 
 .invalid-json {
 	border: 1px solid red !important;
+	box-shadow: 0px 0px 1px red;
 }
 
 .invalid-json:focus {
 	border: 1px solid red !important;
+	box-shadow: 0px 0px 1px red;
 }
