@@ -19,6 +19,8 @@
 
 include_recipe 'krb5::default'
 
+node.default['krb5']['krb5_conf']['realms']['default_realm_kdcs'] = node['krb5']['krb5_conf']['realms']['default_realm_kdcs'] + [ node['fqdn'] ]
+
 node['krb5']['kdc']['packages'].each do |krb5_package|
   package krb5_package
 end

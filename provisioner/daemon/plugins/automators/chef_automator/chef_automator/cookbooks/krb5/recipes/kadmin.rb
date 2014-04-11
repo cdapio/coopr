@@ -17,6 +17,10 @@
 # limitations under the License.
 #
 
+include_recipe 'krb5::default'
+
+node.default['krb5']['krb5_conf']['realms']['default_realm_admin_server'] = node['fqdn']
+
 node['krb5']['kadmin']['packages'].each do |krb5_package|
   package krb5_package
 end

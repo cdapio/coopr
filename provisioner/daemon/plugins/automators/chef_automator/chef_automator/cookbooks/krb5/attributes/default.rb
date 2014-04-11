@@ -49,7 +49,7 @@ default_realm =
   elsif node['krb5']['krb5_conf']['libdefaults']['default_realm']
     ['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase
   else
-    "LOCAL"
+    'LOCAL'
   end
 
 # Client Packages
