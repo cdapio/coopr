@@ -49,7 +49,8 @@ CreateCluster.app.factory('dataFactory', ['$http', '$q', 'fetchUrl',
  
 CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataFactory',
   function ($scope, $interval, dataFactory) {
-
+  $scope.configDiv = $('#inputConfig')[0];
+  PP.registerPrettifier($scope.configDiv);
   $scope.clusterId = dataFactory.getClusterId();
 
   $scope.showAdvanced = false;
@@ -90,7 +91,6 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
       $scope.clusterName = cluster.name;
       $scope.clusterNumMachines = cluster.nodes.length;
       $scope.clusterTemplateId = cluster.clusterTemplate.name;
-      console.log($scope.clusterTemplateId)
       $scope = CreateCluster.addTemplateToScope(cluster.clusterTemplate, $scope);
     });
   }
@@ -161,6 +161,11 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
   };
 }]);
 
+/**
+ * Adds cluster template data to an existing scope.
+ * @param {Object} template Cluster template definition.
+ * @param {Object} scope CreateClusterCtrl scope.
+ */
 CreateCluster.addTemplateToScope = function (template, scope) {
   scope.template = template;
   scope.allowedHardwareTypes = template.compatibility.hardwaretypes;
@@ -175,6 +180,10 @@ CreateCluster.addTemplateToScope = function (template, scope) {
     scope.leaseDuration.initial = Helpers.parseMilliseconds(
       template.administration.leaseduration.initial);
   }
+
+  // Prettify the json config
+  PP.prettify(scope.configDiv, 1000);
+
   return scope;
 };
 

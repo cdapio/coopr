@@ -24,9 +24,8 @@
           </div>
         </div>
         <div class="panel-body">
-          <form class="form-horizontal" role="form" id="create-cluster-form" action="/user/clusters/create" ng-submit="submitData($event)" ng-hide="clusterId">
-          <form class="form-horizontal" role="form" id="create-cluster-form" action="/user/clusters/update/{{clusterId}}" ng-submit="submitData($event)" ng-show="clusterId">
-            <input type="hidden" value="{{clusterId}}" id="user-cluster-id"/>
+          <input type="hidden" value="{{clusterId}}" id="user-cluster-id"/>
+          <form class="form-horizontal" role="form" id="create-cluster-form" action="{% if clusterId %}/user/clusters/update/{{clusterId}} {% else %} /user/clusters/create{% endif %}" ng-submit="submitData($event)">
             <div class="form-group">
               <label for="inputName" class="col-sm-2 control-label">Name</label>
               <div class="col-sm-8">

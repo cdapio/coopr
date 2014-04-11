@@ -217,10 +217,6 @@ progress::-moz-progress-bar {
 	margin-top: 0px;
 }
 
-a, a:visited {
-	color: #505050;
-}
-
 .list-health-cell {
 	width: 36px;
 	padding: 10px 0px 10px 14px !important;
@@ -1479,6 +1475,13 @@ a strong {
 	border-radius: 0;
 	border-bottom-left-radius: 2px;
 	border-top-left-radius: 2px;
+}
+
+.form-control:focus {
+	border: 1px solid #8D8D8D;
+	outline: 0;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
 }
 
 /*
@@ -3004,6 +3007,7 @@ div.tooltip {
 
 #inputConfig {
 	height: 500px;
+	
 }
 
 .table tr:first-child td {
@@ -3125,4 +3129,20 @@ div.tooltip {
 
 .number-input {
 	width: 50px;
+}
+
+.valid-json {
+	border: 1px solid green;
+}
+
+.valid-json:focus {
+	border: 1px solid green !important;
+}
+
+.invalid-json {
+	border: 1px solid red !important;
+}
+
+.invalid-json:focus {
+	border: 1px solid red !important;
 }
