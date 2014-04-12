@@ -5,6 +5,10 @@
   ],
   "provisioner": {
     "actions": {
+      "install": {
+        "type": "chef",
+        "script": "recipe[loom_base::default]"
+      },
       "configure": {
         "type": "chef",
         "script": "recipe[loom_base::default]"
