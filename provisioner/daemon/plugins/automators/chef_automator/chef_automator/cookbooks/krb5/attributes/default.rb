@@ -23,9 +23,17 @@ case node['platform_family']
 when 'rhel'
   default['krb5']['packages'] = %w(krb5-libs krb5-workstation pam pam_krb5 authconfig)
   default['krb5']['authconfig'] = 'authconfig --enableshadow --enablemd5 --enablekrb5 --enablelocauthorize --update'
+  default['krb5']['conf_dir'] = '/var/kerberos/krb5kdc'
+  default['krb5']['data_dir'] = '/var/kerberos/krb5kdc'
+  default['krb5']['kadmin']['service_name'] = 'kadmin'
+  default['krb5']['kdc']['service_name'] = 'krb5kdc'
 when 'debian'
   default['krb5']['packages'] = %w(libpam-krb5 libpam-runtime libkrb5-3 krb5-user)
   default['krb5']['authconfig'] = 'pam-auth-update --package krb5'
+  default['krb5']['conf_dir'] = '/etc/krb5kdc'
+  default['krb5']['data_dir'] = '/var/lib/krb5kdc'
+  default['krb5']['kadmin']['service_name'] = 'krb5-admin-server'
+  default['krb5']['kdc']['service_name'] = 'krb5-kdc'
 when 'suse'
   default['krb5']['packages'] = %w(krb5 pam_krb5 pam-config)
   default['krb5']['authconfig'] = 'pam-config --add --krb5'
