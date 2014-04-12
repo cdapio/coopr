@@ -32,7 +32,4 @@ template "#{node['krb5']['conf_dir']}/kdc.conf" do
   variables node['krb5']['kdc_conf']
 end
 
-service 'krb5-kdc' do
-  service_name node['krb5']['kdc']['service_name']
-  action :nothing
-end
+include_recipe 'krb5::kdc_service'
