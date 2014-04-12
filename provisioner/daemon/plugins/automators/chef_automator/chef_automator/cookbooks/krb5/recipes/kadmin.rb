@@ -34,25 +34,6 @@ template node['krb5']['kdc_conf']['realms'][default_realm]['acl_file'] do
   not_if { node['krb5']['kadm5_acl'].empty? }
 end
 
-log 'create-krb5-db' do
-  message 'Creating Kerberos Database... this may take a while...'
-  level :info
-  not_if "test -e #{node['krb5']['data_dir']}/principal"
-end
-
-execute 'create-krb5-db' do
-  command "echo '#{node['krb5']['master_password']}\n#{node['krb5']['master_password']}\n' | kdb5_util create -s"
-  not_if "test -e #{node['krb5']['data_dir']}/principal"
-end
-
-execute 'create-admin-principal' do
-  command "echo '#{node['krb5']['admin_password']}\n#{node['krb5']['admin_password']}\n' | kadmin.local -q 'addprinc #{node['krb5']['admin_principal']}'"
-  not_if "kadmin.local -q 'list_principals' | grep -e ^#{node['krb5']['admin_principal']}"
-end
-
+include_recipe 'krb5::kadmin_init'
 include_recipe 'krb5::kdc'
-
-service 'krb5-admin-server' do
-  service_name node['krb5']['kadmin']['service_name']
-  action :nothing
-end
+include_recipe 'krb5::kadmin_service'
