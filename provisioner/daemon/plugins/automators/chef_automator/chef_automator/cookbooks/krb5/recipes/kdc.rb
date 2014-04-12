@@ -25,17 +25,7 @@ node['krb5']['kdc']['packages'].each do |krb5_package|
   package krb5_package
 end
 
-case node['platform_family']
-when 'rhel'
-  kdc_dir = '/var/kerberos/krb5kdc'
-  etc_dir = kdc_dir
-  kdc_svc = 'krb5kdc'
-when 'debian'
-  etc_dir = '/etc/krb5kdc'
-  kdc_svc = 'krb5-kdc'
-end
-
-template "#{etc_dir}/kdc.conf" do
+template "#{node['krb5']['conf_dir']}/kdc.conf" do
   owner 'root'
   group 'root'
   mode '0644'
@@ -43,6 +33,6 @@ template "#{etc_dir}/kdc.conf" do
 end
 
 service 'krb5-kdc' do
-  service_name kdc_svc
-  action :start
+  service_name node['krb5']['kdc']['service_name']
+  action :nothing
 end
