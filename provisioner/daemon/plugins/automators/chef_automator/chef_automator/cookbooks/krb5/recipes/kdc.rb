@@ -25,7 +25,7 @@ node['krb5']['kdc']['packages'].each do |krb5_package|
   package krb5_package
 end
 
-template "#{node['krb5']['conf_dir']}/kdc.conf" do
+template "#{node['krb5']['data_dir']}/kdc.conf" do
   owner 'root'
   group 'root'
   mode '0644'
