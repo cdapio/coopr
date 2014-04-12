@@ -34,6 +34,4 @@ template node['krb5']['kdc_conf']['realms'][default_realm]['acl_file'] do
   not_if { node['krb5']['kadm5_acl'].empty? }
 end
 
-include_recipe 'krb5::kadmin_init'
 include_recipe 'krb5::kdc'
-include_recipe 'krb5::kadmin_service'
