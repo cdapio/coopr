@@ -28,7 +28,7 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.http.ClusterConfigureRequest;
-import com.continuuity.loom.layout.ClusterRequest;
+import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -57,7 +57,7 @@ public class JsonSerde {
       .registerTypeAdapter(ClusterDefaults.class, new ClusterDefaultsCodec())
       .registerTypeAdapter(Administration.class, new AdministrationCodec())
       .registerTypeAdapter(LeaseDuration.class, new LeaseDurationCodec())
-      .registerTypeAdapter(ClusterRequest.class, new ClusterRequestCodec())
+      .registerTypeAdapter(ClusterCreateRequest.class, new ClusterCreateRequestCodec())
       .registerTypeAdapter(ClusterConfigureRequest.class, new ClusterConfigureRequestCodec())
       .enableComplexMapKeySerialization()
       .create();

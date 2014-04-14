@@ -55,8 +55,8 @@ public class Solver {
   }
 
   /**
-   * Given a {@link Cluster} and {@link ClusterRequest}, return a mapping of node id to {@link Node} describing how the
-   * cluster should be laid out. If multiple possible cluster layouts are possible, one will be chosen
+   * Given a {@link Cluster} and {@link ClusterCreateRequest}, return a mapping of node id to {@link Node} describing
+   * how the cluster should be laid out. If multiple possible cluster layouts are possible, one will be chosen
    * deterministically.
    *
    * @param cluster Cluster to solve a layout for.
@@ -64,7 +64,7 @@ public class Solver {
    * @return Mapping of node id to node for all nodes in the cluster.
    * @throws Exception
    */
-  public Map<String, Node> solveClusterNodes(Cluster cluster, ClusterRequest request) throws Exception {
+  public Map<String, Node> solveClusterNodes(Cluster cluster, ClusterCreateRequest request) throws Exception {
     // make sure the template exists
     String clusterTemplateName = request.getClusterTemplate();
     ClusterTemplate template = entityStore.getClusterTemplate(clusterTemplateName);

@@ -16,8 +16,6 @@
 package com.continuuity.loom.codec.json;
 
 import com.continuuity.loom.http.ClusterConfigureRequest;
-import com.continuuity.loom.layout.ClusterRequest;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -25,7 +23,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
-import java.util.Set;
 
 /**
  * Codec for deserializing a {@link com.continuuity.loom.http.ClusterConfigureRequest}, used so some validation is done

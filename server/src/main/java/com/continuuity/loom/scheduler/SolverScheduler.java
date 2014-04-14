@@ -17,9 +17,10 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.layout.ClusterRequest;
+import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.layout.Solver;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -38,7 +39,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
- * Polls a queue which contains {@link ClusterRequest} and a cluster id, and
+ * Polls a queue which contains {@link com.continuuity.loom.layout.ClusterCreateRequest} and a cluster id, and
  * runs the solver to determine what the cluster layout should be for the specified cluster and cluster request.
  * If the solver fails to find a valid solution, statuses are updated accordingly. If the solver finds a valid solution,
  * the cluster is sent on to the {@link ClusterScheduler} by writing to a queue that the cluster scheduler reads.
@@ -46,7 +47,7 @@ import java.util.concurrent.Callable;
 public class SolverScheduler implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(SolverScheduler.class);
-  private static final Gson GSON = new Gson();
+  private static final Gson GSON = new JsonSerde().getGson();
 
   private final String id;
   private final Solver solver;
@@ -102,17 +103,20 @@ public class SolverScheduler implements Runnable {
 
   private class SolverRunner implements Callable<String> {
     private final Element solveElement;
+    private final String clusterId;
+    private ClusterJob solverJob;
+    private ClusterJob plannerJob;
 
     private SolverRunner(Element solveElement) {
       this.solveElement = solveElement;
+      this.clusterId = solveElement.getId();
+      this.solverJob = null;
+      this.plannerJob = null;
     }
 
     @Override
     public String call() {
       try {
-        ClusterRequest request = GSON.fromJson(solveElement.getValue(), ClusterRequest.class);
-
-        String clusterId = solveElement.getId();
         LOG.debug("Got a request to solve cluster {}", clusterId);
 
         Cluster cluster = clusterStore.getCluster(clusterId);
@@ -122,66 +126,24 @@ public class SolverScheduler implements Runnable {
         }
 
         // Get cluster job for solving.
-        ClusterJob solverJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-        ClusterJob createJob = null;
+        solverJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
         try {
           solverJob.setJobStatus(ClusterJob.Status.RUNNING);
           clusterStore.writeClusterJob(solverJob);
 
-          long start = System.nanoTime();
-          Map<String, Node> clusterNodes =  null;
-          String errorMessage = "Layout solving failed";
-          try {
-            clusterNodes = solver.solveClusterNodes(cluster, request);
-          } catch (IllegalArgumentException e) {
-            LOG.error("Layout solving failed due to impossible constraints.", e);
-            errorMessage = errorMessage + ": " + e.getMessage();
+          SolverRequest solverRequest = GSON.fromJson(solveElement.getValue(), SolverRequest.class);
+          switch (solverRequest.getType()) {
+            case CREATE_CLUSTER:
+              return solveClusterCreate(cluster, GSON.fromJson(solverRequest.getJsonRequest(),
+                                                               ClusterCreateRequest.class));
+            default:
+              return "unknown solver request type " + solverRequest.getType();
           }
 
-          long duration = (System.nanoTime() - start) / 1000000;
-          LOG.debug("took {} ms to solve layout.", duration);
-
-          // If nodes is empty or null, then solving failed. Fail solving job and return.
-          if (clusterNodes == null || clusterNodes.isEmpty()) {
-            LOG.error(
-              String.format("Could not solve cluster id %s named %s with template %s and %d machines", clusterId,
-                            request.getName(), request.getClusterTemplate(), request.getNumMachines()));
-
-            // Fail job updates loom stats
-            taskService.failJobAndTerminateCluster(solverJob, cluster, errorMessage);
-            return "Unable to solve layout";
-          }
-
-          // Solving succeeded, schedule cluster creation.
-          solverJob.setJobStatus(ClusterJob.Status.COMPLETE);
-          clusterStore.writeClusterJob(solverJob);
-
-          // TODO: loom status update should happen in TaskService.
-          loomStats.getSuccessfulClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
-
-          for (Node node : clusterNodes.values()) {
-            clusterStore.writeNode(node);
-          }
-
-          // Create new Job for creating cluster.
-          JobId clusterJobId = clusterStore.getNewJobId(clusterId);
-          createJob = new ClusterJob(clusterJobId, ClusterAction.CLUSTER_CREATE);
-          cluster.addJob(createJob.getJobId());
-          clusterStore.writeClusterJob(createJob);
-
-          clusterStore.writeCluster(cluster);
-
-          // TODO: loom status update should happen in TaskService.
-          loomStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_CREATE);
-
-          LOG.debug("added a cluster create request to the queue");
-          clusterQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
-
-          return "Solved";
         } catch (Throwable e) {
           LOG.error("Got exception when solving, cancelling job: ", e);
 
-          ClusterJob toFailJob = createJob == null ? solverJob : createJob;
+          ClusterJob toFailJob = plannerJob == null ? solverJob : plannerJob;
           taskService.failJobAndTerminateCluster(toFailJob, cluster, "Exception while solving layout");
 
           return "Exception while solving layout";
@@ -190,6 +152,60 @@ public class SolverScheduler implements Runnable {
         LOG.error("Got exception: ", e);
         return "Exception while solving layout";
       }
+    }
+
+    private String solveClusterCreate(Cluster cluster, ClusterCreateRequest request) throws Exception {
+
+      long start = System.nanoTime();
+      Map<String, Node> clusterNodes =  null;
+      String errorMessage = "Layout solving failed";
+      try {
+        clusterNodes = solver.solveClusterNodes(cluster, request);
+      } catch (IllegalArgumentException e) {
+        LOG.error("Layout solving failed due to impossible constraints.", e);
+        errorMessage = errorMessage + ": " + e.getMessage();
+      }
+
+      long duration = (System.nanoTime() - start) / 1000000;
+      LOG.debug("took {} ms to solve layout.", duration);
+
+      // If nodes is empty or null, then solving failed. Fail solving job and return.
+      if (clusterNodes == null || clusterNodes.isEmpty()) {
+        LOG.error(
+          String.format("Could not solve cluster id %s named %s with template %s and %d machines", cluster.getId(),
+                        request.getName(), request.getClusterTemplate(), request.getNumMachines()));
+
+        // Fail job updates loom stats
+        taskService.failJobAndTerminateCluster(solverJob, cluster, errorMessage);
+        return "Unable to solve layout";
+      }
+
+      // Solving succeeded, schedule cluster creation.
+      solverJob.setJobStatus(ClusterJob.Status.COMPLETE);
+      clusterStore.writeClusterJob(solverJob);
+
+      // TODO: loom status update should happen in TaskService.
+      loomStats.getSuccessfulClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
+
+      for (Node node : clusterNodes.values()) {
+        clusterStore.writeNode(node);
+      }
+
+      // Create new Job for creating cluster.
+      JobId clusterJobId = clusterStore.getNewJobId(cluster.getId());
+      ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.CLUSTER_CREATE);
+      cluster.addJob(createJob.getJobId());
+      clusterStore.writeClusterJob(createJob);
+
+      clusterStore.writeCluster(cluster);
+
+      // TODO: loom status update should happen in TaskService.
+      loomStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_CREATE);
+
+      LOG.debug("added a cluster create request to the queue");
+      clusterQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
+
+      return "Solved";
     }
   }
 }

@@ -23,9 +23,10 @@ import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.layout.ClusterRequest;
+import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
+import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -51,7 +52,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -295,22 +295,23 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
 
     try {
-      ClusterRequest clusterRequest = codec.getGson().fromJson(reader, ClusterRequest.class);
+      ClusterCreateRequest clusterCreateRequest = codec.getGson().fromJson(reader, ClusterCreateRequest.class);
 
-      if (clusterRequest.getNumMachines() > maxClusterSize) {
+      if (clusterCreateRequest.getNumMachines() > maxClusterSize) {
         responder.sendError(HttpResponseStatus.BAD_REQUEST, "numMachines above max cluster size " + maxClusterSize);
         return;
       }
 
-      String name = clusterRequest.getName();
-      int numMachines = clusterRequest.getNumMachines();
-      String templateName = clusterRequest.getClusterTemplate();
+      String name = clusterCreateRequest.getName();
+      int numMachines = clusterCreateRequest.getNumMachines();
+      String templateName = clusterCreateRequest.getClusterTemplate();
       LOG.debug(String.format("Received a request to create cluster %s with %d machines from template %s", name,
                              numMachines, templateName));
       String clusterId = store.getNewClusterId();
       Cluster cluster = new Cluster(clusterId, userId, name, System.currentTimeMillis(),
-                                    clusterRequest.getDescription(), null, null,
-                                    ImmutableSet.<String>of(), ImmutableSet.<String>of(), clusterRequest.getConfig());
+                                    clusterCreateRequest.getDescription(), null, null,
+                                    ImmutableSet.<String>of(), ImmutableSet.<String>of(),
+                                    clusterCreateRequest.getConfig());
       JobId clusterJobId = store.getNewJobId(clusterId);
       ClusterJob clusterJob = new ClusterJob(clusterJobId, ClusterAction.SOLVE_LAYOUT);
       cluster.addJob(clusterJob.getJobId());
@@ -326,7 +327,9 @@ public class LoomClusterHandler extends LoomAuthHandler {
       }
 
       LOG.debug("adding create cluster element to solverQueue");
-      solverQueue.add(new Element(cluster.getId(), codec.getGson().toJson(clusterRequest)));
+      SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER,
+                                                      GSON.toJson(clusterCreateRequest));
+      solverQueue.add(new Element(cluster.getId(), GSON.toJson(solverRequest)));
 
       loomStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
 
