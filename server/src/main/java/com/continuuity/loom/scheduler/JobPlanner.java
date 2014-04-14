@@ -253,8 +253,13 @@ public class JobPlanner {
         // each node that the dependent service exist on must perform the from action before we perform the
         // to action for the service on this node.
         for (Node fromNode : serviceNodeMap.get(dependentServiceName)) {
-          taskDag.addDependency(new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName),
-                                new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()));
+          if (actionDependency.getIsReversed()) {
+            taskDag.addDependency(new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()),
+                                  new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName));
+          } else {
+            taskDag.addDependency(new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName),
+                                  new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()));
+          }
         }
       }
     }

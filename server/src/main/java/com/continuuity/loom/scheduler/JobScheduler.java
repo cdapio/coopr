@@ -209,8 +209,9 @@ public class JobScheduler implements Runnable {
             }
           } else if (inProgressTasks == 0) {
             // Job failed and no in progress tasks remaining, update cluster status
-            loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
-            cluster.setStatus(Cluster.Status.INCOMPLETE);
+            ClusterAction clusterAction = job.getClusterAction();
+            loomStats.getFailedClusterStats().incrementStat(clusterAction);
+            cluster.setStatus(clusterAction.getFailureStatus());
             clusterStore.writeCluster(cluster);
           }
 
