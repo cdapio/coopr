@@ -111,6 +111,10 @@ public class Actions {
                                        ProvisionerAction.INITIALIZE, ProvisionerAction.START),
         ClusterAction.CLUSTER_DELETE,
                       ImmutableList.of(ProvisionerAction.DELETE),
+        ClusterAction.ADD_SERVICES,
+                      ImmutableList.of(ProvisionerAction.BOOTSTRAP, ProvisionerAction.INSTALL,
+                                       ProvisionerAction.CONFIGURE, ProvisionerAction.INITIALIZE,
+                                       ProvisionerAction.START),
         ClusterAction.CLUSTER_CONFIGURE,
                       ImmutableList.of(ProvisionerAction.BOOTSTRAP, ProvisionerAction.CONFIGURE),
         ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART,
@@ -130,6 +134,12 @@ public class Actions {
     this.actionDependency =
       ImmutableMap.<ClusterAction, Set<Dependency>>of(
         ClusterAction.CLUSTER_CREATE,
+                      ImmutableSet.of(
+                        // Start of a dependent service can happen only after its dependency has started
+                        new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+                        // Initialize of a dependent service can happen only after its dependency has started
+                        new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)),
+        ClusterAction.ADD_SERVICES,
                       ImmutableSet.of(
                         // Start of a dependent service can happen only after its dependency has started
                         new Dependency(ProvisionerAction.START, ProvisionerAction.START),

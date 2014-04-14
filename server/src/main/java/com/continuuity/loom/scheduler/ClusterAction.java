@@ -25,7 +25,9 @@ public enum ClusterAction {
   CLUSTER_CREATE(Cluster.Status.INCOMPLETE),
   CLUSTER_DELETE(Cluster.Status.INCOMPLETE),
   CLUSTER_CONFIGURE(Cluster.Status.INCONSISTENT),
-  CLUSTER_CONFIGURE_WITH_RESTART(Cluster.Status.INCONSISTENT);
+  CLUSTER_CONFIGURE_WITH_RESTART(Cluster.Status.INCONSISTENT),
+  ADD_SERVICES(Cluster.Status.INCONSISTENT);
+
   private final Cluster.Status failureStatus;
 
   ClusterAction(Cluster.Status status) {
