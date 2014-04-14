@@ -17,16 +17,6 @@
 # limitations under the License.
 #
 
-# Admin Server packages
-case node['platform_family']
-when 'rhel'
-  default['krb5']['kadmin']['packages'] = %w(krb5-server)
-when 'debian'
-  default['krb5']['kadmin']['packages'] = %w(krb5-admin-server)
-else
-  default['krb5']['kadmin']['packages'] = []
-end
-
 # Master password
 default['krb5']['master_password'] = 'password'
 

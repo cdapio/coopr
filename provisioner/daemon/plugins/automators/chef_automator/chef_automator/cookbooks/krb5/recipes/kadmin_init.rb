@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: krb5
-# Recipe:: kadmin
+# Recipe:: kadmin_init
 #
 # Copyright 2014, Continuuity, Inc.
 #
@@ -20,15 +20,17 @@
 include_recipe 'krb5::default'
 include_recipe 'krb5::kadmin'
 
+default_realm = node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase
+
 log 'create-krb5-db' do
   message 'Creating Kerberos Database... this may take a while...'
   level :info
-  not_if "test -e #{node['krb5']['data_dir']}/principal"
+  not_if "test -e #{node['krb5']['kdc_conf']['realms'][default_realm]['database_name']}"
 end
 
 execute 'create-krb5-db' do
-  command "echo '#{node['krb5']['master_password']}\n#{node['krb5']['master_password']}\n' | kdb5_util create -s"
-  not_if "test -e #{node['krb5']['data_dir']}/principal"
+  command "echo '#{node['krb5']['master_password']}\n#{node['krb5']['master_password']}\n' | kdb5_util -r #{default_realm} create -s"
+  not_if "test -e #{node['krb5']['kdc_conf']['realms'][default_realm]['database_name']}"
 end
 
 execute 'create-admin-principal' do
