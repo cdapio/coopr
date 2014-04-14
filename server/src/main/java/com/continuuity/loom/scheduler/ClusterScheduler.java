@@ -239,7 +239,7 @@ public class ClusterScheduler implements Runnable {
   // service B contains no start action, while service A and service C both contain a start action.
   // therefore start A depends on start B makes no sense.  We need it to instead be start A depends on start C.
   static Set<ImmutablePair<String, ProvisionerAction>> getDirectActionDependencies(
-    Service service, Actions.Dependency actionDependency, SetMultimap <String, String> minimizedDependencies,
+    Service service, Actions.Dependency actionDependency, SetMultimap<String, String> minimizedDependencies,
     Map<String, Service> serviceMap) {
 
     if (!service.getProvisionerActions().containsKey(actionDependency.getTo())) {
@@ -341,9 +341,16 @@ public class ClusterScheduler implements Runnable {
               ProvisionerAction dependentAction = dependentServiceAction.getSecond();
               // each node that the dependent service exist on must perform the from action before we perform the
               // to action for the service on this node.
-              for (Node fromNode : serviceNodeMap.get(dependentServiceName)) {
-                taskDag.addDependency(new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName),
-                                      new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()));
+              if (actionDependency.getIsReversed()) {
+                for (Node fromNode : serviceNodeMap.get(dependentServiceName)) {
+                  taskDag.addDependency(new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()),
+                                        new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName));
+                }
+              } else {
+                for (Node fromNode : serviceNodeMap.get(dependentServiceName)) {
+                  taskDag.addDependency(new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName),
+                                        new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()));
+                }
               }
             }
           }
