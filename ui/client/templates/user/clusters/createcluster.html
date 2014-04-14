@@ -19,24 +19,29 @@
     <div id="panels">
       <div class="panel" style="clear: both;">
         <div class="panel-head">
-          <div class="panel-title">Create a cluster</div>
+          <div class="panel-title" ng-hide="clusterId">Create a cluster</div>
+          <div class="panel-title" ng-show="clusterId">Reconfigure cluster: [[clusterName]]
+          </div>
         </div>
         <div class="panel-body">
-          <form class="form-horizontal" role="form" id="create-cluster-form" action="/user/clusters/create" ng-submit="submitData($event)">
+          <input type="hidden" value="{{clusterId}}" id="user-cluster-id"/>
+          <form class="form-horizontal" role="form" id="create-cluster-form" action="{% if clusterId %}/user/clusters/update/{{clusterId}} {% else %} /user/clusters/create{% endif %}" ng-submit="submitData($event)">
             <div class="form-group">
               <label for="inputName" class="col-sm-2 control-label">Name</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name" ng-model="clusterName">
+                <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name" ng-model="clusterName" ng-hide="clusterId">
+                <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name" ng-model="clusterName" ng-show="clusterId" disabled>
               </div>
             </div>
             <div class="form-group">
               <label for="inputConfiguration" class="col-sm-2 control-label">Template</label>
               <div class="col-sm-8">
-                <select class="form-control" name="inputConfiguration" id="inputConfiguration" ng-model="clusterTemplateId">
+                <select class="form-control" name="inputConfiguration" id="inputConfiguration" ng-model="clusterTemplateId" ng-hide="clusterId">
                   {% for item in clustertemplates %}
                     <option>{{ item.name }}</option>
                   {% endfor %}
                 </select>
+                <input type="text" class="form-control" id="inputConfiguration" name="inputConfiguration" placeholder="Name" ng-model="clusterTemplateId" ng-show="clusterId" disabled>
               </div>
             </div>
             <div class="form-group">
@@ -119,9 +124,13 @@
                 </div>
               </div>
               <div class="form-group">
-                <label class="col-sm-2 control-label">Config</label>
+                <label class="col-sm-2 control-label">Config <br />
+                  <br />
+                  <div type="button" id="is-json-valid" class="btn-spl btn-default valid-json-icon">Format</div>
+                </label>
                 <div class="col-sm-8">
                   <textarea class="form-control" rows="5" id="inputConfig" ng-model="defaultConfig"></textarea>
+                  <br />
                 </div>
               </div>
             </div>
@@ -130,7 +139,8 @@
               <div class="col-sm-offset-2 col-sm-8">
                 <div id="secondary-notification" ng-if="notification" class="alert alert-danger">[[notification]]</div>
                 <br />
-                <button type="submit" class="btn-spl btn-info">Create</button>
+                <button type="submit" class="btn-spl btn-info" ng-hide="clusterId">Create</button>
+                <button type="submit" class="btn-spl btn-info" ng-show="clusterId">Reconfigure</button>
               </div>
             </div>
           </form>

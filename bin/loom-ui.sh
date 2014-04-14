@@ -31,7 +31,7 @@ die ( ) {
 UI_PATH=${UI_PATH:-${LOOM_HOME}/ui}
 ENVIRONMENT=${ENVIRONMENT:-production}
 
-LOOM_NODE=${LOOM_NODE:-"${UI_PATH}/embedded/bin/node"}
+LOOM_NODE=${LOOM_NODE:-"${LOOM_HOME}/embedded/bin/node"}
 APP_NAME="loom-ui"
 PID_DIR=${PID_DIR:-/var/run/loom}
 pid="${PID_DIR}/${APP_NAME}.pid"
