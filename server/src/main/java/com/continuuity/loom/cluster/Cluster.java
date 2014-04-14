@@ -56,7 +56,10 @@ public final class Cluster extends NamedEntity {
     /**
      * The cluster no longer exists.
      */
-    TERMINATED
+    TERMINATED;
+
+    public static final Set<Cluster.Status> CONFIGURABLE_STATES =
+      ImmutableSet.of(Cluster.Status.ACTIVE, Cluster.Status.INCONSISTENT);
   }
 
   private final String id;
