@@ -24,7 +24,6 @@ import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.store.ClusterStore;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -41,8 +40,6 @@ import java.util.Set;
  */
 public class ClusterService {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterService.class);
-  private static final ImmutableSet<Cluster.Status> CONFIGURABLE_STATES =
-    ImmutableSet.of(Cluster.Status.ACTIVE, Cluster.Status.INCONSISTENT);
 
   private final ClusterStore store;
   private final TrackingQueue clusterQueue;
@@ -96,7 +93,7 @@ public class ClusterService {
       if (cluster == null) {
         throw new MissingClusterException("cluster " + clusterId + " owned by user " + userId + " does not exist");
       }
-      if (!CONFIGURABLE_STATES.contains(cluster.getStatus())) {
+      if (!Cluster.Status.CONFIGURABLE_STATES.contains(cluster.getStatus())) {
         throw new IllegalStateException("cluster " + clusterId + " is not in a configurable state");
       }
       JobId configureJobId = store.getNewJobId(clusterId);

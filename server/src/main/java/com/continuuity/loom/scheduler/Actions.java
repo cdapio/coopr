@@ -139,7 +139,7 @@ public class Actions {
                       ImmutableSet.of(
                         // Start of a dependent service can happen only after its dependency has started
                         new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-                        // Stop of a dependent service can happen only after its dependency has started
+                        // Stop of a dependent service can happen only before its dependency has stopped
                         new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)
                       )
       );
