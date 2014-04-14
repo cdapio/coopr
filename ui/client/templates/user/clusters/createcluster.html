@@ -25,7 +25,7 @@
         </div>
         <div class="panel-body">
           <input type="hidden" value="{{clusterId}}" id="user-cluster-id"/>
-          <form class="form-horizontal" role="form" id="create-cluster-form" action="{% if clusterId %}/user/clusters/update/{{clusterId}} {% else %} /user/clusters/create{% endif %}" ng-submit="submitData($event)">
+          <form class="form-horizontal" role="form" id="create-cluster-form" action="{% if clusterId %}/user/clusters/cluster/{{clusterId}}/reconfigure {% else %} /user/clusters/create{% endif %}" ng-submit="submitData($event)">
             <div class="form-group">
               <label for="inputName" class="col-sm-2 control-label">Name</label>
               <div class="col-sm-8">
@@ -133,6 +133,13 @@
                   <br />
                 </div>
               </div>
+              {% if clusterId %}
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <div type="button" class="btn-spl btn-default" ng-class="{'valid-json-icon btn-success': restart, 'invalid-json-icon btn-warning': !restart}" ng-click="toggleRestart()" id="restart-server">Restart</div>
+                </div>
+              </div>
+              {% endif %}
             </div>
             <br />
             <div class="form-group">

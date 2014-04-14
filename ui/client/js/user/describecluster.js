@@ -83,6 +83,16 @@ ClusterView.getStatusFn = function ($scope, dataFactory, Globals) {
 };
 
 /**
+ * Reset adding service controls.
+ * @param  {Object} $scope.
+ */
+ClusterView.resetServiceAddControls = function ($scope) {
+  $scope.remainingServices = [];
+  $scope.servicesToAdd = [];
+  $scope.curRemainingService = '';
+};
+
+/**
  * Load cluster information.
  * @param  {Object} scope ClusterCtrl scope.
  * @param  {Object} dataFactory.
@@ -218,11 +228,9 @@ ClusterView.app.controller('ClusterCtrl',
   $scope.extendLeaseInvalid = false;
 
   /**
-   * Add services controls.
+   * Reset services controls.
    */
-  $scope.remainingServices = [];
-  $scope.servicesToAdd = [];
-  $scope.curRemainingService = '';
+  ClusterView.resetServiceAddControls($scope);
 
   ClusterView.loadCluster($scope, dataFactory, $interval);
 
@@ -245,10 +253,23 @@ ClusterView.app.controller('ClusterCtrl',
    * @param {Array} servicesToAdd (implicit).
    */
   $scope.submitServicesToAdd = function () {
-    $http.put('/user/clusters/cluster/services', $scope.servicesToAdd).success(function (data) {
-      ClusterView.loadCluster($scope, dataFactory, $interval);
+    Helpers.submitPost('/user/clusters/cluster/' + $scope.cluster.id + '/services',
+      { services: $scope.servicesToAdd}, '/user/clusters/cluster/' + $scope.cluster.id,
+      function (resp) {
+      if (resp === 'OK') {
+        ClusterView.resetServiceAddControls($scope);
+        ClusterView.loadCluster($scope, dataFactory, $interval);
+      } else {
+        var errorMessage = '';
+        if (resp) {
+          errorMessage = resp;
+        } else {
+          errorMessage = 'Request unsuccessful';
+        }
+        $("#notification").text(errorMessage);
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+      }
     });
-
   };
 
   /**

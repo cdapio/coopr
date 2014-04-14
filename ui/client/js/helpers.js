@@ -160,10 +160,12 @@ Helpers.clearValues = function (el) {
  * @return {Boolean} If JSON is valid.
  */
 Helpers.isValidJSON = function (input) {
-  return (/^[\],:{}\s]*$/
-          .test(input.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
-          .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-          .replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
+  try {
+    JSON.parse(input);
+    return true;
+  } catch (e) {
+    return false;
+  }
 };
 
 /**
