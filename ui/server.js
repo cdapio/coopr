@@ -1031,10 +1031,30 @@ site.app.get('/user/clusters/cluster/:id/reconfigure', function (req, res) {
   });
 });
 
+site.app.post('/user/clusters/cluster/:id/reconfigure', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/config',
+    method: 'PUT',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
 site.app.post('/user/clusters/cluster/:id', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id,
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/cluster/:id/services', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/services',
     method: 'POST',
     json: req.body
   };

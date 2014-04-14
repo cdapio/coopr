@@ -68,13 +68,21 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
   };
   $scope.notification = '';
 
+  /**
+   * Restarting cluster on config change.
+   */
+  $scope.restart = false;
+
+  $scope.toggleRestart = function () {
+    $scope.restart = !$scope.restart;
+  };
 
   dataFactory.getProviders(function (providers) {
     $scope.allowedProviders = providers.map(function (provider) {
       return provider.name;
     });
   });
-  
+
   /**
    * Watches clusterTemplateId and changes advanced settings based on selected value. Registers a
    * listener.
@@ -94,6 +102,9 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
       $scope.clusterNumMachines = cluster.nodes.length;
       $scope.clusterTemplateId = cluster.clusterTemplate.name;
       $scope = CreateCluster.addTemplateToScope(cluster.clusterTemplate, $scope);
+
+      // Since cluster already exists, overwrite template config with cluster config.
+      $scope.defaultConfig = JSON.stringify(cluster.config);
     });
   }
 
@@ -128,6 +139,12 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
    */
   $scope.submitData = function ($event) {
     $event.preventDefault();
+    
+    if ($event.currentTarget.action.indexOf('reconfigure') != -1) {
+      CreateCluster.submitReconfiguration($scope, $event);
+      return;
+    }
+
     $scope.notification = '';
     if (!$scope.template) {
       $scope.notification = 'Template is empty.';
@@ -162,6 +179,23 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
     Helpers.submitPost($event, postJson, '/user/clusters');
   };
 }]);
+
+/**
+ * Issues a reconfiguration request for cluster.
+ * @param  {Object} scope local scope.
+ * @param  {Object} event generated form submit event.
+ */
+CreateCluster.submitReconfiguration = function (scope, event) {
+  if (!Helpers.isValidJSON(scope.defaultConfig)) {
+    scope.notification = Helpers.JSON_ERR;
+    return;
+  }
+  var postJson = {
+    config: $.extend({}, JSON.parse(scope.defaultConfig)),
+    restart: scope.restart
+  };
+  Helpers.submitPost(event, postJson, '/user/clusters');
+};
 
 /**
  * Adds cluster template data to an existing scope.
