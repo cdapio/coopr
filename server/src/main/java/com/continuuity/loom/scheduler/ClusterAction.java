@@ -21,5 +21,6 @@ package com.continuuity.loom.scheduler;
 public enum ClusterAction {
   SOLVE_LAYOUT,
   CLUSTER_CREATE,
-  CLUSTER_DELETE
+  CLUSTER_DELETE,
+  ADD_SERVICES
 }
