@@ -28,7 +28,8 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
- *
+ * Given a {@link ClusterJob} and a set of {@link Node}s belonging to the cluster, the planner will create a plan for
+ * carrying out the job, based on the type of job being performed and dependencies between cluster services.
  */
 public class JobPlanner {
   private static final Logger LOG = LoggerFactory.getLogger(JobPlanner.class);
@@ -65,6 +66,13 @@ public class JobPlanner {
     return nodeMap;
   }
 
+  /**
+   * Create a plan of tasks to be executed in order to perform the cluster operation. Each item in the list represents
+   * a stage of tasks that can be performed. All tasks in a stage may be run in parallel, but every task in a stage
+   * must be successfully completed before moving on to the next stage.
+   *
+   * @return Plan of tasks to be executed in order to perform a cluster operation.
+   */
   public List<Set<TaskNode>> linearizeDependentTasks() {
     TaskDag taskDag = createTaskDag();
 
@@ -76,6 +84,13 @@ public class JobPlanner {
     return linearizedTasks;
   }
 
+  /**
+   * Given services, this method prunes unnecessary dependencies, leaving only first order dependencies. For example,
+   * if A depends on B and C, and if B depends on C, this will minimize A's dependencies so it just has A depends on B.
+   *
+   * @param serviceMap Map of service name to {@link Service}.
+   * @return Minimized dependencies.
+   */
   static SetMultimap<String, String> minimizeDependencies(Map<String, Service> serviceMap) {
     SetMultimap<String, String> minimized = HashMultimap.create();
 
@@ -123,10 +138,18 @@ public class JobPlanner {
     return result;
   }
 
-  // search through action dependency graph, looking for direct action dependencies.  For example:
-  // service A depends on service B, which depends on service C
-  // service B contains no start action, while service A and service C both contain a start action.
-  // therefore start A depends on start B makes no sense.  We need it to instead be start A depends on start C.
+  /**
+   * Search through the action dependency graph, looking for direct action dependencies.  For example:
+   * service A depends on service B, which depends on service C
+   * service B contains no start action, while service A and service C both contain a start action.
+   * therefore start A depends on start B makes no sense.  We need it to instead be start A depends on start C.
+   *
+   * @param service Service whose direct action dependencies we are looking for.
+   * @param actionDependency Action dependency we are searching with.
+   * @param minimizedDependencies Minimized service dependencies.
+   * @param serviceMap Map of service name to {@link Service}.
+   * @return Direct action dependencies of the given service and action dependency.
+   */
   static Set<ImmutablePair<String, ProvisionerAction>> getDirectActionDependencies(
     Service service, Actions.Dependency actionDependency, SetMultimap <String, String> minimizedDependencies,
     Map<String, Service> serviceMap) {
@@ -169,7 +192,14 @@ public class JobPlanner {
     return directDependencies;
   }
 
-  // true if service1 depends on service2 in some way, either directly or indirectly
+  /**
+   * Returns whether or not service1 depends on service2 in some way, either directly or indirectly.
+   *
+   * @param service1 Service to check dependency for.
+   * @param service2 Service to check dependency on.
+   * @param dependencies Minimized service dependencies.
+   * @return True if service 1 depends on service 2 directly or indirectly, false if not.
+   */
   static boolean dependsOn(String service1, String service2, Multimap<String, String> dependencies) {
     if (service1.equals(service2)) {
       return false;
@@ -186,6 +216,11 @@ public class JobPlanner {
     return false;
   }
 
+  /**
+   * Creates a DAG (directed acyclic graph) of tasks to execute in order to perform the cluster job.
+   *
+   * @return Task dag for the cluster operation.
+   */
   TaskDag createTaskDag() {
     long start = System.currentTimeMillis();
     TaskDag taskDag = new TaskDag();
