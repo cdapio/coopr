@@ -16,6 +16,9 @@
 package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
 
 /**
  * Actions that can be performed on a cluster.
@@ -26,8 +29,13 @@ public enum ClusterAction {
   CLUSTER_DELETE(Cluster.Status.INCOMPLETE),
   CLUSTER_CONFIGURE(Cluster.Status.INCONSISTENT),
   CLUSTER_CONFIGURE_WITH_RESTART(Cluster.Status.INCONSISTENT),
+  STOP_SERVICES(Cluster.Status.INCONSISTENT),
+  START_SERVICES(Cluster.Status.INCONSISTENT),
+  RESTART_SERVICES(Cluster.Status.INCONSISTENT),
   ADD_SERVICES(Cluster.Status.INCONSISTENT);
 
+  public static final Set<ClusterAction> SERVICE_ACTIONS = ImmutableSet.of(
+    STOP_SERVICES, START_SERVICES, RESTART_SERVICES);
   private final Cluster.Status failureStatus;
 
   ClusterAction(Cluster.Status status) {

@@ -644,6 +644,72 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
   }
 
+  @POST
+  @Path("/{cluster-id}/services/start")
+  public void startAllClusterServices(HttpRequest request, HttpResponder responder,
+                                      @PathParam("cluster-id") String clusterId) throws Exception {
+    requestServiceAction(request, responder, clusterId, null, ClusterAction.START_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/services/stop")
+  public void stopAllClusterServices(HttpRequest request, HttpResponder responder,
+                                     @PathParam("cluster-id") String clusterId) throws Exception {
+    requestServiceAction(request, responder, clusterId, null, ClusterAction.STOP_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/services/restart")
+  public void restartAllClusterServices(HttpRequest request, HttpResponder responder,
+                                        @PathParam("cluster-id") String clusterId) throws Exception {
+    requestServiceAction(request, responder, clusterId, null, ClusterAction.RESTART_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/service/{service-id}/start")
+  public void startClusterService(HttpRequest request, HttpResponder responder,
+                                  @PathParam("cluster-id") String clusterId,
+                                  @PathParam("service-id") String serviceId) throws Exception {
+    requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.START_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/service/{service-id}/stop")
+  public void stopClusterService(HttpRequest request, HttpResponder responder,
+                                 @PathParam("cluster-id") String clusterId,
+                                 @PathParam("service-id") String serviceId) throws Exception {
+    requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.STOP_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/service/{service-id}/restart")
+  public void restartClusterService(HttpRequest request, HttpResponder responder,
+                                    @PathParam("cluster-id") String clusterId,
+                                    @PathParam("service-id") String serviceId) throws Exception {
+    requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.RESTART_SERVICES);
+  }
+
+  private void requestServiceAction(HttpRequest request, HttpResponder responder, String clusterId,
+                                    String service, ClusterAction action) {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    try {
+      clusterService.requestServiceAction(clusterId, userId, action, service);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (MissingClusterException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT,
+                          "Cluster is not in a state where service actions can be performed.");
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Internal error while requesting cluster reconfigure");
+    }
+  }
+
   private JsonObject formatJobPlan(ClusterJob job) throws Exception {
     JsonObject jobJson = new JsonObject();
     jobJson.addProperty("id", job.getJobId());

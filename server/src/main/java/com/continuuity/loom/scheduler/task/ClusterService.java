@@ -24,6 +24,8 @@ import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.store.ClusterStore;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -109,6 +111,37 @@ public class ClusterService {
       cluster.setConfig(config);
       store.writeCluster(cluster);
       store.writeClusterJob(configureJob);
+
+      loomStats.getClusterStats().incrementStat(action);
+      clusterQueue.add(new Element(clusterId, action.name()));
+    } finally {
+      lock.release();
+    }
+  }
+
+  public void requestServiceAction(String clusterId, String userId, ClusterAction action, String service)
+    throws Exception {
+    Preconditions.checkArgument(ClusterAction.SERVICE_ACTIONS.contains(action),
+                                action + " is not a service action.");
+    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    lock.acquire();
+    try {
+      Cluster cluster = getUserCluster(clusterId, userId);
+      if (cluster == null) {
+        throw new MissingClusterException("cluster " + clusterId + " owned by user " + userId + " does not exist");
+      }
+      if (!Cluster.Status.SERVICE_ACTIONABLE_STATES.contains(cluster.getStatus())) {
+        throw new IllegalStateException(
+          "cluster " + clusterId + " is not in a state where service actions can be performed");
+      }
+      JobId jobId = store.getNewJobId(clusterId);
+
+      ClusterJob job = new ClusterJob(jobId, action, service == null ? null : ImmutableSet.of(service), null);
+      job.setJobStatus(ClusterJob.Status.RUNNING);
+      cluster.addJob(job.getJobId());
+      cluster.setStatus(Cluster.Status.PENDING);
+      store.writeCluster(cluster);
+      store.writeClusterJob(job);
 
       loomStats.getClusterStats().incrementStat(action);
       clusterQueue.add(new Element(clusterId, action.name()));

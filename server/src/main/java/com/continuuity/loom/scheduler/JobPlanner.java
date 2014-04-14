@@ -40,11 +40,11 @@ public class JobPlanner {
   private final Multimap<String, Node> serviceNodeMap;
   private final Map<String, Service> serviceMap;
   private final Map<String, Node> nodeMap;
+  private final SetMultimap<String, String> serviceDependencies;
 
   public JobPlanner(ClusterJob job, Set<Node> clusterNodes) {
     this.clusterAction = job.getClusterAction();
     this.nodesToPlan = job.getPlannedNodes();
-    this.servicesToPlan = job.getPlannedServices();
     this.serviceNodeMap = ArrayListMultimap.create();
     this.serviceMap = Maps.newHashMap();
     this.nodeMap = Maps.newHashMap();
@@ -55,6 +55,14 @@ public class JobPlanner {
         serviceMap.put(service.getName(), service);
       }
       nodeMap.put(node.getId(), node);
+    }
+    this.serviceDependencies = minimizeDependencies(serviceMap);
+
+    if (job.getPlannedServices() != null) {
+      this.servicesToPlan = clusterAction == ClusterAction.RESTART_SERVICES ?
+        ImmutableSet.copyOf(expandServicesToRestart(job.getPlannedServices())) : job.getPlannedServices();
+    } else {
+      this.servicesToPlan = null;
     }
   }
 
@@ -120,17 +128,26 @@ public class JobPlanner {
 
   // finds direct action dependencies, given the minimized service dependencies.
   static SetMultimap<ImmutablePair<String, ProvisionerAction>, ImmutablePair<String, ProvisionerAction>>
-  findDirectActionDependencies(SetMultimap<String, String> minimizedDependencies,
+  findDirectActionDependencies(SetMultimap<String, String> forwardDependencies,
                                Set<Actions.Dependency> actionDependencies, Map<String, Service> serviceMap) {
 
     SetMultimap<ImmutablePair<String, ProvisionerAction>,
       ImmutablePair<String, ProvisionerAction>> result = HashMultimap.create();
 
+    // if service A -> { service B, service C} is in the forward dependencies,
+    // service B -> { service A } and service C -> { service A } would be in the reverse dependencies.
+    SetMultimap<String, String> reversedDependencies = HashMultimap.create();
+    for (Map.Entry<String, String> entry : forwardDependencies.entries()) {
+      reversedDependencies.put(entry.getValue(), entry.getKey());
+    }
+
     if (actionDependencies != null) {
       for (Service service : serviceMap.values()) {
         for (Actions.Dependency actionDependency : actionDependencies) {
+          SetMultimap<String, String> dependencies = actionDependency.getIsReversed() ?
+            reversedDependencies : forwardDependencies;
           result.putAll(ImmutablePair.of(service.getName(), actionDependency.getTo()),
-                        getDirectActionDependencies(service, actionDependency, minimizedDependencies, serviceMap));
+                        getDirectActionDependencies(service, actionDependency, dependencies, serviceMap));
         }
       }
     }
@@ -151,7 +168,7 @@ public class JobPlanner {
    * @return Direct action dependencies of the given service and action dependency.
    */
   static Set<ImmutablePair<String, ProvisionerAction>> getDirectActionDependencies(
-    Service service, Actions.Dependency actionDependency, SetMultimap <String, String> minimizedDependencies,
+    Service service, Actions.Dependency actionDependency, SetMultimap<String, String> minimizedDependencies,
     Map<String, Service> serviceMap) {
 
     if (!service.getProvisionerActions().containsKey(actionDependency.getTo())) {
@@ -226,7 +243,6 @@ public class JobPlanner {
     TaskDag taskDag = new TaskDag();
     List<ProvisionerAction> actionOrder = actions.getActionOrder().get(clusterAction);
     Set<Actions.Dependency> actionDependencies = actions.getActionDependency().get(clusterAction);
-    SetMultimap<String, String> serviceDependencies = minimizeDependencies(serviceMap);
 
     SetMultimap<ImmutablePair<String, ProvisionerAction>, ImmutablePair<String, ProvisionerAction>>
       directActionDependencies = findDirectActionDependencies(serviceDependencies, actionDependencies, serviceMap);
@@ -288,13 +304,8 @@ public class JobPlanner {
         // each node that the dependent service exist on must perform the from action before we perform the
         // to action for the service on this node.
         for (Node fromNode : serviceNodeMap.get(dependentServiceName)) {
-          if (actionDependency.getIsReversed()) {
-            taskDag.addDependency(new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()),
-                                  new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName));
-          } else {
-            taskDag.addDependency(new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName),
-                                  new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()));
-          }
+          taskDag.addDependency(new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName),
+                                new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()));
         }
       }
     }
@@ -351,5 +362,24 @@ public class JobPlanner {
 
   private boolean shouldPlanService(Service service) {
     return servicesToPlan == null || servicesToPlan.contains(service.getName());
+  }
+
+  // if svc A depends on svc B depends on svc C, and if we're asked to restart svc B, we actually need to
+  // restart both svc A and svc B.
+  private Set<String> expandServicesToRestart(Set<String> servicesToRestart) {
+    Set<String> expandedServices = Sets.newHashSet(servicesToRestart);
+    Set<String> additionalServicesToRestart = Sets.newHashSet();
+    do {
+      additionalServicesToRestart.clear();
+      for (String service : Sets.difference(serviceMap.keySet(), expandedServices)) {
+        for (String serviceToRestart : expandedServices) {
+          if (dependsOn(service, serviceToRestart, serviceDependencies)) {
+            additionalServicesToRestart.add(service);
+          }
+        }
+      }
+      expandedServices.addAll(additionalServicesToRestart);
+    } while (!additionalServicesToRestart.isEmpty());
+    return expandedServices;
   }
 }
