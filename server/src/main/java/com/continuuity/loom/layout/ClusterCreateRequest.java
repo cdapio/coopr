@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * Request to create a cluster, containing values for optional cluster settings.
  */
-public class ClusterRequest {
+public class ClusterCreateRequest {
   private final String name;
   private final String description;
   private final String clusterTemplate;
@@ -37,10 +37,10 @@ public class ClusterRequest {
   private final String dnsSuffix;
   private final JsonObject config;
 
-  public ClusterRequest(String name, String description, String clusterTemplate,
-                        int numMachines, String provider, Set<String> services,
-                        String hardwareType, String imageType, Long initialLeaseDuration,
-                        String dnsSuffix, JsonObject config) {
+  public ClusterCreateRequest(String name, String description, String clusterTemplate,
+                              int numMachines, String provider, Set<String> services,
+                              String hardwareType, String imageType, Long initialLeaseDuration,
+                              String dnsSuffix, JsonObject config) {
     // check that the arguments that don't have defaults are not null.
     Preconditions.checkArgument(name != null && !name.isEmpty(), "cluster name must be specified");
     Preconditions.checkArgument(clusterTemplate != null && !clusterTemplate.isEmpty(),
@@ -165,10 +165,10 @@ public class ClusterRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof ClusterRequest)) {
+    if (!(o instanceof ClusterCreateRequest)) {
       return false;
     }
-    ClusterRequest other = (ClusterRequest) o;
+    ClusterCreateRequest other = (ClusterCreateRequest) o;
     return Objects.equal(name, other.name) &&
       Objects.equal(description, other.description) &&
       Objects.equal(clusterTemplate, other.clusterTemplate) &&
