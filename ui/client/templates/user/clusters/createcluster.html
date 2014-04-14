@@ -72,9 +72,9 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <td><input type="text" class="number-input initial-days" ng-model="leaseDuration.initial.days"/></td>
-                          <td><input type="text" class="number-input initial-hours" ng-model="leaseDuration.initial.hours"/></td>
-                          <td><input type="text" class="number-input initial-minutes" ng-model="leaseDuration.initial.minutes"/></td>
+                          <td><input type="text" class="number-input initial-days" ng-model="leaseDuration.initial.days" ng-disabled="clusterId"/></td>
+                          <td><input type="text" class="number-input initial-hours" ng-model="leaseDuration.initial.hours" ng-disabled="clusterId"/></td>
+                          <td><input type="text" class="number-input initial-minutes" ng-model="leaseDuration.initial.minutes" ng-disabled="clusterId"/></td>
                         </tr>
                       </tbody>
                   </table>
@@ -83,7 +83,7 @@
               <div class="form-group">
                 <label for="inputProvider" class="col-sm-2 control-label">Provider</label>
                 <div class="col-sm-8">
-                  <select class="form-control" name="inputProvider" id="inputProvider" ng-model="defaultProvider" ng-options="item for item in allowedProviders">
+                  <select class="form-control" name="inputProvider" id="inputProvider" ng-model="defaultProvider" ng-options="item for item in allowedProviders" ng-disabled="clusterId">
                     <option selected="selected"></option>
                   </select>
                 </div>
@@ -91,7 +91,7 @@
               <div class="form-group">
                 <label for="inputHardwareType" class="col-sm-2 control-label">Hardware type</label>
                 <div class="col-sm-8">
-                  <select class="form-control" name="inputHardwareType" id="inputHardwareType" ng-model="defaultHardwareType" ng-options="item for item in allowedHardwareTypes">
+                  <select class="form-control" name="inputHardwareType" id="inputHardwareType" ng-model="defaultHardwareType" ng-options="item for item in allowedHardwareTypes" ng-disabled="clusterId">
                     <option selected="selected"></option>
                   </select>
                 </div>
@@ -107,19 +107,19 @@
               <div class="form-group">
                 <label for="inputService" class="col-sm-2 control-label">Services</label>
                 <div class="col-sm-4">
-                  <select class="form-control" name="inputService" id="inputService" ng-model="defaultService" ng-options="item for item in allowedServices">
+                  <select class="form-control" name="inputService" id="inputService" ng-model="defaultService" ng-options="item for item in allowedServices" ng-disabled="clusterId">
                     <option selected="selected"></option>
                   </select>
                 </div>
                 <div class="col-sm-4">
-                  <button type="button" class="btn-spl btn-default inline-display add-service-btn" ng-click="addEntry(defaultService, selectedServices)">Add service</button>
+                  <button type="button" class="btn-spl btn-default inline-display add-service-btn" ng-click="addEntry(defaultService, selectedServices)" ng-disabled="clusterId">Add service</button>
                 </div>
               </div>
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-8 allowed-service-entries">
                   <div class="form-control" ng-repeat="item in selectedServices">
                     <span class="service-name default-service-entry">[[item]]</span>
-                    <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, selectedServices)"></span>
+                    <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, selectedServices)" ng-hide="clusterId"></span>
                   </div>
                 </div>
               </div>
@@ -133,13 +133,11 @@
                   <br />
                 </div>
               </div>
-              {% if clusterId %}
-              <div class="form-group">
+              <div class="form-group" ng-show="clusterId">
                 <div class="col-sm-offset-2 col-sm-10">
-                  <div type="button" class="btn-spl btn-default" ng-class="{'valid-json-icon btn-success': restart, 'invalid-json-icon btn-warning': !restart}" ng-click="toggleRestart()" id="restart-server">Restart</div>
+                  <div type="button" class="btn-spl btn-default" ng-class="{'valid-json-icon btn-success': restart, 'invalid-json-icon btn-danger': !restart}" ng-click="toggleRestart()" id="restart-server">Restart</div>
                 </div>
               </div>
-              {% endif %}
             </div>
             <br />
             <div class="form-group">
