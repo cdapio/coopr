@@ -22,11 +22,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.google.common.collect.TreeMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A DAG (directed acyclic graph) to linearize a set of dependent tasks.
@@ -142,9 +145,43 @@ public class TaskDag {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
-      .add("nodes", nodes)
-      .add("edges", edges)
-      .toString();
+    StringBuilder output = new StringBuilder();
+    Comparator<TaskNode> comparator = new TaskNodeComparator();
+    TreeSet<TaskNode> nodes = Sets.newTreeSet(comparator);
+    nodes.addAll(this.nodes);
+    SetMultimap<TaskNode, TaskNode> edges = TreeMultimap.create(comparator, comparator);
+    edges.putAll(this.edges);
+    output.append("services:\n");
+    for (TaskNode node : nodes) {
+      output.append(node);
+      output.append("\n");
+    }
+    output.append("edges:\n");
+    for (TaskNode startNode : edges.keySet()) {
+      output.append("  ");
+      output.append(startNode);
+      output.append("\n");
+      for (TaskNode endNode : edges.get(startNode)) {
+        output.append("    -> ");
+        output.append(endNode);
+        output.append("\n");
+      }
+    }
+    return output.toString();
+  }
+
+  private class TaskNodeComparator implements Comparator<TaskNode> {
+    @Override
+    public int compare(TaskNode taskNode, TaskNode taskNode2) {
+      int compare = taskNode.getTaskName().compareTo(taskNode2.getTaskName());
+      if (compare != 0) {
+        return compare;
+      }
+      compare = taskNode.getService().compareTo(taskNode2.getService());
+      if (compare != 0) {
+        return compare;
+      }
+      return taskNode.getHostId().compareTo(taskNode2.getHostId());
+    }
   }
 }

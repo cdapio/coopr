@@ -15,11 +15,9 @@
  */
 package com.continuuity.loom.http;
 
-import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
@@ -33,11 +31,14 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
-import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.ClusterScheduler;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
@@ -58,6 +59,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -157,8 +159,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     userConfig.addProperty("userconfig1", "value1");
     userConfig.addProperty("userconfig2", "value1");
 
-    ClusterCreateRequest clusterCreateRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1,
-                                                         userConfig);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest(clusterName, "test cluster", smallTemplate
+      .getName(), 1, userConfig);
     HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
@@ -1132,6 +1134,102 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals(21000, cluster.getExpireTime());
   }
 
+  @Test
+  public void testInvalidGetClusterConfigRequests() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), new JsonObject());
+    clusterStore.writeCluster(cluster);
+
+    assertResponseStatus(doGet("/v1/loom/clusters/" + cluster.getId() + "9/config", USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGet("/v1/loom/clusters/" + cluster.getId() + "/config", USER2_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+  }
+
+  @Test
+  public void testGetClusterConfig() throws Exception {
+    JsonObject config = new JsonObject();
+    config.addProperty("key1", "val1");
+    JsonArray arrayVal = new JsonArray();
+    arrayVal.add(new JsonPrimitive("arrayval1"));
+    arrayVal.add(new JsonPrimitive("arrayval2"));
+    config.add("key2", arrayVal);
+    JsonObject objVal = new JsonObject();
+    objVal.addProperty("okey1", "oval1");
+    objVal.addProperty("okey2", "oval2");
+    config.add("key3", objVal);
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), config);
+    clusterStore.writeCluster(cluster);
+    HttpResponse response = doGet("/v1/loom/clusters/" + cluster.getId() + "/config", USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject actual = GSON.fromJson(reader, JsonObject.class);
+    Assert.assertEquals(config, actual);
+  }
+
+  @Test
+  public void testInvalidClusterConfigRequests() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), new JsonObject());
+    clusterStore.writeCluster(cluster);
+    String requestStr = GSON.toJson(new ClusterConfigureRequest(new JsonObject(), false));
+
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", "{}", USER1_HEADERS),
+                         HttpResponseStatus.BAD_REQUEST);
+
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "9/config", requestStr, USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", requestStr, USER2_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+
+    cluster.setStatus(Cluster.Status.INCOMPLETE);
+    clusterStore.writeCluster(cluster);
+
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", requestStr, USER1_HEADERS),
+                         HttpResponseStatus.CONFLICT);
+  }
+
+  @Test
+  public void testPutClusterConfigCanRunOnInconsistentClusters() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), new JsonObject());
+    cluster.setStatus(Cluster.Status.INCONSISTENT);
+    clusterStore.writeCluster(cluster);
+    String requestStr = GSON.toJson(new ClusterConfigureRequest(new JsonObject(), false));
+
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", requestStr, USER1_HEADERS),
+                         HttpResponseStatus.OK);
+  }
+
+  @Test
+  public void testPutClusterConfig() throws Exception {
+    JsonObject originalConfig = new JsonObject();
+    originalConfig.addProperty("key1", "val1");
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), originalConfig);
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+
+    HttpResponse response = doGet("/v1/loom/clusters/123/config", USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject actual = GSON.fromJson(reader, JsonObject.class);
+    Assert.assertEquals(originalConfig, actual);
+
+    JsonObject newConfig = new JsonObject();
+    newConfig.addProperty("key2", "val2");
+    ClusterConfigureRequest configRequest = new ClusterConfigureRequest(newConfig, false);
+    assertResponseStatus(doPut("/v1/loom/clusters/123/config", GSON.toJson(configRequest), USER1_HEADERS),
+                         HttpResponseStatus.OK);
+
+    response = doGet("/v1/loom/clusters/123/config", USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    actual = GSON.fromJson(reader, JsonObject.class);
+    Assert.assertEquals(newConfig, actual);
+  }
+
   private void verifyPlanJson(JsonObject expected, JsonObject actual) {
     // Fix ids before comparing
     int nodeId = 0;
@@ -1154,16 +1252,14 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   protected static ClusterCreateRequest createClusterRequest(String name, String description,
                                                        String template, int numMachines) {
-    ClusterCreateRequest request =
-      new ClusterCreateRequest(name, description, template, numMachines, null, null, null, null, -1L, null, null);
-    return request;
+    return new ClusterCreateRequest(name, description, template, numMachines,
+                                    null, null, null, null, -1L, null, null);
   }
 
   protected static ClusterCreateRequest createClusterRequest(String name, String description, String template,
                                                              int numMachines, JsonObject userConfig) {
-    ClusterCreateRequest request =
-      new ClusterCreateRequest(name, description, template, numMachines, null, null, null, null, -1L, null, userConfig);
-    return request;
+    return new ClusterCreateRequest(name, description, template, numMachines,
+                                    null, null, null, null, -1L, null, userConfig);
   }
 
   @BeforeClass

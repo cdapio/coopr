@@ -15,11 +15,26 @@
  */
 package com.continuuity.loom.scheduler;
 
+import com.continuuity.loom.cluster.Cluster;
+
 /**
  * Actions that can be performed on a cluster.
  */
 public enum ClusterAction {
-  SOLVE_LAYOUT,
-  CLUSTER_CREATE,
-  CLUSTER_DELETE
+  SOLVE_LAYOUT(Cluster.Status.TERMINATED),
+  CLUSTER_CREATE(Cluster.Status.INCOMPLETE),
+  CLUSTER_DELETE(Cluster.Status.INCOMPLETE),
+  CLUSTER_CONFIGURE(Cluster.Status.INCONSISTENT),
+  CLUSTER_CONFIGURE_WITH_RESTART(Cluster.Status.INCONSISTENT),
+  ADD_SERVICES(Cluster.Status.INCONSISTENT);
+
+  private final Cluster.Status failureStatus;
+
+  ClusterAction(Cluster.Status status) {
+    failureStatus = status;
+  }
+
+  public Cluster.Status getFailureStatus() {
+    return failureStatus;
+  }
 }

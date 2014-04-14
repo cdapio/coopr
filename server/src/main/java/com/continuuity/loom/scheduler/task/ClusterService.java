@@ -24,6 +24,7 @@ import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.store.ClusterStore;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.apache.twill.zookeeper.ZKClient;
@@ -78,6 +79,39 @@ public class ClusterService {
 
       loomStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_DELETE);
       clusterQueue.add(new Element(clusterId, ClusterAction.CLUSTER_DELETE.name()));
+    } finally {
+      lock.release();
+    }
+  }
+
+  public void requestClusterReconfigure(String clusterId, String userId, boolean restartServices, JsonObject config)
+    throws Exception {
+    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    lock.acquire();
+    try {
+      Cluster cluster = getUserCluster(clusterId, userId);
+      if (cluster == null) {
+        throw new MissingClusterException("cluster " + clusterId + " owned by user " + userId + " does not exist");
+      }
+      if (!Cluster.Status.CONFIGURABLE_STATES.contains(cluster.getStatus())) {
+        throw new IllegalStateException("cluster " + clusterId + " is not in a configurable state");
+      }
+      JobId configureJobId = store.getNewJobId(clusterId);
+
+      ClusterAction action =
+        restartServices ? ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART : ClusterAction.CLUSTER_CONFIGURE;
+      ClusterJob configureJob = new ClusterJob(configureJobId, action);
+      configureJob.setJobStatus(ClusterJob.Status.RUNNING);
+      cluster.addJob(configureJobId.getId());
+      cluster.setStatus(Cluster.Status.PENDING);
+
+      LOG.debug("Writing cluster {} to store with configure job {}", clusterId, configureJobId);
+      cluster.setConfig(config);
+      store.writeCluster(cluster);
+      store.writeClusterJob(configureJob);
+
+      loomStats.getClusterStats().incrementStat(action);
+      clusterQueue.add(new Element(clusterId, action.name()));
     } finally {
       lock.release();
     }

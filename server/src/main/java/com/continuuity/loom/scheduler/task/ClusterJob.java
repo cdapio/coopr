@@ -20,6 +20,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.util.List;
 import java.util.Map;
@@ -44,20 +45,46 @@ public class ClusterJob {
   private final String clusterId;
   private final ClusterAction clusterAction;
   private final List<Set<String>> stagedTasks;
+  private final Set<String> plannedServices;
+  private final Set<String> plannedNodes;
   private int currentStageNumber;
   private final Map<String, ClusterTask.Status> taskStatus;
   private Status jobStatus;
   private String statusMessage;
 
+  /**
+   * Create a cluster job with the given job id that represent the given action to perform on a cluster across all
+   * services and nodes on the cluster.
+   *
+   * @param jobId Id of the job.
+   * @param clusterAction Action the job is carrying out.
+   */
   public ClusterJob(JobId jobId, ClusterAction clusterAction) {
+    this(jobId, clusterAction, null, null);
+  }
+
+  /**
+   * Create a cluster job with the given job id that represent the given action to perform on a cluster, for the given
+   * services on the given nodes. Null values for services or nodes indicates that the job covers all cluster services
+   * or all cluster nodes.
+   *
+   * @param jobId Id of the job.
+   * @param clusterAction Action the job is carrying out.
+   * @param plannedServices Services affected by the job, with null indicating all services.
+   * @param plannedNodes Nodes affected by the job, with null indicating all nodes.
+   */
+  public ClusterJob(JobId jobId, ClusterAction clusterAction, Set<String> plannedServices, Set<String> plannedNodes) {
     this.jobId = jobId.getId();
     this.clusterId = jobId.getClusterId();
     this.clusterAction = clusterAction;
     this.stagedTasks = Lists.newArrayList();
     this.currentStageNumber = 0;
     this.jobStatus = Status.NOT_SUBMITTED;
+    this.plannedServices = plannedServices;
+    this.plannedNodes = plannedNodes;
     taskStatus = Maps.newHashMap();
   }
+
 
   /**
    * Get the id of the job.
@@ -95,6 +122,26 @@ public class ClusterJob {
    */
   public List<Set<String>> getStagedTasks() {
     return stagedTasks;
+  }
+
+  /**
+   * Get cluster services to include in job planning. Services not in the set should not be included in job planning,
+   * with a null value indicating that all services should be included in planning.
+   *
+   * @return Cluster services to be included in job planning.
+   */
+  public Set<String> getPlannedServices() {
+    return plannedServices;
+  }
+
+  /**
+   * Get cluster nodes to include in job planning. Services not in the set should not be included in job planning,
+   * with a null value indicating that all nodes should be included in planning.
+   *
+   * @return Cluster nodes to be included in job planning.
+   */
+  public Set<String> getPlannedNodes() {
+    return plannedNodes;
   }
 
   /**
