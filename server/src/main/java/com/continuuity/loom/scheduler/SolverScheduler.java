@@ -134,10 +134,10 @@ public class SolverScheduler implements Runnable {
           SolverRequest solverRequest = GSON.fromJson(solveElement.getValue(), SolverRequest.class);
           switch (solverRequest.getType()) {
             case CREATE_CLUSTER:
-              return solveClusterCreate(cluster, GSON.fromJson(solverRequest.getSerializedRequest(),
+              return solveClusterCreate(cluster, GSON.fromJson(solverRequest.getJsonRequest(),
                                                                ClusterCreateRequest.class));
             default:
-              return "unknown solver request type.";
+              return "unknown solver request type " + solverRequest.getType();
           }
 
         } catch (Throwable e) {

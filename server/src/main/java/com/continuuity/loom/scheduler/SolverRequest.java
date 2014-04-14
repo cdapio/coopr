@@ -23,7 +23,7 @@ import com.google.common.base.Objects;
  */
 public class SolverRequest {
   private final Type type;
-  private final String serializedRequest;
+  private final String jsonRequest;
 
   /**
    * Type of solver request.
@@ -33,14 +33,14 @@ public class SolverRequest {
   }
 
   /**
-   * Create a request of the given type, with corresponding request details serialized as a string.
+   * Create a request of the given type, with corresponding request details serialized as a json string.
    *
    * @param type Type of solver request.
-   * @param serializedRequest Serialized request details.
+   * @param jsonRequest Serialized request details.
    */
-  public SolverRequest(Type type, String serializedRequest) {
+  public SolverRequest(Type type, String jsonRequest) {
     this.type = type;
-    this.serializedRequest = serializedRequest;
+    this.jsonRequest = jsonRequest;
   }
 
   /**
@@ -58,8 +58,8 @@ public class SolverRequest {
    *
    * @return Serialized request details.
    */
-  public String getSerializedRequest() {
-    return serializedRequest;
+  public String getJsonRequest() {
+    return jsonRequest;
   }
 
   @Override
@@ -73,11 +73,11 @@ public class SolverRequest {
 
     SolverRequest that = (SolverRequest) o;
 
-    return Objects.equal(type, that.type) && Objects.equal(serializedRequest, that.serializedRequest);
+    return Objects.equal(type, that.type) && Objects.equal(jsonRequest, that.jsonRequest);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(type, serializedRequest);
+    return Objects.hashCode(type, jsonRequest);
   }
 }

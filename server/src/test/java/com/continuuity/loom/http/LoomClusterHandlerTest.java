@@ -143,7 +143,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     // check there was an element added to the cluster queue for creating this cluster
     Element element = solverQueue.take("0");
     SolverRequest request = GSON.fromJson(element.getValue(), SolverRequest.class);
-    ClusterCreateRequest createRequest = GSON.fromJson(request.getSerializedRequest(), ClusterCreateRequest.class);
+    ClusterCreateRequest createRequest = GSON.fromJson(request.getJsonRequest(), ClusterCreateRequest.class);
     Assert.assertEquals("providerA", createRequest.getProvider());
     Assert.assertEquals("imageB", createRequest.getImageType());
     Assert.assertEquals("hardwareC", createRequest.getHardwareType());
@@ -337,7 +337,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testFailedClusterStatus() throws Exception {
     //Test Failed Status
     String clusterName = "test-cluster-should-be-failed";
-    ClusterCreateRequest clusterCreateRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
+    ClusterCreateRequest clusterCreateRequest =
+      createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
     HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
@@ -773,7 +774,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testGetClusterNotOwnedByUserReturns404() throws Exception {
-    ClusterCreateRequest clusterCreateRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest("cluster1", "my 1st cluster",
+                                                                     reactorTemplate.getName(), 5);
     HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String clusterId = getIdFromResponse(response);
