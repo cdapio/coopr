@@ -57,7 +57,6 @@ import java.io.InputStreamReader;
     ImagetypesInstanceTest.class, ImagetypesTest.class, ProvidersInstanceTest.class, ProvidersTest.class,
     ServicesInstanceTest.class, ServicesTest.class, CloseDriverTest.class
 })
-
 public class SuiteOrder {
 
   static Process process;
