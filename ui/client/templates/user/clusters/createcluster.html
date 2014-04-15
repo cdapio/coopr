@@ -99,7 +99,7 @@
               <div class="form-group">
                 <label for="inputImagetype" class="col-sm-2 control-label">Image type</label>
                 <div class="col-sm-8">
-                  <select class="form-control" name="inputImagetype" id="inputImagetype" ng-model="defaultImageType" ng-options="item for item in allowedImageTypes">
+                  <select class="form-control" name="inputImagetype" id="inputImagetype" ng-model="defaultImageType" ng-options="item for item in allowedImageTypes" ng-disabled="clusterId">
                     <option selected="selected"></option>
                   </select>
                 </div>
