@@ -77,6 +77,7 @@ public class ClusterLayoutFinder {
       int[] candidateLayout = layoutIter.next();
       // update service counts for layout validation
       for (int i = 0; i < candidateLayout.length; i++) {
+        // update is based on the difference between this layout and the previous one.
         int countDiff = candidateLayout[i] - previousLayout[i];
         updateServiceCounts(i, countDiff);
       }
