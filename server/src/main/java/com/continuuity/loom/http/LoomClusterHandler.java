@@ -321,7 +321,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
         store.writeCluster(cluster);
         store.writeClusterJob(clusterJob);
       } catch (Exception e) {
-        LOG.error("Exception while trying to add cluster {} to cluster store", cluster.getName(), e);
+        LOG.error("Exception while trying to add cluster {} to cluster store.", cluster.getName(), e);
         responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error adding cluster.");
         return;
       }
@@ -393,7 +393,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
     try {
       clusterService.requestClusterDelete(clusterId, userId);
     } catch (Throwable e) {
-      LOG.error("Exception while trying to write cluster {} to cluster store", cluster.getName(), e);
+      LOG.error("Exception while trying to write cluster {} to cluster store.", cluster.getName(), e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error deleting cluster.");
       return;
     }
@@ -480,7 +480,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
         // Reschedule the job.
         jobQueue.add(new Element(clusterJob.getJobId()));
       } catch (Exception e) {
-        LOG.error("Exception while trying to write job {} to cluster store", clusterJob.getJobId(), e);
+        LOG.error("Exception while trying to write job {} to cluster store.", clusterJob.getJobId(), e);
         responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error aborting cluster.");
         return;
       }
@@ -521,7 +521,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
     } catch (JsonSyntaxException e) {
-      LOG.error("Got exception while parsing JSON: ", e);
+      LOG.error("Exception while parsing JSON.", e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid JSON");
     }
   }
@@ -560,7 +560,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
 
       responder.sendJson(HttpResponseStatus.OK, formatJobPlan(clusterJob));
     } catch (IllegalArgumentException e) {
-      LOG.error("Got exception: ", e);
+      LOG.error("Exception get plan {} for cluster {}.", planId, clusterId, e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
     }
   }
@@ -596,7 +596,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
 
       responder.sendJson(HttpResponseStatus.OK, jobsJson);
     } catch (IllegalArgumentException e) {
-      LOG.error("Got exception: ", e);
+      LOG.error("Exception getting plans for cluster {}.", clusterId, e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
     }
   }
@@ -639,8 +639,76 @@ public class LoomClusterHandler extends LoomAuthHandler {
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, "Cluster is not in a configurable state.");
     } catch (Exception e) {
+      LOG.error("Exception requesting reconfigure on cluster {}.", clusterId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Internal error while requesting cluster reconfigure");
+    }
+  }
+
+  @POST
+  @Path("/{cluster-id}/services/start")
+  public void startAllClusterServices(HttpRequest request, HttpResponder responder,
+                                      @PathParam("cluster-id") String clusterId) throws Exception {
+    requestServiceAction(request, responder, clusterId, null, ClusterAction.START_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/services/stop")
+  public void stopAllClusterServices(HttpRequest request, HttpResponder responder,
+                                     @PathParam("cluster-id") String clusterId) throws Exception {
+    requestServiceAction(request, responder, clusterId, null, ClusterAction.STOP_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/services/restart")
+  public void restartAllClusterServices(HttpRequest request, HttpResponder responder,
+                                        @PathParam("cluster-id") String clusterId) throws Exception {
+    requestServiceAction(request, responder, clusterId, null, ClusterAction.RESTART_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/service/{service-id}/start")
+  public void startClusterService(HttpRequest request, HttpResponder responder,
+                                  @PathParam("cluster-id") String clusterId,
+                                  @PathParam("service-id") String serviceId) throws Exception {
+    requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.START_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/service/{service-id}/stop")
+  public void stopClusterService(HttpRequest request, HttpResponder responder,
+                                 @PathParam("cluster-id") String clusterId,
+                                 @PathParam("service-id") String serviceId) throws Exception {
+    requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.STOP_SERVICES);
+  }
+
+  @POST
+  @Path("/{cluster-id}/service/{service-id}/restart")
+  public void restartClusterService(HttpRequest request, HttpResponder responder,
+                                    @PathParam("cluster-id") String clusterId,
+                                    @PathParam("service-id") String serviceId) throws Exception {
+    requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.RESTART_SERVICES);
+  }
+
+  private void requestServiceAction(HttpRequest request, HttpResponder responder, String clusterId,
+                                    String service, ClusterAction action) {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    try {
+      clusterService.requestServiceRuntimeAction(clusterId, userId, action, service);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (MissingClusterException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT,
+                          "Cluster is not in a state where service actions can be performed.");
+    } catch (Exception e) {
+      LOG.error("Exception requesting {} on service {} for cluster {}.", action, service, clusterId, e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Internal error while requesting service action.");
     }
   }
 

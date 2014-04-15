@@ -494,6 +494,7 @@ public class JobPlannerTest {
     Assert.assertEquals(expected, planner.createTaskDag());
   }
 
+  @Test
   public void testConfigureTaskDag() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
@@ -504,16 +505,10 @@ public class JobPlannerTest {
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                 ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data")));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), Collections.EMPTY_MAP);
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), Collections.EMPTY_MAP);
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
-    Multimap<String, Node> serviceNodeMap = HashMultimap.create();
-    serviceNodeMap.put(s1.getName(), node1);
-    serviceNodeMap.put(s1.getName(), node2);
-    serviceNodeMap.put(s2.getName(), node2);
-    serviceNodeMap.put(s3.getName(), node2);
-    Map<String, Service> serviceMap = ImmutableMap.of(s1.getName(), s1, s2.getName(), s2, s3.getName(), s3);
 
     TaskDag expected = new TaskDag();
     // node1 has bootstrap -> configure s1
@@ -547,16 +542,10 @@ public class JobPlannerTest {
                                 ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
                                 ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
                                 ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), Collections.EMPTY_MAP);
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), Collections.EMPTY_MAP);
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
-    Multimap<String, Node> serviceNodeMap = HashMultimap.create();
-    serviceNodeMap.put(s1.getName(), node1);
-    serviceNodeMap.put(s1.getName(), node2);
-    serviceNodeMap.put(s2.getName(), node2);
-    serviceNodeMap.put(s3.getName(), node2);
-    Map<String, Service> serviceMap = ImmutableMap.of(s1.getName(), s1, s2.getName(), s2, s3.getName(), s3);
 
     TaskDag expected = new TaskDag();
     // stop of each service on each node depends on bootstrap
@@ -603,9 +592,172 @@ public class JobPlannerTest {
     expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()),
                            new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
 
-
     ClusterJob job = new ClusterJob(JobId.fromString("123-001"), ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART);
     JobPlanner planner = new JobPlanner(job, clusterNodes);
+    Assert.assertEquals(expected, planner.createTaskDag());
+  }
+
+  @Test
+  public void testStopServiceTaskDag() {
+    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+
+    Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
+
+    // stop all services
+    ClusterJob job = new ClusterJob(JobId.fromString("123-001"), ClusterAction.STOP_SERVICES);
+    JobPlanner planner = new JobPlanner(job, clusterNodes);
+
+    TaskDag expected = new TaskDag();
+    // s3 needs to be stopped first, then s2, then s1.
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node1.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    Assert.assertEquals(expected, planner.createTaskDag());
+
+    // request to stop just s2, which will stop s3 as well.
+    job = new ClusterJob(JobId.fromString("123-002"), ClusterAction.STOP_SERVICES,
+                         ImmutableSet.of(s2.getName()), null);
+    planner = new JobPlanner(job, clusterNodes);
+
+    expected = new TaskDag();
+    // s3 needs to be stopped first, then s2
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
+    Assert.assertEquals(expected, planner.createTaskDag());
+  }
+
+  @Test
+  public void testStartServiceTaskDag() {
+    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+
+    Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
+
+    // start all services
+    ClusterJob job = new ClusterJob(JobId.fromString("123-001"), ClusterAction.START_SERVICES);
+    JobPlanner planner = new JobPlanner(job, clusterNodes);
+
+    TaskDag expected = new TaskDag();
+    // start s1 -> start s2 -> start s3
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    Assert.assertEquals(expected, planner.createTaskDag());
+
+    // request to start just s2, which will start s1 as well.
+    job = new ClusterJob(JobId.fromString("123-002"), ClusterAction.START_SERVICES,
+                         ImmutableSet.of(s2.getName()), null);
+    planner = new JobPlanner(job, clusterNodes);
+
+    expected = new TaskDag();
+    // s1 needs to be started first, then s2
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    Assert.assertEquals(expected, planner.createTaskDag());
+  }
+
+  @Test
+  public void testRestartServiceTaskDag() {
+    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
+                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+
+    Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
+
+    // restart all services
+    ClusterJob job = new ClusterJob(JobId.fromString("123-001"), ClusterAction.RESTART_SERVICES);
+    JobPlanner planner = new JobPlanner(job, clusterNodes);
+
+    TaskDag expected = new TaskDag();
+    // stop s3 -> stop s2 -> stop s1 -> start s1 -> start s2 -> start s3
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node1.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
+    // stop service -> start service
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.STOP.name(), s1.getName()),
+                           new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
+    Assert.assertEquals(expected, planner.createTaskDag());
+
+    // request to restart s2 and s3
+    job = new ClusterJob(JobId.fromString("123-002"), ClusterAction.RESTART_SERVICES,
+                         ImmutableSet.of(s2.getName()), null);
+    planner = new JobPlanner(job, clusterNodes);
+
+    expected = new TaskDag();
+    // stop s3 -> stop s2 -> start s2 -> start s3
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
+    // start s1 -> start s2 gets thrown in for safety
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    // stop service -> start service
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
     Assert.assertEquals(expected, planner.createTaskDag());
   }
 
