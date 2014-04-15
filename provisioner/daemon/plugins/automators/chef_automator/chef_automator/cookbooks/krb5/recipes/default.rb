@@ -29,6 +29,14 @@ execute 'krb5-authconfig' do
   action :nothing
 end
 
+directory node['krb5']['conf_dir'] do
+  owner 'root'
+  group 'root'
+  mode '0755'
+  recursive true
+  action :create
+end
+
 template '/etc/krb5.conf' do
   owner 'root'
   group 'root'
