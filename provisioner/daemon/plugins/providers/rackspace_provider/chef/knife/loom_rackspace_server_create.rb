@@ -56,7 +56,9 @@ class Chef
           :flavor_id => locate_config_value(:flavor),
           :metadata => Chef::Config[:knife][:rackspace_metadata],
           :disk_config => Chef::Config[:knife][:rackspace_disk_config],
-          :personality => files
+          :config_drive => locate_config_value(:rackspace_config_drive) || false,
+          :personality => files,
+          :keypair => Chef::Config[:knife][:rackspace_ssh_keypair]
         )
 
         if version_one?
@@ -74,9 +76,16 @@ class Chef
         msg_pair("RackConnect Wait", rackconnect_wait ? 'yes' : 'no')
         msg_pair("ServiceLevel Wait", rackspace_servicelevel_wait ? 'yes' : 'no')
         msg_pair("Password", server.password)
+        msg_pair("SSH Key", Chef::Config[:knife][:rackspace_ssh_keypair])
 
         puts "SERVERID: #{server.id.to_s}"
-        return { "status" => 0, "providerid" => server.id.to_s, "rootpassword" => server.password }
+
+        if (server.password && !server.key_name)
+          return { "status" => 0, "providerid" => server.id.to_s, "rootpassword" => server.password }
+        else
+          return { "status" => 0, "providerid" => server.id.to_s }
+        end
+        #return { "status" => 0, "providerid" => server.id.to_s, "rootpassword" => server.password }
       end
     end
   end

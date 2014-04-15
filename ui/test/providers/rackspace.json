@@ -6,6 +6,7 @@
     "auth": {
       "rackspace_username": "EXAMPLE_USERNAME",
       "rackspace_api_key": "EXAMPLE_API_KEY"
+      "rackspace_region": "dfw"
     }
   }
 }

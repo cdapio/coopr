@@ -147,7 +147,8 @@ Example
                 "provisioner": {
                     "auth": {
                         "rackspace_username": "USERNAME",
-                        "rackspace_api_key": "API_KEY"
+                        "rackspace_api_key": "API_KEY",
+                        "rackspace_region": "dfw"
                     }
                 }
             },

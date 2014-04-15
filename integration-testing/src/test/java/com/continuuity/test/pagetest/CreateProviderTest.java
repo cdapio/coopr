@@ -94,6 +94,8 @@ public class CreateProviderTest extends GenericTest {
                              + rackspace.getProvisionerData().get("auth").get("rackspace_username") + "'");
     executor.executeScript("document.getElementById('rackspace_api_key').value = '"
                              + rackspace.getProvisionerData().get("auth").get("rackspace_api_key") + "'");
+    WebElement inputRegion = globalDriver.findElement(By.cssSelector("#rackspace_region"));
+    inputRegion.sendKeys(rackspace.getProvisionerData().get("auth").get("rackspace_region"));
 
     globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
     Global.driverWait(1);

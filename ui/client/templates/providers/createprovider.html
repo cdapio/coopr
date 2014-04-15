@@ -69,6 +69,18 @@
                     <input type="text" class="form-control" id="rackspace_api_key" name="rackspace_api_key" placeholder="Api key" value="{{provider.provisioner.auth.rackspace_api_key}}">
                   </div>
                 </div>
+                <div class="form-group">
+                  <label for="rackspace_region" class="col-sm-2 control-label">Region</label>
+                  <div class="col-sm-8">
+                    <select class="form-control" name="rackspace_region" id="rackspace_region">
+                      <option {% if provider.provisioner.auth.rackspace_region == "dfw" %} selected="selected" {% endif %}>dfw</option>
+                      <option {% if provider.provisioner.auth.rackspace_region == "iad" %} selected="selected" {% endif %}>iad</option>
+                      <option {% if provider.provisioner.auth.rackspace_region == "ord" %} selected="selected" {% endif %}>ord</option>
+                      <option {% if provider.provisioner.auth.rackspace_region == "hkg" %} selected="selected" {% endif %}>hkg</option>
+                      <option {% if provider.provisioner.auth.rackspace_region == "syd" %} selected="selected" {% endif %}>syd</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div id="joyent-auth-fields" class="auth-group col-sm-offset-2 col-sm-8 top-margin" {% if provider.providertype == "joyent" %} style="display: block" {% endif %}>
                 <div class="form-group">
