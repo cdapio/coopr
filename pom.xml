@@ -107,7 +107,7 @@
                             <link>http://download.oracle.com/javase/6/docs/api/</link>
                         </links>
                         <bottom>
-                            <![CDATA[Copyright 2013 Continuuity, Inc. <a href="http://www.apache.org/licenses/LICENSE-2.0">Licensed under the Apache License, Version 2.0</a>]]>
+                            <![CDATA[Copyright 2013-2014 Continuuity, Inc. <a href="http://www.apache.org/licenses/LICENSE-2.0">Licensed under the Apache License, Version 2.0</a>]]>
                         </bottom>
                     </configuration>
                     <executions>
