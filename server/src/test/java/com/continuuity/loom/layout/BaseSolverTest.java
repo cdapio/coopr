@@ -26,7 +26,9 @@ import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.LayoutConstraint;
 import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.utils.ImmutablePair;
@@ -34,7 +36,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.junit.BeforeClass;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,6 +45,15 @@ import java.util.Set;
 public class BaseSolverTest extends BaseTest {
   protected static ClusterTemplate reactorTemplate;
   protected static ClusterTemplate reactorTemplate2;
+  protected static Service namenode;
+  protected static Service resourcemanager;
+  protected static Service datanode;
+  protected static Service nodemanager;
+  protected static Service hbasemaster;
+  protected static Service regionserver;
+  protected static Service zookeeper;
+  protected static Service reactor;
+  protected static Service mysql;
 
   @BeforeClass
   public static void setupBaseSolverTests() throws Exception {
@@ -94,7 +104,8 @@ public class BaseSolverTest extends BaseTest {
       new JsonSerde().getGson().fromJson(Entities.ClusterTemplateExample.REACTOR2_STRING, ClusterTemplate.class);
 
     // create providers
-    entityStore.writeProvider(new Provider("joyent", "joyent provider", Provider.Type.JOYENT, Collections.EMPTY_MAP));
+    entityStore.writeProvider(new Provider("joyent", "joyent provider", Provider.Type.JOYENT,
+                                           ImmutableMap.<String, Map<String, String>>of()));
     // create hardware types
     entityStore.writeHardwareType(
       new HardwareType(
@@ -142,17 +153,33 @@ public class BaseSolverTest extends BaseTest {
       )
     );
     // create services
-    entityStore.writeService(new Service("namenode", "", ImmutableSet.<String>of(), Collections.EMPTY_MAP));
-    entityStore.writeService(new Service("datanode", "", ImmutableSet.<String>of("namenode"), Collections.EMPTY_MAP));
-    entityStore.writeService(new Service("resourcemanager", "", ImmutableSet.<String>of("datanode"), Collections.EMPTY_MAP));
-    entityStore.writeService(new Service(
-      "nodemanager", "", ImmutableSet.<String>of("resourcemanager"), Collections.EMPTY_MAP));
-    entityStore.writeService(new Service(
-      "hbasemaster", "", ImmutableSet.<String>of("zookeeper", "datanode"), Collections.EMPTY_MAP));
-    entityStore.writeService(new Service("regionserver", "", ImmutableSet.<String>of("hbasemaster"), Collections.EMPTY_MAP));
-    entityStore.writeService(new Service("zookeeper", "", ImmutableSet.<String>of(), Collections.EMPTY_MAP));
-    entityStore.writeService(new Service(
-      "reactor", "", ImmutableSet.<String>of("zookeeper", "regionserver", "nodemanager"), Collections.EMPTY_MAP));
+    namenode = new Service("namenode", "", ImmutableSet.<String>of(),
+                           ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    datanode = new Service("datanode", "", ImmutableSet.<String>of("namenode"),
+                           ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    resourcemanager = new Service("resourcemanager", "", ImmutableSet.<String>of("datanode"),
+                                  ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    nodemanager = new Service("nodemanager", "", ImmutableSet.<String>of("resourcemanager"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    hbasemaster = new Service("hbasemaster", "", ImmutableSet.<String>of("datanode"),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    regionserver = new Service("regionserver", "", ImmutableSet.<String>of("hbasemaster"),
+                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    zookeeper = new Service("zookeeper", "", ImmutableSet.<String>of(),
+                            ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    reactor = new Service("reactor", "", ImmutableSet.<String>of("zookeeper", "regionserver", "nodemanager"),
+                          ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    mysql = new Service("mysql", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
+
+    entityStore.writeService(namenode);
+    entityStore.writeService(datanode);
+    entityStore.writeService(resourcemanager);
+    entityStore.writeService(nodemanager);
+    entityStore.writeService(hbasemaster);
+    entityStore.writeService(regionserver);
+    entityStore.writeService(zookeeper);
+    entityStore.writeService(reactor);
+    entityStore.writeService(mysql);
     entityStore.writeClusterTemplate(reactorTemplate);
   }
 }

@@ -129,7 +129,6 @@ public class ClusterLayoutFinderTest extends BaseSolverTest {
                                    int[] nodeCounts, int numMachines, boolean expected) {
     ClusterLayoutFinder clusterLayoutFinder =
       new ClusterLayoutFinder(nodeLayouts, template, template.getClusterDefaults().getServices(), numMachines);
-    clusterLayoutFinder.setNodeCount(nodeCounts);
-    Assert.assertEquals(expected, clusterLayoutFinder.isValidCluster());
+    Assert.assertEquals(expected, clusterLayoutFinder.isValidCluster(nodeCounts));
   }
 }

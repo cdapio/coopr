@@ -19,6 +19,7 @@ import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.google.common.collect.Maps;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,11 +31,9 @@ import java.util.Set;
  */
 public class ClusterLayoutFinder {
   private final List<NodeLayout> nodePreferences;
-  private final int[] nodeCounts;
   private final int numMachines;
-  private Map<String, Integer> serviceCounts;
   private final Map<String, ServiceConstraint> serviceConstraints;
-  private boolean doneSearching;
+  private Map<String, Integer> serviceCounts;
 
   public ClusterLayoutFinder(List<NodeLayout> nodePreferences, ClusterTemplate template, Set<String> services,
                              int numMachines) {
@@ -50,15 +49,11 @@ public class ClusterLayoutFinder {
       }
     }
 
-    // initialize data structures
-    nodeCounts = new int[nodePreferences.size()];
-
     // calculate number of each service across the entire cluster
     serviceCounts = Maps.newHashMap();
     for (String service : services) {
       serviceCounts.put(service, 0);
     }
-    initializeNodeCounts();
   }
 
   /**
@@ -70,50 +65,77 @@ public class ClusterLayoutFinder {
    * @return Array containing how many of each node type to use.
    */
   public int[] findValidNodeCounts() {
-    while (!doneSearching) {
-      if (isValidCluster()) {
-        return nodeCounts;
+    int[] initialLayout = getInitialNodeCounts();
+    if (initialLayout == null) {
+      return null;
+    }
+
+    SlottedCombinationIterator layoutIter = new SlottedCombinationIterator(initialLayout, getGlobalNodeLayoutMaxes());
+    int[] previousLayout = initialLayout;
+    // while we haven't looked at all candidate layouts
+    while (layoutIter.hasNext()) {
+      int[] candidateLayout = layoutIter.next();
+      // update service counts for layout validation
+      for (int i = 0; i < candidateLayout.length; i++) {
+        // update is based on the difference between this layout and the previous one.
+        int countDiff = candidateLayout[i] - previousLayout[i];
+        updateServiceCounts(i, countDiff);
       }
-      advanceToNextClusterLayout();
+      // if this is a valid layout, return it
+      if (isValidCluster(serviceCounts)) {
+        return candidateLayout;
+      }
+      previousLayout = candidateLayout;
     }
     return null;
   }
 
-  // for unit testing only
-  void setNodeCount(int[] nodeCounts) {
-    for (String service : serviceCounts.keySet()) {
-      serviceCounts.put(service, 0);
-    }
-    for (int i = 0; i < nodeCounts.length; i++) {
-      int nodeCount = nodeCounts[i];
-      this.nodeCounts[i] = nodeCount;
-      if (nodeCount > 0) {
-        updateServiceCounts(i, nodeCount);
+  // get the max number of each nodelayout possible, assuming no other node layouts are used.
+  private int[] getGlobalNodeLayoutMaxes() {
+    int[] layoutsMaxes = new int[nodePreferences.size()];
+    for (int i = 0; i < layoutsMaxes.length; i++) {
+      NodeLayout layout = nodePreferences.get(i);
+      int max = Integer.MAX_VALUE;
+      for (String service : layout.getServiceNames()) {
+        ServiceConstraint constraint = serviceConstraints.get(service);
+        if (constraint != null) {
+          int constraintMax = constraint.getMaxCount();
+          if (constraintMax < max) {
+            max = constraintMax;
+          }
+        }
       }
+      layoutsMaxes[i] = max;
     }
+    return layoutsMaxes;
   }
 
   // initialize the node counts to the first possible cluster layout based on max service counts.
-  void initializeNodeCounts() {
-    doneSearching = false;
+  private int[] getInitialNodeCounts() {
+    int[] nodeCounts = new int[nodePreferences.size()];
     // start off with as many of the most preferred node layout as possible
     for (int i = 0; i < nodeCounts.length; i++) {
-      int maxNodeCount = getMaxForNodelayout(i);
+      int maxNodeCount = getMaxForNodelayout(i, nodeCounts);
       nodeCounts[i] = maxNodeCount;
       if (maxNodeCount > 0) {
         updateServiceCounts(i, maxNodeCount);
       }
     }
     // if the max # of nodes we can place is below the # of nodes in the cluster, there is no possible solution.
-    if (getTotalCount() < numMachines) {
-      doneSearching = true;
+    int total = 0;
+    for (int nodeCount : nodeCounts) {
+      total += nodeCount;
     }
+    if (total < numMachines) {
+      return null;
+    }
+    return nodeCounts;
   }
 
   // get the max number of nodes of the i'th node layout, given the service constraints and how many machines are
   // accounted for already.
-  int getMaxForNodelayout(int i) {
-    int maxSoFar = numMachines - getTotalCount();
+  int getMaxForNodelayout(int i, int[] counts) {
+    int maxSoFar = numMachines - getTotalCount(counts);
     if (maxSoFar == 0) {
       return 0;
     }
@@ -131,59 +153,12 @@ public class ClusterLayoutFinder {
     return maxSoFar;
   }
 
-  // get total number of nodes accounted for.
-  int getTotalCount() {
+  private int getTotalCount(int[] counts) {
     int sum = 0;
-    for (int i = 0; i < nodeCounts.length; i++) {
-      sum += nodeCounts[i];
+    for (int count : counts) {
+      sum += count;
     }
     return sum;
-  }
-
-  /**
-   * start at the rightmost layout from the traversal order, moving left until you find something
-   * non-zero that you can move one slot to the right.  For example:
-   * 3, 0, 0, 0
-   * 2, 1, 0, 0
-   * 2, 0, 1, 0
-   * 2, 0, 0, 1
-   * 1, 2, 0, 0
-   * 1, 1, 1, 0
-   * 1, 1, 0, 1
-   * 1, 0, 2, 0
-   * 1, 0, 1, 1
-   * 1, 0, 0, 2
-   * 0, 3, 0, 0
-   * 0, 2, 1, 0
-   * 0, 2, 0, 1
-   * 0, 1, 2, 0
-   * ...
-   * // TODO: perform search in a smarter manner based on min, max service counts
-   */
-  private void advanceToNextClusterLayout() {
-    int end = nodeCounts.length - 1;
-    for (int i = end - 1; i >= 0; i--) {
-      // we've found the first non-zero
-      if (nodeCounts[i] > 0) {
-        // this part takes 1 from the non-zero and moves it to the right one slot
-        nodeCounts[i]--;
-        updateServiceCounts(i, -1);
-
-        // add clusterlayout[end] because we want as many in slot i+1 as possible
-        // ex: going from 2, 0, 0, 1 -> 1, 2, 0, 0
-        int inc = 1 + nodeCounts[end] - nodeCounts[i + 1];
-        nodeCounts[i + 1] += inc;
-        updateServiceCounts(i + 1, inc);
-
-        // need to zero out clusterlayout[end] if we've added it to slot i+1
-        if (i < end - 1) {
-          updateServiceCounts(end, 0 - nodeCounts[end]);
-          nodeCounts[end] = 0;
-        }
-        return;
-      }
-    }
-    doneSearching = true;
   }
 
   // update service counts from changing nodePreferences[nodeNum] by nodesChanged
@@ -198,7 +173,7 @@ public class ClusterLayoutFinder {
   // defined in the cluster template.  If clusterlayout[x] = y, this means the x'th node layout in nodeLayouts has
   // y nodes in the cluster.  For example, if clusterlayout[0] = 5, this means there are 5 nodes with nodelayout of
   // nodelayouts.get(0) in the cluster.
-  boolean isValidCluster() {
+  private boolean isValidCluster(Map<String, Integer> serviceCounts) {
     for (Map.Entry<String, ServiceConstraint> entry : serviceConstraints.entrySet()) {
       String service = entry.getKey();
       ServiceConstraint constraint = entry.getValue();
@@ -211,5 +186,19 @@ public class ClusterLayoutFinder {
     }
 
     return true;
+  }
+
+  // for unit testing only
+  boolean isValidCluster(int[] nodeCounts) {
+    for (String service : serviceCounts.keySet()) {
+      serviceCounts.put(service, 0);
+    }
+    for (int i = 0; i < nodeCounts.length; i++) {
+      int nodeCount = nodeCounts[i];
+      if (nodeCount > 0) {
+        updateServiceCounts(i, nodeCount);
+      }
+    }
+    return isValidCluster(serviceCounts);
   }
 }
