@@ -34,7 +34,8 @@ public enum ClusterAction {
   RESTART_SERVICES(Cluster.Status.INCONSISTENT),
   ADD_SERVICES(Cluster.Status.INCONSISTENT);
 
-  public static final Set<ClusterAction> SERVICE_ACTIONS = ImmutableSet.of(
+  // these are runtime actions for services that don't change cluster state
+  public static final Set<ClusterAction> SERVICE_RUNTIME_ACTIONS = ImmutableSet.of(
     STOP_SERVICES, START_SERVICES, RESTART_SERVICES);
   private final Cluster.Status failureStatus;
 

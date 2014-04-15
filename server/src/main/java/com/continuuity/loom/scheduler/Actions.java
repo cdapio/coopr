@@ -104,19 +104,45 @@ public class Actions {
 
   public Actions() {
     this.actionOrder = ImmutableMap.<ClusterAction, List<ProvisionerAction>>builder()
-      .put(ClusterAction.CLUSTER_CREATE, ImmutableList.of(
-        ProvisionerAction.CREATE, ProvisionerAction.CONFIRM, ProvisionerAction.BOOTSTRAP, ProvisionerAction.INSTALL,
-        ProvisionerAction.CONFIGURE, ProvisionerAction.INITIALIZE, ProvisionerAction.START))
-      .put(ClusterAction.CLUSTER_DELETE, ImmutableList.of(ProvisionerAction.DELETE))
-      .put(ClusterAction.ADD_SERVICES, ImmutableList.of(
-        ProvisionerAction.BOOTSTRAP, ProvisionerAction.INSTALL, ProvisionerAction.CONFIGURE,
-        ProvisionerAction.INITIALIZE, ProvisionerAction.START))
-      .put(ClusterAction.CLUSTER_CONFIGURE, ImmutableList.of(ProvisionerAction.BOOTSTRAP, ProvisionerAction.CONFIGURE))
-      .put(ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART, ImmutableList.of(
-        ProvisionerAction.BOOTSTRAP, ProvisionerAction.STOP, ProvisionerAction.CONFIGURE, ProvisionerAction.START))
-      .put(ClusterAction.STOP_SERVICES, ImmutableList.of(ProvisionerAction.STOP))
-      .put(ClusterAction.START_SERVICES, ImmutableList.of(ProvisionerAction.START))
-      .put(ClusterAction.RESTART_SERVICES, ImmutableList.of(ProvisionerAction.STOP, ProvisionerAction.START))
+      .put(ClusterAction.CLUSTER_CREATE,
+           ImmutableList.of(
+             ProvisionerAction.CREATE,
+             ProvisionerAction.CONFIRM,
+             ProvisionerAction.BOOTSTRAP,
+             ProvisionerAction.INSTALL,
+             ProvisionerAction.CONFIGURE,
+             ProvisionerAction.INITIALIZE,
+             ProvisionerAction.START))
+      .put(ClusterAction.CLUSTER_DELETE,
+           ImmutableList.of(
+             ProvisionerAction.DELETE))
+      .put(ClusterAction.ADD_SERVICES,
+           ImmutableList.of(
+             ProvisionerAction.BOOTSTRAP,
+             ProvisionerAction.INSTALL,
+             ProvisionerAction.CONFIGURE,
+             ProvisionerAction.INITIALIZE,
+             ProvisionerAction.START))
+      .put(ClusterAction.CLUSTER_CONFIGURE,
+           ImmutableList.of(
+             ProvisionerAction.BOOTSTRAP,
+             ProvisionerAction.CONFIGURE))
+      .put(ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART,
+           ImmutableList.of(
+             ProvisionerAction.BOOTSTRAP,
+             ProvisionerAction.STOP,
+             ProvisionerAction.CONFIGURE,
+             ProvisionerAction.START))
+      .put(ClusterAction.STOP_SERVICES,
+           ImmutableList.of(
+             ProvisionerAction.STOP))
+      .put(ClusterAction.START_SERVICES,
+           ImmutableList.of(
+             ProvisionerAction.START))
+      .put(ClusterAction.RESTART_SERVICES,
+           ImmutableList.of(
+             ProvisionerAction.STOP,
+             ProvisionerAction.START))
       .build();
 
     this.rollbackActions =
@@ -129,28 +155,34 @@ public class Actions {
                                            ProvisionerAction.BOOTSTRAP, ProvisionerAction.DELETE);
 
     this.actionDependency = ImmutableMap.<ClusterAction, Set<Dependency>>builder()
-      .put(ClusterAction.CLUSTER_CREATE, ImmutableSet.of(
-        // Start of a dependent service can happen only after its dependency has started
-        new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-        // Initialize of a dependent service can happen only after its dependency has started
-        new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)))
-      .put(ClusterAction.ADD_SERVICES, ImmutableSet.of(
-        // Start of a dependent service can happen only after its dependency has started
-        new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-        // Initialize of a dependent service can happen only after its dependency has started
-        new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)))
-      .put(ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART, ImmutableSet.of(
-        // Start of a dependent service can happen only after its dependency has started
-        new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-        // Stop of a dependent service can happen only before its dependency has stopped
-        new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
-      .put(ClusterAction.STOP_SERVICES, ImmutableSet.of(
-        new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
-      .put(ClusterAction.START_SERVICES, ImmutableSet.of(
-        new Dependency(ProvisionerAction.START, ProvisionerAction.START)))
-      .put(ClusterAction.RESTART_SERVICES, ImmutableSet.of(
-        new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-        new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
+      .put(ClusterAction.CLUSTER_CREATE,
+           ImmutableSet.of(
+             // Start of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+             // Initialize of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)))
+      .put(ClusterAction.ADD_SERVICES,
+           ImmutableSet.of(
+             // Start of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+             // Initialize of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)))
+      .put(ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART,
+           ImmutableSet.of(
+             // Start of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+             // Stop of a dependent service can happen only before its dependency has stopped
+             new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
+      .put(ClusterAction.STOP_SERVICES,
+           ImmutableSet.of(
+             new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
+      .put(ClusterAction.START_SERVICES,
+           ImmutableSet.of(
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START)))
+      .put(ClusterAction.RESTART_SERVICES,
+           ImmutableSet.of(
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+             new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
       .build();
   }
 

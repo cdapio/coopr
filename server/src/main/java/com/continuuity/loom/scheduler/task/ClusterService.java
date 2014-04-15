@@ -119,10 +119,10 @@ public class ClusterService {
     }
   }
 
-  public void requestServiceAction(String clusterId, String userId, ClusterAction action, String service)
+  public void requestServiceRuntimeAction(String clusterId, String userId, ClusterAction action, String service)
     throws Exception {
-    Preconditions.checkArgument(ClusterAction.SERVICE_ACTIONS.contains(action),
-                                action + " is not a service action.");
+    Preconditions.checkArgument(ClusterAction.SERVICE_RUNTIME_ACTIONS.contains(action),
+                                action + " is not a service runtime action.");
     ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
     lock.acquire();
     try {

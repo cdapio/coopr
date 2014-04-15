@@ -364,8 +364,7 @@ public class JobPlanner {
     return servicesToPlan == null || servicesToPlan.contains(service.getName());
   }
 
-  // if svc A depends on svc B depends on svc C, and if we're asked to restart svc B, we actually need to
-  // restart both svc A and svc B.
+  // if svc A depends on svc B and we're asked to restart svc B, we actually need to restart both svc A and svc B.
   private Set<String> expandServicesToRestart(Set<String> servicesToRestart) {
     Set<String> expandedServices = Sets.newHashSet(servicesToRestart);
     Set<String> additionalServicesToRestart = Sets.newHashSet();
