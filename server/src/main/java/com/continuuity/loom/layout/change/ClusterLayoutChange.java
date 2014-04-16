@@ -38,12 +38,12 @@ public interface ClusterLayoutChange {
   ClusterLayout applyChange(ClusterLayout layout);
 
   /**
-   * Apply the change to a set of nodes.
+   * Apply the change to a set of nodes, returning nodes that have changed.
    *
    * @param cluster Cluster to apply the change to.
    * @param clusterNodes Nodes to apply the change to.
    * @param serviceMap Map of service name to {@link Service} for available services.
    * TODO: remove the need for the serviceMap
    */
-  void applyChange(Cluster cluster, Set<Node> clusterNodes, Map<String, Service> serviceMap);
+  Set<Node> applyChange(Cluster cluster, Set<Node> clusterNodes, Map<String, Service> serviceMap);
 }

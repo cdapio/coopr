@@ -33,6 +33,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
+import javax.ws.rs.HEAD;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,21 +55,16 @@ public class ClusterLayoutUpdater {
     this.entityStore = entityStore;
   }
 
-  public ClusterLayoutTracker addServicesToCluster(String clusterId, Set<String> servicesToAdd) throws Exception {
-    Cluster cluster = clusterStore.getCluster(clusterId);
-    if (cluster == null) {
-      throw new IllegalArgumentException("cluster " + clusterId + " does not exist.");
-    }
-    Set<Node> clusterNodes = clusterStore.getClusterNodes(clusterId);
-    if (clusterNodes == null || clusterNodes.isEmpty()) {
-      throw new IllegalArgumentException("cluster " + clusterId + " has no nodes.");
-    }
+  public ClusterLayoutTracker addServicesToCluster(Cluster cluster, Set<Node> clusterNodes,
+                                                   Set<String> servicesToAdd) throws Exception {
+    Preconditions.checkArgument(cluster != null, "Cannot add services to a nonexistant cluster.");
+    Preconditions.checkArgument(clusterNodes != null && !clusterNodes.isEmpty(),
+                                "Cannot add services to nonexistant nodes.");
     validateServicesToAdd(cluster, servicesToAdd);
 
     Constraints clusterConstraints = cluster.getClusterTemplate().getConstraints();
-    ClusterLayout clusterLayout = ClusterLayout.fromNodes(clusterNodes, clusterConstraints);
+    ClusterLayout clusterLayout = ClusterLayout.fromClusterNodes(clusterNodes, clusterConstraints);
 
-    // heuristic: try and add services in order of lowest max count allowed.
     Set<String> servicesToAddCopy = Sets.newHashSet(servicesToAdd);
     SortedSet<Map.Entry<String, ServiceConstraint>> sortedConstraints = Sets.newTreeSet(new ServiceMaxComparator());
     sortedConstraints.addAll(clusterConstraints.getServiceConstraints().entrySet());
@@ -86,7 +82,7 @@ public class ClusterLayoutUpdater {
     return canAddServicesToCluster(tracker, sortedServices) ? tracker : null;
   }
 
-  private void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd) throws Exception {
+  public void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd) throws Exception {
     Preconditions.checkArgument(servicesToAdd != null && !servicesToAdd.isEmpty(),
                                 "At least one service to add must be specified.");
 
@@ -113,7 +109,7 @@ public class ClusterLayoutUpdater {
           errMsg.append(serviceName);
           errMsg.append(" requires ");
           errMsg.append(serviceDependency);
-          errMsg.append(", which is not on the cluster or in the list of services to add.");
+          errMsg.append(", which is not on the cluster or in the list of services to add. ");
         }
       }
     }

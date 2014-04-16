@@ -59,9 +59,29 @@ public class Solver {
     this.updater = updater;
   }
 
-  public Queue<ClusterLayoutChange> addServiceToCluster(String clusterId, Set<String> servicesToAdd) throws Exception {
-    ClusterLayoutTracker tracker = updater.addServicesToCluster(clusterId, servicesToAdd);
-    return tracker == null ? null : tracker.getChanges();
+  /**
+   * Add services to a cluster, returning which nodes were affected by the change or null if there was no way to
+   * add the services to the cluster.
+   *
+   * @param cluster Cluster to add the services to.
+   * @param clusterNodes Nodes in the cluster.
+   * @param servicesToAdd Services to add to the cluster.
+   * @return Nodes that need to have services added to them.
+   * @throws Exception
+   */
+  public Set<Node> addServicesToCluster(Cluster cluster, Set<Node> clusterNodes,
+                                        Set<String> servicesToAdd) throws Exception {
+    ClusterLayoutTracker tracker = updater.addServicesToCluster(cluster, clusterNodes, servicesToAdd);
+    if (tracker == null) {
+      return null;
+    }
+
+    Set<Node> changedNodes = Sets.newHashSet();
+    Map<String, Service> serviceMap = getServiceMap(Sets.union(cluster.getServices(), servicesToAdd));
+    for (ClusterLayoutChange change : tracker.getChanges()) {
+      changedNodes.addAll(change.applyChange(cluster, clusterNodes, serviceMap));
+    }
+    return changedNodes;
   }
 
   /**

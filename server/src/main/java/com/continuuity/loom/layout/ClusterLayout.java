@@ -20,10 +20,8 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Node;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 
@@ -60,6 +58,28 @@ public class ClusterLayout {
 
   public Constraints getConstraints() {
     return constraints;
+  }
+
+  /**
+   * Determine a cluster layout based on a set of nodes and their constraints.
+   *
+   * @param clusterNodes Nodes of a cluster.
+   * @param constraints Constraints associated with the cluster.
+   * @return The ClusterLayout derived from the nodes of a cluster.
+   */
+  public static ClusterLayout fromClusterNodes(Set<Node> clusterNodes, Constraints constraints) {
+    Multiset<NodeLayout> nodeLayoutCounts = HashMultiset.create();
+    for (Node node : clusterNodes) {
+      Set<String> nodeServices = Sets.newHashSet();
+      for (Service service : node.getServices()) {
+        nodeServices.add(service.getName());
+      }
+      // TODO: node really should be refactored so these are proper fields
+      String hardwareType = node.getProperties().get(Node.Properties.HARDWARETYPE.name().toLowerCase()).getAsString();
+      String imageType = node.getProperties().get(Node.Properties.IMAGETYPE.name().toLowerCase()).getAsString();
+      nodeLayoutCounts.add(new NodeLayout(hardwareType, imageType, nodeServices));
+    }
+    return new ClusterLayout(constraints, nodeLayoutCounts);
   }
 
   /**

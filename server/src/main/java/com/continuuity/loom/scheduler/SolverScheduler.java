@@ -20,13 +20,18 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.http.AddServicesRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.Solver;
+import com.continuuity.loom.layout.change.ClusterLayoutChange;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskService;
 import com.continuuity.loom.store.ClusterStore;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.gson.Gson;
@@ -36,6 +41,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -127,15 +134,17 @@ public class SolverScheduler implements Runnable {
 
         // Get cluster job for solving.
         solverJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+        SolverRequest solverRequest = GSON.fromJson(solveElement.getValue(), SolverRequest.class);
         try {
           solverJob.setJobStatus(ClusterJob.Status.RUNNING);
           clusterStore.writeClusterJob(solverJob);
 
-          SolverRequest solverRequest = GSON.fromJson(solveElement.getValue(), SolverRequest.class);
           switch (solverRequest.getType()) {
             case CREATE_CLUSTER:
               return solveClusterCreate(cluster, GSON.fromJson(solverRequest.getJsonRequest(),
                                                                ClusterCreateRequest.class));
+            case ADD_SERVICES:
+              return solveAddServices(cluster, GSON.fromJson(solverRequest.getJsonRequest(), AddServicesRequest.class));
             default:
               return "unknown solver request type " + solverRequest.getType();
           }
@@ -144,7 +153,17 @@ public class SolverScheduler implements Runnable {
           LOG.error("Got exception when solving, cancelling job: ", e);
 
           ClusterJob toFailJob = plannerJob == null ? solverJob : plannerJob;
-          taskService.failJobAndTerminateCluster(toFailJob, cluster, "Exception while solving layout");
+          switch(solverRequest.getType()) {
+            case CREATE_CLUSTER:
+              taskService.failJobAndTerminateCluster(toFailJob, cluster, "Exception while solving layout.");
+              break;
+            case ADD_SERVICES:
+              // add services can only be performed from an active state, and since we did not do anything to it,
+              // the status should go back to active.
+              taskService.failJobAndSetClusterStatus(toFailJob, cluster, Cluster.Status.ACTIVE,
+                                                     "Exception while solving layout.");
+              break;
+          }
 
           return "Exception while solving layout";
         }
@@ -152,6 +171,54 @@ public class SolverScheduler implements Runnable {
         LOG.error("Got exception: ", e);
         return "Exception while solving layout";
       }
+    }
+
+    private String solveAddServices(Cluster cluster, AddServicesRequest request) throws Exception {
+
+      Set<Node> clusterNodes = clusterStore.getClusterNodes(cluster.getId());
+      Set<Node> changedNodes = null;
+      String servicesStr = Joiner.on(',').join(request.getServices());
+      try {
+        changedNodes = solver.addServicesToCluster(cluster, clusterNodes, request.getServices());
+      } catch (IllegalArgumentException e) {
+        LOG.debug("Could not add services {} to cluster {}.", servicesStr, cluster.getId(), e);
+        return "Unable to solve layout: " + e.getMessage();
+      }
+
+      if (changedNodes == null) {
+        return "Unable to solve layout.";
+      }
+
+      // TODO: stuff like this should be wrapped in a transaction
+      Set<String> changedNodeIds = Sets.newHashSet();
+      for (Node node : changedNodes) {
+        clusterStore.writeNode(node);
+        changedNodeIds.add(node.getId());
+      }
+      clusterStore.writeCluster(cluster);
+
+      // Solving succeeded, schedule planning.
+      solverJob.setJobStatus(ClusterJob.Status.COMPLETE);
+      clusterStore.writeClusterJob(solverJob);
+
+      // TODO: loom status update should happen in TaskService.
+      loomStats.getSuccessfulClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
+
+      // Create new Job for creating cluster.
+      JobId clusterJobId = clusterStore.getNewJobId(cluster.getId());
+      ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.ADD_SERVICES,
+                                            request.getServices(), changedNodeIds);
+      cluster.setLatestJobId(createJob.getJobId());
+      clusterStore.writeClusterJob(createJob);
+
+      clusterStore.writeCluster(cluster);
+
+      // TODO: loom status update should happen in TaskService.
+      loomStats.getClusterStats().incrementStat(ClusterAction.ADD_SERVICES);
+
+      LOG.debug("added a cluster add services request to the queue");
+      clusterQueue.add(new Element(cluster.getId(), ClusterAction.ADD_SERVICES.name()));
+      return "Solved";
     }
 
     private String solveClusterCreate(Cluster cluster, ClusterCreateRequest request) throws Exception {

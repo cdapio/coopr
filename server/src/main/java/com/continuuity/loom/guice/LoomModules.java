@@ -32,6 +32,7 @@ import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.EntityStore;
 import com.continuuity.loom.store.SQLClusterStore;
 import com.continuuity.loom.store.SQLEntityStore;
@@ -138,7 +139,7 @@ public final class LoomModules {
           bind(TrackingQueue.class)
             .annotatedWith(Names.named("internal.job.queue")).toInstance(jobSchedulerQueue);
 
-          bind(EntityStore.class).to(SQLEntityStore.class);
+          bind(EntityStore.class).to(SQLEntityStore.class).in(Scopes.SINGLETON);
           bind(ClusterStore.class).to(SQLClusterStore.class).in(Scopes.SINGLETON);
           bind(ZKClient.class).toInstance(zkClient);
           bind(Integer.class)
@@ -184,6 +185,7 @@ public final class LoomModules {
           bind(SolverScheduler.class).in(Scopes.SINGLETON);
           bind(Scheduler.class).in(Scopes.SINGLETON);
           bind(LoomStats.class).in(Scopes.SINGLETON);
+          bind(DBConnectionPool.class).in(Scopes.SINGLETON);
 
           Multibinder<HttpHandler> handlerBinder = Multibinder.newSetBinder(binder(), HttpHandler.class);
           handlerBinder.addBinding().to(LoomAdminHandler.class);

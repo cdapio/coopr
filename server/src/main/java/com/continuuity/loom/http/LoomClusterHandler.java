@@ -35,7 +35,9 @@ import com.continuuity.loom.scheduler.task.MissingClusterException;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -645,6 +647,61 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
   }
 
+  /**
+   * Add specific services to a cluster. The POST body must be a JSON Object with a 'services' key whose value is a
+   * JSON Array of service names. Services must be compatible with the template used when the cluster was created,
+   * and any dependencies of services to add must either already be on the cluster, or also in the list of services
+   * to add. If any of these rules are violated, a BAD_REQUEST status is returned back. Otherwise, the request to add
+   * services is queued up.
+   *
+   * @param request Request to add services to a cluster.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster to add services to.
+   * @throws Exception
+   */
+  @POST
+  @Path("/{cluster-id}/services")
+  public void addClusterServices(HttpRequest request, HttpResponder responder,
+                                 @PathParam("cluster-id") String clusterId) throws Exception {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    AddServicesRequest addServicesRequest;
+    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
+    try {
+      addServicesRequest = GSON.fromJson(reader, AddServicesRequest.class);
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body.");
+      return;
+    }
+
+    try {
+      clusterService.requestAddServices(clusterId, userId, addServicesRequest);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    } catch (MissingClusterException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT,
+                          "Cluster is not in a state where service actions can be performed.");
+    } catch (Exception e) {
+      LOG.error("Exception requesting to add services to cluster {}.", clusterId, e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Internal error while requesting service action.");
+    }
+  }
+
+  /**
+   * Starts all services on the cluster, taking into account service dependencies for order of service starts.
+   *
+   * @param request Request to start cluster services.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster whose services should be started.
+   * @throws Exception
+   */
   @POST
   @Path("/{cluster-id}/services/start")
   public void startAllClusterServices(HttpRequest request, HttpResponder responder,
@@ -652,6 +709,14 @@ public class LoomClusterHandler extends LoomAuthHandler {
     requestServiceAction(request, responder, clusterId, null, ClusterAction.START_SERVICES);
   }
 
+  /**
+   * Stops all services on the cluster, taking into account service dependencies for order of service stops.
+   *
+   * @param request Request to stop cluster services.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster whose services should be stopped.
+   * @throws Exception
+   */
   @POST
   @Path("/{cluster-id}/services/stop")
   public void stopAllClusterServices(HttpRequest request, HttpResponder responder,
@@ -659,6 +724,15 @@ public class LoomClusterHandler extends LoomAuthHandler {
     requestServiceAction(request, responder, clusterId, null, ClusterAction.STOP_SERVICES);
   }
 
+  /**
+   * Restarts all services on the cluster, taking into account service dependencies for order of service stops
+   * and starts.
+   *
+   * @param request Request to restart cluster services.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster whose services should be restarted.
+   * @throws Exception
+   */
   @POST
   @Path("/{cluster-id}/services/restart")
   public void restartAllClusterServices(HttpRequest request, HttpResponder responder,
@@ -666,6 +740,14 @@ public class LoomClusterHandler extends LoomAuthHandler {
     requestServiceAction(request, responder, clusterId, null, ClusterAction.RESTART_SERVICES);
   }
 
+  /**
+   * Starts the specified service, plus all services it depends on, on the cluster.
+   *
+   * @param request Request to start cluster service.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster whose services should be started.
+   * @throws Exception
+   */
   @POST
   @Path("/{cluster-id}/services/{service-id}/start")
   public void startClusterService(HttpRequest request, HttpResponder responder,
@@ -674,6 +756,15 @@ public class LoomClusterHandler extends LoomAuthHandler {
     requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.START_SERVICES);
   }
 
+  /**
+   * Stops the specified service on the cluster, plus all services that depend on it,
+   * taking into account service dependencies for order of service stops.
+   *
+   * @param request Request to stop cluster services.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster whose services should be stopped.
+   * @throws Exception
+   */
   @POST
   @Path("/{cluster-id}/services/{service-id}/stop")
   public void stopClusterService(HttpRequest request, HttpResponder responder,
@@ -682,6 +773,15 @@ public class LoomClusterHandler extends LoomAuthHandler {
     requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.STOP_SERVICES);
   }
 
+  /**
+   * Restarts the specified service on the cluster, plus all services that depend on it,
+   * taking into account service dependencies for order of service stops and starts.
+   *
+   * @param request Request to restart cluster service.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster whose service should be restarted.
+   * @throws Exception
+   */
   @POST
   @Path("/{cluster-id}/services/{service-id}/restart")
   public void restartClusterService(HttpRequest request, HttpResponder responder,
