@@ -48,7 +48,8 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
     expectedCounts.add(slaveNodeLayout, 50);
     ClusterLayout expected = new ClusterLayout(reactorTemplate.getConstraints(), expectedCounts);
 
-    ClusterLayout layout = updater.addServicesToCluster(clusterId, ImmutableSet.of(resourcemanager.getName()));
+    ClusterLayout layout =
+      updater.addServicesToCluster(clusterId, ImmutableSet.of(resourcemanager.getName())).getCurrentLayout();
     Assert.assertEquals(expected, layout);
   }
 
@@ -66,9 +67,9 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
     expectedCounts.add(slaveNodeLayout, 50);
     ClusterLayout expected = new ClusterLayout(reactorTemplate.getConstraints(), expectedCounts);
 
-    ClusterLayout layout =
-      updater.addServicesToCluster(clusterId, ImmutableSet.of(resourcemanager.getName(), nodemanager.getName(),
-                                                              hbasemaster.getName(), regionserver.getName()));
+    ClusterLayout layout = updater.addServicesToCluster(
+      clusterId, ImmutableSet.of(resourcemanager.getName(), nodemanager.getName(),
+                                 hbasemaster.getName(), regionserver.getName())).getCurrentLayout();
     Assert.assertEquals(expected, layout);
   }
 

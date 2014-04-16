@@ -16,8 +16,11 @@
 package com.continuuity.loom.layout;
 
 import com.continuuity.loom.admin.Constraints;
+import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.cluster.Node;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
 
@@ -106,9 +109,43 @@ public class NodeLayout {
     return true;
   }
 
+  /**
+   * Return the node layout of a given {@link Node}.
+   *
+   * @param node Node to derive the node layout from.
+   * @return Node layout of the node.
+   */
+  public static NodeLayout fromNode(Node node) {
+    String hardwareType = node.getProperties().get(Node.Properties.HARDWARETYPE.name().toLowerCase()).getAsString();
+    String imageType = node.getProperties().get(Node.Properties.IMAGETYPE.name().toLowerCase()).getAsString();
+    Set<String> services = Sets.newHashSet();
+    for (Service service : node.getServices()) {
+      services.add(service.getName());
+    }
+    return new NodeLayout(hardwareType, imageType, services);
+  }
+
+  /**
+   * Create a new NodeLayout by adding a service to the given NodeLayout.
+   *
+   * @param nodeLayout NodeLayout to add the service to.
+   * @param service Service to add.
+   * @return New layout obtained by adding the service to the given layout.
+   */
   public static NodeLayout addServiceToNodeLayout(NodeLayout nodeLayout, String service) {
+    return addServicesToNodeLayout(nodeLayout, ImmutableSet.of(service));
+  }
+
+  /**
+   * Create a new NodeLayout by adding a set of services to the given NodeLayout.
+   *
+   * @param nodeLayout NodeLayout to add the services to.
+   * @param services Services to add.
+   * @return New layout obtained by adding the services to the given layout.
+   */
+  public static NodeLayout addServicesToNodeLayout(NodeLayout nodeLayout, Set<String> services) {
     Set<String> expandedServices = Sets.newTreeSet(nodeLayout.getServiceNames());
-    expandedServices.add(service);
+    expandedServices.addAll(services);
     return new NodeLayout(nodeLayout.hardwareType, nodeLayout.imageType, expandedServices);
   }
 
@@ -126,5 +163,14 @@ public class NodeLayout {
   @Override
   public int hashCode() {
     return Objects.hashCode(services, hardwareType, imageType);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("hardwareType", hardwareType)
+      .add("imageType", imageType)
+      .add("services", services)
+      .toString();
   }
 }
