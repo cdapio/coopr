@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: hadoop
-# Recipe:: hadoop_yarn_resourcemanager
+# Recipe:: hadoop_yarn_proxyserver
 #
 # Copyright (C) 2013 Continuuity, Inc.
 # 
@@ -19,17 +19,17 @@
 
 include_recipe 'hadoop::default'
 
-package "hadoop-yarn-resourcemanager" do
+if (node['hadoop'].has_key? 'yarn_site' and node['hadoop']['yarn_site'].has_key? 'yarn.web-proxy.address')
+  Chef::Log.info("Setting up YARN Web Proxy at #{node['hadoop']['yarn_site']['yarn.web-proxy.address']}")
+else
+  Chef::Application.fatal!("YARN Web Proxy must be configured! Set default['hadoop']['yarn_site']['yarn.web-proxy.address']}!")
+end
+
+package "hadoop-yarn-proxyserver" do
   action :install
 end
 
-# TODO: check for these and set them up
-# mapreduce.cluster.local.dir = #{hadoop_tmp_dir}/mapred/local
-# mapreduce.jobtracker.system.dir = #{hadoop_tmp_dir}/mapred/system
-# mapreduce.jobtracker.staging.root.dir = #{hadoop_tmp_dir}/mapred/staging
-# mapreduce.cluster.temp.dir = #{hadoop_tmp_dir}/mapred/temp
-
-service "hadoop-yarn-resourcemanager" do
+service "hadoop-yarn-proxyserver" do
   supports [ :restart => true, :reload => false, :status => true ]
   action :nothing
 end
