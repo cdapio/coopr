@@ -1,4 +1,7 @@
 {
+  "joyent": {
+    "classname": "JoyentProvider"
+  },
   "name" : "joyent",
   "type" : "provider",
   "classname" : "JoyentProvider",

@@ -1,4 +1,7 @@
 {
+  "rackspace": {
+    "classname": "RackspaceProvider"
+  },
   "name" : "rackspace",
   "type" : "provider",
   "classname" : "RackspaceProvider",
