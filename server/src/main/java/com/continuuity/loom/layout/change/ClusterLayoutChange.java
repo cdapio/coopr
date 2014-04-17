@@ -18,7 +18,10 @@ import java.util.Set;
 public interface ClusterLayoutChange {
 
   /**
-   * Returns whether or not the change can be applied to the given {@link ClusterLayout}.
+   * Returns whether or not the change can be applied to the given {@link ClusterLayout}. This is not for checking
+   * if the resulting cluster layout would satisfy all its constraints, but for checking whether or not it is physically
+   * possible to apply the change. For example, it is not physically possible to add a service to 10 nodes if the
+   * cluster is only 5 nodes.
    *
    * @param layout Layout to check the legality of the change for.
    * @return True if the change can be applied, false if not.
