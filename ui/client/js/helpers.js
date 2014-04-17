@@ -59,7 +59,11 @@ Helpers.READABLE_ACTIONS = {
   SOLVE_LAYOUT: "Solve layout",
   CLUSTER_EXPIRE: "Deletion on expiry",
   CLUSTER_CONFIGURE: "Configure",
-  CLUSTER_CONFIGURE_WITH_RESTART: "Configure and restart"
+  CLUSTER_CONFIGURE_WITH_RESTART: "Configure and restart",
+  STOP_SERVICES: "Stop services",
+  RESTART_SERVICES: "Restart services",
+  START_SERVICES: "Start services",
+  ADD_SERVICES: "Add services"
 };
 
 /**
