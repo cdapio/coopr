@@ -16,13 +16,16 @@
 package com.continuuity.loom.layout;
 
 import com.continuuity.loom.admin.Constraints;
+import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.cluster.Node;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Sets;
 
 import java.util.Map;
 import java.util.Set;
@@ -60,34 +63,6 @@ public class ClusterLayout {
   }
 
   /**
-   * Create a new cluster layout that is derived by adding a service to the node layout given in the input.
-   *
-   * @param service Service to add to node layouts.
-   * @param countsPerNodeLayout Number of nodes of the node layout to add the service to.
-   * @return A new cluster layout derived from the current one.
-   */
-  public static ClusterLayout expandClusterLayout(ClusterLayout originalLayout, String service,
-                                                  Multiset<NodeLayout> countsPerNodeLayout) {
-    Preconditions.checkArgument(originalLayout.layout.containsAll(countsPerNodeLayout.elementSet()),
-                                "Cannot add service to non-existent node layout.");
-    for (Multiset.Entry<NodeLayout> entry : countsPerNodeLayout.entrySet()) {
-      Preconditions.checkArgument(originalLayout.layout.count(entry.getElement()) >= entry.getCount(),
-                                  "cannot add the service to more nodes than exist of the given node layout.");
-    }
-
-    Multiset<NodeLayout> newLayout = HashMultiset.create(originalLayout.layout);
-    for (Multiset.Entry<NodeLayout> entry : countsPerNodeLayout.entrySet()) {
-      NodeLayout originalNodeLayout = entry.getElement();
-      NodeLayout expandedNodeLayout = NodeLayout.addServiceToNodeLayout(originalNodeLayout, service);
-      // add the service count times
-      newLayout.add(expandedNodeLayout, entry.getCount());
-      // subtract count nodes from the original node layout since that many have now been expanded.
-      newLayout.setCount(originalNodeLayout, originalLayout.layout.count(originalNodeLayout) - entry.getCount());
-    }
-    return new ClusterLayout(originalLayout.constraints, newLayout);
-  }
-
-  /**
    * Returns whether or not the cluster layout is valid based on the constraints it has.
    *
    * @return True if the cluster layout is valid, false if not.
@@ -115,6 +90,28 @@ public class ClusterLayout {
       }
     }
     return true;
+  }
+
+  /**
+   * Derive a ClusterLayout from a set of {@link Node}s and some {@link Constraints}.
+   *
+   * @param clusterNodes Nodes to derive the layout from.
+   * @param constraints Constraints for the cluster layout.
+   * @return ClusterLayout derived from the nodes.
+   */
+  public static ClusterLayout fromNodes(Set<Node> clusterNodes, Constraints constraints) {
+    Multiset<NodeLayout> nodeLayoutCounts = HashMultiset.create();
+    for (Node node : clusterNodes) {
+      Set<String> nodeServices = Sets.newHashSet();
+      for (Service service : node.getServices()) {
+        nodeServices.add(service.getName());
+      }
+      // TODO: node really should be refactored so these are proper fields
+      String hardwareType = node.getProperties().get(Node.Properties.HARDWARETYPE.name().toLowerCase()).getAsString();
+      String imageType = node.getProperties().get(Node.Properties.IMAGETYPE.name().toLowerCase()).getAsString();
+      nodeLayoutCounts.add(new NodeLayout(hardwareType, imageType, nodeServices));
+    }
+    return new ClusterLayout(constraints, nodeLayoutCounts);
   }
 
   @Override

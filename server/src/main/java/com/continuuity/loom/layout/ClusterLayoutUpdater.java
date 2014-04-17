@@ -20,6 +20,9 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.layout.change.AddServiceChangeIterator;
+import com.continuuity.loom.layout.change.ClusterLayoutChange;
+import com.continuuity.loom.layout.change.ClusterLayoutTracker;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.EntityStore;
 import com.google.common.base.Joiner;
@@ -30,12 +33,9 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
@@ -54,7 +54,7 @@ public class ClusterLayoutUpdater {
     this.entityStore = entityStore;
   }
 
-  public ClusterLayout addServicesToCluster(String clusterId, Set<String> servicesToAdd) throws Exception {
+  public ClusterLayoutTracker addServicesToCluster(String clusterId, Set<String> servicesToAdd) throws Exception {
     Cluster cluster = clusterStore.getCluster(clusterId);
     if (cluster == null) {
       throw new IllegalArgumentException("cluster " + clusterId + " does not exist.");
@@ -65,19 +65,8 @@ public class ClusterLayoutUpdater {
     }
     validateServicesToAdd(cluster, servicesToAdd);
 
-    Multiset<NodeLayout> nodeLayoutCounts = HashMultiset.create();
-    for (Node node : clusterNodes) {
-      Set<String> nodeServices = Sets.newHashSet();
-      for (Service service : node.getServices()) {
-        nodeServices.add(service.getName());
-      }
-      // TODO: node really should be refactored so these are proper fields
-      String hardwareType = node.getProperties().get(Node.Properties.HARDWARETYPE.name().toLowerCase()).getAsString();
-      String imageType = node.getProperties().get(Node.Properties.IMAGETYPE.name().toLowerCase()).getAsString();
-      nodeLayoutCounts.add(new NodeLayout(hardwareType, imageType, nodeServices));
-    }
     Constraints clusterConstraints = cluster.getClusterTemplate().getConstraints();
-    ClusterLayout clusterLayout = new ClusterLayout(clusterConstraints, nodeLayoutCounts);
+    ClusterLayout clusterLayout = ClusterLayout.fromNodes(clusterNodes, clusterConstraints);
 
     // heuristic: try and add services in order of lowest max count allowed.
     Set<String> servicesToAddCopy = Sets.newHashSet(servicesToAdd);
@@ -93,7 +82,8 @@ public class ClusterLayoutUpdater {
     // any service without a constraint has no limit on the number of nodes it can be placed on, so add them to the end
     sortedServices.addAll(servicesToAddCopy);
 
-    return addServicesToCluster(clusterLayout, sortedServices);
+    ClusterLayoutTracker tracker = new ClusterLayoutTracker(clusterLayout);
+    return canAddServicesToCluster(tracker, sortedServices) ? tracker : null;
   }
 
   private void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd) throws Exception {
@@ -104,7 +94,7 @@ public class ClusterLayoutUpdater {
     Set<String> compatibleServices = cluster.getClusterTemplate().getCompatibilities().getServices();
     Set<String> incompatibleServices = Sets.difference(servicesToAdd, compatibleServices);
     if (!incompatibleServices.isEmpty()) {
-      String incompatibleStr = Joiner.on(',').join(incompatibleServices).toString();
+      String incompatibleStr = Joiner.on(',').join(incompatibleServices);
       throw new IllegalArgumentException(incompatibleStr + " are incompatible with the cluster");
     }
 
@@ -132,116 +122,38 @@ public class ClusterLayoutUpdater {
     }
   }
 
-  private ClusterLayout addServicesToCluster(ClusterLayout clusterLayout, Queue<String> servicesToAdd) {
-    ClusterLayout result;
-    if (!servicesToAdd.isEmpty()) {
-      String service = servicesToAdd.remove();
-      // find valid moves, where a move is adding some number of the first service in the queue to nodes in the cluster
-      Iterator<Multiset<NodeLayout>> moves = new ClusterLayoutExpanderIterator(clusterLayout, service);
-
-      while (moves.hasNext()) {
-        // expand the cluster
-        ClusterLayout expandedClusterLayout = ClusterLayout.expandClusterLayout(clusterLayout, service, moves.next());
-        if (expandedClusterLayout.isValid()) {
-          result = addServicesToCluster(expandedClusterLayout, Lists.newLinkedList(servicesToAdd));
-          if (result != null) {
-            return result;
-          }
-        }
-      }
-    } else if (clusterLayout.isValid()) {
-      return clusterLayout;
-    }
-    return null;
-  }
-
-  /**
-   * Return all the ways in which the given cluster layout can be expanded by adding the given service to one or more
-   * nodes in the cluster layout.
-   */
-  private class ClusterLayoutExpanderIterator implements Iterator<Multiset<NodeLayout>> {
-    private final List<NodeLayout> expandableNodeLayouts;
-    private Iterator<int[]> nodeLayoutCountIterator;
-    private int[] nodeLayoutMaxCounts;
-    private int nodesToAddTo;
-    private int minNodesToAddTo;
-
-    private ClusterLayoutExpanderIterator(ClusterLayout clusterLayout, String service) {
-      // cluster services are needed in order to prune the constraints to only use ones that pertain to services
-      // on the cluster
-      Set<String> expandedClusterServices = Sets.newHashSet(service);
-      for (NodeLayout nodeLayout : clusterLayout.getLayout().elementSet()) {
-        expandedClusterServices.addAll(nodeLayout.getServiceNames());
-      }
-      // first figure out which node layouts can add this service
-      this.expandableNodeLayouts = Lists.newArrayListWithCapacity(clusterLayout.getLayout().elementSet().size());
-      Multiset<NodeLayout> expandedCounts = HashMultiset.create();
-      for (NodeLayout originalNodeLayout : clusterLayout.getLayout().elementSet()) {
-        NodeLayout expandedNodeLayout = NodeLayout.addServiceToNodeLayout(originalNodeLayout, service);
-        if (expandedNodeLayout.satisfiesConstraints(clusterLayout.getConstraints(), expandedClusterServices)) {
-          expandableNodeLayouts.add(originalNodeLayout);
-          expandedCounts.add(originalNodeLayout, clusterLayout.getLayout().count(originalNodeLayout));
-        }
-      }
-      // sort expandable node layouts by preference order
-      Collections.sort(this.expandableNodeLayouts, new NodeLayoutComparator(null, null));
-      // need to pass this to the slotted iterator so we don't try and add the service to a node layout more times
-      // than there are nodes for the node layout.
-      this.nodeLayoutMaxCounts = new int[expandableNodeLayouts.size()];
-      for (int i = 0; i < nodeLayoutMaxCounts.length; i++) {
-        nodeLayoutMaxCounts[i] = expandedCounts.count(expandableNodeLayouts.get(i));
-      }
-      // figure out the max number of nodes we can add the service to. Start off by saying we can add it to all nodes.
-      this.nodesToAddTo = expandedCounts.size();
-      // we always need to add the service to at least one node.
-      this.minNodesToAddTo = 1;
-      ServiceConstraint serviceConstraint = clusterLayout.getConstraints().getServiceConstraints().get(service);
-      // if there is a max constraint on this service and its less than the number of nodes in the cluster, start
-      // there instead. Similarly, if there is a min constraint on this service higher than 1, use that instead.
-      if (serviceConstraint != null) {
-        this.nodesToAddTo = Math.min(serviceConstraint.getMaxCount(), this.nodesToAddTo);
-        this.minNodesToAddTo = Math.max(serviceConstraint.getMinCount(), this.minNodesToAddTo);
-      }
-      this.nodeLayoutCountIterator = (this.nodesToAddTo < 1) ? null :
-        new SlottedCombinationIterator(expandableNodeLayouts.size(), nodesToAddTo, nodeLayoutMaxCounts);
-    }
-
-    @Override
-    public boolean hasNext() {
-      if (nodeLayoutCountIterator == null) {
-        return false;
-      }
-      // run out of possibilities with this iterator, reduce the number of nodes we're adding the service to
-      // and look for more possibilites.
-      while (!nodeLayoutCountIterator.hasNext()) {
-        nodesToAddTo--;
-        if (nodesToAddTo < minNodesToAddTo) {
-          return false;
-        } else {
-          nodeLayoutCountIterator =
-            new SlottedCombinationIterator(expandableNodeLayouts.size(), nodesToAddTo, nodeLayoutMaxCounts);
-        }
-      }
+  private boolean canAddServicesToCluster(ClusterLayoutTracker tracker, Queue<String> servicesToAdd) {
+    if (servicesToAdd.isEmpty()) {
       return true;
     }
 
-    @Override
-    public Multiset<NodeLayout> next() {
-      if (hasNext()) {
-        int[] nodeLayoutCounts = nodeLayoutCountIterator.next();
-        Multiset<NodeLayout> counts = HashMultiset.create();
-        for (int i = 0; i < nodeLayoutCounts.length; i++) {
-          counts.add(expandableNodeLayouts.get(i), nodeLayoutCounts[i]);
-        }
-        return counts;
-      }
-      throw new NoSuchElementException();
-    }
+    String service = servicesToAdd.remove();
+    ClusterLayout currentLayout = tracker.getCurrentLayout();
+    // find valid moves, where a move is adding some number of the first service in the queue to nodes in the cluster
+    Iterator<ClusterLayoutChange> changes = new AddServiceChangeIterator(currentLayout, service);
 
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
+    while (changes.hasNext()) {
+      // expand the cluster
+      ClusterLayoutChange change = changes.next();
+      if (tracker.addChangeIfValid(change)) {
+        // though the change was applied, the layout may not satisfy all constraints
+        ClusterLayout nextLayout = tracker.getCurrentLayout();
+        if (!nextLayout.isValid()) {
+          // if constraints were not all satisfied, remove the last change and keep searching
+          tracker.removeLastChange();
+          continue;
+        }
+
+        // successfully added the service. See if we can add the rest of the services.
+        if (canAddServicesToCluster(tracker, servicesToAdd)) {
+          return true;
+        } else {
+          // we were not able to add the rest of the services. Move on to the next change for this service.
+          tracker.removeLastChange();
+        }
+      }
     }
+    return false;
   }
 
   /**
@@ -259,7 +171,7 @@ public class ClusterLayoutUpdater {
         return 1;
       } else if (constraint1 != null && constraint2 == null) {
         return -1;
-      } else if (constraint1 != null && constraint2 != null) {
+      } else if (constraint1 != null) {
         int compare = ((Integer) constraint1.getMaxCount()).compareTo(constraint2.getMaxCount());
         if (compare != 0) {
           return compare;

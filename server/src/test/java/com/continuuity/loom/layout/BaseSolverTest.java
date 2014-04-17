@@ -34,6 +34,7 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.utils.ImmutablePair;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import org.junit.BeforeClass;
 
 import java.util.Map;
@@ -54,6 +55,7 @@ public class BaseSolverTest extends BaseTest {
   protected static Service zookeeper;
   protected static Service reactor;
   protected static Service mysql;
+  protected static Map<String, Service> serviceMap;
 
   @BeforeClass
   public static void setupBaseSolverTests() throws Exception {
@@ -170,6 +172,16 @@ public class BaseSolverTest extends BaseTest {
     reactor = new Service("reactor", "", ImmutableSet.<String>of("zookeeper", "regionserver", "nodemanager"),
                           ImmutableMap.<ProvisionerAction, ServiceAction>of());
     mysql = new Service("mysql", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    serviceMap = Maps.newHashMap();
+    serviceMap.put(namenode.getName(), namenode);
+    serviceMap.put(datanode.getName(), datanode);
+    serviceMap.put(resourcemanager.getName(), resourcemanager);
+    serviceMap.put(nodemanager.getName(), nodemanager);
+    serviceMap.put(hbasemaster.getName(), hbasemaster);
+    serviceMap.put(regionserver.getName(), regionserver);
+    serviceMap.put(zookeeper.getName(), zookeeper);
+    serviceMap.put(reactor.getName(), reactor);
+    serviceMap.put(mysql.getName(), mysql);
 
     entityStore.writeService(namenode);
     entityStore.writeService(datanode);

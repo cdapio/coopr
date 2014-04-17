@@ -36,62 +36,6 @@ public class ClusterLayoutTest {
   private static Constraints constraints;
 
   @Test
-  public void testExpandClusterLayout() {
-    NodeLayout masterNodeLayout = new NodeLayout("large-mem", "centos6", ImmutableSet.of("namenode"));
-    NodeLayout slaveLayout = new NodeLayout("medium", "centos6", ImmutableSet.of("datanode"));
-    Multiset<NodeLayout> counts = HashMultiset.create();
-    counts.add(masterNodeLayout);
-    counts.add(slaveLayout, 50);
-    ClusterLayout layout = new ClusterLayout(constraints, counts);
-
-    NodeLayout expandedMasterNodeLayout =
-      new NodeLayout("large-mem", "centos6", ImmutableSet.of("namenode", "resourcemanager"));
-    NodeLayout expandedSlaveNodeLayout =
-      new NodeLayout("medium", "centos6", ImmutableSet.of("datanode", "nodemanager"));
-
-    // add resourcemanager to master node
-    Multiset<NodeLayout> addCounts = HashMultiset.create();
-    addCounts.add(masterNodeLayout, 1);
-    ClusterLayout expanded = ClusterLayout.expandClusterLayout(layout, "resourcemanager", addCounts);
-    Multiset<NodeLayout> expectedCounts = HashMultiset.create();
-    expectedCounts.add(expandedMasterNodeLayout, 1);
-    expectedCounts.add(slaveLayout, 50);
-    ClusterLayout expected = new ClusterLayout(constraints, expectedCounts);
-    Assert.assertEquals(expected, expanded);
-
-    // add nodemanager to half of the slave nodes
-    addCounts = HashMultiset.create();
-    addCounts.add(slaveLayout, 25);
-    expanded = ClusterLayout.expandClusterLayout(expanded, "nodemanager", addCounts);
-    expectedCounts = HashMultiset.create();
-    expectedCounts.add(expandedMasterNodeLayout, 1);
-    expectedCounts.add(slaveLayout, 25);
-    expectedCounts.add(expandedSlaveNodeLayout, 25);
-    expected = new ClusterLayout(constraints, expectedCounts);
-    Assert.assertEquals(expected, expanded);
-
-    // add nodemanager to the rest of the slave nodes
-    expanded = ClusterLayout.expandClusterLayout(expanded, "nodemanager", addCounts);
-    expectedCounts = HashMultiset.create();
-    expectedCounts.add(expandedMasterNodeLayout, 1);
-    expectedCounts.add(expandedSlaveNodeLayout, 50);
-    expected = new ClusterLayout(constraints, expectedCounts);
-    Assert.assertEquals(expected, expanded);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testInvalidNodeLayoutsThrowsException() {
-    NodeLayout masterNodeLayout = new NodeLayout("large-mem", "centos6", ImmutableSet.of("namenode"));
-    Multiset<NodeLayout> counts = HashMultiset.create();
-    counts.add(masterNodeLayout);
-    NodeLayout badNodeLayout = new NodeLayout("large-mem", "ubuntu12", ImmutableSet.of("namenode"));
-    Multiset badCounts = HashMultiset.create();
-    badCounts.add(badNodeLayout);
-    ClusterLayout layout = new ClusterLayout(constraints, counts);
-    ClusterLayout.expandClusterLayout(layout, "resourcemanager", badCounts);
-  }
-
-  @Test
   public void testInvalidHardwareTypeShowsAsInvalid() {
     NodeLayout badNodeLayout = new NodeLayout("medium", "centos6", ImmutableSet.of("namenode"));
     Multiset<NodeLayout> counts = HashMultiset.create();

@@ -22,6 +22,8 @@ import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.layout.change.ClusterLayoutChange;
+import com.continuuity.loom.layout.change.ClusterLayoutTracker;
 import com.continuuity.loom.scheduler.task.NodeService;
 import com.continuuity.loom.store.EntityStore;
 import com.google.common.base.Joiner;
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
@@ -56,8 +59,9 @@ public class Solver {
     this.updater = updater;
   }
 
-  public ClusterLayout addServiceToCluster(String clusterId, Set<String> servicesToAdd) throws Exception {
-    return updater.addServicesToCluster(clusterId, servicesToAdd);
+  public Queue<ClusterLayoutChange> addServiceToCluster(String clusterId, Set<String> servicesToAdd) throws Exception {
+    ClusterLayoutTracker tracker = updater.addServicesToCluster(clusterId, servicesToAdd);
+    return tracker == null ? null : tracker.getChanges();
   }
 
   /**

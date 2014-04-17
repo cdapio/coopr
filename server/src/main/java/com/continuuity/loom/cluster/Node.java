@@ -158,6 +158,15 @@ public final class Node implements Comparable<Node> {
     return ImmutableList.copyOf((actions));
   }
 
+  /**
+   * Add a service to the node.
+   *
+   * @param service Service to add to the node.
+   */
+  public void addService(Service service) {
+    this.services.add(service);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
