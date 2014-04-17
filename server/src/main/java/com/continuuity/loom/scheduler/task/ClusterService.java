@@ -127,7 +127,7 @@ public class ClusterService {
     lock.acquire();
     try {
       Cluster cluster = getUserCluster(clusterId, userId);
-      if (cluster == null) {
+      if (cluster == null || (service != null && !cluster.getServices().contains(service))) {
         throw new MissingClusterException("cluster " + clusterId + " owned by user " + userId + " does not exist");
       }
       if (!Cluster.Status.SERVICE_ACTIONABLE_STATES.contains(cluster.getStatus())) {

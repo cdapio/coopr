@@ -53,6 +53,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -1230,6 +1231,94 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     actual = GSON.fromJson(reader, JsonObject.class);
     Assert.assertEquals(newConfig, actual);
+  }
+
+  @Test
+  public void testClusterServiceActions() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "service-actions", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    Map<String, ClusterAction> actions = Maps.newHashMap();
+    actions.put("/stop", ClusterAction.STOP_SERVICES);
+    actions.put("/start", ClusterAction.START_SERVICES);
+    actions.put("/restart", ClusterAction.RESTART_SERVICES);
+    actions.put("/namenode/stop", ClusterAction.STOP_SERVICES);
+    actions.put("/namenode/start", ClusterAction.START_SERVICES);
+    actions.put("/namenode/restart", ClusterAction.RESTART_SERVICES);
+
+    try {
+      for (Map.Entry<String, ClusterAction> entry : actions.entrySet()) {
+        assertResponseStatus(doPost("/v1/loom/clusters/123/services" + entry.getKey(), "", USER1_HEADERS),
+                             HttpResponseStatus.OK);
+        Assert.assertEquals(entry.getValue().name(), clusterQueue.take("0").getValue());
+        cluster.setStatus(Cluster.Status.ACTIVE);
+        clusterStore.writeCluster(cluster);
+      }
+    } finally {
+      clusterQueue.removeAll();
+    }
+  }
+
+  @Test
+  public void testServiceActionsOnNonexistantClusterReturn404() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of());
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    Set<String> actions = ImmutableSet.of(
+      "/stop",
+      "/start",
+      "/restart",
+      "/namenode/stop",
+      "/namenode/start",
+      "/namenode/restart"
+    );
+    for (String action : actions) {
+      // no cluster 1123
+      assertResponseStatus(doPost("/v1/loom/clusters/1123/services" + action, "", USER1_HEADERS),
+                           HttpResponseStatus.NOT_FOUND);
+      // no cluster for user2
+      assertResponseStatus(doPost("/v1/loom/clusters/123/services" + action, "", USER2_HEADERS),
+                           HttpResponseStatus.NOT_FOUND);
+    }
+  }
+
+  @Test
+  public void testServiceActionsOnNonexistantClusterServiceReturn404() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of());
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services/fake/stop", "", USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services/fake/start", "", USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services/fake/restart", "", USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+  }
+
+  @Test
+  public void testServiceActionsCanOnlyRunOnActiveCluster() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    Set<Cluster.Status> badStatuses = ImmutableSet.of(
+      Cluster.Status.INCOMPLETE, Cluster.Status.PENDING, Cluster.Status.TERMINATED, Cluster.Status.INCONSISTENT);
+    Set<String> resources = ImmutableSet.of(
+      "/v1/loom/clusters/123/services/stop",
+      "/v1/loom/clusters/123/services/start",
+      "/v1/loom/clusters/123/services/restart",
+      "/v1/loom/clusters/123/services/namenode/stop",
+      "/v1/loom/clusters/123/services/namenode/start",
+      "/v1/loom/clusters/123/services/namenode/restart"
+    );
+    for (Cluster.Status status : badStatuses) {
+      cluster.setStatus(status);
+      clusterStore.writeCluster(cluster);
+      for (String resource : resources) {
+        assertResponseStatus(doPost(resource, "", USER1_HEADERS), HttpResponseStatus.CONFLICT);
+      }
+    }
   }
 
   private void verifyPlanJson(JsonObject expected, JsonObject actual) {

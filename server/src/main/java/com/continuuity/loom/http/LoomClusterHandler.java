@@ -667,7 +667,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
   }
 
   @POST
-  @Path("/{cluster-id}/service/{service-id}/start")
+  @Path("/{cluster-id}/services/{service-id}/start")
   public void startClusterService(HttpRequest request, HttpResponder responder,
                                   @PathParam("cluster-id") String clusterId,
                                   @PathParam("service-id") String serviceId) throws Exception {
@@ -675,7 +675,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
   }
 
   @POST
-  @Path("/{cluster-id}/service/{service-id}/stop")
+  @Path("/{cluster-id}/services/{service-id}/stop")
   public void stopClusterService(HttpRequest request, HttpResponder responder,
                                  @PathParam("cluster-id") String clusterId,
                                  @PathParam("service-id") String serviceId) throws Exception {
@@ -683,7 +683,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
   }
 
   @POST
-  @Path("/{cluster-id}/service/{service-id}/restart")
+  @Path("/{cluster-id}/services/{service-id}/restart")
   public void restartClusterService(HttpRequest request, HttpResponder responder,
                                     @PathParam("cluster-id") String clusterId,
                                     @PathParam("service-id") String serviceId) throws Exception {
