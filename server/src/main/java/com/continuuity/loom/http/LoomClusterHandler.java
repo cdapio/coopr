@@ -314,7 +314,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
                                     clusterCreateRequest.getConfig());
       JobId clusterJobId = store.getNewJobId(clusterId);
       ClusterJob clusterJob = new ClusterJob(clusterJobId, ClusterAction.SOLVE_LAYOUT);
-      cluster.addJob(clusterJob.getJobId());
+      cluster.setLatestJobId(clusterJob.getJobId());
 
       try {
         LOG.trace("Writing cluster {} to store", cluster);
@@ -582,15 +582,15 @@ public class LoomClusterHandler extends LoomAuthHandler {
       return;
     }
     try {
-      Cluster cluster = clusterService.getUserCluster(clusterId, userId);
-      if (cluster == null) {
-        responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
-        return;
-      }
 
       JsonArray jobsJson = new JsonArray();
-      for (String jobId : cluster.getJobs()) {
-        ClusterJob clusterJob = store.getClusterJob(JobId.fromString(jobId));
+
+      List<ClusterJob> jobs = clusterService.getClusterJobs(clusterId, userId);
+      if (jobs.isEmpty()) {
+        responder.sendError(HttpResponseStatus.NOT_FOUND, "Plans for cluster " + clusterId + " not found.");
+        return;
+      }
+      for (ClusterJob clusterJob : clusterService.getClusterJobs(clusterId, userId)) {
         jobsJson.add(formatJobPlan(clusterJob));
       }
 

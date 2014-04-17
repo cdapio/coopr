@@ -384,6 +384,55 @@ public class SQLClusterStore extends BaseClusterStore {
     return jobMap;
   }
 
+  public List<ClusterJob> getClusterJobs(String clusterId, int limit) throws TaskException {
+    long clusterNum = Long.parseLong(clusterId);
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT job FROM jobs WHERE cluster_id=? ORDER BY job_num DESC");
+        statement.setLong(1, clusterNum);
+        statement.setInt(2, limit);
+
+        try {
+          return getQueryList(statement, ClusterJob.class);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting cluster jobs for cluster {} with limit {}", clusterId, limit, e);
+      throw new TaskException("Exception getting cluster jobs for cluster " + clusterId);
+    }
+  }
+
+  public List<ClusterJob> getClusterJobs(String clusterId, String ownerId, int limit) throws TaskException {
+    long clusterNum = Long.parseLong(clusterId);
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement(
+            "SELECT J.job FROM jobs J, clusters C WHERE J.cluster_id=C.id AND C.id=? AND C.owner_id=? " +
+              "ORDER BY J.job_num DESC");
+        statement.setLong(1, clusterNum);
+        statement.setString(2, ownerId);
+
+        try {
+          return getQueryList(statement, ClusterJob.class, limit);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting cluster jobs for cluster {} with limit {}", clusterId, limit, e);
+      throw new TaskException("Exception getting cluster jobs for cluster " + clusterId);
+    }
+  }
+
   @Override
   public void writeClusterJob(ClusterJob clusterJob) throws TaskException {
     JobId jobId = JobId.fromString(clusterJob.getJobId());
@@ -738,6 +787,11 @@ public class SQLClusterStore extends BaseClusterStore {
     }
   }
 
+
+  private <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
+    return getQueryList(statement, clazz, Integer.MAX_VALUE);
+  }
+
   /**
    * Queries the store for a list of items, deserializing the items and returning an immutable list of them. If no items
    * exist, the list will be empty.
@@ -745,16 +799,21 @@ public class SQLClusterStore extends BaseClusterStore {
    * @param statement PreparedStatement of the query, ready for execution.
    * @param clazz Class of the items being queried.
    * @param <T> Type of the items being queried.
+   * @param limit Max number of items to get.
    * @return
    * @throws SQLException
    */
-  private <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
+  private <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz, int limit)
+    throws SQLException {
     ResultSet rs = statement.executeQuery();
     try {
       List<T> results = Lists.newArrayList();
-      while (rs.next()) {
+      int numResults = 0;
+      int actualLimit = limit < 0 ? Integer.MAX_VALUE : limit;
+      while (rs.next() && numResults < actualLimit) {
         Blob blob = rs.getBlob(1);
         results.add(deserializeBlob(blob, clazz));
+        numResults++;
       }
       return ImmutableList.copyOf(results);
     } finally {

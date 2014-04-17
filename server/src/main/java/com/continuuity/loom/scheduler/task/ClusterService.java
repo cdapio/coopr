@@ -72,7 +72,7 @@ public class ClusterService {
       JobId deleteJobId = store.getNewJobId(clusterId);
       ClusterJob deleteJob = new ClusterJob(deleteJobId, ClusterAction.CLUSTER_DELETE);
       deleteJob.setJobStatus(ClusterJob.Status.RUNNING);
-      cluster.addJob(deleteJobId.getId());
+      cluster.setLatestJobId(deleteJobId.getId());
       cluster.setStatus(Cluster.Status.PENDING);
 
       LOG.debug("Writing cluster {} to store with delete job {}", clusterId, deleteJobId);
@@ -104,7 +104,7 @@ public class ClusterService {
         restartServices ? ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART : ClusterAction.CLUSTER_CONFIGURE;
       ClusterJob configureJob = new ClusterJob(configureJobId, action);
       configureJob.setJobStatus(ClusterJob.Status.RUNNING);
-      cluster.addJob(configureJobId.getId());
+      cluster.setLatestJobId(configureJobId.getId());
       cluster.setStatus(Cluster.Status.PENDING);
 
       LOG.debug("Writing cluster {} to store with configure job {}", clusterId, configureJobId);
@@ -138,7 +138,7 @@ public class ClusterService {
 
       ClusterJob job = new ClusterJob(jobId, action, service == null ? null : ImmutableSet.of(service), null);
       job.setJobStatus(ClusterJob.Status.RUNNING);
-      cluster.addJob(job.getJobId());
+      cluster.setLatestJobId(job.getJobId());
       cluster.setStatus(Cluster.Status.PENDING);
       store.writeCluster(cluster);
       store.writeClusterJob(job);
@@ -214,6 +214,22 @@ public class ClusterService {
       cluster = store.getCluster(clusterId, userId);
     }
     return cluster;
+  }
+
+  /**
+   * Get the jobs associated with the given cluster that the user has permission to get.
+   *
+   * @param clusterId Id of the cluster associated with the jobs to get.
+   * @param userId Id of the owner of the cluster, or the admin user id.
+   * @return List of cluster jobs performed or being performed on the cluster. Will be empty if none exist.
+   * @throws Exception
+   */
+  public List<ClusterJob> getClusterJobs(String clusterId, String userId) throws Exception {
+    if (userId.equals(Constants.ADMIN_USER) || userId.equals(Constants.SYSTEM_USER)) {
+      return store.getClusterJobs(clusterId, -1);
+    } else {
+      return store.getClusterJobs(clusterId, userId, -1);
+    }
   }
 
   /**

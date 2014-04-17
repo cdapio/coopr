@@ -145,6 +145,29 @@ public interface ClusterStore {
   Map<JobId, ClusterJob> getClusterJobs(Set<JobId> jobIds) throws TaskException;
 
   /**
+   * Get all jobs performed or being performed on the given cluster.
+   * @param clusterId Id of the cluster for which to get jobs.
+   * @param limit Max number of jobs to return. If there are more, the most recent jobs will be returned. A
+   *              negative number is interpreted as no limit.
+   * @return List of all jobs performed or being performed on the given cluster, up to limit amount of jobs. If no jobs
+   *         exist for the cluster, an empty list is returned.
+   * @throws TaskException if there was a problem getting the cluster jobs.
+   */
+  List<ClusterJob> getClusterJobs(String clusterId, int limit) throws TaskException;
+
+  /**
+   * Get all jobs performed or being performed on the given cluster owned by the given user.
+   * @param clusterId Id of the cluster for which to get jobs.
+   * @param ownerId Id of the owner of the cluster.
+   * @param limit Max number of jobs to return. If there are more, the most recent jobs will be returned. A
+   *              negative number is interpreted as no limit.
+   * @return List of all jobs performed or being performed on the given cluster owned by the user, up to limit amount
+   *         of jobs. If no jobs exist for the cluster owned by the user, an empty list is returned.
+   * @throws TaskException if there was a problem getting the cluster jobs.
+   */
+  List<ClusterJob> getClusterJobs(String clusterId, String ownerId, int limit) throws TaskException;
+
+  /**
    * Write a cluster job to the store.
    * @param clusterJob The cluster job to write.
    * @throws TaskException if there was a problem writing the cluster job.

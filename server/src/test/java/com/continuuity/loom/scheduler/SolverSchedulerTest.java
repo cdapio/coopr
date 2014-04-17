@@ -75,7 +75,7 @@ public class SolverSchedulerTest extends BaseTest {
     Cluster cluster = new Cluster("1", "user", clusterName, System.currentTimeMillis(),
                                   "my cluster", null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of());
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CREATE);
-    cluster.addJob(job.getJobId());
+    cluster.setLatestJobId(job.getJobId());
     clusterStore.writeCluster(cluster);
     clusterStore.writeClusterJob(job);
     ClusterCreateRequest createRequest =
