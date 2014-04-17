@@ -392,10 +392,9 @@ public class SQLClusterStore extends BaseClusterStore {
         PreparedStatement statement = conn.prepareStatement(
           "SELECT job FROM jobs WHERE cluster_id=? ORDER BY job_num DESC");
         statement.setLong(1, clusterNum);
-        statement.setInt(2, limit);
 
         try {
-          return getQueryList(statement, ClusterJob.class);
+          return getQueryList(statement, ClusterJob.class, limit);
         } finally {
           statement.close();
         }
