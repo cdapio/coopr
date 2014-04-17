@@ -24,6 +24,7 @@ import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.AddServicesRequest;
 import com.continuuity.loom.layout.ClusterLayoutUpdater;
+import com.continuuity.loom.layout.Solver;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.SolverRequest;
@@ -54,18 +55,18 @@ public class ClusterService {
   private final TrackingQueue solverQueue;
   private final ZKClient zkClient;
   private final LoomStats loomStats;
-  private final ClusterLayoutUpdater clusterLayoutUpdater;
+  private final Solver solver;
 
   @Inject
   public ClusterService(ClusterStore store, @Named("cluster.queue") TrackingQueue clusterQueue,
                         @Named("solver.queue") TrackingQueue solverQueue, ZKClient zkClient,
-                        LoomStats loomStats, ClusterLayoutUpdater clusterLayoutUpdater) {
+                        LoomStats loomStats, Solver solver) {
     this.store = store;
     this.clusterQueue = clusterQueue;
     this.solverQueue = solverQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.loomStats = loomStats;
-    this.clusterLayoutUpdater = clusterLayoutUpdater;
+    this.solver = solver;
   }
 
   /**
@@ -175,7 +176,7 @@ public class ClusterService {
           "cluster " + clusterId + " is not in a state where services can be added to it.");
       }
       JobId jobId = store.getNewJobId(clusterId);
-      clusterLayoutUpdater.validateServicesToAdd(cluster, addRequest.getServices());
+      solver.validateServicesToAdd(cluster, addRequest.getServices());
 
       ClusterAction action = ClusterAction.ADD_SERVICES;
       ClusterJob job = new ClusterJob(jobId, action, addRequest.getServices(), null);

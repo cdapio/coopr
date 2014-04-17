@@ -27,6 +27,8 @@ import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.admin.ServiceDependencies;
+import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.http.AddServicesRequest;
 import com.continuuity.loom.http.ClusterConfigureRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
@@ -49,6 +51,8 @@ public class JsonSerde {
       .registerTypeAdapter(HardwareType.class, new HardwareTypeCodec())
       .registerTypeAdapter(ImageType.class, new ImageTypeCodec())
       .registerTypeAdapter(Service.class, new ServiceCodec())
+      .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
+      .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
       .registerTypeAdapter(ClusterTemplate.class, new ClusterTemplateCodec())
       .registerTypeAdapter(ServiceAction.class, new ServiceActionCodec())
       .registerTypeAdapter(ServiceConstraint.class, new ServiceConstraintCodec())

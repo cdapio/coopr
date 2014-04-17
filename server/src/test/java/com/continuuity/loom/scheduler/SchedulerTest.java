@@ -177,7 +177,7 @@ public class SchedulerTest extends BaseTest {
     LoomStats loomStats = new LoomStats();
     JobScheduler jobScheduler = new JobScheduler(clusterStore, provisionQueue, new JsonSerde(),
                                                  jobQueue, zkClient,
-                                                 new TaskService(clusterStore, new Actions(), loomStats),
+                                                 new TaskService(clusterStore, Actions.DEFAULT_ACTIONS, loomStats),
                                                  3, loomStats);
     jobScheduler.run();
     Assert.assertEquals(0, jobQueue.size());

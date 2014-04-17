@@ -56,7 +56,7 @@ public final class HardwareType extends NamedEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof HardwareType) || o == null) {
+    if (!(o instanceof HardwareType)) {
       return false;
     }
     HardwareType other = (HardwareType) o;
