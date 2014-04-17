@@ -269,7 +269,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     cluster.setStatus(Cluster.Status.ACTIVE);
     ClusterJob clusterJob = new ClusterJob(new JobId(clusterId, 1), ClusterAction.CLUSTER_DELETE);
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
-    cluster.addJob(clusterJob.getJobId());
+    cluster.setLatestJobId(clusterJob.getJobId());
     clusterStore.writeCluster(cluster);
     clusterStore.writeClusterJob(clusterJob);
 
@@ -810,7 +810,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     cluster.setStatus(Cluster.Status.ACTIVE);
     ClusterJob clusterJob = new ClusterJob(new JobId(clusterId, 1), ClusterAction.CLUSTER_DELETE);
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
-    cluster.addJob(clusterJob.getJobId());
+    cluster.setLatestJobId(clusterJob.getJobId());
     clusterStore.writeCluster(cluster);
     clusterStore.writeClusterJob(clusterJob);
 
@@ -1405,7 +1405,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   private static final String ALL_SAMPLE_PLANS =
     "[\n" +
-      SOLVER_PLAN + ",\n" +
-      SAMPLE_PLAN +
+      SAMPLE_PLAN + ",\n" +
+      SOLVER_PLAN +
       "\n]";
 }

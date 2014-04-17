@@ -194,7 +194,7 @@ public class SolverScheduler implements Runnable {
       // Create new Job for creating cluster.
       JobId clusterJobId = clusterStore.getNewJobId(cluster.getId());
       ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.CLUSTER_CREATE);
-      cluster.addJob(createJob.getJobId());
+      cluster.setLatestJobId(createJob.getJobId());
       clusterStore.writeClusterJob(createJob);
 
       clusterStore.writeCluster(cluster);

@@ -101,7 +101,7 @@ public class SchedulerTest extends BaseTest {
 
     Cluster cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
-    cluster.addJob(job.getJobId());
+    cluster.setLatestJobId(job.getJobId());
     clusterStore.writeCluster(cluster);
     clusterStore.writeClusterJob(job);
 
