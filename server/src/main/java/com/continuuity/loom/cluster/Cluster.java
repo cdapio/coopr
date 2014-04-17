@@ -59,7 +59,7 @@ public final class Cluster extends NamedEntity {
     TERMINATED;
 
     public static final Set<Status> CONFIGURABLE_STATES = ImmutableSet.of(Status.ACTIVE, Status.INCONSISTENT);
-    public static final Set<Status> SERVICE_ACTIONABLE_STATES = ImmutableSet.of(Status.ACTIVE, Status.INCONSISTENT);
+    public static final Set<Status> SERVICE_ACTIONABLE_STATES = ImmutableSet.of(Status.ACTIVE);
   }
 
   private final String id;
