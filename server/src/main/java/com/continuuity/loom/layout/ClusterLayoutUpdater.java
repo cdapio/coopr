@@ -27,13 +27,10 @@ import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.EntityStore;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-import javax.ws.rs.HEAD;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
@@ -46,12 +43,10 @@ import java.util.SortedSet;
  * services, removing services, adding nodes, or removing nodes.
  */
 public class ClusterLayoutUpdater {
-  private final ClusterStore clusterStore;
   private final EntityStore entityStore;
 
   @Inject
   ClusterLayoutUpdater(ClusterStore clusterStore, EntityStore entityStore) {
-    this.clusterStore = clusterStore;
     this.entityStore = entityStore;
   }
 
@@ -103,6 +98,7 @@ public class ClusterLayoutUpdater {
       if (service == null) {
         throw new IllegalArgumentException(serviceName + " does not exist");
       }
+
       for (String serviceDependency : service.getDependsOn()) {
         if (!existingClusterServices.contains(serviceDependency) && !servicesToAdd.contains(serviceDependency)) {
           dependenciesSatisfied = false;
