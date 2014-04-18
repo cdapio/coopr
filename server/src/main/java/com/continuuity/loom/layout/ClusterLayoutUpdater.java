@@ -46,7 +46,7 @@ public class ClusterLayoutUpdater {
   private final EntityStore entityStore;
 
   @Inject
-  ClusterLayoutUpdater(ClusterStore clusterStore, EntityStore entityStore) {
+  ClusterLayoutUpdater(EntityStore entityStore) {
     this.entityStore = entityStore;
   }
 
@@ -58,7 +58,7 @@ public class ClusterLayoutUpdater {
     validateServicesToAdd(cluster, servicesToAdd);
 
     Constraints clusterConstraints = cluster.getClusterTemplate().getConstraints();
-    ClusterLayout clusterLayout = ClusterLayout.fromClusterNodes(clusterNodes, clusterConstraints);
+    ClusterLayout clusterLayout = ClusterLayout.fromNodes(clusterNodes, clusterConstraints);
 
     Set<String> servicesToAddCopy = Sets.newHashSet(servicesToAdd);
     SortedSet<Map.Entry<String, ServiceConstraint>> sortedConstraints = Sets.newTreeSet(new ServiceMaxComparator());

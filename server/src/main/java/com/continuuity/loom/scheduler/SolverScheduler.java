@@ -22,9 +22,7 @@ import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.http.AddServicesRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
-import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.Solver;
-import com.continuuity.loom.layout.change.ClusterLayoutChange;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
@@ -41,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -158,9 +155,13 @@ public class SolverScheduler implements Runnable {
               taskService.failJobAndTerminateCluster(toFailJob, cluster, "Exception while solving layout.");
               break;
             case ADD_SERVICES:
-              // add services can only be performed from an active state, and since we did not do anything to it,
-              // the status should go back to active.
-              taskService.failJobAndSetClusterStatus(toFailJob, cluster, Cluster.Status.ACTIVE,
+              // if the solver job is complete, we have changed the cluster state so cluster status is inconsistent.
+              // if we haven't change completed solving, no state has changed so the cluster can go back to an
+              // active state.
+              // TODO: just rollback to previous state once we keep track of history.
+              Cluster.Status clusterStatus = solverJob.getJobStatus() == ClusterJob.Status.COMPLETE ?
+                Cluster.Status.INCONSISTENT : Cluster.Status.ACTIVE;
+              taskService.failJobAndSetClusterStatus(toFailJob, cluster, clusterStatus,
                                                      "Exception while solving layout.");
               break;
           }
@@ -176,7 +177,7 @@ public class SolverScheduler implements Runnable {
     private String solveAddServices(Cluster cluster, AddServicesRequest request) throws Exception {
 
       Set<Node> clusterNodes = clusterStore.getClusterNodes(cluster.getId());
-      Set<Node> changedNodes = null;
+      Set<Node> changedNodes;
       String servicesStr = Joiner.on(',').join(request.getServices());
       try {
         changedNodes = solver.addServicesToCluster(cluster, clusterNodes, request.getServices());
@@ -189,6 +190,13 @@ public class SolverScheduler implements Runnable {
         return "Unable to solve layout.";
       }
 
+      // Solving succeeded, schedule planning.
+      solverJob.setJobStatus(ClusterJob.Status.COMPLETE);
+      clusterStore.writeClusterJob(solverJob);
+
+      // TODO: loom status update should happen in TaskService.
+      loomStats.getSuccessfulClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
+
       // TODO: stuff like this should be wrapped in a transaction
       Set<String> changedNodeIds = Sets.newHashSet();
       for (Node node : changedNodes) {
@@ -196,13 +204,6 @@ public class SolverScheduler implements Runnable {
         changedNodeIds.add(node.getId());
       }
       clusterStore.writeCluster(cluster);
-
-      // Solving succeeded, schedule planning.
-      solverJob.setJobStatus(ClusterJob.Status.COMPLETE);
-      clusterStore.writeClusterJob(solverJob);
-
-      // TODO: loom status update should happen in TaskService.
-      loomStats.getSuccessfulClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
 
       // Create new Job for creating cluster.
       JobId clusterJobId = clusterStore.getNewJobId(cluster.getId());

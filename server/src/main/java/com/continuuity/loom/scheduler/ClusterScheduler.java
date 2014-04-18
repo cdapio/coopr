@@ -146,11 +146,10 @@ public class ClusterScheduler implements Runnable {
               taskService.failJobAndTerminateCluster(job, cluster, "Failed to schedule the action");
               break;
             default:
-              // failed to plan means the job should fail, but since no actions were performed on the cluster
-              // it should stay in the same state as before.
-              // TODO: at this point the cluster state has been changed. Should revert it here but need versioning
-              //       or cluster history or something to that effect.
-              taskService.failJobAndSetClusterStatus(job, cluster, Cluster.Status.ACTIVE,
+              // failed to plan means the job should fail, but state has already been changed so the cluster
+              // state in the db is inconsistent with reality.
+              // TODO: Should revert it here but need versioning or cluster history or something to that effect.
+              taskService.failJobAndSetClusterStatus(job, cluster, Cluster.Status.INCONSISTENT,
                                                      "Failed to schedule the " + clusterAction + " operation.");
               break;
           }

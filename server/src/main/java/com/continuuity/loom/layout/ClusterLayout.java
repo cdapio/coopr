@@ -61,28 +61,6 @@ public class ClusterLayout {
   }
 
   /**
-   * Determine a cluster layout based on a set of nodes and their constraints.
-   *
-   * @param clusterNodes Nodes of a cluster.
-   * @param constraints Constraints associated with the cluster.
-   * @return The ClusterLayout derived from the nodes of a cluster.
-   */
-  public static ClusterLayout fromClusterNodes(Set<Node> clusterNodes, Constraints constraints) {
-    Multiset<NodeLayout> nodeLayoutCounts = HashMultiset.create();
-    for (Node node : clusterNodes) {
-      Set<String> nodeServices = Sets.newHashSet();
-      for (Service service : node.getServices()) {
-        nodeServices.add(service.getName());
-      }
-      // TODO: node really should be refactored so these are proper fields
-      String hardwareType = node.getProperties().get(Node.Properties.HARDWARETYPE.name().toLowerCase()).getAsString();
-      String imageType = node.getProperties().get(Node.Properties.IMAGETYPE.name().toLowerCase()).getAsString();
-      nodeLayoutCounts.add(new NodeLayout(hardwareType, imageType, nodeServices));
-    }
-    return new ClusterLayout(constraints, nodeLayoutCounts);
-  }
-
-  /**
    * Returns whether or not the cluster layout is valid based on the constraints it has.
    *
    * @return True if the cluster layout is valid, false if not.
