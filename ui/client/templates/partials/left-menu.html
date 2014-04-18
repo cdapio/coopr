@@ -13,11 +13,27 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<ul>
-  <li class="overview {% if activeTab == 'clustertemplates' %}active{% endif %}" id="nav-clustertemplates-container"><a class="nav-link nav-clustertemplates" id="nav-clustertemplates" href="/clustertemplates">Catalog</a></li>
-  <li id="nav-providers-container" class="{% if activeTab == 'providers' %}active{% endif %}"><a class="nav-link nav-providers" id="nav-providers" href="/providers">Providers</a></li>
-  <li id="nav-hardwaretypes-container" class="{% if activeTab == 'hardwaretypes' %}active{% endif %}"><a class="nav-link nav-hardwaretypes" id="nav-hardwaretypes" href="/hardwaretypes">Hardware</a></li>
-  <li id="nav-imagetypes-container" class="{% if activeTab == 'imagetypes' %}active{% endif %}"><a class="nav-link nav-imagetypes" id="nav-imagetypes" href="/imagetypes">Images</a></li>
-  <li id="nav-services-container" class="{% if activeTab == 'services' %}active{% endif %}"><a class="nav-link nav-services" id="nav-services" href="/services">Services</a></li>
-  <li id="nav-clusters-container" class="{% if activeTab == 'clusters' %}active{% endif %}"><a class="nav-link nav-clusters" id="nav-clusters" href="/admin/clusters">Clusters</a></li>
-</ul>
+<li class="overview {% if activeTab == 'clustertemplates' %}active{% endif %} nav-item" id="nav-clustertemplates-container">
+  <a class="nav-icon nav-clustertemplates" href="/clustertemplates"></a>
+  <a class="nav-link" id="nav-clustertemplates" href="/clustertemplates">Catalog</a>
+</li>
+<li id="nav-providers-container" class="{% if activeTab == 'providers' %}active{% endif %} nav-item">
+  <a class="nav-icon nav-providers" href="/providers"></a>
+  <a class="nav-link" id="nav-providers" href="/providers">Providers</a>
+</li>
+<li id="nav-hardwaretypes-container" class="{% if activeTab == 'hardwaretypes' %}active{% endif %} nav-item">
+  <a class="nav-icon nav-hardwaretypes" href="/hardwaretypes"></a>
+  <a class="nav-link" id="nav-hardwaretypes" href="/hardwaretypes">Hardware</a>
+</li>
+<li id="nav-imagetypes-container" class="{% if activeTab == 'imagetypes' %}active{% endif %} nav-item">
+  <a class="nav-icon nav-imagetypes" href="/imagetypes"></a>
+  <a class="nav-link" id="nav-imagetypes" href="/imagetypes">Images</a>
+</li>
+<li id="nav-services-container" class="{% if activeTab == 'services' %}active{% endif %} nav-item">
+  <a class="nav-icon nav-services" href="/services"></a>
+  <a class="nav-link" id="nav-services" href="/services">Services</a>
+</li>
+<li id="nav-clusters-container" class="{% if activeTab == 'clusters' %}active{% endif %} nav-item last">
+  <a class="nav-icon nav-clusters" href="/admin/clusters"></a>
+  <a class="nav-link" id="nav-clusters" href="/admin/clusters">Clusters</a>
+</li>

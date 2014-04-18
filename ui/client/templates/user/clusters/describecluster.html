@@ -23,7 +23,7 @@
                 <div class="pull-right">
                   <form role="form" method="POST" ng-submit="deleteCluster($event)" action = "[[ '/user/clusters/delete/' + cluster.id ]]" class="cluster-delete-form">
                     <input type="hidden" value="[[cluster.id]]" name="name" />
-                    <a href="/user/clusters/cluster/[[cluster.id]]/reconfigure" class="btn-spl btn-info" ng-show="cluster.status !== 'DELETED'" >Reconfigure</a>
+                    <a href="/user/clusters/cluster/[[cluster.id]]/reconfigure" class="btn-spl btn-info" ng-show="cluster.status !== 'DELETED'" id="reconfigure-cluster-link">Reconfigure</a>
                     <button type="submit" class="btn-spl btn-danger" ng-show="cluster.status !== 'DELETED'" >Delete</button>
                   </form>
                 </div>
