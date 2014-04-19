@@ -35,7 +35,8 @@ import java.util.UUID;
  */
 public class ClusterLayoutUpdaterTest extends BaseSolverTest {
   private ClusterLayoutUpdater updater;
-  private String clusterId;
+  private Cluster cluster;
+  private Set<Node> nodes;
 
   @Test
   public void testAddService() throws Exception {
@@ -49,7 +50,7 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
     ClusterLayout expected = new ClusterLayout(reactorTemplate.getConstraints(), expectedCounts);
 
     ClusterLayout layout =
-      updater.addServicesToCluster(clusterId, ImmutableSet.of(resourcemanager.getName())).getCurrentLayout();
+      updater.addServicesToCluster(cluster, nodes, ImmutableSet.of(resourcemanager.getName())).getCurrentLayout();
     Assert.assertEquals(expected, layout);
   }
 
@@ -68,46 +69,47 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
     ClusterLayout expected = new ClusterLayout(reactorTemplate.getConstraints(), expectedCounts);
 
     ClusterLayout layout = updater.addServicesToCluster(
-      clusterId, ImmutableSet.of(resourcemanager.getName(), nodemanager.getName(),
-                                 hbasemaster.getName(), regionserver.getName())).getCurrentLayout();
+      cluster, nodes, ImmutableSet.of(resourcemanager.getName(), nodemanager.getName(),
+                                      hbasemaster.getName(), regionserver.getName())).getCurrentLayout();
     Assert.assertEquals(expected, layout);
   }
 
   @Test
   public void testNoSolutionReturnsNull() throws Exception {
     // zookeeper is forced onto its own node, should not be possible to add it
-    Assert.assertNull(updater.addServicesToCluster(clusterId, ImmutableSet.of(zookeeper.getName())));
+    Assert.assertNull(updater.addServicesToCluster(cluster, nodes, ImmutableSet.of(zookeeper.getName())));
   }
 
   @Test
   public void testNoSolutionWithMixedServicesReturnsNull() throws Exception {
     // it is possible to add resourcemanger and nodemanager, but
     // reactor is forced onto its own node, should not be possible to add it.
-    Assert.assertNull(updater.addServicesToCluster(clusterId, ImmutableSet.of(
+    Assert.assertNull(updater.addServicesToCluster(cluster, nodes, ImmutableSet.of(
       resourcemanager.getName(), nodemanager.getName(), zookeeper.getName())));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDependencyMissingThrowsException() throws Exception {
-    updater.addServicesToCluster(clusterId, ImmutableSet.of(nodemanager.getName()));
+    updater.addServicesToCluster(cluster, nodes, ImmutableSet.of(nodemanager.getName()));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testInvalidServiceThrowsException() throws Exception {
-    updater.addServicesToCluster(clusterId, ImmutableSet.of("fakeservice"));
+    updater.addServicesToCluster(cluster, nodes, ImmutableSet.of("fakeservice"));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testIncompatibleServiceThrowsException() throws Exception {
-    updater.addServicesToCluster(clusterId, ImmutableSet.of(mysql.getName()));
+    updater.addServicesToCluster(cluster, nodes, ImmutableSet.of(mysql.getName()));
   }
 
   @Before
   public void beforeLayoutUpdater() throws Exception {
     updater = injector.getInstance(ClusterLayoutUpdater.class);
 
+    nodes = Sets.newHashSet();
     // 200 node cluster, 1 hadoop master node, 199 hadoop slave nodes
-    clusterId = "123";
+    String clusterId = "123";
     Set<String> nodeIds = Sets.newHashSet();
     // hadoop master node
     Node node = new Node(UUID.randomUUID().toString(), clusterId,
@@ -117,6 +119,7 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
                            Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
     clusterStore.writeNode(node);
     nodeIds.add(node.getId());
+    nodes.add(node);
     // slave nodes
     for (int i = 0; i < 50; i++) {
       node = new Node(UUID.randomUUID().toString(), clusterId, ImmutableSet.of(datanode),
@@ -125,10 +128,10 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
                         Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
       clusterStore.writeNode(node);
       nodeIds.add(node.getId());
+      nodes.add(node);
     }
-    Cluster hadoopCluster = new Cluster(clusterId, "user1", "hadoop", System.currentTimeMillis(), "hadoop cluster",
-                                       Entities.ProviderExample.RACKSPACE, reactorTemplate, nodeIds,
-                                       ImmutableSet.of(namenode.getName(), datanode.getName()));
-    clusterStore.writeCluster(hadoopCluster);
+    cluster = new Cluster(clusterId, "user1", "hadoop", System.currentTimeMillis(), "hadoop cluster",
+                          Entities.ProviderExample.RACKSPACE, reactorTemplate, nodeIds,
+                          ImmutableSet.of(namenode.getName(), datanode.getName()));
   }
 }

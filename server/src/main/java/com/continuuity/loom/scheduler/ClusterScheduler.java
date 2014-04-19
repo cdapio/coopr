@@ -85,9 +85,9 @@ public class ClusterScheduler implements Runnable {
 
         Cluster cluster = clusterStore.getCluster(clusterElement.getId());
         ClusterJob job = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+        ClusterAction clusterAction = ClusterAction.valueOf(clusterElement.getValue());
+        LOG.debug("Got cluster {} with action {}", cluster.getName(), clusterAction);
         try {
-          ClusterAction clusterAction = ClusterAction.valueOf(clusterElement.getValue());
-          LOG.debug("Got cluster {} with action {}", cluster.getName(), clusterAction);
 
           List<ProvisionerAction> actionOrder = actions.getActionOrder().get(clusterAction);
           if (actionOrder == null) {
@@ -141,7 +141,18 @@ public class ClusterScheduler implements Runnable {
 
           // Clear staged tasks, and fail task
           job.clearTasks();
-          taskService.failJobAndTerminateCluster(job, cluster, "Failed to schedule the action");
+          switch (clusterAction) {
+            case CLUSTER_CREATE:
+              taskService.failJobAndTerminateCluster(job, cluster, "Failed to schedule the action");
+              break;
+            default:
+              // failed to plan means the job should fail, but state has already been changed so the cluster
+              // state in the db is inconsistent with reality.
+              // TODO: Should revert it here but need versioning or cluster history or something to that effect.
+              taskService.failJobAndSetClusterStatus(job, cluster, Cluster.Status.INCONSISTENT,
+                                                     "Failed to schedule the " + clusterAction + " operation.");
+              break;
+          }
 
           inputQueue.recordProgress(id, clusterElement.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
                                     "Exception during scheduling");

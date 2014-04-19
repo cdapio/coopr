@@ -29,7 +29,8 @@ public class SolverRequest {
    * Type of solver request.
    */
   public enum Type {
-    CREATE_CLUSTER;
+    CREATE_CLUSTER,
+    ADD_SERVICES;
   }
 
   /**

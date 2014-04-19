@@ -1262,7 +1262,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testServiceActionsOnNonexistantClusterReturn404() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of());
     cluster.setStatus(Cluster.Status.ACTIVE);
     clusterStore.writeCluster(cluster);
@@ -1286,7 +1286,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testServiceActionsOnNonexistantClusterServiceReturn404() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of());
     cluster.setStatus(Cluster.Status.ACTIVE);
     clusterStore.writeCluster(cluster);
@@ -1300,7 +1300,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testServiceActionsCanOnlyRunOnActiveCluster() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
     Set<Cluster.Status> badStatuses = ImmutableSet.of(
       Cluster.Status.INCOMPLETE, Cluster.Status.PENDING, Cluster.Status.TERMINATED, Cluster.Status.INCONSISTENT);
@@ -1318,6 +1318,50 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       for (String resource : resources) {
         assertResponseStatus(doPost(resource, "", USER1_HEADERS), HttpResponseStatus.CONFLICT);
       }
+    }
+  }
+
+  @Test
+  public void testAddInvalidServicesReturns400() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    // can't add nodemanager without resourcemanager
+    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("nodemanager"));
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER1_HEADERS),
+                         HttpResponseStatus.BAD_REQUEST);
+    // can't add nonexistant service
+    body = new AddServicesRequest(ImmutableSet.of("fakeservice"));
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER1_HEADERS),
+                         HttpResponseStatus.BAD_REQUEST);
+  }
+
+  @Test
+  public void testAddServicesOnNonexistantClusterReturns404() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
+    assertResponseStatus(doPost("/v1/loom/clusters/1123/services", GSON.toJson(body), USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER2_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+  }
+
+  @Test
+  public void testAddServicesCanOnlyRunOnActiveCluster() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    Set<Cluster.Status> badStatuses = ImmutableSet.of(
+      Cluster.Status.INCOMPLETE, Cluster.Status.PENDING, Cluster.Status.TERMINATED, Cluster.Status.INCONSISTENT);
+    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
+    for (Cluster.Status status : badStatuses) {
+      cluster.setStatus(status);
+      clusterStore.writeCluster(cluster);
+      assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER1_HEADERS),
+                           HttpResponseStatus.CONFLICT);
     }
   }
 

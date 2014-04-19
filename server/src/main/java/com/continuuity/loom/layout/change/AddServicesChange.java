@@ -76,7 +76,8 @@ public class AddServicesChange implements ClusterLayoutChange {
   }
 
   @Override
-  public void applyChange(Cluster cluster, Set<Node> clusterNodes, Map<String, Service> serviceMap) {
+  public Set<Node> applyChange(Cluster cluster, Set<Node> clusterNodes, Map<String, Service> serviceMap) {
+    Set<Node> changedNodes = Sets.newHashSet();
     Multiset<NodeLayout> countsToAdd = HashMultiset.create(countsPerNodeLayout);
     for (Node node : clusterNodes) {
       NodeLayout nodeLayout = NodeLayout.fromNode(node);
@@ -85,9 +86,11 @@ public class AddServicesChange implements ClusterLayoutChange {
           node.addService(serviceMap.get(service));
         }
         countsToAdd.setCount(nodeLayout, countsToAdd.count(nodeLayout) - 1);
+        changedNodes.add(node);
       }
     }
     cluster.setServices(Sets.union(cluster.getServices(), services));
+    return changedNodes;
   }
 
   @Override

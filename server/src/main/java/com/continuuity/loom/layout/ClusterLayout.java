@@ -20,10 +20,8 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Node;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 

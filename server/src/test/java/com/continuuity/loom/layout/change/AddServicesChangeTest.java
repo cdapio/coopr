@@ -129,9 +129,14 @@ public class AddServicesChangeTest extends BaseSolverTest {
                           ImmutableSet.of(namenode.getName(), datanode.getName()));
     Constraints constraints = cluster.getClusterTemplate().getConstraints();
 
+    // create the change objects
+    Set<Node> affectedNodes = Sets.newHashSet();
     NodeLayout masterNodeLayout = new NodeLayout("large-mem", "centos6", ImmutableSet.of("namenode"));
     NodeLayout expandedMasterNodeLayout =
       new NodeLayout("large-mem", "centos6", ImmutableSet.of(namenode.getName(), resourcemanager.getName()));
+    NodeLayout finalMasterNodeLayout =
+      new NodeLayout("large-mem", "centos6",
+                     ImmutableSet.of(namenode.getName(), resourcemanager.getName(), hbasemaster.getName()));
     NodeLayout slaveLayout = new NodeLayout("medium", "centos6", ImmutableSet.of(datanode.getName()));
     NodeLayout expandedSlaveLayout =
       new NodeLayout("medium", "centos6", ImmutableSet.of(datanode.getName(), nodemanager.getName()));
@@ -141,17 +146,23 @@ public class AddServicesChangeTest extends BaseSolverTest {
     counts = HashMultiset.create();
     counts.add(slaveLayout, 25);
     AddServicesChange nodeManagerChange = new AddServicesChange(counts, nodemanager.getName());
+    counts = HashMultiset.create();
+    counts.add(expandedMasterNodeLayout);
+    AddServicesChange hbaseMasterChange = new AddServicesChange(counts, hbasemaster.getName());
 
+    // expected cluster has the master node expanded with the resourcemanager and 50 slaves nodes same as before
     Cluster expectedCluster = copyOfClusterWith(cluster, ImmutableSet.of(
       namenode.getName(), datanode.getName(), resourcemanager.getName()));
     counts = HashMultiset.create();
     counts.add(expandedMasterNodeLayout);
     counts.add(slaveLayout, 50);
     ClusterLayout expectedLayout = new ClusterLayout(constraints, counts);
-    resourceManagerChange.applyChange(cluster, nodes, serviceMap);
+    affectedNodes.addAll(resourceManagerChange.applyChange(cluster, nodes, serviceMap));
     Assert.assertEquals(expectedCluster, cluster);
     Assert.assertEquals(expectedLayout, ClusterLayout.fromNodes(nodes, constraints));
+    Assert.assertEquals(1, affectedNodes.size());
 
+    // adding nodemanager to 25 slaves nodes
     expectedCluster = copyOfClusterWith(cluster, ImmutableSet.of(
       namenode.getName(), datanode.getName(), resourcemanager.getName(), nodemanager.getName()));
     counts = HashMultiset.create();
@@ -159,17 +170,35 @@ public class AddServicesChangeTest extends BaseSolverTest {
     counts.add(expandedSlaveLayout, 25);
     counts.add(slaveLayout, 25);
     expectedLayout = new ClusterLayout(constraints, counts);
-    nodeManagerChange.applyChange(cluster, nodes, serviceMap);
+    affectedNodes.addAll(nodeManagerChange.applyChange(cluster, nodes, serviceMap));
     Assert.assertEquals(expectedCluster, cluster);
     Assert.assertEquals(expectedLayout, ClusterLayout.fromNodes(nodes, constraints));
+    Assert.assertEquals(26, affectedNodes.size());
 
+    // adding nodemanager to rest of 25 slaves
     counts = HashMultiset.create();
     counts.add(expandedMasterNodeLayout);
     counts.add(expandedSlaveLayout, 50);
     expectedLayout = new ClusterLayout(constraints, counts);
-    nodeManagerChange.applyChange(cluster, nodes, serviceMap);
+    affectedNodes.addAll(nodeManagerChange.applyChange(cluster, nodes, serviceMap));
     Assert.assertEquals(expectedCluster, cluster);
     Assert.assertEquals(expectedLayout, ClusterLayout.fromNodes(nodes, constraints));
+
+    // all nodes should have been affected by now.
+    Assert.assertEquals(nodes, affectedNodes);
+
+    // add hbase-master to master node
+    expectedCluster = copyOfClusterWith(cluster, ImmutableSet.of(
+      namenode.getName(), datanode.getName(), resourcemanager.getName(), nodemanager.getName(), hbasemaster.getName()));
+    counts = HashMultiset.create();
+    counts.add(finalMasterNodeLayout);
+    counts.add(expandedSlaveLayout, 50);
+    expectedLayout = new ClusterLayout(constraints, counts);
+    affectedNodes.addAll(hbaseMasterChange.applyChange(cluster, nodes, serviceMap));
+    Assert.assertEquals(expectedCluster, cluster);
+    Assert.assertEquals(expectedLayout, ClusterLayout.fromNodes(nodes, constraints));
+    // all nodes are affected, shouldn't be more.
+    Assert.assertEquals(nodes, affectedNodes);
   }
 
   private Cluster copyOfClusterWith(Cluster cluster, Set<String> services) {

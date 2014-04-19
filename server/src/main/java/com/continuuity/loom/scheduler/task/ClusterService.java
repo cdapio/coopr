@@ -17,15 +17,20 @@ package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.http.AddServicesRequest;
+import com.continuuity.loom.layout.ClusterLayoutUpdater;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
+import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -42,19 +47,25 @@ import java.util.Set;
  */
 public class ClusterService {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterService.class);
+  private static final Gson GSON = new JsonSerde().getGson();
 
   private final ClusterStore store;
   private final TrackingQueue clusterQueue;
+  private final TrackingQueue solverQueue;
   private final ZKClient zkClient;
   private final LoomStats loomStats;
+  private final ClusterLayoutUpdater clusterLayoutUpdater;
 
   @Inject
-  public ClusterService(ClusterStore store, @Named("cluster.queue") TrackingQueue clusterQueue, ZKClient zkClient,
-                        LoomStats loomStats) {
+  public ClusterService(ClusterStore store, @Named("cluster.queue") TrackingQueue clusterQueue,
+                        @Named("solver.queue") TrackingQueue solverQueue, ZKClient zkClient,
+                        LoomStats loomStats, ClusterLayoutUpdater clusterLayoutUpdater) {
     this.store = store;
     this.clusterQueue = clusterQueue;
+    this.solverQueue = solverQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.loomStats = loomStats;
+    this.clusterLayoutUpdater = clusterLayoutUpdater;
   }
 
   /**
@@ -145,6 +156,38 @@ public class ClusterService {
 
       loomStats.getClusterStats().incrementStat(action);
       clusterQueue.add(new Element(clusterId, action.name()));
+    } finally {
+      lock.release();
+    }
+  }
+
+  public void requestAddServices(String clusterId, String userId, AddServicesRequest addRequest)
+    throws Exception {
+    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    lock.acquire();
+    try {
+      Cluster cluster = getUserCluster(clusterId, userId);
+      if (cluster == null) {
+        throw new MissingClusterException("cluster " + clusterId + " owned by user " + userId + " does not exist");
+      }
+      if (cluster.getStatus() != Cluster.Status.ACTIVE) {
+        throw new IllegalStateException(
+          "cluster " + clusterId + " is not in a state where services can be added to it.");
+      }
+      JobId jobId = store.getNewJobId(clusterId);
+      clusterLayoutUpdater.validateServicesToAdd(cluster, addRequest.getServices());
+
+      ClusterAction action = ClusterAction.ADD_SERVICES;
+      ClusterJob job = new ClusterJob(jobId, action, addRequest.getServices(), null);
+      job.setJobStatus(ClusterJob.Status.RUNNING);
+      cluster.setLatestJobId(job.getJobId());
+      cluster.setStatus(Cluster.Status.PENDING);
+      store.writeCluster(cluster);
+      store.writeClusterJob(job);
+
+      loomStats.getClusterStats().incrementStat(action);
+      SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, GSON.toJson(addRequest));
+      solverQueue.add(new Element(clusterId, GSON.toJson(solverRequest)));
     } finally {
       lock.release();
     }

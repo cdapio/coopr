@@ -120,6 +120,28 @@ public class TaskService {
   }
 
   /**
+   * Sets the status of the given job to {@link ClusterJob.Status#FAILED} and the status of the cluster to some given
+   * status.
+   *
+   * @param job Job to fail.
+   * @param cluster Cluster to set the status for.
+   * @param status Status to set the cluster to.
+   * @param message Error message.
+   * @throws Exception
+   */
+  public void failJobAndSetClusterStatus(ClusterJob job, Cluster cluster, Cluster.Status status, String message)
+    throws Exception {
+    loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
+
+    cluster.setStatus(status);
+    clusterStore.writeCluster(cluster);
+
+    job.setJobStatus(ClusterJob.Status.FAILED);
+    job.setStatusMessage(message);
+    clusterStore.writeClusterJob(job);
+  }
+
+  /**
    * Sets the status of the given job to {@link ClusterJob.Status#FAILED} and the status of the given cluster to
    * {@link com.continuuity.loom.cluster.Cluster.Status#TERMINATED}.
    *
@@ -129,14 +151,7 @@ public class TaskService {
    * @throws Exception
    */
   public void failJobAndTerminateCluster(ClusterJob job, Cluster cluster, String message) throws Exception {
-    loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
-
-    cluster.setStatus(Cluster.Status.TERMINATED);
-    clusterStore.writeCluster(cluster);
-
-    job.setJobStatus(ClusterJob.Status.FAILED);
-    job.setStatusMessage(message);
-    clusterStore.writeClusterJob(job);
+    failJobAndSetClusterStatus(job, cluster, Cluster.Status.TERMINATED, message);
   }
 
   /**
