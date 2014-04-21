@@ -1,13 +1,13 @@
 <div id="panels">
-  <div class="panel" style="clear: both;">
-    <div class="panel-head">
-      <div class="panel-title">
-        <h3>Live clusters ({{ activeClusters }})</h3>
+  <div class="panel spl-panel" style="clear: both;">
+    <div class="panel-head spl-panel-head">
+      <div class="panel-title spl-panel-title">
+        <h4>Live clusters ({{ activeClusters }})</h4>
       </div>
     </div>
-    <div class="panel-body" id="active-clusters">
+    <div class="panel-body spl-panel-body" id="active-clusters">
       {% if clusters and clusters.length %}
-        <table class="table table-striped tablesorter">
+        <table class="table table-striped tablesorter spl-panel-table">
           <thead>
             <tr>
               <th>Name</th>
@@ -57,14 +57,14 @@
     </div>
   </div>
   {% if deletedClusters %}
-  <div class="panel" style="clear: both;">
-    <div class="panel-head">
+  <div class="panel spl-panel" style="clear: both;">
+    <div class="panel-head spl-panel-head">
       <div class="panel-title delete-cluster-header">
-        <h3><span class="caret dark large left-float toggle-delete-cluster"></span>Inactive clusters ({{ deletedClusters }})</h3>
+        <h4><span class="caret large left-float toggle-delete-cluster"></span>Inactive clusters ({{ deletedClusters }})</h4>
       </div>
     </div>
-    <div class="panel-body" id="deleted-clusters">
-        <table class="table table-striped tablesorter">
+    <div class="panel-body spl-panel-body" id="deleted-clusters">
+        <table class="table table-striped tablesorter spl-panel-table">
           <thead>
             <tr>
               <th>Name</th>

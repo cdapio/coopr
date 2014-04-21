@@ -72,8 +72,10 @@
 
                 <ul class="nav navbar-nav navbar-right">
                   <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
-                    <ul class="dropdown-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                      <img src="/static/img/v2-assets/icon_more.png" />
+                    </a>
+                    <ul class="dropdown-menu login-dropdown">
                       {% include "partials/menu-login-item.html" %}
                     </ul>
                   </li>
@@ -157,7 +159,7 @@
             </div>
             <div class="panel spl-panel" style="clear: both;">
               <div class="panel-head spl-panel-head">
-                <div class="panel-title spl-panel-title"><a href="/clustertemplates">Catalog</a></div>
+                <div class="panel-title spl-panel-title"><a href="/clustertemplates"><h3>Catalog</h3></a></div>
               </div>
               <div class="panel-body spl-panel-body">
                 {% if clustertemplates and clustertemplates.length %}
@@ -187,6 +189,11 @@
         </div>
       <script data-main="/static/js/admin-index" src="/static/third_party/require.js"></script>
       {% endblock %}
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
         <div id="footer" style="clear: both;"><span id="copyright">COPYRIGHT © 2014 CONTINUUITY INC. ALL RIGHTS RESERVED.</span><br>
 
           <a href="http://www.continuuity.com/terms-and-privacy" id="footer-terms" target="blank">Terms and Privacy</a>
@@ -197,6 +204,8 @@
           </div>
         {% endblock %}
         </div>
+        <br/>
+        <br/>
     {% block bodyscript %}
     {% endblock %}
     </body>
