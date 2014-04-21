@@ -996,7 +996,7 @@ site.app.get('/services/service/:id', function (req, res) {
 });
 
 site.app.get('/admin/clusters', function (req, res) {
-  var user = site.checkAuth(req, res);
+  var user = site.checkAuth(req, res, true);
   async.parallel([
     site.getEntity('/clusters', user),
   ], function (err, results) {
