@@ -103,6 +103,13 @@ site.HOME_MAX_ITEMS = 5;
 site.app = express();
 
 /**
+ * Temporary skins related data. Each server instance maintains a record of users
+ * and their selected skins.
+ */
+
+site.skins = {};
+
+/**
  * Configure static files server.
  */
 site.app.use(express.cookieParser());
@@ -159,7 +166,8 @@ site.app.use(function(err, req, res, next) {
   if (req.accepts('html')) {
     res.render('500.html', {
       url: req.url,
-      env: env
+      env: env,
+      skin: site.getSkin()
     });
     return;
   }
@@ -326,6 +334,19 @@ site.parseClusterData = function (clusters) {
 };
 
 /**
+ * Get skin by username.
+ * @param  {String} username.
+ * @return {String} skin name.
+ */
+site.getSkin = function (username) {
+  var selectedSkin = 'dark';
+  if (username && username in site.skins) {
+    selectedSkin = site.skins[username];
+  }
+  return selectedSkin;
+};
+
+/**
  * Pipes all frontend calls through to the loom server and returns responses. Expects path to come
  * in the form of query string after /v1/loom ex:
  * /v1/loom/providers => /pipeApiCall?path=/providers
@@ -352,7 +373,8 @@ site.app.post('/import', function (req, res) {
       ], function (err, results) {
         var context = {
           authenticated: user,
-          env: env
+          env: env,
+          skin: site.getSkin(user)
         };
         if (err) {
           context.err = err;
@@ -439,7 +461,8 @@ site.app.get('/', function (req, res) {
   ], function (err, results) {
     var context = {
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -464,6 +487,24 @@ site.app.get('/', function (req, res) {
     }
     res.render('index.html', context);
   });
+});
+
+site.app.get('/profile', function (req, res) {
+  var user = site.checkAuth(req, res, false);
+  var context = {
+    authenticated: user,
+    env: env,
+    skin: site.getSkin(user)
+  };
+  res.render('profile.html', context);
+});
+
+site.app.post('/setskin', function (req, res) {
+  var user = site.checkAuth(req, res, false);
+  if ('skin' in req.body) {
+    site.skins[user] = req.body.skin;
+  }
+  res.redirect('/profile');
 });
 
 site.app.get('/clustertemplates', function (req, res) {
@@ -497,7 +538,8 @@ site.app.get('/clustertemplates/create', function (req, res) {
     var context = {
       activeTab: 'clustertemplates',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -555,7 +597,8 @@ site.app.get('/clustertemplates/clustertemplate/:id', function (req, res) {
     var context = {
       activeTab: 'clustertemplates',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -579,7 +622,8 @@ site.app.get('/hardwaretypes', function (req, res) {
     var context = {
       activeTab: 'hardwaretypes',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -599,7 +643,8 @@ site.app.get('/hardwaretypes/create', function (req, res) {
     var context = {
       activeTab: 'hardwaretypes',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -652,7 +697,8 @@ site.app.get('/hardwaretypes/hardwaretype/:id', function (req, res) {
     var context = {
       activeTab: 'hardwaretypes',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -673,7 +719,8 @@ site.app.get('/imagetypes', function (req, res) {
     var context = {
       activeTab: 'imagetypes',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -693,7 +740,8 @@ site.app.get('/imagetypes/create', function (req, res) {
     var context = {
       activeTab: 'imagetypes',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -746,7 +794,8 @@ site.app.get('/imagetypes/imagetype/:id', function (req, res) {
     var context = {
       activeTab: 'imagetypes',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -767,7 +816,8 @@ site.app.get('/providers', function (req, res) {
     var context = {
       activeTab: 'providers',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -790,7 +840,8 @@ site.app.get('/providers/create', function (req, res) {
     var context = {
       activeTab: 'providers',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -842,7 +893,8 @@ site.app.get('/providers/provider/:id', function (req, res) {
     var context = {
       activeTab: 'providers',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -862,7 +914,8 @@ site.app.get('/services', function (req, res) {
     var context = {
       activeTab: 'services',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -881,7 +934,8 @@ site.app.get('/services/create', function (req, res) {
     var context = {
       activeTab: 'services',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -934,7 +988,8 @@ site.app.get('/services/service/:id', function (req, res) {
       service: results[1],
       activeTab: 'services',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     });
   });
 });
@@ -947,7 +1002,8 @@ site.app.get('/admin/clusters', function (req, res) {
     var context = {
       activeTab: 'clusters',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -973,7 +1029,8 @@ site.app.get('/user/clusters', function (req, res) {
     var context = {
       activeTab: 'clusters',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -996,7 +1053,8 @@ site.app.get('/user/clusters/cluster/:id', function (req, res) {
     var context = {
       activeTab: 'clusters',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -1018,7 +1076,8 @@ site.app.get('/user/clusters/cluster/:id/reconfigure', function (req, res) {
     var context = {
       activeTab: 'clusters',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -1070,7 +1129,8 @@ site.app.get('/user/clusters/create', function (req, res) {
     var context = {
       activeTab: 'clusters',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)
     };
     if (err) {
       context.err = err;
@@ -1138,8 +1198,9 @@ site.app.get('/login', function (req, res) {
   res.clearCookie('continuuity-loom-session');
   var authenticated = false;
   res.render('login.html', {
-      authenticated: authenticated,
-      env: env
+    authenticated: authenticated,
+    env: env,
+    skin: site.getSkin()
   });
 });
 
@@ -1174,7 +1235,8 @@ site.app.get('/status', function (req, res) {
 site.app.get('/error', function (req, res) {
   res.render('404.html', {
     url: req.url,
-    env: env
+    env: env,
+    skin: site.getSkin()
   });
   return;
 });
@@ -1192,7 +1254,8 @@ site.app.get('/*', function(req, res) {
   if (req.accepts('html')) {
     res.render('404.html', {
       url: req.url,
-      env: env
+      env: env,
+      skin: site.getSkin()
     });
     return;
   }
@@ -1210,7 +1273,8 @@ site.app.use(function (req, res, next) {
   if (req.accepts('html')) {
     res.render('404.html', {
       url: req.url,
-      env: env
+      env: env,
+      skin: site.getSkin()
     });
     return;
   }

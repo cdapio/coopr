@@ -24,7 +24,10 @@
               {% if authenticated === 'admin' %}
               {% include "partials/left-menu.html" %}
               {% else %}
-                <li  class="overview {% if activeTab == 'clusters' %}active{% endif %}"><a class="nav-link nav-clusters" id="nav-clusters" href="/user/clusters">Clusters</a></li>
+              <li id="nav-clusters-container" class="{% if activeTab == 'clusters' %}active{% endif %} nav-item last">
+                <a class="nav-icon nav-clusters" href="/user/clusters"></a>
+                <a class="nav-link" id="nav-clusters" href="/user/clusters">Clusters</a>
+              </li>
               {% endif %}
             </ul>
 
