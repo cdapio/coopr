@@ -515,7 +515,8 @@ site.app.get('/clustertemplates', function (req, res) {
     var context = {
       activeTab: 'clustertemplates',
       authenticated: user,
-      env: env
+      env: env,
+      skin: site.getSkin(user)  
     };
     if (err) {
       context.err = err;
