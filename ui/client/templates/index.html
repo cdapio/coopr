@@ -24,12 +24,12 @@
 
         <link rel="stylesheet" href="/static/css/normalize.css">
         <link rel="stylesheet" href="/static/css/main.css">
-        <link rel="stylesheet" type="text/css" href="/static/css/custom_tablesorter.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/{{skin}}/custom_tablesorter.css">
         <link rel="stylesheet" href="/static/third_party/bootstrap_3/css/bootstrap.min.css">
         {% if env == 'production' %}
-            <link rel="stylesheet" type="text/css" href="/static/css/custom.css">
+            <link rel="stylesheet" type="text/css" href="/static/css/{{skin}}/custom.css">
         {% else %}
-            <link rel="stylesheet/less" type="text/css" href="/static/css/custom.less">
+            <link rel="stylesheet/less" type="text/css" href="/static/css/{{skin}}/custom.less">
         {% endif %}
         <link rel="shortcut icon" href="/static/favicon.ico">
         <link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,500,700,900' rel='stylesheet' type='text/css'>
@@ -51,9 +51,37 @@
     {% block body %}
       {% block nav %}
         <div id="nav">
-          <a href="/" id="logo"></a>
-          <a href="/" id="product-name">Enterprise Loom | Admin</a>
-          {% include "partials/left-menu.html" %}
+          <div class="navbar transparent navbar-transparent" role="navigation">
+            <div class="">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <div class="navbar-brand" href="#">
+                  <a href="/" id="logo"></a>
+                </div>
+              </div>
+              <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                  {% include "partials/left-menu.html" %}
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                      <img src="/static/img/v2-assets/icon_more.png" />
+                    </a>
+                    <ul class="dropdown-menu login-dropdown">
+                      {% include "partials/menu-login-item.html" %}
+                    </ul>
+                  </li>
+                </ul>
+              </div><!--/.nav-collapse -->
+            </div>
+          </div>
         </div>
       {% endblock %}
       <div id="content">
@@ -61,17 +89,9 @@
           <div id="notification">{{ err }}</div>
         </div>
       {% block content %}
-        <div id="header">
-          <div id="global">
-            <ul>
-              {% include "partials/menu-login-item.html" %}
-            </ul>
-          </div>
-        </div>
         <div id="content-body">
           <div id="title clearfix">
             <div>
-              <div class="pull-left" style="margin-top: 2px;position: relative; width: 150px;text-align: center;"><h1>Overview</h1></div>
               <div class="pull-right" style="margin-right: 24px">
                 <form class="inline-display" id="import-config-form" enctype='multipart/form-data' method="POST" action="/import">
                   <input id="import-file" type="file" name="import-file"/>
@@ -87,8 +107,8 @@
 
           <div id="panels">
             <div class="row">
-              <div class="col-sm-3">
-                <div class="panel">
+              <div class="col-sm-offset-2 col-sm-2">
+                <div class="panel frontpage-ticker">
                   <div class="panel-head">
                     <div class="panel-title">
                       <h4 class="center-align">Live Clusters</h4>
@@ -99,8 +119,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-3">
-                <div class="panel">
+              <div class="col-sm-2">
+                <div class="panel frontpage-ticker">
                   <div class="panel-head">
                     <div class="panel-title">
                       <h4 class="center-align">Pending Clusters</h4>
@@ -111,8 +131,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-3">
-                <div class="panel">
+              <div class="col-sm-2">
+                <div class="panel frontpage-ticker">
                   <div class="panel-head">
                     <div class="panel-title">
                       <h4 class="center-align">Live Nodes</h4>
@@ -123,8 +143,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-3">
-                <div class="panel">
+              <div class="col-sm-2">
+                <div class="panel frontpage-ticker">
                   <div class="panel-head">
                     <div class="panel-title">
                       <h4 class="center-align">All Nodes</h4>
@@ -136,13 +156,13 @@
                 </div>
               </div>
             </div>
-            <div class="panel" style="clear: both;">
-              <div class="panel-head">
-                <div class="panel-title"><a href="/clustertemplates">Catalog</a></div>
+            <div class="panel spl-panel" style="clear: both;">
+              <div class="panel-head spl-panel-head">
+                <div class="panel-title spl-panel-title"><a href="/clustertemplates"><h3>Catalog</h3></a></div>
               </div>
-              <div class="panel-body">
+              <div class="panel-body spl-panel-body">
                 {% if clustertemplates and clustertemplates.length %}
-                  <table class="table table-striped table-main clustertemplates-table tablesorter">
+                  <table class="table table-striped table-main clustertemplates-table tablesorter spl-panel-table">
                     <thead>
                       <tr>
                         <th>Name</th>
@@ -168,6 +188,11 @@
         </div>
       <script data-main="/static/js/admin-index" src="/static/third_party/require.js"></script>
       {% endblock %}
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
         <div id="footer" style="clear: both;"><span id="copyright">COPYRIGHT © 2014 CONTINUUITY INC. ALL RIGHTS RESERVED.</span><br>
 
           <a href="http://www.continuuity.com/terms-and-privacy" id="footer-terms" target="blank">Terms and Privacy</a>
@@ -178,6 +203,8 @@
           </div>
         {% endblock %}
         </div>
+        <br/>
+        <br/>
     {% block bodyscript %}
     {% endblock %}
     </body>

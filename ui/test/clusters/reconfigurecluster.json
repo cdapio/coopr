@@ -1,0 +1,26 @@
+{
+    "restart": true,
+    "config": {
+      "hadoop": {
+        "core_site": {
+          "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%"
+        },
+        "hdfs_site": {
+          "dfs.datanode.max.xcievers": "2048"
+        },
+        "mapred_site": {
+          "mapreduce.framework.name": "yarn"
+        },
+        "yarn_site": {
+          "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%"
+        }
+      },
+      "hbase": {
+        "hbase_site": {
+          "hbase.rootdir": "hdfs://%host.service.hadoop-hdfs-namenode%/hbase",
+          "hbase.cluster.distributed": "true",
+          "hbase.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
+        }
+      }
+    }
+}

@@ -7,35 +7,33 @@
 {% endblock %}
 
 {% block content %}
-    <div id="header">
-      <div id="global">
-        {% include "hardwaretypes/topmenu.html" %}
-      </div>
-    </div>
     <div id="content-body">
       <div id="title">
-        <div><div class="pull-right" style="margin-top: 2px;position: relative; width: 150px;text-align: center;">
-      </div></div>
-        <h1>Hardware types</h1>
+        <div class="pull-right">
+          <div id="global">
+            {% include "hardwaretypes/topmenu.html" %}
+          </div>
+        </div>
+        <div style="clear: both"></div>
       </div>
 
       <div id="panels">
 
-        <div class="panel" style="clear: both;">
-          <div class="panel-head clearfix">
-            <div class="panel-title"><h3 class="pull-left">{% if hardwaretype %} Edit hardware type: {{hardwaretype.name}} {% else %}Create a hardware type{% endif %}</h3>
+        <div class="panel spl-panel" style="clear: both;">
+          <div class="panel-head spl-panel-head clearfix">
+            <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if hardwaretype %} Edit hardware type: {{hardwaretype.name}} {% else %}Create a hardware type{% endif %}</h4>
             <div class="pull-right">
               {% if hardwaretype %}
               <form role="form" method="POST" action="/hardwaretypes/delete/{{hardwaretype.name}}" class="hardwaretype-delete-form">
                 <input type="hidden" value="{{entry.name}}" name="name" />
-                <button type="submit" class="btn-spl btn-danger">Delete</button>
+                <button type="submit" class="btn-spl btn-delete"></button>
               </form>
               {% endif %}
             </div>
             </div>
           </div>
 
-          <div class="panel-body">
+          <div class="panel-body spl-panel-body">
             <form class="form-horizontal" role="form" id="create-hardwaretype-form" action="{% if hardwaretype %}/hardwaretypes/update{% else %}/hardwaretypes/create{% endif %}">
               <div class="form-group">
                 <label for="inputName" class="col-sm-2 control-label">Name</label>
