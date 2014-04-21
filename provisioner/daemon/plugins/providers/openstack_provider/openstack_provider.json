@@ -1,11 +1,9 @@
 {
-  "openstack": {
-    "classname": "OpenstackProvider"
-  },
   "name": "openstack",
-  "type": "provider",
-  "classname": "OpenstackProvider",
-  "parameters": {
+  "description": "Openstack cloud provider",
+  "providertypes": [ "openstack" ],
+  "openstack": {
+    "classname": "OpenstackProvider",
     "admin": {
       "fields": {
         "openstack_username": {

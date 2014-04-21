@@ -1,11 +1,9 @@
 {
-  "joyent": {
-    "classname": "JoyentProvider"
-  },
   "name": "joyent",
-  "type": "provider",
-  "classname": "JoyentProvider",
-  "parameters": {
+  "description": "Joyent Public Cloud provider",
+  "providertypes": [ "joyent" ],
+  "joyent": {
+    "classname": "JoyentProvider",
     "admin": {
       "fields": {
         "joyent_username": {

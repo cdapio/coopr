@@ -1,11 +1,9 @@
 {
+  "name": "rackspace",
+  "description": "Rackspace Public Cloud provider",
+  "providertypes": [ "rackspace" ],
   "rackspace": {
     "classname": "RackspaceProvider"
-  },
-  "name": "rackspace",
-  "type": "provider",
-  "classname": "RackspaceProvider",
-  "parameters": {
     "admin": {
       "fields": {
         "rackspace_username": {
