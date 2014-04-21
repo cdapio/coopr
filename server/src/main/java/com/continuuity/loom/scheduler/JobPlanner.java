@@ -96,7 +96,6 @@ public class JobPlanner {
     long start = System.currentTimeMillis();
     TaskDag taskDag = new TaskDag();
     List<ProvisionerAction> actionOrder = actions.getActionOrder().get(clusterAction);
-    Set<Actions.Dependency> actionDependencies = actions.getActionDependencies();
 
     for (Node node : nodeMap.values()) {
       if (!shouldPlanNode(node)) {
@@ -107,11 +106,7 @@ public class JobPlanner {
           continue;
         }
 
-        addActionOrderDependencies(taskDag, actionOrder, service, node);
-
-        /*if (actionDependencies != null) {
-          addServiceActionDependencies(taskDag, actionDependencies, service, node);
-        }*/
+        addDependencies(taskDag, actionOrder, service, node);
       }
     }
     long dur = System.currentTimeMillis() - start;
@@ -119,9 +114,7 @@ public class JobPlanner {
     return taskDag;
   }
 
-  private void addActionOrderDependencies(TaskDag taskDag, List<ProvisionerAction> actionOrder,
-                                          Service service, Node node) {
-
+  private void addDependencies(TaskDag taskDag, List<ProvisionerAction> actionOrder, Service service, Node node) {
     // Add tasks for this service in the order they need to be run.
     String prevTask = null;
     String prevService = null;
@@ -142,7 +135,6 @@ public class JobPlanner {
         prevService = effectiveService;
       }
 
-
       for (ActionOnService dependentServiceAction :
         dependencyResolver.getDirectDependentActions(service.getName(), task)) {
 
@@ -153,25 +145,6 @@ public class JobPlanner {
         for (Node fromNode : serviceNodeMap.get(dependentServiceName)) {
           taskDag.addDependency(new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName),
                                 new TaskNode(node.getId(), task.name(), service.getName()));
-        }
-      }
-    }
-  }
-
-  private void addServiceActionDependencies(TaskDag taskDag, Set<Actions.Dependency> actionDependencies,
-                                            Service service, Node node) {
-
-    for (Actions.Dependency actionDependency : actionDependencies) {
-      for (ActionOnService dependentServiceAction :
-        dependencyResolver.getDirectDependentActions(service.getName(), actionDependency.getTo())) {
-
-        String dependentServiceName = dependentServiceAction.getService();
-        ProvisionerAction dependentAction = dependentServiceAction.getAction();
-        // each node that the dependent service exist on must perform the from action before we perform the
-        // to action for the service on this node.
-        for (Node fromNode : serviceNodeMap.get(dependentServiceName)) {
-          taskDag.addDependency(new TaskNode(fromNode.getId(), dependentAction.name(), dependentServiceName),
-                                new TaskNode(node.getId(), actionDependency.getTo().name(), service.getName()));
         }
       }
     }
