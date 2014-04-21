@@ -22,6 +22,8 @@ import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.layout.change.ClusterLayoutChange;
+import com.continuuity.loom.layout.change.ClusterLayoutTracker;
 import com.continuuity.loom.scheduler.task.NodeService;
 import com.continuuity.loom.store.EntityStore;
 import com.google.common.base.Joiner;
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
@@ -48,15 +51,42 @@ import java.util.UUID;
 public class Solver {
   private static final Logger LOG  = LoggerFactory.getLogger(Solver.class);
   private final EntityStore entityStore;
+  private final ClusterLayoutUpdater updater;
 
   @Inject
-  Solver(EntityStore entityStore) {
+  Solver(EntityStore entityStore, ClusterLayoutUpdater updater) {
     this.entityStore = entityStore;
+    this.updater = updater;
   }
 
   /**
-   * Given a {@link Cluster} and {@link ClusterRequest}, return a mapping of node id to {@link Node} describing how the
-   * cluster should be laid out. If multiple possible cluster layouts are possible, one will be chosen
+   * Add services to a cluster, returning which nodes were affected by the change or null if there was no way to
+   * add the services to the cluster.
+   *
+   * @param cluster Cluster to add the services to.
+   * @param clusterNodes Nodes in the cluster.
+   * @param servicesToAdd Services to add to the cluster.
+   * @return Nodes that need to have services added to them.
+   * @throws Exception
+   */
+  public Set<Node> addServicesToCluster(Cluster cluster, Set<Node> clusterNodes,
+                                        Set<String> servicesToAdd) throws Exception {
+    ClusterLayoutTracker tracker = updater.addServicesToCluster(cluster, clusterNodes, servicesToAdd);
+    if (tracker == null) {
+      return null;
+    }
+
+    Set<Node> changedNodes = Sets.newHashSet();
+    Map<String, Service> serviceMap = getServiceMap(Sets.union(cluster.getServices(), servicesToAdd));
+    for (ClusterLayoutChange change : tracker.getChanges()) {
+      changedNodes.addAll(change.applyChange(cluster, clusterNodes, serviceMap));
+    }
+    return changedNodes;
+  }
+
+  /**
+   * Given a {@link Cluster} and {@link ClusterCreateRequest}, return a mapping of node id to {@link Node} describing
+   * how the cluster should be laid out. If multiple possible cluster layouts are possible, one will be chosen
    * deterministically.
    *
    * @param cluster Cluster to solve a layout for.
@@ -64,7 +94,7 @@ public class Solver {
    * @return Mapping of node id to node for all nodes in the cluster.
    * @throws Exception
    */
-  public Map<String, Node> solveClusterNodes(Cluster cluster, ClusterRequest request) throws Exception {
+  public Map<String, Node> solveClusterNodes(Cluster cluster, ClusterCreateRequest request) throws Exception {
     // make sure the template exists
     String clusterTemplateName = request.getClusterTemplate();
     ClusterTemplate template = entityStore.getClusterTemplate(clusterTemplateName);
@@ -309,10 +339,11 @@ public class Solver {
         String hardwaretype = nodeLayout.getHardwareTypeName();
         String imagetype = nodeLayout.getImageTypeName();
         Map<String, String> nodeProperties = Maps.newHashMap();
-        nodeProperties.put("hardwaretype", hardwaretype);
-        nodeProperties.put("imagetype", imagetype);
-        nodeProperties.put("flavor", hardwareTypeMap.get(hardwaretype));
-        nodeProperties.put("image", imageTypeMap.get(imagetype));
+        // TODO: these should be proper fields and logic for populating node properties should not be in the solver.
+        nodeProperties.put(Node.Properties.HARDWARETYPE.name().toLowerCase(), hardwaretype);
+        nodeProperties.put(Node.Properties.IMAGETYPE.name().toLowerCase(), imagetype);
+        nodeProperties.put(Node.Properties.FLAVOR.name().toLowerCase(), hardwareTypeMap.get(hardwaretype));
+        nodeProperties.put(Node.Properties.IMAGE.name().toLowerCase(), imageTypeMap.get(imagetype));
         // used for macro expansion and when expanding service numbers.  For every new node added to the cluster,
         // the nodenum should be greater than any other nodenum in the cluster.
         nodeProperties.put(Node.Properties.NODENUM.name().toLowerCase(), String.valueOf(nodeNum));

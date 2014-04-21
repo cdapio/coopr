@@ -130,7 +130,11 @@ public class SQLClusterStore extends BaseClusterStore {
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("SELECT cluster FROM clusters ORDER BY create_time DESC");
-      return getQueryList(statement, Cluster.class);
+      try {
+        return getQueryList(statement, Cluster.class);
+      } finally {
+        statement.close();
+      }
     } finally {
       conn.close();
     }
@@ -143,7 +147,11 @@ public class SQLClusterStore extends BaseClusterStore {
       PreparedStatement statement =
         conn.prepareStatement("SELECT cluster FROM clusters WHERE owner_id=? ORDER BY create_time DESC");
       statement.setString(1, ownerId);
-      return getQueryList(statement, Cluster.class);
+      try {
+        return getQueryList(statement, Cluster.class);
+      } finally {
+        statement.close();
+      }
     } finally {
       conn.close();
     }
@@ -151,12 +159,16 @@ public class SQLClusterStore extends BaseClusterStore {
 
   @Override
   public Cluster getCluster(String clusterId) throws Exception {
-    long clusterNum = Long.valueOf(clusterId);
+    long clusterNum = Long.parseLong(clusterId);
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("SELECT cluster FROM clusters WHERE id=? ");
       statement.setLong(1, clusterNum);
-      return getQueryItem(statement, Cluster.class);
+      try {
+        return getQueryItem(statement, Cluster.class);
+      } finally {
+        statement.close();
+      }
     } finally {
       conn.close();
     }
@@ -164,13 +176,52 @@ public class SQLClusterStore extends BaseClusterStore {
 
   @Override
   public Cluster getCluster(String clusterId, String ownerId) throws Exception {
-    long clusterNum = Long.valueOf(clusterId);
+    long clusterNum = Long.parseLong(clusterId);
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("SELECT cluster FROM clusters WHERE id=? AND owner_id=?");
       statement.setLong(1, clusterNum);
       statement.setString(2, ownerId);
-      return getQueryItem(statement, Cluster.class);
+      try {
+        return getQueryItem(statement, Cluster.class);
+      } finally {
+        statement.close();
+      }
+    } finally {
+      conn.close();
+    }
+  }
+
+  @Override
+  public boolean clusterExists(String clusterId) throws Exception {
+    long clusterNum = Long.parseLong(clusterId);
+    Connection conn = dbConnectionPool.getConnection();
+    try {
+      PreparedStatement statement = conn.prepareStatement("SELECT id FROM clusters WHERE id=?");
+      statement.setLong(1, clusterNum);
+      try {
+        return hasResults(statement);
+      } finally {
+        statement.close();
+      }
+    } finally {
+      conn.close();
+    }
+  }
+
+  @Override
+  public boolean clusterExists(String clusterId, String userId) throws Exception {
+    long clusterNum = Long.parseLong(clusterId);
+    Connection conn = dbConnectionPool.getConnection();
+    try {
+      PreparedStatement statement = conn.prepareStatement("SELECT id FROM clusters WHERE id=? AND owner_id=?");
+      statement.setLong(1, clusterNum);
+      statement.setString(2, userId);
+      try {
+        return hasResults(statement);
+      } finally {
+        statement.close();
+      }
     } finally {
       conn.close();
     }
@@ -180,7 +231,7 @@ public class SQLClusterStore extends BaseClusterStore {
   public void writeCluster(Cluster cluster) throws Exception {
     // sticking with standard sql... this could be done in one step with replace, or with
     // insert ... on duplicate key update with mysql.
-    long clusterNum = Long.valueOf(cluster.getId());
+    long clusterNum = Long.parseLong(cluster.getId());
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement checkStatement = conn.prepareStatement("SELECT id FROM clusters WHERE id=?");
@@ -230,7 +281,7 @@ public class SQLClusterStore extends BaseClusterStore {
 
   @Override
   public void deleteCluster(String clusterId) throws Exception {
-    long clusterNum = Long.valueOf(clusterId);
+    long clusterNum = Long.parseLong(clusterId);
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("DELETE FROM clusters WHERE id=? ");
@@ -252,8 +303,12 @@ public class SQLClusterStore extends BaseClusterStore {
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT job FROM jobs WHERE job_num=? AND cluster_id=?");
         statement.setLong(1, jobId.getJobNum());
-        statement.setLong(2, Long.valueOf(jobId.getClusterId()));
-        return getQueryItem(statement, ClusterJob.class);
+        statement.setLong(2, Long.parseLong(jobId.getClusterId()));
+        try {
+          return getQueryItem(statement, ClusterJob.class);
+        } finally {
+          statement.close();
+        }
       } finally {
         conn.close();
       }
@@ -264,7 +319,7 @@ public class SQLClusterStore extends BaseClusterStore {
   }
 
   @Override
-  public Map<JobId, ClusterJob> getClusterJobs(Set<JobId> jobIds) throws TaskException {
+  public Map<JobId, ClusterJob> getClusterJobs(Set <JobId> jobIds) throws TaskException {
 
     Map<JobId, ClusterJob> jobMap = Maps.newHashMap();
 
@@ -274,7 +329,7 @@ public class SQLClusterStore extends BaseClusterStore {
 
     Map<Long, JobId> clusterIdToJobId = Maps.newHashMap();
     for (JobId jobId : jobIds) {
-      clusterIdToJobId.put(Long.valueOf(jobId.getClusterId()), jobId);
+      clusterIdToJobId.put(Long.parseLong(jobId.getClusterId()), jobId);
     }
 
     ClusterJob job;
@@ -329,17 +384,65 @@ public class SQLClusterStore extends BaseClusterStore {
     return jobMap;
   }
 
+  public List<ClusterJob> getClusterJobs(String clusterId, int limit) throws TaskException {
+    long clusterNum = Long.parseLong(clusterId);
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT job FROM jobs WHERE cluster_id=? ORDER BY job_num DESC");
+        statement.setLong(1, clusterNum);
+
+        try {
+          return getQueryList(statement, ClusterJob.class, limit);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting cluster jobs for cluster {} with limit {}", clusterId, limit, e);
+      throw new TaskException("Exception getting cluster jobs for cluster " + clusterId);
+    }
+  }
+
+  public List<ClusterJob> getClusterJobs(String clusterId, String ownerId, int limit) throws TaskException {
+    long clusterNum = Long.parseLong(clusterId);
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement(
+            "SELECT J.job FROM jobs J, clusters C WHERE J.cluster_id=C.id AND C.id=? AND C.owner_id=? " +
+              "ORDER BY J.job_num DESC");
+        statement.setLong(1, clusterNum);
+        statement.setString(2, ownerId);
+
+        try {
+          return getQueryList(statement, ClusterJob.class, limit);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting cluster jobs for cluster {} with limit {}", clusterId, limit, e);
+      throw new TaskException("Exception getting cluster jobs for cluster " + clusterId);
+    }
+  }
+
   @Override
   public void writeClusterJob(ClusterJob clusterJob) throws TaskException {
     JobId jobId = JobId.fromString(clusterJob.getJobId());
-    long clusterId = Long.valueOf(jobId.getClusterId());
+    long clusterId = Long.parseLong(jobId.getClusterId());
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement checkStatement =
           conn.prepareStatement("SELECT job_num FROM jobs WHERE job_num=? AND cluster_id=?");
         checkStatement.setLong(1, jobId.getJobNum());
-        checkStatement.setLong(2, Long.valueOf(jobId.getClusterId()));
+        checkStatement.setLong(2, Long.parseLong(jobId.getClusterId()));
         PreparedStatement writeStatement;
         try {
           ResultSet rs = checkStatement.executeQuery();
@@ -389,7 +492,7 @@ public class SQLClusterStore extends BaseClusterStore {
       try {
         PreparedStatement statement = conn.prepareStatement("DELETE FROM jobs WHERE job_num=? AND cluster_id=?");
         statement.setLong(1, jobId.getJobNum());
-        statement.setLong(2, Long.valueOf(jobId.getClusterId()));
+        statement.setLong(2, Long.parseLong(jobId.getClusterId()));
         try {
           statement.executeUpdate();
         } finally {
@@ -411,9 +514,13 @@ public class SQLClusterStore extends BaseClusterStore {
         PreparedStatement statement =
           conn.prepareStatement("SELECT task FROM tasks WHERE task_num=? AND cluster_id=? AND job_num=?");
         statement.setLong(1, taskId.getTaskNum());
-        statement.setLong(2, Long.valueOf(taskId.getClusterId()));
+        statement.setLong(2, Long.parseLong(taskId.getClusterId()));
         statement.setLong(3, taskId.getJobNum());
-        return getQueryItem(statement, ClusterTask.class);
+        try {
+          return getQueryItem(statement, ClusterTask.class);
+        } finally {
+          statement.close();
+        }
       } finally {
         conn.close();
       }
@@ -426,7 +533,7 @@ public class SQLClusterStore extends BaseClusterStore {
   @Override
   public void writeClusterTask(ClusterTask clusterTask) throws TaskException {
     TaskId taskId = TaskId.fromString(clusterTask.getTaskId());
-    long clusterId = Long.valueOf(taskId.getClusterId());
+    long clusterId = Long.parseLong(taskId.getClusterId());
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -491,7 +598,7 @@ public class SQLClusterStore extends BaseClusterStore {
         PreparedStatement statement =
           conn.prepareStatement("DELETE FROM tasks WHERE task_num=? AND cluster_id=? AND job_num=?");
         statement.setLong(1, taskId.getTaskNum());
-        statement.setLong(2, Long.valueOf(taskId.getClusterId()));
+        statement.setLong(2, Long.parseLong(taskId.getClusterId()));
         statement.setLong(3, taskId.getJobNum());
         try {
           statement.executeUpdate();
@@ -512,7 +619,11 @@ public class SQLClusterStore extends BaseClusterStore {
     try {
       PreparedStatement statement = conn.prepareStatement("SELECT node FROM nodes WHERE id=? ");
       statement.setString(1, nodeId);
-      return getQueryItem(statement, Node.class);
+      try {
+        return getQueryItem(statement, Node.class);
+      } finally {
+        statement.close();
+      }
     } finally {
       conn.close();
     }
@@ -540,7 +651,7 @@ public class SQLClusterStore extends BaseClusterStore {
             writeStatement = conn.prepareStatement(
               "INSERT INTO nodes (id, cluster_id, node) VALUES (?, ?, ?)");
             writeStatement.setString(1, node.getId());
-            writeStatement.setLong(2, Long.valueOf(node.getClusterId()));
+            writeStatement.setLong(2, Long.parseLong(node.getClusterId()));
             writeStatement.setBlob(3, new ByteArrayInputStream(codec.serialize(node, Node.class)));
           }
         } finally {
@@ -581,8 +692,12 @@ public class SQLClusterStore extends BaseClusterStore {
     Connection conn = dbConnectionPool.getConnection();
     try {
       PreparedStatement statement = conn.prepareStatement("SELECT node FROM nodes WHERE cluster_id=? ");
-      statement.setLong(1, Long.valueOf(clusterId));
-      return getQuerySet(statement, Node.class);
+      statement.setLong(1, Long.parseLong(clusterId));
+      try {
+        return getQuerySet(statement, Node.class);
+      } finally {
+        statement.close();
+      }
     } finally {
       conn.close();
     }
@@ -594,9 +709,13 @@ public class SQLClusterStore extends BaseClusterStore {
     try {
       PreparedStatement statement = conn.prepareStatement(
         "SELECT N.node FROM nodes N, clusters C WHERE C.id=? AND C.owner_id=? AND N.cluster_id=C.id");
-      statement.setLong(1, Long.valueOf(clusterId));
+      statement.setLong(1, Long.parseLong(clusterId));
       statement.setString(2, userId);
-      return getQuerySet(statement, Node.class);
+      try {
+        return getQuerySet(statement, Node.class);
+      } finally {
+        statement.close();
+      }
     } finally {
       conn.close();
     }
@@ -610,7 +729,11 @@ public class SQLClusterStore extends BaseClusterStore {
         conn.prepareStatement("SELECT task FROM tasks WHERE status = ? AND submit_time < ?");
       statement.setString(1, ClusterTask.Status.IN_PROGRESS.name());
       statement.setTimestamp(2, getTimestamp(timestamp));
-      return getQuerySet(statement, ClusterTask.class);
+      try {
+        return getQuerySet(statement, ClusterTask.class);
+      } finally {
+        statement.close();
+      }
     } finally {
       conn.close();
     }
@@ -625,7 +748,11 @@ public class SQLClusterStore extends BaseClusterStore {
       statement.setString(1, Cluster.Status.ACTIVE.name());
       statement.setString(2, Cluster.Status.INCOMPLETE.name());
       statement.setTimestamp(3, getTimestamp(timestamp));
-      return getQuerySet(statement, Cluster.class);
+      try {
+        return getQuerySet(statement, Cluster.class);
+      } finally {
+        statement.close();
+      }
     } finally {
       conn.close();
     }
@@ -659,58 +786,76 @@ public class SQLClusterStore extends BaseClusterStore {
     }
   }
 
+
+  private <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
+    return getQueryList(statement, clazz, Integer.MAX_VALUE);
+  }
+
   /**
    * Queries the store for a list of items, deserializing the items and returning an immutable list of them. If no items
    * exist, the list will be empty.
    *
-   * @param statement PreparedStatement of the query, ready for execution. Will be closed by this method.
+   * @param statement PreparedStatement of the query, ready for execution.
    * @param clazz Class of the items being queried.
    * @param <T> Type of the items being queried.
+   * @param limit Max number of items to get.
    * @return
    * @throws SQLException
    */
-  private <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
+  private <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz, int limit)
+    throws SQLException {
+    ResultSet rs = statement.executeQuery();
     try {
-      ResultSet rs = statement.executeQuery();
-      try {
-        List<T> results = Lists.newArrayList();
-        while (rs.next()) {
-          Blob blob = rs.getBlob(1);
-          results.add(deserializeBlob(blob, clazz));
-        }
-        return ImmutableList.copyOf(results);
-      } finally {
-        rs.close();
+      List<T> results = Lists.newArrayList();
+      int numResults = 0;
+      int actualLimit = limit < 0 ? Integer.MAX_VALUE : limit;
+      while (rs.next() && numResults < actualLimit) {
+        Blob blob = rs.getBlob(1);
+        results.add(deserializeBlob(blob, clazz));
+        numResults++;
       }
+      return ImmutableList.copyOf(results);
     } finally {
-      statement.close();
+      rs.close();
     }
   }
 
   /**
    * Queries the store for a single item, deserializing the item and returning it or null if the item does not exist.
    *
-   * @param statement PreparedStatement of the query, ready for execution. Will be closed by this method.
+   * @param statement PreparedStatement of the query, ready for execution.
    * @param clazz Class of the item being queried.
    * @param <T> Type of the item being queried.
    * @return
    * @throws SQLException
    */
   private <T> T getQueryItem(PreparedStatement statement, Class<T> clazz) throws SQLException {
+    ResultSet rs = statement.executeQuery();
     try {
-      ResultSet rs = statement.executeQuery();
-      try {
-        if (rs.next()) {
-          Blob blob = rs.getBlob(1);
-          return deserializeBlob(blob, clazz);
-        } else {
-          return null;
-        }
-      } finally {
-        rs.close();
+      if (rs.next()) {
+        Blob blob = rs.getBlob(1);
+        return deserializeBlob(blob, clazz);
+      } else {
+        return null;
       }
     } finally {
-      statement.close();
+      rs.close();
+    }
+  }
+
+  /**
+   * Performs the query and returns whether or not there are results.
+   *
+   * @param statement PreparedStatement of the query, ready for execution.
+   * @return True if the query has results, false if not.
+   * @throws SQLException
+   */
+  private boolean hasResults(PreparedStatement statement) throws SQLException {
+    ResultSet rs = statement.executeQuery();
+    try {
+      return rs.next();
+    } finally {
+      rs.close();
     }
   }
 

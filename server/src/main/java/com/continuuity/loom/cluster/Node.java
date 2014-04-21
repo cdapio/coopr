@@ -49,7 +49,11 @@ public final class Node implements Comparable<Node> {
     IPADDRESS,
     HOSTNAME,
     NODENUM,
-    AUTOMATORS
+    AUTOMATORS,
+    HARDWARETYPE,
+    IMAGETYPE,
+    FLAVOR,
+    IMAGE
   }
 
   /**
@@ -152,6 +156,15 @@ public final class Node implements Comparable<Node> {
    */
   public List<Action> getActions() {
     return ImmutableList.copyOf((actions));
+  }
+
+  /**
+   * Add a service to the node.
+   *
+   * @param service Service to add to the node.
+   */
+  public void addService(Service service) {
+    this.services.add(service);
   }
 
   @Override

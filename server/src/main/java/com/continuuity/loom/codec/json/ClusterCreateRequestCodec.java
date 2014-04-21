@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.codec.json;
 
-import com.continuuity.loom.layout.ClusterRequest;
+import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -27,13 +27,13 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.layout.ClusterRequest}, used so some validation is done
+ * Codec for deserializing a {@link com.continuuity.loom.layout.ClusterCreateRequest}, used so some validation is done
  * on required fields.
  */
-public class ClusterRequestCodec implements JsonDeserializer<ClusterRequest> {
+public class ClusterCreateRequestCodec implements JsonDeserializer<ClusterCreateRequest> {
 
   @Override
-  public ClusterRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
+  public ClusterCreateRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
@@ -50,7 +50,7 @@ public class ClusterRequestCodec implements JsonDeserializer<ClusterRequest> {
     String dnsSuffix = context.deserialize(jsonObj.get("dnsSuffix"), String.class);
     JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
 
-    return new ClusterRequest(name, description, clusterTemplate, numMachines, provider, services, hardwaretype,
+    return new ClusterCreateRequest(name, description, clusterTemplate, numMachines, provider, services, hardwaretype,
                               imagetype, initialLeaseDuration, dnsSuffix, config);
   }
 }

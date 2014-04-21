@@ -338,6 +338,7 @@ site.app.get('/pipeApiCall', function (req, res) {
     method: 'GET',
 
   };
+  res.setHeader('Content-type', 'application/json');
   site.sendRequestAndHandleResponse(options, user, res);
 });
 
@@ -1007,10 +1008,53 @@ site.app.get('/user/clusters/cluster/:id', function (req, res) {
   });
 });
 
+site.app.get('/user/clusters/cluster/:id/reconfigure', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var clusterId = req.params.id;
+  async.parallel([
+    site.getEntity('/clusters', user),
+    site.getEntity('/clustertemplates', user)
+  ], function (err, results) {
+    var context = {
+      activeTab: 'clusters',
+      authenticated: user,
+      env: env
+    };
+    if (err) {
+      context.err = err;
+    } else {
+      context.clusters = results[0];
+      context.clustertemplates = site.verifyData(results[1]);
+      context.clusterId = clusterId;
+    }
+    res.render('user/clusters/createcluster.html', context);
+  });
+});
+
+site.app.post('/user/clusters/cluster/:id/reconfigure', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/config',
+    method: 'PUT',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
 site.app.post('/user/clusters/cluster/:id', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id,
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/cluster/:id/services', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/services',
     method: 'POST',
     json: req.body
   };
@@ -1042,6 +1086,17 @@ site.app.post('/user/clusters/create', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + '/clusters',
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/update/:clusterId', function (req, res) {
+  var clusterId = req.params.clusterId;
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + clusterId,
     method: 'POST',
     json: req.body
   };

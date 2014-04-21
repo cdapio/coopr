@@ -20,7 +20,8 @@ define([], function () {
     providerFields: {
       rackspace: [
         "rackspace_username",
-        "rackspace_api_key"
+        "rackspace_api_key",
+        "rackspace_region"
       ],
       joyent: [
         "joyent_username",

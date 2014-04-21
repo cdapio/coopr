@@ -15,11 +15,9 @@
  */
 package com.continuuity.loom.http;
 
-import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
@@ -33,15 +31,19 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
-import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.layout.ClusterRequest;
+import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.ClusterScheduler;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.SchedulerTest;
+import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
@@ -51,6 +53,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -113,38 +116,39 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   @Test
   public void testAddCluster() throws Exception {
     String clusterName = "my-cluster";
-    ClusterRequest clusterRequest = createClusterRequest(clusterName, "my cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest(clusterName, "my cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String clusterId = getIdFromResponse(response);
 
     // check there was an element added to the cluster queue for creating this cluster
     Element element = solverQueue.take("0");
     Assert.assertEquals(clusterId, element.getId());
-    ClusterRequest expected =
-      new ClusterRequest(clusterName, "my cluster", reactorTemplate.getName(),
-                         5, null, null, null, null, -1L, null, null);
-    Assert.assertEquals(expected, GSON.fromJson(element.getValue(), ClusterRequest.class));
-
+    ClusterCreateRequest expected =
+      new ClusterCreateRequest(clusterName, "my cluster", reactorTemplate.getName(),
+                               5, null, null, null, null, -1L, null, null);
+    SolverRequest expectedSolverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, GSON.toJson(expected));
+    Assert.assertEquals(expectedSolverRequest, GSON.fromJson(element.getValue(), SolverRequest.class));
   }
 
   @Test
   public void testAddClusterWithOptionalArgs() throws Exception {
     String clusterName = "my-cluster";
-    ClusterRequest clusterRequest =
-      new ClusterRequest(clusterName, "my cluster", reactorTemplate.getName(), 5, "providerA",
+    ClusterCreateRequest clusterCreateRequest =
+      new ClusterCreateRequest(clusterName, "my cluster", reactorTemplate.getName(), 5, "providerA",
                          ImmutableSet.of("service1", "service2"), "hardwareC", "imageB", -1L, null, null);
 
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     // check there was an element added to the cluster queue for creating this cluster
     Element element = solverQueue.take("0");
-    ClusterRequest queuedRequest = GSON.fromJson(element.getValue(), ClusterRequest.class);
-    Assert.assertEquals("providerA", queuedRequest.getProvider());
-    Assert.assertEquals("imageB", queuedRequest.getImageType());
-    Assert.assertEquals("hardwareC", queuedRequest.getHardwareType());
-    Assert.assertEquals(ImmutableSet.of("service1", "service2"), queuedRequest.getServices());
+    SolverRequest request = GSON.fromJson(element.getValue(), SolverRequest.class);
+    ClusterCreateRequest createRequest = GSON.fromJson(request.getJsonRequest(), ClusterCreateRequest.class);
+    Assert.assertEquals("providerA", createRequest.getProvider());
+    Assert.assertEquals("imageB", createRequest.getImageType());
+    Assert.assertEquals("hardwareC", createRequest.getHardwareType());
+    Assert.assertEquals(ImmutableSet.of("service1", "service2"), createRequest.getServices());
   }
 
   @Test
@@ -156,9 +160,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     userConfig.addProperty("userconfig1", "value1");
     userConfig.addProperty("userconfig2", "value1");
 
-    ClusterRequest clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1,
-                                                         userConfig);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest(clusterName, "test cluster", smallTemplate
+      .getName(), 1, userConfig);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -192,8 +196,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     //Create cluster
     String clusterName = "test-cluster-should-be-provisioned";
-    ClusterRequest clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -266,7 +270,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     cluster.setStatus(Cluster.Status.ACTIVE);
     ClusterJob clusterJob = new ClusterJob(new JobId(clusterId, 1), ClusterAction.CLUSTER_DELETE);
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
-    cluster.addJob(clusterJob.getJobId());
+    cluster.setLatestJobId(clusterJob.getJobId());
     clusterStore.writeCluster(cluster);
     clusterStore.writeClusterJob(clusterJob);
 
@@ -334,8 +338,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testFailedClusterStatus() throws Exception {
     //Test Failed Status
     String clusterName = "test-cluster-should-be-failed";
-    ClusterRequest clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest =
+      createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -375,8 +380,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testFailedRetryClusterStatus() throws Exception {
     //Test Failed Status
     String clusterName = "test-cluster-retry-failed";
-    ClusterRequest clusterRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest(clusterName, "test cluster", smallTemplate.getName(), 1);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -450,9 +455,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testUnsolvableCluster() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-unsolvable";
-    ClusterRequest clusterRequest =
+    ClusterCreateRequest clusterCreateRequest =
       createClusterRequest(clusterName, "unsolvable cluster", reactorTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -487,9 +492,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testCancelClusterJobWithTasks() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-should-be-canceled-with-tasks";
-    ClusterRequest clusterRequest =
+    ClusterCreateRequest clusterCreateRequest =
       createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 2);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -545,9 +550,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testCancelClusterJobNotAllowed1() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-should-be-canceled-after-solving";
-    ClusterRequest clusterRequest =
+    ClusterCreateRequest clusterCreateRequest =
       createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -597,9 +602,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testCancelClusterJobNotAllowed2() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-should-be-canceled-after-solving";
-    ClusterRequest clusterRequest =
+    ClusterCreateRequest clusterCreateRequest =
       createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -643,9 +648,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testCancelClusterNotRunningJob() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-should-be-canceled-after-solving";
-    ClusterRequest clusterRequest =
+    ClusterCreateRequest clusterCreateRequest =
       createClusterRequest(clusterName, "test cancel cluster", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -720,15 +725,15 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       clusterStore.deleteCluster(cluster.getId());
     }
 
-    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String cluster1 = getIdFromResponse(response);
 
     solverScheduler.run();
 
-    clusterRequest = createClusterRequest("cluster2", "my 2nd cluster", reactorTemplate.getName(), 6);
-    response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    clusterCreateRequest = createClusterRequest("cluster2", "my 2nd cluster", reactorTemplate.getName(), 6);
+    response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String cluster2 = getIdFromResponse(response);
 
@@ -770,8 +775,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testGetClusterNotOwnedByUserReturns404() throws Exception {
-    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest("cluster1", "my 1st cluster",
+                                                                     reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String clusterId = getIdFromResponse(response);
 
@@ -780,8 +786,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testAdminCanGetClustersOwnedByOthers() throws Exception {
-    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String clusterId = getIdFromResponse(response);
 
@@ -790,8 +796,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testDeleteOnClusterNotOwnedByUserReturns404() throws Exception {
-    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String clusterId = getIdFromResponse(response);
 
@@ -805,7 +811,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     cluster.setStatus(Cluster.Status.ACTIVE);
     ClusterJob clusterJob = new ClusterJob(new JobId(clusterId, 1), ClusterAction.CLUSTER_DELETE);
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
-    cluster.addJob(clusterJob.getJobId());
+    cluster.setLatestJobId(clusterJob.getJobId());
     clusterStore.writeCluster(cluster);
     clusterStore.writeClusterJob(clusterJob);
 
@@ -814,13 +820,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testGetAllClustersReturnsOnlyThoseOwnedByUser() throws Exception {
-    ClusterRequest clusterRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    ClusterCreateRequest clusterCreateRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String cluster1 = getIdFromResponse(response);
 
-    clusterRequest = createClusterRequest("cluster2", "my 2nd cluster", reactorTemplate.getName(), 6);
-    response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER2_HEADERS);
+    clusterCreateRequest = createClusterRequest("cluster2", "my 2nd cluster", reactorTemplate.getName(), 6);
+    response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER2_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     String cluster2 = getIdFromResponse(response);
 
@@ -888,9 +894,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testGetPlanForJob() throws Exception {
     //Create cluster
     String clusterName = "test-cluster-for-plan-job";
-    ClusterRequest clusterRequest =
+    ClusterCreateRequest clusterCreateRequest =
       createClusterRequest(clusterName, "test cluster plan job", smallTemplate.getName(), 1);
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     String clusterId = getIdFromResponse(response);
@@ -928,9 +934,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testMaxClusterSize() throws Exception {
-    ClusterRequest clusterRequest =
+    ClusterCreateRequest clusterCreateRequest =
       createClusterRequest("cluster", "desc", smallTemplate.getName(), Constants.DEFAULT_MAX_CLUSTER_SIZE + 1);
-    assertResponseStatus(doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS),
+    assertResponseStatus(doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 
@@ -952,10 +958,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   private void verifyInitialLeaseDuration(long expectedExpireTime, Cluster.Status expectedStatus,
                                           long requestedLeaseDuration,
                                           String clusterTemplate) throws Exception {
-    ClusterRequest clusterRequest = new ClusterRequest("test-lease", "test cluster initial lease", clusterTemplate, 4,
+    ClusterCreateRequest clusterCreateRequest = new ClusterCreateRequest("test-lease", "test cluster initial lease", clusterTemplate, 4,
                                                        null, null, null, null, requestedLeaseDuration, null, null);
 
-    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterRequest), USER1_HEADERS);
+    HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     solverScheduler.run();
@@ -1131,6 +1137,234 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals(21000, cluster.getExpireTime());
   }
 
+  @Test
+  public void testInvalidGetClusterConfigRequests() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), new JsonObject());
+    clusterStore.writeCluster(cluster);
+
+    assertResponseStatus(doGet("/v1/loom/clusters/" + cluster.getId() + "9/config", USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGet("/v1/loom/clusters/" + cluster.getId() + "/config", USER2_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+  }
+
+  @Test
+  public void testGetClusterConfig() throws Exception {
+    JsonObject config = new JsonObject();
+    config.addProperty("key1", "val1");
+    JsonArray arrayVal = new JsonArray();
+    arrayVal.add(new JsonPrimitive("arrayval1"));
+    arrayVal.add(new JsonPrimitive("arrayval2"));
+    config.add("key2", arrayVal);
+    JsonObject objVal = new JsonObject();
+    objVal.addProperty("okey1", "oval1");
+    objVal.addProperty("okey2", "oval2");
+    config.add("key3", objVal);
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), config);
+    clusterStore.writeCluster(cluster);
+    HttpResponse response = doGet("/v1/loom/clusters/" + cluster.getId() + "/config", USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject actual = GSON.fromJson(reader, JsonObject.class);
+    Assert.assertEquals(config, actual);
+  }
+
+  @Test
+  public void testInvalidClusterConfigRequests() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), new JsonObject());
+    clusterStore.writeCluster(cluster);
+    String requestStr = GSON.toJson(new ClusterConfigureRequest(new JsonObject(), false));
+
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", "{}", USER1_HEADERS),
+                         HttpResponseStatus.BAD_REQUEST);
+
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "9/config", requestStr, USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", requestStr, USER2_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+
+    cluster.setStatus(Cluster.Status.INCOMPLETE);
+    clusterStore.writeCluster(cluster);
+
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", requestStr, USER1_HEADERS),
+                         HttpResponseStatus.CONFLICT);
+  }
+
+  @Test
+  public void testPutClusterConfigCanRunOnInconsistentClusters() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), new JsonObject());
+    cluster.setStatus(Cluster.Status.INCONSISTENT);
+    clusterStore.writeCluster(cluster);
+    String requestStr = GSON.toJson(new ClusterConfigureRequest(new JsonObject(), false));
+
+    assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", requestStr, USER1_HEADERS),
+                         HttpResponseStatus.OK);
+  }
+
+  @Test
+  public void testPutClusterConfig() throws Exception {
+    JsonObject originalConfig = new JsonObject();
+    originalConfig.addProperty("key1", "val1");
+    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), originalConfig);
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+
+    HttpResponse response = doGet("/v1/loom/clusters/123/config", USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject actual = GSON.fromJson(reader, JsonObject.class);
+    Assert.assertEquals(originalConfig, actual);
+
+    JsonObject newConfig = new JsonObject();
+    newConfig.addProperty("key2", "val2");
+    ClusterConfigureRequest configRequest = new ClusterConfigureRequest(newConfig, false);
+    assertResponseStatus(doPut("/v1/loom/clusters/123/config", GSON.toJson(configRequest), USER1_HEADERS),
+                         HttpResponseStatus.OK);
+
+    response = doGet("/v1/loom/clusters/123/config", USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    actual = GSON.fromJson(reader, JsonObject.class);
+    Assert.assertEquals(newConfig, actual);
+  }
+
+  @Test
+  public void testClusterServiceActions() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "service-actions", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    Map<String, ClusterAction> actions = Maps.newHashMap();
+    actions.put("/stop", ClusterAction.STOP_SERVICES);
+    actions.put("/start", ClusterAction.START_SERVICES);
+    actions.put("/restart", ClusterAction.RESTART_SERVICES);
+    actions.put("/namenode/stop", ClusterAction.STOP_SERVICES);
+    actions.put("/namenode/start", ClusterAction.START_SERVICES);
+    actions.put("/namenode/restart", ClusterAction.RESTART_SERVICES);
+
+    try {
+      for (Map.Entry<String, ClusterAction> entry : actions.entrySet()) {
+        assertResponseStatus(doPost("/v1/loom/clusters/123/services" + entry.getKey(), "", USER1_HEADERS),
+                             HttpResponseStatus.OK);
+        Assert.assertEquals(entry.getValue().name(), clusterQueue.take("0").getValue());
+        cluster.setStatus(Cluster.Status.ACTIVE);
+        clusterStore.writeCluster(cluster);
+      }
+    } finally {
+      clusterQueue.removeAll();
+    }
+  }
+
+  @Test
+  public void testServiceActionsOnNonexistantClusterReturn404() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of());
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    Set<String> actions = ImmutableSet.of(
+      "/stop",
+      "/start",
+      "/restart",
+      "/namenode/stop",
+      "/namenode/start",
+      "/namenode/restart"
+    );
+    for (String action : actions) {
+      // no cluster 1123
+      assertResponseStatus(doPost("/v1/loom/clusters/1123/services" + action, "", USER1_HEADERS),
+                           HttpResponseStatus.NOT_FOUND);
+      // no cluster for user2
+      assertResponseStatus(doPost("/v1/loom/clusters/123/services" + action, "", USER2_HEADERS),
+                           HttpResponseStatus.NOT_FOUND);
+    }
+  }
+
+  @Test
+  public void testServiceActionsOnNonexistantClusterServiceReturn404() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of());
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services/fake/stop", "", USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services/fake/start", "", USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services/fake/restart", "", USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+  }
+
+  @Test
+  public void testServiceActionsCanOnlyRunOnActiveCluster() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    Set<Cluster.Status> badStatuses = ImmutableSet.of(
+      Cluster.Status.INCOMPLETE, Cluster.Status.PENDING, Cluster.Status.TERMINATED, Cluster.Status.INCONSISTENT);
+    Set<String> resources = ImmutableSet.of(
+      "/v1/loom/clusters/123/services/stop",
+      "/v1/loom/clusters/123/services/start",
+      "/v1/loom/clusters/123/services/restart",
+      "/v1/loom/clusters/123/services/namenode/stop",
+      "/v1/loom/clusters/123/services/namenode/start",
+      "/v1/loom/clusters/123/services/namenode/restart"
+    );
+    for (Cluster.Status status : badStatuses) {
+      cluster.setStatus(status);
+      clusterStore.writeCluster(cluster);
+      for (String resource : resources) {
+        assertResponseStatus(doPost(resource, "", USER1_HEADERS), HttpResponseStatus.CONFLICT);
+      }
+    }
+  }
+
+  @Test
+  public void testAddInvalidServicesReturns400() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    // can't add nodemanager without resourcemanager
+    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("nodemanager"));
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER1_HEADERS),
+                         HttpResponseStatus.BAD_REQUEST);
+    // can't add nonexistant service
+    body = new AddServicesRequest(ImmutableSet.of("fakeservice"));
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER1_HEADERS),
+                         HttpResponseStatus.BAD_REQUEST);
+  }
+
+  @Test
+  public void testAddServicesOnNonexistantClusterReturns404() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
+    assertResponseStatus(doPost("/v1/loom/clusters/1123/services", GSON.toJson(body), USER1_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER2_HEADERS),
+                         HttpResponseStatus.NOT_FOUND);
+  }
+
+  @Test
+  public void testAddServicesCanOnlyRunOnActiveCluster() throws Exception {
+    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+                                  ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
+    Set<Cluster.Status> badStatuses = ImmutableSet.of(
+      Cluster.Status.INCOMPLETE, Cluster.Status.PENDING, Cluster.Status.TERMINATED, Cluster.Status.INCONSISTENT);
+    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
+    for (Cluster.Status status : badStatuses) {
+      cluster.setStatus(status);
+      clusterStore.writeCluster(cluster);
+      assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER1_HEADERS),
+                           HttpResponseStatus.CONFLICT);
+    }
+  }
+
   private void verifyPlanJson(JsonObject expected, JsonObject actual) {
     // Fix ids before comparing
     int nodeId = 0;
@@ -1151,18 +1385,16 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     return GSON.fromJson(reader, JsonObject.class).get("id").getAsString();
   }
 
-  protected static ClusterRequest createClusterRequest(String name, String description,
+  protected static ClusterCreateRequest createClusterRequest(String name, String description,
                                                        String template, int numMachines) {
-    ClusterRequest request =
-      new ClusterRequest(name, description, template, numMachines, null, null, null, null, -1L, null, null);
-    return request;
+    return new ClusterCreateRequest(name, description, template, numMachines,
+                                    null, null, null, null, -1L, null, null);
   }
 
-  protected static ClusterRequest createClusterRequest(String name, String description, String template, int numMachines,
-                                          JsonObject userConfig) {
-    ClusterRequest request =
-      new ClusterRequest(name, description, template, numMachines, null, null, null, null, -1L, null, userConfig);
-    return request;
+  protected static ClusterCreateRequest createClusterRequest(String name, String description, String template,
+                                                             int numMachines, JsonObject userConfig) {
+    return new ClusterCreateRequest(name, description, template, numMachines,
+                                    null, null, null, null, -1L, null, userConfig);
   }
 
   @BeforeClass
@@ -1306,7 +1538,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   private static final String ALL_SAMPLE_PLANS =
     "[\n" +
-      SOLVER_PLAN + ",\n" +
-      SAMPLE_PLAN +
+      SAMPLE_PLAN + ",\n" +
+      SOLVER_PLAN +
       "\n]";
 }

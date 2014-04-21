@@ -5,7 +5,7 @@
       <a data-toggle="dropdown" href="#">Clusters <span class="caret"></span></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
         {% for item in clusters %}
-          {% if item.status === 'ACTIVE' %}
+          {% if item.status !== 'TERMINATED' %}
             <li><a class="list-types" href="/user/clusters/cluster/{{item.id}}">{{ item.name }}</a></li>
           {% endif %}
         {% endfor %}
