@@ -2,6 +2,17 @@ windows Cookbook CHANGELOG
 =======================
 This file is used to list changes made in each version of the windows cookbook.
 
+v1.30.2 (2014-04-02)
+--------------------
+- [COOK-4414] - Adding ChefSpec matchers
+
+
+v1.30.0 (2014-02-14)
+--------------------
+- [COOK-3715] - Unable to create a startup task with no login
+- [COOK-4188] - Add powershell_version method to return Powershell version
+
+
 v1.12.8 (2014-01-21)
 --------------------
 [COOK-3988] Don't unescape URI before constructing it.
