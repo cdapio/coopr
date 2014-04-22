@@ -1457,8 +1457,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                                          null, new Administration(new LeaseDuration(10000, 30000, 5000)));
 
     // create providers
-    entityStore.writeProvider(new Provider("joyent", "joyent provider", Provider.Type.JOYENT,
-                                     Collections.<String, Map<String, String>>emptyMap()));
+    entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
+                                           ImmutableMap.<String, String>of()));
     // create hardware types
     entityStore.writeHardwareType(
       new HardwareType(

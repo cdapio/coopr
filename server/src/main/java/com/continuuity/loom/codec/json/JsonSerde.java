@@ -16,14 +16,18 @@
 package com.continuuity.loom.codec.json;
 
 import com.continuuity.loom.admin.Administration;
+import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Constraints;
+import com.continuuity.loom.admin.FieldSchema;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.LayoutConstraint;
 import com.continuuity.loom.admin.LeaseDuration;
+import com.continuuity.loom.admin.ParametersSpecification;
 import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
@@ -47,24 +51,28 @@ public class JsonSerde {
 
   public JsonSerde() {
     gson = new GsonBuilder()
-      .registerTypeAdapter(Provider.class, new ProviderCodec())
+      .registerTypeAdapter(AddServicesRequest.class, new AddServicesRequestCodec())
+      .registerTypeAdapter(Administration.class, new AdministrationCodec())
+      .registerTypeAdapter(AutomatorType.class, new AutomatorTypeCodec())
+      .registerTypeAdapter(ClusterConfigureRequest.class, new ClusterConfigureRequestCodec())
+      .registerTypeAdapter(ClusterCreateRequest.class, new ClusterCreateRequestCodec())
+      .registerTypeAdapter(ClusterDefaults.class, new ClusterDefaultsCodec())
+      .registerTypeAdapter(ClusterTemplate.class, new ClusterTemplateCodec())
+      .registerTypeAdapter(Constraints.class, new ConstraintsCodec())
+      .registerTypeAdapter(FieldSchema.class, new FieldSchemaCodec())
       .registerTypeAdapter(HardwareType.class, new HardwareTypeCodec())
       .registerTypeAdapter(ImageType.class, new ImageTypeCodec())
+      .registerTypeAdapter(LayoutConstraint.class, new LayoutConstraintCodec())
+      .registerTypeAdapter(LeaseDuration.class, new LeaseDurationCodec())
+      .registerTypeAdapter(ParametersSpecification.class, new ParametersSpecificationCodec())
+      .registerTypeAdapter(Provider.class, new ProviderCodec())
+      .registerTypeAdapter(ProviderType.class, new ProviderTypeCodec())
       .registerTypeAdapter(Service.class, new ServiceCodec())
-      .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
-      .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
-      .registerTypeAdapter(ClusterTemplate.class, new ClusterTemplateCodec())
       .registerTypeAdapter(ServiceAction.class, new ServiceActionCodec())
       .registerTypeAdapter(ServiceConstraint.class, new ServiceConstraintCodec())
-      .registerTypeAdapter(LayoutConstraint.class, new LayoutConstraintCodec())
-      .registerTypeAdapter(Constraints.class, new ConstraintsCodec())
+      .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
+      .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
-      .registerTypeAdapter(ClusterDefaults.class, new ClusterDefaultsCodec())
-      .registerTypeAdapter(Administration.class, new AdministrationCodec())
-      .registerTypeAdapter(LeaseDuration.class, new LeaseDurationCodec())
-      .registerTypeAdapter(ClusterCreateRequest.class, new ClusterCreateRequestCodec())
-      .registerTypeAdapter(ClusterConfigureRequest.class, new ClusterConfigureRequestCodec())
-      .registerTypeAdapter(AddServicesRequest.class, new AddServicesRequestCodec())
       .enableComplexMapKeySerialization()
       .create();
   }

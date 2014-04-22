@@ -65,6 +65,18 @@ CREATE TABLE IF NOT EXISTS nodes (
     INDEX cluster_node_index (cluster_id, id)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS providerTypes (
+    name VARCHAR(255),
+    providerType MEDIUMBLOB,
+    PRIMARY KEY (name)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS automatorTypes (
+    name VARCHAR(255),
+    automatorType MEDIUMBLOB,
+    PRIMARY KEY (name)
+) ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS providers (
     name VARCHAR(255),
     provider MEDIUMBLOB,

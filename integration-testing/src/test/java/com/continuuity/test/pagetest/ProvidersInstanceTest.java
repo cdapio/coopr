@@ -62,9 +62,9 @@ public class ProvidersInstanceTest extends GenericTest {
     Provider joyent = EXAMPLE_READER.getProviders(Constants.PROVIDERS_PATH).get(PROVIDER_NAME);
     assertEquals("Name is not correct.", joyent.getName(), JOYENT_PROVIDERS_PAGE.getInputName());
     assertEquals("Description is not correct.", joyent.getDescription(), JOYENT_PROVIDERS_PAGE.getDescription());
-    assertEquals("Provisioner is not correct.", joyent.getProviderType().name().toLowerCase(),
+    assertEquals("Provisioner is not correct.", joyent.getProviderType(),
                  JOYENT_PROVIDERS_PAGE.getProvisioner());
-    Map<String, String> authValue = joyent.getProvisionerData().get(Constants.AUTH);
+    Map<String, String> authValue = joyent.getProvisionerFields();
     assertEquals("Username is not correct.", authValue.get(USERNAME), JOYENT_PROVIDERS_PAGE.getUsername());
     assertEquals("Keyname is not correct.", authValue.get(KEYNAME), JOYENT_PROVIDERS_PAGE.getKeyname());
     assertEquals("Keyfile is not correct.", authValue.get(KEYFILE), JOYENT_PROVIDERS_PAGE.getKeyfile());

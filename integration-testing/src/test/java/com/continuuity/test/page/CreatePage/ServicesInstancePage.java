@@ -18,6 +18,7 @@ package com.continuuity.test.page.CreatePage;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.test.Constants;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.openqa.selenium.By;
@@ -66,7 +67,8 @@ public class ServicesInstancePage extends GenericPage {
       if (data.isEmpty()) {
         data = null;
       }
-      provisionerActions.put(action, new ServiceAction(type, script, data));
+      provisionerActions.put(action,
+                             new ServiceAction(type, ImmutableMap.<String, String>of("script", script, "data", data)));
     }
     return provisionerActions;
   }

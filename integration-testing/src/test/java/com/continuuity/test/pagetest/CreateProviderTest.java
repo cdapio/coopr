@@ -56,20 +56,20 @@ public class CreateProviderTest extends GenericTest {
     Global.driverWait(1);
     JavascriptExecutor executor = (JavascriptExecutor) globalDriver;
     executor.executeScript("document.getElementById('joyent_username').value = '"
-      + joyent.getProvisionerData().get("auth").get("joyent_username") + "'");
+      + joyent.getProvisionerFields().get("joyent_username") + "'");
 
     executor.executeScript("document.getElementById('joyent_keyname').value = '"
-      + joyent.getProvisionerData().get("auth").get("joyent_keyname") + "'");
+      + joyent.getProvisionerFields().get("joyent_keyname") + "'");
 
     executor.executeScript("document.getElementById('joyent_keyfile').value = '"
-      + joyent.getProvisionerData().get("auth").get("joyent_keyfile") + "'");
+      + joyent.getProvisionerFields().get("joyent_keyfile") + "'");
 
 
     executor.executeScript("document.getElementById('joyent_api_url').value = '"
-      + joyent.getProvisionerData().get("auth").get("joyent_api_url") + "'");
+      + joyent.getProvisionerFields().get("joyent_api_url") + "'");
 
     executor.executeScript("document.getElementById('joyent_version').value = '"
-      + joyent.getProvisionerData().get("auth").get("joyent_version") + "'");
+      + joyent.getProvisionerFields().get("joyent_version") + "'");
 
 
     globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
@@ -91,11 +91,11 @@ public class CreateProviderTest extends GenericTest {
 
     JavascriptExecutor executor = (JavascriptExecutor) globalDriver;
     executor.executeScript("document.getElementById('rackspace_username').value = '"
-                             + rackspace.getProvisionerData().get("auth").get("rackspace_username") + "'");
+                             + rackspace.getProvisionerFields().get("rackspace_username") + "'");
     executor.executeScript("document.getElementById('rackspace_api_key').value = '"
-                             + rackspace.getProvisionerData().get("auth").get("rackspace_api_key") + "'");
+                             + rackspace.getProvisionerFields().get("rackspace_api_key") + "'");
     executor.executeScript("document.getElementById('rackspace_region').value = '"
-                             + rackspace.getProvisionerData().get("auth").get("rackspace_region") + "'");
+                             + rackspace.getProvisionerFields().get("rackspace_region") + "'");
 
     globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
     Global.driverWait(1);

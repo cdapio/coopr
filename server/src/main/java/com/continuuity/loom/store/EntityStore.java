@@ -15,10 +15,12 @@
  */
 package com.continuuity.loom.store;
 
+import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 
 import java.util.Collection;
@@ -195,4 +197,72 @@ public interface EntityStore {
    * @throws Exception
    */
   void deleteClusterTemplate(String clusterTemplateName) throws Exception;
+
+  /**
+   * Get the {@link ProviderType} associated with the given unique name or null if no such provider type exists.
+   *
+   * @param providerTypeName Unique name of the provider type to get.
+   * @return Provider type matching the given name or null if no such provider exists.
+   * @throws Exception
+   */
+  ProviderType getProviderType(String providerTypeName) throws Exception;
+
+  /**
+   * Get all {@link ProviderType}s.
+   *
+   * @return Collection of all provider types.
+   * @throws Exception
+   */
+  Collection<ProviderType> getAllProviderTypes() throws Exception;
+
+  /**
+   * Write the given {@link ProviderType} to the store.
+   * Will overwrite the existing {@link ProviderType} if it exists.
+   *
+   * @param providerType Provider type to write.
+   * @throws Exception
+   */
+  void writeProviderType(ProviderType providerType) throws Exception;
+
+  /**
+   * Delete the {@link ProviderType} associated with the given unique name.
+   *
+   * @param providerTypeName Name of the provider type to delete.
+   * @throws Exception
+   */
+  void deleteProviderType(String providerTypeName) throws Exception;
+
+  /**
+   * Get the {@link AutomatorType} associated with the given unique name or null if no such automator type exists.
+   *
+   * @param automatorTypeName Unique name of the automator type to get.
+   * @return Automator type matching the given name or null if no such provider exists.
+   * @throws Exception
+   */
+  AutomatorType getAutomatorType(String automatorTypeName) throws Exception;
+
+  /**
+   * Get all {@link AutomatorType}s.
+   *
+   * @return Collection of all automator types.
+   * @throws Exception
+   */
+  Collection<AutomatorType> getAllAutomatorTypes() throws Exception;
+
+  /**
+   * Write the given {@link AutomatorType} to the store.
+   * Will overwrite the existing {@link AutomatorType} if it exists.
+   *
+   * @param automatorType Automator type to write.
+   * @throws Exception
+   */
+  void writeAutomatorType(AutomatorType automatorType) throws Exception;
+
+  /**
+   * Delete the {@link AutomatorType} associated with the given unique name.
+   *
+   * @param automatorTypeName Name of the automator type to delete.
+   * @throws Exception
+   */
+  void deleteAutomatorType(String automatorTypeName) throws Exception;
 }

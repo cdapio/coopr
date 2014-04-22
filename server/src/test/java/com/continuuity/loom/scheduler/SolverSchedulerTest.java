@@ -16,6 +16,7 @@
 package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.BaseTest;
+import com.continuuity.loom.Entities;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
@@ -175,8 +176,8 @@ public class SolverSchedulerTest extends BaseTest {
     );
 
     // create providers
-    entityStore.writeProvider(new Provider("joyent", "joyent provider", Provider.Type.JOYENT,
-                                           ImmutableMap.<String, Map<String, String>>of()));
+    entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
+                                           ImmutableMap.<String, String>of()));
     // create hardware types
     entityStore.writeHardwareType(
       new HardwareType(
