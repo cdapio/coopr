@@ -20,46 +20,44 @@ class Provider
   attr_accessor :task, :flavor, :image, :hostname, :providerid, :result
   def initialize(task)
     @task = task
-    @result = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
+    @result = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
   end
 
-  def runTask 
+  def runTask
     case task['taskName'].downcase
-    when "create"
-      create({'flavor' => task['config']['flavor'], 'image' => task['config']['image'], 'hostname' => task['config']['hostname']})
+    when 'create'
+      create('flavor' => task['config']['flavor'], 'image' => task['config']['image'], 'hostname' => task['config']['hostname'])
       return @result
-    when "confirm"
-      confirm({'providerid' => task['config']['providerid']})
+    when 'confirm'
+      confirm('providerid' => task['config']['providerid'])
       return @result
-    when "delete"
-      delete({'providerid' => task['config']['providerid']})
+    when 'delete'
+      delete('providerid' => task['config']['providerid'])
       return @result
     else
-      raise "unhandled provider task type: #{task['taskName']}"
+      fail "unhandled provider task type: #{task['taskName']}"
     end
   end
 
   def create(inputmap)
     @result['status'] = 1
-    @result['message'] = "Unimplemented task create in class #{self.class.name}"  
+    @result['message'] = "Unimplemented task create in class #{self.class.name}"
     # fields under 'result' will be passed to subsequent tasks
     @result['result']['providerid'] = 'exampleid'
     @result['result']['foo'] = 'bar'
-    raise "Unimplemented task create in class #{self.class.name}"
+    fail "Unimplemented task create in class #{self.class.name}"
   end
 
   def confirm(inputmap)
     @result['status'] = 1
-    @result['message'] = "Unimplemented task create in class #{self.class.name}"  
+    @result['message'] = "Unimplemented task create in class #{self.class.name}"
     @result['result']['ipaddress'] = '1.2.3.4'
-    raise "Unimplemented task confirm in class #{self.class.name}"
+    fail "Unimplemented task confirm in class #{self.class.name}"
   end
 
   def delete(inputmap)
     @result['status'] = 1
-    @result['message'] = "Unimplemented task create in class #{self.class.name}"  
-    raise "Unimplemented task delete in class #{self.class.name}"
+    @result['message'] = "Unimplemented task create in class #{self.class.name}"
+    fail "Unimplemented task delete in class #{self.class.name}"
   end
 end
-
-

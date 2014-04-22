@@ -15,18 +15,18 @@
 # limitations under the License.
 #
 
-#require 'json'
-#require 'net/scp'
+# require 'json'
+# require 'net/scp'
 
 # base class for all automator plugins.  This should be extended, not modified
 class Automator
   attr_accessor :task, :flavor, :image, :hostname, :providerid, :result
   def initialize(task)
     @task = task
-    @result = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
+    @result = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
   end
 
-  def runTask 
+  def runTask
     sshauth = @task['config']['ssh-auth']
     hostname = @task['config']['hostname']
     ipaddress = @task['config']['ipaddress']
@@ -34,74 +34,71 @@ class Automator
     actiondata = @task['config']['service']['action']['data'] rescue nil
 
     case task['taskName'].downcase
-    when "bootstrap"
-      bootstrap({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth})
+    when 'bootstrap'
+      bootstrap('hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth)
       return @result
-    when "install"
-      install({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata})
+    when 'install'
+      install('hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata)
       return @result
-    when "configure"
-      configure({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata})
+    when 'configure'
+      configure('hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata)
       return @result
-    when "initialize"
-      init({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+    when 'initialize'
+      init('hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata)
       return @result
-    when "start"
-      start({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+    when 'start'
+      start('hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata)
       return @result
-    when "stop"
-      stop({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+    when 'stop'
+      stop('hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata)
       return @result
-    when "remove"
-      remove({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+    when 'remove'
+      remove('hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata)
       return @result
     else
-      raise "unhandled automator task type: #{task['taskName']}"
+      fail "unhandled automator task type: #{task['taskName']}"
     end
   end
 
   def bootstrap(ssh_auth_hash)
     @result['status'] = 1
     @result['message'] = "Unimplemented task bootstrap in class #{self.class.name}"
-    raise "Unimplemented task bootstrap in class #{self.class.name}"
+    fail "Unimplemented task bootstrap in class #{self.class.name}"
   end
 
   def install(ssh_auth_hash, script_string, data_string)
     @result['status'] = 1
     @result['message'] = "Unimplemented task install in class #{self.class.name}"
-    raise "Unimplemented task install in class #{self.class.name}"
+    fail "Unimplemented task install in class #{self.class.name}"
   end
 
   def configure(ssh_auth_hash, script_string, data_string)
     @result['status'] = 1
     @result['message'] = "Unimplemented task configure in class #{self.class.name}"
-    raise "Unimplemented task configure in class #{self.class.name}"
+    fail "Unimplemented task configure in class #{self.class.name}"
   end
 
   def init(ssh_auth_hash, script_string, data_string)
     @result['status'] = 1
     @result['message'] = "Unimplemented task initialize in class #{self.class.name}"
-    raise "Unimplemented task initialize in class #{self.class.name}"
+    fail "Unimplemented task initialize in class #{self.class.name}"
   end
 
   def start(ssh_auth_hash, script_string, data_string)
     @result['status'] = 1
     @result['message'] = "Unimplemented task start in class #{self.class.name}"
-    raise "Unimplemented task start in class #{self.class.name}"
+    fail "Unimplemented task start in class #{self.class.name}"
   end
 
   def stop(ssh_auth_hash, script_string, data_string)
     @result['status'] = 1
     @result['message'] = "Unimplemented task stop in class #{self.class.name}"
-    raise "Unimplemented task stop in class #{self.class.name}"
+    fail "Unimplemented task stop in class #{self.class.name}"
   end
 
   def remove(ssh_auth_hash, script_string, data_string)
     @result['status'] = 1
     @result['message'] = "Unimplemented task remove in class #{self.class.name}"
-    raise "Unimplemented task remove in class #{self.class.name}"
+    fail "Unimplemented task remove in class #{self.class.name}"
   end
-
 end
-
-
