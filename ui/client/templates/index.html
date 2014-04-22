@@ -52,7 +52,7 @@
       {% block nav %}
         <div id="nav">
           <div class="navbar transparent navbar-transparent" role="navigation">
-            <div class="">
+            <div>
               <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                   <span class="sr-only">Toggle navigation</span>
@@ -61,7 +61,7 @@
                   <span class="icon-bar"></span>
                 </button>
                 <div class="navbar-brand" href="#">
-                  <a href="/" id="logo"></a>
+                  <a href="{% if authenticated === 'admin' %}/{% else %}/user/clusters{% endif %}" id="logo"></a>
                 </div>
               </div>
               <div class="navbar-collapse collapse">
@@ -193,18 +193,11 @@
       <br/>
       <br/>
       <br/>
-        <div id="footer" style="clear: both;"><span id="copyright">COPYRIGHT © 2014 CONTINUUITY INC. ALL RIGHTS RESERVED.</span><br>
-
-          <a href="http://www.continuuity.com/terms-and-privacy" id="footer-terms" target="blank">Terms and Privacy</a>
-          <span>&nbsp;·&nbsp;</span>
-          <a href="http://www.continuuity.com/contact-us" id="footer-contact" target="blank">Contact</a>
-          <span>&nbsp;·&nbsp;</span>
-          <a href="http://support.continuuity.com/" id="footer-support" target="blank">Support</a>
-          </div>
-        {% endblock %}
-        </div>
-        <br/>
-        <br/>
+        {% include "partials/footer.html" %}
+      {% endblock %}
+      </div>
+      <br/>
+      <br/>
     {% block bodyscript %}
     {% endblock %}
     </body>
