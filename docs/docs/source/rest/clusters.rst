@@ -359,3 +359,458 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/plans
 
+.. _cluster-get-config:
+Get Cluster Configuration
+=========================
+To get the configuration of a cluster, make a GET HTTP request to URI:
+::
+ /clusters/{cluster-id}/config
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
+ {
+    "hadoop": {
+        "core_site": {
+            "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
+            "io.file.buffer.size": "131072"
+        },
+        "hdfs_site": {
+            "dfs.blocksize": "134217728",
+            "dfs.datanode.du.reserved": "1073741824",
+            "dfs.datanode.handler.count": "8",
+            "dfs.datanode.max.transfer.threads": "4096",
+            "dfs.datanode.max.xcievers": "4096",
+            "dfs.namenode.handler.count": "30",
+            "dfs.replication": "1"
+        },
+        "yarn_site": {
+            "yarn.nodemanager.resource.memory-mb": "4096",
+            "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+            "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
+            "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+            "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
+            "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+        }
+    }
+ }
+
+.. _cluster-update-config:
+Update Cluster Configuration
+============================
+To update the configuration of a cluster, make a PUT HTTP request to URI:
+::
+ /clusters/{cluster-id}/config
+
+The request body must be a JSON object that includes a ``config`` key whose value is a 
+JSON Object that will replace the current cluster configuration. It may optionally contain a 
+``restart`` key whose value is true or false, indicating whether or not cluster services should 
+be restarted along with the configuration change. The order of service restarts is derived from
+service dependencies, ensuring that if service A depends on service B, service A will be stopped
+before service B is stopped, and service B will be started before service A is started. After the
+request is made, status calls can be made to check on the status of the cluster configure job. 
+If the configure operation fails, the cluster is placed in an inconsistent state where the cluster
+can be configured again or deleted.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 400 (BAD REQUEST)
+     - If the request body is specified incorrectly.
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - The cluster is not in a configurable state.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -X PUT
+        -d '
+  {
+      "config": {
+          "hadoop": {
+              "core_site": {
+                  "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
+                  "io.file.buffer.size": "131072"
+              },
+              "hdfs_site": {
+                  "dfs.blocksize": "134217728",
+                  "dfs.datanode.du.reserved": "1073741824",
+                  "dfs.datanode.handler.count": "8",
+                  "dfs.datanode.max.transfer.threads": "4096",
+                  "dfs.datanode.max.xcievers": "4096",
+                  "dfs.namenode.handler.count": "30",
+                  "dfs.replication": "1"
+              },
+              "yarn_site": {
+                  "yarn.nodemanager.resource.memory-mb": "4096",
+                  "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+                  "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
+                  "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+                  "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
+                  "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+              }
+          }
+      },
+      "restart": "false" 
+  }'
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
+
+.. _cluster-get-services:
+Get Cluster Services
+====================
+To get the services on a cluster, make a GET HTTP request to URI:
+::
+ /clusters/{cluster-id}/services
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 400 (BAD REQUEST)
+     - If the resource uri is specified incorrectly.
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services
+ [
+     "hadoop-hdfs-namenode",
+     "hadoop-hdfs-datanode",
+     "hadoop-yarn-resourcemanager",
+     "hadoop-yarn-nodemanager"
+ ]
+
+
+.. _cluster-add-services:
+Add Services to a Cluster
+=========================
+To add services to a cluster, make a POST HTTP request to URI:
+::
+ /clusters/{cluster-id}/services
+
+The POST body must be a JSON Object containing a ``services`` key whose value is a JSON Array
+of services to add to the cluster. The services must be compatible with the cluster template
+used to create the cluster. After the request is made, status calls can be made to check on
+the status of the add services cluster operation.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 400 (BAD REQUEST)
+     - If the request is specified incorrectly, or if the services to add are incompatible
+       or the cluster is missing services they require.
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - If the cluster is not in a state where services can be added.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -X POST
+        -d '
+  {
+      "services": [ "zookeeper-server", "hbase-master", "hbase-regionserver" ]
+  }
+        '
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services
+
+.. _cluster-stop-services:
+Stop all Services on a Cluster
+==============================
+To stop all services on a cluster, make a POST HTTP request to URI:
+::
+ /clusters/{cluster-id}/services/stop
+
+There is no POST body expected. The ordering of service stops is based on the dependencies
+defined for the services. If service A requires service B, service A will be stopped before
+service B. After the request is made, a status call can be made to check on the status of 
+the service stop operation. A cluster must be in the ACTIVE state in order for the stop
+operation to be allowed.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - If the cluster is not in a state where services can be stopped.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -X POST
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/stop
+
+.. _cluster-stop-service:
+Stop a Service on a Cluster
+===========================
+To stop a specific service on a cluster, make a POST HTTP request to URI:
+::
+ /clusters/{cluster-id}/services/{service-id}/stop
+
+There is no POST body expected. If there are services that depend on the service being stopped,
+those services will be stopped first. For example, if service A depends on service B, and 
+service B is being stopped, service A will automatically be stopped before service B is stopped.
+After the request is made, a status call can be made to check on the status of 
+the service start operation. A cluster must be in the ACTIVE state in order for the stop
+operation to be allowed.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - If the cluster is not in a state where services can be restarted.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -X POST
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/stop
+
+.. _cluster-start-services:
+Start all Services on a Cluster
+================================
+To start all services on a cluster, make a POST HTTP request to URI:
+::
+ /clusters/{cluster-id}/services/start
+
+There is no POST body expected. The ordering of service starts is based on the dependencies
+defined for the services. If service A requires service B, service B will be started before
+service A. After the request is made, a status call can be made to check on the status of 
+the service stop operation. A cluster must be in the ACTIVE state in order for the start
+operation to be allowed.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - If the cluster is not in a state where services can be started.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -X POST
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/start
+
+.. _cluster-start-service:
+Start a Service on a Cluster
+============================
+To start a specific service on a cluster, make a POST HTTP request to URI:
+::
+ /clusters/{cluster-id}/services/{service-id}/start
+
+There is no POST body expected. If the service being started depends on any other services,
+those services will be started first. For example, if service A depends on service B, and 
+service A is being started, service B will automatically be started before service A is started.
+After the request is made, a status call can be made to check on the status of 
+the service start operation. A cluster must be in the ACTIVE state in order for the start
+operation to be allowed.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - If the cluster is not in a state where services can be restarted.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -X POST
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/start
+
+.. _cluster-restart-services:
+Restart all Services on a Cluster
+=================================
+To restart all services on a cluster, make a POST HTTP request to URI:
+::
+ /clusters/{cluster-id}/services/restart
+
+There is no POST body expected. The ordering of service starts and stops is based on the 
+dependencies defined for the services. If service A requires service B, service A will be 
+stopped before service B is stopped. Service B will be started after it has been stopped,
+and finally service A will be started after service B has been started.
+After the request is made, a status call can be made to check on the status of 
+the service restart operation. A cluster must be in the ACTIVE state in order for the restart
+operation to be allowed.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - If the cluster is not in a state where services can be restarted.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -X POST
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/restart
+
+
+.. _cluster-restart-service:
+Restart a Service on a Cluster
+==============================
+To restart a specific service on a cluster, make a POST HTTP request to URI:
+::
+ /clusters/{cluster-id}/services/{service-id}/restart
+
+There is no POST body expected. If there are services that depend on the service being
+restarted, they will be restarted as well. The ordering of service starts and stops is based on the 
+dependencies defined for the services. If service A requires service B, service A will be 
+stopped before service B is stopped. Service B will be started after it has been stopped,
+and finally service A will be started after service B has been started.
+After the request is made, a status call can be made to check on the status of 
+the service restart operation. A cluster must be in the ACTIVE state in order for the restart
+operation to be allowed.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - If the cluster is not in a state where services can be restarted.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -X POST
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/restart

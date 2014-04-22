@@ -88,21 +88,27 @@ Cluster Templates
 
 Import/Export
 -----------------
-  * :ref:`Exporting Template Metadata <entity-export>`
-  * :ref:`Importing Template Metadata <entity-import>`
+  * :ref:`Export Template Metadata <entity-export>`
+  * :ref:`Import Template Metadata <entity-import>`
 
 User APIs
 =========
-The User Web service provides methods that can be used to create, delete and get status of cluster 
-being created. 
+The User Web service provides methods that can be used to create, delete and manage clusters. 
 
 Clusters
 ------------
-  * :ref:`Creating a Cluster <cluster-create>`
-  * :ref:`Getting Cluster Details <cluster-details>`
-  * :ref:`Deleting a Cluster <cluster-delete>`
-  * :ref:`Getting Status of a Cluster <cluster-status>`
-  * :ref:`Getting a Cluster Action Plan <cluster-plan>`
+  * :ref:`Create a Cluster <cluster-create>`
+  * :ref:`Get Cluster Details <cluster-details>`
+  * :ref:`Delete a Cluster <cluster-delete>`
+  * :ref:`Get Cluster Status <cluster-status>`
+  * :ref:`Get a Cluster Action Plan <cluster-plan>`
+  * :ref:`Get Cluster Configuration <cluster-get-config>`
+  * :ref:`Update Cluster Configuration <cluster-update-config>`
+  * :ref:`Get Cluster Services <cluster-get-services>`
+  * :ref:`Add Services to a Cluster <cluster-add-services>`
+  * :ref:`Stop Services on a Cluster <cluster-stop-services>`
+  * :ref:`Start Services on a Cluster <cluster-start-services>`
+  * :ref:`Restart Services on a Cluster <cluster-restart-services>`
 
 RPC Calls
 =========
