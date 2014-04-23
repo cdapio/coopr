@@ -38,7 +38,7 @@ public class GenericTest {
     globalDriver.get(Constants.LOGIN_URL);
     Global.driverWait(1);
     globalDriver.findElement(By.cssSelector("#username")).sendKeys("admin");
-    globalDriver.findElement(By.cssSelector("#password")).sendKeys("L0omProd!23");
+    globalDriver.findElement(By.cssSelector("#password")).sendKeys("admin");
     globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
   }
 

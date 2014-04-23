@@ -14,7 +14,7 @@ sudo gem install knife-openstack --version 0.8.1
 Start
 =====
 bin/loom.sh start
-Login at http://localhost:8100 with username 'admin' and password 'L0omProd!23'
+Login at http://localhost:8100 with username 'admin' and password 'admin'
 
 Stop
 =====
