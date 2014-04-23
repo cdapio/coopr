@@ -58,6 +58,13 @@ if node['hadoop'].key? 'core_site' and node['hadoop']['core_site'].key? 'hadoop.
     command 'sed -i -e "/HADOOP_SECURE_DN/ s/^#//g" /etc/default/hadoop-hdfs-datanode'
     only_if 'test -e /etc/default/hadoop-hdfs-datanode'
   end
+  # We need to kinit as hdfs to create directories
+  execute 'kinit-as-hdfs-user' do
+    command "kinit -kt #{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab hdfs/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm']}"
+    user 'hdfs'
+    group 'hdfs'
+    only_if { File.exist?("#{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab") }
+  end
 end
 
 if node['hbase'].key? 'hbase_site' and node['hbase']['hbase_site'].key? 'hbase.security.authorization' and
