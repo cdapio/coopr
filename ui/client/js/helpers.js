@@ -204,7 +204,7 @@ Helpers.bindDeletion = function (className) {
  * Manages a confirm deletion dialog.
  */
 Helpers.handleConfirmDeletion = function (e, redirectUrl) {
-  var message = '<div class="row"><div class="col-sm-2"><img src="/static/img/warning.png" />' +
+  var message = '<div class="row"><div class="col-sm-2 delete-trashcan">' +
     '</div><div class="col-sm-10 modal-text">This action is not reversible, are you sure you want' +
     ' to delete?</div></div>';
   bootbox.dialog({

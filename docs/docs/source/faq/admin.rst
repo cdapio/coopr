@@ -56,7 +56,7 @@ see Creating a Template section in :doc:`Administration User Interface </guide/a
 What is the admin password?
 ---------------------------
 
-The default admin password is L0omProd!23. 
+The default admin password is 'admin'. 
 
 Any user password works. What are the user passwords for?
 ---------------------------------------------------------

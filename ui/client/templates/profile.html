@@ -1,0 +1,95 @@
+{% extends 'index.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block header %}
+    {% include "page-header.html" %}
+{% endblock %}
+
+{% block nav %}
+  <div id="nav">
+    <div class="navbar transparent navbar-transparent" role="navigation">
+      <div class="">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="navbar-brand" href="#">
+            <a href="{% if authenticated === 'admin' %}/{% else %}/user/clusters{% endif %}" id="logo"></a>
+          </div>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            {% if authenticated === 'admin' %}
+            {% include "partials/left-menu.html" %}
+            {% else %}
+            <li id="nav-clusters-container" class="{% if activeTab == 'clusters' %}active{% endif %} nav-item last">
+              <a class="nav-icon nav-clusters" href="/user/clusters"></a>
+              <a class="nav-link" id="nav-clusters" href="/user/clusters">Clusters</a>
+            </li>
+            {% endif %}
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <img src="/static/img/v2-assets/icon_more.png" />
+              </a>
+              <ul class="dropdown-menu login-dropdown">
+                {% include "partials/menu-login-item.html" %}
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div id="content-body">
+    <div id="panels">
+
+      <div class="panel spl-panel" style="clear: both;">
+        <div class="panel-body spl-panel-body">
+           <form class="form-horizontal" role="form" id="profile-form" action="/setskin" method="post">
+            <div class="form-group">
+              <label class="col-sm-2 control-label">Username</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="username" placeholder="username" value="{{authenticated}}" disabled/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="skin" class="col-sm-2 control-label">Select skin</label>
+              <div class="col-sm-8">
+                <div class="row">
+                  <div class="col-sm-4 skin-container">
+                    <a href="/static/img/v2-assets/light_skin.png">
+                      <img class="img-responsive" src="/static/img/v2-assets/light_skin.png" />
+                    </a>
+                    <label for="skin"><input type="radio" name="skin" value="light" {% if skin == "light" %} checked {% endif %}/>     Light</label>
+                  </div>
+                  <div class="col-sm-4 skin-container">
+                    <a href="/static/img/v2-assets/dark_skin.png">
+                      <img class="img-responsive" src="/static/img/v2-assets/dark_skin.png" />
+                    </a>
+                    <label for="skin"><input type="radio" name="skin" value="dark" {% if skin == "dark" %} checked {% endif %}/>     Dark</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-8">
+                <button type="submit" class="btn-spl btn-info">Submit</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+{% endblock %}

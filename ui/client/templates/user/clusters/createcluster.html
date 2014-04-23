@@ -5,25 +5,24 @@
 <script src="/static/js/user/createcluster.js" type="text/javascript"></script>
 {% endblock %}
 {% block content %}
-<div id="header">
-  <div id="global">
-    {% include "user/clusters/topmenu.html" %}
-  </div>
-</div>
 <div ng-app="createcluster">
   <div id="content-body" ng-controller="CreateClusterCtrl">
     <div id="title">
-      <h1>Clusters</h1>
+      <div class="pull-right">
+        <div id="global">
+          {% include "user/clusters/topmenu.html" %}
+        </div>
+      </div>
+      <div style="clear: both"></div>
     </div>
-
     <div id="panels">
-      <div class="panel" style="clear: both;">
-        <div class="panel-head">
-          <div class="panel-title" ng-hide="clusterId">Create a cluster</div>
-          <div class="panel-title" ng-show="clusterId">Reconfigure cluster: [[clusterName]]
+      <div class="panel spl-panel" style="clear: both;">
+        <div class="panel-head spl-panel-head">
+          <div class="panel-title spl-panel-title" ng-hide="clusterId">Create a cluster</div>
+          <div class="panel-title spl-panel-title" ng-show="clusterId">Reconfigure cluster: [[clusterName]]
           </div>
         </div>
-        <div class="panel-body">
+        <div class="panel-body spl-panel-body">
           <input type="hidden" value="{{clusterId}}" id="user-cluster-id"/>
           <form class="form-horizontal" role="form" id="create-cluster-form" action="{% if clusterId %}/user/clusters/cluster/{{clusterId}}/reconfigure {% else %} /user/clusters/create{% endif %}" ng-submit="submitData($event)">
             <div class="form-group">
@@ -50,10 +49,10 @@
                 <input type="text" class="form-control" id="inputNumMachines" name="inputNumMachines" placeholder="Machines" ng-model="clusterNumMachines">
               </div>
             </div>
-            <div class="panel-head">
-              <div class="panel-title toggle-advanced-header pointer-cursor" ng-click="toggleAdvanced()">
-                <span class="caret dark large left-float toggle-advanced" ng-show="showAdvanced"></span>
-                <span class="open caret dark large left-float toggle-advanced" ng-hide="showAdvanced"></span>
+            <div class="panel-head spl-panel-head">
+              <div class="panel-title spl-panel-title toggle-advanced-header pointer-cursor" ng-click="toggleAdvanced()">
+                <span class="caret large left-float toggle-advanced" ng-show="showAdvanced"></span>
+                <span class="open caret large left-float toggle-advanced" ng-hide="showAdvanced"></span>
                 <span>Advanced</span>
               </div>
             </div>

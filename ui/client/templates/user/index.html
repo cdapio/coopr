@@ -6,15 +6,44 @@
 {% block body %}
   {% block nav %}
     <div id="nav">
-      <a href="/user" id="logo"></a>
-      <a href="/user" id="product-name">Enterprise Loom | User</a>
-      <ul>
-        {% if authenticated === 'admin' %}
-        {% include "partials/left-menu.html" %}
-        {% else %}
-          <li  class="overview {% if activeTab == 'clusters' %}active{% endif %}"><a class="nav-link nav-clusters" id="nav-clusters" href="/user/clusters">Clusters</a></li>
-        {% endif %}
-      </ul>
+      <div class="navbar transparent navbar-transparent" role="navigation">
+        <div class="">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <div class="navbar-brand" href="#">
+              <a href="/user/clusters" id="logo"></a>
+            </div>
+          </div>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              {% if authenticated === 'admin' %}
+              {% include "partials/left-menu.html" %}
+              {% else %}
+              <li id="nav-clusters-container" class="{% if activeTab == 'clusters' %}active{% endif %} nav-item last">
+                <a class="nav-icon nav-clusters" href="/user/clusters"></a>
+                <a class="nav-link" id="nav-clusters" href="/user/clusters">Clusters</a>
+              </li>
+              {% endif %}
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <img src="/static/img/v2-assets/icon_more.png" />
+                </a>
+                <ul class="dropdown-menu login-dropdown">
+                  {% include "partials/menu-login-item.html" %}
+                </ul>
+              </li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
     </div>
   {% endblock %}
   <div id="content">

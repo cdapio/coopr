@@ -34,7 +34,7 @@ Getting Started
 ===============
 
 Open the Loom UI using a browser at ``http://<loom-host>:<loom-ui-port>/`` and login as an administrator. The default
-password is 'L0omProd!23'.  
+password is 'admin'.  
 
 .. figure:: /guide/quickstart/quickstart-screenshot-1.png
     :align: center

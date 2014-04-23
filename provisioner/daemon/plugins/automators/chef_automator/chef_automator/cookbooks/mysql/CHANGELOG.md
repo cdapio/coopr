@@ -3,6 +3,21 @@ mysql Cookbook CHANGELOG
 This file is used to list changes made in each version of the mysql cookbook.
 
 
+v4.1.2 (2014-02-28)
+-------------------
+- [COOK-4349] - Fix invalid platform check
+- [COOK-4184] - Better handling of Ubuntu upstart service
+- [COOK-2100] - Changing innodb_log_file_size tunable results in inability to start MySQL
+
+
+v4.1.1 (2014-02-25)
+-------------------
+- **[COOK-2966] - Address foodcritic failures'
+- **[COOK-4182] - Template parse failure in /etc/init/mysql.conf (data_dir)'
+- **[COOK-4198] - Added missing tunable'
+- **[COOK-4206] - create root@127.0.0.1, as well as root@localhost'
+
+
 v4.0.20 (2014-01-18)
 --------------------
 * [COOK-3931] - MySQL Server Recipe Regression for Non-LTS Ubuntu Versions

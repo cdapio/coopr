@@ -7,11 +7,44 @@
 {% block body %}
   {% block nav %}
     <div id="nav">
-      <a href="/user" id="logo"></a>
-      <a href="/user" id="product-name">Enterprise Loom</a>
-      <ul>
-        <li class="overview active"><a class="nav-link nav-login" id="nav-login" href="/login">{% if authenticated %}Logout{% else %}Login{% endif %}</a></li>
-      </ul>
+      <div class="navbar transparent navbar-transparent" role="navigation">
+        <div class="">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <div class="navbar-brand" href="#">
+              <a href="/" id="logo"></a>
+            </div>
+          </div>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              {% if authenticated === 'admin' %}
+              {% include "partials/left-menu.html" %}
+              {% else %}
+              <li id="nav-clusters-container" class="{% if activeTab == 'clusters' %}active{% endif %} nav-item last">
+                <a class="nav-icon nav-clusters" href="/user/clusters"></a>
+                <a class="nav-link" id="nav-clusters" href="/user/clusters">Clusters</a>
+              </li>
+              {% endif %}
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <img src="/static/img/v2-assets/icon_more.png" />
+                </a>
+                <ul class="dropdown-menu login-dropdown">
+                  {% include "partials/menu-login-item.html" %}
+                </ul>
+              </li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
     </div>
   {% endblock %}
   <div id="content">
@@ -25,35 +58,35 @@
     </div>
     <div id="content-body">
       <div id="title">
-        <h1>Login</h1>
+        <h3>Login</h3>
       </div>
 
-      <div id="panels">
+    <div id="panels">
 
-        <div class="panel" style="clear: both;">
-          <div class="panel-body">
-            <form class="form-horizontal" role="form" id="create-provider-form" method="POST" action="/login">
-            <div class="form-group">
-              <label for="inputName" class="col-sm-2 control-label">Username</label>
-              <div class="col-sm-4">
-                <input type="text" class="form-control" id="username" name="username" placeholder="username" />
-              </div>
+      <div class="panel spl-panel" style="clear: both;">
+        <div class="panel-body spl-panel-body">
+          <form class="form-horizontal" role="form" id="create-provider-form" method="POST" action="/login">
+          <div class="form-group">
+            <label for="inputName" class="col-sm-2 control-label">Username</label>
+            <div class="col-sm-4">
+              <input type="text" class="form-control" id="username" name="username" placeholder="username" />
             </div>
-            <div class="form-group">
-              <label for="inputName" class="col-sm-2 control-label">Password</label>
-              <div class="col-sm-4">
-                <input type="password" class="form-control" id="password" name="password" placeholder="password" />
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-offset-2 col-sm-8">
-                <button type="submit" class="btn-spl btn-default">Login</button>
-              </div>
-            </div>
-          </form>
           </div>
+          <div class="form-group">
+            <label for="inputName" class="col-sm-2 control-label">Password</label>
+            <div class="col-sm-4">
+              <input type="password" class="form-control" id="password" name="password" placeholder="password" />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-8">
+              <button type="submit" class="btn-spl btn-info">Login</button>
+            </div>
+          </div>
+        </form>
         </div>
       </div>
+    </div>
   {% endblock %}
   <div id="footer" style="clear: both;"><span id="copyright">COPYRIGHT © 2014 CONTINUUITY INC. ALL RIGHTS RESERVED.</span><br>
 
