@@ -1,8 +1,8 @@
 # Hadoop
-if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key? 'hadoop.security.authorization' and
-  node['hadoop']['core_site'].has_key? 'hadoop.security.authentication' and
+if node['hadoop'].key? 'core_site' and node['hadoop']['core_site'].key? 'hadoop.security.authorization' and
+  node['hadoop']['core_site'].key? 'hadoop.security.authentication' and
   node['hadoop']['core_site']['hadoop.security.authorization'] == 'true' and
-  node['hadoop']['core_site']['hadoop.security.authentication'].downcase == 'kerberos')
+  node['hadoop']['core_site']['hadoop.security.authentication'].downcase == 'kerberos'
 
   include_attribute 'krb5'
   include_attribute 'krb5_utils'
@@ -12,12 +12,12 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   default['hadoop']['container_executor']['min.user.id'] = 500
   default['hadoop']['container_executor']['yarn.nodemanager.linux-container-executor.group'] = 'yarn'
   default['hadoop']['container_executor']['yarn.nodemanager.local-dirs'] =
-    if node['hadoop'].has_key? 'yarn_site' and node['hadoop']['yarn_site'].has_key? 'yarn.nodemanager.local-dirs'
+    if node['hadoop'].key? 'yarn_site' and node['hadoop']['yarn_site'].key? 'yarn.nodemanager.local-dirs'
       node['hadoop']['yarn_site']['yarn.nodemanager.local-dirs']
-    elsif node['hadoop'].has_key? 'hadoop.tmp.dir'
+    elsif node['hadoop'].key? 'hadoop.tmp.dir'
       "#{node['hadoop']['hadoop.tmp.dir']}/nm-local-dir"
     else
-      "/tmp/hadoop-yarn/nm-local-dir"
+      '/tmp/hadoop-yarn/nm-local-dir'
     end
   default['hadoop']['container_executor']['yarn.nodemanager.log-dirs'] = '/var/log/hadoop-yarn/userlogs'
 
@@ -43,8 +43,8 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
   default['hadoop']['hdfs_site']['dfs.datanode.keytab.file'] = "#{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab"
   default['hadoop']['hdfs_site']['dfs.namenode.keytab.file'] = "#{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab"
   default['hadoop']['hdfs_site']['dfs.secondary.namenode.keytab.file'] = "#{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab"
-  default['hadoop']['hdfs_site']['dfs.datanode.address'] = "0.0.0.0:1004"
-  default['hadoop']['hdfs_site']['dfs.datanode.http.address'] = "0.0.0.0:1006"
+  default['hadoop']['hdfs_site']['dfs.datanode.address'] = '0.0.0.0:1004'
+  default['hadoop']['hdfs_site']['dfs.datanode.http.address'] = '0.0.0.0:1006'
 
   # yarn-site.xml
   default['hadoop']['yarn_site']['yarn.resourcemanager.keytab'] = "#{node['krb5_utils']['keytabs_dir']}/yarn.service.keytab"
@@ -57,10 +57,10 @@ if (node['hadoop'].has_key? 'core_site' and node['hadoop']['core_site'].has_key?
 end
 
 # HBase
-if (node['hbase'].has_key? 'hbase_site' and node['hbase']['hbase_site'].has_key? 'hbase.security.authorization' and
-  node['hbase']['hbase_site'].has_key? 'hbase.security.authentication' and
+if node['hbase'].key? 'hbase_site' and node['hbase']['hbase_site'].key? 'hbase.security.authorization' and
+  node['hbase']['hbase_site'].key? 'hbase.security.authentication' and
   node['hbase']['hbase_site']['hbase.security.authorization'] == 'true' and
-  node['hbase']['hbase_site']['hbase.security.authentication'].downcase == 'kerberos')
+  node['hbase']['hbase_site']['hbase.security.authentication'].downcase == 'kerberos'
 
   include_attribute 'krb5'
   include_attribute 'krb5_utils'
