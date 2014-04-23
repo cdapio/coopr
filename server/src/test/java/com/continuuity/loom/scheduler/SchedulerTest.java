@@ -25,7 +25,6 @@ import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.http.LoomService;
-import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
@@ -42,9 +41,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.apache.twill.zookeeper.ZKClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -61,7 +60,6 @@ public class SchedulerTest extends BaseTest {
   private static TimeoutTrackingQueue provisionQueue;
   private static TimeoutTrackingQueue solverQueue;
   private static LoomService loomService;
-  private static ZKClient zkClient;
   private static TimeoutTrackingQueue jobQueue;
   private static TaskService taskService;
 
@@ -75,7 +73,6 @@ public class SchedulerTest extends BaseTest {
 
     solverQueue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named("solver.queue")));
     solverQueue.start();
-    zkClient = injector.getInstance(ZKClient.class);
 
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
@@ -94,10 +91,17 @@ public class SchedulerTest extends BaseTest {
     solverQueue.stop();
   }
 
+  @Before
+  public void beforeTest() {
+    jobQueue.removeAll();
+    inputQueue.removeAll();
+    solverQueue.removeAll();
+    provisionQueue.removeAll();
+  }
+
   @Test
   public void testScheduler() throws Exception {
-    ClusterScheduler clusterScheduler = new ClusterScheduler("cluster_scheduler", clusterStore, inputQueue, jobQueue,
-                                                             taskService);
+    ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
 
     Cluster cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
@@ -174,11 +178,7 @@ public class SchedulerTest extends BaseTest {
 
     // Add the job back into the jobQueue, and run job scheduler
     jobQueue.add(new Element(jobId));
-    LoomStats loomStats = new LoomStats();
-    JobScheduler jobScheduler = new JobScheduler(clusterStore, provisionQueue, new JsonSerde(),
-                                                 jobQueue, zkClient,
-                                                 new TaskService(clusterStore, new Actions(), loomStats),
-                                                 3, loomStats);
+    JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
     jobScheduler.run();
     Assert.assertEquals(0, jobQueue.size());
 
@@ -224,6 +224,52 @@ public class SchedulerTest extends BaseTest {
       jobScheduler.run();
     }
   }
+
+  @Test
+  public void testCallbacks() throws Exception {
+    ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
+
+    Cluster cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
+    ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
+    cluster.setLatestJobId(job.getJobId());
+    clusterStore.writeCluster(cluster);
+    clusterStore.writeClusterJob(job);
+
+    Node node = GSON.fromJson(NODE1, Node.class);
+    clusterStore.writeNode(node);
+
+    node = GSON.fromJson(NODE2, Node.class);
+    clusterStore.writeNode(node);
+
+    inputQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
+    clusterScheduler.run();
+
+    // at this point, the before callback should have run, but not the after callback
+    Assert.assertEquals(1, hookExecutor.getBeforeCallbacks().size());
+    Assert.assertEquals(0, hookExecutor.getAfterCallbacks().size());
+
+    JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
+    jobScheduler.run();
+
+    // complete tasks until there are no more
+    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
+    while (taskJson.entrySet().size() > 0) {
+      System.out.println("Got task " + taskJson);
+      JsonObject returnJson = new JsonObject();
+      returnJson.addProperty("status", 0);
+      returnJson.addProperty("workerId", "consumer1");
+      returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
+      TestHelper.finishTask(getLoomUrl(), returnJson);
+      jobScheduler.run();
+      jobScheduler.run();
+
+      taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
+    }
+
+    // at this point, the after callback should have run
+    Assert.assertEquals(1, hookExecutor.getAfterCallbacks().size());
+  }
+
 
   private String getLoomUrl() {
     InetSocketAddress address = loomService.getBindAddress();

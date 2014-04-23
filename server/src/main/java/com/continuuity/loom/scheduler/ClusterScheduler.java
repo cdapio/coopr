@@ -62,10 +62,10 @@ public class ClusterScheduler implements Runnable {
   private final Actions actions;
 
   @Inject
-  public ClusterScheduler(@Named("scheduler.id") String id, ClusterStore clusterStore,
-                          @Named("cluster.queue") TrackingQueue inputQueue,
-                          @Named("internal.job.queue") TrackingQueue jobQueue,
-                          TaskService taskService) {
+  private ClusterScheduler(@Named("scheduler.id") String id, ClusterStore clusterStore,
+                           @Named("cluster.queue") TrackingQueue inputQueue,
+                           @Named("internal.job.queue") TrackingQueue jobQueue,
+                           TaskService taskService) {
     this.id = id;
     this.clusterStore = clusterStore;
     this.inputQueue = inputQueue;
@@ -120,19 +120,10 @@ public class ClusterScheduler implements Runnable {
           for (Set<ClusterTask> stageTasks : clusterTasks) {
             job.addStage(Sets.newHashSet(Iterables.transform(stageTasks, CLUSTER_TASK_STRING_FUNCTION)));
           }
-
-          job.setJobStatus(ClusterJob.Status.RUNNING);
-
-          LOG.debug("Persisting cluster job {}", job.getJobId());
-          LOG.trace("Cluster Job = {}", job);
-
-          clusterStore.writeCluster(cluster);
-
-          // Note: writing job status as RUNNING, will allow other operations on the job
-          // (like cancel, etc.) to happen in parallel.
-          clusterStore.writeClusterJob(job);
+          taskService.startJob(job, cluster);
 
           jobQueue.add(new Element(job.getJobId()));
+          LOG.debug("added job {} to job queue", job.getJobId());
 
           inputQueue.recordProgress(id, clusterElement.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
                                     "Scheduled");

@@ -31,6 +31,7 @@ import com.continuuity.loom.scheduler.ClusterScheduler;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.SolverScheduler;
+import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.EntityStore;
@@ -117,6 +118,8 @@ public final class LoomModules {
                                queueMsBetweenChecks,
                                queueMsRescheduleTimeout);
 
+    final Class callbackClass = Class.forName(conf.get(Constants.CALLBACK_CLASS, Constants.DEFAULT_CALLBACK_CLASS));
+
     return new AbstractModule() {
         @Override
         protected void configure() {
@@ -139,6 +142,7 @@ public final class LoomModules {
           bind(TrackingQueue.class)
             .annotatedWith(Names.named("internal.job.queue")).toInstance(jobSchedulerQueue);
 
+          bind(ClusterCallback.class).to(callbackClass).in(Scopes.SINGLETON);
           bind(EntityStore.class).to(SQLEntityStore.class).in(Scopes.SINGLETON);
           bind(ClusterStore.class).to(SQLClusterStore.class).in(Scopes.SINGLETON);
           bind(ZKClient.class).toInstance(zkClient);
@@ -186,6 +190,8 @@ public final class LoomModules {
           bind(Scheduler.class).in(Scopes.SINGLETON);
           bind(LoomStats.class).in(Scopes.SINGLETON);
           bind(DBConnectionPool.class).in(Scopes.SINGLETON);
+          bind(SQLClusterStore.class).in(Scopes.SINGLETON);
+          bind(SQLEntityStore.class).in(Scopes.SINGLETON);
 
           Multibinder<HttpHandler> handlerBinder = Multibinder.newSetBinder(binder(), HttpHandler.class);
           handlerBinder.addBinding().to(LoomAdminHandler.class);
