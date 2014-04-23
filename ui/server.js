@@ -51,7 +51,7 @@ if (env === 'test') {
 var ADMINS = {
   'admin': {
     username: 'admin',
-    password: 'L0omProd!23'
+    password: 'admin'
   }
 };
 var DEFAULT_API_KEY = '123456789abcdef';
