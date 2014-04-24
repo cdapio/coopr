@@ -60,7 +60,7 @@ if node['hadoop'].key? 'core_site' and node['hadoop']['core_site'].key? 'hadoop.
   end
   # We need to kinit as hdfs to create directories
   execute 'kinit-as-hdfs-user' do
-    command "kinit -kt #{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab hdfs/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm']}"
+    command "kinit -kt #{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab hdfs/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
     user 'hdfs'
     group 'hdfs'
     only_if { File.exist?("#{node['krb5_utils']['keytabs_dir']}/hdfs.service.keytab") }
