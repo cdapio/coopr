@@ -1,8 +1,11 @@
 {
   "name": "nodejs",
   "description": "Node.JS server",
-  "dependson": [
-  ],
+  "dependencies": {
+    "runtime": {
+      "requires": []
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

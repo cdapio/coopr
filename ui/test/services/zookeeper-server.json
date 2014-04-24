@@ -1,9 +1,11 @@
 {
   "name": "zookeeper-server",
   "description": "ZooKeeper Server",
-  "dependson": [
-    "base"
-  ],
+  "dependencies": {
+    "runtime": {
+      "requires": [ "base" ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {
