@@ -18,7 +18,7 @@ package com.continuuity.loom.layout;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 /**
  * Comparator for {@link NodeLayout} objects, which allows specifying preferences for hardware types and image types.
@@ -43,8 +43,8 @@ public class NodeLayoutComparator implements Comparator<NodeLayout> {
   @Override
   public int compare(NodeLayout n1, NodeLayout n2) {
     // first compare by number of services
-    TreeSet<String> n1Services = n1.getServiceNames();
-    TreeSet<String> n2Services = n2.getServiceNames();
+    SortedSet<String> n1Services = n1.getServiceNames();
+    SortedSet<String> n2Services = n2.getServiceNames();
     if (n1Services.size() > n2Services.size()) {
       return -1;
     } else if (n2Services.size() > n1Services.size()) {

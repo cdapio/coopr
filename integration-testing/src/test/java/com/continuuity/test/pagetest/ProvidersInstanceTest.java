@@ -58,11 +58,6 @@ public class ProvidersInstanceTest extends GenericTest {
   }
 
   @Test
-  public void test_04_title() {
-    assertEquals("Providers", globalDriver.findElement(Constants.TITLE_BY).getText());
-  }
-
-  @Test
   public void test_05_getProvider() throws Exception {
     Provider joyent = EXAMPLE_READER.getProviders(Constants.PROVIDERS_PATH).get(PROVIDER_NAME);
     assertEquals("Name is not correct.", joyent.getName(), JOYENT_PROVIDERS_PAGE.getInputName());

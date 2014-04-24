@@ -58,11 +58,6 @@ public class ClustertemplatesInstanceTest extends GenericTest {
   }
 
   @Test
-  public void test_04_title() {
-    assertEquals("Catalog", globalDriver.findElement(Constants.TITLE_BY).getText());
-  }
-
-  @Test
   public void test_05_general() throws IOException {
     assertEquals("Name is not correct.", clustertemplate.getName(), CLUSTERTEMPLATES_INSTANCE_PAGE.getInputName());
     assertEquals("Description is not correct.", clustertemplate.getDescription(),
@@ -79,17 +74,19 @@ public class ClustertemplatesInstanceTest extends GenericTest {
   @Test
   public void test_07_defaults() throws IOException, JSONException {
     ClusterDefaults expectedClusterDefaults = clustertemplate.getClusterDefaults();
-    ClusterDefaults actualClusterDeaults = CLUSTERTEMPLATES_INSTANCE_PAGE.getClusterDefaults();
+    ClusterDefaults actualClusterDefaults = CLUSTERTEMPLATES_INSTANCE_PAGE.getClusterDefaults();
     assertEquals("ClusterDefaults.provider is not correct.", expectedClusterDefaults.getProvider(),
-                 actualClusterDeaults.getProvider());
+                 actualClusterDefaults.getProvider());
     assertEquals("ClusterDefaults.hardwaretype is not correct.", expectedClusterDefaults.getHardwaretype(),
-                 actualClusterDeaults.getHardwaretype());
+                 actualClusterDefaults.getHardwaretype());
     assertEquals("ClusterDefaults.imagetype is not correct.", expectedClusterDefaults.getImagetype(),
-                 actualClusterDeaults.getImagetype());
+                 actualClusterDefaults.getImagetype());
     assertEquals("ClusterDefaults.config is not correct.", expectedClusterDefaults.getConfig(),
-                 actualClusterDeaults.getConfig());
+                 actualClusterDefaults.getConfig());
     assertEquals("ClusterDefaults.services is not correct.", expectedClusterDefaults.getServices(),
-                 actualClusterDeaults.getServices());
+                 actualClusterDefaults.getServices());
+    assertEquals("ClusterDefaults.config is not correct.", expectedClusterDefaults.getDnsSuffix(),
+                 actualClusterDefaults.getDnsSuffix());
   }
 
   @Test

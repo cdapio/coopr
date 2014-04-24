@@ -59,10 +59,15 @@ APP_HOME="`pwd -P`"
 
 export PID_DIR=/var/tmp
 export LOOM_HOME=$APP_HOME
-export LOOM_SERVER_HOME=$APP_HOME
+export LOOM_SERVER_HOME=$APP_HOME/server
 export LOOM_SERVER_CONF=$LOOM_HOME/server/conf/
 export LOOM_LOG_DIR=$LOOM_HOME/logs
 export LOOM_DATA_DIR=$LOOM_HOME/data
+
+# Add Continuuity Loom embedded bin PATH, if it exists
+if [ -d /opt/loom/embedded/bin ] ; then
+    export PATH=/opt/loom/embedded/bin:${PATH}
+fi
 
 # Create log dir
 mkdir -p $LOOM_LOG_DIR || die "Could not create dir $LOOM_LOG_DIR: $!"
@@ -150,7 +155,7 @@ function load_defaults () {
         fi 
 
         echo "Loading default configuration..."
-        $LOOM_HOME/config/defaults/load-defaults.sh && \
+        $LOOM_HOME/server/config/defaults/load-defaults.sh && \
         touch $LOOM_DATA_DIR/.load_defaults
 
         echo

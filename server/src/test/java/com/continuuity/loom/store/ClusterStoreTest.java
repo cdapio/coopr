@@ -28,6 +28,7 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskException;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.Assert;
@@ -55,8 +56,12 @@ public abstract class ClusterStoreTest {
     );
     String clusterId = cluster.getId();
     Assert.assertNull(store.getCluster(clusterId));
+    Assert.assertFalse(store.clusterExists(clusterId));
 
     store.writeCluster(cluster);
+    Assert.assertTrue(store.clusterExists(clusterId));
+    Assert.assertTrue(store.clusterExists(clusterId, cluster.getOwnerId()));
+    Assert.assertFalse(store.clusterExists(clusterId, "not" + cluster.getOwnerId()));
     Assert.assertEquals(cluster, store.getCluster(clusterId));
     // check overwrite
     store.writeCluster(cluster);
@@ -109,6 +114,44 @@ public abstract class ClusterStoreTest {
 
     store.deleteClusterJob(id);
     Assert.assertNull(store.getClusterJob(id));
+  }
+
+  @Test
+  public void testGetClusterJobs() throws Exception {
+    String ownerId = "user1";
+    Cluster cluster = new Cluster(
+      "1", ownerId, "example-hdfs-delete", System.currentTimeMillis(), "hdfs cluster",
+      Entities.ProviderExample.RACKSPACE,
+      Entities.ClusterTemplateExample.HDFS,
+      ImmutableSet.of("node1", "node2"),
+      ImmutableSet.of("s1", "s2")
+    );
+    store.writeCluster(cluster);
+    Set<ClusterJob> jobs = Sets.newHashSet();
+    for (int i = 0; i < 10; i++) {
+      JobId jobId = new JobId(cluster.getId(), i);
+      ClusterJob job = new ClusterJob(jobId, ClusterAction.RESTART_SERVICES);
+      store.writeClusterJob(job);
+      jobs.add(job);
+    }
+    // this job shouldn't get fetched
+    ClusterJob randomJob = new ClusterJob(JobId.fromString("2123-0214"), ClusterAction.CLUSTER_CONFIGURE);
+    store.writeClusterJob(randomJob);
+
+    // shouldn't be able to get since the cluster isn't owned by this user
+    Assert.assertTrue(store.getClusterJobs(cluster.getId(), "not" + ownerId, -1).isEmpty());
+
+    // check we can get all the jobs
+    Assert.assertEquals(Sets.newHashSet(store.getClusterJobs(cluster.getId(), ownerId, -1)), jobs);
+    Assert.assertEquals(Sets.newHashSet(store.getClusterJobs(cluster.getId(), -1)), jobs);
+
+    // check the limit
+    List<ClusterJob> fetchedJobs = store.getClusterJobs(cluster.getId(), ownerId, 5);
+    Assert.assertEquals(5, fetchedJobs.size());
+    Assert.assertTrue(jobs.containsAll(fetchedJobs));
+    fetchedJobs = store.getClusterJobs(cluster.getId(), 5);
+    Assert.assertEquals(5, fetchedJobs.size());
+    Assert.assertTrue(jobs.containsAll(fetchedJobs));
   }
 
   @Test
@@ -188,6 +231,11 @@ public abstract class ClusterStoreTest {
     Set<Node> nodes =  store.getClusterNodes(cluster.getId());
     Assert.assertEquals(ImmutableSet.of(node1, node2), nodes);
 
+    nodes = store.getClusterNodes(cluster.getId(), cluster.getOwnerId());
+    Assert.assertEquals(ImmutableSet.of(node1, node2), nodes);
+
+    Assert.assertTrue(store.getClusterNodes(cluster.getId(), "not" + cluster.getOwnerId()).isEmpty());
+
     store.deleteNode(node1.getId());
     Assert.assertNull(store.getNode(node1.getId()));
 
@@ -205,9 +253,6 @@ public abstract class ClusterStoreTest {
 
     Node node2 = GSON.fromJson(SchedulerTest.NODE2, Node.class);
     store.writeNode(node2);
-
-    Set<Node> nodes =  store.getNodes(ImmutableSet.of(node1.getId(), node2.getId()));
-    Assert.assertEquals(ImmutableSet.of(node1, node2), nodes);
 
     store.deleteNode(node1.getId());
     Assert.assertNull(store.getNode(node1.getId()));

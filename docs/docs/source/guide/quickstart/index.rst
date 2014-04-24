@@ -24,8 +24,8 @@ Quick Start Guide
 This guide will help you get started with Continuuity Loom. In this section, you will learn to provision a cluster
 using one of the preset templates.
 
-Installing Loom
-===============
+Installing Continuuity Loom
+===========================
 
 Please follow the steps found in the :doc:`Installation Guide </guide/installation/index>`. Once successfully installed,
 start all the relevant Loom components: the Loom server, provisioners, and UI.
@@ -34,7 +34,7 @@ Getting Started
 ===============
 
 Open the Loom UI using a browser at ``http://<loom-host>:<loom-ui-port>/`` and login as an administrator. The default
-password is 'L0omProd!23'.  
+password is 'admin'.  
 
 .. figure:: /guide/quickstart/quickstart-screenshot-1.png
     :align: center
@@ -71,7 +71,7 @@ provider you are using.
 
 Rackspace
 ^^^^^^^^^
-An API key and username are required for using Rackspace (for more information on how to obtain your personalized API key, see
+An API key, username, and region are required for using Rackspace (for more information on how to obtain your personalized API key, see
 `this page <http://www.rackspace.com/knowledge_center/article/rackspace-cloud-essentials-1-generating-your-api-key>`_ ).
 
 .. figure:: /guide/quickstart/rackspace.png
@@ -85,7 +85,7 @@ Enter the necessary fields and click on 'Save' to persist them.
 Joyent
 ^^^^^^
 Joyent request a username, api key name, an api key file, api url, and version. The key file must be present on all machines
-running the Provisioner, must be owned by the user running Loom, and must be readable only by the user that owns it 
+running the Provisioner, must be owned by the user running Continuuity Loom, and must be readable only by the user that owns it
 (0400 permissions). 
 
 .. figure:: /guide/quickstart/joyent.png
@@ -100,10 +100,10 @@ OpenStack
 ^^^^^^^^^
 OpenStack has been extensively tested on Havana, but it also supports Grizzly out of the box. OpenStack support has 
 some limitations that are described :doc:`here </guide/installation/openstack-config>`.
-Several of these limitations will be eliminated in future releases of Loom. 
+Several of these limitations will be eliminated in future releases of Continuuity Loom.
 The first step is to configure the openstack provider to use your credentials. 
 OpenStack requires a username, password, tenant, api url, ssh key id, and identity file. The identity file must be 
-present on all machines running the Provisioner, must be owned by the user running Loom, and must be readable only by 
+present on all machines running the Provisioner, must be owned by the user running Continuuity Loom, and must be readable only by
 the user that owns it (0400 permissions).
 
 .. figure:: /guide/quickstart/openstack-provider.png

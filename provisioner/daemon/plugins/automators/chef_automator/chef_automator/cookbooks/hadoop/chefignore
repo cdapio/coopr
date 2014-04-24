@@ -47,12 +47,14 @@ a.out
 ###########
 .watchr
 .rspec
+.rubocop.yml
 spec/*
 spec/fixtures/*
 test/*
 features/*
 Guardfile
 Procfile
+Thorfile
 
 # SCM #
 #######

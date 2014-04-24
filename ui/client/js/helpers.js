@@ -57,7 +57,13 @@ Helpers.READABLE_ACTIONS = {
   CLUSTER_CREATE: "Creation",
   CLUSTER_DELETE: "Deletion",
   SOLVE_LAYOUT: "Solve layout",
-  CLUSTER_EXPIRE: "Deletion on expiry"
+  CLUSTER_EXPIRE: "Deletion on expiry",
+  CLUSTER_CONFIGURE: "Configure",
+  CLUSTER_CONFIGURE_WITH_RESTART: "Configure and restart",
+  STOP_SERVICES: "Stop services",
+  RESTART_SERVICES: "Restart services",
+  START_SERVICES: "Start services",
+  ADD_SERVICES: "Add services"
 };
 
 /**
@@ -158,10 +164,12 @@ Helpers.clearValues = function (el) {
  * @return {Boolean} If JSON is valid.
  */
 Helpers.isValidJSON = function (input) {
-  return (/^[\],:{}\s]*$/
-          .test(input.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
-          .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-          .replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
+  try {
+    JSON.parse(input);
+    return true;
+  } catch (e) {
+    return false;
+  }
 };
 
 /**
@@ -196,7 +204,7 @@ Helpers.bindDeletion = function (className) {
  * Manages a confirm deletion dialog.
  */
 Helpers.handleConfirmDeletion = function (e, redirectUrl) {
-  var message = '<div class="row"><div class="col-sm-2"><img src="/static/img/warning.png" />' +
+  var message = '<div class="row"><div class="col-sm-2 delete-trashcan">' +
     '</div><div class="col-sm-10 modal-text">This action is not reversible, are you sure you want' +
     ' to delete?</div></div>';
   bootbox.dialog({

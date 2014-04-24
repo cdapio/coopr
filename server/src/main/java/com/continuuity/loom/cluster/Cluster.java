@@ -21,11 +21,9 @@ import com.continuuity.loom.admin.Provider;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -46,13 +44,20 @@ public final class Cluster extends NamedEntity {
      */
     ACTIVE,
     /**
-     * Previous job on cluster failed, cluster may not be ready to use.
+     * Cluster creation did not complete, cluster may not be ready to use.
      */
     INCOMPLETE,
     /**
+     * Cluster used to be ACTIVE, but a previous operation failed leaving it in an inconsistent state.
+     */
+    INCONSISTENT,
+    /**
      * The cluster no longer exists.
      */
-    TERMINATED
+    TERMINATED;
+
+    public static final Set<Status> CONFIGURABLE_STATES = ImmutableSet.of(Status.ACTIVE, Status.INCONSISTENT);
+    public static final Set<Status> SERVICE_ACTIONABLE_STATES = ImmutableSet.of(Status.ACTIVE);
   }
 
   private final String id;
@@ -63,10 +68,10 @@ public final class Cluster extends NamedEntity {
   private ClusterTemplate clusterTemplate;
   private Set<String> nodes;
   private Set<String> services;
-  private final List<String> jobs;
+  private String latestJobId;
   private String ownerId;
   private Status status;
-  private final JsonObject config;
+  private JsonObject config;
 
   public Cluster(String id, String ownerId, String name, long createTime, String description, Provider provider,
                  ClusterTemplate clusterTemplate, Set<String> nodes, Set<String> services, JsonObject config) {
@@ -81,7 +86,7 @@ public final class Cluster extends NamedEntity {
     this.clusterTemplate = clusterTemplate;
     this.nodes = nodes;
     this.services = Sets.newHashSet(services);
-    this.jobs = Lists.newArrayList();
+    this.latestJobId = null;
     this.status = Status.PENDING;
     this.config = config;
   }
@@ -184,25 +189,16 @@ public final class Cluster extends NamedEntity {
    * @return Id of the most recent job performed, or being performed, on the cluster.
    */
   public String getLatestJobId() {
-    return jobs.isEmpty() ? null : jobs.get(jobs.size() - 1);
+    return latestJobId;
   }
 
   /**
-   * Get a list of ids for all jobs performed or being performed on the cluster.
+   * Set the latest job of the cluster.
    *
-   * @return List of ids for all jobs performed or being performed on the cluster.
+   * @param jobId Id of the latest cluster job.
    */
-  public List<String> getJobs() {
-    return jobs;
-  }
-
-  /**
-   * Add a job to the cluster. It will become the most recent job.
-   *
-   * @param jobId Id of the job to add.
-   */
-  public void addJob(String jobId) {
-    jobs.add(jobId);
+  public void setLatestJobId(String jobId) {
+    latestJobId = jobId;
   }
 
   /**
@@ -295,6 +291,16 @@ public final class Cluster extends NamedEntity {
     this.services = ImmutableSet.copyOf(services);
   }
 
+  /**
+   * Set the config for the cluster. Only sets the config in this Java object.
+   * A separate call must be made to persistently store changes in config.
+   *
+   * @param config Cluster configuration to use.
+   */
+  public void setConfig(JsonObject config) {
+    this.config = config;
+  }
+
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
@@ -308,7 +314,7 @@ public final class Cluster extends NamedEntity {
       .add("clusterTemplate", clusterTemplate)
       .add("nodes", nodes)
       .add("services", services)
-      .add("jobs", jobs)
+      .add("latestJobId", latestJobId)
       .add("status", status)
       .add("config", config)
       .toString();
@@ -329,13 +335,13 @@ public final class Cluster extends NamedEntity {
       Objects.equal(clusterTemplate, other.clusterTemplate) &&
       Objects.equal(nodes, other.nodes) &&
       Objects.equal(services, other.services) &&
-      Objects.equal(jobs, other.jobs) &&
+      Objects.equal(latestJobId, other.latestJobId) &&
       Objects.equal(config, other.config);
   }
 
   @Override
   public int hashCode() {
     return Objects.hashCode(id, name, description, createTime, expireTime, provider, clusterTemplate,
-                            nodes, services, jobs, config);
+                            nodes, services, latestJobId, config);
   }
 }

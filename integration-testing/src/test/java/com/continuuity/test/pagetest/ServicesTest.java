@@ -92,7 +92,7 @@ public class ServicesTest extends GenericTest {
 
   @Test
   public void test_05_testServicesSelected() {
-    assertEquals("Services menu item is not selected", "active", TEST_UTIL.getHTMLClasses("#nav-services-container"));
+    assertEquals("Services menu item is not selected", "active nav-item", TEST_UTIL.getHTMLClasses("#nav-services-container"));
   }
 
   @Test

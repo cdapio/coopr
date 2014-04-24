@@ -31,31 +31,18 @@ import java.util.Properties;
  * //driver = new PhantomDriver().getDriver();
  * 
  * ROOT_URL is root url of application
- * ACCOUNT_URL is url that should appear when click on "Account"
- * SUPPORT_URL is url that should appear when click on "Support"
- * TERMS_URL is url that should appear when click on "Terms and Privacy"
- * CONTACT_URL is url that should appear when click on "Contact"
- * @author elmira
  *
  */
 public class Global {
   public static WebDriver globalDriver;
   public static Properties properties;
   public static boolean read = readProperties();
-  public static final String ROOT_URL = Global.properties.getProperty("rootUrl");
-  public static final String ACCOUNT_URL = Global.properties.getProperty("accountUrl");
-  public static final String SUPPORT_URL = Global.properties.getProperty("supportUrl");
-  public static final String TERMS_URL = Global.properties.getProperty("termsUrl");
-  public static final String CONTACT_URL = Global.properties.getProperty("contactUrl");;
   public static  final OS OS_VERSION = detectOs();
-  public static final boolean RUN_SUITE = Boolean.parseBoolean(Global.properties.getProperty("runSuite"));
   
   static {
     chooseDriver();
   }
-  public static void assignUrls() {
-    
-  }
+
   public static void driverWait(int sec) {
     try {
       Thread.sleep(sec * 1000);
@@ -63,7 +50,6 @@ public class Global {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    //globalDriver.manage().timeouts().implicitlyWait(sec, TimeUnit.SECONDS);
   }
   public static boolean readProperties() {
     properties = new Properties();
@@ -103,44 +89,11 @@ public class Global {
       globalDriver = new PhantomDriver().getDriver();
     }
   }
-  public static void waitForLoading(String url) {
-    Global.driverWait(15);
-    /*
-    try {
-      globalDriver.get(url);
-      WebElement message = (new WebDriverWait(globalDriver, 5))
-          .until(new ExpectedCondition<WebElement>(){
-            public WebElement apply(WebDriver d) {
-              return  globalDriver.findElement(By.id("load-app-trigger"));
-            }});
-    } catch (NoSuchElementException e) {
-      fail("Element not found!!");
-      e.printStackTrace();
-    } 
-    */
-  }
+
   public static void waitForLoading() {
     Global.driverWait(15);
-    /*
-    try {
-      WebElement message = (new WebDriverWait(globalDriver, 15))
-          .until(new ExpectedCondition<WebElement>(){
-            public WebElement apply(WebDriver d) {
-              WebElement elem = globalDriver.findElement(By.id("load-app-trigger"));
-              //System.out.println(elem.getText());
-              return  elem;
-            }});
-    } catch (NoSuchElementException e) {
-      fail("Element not found!!");
-      e.printStackTrace();
-    } 
-    */
   }
- /**
-  * enum class for detection running os
-  * @author elmira
-  *
-  */
+
   public enum OS {
     MAC_OS, LINUX
   }

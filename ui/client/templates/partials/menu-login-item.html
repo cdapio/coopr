@@ -13,7 +13,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<li class="right-float"><a class="nav-link" href="/login">{% if authenticated %}Logout{% else %}Login{% endif %}</a></li>
-<li class="right-float right-border"><a class="nav-link" href="http://support.continuuity.com">Support</a></li>
-<li class="right-float right-border"><a class="nav-link" href="http://continuuity.com/docs/loom/0.9.5/en/index.html">Docs</a></li>
-{% if authenticated %}<li class="right-float right-border"><a class="nav-link nav-login" id="nav-login" href="/user/clusters">{{authenticated}}</a></li>{% endif %}
+{% if authenticated %}<li class=""><a class="right-nav-link nav-login" id="nav-login" href="/profile">{{authenticated}}</a></li>{% endif %}
+<li class=""><a class="right-nav-link nav-docs" href="http://continuuity.com/docs/loom/0.9.6/en/index.html">Docs</a></li>
+<li class=""><a class="right-nav-link nav-support" href="http://support.continuuity.com">Support</a></li>
+<li class=""><a class="right-nav-link nav-logout" href="/login">{% if authenticated %}Logout{% else %}Login{% endif %}</a></li>
+
+
+

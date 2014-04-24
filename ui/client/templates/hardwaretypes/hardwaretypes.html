@@ -7,22 +7,23 @@
 {% endblock %}
 
 {% block content %}
-  <div id="header">
-    <div id="global">
-      {% include "hardwaretypes/topmenu.html" %}
-    </div>
-  </div>
   <div id="content-body">
     <div id="title">
-      <h1>Hardware Types</h1>
+      <h3 class="pull-left">Hardware types</h3>
+      <div class="pull-right">
+        <div id="global">
+          {% include "hardwaretypes/topmenu.html" %}
+        </div>
+      </div>
+      <div style="clear: both"></div>
     </div>
 
     <div id="panels">
 
-      <div class="panel" style="clear: both;">
-        <div class="panel-body">
+      <div class="panel spl-panel" style="clear: both;">
+        <div class="panel-body spl-panel-body">
           {% if hardwaretypes and hardwaretypes.length %}
-            <table class="table table-striped tablesorter">
+            <table class="table table-striped tablesorter spl-panel-table">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -38,7 +39,7 @@
                     <td>
                       <form role="form" method="POST" action="/hardwaretypes/delete/{{entry.name}}" class="delete-form">
                         <input type="hidden" value="{{entry.name}}" name="name" />
-                        <button type="submit" class="btn-spl btn-danger">Delete</button>
+                        <button type="submit" class="btn-spl btn-delete"></button>
                       </form>
                     </td>
                   </tr>

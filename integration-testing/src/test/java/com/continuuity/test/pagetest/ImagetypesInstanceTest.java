@@ -55,11 +55,6 @@ public class ImagetypesInstanceTest extends GenericTest {
   }
 
   @Test
-  public void test_04_title() {
-    assertEquals("Image types", globalDriver.findElement(Constants.TITLE_BY).getText());
-  }
-
-  @Test
   public void test_05_getImagetype() throws Exception {
     HardwareType small = EXAMPLE_READER.getHardwareTypes(Constants.IMAGETYPES_PATH).get(NAME);
     assertEquals("Name is not correct.", small.getName(), IMAGETYPES_INSTANCE_PAGE.getInputName());

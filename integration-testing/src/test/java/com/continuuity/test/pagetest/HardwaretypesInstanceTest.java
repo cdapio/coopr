@@ -55,11 +55,6 @@ public class HardwaretypesInstanceTest extends GenericTest {
   }
 
   @Test
-  public void test_04_title() {
-    assertEquals("Hardware types", globalDriver.findElement(Constants.TITLE_BY).getText());
-  }
-
-  @Test
   public void test_05_getHardwaretype() throws Exception {
     HardwareType small = EXAMPLE_READER.getHardwareTypes(Constants.HARDWARETYPES_PATH).get(NAME);
     assertEquals("Name is not correct.", small.getName(), HARDWARETYPES_INSTANCE_PAGE.getInputName());

@@ -15,6 +15,7 @@
  */
 package com.continuuity.test.drivers;
 
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 
 /** Driver is a class for phantom browser (headless without GUI).
@@ -22,7 +23,6 @@ import org.openqa.selenium.WebDriver;
  * if it throw mistake that is not executable check for mode of the file
  * and chmod it to be executable 
  * chmod a+x file
- * @author elmira
  *
  */
 public class PhantomDriver extends Driver {
@@ -47,6 +47,7 @@ public class PhantomDriver extends Driver {
     }
     System.setProperty("phantomjs.binary.path", path);
     driver = new CustomPhantomJSDriver();
+    driver.manage().window().setSize(new Dimension(2500,2500));
     return this.driver;
 
   }

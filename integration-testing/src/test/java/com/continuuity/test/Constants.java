@@ -19,13 +19,16 @@ import com.google.common.collect.ImmutableSet;
 import org.openqa.selenium.By;
 
 import java.io.File;
+import java.net.ServerSocket;
 
 /**
  *
  */
 public class Constants {
+
   // URI
-  public static final String ROOT_URL = "http://localhost:8100";
+  public static final int PORT = getPort();
+  public static final String ROOT_URL = "http://localhost:" + PORT;
   public static final String INDEX_URL = ROOT_URL;
   public static final String LOGIN_URL = ROOT_URL + "/login";
   public static final String PROVIDERS_URL = ROOT_URL + "/providers";
@@ -67,7 +70,7 @@ public class Constants {
   public static final By TD = By.tagName("td");
 
   // Table location properties
-  public static final By TITLE_BY = By.cssSelector("#title");
+  public static final By TITLE_BY = By.cssSelector("#title h3");
   public static final String TABLE = "table.table-striped";
   public static final String VALUE = "value";
   public static final String AUTH = "auth";
@@ -84,7 +87,7 @@ public class Constants {
   public static final By NAV_SERVICES = By.cssSelector("#nav-services");
   public static final By NAV_LOGIN = By.cssSelector("#nav-login");
 
-  public static final ImmutableSet<String> LEFT_PANEL = ImmutableSet.of("admin", "Clusters",
+  public static final ImmutableSet<String> LEFT_PANEL = ImmutableSet.of("Clusters",
                                                         "Providers", "Hardware", "Images", "Services");
 
   // Fixture properties
@@ -93,4 +96,17 @@ public class Constants {
   public static final String CLUSTER_CREATE_FILE_NAME = PARENT_PATH + "/ui/test/clusters/createcluster.json";
 
   public static final String ACTION_TABLE_CLASSNAME = ".node-actions-table";
+
+  public static int getPort() {
+    int port = -1;
+    try {
+      ServerSocket s = new ServerSocket(0);
+      port = s.getLocalPort();
+      s.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("Could not find port");
+    }
+    return port;
+  }
 }

@@ -23,9 +23,9 @@
 Licensing and Open Source 
 ============================
 
-What type of license is Loom open sourced under?
-------------------------------------------------
-Loom is licensed under an `Apache 2.0 license <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
+What type of license is Continuuity Loom open sourced under?
+-------------------------------------------------------------
+Continuuity Loom is licensed under an `Apache 2.0 license <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
 
 How can I contribute?
 ---------------------
@@ -38,4 +38,3 @@ Are you interested in making Loom better? Our development model is a simple pull
  * Address all the review comments
  * Once addressed, the changes will be committed to the continuuity/loom repo.
 
-In order to accept your pull request, we need you to submit a CLA. You only need to do this once, so if you've done this for another Continuuity open source project, you're good to go. If you are submitting a pull request for the first time, just let us know that you have completed the CLA and we can cross-check with your GitHub username. Email cla@continuuity.com for a copy of the CLA, fill out the form, and send it back to cla@continuuity.com

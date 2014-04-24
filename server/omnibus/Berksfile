@@ -1,5 +1,0 @@
-site :opscode
-
-cookbook "omnibus"
-cookbook "java", ">= 1.21.2"
-cookbook "maven"

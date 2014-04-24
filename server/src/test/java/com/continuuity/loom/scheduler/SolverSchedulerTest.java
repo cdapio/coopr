@@ -24,13 +24,16 @@ import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.LayoutConstraint;
 import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.layout.ClusterRequest;
+import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.store.ClusterStore;
@@ -51,7 +54,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,6 +61,7 @@ import java.util.Set;
  *
  */
 public class SolverSchedulerTest extends BaseTest {
+  private static Gson GSON = new JsonSerde().getGson();
   private static TimeoutTrackingQueue solverQueue;
   private static TimeoutTrackingQueue clusterQueue;
   private static ClusterStore clusterStore;
@@ -72,12 +75,14 @@ public class SolverSchedulerTest extends BaseTest {
     Cluster cluster = new Cluster("1", "user", clusterName, System.currentTimeMillis(),
                                   "my cluster", null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of());
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CREATE);
-    cluster.addJob(job.getJobId());
+    cluster.setLatestJobId(job.getJobId());
     clusterStore.writeCluster(cluster);
     clusterStore.writeClusterJob(job);
-    ClusterRequest request = new ClusterRequest(cluster.getName(), cluster.getDescription(),
-                                                reactorTemplate.getName(), 5, null, null, null, null, 0);
-    solverQueue.add(new Element(cluster.getId(), new Gson().toJson(request)));
+    ClusterCreateRequest createRequest =
+      new ClusterCreateRequest(cluster.getName(), cluster.getDescription(),
+                               reactorTemplate.getName(), 5, null, null, null, null, 0L, null, null);
+    SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, GSON.toJson(createRequest));
+    solverQueue.add(new Element(cluster.getId(), GSON.toJson(solverRequest)));
 
     solverScheduler.run();
 
@@ -127,7 +132,7 @@ public class SolverSchedulerTest extends BaseTest {
     reactorTemplate = new ClusterTemplate(
       "reactor-medium",
       "medium reactor cluster template",
-      new ClusterDefaults(services, "joyent", null, null, new JsonObject()),
+      new ClusterDefaults(services, "joyent", null, null, null, new JsonObject()),
       new Compatibilities(
         ImmutableSet.<String>of("large-mem", "large-cpu", "large", "medium", "small"),
         null,
@@ -170,7 +175,8 @@ public class SolverSchedulerTest extends BaseTest {
     );
 
     // create providers
-    entityStore.writeProvider(new Provider("joyent", "joyent provider", Provider.Type.JOYENT, Collections.EMPTY_MAP));
+    entityStore.writeProvider(new Provider("joyent", "joyent provider", Provider.Type.JOYENT,
+                                           ImmutableMap.<String, Map<String, String>>of()));
     // create hardware types
     entityStore.writeHardwareType(
       new HardwareType(
@@ -203,9 +209,8 @@ public class SolverSchedulerTest extends BaseTest {
     );
     // create services
     for (String serviceName : services) {
-      entityStore.writeService(new Service(
-        serviceName, serviceName + " description", Collections.EMPTY_SET, Collections.EMPTY_MAP
-      ));
+      entityStore.writeService(new Service(serviceName, serviceName + " description", ImmutableSet.<String>of(),
+                                           ImmutableMap.<ProvisionerAction, ServiceAction>of()));
     }
     entityStore.writeClusterTemplate(reactorTemplate);
   }

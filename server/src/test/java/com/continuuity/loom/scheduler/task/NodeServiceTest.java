@@ -41,6 +41,28 @@ public class NodeServiceTest extends LoomServiceTestBase {
   }
 
   @Test
+  public void testCreateHostname() {
+    String clusterId = "00000001";
+    Assert.assertEquals("i-am-a-cluster1-1002.local",
+                        NodeService.createHostname("i.am-a_cluster", clusterId, 1002, null));
+  }
+
+  @Test
+  public void testLongHostname() {
+    String clusterId = "00000123";
+    String domain = "dev.company.com";
+    String expectedSuffix = "123-1002." + domain;
+    StringBuilder longName = new StringBuilder();
+    for (int i = 0; i < 255 - expectedSuffix.length(); i++) {
+      longName.append("a");
+    }
+    String bigName = longName.toString();
+    Assert.assertEquals(bigName + expectedSuffix,
+                        NodeService.createHostname(bigName + "bcde", clusterId, 1002, domain));
+
+  }
+
+  @Test
   public void testNodeMaxActions() throws Exception {
     NodeService nodeService = new NodeService(clusterStore, 3, 100);
 

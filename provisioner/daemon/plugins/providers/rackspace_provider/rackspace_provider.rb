@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-gem 'knife-rackspace', '= 0.8.4'
+gem 'knife-rackspace', '= 0.9.1'
 
 require 'json'
 require_relative 'chef/knife/loom_rackspace_server_create'
@@ -39,15 +39,20 @@ class RackspaceProvider < Provider
 
       Chef::Config[:knife][:rackspace_username] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_username"]
       Chef::Config[:knife][:rackspace_api_key] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_api_key"]
+      Chef::Config[:knife][:rackspace_region] =  @task["config"]["provider"]["provisioner"]["auth"]["rackspace_region"]
 
       # invoke knife
       log.debug "Invoking server create"
       kniferesult = knife_instance.run
       @result['result']['providerid'] = kniferesult['providerid']
       @result['result']['ssh-auth']['user'] = "root"
-      @result['result']['ssh-auth']['password'] = kniferesult['rootpassword']
-      @result['status'] = kniferesult['status']
 
+      if kniferesult.has_key? 'rootpassword'
+        @result['result']['ssh-auth']['password'] = kniferesult['rootpassword']
+      else
+        @result['result']['ssh-auth']['identityfile'] = Chef::Config[:knife][:identity_file] || "/opt/loom/provisioner/daemon/plugins/providers/rackspace_provider/id_rsa"
+      end
+      @result['status'] = kniferesult['status']
     rescue Exception => e
       log.error('Unexpected Error Occured in RackspaceProvider.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occured in RackspaceProvider.create: #{e.inspect}"
@@ -68,6 +73,7 @@ class RackspaceProvider < Provider
 
       Chef::Config[:knife][:rackspace_username] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_username"]
       Chef::Config[:knife][:rackspace_api_key] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_api_key"]
+      Chef::Config[:knife][:rackspace_region] =  @task["config"]["provider"]["provisioner"]["auth"]["rackspace_region"]
 
       # invoke knife
       log.debug "Invoking server confirm"
@@ -113,6 +119,7 @@ class RackspaceProvider < Provider
 
       Chef::Config[:knife][:rackspace_username] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_username"]
       Chef::Config[:knife][:rackspace_api_key] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_api_key"]
+      Chef::Config[:knife][:rackspace_region] =  @task["config"]["provider"]["provisioner"]["auth"]["rackspace_region"]
 
       # invoke knife
       log.debug "Invoking server delete"

@@ -107,7 +107,7 @@ public class ClusterLayoutFinderTest extends BaseSolverTest {
     Set<String> services = ImmutableSet.of("svc1", "svc2", "svc3");
     ClusterTemplate template = new ClusterTemplate(
       "simple", "all services on all nodes template",
-      new ClusterDefaults(services, "joyent", null, null, new JsonObject()),
+      new ClusterDefaults(services, "joyent", null, null, null, new JsonObject()),
       new Compatibilities(null, null, services),
       new Constraints(
         ImmutableMap.<String, ServiceConstraint>of("svc1", new ServiceConstraint(null, null, 1, 1, 1, null)),
@@ -129,7 +129,6 @@ public class ClusterLayoutFinderTest extends BaseSolverTest {
                                    int[] nodeCounts, int numMachines, boolean expected) {
     ClusterLayoutFinder clusterLayoutFinder =
       new ClusterLayoutFinder(nodeLayouts, template, template.getClusterDefaults().getServices(), numMachines);
-    clusterLayoutFinder.setNodeCount(nodeCounts);
-    Assert.assertEquals(expected, clusterLayoutFinder.isValidCluster());
+    Assert.assertEquals(expected, clusterLayoutFinder.isValidCluster(nodeCounts));
   }
 }

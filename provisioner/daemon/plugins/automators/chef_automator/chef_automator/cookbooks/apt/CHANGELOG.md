@@ -2,6 +2,24 @@ apt Cookbook CHANGELOG
 ======================
 This file is used to list changes made in each version of the apt cookbook.
 
+v2.3.8 (2014-02-14)
+-------------------
+### Bug
+- **[COOK-4287](https://tickets.opscode.com/browse/COOK-4287)** - Cleanup the Kitchen
+
+
+v2.3.6
+------
+* [COOK-4154] - Add chefspec matchers.rb file to apt cookbook
+* [COOK-4102] - Only index created repository
+
+
+v2.3.6
+------
+* [COOK-4154] - Add chefspec matchers.rb file to apt cookbook
+* [COOK-4102] - Only index created repository
+
+
 v2.3.4
 ------
 No change. Version bump for toolchain sanity

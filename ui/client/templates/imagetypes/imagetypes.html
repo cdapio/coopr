@@ -7,25 +7,24 @@
 {% endblock %}
 
 {% block content %}
-  <div id="header">
-    <div id="global">
-      {% include "imagetypes/topmenu.html" %}
-    </div>
-  </div>
   <div id="content-body">
     <div id="title">
-      <div><div class="pull-right" style="margin-top: 2px;position: relative; width: 150px;text-align: center;">
-    </div></div>
-      <h1>Image types</h1>
+      <h3 class="pull-left">Image types</h3>
+      <div class="pull-right">
+        <div id="global">
+          {% include "imagetypes/topmenu.html" %}
+        </div>
+      </div>
+      <div style="clear: both"></div>
     </div>
 
     <div id="panels">
 
-      <div class="panel" style="clear: both;">
+      <div class="panel spl-panel" style="clear: both;">
 
-        <div class="panel-body">
+        <div class="panel-body spl-panel-body">
           {% if imagetypes and imagetypes.length %}
-            <table class="table table-striped tablesorter">
+            <table class="table table-striped tablesorter spl-panel-table">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -41,7 +40,7 @@
                     <td>
                       <form role="form" method="POST" action="/imagetypes/delete/{{entry.name}}" class="delete-form">
                         <input type="hidden" value="{{entry.name}}" name="name" />
-                        <button type="submit" class="btn-spl btn-danger">Delete</button>
+                        <button type="submit" class="btn-spl btn-delete"></button>
                       </form>
                     </td>
                   </tr>

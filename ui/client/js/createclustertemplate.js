@@ -55,6 +55,9 @@ TemplateView.app.factory('dataFactory', ['$http', '$q', 'fetchUrl', 'templateEnd
 TemplateView.app.controller('TemplateCtrl', ['$scope', '$interval', 'dataFactory',
   'templateEndpoint', function ($scope, $interval, dataFactory, templateEndpoint) {
 
+  $scope.configDiv = $('#inputConfig')[0];
+  $scope.jsonValidEl = $('#is-json-valid')[0];
+
   /**
    * Cluster template model description.
    */
@@ -66,6 +69,7 @@ TemplateView.app.controller('TemplateCtrl', ['$scope', '$interval', 'dataFactory
       provider: '',
       hardwaretype: '',
       imagetype: '',
+      dnsSuffix: '',
       config: ''
     },
     compatibility: {
@@ -145,7 +149,7 @@ TemplateView.app.controller('TemplateCtrl', ['$scope', '$interval', 'dataFactory
     // Get cluster template and map to model.
     dataFactory.getTemplate(function (clustertemplate) {
       if ('config' in clustertemplate.defaults) {
-        $scope.defaultConfig = JSON.stringify(clustertemplate.defaults.config);
+        $scope.defaultConfig = JSON.stringify(clustertemplate.defaults.config, undefined, 4);
       }
       if ('services' in clustertemplate.constraints) {
         for (var item in clustertemplate.constraints.services) {
@@ -166,6 +170,9 @@ TemplateView.app.controller('TemplateCtrl', ['$scope', '$interval', 'dataFactory
         $scope.leaseDuration.step = Helpers.parseMilliseconds(
           clustertemplate.administration.leaseduration.step);
       }
+
+      // Prettify the json config manually since PP doesn't recognize angular change event.
+      PP.prettify($scope.configDiv, $scope.jsonValidEl, 1000, true);
 
       $scope.clustertemplate = $.extend($scope.clustertemplate, clustertemplate);
       $scope.templateJSON = JSON.stringify($scope.clustertemplate);

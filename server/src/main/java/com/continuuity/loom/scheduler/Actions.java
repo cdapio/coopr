@@ -38,15 +38,26 @@ public class Actions {
   private final Map<ClusterAction, Set<Dependency>> actionDependency;
 
   /**
-   * Represents action dependency.
+   * Represents action dependency between services. Suppose we have a service A that depends on service B. A dependency
+   * from start to initialize means that initialize service B must run before start service A runs. A dependency from
+   * start to start means that start service B must run before start service A runs. Setting the reverse flag reverses
+   * the order of services. For example, a reverse dependency from stop to stop means that stop service A must run
+   * before stop service B. Similarly, a reverse dependency from stop to remove means that stop service A must run
+   * before remove service B.
    */
   public static class Dependency {
     private final ProvisionerAction from;
     private final ProvisionerAction to;
+    private final boolean isReversed;
 
     public Dependency(ProvisionerAction from, ProvisionerAction to) {
+      this(from, to, false);
+    }
+
+    public Dependency(ProvisionerAction from, ProvisionerAction to, boolean isReversed) {
       this.from = from;
       this.to = to;
+      this.isReversed = isReversed;
     }
 
     public ProvisionerAction getFrom() {
@@ -55,6 +66,10 @@ public class Actions {
 
     public ProvisionerAction getTo() {
       return to;
+    }
+
+    public boolean getIsReversed() {
+      return isReversed;
     }
 
     @Override
@@ -68,15 +83,13 @@ public class Actions {
 
       Dependency that = (Dependency) o;
 
-      return from == that.from && to == that.to;
+      return from == that.from && to == that.to && isReversed == that.isReversed;
 
     }
 
     @Override
     public int hashCode() {
-      int result = from.hashCode();
-      result = 31 * result + to.hashCode();
-      return result;
+      return Objects.hashCode(from, to, isReversed);
     }
 
     @Override
@@ -84,20 +97,53 @@ public class Actions {
       return Objects.toStringHelper(this)
         .add("from", from)
         .add("to", to)
+        .add("reverse", isReversed)
         .toString();
     }
   }
 
   public Actions() {
-    this.actionOrder =
-      ImmutableMap.<ClusterAction, List<ProvisionerAction>>of(
-        ClusterAction.CLUSTER_CREATE,
-                      ImmutableList.of(ProvisionerAction.CREATE, ProvisionerAction.CONFIRM, ProvisionerAction.BOOTSTRAP,
-                                       ProvisionerAction.INSTALL, ProvisionerAction.CONFIGURE,
-                                       ProvisionerAction.INITIALIZE, ProvisionerAction.START),
-        ClusterAction.CLUSTER_DELETE,
-                      ImmutableList.of(ProvisionerAction.DELETE));
-
+    this.actionOrder = ImmutableMap.<ClusterAction, List<ProvisionerAction>>builder()
+      .put(ClusterAction.CLUSTER_CREATE,
+           ImmutableList.of(
+             ProvisionerAction.CREATE,
+             ProvisionerAction.CONFIRM,
+             ProvisionerAction.BOOTSTRAP,
+             ProvisionerAction.INSTALL,
+             ProvisionerAction.CONFIGURE,
+             ProvisionerAction.INITIALIZE,
+             ProvisionerAction.START))
+      .put(ClusterAction.CLUSTER_DELETE,
+           ImmutableList.of(
+             ProvisionerAction.DELETE))
+      .put(ClusterAction.ADD_SERVICES,
+           ImmutableList.of(
+             ProvisionerAction.BOOTSTRAP,
+             ProvisionerAction.INSTALL,
+             ProvisionerAction.CONFIGURE,
+             ProvisionerAction.INITIALIZE,
+             ProvisionerAction.START))
+      .put(ClusterAction.CLUSTER_CONFIGURE,
+           ImmutableList.of(
+             ProvisionerAction.BOOTSTRAP,
+             ProvisionerAction.CONFIGURE))
+      .put(ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART,
+           ImmutableList.of(
+             ProvisionerAction.BOOTSTRAP,
+             ProvisionerAction.STOP,
+             ProvisionerAction.CONFIGURE,
+             ProvisionerAction.START))
+      .put(ClusterAction.STOP_SERVICES,
+           ImmutableList.of(
+             ProvisionerAction.STOP))
+      .put(ClusterAction.START_SERVICES,
+           ImmutableList.of(
+             ProvisionerAction.START))
+      .put(ClusterAction.RESTART_SERVICES,
+           ImmutableList.of(
+             ProvisionerAction.STOP,
+             ProvisionerAction.START))
+      .build();
 
     this.rollbackActions =
       ImmutableMap.of(ProvisionerAction.CONFIRM, ProvisionerAction.DELETE);
@@ -108,15 +154,36 @@ public class Actions {
     this.hardwareActions = ImmutableSet.of(ProvisionerAction.CREATE, ProvisionerAction.CONFIRM,
                                            ProvisionerAction.BOOTSTRAP, ProvisionerAction.DELETE);
 
-    this.actionDependency =
-      ImmutableMap.<ClusterAction, Set<Dependency>>of(
-        ClusterAction.CLUSTER_CREATE,
-                      ImmutableSet.of(
-                        // Start of a dependent service can happen only after its dependency has started
-                        new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-                        // Initialize of a dependent service can happen only after its dependency has started
-                        new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE))
-      );
+    this.actionDependency = ImmutableMap.<ClusterAction, Set<Dependency>>builder()
+      .put(ClusterAction.CLUSTER_CREATE,
+           ImmutableSet.of(
+             // Start of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+             // Initialize of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)))
+      .put(ClusterAction.ADD_SERVICES,
+           ImmutableSet.of(
+             // Start of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+             // Initialize of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)))
+      .put(ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART,
+           ImmutableSet.of(
+             // Start of a dependent service can happen only after its dependency has started
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+             // Stop of a dependent service can happen only before its dependency has stopped
+             new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
+      .put(ClusterAction.STOP_SERVICES,
+           ImmutableSet.of(
+             new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
+      .put(ClusterAction.START_SERVICES,
+           ImmutableSet.of(
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START)))
+      .put(ClusterAction.RESTART_SERVICES,
+           ImmutableSet.of(
+             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+             new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
+      .build();
   }
 
   public Actions(Map<ClusterAction, List<ProvisionerAction>> actionOrder,

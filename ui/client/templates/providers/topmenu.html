@@ -1,8 +1,8 @@
 <ul>
-  <li><a class="nav-link nav-dash" id="nav-overview" href="/providers">Home</a></li>
+  <li><a class="nav-link nav-dash btn-spl btn-default secondary-nav-home" href="/providers">Home</a></li>
   <li>
     <div class="dropdown" id="providers-list">
-      <a data-toggle="dropdown" href="#">Providers <span class="caret"></span></a>
+      <a data-toggle="dropdown" class="btn-spl btn-default nav-dash secondary-nav-dropdown" href="#">Providers <span class="caret"></span></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
         {% for item in providers %}
           <li><a class="list-types" href="/providers/provider/{{item.name}}">{{ item.name }}</a></li>
@@ -13,6 +13,5 @@
       </ul>
     </div>
   </li>
-  <li><a class="nav-link nav-dash" id="nav-overview" href="/providers/create"><span class="glyphicon glyphicon-plus"></span>&nbsp;Create a provider</a></li>
-  {% include "partials/menu-login-item.html" %}
+  <li><a class="nav-link nav-dash btn-spl btn-default secondary-nav-create" href="/providers/create">Create</a></li>
 </ul>

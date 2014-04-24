@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-gem 'knife-joyent', '= 0.3.2'
+gem 'knife-joyent', '= 0.4.8'
 
 require 'json'
 require_relative 'chef/knife/loom_joyent_server_create'

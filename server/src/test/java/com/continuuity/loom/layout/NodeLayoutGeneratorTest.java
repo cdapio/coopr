@@ -75,50 +75,36 @@ public class NodeLayoutGeneratorTest extends BaseSolverTest {
     Map<String, ServiceConstraint> serviceConstraints = reactorTemplate.getConstraints().getServiceConstraints();
 
     // test all possible valid node layouts
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "large-mem", "centos6", ImmutableSet.of("namenode", "resourcemanager", "hbasemaster"), serviceConstraints));
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "large-mem", "ubuntu12", ImmutableSet.of("namenode", "resourcemanager", "hbasemaster"), serviceConstraints));
+    Set<String> masterServices = ImmutableSet.of("namenode", "resourcemanager", "hbasemaster");
+    assertSatisfiesServiceConstraints("large-mem", "centos6", masterServices, serviceConstraints);
+    assertSatisfiesServiceConstraints("large-mem", "ubuntu12", masterServices, serviceConstraints);
 
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "medium", "centos6", ImmutableSet.of("datanode", "nodemanager", "regionserver"), serviceConstraints));
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "medium", "ubuntu12", ImmutableSet.of("datanode", "nodemanager", "regionserver"), serviceConstraints));
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "large-cpu", "centos6", ImmutableSet.of("datanode", "nodemanager", "regionserver"), serviceConstraints));
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "large-cpu", "ubuntu12", ImmutableSet.of("datanode", "nodemanager", "regionserver"), serviceConstraints));
+    Set<String> slaveServices = ImmutableSet.of("datanode", "nodemanager", "regionserver");
+    assertSatisfiesServiceConstraints("medium", "centos6", slaveServices, serviceConstraints);
+    assertSatisfiesServiceConstraints("medium", "ubuntu12", slaveServices, serviceConstraints);
+    assertSatisfiesServiceConstraints("large-cpu", "centos6", slaveServices, serviceConstraints);
+    assertSatisfiesServiceConstraints("large-cpu", "ubuntu12", slaveServices, serviceConstraints);
 
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "small", "centos6", ImmutableSet.of("zookeeper"), serviceConstraints));
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "medium", "centos6", ImmutableSet.of("zookeeper"), serviceConstraints));
+    assertSatisfiesServiceConstraints("small", "centos6", ImmutableSet.of("zookeeper"), serviceConstraints);
+    assertSatisfiesServiceConstraints("medium", "centos6", ImmutableSet.of("zookeeper"), serviceConstraints);
 
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "large", "centos6", ImmutableSet.of("reactor"), serviceConstraints));
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "medium", "centos6", ImmutableSet.of("reactor"), serviceConstraints));
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "large", "ubuntu12", ImmutableSet.of("reactor"), serviceConstraints));
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "medium", "ubuntu12", ImmutableSet.of("reactor"), serviceConstraints));
+    assertSatisfiesServiceConstraints("large", "centos6", ImmutableSet.of("reactor"), serviceConstraints);
+    assertSatisfiesServiceConstraints("medium", "centos6", ImmutableSet.of("reactor"), serviceConstraints);
+    assertSatisfiesServiceConstraints("large", "ubuntu12", ImmutableSet.of("reactor"), serviceConstraints);
+    assertSatisfiesServiceConstraints("medium", "ubuntu12", ImmutableSet.of("reactor"), serviceConstraints);
     // there are no image type constraints for reactor so this should pass
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "medium", "asdf", ImmutableSet.of("reactor"), serviceConstraints));
+    assertSatisfiesServiceConstraints("medium", "asdf", ImmutableSet.of("reactor"), serviceConstraints);
 
 
-    Assert.assertTrue(NodeLayoutGenerator.isValidNodeLayout(
-      "medium", "centos6", ImmutableSet.of("reactor", "zookeeper"), serviceConstraints));
+    assertSatisfiesServiceConstraints("medium", "centos6", ImmutableSet.of("reactor", "zookeeper"), serviceConstraints);
 
     // test hardware type is invalid
-    Assert.assertFalse(NodeLayoutGenerator.isValidNodeLayout(
-      "large", "centos6", ImmutableSet.of("namenode", "resourcemanager", "hbasemaster"), serviceConstraints));
+    assertUnsatisfiesServiceConstraints("large", "centos6", masterServices, serviceConstraints);
     // test image type is invalid
-    Assert.assertFalse(NodeLayoutGenerator.isValidNodeLayout(
-      "large", "asdf", ImmutableSet.of("namenode", "resourcemanager", "hbasemaster"), serviceConstraints));
+    assertUnsatisfiesServiceConstraints("large", "asdf", masterServices, serviceConstraints);
     // test both are invalid
-    Assert.assertFalse(NodeLayoutGenerator.isValidNodeLayout(
-      "large-mem", "ubuntu12", ImmutableSet.of("reactor", "zookeeper"), serviceConstraints));
+    assertUnsatisfiesServiceConstraints("large-mem", "ubuntu12",
+                                        ImmutableSet.of("reactor", "zookeeper"), serviceConstraints);
   }
 
   @Test
@@ -232,7 +218,7 @@ public class NodeLayoutGeneratorTest extends BaseSolverTest {
     Set<String> services = ImmutableSet.of("svc1", "svc2", "svc3");
     ClusterTemplate template = new ClusterTemplate(
       "simple", "all services on all nodes template",
-      new ClusterDefaults(services, "joyent", null, null, new JsonObject()),
+      new ClusterDefaults(services, "joyent", null, null, null, new JsonObject()),
       new Compatibilities(null, null, services),
       new Constraints(
         ImmutableMap.<String, ServiceConstraint>of("svc1", new ServiceConstraint(null, null, 1, 1, 1, null)),
@@ -250,5 +236,17 @@ public class NodeLayoutGeneratorTest extends BaseSolverTest {
       new NodeLayoutGenerator(template, services, ImmutableSet.<String>of("small"), ImmutableSet.<String>of("centos6"));
     List<NodeLayout> actual = nodeLayoutGenerator.generateNodeLayoutPreferences();
     Assert.assertEquals(expected, actual);
+  }
+
+  private void assertSatisfiesServiceConstraints(String hardwareType, String imageType, Set<String> services,
+                                           Map<String, ServiceConstraint> serviceConstraints) {
+    NodeLayout nodeLayout = new NodeLayout(hardwareType, imageType, services);
+    Assert.assertTrue(nodeLayout.satisfiesServiceConstraints(serviceConstraints));
+  }
+
+  private void assertUnsatisfiesServiceConstraints(String hardwareType, String imageType, Set<String> services,
+                                                   Map<String, ServiceConstraint> serviceConstraints) {
+    NodeLayout nodeLayout = new NodeLayout(hardwareType, imageType, services);
+    Assert.assertFalse(nodeLayout.satisfiesServiceConstraints(serviceConstraints));
   }
 }

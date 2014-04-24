@@ -15,12 +15,12 @@
  */
 package com.continuuity.loom.http;
 
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.BaseTest;
+import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
+import com.continuuity.loom.store.ClusterStore;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -94,14 +94,6 @@ public class LoomServiceTestBase extends BaseTest {
     scheduler.stopAndWait();
   }
 
-  protected static void startScheduler(){
-    scheduler.startAndWait();
-  }
-
-protected static JobScheduler getJobScheduler(){
-    return jobScheduler;
-  }
-
   public static HttpResponse doGet(String resource) throws Exception {
     return doGet(resource, null);
   }
@@ -115,10 +107,6 @@ protected static JobScheduler getJobScheduler(){
     }
 
     return client.execute(get);
-  }
-
-  public static HttpResponse doPut(String resource, String body) throws Exception {
-    return doPut(resource, body, null);
   }
 
   public static HttpResponse doPut(String resource, String body, Header[] headers) throws Exception {
@@ -150,10 +138,6 @@ protected static JobScheduler getJobScheduler(){
     }
 
     return client.execute(post);
-  }
-
-  public static HttpResponse doDelete(String resource) throws Exception {
-    return doDelete(resource, null);
   }
 
   public static HttpResponse doDelete(String resource, Header[] headers) throws Exception {

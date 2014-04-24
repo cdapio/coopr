@@ -62,11 +62,6 @@ public class ClustersTest extends GenericTest {
   }
 
   @Test
-  public void test_02_Title() {
-    assertEquals("Clusters", globalDriver.findElement(Constants.TITLE_BY).getText());
-  }
-
-  @Test
   public void test_03_activeClusters() throws Exception {
     WebElement activeTable = globalDriver.findElement(ACTIVE_CLUSTER).findElement(TABLE);
     assertEquals("active clusters is not correct.", CLUSTER_READER.getClusters(ACTIVE),
@@ -85,7 +80,7 @@ public class ClustersTest extends GenericTest {
   @Test
   public void test_05_testClustersSelected() {
     assertEquals("Clusters menu item is not selected",
-                 "active", TEST_UTIL.getHTMLClasses("#nav-clusters-container"));
+                 "active nav-item last", TEST_UTIL.getHTMLClasses("#nav-clusters-container"));
   }
 
   @Test

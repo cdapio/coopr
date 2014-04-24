@@ -3,34 +3,35 @@
 Runs with the test environment of loom UI.
 
 ### Dependencies:
-Nodejs: http://nodejs.org/
+   * Nodejs: http://nodejs.org/
+   * Chrome: https://www.google.com/intl/en/chrome/browser/
+   * Phantomjs: http://phantomjs.org/ (for headless testing)
 
-Chrome: https://www.google.com/intl/en/chrome/browser/
+### Usage:
+##### Full Test
+From the project root directory, run:
 
-Phantomjs: http://phantomjs.org/ (for headless testing)
+```
+$ mvn test
+```
 
-###Steps
-#####First build server:
+This will build the server module first, then run the SuiteOrder test suite.
 
-$ cd server
+##### Just Integration Tests
+Alternatively, you can first install the project to your local maven repository:
 
-$ mvn clean package
+```
+$ mvn install
+```
 
-Add loom server as a dependency:
+And then run just the integration tests after that:
 
-mvn org.apache.maven.plugins:maven-install-plugin:2.5.1:install-file \
+```
+$ cd integration-testing
+$ mvn test
+```
 
--Dfile=../server/target/loom-<version>.jar \
+If the server code changes, you may need to install it again.
 
--DgroupId=com.continuuity \
-
--DartifactId=loom \
-
--Dpackaging=jar \
-
--Dversion=<version>
-
-#####Run tests:
-
-mvn -Dtest=SuiteOrder test
-
+##### Location of stdout
+stdout of tests is captured by the surefire plugin and placed in target/surefire-reports

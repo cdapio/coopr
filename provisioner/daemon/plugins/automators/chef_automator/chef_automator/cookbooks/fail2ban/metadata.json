@@ -1,6 +1,6 @@
 {
   "name": "fail2ban",
-  "version": "2.0.4",
+  "version": "2.1.2",
   "description": "Installs and configures fail2ban",
   "long_description": "",
   "maintainer": "Opscode, Inc.",
@@ -11,13 +11,13 @@
     "ubuntu": ">= 0.0.0",
     "redhat": ">= 0.0.0",
     "centos": ">= 0.0.0",
-    "fedora": ">= 0.0.0",
     "scientific": ">= 0.0.0",
     "amazon": ">= 0.0.0",
     "oracle": ">= 0.0.0"
   },
   "dependencies": {
-    "yum": "< 3.0.0"
+    "yum": "~> 3.0",
+    "yum-epel": ">= 0.0.0"
   },
   "recommendations": {
   },

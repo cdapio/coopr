@@ -12,36 +12,34 @@
 {% endblock %}
 
 {% block content %}
-  <div id="header">
-    <div id="global">
-      {% include "clustertemplates/topmenu.html" %}
-    </div>
-  </div>
   <div ng-app="templateview">
     <div id="content-body" ng-controller="TemplateCtrl">
       <div id="title">
-        <div><div class="pull-right" style="margin-top: 2px;position: relative; width: 150px;text-align: center;">
-      </div></div>
-        <h1>Catalog</h1>
+        <div class="pull-right">
+          <div id="global">
+            {% include "clustertemplates/topmenu.html" %}
+          </div>
+        </div>
+        <div style="clear: both"></div>
       </div>
 
     <div id="panels">
 
-      <div class="panel" style="clear: both;">
-        <div class="panel-head clearfix">
-          <div class="panel-title"><h3 class="pull-left">{% if clustertemplateId %} Edit template: {{clustertemplateId}} {% else %}Create a template{% endif %}</h3>
+      <div class="panel spl-panel" style="clear: both;">
+        <div class="panel-head spl-panel-head clearfix">
+          <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if clustertemplateId %} Edit template: {{clustertemplateId}} {% else %}Create a template{% endif %}</h4>
           <div class="pull-right">
             {% if clustertemplateId %}
             <form role="form" method="POST" action="/clustertemplates/delete/{{clustertemplateId}}" class="clustertemplate-delete-form inline-display" ng-submit="deleteTemplate($event)">
               <input type="hidden" value="{{clustertemplateId}}" name="name" id="inputName" />
-              <button type="submit" class="btn-spl btn-danger">Delete</button>
+              <button type="submit" class="btn-spl btn-delete"></button>
             </form>
             {% endif %}
           </div>
           </div>
         </div>
 
-        <div class="panel-body">
+        <div class="panel-body spl-panel-body">
           <form class="form-horizontal" role="form" action="{% if clustertemplateId %}/clustertemplates/update{% else %}/clustertemplates/create{% endif %}" id="create-clustertemplate-form" ng-submit="submitData($event)">
           <div class="tabbed-pages">
             <ul id="sectionTab" class="nav nav-tabs">
@@ -105,7 +103,7 @@
                   </div>
                 </div>
               </div>
-              <div class="tab-pane panel-body fade" id="defaults">
+              <div class="tab-pane panel-body spl-panel-body fade" id="defaults">
                 <div class="form-group">
                   <div class="">
                     <div class="form-group">
@@ -119,7 +117,7 @@
                     <div class="form-group">
                       <label for="inputHardwaretype" class="col-sm-2 control-label">Hardware type</label>
                       <div class="col-sm-8">
-                        <select class="form-control hardwaretype-select" name="inputHardwaretype" ng-model="clustertemplate.defaults.hardwaretype" ng-options="item for item in hardwaretypes">
+                        <select class="form-control hardwaretype-select" name="inputHardwaretype" ng-model="clustertemplate.defaults.hardwaretype" ng-options="item for item in clustertemplate.compatibility.hardwaretypes">
                            <option></option>
                         </select>
                       </div>
@@ -127,13 +125,22 @@
                     <div class="form-group">
                       <label for="inputImagetype" class="col-sm-2 control-label">Image type</label>
                       <div class="col-sm-8">
-                        <select class="form-control imagetype-select" name="inputImagetype" ng-model="clustertemplate.defaults.imagetype" ng-options="item for item in imagetypes">
+                        <select class="form-control imagetype-select" name="inputImagetype" ng-model="clustertemplate.defaults.imagetype" ng-options="item for item in clustertemplate.compatibility.imagetypes">
                            <option></option>
                         </select>
                       </div>
                     </div>
                     <div class="form-group">
-                      <label class="col-sm-2 control-label">Config</label>
+                      <label for="inputDnsSuffix" class="col-sm-2 control-label">DNS Suffix</label>
+                      <div class="col-sm-8">
+                        <input type="text" class="form-control" id="inputDnsSuffix" placeholder="DNS Suffix" ng-model="clustertemplate.defaults.dnsSuffix">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-2 control-label">Config <br />
+                        <br />
+                        <div type="button" id="is-json-valid" class="btn-spl btn-default valid-json-icon">Format</div>
+                      </label>
                       <div class="col-sm-8">
                         <textarea class="form-control" rows="5" id="inputConfig" ng-model="defaultConfig"></textarea>
                       </div>
@@ -141,7 +148,7 @@
                     <div class="form-group">
                       <label for="inputDefaultServices" class="col-sm-2 control-label">Default services</label>
                       <div class="col-sm-4">
-                        <select class="form-control service-select" name="inputService" ng-model="defaultServiceEntry" ng-options="item for item in services">
+                        <select class="form-control service-select" name="inputService" ng-model="defaultServiceEntry" ng-options="item for item in clustertemplate.compatibility.services">
                            <option selected="selected"></option>
                         </select>
                       </div>
@@ -165,7 +172,7 @@
                   </div>
                 </div>
               </div>
-              <div class="tab-pane panel-body fade" id="compatibility">
+              <div class="tab-pane panel-body spl-panel-body fade" id="compatibility">
                 <div class="">
                   <div class="form-group">
                     <label class="col-sm-2 control-label">Services</label>
@@ -232,7 +239,7 @@
                   </div>
                 </div>
               </div>
-              <div class="tab-pane panel-body fade" id="constraints">
+              <div class="tab-pane panel-body spl-panel-body fade" id="constraints">
                 <!-- Must coexist modal -->
                 <div class="modal fade" id="must-coexist-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
@@ -242,22 +249,24 @@
                         <h4 class="modal-title" id="myModalLabel">Add group</h4>
                       </div>
                       <div class="modal-body">
-                        <div class="form-group">
-                          <label class="col-sm-2 control-label">Must coexist</label>
-                          <div class="col-sm-4">
-                            <select class="form-control must-coexist-select" name="inputService" ng-model="mustcoexistSelect" ng-options="item for item in services">
-                               <option selected="selected"></option>
-                            </select>
+                        <div class="padded-interior">
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label">Must coexist</label>
+                            <div class="col-sm-4">
+                              <select class="form-control must-coexist-select" name="inputService" ng-model="mustcoexistSelect" ng-options="item for item in services">
+                                 <option selected="selected"></option>
+                              </select>
+                            </div>
+                            <div class="col-sm-4">
+                              <button type="button" class="btn-spl btn-default inline-display add-service-btn" data-context="must-coexist" ng-click="addEntry(mustcoexistSelect, currentConstraints.mustcoexistGroup)">Add service</button>
+                            </div>
                           </div>
-                          <div class="col-sm-4">
-                            <button type="button" class="btn-spl btn-default inline-display add-service-btn" data-context="must-coexist" ng-click="addEntry(mustcoexistSelect, currentConstraints.mustcoexistGroup)">Add service</button>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <div class="col-sm-offset-2 col-sm-8 must-coexist-entries">
-                            <div class="form-control" ng-repeat="item in currentConstraints.mustcoexistGroup">
-                              <span class="service-name default-service-entry">[[item]]</span>
-                              <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.mustcoexistGroup)"></span>
+                          <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-8 must-coexist-entries">
+                              <div class="form-control" ng-repeat="item in currentConstraints.mustcoexistGroup">
+                                <span class="service-name default-service-entry">[[item]]</span>
+                                <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.mustcoexistGroup)"></span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -278,22 +287,24 @@
                         <h4 class="modal-title" id="myModalLabel">Add group</h4>
                       </div>
                       <div class="modal-body">
-                        <div class="form-group">
-                          <label class="col-sm-2 control-label">Can't coexist</label>
-                          <div class="col-sm-4">
-                            <select class="form-control cant-coexist-select" name="inputService" ng-model="cantcoexistSelect" ng-options="item for item in services">
-                               <option selected="selected"></option>
-                            </select>
+                        <div class="padded-interior">
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label">Can't coexist</label>
+                            <div class="col-sm-4">
+                              <select class="form-control cant-coexist-select" name="inputService" ng-model="cantcoexistSelect" ng-options="item for item in services">
+                                 <option selected="selected"></option>
+                              </select>
+                            </div>
+                            <div class="col-sm-4">
+                              <button type="button" class="btn-spl btn-default inline-display add-service-btn" data-context="cant-coexist" ng-click="addEntry(cantcoexistSelect, currentConstraints.cantcoexistGroup)">Add service</button>
+                            </div>
                           </div>
-                          <div class="col-sm-4">
-                            <button type="button" class="btn-spl btn-default inline-display add-service-btn" data-context="cant-coexist" ng-click="addEntry(cantcoexistSelect, currentConstraints.cantcoexistGroup)">Add service</button>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <div class="col-sm-offset-2 col-sm-8 cant-coexist-entries">
-                            <div class="form-control" ng-repeat="item in currentConstraints.cantcoexistGroup">
-                              <span class="service-name default-service-entry">[[item]]</span>
-                              <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.cantcoexistGroup)"></span>
+                          <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-8 cant-coexist-entries">
+                              <div class="form-control" ng-repeat="item in currentConstraints.cantcoexistGroup">
+                                <span class="service-name default-service-entry">[[item]]</span>
+                                <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.cantcoexistGroup)"></span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -317,7 +328,7 @@
                       <div class="col-sm-offset-2 col-sm-8">
                         <div class="must-coexist-group">
                             <div class="coexist-group" ng-repeat="item in clustertemplate.constraints.layout.mustcoexist">
-                              <span class="group-delete mid-btn glyphicon glyphicon-remove btn btn-danger right-float" ng-click="removeEntry(item, clustertemplate.constraints.layout.mustcoexist)"></span>
+                              <span class="group-delete mid-btn glyphicon glyphicon-remove btn  right-float" ng-click="removeEntry(item, clustertemplate.constraints.layout.mustcoexist)"></span>
                               <div class="clearfix"></div>
                               <div class="form-control" ng-repeat="entry in item">
                                 <span class="service-name must-coexist-entry">[[entry]]</span>
@@ -336,7 +347,7 @@
                       <div class="col-sm-offset-2 col-sm-8">
                         <div class=" cant-coexist-group">
                             <div class="coexist-group" ng-repeat="item in clustertemplate.constraints.layout.cantcoexist">
-                              <span class="group-delete mid-btn glyphicon glyphicon-remove btn btn-danger right-float" ng-click="removeEntry(item, clustertemplate.constraints.layout.cantcoexist)"></span>
+                              <span class="group-delete mid-btn glyphicon glyphicon-remove btn  right-float" ng-click="removeEntry(item, clustertemplate.constraints.layout.cantcoexist)"></span>
                               <div class="clearfix"></div>
                               <div class="form-control" ng-repeat="entry in item">
                                 <span class="service-name cant-coexist-entry">[[entry]]</span>
@@ -358,67 +369,69 @@
                         <h4 class="modal-title" id="myModalLabel">Add service constraint</h4>
                       </div>
                       <div class="modal-body">
-                        <div class="pull-right">
-                          <button type="button" ng-click="clearServiceConstraintForm()" class="btn-spl btn-default">Clear</button>
-                        </div>
-                        <div style="clear:both"></div>
-                        <div class="form-group">
-                          <label class="col-sm-2 control-label">Service name</label>
-                          <div class="col-sm-4">
-                            <select class="form-control service-select" name="service-name" id="service-name" ng-model="currentConstraints.serviceGroup.name" ng-options="item for item in services">
-                               <option selected="selected"></option>
-                            </select>
+                        <div class="padded-interior">
+                          <div class="pull-right">
+                            <button type="button" ng-click="clearServiceConstraintForm()" class="btn-spl btn-default">Clear</button>
                           </div>
-                        </div>
-                        <div class="form-group">
-                          <label class="col-sm-2 control-label">Hardware type</label>
-                          <div class="col-sm-4">
-                            <select class="form-control hardwaretype-select" ng-model="currentConstraints.serviceGroup.currentHardwareType" ng-options="item for item in hardwaretypes">
-                               <option selected="selected"></option>
-                            </select>
-                          </div>
-                          <div class="col-sm-4">
-                            <button type="button" class="btn-spl btn-default add-hardwaretype-btn" ng-click="addEntry(currentConstraints.serviceGroup.currentHardwareType, currentConstraints.serviceGroup.hardwaretypes)">Add</button>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <div class="col-sm-offset-2 col-sm-6">
-                            <div class="form-control" ng-repeat="item in currentConstraints.serviceGroup.hardwaretypes">
-                              <span class="hardwaretype-name">[[item]]</span>
-                              <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.serviceGroup.hardwaretypes)"></span>
+                          <div style="clear:both"></div>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label">Service name</label>
+                            <div class="col-sm-4">
+                              <select class="form-control service-select" name="service-name" id="service-name" ng-model="currentConstraints.serviceGroup.name" ng-options="item for item in services">
+                                 <option selected="selected"></option>
+                              </select>
                             </div>
                           </div>
-                        </div>
-                        <div class="form-group">
-                          <label class="col-sm-2 control-label">Image type</label>
-                          <div class="col-sm-4">
-                            <select class="form-control imagetype-select" ng-model="currentConstraints.serviceGroup.currentImageType" ng-options="item for item in imagetypes">
-                               <option selected="selected"></option>
-                            </select>
-                          </div>
-                          <div class="col-sm-4">
-                            <button type="button" class="btn-spl btn-default add-imagetype-btn" ng-click="addEntry(currentConstraints.serviceGroup.currentImageType, currentConstraints.serviceGroup.imagetypes)">Add</button>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <div class="col-sm-offset-2 col-sm-6">
-                            <div class="form-control" ng-repeat="item in currentConstraints.serviceGroup.imagetypes">
-                              <span class="hardwaretype-name">[[item]]</span>
-                              <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.serviceGroup.imagetypes)"></span>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label">Hardware type</label>
+                            <div class="col-sm-4">
+                              <select class="form-control hardwaretype-select" ng-model="currentConstraints.serviceGroup.currentHardwareType" ng-options="item for item in hardwaretypes">
+                                 <option selected="selected"></option>
+                              </select>
+                            </div>
+                            <div class="col-sm-4">
+                              <button type="button" class="btn-spl btn-default add-hardwaretype-btn" ng-click="addEntry(currentConstraints.serviceGroup.currentHardwareType, currentConstraints.serviceGroup.hardwaretypes)">Add</button>
                             </div>
                           </div>
-                        </div>
-                        <h4>Quantities</h4>
-                        <div class="form-group">
-                          <label class="col-sm-2 control-label">Min</label>
-                          <div class="col-sm-4">
-                            <input type="text" class="form-control constraint-min" ng-model="currentConstraints.serviceGroup.min" id="quantityMin" name="quantityMin" placeholder="Min">
+                          <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-6">
+                              <div class="form-control" ng-repeat="item in currentConstraints.serviceGroup.hardwaretypes">
+                                <span class="hardwaretype-name">[[item]]</span>
+                                <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.serviceGroup.hardwaretypes)"></span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div class="form-group">
-                          <label class="col-sm-2 control-label">Max</label>
-                          <div class="col-sm-4">
-                            <input type="text" class="form-control constraint-max" ng-model="currentConstraints.serviceGroup.max" id="quantityMax" placeholder="Max">
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label">Image type</label>
+                            <div class="col-sm-4">
+                              <select class="form-control imagetype-select" ng-model="currentConstraints.serviceGroup.currentImageType" ng-options="item for item in imagetypes">
+                                 <option selected="selected"></option>
+                              </select>
+                            </div>
+                            <div class="col-sm-4">
+                              <button type="button" class="btn-spl btn-default add-imagetype-btn" ng-click="addEntry(currentConstraints.serviceGroup.currentImageType, currentConstraints.serviceGroup.imagetypes)">Add</button>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-6">
+                              <div class="form-control" ng-repeat="item in currentConstraints.serviceGroup.imagetypes">
+                                <span class="hardwaretype-name">[[item]]</span>
+                                <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.serviceGroup.imagetypes)"></span>
+                              </div>
+                            </div>
+                          </div>
+                          <h4>Quantities</h4>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label">Min</label>
+                            <div class="col-sm-4">
+                              <input type="text" class="form-control constraint-min" ng-model="currentConstraints.serviceGroup.min" id="quantityMin" name="quantityMin" placeholder="Min">
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label class="col-sm-2 control-label">Max</label>
+                            <div class="col-sm-4">
+                              <input type="text" class="form-control constraint-max" ng-model="currentConstraints.serviceGroup.max" id="quantityMax" placeholder="Max">
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -436,7 +449,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12 service-constraint-entries">
-                    <table class="table table-striped table-main tablesorter">
+                    <table class="table table-striped table-main tablesorter spl-table">
                       <thead>
                         <th style="width: 25%">Name</th>
                         <th style="width: 25%">Hardware type</th>
@@ -479,7 +492,7 @@
                           </td>
                           <td style="width: 10%"><input class="form-control quantity-min" ng-model="item.quantities.min" /></td>
                           <td style="width: 10%"><input class="form-control quantity-max" ng-model="item.quantities.max" /></td>
-                          <td><span class="constraint-delete mid-btn glyphicon glyphicon-remove btn btn-danger right-float" ng-click="removeServiceConstraint(name)"></span></td>
+                          <td><span class="constraint-delete mid-btn glyphicon glyphicon-remove btn  right-float" ng-click="removeServiceConstraint(name)"></span></td>
                         </tr>
                       </tbody>
                     </table>  

@@ -25,11 +25,9 @@ import java.util.ArrayList;
 
 import static com.continuuity.test.drivers.Global.driverWait;
 import static com.continuuity.test.drivers.Global.globalDriver;
-import static com.continuuity.test.drivers.Global.waitForLoading;
 
 /** Generic Test is parent object for all tests classes
  * Created for common helpers methods
- * @author elmira
  *
  */
 public class GenericTest {
@@ -40,7 +38,7 @@ public class GenericTest {
     globalDriver.get(Constants.LOGIN_URL);
     Global.driverWait(1);
     globalDriver.findElement(By.cssSelector("#username")).sendKeys("admin");
-    globalDriver.findElement(By.cssSelector("#password")).sendKeys("L0omProd!23");
+    globalDriver.findElement(By.cssSelector("#password")).sendKeys("admin");
     globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
   }
 
@@ -56,7 +54,6 @@ public class GenericTest {
     globalDriver.close();
     // change focus back to old tab
     globalDriver.switchTo().window(oldTab);
-    waitForLoading(url);
 
     return newUrl;
   }

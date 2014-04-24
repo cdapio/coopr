@@ -1,11 +1,11 @@
 <ul>
-  <li><a class="nav-link nav-dash" id="nav-overview" href="/user/clusters">Home</a></li>
+  <li><a class="nav-link nav-dash btn-spl btn-default secondary-nav-home" href="/user/clusters">Home</a></li>
   <li>
     <div class="dropdown">
-      <a data-toggle="dropdown" href="#">Clusters <span class="caret"></span></a>
+      <a data-toggle="dropdown" class="btn-spl btn-default nav-dash secondary-nav-dropdown" href="#">Clusters <span class="caret"></span></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
         {% for item in clusters %}
-          {% if item.status === 'ACTIVE' %}
+          {% if item.status !== 'TERMINATED' %}
             <li><a class="list-types" href="/user/clusters/cluster/{{item.id}}">{{ item.name }}</a></li>
           {% endif %}
         {% endfor %}
@@ -15,6 +15,5 @@
       </ul>
     </div>
   </li>
-  <li><a class="nav-link nav-dash" id="nav-overview" href="/user/clusters/create"><span class="glyphicon glyphicon-plus"></span>&nbsp;Create a cluster</a></li>
-  {% include "partials/menu-login-item.html" %}
+  <li><a class="nav-link nav-dash btn-spl btn-default secondary-nav-create" id="nav-overview" href="/user/clusters/create">Create</a></li>
 </ul>

@@ -16,13 +16,22 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.http.AddServicesRequest;
+import com.continuuity.loom.layout.ClusterLayoutUpdater;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
+import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.store.ClusterStore;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.apache.twill.zookeeper.ZKClient;
@@ -31,25 +40,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service for performing operations on clusters.
  */
 public class ClusterService {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterService.class);
+  private static final Gson GSON = new JsonSerde().getGson();
 
   private final ClusterStore store;
   private final TrackingQueue clusterQueue;
+  private final TrackingQueue solverQueue;
   private final ZKClient zkClient;
   private final LoomStats loomStats;
+  private final ClusterLayoutUpdater clusterLayoutUpdater;
 
   @Inject
-  public ClusterService(ClusterStore store, @Named("cluster.queue") TrackingQueue clusterQueue, ZKClient zkClient,
-                        LoomStats loomStats) {
+  public ClusterService(ClusterStore store, @Named("cluster.queue") TrackingQueue clusterQueue,
+                        @Named("solver.queue") TrackingQueue solverQueue, ZKClient zkClient,
+                        LoomStats loomStats, ClusterLayoutUpdater clusterLayoutUpdater) {
     this.store = store;
     this.clusterQueue = clusterQueue;
+    this.solverQueue = solverQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.loomStats = loomStats;
+    this.clusterLayoutUpdater = clusterLayoutUpdater;
   }
 
   /**
@@ -67,7 +83,7 @@ public class ClusterService {
       JobId deleteJobId = store.getNewJobId(clusterId);
       ClusterJob deleteJob = new ClusterJob(deleteJobId, ClusterAction.CLUSTER_DELETE);
       deleteJob.setJobStatus(ClusterJob.Status.RUNNING);
-      cluster.addJob(deleteJobId.getId());
+      cluster.setLatestJobId(deleteJobId.getId());
       cluster.setStatus(Cluster.Status.PENDING);
 
       LOG.debug("Writing cluster {} to store with delete job {}", clusterId, deleteJobId);
@@ -76,6 +92,102 @@ public class ClusterService {
 
       loomStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_DELETE);
       clusterQueue.add(new Element(clusterId, ClusterAction.CLUSTER_DELETE.name()));
+    } finally {
+      lock.release();
+    }
+  }
+
+  public void requestClusterReconfigure(String clusterId, String userId, boolean restartServices, JsonObject config)
+    throws Exception {
+    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    lock.acquire();
+    try {
+      Cluster cluster = getUserCluster(clusterId, userId);
+      if (cluster == null) {
+        throw new MissingClusterException("cluster " + clusterId + " owned by user " + userId + " does not exist");
+      }
+      if (!Cluster.Status.CONFIGURABLE_STATES.contains(cluster.getStatus())) {
+        throw new IllegalStateException("cluster " + clusterId + " is not in a configurable state");
+      }
+      JobId configureJobId = store.getNewJobId(clusterId);
+
+      ClusterAction action =
+        restartServices ? ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART : ClusterAction.CLUSTER_CONFIGURE;
+      ClusterJob configureJob = new ClusterJob(configureJobId, action);
+      configureJob.setJobStatus(ClusterJob.Status.RUNNING);
+      cluster.setLatestJobId(configureJobId.getId());
+      cluster.setStatus(Cluster.Status.PENDING);
+
+      LOG.debug("Writing cluster {} to store with configure job {}", clusterId, configureJobId);
+      cluster.setConfig(config);
+      store.writeCluster(cluster);
+      store.writeClusterJob(configureJob);
+
+      loomStats.getClusterStats().incrementStat(action);
+      clusterQueue.add(new Element(clusterId, action.name()));
+    } finally {
+      lock.release();
+    }
+  }
+
+  public void requestServiceRuntimeAction(String clusterId, String userId, ClusterAction action, String service)
+    throws Exception {
+    Preconditions.checkArgument(ClusterAction.SERVICE_RUNTIME_ACTIONS.contains(action),
+                                action + " is not a service runtime action.");
+    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    lock.acquire();
+    try {
+      Cluster cluster = getUserCluster(clusterId, userId);
+      if (cluster == null || (service != null && !cluster.getServices().contains(service))) {
+        throw new MissingClusterException("cluster " + clusterId + " owned by user " + userId + " does not exist");
+      }
+      if (!Cluster.Status.SERVICE_ACTIONABLE_STATES.contains(cluster.getStatus())) {
+        throw new IllegalStateException(
+          "cluster " + clusterId + " is not in a state where service actions can be performed");
+      }
+      JobId jobId = store.getNewJobId(clusterId);
+
+      ClusterJob job = new ClusterJob(jobId, action, service == null ? null : ImmutableSet.of(service), null);
+      job.setJobStatus(ClusterJob.Status.RUNNING);
+      cluster.setLatestJobId(job.getJobId());
+      cluster.setStatus(Cluster.Status.PENDING);
+      store.writeCluster(cluster);
+      store.writeClusterJob(job);
+
+      loomStats.getClusterStats().incrementStat(action);
+      clusterQueue.add(new Element(clusterId, action.name()));
+    } finally {
+      lock.release();
+    }
+  }
+
+  public void requestAddServices(String clusterId, String userId, AddServicesRequest addRequest)
+    throws Exception {
+    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    lock.acquire();
+    try {
+      Cluster cluster = getUserCluster(clusterId, userId);
+      if (cluster == null) {
+        throw new MissingClusterException("cluster " + clusterId + " owned by user " + userId + " does not exist");
+      }
+      if (cluster.getStatus() != Cluster.Status.ACTIVE) {
+        throw new IllegalStateException(
+          "cluster " + clusterId + " is not in a state where services can be added to it.");
+      }
+      JobId jobId = store.getNewJobId(clusterId);
+      clusterLayoutUpdater.validateServicesToAdd(cluster, addRequest.getServices());
+
+      ClusterAction action = ClusterAction.ADD_SERVICES;
+      ClusterJob job = new ClusterJob(jobId, action, addRequest.getServices(), null);
+      job.setJobStatus(ClusterJob.Status.RUNNING);
+      cluster.setLatestJobId(job.getJobId());
+      cluster.setStatus(Cluster.Status.PENDING);
+      store.writeCluster(cluster);
+      store.writeClusterJob(job);
+
+      loomStats.getClusterStats().incrementStat(action);
+      SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, GSON.toJson(addRequest));
+      solverQueue.add(new Element(clusterId, GSON.toJson(solverRequest)));
     } finally {
       lock.release();
     }
@@ -148,6 +260,22 @@ public class ClusterService {
   }
 
   /**
+   * Get the jobs associated with the given cluster that the user has permission to get.
+   *
+   * @param clusterId Id of the cluster associated with the jobs to get.
+   * @param userId Id of the owner of the cluster, or the admin user id.
+   * @return List of cluster jobs performed or being performed on the cluster. Will be empty if none exist.
+   * @throws Exception
+   */
+  public List<ClusterJob> getClusterJobs(String clusterId, String userId) throws Exception {
+    if (userId.equals(Constants.ADMIN_USER) || userId.equals(Constants.SYSTEM_USER)) {
+      return store.getClusterJobs(clusterId, -1);
+    } else {
+      return store.getClusterJobs(clusterId, userId, -1);
+    }
+  }
+
+  /**
    * Get all the clusters that the user has permission to get.
    *
    * @param userId Id of the user.
@@ -162,5 +290,21 @@ public class ClusterService {
       clusters = store.getAllClusters(userId);
     }
     return clusters;
+  }
+
+  /**
+   * Get all the nodes in a cluster that the user has permission to get.
+   *
+   * @param clusterId Id of the cluster.
+   * @param userId Id of the user.
+   * @return Set of all nodes in the cluster owned by the user or the user is the admin.
+   * @throws Exception
+   */
+  public Set<Node> getClusterNodes(String clusterId, String userId) throws Exception {
+    if (userId.equals(Constants.ADMIN_USER) || userId.equals(Constants.SYSTEM_USER)) {
+      return store.getClusterNodes(clusterId);
+    } else {
+      return store.getClusterNodes(clusterId, userId);
+    }
   }
 }
