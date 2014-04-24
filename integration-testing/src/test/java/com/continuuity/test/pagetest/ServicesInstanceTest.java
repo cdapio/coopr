@@ -53,11 +53,6 @@ public class ServicesInstanceTest extends GenericTest {
   }
 
   @Test
-  public void test_04_title() {
-    assertEquals("Services", globalDriver.findElement(Constants.TITLE_BY).getText());
-  }
-
-  @Test
   public void test_05_getService() throws Exception {
     Service reactor = EXAMPLE_READER.getServices(Constants.SERVICES_PATH).get(NAME);
     assertEquals("Name is not correct.", reactor.getName(), REACTOR_SERVICES_PAGE.getInputName());

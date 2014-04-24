@@ -114,7 +114,6 @@ public class TestUtil {
 
   public Set<String> getLeftPanel(WebDriver driver) {
     Set<String> leftPanel = Sets.newHashSet();
-    leftPanel.add(driver.findElement(Constants.NAV_LOGIN).getText());
     leftPanel.add(driver.findElement(Constants.NAV_CLUSTERS).getText());
     leftPanel.add((driver.findElement(Constants.NAV_PROVIDERS).getText()));
     leftPanel.add(driver.findElement(Constants.NAV_HARDWARETYPES).getText());
