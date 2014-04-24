@@ -58,11 +58,6 @@ public class ClustertemplatesInstanceTest extends GenericTest {
   }
 
   @Test
-  public void test_04_title() {
-    assertEquals("Catalog", globalDriver.findElement(Constants.TITLE_BY).getText());
-  }
-
-  @Test
   public void test_05_general() throws IOException {
     assertEquals("Name is not correct.", clustertemplate.getName(), CLUSTERTEMPLATES_INSTANCE_PAGE.getInputName());
     assertEquals("Description is not correct.", clustertemplate.getDescription(),

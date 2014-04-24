@@ -54,7 +54,7 @@ public class ClustertemplatesTest extends GenericTest {
 
   @Test
   public void test_02_Title() {
-    assertEquals("Templates", globalDriver.findElement(Constants.TITLE_BY).getText());
+    assertEquals("Catalog", globalDriver.findElement(Constants.TITLE_BY).getText());
   }
 
   @Test
@@ -91,7 +91,7 @@ public class ClustertemplatesTest extends GenericTest {
   @Test
   public void test_05_testClusterTemplatesSelected() {
     assertEquals("Cluster templates menu item is not selected",
-                 "overview active", TEST_UTIL.getHTMLClasses("#nav-clustertemplates-container"));
+                 "overview active nav-item", TEST_UTIL.getHTMLClasses("#nav-clustertemplates-container"));
   }
 
   @Test
