@@ -31,7 +31,7 @@ import java.util.Set;
  * to carry out specific {@link ClusterAction}s, and action dependencies.
  */
 public class Actions {
-  public static final Actions DEFAULT_ACTIONS = new Actions();
+  private static final Actions INSTANCE = new Actions();
   private final Map<ClusterAction, List<ProvisionerAction>> actionOrder;
   private final Map<ProvisionerAction, ProvisionerAction> rollbackActions;
   private final Map<ProvisionerAction, ProvisionerAction> retryAction;
@@ -102,7 +102,11 @@ public class Actions {
     }
   }
 
-  public Actions() {
+  public static Actions getInstance() {
+    return INSTANCE;
+  }
+
+  private Actions() {
     this.actionOrder = ImmutableMap.<ClusterAction, List<ProvisionerAction>>builder()
       .put(ClusterAction.CLUSTER_CREATE,
            ImmutableList.of(

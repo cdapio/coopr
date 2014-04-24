@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class JobPlanner {
   private static final Logger LOG = LoggerFactory.getLogger(JobPlanner.class);
-  private static final Actions actions = Actions.DEFAULT_ACTIONS;
+  private static final Actions actions = Actions.getInstance();
   private final ClusterAction clusterAction;
   private final Set<String> nodesToPlan;
   private final Set<String> servicesToPlan;

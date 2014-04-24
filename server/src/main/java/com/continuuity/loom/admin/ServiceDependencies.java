@@ -27,6 +27,7 @@ public class ServiceDependencies {
   private final Set<String> conflicts;
   private final ServiceStageDependencies install;
   private final ServiceStageDependencies runtime;
+  // for convenience, this stores a union of the install and runtime requirements. Field is not serialized.
   private final Set<String> requiredServices;
 
   public ServiceDependencies(Set<String> provides, Set<String> conflicts, ServiceStageDependencies install,

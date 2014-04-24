@@ -33,18 +33,20 @@ public class ServiceDependencyResolver {
   public ServiceDependencyResolver(Actions actions, Map<String, Service> clusterServices) {
     this.clusterServices = ImmutableMap.copyOf(clusterServices);
     this.providesIndex = ImmutableSetMultimap.copyOf(getProvidesIndex());
-    this.installServiceDependencies = minimizeDependencies(new Function<Service, Set<String>>() {
-      @Override
-      public Set<String> apply(Service input) {
-        return replaceProvidedServices(input.getDependencies().getInstall().getDependencies());
-      }
-    });
-    this.runtimeServiceDependencies = minimizeDependencies(new Function<Service, Set<String>>() {
-      @Override
-      public Set<String> apply(Service input) {
-        return replaceProvidedServices(input.getDependencies().getRuntime().getDependencies());
-      }
-    });
+    this.installServiceDependencies = minimizeDependencies(
+      new Function<Service, Set<String>>() {
+        @Override
+        public Set<String> apply(Service input) {
+          return replaceProvidedServices(input.getDependencies().getInstall().getDependencies());
+        }
+      });
+    this.runtimeServiceDependencies = minimizeDependencies(
+      new Function<Service, Set<String>>() {
+        @Override
+        public Set<String> apply(Service input) {
+          return replaceProvidedServices(input.getDependencies().getRuntime().getDependencies());
+        }
+      });
     this.reversedInstallServiceDependencies = reverseDependencies(installServiceDependencies);
     this.reversedRuntimeServiceDependencies = reverseDependencies(runtimeServiceDependencies);
     this.clusterDependencies = HashMultimap.create();
@@ -82,7 +84,7 @@ public class ServiceDependencyResolver {
    * @return True if service 1 depends on service 2 directly or indirectly, false if not.
    */
   public boolean runtimeDependsOn(String service1, String service2) {
-    return dependsOn(service1, service2, runtimeServiceDependencies);
+    return doesDependOn(service1, service2, runtimeServiceDependencies);
   }
 
   SetMultimap<String, String> getInstallServiceDependencies() {
@@ -129,7 +131,7 @@ public class ServiceDependencyResolver {
    * Given services, this method prunes unnecessary dependencies, leaving only first order dependencies. For example,
    * if A depends on B and C, and if B depends on C, this will minimize A's dependencies so it just has A depends on B.
    * It will also flatten dependencies. If A depends on B, and B-1 provides B, and there is no B, then A depends on
-   * B-1 is placed in the dependencies.
+   * B-1 is placed in the dependencies. If both B-1 and B-2 provide B, then A depends on both B-1 and B-2.
    */
   private SetMultimap<String, String> minimizeDependencies(Function<Service, Set<String>> getDependencies) {
     SetMultimap<String, String> minimized = HashMultimap.create();
@@ -230,7 +232,7 @@ public class ServiceDependencyResolver {
     for (ActionOnService directDependency1 : directDependencies) {
       // if a service depends on another service in the set, we can remove the service it depends on
       for (ActionOnService directDependency2 : directDependencies) {
-        if (dependsOn(directDependency1.getService(), directDependency2.getService(), serviceDependencies)) {
+        if (doesDependOn(directDependency1.getService(), directDependency2.getService(), serviceDependencies)) {
           toRemove.add(directDependency2);
         }
       }
@@ -248,7 +250,7 @@ public class ServiceDependencyResolver {
    * @param dependencies Minimized service dependencies.
    * @return True if service 1 depends on service 2 directly or indirectly, false if not.
    */
-  static boolean dependsOn(String service1, String service2, Multimap<String, String> dependencies) {
+  static boolean doesDependOn(String service1, String service2, Multimap<String, String> dependencies) {
     if (service1.equals(service2)) {
       return false;
     }

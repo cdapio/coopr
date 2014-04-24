@@ -59,7 +59,7 @@ public class ClusterScheduler implements Runnable {
   private final TrackingQueue jobQueue;
   private final TaskService taskService;
 
-  private final Actions actions = Actions.DEFAULT_ACTIONS;
+  private final Actions actions = Actions.getInstance();
 
   @Inject
   public ClusterScheduler(@Named("scheduler.id") String id, ClusterStore clusterStore,

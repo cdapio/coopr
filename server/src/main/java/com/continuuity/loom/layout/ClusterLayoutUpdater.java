@@ -38,7 +38,7 @@ import java.util.SortedSet;
  * services, removing services, adding nodes, or removing nodes.
  */
 public class ClusterLayoutUpdater {
-  private final ServiceMaxComparator serviceComparator = new ServiceMaxComparator();
+  private static final ServiceMaxComparator serviceComparator = new ServiceMaxComparator();
 
   public ClusterLayoutTracker addServicesToCluster(Cluster cluster, Set<Node> clusterNodes,
                                                    Set<String> servicesToAdd) throws Exception {
@@ -105,7 +105,7 @@ public class ClusterLayoutUpdater {
    * the constraint is lower), sorted next by their min count (higher min count means the constraint is lower), and
    * finally by the service name if all else is equal.
    */
-  private class ServiceMaxComparator implements Comparator<Map.Entry<String, ServiceConstraint>> {
+  private static class ServiceMaxComparator implements Comparator<Map.Entry<String, ServiceConstraint>> {
 
     @Override
     public int compare(Map.Entry<String, ServiceConstraint> entry1, Map.Entry<String, ServiceConstraint> entry2) {

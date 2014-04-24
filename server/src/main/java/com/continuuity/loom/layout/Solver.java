@@ -302,7 +302,7 @@ public class Solver {
 
   private void validateServiceCompatibilities(Compatibilities compatibilities, Set<String> services) {
     Set<String> compatibleServices = compatibilities.getServices();
-    if (compatibleServices!= null && !compatibleServices.isEmpty()) {
+    if (compatibleServices != null && !compatibleServices.isEmpty()) {
       Set<String> incompatibleServices = Sets.difference(services, compatibilities.getServices());
       if (!incompatibleServices.isEmpty()) {
         String incompatibleStr = Joiner.on(',').join(incompatibleServices);
@@ -333,11 +333,14 @@ public class Solver {
     for (Service service : serviceMap.values()) {
       for (String serviceDependency : service.getDependencies().getRequiredServices()) {
         if (!providedServices.contains(serviceDependency)) {
-          dependenciesSatisfied = false;
+          if (!dependenciesSatisfied) {
+            errMsg.append("\n");
+          }
           errMsg.append(service.getName());
           errMsg.append(" requires ");
           errMsg.append(serviceDependency);
           errMsg.append(", which is not on the cluster or in the list of services to add.");
+          dependenciesSatisfied = false;
         }
       }
     }
@@ -345,12 +348,24 @@ public class Solver {
       throw new IllegalArgumentException(errMsg.toString());
     }
 
+    boolean hasConflicts = false;
+    errMsg = new StringBuilder();
     for (Service service : serviceMap.values()) {
       for (String conflictingService : service.getDependencies().getConflicts()) {
         if (serviceMap.keySet().contains(conflictingService)) {
-          throw new IllegalArgumentException(service.getName() + " conflicts with " + conflictingService);
+          if (hasConflicts) {
+            errMsg.append("\n");
+          }
+          errMsg.append(service.getName());
+          errMsg.append(" conflicts with ");
+          errMsg.append(conflictingService);
+          errMsg.append(".");
+          hasConflicts = true;
         }
       }
+    }
+    if (hasConflicts) {
+      throw new IllegalArgumentException(errMsg.toString());
     }
   }
 

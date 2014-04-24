@@ -45,7 +45,7 @@ public class ServiceDependencyResolverTest {
     expected.put("s4", "base");
     expected.put("s5", "s3");
     expected.put("s5", "s4");
-    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.DEFAULT_ACTIONS, serviceMap);
+    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.getInstance(), serviceMap);
     SetMultimap<String, String> actual = resolver.getRuntimeServiceDependencies();
     Assert.assertEquals(expected, actual);
     Assert.assertTrue(actual.get("base").isEmpty());
@@ -56,26 +56,38 @@ public class ServiceDependencyResolverTest {
     Map<ProvisionerAction, ServiceAction> emptyActions = ImmutableMap.of();
     Service base =  new Service("base", "", ImmutableSet.<String>of(), emptyActions);
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of("base"), emptyActions);
-    Service s2 =  new Service("s2-v1", "",
-                              new ServiceDependencies(
-                                ImmutableSet.<String>of("s2"),
-                                null, null,
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of("base", "s1"),
-                                  null
-                                )
-                              ), emptyActions);
+    Service s2v1 =  new Service("s2-v1", "",
+                                new ServiceDependencies(
+                                  ImmutableSet.<String>of("s2"),
+                                  null, null,
+                                  new ServiceStageDependencies(
+                                    ImmutableSet.<String>of("base", "s1"),
+                                    null
+                                  )
+                                ), emptyActions);
+    Service s2v2 =  new Service("s2-v2", "",
+                                new ServiceDependencies(
+                                  ImmutableSet.<String>of("s2"),
+                                  null, null,
+                                  new ServiceStageDependencies(
+                                    ImmutableSet.<String>of("base", "s1"),
+                                    null
+                                  )
+                                ), emptyActions);
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("base", "s1", "s2"), emptyActions);
     Map<String, Service> serviceMap = Maps.newHashMap();
     serviceMap.put(base.getName(), base);
     serviceMap.put(s1.getName(), s1);
-    serviceMap.put(s2.getName(), s2);
+    serviceMap.put(s2v1.getName(), s2v1);
+    serviceMap.put(s2v2.getName(), s2v2);
     serviceMap.put(s3.getName(), s3);
     SetMultimap<String, String> expected = HashMultimap.create();
     expected.put("s1", "base");
     expected.put("s2-v1", "s1");
+    expected.put("s2-v2", "s1");
     expected.put("s3", "s2-v1");
-    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.DEFAULT_ACTIONS, serviceMap);
+    expected.put("s3", "s2-v2");
+    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.getInstance(), serviceMap);
     SetMultimap<String, String> actual = resolver.getRuntimeServiceDependencies();
     Assert.assertEquals(expected, actual);
     Assert.assertTrue(actual.get("base").isEmpty());
@@ -110,7 +122,7 @@ public class ServiceDependencyResolverTest {
     for (String service1 : serviceDeps.keySet()) {
       for (String service2 : serviceDeps.keySet()) {
         Assert.assertEquals(serviceDeps.get(service1).contains(service2),
-                            ServiceDependencyResolver.dependsOn(service1, service2, dependencies));
+                            ServiceDependencyResolver.doesDependOn(service1, service2, dependencies));
       }
     }
   }
@@ -183,7 +195,7 @@ public class ServiceDependencyResolverTest {
     expected.put(new ActionOnService(ProvisionerAction.INITIALIZE, "s6"),
                  new ActionOnService(ProvisionerAction.START, "s5"));
 
-    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.DEFAULT_ACTIONS, serviceMap);
+    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.getInstance(), serviceMap);
     SetMultimap<ActionOnService, ActionOnService> actual = resolver.getClusterDependencies();
     Assert.assertEquals(expected, actual);
   }
@@ -267,7 +279,7 @@ public class ServiceDependencyResolverTest {
     expected.put(new ActionOnService(ProvisionerAction.INSTALL, "s4"),
                  new ActionOnService(ProvisionerAction.INSTALL, "s5"));
 
-    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.DEFAULT_ACTIONS, serviceMap);
+    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.getInstance(), serviceMap);
     SetMultimap<ActionOnService, ActionOnService> actual = resolver.getClusterDependencies();
     Assert.assertEquals(expected, actual);
   }
@@ -301,7 +313,7 @@ public class ServiceDependencyResolverTest {
     expected.put(new ActionOnService(ProvisionerAction.INSTALL, "s2"),
                  new ActionOnService(ProvisionerAction.INSTALL, "s1"));
 
-    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.DEFAULT_ACTIONS, serviceMap);
+    ServiceDependencyResolver resolver = new ServiceDependencyResolver(Actions.getInstance(), serviceMap);
     SetMultimap<ActionOnService, ActionOnService> actual = resolver.getClusterDependencies();
     Assert.assertEquals(expected, actual);
   }
