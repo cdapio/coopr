@@ -64,7 +64,7 @@ public final class LayoutConstraint {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof LayoutConstraint) || o == null) {
+    if (!(o instanceof LayoutConstraint)) {
       return false;
     }
     LayoutConstraint other = (LayoutConstraint) o;

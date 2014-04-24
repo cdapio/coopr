@@ -16,20 +16,15 @@
 package com.continuuity.loom.layout;
 
 import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.layout.change.AddServiceChangeIterator;
 import com.continuuity.loom.layout.change.ClusterLayoutChange;
 import com.continuuity.loom.layout.change.ClusterLayoutTracker;
-import com.continuuity.loom.store.ClusterStore;
-import com.continuuity.loom.store.EntityStore;
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.inject.Inject;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -43,25 +38,19 @@ import java.util.SortedSet;
  * services, removing services, adding nodes, or removing nodes.
  */
 public class ClusterLayoutUpdater {
-  private final EntityStore entityStore;
-
-  @Inject
-  ClusterLayoutUpdater(EntityStore entityStore) {
-    this.entityStore = entityStore;
-  }
+  private static final ServiceMaxComparator serviceComparator = new ServiceMaxComparator();
 
   public ClusterLayoutTracker addServicesToCluster(Cluster cluster, Set<Node> clusterNodes,
                                                    Set<String> servicesToAdd) throws Exception {
     Preconditions.checkArgument(cluster != null, "Cannot add services to a nonexistant cluster.");
     Preconditions.checkArgument(clusterNodes != null && !clusterNodes.isEmpty(),
                                 "Cannot add services to nonexistant nodes.");
-    validateServicesToAdd(cluster, servicesToAdd);
 
     Constraints clusterConstraints = cluster.getClusterTemplate().getConstraints();
     ClusterLayout clusterLayout = ClusterLayout.fromNodes(clusterNodes, clusterConstraints);
 
     Set<String> servicesToAddCopy = Sets.newHashSet(servicesToAdd);
-    SortedSet<Map.Entry<String, ServiceConstraint>> sortedConstraints = Sets.newTreeSet(new ServiceMaxComparator());
+    SortedSet<Map.Entry<String, ServiceConstraint>> sortedConstraints = Sets.newTreeSet(serviceComparator);
     sortedConstraints.addAll(clusterConstraints.getServiceConstraints().entrySet());
     Queue<String> sortedServices = Lists.newLinkedList();
     for (Map.Entry<String, ServiceConstraint> entry : sortedConstraints) {
@@ -75,43 +64,6 @@ public class ClusterLayoutUpdater {
 
     ClusterLayoutTracker tracker = new ClusterLayoutTracker(clusterLayout);
     return canAddServicesToCluster(tracker, sortedServices) ? tracker : null;
-  }
-
-  public void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd) throws Exception {
-    Preconditions.checkArgument(servicesToAdd != null && !servicesToAdd.isEmpty(),
-                                "At least one service to add must be specified.");
-
-    // check compatibility
-    Set<String> compatibleServices = cluster.getClusterTemplate().getCompatibilities().getServices();
-    Set<String> incompatibleServices = Sets.difference(servicesToAdd, compatibleServices);
-    if (!incompatibleServices.isEmpty()) {
-      String incompatibleStr = Joiner.on(',').join(incompatibleServices);
-      throw new IllegalArgumentException(incompatibleStr + " are incompatible with the cluster");
-    }
-
-    // check dependencies
-    boolean dependenciesSatisfied = true;
-    StringBuilder errMsg = new StringBuilder();
-    Set<String> existingClusterServices = cluster.getServices();
-    for (String serviceName : servicesToAdd) {
-      Service service = entityStore.getService(serviceName);
-      if (service == null) {
-        throw new IllegalArgumentException(serviceName + " does not exist");
-      }
-
-      for (String serviceDependency : service.getDependsOn()) {
-        if (!existingClusterServices.contains(serviceDependency) && !servicesToAdd.contains(serviceDependency)) {
-          dependenciesSatisfied = false;
-          errMsg.append(serviceName);
-          errMsg.append(" requires ");
-          errMsg.append(serviceDependency);
-          errMsg.append(", which is not on the cluster or in the list of services to add. ");
-        }
-      }
-    }
-    if (!dependenciesSatisfied) {
-      throw new IllegalArgumentException(errMsg.toString());
-    }
   }
 
   private boolean canAddServicesToCluster(ClusterLayoutTracker tracker, Queue<String> servicesToAdd) {
@@ -153,7 +105,7 @@ public class ClusterLayoutUpdater {
    * the constraint is lower), sorted next by their min count (higher min count means the constraint is lower), and
    * finally by the service name if all else is equal.
    */
-  private class ServiceMaxComparator implements Comparator<Map.Entry<String, ServiceConstraint>> {
+  private static class ServiceMaxComparator implements Comparator<Map.Entry<String, ServiceConstraint>> {
 
     @Override
     public int compare(Map.Entry<String, ServiceConstraint> entry1, Map.Entry<String, ServiceConstraint> entry2) {

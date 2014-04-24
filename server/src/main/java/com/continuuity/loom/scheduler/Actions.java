@@ -31,11 +31,11 @@ import java.util.Set;
  * to carry out specific {@link ClusterAction}s, and action dependencies.
  */
 public class Actions {
+  private static final Actions INSTANCE = new Actions();
   private final Map<ClusterAction, List<ProvisionerAction>> actionOrder;
   private final Map<ProvisionerAction, ProvisionerAction> rollbackActions;
   private final Map<ProvisionerAction, ProvisionerAction> retryAction;
-  private final Set<ProvisionerAction> hardwareActions;
-  private final Map<ClusterAction, Set<Dependency>> actionDependency;
+  private final Set<Dependency> actionDependencies;
 
   /**
    * Represents action dependency between services. Suppose we have a service A that depends on service B. A dependency
@@ -102,7 +102,11 @@ public class Actions {
     }
   }
 
-  public Actions() {
+  public static Actions getInstance() {
+    return INSTANCE;
+  }
+
+  private Actions() {
     this.actionOrder = ImmutableMap.<ClusterAction, List<ProvisionerAction>>builder()
       .put(ClusterAction.CLUSTER_CREATE,
            ImmutableList.of(
@@ -151,51 +155,12 @@ public class Actions {
     this.retryAction =
       ImmutableMap.of(ProvisionerAction.CONFIRM, ProvisionerAction.CREATE);
 
-    this.hardwareActions = ImmutableSet.of(ProvisionerAction.CREATE, ProvisionerAction.CONFIRM,
-                                           ProvisionerAction.BOOTSTRAP, ProvisionerAction.DELETE);
-
-    this.actionDependency = ImmutableMap.<ClusterAction, Set<Dependency>>builder()
-      .put(ClusterAction.CLUSTER_CREATE,
-           ImmutableSet.of(
-             // Start of a dependent service can happen only after its dependency has started
-             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-             // Initialize of a dependent service can happen only after its dependency has started
-             new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)))
-      .put(ClusterAction.ADD_SERVICES,
-           ImmutableSet.of(
-             // Start of a dependent service can happen only after its dependency has started
-             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-             // Initialize of a dependent service can happen only after its dependency has started
-             new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)))
-      .put(ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART,
-           ImmutableSet.of(
-             // Start of a dependent service can happen only after its dependency has started
-             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-             // Stop of a dependent service can happen only before its dependency has stopped
-             new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
-      .put(ClusterAction.STOP_SERVICES,
-           ImmutableSet.of(
-             new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
-      .put(ClusterAction.START_SERVICES,
-           ImmutableSet.of(
-             new Dependency(ProvisionerAction.START, ProvisionerAction.START)))
-      .put(ClusterAction.RESTART_SERVICES,
-           ImmutableSet.of(
-             new Dependency(ProvisionerAction.START, ProvisionerAction.START),
-             new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true)))
-      .build();
-  }
-
-  public Actions(Map<ClusterAction, List<ProvisionerAction>> actionOrder,
-                 Map<ProvisionerAction, ProvisionerAction> rollbackActions,
-                 Map<ProvisionerAction, ProvisionerAction> retryAction,
-                 Set<ProvisionerAction> hardwareActions,
-                 Map<ClusterAction, Set<Dependency>> actionDependency) {
-    this.actionOrder = actionOrder;
-    this.rollbackActions = rollbackActions;
-    this.retryAction = retryAction;
-    this.hardwareActions = hardwareActions == null ? ImmutableSet.<ProvisionerAction>of() : hardwareActions;
-    this.actionDependency = actionDependency;
+    this.actionDependencies = ImmutableSet.of(
+      new Dependency(ProvisionerAction.START, ProvisionerAction.START),
+      new Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE),
+      new Dependency(ProvisionerAction.STOP, ProvisionerAction.STOP, true),
+      new Dependency(ProvisionerAction.INSTALL, ProvisionerAction.INSTALL)
+    );
   }
 
   /**
@@ -235,25 +200,16 @@ public class Actions {
   }
 
   /**
-   * Get the set of {@link ProvisionerAction}s that are actions on hardware and not on services.
+   * Get the set of {@link Dependency} describing which {@link ProvisionerAction}s
+   * depend on other {@link ProvisionerAction}s for service provisioner actions.
+   * For example, if serviceA depends on serviceB, starting serviceA depends on starting
+   * serviceB. Similarly, initializing serviceA depends on starting serviceB.
    *
-   * @return Set of {@link ProvisionerAction}s that are actions on hardware and not on services.
+   * @return Set of {@link Dependency} as the value describing what {@link ProvisionerAction}s depend on other
+   *         {@link ProvisionerAction}s for the given cluster action.
    */
-  public Set<ProvisionerAction> getHardwareActions() {
-    return hardwareActions;
-  }
-
-  /**
-   * Get a mapping of {@link ClusterAction} to the set of {@link Dependency} describing which {@link ProvisionerAction}s
-   * depend on other {@link ProvisionerAction}s for a given {@link ClusterAction}. For example, when creating a cluster,
-   * if serviceA depends on serviceB, starting serviceA depends on starting serviceB. Similarly, initializing serviceA
-   * depends on starting serviceB.
-   *
-   * @return Map containing {@link ClusterAction} as its keys and a set of {@link Dependency} as the value describing
-   *         what {@link ProvisionerAction}s depend on other {@link ProvisionerAction}s for the given cluster action.
-   */
-  public Map<ClusterAction, Set<Dependency>> getActionDependency() {
-    return actionDependency;
+  public Set<Dependency> getActionDependencies() {
+    return actionDependencies;
   }
 
   @Override
@@ -262,8 +218,7 @@ public class Actions {
       .add("actionOrder", actionOrder)
       .add("rollbackActions", rollbackActions)
       .add("retryAction", retryAction)
-      .add("hardwareActions", hardwareActions)
-      .add("actionDependency", actionDependency)
+      .add("actionDependencies", actionDependencies)
       .toString();
   }
 }

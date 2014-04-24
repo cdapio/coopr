@@ -18,6 +18,8 @@ package com.continuuity.loom.codec.json;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
+import com.continuuity.loom.admin.ServiceDependencies;
+import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -41,7 +43,7 @@ public class ServiceCodec extends AbstractCodec<Service> {
 
     jsonObj.add("name", context.serialize(service.getName()));
     jsonObj.add("description", context.serialize(service.getDescription()));
-    jsonObj.add("dependson", context.serialize(service.getDependsOn()));
+    jsonObj.add("dependencies", context.serialize(service.getDependencies()));
     JsonObject provisioner = new JsonObject();
     provisioner.add("actions", context.serialize(service.getProvisionerActions()));
     jsonObj.add("provisioner", provisioner);
@@ -58,6 +60,19 @@ public class ServiceCodec extends AbstractCodec<Service> {
     String description = context.deserialize(jsonObj.get("description"), String.class);
     Set<String> dependsOn = context.deserialize(jsonObj.get("dependson"),
                                                 new TypeToken<Set<String>>() {}.getType());
+    ServiceDependencies dependencies = context.deserialize(jsonObj.get("dependencies"), ServiceDependencies.class);
+    // for backwards compatibility.
+    // TODO: take out next major release (1.0)
+    if (dependsOn != null && !dependsOn.isEmpty()) {
+      if (dependencies == null) {
+        dependencies = new ServiceDependencies(null, null, null, new ServiceStageDependencies(dependsOn, null));
+      } else if (dependencies.getRuntime().getRequires().isEmpty()) {
+        dependencies =
+          new ServiceDependencies(dependencies.getProvides(), dependencies.getConflicts(), dependencies.getInstall(),
+                                  new ServiceStageDependencies(dependsOn, dependencies.getRuntime().getUses()));
+      }
+    }
+
     JsonObject provisioner = context.deserialize(jsonObj.get("provisioner"), JsonObject.class);
     Map<ProvisionerAction, ServiceAction> actions = Collections.emptyMap();
     if (provisioner != null) {
@@ -65,6 +80,6 @@ public class ServiceCodec extends AbstractCodec<Service> {
                                    new TypeToken<Map<ProvisionerAction, ServiceAction>>(){}.getType());
     }
 
-    return new Service(name, description, dependsOn, actions);
+    return new Service(name, description, dependencies, actions);
   }
 }

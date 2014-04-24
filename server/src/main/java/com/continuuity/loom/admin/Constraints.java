@@ -55,7 +55,7 @@ public final class Constraints {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof Constraints) || o == null) {
+    if (!(o instanceof Constraints)) {
       return false;
     }
     Constraints other = (Constraints) o;

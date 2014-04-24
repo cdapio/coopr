@@ -47,10 +47,12 @@
                   <input type="text" class="form-control" id="inputDescription" name="inputDescription" placeholder="Description" value="{{service.description}}">
                 </div>
               </div>
+              <h4>Dependencies</h4>
+              <br>
               <div class="form-group">
-                <label for="inputDependsOn" class="col-sm-2 control-label">Depends on</label>
+                <label for="inputRuntimeRequires" class="col-sm-2 control-label">Runtime Requires</label>
                 <div class="col-sm-6">
-                  <select class="form-control" name="inputDependsOn" id="inputDependsOn">
+                  <select class="form-control" name="inputRuntimeRequires" id="inputRuntimeRequires">
                     <option></option>
                     {% for itr in services %}
                       <option>{{itr.name}}</option>
@@ -64,11 +66,13 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label"></label>
                 <div class="col-sm-6 service-entries">
-                  {% for item in service.dependson %}
+                  {% for item in service.dependencies.runtime.requires %}
                     <div class="form-control"><span class="service-name">{{item}}</span><span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus"></span></div>
                   {% endfor %}
                 </div>
               </div>
+              <h4>Automator Details</h4>
+              <br>
               <div class="form-group">
                 <label class="col-sm-2 control-label">Actions</label>
                 <div class="col-sm-8">

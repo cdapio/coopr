@@ -175,10 +175,7 @@ public class SchedulerTest extends BaseTest {
     // Add the job back into the jobQueue, and run job scheduler
     jobQueue.add(new Element(jobId));
     LoomStats loomStats = new LoomStats();
-    JobScheduler jobScheduler = new JobScheduler(clusterStore, provisionQueue, new JsonSerde(),
-                                                 jobQueue, zkClient,
-                                                 new TaskService(clusterStore, new Actions(), loomStats),
-                                                 3, loomStats);
+    JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
     jobScheduler.run();
     Assert.assertEquals(0, jobQueue.size());
 

@@ -88,21 +88,6 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
       resourcemanager.getName(), nodemanager.getName(), zookeeper.getName())));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testDependencyMissingThrowsException() throws Exception {
-    updater.addServicesToCluster(cluster, nodes, ImmutableSet.of(nodemanager.getName()));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testInvalidServiceThrowsException() throws Exception {
-    updater.addServicesToCluster(cluster, nodes, ImmutableSet.of("fakeservice"));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testIncompatibleServiceThrowsException() throws Exception {
-    updater.addServicesToCluster(cluster, nodes, ImmutableSet.of(mysql.getName()));
-  }
-
   @Before
   public void beforeLayoutUpdater() throws Exception {
     updater = injector.getInstance(ClusterLayoutUpdater.class);

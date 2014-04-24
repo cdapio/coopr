@@ -272,7 +272,7 @@ public abstract class EntityStoreTest {
                                new ServiceAction("chef", "configure recipe", null)
                              )
     );
-    Service s3 = new Service("hosts", "for managing /etc/hosts", null,
+    Service s3 = new Service("hosts", "for managing /etc/hosts", ImmutableSet.<String>of(),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.CONFIGURE,
                                new ServiceAction("chef", "configure recipe", null)

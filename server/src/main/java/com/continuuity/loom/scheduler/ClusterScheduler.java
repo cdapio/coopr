@@ -59,7 +59,7 @@ public class ClusterScheduler implements Runnable {
   private final TrackingQueue jobQueue;
   private final TaskService taskService;
 
-  private final Actions actions;
+  private final Actions actions = Actions.getInstance();
 
   @Inject
   public ClusterScheduler(@Named("scheduler.id") String id, ClusterStore clusterStore,
@@ -71,7 +71,6 @@ public class ClusterScheduler implements Runnable {
     this.inputQueue = inputQueue;
     this.jobQueue = jobQueue;
     this.taskService = taskService;
-    this.actions = new Actions();
   }
 
   @Override

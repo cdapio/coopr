@@ -16,6 +16,7 @@
 package com.continuuity.loom.layout;
 
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.admin.Administration;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
@@ -23,6 +24,8 @@ import com.continuuity.loom.admin.Constraints;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
+import com.continuuity.loom.admin.ServiceDependencies;
+import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
@@ -49,6 +52,112 @@ import java.util.Set;
  */
 public class SolverTest extends BaseSolverTest {
   private static Solver solver;
+
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testDependencyMissingThrowsException() throws Exception {
+    Cluster cluster = new Cluster("123", "user1", "hadoop", System.currentTimeMillis(), "hadoop cluster",
+                                  Entities.ProviderExample.RACKSPACE, reactorTemplate, ImmutableSet.<String>of(),
+                                  ImmutableSet.of(namenode.getName(), datanode.getName()));
+    solver.validateServicesToAdd(cluster, ImmutableSet.of(nodemanager.getName()));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidServiceThrowsException() throws Exception {
+    Cluster cluster = new Cluster("123", "user1", "hadoop", System.currentTimeMillis(), "hadoop cluster",
+                                  Entities.ProviderExample.RACKSPACE, reactorTemplate, ImmutableSet.<String>of(),
+                                  ImmutableSet.of(namenode.getName(), datanode.getName()));
+    solver.validateServicesToAdd(cluster, ImmutableSet.of("fakeservice"));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testIncompatibleServiceThrowsException() throws Exception {
+    Cluster cluster = new Cluster("123", "user1", "hadoop", System.currentTimeMillis(), "hadoop cluster",
+                                  Entities.ProviderExample.RACKSPACE, reactorTemplate, ImmutableSet.<String>of(),
+                                  ImmutableSet.of(namenode.getName(), datanode.getName()));
+    solver.validateServicesToAdd(cluster, ImmutableSet.of(mysql.getName()));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testConflictingServicesThrowsException() throws Exception {
+    Set<String> services = ImmutableSet.of("myapp-1");
+    ClusterTemplate template = new ClusterTemplate(
+      "name", "description",
+      new ClusterDefaults(services, "joyent", null, null, null, Entities.ClusterTemplateExample.clusterConf),
+      new Compatibilities(null, null, ImmutableSet.<String>of("myapp-1", "myapp-2")),
+      Constraints.EMPTY_CONSTRAINTS,
+      Administration.EMPTY_ADMINISTRATION
+    );
+    Service myapp1 = new Service("myapp-1",
+                                 "my app v1",
+                                 new ServiceDependencies(
+                                   ImmutableSet.<String>of("myapp"),
+                                   ImmutableSet.<String>of("myapp-2"),
+                                   null, null),
+                                 ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service myapp2 = new Service("myapp-2",
+                                 "my app v2",
+                                 new ServiceDependencies(
+                                   ImmutableSet.<String>of("myapp"),
+                                   ImmutableSet.<String>of("myapp-1"),
+                                   null, null),
+                                 ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    entityStore.writeService(myapp1);
+    entityStore.writeService(myapp2);
+    Cluster cluster = new Cluster("123", "user1", "cluster", System.currentTimeMillis(), "test cluster",
+                                  Entities.ProviderExample.RACKSPACE, template, ImmutableSet.<String>of(),
+                                  ImmutableSet.of(myapp1.getName()));
+    solver.validateServicesToAdd(cluster, ImmutableSet.of(myapp2.getName()));
+  }
+
+  @Test
+  public void testUsesDoesNotForceDependencyOnCluster() throws Exception {
+    Set<String> services = ImmutableSet.of("service1");
+    ClusterTemplate template = new ClusterTemplate(
+      "name", "description",
+      new ClusterDefaults(services, "joyent", null, null, null, Entities.ClusterTemplateExample.clusterConf),
+      new Compatibilities(null, null, ImmutableSet.<String>of("service1", "service2", "service3")),
+      Constraints.EMPTY_CONSTRAINTS,
+      Administration.EMPTY_ADMINISTRATION
+    );
+    Service service1 = new Service("service1",
+                                   "my service1",
+                                   ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES,
+                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    // service2 uses service 1 at install time
+    Service service2 = new Service("service2",
+                                   "my service2",
+                                   new ServiceDependencies(
+                                     null,
+                                     null,
+                                     new ServiceStageDependencies(
+                                       ImmutableSet.<String>of(),
+                                       ImmutableSet.<String>of("service1")
+                                     ),
+                                     null
+                                   ),
+                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    // service 3 uses service 1 at runtime
+    Service service3 = new Service("service3",
+                                   "my service3",
+                                   new ServiceDependencies(
+                                     null,
+                                     null,
+                                     null,
+                                     new ServiceStageDependencies(
+                                       ImmutableSet.<String>of(),
+                                       ImmutableSet.<String>of("service1")
+                                     )
+                                   ),
+                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    entityStore.writeService(service1);
+    entityStore.writeService(service2);
+    entityStore.writeService(service3);
+    Cluster cluster = new Cluster("123", "user1", "cluster", System.currentTimeMillis(), "test cluster",
+                                  Entities.ProviderExample.RACKSPACE, template, ImmutableSet.<String>of(),
+                                  ImmutableSet.of(service1.getName()));
+    solver.validateServicesToAdd(cluster, ImmutableSet.of(service2.getName(), service3.getName()));
+  }
 
 
   @Test
