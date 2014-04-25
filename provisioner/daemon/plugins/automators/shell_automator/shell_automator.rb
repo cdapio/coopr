@@ -63,8 +63,13 @@ class ShellAutomator < Automator
     sshauth = inputmap['sshauth']
     hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
-    shellscript = inputmap['actionscript']
-    shellargs = inputmap['actiondata']
+    fields = inputmap['fields']
+
+#    shellscript = fields['script']
+#    shellargs = fields['args']
+    shellscript = fields['script']
+    shellargs = fields['data']
+
     set_credentials(sshauth)
 
     jsondata = JSON.generate(task)
