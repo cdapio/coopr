@@ -3,7 +3,7 @@
   "description": "Rackspace Public Cloud provider",
   "providertypes": [ "rackspace" ],
   "rackspace": {
-    "classname": "RackspaceProvider"
+    "classname": "RackspaceProvider",
     "admin": {
       "fields": {
         "rackspace_username": {
@@ -31,3 +31,4 @@
     }
   }
 }
+

@@ -69,6 +69,9 @@ if (pluginmanager.providermap.empty? or pluginmanager.automatormap.empty?)
   exit(1)
 end
 
+log.debug "provisioner starting with provider types: #{pluginmanager.providermap.keys}"
+log.debug "provisioner starting with automator types: #{pluginmanager.automatormap.keys}"
+
 
 def delegate_task(task, pluginmanager)
   task_id = nil

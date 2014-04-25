@@ -45,6 +45,7 @@
           "user_override": true,
           "tip": "Joyent Region (us-west-1 default)"
         }
+      },
       "required": [
         [ "joyent_username", "joyent_password" ],
         [ "joyent_username", "joyent_keyname", "joyent_keyfile" ]
