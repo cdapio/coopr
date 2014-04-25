@@ -14,7 +14,7 @@
     <div class="form-group">
       <label for="inputProvisioner" class="col-sm-2 control-label">Provider type</label>
       <div class="col-sm-8">
-        <select class="form-control" name="inputProvisioner" id="provisioner-select" ng-model="currProvider.providertype" ng-options="name as name for (name,item) in providerData">
+        <select class="form-control" name="inputProvisioner" id="provisioner-select" ng-model="currProvider.providertype" ng-options="name as name for (name,item) in providerData" ng-disabled="true">
           <option></option>
         </select>
       </div>                

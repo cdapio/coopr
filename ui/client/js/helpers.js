@@ -67,18 +67,16 @@ Helpers.READABLE_ACTIONS = {
 };
 
 /**
- * Compare 2 arrays to check if they ahve the same values.
- * @param  {Array} arr1.
- * @param  {Array} arr2.
+ * Compares 2 arrays and checks if required values are present in availableFields.
+ * @param  {Array} availableFields.
+ * @param  {Array} requiredFields.
  * @return {Boolean} true or false whether they have same values.
  */
-Helpers.compareArray = function(arr1, arr2) {
-  if (arr1.length != arr2.length) return false;
-  for (var i = 0; i < arr2.length; i++) {
-      if (arr1[i].compare) { 
-          if (!arr1[i].compare(arr2[i])) return false;
-      }
-      if (arr1[i] !== arr2[i]) return false;
+Helpers.compareArray = function(availableFields, requiredFields) {
+  for (var i = 0, len = requiredFields.length; i < len; i++) {
+    if (availableFields.indexOf(requiredFields[i]) === -1) {
+      return false;
+    }
   }
   return true;
 };

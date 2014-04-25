@@ -63,6 +63,7 @@ var createCluster = require('./clusters/createcluster.json');
 
 var plugins = {};
 plugins['rackspace'] = require('./plugins/rackspace.json');
+plugins['openstack'] = require('./plugins/openstack.json');
 
 module.exports = function (nock, argv, clientAddr) {
 

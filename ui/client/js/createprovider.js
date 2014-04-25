@@ -128,8 +128,9 @@ CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFa
     });
 
   $scope.$watch('currProvider.providertype', function () {
-    if ($scope.currProvider) {
-      $scope.providerInputs = $scope.providerData[$scope.currProvider.providertype];  
+    if ($scope.currProvider && 'providertype' in $scope.currProvider) {
+      $scope.providerInputs = $scope.providerData[$scope.currProvider.providertype];
+      AppHelpers.addInputSchema($scope.currProvider, $scope.providerInputs);
     }
   });
 
@@ -174,15 +175,21 @@ CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFa
  */
 var AppHelpers = {};
 
-AppHelpers.addInputSchema = function (currProvider, providerData) {
+AppHelpers.addInputSchema = function (currProvider, providerInputs) {
   for (var item in currProvider.provisioner) {
-    for (var entry in providerData.parameters.admin.fields) {
+    for (var entry in providerInputs.parameters.admin.fields) {
       if (entry === item) {
-        currProvider.provisioner[entry] = {
-          userinput: currProvider.provisioner[entry]
-        };
-        for (var field in providerData.parameters.admin.fields[entry]) {
-          currProvider.provisioner[entry][field] = providerData.parameters.admin.fields[entry][field];
+        var userinput = currProvider.provisioner[entry];
+
+        if(typeof currProvider.provisioner[entry] !== 'object') {
+          currProvider.provisioner[entry] = {
+            userinput: userinput
+          };
+        }
+
+        for (var field in providerInputs.parameters.admin.fields[entry]) {
+          currProvider.provisioner[entry][field] = (
+            providerInputs.parameters.admin.fields[entry][field]);
         }
       }
     }

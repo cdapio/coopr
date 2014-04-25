@@ -1,0 +1,47 @@
+{
+    "name": "openstack",
+    "parameters": {
+        "admin": {
+            "fields": {
+                "openstack_username": {
+                    "label": "User",
+                    "type": "text",
+                    "tip": "Your Openstack user name"
+                },
+                "identity_file": {
+                    "label": "Indentity file",
+                    "type": "text",
+                    "tip": "Your Openstack identity file"
+                },
+                "openstack_auth_url": {
+                    "label": "Auth url",
+                    "type": "text",
+                    "tip": "Your Openstack auth url"
+                },
+                "openstack_password": {
+                    "label": "Password",
+                    "type": "password",
+                    "tip": "Your Openstack password"
+                },
+                "openstack_ssh_key_id": {
+                    "label": "SSH key id",
+                    "type": "text",
+                    "tip": "Your Openstack ssh key id"
+                },
+                "openstack_tenant": {
+                    "label": "Tenant",
+                    "type": "text",
+                    "tip": "Your Openstack tenant"
+                }
+            },
+            "required": [
+                ["openstack_username",
+                 "openstack_password",
+                 "openstack_tenant",
+                 "openstack_auth_url",
+                 "openstack_ssh_key_id",
+                 "identity_file"]
+            ]
+        }
+    }
+}
