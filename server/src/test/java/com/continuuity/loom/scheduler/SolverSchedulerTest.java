@@ -81,7 +81,7 @@ public class SolverSchedulerTest extends BaseTest {
     clusterStore.writeClusterJob(job);
     ClusterCreateRequest createRequest =
       new ClusterCreateRequest(cluster.getName(), cluster.getDescription(),
-                               reactorTemplate.getName(), 5, null, null, null, null, 0L, null, null);
+                               reactorTemplate.getName(), 5, null, null, null, null, null, 0L, null, null);
     SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, GSON.toJson(createRequest));
     solverQueue.add(new Element(cluster.getId(), GSON.toJson(solverRequest)));
 
@@ -178,6 +178,7 @@ public class SolverSchedulerTest extends BaseTest {
     // create providers
     entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
                                            ImmutableMap.<String, String>of()));
+    entityStore.writeProviderType(Entities.ProviderTypeExample.JOYENT);
     // create hardware types
     entityStore.writeHardwareType(
       new HardwareType(

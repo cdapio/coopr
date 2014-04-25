@@ -43,7 +43,8 @@ public class ParametersSpecificationCodec implements JsonDeserializer<Parameters
 
     Map<String, FieldSchema> fields =
       context.deserialize(jsonObj.get("fields"), new TypeToken<Map<String, FieldSchema>>() {}.getType());
-    Set<String> required = context.deserialize(jsonObj.get("required"), new TypeToken<Set<String>>() {}.getType());
+    Set<Set<String>> required =
+      context.deserialize(jsonObj.get("required"), new TypeToken<Set<Set<String>>>() {}.getType());
 
     return new ParametersSpecification(fields, required);
   }

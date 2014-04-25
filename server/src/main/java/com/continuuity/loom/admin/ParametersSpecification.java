@@ -30,15 +30,19 @@ import java.util.Set;
 public class ParametersSpecification {
   public static final ParametersSpecification EMPTY_SPECIFICATION = new ParametersSpecification(null, null);
   private final Map<String, FieldSchema> fields;
-  private final Set<String> required;
+  private final Set<Set<String>> required;
 
-  public ParametersSpecification(Map<String, FieldSchema> fields, Set<String> required) {
+  public ParametersSpecification(Map<String, FieldSchema> fields, Set<Set<String>> required) {
     this.fields = fields == null ? ImmutableMap.<String, FieldSchema>of() : fields;
-    this.required = required == null ? ImmutableSet.<String>of() : required;
-    Set<String> badRequires = Sets.difference(this.required, this.fields.keySet());
+    this.required = required == null ? ImmutableSet.<Set<String>>of() : required;
+    Set<String> flattenedRequires = Sets.newHashSet();
+    for (Set<String> requiredSet : this.required) {
+      flattenedRequires.addAll(requiredSet);
+    }
+    Set<String> badRequires = Sets.difference(flattenedRequires, this.fields.keySet());
     if (badRequires.size() > 0) {
       String badRequiresStr = Joiner.on(',').join(badRequires);
-      throw new IllegalArgumentException(badRequiresStr + " are required, but are not fields.");
+      throw new IllegalArgumentException(badRequiresStr + " specified as required, but are not fields.");
     }
   }
 
@@ -52,11 +56,12 @@ public class ParametersSpecification {
   }
 
   /**
-   * Get the set of fields that must have values.
+   * Get the set of required field combinations, one of which must be satisfied. For example, if it contains the sets
+   * {f1, f2} and {f3, f4}, then it means either f1 and f2 must be given, or f3 and f4 must be given.
    *
-   * @return Set of fields that must have values.
+   * @return Set of required field sets.
    */
-  public Set<String> getRequiredFields() {
+  public Set<Set<String>> getRequiredFields() {
     return required;
   }
 

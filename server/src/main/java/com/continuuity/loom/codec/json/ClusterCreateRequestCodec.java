@@ -24,6 +24,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -42,6 +43,8 @@ public class ClusterCreateRequestCodec implements JsonDeserializer<ClusterCreate
     String clusterTemplate = context.deserialize(jsonObj.get("clusterTemplate"), String.class);
     Integer numMachines = context.deserialize(jsonObj.get("numMachines"), Integer.class);
     String provider = context.deserialize(jsonObj.get("provider"), String.class);
+    Map<String, String> providerFields =
+      context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, String>>() {}.getType());
     Set<String> services = context.deserialize(jsonObj.get("services"),
                                                new TypeToken<Set<String>>() {}.getType());
     String hardwaretype = context.deserialize(jsonObj.get("hardwaretype"), String.class);
@@ -50,7 +53,7 @@ public class ClusterCreateRequestCodec implements JsonDeserializer<ClusterCreate
     String dnsSuffix = context.deserialize(jsonObj.get("dnsSuffix"), String.class);
     JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
 
-    return new ClusterCreateRequest(name, description, clusterTemplate, numMachines, provider, services, hardwaretype,
-                              imagetype, initialLeaseDuration, dnsSuffix, config);
+    return new ClusterCreateRequest(name, description, clusterTemplate, numMachines, provider, providerFields,
+                                    services, hardwaretype, imagetype, initialLeaseDuration, dnsSuffix, config);
   }
 }

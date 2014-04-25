@@ -65,7 +65,9 @@ public class Entities {
                                               "path to your joyent key file", null, null, false),
             "joyent_version", new FieldSchema("version", "text", "joyent version", null, null, false)
           ),
-          ImmutableSet.of("joyent_username", "joyent_keyname", "joyent_keyfile", "joyent_version")
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.of("joyent_username", "joyent_keyname", "joyent_keyfile", "joyent_version")
+          )
         ),
         ParameterType.USER,
         ParametersSpecification.EMPTY_SPECIFICATION
@@ -103,10 +105,12 @@ public class Entities {
         "                }\n" +
         "            },\n" +
         "            \"required\": [\n" +
-        "                \"joyent_username\",\n" +
-        "                \"joyent_keyname\",\n" +
-        "                \"joyent_keyfile\",\n" +
-        "                \"joyent_version\"\n" +
+        "                [\n" +
+        "                    \"joyent_username\",\n" +
+        "                    \"joyent_keyname\",\n" +
+        "                    \"joyent_keyfile\",\n" +
+        "                    \"joyent_version\"\n" +
+        "                ]\n" +
         "            ]\n" +
         "        }\n" +
         "    }\n" +
@@ -120,7 +124,9 @@ public class Entities {
             "rackspace_username", new FieldSchema("user name", "text", "your rackspace username", null, null, true),
             "rackspace_apikey", new FieldSchema("key name", "text", "your rackspace key name", null, null, true)
           ),
-          ImmutableSet.of("rackspace_username", "rackspace_apikey")
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.of("rackspace_username", "rackspace_apikey")
+          )
         )));
     public static final String RACKSPACE_STRING =
       "{\n" +
@@ -143,8 +149,10 @@ public class Entities {
         "                }\n" +
         "            },\n" +
         "            \"required\": [\n" +
-        "                \"rackspace_username\",\n" +
-        "                \"rackspace_apikey\"\n" +
+        "                [\n" +
+        "                    \"rackspace_username\",\n" +
+        "                    \"rackspace_apikey\"\n" +
+        "                ]\n" +
         "            ]\n" +
         "        }\n" +
         "    }\n" +
@@ -158,7 +166,9 @@ public class Entities {
             "rackspace_username", new FieldSchema("user name", "text", "your rackspace username", null, null, false),
             "rackspace_apikey", new FieldSchema("key name", "text", "your rackspace key name", null, null, false)
           ),
-          ImmutableSet.of("rackspace_username", "rackspace_apikey")
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.of("rackspace_username", "rackspace_apikey")
+          )
         )
       ));
     public static final String USER_RACKSPACE_STRING =
@@ -182,8 +192,10 @@ public class Entities {
         "                }\n" +
         "            },\n" +
         "            \"required\": [\n" +
-        "                \"rackspace_username\",\n" +
-        "                \"rackspace_apikey\"\n" +
+        "                [\n" +
+        "                    \"rackspace_username\",\n" +
+        "                    \"rackspace_apikey\"\n" +
+        "                ]\n" +
         "            ]\n" +
         "        }\n" +
         "    }\n" +
@@ -202,7 +214,9 @@ public class Entities {
             "data",
             new FieldSchema("script arguments", "text", "args", ImmutableSet.<String>of("opt1", "opt2"), null, false)
           ),
-          ImmutableSet.of("script")
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.of("script")
+          )
         )
       ));
     public static final String SHELL_STRING =
@@ -227,7 +241,7 @@ public class Entities {
         "                }\n" +
         "            },\n" +
         "            \"required\": [\n" +
-        "                \"script\"\n" +
+        "                [ \"script\" ]\n" +
         "            ]\n" +
         "        }\n" +
         "    }\n" +
@@ -243,7 +257,9 @@ public class Entities {
             "args",
             new FieldSchema("chef arguments", "text", "args", ImmutableSet.<String>of("opt1", "opt2"), null, false)
           ),
-          ImmutableSet.of("recipe")
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.of("recipe")
+          )
         )
       ));
     public static final String CHEF_STRING =
@@ -268,7 +284,7 @@ public class Entities {
         "                }\n" +
         "            },\n" +
         "            \"required\": [\n" +
-        "                \"recipe\"\n" +
+        "                [ \"recipe\" ]\n" +
         "            ]\n" +
         "        }\n" +
         "    }\n" +
@@ -284,7 +300,9 @@ public class Entities {
             "args",
             new FieldSchema("puppet arguments", "text", "args", ImmutableSet.<String>of("opt1", "opt2"), null, false)
           ),
-          ImmutableSet.of("manifest")
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.of("manifest")
+          )
         )
       ));
   }
