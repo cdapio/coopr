@@ -24,28 +24,44 @@ import java.util.List;
  *
  */
 public class MockClusterCallback extends ClusterCallback {
-  private final List<CallbackData> beforeCallbacks = Lists.newArrayList();
-  private final List<CallbackData> afterCallbacks = Lists.newArrayList();
+  private final List<CallbackData> startCallbacks = Lists.newArrayList();
+  private final List<CallbackData> successCallbacks = Lists.newArrayList();
+  private final List<CallbackData> failureCallbacks = Lists.newArrayList();
 
   public MockClusterCallback(Configuration conf) {
     super(conf);
   }
 
-  public List<CallbackData> getBeforeCallbacks() {
-    return beforeCallbacks;
+  public List<CallbackData> getStartCallbacks() {
+    return startCallbacks;
   }
 
-  public List<CallbackData> getAfterCallbacks() {
-    return afterCallbacks;
+  public List<CallbackData> getSuccessCallbacks() {
+    return successCallbacks;
+  }
+
+  public List<CallbackData> getFailureCallbacks() {
+    return failureCallbacks;
+  }
+
+  public void clear() {
+    startCallbacks.clear();
+    successCallbacks.clear();
+    failureCallbacks.clear();
   }
 
   @Override
-  public void executeBeforeCallback(CallbackData data) {
-    beforeCallbacks.add(data);
+  public void onStart(CallbackData data) {
+    startCallbacks.add(data);
   }
 
   @Override
-  public void executeAfterCallback(CallbackData data) {
-    afterCallbacks.add(data);
+  public void onSuccess(CallbackData data) {
+    successCallbacks.add(data);
+  }
+
+  @Override
+  public void onFailure(CallbackData data) {
+    failureCallbacks.add(data);
   }
 }

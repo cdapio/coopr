@@ -50,35 +50,43 @@ import java.util.Set;
 public class HttpPostClusterCallback extends ClusterCallback {
   private static final Logger LOG = LoggerFactory.getLogger(HttpPostClusterCallback.class);
   private static final Gson GSON = new JsonSerde().getGson();
-  private final String beforeUrl;
-  private final String afterUrl;
-  private final Set<ClusterAction> beforeTriggerActions;
-  private final Set<ClusterAction> afterTriggerActions;
+  private final String onStartUrl;
+  private final String onSuccessUrl;
+  private final String onFailureUrl;
+  private final Set<ClusterAction> startTriggerActions;
+  private final Set<ClusterAction> successTriggerActions;
+  private final Set<ClusterAction> failureTriggerActions;
   private final DefaultHttpClient httpClient;
 
   @Inject
   public HttpPostClusterCallback(Configuration conf) {
     super(conf);
-    this.beforeUrl = conf.get(Constants.HTTP_CALLBACK_BEFORE_URL);
-    this.afterUrl = conf.get(Constants.HTTP_CALLBACK_AFTER_URL);
-    this.beforeTriggerActions = parseActionsString(conf.get(Constants.HTTP_CALLBACK_BEFORE_TRIGGER_ACTIONS,
-                                                            Constants.DEFAULT_HTTP_CALLBACK_BEFORE_TRIGGER_ACTIONS));
-    this.afterTriggerActions = parseActionsString(conf.get(Constants.HTTP_CALLBACK_AFTER_TRIGGER_ACTIONS,
-                                                           Constants.DEFAULT_HTTP_CALLBACK_AFTER_TRIGGER_ACTIONS));
-    if (beforeUrl != null) {
-      LOG.debug("before hook will be triggered on actions {}", Joiner.on(',').join(beforeTriggerActions));
+    this.onStartUrl = conf.get(Constants.HttpCallback.START_URL);
+    this.onSuccessUrl = conf.get(Constants.HttpCallback.SUCCESS_URL);
+    this.onFailureUrl = conf.get(Constants.HttpCallback.FAILURE_URL);
+    this.startTriggerActions = parseActionsString(conf.get(Constants.HttpCallback.START_TRIGGERS,
+                                                            Constants.HttpCallback.DEFAULT_START_TRIGGERS));
+    this.successTriggerActions = parseActionsString(conf.get(Constants.HttpCallback.SUCCESS_TRIGGERS,
+                                                           Constants.HttpCallback.DEFAULT_SUCCESS_TRIGGERS));
+    this.failureTriggerActions = parseActionsString(conf.get(Constants.HttpCallback.FAILURE_TRIGGERS,
+                                                             Constants.HttpCallback.DEFAULT_FAILURE_TRIGGERS));
+    if (onStartUrl != null) {
+      LOG.debug("before hook will be triggered on actions {}", Joiner.on(',').join(startTriggerActions));
     }
-    if (afterUrl != null) {
-      LOG.debug("after hook will be triggered on actions {}", Joiner.on(',').join(afterTriggerActions));
+    if (onSuccessUrl != null) {
+      LOG.debug("after hook will be triggered on actions {}", Joiner.on(',').join(successTriggerActions));
+    }
+    if (onFailureUrl != null) {
+      LOG.debug("after hook will be triggered on actions {}", Joiner.on(',').join(failureTriggerActions));
     }
 
     HttpParams httpParams = new BasicHttpParams();
     HttpConnectionParams.setConnectionTimeout(
-      httpParams, conf.getInt(Constants.HTTP_CALLBACK_CONNECTION_TIMEOUT,
-                              Constants.DEFAULT_HTTP_CALLBACK_CONNECTION_TIMEOUT));
+      httpParams, conf.getInt(Constants.HttpCallback.CONNECTION_TIMEOUT,
+                              Constants.HttpCallback.DEFAULT_CONNECTION_TIMEOUT));
     HttpConnectionParams.setSoTimeout(
-      httpParams, conf.getInt(Constants.HTTP_CALLBACK_SOCKET_TIMEOUT,
-                              Constants.DEFAULT_HTTP_CALLBACK_SOCKET_TIMEOUT));
+      httpParams, conf.getInt(Constants.HttpCallback.SOCKET_TIMEOUT,
+                              Constants.HttpCallback.DEFAULT_SOCKET_TIMEOUT));
     this.httpClient = new DefaultHttpClient(httpParams);
   }
 
@@ -101,21 +109,31 @@ public class HttpPostClusterCallback extends ClusterCallback {
     return actions;
   }
 
-  public void executeBeforeCallback(CallbackData data) {
+  public void onStart(CallbackData data) {
     ClusterAction jobAction = data.getJob().getClusterAction();
-    if (beforeTriggerActions.contains(jobAction)) {
+    if (startTriggerActions.contains(jobAction)) {
       LOG.debug("sending request to {} before performing {} on cluster {}",
-                beforeUrl, jobAction, data.getCluster().getId());
-      sendPost(beforeUrl, data);
+                onStartUrl, jobAction, data.getCluster().getId());
+      sendPost(onStartUrl, data);
     }
   }
 
-  public void executeAfterCallback(CallbackData data) {
+  public void onSuccess(CallbackData data) {
     ClusterAction jobAction = data.getJob().getClusterAction();
-    if (afterTriggerActions.contains(data.getJob().getClusterAction())) {
-      LOG.debug("sending request to {} after performing {} on cluster {}",
-                afterUrl, jobAction, data.getCluster().getId());
-      sendPost(afterUrl, data);
+    if (successTriggerActions.contains(data.getJob().getClusterAction())) {
+      LOG.debug("{} completed successfully on cluster {}, sending request to {}",
+                jobAction, data.getCluster().getId(), onSuccessUrl);
+      sendPost(onSuccessUrl, data);
+    }
+  }
+
+  @Override
+  public void onFailure(CallbackData data) {
+    ClusterAction jobAction = data.getJob().getClusterAction();
+    if (failureTriggerActions.contains(data.getJob().getClusterAction())) {
+      LOG.debug("{} failed on cluster {}, sending request to {}",
+                jobAction, data.getCluster().getId(), onFailureUrl);
+      sendPost(onFailureUrl, data);
     }
   }
 

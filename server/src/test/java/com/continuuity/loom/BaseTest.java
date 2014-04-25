@@ -52,7 +52,7 @@ public class BaseTest {
   protected static EntityStore entityStore;
   protected static ClusterStore clusterStore;
   protected static Configuration conf;
-  protected static MockClusterCallback hookExecutor;
+  protected static MockClusterCallback mockClusterCallback;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -72,7 +72,7 @@ public class BaseTest {
     conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
 
-    hookExecutor = new MockClusterCallback(conf);
+    mockClusterCallback = new MockClusterCallback(conf);
     injector = Guice.createInjector(
       Modules.override(
         LoomModules.createModule(zkClientService, MoreExecutors.sameThreadExecutor(), conf)
@@ -80,7 +80,7 @@ public class BaseTest {
         new AbstractModule() {
           @Override
           protected void configure() {
-            bind(ClusterCallback.class).toInstance(hookExecutor);
+            bind(ClusterCallback.class).toInstance(mockClusterCallback);
           }
         }
       )

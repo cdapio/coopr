@@ -34,12 +34,19 @@ public abstract class ClusterCallback {
    *
    * @param data Data available to use while executing callback.
    */
-  public abstract void executeBeforeCallback(CallbackData data);
+  public abstract void onStart(CallbackData data);
 
   /**
-   * Execute some method after a cluster job ends.
+   * Execute some method after a cluster completes succesfully.
    *
    * @param data Data available to use while executing callback.
    */
-  public abstract void executeAfterCallback(CallbackData data);
+  public abstract void onSuccess(CallbackData data);
+
+  /**
+   * Execute some method after a cluster job fails.
+   *
+   * @param data Data available to use while executing callback.
+   */
+  public abstract void onFailure(CallbackData data);
 }

@@ -28,6 +28,7 @@ import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.scheduler.task.TaskException;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
 import com.google.common.base.Objects;
@@ -97,6 +98,7 @@ public class SchedulerTest extends BaseTest {
     inputQueue.removeAll();
     solverQueue.removeAll();
     provisionQueue.removeAll();
+    mockClusterCallback.clear();
   }
 
   @Test
@@ -226,7 +228,16 @@ public class SchedulerTest extends BaseTest {
   }
 
   @Test
-  public void testCallbacks() throws Exception {
+  public void testSuccessCallbacks() throws Exception {
+    testCallbacks(false);
+  }
+
+  @Test
+  public void testFailureCallbacks() throws Exception {
+    testCallbacks(true);
+  }
+
+  private void testCallbacks(boolean failJob) throws Exception {
     ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
 
     Cluster cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
@@ -244,19 +255,20 @@ public class SchedulerTest extends BaseTest {
     inputQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
     clusterScheduler.run();
 
-    // at this point, the before callback should have run, but not the after callback
-    Assert.assertEquals(1, hookExecutor.getBeforeCallbacks().size());
-    Assert.assertEquals(0, hookExecutor.getAfterCallbacks().size());
+    // at this point, the start callback should have run, but not the after callbacks
+    Assert.assertEquals(1, mockClusterCallback.getStartCallbacks().size());
+    Assert.assertEquals(0, mockClusterCallback.getSuccessCallbacks().size());
+    Assert.assertEquals(0, mockClusterCallback.getFailureCallbacks().size());
 
     JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
     jobScheduler.run();
 
-    // complete tasks until there are no more
+    // take tasks until there are no more
     JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
     while (taskJson.entrySet().size() > 0) {
       System.out.println("Got task " + taskJson);
       JsonObject returnJson = new JsonObject();
-      returnJson.addProperty("status", 0);
+      returnJson.addProperty("status", failJob ? 1 : 0);
       returnJson.addProperty("workerId", "consumer1");
       returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
       TestHelper.finishTask(getLoomUrl(), returnJson);
@@ -265,9 +277,12 @@ public class SchedulerTest extends BaseTest {
 
       taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
     }
+    jobScheduler.run();
 
-    // at this point, the after callback should have run
-    Assert.assertEquals(1, hookExecutor.getAfterCallbacks().size());
+    // at this point, the failure callback should have run
+    Assert.assertEquals(1, mockClusterCallback.getStartCallbacks().size());
+    Assert.assertEquals(failJob ? 0 : 1, mockClusterCallback.getSuccessCallbacks().size());
+    Assert.assertEquals(failJob ? 1 : 0, mockClusterCallback.getFailureCallbacks().size());
   }
 
 

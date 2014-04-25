@@ -148,7 +148,7 @@ public class TaskService {
     clusterStore.writeClusterJob(job);
 
     loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
-    clusterCallback.executeAfterCallback(new CallbackData(cluster, job));
+    clusterCallback.onFailure(new CallbackData(cluster, job));
   }
 
   /**
@@ -201,7 +201,7 @@ public class TaskService {
     // Note: writing job status as RUNNING, will allow other operations on the job
     // (like cancel, etc.) to happen in parallel.
     clusterStore.writeClusterJob(job);
-    clusterCallback.executeBeforeCallback(new CallbackData(cluster, job));
+    clusterCallback.onStart(new CallbackData(cluster, job));
   }
 
   /**
@@ -226,7 +226,7 @@ public class TaskService {
     clusterStore.writeCluster(cluster);
 
     loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
-    clusterCallback.executeAfterCallback(new CallbackData(cluster, job));
+    clusterCallback.onSuccess(new CallbackData(cluster, job));
   }
 
   /**

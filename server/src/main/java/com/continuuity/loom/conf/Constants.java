@@ -15,7 +15,9 @@
  */
 package com.continuuity.loom.conf;
 
+import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.HttpPostClusterCallback;
+import com.google.common.base.Joiner;
 
 import java.util.concurrent.TimeUnit;
 
@@ -102,17 +104,24 @@ public class Constants {
   public static final String CALLBACK_CLASS = "loom.callback.class";
   public static final String DEFAULT_CALLBACK_CLASS = HttpPostClusterCallback.class.getCanonicalName();
 
-  public static final String HTTP_CALLBACK_BEFORE_TRIGGER_ACTIONS = "loom.callback.before.http.trigger.actions";
-  public static final String DEFAULT_HTTP_CALLBACK_BEFORE_TRIGGER_ACTIONS = "CLUSTER_CREATE,CLUSTER_DELETE";
-  public static final String HTTP_CALLBACK_AFTER_TRIGGER_ACTIONS = "loom.callback.after.http.trigger.actions";
-  public static final String DEFAULT_HTTP_CALLBACK_AFTER_TRIGGER_ACTIONS = "CLUSTER_CREATE,CLUSTER_DELETE";
+  public static class HttpCallback {
+    private static final String prefix = "loom.callback.http.";
+    public static final String START_TRIGGERS = prefix + "start.triggers";
+    public static final String DEFAULT_START_TRIGGERS = Joiner.on(',').join(ClusterAction.values());
+    public static final String SUCCESS_TRIGGERS = prefix + "success.triggers";
+    public static final String DEFAULT_SUCCESS_TRIGGERS = Joiner.on(',').join(ClusterAction.values());
+    public static final String FAILURE_TRIGGERS = prefix + "failure.triggers";
+    public static final String DEFAULT_FAILURE_TRIGGERS = Joiner.on(',').join(ClusterAction.values());
 
-  public static final String HTTP_CALLBACK_BEFORE_URL = "loom.callback.before.http.url";
-  public static final String HTTP_CALLBACK_AFTER_URL = "loom.callback.after.http.url";
+    public static final String START_URL = prefix + "start.url";
+    public static final String SUCCESS_URL = prefix + "success.url";
+    public static final String FAILURE_URL = prefix + "failure.url";
 
-  public static final String HTTP_CALLBACK_SOCKET_TIMEOUT = "loom.callback.http.socket.timeout";
-  public static final int DEFAULT_HTTP_CALLBACK_SOCKET_TIMEOUT = 10000;
+    public static final String SOCKET_TIMEOUT = prefix + "socket.timeout";
+    public static final int DEFAULT_SOCKET_TIMEOUT = 10000;
 
-  public static final String HTTP_CALLBACK_CONNECTION_TIMEOUT = "loom.callback.http.connection.timeout";
-  public static final int DEFAULT_HTTP_CALLBACK_CONNECTION_TIMEOUT = 10000;
+    public static final String CONNECTION_TIMEOUT = prefix + "connection.timeout";
+    public static final int DEFAULT_CONNECTION_TIMEOUT = 10000;
+
+  }
 }
