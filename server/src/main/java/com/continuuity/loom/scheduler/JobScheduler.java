@@ -23,7 +23,6 @@ import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.macro.Expander;
-import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
@@ -66,7 +65,7 @@ public class JobScheduler implements Runnable {
   private final ZKClient zkClient;
   private final TaskService taskService;
   private final int maxTaskRetries;
-  private final Actions actions;
+  private final Actions actions = Actions.getInstance();
 
   @Inject
   private JobScheduler(ClusterStore clusterStore, @Named("nodeprovisioner.queue") TrackingQueue provisionerQueue,
@@ -79,7 +78,6 @@ public class JobScheduler implements Runnable {
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.taskService = taskService;
     this.maxTaskRetries = maxTaskRetries;
-    this.actions = new Actions();
   }
 
   @Override
@@ -195,7 +193,7 @@ public class JobScheduler implements Runnable {
       TaskConfig.addNodeList(task.getConfig(), clusterNodes);
 
       // TODO: do this only once and save it
-      if (!actions.getHardwareActions().contains(task.getTaskName())) {
+      if (!task.getTaskName().isHardwareAction()) {
         try {
           task.setConfig(Expander.expand(task.getConfig(), null, clusterNodes, taskNode).getAsJsonObject());
         } catch (Throwable e) {

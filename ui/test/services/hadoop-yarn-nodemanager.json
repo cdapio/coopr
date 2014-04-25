@@ -1,10 +1,14 @@
 {
   "name": "hadoop-yarn-nodemanager",
   "description": "Hadoop YARN NodeManager",
-  "dependson": [
-    "base",
-    "hadoop-yarn-resourcemanager"
-  ],
+  "dependencies": {
+    "runtime": {
+      "requires": [
+        "base",
+        "hadoop-yarn-resourcemanager"
+      ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

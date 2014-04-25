@@ -64,7 +64,18 @@ define([], function () {
       var postJson = {
         name: $("#inputName").val(),
         description: $("#inputDescription").val(),
-        dependson: [],
+        dependencies: {
+          provides: [],
+          conflicts: [],
+          install: {
+            requires: [],
+            uses: []
+          },
+          runtime: {
+            requires: [],
+            uses: []
+          }
+        },
         provisioner: {
           actions: {}
         }
@@ -83,7 +94,7 @@ define([], function () {
           
       }
       var serviceEntries = $(".service-entries .service-name").each(function (index, item) {
-        postJson.dependson.push($(item).text());
+        postJson.dependencies.runtime.requires.push($(item).text());
       });
       Helpers.submitPost(e, postJson, '/services');
     }

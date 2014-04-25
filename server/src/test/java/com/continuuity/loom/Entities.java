@@ -29,6 +29,8 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.admin.ServiceDependencies;
+import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -200,15 +202,32 @@ public class Entities {
 
   public static class ServiceExample {
     public static final Service HOSTS =
-      new Service("hosts", "Manages /etc/hosts", null,
+      new Service("hosts-1.0", "Manages /etc/hosts",
+                  new ServiceDependencies(
+                    ImmutableSet.<String>of("hosts"),
+                    ImmutableSet.<String>of("hosts-1.1", "hosts-1.2"),
+                    new ServiceStageDependencies(ImmutableSet.<String>of(), ImmutableSet.<String>of("base")),
+                    new ServiceStageDependencies(ImmutableSet.<String>of(), ImmutableSet.<String>of("base"))
+                  ),
                   ImmutableMap.<ProvisionerAction, ServiceAction>of(
                     ProvisionerAction.CONFIGURE, new ServiceAction("chef", "recipe[loom_hosts::default]", null)
                   ));
     public static final String HOSTS_STRING =
       "{\n" +
-      "  \"name\": \"hosts\",\n" +
+      "  \"name\": \"hosts-1.0\",\n" +
       "  \"description\": \"Manages /etc/hosts\",\n" +
-      "  \"dependson\": [],\n" +
+      "  \"dependencies\": {\n" +
+      "    \"provides\": [ \"hosts\" ],\n" +
+      "    \"conflicts\": [ \"hosts-1.1\", \"hosts-1.2\" ],\n" +
+      "    \"install\": {\n" +
+      "      \"requires\": [],\n" +
+      "      \"uses\": [ \"base\" ]\n" +
+      "     },\n" +
+      "    \"runtime\": {\n" +
+      "      \"requires\": [],\n" +
+      "      \"uses\": [ \"base\" ]\n" +
+      "     }\n" +
+      "   },\n" +
       "  \"provisioner\": {\n" +
       "    \"actions\": {\n" +
       "      \"configure\": {\n" +
@@ -238,9 +257,18 @@ public class Entities {
       "{\n" +
       "  \"name\": \"namenode\",\n" +
       "  \"description\": \"Hadoop HDFS NameNode\",\n" +
-      "  \"dependson\": [\n" +
-      "    \"hosts\"\n" +
-      "  ],\n" +
+      "  \"dependencies\": {\n" +
+      "    \"provides\": [],\n" +
+      "    \"conflicts\": [],\n" +
+      "    \"install\": {\n" +
+      "      \"requires\": [],\n" +
+      "      \"uses\": []\n" +
+      "     },\n" +
+      "    \"runtime\": {\n" +
+      "      \"requires\": [ \"hosts\" ],\n" +
+      "      \"uses\": []\n" +
+      "     }\n" +
+      "   },\n" +
       "  \"provisioner\": {\n" +
       "    \"actions\": {\n" +
       "      \"install\": {\n" +
@@ -288,10 +316,18 @@ public class Entities {
       "{\n" +
       "  \"name\": \"datanode\",\n" +
       "  \"description\": \"Hadoop HDFS DataNode\",\n" +
-      "  \"dependson\": [\n" +
-      "    \"hosts\",\n" +
-      "    \"namenode\"\n" +
-      "  ],\n" +
+      "  \"dependencies\": {\n" +
+      "    \"provides\": [],\n" +
+      "    \"conflicts\": [],\n" +
+      "    \"install\": {\n" +
+      "      \"requires\": [],\n" +
+      "      \"uses\": []\n" +
+      "     },\n" +
+      "    \"runtime\": {\n" +
+      "      \"requires\": [ \"hosts\", \"namenode\" ],\n" +
+      "      \"uses\": []\n" +
+      "     }\n" +
+      "   },\n" +
       "  \"provisioner\": {\n" +
       "    \"actions\": {\n" +
       "      \"install\": {\n" +

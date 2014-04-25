@@ -80,7 +80,7 @@ public final class Provider extends NamedEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof Provider) || o == null) {
+    if (!(o instanceof Provider)) {
       return false;
     }
     Provider other = (Provider) o;

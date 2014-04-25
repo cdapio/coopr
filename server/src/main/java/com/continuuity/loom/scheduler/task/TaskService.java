@@ -39,14 +39,13 @@ import java.util.List;
 public class TaskService {
   private static final Logger LOG  = LoggerFactory.getLogger(TaskService.class);
   private final ClusterStore clusterStore;
-  private final Actions actions;
+  private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
   private final ClusterCallback clusterCallback;
 
   @Inject
-  public TaskService(ClusterStore clusterStore, Actions actions, LoomStats loomStats, ClusterCallback clusterCallback) {
+  public TaskService(ClusterStore clusterStore, LoomStats loomStats, ClusterCallback clusterCallback) {
     this.clusterStore = clusterStore;
-    this.actions = actions;
     this.loomStats = loomStats;
     this.clusterCallback = clusterCallback;
   }

@@ -7,15 +7,15 @@ default['java']['oracle']['accept_oracle_download_terms'] = true
 # core-site.xml
 default['hadoop']['core_site']['hadoop.tmp.dir'] = '/hadoop'
 # hdfs-site.xml
-default['hadoop']['hdfs_site']['dfs.datanode.max.xcievers'] = 4096
+default['hadoop']['hdfs_site']['dfs.datanode.max.xcievers'] = '4096'
 # mapred-site.xml
 default['hadoop']['mapred_site']['mapreduce.framework.name'] = 'yarn'
 # yarn-site.xml
 default['hadoop']['yarn_site']['yarn.log-aggregation-enable'] = 'true'
-default['hadoop']['yarn_site']['yarn.scheduler.minimum-allocation-mb'] = 512
+default['hadoop']['yarn_site']['yarn.scheduler.minimum-allocation-mb'] = '512'
 default['hadoop']['yarn_site']['yarn.nodemanager.vmem-check-enabled'] = 'false'
 default['hadoop']['yarn_site']['yarn.nodemanager.vmem-pmem-ratio'] = '5.1'
-default['hadoop']['yarn_site']['yarn.nodemanager.delete.debug-delay-sec'] = 86400
+default['hadoop']['yarn_site']['yarn.nodemanager.delete.debug-delay-sec'] = '86400'
 default['hadoop']['yarn_site']['yarn.nodemanager.resource.memory-mb'] = (node[:memory][:total].to_i / 1024) / 2
 # Do the right thing, based on distribution
 case node['hadoop']['distribution']
@@ -35,27 +35,27 @@ end
 default['hadoop']['yarn_site']['yarn.resourcemanager.scheduler.class'] = 'org.apache.hadoop.yarn.server.resourcemanager.scheduler.fifo.FifoScheduler'
 # hadoop-metrics.properties
 default['hadoop']['hadoop_metrics']['dfs.class'] = 'org.apache.hadoop.metrics.spi.NullContextWithUpdateThread'
-default['hadoop']['hadoop_metrics']['dfs.period'] = 60
+default['hadoop']['hadoop_metrics']['dfs.period'] = '60'
 default['hadoop']['hadoop_metrics']['mapred.class'] = 'org.apache.hadoop.metrics.spi.NullContextWithUpdateThread'
-default['hadoop']['hadoop_metrics']['mapred.period'] = 60
+default['hadoop']['hadoop_metrics']['mapred.period'] = '60'
 default['hadoop']['hadoop_metrics']['rpc.class'] = 'org.apache.hadoop.metrics.spi.NullContextWithUpdateThread'
-default['hadoop']['hadoop_metrics']['rpc.period'] = 60
+default['hadoop']['hadoop_metrics']['rpc.period'] = '60'
 default['hadoop']['hadoop_metrics']['ugi.class'] = 'org.apache.hadoop.metrics.spi.NullContextWithUpdateThread'
-default['hadoop']['hadoop_metrics']['ugi.period'] = 60
-# Enable JMX
+default['hadoop']['hadoop_metrics']['ugi.period'] = '60'
 # hadoop-env.sh
-default['hadoop']['hadoop_env']['hadoop_jmx_base'] = "-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
-default['hadoop']['hadoop_env']['hadoop_namenode_opts'] = "$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8004"
-default['hadoop']['hadoop_env']['hadoop_secondarynamenode_opts'] = "$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8005"
-default['hadoop']['hadoop_env']['hadoop_datanode_opts'] = "$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8006"
-default['hadoop']['hadoop_env']['hadoop_mapred_home'] = "/usr/lib/hadoop-mapreduce"
+# Enable JMX
+default['hadoop']['hadoop_env']['hadoop_jmx_base'] = '-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false'
+default['hadoop']['hadoop_env']['hadoop_namenode_opts'] = '$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8004'
+default['hadoop']['hadoop_env']['hadoop_secondarynamenode_opts'] = '$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8005'
+default['hadoop']['hadoop_env']['hadoop_datanode_opts'] = '$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8006'
+default['hadoop']['hadoop_env']['hadoop_mapred_home'] = '/usr/lib/hadoop-mapreduce'
 # yarn-env.sh
-default['hadoop']['yarn_env']['yarn_opts'] = "-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
-default['hadoop']['yarn_env']['yarn_resourcemanager_opts'] = "$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=8008"
-default['hadoop']['yarn_env']['yarn_nodemanager_opts'] = "$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=8009"
+default['hadoop']['yarn_env']['yarn_opts'] = '-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false'
+default['hadoop']['yarn_env']['yarn_resourcemanager_opts'] = '$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=8008'
+default['hadoop']['yarn_env']['yarn_nodemanager_opts'] = '$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=8009'
 
 # HBase
 # hbase-site.xml configs
-default['hbase']['hbase_site']['hbase.cluster.distributed'] = true
-default['hbase']['hbase_site']['hbase.defaults.for.version.skip'] = false
-default['hbase']['hbase_site']['hbase.regionserver.handler.count'] = 100
+default['hbase']['hbase_site']['hbase.cluster.distributed'] = 'true'
+default['hbase']['hbase_site']['hbase.defaults.for.version.skip'] = 'false'
+default['hbase']['hbase_site']['hbase.regionserver.handler.count'] = '100'

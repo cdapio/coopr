@@ -29,15 +29,25 @@ import java.util.Set;
  */
 public final class Service extends NamedEntity {
   private final String description;
-  private final Set<String> dependsOn;
+  private final ServiceDependencies dependencies;
   private final Map<ProvisionerAction, ServiceAction> provisionerActions;
 
-  public Service(String name, String description, Set<String> dependsOn,
+  public Service(String name, String description, Set<String> runtimeRequirements,
                  Map<ProvisionerAction, ServiceAction> provisionerActions) {
     super(name);
     Preconditions.checkArgument(provisionerActions != null, "service must contain provisioner actions");
     this.description = description;
-    this.dependsOn = dependsOn == null ? ImmutableSet.<String>of() : dependsOn;
+    this.dependencies =
+      new ServiceDependencies(null, null, null, new ServiceStageDependencies(runtimeRequirements, null));
+    this.provisionerActions = provisionerActions;
+  }
+
+  public Service(String name, String description, ServiceDependencies dependencies,
+                 Map<ProvisionerAction, ServiceAction> provisionerActions) {
+    super(name);
+    Preconditions.checkArgument(provisionerActions != null, "service must contain provisioner actions");
+    this.description = description;
+    this.dependencies = dependencies == null ? ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES : dependencies;
     this.provisionerActions = provisionerActions;
   }
 
@@ -51,13 +61,12 @@ public final class Service extends NamedEntity {
   }
 
   /**
-   * Get the set of services this depends on.  Dependencies will be used to determine the order of certain actions
-   * that happen on the cluster, as well as for cluster verification.
+   * Get the {@link ServiceDependencies} of this service.
    *
-   * @return Set of services this service depends on.
+   * @return Dependencies of this service.
    */
-  public Set<String> getDependsOn() {
-    return dependsOn;
+  public ServiceDependencies getDependencies() {
+    return dependencies;
   }
 
   /**
@@ -71,26 +80,26 @@ public final class Service extends NamedEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof Service) || o == null) {
+    if (!(o instanceof Service)) {
       return false;
     }
     Service other = (Service) o;
     return Objects.equal(name, other.name) &&
       Objects.equal(description, other.description) &&
-      Objects.equal(dependsOn, other.dependsOn) &&
+      Objects.equal(dependencies, other.dependencies) &&
       Objects.equal(provisionerActions, other.provisionerActions);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, dependsOn, provisionerActions);
+    return Objects.hashCode(name, description, dependencies, provisionerActions);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
       .add("description", description)
-      .add("dependsOn", dependsOn)
+      .add("dependencies", dependencies)
       .add("provisionerActions", provisionerActions)
       .toString();
   }
