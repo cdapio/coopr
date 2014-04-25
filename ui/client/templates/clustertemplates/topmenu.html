@@ -2,7 +2,7 @@
   <li><a class="nav-link nav-dash btn-spl btn-default secondary-nav-home" href="/clustertemplates">Home</a></li>
   <li>
     <div class="dropdown">
-      <a data-toggle="dropdown" href="#" class="btn-spl btn-default nav-dash secondary-nav-dropdown">Templates<span class="caret"></span></a>
+      <a data-toggle="dropdown" class="btn-spl btn-default nav-dash secondary-nav-dropdown">Templates<span class="caret"></span></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
         {% for item in clustertemplates %}
           <li><a class="list-types" href="/clustertemplates/clustertemplate/{{item.name}}">{{ item.name }}</a></li>

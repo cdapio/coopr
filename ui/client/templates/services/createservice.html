@@ -22,14 +22,14 @@
         <div class="panel spl-panel" style="clear: both;">
           <div class="panel-head spl-panel-head clearfix">
             <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if service %} Edit service: {{service.name}} {% else %}Create a service{% endif %}</h4>
-            <div class="pull-right">
-              {% if service %}
-              <form role="form" method="POST" action="/services/delete/{{service.name}}" class="service-delete-form">
-                <input type="hidden" value="{{service.name}}" name="name" />
-                <button type="submit" class="btn-spl btn-delete"></button>
-              </form>
-              {% endif %}
-            </div>
+              <div class="pull-right">
+                {% if service %}
+                <form role="form" method="POST" action="/services/delete/{{service.name}}" class="service-delete-form">
+                  <input type="hidden" value="{{service.name}}" name="name" />
+                  <button type="submit" class="btn-spl btn-delete"></button>
+                </form>
+                {% endif %}
+              </div>
             </div>
           </div>
 
