@@ -1,9 +1,11 @@
 {
   "name": "hadoop-hdfs-namenode",
   "description": "Hadoop HDFS NameNode",
-  "dependson": [
-    "base"
-  ],
+  "dependencies": {
+    "runtime": {
+      "requires": [ "base" ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

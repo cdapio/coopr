@@ -58,7 +58,7 @@ public class ServicesInstanceTest extends GenericTest {
     assertEquals("Name is not correct.", reactor.getName(), REACTOR_SERVICES_PAGE.getInputName());
     assertEquals("Description is not correct.", reactor.getDescription(),
                  REACTOR_SERVICES_PAGE.getDescription());
-    assertEquals("DependsOn is not correct.", reactor.getDependsOn(),
+    assertEquals("DependsOn is not correct.", reactor.getDependencies().getRuntime().getRequires(),
                  REACTOR_SERVICES_PAGE.getDependsOn());
     assertEquals("Provisioner is not correct", reactor.getProvisionerActions(),
                  REACTOR_SERVICES_PAGE.getProvisionerActions());

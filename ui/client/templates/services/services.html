@@ -38,7 +38,7 @@
                   <tr>
                     <td><a href="/services/service/{{entry.name}}">{{ entry.name }}</a></td>
                     <td>{{ entry.description }}</td>
-                    <td>{{ entry.dependson }}</td>
+                    <td>{{ entry.dependencies.runtime.requires }}</td>
                     <td>
                       <form role="form" method="POST" action="/services/delete/{{entry.name}}" class="delete-form">
                         <input type="hidden" value="{{entry.name}}" name="name" />
