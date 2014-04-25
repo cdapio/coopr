@@ -30,9 +30,9 @@
           <div class="panel-head spl-panel-head clearfix">
             <input type="hidden" id="inputName" value="{{provider.name}}" />
             <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if provider %} Edit provider: {{provider.name}} {% else %}Create a provider{% endif %}</h4>
-              <div class="pull-right">
+              <div class="pull-right" ng-controller="DeleteProviderCtrl">
                 {% if provider %}
-                <form role="form" method="POST" action="/providers/delete/{{provider.name}}" class="provider-delete-form">
+                <form role="form" method="POST" action="/providers/delete/{{provider.name}}" class="provider-delete-form" ng-submit="submitDeletion($event)">
                   <input type="hidden" value="{{entry.name}}" name="name" />
                   <button type="submit" class="btn-spl btn-delete"></button>
                 </form>

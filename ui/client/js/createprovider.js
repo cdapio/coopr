@@ -61,6 +61,16 @@ CreateProviderApp.factory('dataFactory', ['$http', '$q', 'fetchUrl',
   }
 }]);
 
+CreateProviderApp.controller('DeleteProviderCtrl', ['$scope', '$interval', 'dataFactory',
+  function ($scope, $interval, dataFactory) {
+
+  $scope.submitDeletion = function ($event) {
+    $event.preventDefault();
+    Helpers.handleConfirmDeletion($event, '/providers');
+  };
+
+}]);
+
 CreateProviderApp.controller('CreateProviderCtrl', ['$scope', '$interval', 'dataFactory',
   function ($scope, $interval, dataFactory) {
 
