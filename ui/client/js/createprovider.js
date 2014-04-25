@@ -135,10 +135,9 @@ CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFa
     providertypes.map(function (item) {
       $scope.providerData[item.name] = item;
     });
-  });
-
-  dataFactory.getCurrentProvider($scope.providerId, function (provider) {
-    $scope.currProvider = provider;
+    dataFactory.getCurrentProvider($scope.providerId, function (provider) {
+      $scope.currProvider = provider;
+    });
   });
 
   /**
