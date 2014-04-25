@@ -52,7 +52,7 @@ public class CreateServiceTest extends GenericTest {
     WebElement inputDescription = globalDriver.findElement(By.cssSelector("#inputDescription"));
     inputDescription.sendKeys(service.getDescription());
 
-    Select dependsOn = new Select(globalDriver.findElement(By.cssSelector("#inputDependsOn")));
+    Select dependsOn = new Select(globalDriver.findElement(By.cssSelector("#inputRuntimeRequires")));
     WebElement addService = globalDriver.findElement(By.cssSelector("#add-service"));
     dependsOn.selectByVisibleText("base");
     addService.click();

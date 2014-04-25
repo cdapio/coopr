@@ -1,8 +1,11 @@
 {
   "name": "fail2ban",
   "description": "fail2ban Service Wrapper",
-  "dependson": [
-  ],
+  "dependencies": {
+    "runtime": {
+      "requires": []
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {
