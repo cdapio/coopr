@@ -13,85 +13,179 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([], function () {
-  
-  var Page = {
 
-    providerFields: {
-      rackspace: [
-        "rackspace_username",
-        "rackspace_api_key",
-        "rackspace_region"
-      ],
-      joyent: [
-        "joyent_username",
-        "joyent_keyname",
-        "joyent_keyfile",
-        "joyent_api_url",
-        "joyent_version"
-      ],
-      openstack: [
-        "openstack_username",
-        "openstack_password",
-        "openstack_tenant",
-        "openstack_auth_url",
-        "openstack_ssh_key_id",
-        "identity_file"
-      ]
-    },
 
-    init: function () {
-      var self = this;
-      $("#provisioner-select").change(function () {
-        self.handleProviderType($(this).val());
+/**
+ * Create provider page.
+ */
+
+var CreateProviderApp = {};
+
+CreateProviderApp = angular.module('CreateProviderApp', ['ngRoute'], ['$interpolateProvider',
+  function ($interpolateProvider) {
+  $interpolateProvider.startSymbol('[[');
+  $interpolateProvider.endSymbol(']]');
+}]);
+
+CreateProviderApp.config(['$routeProvider',
+  function ($routeProvider) {
+    $routeProvider.
+      when('/', {
+        templateUrl: '/static/templates/providers/createprovider.html',
+        controller: 'CreateProviderCtrl'
+      }).
+      when('/edit', {
+        templateUrl: '/static/templates/providers/editprovider.html',
+        controller: 'EditProviderCtrl'
+      }).
+      otherwise({
+        redirectTo: '/'
       });
+  }]);
 
-      $("#create-provider-form").submit(function (e) {
-        e.preventDefault();
-        self.getFormDataAndSubmit(e);
-      });
+CreateProviderApp.value('fetchUrl', '/pipeApiCall?path=');
 
-      $(".provider-delete-form").submit(function (e) {
-        e.preventDefault();
-        Helpers.handleConfirmDeletion(e, '/providers');
-      });
-
+CreateProviderApp.factory('dataFactory', ['$http', '$q', 'fetchUrl',
+  function ($http, $q, fetchUrl) {
+  var providerId = $("#inputName").val();
+  return {
+    getProviderId: function () {
+      return providerId;
     },
-
-    handleProviderType: function (provider) {
-      $(".auth-group").each(function (index, group) {
-        if ($(group).attr("id") === provider + "-auth-fields") {
-          $(group).show();
-        } else {
-          $(group).hide();
-        }
-      })
+    getCurrentProvider: function (currentProvider, callback) {
+      $http.get(fetchUrl + '/providers/' + currentProvider).success(callback);
     },
-
-    getFormDataAndSubmit: function (e) {
-      var self = this;
-      var providerType = $("#provisioner-select").val();
-      var postJson = {
-        name: $("#inputName").val(),
-        description: $("#inputDescription").val(),
-        providertype: providerType,
-        provisioner: {
-        }
-      };
-      if (providerType in self.providerFields) {
-        for (var i = 0; i < self.providerFields[providerType].length; i++) {
-          var key = self.providerFields[providerType][i];
-          postJson.provisioner[key] = $("#" + providerType + "-auth-fields #" + key).val();
-        }
-        Helpers.submitPost(e, postJson, '/providers');
-      } else {
-        $("#notification").text('Provider type empty.');
-        $("html, body").animate({ scrollTop: 0 }, "slow");
-      }
+    getProviders: function (callback) {
+      $http.get(fetchUrl + '/providertypes').success(callback);
     }
+  }
+}]);
 
+CreateProviderApp.controller('CreateProviderCtrl', ['$scope', '$interval', 'dataFactory',
+  function ($scope, $interval, dataFactory) {
+
+
+  $scope.providerType = '';
+  $scope.providerData = {};
+  $scope.providerTypes = [];
+  $scope.providerInputs = {};
+
+
+  dataFactory.getProviders(function (providertypes) {
+    providertypes.map(function (item) {
+      $scope.providerData[item.name] = item;
+    });
+  });
+
+  $scope.$watch('providerType', function () {
+    if ($scope.providerType) {
+      $scope.providerInputs = $scope.providerData[$scope.providerType.name];  
+    }
+  });
+
+  $scope.submitProvider = function ($event) {
+    $event.preventDefault();
+    if (!$scope.providerInputs) {
+      $("#notification").text('You must select a provider.');
+      $("html, body").animate({ scrollTop: 0 }, "slow");
+    }
+    var postJson = {
+      name: $scope.inputName,
+      description: $scope.inputDescription,
+      providertype: $scope.providerType,
+      provisioner: {}
+    };
+    for (var item in $scope.providerInputs.parameters.admin.fields) {
+      postJson.provisioner[item] = $scope.providerInputs.parameters.admin.fields[item];
+    }
+    if (Helpers.isProviderInputValid(
+      postJson, $scope.providerInputs.parameters.admin.required)) {
+      Helpers.submitPost($event, postJson, '/providers');  
+    } else {
+      $("#notification").text('Required fields missing.');
+      $("html, body").animate({ scrollTop: 0 }, "slow");
+    }
+    
   };
 
-  return Page.init();
+}]);
 
-});
+CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFactory',
+  function ($scope, $interval, dataFactory) {
+    $scope.providerId = dataFactory.getProviderId();
+    $scope.currProvider;
+    $scope.providerInputs;
+    
+    $scope.providerData = {};
+    dataFactory.getProviders(function (providertypes) {
+      providertypes.map(function (item) {
+        $scope.providerData[item.name] = item;
+      });
+    });
+
+    dataFactory.getCurrentProvider($scope.providerId, function (provider) {
+      $scope.currProvider = provider;
+    });
+
+  $scope.$watch('currProvider.providertype', function () {
+    if ($scope.currProvider) {
+      $scope.providerInputs = $scope.providerData[$scope.currProvider.providertype];  
+    }
+  });
+
+    $scope.$watchCollection('[currProvider,providerData]', function (newValues, oldValues) {
+      if (!$.isEmptyObject($scope.currProvider) && !$.isEmptyObject($scope.providerData)) {
+        $scope.currProvider = AppHelpers.addInputSchema(
+          $scope.currProvider, $scope.providerData[$scope.providerId]);
+      }
+    }, true);
+
+    $scope.submitProvider = function ($event) {
+      $event.preventDefault();
+      if (!$scope.currProvider.providertype) {
+        $("#notification").text('You must select a provider.');
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+      }
+      var postJson = {
+        name: $scope.currProvider.name,
+        description: $scope.currProvider.description,
+        providertype: $scope.currProvider.providertype,
+        provisioner: {}
+      };
+      for (var item in $scope.currProvider.provisioner) {
+        postJson.provisioner[item] = $scope.currProvider.provisioner[item]['userinput'];
+      }
+      if (Helpers.isProviderInputValid(
+        postJson, $scope.providerInputs.parameters.admin.required)) {
+        Helpers.submitPost($event, postJson, '/providers');  
+      } else {
+        $("#notification").text('Required fields missing.');
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+      }
+      
+    };
+
+
+
+}]);
+
+/**
+ * Helper methods.
+ */
+var AppHelpers = {};
+
+AppHelpers.addInputSchema = function (currProvider, providerData) {
+  for (var item in currProvider.provisioner) {
+    for (var entry in providerData.parameters.admin.fields) {
+      if (entry === item) {
+        currProvider.provisioner[entry] = {
+          userinput: currProvider.provisioner[entry]
+        };
+        for (var field in providerData.parameters.admin.fields[entry]) {
+          currProvider.provisioner[entry][field] = providerData.parameters.admin.fields[entry][field];
+        }
+      }
+    }
+  }
+  return currProvider;
+};

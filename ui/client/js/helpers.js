@@ -67,6 +67,43 @@ Helpers.READABLE_ACTIONS = {
 };
 
 /**
+ * Compare 2 arrays to check if they ahve the same values.
+ * @param  {Array} arr1.
+ * @param  {Array} arr2.
+ * @return {Boolean} true or false whether they have same values.
+ */
+Helpers.compareArray = function(arr1, arr2) {
+  if (arr1.length != arr2.length) return false;
+  for (var i = 0; i < arr2.length; i++) {
+      if (arr1[i].compare) { 
+          if (!arr1[i].compare(arr2[i])) return false;
+      }
+      if (arr1[i] !== arr2[i]) return false;
+  }
+  return true;
+};
+
+/**
+ * Checks if input provider data is valid.
+ * @param  {Object}  input Provider form data.
+ * @param  {Array<Array>}  required Possibilities for required combinations.
+ * @return {Boolean} Whethere provider input is valid.
+ */
+Helpers.isProviderInputValid = function (input, required) {
+  var inputEntries = [];
+  for (var item in input.provisioner) {
+    inputEntries.push(item);
+  }
+  // Compare array for all required possibilities.
+  for (var i = 0, len = required.length; i < len; i++) {
+    if (Helpers.compareArray(inputEntries, required[i])) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
  * Submits a post request.
  * @param  {Object|String} e Jquery submit event containing form data or url submit location.
  * @param  {String} redirectUrl Url for redirection.

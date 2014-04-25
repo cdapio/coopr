@@ -61,12 +61,32 @@ var clusterDefinitions = require('./clusters/clusterdefinitions.json');
 var clusterStatuses = require('./clusters/clusterstatuses.json');
 var createCluster = require('./clusters/createcluster.json');
 
+var plugins = {};
+plugins['rackspace'] = require('./plugins/rackspace.json');
+
 module.exports = function (nock, argv, clientAddr) {
 
   /**
    * Set up nock environment. Disable net connection.
    */
   nock.disableNetConnect();
+
+  /**
+   * Plugins call mocks.
+   */
+  var pluginsResponse = [];
+  for (var item in plugins) {
+    nock(clientAddr)
+      .persist()
+      .get('/v1/loom/providertypes/' + item)
+      .reply(200, plugins[item]);
+    pluginsResponse.push(plugins[item]);
+  }
+
+  nock(clientAddr)
+    .persist()
+    .get('/v1/loom/providertypes')
+    .reply(200, pluginsResponse);
 
   /**
    * Clusters call mocks.
