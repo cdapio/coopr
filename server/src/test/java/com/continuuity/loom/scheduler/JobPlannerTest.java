@@ -25,14 +25,9 @@ import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
-import com.continuuity.utils.ImmutablePair;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 import org.junit.Assert;
@@ -41,7 +36,6 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -84,148 +78,6 @@ public class JobPlannerTest {
       createSortedSet(createClusterTask("CONFIGURE", "1-1-22", "host1"))
     );
 
-    Assert.assertEquals(expected, actual);
-  }
-
-  @Test
-  public void testMinimizeDependencies() {
-    Map<ProvisionerAction, ServiceAction> emptyActions = ImmutableMap.of();
-    Service base =  new Service("base", "", ImmutableSet.<String>of(), emptyActions);
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of("base"), emptyActions);
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("base", "s1"), emptyActions);
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("base", "s1", "s2"), emptyActions);
-    Service s4 =  new Service("s4", "", ImmutableSet.<String>of("base"), emptyActions);
-    Service s5 =  new Service("s5", "", ImmutableSet.<String>of("base", "s1", "s2", "s3", "s4"), emptyActions);
-    Map<String, Service> serviceMap = Maps.newHashMap();
-    serviceMap.put(base.getName(), base);
-    serviceMap.put(s1.getName(), s1);
-    serviceMap.put(s2.getName(), s2);
-    serviceMap.put(s3.getName(), s3);
-    serviceMap.put(s4.getName(), s4);
-    serviceMap.put(s5.getName(), s5);
-    SetMultimap<String, String> expected = HashMultimap.create();
-    expected.put("s1", "base");
-    expected.put("s2", "s1");
-    expected.put("s3", "s2");
-    expected.put("s4", "base");
-    expected.put("s5", "s3");
-    expected.put("s5", "s4");
-    SetMultimap<String, String> actual = JobPlanner.minimizeDependencies(serviceMap);
-    Assert.assertEquals(expected, actual);
-    Assert.assertTrue(actual.get("base").isEmpty());
-  }
-
-  /**
-   *     |---> s2 ---|           |---> s6
-   * s1--|           |---> s4 ---|
-   *     |---> s3 ---|           |---> s7
-   *           |
-   *           |---------> s5
-   */
-  @Test
-  public void testDependsOn() {
-    Multimap<String, String> dependencies = HashMultimap.create();
-    dependencies.put("s2", "s1");
-    dependencies.put("s3", "s1");
-    dependencies.put("s4", "s3");
-    dependencies.put("s4", "s2");
-    dependencies.put("s5", "s3");
-    dependencies.put("s6", "s4");
-    dependencies.put("s7", "s4");
-    Map<String, Set<String>> serviceDeps = Maps.newHashMap();
-    serviceDeps.put("s1", ImmutableSet.<String>of());
-    serviceDeps.put("s2", ImmutableSet.<String>of("s1"));
-    serviceDeps.put("s3", ImmutableSet.<String>of("s1"));
-    serviceDeps.put("s4", ImmutableSet.<String>of("s1", "s2", "s3"));
-    serviceDeps.put("s5", ImmutableSet.<String>of("s1", "s3"));
-    serviceDeps.put("s6", ImmutableSet.<String>of("s1", "s2", "s3", "s4"));
-    serviceDeps.put("s7", ImmutableSet.<String>of("s1", "s2", "s3", "s4"));
-
-    for (String service1 : serviceDeps.keySet()) {
-      for (String service2 : serviceDeps.keySet()) {
-        Assert.assertEquals(serviceDeps.get(service1).contains(service2),
-                            JobPlanner.dependsOn(service1, service2, dependencies));
-      }
-    }
-  }
-
-  /**
-   *     |---> s2 ---|
-   * s1--|           |---> s4
-   *     |---> s3 ---|      |
-   *                        |
-   * s5 -----> s6 ----------|
-   *
-   */
-  @Test
-  public void testFindDirectActionDependencies() {
-    ServiceAction sAction = new ServiceAction(null, null, null);
-    // s1 has initialize and start
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INITIALIZE, sAction,
-                                ProvisionerAction.START, sAction));
-    // s2 has configure and initialize
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, sAction,
-                                ProvisionerAction.INITIALIZE, sAction));
-    // s3 has start
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, sAction));
-    // s4 has initialize and start
-    Service s4 =  new Service("s4", "", ImmutableSet.<String>of("s2", "s3", "s6"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INITIALIZE, sAction,
-                                ProvisionerAction.START, sAction));
-    Service s5 =  new Service("s5", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INITIALIZE, sAction,
-                                ProvisionerAction.START, sAction));
-    Service s6 =  new Service("s6", "", ImmutableSet.<String>of("s5"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INITIALIZE, sAction));
-
-    SetMultimap<String, String> serviceDependencies = HashMultimap.create();
-    serviceDependencies.putAll(s1.getName(), s1.getDependsOn());
-    serviceDependencies.putAll(s2.getName(), s2.getDependsOn());
-    serviceDependencies.putAll(s3.getName(), s3.getDependsOn());
-    serviceDependencies.putAll(s4.getName(), s4.getDependsOn());
-    serviceDependencies.putAll(s5.getName(), s5.getDependsOn());
-    serviceDependencies.putAll(s6.getName(), s6.getDependsOn());
-
-    Map<String, Service> serviceMap = Maps.newHashMap();
-    serviceMap.put(s1.getName(), s1);
-    serviceMap.put(s2.getName(), s2);
-    serviceMap.put(s3.getName(), s3);
-    serviceMap.put(s4.getName(), s4);
-    serviceMap.put(s5.getName(), s5);
-    serviceMap.put(s6.getName(), s6);
-
-    Set<Actions.Dependency> actionDependencies = ImmutableSet.of(
-      new Actions.Dependency(ProvisionerAction.START, ProvisionerAction.START),
-      new Actions.Dependency(ProvisionerAction.START, ProvisionerAction.INITIALIZE)
-    );
-
-    SetMultimap<ImmutablePair<String, ProvisionerAction>, ImmutablePair<String, ProvisionerAction>> expected =
-      HashMultimap.create();
-
-    // s2 initialize depends on s1 start
-    expected.put(ImmutablePair.of("s2", ProvisionerAction.INITIALIZE), ImmutablePair.of("s1", ProvisionerAction.START));
-    // s3 start depends on s1 start
-    expected.put(ImmutablePair.of("s3", ProvisionerAction.START), ImmutablePair.of("s1", ProvisionerAction.START));
-    // s4 start depends on s1 start, s3 start, and s5 start.  but s3 depends on s1 so s3 start should not be here.
-    expected.put(ImmutablePair.of("s4", ProvisionerAction.START), ImmutablePair.of("s3", ProvisionerAction.START));
-    expected.put(ImmutablePair.of("s4", ProvisionerAction.START), ImmutablePair.of("s5", ProvisionerAction.START));
-    // s4 initialize depends on s1 start, s3 start, and s5 start.  but s3 depends on s1 so s3 start should not be here.
-    expected.put(ImmutablePair.of("s4", ProvisionerAction.INITIALIZE), ImmutablePair.of("s3", ProvisionerAction.START));
-    expected.put(ImmutablePair.of("s4", ProvisionerAction.INITIALIZE), ImmutablePair.of("s5", ProvisionerAction.START));
-    // s6 initialize depends on s5 start
-    expected.put(ImmutablePair.of("s6", ProvisionerAction.INITIALIZE), ImmutablePair.of("s5", ProvisionerAction.START));
-
-    SetMultimap<ImmutablePair<String, ProvisionerAction>, ImmutablePair<String, ProvisionerAction>> actual =
-      JobPlanner.findDirectActionDependencies(serviceDependencies, actionDependencies, serviceMap);
     Assert.assertEquals(expected, actual);
   }
 

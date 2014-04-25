@@ -28,7 +28,6 @@ import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.Set;
 
 import static com.continuuity.loom.macro.Expression.Type.HOST_OF_SERVICE;
@@ -45,9 +44,12 @@ public class ExpressionTest {
   static Node node2;
 
   static {
-    Service svc1 = new Service("svc1", "service 1", null, Collections.<ProvisionerAction, ServiceAction>emptyMap());
-    Service svc2 = new Service("svc2", "service 2", null, Collections.<ProvisionerAction, ServiceAction>emptyMap());
-    Service svc3 = new Service("svc3", "service 3", null, Collections.<ProvisionerAction, ServiceAction>emptyMap());
+    Service svc1 = new Service("svc1", "service 1", ImmutableSet.<String>of(),
+                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service svc2 = new Service("svc2", "service 2", ImmutableSet.<String>of(),
+                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service svc3 = new Service("svc3", "service 3", ImmutableSet.<String>of(),
+                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
     Node foo = new Node("foo", "1", ImmutableSet.of(svc1, svc2),
                         ImmutableMap.of("hostname", "oof", "ipaddress", "9.7.8.4", "nodenum", "0"));
     Node bar = new Node("bar", "1", ImmutableSet.of(svc1),

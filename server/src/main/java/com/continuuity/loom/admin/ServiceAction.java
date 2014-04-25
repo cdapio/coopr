@@ -63,7 +63,7 @@ public final class ServiceAction {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof ServiceAction) || o == null) {
+    if (!(o instanceof ServiceAction)) {
       return false;
     }
     ServiceAction other = (ServiceAction) o;

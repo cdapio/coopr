@@ -1,9 +1,11 @@
 {
   "name": "haproxy",
   "description": "HAproxy software load balancer",
-  "dependson": [
-    "base"
-  ],
+  "dependencies": {
+    "runtime": {
+      "requires": [ "base" ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

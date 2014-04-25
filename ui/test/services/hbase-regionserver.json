@@ -1,11 +1,15 @@
 {
   "name": "hbase-regionserver",
   "description": "HBase RegionServer",
-  "dependson": [
-    "base",
-    "hbase-master",
-    "zookeeper-server"
-  ],
+  "dependencies": {
+    "runtime": {
+      "requires": [
+        "base",
+        "hbase-master",
+        "zookeeper-server"
+      ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

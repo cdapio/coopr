@@ -1,9 +1,11 @@
 {
   "name": "php",
   "description": "PHP language support",
-  "dependson": [
-    "apache-httpd"
-  ],
+  "dependencies": {
+    "runtime": {
+      "requires": [ "apache-httpd" ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

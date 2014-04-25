@@ -16,6 +16,7 @@
 package com.continuuity.loom.layout;
 
 import com.continuuity.loom.admin.ClusterTemplate;
+import com.continuuity.loom.admin.Compatibilities;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
@@ -36,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
@@ -71,17 +71,38 @@ public class Solver {
    */
   public Set<Node> addServicesToCluster(Cluster cluster, Set<Node> clusterNodes,
                                         Set<String> servicesToAdd) throws Exception {
+    Map<String, Service> serviceMap = getServiceMap(Sets.union(cluster.getServices(), servicesToAdd));
+    validateServiceCompatibilities(cluster.getClusterTemplate().getCompatibilities(), servicesToAdd);
+    validateServiceDependencies(serviceMap);
+
     ClusterLayoutTracker tracker = updater.addServicesToCluster(cluster, clusterNodes, servicesToAdd);
     if (tracker == null) {
       return null;
     }
 
     Set<Node> changedNodes = Sets.newHashSet();
-    Map<String, Service> serviceMap = getServiceMap(Sets.union(cluster.getServices(), servicesToAdd));
     for (ClusterLayoutChange change : tracker.getChanges()) {
       changedNodes.addAll(change.applyChange(cluster, clusterNodes, serviceMap));
     }
     return changedNodes;
+  }
+
+  /**
+   * Validate whether or not a set of services are allowed to be added to a cluster.
+   *
+   * @param cluster Cluster to check addition of services to.
+   * @param servicesToAdd Services to add to the cluster
+   * @throws Exception
+   */
+  public void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd) throws Exception {
+    Map<String, Service> serviceMap = getServiceMap(Sets.union(cluster.getServices(), servicesToAdd));
+    validateServicesToAdd(cluster, servicesToAdd, serviceMap);
+  }
+
+  private void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd, Map<String, Service> serviceMap)
+    throws Exception {
+    validateServiceCompatibilities(cluster.getClusterTemplate().getCompatibilities(), servicesToAdd);
+    validateServiceDependencies(serviceMap);
   }
 
   /**
@@ -172,29 +193,10 @@ public class Solver {
     if (serviceNames == null || serviceNames.isEmpty()) {
       serviceNames = template.getClusterDefaults().getServices();
     }
-    Set<String> allowedServices = template.getCompatibilities().getServices();
-    if (!allowedServices.isEmpty()) {
-      Sets.SetView<String> diff = Sets.difference(serviceNames, allowedServices);
-      if (diff.size() > 1) {
-        String badServices =
-          Joiner.on(",").join(Sets.difference(serviceNames, template.getCompatibilities().getServices()));
-        throw new IllegalArgumentException(
-          "services " + badServices + " are not allowed with template " + clusterTemplateName);
-      } else if (diff.size() > 0) {
-        throw new IllegalArgumentException(
-          "service " + diff.iterator().next() + " is not allowed with template " + clusterTemplateName);
-      }
-    }
+    validateServiceCompatibilities(template.getCompatibilities(), serviceNames);
 
     Map<String, Service> serviceMap = getServiceMap(serviceNames);
-    for (Service service : serviceMap.values()) {
-      for (String dependency : service.getDependsOn()) {
-        if (!serviceNames.contains(dependency)) {
-          throw new IllegalArgumentException("service " + service.getName() + " depends on " + dependency
-          + ", which is not in the set of cluster services");
-        }
-      }
-    }
+    validateServiceDependencies(serviceMap);
     cluster.setServices(serviceNames);
 
     // TODO: move building of node properties to NodeService or Node or some place more sensible
@@ -295,6 +297,75 @@ public class Solver {
           map.put(name, image);
         }
       }
+    }
+  }
+
+  private void validateServiceCompatibilities(Compatibilities compatibilities, Set<String> services) {
+    Set<String> compatibleServices = compatibilities.getServices();
+    if (compatibleServices != null && !compatibleServices.isEmpty()) {
+      Set<String> incompatibleServices = Sets.difference(services, compatibilities.getServices());
+      if (!incompatibleServices.isEmpty()) {
+        String incompatibleStr = Joiner.on(',').join(incompatibleServices);
+        throw new IllegalArgumentException(incompatibleStr + " are incompatible with the cluster");
+      }
+    }
+  }
+
+  /**
+   * Given a map of service name to {@link Service}, validate that the service dependency requirements for all services
+   * in the map are satisfied by some other service in the map, throwing an {@link IllegalArgumentException} if they
+   * are not.
+   *
+   * @param serviceMap Map of service name to {@link Service} to check all dependency requirements for.
+   * @throws Exception
+   */
+  private void validateServiceDependencies(Map<String, Service> serviceMap) throws Exception {
+    // gather all services that will be provided on the cluster. This is every service plus any service they provide.
+    Set<String> providedServices = Sets.newHashSet();
+    for (Service service : serviceMap.values()) {
+      providedServices.addAll(service.getDependencies().getProvides());
+    }
+    providedServices = Sets.union(serviceMap.keySet(), providedServices);
+
+    // check dependencies
+    boolean dependenciesSatisfied = true;
+    StringBuilder errMsg = new StringBuilder();
+    for (Service service : serviceMap.values()) {
+      for (String serviceDependency : service.getDependencies().getRequiredServices()) {
+        if (!providedServices.contains(serviceDependency)) {
+          if (!dependenciesSatisfied) {
+            errMsg.append("\n");
+          }
+          errMsg.append(service.getName());
+          errMsg.append(" requires ");
+          errMsg.append(serviceDependency);
+          errMsg.append(", which is not on the cluster or in the list of services to add.");
+          dependenciesSatisfied = false;
+        }
+      }
+    }
+    if (!dependenciesSatisfied) {
+      throw new IllegalArgumentException(errMsg.toString());
+    }
+
+    boolean hasConflicts = false;
+    errMsg = new StringBuilder();
+    for (Service service : serviceMap.values()) {
+      for (String conflictingService : service.getDependencies().getConflicts()) {
+        if (serviceMap.keySet().contains(conflictingService)) {
+          if (hasConflicts) {
+            errMsg.append("\n");
+          }
+          errMsg.append(service.getName());
+          errMsg.append(" conflicts with ");
+          errMsg.append(conflictingService);
+          errMsg.append(".");
+          hasConflicts = true;
+        }
+      }
+    }
+    if (hasConflicts) {
+      throw new IllegalArgumentException(errMsg.toString());
     }
   }
 

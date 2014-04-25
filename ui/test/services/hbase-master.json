@@ -1,12 +1,16 @@
 {
   "name": "hbase-master",
   "description": "HBase Master",
-  "dependson": [
-    "base",
-    "hadoop-hdfs-namenode",
-    "hadoop-hdfs-datanode",
-    "zookeeper-server"
-  ],
+  "dependencies": {
+    "runtime": {
+      "requires": [ 
+        "base",
+        "hadoop-hdfs-namenode",
+        "hadoop-hdfs-datanode",
+        "zookeeper-server"
+      ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {
