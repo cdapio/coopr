@@ -176,20 +176,22 @@ CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFa
 var AppHelpers = {};
 
 AppHelpers.addInputSchema = function (currProvider, providerInputs) {
-  for (var item in currProvider.provisioner) {
-    for (var entry in providerInputs.parameters.admin.fields) {
-      if (entry === item) {
-        var userinput = currProvider.provisioner[entry];
+  if (providerInputs) {
+    for (var item in currProvider.provisioner) {
+      for (var entry in providerInputs.parameters.admin.fields) {
+        if (entry === item) {
+          var userinput = currProvider.provisioner[entry];
 
-        if(typeof currProvider.provisioner[entry] !== 'object') {
-          currProvider.provisioner[entry] = {
-            userinput: userinput
-          };
-        }
+          if(typeof currProvider.provisioner[entry] !== 'object') {
+            currProvider.provisioner[entry] = {
+              userinput: userinput
+            };
+          }
 
-        for (var field in providerInputs.parameters.admin.fields[entry]) {
-          currProvider.provisioner[entry][field] = (
-            providerInputs.parameters.admin.fields[entry][field]);
+          for (var field in providerInputs.parameters.admin.fields[entry]) {
+            currProvider.provisioner[entry][field] = (
+              providerInputs.parameters.admin.fields[entry][field]);
+          }
         }
       }
     }
