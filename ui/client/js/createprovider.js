@@ -96,11 +96,11 @@ CreateProviderApp.controller('CreateProviderCtrl', ['$scope', '$interval', 'data
     var postJson = {
       name: $scope.inputName,
       description: $scope.inputDescription,
-      providertype: $scope.providerType,
+      providertype: $scope.providerType.name,
       provisioner: {}
     };
     for (var item in $scope.providerInputs.parameters.admin.fields) {
-      postJson.provisioner[item] = $scope.providerInputs.parameters.admin.fields[item];
+      postJson.provisioner[item] = $scope.providerInputs.parameters.admin.fields[item]['userinput'];
     }
     if (Helpers.isProviderInputValid(
       postJson, $scope.providerInputs.parameters.admin.required)) {
