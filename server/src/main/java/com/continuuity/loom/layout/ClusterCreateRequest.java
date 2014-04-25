@@ -17,8 +17,10 @@ package com.continuuity.loom.layout;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,6 +32,7 @@ public class ClusterCreateRequest {
   private final String clusterTemplate;
   private final int numMachines;
   private final String provider;
+  private final Map<String, String> providerFields;
   private final Set<String> services;
   private final String hardwaretype;
   private final String imagetype;
@@ -38,8 +41,8 @@ public class ClusterCreateRequest {
   private final JsonObject config;
 
   public ClusterCreateRequest(String name, String description, String clusterTemplate,
-                              int numMachines, String provider, Set<String> services,
-                              String hardwareType, String imageType, Long initialLeaseDuration,
+                              int numMachines, String provider, Map<String, String> providerFields,
+                              Set<String> services, String hardwareType, String imageType, Long initialLeaseDuration,
                               String dnsSuffix, JsonObject config) {
     // check that the arguments that don't have defaults are not null.
     Preconditions.checkArgument(name != null && !name.isEmpty(), "cluster name must be specified");
@@ -51,6 +54,7 @@ public class ClusterCreateRequest {
     this.clusterTemplate = clusterTemplate;
     this.numMachines = numMachines;
     this.provider = provider;
+    this.providerFields = providerFields == null ? ImmutableMap.<String, String>of() : providerFields;
     this.services = services;
     this.hardwaretype = hardwareType;
     this.imagetype = imageType;
@@ -152,6 +156,15 @@ public class ClusterCreateRequest {
    */
   public String getDnsSuffix() {
     return dnsSuffix;
+  }
+
+  /**
+   * Get provider fields specified by the user at creation time.
+   *
+   * @return Provider fields specified by the user.
+   */
+  public Map<String, String> getProviderFields() {
+    return providerFields;
   }
 
   /**

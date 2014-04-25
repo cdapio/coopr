@@ -18,6 +18,7 @@ package com.continuuity.loom.admin;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import java.util.Map;
 
@@ -35,7 +36,8 @@ public final class Provider extends NamedEntity {
     Preconditions.checkArgument(providerType != null, "invalid provider type.");
     this.description = description;
     this.providerType = providerType;
-    this.provisionerFields = provisionerFields == null ? ImmutableMap.<String, String>of() : provisionerFields;
+    this.provisionerFields = provisionerFields == null ?
+      Maps.<String, String>newHashMap() : Maps.newHashMap(provisionerFields);
   }
 
   /**
@@ -64,6 +66,33 @@ public final class Provider extends NamedEntity {
    */
   public Map<String, String> getProvisionerFields() {
     return provisionerFields;
+  }
+
+  /**
+   * Add some user defined fields to the provider's fields, checking that the provider type for this provider allows
+   * those fields as user specified fields.
+   *
+   * @param userFields User specified fields to add.
+   * @param providerType Provider type for this provider.
+   */
+  public void addUserFields(Map<String, String> userFields, ProviderType providerType) {
+    Preconditions.checkArgument(providerType != null, "Provider type must be specified.");
+    Preconditions.checkArgument(this.providerType.equals(providerType.getName()),
+                                "Invalid provider type " + providerType.getName());
+    Map<String, FieldSchema> typeAdminFields = providerType.getParameters().containsKey(ParameterType.ADMIN) ?
+      providerType.getParameters().get(ParameterType.ADMIN).getFields() :
+      ImmutableMap.<String, FieldSchema>of();
+    Map<String, FieldSchema> typeUserFields = providerType.getParameters().containsKey(ParameterType.USER) ?
+      providerType.getParameters().get(ParameterType.USER).getFields() :
+      ImmutableMap.<String, FieldSchema>of();
+    for (Map.Entry<String, String> fieldEntry : userFields.entrySet()) {
+      String field = fieldEntry.getKey();
+      // if this is a user field or an overridable field.
+      if (typeUserFields.containsKey(field) ||
+        (typeAdminFields.containsKey(field) && typeAdminFields.get(field).getOverride())) {
+        provisionerFields.put(field, fieldEntry.getValue());
+      }
+    }
   }
 
   @Override

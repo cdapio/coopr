@@ -193,5 +193,8 @@ public class BaseSolverTest extends BaseTest {
     entityStore.writeService(reactor);
     entityStore.writeService(mysql);
     entityStore.writeClusterTemplate(reactorTemplate);
+
+    entityStore.writeProviderType(Entities.ProviderTypeExample.JOYENT);
+    entityStore.writeProviderType(Entities.ProviderTypeExample.RACKSPACE);
   }
 }
