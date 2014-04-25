@@ -44,8 +44,10 @@ import java.util.Set;
 
 /**
  * Executes before and after hooks by sending an HTTP POST request to some configurable endpoints, with the post body
- * containing the cluster and job objects. By default the requests are sent before and after cluster creation and
- * cluster deletion,
+ * containing the cluster and job objects, assuming there is a valid url assigned to the start, success, and/or failure
+ * urls. If no url is specified, no request will be sent. Additionally, trigger actions can be configured so that
+ * the HTTP POST request is sent only for specific cluster actions. This is done by specifying a comma separated list
+ * of {@link ClusterAction}s in the configuration for start, success, and/or triggers.
  */
 public class HttpPostClusterCallback extends ClusterCallback {
   private static final Logger LOG = LoggerFactory.getLogger(HttpPostClusterCallback.class);

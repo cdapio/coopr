@@ -104,6 +104,9 @@ public class Constants {
   public static final String CALLBACK_CLASS = "loom.callback.class";
   public static final String DEFAULT_CALLBACK_CLASS = HttpPostClusterCallback.class.getCanonicalName();
 
+  /**
+   * {@link HttpPostClusterCallback} config settings.
+   */
   public static class HttpCallback {
     private static final String prefix = "loom.callback.http.";
     public static final String START_TRIGGERS = prefix + "start.triggers";
