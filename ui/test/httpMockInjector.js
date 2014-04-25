@@ -65,12 +65,19 @@ var plugins = {};
 plugins['rackspace'] = require('./plugins/rackspace.json');
 plugins['openstack'] = require('./plugins/openstack.json');
 
+var automators = {};
+// automators['rackspace'] = require('./automators/rackspace.json');
+
 module.exports = function (nock, argv, clientAddr) {
 
   /**
    * Set up nock environment. Disable net connection.
    */
   nock.disableNetConnect();
+
+  /**
+   * Automators call mocks.
+   */
 
   /**
    * Plugins call mocks.

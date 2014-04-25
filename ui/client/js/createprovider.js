@@ -83,6 +83,10 @@ CreateProviderApp.controller('CreateProviderCtrl', ['$scope', '$interval', 'data
     }
   });
 
+  /**
+   * Submit provider information.
+   * @param  {Object} $event Form submit event.
+   */
   $scope.submitProvider = function ($event) {
     $event.preventDefault();
     if (!$scope.providerInputs) {
@@ -112,21 +116,25 @@ CreateProviderApp.controller('CreateProviderCtrl', ['$scope', '$interval', 'data
 
 CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFactory',
   function ($scope, $interval, dataFactory) {
-    $scope.providerId = dataFactory.getProviderId();
-    $scope.currProvider;
-    $scope.providerInputs;
-    
-    $scope.providerData = {};
-    dataFactory.getProviders(function (providertypes) {
-      providertypes.map(function (item) {
-        $scope.providerData[item.name] = item;
-      });
+  $scope.providerId = dataFactory.getProviderId();
+  $scope.currProvider;
+  $scope.providerInputs;
+  
+  $scope.providerData = {};
+  dataFactory.getProviders(function (providertypes) {
+    providertypes.map(function (item) {
+      $scope.providerData[item.name] = item;
     });
+  });
 
-    dataFactory.getCurrentProvider($scope.providerId, function (provider) {
-      $scope.currProvider = provider;
-    });
+  dataFactory.getCurrentProvider($scope.providerId, function (provider) {
+    $scope.currProvider = provider;
+  });
 
+  /**
+   * Sync field types when provider type changes i.e. rackspace to joyent.
+   * Currently this cannot be called as field is disabled.
+   */
   $scope.$watch('currProvider.providertype', function () {
     if ($scope.currProvider && 'providertype' in $scope.currProvider) {
       $scope.providerInputs = $scope.providerData[$scope.currProvider.providertype];
@@ -134,39 +142,43 @@ CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFa
     }
   });
 
-    $scope.$watchCollection('[currProvider,providerData]', function (newValues, oldValues) {
-      if (!$.isEmptyObject($scope.currProvider) && !$.isEmptyObject($scope.providerData)) {
-        $scope.currProvider = AppHelpers.addInputSchema(
-          $scope.currProvider, $scope.providerData[$scope.providerId]);
-      }
-    }, true);
+  /**
+   * If current provider or provider data changes, sync field types.
+   */
+  $scope.$watchCollection('[currProvider,providerData]', function (newValues, oldValues) {
+    if (!$.isEmptyObject($scope.currProvider) && !$.isEmptyObject($scope.providerData)) {
+      $scope.currProvider = AppHelpers.addInputSchema(
+        $scope.currProvider, $scope.providerData[$scope.providerId]);
+    }
+  }, true);
 
-    $scope.submitProvider = function ($event) {
-      $event.preventDefault();
-      if (!$scope.currProvider.providertype) {
-        $("#notification").text('You must select a provider.');
-        $("html, body").animate({ scrollTop: 0 }, "slow");
-      }
-      var postJson = {
-        name: $scope.currProvider.name,
-        description: $scope.currProvider.description,
-        providertype: $scope.currProvider.providertype,
-        provisioner: {}
-      };
-      for (var item in $scope.currProvider.provisioner) {
-        postJson.provisioner[item] = $scope.currProvider.provisioner[item]['userinput'];
-      }
-      if (Helpers.isProviderInputValid(
-        postJson, $scope.providerInputs.parameters.admin.required)) {
-        Helpers.submitPost($event, postJson, '/providers');  
-      } else {
-        $("#notification").text('Required fields missing.');
-        $("html, body").animate({ scrollTop: 0 }, "slow");
-      }
-      
+  /**
+   * Submit provider information.
+   * @param  {Object} $event Form submit event.
+   */
+  $scope.submitProvider = function ($event) {
+    $event.preventDefault();
+    if (!$scope.currProvider.providertype) {
+      $("#notification").text('You must select a provider.');
+      $("html, body").animate({ scrollTop: 0 }, "slow");
+    }
+    var postJson = {
+      name: $scope.currProvider.name,
+      description: $scope.currProvider.description,
+      providertype: $scope.currProvider.providertype,
+      provisioner: {}
     };
-
-
+    for (var item in $scope.currProvider.provisioner) {
+      postJson.provisioner[item] = $scope.currProvider.provisioner[item]['userinput'];
+    }
+    if (Helpers.isProviderInputValid(
+      postJson, $scope.providerInputs.parameters.admin.required)) {
+      Helpers.submitPost($event, postJson, '/providers');  
+    } else {
+      $("#notification").text('Required fields missing.');
+      $("html, body").animate({ scrollTop: 0 }, "slow");
+    }
+  };
 
 }]);
 
@@ -175,6 +187,11 @@ CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFa
  */
 var AppHelpers = {};
 
+/**
+ * Merges field metadata i.e type: "text", label: "SSH key id" for provisioner fields.
+ * @param {Object} currProvider provider being modified.
+ * @param {Object} providerInputs field metadata.
+ */
 AppHelpers.addInputSchema = function (currProvider, providerInputs) {
   if (providerInputs) {
     for (var item in currProvider.provisioner) {
