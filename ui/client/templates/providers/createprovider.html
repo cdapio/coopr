@@ -60,24 +60,24 @@
                 <div class="form-group">
                   <label for="rackspace_username" class="col-sm-2 control-label">Username</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="rackspace_username" name="rackspace_username" placeholder="Username" value="{{provider.provisioner.auth.rackspace_username}}">
+                    <input type="text" class="form-control" id="rackspace_username" name="rackspace_username" placeholder="Username" value="{{provider.provisioner.rackspace_username}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="rackspace_api_key" class="col-sm-2 control-label">Api key</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="rackspace_api_key" name="rackspace_api_key" placeholder="Api key" value="{{provider.provisioner.auth.rackspace_api_key}}">
+                    <input type="text" class="form-control" id="rackspace_api_key" name="rackspace_api_key" placeholder="Api key" value="{{provider.provisioner.rackspace_api_key}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="rackspace_region" class="col-sm-2 control-label">Region</label>
                   <div class="col-sm-8">
                     <select class="form-control" name="rackspace_region" id="rackspace_region">
-                      <option {% if provider.provisioner.auth.rackspace_region == "dfw" %} selected="selected" {% endif %}>dfw</option>
-                      <option {% if provider.provisioner.auth.rackspace_region == "iad" %} selected="selected" {% endif %}>iad</option>
-                      <option {% if provider.provisioner.auth.rackspace_region == "ord" %} selected="selected" {% endif %}>ord</option>
-                      <option {% if provider.provisioner.auth.rackspace_region == "hkg" %} selected="selected" {% endif %}>hkg</option>
-                      <option {% if provider.provisioner.auth.rackspace_region == "syd" %} selected="selected" {% endif %}>syd</option>
+                      <option {% if provider.provisioner.rackspace_region == "dfw" %} selected="selected" {% endif %}>dfw</option>
+                      <option {% if provider.provisioner.rackspace_region == "iad" %} selected="selected" {% endif %}>iad</option>
+                      <option {% if provider.provisioner.rackspace_region == "ord" %} selected="selected" {% endif %}>ord</option>
+                      <option {% if provider.provisioner.rackspace_region == "hkg" %} selected="selected" {% endif %}>hkg</option>
+                      <option {% if provider.provisioner.rackspace_region == "syd" %} selected="selected" {% endif %}>syd</option>
                     </select>
                   </div>
                 </div>
@@ -86,31 +86,31 @@
                 <div class="form-group">
                   <label for="joyent_username" class="col-sm-2 control-label">Username</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_username" name="joyent_username" placeholder="Username" value="{{provider.provisioner.auth.joyent_username}}">
+                    <input type="text" class="form-control" id="joyent_username" name="joyent_username" placeholder="Username" value="{{provider.provisioner.joyent_username}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="joyent_keyname" class="col-sm-2 control-label">Api key name</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_keyname" name="joyent_keyname" placeholder="Api key name" value="{{provider.provisioner.auth.joyent_keyname}}">
+                    <input type="text" class="form-control" id="joyent_keyname" name="joyent_keyname" placeholder="Api key name" value="{{provider.provisioner.joyent_keyname}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="joyent_keyfile" class="col-sm-2 control-label">Api key file</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_keyfile" name="joyent_keyfile" placeholder="Api key file" value="{{provider.provisioner.auth.joyent_keyfile}}">
+                    <input type="text" class="form-control" id="joyent_keyfile" name="joyent_keyfile" placeholder="Api key file" value="{{provider.provisioner.joyent_keyfile}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="joyent_api_url" class="col-sm-2 control-label">Api url</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_api_url" name="joyent_api_url" placeholder="Api url" value="{{provider.provisioner.auth.joyent_api_url}}">
+                    <input type="text" class="form-control" id="joyent_api_url" name="joyent_api_url" placeholder="Api url" value="{{provider.provisioner.joyent_api_url}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="joyent_version" class="col-sm-2 control-label">Version</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_version" name="joyent_version" placeholder="Version" value="{{provider.provisioner.auth.joyent_version}}">
+                    <input type="text" class="form-control" id="joyent_version" name="joyent_version" placeholder="Version" value="{{provider.provisioner.joyent_version}}">
                   </div>
                 </div>
               </div>
@@ -118,37 +118,37 @@
                 <div class="form-group">
                   <label for="openstack_username" class="col-sm-2 control-label">Username</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="openstack_username" name="openstack_username" placeholder="Username" value="{{provider.provisioner.auth.openstack_username}}">
+                    <input type="text" class="form-control" id="openstack_username" name="openstack_username" placeholder="Username" value="{{provider.provisioner.openstack_username}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="openstack_password" class="col-sm-2 control-label">Password</label>
                   <div class="col-sm-8">
-                    <input type="password" class="form-control" id="openstack_password" name="openstack_password" placeholder="Password" value="{{provider.provisioner.auth.openstack_password}}">
+                    <input type="password" class="form-control" id="openstack_password" name="openstack_password" placeholder="Password" value="{{provider.provisioner.openstack_password}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="openstack_tenant" class="col-sm-2 control-label">Tenant</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="openstack_tenant" name="openstack_tenant" placeholder="Tenant" value="{{provider.provisioner.auth.openstack_tenant}}">
+                    <input type="text" class="form-control" id="openstack_tenant" name="openstack_tenant" placeholder="Tenant" value="{{provider.provisioner.openstack_tenant}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="openstack_auth_url" class="col-sm-2 control-label">Api Url</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="openstack_auth_url" name="openstack_auth_url" placeholder="Api url" value="{{provider.provisioner.auth.openstack_auth_url}}">
+                    <input type="text" class="form-control" id="openstack_auth_url" name="openstack_auth_url" placeholder="Api url" value="{{provider.provisioner.openstack_auth_url}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="openstack_ssh_key_id" class="col-sm-2 control-label">SSH key id</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="openstack_ssh_key_id" name="openstack_ssh_key_id" placeholder="SSH key id" value="{{provider.provisioner.auth.openstack_ssh_key_id}}">
+                    <input type="text" class="form-control" id="openstack_ssh_key_id" name="openstack_ssh_key_id" placeholder="SSH key id" value="{{provider.provisioner.openstack_ssh_key_id}}">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="identity_file" class="col-sm-2 control-label">Identity file</label>
                   <div class="col-sm-8">
-                    <input type="text" class="form-control" id="identity_file" name="identity_file" placeholder="Identity file" value="{{provider.provisioner.auth.identity_file}}">
+                    <input type="text" class="form-control" id="identity_file" name="identity_file" placeholder="Identity file" value="{{provider.provisioner.identity_file}}">
                   </div>
                 </div>
               </div>

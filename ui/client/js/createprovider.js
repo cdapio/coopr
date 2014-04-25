@@ -76,13 +76,12 @@ define([], function () {
         description: $("#inputDescription").val(),
         providertype: providerType,
         provisioner: {
-          auth: {}
         }
       };
       if (providerType in self.providerFields) {
         for (var i = 0; i < self.providerFields[providerType].length; i++) {
           var key = self.providerFields[providerType][i];
-          postJson.provisioner.auth[key] = $("#" + providerType + "-auth-fields #" + key).val();
+          postJson.provisioner[key] = $("#" + providerType + "-auth-fields #" + key).val();
         }
         Helpers.submitPost(e, postJson, '/providers');
       } else {

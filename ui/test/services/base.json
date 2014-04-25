@@ -7,7 +7,9 @@
     "actions": {
       "configure": {
         "type": "chef",
-        "script": "recipe[loom_base::default]"
+        "fields": {
+          "script": "recipe[loom_base::default]"
+        }
       }
     }
   }

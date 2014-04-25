@@ -35,7 +35,6 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.ws.rs.Path;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;

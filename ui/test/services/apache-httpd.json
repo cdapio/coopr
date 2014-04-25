@@ -8,21 +8,29 @@
     "actions": {
       "install": {
         "type":"chef",
-        "script": "recipe[apache2::default]"
+        "fields": {
+          "script": "recipe[apache2::default]"
+        }
       },
       "configure": {
         "type": "chef",
-        "script": "recipe[apache2::default]"
+        "fields": {
+          "script": "recipe[apache2::default]"
+        }
       },
       "start": {
         "type": "chef",
-        "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }" 
+        "fields": {
+          "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
+          "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }" 
+        }
       },
       "stop": {
         "type": "chef",
-        "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }" 
+        "fields": {
+          "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
+          "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }" 
+        }
       }
     }
   }
