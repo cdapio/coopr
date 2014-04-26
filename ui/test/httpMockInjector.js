@@ -66,7 +66,7 @@ plugins['rackspace'] = require('./plugins/rackspace.json');
 plugins['openstack'] = require('./plugins/openstack.json');
 
 var automators = {};
-// automators['rackspace'] = require('./automators/rackspace.json');
+automators['shell'] = require('./automators/shell.json');
 
 module.exports = function (nock, argv, clientAddr) {
 
@@ -78,6 +78,19 @@ module.exports = function (nock, argv, clientAddr) {
   /**
    * Automators call mocks.
    */
+  var automatorsResponse = [];
+  for (var item in automators) {
+    nock(clientAddr)
+      .persist()
+      .get('/v1/loom/automators/' + item)
+      .reply(200, automators[item]);
+    automatorsResponse.push(automators[item]);
+  }
+
+  nock(clientAddr)
+    .persist()
+    .get('/v1/loom/automators')
+    .reply(200, automatorsResponse);
 
   /**
    * Plugins call mocks.

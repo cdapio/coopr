@@ -1,0 +1,22 @@
+{
+    "name": "shell",
+    "parameters": {
+        "admin": {
+            "fields": {
+                "script": {
+                    "label": "Script",
+                    "type": "text",
+                    "tip": "Path to script"
+                },
+                "data": {
+                    "label": "Data",
+                    "type": "text",
+                    "tip": "Script arguments"
+                }
+            },
+            "required": [
+                  ["script"]
+            ]
+        }
+    }
+}
