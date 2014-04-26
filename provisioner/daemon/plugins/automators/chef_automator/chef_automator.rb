@@ -57,11 +57,10 @@ class ChefAutomator < Automator
   end
 
   # generate the chef run json_attributes from the loom task metadata
-  def generate_chef_json_attributes()
+  def generate_chef_json_attributes(servicestring)
 
     servicedata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
 
-    servicestring = @task['config']['service']['action']['data']
     if (servicestring.nil? || servicestring == "")
       servicestring = "{}"
     end
@@ -188,15 +187,21 @@ class ChefAutomator < Automator
     sshauth = inputmap['sshauth']
     hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
-    actionscript = inputmap['actionscript']
-    actiondata = inputmap['actiondata']
+    fields = inputmap['fields']
+
+    # run_list as specified by user
+    run_list = fields['script']
+    # whitespace in the runlist is not allowed
+    run_list.gsub!(/\s+/, "")
+
+    # additional json attributes defined for this service action
+    json_attributes = fields['data']
+
+    # merge together json_attributes, cluster config, loom node data
+    jsondata = generate_chef_json_attributes(json_attributes)
 
     set_credentials(sshauth)
 
-    jsondata = generate_chef_json_attributes()
-
-    # whitespace in the runlist is not allowed
-    actionscript.gsub!(/\s+/, "")
 
     begin
       # write json attributes to a local tmp file
@@ -223,7 +228,7 @@ class ChefAutomator < Automator
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
 
         log.debug "Running chef-solo"
-        output = ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{actionscript}'")
+        output = ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'")
         if (output[2] != 0 )
           log.error "Chef run did not complete successfully: #{output}"
           raise "Chef run did not complete successfully: #{output}"

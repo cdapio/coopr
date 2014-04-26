@@ -30,30 +30,29 @@ class Automator
     sshauth = @task['config']['ssh-auth']
     hostname = @task['config']['hostname']
     ipaddress = @task['config']['ipaddress']
-    actionscript = @task['config']['service']['action']['script'] rescue nil
-    actiondata = @task['config']['service']['action']['data'] rescue nil
+    fields = @task['config']['service']['action']['fields'] rescue nil
 
     case task['taskName'].downcase
     when "bootstrap"
       bootstrap({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth})
       return @result
     when "install"
-      install({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata})
+      install({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "configure"
-      configure({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata})
+      configure({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "initialize"
-      init({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+      init({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "start"
-      start({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+      start({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "stop"
-      stop({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+      stop({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "remove"
-      remove({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+      remove({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     else
       raise "unhandled automator task type: #{task['taskName']}"
