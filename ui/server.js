@@ -989,11 +989,10 @@ site.app.get('/services/service/:id', function (req, res) {
   var serviceId = req.params.id;
   async.parallel([
     site.getEntity('/services', user),
-    site.getEntity('/services/' + serviceId, user)
   ], function (err, results) {
     res.render('services/createservice.html', {
       services: results[0],
-      service: results[1],
+      serviceId: serviceId,
       activeTab: 'services',
       authenticated: user,
       env: env,
