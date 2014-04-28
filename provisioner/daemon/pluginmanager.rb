@@ -23,11 +23,11 @@ class PluginManager
   def initialize()
     @providermap = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     @automatormap = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
-    scanPlugins()
+    scan_plugins()
   end
 
   # scan plugins directory for json plugin definitions, load and register plugins 
-  def scanPlugins
+  def scan_plugins
     # enforces directory structure from top-level: ./plugins/['providers']/[plugin-name]/*.json
     Dir["#{File.expand_path(File.dirname(__FILE__))}/plugins/*/*/*.json"].each do |jsonfile| 
       begin
