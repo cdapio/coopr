@@ -1,7 +1,7 @@
 krb5 Cookbook
 =============
 
-[![Build Status](https://secure.travis-ci.org/atomic-penguin/cookbook-krb5.png?branch=master)](http://travis-ci.org/atomic-penguin/cookbook-krb5)
+[![Build Status](https://secure.travis-ci.org/atomic-penguin/cookbook-krb5.svg?branch=master)](http://travis-ci.org/atomic-penguin/cookbook-krb5)
 
 
 Description
@@ -140,7 +140,9 @@ License and Authors
 -------------------
 
 Author:: Eric G. Wolfe
-Copyright:: 2012
+Author:: Chris Gianelloni
+Copyright:: 2012-2014, Eric G. Wolfe
+Copyright:: 2014, Continuuity, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

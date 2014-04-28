@@ -22,7 +22,9 @@ include_recipe 'krb5::default'
 node.default['krb5']['krb5_conf']['realms']['default_realm_admin_server'] = node['fqdn']
 
 node['krb5']['kadmin']['packages'].each do |krb5_package|
-  package krb5_package
+  unless node['krb5']['kdc']['packages'].include? krb5_package
+    package krb5_package
+  end
 end
 
 default_realm = node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase
