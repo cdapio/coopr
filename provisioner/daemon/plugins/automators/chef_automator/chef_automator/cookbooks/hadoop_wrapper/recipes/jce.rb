@@ -17,9 +17,6 @@
 # limitations under the License.
 #
 
-# node['java']['jdk_version']
-# download_direct_from_oracle(tarball_name, new_resource)
-
 include_recipe 'java'
 
 if node['java'].key? 'jdk_version'
