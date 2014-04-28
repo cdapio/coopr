@@ -58,6 +58,7 @@ API</rest/templates>` or :doc:`Admin UI </guide/admin/ui>` carefully to design t
 
 
 .. _provision-templates2:
+
 Tools
 =====
 Continuuity Loom includes several tools for administrators to simplify their administrative tasks. Apart from the

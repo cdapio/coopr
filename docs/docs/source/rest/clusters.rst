@@ -17,6 +17,7 @@
 
 .. index::
    single: REST API: Clusters
+
 ==================
 REST API: Clusters
 ==================
@@ -26,11 +27,13 @@ REST API: Clusters
 Using the Loom REST API, users can create clusters, get cluster details, action plans, and delete clusters.  
 
 .. _cluster-create:
+
 Create a Cluster
 ==================
 
 To create a new cluster, make a HTTP POST request to URI:
 ::
+
  /clusters
 
 The request body must contain name, numMachines, and clusterTemplate.  Optionally, it can contain imagetype, hardwaretype, provider, services, initialLeaseDuration, dnsSuffix, and config.  If the user specifies any optional value, it will override the corresponding default value in the cluster template.
@@ -99,11 +102,13 @@ Example
  $ { "id":"00000079" }
 
 .. _cluster-details:
+
 Get Cluster Details
 ===================
 
 To retrieve full details about a cluster, make a GET HTTP request to URI:
 ::
+
  /clusters/{id}
 
 The cluster is represented as a JSON Object which contains an id, name, description, services, createTime, provider,
@@ -187,11 +192,13 @@ Example
 
 
 .. _cluster-delete:
+
 Delete a Cluster
 =================
 
 To delete a cluster, make a DELETE HTTP request to URI:
 ::
+
  /clusters/{id}
 
 This resource request represents an individual cluster for deletion.
@@ -224,11 +231,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079
 
 .. _cluster-status:
+
 Cluster Status
 ==================
 
 To get the status of a cluster, make a GET HTTP request to URI:
 ::
+
  /clusters/{id}/status
 
 Status of a cluster is a JSON Object with a clusterid, stepstotal, stepscompleted, 
@@ -247,10 +256,12 @@ NOT_SUBMITTED, RUNNING, COMPLETE, and FAILED.
 
 
 .. _cluster-plan:
+
 Get an Action Plan for a Cluster
 ================================
 To get the plan for a cluster action, make a GET HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/plans/{plan-id}
 
 A cluster action plan lists out the tasks that must be performed in order
@@ -331,6 +342,7 @@ that have been performed or are being performed on a cluster.
 
 To get all the action plans for a cluster, make a GET HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/plans
 
 HTTP Responses

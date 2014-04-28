@@ -17,6 +17,7 @@
 
 .. index::
    single: Installation Guide
+
 ==================
 Installation Guide
 ==================
@@ -39,12 +40,17 @@ Supported Operating System
 Various systems of Continuuity Loom have been tested against the following platforms:
 
 * **Loom Server**
+
  * CentOS 6.4
  * Ubuntu 12.04
+
 * **Loom Provisioner**
+
  * CentOS 6.4
  * Ubuntu 12.04
+
 * **Loom UI**
+
  * CentOS 6.4
  * Ubuntu 12.04
 
@@ -83,20 +89,22 @@ Supported Node.js Versions
 Continuuity Loom supports Node.js version 0.10.26 or above.
 
 .. _prerequisites:
+
 Software Prerequisites
 ======================
 
 Continuuity Loom requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Continuuity Loom is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.
 
 Linux
-^^^^^
+-----
 `Click here <http://www.java.com/en/download/manual.jsp>`_ to download the Java Runtime for Linux and Solaris. Following installation, please set the ``JAVA_HOME`` environment variable.
 
 Mac OS
-^^^^^^
+------
 On Mac OS X, the JVM is bundled with the operating system. Following installation, please set the ``JAVA_HOME`` environment variable.
 
 .. _installation-file:
+
 Installing from File
 ====================
 
@@ -122,6 +130,7 @@ To install each of the Loom components locally from a Debian package:
   $ sudo dpkg -i loom-ui\_\ |version|\ .ubuntu.12.04_amd64.deb
 
 .. _installation-repository:
+
 Installing from Repository
 ==========================
 
@@ -131,6 +140,7 @@ Yum
 ---
 To add the Continuuity Yum repository, add the following content to the file ``/etc/yum.repos.d/continuuity.repo``:
 ::
+
   [continuuity]
   name=Continuuity Loom Releases
   baseurl=https://<username>:<password>@repository.continuuity.com/content/repositories/loom
@@ -145,6 +155,7 @@ To add the Continuuity Yum repository, add the following content to the file ``/
 
 Instructions for installing each of the Loom components are as below:
 ::
+
   $ sudo yum install loom-server
   $ sudo yum install loom-provisioner
   $ sudo yum install loom-ui
@@ -153,10 +164,12 @@ Debian
 ------
 To add the Continuuity Debian repository, add the following content to the file ``/etc/apt/sources.list.d/continuuity.list``:
 ::
+
   deb     [arch=amd64] https://<username>:<password>@repository.continuuity.com/content/sites/apt-loom precise release
 
 Instructions for installing each of the Loom components are as below:
 ::
+
   $ sudo apt-get update
   $ sudo apt-get install loom-server
   $ sudo apt-get install loom-provisioner
@@ -166,6 +179,7 @@ Update-Alternatives
 -------------------
 Loom packages by default use the ``alternatives`` system to initialize a configuration directory which will not be overwritten on subsequent package upgrades.  This directory is ``/etc/loom/conf.loom/`` and is pointed to by the symlink ``/etc/loom/conf/``.  The ``/etc/loom/conf.dist/`` directory is owned by the Loom packages and should not be customized.  To doublecheck that ``/etc/loom/conf.loom/`` is the active configuration, simply run:
 ::
+
   $  update-alternatives --display loom-conf
 
 Database Configuration
@@ -181,9 +195,12 @@ Execute the following command on the Loom server machine:
 
 For RHEL/CentOS/Oracle Linux:
 ::
+
   $ sudo yum install mysql-connector-java*
+
 For Ubuntu:
 ::
+
   $ sudo apt-get install libmysql-java*
 
 After the install, the MySQL JAR is placed in ``/usr/share/java/``. Copy the installed JAR files to the
@@ -230,6 +247,7 @@ available configurations, see the :doc:`Server Configuration </guide/admin/serve
 
 
 .. _setting-environmental-variables:
+
 Setting Environmental Variables
 ===============================
 
@@ -303,6 +321,7 @@ The UI environmental variables can be set at ``/etc/default/loom-ui``. The confi
      - The port number that hosts the UI
 
 .. _starting_stopping:
+
 Starting and Stopping Loom Services
 ===================================
 By default, Continuuity Loom's installation RPMs and PKGs do not configure auto start of the services in the ``init.d``. We leave
@@ -310,11 +329,13 @@ that privilege to the administrator. For each Loom component and its related ser
 there is a launch script, which you may use to execute a desired operation. For example, to start, stop, or check status
 for a Loom Provisioner, you can use:
 ::
+
   $ sudo /etc/init.d/loom-server start|stop
   $ sudo /etc/init.d/loom-provisioner start|stop|status
   $ sudo /etc/init.d/loom-ui start|stop
 
 .. _loading_defaults:
+
 Loading Default Templates
 =========================
 
@@ -322,6 +343,7 @@ Loom provides a set of useful default templates that covers most supported use c
 recommend installing these defaults as a starting point for template definition. These defaults are required for running
 the example in the :doc:`Quick Start Guide </guide/quickstart/index>`. To load these templates, run:
 ::
+
   $ export LOOM_SERVER_URI=http://<loom-server>:<loom-port>/v1/loom
   $ /opt/loom/server/config/defaults/load-defaults.sh
 
@@ -330,6 +352,7 @@ the example in the :doc:`Quick Start Guide </guide/quickstart/index>`. To load t
     bind to an address other than localhost.
 
 .. _logs:
+
 Log Management
 ==============
 
@@ -350,6 +373,7 @@ packages contain logrotate configurations in ``/etc/logrotate.d`` but it does no
 Please ensure logrotate is enabled on your Loom hosts.
 
 .. _common-issues:
+
 Common Installation Issues
 ==========================
 
@@ -357,6 +381,7 @@ Common Installation Issues
 
 * If you see JDBC exceptions in the Loom Server log like:
   ::
+
     Caused by: java.lang.AbstractMethodError: com.mysql.jdbc.PreparedStatement.setBlob(ILjava/io/InputStream;)
 
   it means your JDBC connector version is too old.  Upgrade to a newer version to solve the problem.

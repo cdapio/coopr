@@ -17,6 +17,7 @@
 
 .. index::
    single: REST API: Services
+
 ==================
 REST API: Services
 ==================
@@ -161,11 +162,13 @@ cluster. All the ordering enforced by that runtime *requires* dependency would b
 services.
  
 .. _service-create:
+
 Add a Service
 ==================
 
 To create a new services, make a HTTP POST request to URI:
 ::
+
  /services
 
 The POST body must contain a unique ``name``, and a ``provisioner`` section
@@ -257,11 +260,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/services
 
 .. _service-retrieve:
+
 Retrieve a Service
 ===================
 
 To retrieve details about a services, make a GET HTTP request to URI:
 ::
+
  /services/{name}
 
 This resource request represents an individual services for viewing.
@@ -322,11 +327,13 @@ Example
    }
 
 .. _service-delete:
+
 Delete a Service
 =================
 
 To delete services, make a DELETE HTTP request to URI:
 ::
+
  /services/{name}
 
 This resource request represents an individual services for deletion.
@@ -355,11 +362,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/services/example
 
 .. _service-modify:
+
 Update a Service
 ==================
 
 To update a service, make a PUT HTTP request to URI:
 ::
+
  /services/{name}
 
 Resource specified above respresents an individual services request for an update operation.
@@ -430,11 +439,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/services/myapp
 
 .. _service-all-list:
+
 List all Services
 =============================
 
 To list all the services configured within Continuuity Loom, make a GET HTTP request to URI:
 ::
+
  /services
 
 HTTP Responses

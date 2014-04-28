@@ -19,6 +19,7 @@
 
 .. index::
    single: Server Configuration
+
 ====================
 Server Configuration
 ====================
@@ -44,6 +45,7 @@ Continuuity Loom uses JDBC for database access. To provide your own database, an
 a user, and a password, as shown in the following example.  We also recommend specifying a validation query to be used with jdbc connection 
 pooling.  The query will change based on which database you are using.  
 ::
+
   <?xml version="1.0"?>
   <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
   <configuration>
