@@ -53,11 +53,9 @@ if node['java'].key? 'jdk_version'
   bash 'unzip-jce-zipfile' do
     code <<-CODE
       mkdir -p #{jce_tmp}
-      cd #{jce_tmp}
-      unzip -o #{download_path}
+      unzip -o #{download_path} -d #{jce_tmp}
     CODE
     not_if "test -e #{jce_tmp}/jce/US_export_policy.jar"
-#    subscribes :run, "bash[download-jce-zipfile]", :immediately
   end
 
   jce_dir = "#{node['java']['java_home']}/jre/lib/security"
