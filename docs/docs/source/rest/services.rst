@@ -23,11 +23,143 @@ REST API: Services
 
 .. include:: /rest/rest-links.rst
 
-Loom REST APIs allow you to manage the mapping of services capabilities to "flavors" supported by configured services. Loom services maps to multiple flavors as specified by 
-different services. Using services Loom REST APIs, you can manage the services' specifications.
+Loom REST APIs allow the administrator to add services. A service is some piece of software
+that can be placed on a cluster. Examples include a mysql server, a Hadoop namenode, a 
+Lucene indexer, and much more. The administrator defines the service entirely, so any software
+supported by the underlying provisioners can be added to Continuuity Loom. By writing a provisioner
+automator plugin, or by using the included chef and script plugins, an administrator can manage
+any service they want.
 
-Each services configured in the system has a unique name, a short description, and a list of key-value pairs that are required by the backend services provisioner.
+A service is uniquely identified by its name. It also contains a short description and a section for
+provisioner information and a section for its dependencies. The provisioner and dependencies sections
+are described in more detail below.  
 
+Provisioner
+^^^^^^^^^^^
+
+The provisioner section contains any information the provisioner may need to 
+carry out actions related to the service. Service actions include INSTALL,
+CONFIGURE, INITIALIZE, START, STOP, and REMOVE. The administrator needs to 
+add any relevant actions for a service. For example, it is possible to have a
+service that only installs and configures, but does none of the other actions.
+For that service, the administrator would need to add 2 actions for the service,
+and choose which automator type will be used to carry out that action. Depending
+on the automator type, different fields may need to be provided. Required fields
+are defined by the automator type, which is given by the plugin itself.
+
+The provisioner section itself is a JSON object with ``actions`` as a key, and a
+JSON object as its value.  The value contains a mapping of service action 
+(one of install, configure, initialize, start, stop, and remove) to 
+automator details. The automator details is a JSON object containing a ``type``,
+which defines which automator type to use for that action, and ``fields``. Fields
+contains another JSON object which is a set of key values pairs required by the 
+automator plugin.
+
+This example is taken from an example Hadoop namenode service. It uses chef as the 
+automator type, which requires a script field and also allows an optional data field.
+
+.. code-block:: bash
+
+  "provisioner": {
+    "actions": {
+        "configure": {
+            "type": "chef",
+            "fields": {
+                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+            }
+        },
+        "initialize": {
+            "type": "chef",
+            "fields": {
+                "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+            }
+        },
+        "install": {
+            "type": "chef",
+            "fields": {
+                "script": "recipe[hadoop::hadoop_hdfs_namenode]"
+            }
+        },
+        "start": {
+            "type": "chef",
+            "fields": {
+                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
+                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+            }
+        },
+        "stop": {
+            "type": "chef",
+            "fields": {
+                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
+                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+            }
+        }
+    }
+
+Dependencies
+^^^^^^^^^^^^
+
+Dependencies serve two general purposes. The first is to enforce that a service that requires other services
+cannot be placed onto a cluster without also placing the services it requires. The second is to enforce a safe
+ordering of service actions while performing cluster operations. It is easiest to understand the different
+types of dependencies by going through example. In this example we have a service called "myapp-2.0". 
+
+.. code-block:: bash
+
+    "dependencies": {
+        "provides": [ "myapp" ],
+        "conflicts": [ "myapp-1.0", "myapp-1.5" ],
+        "install": {
+            "requires": [ "base" ],
+            "uses": [ "ntp" ]
+        },
+        "runtime": {
+            "requires": [ "sql-db" ],
+            "uses": [ "load-balancer" ]
+        }
+    }
+
+Conflicts
+^^^^^^^^^
+The ``conflicts`` key specifies an array of services that cannot be placed on a cluster with the given service.
+In this example, that means that "myapp-2.0" cannot be placed on a cluster with "myapp-1.0" or "myapp-1.5".
+
+Install
+^^^^^^^
+Install defines install time dependencies. Install time dependencies take effect for the INSTALL and REMOVE
+service actions. It contains a ``requires`` key which specifies an array of services that the given services
+requires for its installation. In this example, "myapp-2.0" requires the "base" service at install time. This
+means that the installation of the "base" service will occur before the install of the "base" service. Similarly,
+the removal of the "myapp-2.0" service will occur before the removal of the "base" service. This also means that
+the "myapp-2.0" service cannot be placed on a service without the "base" service also being present on the cluster.
+The ``uses`` key is like the ``requires`` key in that it enforces the same ordering of service actions. However,
+``uses`` will not enforce the presence of the dependent service. In this example, "myapp-2.0" uses the "ntp" service
+at install time. This means that if the "ntp" service is also on the cluster, the installation of "ntp" will occur
+before the installation of "myapp-2.0". However, "ntp" does not have to be placed on the cluster in order for "myapp-2.0"
+to be placed on the cluster.
+
+Runtime
+^^^^^^^
+Runtime defines run time dependencies. It also contains ``requires`` and ``uses`` keys that are analagous to those
+in the install section. The only difference is the service actions that they apply to. Install dependencies affect
+the INSTALL and REMOVE service actions, whereas runtime dependencies affect the INITIALIZE, START, and STOP dependencies.
+In this example, "myapp-2.0" requires the "sql-db" service. This means that "myapp-2.0" cannot be placed on a cluster
+without a "sql-db" service. It also means that the initialization of "myapp-2.0" will occur after the start of "sql-db".
+It also means the start of "myapp-2.0" will occur after the start of "sql-db". It also means that the stop of "myapp-2.0" 
+will occur before the stop of "sql-db". Similarly, because "myapp-2.0" uses "load-balancer", initialization and start of
+"myapp-2.0" will occur after the start of "load-balancer". Similarly, the stop of "myapp-2.0" will occur before the stop
+of "load-balancer". Since it is in ``uses``, enforcement of this ordering only applies is "load-balancer" is present on the
+same cluster as "myapp-2.0". The "myapp-2.0" service can be placed on a cluster without the "load-balancer" service.
+
+Provides
+^^^^^^^^
+The provides section provides an extra level of indirection when specifying dependencies. In this example, the "myapp-2.0" 
+service provides the "myapp" service. This means that if other services can put "myapp" in their runtime or install dependencies,
+"myapp-2.0" can satisfy that dependency. As another example, "myapp-2.0" requires the "sql-db" service. If there was a
+service called "mysql-db" that provides "sql-db", then it would be fine for "mysql-db" and "myapp-2.0" to be on the same 
+cluster. All the ordering enforced by that runtime requires dependency would be enforced between the "myapp-2.0" and "mysql-db"
+services.
+ 
 .. _service-create:
 Add a Service
 ==================
@@ -36,10 +168,16 @@ To create a new services, make a HTTP POST request to URI:
 ::
  /services
 
+The POST body must contain a unique ``name``, and a ``provisioner`` section
+describing how provisioner automators should carry out service actions. 
+Optionally, a ``description`` can be given describing the service, and a 
+``dependencies`` section can be given, describing other services that the 
+service depends on. 
+
 POST Parameters
 ^^^^^^^^^^^^^^^^
 
-Required Parameters
+Parameters
 
 .. list-table::
    :widths: 15 10
@@ -47,14 +185,19 @@ Required Parameters
 
    * - Parameter
      - Description
-   * - name
+   * - name 
      - Specifies the name for the services. The assigned name must have only
-       alphanumeric, dash(-), dot(.), and underscore(_) characters.
+       alphanumeric, dash(-), dot(.), and underscore(_) characters. Required.
    * - description
-     - Provides a description for the services.
-   * - providermap
-     - Provider map is map of providers and equivalent flavor type for current services being configured.
-       It's currently a map of map.
+     - Provides a description for the service. Not required.
+   * - dependencies
+     - Dependencies of the service. Includes information about what the service
+       requires and uses at install time and at runtime, as well as what services
+       it conflicts with.
+   * - provisioner
+     - Provisioner related information, including how provisioner automators should
+       perform service actions like install, configure, initialize, start, stop, 
+       and remove. 
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -79,17 +222,38 @@ Example
         -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{
-                "name": "small.example",
-                "description": "Example 1 vCPU, 1 GB RAM, 30+ GB Disk",
-                "dependson": ["hosts"],
+                "name": "hadoop-hdfs-datanode",
+                "description": "Hadoop HDFS DataNode",
+                "dependencies": {
+                    "conflicts": [],
+                    "provides": [],
+                    "install": {
+                        "requires": [],
+                        "uses": []
+                    },
+                    "runtime": {
+                        "requires": [ "hadoop-hdfs-namenode" ],
+                        "uses": []
+                    }
+                },
                 "provisioner": {
                     "actions": {
                         "configure": {
-                            "script": "recipe[apt::default]", "type": "chef"
-                        }
+                            "type": "chef",
+                            "fields": {
+                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                            }
+                        },
+                        "initialize": {
+                            "type": "chef",
+                            "fields": {
+                                "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+                            },
+                        },
+                        ...
                     }
                 }
-           }'
+            }'
         http://<loom-server>:<loom-port>/<version>/loom/services
 
 .. _service-retrieve:
@@ -124,11 +288,36 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/services/small.example
  $ {
-       "dependson": [ "hosts" ],
-       "description": "Example 1 vCPU, 1 GB RAM, 30+ GB Disk",
-       "name": "small.example",
+       "name": "hadoop-hdfs-datanode",
+       "description": "Hadoop HDFS DataNode",
+       "dependencies": {
+           "conflicts": [],
+           "provides": [],
+           "install": {
+               "requires": [],
+               "uses": []
+           },
+           "runtime": {
+               "requires": [ "hadoop-hdfs-namenode" ],
+               "uses": []
+           }
+       },
        "provisioner": {
-           "actions": {}
+           "actions": {
+               "configure": {
+                   "type": "chef",
+                   "fields": {
+                       "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                   }
+               },
+               "initialize": {
+                   "type": "chef",
+                   "fields": {
+                       "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+                   },
+               },
+               ...
+           }
        }
    }
 
@@ -218,41 +407,27 @@ Example
         -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{
-                 "name": "small.example",
-                 "description": "New Example 1 vCPU, 1 GB RAM, 30+ GB Disk",
-                 "dependson": ["hosts"],
+                 "name": "myapp",
+                 "description": "my application",
+                 "dependson": [ "base" ],
                  "provisioner": {
                      "actions": {
                          "configure": {
-                             "script": "recipe[apt::default]","type": "chef"
+                             "type": "chef",
+                             "fields": {
+                                 "script": "recipe[apt::default]"
+                             }
                          },
                          "install": {
-                             "script": "recipe[apt::default]", "type": "chef"
+                             "type": "chef",
+                             "fields": {
+                                 "script": "recipe[apt::default]"
+                             }
                          }
                      }
                  }
            }'
-        http://<loom-server>:<loom-port>/<version>/loom/services/small.example
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/services/small.example
- $ {
-       "name":"small.example",
-       "description":"New Example 1 vCPU, 1 GB RAM, 30+ GB Disk",
-       "dependson":["hosts"],
-       "provisioner":{
-           "actions":{
-               "install":{
-                   "type":"chef",
-                   "script":"recipe[apt::default]"
-               },
-               "configure":{
-                   "type":"chef",
-                   "script":"recipe[apt::default]"
-               }
-           }
-       }
-   }
+        http://<loom-server>:<loom-port>/<version>/loom/services/myapp
 
 .. _service-all-list:
 List all Services
