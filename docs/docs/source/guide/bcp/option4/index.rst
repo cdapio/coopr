@@ -16,6 +16,7 @@
 .. _overview_multi_data_center_high-availability:
 .. index::
    single: Hot-Hot : Custom Replication
+
 =================================
 Hot-Hot : With Custom Replication
 =================================

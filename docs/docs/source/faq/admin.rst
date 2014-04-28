@@ -19,6 +19,7 @@
 
 .. index::
    single: FAQ: Loom Administration
+
 ============================
 Loom Administration
 ============================

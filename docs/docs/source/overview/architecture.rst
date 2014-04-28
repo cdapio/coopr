@@ -16,6 +16,7 @@
 .. _overview_architecture:
 .. index::
    single: Architecture
+
 ============
 Architecture
 ============

@@ -17,6 +17,7 @@
 
 .. index::
    single: Web Services
+
 =============
 Web Services
 =============
@@ -35,6 +36,7 @@ Base URL
 
 All URLs referenced in the documentation have the following base:
 ::
+
  http://<loom-server>:<loom-port>/v1/loom
 
 In addition, two headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
@@ -75,7 +77,7 @@ Services
   * :ref:`Add a Service <service-create>`
   * :ref:`Retrieve a Service <service-retrieve>`
   * :ref:`Delete a Service <service-delete>`
-  * :ref:`Update a Service type <service-modify>`
+  * :ref:`Update a Service <service-modify>`
   * :ref:`List all Services <service-all-list>`
 
 Cluster Templates
@@ -134,9 +136,12 @@ REST's proponents argue that the Web's scalability and growth are a direct resul
   * Application state and functionality are divided into resources
   * Every resource is uniquely addressable using a universal syntax for use in hypermedia links
   * All resources share a uniform interface for the transfer of state between client and resource, consisting of
+ 
    * A constrained set of well-defined operations
    * A constrained set of content types, optionally supporting code on demand
+
   * A protocol which is:
+
    * Client-server
    * Stateless
    * Cacheable

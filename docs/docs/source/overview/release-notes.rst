@@ -17,9 +17,10 @@
 
 .. index::
    single: Release Notes
-========
+
+=============
 Release Notes
-========
+=============
 .. _release-notes:
 
 Welcome to Continuuity Loom |release| Release. In today's release, we have updated Loom Server, Loom Provisioners, and Loom UI. Continuuity Loom overall has new and improved functionality and ton of bug fixes.
@@ -51,7 +52,7 @@ New Features
 • Fully driven by REST APIs 
 
 Released Versions
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 • |release|
 • 0.9.5 Beta
 • 0.5.0 Alpha

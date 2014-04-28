@@ -17,6 +17,7 @@
 
 .. index::
    single: REST API: Services
+
 ==================
 REST API: Services
 ==================
@@ -29,11 +30,13 @@ different services. Using services Loom REST APIs, you can manage the services' 
 Each services configured in the system has a unique name, a short description, and a list of key-value pairs that are required by the backend services provisioner.
 
 .. _service-create:
+
 Add a Service
 ==================
 
 To create a new services, make a HTTP POST request to URI:
 ::
+
  /services
 
 POST Parameters
@@ -93,11 +96,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/services
 
 .. _service-retrieve:
+
 Retrieve a Service
 ===================
 
 To retrieve details about a services, make a GET HTTP request to URI:
 ::
+
  /services/{name}
 
 This resource request represents an individual services for viewing.
@@ -133,11 +138,13 @@ Example
    }
 
 .. _service-delete:
+
 Delete a Service
 =================
 
 To delete services, make a DELETE HTTP request to URI:
 ::
+
  /services/{name}
 
 This resource request represents an individual services for deletion.
@@ -166,11 +173,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/services/example
 
 .. _service-modify:
+
 Update a Service
 ==================
 
 To update a service, make a PUT HTTP request to URI:
 ::
+
  /services/{name}
 
 Resource specified above respresents an individual services request for an update operation.
@@ -255,11 +264,13 @@ Example
    }
 
 .. _service-all-list:
+
 List all Services
 =============================
 
 To list all the services configured within Continuuity Loom, make a GET HTTP request to URI:
 ::
+
  /services
 
 HTTP Responses

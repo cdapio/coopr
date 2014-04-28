@@ -17,6 +17,7 @@
 
 .. index::
    single: RPC
+
 ===
 RPC
 ===
@@ -27,10 +28,12 @@ In addition to the standard REST endpoints, a few RPC functions are available to
 cluster information.
 
 .. _rpc-statuses:
+
 Get Status of All Clusters
 ==========================
 To get the status of all clusters accessible to the caller, make a POST HTTP request to URI:
 ::
+
  /getClusterStatuses
 
 HTTP Responses
@@ -89,6 +92,7 @@ Example
    ]
 
 .. _rpc-properties:
+
 Get Properties of Nodes in a Cluster
 ====================================
 
@@ -97,6 +101,7 @@ The properties fetched can be whitelisted. Nodes returned can also be filtered s
 only nodes containing a specific list of services are returned. To get a list of node
 properties from a cluster, make a POST HTTP request to URI: 
 ::
+
  /getNodeProperties
 
 The POST body must contain the ``clusterId``. Optionally it can include an array of 
