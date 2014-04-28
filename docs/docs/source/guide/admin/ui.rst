@@ -17,6 +17,7 @@
 
 .. index::
    single: User Interface
+
 =============================
 Administration User Interface
 =============================
@@ -52,6 +53,7 @@ Clicking on the name of each element allows an administrator to enter its manage
     :figclass: align-center
 
 .. _provision-templates:
+
 Managing Cluster Templates
 ============================
 
@@ -215,6 +217,7 @@ template can be modified and deleted accordingly.
     :figclass: align-center
 
 .. _infrastructure-providers:
+
 Managing Infrastructure Providers
 =================================
 
@@ -263,6 +266,7 @@ manage its credentials.
 To add the new configuration to the list of providers, click 'Create'.
 
 .. _manage-existing-providers:
+
 Managing Existing Providers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -280,6 +284,7 @@ provider can be modified and deleted accordingly.
 
 
 .. _hardware-configs:
+
 Managing Hardware Configurations
 ================================
 
@@ -351,6 +356,7 @@ settings for the hardware type can be modified and deleted accordingly.
     :figclass: align-center
 
 .. _image-types:
+
 Managing Image Types
 ====================
 
@@ -406,6 +412,7 @@ image type can be modified and deleted accordingly.
     :figclass: align-center
 
 .. _cluster-services:
+
 Managing Services
 =================
 

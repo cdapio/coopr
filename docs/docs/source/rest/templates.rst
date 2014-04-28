@@ -17,9 +17,10 @@
 
 .. index::
    single: REST API: Templates
-==================
+
+===========================
 REST API: Cluster Templates
-==================
+===========================
 
 .. include:: /rest/rest-links.rst
 
@@ -31,7 +32,7 @@ cluster-wide hardware and image type. Finally, a set of constraints are defined 
 
 
 Cluster Template Details
-=================
+========================
 
 Each cluster template configured in the system has a unique name, a short description, and a section devoted to compatibilities, defaults, and constraints.
 
@@ -206,11 +207,13 @@ Example Administration Section
 
 
 .. _template-create:
+
 Add a Cluster Template
-==================
+======================
 
 To create a new cluster template, make a HTTP POST request to URI:
 ::
+
  /clustertemplates
 
 POST Parameters
@@ -350,11 +353,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clustertemplates
 
 .. _template-retrieve:
+
 Retrieve a Cluster Template
-===================
+===========================
 
 To retrieve details about a cluster template, make a GET HTTP request to URI:
 ::
+
  /clustertemplates/{name}
 
 This resource request represents an individual cluster template for viewing.
@@ -374,7 +379,7 @@ HTTP Responses
      - If the resource requested is not configured and available in system.
 
 Example
-^^^^^^^^
+^^^^^^^
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
@@ -466,12 +471,15 @@ Example
          }
       }
   }
+
 .. _template-delete:
+
 Delete a Cluster Template
-=================
+=========================
 
 To delete a cluster template, make a DELETE HTTP request to URI:
 ::
+
  /clustertemplates/{name}
 
 This resource requests represents an individual cluster template for deletion.
@@ -500,11 +508,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clustertemplates/hadoop.example
 
 .. _template-modify:
+
 Update a Cluster Template
-==================
+=========================
 
 To update a service, make a PUT HTTP request to URI:
 ::
+
  /clustertemplates/{name}
 
 Resource specified above respresents an individual services request for an update operation.
@@ -643,12 +653,14 @@ Example
       http://<loom-server>:<loom-port>/<version>/loom/clustertemplates/hadoop.example
 
 .. _template-all-list:
-List all Cluster Templates
-=============================
 
-To list all the services configured within Continuuity Loom, make GET HTTP request to URI:
+List all Cluster Templates
+==========================
+
+To list all the cluster templates configured within Continuuity Loom, make a GET HTTP request to URI:
 ::
- /clustertemplates
+
+  /clustertemplates
 
 HTTP Responses
 ^^^^^^^^^^^^^^

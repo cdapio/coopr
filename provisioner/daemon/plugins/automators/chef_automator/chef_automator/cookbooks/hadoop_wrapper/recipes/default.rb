@@ -47,3 +47,5 @@ pkg =
 package pkg do
   action :install
 end
+
+include_recipe 'hadoop_wrapper::kerberos_init'

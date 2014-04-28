@@ -19,6 +19,7 @@
 
 .. index::
    single: FAQ: Loom Server
+
 ============================
 Loom Server
 ============================
@@ -51,6 +52,7 @@ by simple configurations specified in loom.xml.
 
 Following are the configuration required for enabling Loom Server to connect to external relational database:
 ::
+
  ...
  <property>
     <name>loom.jdbc.driver</name>
@@ -114,6 +116,7 @@ before proceeding to the next stage. This ensures the actions are executed in th
 Following is an example web service call along with the output returned from the Loom Server provisioning a web server
 on a single node.:
 ::
+
   $ curl -H 'X-Loom-UserID:<user id>' http://<loom-host-name>:<loom-host-port>/v1/loom/clusters/<cluster-id>/plans
   $ [{
         "action": "SOLVE_LAYOUT",

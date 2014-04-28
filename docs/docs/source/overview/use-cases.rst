@@ -15,9 +15,9 @@
 
 .. _overview_use-cases:
 
-========
+=========
 Use Cases
-========
+=========
 
 .. _use-cases:
 .. include:: overview-links.rst

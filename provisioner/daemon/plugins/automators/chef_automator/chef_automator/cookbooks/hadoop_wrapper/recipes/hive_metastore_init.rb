@@ -25,14 +25,23 @@ dfs = node['hadoop']['core_site']['fs.defaultFS']
 
 ruby_block 'initaction-create-hive-hdfs-warehousedir' do
   block do
-    resources('execute[hive-hdfs-warehousedir').run_action(:run)
+    resources('execute[hive-hdfs-warehousedir]').run_action(:run)
   end
   not_if "hdfs dfs -test -d #{dfs}/#{node['hive']['hive_site']['hive.metastore.warehouse.dir']}", :user => 'hdfs'
 end
 
-ruby_block 'initaction-create-hive-hdfs-scratchdir' do
-  block do
-    resources('execute[hive-hdfs-scratchdir').run_action(:run)
+scratch_dir =
+  if node['hive'].key?('hive_site') && node['hive']['hive_site'].key?('hive.exec.scratchdir')
+    node['hive']['hive_site']['hive.exec.scratchdir']
+  else
+    '/tmp/hive-${user.name}'
   end
-  not_if "hdfs dfs -test -d #{dfs}/#{node['hive']['hive_site']['hive.exec.scratchdir']}", :user => 'hdfs'
+
+unless scratch_dir == '/tmp/hive-${user.name}'
+  ruby_block 'initaction-create-hive-hdfs-scratchdir' do
+    block do
+      resources('execute[hive-hdfs-scratchdir]').run_action(:run)
+    end
+    not_if "hdfs dfs -test -d #{dfs}/#{node['hive']['hive_site']['hive.exec.scratchdir']}", :user => 'hdfs'
+  end
 end
