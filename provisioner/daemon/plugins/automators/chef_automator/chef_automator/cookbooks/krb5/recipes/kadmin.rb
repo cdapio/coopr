@@ -1,9 +1,7 @@
 #
 # Cookbook Name:: krb5
-# Recipe:: default
+# Recipe:: kadmin
 #
-# Copyright 2012, Eric G. Wolfe
-# Copyright 2013, Gerald L. Hevener Jr., M.S.
 # Copyright 2014, Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,28 +17,23 @@
 # limitations under the License.
 #
 
-node['krb5']['client']['packages'].each do |krb5_package|
-  package krb5_package
+include_recipe 'krb5::default'
+
+node.default['krb5']['krb5_conf']['realms']['default_realm_admin_server'] = node['fqdn']
+
+node['krb5']['kadmin']['packages'].each do |krb5_package|
+  unless node['krb5']['kdc']['packages'].include? krb5_package
+    package krb5_package
+  end
 end
 
-execute 'krb5-authconfig' do
-  command node['krb5']['client']['authconfig']
-  not_if { 'grep pam_krb5 /etc/pam.d/system-auth' || 'grep pam_krb5 /etc/pam.d/common-auth' }
-  action :nothing
-end
+default_realm = node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase
 
-directory node['krb5']['conf_dir'] do
-  owner 'root'
-  group 'root'
-  mode '0755'
-  recursive true
-  action :create
-end
-
-template '/etc/krb5.conf' do
+template node['krb5']['kdc_conf']['realms'][default_realm]['acl_file'] do
   owner 'root'
   group 'root'
   mode '0644'
-  variables node['krb5']['krb5_conf']
-  notifies :run, 'execute[krb5-authconfig]'
+  not_if { node['krb5']['kadm5_acl'].empty? }
 end
+
+include_recipe 'krb5::kdc'

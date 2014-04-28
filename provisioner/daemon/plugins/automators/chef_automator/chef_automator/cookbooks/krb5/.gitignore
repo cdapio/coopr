@@ -5,3 +5,5 @@ metadata.json
 .kitchen.local.yml
 *.swp
 checkstyle.xml
+.vagrant
+.bundle

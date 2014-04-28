@@ -1,3 +1,15 @@
+## v1.0.0
+
+  Switch to attribute-driven templates
+  Add support for KDC and kadmind
+  Add Chef ntp cookbook to dependencies
+  Add Vagrantfile for direct Vagrant testing
+
+## v0.2.0
+
+  Support for different logging options
+  Add rubocop, foodcritic, and chefspec tests
+
 ## v0.1.0
 
   Support more options: forwardable, ticket/renew_lifetime via @jblaine

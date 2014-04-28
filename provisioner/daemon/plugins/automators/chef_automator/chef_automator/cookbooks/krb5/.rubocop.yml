@@ -2,3 +2,7 @@ Encoding:
   Enabled: False
 LineLength:
   Max: 200
+HashSyntax:
+  Enabled: False
+SingleSpaceBeforeFirstArg:
+  Enabled: false

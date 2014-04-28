@@ -38,7 +38,7 @@ task :deploy do
 end
 
 # default tasks are quick, commit tests
-task :default => ['foodcritic', 'rubocop', 'chefspec']
+task :default => %w(foodcritic rubocop chefspec)
 
 # jenkins tasks format for metric tracking
-task :jenkins => ['foodcritic', 'rubocop_checkformat', 'chefspec'] 
+task :jenkins => %w(foodcritic rubocop_checkformat chefspec)
