@@ -24,6 +24,7 @@ import com.continuuity.loom.scheduler.Actions;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
+import com.continuuity.loom.scheduler.callback.ClusterCallbackExecutor;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -41,13 +42,13 @@ public class TaskService {
   private final ClusterStore clusterStore;
   private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
-  private final ClusterCallback clusterCallback;
+  private final ClusterCallbackExecutor clusterCallbackExecutor;
 
   @Inject
-  public TaskService(ClusterStore clusterStore, LoomStats loomStats, ClusterCallback clusterCallback) {
+  public TaskService(ClusterStore clusterStore, LoomStats loomStats, ClusterCallbackExecutor clusterCallbackExecutor) {
     this.clusterStore = clusterStore;
     this.loomStats = loomStats;
-    this.clusterCallback = clusterCallback;
+    this.clusterCallbackExecutor = clusterCallbackExecutor;
   }
 
   /**
@@ -148,7 +149,7 @@ public class TaskService {
     clusterStore.writeClusterJob(job);
 
     loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
-    clusterCallback.onFailure(new CallbackData(cluster, job));
+    clusterCallbackExecutor.onFailure(new CallbackData(cluster, job));
   }
 
   /**
@@ -201,7 +202,7 @@ public class TaskService {
     // Note: writing job status as RUNNING, will allow other operations on the job
     // (like cancel, etc.) to happen in parallel.
     clusterStore.writeClusterJob(job);
-    clusterCallback.onStart(new CallbackData(cluster, job));
+    clusterCallbackExecutor.onStart(new CallbackData(cluster, job));
   }
 
   /**
@@ -226,7 +227,7 @@ public class TaskService {
     clusterStore.writeCluster(cluster);
 
     loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
-    clusterCallback.onSuccess(new CallbackData(cluster, job));
+    clusterCallbackExecutor.onSuccess(new CallbackData(cluster, job));
   }
 
   /**

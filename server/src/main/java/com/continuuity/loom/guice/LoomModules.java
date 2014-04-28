@@ -32,6 +32,7 @@ import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
+import com.continuuity.loom.scheduler.callback.ClusterCallbackExecutor;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.EntityStore;
@@ -39,6 +40,8 @@ import com.continuuity.loom.store.SQLClusterStore;
 import com.continuuity.loom.store.SQLEntityStore;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
@@ -48,6 +51,7 @@ import org.apache.twill.zookeeper.ZKClient;
 import org.apache.twill.zookeeper.ZKClientService;
 import org.apache.twill.zookeeper.ZKClients;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -118,6 +122,12 @@ public final class LoomModules {
                                queueMsBetweenChecks,
                                queueMsRescheduleTimeout);
 
+    final ListeningExecutorService callbackExecutorService = MoreExecutors.listeningDecorator(
+      Executors.newCachedThreadPool(new ThreadFactoryBuilder()
+                                      .setNameFormat("callback-%d")
+                                      .setDaemon(true)
+                                      .build()));
+
     final Class callbackClass = Class.forName(conf.get(Constants.CALLBACK_CLASS, Constants.DEFAULT_CALLBACK_CLASS));
 
     return new AbstractModule() {
@@ -165,6 +175,9 @@ public final class LoomModules {
           bind(ListeningExecutorService.class)
             .annotatedWith(Names.named("solver.executor.service"))
             .toInstance(executorService);
+          bind(ListeningExecutorService.class)
+            .annotatedWith(Names.named("callback.executor.service"))
+            .toInstance(callbackExecutorService);
 
           bind(Integer.class)
             .annotatedWith(Names.named(Constants.NETTY_EXEC_NUM_THREADS)).toInstance(nettyExecNumThreads);
@@ -192,6 +205,7 @@ public final class LoomModules {
           bind(DBConnectionPool.class).in(Scopes.SINGLETON);
           bind(SQLClusterStore.class).in(Scopes.SINGLETON);
           bind(SQLEntityStore.class).in(Scopes.SINGLETON);
+          bind(ClusterCallbackExecutor.class).in(Scopes.SINGLETON);
 
           Multibinder<HttpHandler> handlerBinder = Multibinder.newSetBinder(binder(), HttpHandler.class);
           handlerBinder.addBinding().to(LoomAdminHandler.class);

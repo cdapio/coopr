@@ -72,7 +72,7 @@ public class BaseTest {
     conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
 
-    mockClusterCallback = new MockClusterCallback(conf);
+    mockClusterCallback = new MockClusterCallback();
     injector = Guice.createInjector(
       Modules.override(
         LoomModules.createModule(zkClientService, MoreExecutors.sameThreadExecutor(), conf)

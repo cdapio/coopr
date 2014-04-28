@@ -121,9 +121,6 @@ public class ClusterScheduler implements Runnable {
           }
           taskService.startJob(job, cluster);
 
-          jobQueue.add(new Element(job.getJobId()));
-          LOG.debug("added job {} to job queue", job.getJobId());
-
           inputQueue.recordProgress(id, clusterElement.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
                                     "Scheduled");
         } catch (Throwable e) {

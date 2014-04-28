@@ -65,7 +65,6 @@ public class JobScheduler implements Runnable {
   private final ZKClient zkClient;
   private final TaskService taskService;
   private final int maxTaskRetries;
-  private final Actions actions = Actions.getInstance();
 
   @Inject
   private JobScheduler(ClusterStore clusterStore, @Named("nodeprovisioner.queue") TrackingQueue provisionerQueue,
@@ -100,6 +99,13 @@ public class JobScheduler implements Runnable {
           if (job.getJobStatus() == ClusterJob.Status.COMPLETE) {
             continue;
           }
+          Cluster cluster = clusterStore.getCluster(job.getClusterId());
+          // this can happen if 2 tasks complete around the same time and the first one places the job in the queue,
+          // sees 0 in progress tasks, and sets the cluster status. The job is still in the queue as another element
+          // from the 2nd task and gets here.  In that case, no need to go further.
+          if (job.getJobStatus() == ClusterJob.Status.FAILED && cluster.getStatus() != Cluster.Status.PENDING) {
+            continue;
+          }
           LOG.trace("Scheduling job {}", job);
           Set<String> currentStage = job.getCurrentStage();
 
@@ -130,8 +136,6 @@ public class JobScheduler implements Runnable {
               ++inProgressTasks;
             }
           }
-
-          Cluster cluster = clusterStore.getCluster(job.getClusterId());
 
           // If the job has not failed continue with scheduling other tasks.
           if (!jobFailed) {

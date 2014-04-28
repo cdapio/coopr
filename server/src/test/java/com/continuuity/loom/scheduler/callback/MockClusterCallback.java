@@ -16,6 +16,7 @@
 package com.continuuity.loom.scheduler.callback;
 
 import com.continuuity.loom.conf.Configuration;
+import com.continuuity.loom.store.ClusterStore;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -23,14 +24,10 @@ import java.util.List;
 /**
  *
  */
-public class MockClusterCallback extends ClusterCallback {
+public class MockClusterCallback implements ClusterCallback {
   private final List<CallbackData> startCallbacks = Lists.newArrayList();
   private final List<CallbackData> successCallbacks = Lists.newArrayList();
   private final List<CallbackData> failureCallbacks = Lists.newArrayList();
-
-  public MockClusterCallback(Configuration conf) {
-    super(conf);
-  }
 
   public List<CallbackData> getStartCallbacks() {
     return startCallbacks;
@@ -48,6 +45,10 @@ public class MockClusterCallback extends ClusterCallback {
     startCallbacks.clear();
     successCallbacks.clear();
     failureCallbacks.clear();
+  }
+
+  @Override
+  public void initialize(Configuration conf, ClusterStore clusterStore) {
   }
 
   @Override

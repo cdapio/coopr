@@ -19,21 +19,21 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.ClusterAction;
+import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.google.inject.Inject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,20 +49,18 @@ import java.util.Set;
  * the HTTP POST request is sent only for specific cluster actions. This is done by specifying a comma separated list
  * of {@link ClusterAction}s in the configuration for start, success, and/or triggers.
  */
-public class HttpPostClusterCallback extends ClusterCallback {
+public class HttpPostClusterCallback implements ClusterCallback {
   private static final Logger LOG = LoggerFactory.getLogger(HttpPostClusterCallback.class);
   private static final Gson GSON = new JsonSerde().getGson();
-  private final String onStartUrl;
-  private final String onSuccessUrl;
-  private final String onFailureUrl;
-  private final Set<ClusterAction> startTriggerActions;
-  private final Set<ClusterAction> successTriggerActions;
-  private final Set<ClusterAction> failureTriggerActions;
-  private final DefaultHttpClient httpClient;
+  private String onStartUrl;
+  private String onSuccessUrl;
+  private String onFailureUrl;
+  private Set<ClusterAction> startTriggerActions;
+  private Set<ClusterAction> successTriggerActions;
+  private Set<ClusterAction> failureTriggerActions;
+  private HttpClient httpClient;
 
-  @Inject
-  public HttpPostClusterCallback(Configuration conf) {
-    super(conf);
+  public void initialize(Configuration conf, ClusterStore clusterStore) {
     this.onStartUrl = conf.get(Constants.HttpCallback.START_URL);
     this.onSuccessUrl = conf.get(Constants.HttpCallback.SUCCESS_URL);
     this.onFailureUrl = conf.get(Constants.HttpCallback.FAILURE_URL);
@@ -82,14 +80,18 @@ public class HttpPostClusterCallback extends ClusterCallback {
       LOG.debug("after hook will be triggered on actions {}", Joiner.on(',').join(failureTriggerActions));
     }
 
-    HttpParams httpParams = new BasicHttpParams();
-    HttpConnectionParams.setConnectionTimeout(
-      httpParams, conf.getInt(Constants.HttpCallback.CONNECTION_TIMEOUT,
-                              Constants.HttpCallback.DEFAULT_CONNECTION_TIMEOUT));
-    HttpConnectionParams.setSoTimeout(
-      httpParams, conf.getInt(Constants.HttpCallback.SOCKET_TIMEOUT,
-                              Constants.HttpCallback.DEFAULT_SOCKET_TIMEOUT));
-    this.httpClient = new DefaultHttpClient(httpParams);
+    int maxConnections = conf.getInt(Constants.HttpCallback.MAX_CONNECTIONS,
+                                     Constants.HttpCallback.DEFAULT_MAX_CONNECTIONS);
+    PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+    connectionManager.setDefaultMaxPerRoute(maxConnections);
+    connectionManager.setMaxTotal(maxConnections);
+
+    SocketConfig socketConfig = SocketConfig.custom()
+      .setSoTimeout(conf.getInt(Constants.HttpCallback.SOCKET_TIMEOUT,
+                                Constants.HttpCallback.DEFAULT_SOCKET_TIMEOUT))
+      .build();
+    connectionManager.setDefaultSocketConfig(socketConfig);
+    this.httpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).build();
   }
 
   private Set<ClusterAction> parseActionsString(String actionsStr) {
@@ -157,6 +159,8 @@ public class HttpPostClusterCallback extends ClusterCallback {
         LOG.warn("Exception executing http post callback to " + url, e);
       } catch (IOException e) {
         LOG.warn("Exception executing http post callback to " + url, e);
+      } finally {
+        post.releaseConnection();
       }
     }
   }

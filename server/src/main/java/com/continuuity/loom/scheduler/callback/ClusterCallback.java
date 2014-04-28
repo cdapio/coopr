@@ -16,37 +16,40 @@
 package com.continuuity.loom.scheduler.callback;
 
 import com.continuuity.loom.conf.Configuration;
+import com.continuuity.loom.store.ClusterStore;
 import com.google.inject.Inject;
 
 /**
  * Executes some code before a job starts and after a job completes.
  */
-public abstract class ClusterCallback {
-  protected final Configuration conf;
+public interface ClusterCallback {
 
-  @Inject
-  protected ClusterCallback(Configuration conf) {
-    this.conf = conf;
-  }
+  /**
+   * Initialize the cluster callback. Guaranteed to be called exactly once before any other methods are called.
+   *
+   * @param conf Server configuration.
+   * @param clusterStore Cluster store for looking up cluster information.
+   */
+  void initialize(Configuration conf, ClusterStore clusterStore);
 
   /**
    * Execute some method before a cluster job starts.
    *
    * @param data Data available to use while executing callback.
    */
-  public abstract void onStart(CallbackData data);
+  void onStart(CallbackData data);
 
   /**
    * Execute some method after a cluster completes succesfully.
    *
    * @param data Data available to use while executing callback.
    */
-  public abstract void onSuccess(CallbackData data);
+  void onSuccess(CallbackData data);
 
   /**
    * Execute some method after a cluster job fails.
    *
    * @param data Data available to use while executing callback.
    */
-  public abstract void onFailure(CallbackData data);
+  void onFailure(CallbackData data);
 }
