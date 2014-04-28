@@ -27,7 +27,7 @@ Loom REST APIs allow the administrator to add services. A service is some piece 
 that can be placed on a cluster. Examples include a mysql server, a Hadoop namenode, a 
 Lucene indexer, and much more. The administrator defines the service entirely, so any software
 supported by the underlying provisioners can be added to Continuuity Loom. By writing a provisioner
-automator plugin, or by using the included chef and script plugins, an administrator can manage
+automator plugin, or by using the included chef and shell plugins, an administrator can manage
 any service they want.
 
 A service is uniquely identified by its name. It also contains a short description and a section for
@@ -52,11 +52,11 @@ JSON object as its value.  The value contains a mapping of service action
 (one of install, configure, initialize, start, stop, and remove) to 
 automator details. The automator details is a JSON object containing a ``type``,
 which defines which automator type to use for that action, and ``fields``. Fields
-contains another JSON object which is a set of key values pairs required by the 
+contains another JSON object which is a set of key-value pairs required by the 
 automator plugin.
 
 This example is taken from an example Hadoop namenode service. It uses chef as the 
-automator type, which requires a script field and also allows an optional data field.
+automator type, which requires a run_list field and also allows an optional json_attributes field.
 
 .. code-block:: bash
 
@@ -65,33 +65,33 @@ automator type, which requires a script field and also allows an optional data f
         "configure": {
             "type": "chef",
             "fields": {
-                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
             }
         },
         "initialize": {
             "type": "chef",
             "fields": {
-                "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+                "run_list": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
             }
         },
         "install": {
             "type": "chef",
             "fields": {
-                "script": "recipe[hadoop::hadoop_hdfs_namenode]"
+                "run_list": "recipe[hadoop::hadoop_hdfs_namenode]"
             }
         },
         "start": {
             "type": "chef",
             "fields": {
-                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
-                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+                "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
+                "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
             }
         },
         "stop": {
             "type": "chef",
             "fields": {
-                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
-                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+                "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
+                "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
             }
         }
     }
@@ -99,7 +99,7 @@ automator type, which requires a script field and also allows an optional data f
 Dependencies
 ^^^^^^^^^^^^
 
-Dependencies serve two general purposes. The first is to enforce that a service that requires other services
+Dependencies serve two general purposes. The first is to enforce that a service
 cannot be placed onto a cluster without also placing the services it requires. The second is to enforce a safe
 ordering of service actions while performing cluster operations. It is easiest to understand the different
 types of dependencies by going through example. In this example we have a service called "myapp-2.0". 
@@ -128,12 +128,12 @@ Install
 ^^^^^^^
 Install defines install time dependencies. Install time dependencies take effect for the INSTALL and REMOVE
 service actions. It contains a ``requires`` key which specifies an array of services that the given services
-requires for its installation. In this example, "myapp-2.0" requires the "base" service at install time. This
-means that the installation of the "base" service will occur before the install of the "base" service. Similarly,
+requires for its installation. In this example, "myapp-2.0" *requires* the "base" service at install time. This
+means that the installation of the "base" service will occur before the install of the "myapp-2.0" service. Similarly,
 the removal of the "myapp-2.0" service will occur before the removal of the "base" service. This also means that
-the "myapp-2.0" service cannot be placed on a service without the "base" service also being present on the cluster.
+the "myapp-2.0" service cannot be placed on a cluster without the "base" service also being placed on the cluster.
 The ``uses`` key is like the ``requires`` key in that it enforces the same ordering of service actions. However,
-``uses`` will not enforce the presence of the dependent service. In this example, "myapp-2.0" uses the "ntp" service
+``uses`` will not enforce the presence of the dependent service. In this example, "myapp-2.0" *uses* the "ntp" service
 at install time. This means that if the "ntp" service is also on the cluster, the installation of "ntp" will occur
 before the installation of "myapp-2.0". However, "ntp" does not have to be placed on the cluster in order for "myapp-2.0"
 to be placed on the cluster.
@@ -143,21 +143,21 @@ Runtime
 Runtime defines run time dependencies. It also contains ``requires`` and ``uses`` keys that are analagous to those
 in the install section. The only difference is the service actions that they apply to. Install dependencies affect
 the INSTALL and REMOVE service actions, whereas runtime dependencies affect the INITIALIZE, START, and STOP dependencies.
-In this example, "myapp-2.0" requires the "sql-db" service. This means that "myapp-2.0" cannot be placed on a cluster
+In this example, "myapp-2.0" *requires* the "sql-db" service. This means that "myapp-2.0" cannot be placed on a cluster
 without a "sql-db" service. It also means that the initialization of "myapp-2.0" will occur after the start of "sql-db".
-It also means the start of "myapp-2.0" will occur after the start of "sql-db". It also means that the stop of "myapp-2.0" 
-will occur before the stop of "sql-db". Similarly, because "myapp-2.0" uses "load-balancer", initialization and start of
+It also means the start of "myapp-2.0" will occur after the start of "sql-db" and that the stop of "myapp-2.0" 
+will occur before the stop of "sql-db". Similarly, because "myapp-2.0" *uses* "load-balancer", initialization and start of
 "myapp-2.0" will occur after the start of "load-balancer". Similarly, the stop of "myapp-2.0" will occur before the stop
-of "load-balancer". Since it is in ``uses``, enforcement of this ordering only applies is "load-balancer" is present on the
+of "load-balancer". Since it is in ``uses``, enforcement of this ordering only applies if "load-balancer" is present on the
 same cluster as "myapp-2.0". The "myapp-2.0" service can be placed on a cluster without the "load-balancer" service.
 
 Provides
 ^^^^^^^^
 The provides section provides an extra level of indirection when specifying dependencies. In this example, the "myapp-2.0" 
 service provides the "myapp" service. This means that if other services can put "myapp" in their runtime or install dependencies,
-"myapp-2.0" can satisfy that dependency. As another example, "myapp-2.0" requires the "sql-db" service. If there was a
+"myapp-2.0" can satisfy that dependency. As another example, "myapp-2.0" *requires* the "sql-db" service. If there was a
 service called "mysql-db" that provides "sql-db", then it would be fine for "mysql-db" and "myapp-2.0" to be on the same 
-cluster. All the ordering enforced by that runtime requires dependency would be enforced between the "myapp-2.0" and "mysql-db"
+cluster. All the ordering enforced by that runtime *requires* dependency would be enforced between the "myapp-2.0" and "mysql-db"
 services.
  
 .. _service-create:
@@ -241,13 +241,13 @@ Example
                         "configure": {
                             "type": "chef",
                             "fields": {
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                             }
                         },
                         "initialize": {
                             "type": "chef",
                             "fields": {
-                                "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+                                "run_list": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
                             },
                         },
                         ...
@@ -307,13 +307,13 @@ Example
                "configure": {
                    "type": "chef",
                    "fields": {
-                       "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                       "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                    }
                },
                "initialize": {
                    "type": "chef",
                    "fields": {
-                       "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+                       "run_list": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
                    },
                },
                ...
@@ -415,13 +415,13 @@ Example
                          "configure": {
                              "type": "chef",
                              "fields": {
-                                 "script": "recipe[apt::default]"
+                                 "run_list": "recipe[apt::default]"
                              }
                          },
                          "install": {
                              "type": "chef",
                              "fields": {
-                                 "script": "recipe[apt::default]"
+                                 "run_list": "recipe[apt::default]"
                              }
                          }
                      }
