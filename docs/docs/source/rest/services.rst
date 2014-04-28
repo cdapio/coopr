@@ -187,9 +187,9 @@ Parameters
      - Description
    * - name 
      - Specifies the name for the services. The assigned name must have only
-       alphanumeric, dash(-), dot(.), and underscore(_) characters. Required.
+       alphanumeric, dash(-), dot(.), and underscore(_) characters.
    * - description
-     - Provides a description for the service. Not required.
+     - Provides a description for the service. 
    * - dependencies
      - Dependencies of the service. Includes information about what the service
        requires and uses at install time and at runtime, as well as what services
