@@ -82,15 +82,17 @@ Helpers.compareArray = function(availableFields, requiredFields) {
 };
 
 /**
- * Checks if input provider data is valid.
- * @param  {Object}  input Provider form data.
+ * Checks if input data is valid.
+ * @param  {Object}  input Form data fields to verify.
  * @param  {Array<Array>}  required Possibilities for required combinations.
- * @return {Boolean} Whethere provider input is valid.
+ * @return {Boolean} Whether input is valid.
  */
-Helpers.isProviderInputValid = function (input, required) {
+Helpers.isInputValid = function (input, required) {
   var inputEntries = [];
-  for (var item in input.provisioner) {
-    inputEntries.push(item);
+  for (var item in input) {
+    if (input.hasOwnProperty(item) && input[item] !== '') {
+      inputEntries.push(item);  
+    }
   }
   // Compare array for all required possibilities.
   for (var i = 0, len = required.length; i < len; i++) {
@@ -100,6 +102,7 @@ Helpers.isProviderInputValid = function (input, required) {
   }
   return false;
 };
+
 
 /**
  * Submits a post request.

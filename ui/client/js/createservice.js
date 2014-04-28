@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/**
+ * Service pages: create, edit and delete services.
+ */
 var ServiceCtrl = {};
 
 ServiceCtrl = angular.module('CreateServiceApp', ['ngRoute'], ['$interpolateProvider',
@@ -21,22 +24,6 @@ ServiceCtrl = angular.module('CreateServiceApp', ['ngRoute'], ['$interpolateProv
   $interpolateProvider.startSymbol('[[');
   $interpolateProvider.endSymbol(']]');
 }]);
-
-// ServiceCtrl.config(['$routeProvider',
-//   function ($routeProvider) {
-//   $routeProvider.
-//     when('/', {
-//       templateUrl: '/static/templates/providers/createprovider.html',
-//       controller: 'CreateProviderCtrl'
-//     }).
-//     when('/edit', {
-//       templateUrl: '/static/templates/providers/editprovider.html',
-//       controller: 'EditProviderCtrl'
-//     }).
-//     otherwise({
-//       redirectTo: '/'
-//     });
-// }]);
 
 ServiceCtrl.value('fetchUrl', '/pipeApiCall?path=');
 
@@ -80,6 +67,22 @@ ServiceCtrl.controller('ServiceCtrl', ['$scope', '$interval', 'dataFactory',
     'stop'
   ];
 
+  $scope.serviceId = dataFactory.getServiceId();
+  $scope.serviceExists = false;
+
+  // If serviceId exists, we are updating existing service, load service into UI.
+  if ($scope.serviceId) {
+    $scope.serviceExists = true;
+    dataFactory.getCurrentService($scope.serviceId, function (service) {
+      if (Object.keys(service).length) {
+        $scope.name = service.name;
+        $scope.description = service.description;
+        $scope.selectedServices = service.dependencies.runtime.requires;
+        $scope.actions = ServiceCtrl.getActionsFromServiceTempl(service.provisioner.actions);
+      }
+    });
+  }
+
   dataFactory.getAutomators(function (automators) {
     automators.map(function (item) {
       $scope.automatorData[item.name] = item;
@@ -92,140 +95,123 @@ ServiceCtrl.controller('ServiceCtrl', ['$scope', '$interval', 'dataFactory',
     });
   });
 
+  /**
+   * Adds service dependency to existing services.
+   */
   $scope.addService = function () {
     Helpers.checkAndAdd($scope.currService, $scope.selectedServices);
   };
 
+  /**
+   * Removes a service dependecy from existing services.
+   * @param  {String} service.
+   */
   $scope.removeService = function (service) {
     Helpers.checkAndRemove(service, $scope.selectedServices);
   };
 
+  /**
+   * Creates a blank configurable action.
+   */
   $scope.addEmptyAction = function () {
     $scope.actions.push({
-      category: ''
+      category: '',
+      fields: {}
     });
+  };
+
+  /**
+   * Removes action based on index.
+   * @param  {Number} actionIndex index of action in actions array.
+   */
+  $scope.removeAction = function (actionIndex) {
+    $scope.actions.splice(actionIndex, 1);
+  };
+
+  /**
+   * Handles deletion of service, shows deletion modal.
+   * @param  {Object} $event form submit event.
+   */
+  $scope.handleDeletion = function ($event) {
+    $event.preventDefault();
+    Helpers.handleConfirmDeletion($event, '/services');
   };
 
   /**
    * Submit provider information.
    * @param  {Object} $event Form submit event.
    */
-  $scope.submitProvider = function ($event) {
+  $scope.handleFormSubmit = function ($event) {
     $event.preventDefault();
-    if (!$scope.providerInputs) {
-      $("#notification").text('You must select a provider.');
-      $("html, body").animate({ scrollTop: 0 }, "slow");
-    }
+    var self = this;
     var postJson = {
-      name: $scope.inputName,
-      description: $scope.inputDescription,
-      providertype: $scope.providerType.name,
-      provisioner: {}
+      name: $scope.name,
+      description: $scope.description,
+      dependencies: {
+        provides: [],
+        conflicts: [],
+        install: {
+          requires: [],
+          uses: []
+        },
+        runtime: {
+          requires: [],
+          uses: []
+        }
+      },
+      provisioner: {
+        actions: {}
+      }
     };
-    for (var item in $scope.providerInputs.parameters.admin.fields) {
-      postJson.provisioner[item] = $scope.providerInputs.parameters.admin.fields[item]['userinput'];
+
+    postJson.dependencies.runtime.requires = $scope.selectedServices;
+    var allInputValid = true;
+    for (var i = 0, len = $scope.actions.length; i < len; i++) {
+      if (!Helpers.isInputValid($scope.actions[i].fields,
+       $scope.automatorData[$scope.actions[i].type].parameters.admin.required)) {
+        allInputValid = false;
+        $("#notification").text('Required fields missing for action automators.');
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+        return;
+      }
+      postJson.provisioner.actions[$scope.actions[i].category] = {
+        type: $scope.actions[i].type,
+        fields: $scope.actions[i].fields
+      };
     }
-    if (Helpers.isProviderInputValid(
-      postJson, $scope.providerInputs.parameters.admin.required)) {
-      Helpers.submitPost($event, postJson, '/providers');  
-    } else {
-      $("#notification").text('Required fields missing.');
-      $("html, body").animate({ scrollTop: 0 }, "slow");
+    if (allInputValid) {
+      Helpers.submitPost($event, postJson, '/services');
     }
-    
   };
 
 }]);
 
-
-define([], function () {
-  var Page = {
-
-    init: function () {
-      var self = this;
-      $("#add-action").click(function () {
-        var providerEntry = $(".action-entry").clone()[0];
-        $(".action-entries").append(providerEntry);
+/**
+ * Modifies actions json received from api call to the format used by the UI. It changes actions
+ * from:
+ * actions: {
+ *   categoryType: {
+ *     fields: {}
+ *     type: ""
+ *   }
+ * }
+ * to:
+ * [ {category: categoryType, type: "", fields: fields },...]
+ * @param  {Object} templActions Template actions object from API call.
+ * @return {Array} List of template actions in UI friendly format.
+ */
+ServiceCtrl.getActionsFromServiceTempl = function (templActions) {
+  var actionsArr = [];
+  for (var category in templActions) {
+    if (templActions.hasOwnProperty(category)) {
+      var action = templActions[category];
+      actionsArr.push({
+        category: category,
+        type: action.type,
+        fields: action.fields
       });
-
-      $("#add-service").click(function (e) {
-        self.handleAddServiceEntry(e);
-      });
-
-      $("#create-service-form").submit(function (e) {
-        e.preventDefault();
-        self.getFormDataAndSubmit(e);
-      });
-
-      $(".service-delete").click(function (e) {
-        $(this).parent().remove();
-      });
-
-      $(".service-delete-form").submit(function (e) {
-        e.preventDefault();
-        Helpers.handleConfirmDeletion(e, '/services');
-      });
-
-    },
-
-    handleAddServiceEntry: function (e) {
-      var self = this;
-      var context = $(e.currentTarget).attr('data-context');
-      var valToAdd = $(e.currentTarget).parent().parent().find('select').val();
-      if (!valToAdd) {
-        return;
-      }
-      var serviceName = $('<span class="service-name"></span>').text(valToAdd);
-      var serviceDelete = $(
-        '<span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus"></span>'
-      );
-      var div = $('<div class="form-control"></div>').append(serviceName).append(serviceDelete);
-      $('.service-entries').append(div);
-      Helpers.bindDeletion('service-delete');
-    },
-
-    getFormDataAndSubmit: function (e) {
-      var self = this;
-      var postJson = {
-        name: $("#inputName").val(),
-        description: $("#inputDescription").val(),
-        dependencies: {
-          provides: [],
-          conflicts: [],
-          install: {
-            requires: [],
-            uses: []
-          },
-          runtime: {
-            requires: [],
-            uses: []
-          }
-        },
-        provisioner: {
-          actions: {}
-        }
-      };
-      var actionEntries = $(".action-entry");
-      for (var i = 0; i < actionEntries.length; i++) {
-        var configurables = { 
-          type: $(actionEntries[i]).find("[name=inputType]").val(),
-          script: $(actionEntries[i]).find("[name=inputScript]").val(),
-        };
-        if ($(actionEntries[i]).find("[name=inputData]").val()) {
-          configurables['data'] = $(actionEntries[i]).find("[name=inputData]").val();
-        }
-        postJson.provisioner.actions[$(actionEntries[i]).find("[name=inputCategory]").val()] = 
-          configurables;
-          
-      }
-      var serviceEntries = $(".service-entries .service-name").each(function (index, item) {
-        postJson.dependencies.runtime.requires.push($(item).text());
-      });
-      Helpers.submitPost(e, postJson, '/services');
     }
+  }
+  return actionsArr;
+};
 
-  };
-
-  return Page.init();
-
-});

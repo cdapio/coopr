@@ -67,6 +67,7 @@ plugins['openstack'] = require('./plugins/openstack.json');
 
 var automators = {};
 automators['shell'] = require('./automators/shell.json');
+automators['chef'] = require('./automators/chef.json');
 
 module.exports = function (nock, argv, clientAddr) {
 

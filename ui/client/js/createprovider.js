@@ -16,7 +16,7 @@
 
 
 /**
- * Create provider page.
+ * Provider pages, create, edit and delete providers.
  */
 
 var CreateProviderApp = {};
@@ -112,8 +112,8 @@ CreateProviderApp.controller('CreateProviderCtrl', ['$scope', '$interval', 'data
     for (var item in $scope.providerInputs.parameters.admin.fields) {
       postJson.provisioner[item] = $scope.providerInputs.parameters.admin.fields[item]['userinput'];
     }
-    if (Helpers.isProviderInputValid(
-      postJson, $scope.providerInputs.parameters.admin.required)) {
+    if (Helpers.isInputValid(
+      postJson.provisioner, $scope.providerInputs.parameters.admin.required)) {
       Helpers.submitPost($event, postJson, '/providers');  
     } else {
       $("#notification").text('Required fields missing.');
@@ -180,8 +180,8 @@ CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFa
     for (var item in $scope.currProvider.provisioner) {
       postJson.provisioner[item] = $scope.currProvider.provisioner[item]['userinput'];
     }
-    if (Helpers.isProviderInputValid(
-      postJson, $scope.providerInputs.parameters.admin.required)) {
+    if (Helpers.isInputValid(
+      postJson.provisioner, $scope.providerInputs.parameters.admin.required)) {
       Helpers.submitPost($event, postJson, '/providers');  
     } else {
       $("#notification").text('Required fields missing.');
