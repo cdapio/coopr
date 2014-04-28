@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 require 'json'
+require 'rest_client'
 require_relative 'automator'
 require_relative 'provider'
 
@@ -87,7 +88,33 @@ class PluginManager
       end 
     end
   end
-   
+
+  def register_plugins(uri)
+    @providermap.each do |name, json_obj|
+      register_plugintype(name, json_obj, "#{uri}/v1/loom/providertypes/#{name}"
+    end
+    @automatormap.each do |name, json_obj|
+      register_plugintype(name, json_obj, "#{uri}/v1/loom/automatortypes/#{name}"
+    end
+  end
+
+  def register_plugintype(name, json_obj, uri)
+    begin
+      log.debug "registering provider/automator type: #{name}"
+      json = JSON.generate(json_obj)
+      resp = RestClient.put("#{uri}", json, :'X-Loom-UserID' => "admin")
+      if(resp.code == 200)
+        log.info "Successfully registered #{name}"
+      else
+        log.error "Response code #{resp.code}, #{resp.to_str} when trying to register #{name}"
+      end
+    rescue => e
+      log.error "Caught exception registering plugins to loom server #{loom_uri}"
+      log.error e.message
+      log.error e.backtrace.inspect
+    end
+  end
+
   # returns registered class name for given provider plugin
   def getHandlerActionObjectForProvider(providerName)
     if @providermap.has_key?(providerName) 

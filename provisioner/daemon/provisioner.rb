@@ -137,34 +137,11 @@ def delegate_task(task, pluginmanager)
   result
 end
 
-def register_providertype_automatortype(name, json_obj, uri)
-  begin
-    log.debug "registering providertype/automatortype: #{name}"
-    json = JSON.generate(json_obj)
-    resp = RestClient.put("#{uri}", json, :'X-Loom-UserID' => "admin")
-    if(resp.code == 200)
-      log.info "Successfully registered #{name}"
-    else
-      log.error "Response code #{resp.code}, #{resp.to_str} when trying to register #{name}"
-    end
-  rescue => e
-    log.error "Caught exception registering plugins to loom server #{loom_uri}"
-    log.error e.message
-    log.error e.backtrace.inspect
-  end
-end
-
 # register plugins with the server if --register flag passed
 if options[:register]
-  pluginmanager.providermap.each do |name, json_obj|
-    register_providertype_automatortype(name, json_obj, "#{loom_uri}/v1/loom/providertypes/#{name}")
-  end
-  pluginmanager.automatormap.each do |name, json_obj|
-    register_providertype_automatortype(name, json_obj, "#{loom_uri}/v1/loom/automatortypes/#{name}")
-  end
+  pluginmanager.register_plugins(loom_uri)
   exit
 end
-
 
 log.debug "provisioner starting with provider types: #{pluginmanager.providermap.keys}"
 log.debug "provisioner starting with automator types: #{pluginmanager.automatormap.keys}"
