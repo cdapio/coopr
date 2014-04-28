@@ -26,7 +26,7 @@ class PluginManager
     scan_plugins()
   end
 
-  # scan plugins directory for json plugin definitions, load and register plugins 
+  # scan plugins directory for json plugin definitions, load plugins 
   def scan_plugins
     # enforces directory structure from top-level: ./plugins/['providers']/[plugin-name]/*.json
     Dir["#{File.expand_path(File.dirname(__FILE__))}/plugins/*/*/*.json"].each do |jsonfile| 
@@ -40,7 +40,7 @@ class PluginManager
         p_providertypes = jsondata['providertypes'] || Array.new
         p_automatortypes = jsondata['automatortypes'] || Array.new
 
-        log.debug "plugin \"#{p_name}\" attempting to register providers: #{p_providertypes} and automators #{p_automatortypes}"
+        log.debug "plugin \"#{p_name}\" configures providers: #{p_providertypes} and automators #{p_automatortypes}"
 
         p_providertypes.each do |providertype|
           raise "declared providertype \"#{providertype}\" is not defined" unless jsondata.key?(providertype)
@@ -52,7 +52,7 @@ class PluginManager
           # check ancestor to determine plugin type
           klass = Object.const_get(jsondata[providertype]['classname'])
           if klass.ancestors.include? Object.const_get('Provider')
-            raise "plugin \"#{p_name}\" attempting to register duplicate provider type \"#{providertype}\"" if @providermap.key?(providertype)
+            raise "plugin \"#{p_name}\" attempting to load duplicate provider type \"#{providertype}\"" if @providermap.key?(providertype)
             @providermap.merge!({providertype => jsondata[providertype]})
           else
             raise "Declared provider \"#{providertype}\" implementation class \"#{jsondata[providertype]['classname']}\" must extend Provider class"
@@ -69,7 +69,7 @@ class PluginManager
           # check ancestor to determine plugin type
           klass = Object.const_get(jsondata[automatortype]['classname'])
           if klass.ancestors.include? Object.const_get('Automator')
-            raise "plugin \"#{p_name}\" attempting to register duplicate automator type \"#{automatortype}\"" if @automatormap.key?(automatortype)
+            raise "plugin \"#{p_name}\" attempting to load duplicate automator type \"#{automatortype}\"" if @automatormap.key?(automatortype)
             @automatormap.merge!({automatortype => jsondata[automatortype]})
           else
             raise "Declared automator \"#{automatortype}\" implementation class \"#{jsondata[automatortype]['classname']}\" must extend Automator class"
@@ -91,10 +91,10 @@ class PluginManager
 
   def register_plugins(uri)
     @providermap.each do |name, json_obj|
-      register_plugintype(name, json_obj, "#{uri}/v1/loom/providertypes/#{name}"
+      register_plugintype(name, json_obj, "#{uri}/v1/loom/providertypes/#{name}")
     end
     @automatormap.each do |name, json_obj|
-      register_plugintype(name, json_obj, "#{uri}/v1/loom/automatortypes/#{name}"
+      register_plugintype(name, json_obj, "#{uri}/v1/loom/automatortypes/#{name}")
     end
   end
 
