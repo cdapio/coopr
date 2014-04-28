@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: hosts
+# Cookbook Name:: loom_hosts
 # Recipe:: default
 #
-# Copyright 2013, Continuuity, Inc.
+# Copyright 2013-2014, Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@
 #
 
 node['loom']['cluster']['nodes'].each do |n, v|
+  short_host = v.hostname.split('.').first
   hostsfile_entry v.ipaddress do
     hostname v.hostname
-    aliases [ v.hostname.gsub('.local','') ]
+    aliases [ short_host ]
     unique true
     action :create
   end
