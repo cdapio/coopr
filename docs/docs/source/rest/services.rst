@@ -50,8 +50,6 @@ Required Parameters
    * - name
      - Specifies the name for the services. The assigned name must have only
        alphanumeric, dash(-), dot(.), and underscore(_) characters.
-   * - description
-     - Provides a description for the services.
    * - providermap
      - Provider map is map of providers and equivalent flavor type for current services being configured.
        It's currently a map of map.
@@ -82,6 +80,8 @@ Example
                 "name": "small.example",
                 "description": "Example 1 vCPU, 1 GB RAM, 30+ GB Disk",
                 "dependson": ["hosts"],
+                "dependencies": {
+                }
                 "provisioner": {
                     "actions": {
                         "configure": {

@@ -388,31 +388,31 @@ Example
  $ curl -H 'X-Loom-UserID:<user-id>' 
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
- {
-    "hadoop": {
-        "core_site": {
-            "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
-            "io.file.buffer.size": "131072"
-        },
-        "hdfs_site": {
-            "dfs.blocksize": "134217728",
-            "dfs.datanode.du.reserved": "1073741824",
-            "dfs.datanode.handler.count": "8",
-            "dfs.datanode.max.transfer.threads": "4096",
-            "dfs.datanode.max.xcievers": "4096",
-            "dfs.namenode.handler.count": "30",
-            "dfs.replication": "1"
-        },
-        "yarn_site": {
-            "yarn.nodemanager.resource.memory-mb": "4096",
-            "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
-            "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
-            "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
-            "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
-            "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
-        }
-    }
- }
+ $ {
+     "hadoop": {
+         "core_site": {
+             "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
+             "io.file.buffer.size": "131072"
+         },
+         "hdfs_site": {
+             "dfs.blocksize": "134217728",
+             "dfs.datanode.du.reserved": "1073741824",
+             "dfs.datanode.handler.count": "8",
+             "dfs.datanode.max.transfer.threads": "4096",
+             "dfs.datanode.max.xcievers": "4096",
+             "dfs.namenode.handler.count": "30",
+             "dfs.replication": "1"
+         },
+         "yarn_site": {
+             "yarn.nodemanager.resource.memory-mb": "4096",
+             "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+             "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
+             "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+             "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
+             "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+         }
+     }
+  }
 
 .. _cluster-update-config:
 Update Cluster Configuration
@@ -457,35 +457,34 @@ Example
  $ curl -H 'X-Loom-UserID:<user-id>' 
         -H 'X-Loom-ApiKey:<apikey>'
         -X PUT
-        -d '
-  {
-      "config": {
-          "hadoop": {
-              "core_site": {
-                  "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
-                  "io.file.buffer.size": "131072"
-              },
-              "hdfs_site": {
-                  "dfs.blocksize": "134217728",
-                  "dfs.datanode.du.reserved": "1073741824",
-                  "dfs.datanode.handler.count": "8",
-                  "dfs.datanode.max.transfer.threads": "4096",
-                  "dfs.datanode.max.xcievers": "4096",
-                  "dfs.namenode.handler.count": "30",
-                  "dfs.replication": "1"
-              },
-              "yarn_site": {
-                  "yarn.nodemanager.resource.memory-mb": "4096",
-                  "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
-                  "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
-                  "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
-                  "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
-                  "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
-              }
-          }
-      },
-      "restart": "false" 
-  }'
+        -d '{
+                "config": {
+                    "hadoop": {
+                        "core_site": {
+                            "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
+                            "io.file.buffer.size": "131072"
+                        },
+                        "hdfs_site": {
+                            "dfs.blocksize": "134217728",
+                            "dfs.datanode.du.reserved": "1073741824",
+                            "dfs.datanode.handler.count": "8",
+                            "dfs.datanode.max.transfer.threads": "4096",
+                            "dfs.datanode.max.xcievers": "4096",
+                            "dfs.namenode.handler.count": "30",
+                            "dfs.replication": "1"
+                        },
+                        "yarn_site": {
+                            "yarn.nodemanager.resource.memory-mb": "4096",
+                            "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+                            "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
+                            "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+                            "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
+                            "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+                        }
+                    }
+                },
+                "restart": "false" 
+            }'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
 
 .. _cluster-get-services:
@@ -566,11 +565,7 @@ Example
  $ curl -H 'X-Loom-UserID:<user-id>' 
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        -d '
-  {
-      "services": [ "zookeeper-server", "hbase-master", "hbase-regionserver" ]
-  }
-        '
+        -d '{ "services": [ "zookeeper-server", "hbase-master", "hbase-regionserver" ] }'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services
 
 .. _cluster-stop-services:
