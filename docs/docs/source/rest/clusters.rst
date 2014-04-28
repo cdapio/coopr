@@ -106,14 +106,14 @@ To retrieve full details about a cluster, make a GET HTTP request to URI:
 ::
  /clusters/{id}
 
-The cluster is represented as a JSON object which contains an id, name, description, services, createTime, provider,
+The cluster is represented as a JSON Object which contains an id, name, description, services, createTime, provider,
 clusterTemplate, nodes, jobs, ownerId, and status.  The provider and clusterTemplate details are copied over 
 from the respective entities at cluster creation time.  This is so that future changes to a cluster template 
 do not affect clusters that were previously created by older versions of the template.  The status is one of
 pending, active, incomplete, and terminated.  Jobs are ids of cluster action plans that are described in 
 the section about getting an action plan for a cluster.  The ownerId holds the owner of the cluster, the createTime
 is a timestamp in milliseconds, and services is a list of services that are on the cluster. Finally, nodes is
-an array of nodes that are in the cluster.  Each node is a JSON object with the id of the node, the clusterId,
+an array of nodes that are in the cluster.  Each node is a JSON Object with the id of the node, the clusterId,
 an array of services on the node, properties of the node such as hostname and ipaddress, and an array of actions
 that have been performed on the node. 
 
@@ -231,7 +231,7 @@ To get the status of a cluster, make a GET HTTP request to URI:
 ::
  /clusters/{id}/status
 
-Status of a cluster is a JSON object with a clusterid, stepstotal, stepscompleted, 
+Status of a cluster is a JSON Object with a clusterid, stepstotal, stepscompleted, 
 status, actionstatus, and action.  
 
 The status can be one of PENDING, ACTIVE, INCOMPLETE,
@@ -360,10 +360,12 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/plans
 
 .. _cluster-get-config:
+
 Get Cluster Configuration
 =========================
 To get the configuration of a cluster, make a GET HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/config
 
 HTTP Responses
@@ -415,16 +417,19 @@ Example
   }
 
 .. _cluster-update-config:
+
 Update Cluster Configuration
 ============================
 To update the configuration of a cluster, make a PUT HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/config
 
-The request body must be a JSON object that includes a ``config`` key whose value is a 
-JSON Object that will replace the current cluster configuration. It may optionally contain a 
+The request body must be a JSON Object that includes a ``config`` key whose value is a 
+JSON Object that will replace the current cluster configuration. It may contain a 
 ``restart`` key whose value is true or false, indicating whether or not cluster services should 
-be restarted along with the configuration change. The order of service restarts is derived from
+be restarted along with the configuration change. If the ``restart`` key is not present, the 
+value defaults to true. The order of service restarts is derived from
 service dependencies, ensuring that if service A depends on service B, service A will be stopped
 before service B is stopped, and service B will be started before service A is started. After the
 request is made, status calls can be made to check on the status of the cluster configure job. 
@@ -488,10 +493,12 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
 
 .. _cluster-get-services:
+
 Get Cluster Services
 ====================
 To get the services on a cluster, make a GET HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/services
 
 HTTP Responses
@@ -527,10 +534,12 @@ Example
 
 
 .. _cluster-add-services:
+
 Add Services to a Cluster
 =========================
 To add services to a cluster, make a POST HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/services
 
 The POST body must be a JSON Object containing a ``services`` key whose value is a JSON Array
@@ -569,10 +578,12 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services
 
 .. _cluster-stop-services:
+
 Stop all Services on a Cluster
 ==============================
 To stop all services on a cluster, make a POST HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/services/stop
 
 There is no POST body expected. The ordering of service stops is based on the dependencies
@@ -608,10 +619,12 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/stop
 
 .. _cluster-stop-service:
+
 Stop a Service on a Cluster
 ===========================
 To stop a specific service on a cluster, make a POST HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/services/{service-id}/stop
 
 There is no POST body expected. If there are services that depend on the service being stopped,
@@ -648,10 +661,12 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/stop
 
 .. _cluster-start-services:
+
 Start all Services on a Cluster
 ================================
 To start all services on a cluster, make a POST HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/services/start
 
 There is no POST body expected. The ordering of service starts is based on the dependencies
@@ -687,10 +702,12 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/start
 
 .. _cluster-start-service:
+
 Start a Service on a Cluster
 ============================
 To start a specific service on a cluster, make a POST HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/services/{service-id}/start
 
 There is no POST body expected. If the service being started depends on any other services,
@@ -727,10 +744,12 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/start
 
 .. _cluster-restart-services:
+
 Restart all Services on a Cluster
 =================================
 To restart all services on a cluster, make a POST HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/services/restart
 
 There is no POST body expected. The ordering of service starts and stops is based on the 
@@ -769,10 +788,12 @@ Example
 
 
 .. _cluster-restart-service:
+
 Restart a Service on a Cluster
 ==============================
 To restart a specific service on a cluster, make a POST HTTP request to URI:
 ::
+
  /clusters/{cluster-id}/services/{service-id}/restart
 
 There is no POST body expected. If there are services that depend on the service being
