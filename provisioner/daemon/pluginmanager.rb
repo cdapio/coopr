@@ -32,9 +32,9 @@ class PluginManager
       begin
         log.debug "pluginmanager scanning #{jsonfile}"
         jsondata =  JSON.parse( IO.read(jsonfile) )
-      
-    #    raise "missing 'name' field when loading plugin #{jsonfile}" unless jsondata.key?('name')
-        p_name = jsondata['name'] 
+
+        raise "missing 'name' field when loading plugin #{jsonfile}" unless jsondata.key?('name')
+        p_name = jsondata['name']
         p_description = jsondata['description'] || "No description found"
         p_providertypes = jsondata['providertypes'] || Array.new
         p_automatortypes = jsondata['automatortypes'] || Array.new
