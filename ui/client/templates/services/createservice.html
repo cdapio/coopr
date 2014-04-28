@@ -2,12 +2,19 @@
 
 {% block title %}{% if service %} Edit service: {{service.name}} {% else %}Create a service{% endif %}{% endblock %}
 
+{% block headscript %}
+<script src="/static/third_party/angular/angular.js" type="text/javascript"></script>
+<script src="/static/third_party/angular/angular-route.js"></script>
+<script src="/static/js/createservice.js" type="text/javascript"></script>
+{% endblock %}
+
 {% block header %}
     {% include "page-header.html" %}
 {% endblock %}
 
 {% block content %}
-    <div id="content-body">
+  <div ng-app="CreateServiceApp">
+    <div id="content-body" ng-controller="ServiceCtrl">
       <div id="title">
         <div class="pull-right">
           <div id="global">
@@ -24,7 +31,7 @@
             <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if service %} Edit service: {{service.name}} {% else %}Create a service{% endif %}</h4>
               <div class="pull-right">
                 {% if service %}
-                <form role="form" method="POST" action="/services/delete/{{service.name}}" class="service-delete-form">
+                <form role="form" method="POST" action="/services/delete/{{service.name}}" class="service-delete-form" ng-submit="handleDeletion()">
                   <input type="hidden" value="{{service.name}}" name="name" />
                   <button type="submit" class="btn-spl btn-delete"></button>
                 </form>
@@ -34,17 +41,17 @@
           </div>
 
           <div class="panel-body spl-panel-body">
-            <form class="form-horizontal" role="form" id="create-service-form" action="{% if service %}/services/update{% else %}/services/create{% endif %}">
+            <form class="form-horizontal" role="form" id="create-service-form" action="{% if service %}/services/update{% else %}/services/create{% endif %}" ng-submit="handleFormSubmit()">
               <div class="form-group">
                 <label for="inputName" class="col-sm-2 control-label">Name</label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name" value="{{service.name}}" {% if service %} disabled {% endif %}>
+                  <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name" value="{{service.name}}" {% if service %} disabled {% endif %} ng-model="name">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputDescription" class="col-sm-2 control-label">Description</label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="inputDescription" name="inputDescription" placeholder="Description" value="{{service.description}}">
+                  <input type="text" class="form-control" id="inputDescription" name="inputDescription" placeholder="Description" ng-model="description">
                 </div>
               </div>
               <h4>Dependencies</h4>
@@ -52,23 +59,21 @@
               <div class="form-group">
                 <label for="inputRuntimeRequires" class="col-sm-2 control-label">Runtime Requires</label>
                 <div class="col-sm-6">
-                  <select class="form-control" name="inputRuntimeRequires" id="inputRuntimeRequires">
+                  <select class="form-control" name="inputRuntimeRequires" id="inputRuntimeRequires" ng-options="item for item in availableServices" ng-model="currService">
                     <option></option>
-                    {% for itr in services %}
-                      <option>{{itr.name}}</option>
-                    {% endfor %}
                   </select>
                 </div>
                 <div class="col-sm-2">
-                  <button type="button" class="btn-spl btn-default" id="add-service">Add service</button>
+                  <button type="button" class="btn-spl btn-default" id="add-service" ng-click="addService()">Add service</button>
                 </div>
               </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label"></label>
                 <div class="col-sm-6 service-entries">
-                  {% for item in service.dependencies.runtime.requires %}
-                    <div class="form-control"><span class="service-name">{{item}}</span><span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus"></span></div>
-                  {% endfor %}
+                    <div class="form-control" ng-repeat="service in selectedServices">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service)"></span>
+                    </div>
                 </div>
               </div>
               <h4>Automator Details</h4>
@@ -76,91 +81,34 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label">Actions</label>
                 <div class="col-sm-8">
-                  <button type="button" class="btn-spl btn-default" id="add-action">Add</button>
+                  <button type="button" class="btn-spl btn-default" id="add-action" ng-click="addEmptyAction()">Add</button>
                 </div>
               </div>
               <div class="form-group action-entries">
-                {% if service.provisioner.actions %}
-                  {% for item in service.provisioner.actions %}
-                  <div class="action-entry">
-                    <div class="col-sm-offset-2 col-sm-8">
-                      <div class="form-group">
-                        <label for="inputCategory" class="col-sm-2 control-label">Category</label>
-                        <div class="col-sm-8">
-                          <select class="form-control inputCategory" name="inputCategory">
-                            <option {% if loop.key === 'install' %}selected="selected"{% endif %}>install</option>
-                            <option {% if loop.key === 'remove' %}selected="selected"{% endif %}>remove</option>
-                            <option {% if loop.key === 'initialize' %}selected="selected"{% endif %}>initialize</option>
-                            <option {% if loop.key === 'configure' %}selected="selected"{% endif %}>configure</option>
-                            <option {% if loop.key === 'start' %}selected="selected"{% endif %}>start</option>
-                            <option {% if loop.key === 'stop' %}selected="selected"{% endif %}>stop</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="inputType" class="col-sm-2 control-label">Type</label>
-                        <div class="col-sm-8">
-                          <select class="form-control inputType" name="inputType">
-                            <option {% if item.type === 'chef' %}selected="selected"{% endif %}>chef</option>
-                            <option {% if item.type === 'shell' %}selected="selected"{% endif %}>shell</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="inputScript" class="col-sm-2 control-label">Script</label>
-                        <div class="col-sm-8">
-                          <input type="text" class="form-control inputScript" name="inputScript" value="{{item.script}}">
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="inputData" class="col-sm-2 control-label">Data</label>
-                        <div class="col-sm-8">
-                          <input type="text" class="form-control inputData" name="inputData" value="{{item.data}}">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {% endfor %}
-                {% else %}
-                <div class="action-entry">
+                <div class="action-entry" ng-repeat="action in actions">
                   <div class="col-sm-offset-2 col-sm-8">
                     <div class="form-group">
                       <label for="inputCategory" class="col-sm-2 control-label">Category</label>
                       <div class="col-sm-8">
-                        <select class="form-control inputCategory" name="inputCategory">
-                          <option>install</option>
-                          <option>remove</option>
-                          <option>initialize</option>
-                          <option>configure</option>
-                          <option>start</option>
-                          <option>stop</option>
+                        <select class="form-control inputCategory" name="inputCategory" ng-model="action.category" ng-options="item for item in categoryOptions">
                         </select>
                       </div>
                     </div>
                     <div class="form-group">
                       <label for="inputType" class="col-sm-2 control-label">Type</label>
                       <div class="col-sm-8">
-                        <select class="form-control inputType" name="inputType">
-                          <option>chef</option>
-                          <option>shell</option>
-                        </select>
+                        <select class="form-control inputType" name="inputType" ng-options="type as type for (type, data) in automatorData" ng-model="action.automatorType"></select>
                       </div>
                     </div>
-                    <div class="form-group">
-                      <label for="inputScript" class="col-sm-2 control-label">Script</label>
+                    <div class="form-group" ng-repeat="(field, fieldData) in automatorData[action.automatorType].parameters.admin.fields">
+                      <label for="inputScript" class="col-sm-2 control-label">[[field]]</label>
                       <div class="col-sm-8">
-                        <input type="text" class="form-control inputScript" name="inputScript">
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="inputData" class="col-sm-2 control-label">Data</label>
-                      <div class="col-sm-8">
-                        <input type="text" class="form-control inputData" name="inputData">
+                        <input class="form-control" type="[[fieldData.type]]" ng-model="fieldData.userinput" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'text' || fieldData.type == 'password'" />
+                        <select class="form-control" type="[[fieldData.type]]" ng-model="fieldData.userinput" ng-options="region as region for region in fieldData.options" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'select'" ></select>
                       </div>
                     </div>
                   </div>
                 </div>
-                {% endif %}
               </div>
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-8">
@@ -173,6 +121,5 @@
         
       </div>
     </div>
-
-<script data-main="/static/js/createservice" src="/static/third_party/require.js"></script>
+  </div>
 {% endblock %}

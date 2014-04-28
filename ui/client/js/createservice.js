@@ -13,6 +13,131 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+var ServiceCtrl = {};
+
+ServiceCtrl = angular.module('CreateServiceApp', ['ngRoute'], ['$interpolateProvider',
+  function ($interpolateProvider) {
+  $interpolateProvider.startSymbol('[[');
+  $interpolateProvider.endSymbol(']]');
+}]);
+
+// ServiceCtrl.config(['$routeProvider',
+//   function ($routeProvider) {
+//   $routeProvider.
+//     when('/', {
+//       templateUrl: '/static/templates/providers/createprovider.html',
+//       controller: 'CreateProviderCtrl'
+//     }).
+//     when('/edit', {
+//       templateUrl: '/static/templates/providers/editprovider.html',
+//       controller: 'EditProviderCtrl'
+//     }).
+//     otherwise({
+//       redirectTo: '/'
+//     });
+// }]);
+
+ServiceCtrl.value('fetchUrl', '/pipeApiCall?path=');
+
+ServiceCtrl.factory('dataFactory', ['$http', '$q', 'fetchUrl',
+  function ($http, $q, fetchUrl) {
+  var serviceId = $("#inputName").val();
+  return {
+    getServiceId: function () {
+      return serviceId;
+    },
+    getCurrentService: function (currentService, callback) {
+      $http.get(fetchUrl + '/services/' + currentService).success(callback);
+    },
+    getAvailableServices: function (callback) {
+      $http.get(fetchUrl + '/services').success(callback);
+    },
+    getAutomators: function (callback) {
+      $http.get(fetchUrl + '/automators').success(callback);
+    }
+  }
+}]);
+
+
+ServiceCtrl.controller('ServiceCtrl', ['$scope', '$interval', 'dataFactory',
+  function ($scope, $interval, dataFactory) {
+
+  $scope.name;
+  $scope.description;
+  $scope.automatorData = {};
+  $scope.availableServices = [];
+  $scope.selectedServices = [];
+  $scope.currService;
+
+  $scope.actions = [];
+  $scope.categoryOptions = [
+    'install',
+    'remove',
+    'initialize',
+    'configure',
+    'start',
+    'stop'
+  ];
+
+  dataFactory.getAutomators(function (automators) {
+    automators.map(function (item) {
+      $scope.automatorData[item.name] = item;
+    });
+  });
+
+  dataFactory.getAvailableServices(function (services) {
+    $scope.availableServices = services.map(function (item) {
+      return item.name;
+    });
+  });
+
+  $scope.addService = function () {
+    Helpers.checkAndAdd($scope.currService, $scope.selectedServices);
+  };
+
+  $scope.removeService = function (service) {
+    Helpers.checkAndRemove(service, $scope.selectedServices);
+  };
+
+  $scope.addEmptyAction = function () {
+    $scope.actions.push({
+      category: ''
+    });
+  };
+
+  /**
+   * Submit provider information.
+   * @param  {Object} $event Form submit event.
+   */
+  $scope.submitProvider = function ($event) {
+    $event.preventDefault();
+    if (!$scope.providerInputs) {
+      $("#notification").text('You must select a provider.');
+      $("html, body").animate({ scrollTop: 0 }, "slow");
+    }
+    var postJson = {
+      name: $scope.inputName,
+      description: $scope.inputDescription,
+      providertype: $scope.providerType.name,
+      provisioner: {}
+    };
+    for (var item in $scope.providerInputs.parameters.admin.fields) {
+      postJson.provisioner[item] = $scope.providerInputs.parameters.admin.fields[item]['userinput'];
+    }
+    if (Helpers.isProviderInputValid(
+      postJson, $scope.providerInputs.parameters.admin.required)) {
+      Helpers.submitPost($event, postJson, '/providers');  
+    } else {
+      $("#notification").text('Required fields missing.');
+      $("html, body").animate({ scrollTop: 0 }, "slow");
+    }
+    
+  };
+
+}]);
+
+
 define([], function () {
   var Page = {
 
