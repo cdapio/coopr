@@ -6,6 +6,10 @@ description      'Hadoop wrapper'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version '0.1.1'
 
-%w(apt java hadoop yum krb5 krb5_utils).each do |cb|
+%w(apt hadoop java krb5_utils yum).each do |cb|
   depends cb
 end
+
+depends 'mysql', '< 5.0.0'
+depends 'database', '< 2.1.0'
+depends 'krb5', '>= 1.0.0'
