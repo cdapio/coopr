@@ -65,7 +65,7 @@
                   </select>
                 </div>
                 <div class="col-sm-2">
-                  <button type="button" class="btn-spl btn-default" id="add-service" ng-click="addService()">Add service</button>
+                  <button type="button" class="btn-spl btn-default" id="add-service" ng-click="addService(currService, selectedServices)">Add service</button>
                 </div>
               </div>
               <div class="form-group">
@@ -73,10 +73,115 @@
                 <div class="col-sm-6 service-entries">
                     <div class="form-control" ng-repeat="service in selectedServices">
                       <span class="service-name">[[service]]</span>
-                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service)"></span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, selectedServices)"></span>
                     </div>
                 </div>
               </div>
+
+              <div class="form-group">
+                <label for="runtimeUses" class="col-sm-2 control-label">Runtime Uses</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="runtimeUses" id="runtimeUses" ng-options="item for item in availableServices" ng-model="currRuntimeUse">
+                    <option></option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currRuntimeUse, runtimeUses)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in runtimeUses">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, runtimeUses)"></span>
+                    </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="installRequires" class="col-sm-2 control-label">Install Requires</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="installRequires" id="installRequires" ng-options="item for item in availableServices" ng-model="currInstallRequire">
+                    <option></option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currInstallRequire, installRequires)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in installRequires">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, installRequires)"></span>
+                    </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="installUses" class="col-sm-2 control-label">Install Uses</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="installUses" id="installUses" ng-options="item for item in availableServices" ng-model="currInstallUse">
+                    <option></option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currInstallUse, installUses)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in installUses">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, installUses)"></span>
+                    </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="conflicts" class="col-sm-2 control-label">Conflicts</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="conflicts" id="conflicts" ng-options="item for item in availableServices" ng-model="currConflict">
+                    <option></option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currConflict, conflicts)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in conflicts">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, conflicts)"></span>
+                    </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="provides" class="col-sm-2 control-label">Provides</label>
+                <div class="col-sm-6">
+                  <input class="form-control" name="provides" id="provides" type="text" ng-model="currProvide" />
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currProvide, provides)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in provides">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, provides)"></span>
+                    </div>
+                </div>
+              </div>
+
+
               <h4>Automator Details</h4>
               <br>
               <div class="form-group">
