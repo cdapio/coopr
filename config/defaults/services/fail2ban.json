@@ -7,21 +7,29 @@
     "actions": {
       "install": {
         "type":"chef",
-        "script": "recipe[fail2ban::default]"
+        "fields": {
+          "run_list": "recipe[fail2ban::default]"
+        }
       },
       "configure": {
         "type":"chef",
-        "script": "recipe[fail2ban::default]"
+        "fields": {
+          "run_list": "recipe[fail2ban::default]"
+        }
       },
       "start": {
         "type": "chef",
-        "script": "recipe[fail2ban::default],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"fail2ban\": \"start\" } } } }" 
+        "fields": {
+          "run_list": "recipe[fail2ban::default],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"fail2ban\": \"start\" } } } }" 
+        }
       },
       "stop": {
         "type": "chef",
-        "script": "recipe[fail2ban::default],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"fail2ban\": \"stop\" } } } }" 
+        "fields": {
+          "run_list": "recipe[fail2ban::default],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"fail2ban\": \"stop\" } } } }" 
+        }
       }
     }
   }
