@@ -65,6 +65,7 @@ class ShellAutomator < Automator
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
 
+    raise "required parameter \"script\" not found in input: #{fields}" if fields['script'].nil?
     shellscript = fields['script']
     shellargs = fields['args']
 
