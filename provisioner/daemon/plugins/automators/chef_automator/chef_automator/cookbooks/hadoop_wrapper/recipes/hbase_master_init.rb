@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop_wrapper
 # Recipe:: hbase_master_init
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@
 
 include_recipe 'hadoop_wrapper::default'
 include_recipe 'hadoop::hbase_master'
-
-dfs = node['hadoop']['core_site']['fs.defaultFS']
 
 if node['hbase']['hbase_site']['hbase.rootdir'] =~ %r{^/|^hdfs://} && node['hbase']['hbase_site']['hbase.cluster.distributed'].to_s == 'true'
   # bootstrap HDFS for HBase
