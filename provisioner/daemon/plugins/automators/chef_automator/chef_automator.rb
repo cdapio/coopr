@@ -190,12 +190,12 @@ class ChefAutomator < Automator
     fields = inputmap['fields']
 
     # run_list as specified by user
-    run_list = fields['script']
+    run_list = fields['run_list']
     # whitespace in the runlist is not allowed
     run_list.gsub!(/\s+/, "")
 
     # additional json attributes defined for this service action
-    json_attributes = fields['data']
+    json_attributes = fields['json_attributes']
 
     # merge together json_attributes, cluster config, loom node data
     jsondata = generate_chef_json_attributes(json_attributes)
