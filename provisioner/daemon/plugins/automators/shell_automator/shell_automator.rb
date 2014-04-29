@@ -65,10 +65,8 @@ class ShellAutomator < Automator
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
 
-#    shellscript = fields['script']
-#    shellargs = fields['args']
     shellscript = fields['script']
-    shellargs = fields['data']
+    shellargs = fields['args']
 
     set_credentials(sshauth)
 
