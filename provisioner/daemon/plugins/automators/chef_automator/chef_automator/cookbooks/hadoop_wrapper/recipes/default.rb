@@ -20,7 +20,7 @@
 # We require Java, and the Hadoop cookbook doesn't have it as a dependency
 include_recipe 'java::default'
 
-if node.key? 'java' and node['java'].key? 'java_home'
+if node.key?('java') && node['java'].key?('java_home')
 
   Chef::Log.info("JAVA_HOME = #{node['java']['java_home']}")
 
