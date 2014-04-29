@@ -140,7 +140,7 @@ end
 # register plugins with the server if --register flag passed
 if options[:register]
   pluginmanager.register_plugins(loom_uri)
-  exit
+  exit(0)
 end
 
 log.debug "provisioner starting with provider types: #{pluginmanager.providermap.keys}"
