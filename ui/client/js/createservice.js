@@ -41,7 +41,7 @@ ServiceCtrl.factory('dataFactory', ['$http', '$q', 'fetchUrl',
       $http.get(fetchUrl + '/services').success(callback);
     },
     getAutomators: function (callback) {
-      $http.get(fetchUrl + '/automators').success(callback);
+      $http.get(fetchUrl + '/automatortypes').success(callback);
     }
   }
 }]);
@@ -53,10 +53,39 @@ ServiceCtrl.controller('ServiceCtrl', ['$scope', '$interval', 'dataFactory',
   $scope.name;
   $scope.description;
   $scope.automatorData = {};
+
+  /**
+   * Dependency management vars.
+   */
   $scope.availableServices = [];
+
+  // Runtime requires.
   $scope.selectedServices = [];
   $scope.currService;
 
+  // Runtime uses.
+  $scope.runtimeUses = [];
+  $scope.currRuntimeUse;
+
+  // Install requires
+  $scope.installRequires = [];
+  $scope.currInstallRequire;
+
+  // Install uses.
+  $scope.installUses = [];
+  $scope.currInstallUse;
+
+  // Conflicts.
+  $scope.conflicts = [];
+  $scope.currConflict;
+
+  // Provides.
+  $scope.provides = [];
+  $scope.currProvide;
+
+  /**
+   * Actions management vars.
+   */
   $scope.actions = [];
   $scope.categoryOptions = [
     'install',
@@ -77,7 +106,18 @@ ServiceCtrl.controller('ServiceCtrl', ['$scope', '$interval', 'dataFactory',
       if (Object.keys(service).length) {
         $scope.name = service.name;
         $scope.description = service.description;
-        $scope.selectedServices = service.dependencies.runtime.requires;
+        $scope.selectedServices = Helpers.PathEvaluator.getOrSetDefault(service,
+          'dependencies.runtime.requires', []);
+        $scope.provides = Helpers.PathEvaluator.getOrSetDefault(service,
+          'dependencies.provides', []);
+        $scope.conflicts = Helpers.PathEvaluator.getOrSetDefault(service,
+          'dependencies.conflicts', []);
+        $scope.installRequires = Helpers.PathEvaluator.getOrSetDefault(service,
+          'dependencies.install.requires', []);
+        $scope.installUses = Helpers.PathEvaluator.getOrSetDefault(service,
+          'dependencies.install.uses', []);
+        $scope.runtimeUses = Helpers.PathEvaluator.getOrSetDefault(service,
+          'dependencies.runtime.uses', []);
         $scope.actions = ServiceCtrl.getActionsFromServiceTempl(service.provisioner.actions);
       }
     });
@@ -96,18 +136,21 @@ ServiceCtrl.controller('ServiceCtrl', ['$scope', '$interval', 'dataFactory',
   });
 
   /**
-   * Adds service dependency to existing services.
+   * Adds service to dependency list.
+   * @param {String} service name.
+   * @param {Array} serviceArr list of services.
    */
-  $scope.addService = function () {
-    Helpers.checkAndAdd($scope.currService, $scope.selectedServices);
+  $scope.addService = function (service, serviceArr) {
+    Helpers.checkAndAdd(service, serviceArr);
   };
 
   /**
    * Removes a service dependecy from existing services.
-   * @param  {String} service.
+   * @param {String} service name.
+   * @param {Array} serviceArr list of services.
    */
-  $scope.removeService = function (service) {
-    Helpers.checkAndRemove(service, $scope.selectedServices);
+  $scope.removeService = function (service, serviceArr) {
+    Helpers.checkAndRemove(service, serviceArr);
   };
 
   /**
@@ -148,15 +191,15 @@ ServiceCtrl.controller('ServiceCtrl', ['$scope', '$interval', 'dataFactory',
       name: $scope.name,
       description: $scope.description,
       dependencies: {
-        provides: [],
-        conflicts: [],
+        provides: $scope.provides,
+        conflicts: $scope.conflicts,
         install: {
-          requires: [],
-          uses: []
+          requires: $scope.installRequires,
+          uses: $scope.installUses
         },
         runtime: {
-          requires: [],
-          uses: []
+          requires: $scope.selectedServices,
+          uses: $scope.runtimeUses
         }
       },
       provisioner: {
@@ -164,7 +207,6 @@ ServiceCtrl.controller('ServiceCtrl', ['$scope', '$interval', 'dataFactory',
       }
     };
 
-    postJson.dependencies.runtime.requires = $scope.selectedServices;
     var allInputValid = true;
     for (var i = 0, len = $scope.actions.length; i < len; i++) {
       if (!Helpers.isInputValid($scope.actions[i].fields,

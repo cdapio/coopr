@@ -83,14 +83,14 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in automators) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/automators/' + item)
+      .get('/v1/loom/automatortypes/' + item)
       .reply(200, automators[item]);
     automatorsResponse.push(automators[item]);
   }
 
   nock(clientAddr)
     .persist()
-    .get('/v1/loom/automators')
+    .get('/v1/loom/automatortypes')
     .reply(200, automatorsResponse);
 
   /**

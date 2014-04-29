@@ -103,6 +103,37 @@ Helpers.isInputValid = function (input, required) {
   return false;
 };
 
+Helpers.PathEvaluator = {};
+
+Helpers.PathEvaluator.getOrSetDefault = function (rootObj, varScope, defaultValue) {
+  var scopeTree = varScope.split('.');
+  this.evalPath(rootObj, scopeTree, defaultValue);
+
+  var curObj = $.extend({}, rootObj, true), scopeTree = varScope.split('.');
+  for (var i = 1; i <= scopeTree.length; i++) {
+    if (i === scopeTree.length) {
+      return curObj[scopeTree[i - 1]];
+    } else {
+      curObj = curObj[scopeTree[i - 1]];
+    }
+  }
+};
+
+Helpers.PathEvaluator.evalPath = function (rootObj, scopeTree, defaultValue) {
+  var currScope = scopeTree.shift();
+  if (!scopeTree.length) {
+    if (!(currScope in rootObj)) {
+      rootObj[currScope] = defaultValue;  
+    }
+    return;
+  }
+  if (currScope in rootObj) {
+    this.evalPath(rootObj[currScope], scopeTree, defaultValue);
+  } else {
+    rootObj[currScope] = {};
+    this.evalPath(rootObj[currScope], scopeTree, defaultValue);
+  }
+};
 
 /**
  * Submits a post request.
