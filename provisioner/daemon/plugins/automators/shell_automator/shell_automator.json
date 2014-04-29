@@ -14,7 +14,7 @@
             "tip": "The script or command to run"
           },
           "args": {
-            "label": "Args",
+            "label": "Arguments",
             "type": "text",
             "tip": "The arguments to the script"
           }
