@@ -54,19 +54,18 @@ As an example, consider the following Loom service definition:
         }
     }
 
-This defines a service named "continuuity-chef-bootstrap" for which has one defined action for "install".  When the 
+This defines a service named "continuuity-chef-bootstrap" which has one defined action for "install".  When the 
 install action is invoked for this service, the ``type`` field indicates to the provisioner to use the Shell Automator
 plugin to manage this action.  The Shell Automator defines two custom fields: a required ``script`` and optional
 ``args``.  The ``script`` field can be a standard shell command, or a custom script.  Note that ``script`` can either
 be a full path to a known executable, or a relative path to a script bundled with the Shell Automator plugin (more on
-this below).  The ``args`` field is an optional.  So in this example, when the install action is invoked for this 
-service, the Shell automator will first ensure this script is transferred to the remote host(s), and then effectively 
+this below).  The ``args`` field is optional.  In this example, when the install action is invoked for this 
+service, the Shell automator will first ensure this script is transferred to the remote host(s), then effectively 
 invoke the following command on them:
 ::
 	chef_client_bootstrap.sh https://mychefserver:443 "role[base]"
 
-Also note that this example is a real script included with the Shell Automator, which can be used to bootstrap a
-Loom host to an existing chef server!
+Note that this example is a real script included with the Shell Automator, which can be used to bootstrap a Loom host to an existing Chef server!
 
 How it works
 ============
@@ -76,14 +75,13 @@ A more in-depth look at Shell Automator:
 	2. During the "bootstrap" action:
 		a. These scripts are bundled and scp'd to the remote host
 		b. The scripts are extracted on the remote host, by default to ``/var/cache/loom/scripts``
-	4. When a defined shell service action runs (ie, install, configure, start, etc):
-		a. The Shell Automator first generates a copy of the current task's json data
-		b. This task json data is scp'd to the remote host, so that it can be referenced by the executed script
+	3. When a defined shell service action runs (ie, install, configure, start, etc):
+		a. The Shell Automator first generates a copy of the current task's JSON data
+		b. This task json data is scp'd to the remote host, where it can be referenced by the executed script
 		c. The Shell Automator invokes a command on the remote host which
-			i. sets the cwd to the scripts directory
-			ii. adds the scripts directory to the $PATH
-			iii. invokes a "hidden" wrapper script, which in turn runs the defined script with the defined args
-			iv. the reason for the wrapper script is to provide some useful utilities (see JSON lookup below)
+			i. Sets the current working directory to the scripts directory
+			ii. Adds the scripts directory to the $PATH
+			iii. Invokes a "hidden" wrapper script, which runs the defined script with the defined args.  The purpose of the wrapper script is to provide some useful utilities (see JSON lookup below)
 
 
 Bootstrap
