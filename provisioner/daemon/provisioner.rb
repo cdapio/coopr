@@ -31,25 +31,25 @@ $stdout.sync = true
 # Parse command line options. 
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: "
-  opts.on("-u", "--uri URI", "Loom web server uri") do |u|
+  opts.banner = 'Usage: '
+  opts.on('-u', '--uri URI', 'Loom web server uri') do |u|
     options[:uri] = u
   end
-  opts.on("-f", "--file FILE", "Full path to task json") do |f|
+  opts.on('-f', '--file FILE', 'Full path to task json') do |f|
     options[:file] = f
   end
   options[:register] = false
-  opts.on("-r", "--register", "Register installed plugins with the server.  requires --uri") do
+  opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do
     options[:register] = true
   end
-  opts.on("-L", "--log-level LEVEL", "Log level") do |f|
+  opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
     options[:log_level] = f
   end
-  opts.on("-l", "--log-file FILE", "Path to logfile") do |f|
+  opts.on('-l', '--log-file FILE', 'Path to logfile') do |f|
     options[:log_file] = f
   end
   options[:once] = false
-  opts.on("-o", "--once", "Only poll and run a single task") do 
+  opts.on('-o', '--once', 'Only poll and run a single task') do
     options[:once] = true 
   end
 end.parse!
