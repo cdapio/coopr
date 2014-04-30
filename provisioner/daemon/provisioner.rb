@@ -38,6 +38,10 @@ OptionParser.new do |opts|
   opts.on("-f", "--file FILE", "Full path to task json") do |f|
     options[:file] = f
   end
+  options[:register] = false
+  opts.on("-r", "--register", "Register installed plugins with the server.  requires --uri") do
+    options[:register] = true
+  end
   opts.on("-L", "--log-level LEVEL", "Log level") do |f|
     options[:log_level] = f
   end
@@ -53,6 +57,11 @@ end.parse!
 loom_uri = options[:uri]
 if(loom_uri == nil && !options[:file]) 
   puts "Either URI for loom server or --file must be specified"
+  exit(1)
+end
+
+if(loom_uri == nil && options[:register])
+  puts "--register option requires the --uri [server uri] option"
   exit(1)
 end
 
@@ -128,6 +137,37 @@ def delegate_task(task, pluginmanager)
   result
 end
 
+def register_providertype_automatortype(name, json_obj, uri)
+  begin
+    log.debug "registering providertype/automatortype: #{name}"
+    json = JSON.generate(json_obj)
+    resp = RestClient.put("#{uri}", json, :'X-Loom-UserID' => "admin")
+    if(resp.code == 200)
+      log.info "Successfully registered #{name}"
+    else
+      log.error "Response code #{resp.code}, #{resp.to_str} when trying to register #{name}"
+    end
+  rescue => e
+    log.error "Caught exception registering plugins to loom server #{loom_uri}"
+    log.error e.message
+    log.error e.backtrace.inspect
+  end
+end
+
+# register plugins with the server if --register flag passed
+if options[:register]
+  pluginmanager.providermap.each do |name, json_obj|
+    register_providertype_automatortype(name, json_obj, "#{loom_uri}/v1/loom/providertypes/#{name}")
+  end
+  pluginmanager.automatormap.each do |name, json_obj|
+    register_providertype_automatortype(name, json_obj, "#{loom_uri}/v1/loom/automatortypes/#{name}")
+  end
+  exit
+end
+
+
+log.debug "provisioner starting with provider types: #{pluginmanager.providermap.keys}"
+log.debug "provisioner starting with automator types: #{pluginmanager.automatormap.keys}"
 
 if options[:file]
   # run a single task read from file
