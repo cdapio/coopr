@@ -1,5 +1,5 @@
 inherit_from: rubocop-todo.yml
 AllCops:
   Exclude:
-    - daemon/plugins/**/*
-#    - daemon/plugins/automators/chef_automator/chef_automator/cookbooks/**/*
+#    - daemon/plugins/**/*
+    - daemon/plugins/automators/chef_automator/chef_automator/cookbooks/**/*
