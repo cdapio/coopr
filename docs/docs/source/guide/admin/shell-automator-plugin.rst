@@ -67,7 +67,7 @@ invoke the following command on them:
 
 Note that this example is a real script included with the Shell Automator, which can be used to bootstrap a Loom host to an existing Chef server!
 
-How it works
+How it Works
 ============
 
 A more in-depth look at Shell Automator:
@@ -89,9 +89,8 @@ Bootstrap
 
 Each Loom Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs 
 to be able to carry out further tasks. The Shell Automator plugin performs the following actions for a bootstrap task:
-        1. Bundle its local copy of the scripts directory into a tarball, ``scripts.tar.gz``.
-                * Unless the tarball exists already and was created in the last 10 minutes.
-        2. Logs into the remote box and creates the loom cache diretory ``/var/cache/loom``.
+        1. Bundle its local copy of the scripts directory into a tarball, ``scripts.tar.gz``, unless the tarball exists already and was created in the last 10 minutes.
+        2. Logs into the remote box and creates the Loom cache diretory ``/var/cache/loom``.
         3. SCP the local tarball to the remote Loom cache directory.
         4. Extracts the tarball on the remote host in the loom cache directory, creating ``/var/cache/loom/scripts``.
 
@@ -99,7 +98,7 @@ The most important thing to note is that upon adding any new script to the local
 regenerated within 10 minutes and used by all running provisioners.
 
 
-JSON lookup
+JSON Lookup
 ===========
 
 The Shell Automator has limited support for looking up values in the Loom cluster metadata.  This should be considered
