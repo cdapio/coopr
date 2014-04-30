@@ -1,7 +1,7 @@
 # Hadoop
-if node['hadoop'].key? 'core_site' and node['hadoop']['core_site'].key? 'hadoop.security.authorization' and
-  node['hadoop']['core_site'].key? 'hadoop.security.authentication' and
-  node['hadoop']['core_site']['hadoop.security.authorization'].to_s == 'true' and
+if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.security.authorization') &&
+  node['hadoop']['core_site'].key?('hadoop.security.authentication') &&
+  node['hadoop']['core_site']['hadoop.security.authorization'].to_s == 'true' &&
   node['hadoop']['core_site']['hadoop.security.authentication'] == 'kerberos'
 
   include_attribute 'krb5'
@@ -12,7 +12,7 @@ if node['hadoop'].key? 'core_site' and node['hadoop']['core_site'].key? 'hadoop.
   default['hadoop']['container_executor']['min.user.id'] = 500
   default['hadoop']['container_executor']['yarn.nodemanager.linux-container-executor.group'] = 'yarn'
   default['hadoop']['container_executor']['yarn.nodemanager.local-dirs'] =
-    if node['hadoop'].key? 'yarn_site' and node['hadoop']['yarn_site'].key? 'yarn.nodemanager.local-dirs'
+    if node['hadoop'].key?('yarn_site') && node['hadoop']['yarn_site'].key?('yarn.nodemanager.local-dirs')
       node['hadoop']['yarn_site']['yarn.nodemanager.local-dirs']
     elsif node['hadoop'].key? 'hadoop.tmp.dir'
       "#{node['hadoop']['hadoop.tmp.dir']}/nm-local-dir"
@@ -57,9 +57,9 @@ if node['hadoop'].key? 'core_site' and node['hadoop']['core_site'].key? 'hadoop.
 end
 
 # HBase
-if node['hbase'].key? 'hbase_site' and node['hbase']['hbase_site'].key? 'hbase.security.authorization' and
-  node['hbase']['hbase_site'].key? 'hbase.security.authentication' and
-  node['hbase']['hbase_site']['hbase.security.authorization'].to_s == 'true' and
+if node['hbase'].key?('hbase_site') && node['hbase']['hbase_site'].key?('hbase.security.authorization') &&
+  node['hbase']['hbase_site'].key?('hbase.security.authentication') &&
+  node['hbase']['hbase_site']['hbase.security.authorization'].to_s == 'true' &&
   node['hbase']['hbase_site']['hbase.security.authentication'] == 'kerberos'
 
   include_attribute 'krb5'

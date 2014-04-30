@@ -18,10 +18,10 @@
 #
 
 # Enable kerberos security
-if node['hadoop'].key? 'core_site' and node['hadoop']['core_site'].key? 'hadoop.security.authorization' and
-  node['hadoop']['core_site'].key? 'hadoop.security.authentication' and
-  node['hadoop']['core_site']['hadoop.security.authorization'].to_s == 'true' and
-  node['hadoop']['core_site']['hadoop.security.authentication'].downcase == 'kerberos'
+if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.security.authorization') &&
+  node['hadoop']['core_site'].key?('hadoop.security.authentication') &&
+  node['hadoop']['core_site']['hadoop.security.authorization'].to_s == 'true' &&
+  node['hadoop']['core_site']['hadoop.security.authentication'] == 'kerberos'
 
   include_recipe 'krb5'
   Chef::Log.info("Secure Hadoop Enabled: Kerberos Realm '#{node['krb5']['krb5_conf']['realms']['default_realm']}'")
@@ -64,10 +64,10 @@ if node['hadoop'].key? 'core_site' and node['hadoop']['core_site'].key? 'hadoop.
   end
 end
 
-if node['hbase'].key? 'hbase_site' and node['hbase']['hbase_site'].key? 'hbase.security.authorization' and
-  node['hbase']['hbase_site'].key? 'hbase.security.authentication' and
-  node['hbase']['hbase_site']['hbase.security.authorization'].to_s == 'true' and
-  node['hbase']['hbase_site']['hbase.security.authentication'].downcase == 'kerberos'
+if node['hbase'].key?('hbase_site') && node['hbase']['hbase_site'].key?('hbase.security.authorization') &&
+  node['hbase']['hbase_site'].key?('hbase.security.authentication') &&
+  node['hbase']['hbase_site']['hbase.security.authorization'].to_s == 'true' &&
+  node['hbase']['hbase_site']['hbase.security.authentication'] == 'kerberos'
 
   if secure_hadoop_enabled.nil?
     Chef::Application.fatal!('You must enable kerberos in Hadoop or disable kerberos for HBase!')
