@@ -54,7 +54,7 @@ public class HardwaretypesTest extends GenericTest {
 
   @Test
   public void test_04_Title() {
-    assertEquals("Hardware Types", globalDriver.findElement(Constants.TITLE_BY).getText());
+    assertEquals("Hardware types", globalDriver.findElement(Constants.TITLE_BY).getText());
   }
 
   @Test
@@ -88,7 +88,7 @@ public class HardwaretypesTest extends GenericTest {
   @Test
   public void test_07_testHardwareSelected() {
     assertEquals("Hardware menu item is not selected",
-                 "active", TEST_UTIL.getHTMLClasses("#nav-hardwaretypes-container"));
+                 "active nav-item", TEST_UTIL.getHTMLClasses("#nav-hardwaretypes-container"));
   }
 
   @Test

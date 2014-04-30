@@ -16,6 +16,7 @@
 .. _overview_single_data_center:
 .. index::
    single: Datacenter High Availability
+
 =============================
 Datacenter High Availability
 =============================
@@ -41,7 +42,7 @@ The diagram below shows the logical deployment diagram of Continuuity Loom for H
     :alt: Within Datacenter Architecture Diagram
 
 Loom UI
-------
+-------
 Loom UI (loom-ui) is stateless, and communicates with Loom Server using REST endpoints. Hence Loom UI can be easily run on multiple machines. User traffic is routed to multiple instances of Loom UI using load balancers (such as HAproxy or Varnish or VIP).
 
 Loom Provisioner

@@ -33,13 +33,12 @@ import java.util.List;
  */
 public class TaskService {
   private final ClusterStore clusterStore;
-  private final Actions actions;
+  private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
 
   @Inject
-  public TaskService(ClusterStore clusterStore, Actions actions, LoomStats loomStats) {
+  public TaskService(ClusterStore clusterStore, LoomStats loomStats) {
     this.clusterStore = clusterStore;
-    this.actions = actions;
     this.loomStats = loomStats;
   }
 

@@ -866,14 +866,14 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       "node1",
       new Node("node1", "123",
                ImmutableSet.<Service>of(
-                 new Service("s1", "", null, ImmutableMap.<ProvisionerAction, ServiceAction>of()),
-                 new Service("s2", "", null, ImmutableMap.<ProvisionerAction, ServiceAction>of())),
+                 new Service("s1", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of()),
+                 new Service("s2", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of())),
                ImmutableMap.<String, String>of()),
       "node2",
       new Node("node2", "123",
                ImmutableSet.<Service>of(
-                 new Service("s2", "", null, ImmutableMap.<ProvisionerAction, ServiceAction>of()),
-                 new Service("s3", "", null, ImmutableMap.<ProvisionerAction, ServiceAction>of())),
+                 new Service("s2", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of()),
+                 new Service("s3", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of())),
                ImmutableMap.<String, String>of()));
     Cluster cluster = new Cluster("123", USER1, "my-cluster", System.currentTimeMillis(), "my cluster", null, null,
                                   nodes.keySet(), ImmutableSet.of("s1", "s2", "s3"));

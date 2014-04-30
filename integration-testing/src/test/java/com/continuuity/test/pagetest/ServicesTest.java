@@ -73,7 +73,8 @@ public class ServicesTest extends GenericTest {
         assertEquals("Description is not correct.", nameProvider.get(name).getDescription(),
                      TEST_UTIL.getTd(table, row, 1));
         assertEquals("Depends on is not correct", TEST_UTIL.convertSetToString(
-                     nameProvider.get(name).getDependsOn()), TEST_UTIL.getTd(table, row, 2));
+                     nameProvider.get(name).getDependencies().getRuntime().getRequires()),
+                     TEST_UTIL.getTd(table, row, 2));
       }
     }
   }
@@ -92,7 +93,7 @@ public class ServicesTest extends GenericTest {
 
   @Test
   public void test_05_testServicesSelected() {
-    assertEquals("Services menu item is not selected", "active", TEST_UTIL.getHTMLClasses("#nav-services-container"));
+    assertEquals("Services menu item is not selected", "active nav-item", TEST_UTIL.getHTMLClasses("#nav-services-container"));
   }
 
   @Test

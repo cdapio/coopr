@@ -55,7 +55,7 @@ public final class ImageType extends NamedEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof ImageType) || o == null) {
+    if (!(o instanceof ImageType)) {
       return false;
     }
     ImageType other = (ImageType) o;

@@ -17,6 +17,7 @@
 .. index::
    single: Features
 .. _features:
+
 ========
 Features
 ========

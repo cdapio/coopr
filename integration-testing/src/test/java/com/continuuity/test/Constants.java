@@ -70,7 +70,7 @@ public class Constants {
   public static final By TD = By.tagName("td");
 
   // Table location properties
-  public static final By TITLE_BY = By.cssSelector("#title");
+  public static final By TITLE_BY = By.cssSelector("#title h3");
   public static final String TABLE = "table.table-striped";
   public static final String VALUE = "value";
   public static final String AUTH = "auth";
@@ -87,7 +87,7 @@ public class Constants {
   public static final By NAV_SERVICES = By.cssSelector("#nav-services");
   public static final By NAV_LOGIN = By.cssSelector("#nav-login");
 
-  public static final ImmutableSet<String> LEFT_PANEL = ImmutableSet.of("admin", "Clusters",
+  public static final ImmutableSet<String> LEFT_PANEL = ImmutableSet.of("Clusters",
                                                         "Providers", "Hardware", "Images", "Services");
 
   // Fixture properties

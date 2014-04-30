@@ -14,6 +14,7 @@
    limitations under the License.
 
 :orphan:
+
 .. index::
    single: Overview
 .. _index_toplevel:
@@ -43,6 +44,7 @@ and easily pluggable (via Chef, Puppet, and other automation tools).
 Future development will focus more on managing clusters of machines or clusters of clusters and less around individual machines.
 
 .. _history-of-loom:
+
 History of Continuuity Loom
 ===========================
 At Continuuity, we built our Loom product to fill an ongoing need - to quickly build and deploy clusters for developers.
@@ -52,6 +54,7 @@ rapidly provisioning our clusters to meet the needs of our business, developers 
 streamlined cluster management was a key investment for Continuuity.
 
 .. _loom-in-production:
+
 Continuuity Loom in Production
 ==============================
 Currently, Continuuity Loom is used to provision Reactor Sandboxes on the Continuuity Cloud and as an IT tool by developers to

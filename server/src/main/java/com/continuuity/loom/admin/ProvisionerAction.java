@@ -28,5 +28,17 @@ public enum ProvisionerAction {
   CONFIGURE,
   START,
   STOP,
-  DELETE
+  DELETE;
+
+  public boolean isHardwareAction() {
+    return this == CREATE || this == CONFIRM || this == BOOTSTRAP || this == DELETE;
+  }
+
+  public boolean isRuntimeAction() {
+    return this == INITIALIZE || this == START || this == STOP;
+  }
+
+  public boolean isInstallTimeAction() {
+    return this == INSTALL || this == REMOVE;
+  }
 }

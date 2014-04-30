@@ -17,9 +17,9 @@
 .. index::
    single: Hot-Hot : Synchronous Database Cluster
 
-================================
+======================================
 Hot-Hot : Synchronous Database Cluster
-================================
+======================================
 
 .. _synchronous-repl:
 .. figure:: /_images/ha_synchronous_repl.png

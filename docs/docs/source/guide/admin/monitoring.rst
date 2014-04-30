@@ -17,6 +17,7 @@
 
 .. index::
    single: Monitoring and Metrics
+
 =======================
 Monitoring and Metrics
 =======================
@@ -40,6 +41,7 @@ Loom Server
 The Loom Server runs as a java process. Similar to the UI, we recommend a standard http monitoring check on the
 ``/status`` endpoint
 ::
+
   http://<loom-host>:<loom-server-port>/status
 
 The server should respond with "OK" and HTTP return code 200.
@@ -49,15 +51,18 @@ Loom Provisioner
 ----------------
 The Loom provisioner runs as an individual Ruby process on each provisioner. We recommend any standard process presence check. The Loom init script itself can be used:
 ::
+
   /etc/init.d/loom-provisioner status
 
 This will display brief status for all configured provisioner process, and return non-zero if any one of them is not running.
 Alternatively, any standard process presence monitoring can check for the process:
 ::
+
   /opt/loom/provisioner/embedded/bin/ruby /opt/loom/provisioner/daemon/provisioner.rb
   
 An example of the output from the above run is:
 ::
+
   $ /etc/init.d/loom-provisioner status
    loom-provisioner 1 running as process 2436
    loom-provisioner 2 running as process 2437
@@ -70,6 +75,7 @@ Loom UI
 -------
 The UI runs as a Node.js process. We recommend a standard http monitoring check on the /status endpoint of the Loom UI:
 ::
+
   http://<loom-host>:<loom-ui-port>/status
 
 The UI should respond with "OK" and HTTP return code 200.
@@ -83,6 +89,7 @@ Continuuity Loom provides a number of cluster provisioning metrics through the u
 By default, JMX support is disabled. To enable JMX, the administrator will need to uncomment out the following line in
 ``/etc/default/loom-server`` and can customize any of the options:
 ::
+
   export LOOM_JAVA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010
               -Dcom.sun.management.jmxremote.local.only=false
               -Dcom.sun.management.jmxremote.authenticate=false

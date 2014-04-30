@@ -24,6 +24,7 @@ Prerequisite
 ------------
 Before getting started, export the following helper variables according to your specific environment:
 ::
+
   $ export REMOTE_LOOM_PLUGINS="http://tools.continuuity.com/downloads/loom/plugins"
   $ export LOOM_SHELL_AUTOMATORS="/opt/loom/provisioner/daemon/plugins/automators/shell_automator"
   $ export LOOM_SERVER_HOST=<loom-server>
@@ -35,6 +36,7 @@ The JBoss Automator Scripts bundle contains a shell script plugin to install and
 
 On every Loom provisioner node, download and install the JBoss bundle into the Loom shell automators directory:
 ::
+
  $ curl -o /tmp/jboss-automator-scripts-0.1.0.tgz  \
     $REMOTE_LOOM_PLUGINS/jboss-automator-scripts-0.1.0.tgz
  $ sudo tar xvf /tmp/jboss-automator-scripts-0.1.0.tgz -C $LOOM_SHELL_AUTOMATORS/scripts
@@ -43,6 +45,7 @@ Verify Installation
 -----------------------------
 After the JBoss bundle is installed, you should see the following directory structure:
 ::
+
  /opt/loom/provisioner/daemon/plugins/automators/shell_automator/scripts$ ls -tlr
  total 24
  -rwxrwxr-x 1 loom loom  629 Feb 14 22:15 loom_service_runner.sh
@@ -57,6 +60,7 @@ Configure Oracle Java 7 Service in Continuuity Loom
 ---------------------------------------------------
 JBoss AS requires Oracle Java 7. The following will add a service to Continuuity Loom for installing and configuring Java:
 ::
+
  $ curl -o /tmp/oracle-java-7 $REMOTE_LOOM_PLUGINS/jboss/services/oracle-java-7
  $ curl -X POST -H "X-Loom-UserId:admin"\
      -d @/tmp/oracle-java-7 http://$LOOM_SERVER:$LOOM_PORT/v1/loom/services
@@ -68,6 +72,7 @@ This configuration can be achieved using either the Loom Admin UI or Webservices
 
 The following adds service 'jboss' to the service list.
 ::
+
  $ curl -o /tmp/jboss $REMOTE_LOOM_PLUGINS/jboss/services/jboss
  $ curl -X POST -H "X-Loom-UserId:admin"\
      -d @/tmp/jboss http://$LOOM_SERVER:$LOOM_PORT/v1/loom/services
@@ -85,6 +90,7 @@ The easiest way to get started running JBoss AS is to use the Webservices to add
 
 Use the following command to create the 'jboss-application-server' cluster template:
 ::
+
  $ curl -o /tmp/jboss-application-server \
      $REMOTE_LOOM_PLUGINS/jboss/templates/jboss-application-server
  $ curl -X POST -H "X-Loom-UserId:admin"\

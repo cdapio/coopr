@@ -64,7 +64,7 @@ public final class Compatibilities {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof Compatibilities) || o == null) {
+    if (!(o instanceof Compatibilities)) {
       return false;
     }
     Compatibilities other = (Compatibilities) o;
