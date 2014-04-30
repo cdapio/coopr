@@ -32,7 +32,6 @@ import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
-import com.continuuity.loom.scheduler.callback.ClusterCallbackExecutor;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.EntityStore;
@@ -121,6 +120,10 @@ public final class LoomModules {
       new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, clusterManagerZKBasePath + "/jobscheduler"),
                                queueMsBetweenChecks,
                                queueMsRescheduleTimeout);
+    final TimeoutTrackingQueue callbackQueue =
+      new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, clusterManagerZKBasePath + "/callback"),
+                               queueMsBetweenChecks,
+                               queueMsRescheduleTimeout);
 
     final ListeningExecutorService callbackExecutorService = MoreExecutors.listeningDecorator(
       Executors.newCachedThreadPool(new ThreadFactoryBuilder()
@@ -136,21 +139,25 @@ public final class LoomModules {
           bind(Configuration.class).toInstance(conf);
 
           bind(TimeoutTrackingQueue.class)
-            .annotatedWith(Names.named("nodeprovisioner.queue")).toInstance(nodeProvisionTaskQueue);
+            .annotatedWith(Names.named(Constants.Queue.PROVISIONER)).toInstance(nodeProvisionTaskQueue);
           bind(TrackingQueue.class)
-            .annotatedWith(Names.named("nodeprovisioner.queue")).toInstance(nodeProvisionTaskQueue);
+            .annotatedWith(Names.named(Constants.Queue.PROVISIONER)).toInstance(nodeProvisionTaskQueue);
           bind(TimeoutTrackingQueue.class)
-            .annotatedWith(Names.named("cluster.queue")).toInstance(clusterCreationQueue);
+            .annotatedWith(Names.named(Constants.Queue.CLUSTER)).toInstance(clusterCreationQueue);
           bind(TrackingQueue.class)
-            .annotatedWith(Names.named("cluster.queue")).toInstance(clusterCreationQueue);
+            .annotatedWith(Names.named(Constants.Queue.CLUSTER)).toInstance(clusterCreationQueue);
           bind(TimeoutTrackingQueue.class)
-            .annotatedWith(Names.named("solver.queue")).toInstance(solverQueue);
+            .annotatedWith(Names.named(Constants.Queue.SOLVER)).toInstance(solverQueue);
           bind(TrackingQueue.class)
-            .annotatedWith(Names.named("solver.queue")).toInstance(solverQueue);
+            .annotatedWith(Names.named(Constants.Queue.SOLVER)).toInstance(solverQueue);
           bind(TimeoutTrackingQueue.class)
-            .annotatedWith(Names.named("internal.job.queue")).toInstance(jobSchedulerQueue);
+            .annotatedWith(Names.named(Constants.Queue.JOB)).toInstance(jobSchedulerQueue);
           bind(TrackingQueue.class)
-            .annotatedWith(Names.named("internal.job.queue")).toInstance(jobSchedulerQueue);
+            .annotatedWith(Names.named(Constants.Queue.JOB)).toInstance(jobSchedulerQueue);
+          bind(TimeoutTrackingQueue.class)
+            .annotatedWith(Names.named(Constants.Queue.CALLBACK)).toInstance(callbackQueue);
+          bind(TrackingQueue.class)
+            .annotatedWith(Names.named(Constants.Queue.CALLBACK)).toInstance(callbackQueue);
 
           bind(ClusterCallback.class).to(callbackClass).in(Scopes.SINGLETON);
           bind(EntityStore.class).to(SQLEntityStore.class).in(Scopes.SINGLETON);
@@ -205,7 +212,6 @@ public final class LoomModules {
           bind(DBConnectionPool.class).in(Scopes.SINGLETON);
           bind(SQLClusterStore.class).in(Scopes.SINGLETON);
           bind(SQLEntityStore.class).in(Scopes.SINGLETON);
-          bind(ClusterCallbackExecutor.class).in(Scopes.SINGLETON);
 
           Multibinder<HttpHandler> handlerBinder = Multibinder.newSetBinder(binder(), HttpHandler.class);
           handlerBinder.addBinding().to(LoomAdminHandler.class);

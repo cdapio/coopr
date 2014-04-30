@@ -33,6 +33,7 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
+import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
@@ -118,10 +119,10 @@ public class SolverSchedulerTest extends BaseTest {
   @BeforeClass
   public static void setupSchedulerTest() throws Exception {
     solverQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named("solver.queue")));
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.SOLVER)));
     solverQueue.start();
     clusterQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named("cluster.queue")));
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
     clusterQueue.start();
     clusterStore = injector.getInstance(ClusterStore.class);
     clusterStore.initialize();

@@ -20,7 +20,8 @@ import com.continuuity.loom.store.ClusterStore;
 import com.google.inject.Inject;
 
 /**
- * Executes some code before a job starts and after a job completes.
+ * Executes some code before a job starts and after a job completes. Callbacks must be idempotent. There is a
+ * possibility they get called more than once if the server goes down at the right time.
  */
 public interface ClusterCallback {
 
@@ -33,14 +34,16 @@ public interface ClusterCallback {
   void initialize(Configuration conf, ClusterStore clusterStore);
 
   /**
-   * Execute some method before a cluster job starts.
+   * Execute some method before a cluster job starts, returning whether or not the job can proceed or whether it should
+   * be failed. Is guaranteed to be called and executed before the cluster operation begins.
    *
    * @param data Data available to use while executing callback.
+   * @return True if it is ok to proceed with the operation, false if not.
    */
-  void onStart(CallbackData data);
+  boolean onStart(CallbackData data);
 
   /**
-   * Execute some method after a cluster completes succesfully.
+   * Execute some method after a cluster completes successfully.
    *
    * @param data Data available to use while executing callback.
    */

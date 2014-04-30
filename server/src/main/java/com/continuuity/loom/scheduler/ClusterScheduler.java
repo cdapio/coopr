@@ -21,6 +21,7 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.dag.TaskNode;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -63,8 +64,8 @@ public class ClusterScheduler implements Runnable {
 
   @Inject
   private ClusterScheduler(@Named("scheduler.id") String id, ClusterStore clusterStore,
-                           @Named("cluster.queue") TrackingQueue inputQueue,
-                           @Named("internal.job.queue") TrackingQueue jobQueue,
+                           @Named(Constants.Queue.CLUSTER) TrackingQueue inputQueue,
+                           @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
                            TaskService taskService) {
     this.id = id;
     this.clusterStore = clusterStore;

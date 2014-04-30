@@ -67,8 +67,8 @@ public class JobScheduler implements Runnable {
   private final int maxTaskRetries;
 
   @Inject
-  private JobScheduler(ClusterStore clusterStore, @Named("nodeprovisioner.queue") TrackingQueue provisionerQueue,
-                       JsonSerde jsonSerde, @Named("internal.job.queue") TrackingQueue jobQueue, ZKClient zkClient,
+  private JobScheduler(ClusterStore clusterStore, @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
+                       JsonSerde jsonSerde, @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
                        TaskService taskService, @Named(Constants.MAX_ACTION_RETRIES) int maxTaskRetries) {
     this.clusterStore = clusterStore;
     this.provisionerQueue = provisionerQueue;
@@ -95,15 +95,11 @@ public class JobScheduler implements Runnable {
         try {
           lock.acquire();
           ClusterJob job = clusterStore.getClusterJob(jobId);
-          // TODO: avoid queueing job when its already complete
-          if (job.getJobStatus() == ClusterJob.Status.COMPLETE) {
-            continue;
-          }
           Cluster cluster = clusterStore.getCluster(job.getClusterId());
           // this can happen if 2 tasks complete around the same time and the first one places the job in the queue,
           // sees 0 in progress tasks, and sets the cluster status. The job is still in the queue as another element
           // from the 2nd task and gets here.  In that case, no need to go further.
-          if (job.getJobStatus() == ClusterJob.Status.FAILED && cluster.getStatus() != Cluster.Status.PENDING) {
+          if (cluster.getStatus() != Cluster.Status.PENDING) {
             continue;
           }
           LOG.trace("Scheduling job {}", job);

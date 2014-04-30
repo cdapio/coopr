@@ -23,6 +23,7 @@ import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.store.ClusterStore;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -42,6 +43,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -108,20 +110,13 @@ public final class LoomServerMain extends DaemonMain {
       // this is here because loom modules does things that need to connect to zookeeper...
       // TODO: move everything that needs zk started out of the module
       injector = Guice.createInjector(LoomModules.createModule(zkClientService, executorService, conf));
-      TimeoutTrackingQueue nodeProvisionTaskQueue = injector.getInstance(
-        Key.get(TimeoutTrackingQueue.class, Names.named("nodeprovisioner.queue")));
-      nodeProvisionTaskQueue.start();
-      TimeoutTrackingQueue clusterQueue = injector.getInstance(
-        Key.get(TimeoutTrackingQueue.class, Names.named("cluster.queue")));
-      clusterQueue.start();
-      TimeoutTrackingQueue solverQueue = injector.getInstance(
-        Key.get(TimeoutTrackingQueue.class, Names.named("solver.queue")));
-      solverQueue.start();
+
       ClusterStore clusterStore = injector.getInstance(ClusterStore.class);
       clusterStore.initialize();
-      TimeoutTrackingQueue jobQueue = injector.getInstance(
-        Key.get(TimeoutTrackingQueue.class, Names.named("internal.job.queue")));
-      jobQueue.start();
+      for (String queueName : Constants.Queue.ALL) {
+        TimeoutTrackingQueue queue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named(queueName)));
+        queue.start();
+      }
 
       // Register MBean
       LoomStats loomStats = injector.getInstance(LoomStats.class);

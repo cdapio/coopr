@@ -19,16 +19,20 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Actions;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.CallbackData;
-import com.continuuity.loom.scheduler.callback.ClusterCallback;
-import com.continuuity.loom.scheduler.callback.ClusterCallbackExecutor;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,17 +42,19 @@ import java.util.List;
  * Service for performing operations on {@link ClusterTask}s.
  */
 public class TaskService {
-  private static final Logger LOG  = LoggerFactory.getLogger(TaskService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TaskService.class);
+  private static final Gson GSON = new JsonSerde().getGson();
   private final ClusterStore clusterStore;
   private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
-  private final ClusterCallbackExecutor clusterCallbackExecutor;
+  private final TrackingQueue callbackQueue;
 
   @Inject
-  public TaskService(ClusterStore clusterStore, LoomStats loomStats, ClusterCallbackExecutor clusterCallbackExecutor) {
+  public TaskService(ClusterStore clusterStore, LoomStats loomStats,
+                     @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue) {
     this.clusterStore = clusterStore;
     this.loomStats = loomStats;
-    this.clusterCallbackExecutor = clusterCallbackExecutor;
+    this.callbackQueue = callbackQueue;
   }
 
   /**
@@ -149,7 +155,7 @@ public class TaskService {
     clusterStore.writeClusterJob(job);
 
     loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
-    clusterCallbackExecutor.onFailure(new CallbackData(cluster, job));
+    callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.FAILURE, cluster, job))));
   }
 
   /**
@@ -202,7 +208,7 @@ public class TaskService {
     // Note: writing job status as RUNNING, will allow other operations on the job
     // (like cancel, etc.) to happen in parallel.
     clusterStore.writeClusterJob(job);
-    clusterCallbackExecutor.onStart(new CallbackData(cluster, job));
+    callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.START, cluster, job))));
   }
 
   /**
@@ -227,7 +233,7 @@ public class TaskService {
     clusterStore.writeCluster(cluster);
 
     loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
-    clusterCallbackExecutor.onSuccess(new CallbackData(cluster, job));
+    callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.SUCCESS, cluster, job))));
   }
 
   /**

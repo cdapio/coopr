@@ -23,12 +23,24 @@ import com.google.common.base.Objects;
  * Data that a {@link ClusterCallback} may use before and after cluster jobs.
  */
 public class CallbackData {
+  private final Type type;
   private final Cluster cluster;
   private final ClusterJob job;
 
-  public CallbackData(Cluster cluster, ClusterJob job) {
+  public enum Type {
+    START,
+    SUCCESS,
+    FAILURE;
+  }
+
+  public CallbackData(Type type, Cluster cluster, ClusterJob job) {
+    this.type = type;
     this.cluster = cluster;
     this.job = job;
+  }
+
+  public Type getType() {
+    return type;
   }
 
   public Cluster getCluster() {

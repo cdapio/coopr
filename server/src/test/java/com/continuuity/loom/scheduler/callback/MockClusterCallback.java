@@ -28,6 +28,7 @@ public class MockClusterCallback implements ClusterCallback {
   private final List<CallbackData> startCallbacks = Lists.newArrayList();
   private final List<CallbackData> successCallbacks = Lists.newArrayList();
   private final List<CallbackData> failureCallbacks = Lists.newArrayList();
+  private boolean returnOnStart = true;
 
   public List<CallbackData> getStartCallbacks() {
     return startCallbacks;
@@ -45,6 +46,11 @@ public class MockClusterCallback implements ClusterCallback {
     startCallbacks.clear();
     successCallbacks.clear();
     failureCallbacks.clear();
+    returnOnStart = true;
+  }
+
+  public void setReturnOnStart(boolean val) {
+    returnOnStart = val;
   }
 
   @Override
@@ -52,8 +58,9 @@ public class MockClusterCallback implements ClusterCallback {
   }
 
   @Override
-  public void onStart(CallbackData data) {
+  public boolean onStart(CallbackData data) {
     startCallbacks.add(data);
+    return returnOnStart;
   }
 
   @Override

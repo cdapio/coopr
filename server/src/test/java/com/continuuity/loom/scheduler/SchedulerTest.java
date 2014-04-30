@@ -24,13 +24,12 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
+import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
-import com.continuuity.loom.scheduler.task.TaskException;
 import com.continuuity.loom.scheduler.task.TaskId;
-import com.continuuity.loom.scheduler.task.TaskService;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
@@ -59,29 +58,37 @@ public class SchedulerTest extends BaseTest {
 
   private static TimeoutTrackingQueue inputQueue;
   private static TimeoutTrackingQueue provisionQueue;
+  private static TimeoutTrackingQueue callbackQueue;
   private static TimeoutTrackingQueue solverQueue;
   private static LoomService loomService;
   private static TimeoutTrackingQueue jobQueue;
-  private static TaskService taskService;
+  private static Cluster cluster;
+  private static ClusterJob job;
 
   @BeforeClass
   public static void start() throws Exception {
-    inputQueue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named("cluster.queue")));
+    inputQueue = injector.getInstance(
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
     inputQueue.start();
 
-    provisionQueue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named("nodeprovisioner.queue")));
+    provisionQueue = injector.getInstance(
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.PROVISIONER)));
     provisionQueue.start();
 
-    solverQueue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named("solver.queue")));
+    solverQueue = injector.getInstance(
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.SOLVER)));
     solverQueue.start();
 
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
 
-    jobQueue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named("internal.job.queue")));
+    jobQueue = injector.getInstance(
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.JOB)));
     jobQueue.start();
 
-    taskService = injector.getInstance(TaskService.class);
+    callbackQueue = injector.getInstance(
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CALLBACK)));
+    callbackQueue.start();
   }
 
   @AfterClass
@@ -93,20 +100,16 @@ public class SchedulerTest extends BaseTest {
   }
 
   @Before
-  public void beforeTest() {
+  public void beforeTest() throws Exception {
     jobQueue.removeAll();
     inputQueue.removeAll();
     solverQueue.removeAll();
     provisionQueue.removeAll();
+    callbackQueue.removeAll();
     mockClusterCallback.clear();
-  }
 
-  @Test
-  public void testScheduler() throws Exception {
-    ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
-
-    Cluster cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
-    ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
+    cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
+    job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
     clusterStore.writeCluster(cluster);
     clusterStore.writeClusterJob(job);
@@ -116,6 +119,12 @@ public class SchedulerTest extends BaseTest {
 
     node = GSON.fromJson(NODE2, Node.class);
     clusterStore.writeNode(node);
+  }
+
+  @Test
+  public void testScheduler() throws Exception {
+    ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
+    CallbackScheduler callbackScheduler = injector.getInstance(CallbackScheduler.class);
 
     inputQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
     clusterScheduler.run();
@@ -146,6 +155,7 @@ public class SchedulerTest extends BaseTest {
       );
 
     List<Multiset<ActionService>> actualStages = Lists.newArrayList();
+    callbackScheduler.run();
 
     Assert.assertEquals(1, jobQueue.size());
     String consumerId = "testJobScheduler";
@@ -237,24 +247,40 @@ public class SchedulerTest extends BaseTest {
     testCallbacks(true);
   }
 
-  private void testCallbacks(boolean failJob) throws Exception {
+  @Test
+  public void testFalseOnStartStopsJob() throws Exception {
     ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
-
-    Cluster cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
-    ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
-    cluster.setLatestJobId(job.getJobId());
-    clusterStore.writeCluster(cluster);
-    clusterStore.writeClusterJob(job);
-
-    Node node = GSON.fromJson(NODE1, Node.class);
-    clusterStore.writeNode(node);
-
-    node = GSON.fromJson(NODE2, Node.class);
-    clusterStore.writeNode(node);
 
     inputQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
     clusterScheduler.run();
 
+    CallbackScheduler callbackScheduler = injector.getInstance(CallbackScheduler.class);
+    // should be no job in the queue until the start callback runs
+    Assert.assertEquals(0, jobQueue.size());
+
+    // tell mock callback to return false for onStart callback
+    mockClusterCallback.setReturnOnStart(false);
+    callbackScheduler.run();
+
+    // at this point, the start callback should have run, but not the after callbacks
+    Assert.assertEquals(1, mockClusterCallback.getStartCallbacks().size());
+    Assert.assertEquals(0, mockClusterCallback.getSuccessCallbacks().size());
+    Assert.assertEquals(0, mockClusterCallback.getFailureCallbacks().size());
+
+    // there also should not be any jobs in the queue
+    Assert.assertEquals(0, jobQueue.size());
+  }
+
+  private void testCallbacks(boolean failJob) throws Exception {
+    ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
+
+    inputQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
+    clusterScheduler.run();
+
+    CallbackScheduler callbackScheduler = injector.getInstance(CallbackScheduler.class);
+    // should be no job in the queue until the start callback runs
+    Assert.assertEquals(0, jobQueue.size());
+    callbackScheduler.run();
     // at this point, the start callback should have run, but not the after callbacks
     Assert.assertEquals(1, mockClusterCallback.getStartCallbacks().size());
     Assert.assertEquals(0, mockClusterCallback.getSuccessCallbacks().size());
@@ -274,10 +300,12 @@ public class SchedulerTest extends BaseTest {
       TestHelper.finishTask(getLoomUrl(), returnJson);
       jobScheduler.run();
       jobScheduler.run();
+      callbackScheduler.run();
 
       taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
     }
     jobScheduler.run();
+    callbackScheduler.run();
 
     // at this point, the failure callback should have run
     Assert.assertEquals(1, mockClusterCallback.getStartCallbacks().size());
@@ -363,7 +391,7 @@ public class SchedulerTest extends BaseTest {
       "      \"hadoop-hdfs-datanode\",\n" +
       "      \"hadoop-hdfs-namenode\"\n" +
       "   ],\n" +
-      "   \"jobs\":[]\n" +
+      "   \"latestJobId\":\"2-001\"\n" +
       "}";
 
   public static final String NODE1 =

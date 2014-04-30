@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.scheduler.callback;
 
+import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
@@ -23,8 +24,10 @@ import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -40,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,8 +63,10 @@ public class HttpPostClusterCallback implements ClusterCallback {
   private Set<ClusterAction> successTriggerActions;
   private Set<ClusterAction> failureTriggerActions;
   private HttpClient httpClient;
+  private ClusterStore clusterStore;
 
   public void initialize(Configuration conf, ClusterStore clusterStore) {
+    this.clusterStore = clusterStore;
     this.onStartUrl = conf.get(Constants.HttpCallback.START_URL);
     this.onSuccessUrl = conf.get(Constants.HttpCallback.SUCCESS_URL);
     this.onFailureUrl = conf.get(Constants.HttpCallback.FAILURE_URL);
@@ -113,13 +119,14 @@ public class HttpPostClusterCallback implements ClusterCallback {
     return actions;
   }
 
-  public void onStart(CallbackData data) {
+  public boolean onStart(CallbackData data) {
     ClusterAction jobAction = data.getJob().getClusterAction();
     if (startTriggerActions.contains(jobAction)) {
       LOG.debug("sending request to {} before performing {} on cluster {}",
                 onStartUrl, jobAction, data.getCluster().getId());
       sendPost(onStartUrl, data);
     }
+    return true;
   }
 
   public void onSuccess(CallbackData data) {
@@ -144,20 +151,28 @@ public class HttpPostClusterCallback implements ClusterCallback {
   private void sendPost(String url, CallbackData data) {
     if (url != null) {
       HttpPost post = new HttpPost(url);
+      Set<Node> nodes = null;
+      try {
+        nodes = clusterStore.getClusterNodes(data.getCluster().getId());
+      } catch (Exception e) {
+        LOG.error("Unable to fetch nodes for cluster {}, not sending post request.", data.getCluster().getId());
+        return;
+      }
 
       try {
-        post.setEntity(new StringEntity(GSON.toJson(data)));
-        HttpResponse response = httpClient.execute(post);
-        // ignore what we get back, but make sure resources are released
-        HttpEntity entity = response.getEntity();
-        if (entity != null) {
-          entity.getContent().close();
-        }
+        JsonObject body = new JsonObject();
+        body.add("cluster", GSON.toJsonTree(data.getCluster()));
+        body.add("job", GSON.toJsonTree(data.getJob()));
+        body.add("nodes", GSON.toJsonTree(nodes));
+        post.setEntity(new StringEntity(GSON.toJson(body)));
+        httpClient.execute(post);
       } catch (UnsupportedEncodingException e) {
         LOG.warn("Exception setting http post body", e);
       } catch (ClientProtocolException e) {
         LOG.warn("Exception executing http post callback to " + url, e);
       } catch (IOException e) {
+        LOG.warn("Exception executing http post callback to " + url, e);
+      } catch (Exception e) {
         LOG.warn("Exception executing http post callback to " + url, e);
       } finally {
         post.releaseConnection();
