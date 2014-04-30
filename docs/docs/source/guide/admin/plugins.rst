@@ -74,27 +74,27 @@ executing. To bring up a cluster, Continuuity Loom issues the following tasks:
      - status
      - Automator
    * - INSTALL
-     - run the specified install service action script/data
+     - run the specified install service action
      - status
      - Automator
    * - CONFIGURE
-     - run the specified configure service action script/data
+     - run the specified configure service action
      - status
      - Automator
    * - INITIALIZE
-     - run the specified initialize service action script/data
+     - run the specified initialize service action
      - status
-     -
+     - Automator
    * - START
-     - run the specified start service action script/data
+     - run the specified start service action
      - status
      - Automator
    * - STOP
-     - run the specified stop service action script/data
+     - run the specified stop service action
      - status
      - Automator
    * - REMOVE
-     - run the specified remove service action script/data
+     - run the specified remove service action
      - status
      - Automator
 
@@ -110,9 +110,7 @@ Currently, a plugin must be written in Ruby and extend from the Continuuity Loom
 Writing a Provider plugin
 -------------------------
 
-A provider plugin must extend from the base ``Provider`` class and implement three methods: ``create``, ``confirm``, and ``delete``.
-Each of these methods are called with a hash of key-value pairs.
-Note that your implementation can also refer to the ``@task`` instance variable, which contains the entire
+A provider plugin must extend from the base ``Provider`` class and implement three methods: ``create``, ``confirm``, and ``delete``.  Each of these methods are called with a hash of key-value pairs. This hash is pre-populated with useful attributes such as ``hostname`` or ``providerid``.  The ``fields`` attribute will always be present and contains a hash of the custom fields that are defined by each plugin (more on this below).  Note that your implementation can also refer to the ``@task`` instance variable, which contains the entire
 input for this task.
 
 Below is a skeleton for a provider plugin:
@@ -126,6 +124,7 @@ Below is a skeleton for a provider plugin:
       flavor = inputmap['flavor']
       image = inputmap['image']
       hostname = inputmap['hostname']
+      fields = inputmap['fields']
       #
       # implement requesting a machine from provider
       #
@@ -135,6 +134,7 @@ Below is a skeleton for a provider plugin:
 
     def confirm(inputmap)
       providerid = inputmap['providerid']
+      fields = inputmap['fields']
       #
       # implement confirmation/validation of this machine from provider
       #
@@ -143,6 +143,7 @@ Below is a skeleton for a provider plugin:
 
     def delete(inputmap)
       providerid = inputmap['providerid']
+      fields = inputmap['fields']
       #
       # implement deletion of machine from provider
       #
@@ -178,59 +179,83 @@ Below is a skeleton for an automator plugin:
 
   class MyAutomator < Automator
 
-    def bootstrap(ssh_auth_hash)
+    def bootstrap(inputmap)
+      ssh_auth_hash = inputmap['sshauth']
+      hostname = inputmap['hostname']
+      ipaddress = inputmap['ipaddress']
       #
       # implement any preparation work required by this plugin (copy cookbooks, etc.)
       # this should be idempotent and unintrusive to any other registered plugins
       @result['status'] = 0
     end
 
-    def install(ssh_auth_hash, script_string, data_string)
+    def install(inputmap)
+      ssh_auth_hash = inputmap['sshauth']
+      hostname = inputmap['hostname']
+      ipaddress = inputmap['ipaddress']
+      fields = inputmap['fields']
       #
-      # implement installing a service as specified by script_string, data_string
-      #
-      @result['status'] = 0
-    end
-
-    def configure(ssh_auth_hash, script_string, data_string)
-      #
-      # implement configuring a service as specified by script_string, data_string
+      # implement installing a service as specified by the custom fields in inputmap['fields']
       #
       @result['status'] = 0
     end
 
-    def init(ssh_auth_hash, script_string, data_string)
+    def configure(inputmap)
+      ssh_auth_hash = inputmap['sshauth']
+      hostname = inputmap['hostname']
+      ipaddress = inputmap['ipaddress']
+      fields = inputmap['fields']
       #
-      # implement initializing a service as specified by script_string, data_string
-      #
-      @result['status'] = 0
-    end
-
-    def start(ssh_auth_hash, script_string, data_string)
-      #
-      # implement starting a service as specified by script_string, data_string
+      # implement configuring a service as specified by the custom fields in inputmap['fields']
       #
       @result['status'] = 0
     end
 
-    def stop(ssh_auth_hash, script_string, data_string)
+    def init(inputmap)
+      ssh_auth_hash = inputmap['sshauth']
+      hostname = inputmap['hostname']
+      ipaddress = inputmap['ipaddress']
+      fields = inputmap['fields']
       #
-      # implement stopping a service as specified by script_string, data_string
-      #
-      @result['status'] = 0
-    end
-
-    def remove(ssh_auth_hash, script_string, data_string)
-      #
-      # implement removing a service as specified by script_string, data_string
+      # implement initializing a service as specified by the custom fields in inputmap['fields']
       #
       @result['status'] = 0
     end
 
-Note that the bootstrap step is unique in that a bootstrap task is not tied to a service. The bootstrap task will
-actually run the bootstrap implementation for all registered automator plugins, and may be run multiple times
-throughout the cluster lifecycle. Therefore, bootstrap implementations should be idempotent and not interfere with
-one another.
+    def start(inputmap)
+      ssh_auth_hash = inputmap['sshauth']
+      hostname = inputmap['hostname']
+      ipaddress = inputmap['ipaddress']
+      fields = inputmap['fields']
+      #
+      # implement starting a service as specified by the custom fields in inputmap['fields']
+      #
+      @result['status'] = 0
+    end
+
+    def stop(inputmap)
+      ssh_auth_hash = inputmap['sshauth']
+      hostname = inputmap['hostname']
+      ipaddress = inputmap['ipaddress']
+      fields = inputmap['fields']
+      #
+      # implement stopping a service as specified by the custom fields in inputmap['fields']
+      #
+      @result['status'] = 0
+    end
+
+    def remove(inputmap)
+      ssh_auth_hash = inputmap['sshauth']
+      hostname = inputmap['hostname']
+      ipaddress = inputmap['ipaddress']
+      fields = inputmap['fields']
+      #
+      # implement removing a service as specified by the custom fields in inputmap['fields']
+      #
+      @result['status'] = 0
+    end
+
+Note that the bootstrap step is unique in that a bootstrap task is not tied to a service. Since services on the same cluster may be implemented with different automator plugins, the bootstrap task will actually run the bootstrap implementations for all automator plugins used by any service on the cluster.  The bootstrap task may also be run multiple times throughout the cluster lifecycle.  Therefore, bootstrap implementations should be idempotent and not interfere with one another.
 
 **Logging and Capturing Output**
 
