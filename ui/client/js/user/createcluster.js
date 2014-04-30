@@ -43,6 +43,12 @@ CreateCluster.app.factory('dataFactory', ['$http', '$q', 'fetchUrl',
       },
       getProviders: function (callback) {
         $http.get(fetchUrl + '/providers').success(callback);
+      },
+      getProviderFields: function(provider, callback) {
+        $http.get(fetchUrl + '/providers/' + provider).success(callback);
+      },
+      getProviderTypes: function (callback) {
+        $http.get(fetchUrl + '/providertypes').success(callback);
       }
     };
 }]);
@@ -68,6 +74,10 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
   };
   $scope.notification = '';
 
+  $scope.providerData = {};
+  $scope.defaultProvider;
+  $scope.providerFields = {};
+
   /**
    * Restarting cluster on config change.
    */
@@ -83,15 +93,30 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
     });
   });
 
-  /**
-   * Watches clusterTemplateId and changes advanced settings based on selected value. Registers a
-   * listener.
-   */
+  dataFactory.getProviderTypes(function (providertypes) {
+    providertypes.map(function (item) {
+      $scope.providerData[item.name] = item;
+    });
+  });
+
+
+  // Watches clusterTemplateId and changes advanced settings based on selected value. Registers a
+  // listener.
   $scope.$watch('clusterTemplateId', function () {
     if ($scope.clusterTemplateId && !$scope.clusterId) {
       dataFactory.getClusterTemplate($scope.clusterTemplateId, function (template) {
         $scope = CreateCluster.addTemplateToScope(template, $scope);
       });
+    }
+  });
+
+  // Watches defaultProvider and shows provider specific fields.
+  $scope.$watch('defaultProvider', function () {
+    if ($scope.defaultProvider) {
+      dataFactory.getProviderFields($scope.defaultProvider, function (providerInfo) {
+        $scope.providerFields = $scope.providerData[providerInfo.name];
+        $scope.defaultProviderInfo = providerInfo;
+      });  
     }
   });
 
@@ -154,7 +179,7 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
       name: $scope.clusterName,
       clusterTemplate: $scope.clusterTemplateId,
       numMachines: $scope.clusterNumMachines,
-      provider: $scope.defaultProvider,
+      provider: $scope.defaultProviderInfo,
       hardwaretype: $scope.defaultHardwareType,
       imagetype: $scope.defaultImageType,
       services: $scope.selectedServices,

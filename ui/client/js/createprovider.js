@@ -55,7 +55,7 @@ CreateProviderApp.factory('dataFactory', ['$http', '$q', 'fetchUrl',
     getCurrentProvider: function (currentProvider, callback) {
       $http.get(fetchUrl + '/providers/' + currentProvider).success(callback);
     },
-    getProviders: function (callback) {
+    getProviderTypes: function (callback) {
       $http.get(fetchUrl + '/providertypes').success(callback);
     }
   }
@@ -81,7 +81,7 @@ CreateProviderApp.controller('CreateProviderCtrl', ['$scope', '$interval', 'data
   $scope.providerInputs = {};
 
 
-  dataFactory.getProviders(function (providertypes) {
+  dataFactory.getProviderTypes(function (providertypes) {
     providertypes.map(function (item) {
       $scope.providerData[item.name] = item;
     });
@@ -110,7 +110,7 @@ CreateProviderApp.controller('CreateProviderCtrl', ['$scope', '$interval', 'data
       provisioner: {}
     };
     for (var item in $scope.providerInputs.parameters.admin.fields) {
-      postJson.provisioner[item] = $scope.providerInputs.parameters.admin.fields[item]['userinput'];
+      postJson.provisioner[item] = $scope.providerInputs.parameters.admin.fields[item]['default'];
     }
     if (Helpers.isInputValid(
       postJson.provisioner, $scope.providerInputs.parameters.admin.required)) {
@@ -131,7 +131,7 @@ CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFa
   $scope.providerInputs;
   
   $scope.providerData = {};
-  dataFactory.getProviders(function (providertypes) {
+  dataFactory.getProviderTypes(function (providertypes) {
     providertypes.map(function (item) {
       $scope.providerData[item.name] = item;
     });
@@ -178,7 +178,7 @@ CreateProviderApp.controller('EditProviderCtrl', ['$scope', '$interval', 'dataFa
       provisioner: {}
     };
     for (var item in $scope.currProvider.provisioner) {
-      postJson.provisioner[item] = $scope.currProvider.provisioner[item]['userinput'];
+      postJson.provisioner[item] = $scope.currProvider.provisioner[item]['default'];
     }
     if (Helpers.isInputValid(
       postJson.provisioner, $scope.providerInputs.parameters.admin.required)) {
@@ -210,7 +210,7 @@ AppHelpers.addInputSchema = function (currProvider, providerInputs) {
 
           if(typeof currProvider.provisioner[entry] !== 'object') {
             currProvider.provisioner[entry] = {
-              userinput: userinput
+              default: userinput
             };
           }
 

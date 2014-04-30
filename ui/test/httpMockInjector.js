@@ -48,6 +48,7 @@ services['nodejs'] = require('./services/nodejs.json');
 services['php'] = require('./services/php.json');
 services['zookeeper-server'] = require('./services/zookeeper-server.json');
 services['reactor'] = require('./services/reactor.json');
+services['test-service'] = require('./services/test-service.json');
 
 var clustertemplates = {};
 clustertemplates['hadoop-distributed'] = require('./clustertemplates/hadoop-distributed.json');

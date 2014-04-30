@@ -1127,6 +1127,36 @@ site.app.post('/user/clusters/cluster/:id/services', function (req, res) {
   site.sendRequestAndHandleResponse(options, user, res);
 });
 
+site.app.post('/user/clusters/cluster/:id/services/:serviceid/start', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/services/' + req.params.serviceid + '/start',
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/cluster/:id/services/:serviceid/stop', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/services/' + req.params.serviceid + '/stop',
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/cluster/:id/services/:serviceid/restart', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/services/' + req.params.serviceid + '/restart',
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
 site.app.get('/user/clusters/create', function (req, res) {
   var user = site.checkAuth(req, res);
   async.parallel([

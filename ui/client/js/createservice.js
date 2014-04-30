@@ -106,17 +106,17 @@ ServiceCtrl.controller('ServiceCtrl', ['$scope', '$interval', 'dataFactory',
       if (Object.keys(service).length) {
         $scope.name = service.name;
         $scope.description = service.description;
-        $scope.selectedServices = Helpers.PathEvaluator.getOrSetDefault(service,
+        $scope.selectedServices = Helpers.PathAssigner.getOrSetDefault(service,
           'dependencies.runtime.requires', []);
-        $scope.provides = Helpers.PathEvaluator.getOrSetDefault(service,
+        $scope.provides = Helpers.PathAssigner.getOrSetDefault(service,
           'dependencies.provides', []);
-        $scope.conflicts = Helpers.PathEvaluator.getOrSetDefault(service,
+        $scope.conflicts = Helpers.PathAssigner.getOrSetDefault(service,
           'dependencies.conflicts', []);
-        $scope.installRequires = Helpers.PathEvaluator.getOrSetDefault(service,
+        $scope.installRequires = Helpers.PathAssigner.getOrSetDefault(service,
           'dependencies.install.requires', []);
-        $scope.installUses = Helpers.PathEvaluator.getOrSetDefault(service,
+        $scope.installUses = Helpers.PathAssigner.getOrSetDefault(service,
           'dependencies.install.uses', []);
-        $scope.runtimeUses = Helpers.PathEvaluator.getOrSetDefault(service,
+        $scope.runtimeUses = Helpers.PathAssigner.getOrSetDefault(service,
           'dependencies.runtime.uses', []);
         $scope.actions = ServiceCtrl.getActionsFromServiceTempl(service.provisioner.actions);
       }

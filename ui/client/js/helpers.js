@@ -67,6 +67,62 @@ Helpers.READABLE_ACTIONS = {
 };
 
 /**
+ * Path evaluator tool for assigning multi level variables.
+ */
+Helpers.PathAssigner = {};
+
+/**
+ * Looks up a multi level variable and assigns it a default value if it doesn't exist.
+ * var myObj = {}; Helpers.PathAssigner.getOrSetDefault(myObj, 'level1.level2.value', []);
+ * myObj => {
+ *   level1: {
+ *     level2: {
+ *       value: []
+ *     }
+ *   }
+ * }
+ * @param  {Object} rootObj to perform search for specified scope.
+ * @param  {String} varScope to search in object separated by '.' i.e. 'products.categories.items'
+ * @param  defaultValue to assign to scope if it doesn't already exist.
+ * @return value at scope being searched.
+ */
+Helpers.PathAssigner.getOrSetDefault = function (rootObj, varScope, defaultValue) {
+  var scopeTree = varScope.split('.');
+  this.evalPath(rootObj, scopeTree, defaultValue);
+
+  var curObj = $.extend({}, rootObj, true), scopeTree = varScope.split('.');
+  for (var i = 1; i <= scopeTree.length; i++) {
+    if (i === scopeTree.length) {
+      return curObj[scopeTree[i - 1]];
+    } else {
+      curObj = curObj[scopeTree[i - 1]];
+    }
+  }
+};
+
+/**
+ * Evaluate path and assign values for objects along a specified scope tree.
+ * @param  {Object} rootObj base object being modified.
+ * @param  {Array} scopeTree list of scopes to check or add i.e. ['products', 'category', 'item']
+ * @param  defaultValue to assign to scope if it doesn't already exist.
+ */
+Helpers.PathAssigner.evalPath = function (rootObj, scopeTree, defaultValue) {
+  var currScope = scopeTree.shift();
+  if (!scopeTree.length) {
+    if (!(currScope in rootObj)) {
+      rootObj[currScope] = defaultValue;  
+    }
+    return;
+  }
+  if (currScope in rootObj) {
+    this.evalPath(rootObj[currScope], scopeTree, defaultValue);
+  } else {
+    rootObj[currScope] = {};
+    this.evalPath(rootObj[currScope], scopeTree, defaultValue);
+  }
+};
+
+/**
  * Compares 2 arrays and checks if required values are present in availableFields.
  * @param  {Array} availableFields.
  * @param  {Array} requiredFields.
@@ -101,38 +157,6 @@ Helpers.isInputValid = function (input, required) {
     }
   }
   return false;
-};
-
-Helpers.PathEvaluator = {};
-
-Helpers.PathEvaluator.getOrSetDefault = function (rootObj, varScope, defaultValue) {
-  var scopeTree = varScope.split('.');
-  this.evalPath(rootObj, scopeTree, defaultValue);
-
-  var curObj = $.extend({}, rootObj, true), scopeTree = varScope.split('.');
-  for (var i = 1; i <= scopeTree.length; i++) {
-    if (i === scopeTree.length) {
-      return curObj[scopeTree[i - 1]];
-    } else {
-      curObj = curObj[scopeTree[i - 1]];
-    }
-  }
-};
-
-Helpers.PathEvaluator.evalPath = function (rootObj, scopeTree, defaultValue) {
-  var currScope = scopeTree.shift();
-  if (!scopeTree.length) {
-    if (!(currScope in rootObj)) {
-      rootObj[currScope] = defaultValue;  
-    }
-    return;
-  }
-  if (currScope in rootObj) {
-    this.evalPath(rootObj[currScope], scopeTree, defaultValue);
-  } else {
-    rootObj[currScope] = {};
-    this.evalPath(rootObj[currScope], scopeTree, defaultValue);
-  }
 };
 
 /**
