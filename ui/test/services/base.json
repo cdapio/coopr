@@ -1,17 +1,12 @@
 {
   "name": "base",
   "description": "Base services, such as host management and firewall",
-  "dependencies": {
-    "runtime": {
-      "requires": []
-    }
-  },
   "provisioner": {
     "actions": {
       "configure": {
         "type": "chef",
         "fields": {
-          "script": "recipe[loom_base::default]"
+          "run_list": "recipe[loom_base::default]"
         }
       }
     }

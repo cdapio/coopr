@@ -11,33 +11,33 @@
       "install": {
         "type":"chef",
         "fields": {
-          "script": "recipe[hadoop::zookeeper_server]"
+          "run_list": "recipe[hadoop::zookeeper_server]"
         }
       },
       "configure": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
         }
       },
       "initialize": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
+          "run_list": "recipe[hadoop_wrapper::zookeeper_server_init]"
         }
       },
       "start": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-          "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-          "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }" 
         }
       }
     }

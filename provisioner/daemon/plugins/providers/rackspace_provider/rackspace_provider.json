@@ -23,7 +23,7 @@
             "type": "select",
             "options": [ "dfw", "ord", "lon", "syd" ],
             "default": "dfw",
-            "user_override": true,
+            "override": true,
             "tip": "Rackspace region (DFW default)"
           }
         },

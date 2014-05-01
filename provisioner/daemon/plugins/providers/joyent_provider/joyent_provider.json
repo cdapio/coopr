@@ -44,7 +44,7 @@
               "https://eu-ams-1.api.joyentcloud.com"
             ],
             "default": "https://us-west-1.api.joyentcloud.com",
-            "user_override": true,
+            "override": true,
             "tip": "Joyent Region (us-west-1 default)"
           }
         },

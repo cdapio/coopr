@@ -11,27 +11,27 @@
       "install": {
         "type":"chef",
         "fields": {
-          "script": "recipe[mysql::server]"
+          "run_list": "recipe[mysql::server]"
         }
       },
       "configure": {
         "type": "chef",
         "fields": {
-          "script": "recipe[mysql::server]"
+          "run_list": "recipe[mysql::server]"
         }
       },
       "start": {
         "type": "chef",
         "fields": {
-          "script": "recipe[mysql::server],recipe[loom_service_runner::default]",
-          "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }" 
+          "run_list": "recipe[mysql::server],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef",
         "fields": {
-          "script": "recipe[mysql::server],recipe[loom_service_runner::default]",
-          "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }" 
+          "run_list": "recipe[mysql::server],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }" 
         }
       }
     }

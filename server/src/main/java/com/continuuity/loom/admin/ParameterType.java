@@ -16,7 +16,7 @@
 package com.continuuity.loom.admin;
 
 /**
- *
+ * Type of parameter for {@link ProviderType} and {@link AutomatorType}.
  */
 public enum ParameterType {
   ADMIN,

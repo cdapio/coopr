@@ -15,27 +15,27 @@
       "install": {
         "type":"chef",
         "fields": {
-          "script": "recipe[hadoop::hbase_regionserver]"
+          "run_list": "recipe[hadoop::hbase_regionserver]"
         }
       },
       "configure": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
         }
       },
       "start": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-          "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }"
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }"
         }
       },
       "stop": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-          "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }"
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }"
         }
       }
     }

@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,7 +53,7 @@ public class ParametersSpecification {
    * @return Mapping of field name to the {@link FieldSchema} to use for the field.
    */
   public Map<String, FieldSchema> getFields() {
-    return fields;
+    return Collections.unmodifiableMap(fields);
   }
 
   /**
@@ -62,7 +63,7 @@ public class ParametersSpecification {
    * @return Set of required field sets.
    */
   public Set<Set<String>> getRequiredFields() {
-    return required;
+    return Collections.unmodifiableSet(required);
   }
 
   @Override
