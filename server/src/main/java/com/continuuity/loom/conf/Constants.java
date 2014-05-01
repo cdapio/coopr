@@ -132,6 +132,9 @@ public class Constants {
     public static final int DEFAULT_MAX_CONNECTIONS = 100;
   }
 
+  /**
+   * Queue related constants.
+   */
   public static final class Queue {
     public static final String PROVISIONER = "nodeprovisioner.queue";
     public static final String CLUSTER = "cluster.queue";

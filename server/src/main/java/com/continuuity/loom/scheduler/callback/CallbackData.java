@@ -27,6 +27,9 @@ public class CallbackData {
   private final Cluster cluster;
   private final ClusterJob job;
 
+  /**
+   * Type of callback the data is for.
+   */
   public enum Type {
     START,
     SUCCESS,
@@ -39,14 +42,29 @@ public class CallbackData {
     this.job = job;
   }
 
+  /**
+   * Get the type of callback the data is for.
+   *
+   * @return Type of callback the data is for.
+   */
   public Type getType() {
     return type;
   }
 
+  /**
+   * Get the cluster that is being operated on.
+   *
+   * @return Cluster that is being operated on.
+   */
   public Cluster getCluster() {
     return cluster;
   }
 
+  /**
+   * Get the job being performed or about to be performed on the cluster.
+   *
+   * @return Job being performed or about to be performed on the cluster.
+   */
   public ClusterJob getJob() {
     return job;
   }
