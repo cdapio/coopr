@@ -35,6 +35,7 @@ public class FieldSchema {
   public FieldSchema(String label, String type, String tip, Set<String> options, String defaultValue,
                      Boolean override) {
     Preconditions.checkArgument(type != null, "Field type must be specified.");
+    Preconditions.checkArgument(label != null && !label.isEmpty(), "Field label must be specified.");
     this.type = type;
     this.label = label == null ? "" : label;
     this.tip = tip == null ? "" : tip;
