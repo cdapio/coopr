@@ -114,9 +114,19 @@ class ChefAutomator < Automator
         log.debug "Validating connectivity to #{hostname}"
         output = ssh_exec!(ssh, "hostname")
 
+        # determine if curl is installed, else default to wget
+        log.debug "Checking for curl"
+        chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | bash"
+        begin
+          ssh_exec!(ssh, "which curl")
+        rescue
+          log.debug "curl not found, defaulting to wget"
+          chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | bash"
+        end
+
         # install chef
         log.debug "Install chef..."
-        output = ssh_exec!(ssh, "curl -L https://www.opscode.com/chef/install.sh | bash")
+        output = ssh_exec!(ssh, chef_install_cmd)
         if (output[2] != 0 )
           log.error "Chef install failed: #{output}"
           raise "Chef install failed: #{output}"
