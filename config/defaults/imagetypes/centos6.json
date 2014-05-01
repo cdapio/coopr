@@ -3,10 +3,10 @@
   "description": "CentOS 6",
   "providermap": {
     "joyent": {
-      "image": "30e9e4c8-bbf2-11e2-ac3b-3b598ee13393"
+      "image": "19daa264-c4c4-11e3-bec3-c30e2c0d4ec0"
     },
     "rackspace": {
-      "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85"
+      "image": "042395fc-728c-4763-86f9-9b0cacb00701"
     }
   }
 }
