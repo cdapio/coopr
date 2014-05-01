@@ -403,5 +403,5 @@ Included Plugins
    :maxdepth: 1
 
    chef-automator-plugin
-   chef-shell-plugin
+   shell-automator-plugin
 
