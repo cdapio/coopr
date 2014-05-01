@@ -35,7 +35,6 @@ imagetypes.ubuntu12 = require('./imagetypes/ubuntu12.json');
 var services = {};
 services['apache-httpd'] = require('./services/apache-httpd.json');
 services['base'] = require('./services/base.json');
-services['fail2ban'] = require('./services/fail2ban.json');
 services['hadoop-hdfs-datanode'] = require('./services/hadoop-hdfs-datanode.json');
 services['hadoop-hdfs-namenode'] = require('./services/hadoop-hdfs-namenode.json');
 services['hadoop-yarn-nodemanager'] = require('./services/hadoop-yarn-nodemanager.json');
@@ -65,6 +64,7 @@ var createCluster = require('./clusters/createcluster.json');
 var plugins = {};
 plugins['rackspace'] = require('./plugins/rackspace.json');
 plugins['openstack'] = require('./plugins/openstack.json');
+plugins['joyent'] = require('./plugins/joyent.json');
 
 var automators = {};
 automators['shell'] = require('./automators/shell.json');

@@ -11,13 +11,13 @@
       "install": {
         "type":"chef",
         "fields": {
-          "script": "recipe[php::default]"
+          "run_list": "recipe[php::default]"
         }
       },
       "configure": {
         "type": "chef",
         "fields": {
-          "script": "recipe[php::default]"
+          "run_list": "recipe[php::default]"
         }
       }
     }

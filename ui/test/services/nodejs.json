@@ -1,17 +1,12 @@
 {
   "name": "nodejs",
   "description": "Node.JS server",
-  "dependencies": {
-    "runtime": {
-      "requires": []
-    }
-  },
   "provisioner": {
     "actions": {
       "install": {
         "type":"chef",
         "fields": {
-          "script": "recipe[nodejs::default]"
+          "run_list": "recipe[nodejs::default]"
         }
       }
     }

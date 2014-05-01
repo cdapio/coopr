@@ -3,19 +3,19 @@
     "parameters": {
         "admin": {
             "fields": {
-                "script": {
-                    "label": "Script",
-                    "type": "text",
-                    "tip": "Path to script"
-                },
-                "data": {
-                    "label": "Data",
-                    "type": "text",
-                    "tip": "Script arguments"
-                }
+              "run_list": {
+                "label": "run_list",
+                "type": "text",
+                "tip": "The chef-solo run_list for this Action"
+              },
+              "json_attributes": {
+                "label": "JSON attributes",
+                "type": "text",
+                "tip": "Custom JSON data for this chef-solo run"
+              }
             },
             "required": [
-                  ["script"]
+              [ "run_list" ]
             ]
         }
     }

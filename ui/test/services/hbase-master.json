@@ -16,33 +16,33 @@
       "install": {
         "type":"chef",
         "fields": {
-          "script": "recipe[hadoop::hbase_master]"
+          "run_list": "recipe[hadoop::hbase_master]"
         }
       },
       "configure": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
         }
       },
       "initialize": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::hbase_master_init]"
+          "run_list": "recipe[hadoop_wrapper::hbase_master_init]"
         }
       },
       "start": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]",
-          "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"start\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef",
         "fields": {
-          "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]",
-          "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"stop\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"stop\" } } } }" 
         }
       }
     }
