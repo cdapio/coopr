@@ -17,20 +17,23 @@
 
 .. index::
    single: REST API: Importing & Exporting Cluster Templates
-==================
+
+=================================================
 REST API: Importing & Exporting Cluster Templates
-==================
+=================================================
 
 .. include:: /rest/rest-links.rst
 
 Loom REST APIs allow you to export all Providers, Hardware Types, Image Types, Services, and Cluster Templates created in a Loom server into a JSON Object that can then be imported into another Loom server.  
 
 .. _entity-export:
+
 Export Template Metadata
 ========================
 
 To export all entities from a Loom server, make a HTTP GET request to URI:
 ::
+
  /export
 
 The response is a JSON Object with keys for providers, hardwaretypes, imagetypes, services, and clustertemplates.  Each key has a JSON array as its value, with each element in the array as the json representation as described in the corresponding sections for providers, hardware types, image types, services, and cluster templates.
@@ -65,11 +68,13 @@ Example
    }
 
 .. _entity-import:
+
 Import Template Metadata
 ========================
 
 To import entities into a Loom server, make a POST HTTP request to URI:
 ::
+
  /import
 
 The post body must be a JSON object of the same format as the export result.  It has a key for providers, hardwaretypes, imagetypes, services, and clustertemplates.  The value for each key is a JSON array, with each element in the array as a JSON object representation of the corresponding entity.  

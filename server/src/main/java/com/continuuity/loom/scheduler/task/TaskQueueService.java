@@ -18,6 +18,7 @@ package com.continuuity.loom.scheduler.task;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.gson.JsonElement;
@@ -43,8 +44,8 @@ public class TaskQueueService {
   private final LoomStats loomStats;
 
   @Inject
-  public TaskQueueService(@Named("nodeprovisioner.queue") TrackingQueue taskQueue,
-                          @Named("internal.job.queue") TrackingQueue jobQueue,
+  public TaskQueueService(@Named(Constants.Queue.PROVISIONER) TrackingQueue taskQueue,
+                          @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
                           ClusterStore clusterStore, TaskService taskService, NodeService nodeService,
                           LoomStats loomStats) {
     this.taskQueue = taskQueue;

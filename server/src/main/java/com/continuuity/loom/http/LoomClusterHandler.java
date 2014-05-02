@@ -83,8 +83,8 @@ public class LoomClusterHandler extends LoomAuthHandler {
   private final LoomStats loomStats;
 
   @Inject
-  public LoomClusterHandler(ClusterStore store, @Named("solver.queue") TrackingQueue solverQueue,
-                            @Named("internal.job.queue") TrackingQueue jobQueue, ZKClient zkClient,
+  public LoomClusterHandler(ClusterStore store, @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
+                            @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
                             ClusterService clusterService, @Named(Constants.MAX_CLUSTER_SIZE) int maxClusterSize,
                             LoomStats loomStats) {
     this.store = store;

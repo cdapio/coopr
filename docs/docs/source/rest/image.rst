@@ -17,6 +17,7 @@
 
 .. index::
    single: REST API: Image
+
 ==================
 REST API: Image
 ==================
@@ -29,11 +30,13 @@ Using the image Loom REST APIs, you can manage the image specifications.
 Each image configured in the system has a unique name, a short description, and a list of key-value pairs that are required by the backend image provisioner.
 
 .. _image-create:
+
 Create an Image Type
 ====================
 
 To create a new image type, make a HTTP POST request to URI:
 ::
+
  /imagetypes
 
 POST Parameters
@@ -82,11 +85,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/imagetypes
 
 .. _image-retrieve:
+
 View an Image Type
 ===================
 
 To retrieve details about an image type, make a GET HTTP request to URI:
 ::
+
  /imagetypes/{name}
 
 This resource request represents an individual image type for viewing.
@@ -116,11 +121,13 @@ Example
 
 
 .. _image-delete:
+
 Delete an Image Type
-=================
+====================
 
 To delete an image type, make a DELETE HTTP request to URI:
 ::
+
  /imagetypes/{name}
 
 This resource request represents an individual image type for deletion.
@@ -149,11 +156,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/imagetypes/example
 
 .. _image-modify:
+
 Update an Image Type
-==================
+====================
 
 To update an image type, make a PUT HTTP request to URI:
 ::
+
  /imagetypes/{name}
 
 Resource specified above respresents an individual image type request for an update operation.
@@ -210,11 +219,13 @@ Example
      "providermap":{"openstack":{"flavor":"m1.small"},"aws":{"flavor":"aws.small"}}}
 
 .. _image-all-list:
+
 List All Image Type
 =============================
 
 To list all the image types configured within Continuuity Loom, make a GET HTTP request to URI:
 ::
+
  /imagetypes
 
 HTTP Responses

@@ -17,6 +17,7 @@
 
 .. index::
    single: Licenses
+
 =======================
 Licenses
 =======================
@@ -86,7 +87,7 @@ The Loom Server uses and depends on the following licenses:
    * - Xerial Snappy for Java
      - Apache License, Version 2.0
    * - ASM
-     - See `this page <http://asm.ow2.org/license.html>`_.
+     - See the license `here <http://asm.ow2.org/license.html>`_.
    * - Apache Avro
      - Apache License, Version 2.0
    * - ParaNamer

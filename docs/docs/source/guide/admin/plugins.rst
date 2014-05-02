@@ -20,6 +20,7 @@
 
 .. index::
    single: Provisioner Plugins
+
 ===================
 Provisioner Plugins
 ===================
@@ -116,6 +117,7 @@ input for this task.
 
 Below is a skeleton for a provider plugin:
 ::
+
   #!/usr/bin/env ruby
 
   class MyProvider < Provider
@@ -156,6 +158,7 @@ public IP, so that it can be used in subsequent tasks. For these cases, simply w
 the line ``@result['result']['key'] = 'value'``. Subsequent tasks will then contain this information in ``config``, for
 example ``@task['config']['key'] = 'value'``. By convention, most plugins should reuse the following fields:
 ::
+
   @result['result']['providerid']
   @result['result']['ssh-auth']['user']
   @result['result']['ssh-auth']['password']
@@ -170,6 +173,7 @@ Note that your implementation can also refer to the ``@task`` instance variable,
 
 Below is a skeleton for an automator plugin:
 ::
+
   #!/usr/bin/env ruby
 
   class MyAutomator < Automator
@@ -232,6 +236,7 @@ one another.
 
 During execution, a plugin can write to the provisioner's instance of the Ruby standard logger using the 'log' method:
 ::
+
   log.debug "my message"
   log.info "my message"
   log.warn "my warning message"
@@ -239,6 +244,7 @@ During execution, a plugin can write to the provisioner's instance of the Ruby s
 
 Additionally, each task can return strings representing ``stdout`` and ``stderr`` to be displayed on the Loom UI. Simply return the values:
 ::
+
   @result['stdout'] = "my captured stdout message"
   @result['stderr'] = "my captured stderr message"
 
@@ -250,6 +256,7 @@ plugin simply has to adhere to the following directory structure:
 
 Below is an example directory structure:
 ::
+
   $LOOM_HOME/
       provisioner/
           daemon/
@@ -265,8 +272,9 @@ Below is an example directory structure:
                           my_provider.rb
                           [any additional data or lib directories]
 
-The content of the plugin definition *.json files simply need to specify the main class of your plugin as follows:
+The content of the plugin definition \*.json files simply need to specify the main class of your plugin as follows:
 ::
+
   {
     "my_provider" : {
       "classname": "MyProvider"
@@ -285,4 +293,5 @@ Included Plugins
    :maxdepth: 1
 
    chef-automator-plugin
+   shell-automator-plugin
 

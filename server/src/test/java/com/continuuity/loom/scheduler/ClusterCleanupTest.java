@@ -23,6 +23,7 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
+import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.LoomServiceTestBase;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
@@ -59,9 +60,12 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
   @BeforeClass
   public static void initTest() {
     clusterStore = injector.getInstance(ClusterStore.class);
-    provisionQueue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named("nodeprovisioner.queue")));
-    clusterQueue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named("cluster.queue")));
-    jobQueue = injector.getInstance(Key.get(TrackingQueue.class, Names.named("internal.job.queue")));
+    provisionQueue = injector.getInstance(
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.PROVISIONER)));
+    clusterQueue = injector.getInstance(
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
+    jobQueue = injector.getInstance(
+      Key.get(TrackingQueue.class, Names.named(Constants.Queue.JOB)));
     nodeService = injector.getInstance(NodeService.class);
     clusterService = injector.getInstance(ClusterService.class);
     taskService = injector.getInstance(TaskService.class);

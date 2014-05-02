@@ -16,6 +16,7 @@
 .. _glossary:
 .. index::
    single: Glossary
+
 ========
 Glossary
 ========

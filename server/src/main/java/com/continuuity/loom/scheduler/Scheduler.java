@@ -47,6 +47,7 @@ public class Scheduler extends AbstractIdleService {
   private final JobScheduler jobScheduler;
   private final ClusterScheduler clusterScheduler;
   private final SolverScheduler solverScheduler;
+  private final CallbackScheduler callbackScheduler;
   private final ClusterCleanup clusterCleanup;
   private final long clusterCleanupRunInterval;
   private final Set<ScheduledFuture<?>> scheduledFutures;
@@ -58,9 +59,10 @@ public class Scheduler extends AbstractIdleService {
                    JobScheduler jobScheduler,
                    ClusterScheduler clusterScheduler,
                    SolverScheduler solverScheduler,
+                   CallbackScheduler callbackScheduler,
                    ClusterCleanup clusterCleanup,
                    ZKClient zkClient) {
-    this.executorService = Executors.newScheduledThreadPool(4,
+    this.executorService = Executors.newScheduledThreadPool(5,
                                                             new ThreadFactoryBuilder()
                                                               .setNameFormat("scheduler-%d")
                                                               .build());
@@ -69,6 +71,7 @@ public class Scheduler extends AbstractIdleService {
     this.jobScheduler = jobScheduler;
     this.clusterScheduler = clusterScheduler;
     this.solverScheduler = solverScheduler;
+    this.callbackScheduler = callbackScheduler;
     this.clusterCleanup = clusterCleanup;
     this.scheduledFutures = Sets.newHashSet();
 
@@ -127,6 +130,11 @@ public class Scheduler extends AbstractIdleService {
     LOG.info("Scheduling solver scheduler every {} secs...", schedulerRunInterval);
     scheduledFutures.add(
       executorService.scheduleAtFixedRate(solverScheduler, 1, schedulerRunInterval, TimeUnit.SECONDS)
+    );
+
+    LOG.info("Scheduling callback scheduler every {} secs...", schedulerRunInterval);
+    scheduledFutures.add(
+      executorService.scheduleAtFixedRate(callbackScheduler, 1, schedulerRunInterval, TimeUnit.SECONDS)
     );
 
     LOG.info("Scheduling cluster cleanup every {} secs...", clusterCleanupRunInterval);

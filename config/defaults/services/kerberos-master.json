@@ -1,0 +1,33 @@
+{
+  "name": "kerberos-master",
+  "description": "Configures Kerberos v5 Administration server and KDC",
+  "dependson": [
+    "kerberos-client"
+  ],
+  "provisioner": {
+    "actions": {
+      "install": {
+        "type":"chef",
+        "script": "recipe[krb5::kadmin]"
+      },
+      "configure": {
+        "type":"chef",
+        "script": "recipe[krb5::kadmin]"
+      },
+      "initialize": {
+        "type":"chef",
+        "script": "recipe[krb5::kadmin_init]"
+      },
+      "start": {
+        "type": "chef",
+        "script": "recipe[krb5::kadmin_service],recipe[loom_service_runner::default]",
+        "data": "{\"loom\": { \"node\": { \"services\": { \"krb5-admin-server\": \"start\" } } } }" 
+      },
+      "stop": {
+        "type": "chef",
+        "script": "recipe[krb5::kadmin_service],recipe[loom_service_runner::default]",
+        "data": "{\"loom\": { \"node\": { \"services\": { \"krb5-admin-server\": \"stop\" } } } }" 
+      }
+    }
+  }
+}

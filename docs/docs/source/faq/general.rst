@@ -19,12 +19,13 @@
 
 .. index::
    single: FAQ: General
+
 ====================================
 General
 ====================================
 
 What are the differences between Continuuity Loom and Ambari/Savanna?
----------------------------------------------------------
+---------------------------------------------------------------------
 
 From the `Apache Ambari <http://ambari.apache.org/>`_ site:
 
