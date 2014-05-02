@@ -18,7 +18,7 @@
 require 'json'
 require 'net/scp'
 
-class ChefAutomator < Automator
+class ChefSoloAutomator < Automator
   attr_accessor :credentials, :cookbooks_path, :cookbooks_tar, :remote_cache_dir
 
   def initialize(task)
@@ -217,7 +217,7 @@ class ChefAutomator < Automator
 
     @result['status'] = 0
 
-    log.info "ChefAutomator.bootstrap completed successfully: #{@result}"
+    log.info "ChefSoloAutomator.bootstrap completed successfully: #{@result}"
     @result
   end
 
@@ -270,8 +270,8 @@ class ChefAutomator < Automator
         log.debug "Running chef-solo"
         output = ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'")
         if (output[2] != 0 )
-          log.error "Chef run did not complete successfully: #{output}"
-          raise "Chef run did not complete successfully: #{output}"
+          log.error "Chef-solo run did not complete successfully: #{output}"
+          raise "Chef-solo run did not complete successfully: #{output}"
         end
       end
     rescue Net::SSH::AuthenticationFailed => e
@@ -279,37 +279,37 @@ class ChefAutomator < Automator
     end
 
     @result['status'] = 0
-    log.info "Chef run completed successfully for task #{@task['taskId']}: #{@result}"
+    log.info "Chef-solo run completed successfully for task #{@task['taskId']}: #{@result}"
     @result
   end
 
   def install(inputmap)
-    log.info "ChefAutomator performing install task #{@task['taskId']}"
+    log.info "ChefSoloAutomator performing install task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def configure(inputmap)
-    log.info "ChefAutomator performing configure task #{@task['taskId']}"
+    log.info "ChefSoloAutomator performing configure task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def init(inputmap)
-    log.info "ChefAutomator performing initialize task #{@task['taskId']}"
+    log.info "ChefSoloAutomator performing initialize task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def start(inputmap)
-    log.info "ChefAutomator performing start task #{@task['taskId']}"
+    log.info "ChefSoloAutomator performing start task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def stop(inputmap)
-    log.info "ChefAutomator performing stop task #{@task['taskId']}"
+    log.info "ChefSoloAutomator performing stop task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def remove(inputmap)
-    log.info "ChefAutomator performing remove task #{@task['taskId']}"
+    log.info "ChefSoloAutomator performing remove task #{@task['taskId']}"
     runchef(inputmap)
   end
 
