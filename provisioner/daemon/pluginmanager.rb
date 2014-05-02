@@ -109,7 +109,7 @@ class PluginManager
         log.error "Response code #{resp.code}, #{resp.to_str} when trying to register #{name}"
       end
     rescue => e
-      log.error "Caught exception registering plugins to loom server #{loom_uri}"
+      log.error "Caught exception registering plugins to loom server #{uri}"
       log.error e.message
       log.error e.backtrace.inspect
     end
