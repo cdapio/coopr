@@ -116,7 +116,7 @@ Continuuity Loom maintains significant JSON data for a cluster, and makes it ava
     * node data for each node of the cluster: hostname, ip, etc
     * service data, specified in the actions for each service
 
-The ChefAutomator plugin automatically merges this data into a single JSON file, which is then passed to chef-solo via
+The Chef Automator plugin automatically merges this data into a single JSON file, which is then passed to chef-solo via
 the ``--json-attributes argument``. Any custom cookbooks that want to make use of this Loom data need to be familiar
 with the JSON layout of the Loom data. In brief, cluster-wide configuration defined in cluster templates and
 service-level action data are merged together, and preserved at the top-level. Loom data is then also merged in under
@@ -144,7 +144,7 @@ Consider the following two rules of thumb:
 Bootstrap
 =========
 
-Each Loom Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs to be able to carry out further tasks. The ChefAutomator plugin performs the following actions for a bootstrap task:
+Each Loom Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs to be able to carry out further tasks. The Chef Automator plugin performs the following actions for a bootstrap task:
 	1. Bundle its local copy of the cookbooks/roles/data_bags directories into tarballs, ``cookbooks.tar.gz``, ``roles.tar.gz``, ``data_bags.tar.gz``.
 		* Unless the tarballs exist already and were created in the last 10 minutes.
 	2. Logs into the remote box and installs chef via the Opscode Omnibus installer (``curl -L https://www.opscode.com/chef/install.sh | bash``).
@@ -161,15 +161,15 @@ Adding your own Cookbooks
 =========================
 **Cookbook requirements**
 
-Since the ChefAutomator plugin is implemented using chef-solo, the following restrictions apply:
+Since the Chef Automator plugin is implemented using chef-solo, the following restrictions apply:
 
 	* No chef search capability
 	* No persistent attributes
 
-Cookbooks should be fully attribute-driven. At this time the ChefAutomator does not support the chef-solo "environment" primitive. 
+Cookbooks should be fully attribute-driven. At this time the Chef Automator does not support the chef-solo "environment" primitive. 
 Attributes normally specified in an environment can instead be populated in Loom primitives such as cluster templates or service action data.
 
-In order to add cookbooks, roles, or data-bags for use by the provisioners, simply add them to the local chef directories for the ChefAutomator
+In order to add cookbooks, roles, or data-bags for use by the provisioners, simply add them to the local chef directories for the Chef Automator
 plugin. If using the default package install, these directories are currently:
 ::
 
@@ -208,7 +208,7 @@ each node.
 
 The example loom service definition invoking this cookbook is called "hosts". It simply sets up a "configure" service
 action of type "chef" and run_list ``recipe[loom_hosts::default]``. Note that the community "hostsfile" cookbook is not
-needed in the runlist since it is declared in loom_hosts's metadata.
+needed in the run-list since it is declared in loom_hosts's metadata.
 
 **loom_service_runner**
 -----------------------

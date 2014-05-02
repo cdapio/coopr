@@ -284,14 +284,14 @@ Loom plugins are required to provide a JSON file which defines the plugin, inclu
   * the class name for each providertype and automatortype
   * any custom fields required by each providertype and automatortype
 
-Custom fields allow a plugin to announce the fields that it requires.  For example a rackspace provider plugin may require a username and password while the joyent provider plugin can require either a password or a key.  Likewise, the ChefAutomator plugin requires a run-list and JSON attributes, while the ShellAutomator plugin requires a command and arguments.
+Custom fields allow a plugin to announce the fields that it requires.  For example a Rackspace provider plugin may require a username and password while the Joyent provider plugin can require either a password or a key.  Likewise, the Chef Automator plugin requires a run-list and JSON attributes, while the Shell Automator plugin requires a command and arguments.
 
 For example, consider the JSON definition file for the Rackspace provider plugin:
 ::
 
     {
         "name": "rackspace",
-        "description": "Rackspace Publici Cloud provider",
+        "description": "Rackspace Public Cloud provider",
         "providertypes": [
             "rackspace"
         ],
@@ -340,18 +340,13 @@ For example, consider the JSON definition file for the Rackspace provider plugin
 This JSON defines a single plugin which contains a single providertype named "rackspace".  The implementing ruby class for this "rackspace" providertype is "RackspaceProvider".  Additionally, it defines three custom fields which can be set by a Loom administrator: "rackspace_username", "rackspace_api_key", and "rackspace_region".  In this example, they are defined within an "admin" block, which indicates these fields can be set only by a Loom administrator.  Alternatively, defining fields within a "user" block indicates a Loom user can set them when creating a cluster.  Each field has additional elements to specify behavior and describe how the field should be presented to the user on the Loom UI:
   * field name: will be used as the key in the hash sent to the provisioner plugin.
   * ``label``: the user-friendly label presented in the Loom UI.
-  * ``type``: must be one of
-
-    * ``text``: an empty text box
-    * ``password``: a text box which masks the value entered
-    * ``select``: a drop-down menu
-
+  * ``type``: any of the HTTP input field types such as ``text`` or ``password``, or "select" for a drop-down menu.
   * ``tip``: the text hint displayed as the value before the user enters anything
   * ``options``: (specific to type "select"), the drop-down menu options
   * ``default``: (specific to type "select"), the default option.
   * ``override``: specifies whether or not a field defined in an admin block can be overridden by the user during cluster creation.  default: false
 
-Note that a single plugin may contain multiple providertypes and automatortypes.  The top-level ``providertypes`` and ``automatortypes`` arrays should list them all, and then each will have a corresponding JSON element where the classname and custom fields are defined.
+Note that a single plugin may contain multiple providertypes and automatortypes.  The top-level ``providertypes`` and ``automatortypes`` arrays should list them all, then each will have a corresponding JSON element where the classname and custom fields are defined.
 
 
 Loading Your Plugin
@@ -391,7 +386,7 @@ The Loom Server needs to be aware of the installed provisioner plugins and their
 
   $LOOM_HOME/provisioner/daemon/provisioner.rb --register --uri http://myloomserver:55054
 
-The above command will start a provisioner which will load its plugins as usual, and then register all providertypes and automatortypes using the Loom Server's API.  After registering each providertype or automatortype, it will exit.
+The above command will start a provisioner which will load its plugins as usual, then register all providertypes and automatortypes using the Loom Server's API.  After registering each providertype or automatortype, it will exit.
 
 When running the Loom standalone distribution, this command is run automatically during initial startup.
 
