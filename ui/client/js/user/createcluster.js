@@ -196,19 +196,41 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
     postJson.initialLeaseDuration = Helpers.concatMilliseconds(
       $scope.leaseDuration.initial);
     if ($scope.template.administration.leaseduration.initial !== 0 &&
-      $scope.template.administration.leaseduration.initial 
-      < postJson.initialLeaseDuration) {
+      $scope.template.administration.leaseduration.initial < postJson.initialLeaseDuration) {
       $("#notification").text('You cannot initially request a longer lease.');
       $("html, body").animate({ scrollTop: 0 }, "slow");
       return;
     }
-    Helpers.submitPost($event, postJson, '/user/clusters');
+
+    if (CreateCluster.areFieldsValid(postJson, $scope)) {
+      Helpers.submitPost($event, postJson, '/user/clusters');
+    } else {
+      $("#notification").text('Required fields missing.');
+      $("html, body").animate({ scrollTop: 0 }, "slow");
+    }
+
   };
 }]);
 
 /**
+ * Validates fields based on user and admin parameters and provider type.
+ * @param  {Object} postJson json body being sent to server.
+ * @param  {Object} scope controller scope.
+ * @return {Boolean} Whether fields are valid.
+ */
+CreateCluster.areFieldsValid = function (postJson, scope) {
+  var valid = Helpers.isInputValid(
+      postJson.providerFields, scope.providerFields.parameters.admin.required);
+  if ('user' in scope.providerFields.parameters) {
+    valid = valid && Helpers.isInputValid(
+      postJson.providerFields, scope.providerFields.parameters.user.required);
+  }
+  return valid;
+};
+
+/**
  * Issues a reconfiguration request for cluster.
- * @param  {Object} scope local scope.
+ * @param  {Object} scope controller scope.
  * @param  {Object} event generated form submit event.
  */
 CreateCluster.submitReconfiguration = function (scope, event) {
@@ -220,6 +242,7 @@ CreateCluster.submitReconfiguration = function (scope, event) {
     config: $.extend({}, JSON.parse(scope.defaultConfig)),
     restart: scope.restart
   };
+
   Helpers.submitPost(event, postJson, '/user/clusters');
 };
 
