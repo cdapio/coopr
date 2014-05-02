@@ -120,6 +120,35 @@ class ShellAutomator < Automator
 
     generate_scripts_tar()
 
+    # check to ensure scp is installed and attempt to install it
+    begin
+      Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
+
+        log.debug "Checking for scp installation"
+        begin
+          ssh_exec!(ssh, "which scp")
+        rescue
+          log.warn "scp not found, attempting to install openssh-client"
+          scp_install_cmd = "yum -qy install openssh-clients"
+          begin
+            ssh_exec!(ssh, "which yum")
+          rescue
+            scp_install_cmd = "apt-get -qy install openssh-client"
+          end
+
+          begin
+            log.debug "installing openssh-client via #{scp_install_cmd}"
+            ssh_exec!(ssh, scp_install_cmd)
+          rescue => e
+            raise $!, "Could not install scp on #{ipaddress}: #{$!}", $!.backtrace
+          end
+        end
+        log.debug "scp found on remote"
+      end
+    rescue Net::SSH::AuthenticationFailed => e
+      raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
+    end
+
     begin
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
 
