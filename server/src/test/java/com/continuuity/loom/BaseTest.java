@@ -16,11 +16,15 @@
 package com.continuuity.loom;
 
 import com.continuuity.loom.conf.Configuration;
+import com.continuuity.loom.scheduler.callback.ClusterCallback;
+import com.continuuity.loom.scheduler.callback.MockClusterCallback;
 import com.continuuity.loom.store.EntityStore;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.guice.LoomModules;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.SQLClusterStore;
+import com.google.inject.AbstractModule;
+import com.google.inject.util.Modules;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.ZKClientService;
 import com.google.common.base.Throwables;
@@ -48,6 +52,7 @@ public class BaseTest {
   protected static EntityStore entityStore;
   protected static ClusterStore clusterStore;
   protected static Configuration conf;
+  protected static MockClusterCallback mockClusterCallback;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -67,9 +72,19 @@ public class BaseTest {
     conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
 
-    injector = Guice.createInjector(LoomModules.createModule(zkClientService,
-                                                             MoreExecutors.sameThreadExecutor(),
-                                                             conf));
+    mockClusterCallback = new MockClusterCallback();
+    injector = Guice.createInjector(
+      Modules.override(
+        LoomModules.createModule(zkClientService, MoreExecutors.sameThreadExecutor(), conf)
+      ).with(
+        new AbstractModule() {
+          @Override
+          protected void configure() {
+            bind(ClusterCallback.class).toInstance(mockClusterCallback);
+          }
+        }
+      )
+    );
 
     entityStore = injector.getInstance(EntityStore.class);
     sqlClusterStore = injector.getInstance(SQLClusterStore.class);

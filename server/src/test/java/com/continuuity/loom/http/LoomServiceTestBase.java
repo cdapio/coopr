@@ -57,6 +57,7 @@ public class LoomServiceTestBase extends BaseTest {
   protected static TimeoutTrackingQueue clusterQueue;
   protected static TimeoutTrackingQueue solverQueue;
   protected static TimeoutTrackingQueue jobQueue;
+  protected static TimeoutTrackingQueue callbackQueue;
   protected static ClusterStore clusterStore;
   protected static Scheduler scheduler;
   protected static JobScheduler jobScheduler;
@@ -65,17 +66,20 @@ public class LoomServiceTestBase extends BaseTest {
   @BeforeClass
   public static void setupServiceBase() throws Exception {
     nodeProvisionTaskQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named("nodeprovisioner.queue")));
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.PROVISIONER)));
     nodeProvisionTaskQueue.start();
     clusterQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named("cluster.queue")));
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
     clusterQueue.start();
     solverQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named("solver.queue")));
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.SOLVER)));
     solverQueue.start();
     jobQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named("internal.job.queue")));
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.JOB)));
     jobQueue.start();
+    callbackQueue = injector.getInstance(
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CALLBACK)));
+    callbackQueue.start();
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
     port = loomService.getBindAddress().getPort();

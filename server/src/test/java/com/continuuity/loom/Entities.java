@@ -31,6 +31,8 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.admin.ServiceDependencies;
 import com.continuuity.loom.admin.ServiceStageDependencies;
+import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.Node;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -853,6 +855,26 @@ public class Entities {
         "     }\n" +
         "  }\n" +
         "}";
+  }
+
+  public static class ClusterExample {
+    private static String node1 = "node1";
+    private static String node2 = "node2";
+    public static Cluster CLUSTER =
+      new Cluster("123", "user1", "name", 1234567890, "description",
+                  ProviderExample.RACKSPACE, ClusterTemplateExample.HDFS,
+                  ImmutableSet.of(node1, node2),
+                  ImmutableSet.of(ServiceExample.NAMENODE.getName(), ServiceExample.DATANODE.getName()));
+    public static Node NODE1 =
+      new Node(node1,
+               CLUSTER.getId(),
+               ImmutableSet.of(ServiceExample.NAMENODE),
+               ImmutableMap.<String, String>of());
+    public static Node NODE2 =
+      new Node(node2,
+               CLUSTER.getId(),
+               ImmutableSet.of(ServiceExample.DATANODE),
+               ImmutableMap.<String, String>of());
   }
 
   protected static JsonObject json(String key, JsonObject val) {
