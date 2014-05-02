@@ -16,10 +16,13 @@
 package com.continuuity.loom.store;
 
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.TestHelper;
+import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
@@ -147,12 +150,106 @@ public abstract class EntityStoreTest {
   }
 
   @Test
+  public void testGetStoreDeleteProviderType() throws Exception {
+    ProviderType providerType = Entities.ProviderTypeExample.JOYENT;
+    String providerTypeName = providerType.getName();
+    Assert.assertNull(entityStore.getProviderType(providerTypeName));
+
+    // write should work
+    entityStore.writeProviderType(providerType);
+    ProviderType result = entityStore.getProviderType(providerTypeName);
+    Assert.assertEquals(providerType, result);
+
+    // overwrite should work
+    entityStore.writeProviderType(providerType);
+    result = entityStore.getProviderType(providerTypeName);
+    Assert.assertEquals(providerType, result);
+
+    // delete should work
+    entityStore.deleteProviderType(providerTypeName);
+    Assert.assertNull(entityStore.getProviderType(providerTypeName));
+  }
+
+  @Test
+  public void testGetStoreDeleteAutomatorType() throws Exception {
+    AutomatorType automatorType = Entities.AutomatorTypeExample.CHEF;
+    String automatorTypeName = automatorType.getName();
+    Assert.assertNull(entityStore.getAutomatorType(automatorTypeName));
+
+    // write should work
+    entityStore.writeAutomatorType(automatorType);
+    AutomatorType result = entityStore.getAutomatorType(automatorTypeName);
+    Assert.assertEquals(automatorType, result);
+
+    // overwrite should work
+    entityStore.writeAutomatorType(automatorType);
+    result = entityStore.getAutomatorType(automatorTypeName);
+    Assert.assertEquals(automatorType, result);
+
+    // delete should work
+    entityStore.deleteAutomatorType(automatorTypeName);
+    Assert.assertNull(entityStore.getAutomatorType(automatorTypeName));
+  }
+
+  @Test
+  public void testGetAllProviderTypes() throws Exception {
+    Assert.assertEquals(0, entityStore.getAllProviderTypes().size());
+
+    ProviderType type1 = Entities.ProviderTypeExample.JOYENT;
+    ProviderType type2 = Entities.ProviderTypeExample.RACKSPACE;
+    ProviderType type3 = Entities.ProviderTypeExample.USER_RACKSPACE;
+    List<ProviderType> types = ImmutableList.of(type1, type2, type3);
+
+    for (ProviderType type : types) {
+      entityStore.writeProviderType(type);
+    }
+    Collection<ProviderType> result = entityStore.getAllProviderTypes();
+    Assert.assertEquals("provider types written and fetched are not equal in size",
+                        types.size(), result.size());
+    Assert.assertTrue("not all provider types written were found in the results", result.containsAll(result));
+
+    // check we get all the providers after one of them is deleted
+    entityStore.deleteProviderType(type1.getName());
+    types = ImmutableList.of(type2, type3);
+    result = entityStore.getAllProviderTypes();
+    Assert.assertEquals("provider types written and fetched are not equal in size",
+                        types.size(), result.size());
+    Assert.assertTrue("not all provider types written were found in the results", result.containsAll(result));
+  }
+
+  @Test
+  public void testGetAllAutomatorTypes() throws Exception {
+    Assert.assertEquals(0, entityStore.getAllAutomatorTypes().size());
+
+    AutomatorType type1 = Entities.AutomatorTypeExample.SHELL;
+    AutomatorType type2 = Entities.AutomatorTypeExample.CHEF;
+    AutomatorType type3 = Entities.AutomatorTypeExample.PUPPET;
+    List<AutomatorType> types = ImmutableList.of(type1, type2, type3);
+
+    for (AutomatorType type : types) {
+      entityStore.writeAutomatorType(type);
+    }
+    Collection<AutomatorType> result = entityStore.getAllAutomatorTypes();
+    Assert.assertEquals("automator types written and fetched are not equal in size",
+                        types.size(), result.size());
+    Assert.assertTrue("not all automator types written were found in the results", result.containsAll(result));
+
+    // check we get all the providers after one of them is deleted
+    entityStore.deleteAutomatorType(type1.getName());
+    types = ImmutableList.of(type2, type3);
+    result = entityStore.getAllAutomatorTypes();
+    Assert.assertEquals("automator types written and fetched are not equal in size",
+                        types.size(), result.size());
+    Assert.assertTrue("not all automator types written were found in the results", result.containsAll(result));
+  }
+
+  @Test
   public void testGetAllProviders() throws Exception {
     Assert.assertEquals(0, entityStore.getAllProviders().size());
 
-    Provider provider1 = createProvider("provider1", "1st provider", Provider.Type.JOYENT, "k1", "v1", "k2", "v2");
-    Provider provider2 = createProvider("provider2", "2nd provider", Provider.Type.OPENSTACK, "k2", "v2", "k3", "v3");
-    Provider provider3 = createProvider("provider3", "3rd provider", Provider.Type.RACKSPACE, "k4", "v4");
+    Provider provider1 = createProvider("provider1", "1st provider", Entities.JOYENT, "k1", "v1", "k2", "v2");
+    Provider provider2 = createProvider("provider2", "2nd provider", Entities.OPENSTACK, "k2", "v2", "k3", "v3");
+    Provider provider3 = createProvider("provider3", "3rd provider", Entities.RACKSPACE, "k4", "v4");
     List<Provider> providers = ImmutableList.of(provider1, provider2, provider3);
 
     for (Provider provider : providers) {
@@ -257,25 +354,25 @@ public abstract class EntityStoreTest {
     Service s1 = new Service("datanode", "hadoop datanode", ImmutableSet.of("namenode"),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.INSTALL,
-                               new ServiceAction("chef", "install recipe", null),
+                               new ServiceAction("chef", TestHelper.actionMapOf("install recipe", null)),
                                ProvisionerAction.REMOVE,
-                               new ServiceAction("chef", "remove recipe", "arbitrary data")
+                               new ServiceAction("chef", TestHelper.actionMapOf("remove recipe", "arbitrary data"))
                              )
     );
     Service s2 = new Service("namenode", "hadoop namenode", ImmutableSet.of("hosts"),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.INSTALL,
-                               new ServiceAction("chef", "install recipe", null),
+                               new ServiceAction("chef", TestHelper.actionMapOf("install recipe", null)),
                                ProvisionerAction.REMOVE,
-                               new ServiceAction("chef", "remove recipe", "arbitrary data"),
+                               new ServiceAction("chef", TestHelper.actionMapOf("remove recipe", "arbitrary data")),
                                ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef", "configure recipe", null)
+                               new ServiceAction("chef", TestHelper.actionMapOf("configure recipe", null))
                              )
     );
     Service s3 = new Service("hosts", "for managing /etc/hosts", ImmutableSet.<String>of(),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef", "configure recipe", null)
+                               new ServiceAction("chef", TestHelper.actionMapOf("configure recipe", null))
                              )
     );
     List<Service> services = ImmutableList.of(s1, s2, s3);
@@ -326,13 +423,13 @@ public abstract class EntityStoreTest {
                       result.containsAll(clusterTemplates));
   }
 
-  protected Provider createProvider(String name, String description, Provider.Type type, String... mapKeyVals) {
+  protected Provider createProvider(String name, String description, String type, String... mapKeyVals) {
     Preconditions.checkArgument(mapKeyVals.length % 2 == 0, "each key must have a corresponding value");
     Map<String, String> authMap = Maps.newHashMap();
     for (int i = 0; i < mapKeyVals.length; i += 2) {
       authMap.put(mapKeyVals[i], mapKeyVals[i+1]);
     }
 
-    return new Provider(name, description, type, ImmutableMap.<String, Map<String, String>>of("auth", authMap));
+    return new Provider(name, description, type, authMap);
   }
 }

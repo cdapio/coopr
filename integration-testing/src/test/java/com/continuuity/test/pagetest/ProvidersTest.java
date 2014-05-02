@@ -73,7 +73,7 @@ public class ProvidersTest extends GenericTest {
         assertTrue("Name is not correct.", nameProvider.containsKey(name));
         assertEquals("Description is not correct.", nameProvider.get(name).getDescription(),
                      TEST_UTIL.getTd(table, row, 1));
-        assertEquals("Providertype is not correct.", nameProvider.get(name).getProviderType().name().toLowerCase(),
+        assertEquals("Providertype is not correct.", nameProvider.get(name).getProviderType(),
                      TEST_UTIL.getTd(table, row, 2));
       }
     }

@@ -1,0 +1,36 @@
+
+<form class="form-horizontal" role="form" id="create-provider-form" action="/providers/update" ng-submit="submitProvider($event)">
+    <div class="form-group">
+      <label for="inputName" class="col-sm-2 control-label">Name</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" name="inputName" placeholder="Name" ng-model="currProvider.name" ng-disabled="true">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputDescription" class="col-sm-2 control-label">Description</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" id="inputDescription" name="inputDescription" placeholder="Description" ng-model="currProvider.description">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputProvisioner" class="col-sm-2 control-label">Provider type</label>
+      <div class="col-sm-8">
+        <select class="form-control" name="inputProvisioner" id="provisioner-select" ng-model="currProvider.providertype" ng-options="name as name for (name,item) in providerData" ng-disabled="true">
+          <option></option>
+        </select>
+      </div>                
+    </div>
+
+    <div class="form-group" ng-repeat="(name,fieldData) in currProvider.provisioner">
+      <label class="col-sm-2 control-label">[[fieldData.label]]</label>
+      <div class="col-sm-8">
+        <input class="form-control" type="[[fieldData.type]]" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'text' || fieldData.type == 'password'" ng-model="fieldData.default" />
+        <select class="form-control" type="[[fieldData.type]]" ng-options="region as region for region in fieldData.options" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'select'" ng-model="fieldData.default" ></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-8">
+          <button type="submit" class="btn-spl btn-info">Submit</button>
+      </div> 
+    </div>
+</form>

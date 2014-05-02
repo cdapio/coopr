@@ -3,13 +3,11 @@
   "description": "Openstack Private Cloud",
   "providertype": "openstack",
   "provisioner": {
-    "auth": {
-      "openstack_username": "USERNAME",
-      "openstack_password": "PASSWORD",
-      "openstack_tenant": "TENANT",
-      "openstack_auth_url": "http://NAME.DOMAIN.COM:5000/v2.0/tokens",
-      "openstack_ssh_key_id": "TENANT_KEY",
-      "identity_file": "/opt/loom/provisioner/daemon/plugins/providers/openstack_provider/TENANT_KEY.pem"
-    }
+    "openstack_username": "USERNAME",
+    "openstack_password": "PASSWORD",
+    "openstack_tenant": "TENANT",
+    "openstack_auth_url": "http://NAME.DOMAIN.COM:5000/v2.0/tokens",
+    "openstack_ssh_key_id": "TENANT_KEY",
+    "identity_file": "/opt/loom/provisioner/daemon/plugins/providers/openstack_provider/TENANT_KEY.pem"
   }
 }

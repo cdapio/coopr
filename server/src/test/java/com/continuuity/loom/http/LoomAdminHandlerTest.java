@@ -74,6 +74,18 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
+  public void testProviderTypes() throws Exception {
+    testNonPostRestAPIs("providertypes", Entities.ProviderTypeExample.JOYENT_JSON,
+                        Entities.ProviderTypeExample.RACKSPACE_JSON);
+  }
+
+  @Test
+  public void testAutomatorTypes() throws Exception {
+    testNonPostRestAPIs("automatortypes", Entities.AutomatorTypeExample.CHEF_JSON,
+                        Entities.AutomatorTypeExample.SHELL_JSON);
+  }
+
+  @Test
   public void testNonAdminUserGetsForbiddenStatus() throws Exception {
     String base = "/v1/loom/";
     String[] resources = { "providers", "hardwaretypes", "imagetypes", "services", "clustertemplates" };
@@ -198,13 +210,55 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     provider.addProperty("name", "?");
     assertResponseStatus(doPost("/v1/loom/providers", provider.toString(), ADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
+  }
 
-    // test bad provider type
-    provider.remove("name");
-    provider.addProperty("name", "valid-name");
-    provider.addProperty("providertype", "badtype");
-    assertResponseStatus(doPost("/v1/loom/providers", provider.toString(), ADMIN_HEADERS),
-                         HttpResponseStatus.BAD_REQUEST);
+  private void testNonPostRestAPIs(String entityType, JsonObject entity1, JsonObject entity2) throws Exception {
+    String base = "/v1/loom/" + entityType;
+    String entity1Path = base + "/" + entity1.get("name").getAsString();
+    String entity2Path = base + "/" + entity2.get("name").getAsString();
+    // should start off with no entities
+    assertResponseStatus(doGet(entity1Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+
+    // add entity through PUT
+    assertResponseStatus(doPut(entity1Path, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.OK);
+    // check we can get it
+    HttpResponse response = doGet(entity1Path, ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+    Assert.assertEquals(entity1, result);
+
+    // add second entity through PUT
+    assertResponseStatus(doPut(entity2Path, entity2.toString(), ADMIN_HEADERS), HttpResponseStatus.OK);
+    // check we can get it
+    response = doGet(entity2Path, ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    result = new Gson().fromJson(reader, JsonObject.class);
+    Assert.assertEquals(entity2, result);
+
+    // get both entities
+    response = doGet(base, ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonArray results = new Gson().fromJson(reader, JsonArray.class);
+
+    Assert.assertEquals(2, results.size());
+    JsonObject first = results.get(0).getAsJsonObject();
+    JsonObject second = results.get(1).getAsJsonObject();
+    if (first.get("name").getAsString().equals(entity1.get("name").getAsString())) {
+      Assert.assertEquals(entity1, first);
+      Assert.assertEquals(entity2, second);
+    } else {
+      Assert.assertEquals(entity2, first);
+      Assert.assertEquals(entity1, second);
+    }
+
+    assertResponseStatus(doDelete(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doDelete(entity2Path, ADMIN_HEADERS), HttpResponseStatus.OK);
+    // check both were deleted
+    assertResponseStatus(doGet(entity1Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGet(entity2Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
   }
 
   private void testRestAPIs(String entityType, JsonObject entity1, JsonObject entity2) throws Exception {

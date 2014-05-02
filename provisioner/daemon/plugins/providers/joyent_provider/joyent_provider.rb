@@ -29,6 +29,8 @@ class JoyentProvider < Provider
     flavor = inputmap['flavor']
     image = inputmap['image']
     hostname = inputmap['hostname']
+    fields = inputmap['fields']
+
     begin
       knife_instance = Chef::Knife::LoomJoyentServerCreate.new
       knife_instance.configure_chef
@@ -37,18 +39,21 @@ class JoyentProvider < Provider
       knife_instance.config[:dataset] = image
       knife_instance.config[:chef_node_name] = hostname
 
-      Chef::Config[:knife][:joyent_username] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_username"]
-      Chef::Config[:knife][:joyent_keyfile] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_keyfile"]
-      Chef::Config[:knife][:joyent_keyname] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_keyname"]
-      Chef::Config[:knife][:joyent_api_url] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_api_url"]
-      Chef::Config[:knife][:joyent_version] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_version"]
+      # our plugin-defined fields are chef knife configs
+      fields.each do |k,v|
+        Chef::Config[:knife][k.to_sym] = v
+      end
 
       # invoke knife
       log.debug "Invoking server create"
       kniferesult = knife_instance.run
       @result['result']['providerid'] = kniferesult['providerid']
       @result['result']['ssh-auth']['user'] = "root"
-      @result['result']['ssh-auth']['identityfile'] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_keyfile"]
+      if fields.key?('joyent_keyfile')
+        @result['result']['ssh-auth']['identityfile'] = fields['joyent_keyfile']
+      elsif fields.key?('joyent_password')
+        @result['result']['ssh-auth']['password'] = fields['joyent_password']
+      end
       @result['status'] = kniferesult['status']
 
     rescue Excon::Errors::Conflict => e
@@ -78,17 +83,17 @@ class JoyentProvider < Provider
 
   def confirm(inputmap)
     providerid = inputmap['providerid']
+    fields = inputmap['fields']
 
     begin
       knife_instance = Chef::Knife::LoomJoyentServerConfirm.new
       knife_instance.configure_chef
       knife_instance.name_args.push(providerid)
 
-      Chef::Config[:knife][:joyent_username] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_username"]
-      Chef::Config[:knife][:joyent_keyfile] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_keyfile"]
-      Chef::Config[:knife][:joyent_keyname] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_keyname"]
-      Chef::Config[:knife][:joyent_api_url] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_api_url"]
-      Chef::Config[:knife][:joyent_version] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_version"]
+      # our plugin-defined fields are chef knife configs
+      fields.each do |k,v|
+        Chef::Config[:knife][k.to_sym] = v
+      end
 
       # invoke knife
       log.debug "Waiting to confirm creation of server"
@@ -127,6 +132,7 @@ class JoyentProvider < Provider
 
   def delete(inputmap)
     providerid = inputmap['providerid']
+    fields = inputmap['fields']
 
     begin
       knife_instance = Chef::Knife::JoyentServerDelete.new
@@ -134,11 +140,10 @@ class JoyentProvider < Provider
       knife_instance.name_args.push(@task["config"]["providerid"])
       knife_instance.config[:yes] = true
 
-      Chef::Config[:knife][:joyent_username] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_username"]
-      Chef::Config[:knife][:joyent_keyfile] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_keyfile"]
-      Chef::Config[:knife][:joyent_keyname] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_keyname"]
-      Chef::Config[:knife][:joyent_api_url] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_api_url"]
-      Chef::Config[:knife][:joyent_version] = @task["config"]["provider"]["provisioner"]["auth"]["joyent_version"]
+      # our plugin-defined fields are chef knife configs
+      fields.each do |k,v|
+        Chef::Config[:knife][k.to_sym] = v
+      end
 
       # invoke knife
       log.debug "Invoking server delete"
@@ -180,4 +185,3 @@ class JoyentProvider < Provider
 
 end
 
-  

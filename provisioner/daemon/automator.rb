@@ -30,73 +30,72 @@ class Automator
     sshauth = @task['config']['ssh-auth']
     hostname = @task['config']['hostname']
     ipaddress = @task['config']['ipaddress']
-    actionscript = @task['config']['service']['action']['script'] rescue nil
-    actiondata = @task['config']['service']['action']['data'] rescue nil
+    fields = @task['config']['service']['action']['fields'] rescue nil
 
     case task['taskName'].downcase
     when "bootstrap"
       bootstrap({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth})
       return @result
     when "install"
-      install({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata})
+      install({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "configure"
-      configure({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata})
+      configure({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "initialize"
-      init({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+      init({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "start"
-      start({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+      start({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "stop"
-      stop({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+      stop({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     when "remove"
-      remove({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'actionscript' => actionscript, 'actiondata' => actiondata} )
+      remove({'hostname' => hostname, 'ipaddress' => ipaddress, 'sshauth' => sshauth, 'fields' => fields})
       return @result
     else
       raise "unhandled automator task type: #{task['taskName']}"
     end
   end
 
-  def bootstrap(ssh_auth_hash)
+  def bootstrap(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task bootstrap in class #{self.class.name}"
     raise "Unimplemented task bootstrap in class #{self.class.name}"
   end
 
-  def install(ssh_auth_hash, script_string, data_string)
+  def install(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task install in class #{self.class.name}"
     raise "Unimplemented task install in class #{self.class.name}"
   end
 
-  def configure(ssh_auth_hash, script_string, data_string)
+  def configure(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task configure in class #{self.class.name}"
     raise "Unimplemented task configure in class #{self.class.name}"
   end
 
-  def init(ssh_auth_hash, script_string, data_string)
+  def init(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task initialize in class #{self.class.name}"
     raise "Unimplemented task initialize in class #{self.class.name}"
   end
 
-  def start(ssh_auth_hash, script_string, data_string)
+  def start(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task start in class #{self.class.name}"
     raise "Unimplemented task start in class #{self.class.name}"
   end
 
-  def stop(ssh_auth_hash, script_string, data_string)
+  def stop(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task stop in class #{self.class.name}"
     raise "Unimplemented task stop in class #{self.class.name}"
   end
 
-  def remove(ssh_auth_hash, script_string, data_string)
+  def remove(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task remove in class #{self.class.name}"
     raise "Unimplemented task remove in class #{self.class.name}"

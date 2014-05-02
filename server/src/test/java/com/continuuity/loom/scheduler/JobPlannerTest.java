@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.scheduler;
 
+import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
@@ -42,6 +43,7 @@ import java.util.Set;
  *
  */
 public class JobPlannerTest {
+  private static final ServiceAction CHEF_ACTION = new ServiceAction("chef", TestHelper.actionMapOf("script", "data"));
 
   @Test
   public void testDedupNodesPerStage() throws Exception {
@@ -85,18 +87,18 @@ public class JobPlannerTest {
   public void testCreateTaskDag() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION));
     Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION));
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.INITIALIZE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION));
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
 
@@ -162,18 +164,18 @@ public class JobPlannerTest {
   public void testPlannerObeysNodesToPlanSet() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION));
     Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION));
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.INITIALIZE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION));
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
 
@@ -248,25 +250,25 @@ public class JobPlannerTest {
   public void testAddServicesPlan() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.INITIALIZE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.INITIALIZE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.INITIALIZE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
 
@@ -350,13 +352,13 @@ public class JobPlannerTest {
   public void testConfigureTaskDag() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION));
     Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.INSTALL, CHEF_ACTION));
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION));
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
 
@@ -381,19 +383,19 @@ public class JobPlannerTest {
   public void testConfigureWithRestartTaskDag() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
 
@@ -453,16 +455,16 @@ public class JobPlannerTest {
   public void testStopServiceTaskDag() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
 
@@ -498,16 +500,16 @@ public class JobPlannerTest {
   public void testStartServiceTaskDag() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
 
@@ -545,16 +547,16 @@ public class JobPlannerTest {
   public void testRestartServiceTaskDag() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, new ServiceAction("chef", "script", "data"),
-                                ProvisionerAction.STOP, new ServiceAction("chef", "script", "data")));
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
 

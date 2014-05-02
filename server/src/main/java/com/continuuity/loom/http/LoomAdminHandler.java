@@ -16,10 +16,12 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.EntityStore;
@@ -178,6 +180,48 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
+   * Get a specific {@link ProviderType} if readable by the user.
+   *
+   * @param request The request for the provider type.
+   * @param responder Responder for sending the response.
+   * @param providertypeId Id of the provider type to get.
+   * @throws Exception
+   */
+  @GET
+  @Path("/providertypes/{providertype-id}")
+  public void getProviderType(HttpRequest request, HttpResponder responder,
+                              @PathParam("providertype-id") String providertypeId) throws Exception {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    respondToGetEntity(entityStore.getProviderType(providertypeId), "provider type",
+                       providertypeId, ProviderType.class, responder);
+  }
+
+  /**
+   * Get a specific {@link AutomatorType} if readable by the user.
+   *
+   * @param request The request for the automator type.
+   * @param responder Responder for sending the response.
+   * @param automatortypeId Id of the automator type to get.
+   * @throws Exception
+   */
+  @GET
+  @Path("/automatortypes/{automatortype-id}")
+  public void getAutomatorType(HttpRequest request, HttpResponder responder,
+                              @PathParam("automatortype-id") String automatortypeId) throws Exception {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    respondToGetEntity(entityStore.getAutomatorType(automatortypeId), "automator type",
+                       automatortypeId, AutomatorType.class, responder);
+  }
+
+  /**
    * Get all {@link Provider}s readable by the user.
    *
    * @param request The request for providers.
@@ -246,7 +290,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
    */
   @GET
   @Path("/services")
-  public void getService(HttpRequest request, HttpResponder responder) throws Exception {
+  public void getServices(HttpRequest request, HttpResponder responder) throws Exception {
     String userId = getAndAuthenticateUser(request, responder);
     if (userId == null) {
       return;
@@ -254,6 +298,46 @@ public class LoomAdminHandler extends LoomAuthHandler {
 
     responder.sendJson(HttpResponseStatus.OK, entityStore.getAllServices(),
                        new TypeToken<Collection<Service>>() {}.getType(),
+                       codec.getGson());
+  }
+
+  /**
+   * Get all {@link ProviderType}s readable by the user.
+   *
+   * @param request The request for services.
+   * @param responder Responder for sending the response.
+   * @throws Exception
+   */
+  @GET
+  @Path("/providertypes")
+  public void getProviderTypes(HttpRequest request, HttpResponder responder) throws Exception {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    responder.sendJson(HttpResponseStatus.OK, entityStore.getAllProviderTypes(),
+                       new TypeToken<Collection<ProviderType>>() {}.getType(),
+                       codec.getGson());
+  }
+
+  /**
+   * Get all {@link AutomatorType}s readable by the user.
+   *
+   * @param request The request for services.
+   * @param responder Responder for sending the response.
+   * @throws Exception
+   */
+  @GET
+  @Path("/automatortypes")
+  public void getAutomatorTypes(HttpRequest request, HttpResponder responder) throws Exception {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    responder.sendJson(HttpResponseStatus.OK, entityStore.getAllAutomatorTypes(),
+                       new TypeToken<Collection<AutomatorType>>() {}.getType(),
                        codec.getGson());
   }
 
@@ -375,6 +459,46 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
     entityStore.deleteClusterTemplate(clustertemplateId);
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  /**
+   * Delete a specific {@link ProviderType}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete a provider type.
+   * @param responder Responder for sending the response.
+   * @param providertypeId Id of the provider type to delete.
+   * @throws Exception
+   */
+  @DELETE
+  @Path("/providertypes/{providertype-id}")
+  public void deleteProviderType(HttpRequest request, HttpResponder responder,
+                                 @PathParam("providertype-id") String providertypeId) throws Exception {
+    if (!isAdminRequest(request)) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+    entityStore.deleteProviderType(providertypeId);
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  /**
+   * Delete a specific {@link AutomatorType}. User must be admin or a 403 is returned.
+   *
+   * @param request The request to delete an automator type.
+   * @param responder Responder for sending the response.
+   * @param automatortypeId Id of the automator type to delete.
+   * @throws Exception
+   */
+  @DELETE
+  @Path("/automatortypes/{automatortype-id}")
+  public void deleteAutomatorType(HttpRequest request, HttpResponder responder,
+                                 @PathParam("automatortype-id") String automatortypeId) throws Exception {
+    if (!isAdminRequest(request)) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+    entityStore.deleteAutomatorType(automatortypeId);
     responder.sendStatus(HttpResponseStatus.OK);
   }
 
@@ -529,6 +653,66 @@ public class LoomAdminHandler extends LoomAuthHandler {
     }
 
     entityStore.writeClusterTemplate(clusterTemplate);
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  /**
+   * Writes a {@link ProviderType}. User must be admin or a 403 is returned.
+   * If the name in the path does not match the name in the put body, a 400 is returned.
+   *
+   * @param request Request to write provider type.
+   * @param responder Responder to send response.
+   * @param providertypeId Id of the provider type to write.
+   * @throws Exception
+   */
+  @PUT
+  @Path("/providertypes/{providertype-id}")
+  public void putProviderType(HttpRequest request, HttpResponder responder,
+                              @PathParam("providertype-id") String providertypeId) throws Exception {
+    if (!isAdminRequest(request)) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+    ProviderType providerType = getEntityFromRequest(request, responder, ProviderType.class);
+    if (providerType == null) {
+      // getEntityFromRequest writes to the responder if there was an issue.
+      return;
+    } else if (!providerType.getName().equals(providertypeId)) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "mismatch between provider type name and name in path.");
+      return;
+    }
+
+    entityStore.writeProviderType(providerType);
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  /**
+   * Writes a {@link AutomatorType}. User must be admin or a 403 is returned.
+   * If the name in the path does not match the name in the put body, a 400 is returned.
+   *
+   * @param request Request to write provider type.
+   * @param responder Responder to send response.
+   * @param automatortypeId Id of the provider type to write.
+   * @throws Exception
+   */
+  @PUT
+  @Path("/automatortypes/{automatortype-id}")
+  public void putAutomatorType(HttpRequest request, HttpResponder responder,
+                               @PathParam("automatortype-id") String automatortypeId) throws Exception {
+    if (!isAdminRequest(request)) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+    AutomatorType automatorType = getEntityFromRequest(request, responder, AutomatorType.class);
+    if (automatorType == null) {
+      // getEntityFromRequest writes to the responder if there was an issue.
+      return;
+    } else if (!automatorType.getName().equals(automatortypeId)) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "mismatch between automator type name and name in path.");
+      return;
+    }
+
+    entityStore.writeAutomatorType(automatorType);
     responder.sendStatus(HttpResponseStatus.OK);
   }
 

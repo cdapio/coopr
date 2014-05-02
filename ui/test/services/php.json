@@ -10,11 +10,15 @@
     "actions": {
       "install": {
         "type":"chef",
-        "script": "recipe[php::default]"
+        "fields": {
+          "run_list": "recipe[php::default]"
+        }
       },
       "configure": {
         "type": "chef",
-        "script": "recipe[php::default]"
+        "fields": {
+          "run_list": "recipe[php::default]"
+        }
       }
     }
   }

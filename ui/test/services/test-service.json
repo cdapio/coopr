@@ -1,0 +1,46 @@
+{
+  "name": "test-service",
+  "description": "Test loom service",
+  "dependencies": {
+    "provides":["sample-service-name"], 
+    "conflicts":["hadoop-hdfs-namenode", "hadoop-hdfs-datanode"],
+    "install": {
+      "requires":[ "base" ],
+      "uses":[ "mysql-server", "nodejs" ]
+    },
+    "runtime":{
+      "requires": [ "base", "apache-httpd", "haproxy", "hbase-master" ],
+      "uses":[ "fail2ban" ]
+    }
+  },
+  "provisioner": {
+    "actions": {
+      "install": {
+        "type":"chef",
+        "fields": {
+          "run_list": "recipe[apache2::default]"
+        }
+      },
+      "configure": {
+        "type": "chef",
+        "fields": {
+          "run_list": "recipe[apache2::default]"
+        }
+      },
+      "start": {
+        "type": "chef",
+        "fields": {
+          "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }" 
+        }
+      },
+      "stop": {
+        "type": "shell",
+        "fields": {
+          "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
+          "args": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }" 
+        }
+      }
+    }
+  }
+}

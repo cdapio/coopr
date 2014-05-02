@@ -1,5 +1,28 @@
 {
-  "shell" : {
-    "classname": "ShellAutomator"
+  "name": "shell",
+  "description": "Run shell commands and scripts",
+  "automatortypes": [ "shell" ],
+  "shell": {
+    "name": "shell",
+    "classname": "ShellAutomator",
+    "parameters": {
+      "admin": {
+        "fields": {
+          "script": {
+            "label": "Script",
+            "type": "text",
+            "tip": "The script or command to run"
+          },
+          "args": {
+            "label": "Arguments",
+            "type": "text",
+            "tip": "The arguments to the script"
+          }
+        },
+        "required": [
+          [ "script" ]
+        ]
+      }
+    }
   }
 }

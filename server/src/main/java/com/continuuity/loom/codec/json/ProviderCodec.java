@@ -16,6 +16,7 @@
 package com.continuuity.loom.codec.json;
 
 import com.continuuity.loom.admin.Provider;
+import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -38,7 +39,7 @@ public class ProviderCodec extends AbstractCodec<Provider> {
     jsonObj.add("name", context.serialize(provider.getName()));
     jsonObj.add("description", context.serialize(provider.getDescription()));
     jsonObj.add("providertype", context.serialize(provider.getProviderType()));
-    jsonObj.add("provisioner", context.serialize(provider.getProvisionerData()));
+    jsonObj.add("provisioner", context.serialize(provider.getProvisionerFields()));
 
     return jsonObj;
   }
@@ -50,10 +51,27 @@ public class ProviderCodec extends AbstractCodec<Provider> {
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
-    Provider.Type providerType = context.deserialize(jsonObj.get("providertype"), Provider.Type.class);
-    Map<String, Map<String, String>> provisionerData =
-      context.deserialize(jsonObj.get("provisioner"), new TypeToken<Map<String, Map<String, String>>>() {}.getType());
+    String providerType = context.deserialize(jsonObj.get("providertype"), String.class);
+    Map<String, String> provisionerFields = deserializeProvisionerFields(jsonObj, context);
 
-    return new Provider(name, description, providerType, provisionerData);
+    return new Provider(name, description, providerType, provisionerFields);
+  }
+
+  // for backwards compatibility
+  // TODO: use api versions
+  private Map<String, String> deserializeProvisionerFields(JsonObject jsonObj, JsonDeserializationContext context) {
+    if (!jsonObj.has("provisioner")) {
+      return Maps.newHashMap();
+    }
+
+    JsonObject fields = jsonObj.get("provisioner").getAsJsonObject();
+    // if its the old type
+    if (fields.has("auth")) {
+      JsonElement authElement = fields.get("auth");
+      if (authElement.isJsonObject()) {
+        fields = authElement.getAsJsonObject();
+      }
+    }
+    return context.deserialize(fields, new TypeToken<Map<String, String>>() {}.getType());
   }
 }

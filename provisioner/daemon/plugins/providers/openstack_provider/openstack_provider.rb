@@ -28,6 +28,7 @@ class OpenstackProvider < Provider
     flavor = inputmap['flavor']
     image = inputmap['image']
     hostname = inputmap['hostname']
+    fields = inputmap['fields']
 
     begin
       knife_instance = Chef::Knife::LoomOpenstackServerCreate.new
@@ -37,7 +38,8 @@ class OpenstackProvider < Provider
       Chef::Config[:knife][:image] = image
       knife_instance.config[:chef_node_name] = hostname
 
-      @task["config"]["provider"]["provisioner"]["auth"].each do |k,v|
+      # our plugin-defined fields are chef knife configs
+      fields.each do |k,v|
         Chef::Config[:knife][k.to_sym] = v
       end
 
@@ -69,8 +71,10 @@ class OpenstackProvider < Provider
       knife_instance = Chef::Knife::LoomOpenstackServerConfirm.new
       knife_instance.configure_chef
       knife_instance.name_args.push(providerid)
+      fields = inputmap['fields']
 
-      @task["config"]["provider"]["provisioner"]["auth"].each do |k,v|
+      # our plugin-defined fields are chef knife configs
+      fields.each do |k,v|
         Chef::Config[:knife][k.to_sym] = v
       end
 
@@ -109,6 +113,7 @@ class OpenstackProvider < Provider
 
   def delete(inputmap)
     providerid = inputmap['providerid']
+    fields = inputmap['fields']
 
     begin
       knife_instance = Chef::Knife::OpenstackServerDelete.new
@@ -116,7 +121,8 @@ class OpenstackProvider < Provider
       knife_instance.name_args.push(providerid)
       knife_instance.config[:yes] = true
 
-      @task["config"]["provider"]["provisioner"]["auth"].each do |k,v|
+      # our plugin-defined fields are chef knife configs
+      fields.each do |k,v|
         Chef::Config[:knife][k.to_sym] = v
       end
 

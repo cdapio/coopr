@@ -7,7 +7,9 @@
     "actions": {
       "install": {
         "type":"chef",
-        "script": "recipe[nodejs::default]"
+        "fields": {
+          "run_list": "recipe[nodejs::default]"
+        }
       }
     }
   }

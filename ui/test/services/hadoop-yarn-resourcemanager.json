@@ -10,21 +10,29 @@
     "actions": {
       "install": {
         "type":"chef",
-        "script": "recipe[hadoop::hadoop_yarn_resourcemanager]"
+        "fields": {
+          "run_list": "recipe[hadoop::hadoop_yarn_resourcemanager]"
+        }
       },
       "configure": {
         "type": "chef",
-        "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+        }
       },
       "start": {
         "type": "chef",
-        "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }" 
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }" 
+        }
       },
       "stop": {
         "type": "chef",
-        "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }" 
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }" 
+        }
       }
     }
   }

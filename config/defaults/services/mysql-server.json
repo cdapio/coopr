@@ -8,21 +8,29 @@
     "actions": {
       "install": {
         "type":"chef",
-        "script": "recipe[mysql::server]"
+        "fields": {
+          "run_list": "recipe[mysql::server]"
+        }
       },
       "configure": {
         "type": "chef",
-        "script": "recipe[mysql::server]"
+        "fields": {
+          "run_list": "recipe[mysql::server]"
+        }
       },
       "start": {
         "type": "chef",
-        "script": "recipe[mysql::server],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }" 
+        "fields": {
+          "run_list": "recipe[mysql::server],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }" 
+        }
       },
       "stop": {
         "type": "chef",
-        "script": "recipe[mysql::server],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }" 
+        "fields": {
+          "run_list": "recipe[mysql::server],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }" 
+        }
       }
     }
   }

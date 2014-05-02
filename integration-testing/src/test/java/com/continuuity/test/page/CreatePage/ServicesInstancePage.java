@@ -18,6 +18,7 @@ package com.continuuity.test.page.CreatePage;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.test.Constants;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.openqa.selenium.By;
@@ -63,10 +64,14 @@ public class ServicesInstancePage extends GenericPage {
       String type = new Select(types.get(i)).getFirstSelectedOption().getText();
       String script = scripts.get(i).getAttribute(Constants.VALUE);
       String data = dataList.get(i).getAttribute(Constants.VALUE);
-      if (data.isEmpty()) {
-        data = null;
+      Map<String, String> fields = Maps.newHashMap();
+      if (script != null && !script.isEmpty()) {
+        fields.put("script", script);
       }
-      provisionerActions.put(action, new ServiceAction(type, script, data));
+      if (data != null && !data.isEmpty()) {
+        fields.put("data", data);
+      }
+      provisionerActions.put(action, new ServiceAction(type, fields));
     }
     return provisionerActions;
   }

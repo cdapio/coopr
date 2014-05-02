@@ -106,8 +106,8 @@ public class BaseSolverTest extends BaseTest {
       new JsonSerde().getGson().fromJson(Entities.ClusterTemplateExample.REACTOR2_STRING, ClusterTemplate.class);
 
     // create providers
-    entityStore.writeProvider(new Provider("joyent", "joyent provider", Provider.Type.JOYENT,
-                                           ImmutableMap.<String, Map<String, String>>of()));
+    entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
+                                           ImmutableMap.<String, String>of()));
     // create hardware types
     entityStore.writeHardwareType(
       new HardwareType(
@@ -193,5 +193,8 @@ public class BaseSolverTest extends BaseTest {
     entityStore.writeService(reactor);
     entityStore.writeService(mysql);
     entityStore.writeClusterTemplate(reactorTemplate);
+
+    entityStore.writeProviderType(Entities.ProviderTypeExample.JOYENT);
+    entityStore.writeProviderType(Entities.ProviderTypeExample.RACKSPACE);
   }
 }

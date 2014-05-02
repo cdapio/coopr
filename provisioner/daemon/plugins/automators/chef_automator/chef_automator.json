@@ -1,5 +1,28 @@
 {
-  "chef" : {
-    "classname": "ChefAutomator"
+  "name": "chef-solo",
+  "description": "Automate all the things with chef-solo",
+  "automatortypes": [ "chef" ],
+  "chef": {
+    "name": "chef",
+    "classname": "ChefAutomator",
+    "parameters": {
+      "admin": {
+        "fields": {
+          "run_list": {
+            "label": "run_list",
+            "type": "text",
+            "tip": "The chef-solo run_list for this Action"
+          },
+          "json_attributes": {
+            "label": "JSON attributes",
+            "type": "text",
+            "tip": "Custom JSON data for this chef-solo run"
+          }
+        },
+        "required": [
+          [ "run_list" ]
+        ]
+      }
+    }
   }
 }

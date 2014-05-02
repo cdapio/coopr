@@ -63,8 +63,12 @@ class ShellAutomator < Automator
     sshauth = inputmap['sshauth']
     hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
-    shellscript = inputmap['actionscript']
-    shellargs = inputmap['actiondata']
+    fields = inputmap['fields']
+
+    raise "required parameter \"script\" not found in input: #{fields}" if fields['script'].nil?
+    shellscript = fields['script']
+    shellargs = fields['args']
+
     set_credentials(sshauth)
 
     jsondata = JSON.generate(task)

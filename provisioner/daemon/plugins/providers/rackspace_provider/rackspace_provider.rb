@@ -28,6 +28,7 @@ class RackspaceProvider < Provider
     flavor = inputmap['flavor']
     image = inputmap['image']
     hostname = inputmap['hostname']
+    fields = inputmap['fields']
 
     begin
       knife_instance = Chef::Knife::LoomRackspaceServerCreate.new
@@ -37,9 +38,10 @@ class RackspaceProvider < Provider
       Chef::Config[:knife][:image] = image
       knife_instance.config[:chef_node_name] = hostname
 
-      Chef::Config[:knife][:rackspace_username] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_username"]
-      Chef::Config[:knife][:rackspace_api_key] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_api_key"]
-      Chef::Config[:knife][:rackspace_region] =  @task["config"]["provider"]["provisioner"]["auth"]["rackspace_region"]
+      # our plugin-defined fields are chef knife configs
+      fields.each do |k,v|
+        Chef::Config[:knife][k.to_sym] = v
+      end
 
       # invoke knife
       log.debug "Invoking server create"
@@ -65,15 +67,17 @@ class RackspaceProvider < Provider
 
   def confirm(inputmap)
     providerid = inputmap['providerid']
+    fields = inputmap['fields']
 
     begin
       knife_instance = Chef::Knife::LoomRackspaceServerConfirm.new
       knife_instance.configure_chef
       knife_instance.name_args.push(providerid)
 
-      Chef::Config[:knife][:rackspace_username] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_username"]
-      Chef::Config[:knife][:rackspace_api_key] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_api_key"]
-      Chef::Config[:knife][:rackspace_region] =  @task["config"]["provider"]["provisioner"]["auth"]["rackspace_region"]
+      # our plugin-defined fields are chef knife configs
+      fields.each do |k,v|
+        Chef::Config[:knife][k.to_sym] = v
+      end
 
       # invoke knife
       log.debug "Invoking server confirm"
@@ -110,6 +114,7 @@ class RackspaceProvider < Provider
 
   def delete(inputmap)
     providerid = inputmap['providerid']
+    fields = inputmap['fields']
 
     begin
       knife_instance = Chef::Knife::RackspaceServerDelete.new
@@ -117,9 +122,10 @@ class RackspaceProvider < Provider
       knife_instance.name_args.push(@task["config"]["providerid"])
       knife_instance.config[:yes] = true
 
-      Chef::Config[:knife][:rackspace_username] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_username"]
-      Chef::Config[:knife][:rackspace_api_key] = @task["config"]["provider"]["provisioner"]["auth"]["rackspace_api_key"]
-      Chef::Config[:knife][:rackspace_region] =  @task["config"]["provider"]["provisioner"]["auth"]["rackspace_region"]
+      # our plugin-defined fields are chef knife configs
+      fields.each do |k,v|
+        Chef::Config[:knife][k.to_sym] = v
+      end
 
       # invoke knife
       log.debug "Invoking server delete"

@@ -120,6 +120,25 @@
                     </td>
                   </tr>
                   <tr>
+                    <td>All services</td>
+                    <td>
+                      <div class="form-group">
+                        <div class="row" ng-repeat="service in cluster.services">
+                          <div class="col-sm-4">
+                            <div class="form-control">
+                              <span class="service-name default-service-entry ng-binding">[[service]]</span>
+                            </div>
+                          </div>
+                          <div class="col-sm-6">
+                              <button type="button" class="btn-spl btn-success" ng-click="startService(service)"><span class="glyphicon glyphicon-play"></span></button>
+                              <button type="button" class="btn-spl btn-danger" ng-click="stopService(service)"><span class="glyphicon glyphicon-stop"></span></button>
+                              <button type="button" class="btn-spl btn-info" ng-click="restartService(service)"><span class="glyphicon glyphicon-repeat"></span></button>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
                     <td>Add services</td>
                     <td>
                       <div class="form-group">
@@ -134,7 +153,7 @@
                         <br />
                         <div class="row">
                           <div class="col-sm-6">
-                            <div class="form-control ng-scope" ng-repeat="item in servicesToAdd">
+                            <div class="form-control" ng-repeat="item in servicesToAdd">
                               <span class="service-name default-service-entry ng-binding">[[item]]</span>
                               <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, servicesToAdd)"></span>
                             </div>
