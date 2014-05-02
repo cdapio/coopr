@@ -6,7 +6,7 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo-solo",
         "fields": {
           "run_list": "recipe[nodejs::default]"
         }
