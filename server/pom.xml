@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.apache.twill</groupId>
             <artifactId>twill-zookeeper</artifactId>
-            <version>0.2.0-incubating-SNAPSHOT</version>
+            <version>0.2.0-incubating</version>
         </dependency>
 
         <dependency>

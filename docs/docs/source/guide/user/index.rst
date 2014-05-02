@@ -17,6 +17,7 @@
 
 .. index::
    single: User Guide
+
 ==========
 User Guide
 ==========

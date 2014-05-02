@@ -1,0 +1,22 @@
+{
+  "name": "kerberos-client",
+  "description": "Configures Kerberos v5 libraries and client",
+  "dependson": [
+  ],
+  "provisioner": {
+    "actions": {
+      "install": {
+        "type":"chef",
+        "script": "recipe[krb5::default]"
+      },
+      "initialize": {
+        "type":"chef",
+        "script": "recipe[krb5_utils::default]"
+      },
+      "configure": {
+        "type":"chef",
+        "script": "recipe[krb5::default]"
+      }
+    }
+  }
+}

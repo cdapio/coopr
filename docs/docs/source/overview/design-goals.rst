@@ -15,9 +15,9 @@
 
 .. _overview_design-goals:
 
-========
+============
 Design Goals
-========
+============
 
 .. _design-goals:
 

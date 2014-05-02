@@ -59,43 +59,43 @@ class Automator
     end
   end
 
-  def bootstrap(ssh_auth_hash)
+  def bootstrap(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task bootstrap in class #{self.class.name}"
     raise "Unimplemented task bootstrap in class #{self.class.name}"
   end
 
-  def install(ssh_auth_hash, script_string, data_string)
+  def install(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task install in class #{self.class.name}"
     raise "Unimplemented task install in class #{self.class.name}"
   end
 
-  def configure(ssh_auth_hash, script_string, data_string)
+  def configure(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task configure in class #{self.class.name}"
     raise "Unimplemented task configure in class #{self.class.name}"
   end
 
-  def init(ssh_auth_hash, script_string, data_string)
+  def init(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task initialize in class #{self.class.name}"
     raise "Unimplemented task initialize in class #{self.class.name}"
   end
 
-  def start(ssh_auth_hash, script_string, data_string)
+  def start(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task start in class #{self.class.name}"
     raise "Unimplemented task start in class #{self.class.name}"
   end
 
-  def stop(ssh_auth_hash, script_string, data_string)
+  def stop(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task stop in class #{self.class.name}"
     raise "Unimplemented task stop in class #{self.class.name}"
   end
 
-  def remove(ssh_auth_hash, script_string, data_string)
+  def remove(inputmap)
     @result['status'] = 1
     @result['message'] = "Unimplemented task remove in class #{self.class.name}"
     raise "Unimplemented task remove in class #{self.class.name}"

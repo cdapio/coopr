@@ -34,14 +34,14 @@ public class TaskId {
    */
   public static TaskId fromString(String taskIdStr) {
     int index1 = taskIdStr.indexOf("-");
-    Preconditions.checkArgument(index1 > 0, "invalid job id string " + taskIdStr);
+    Preconditions.checkArgument(index1 > 0, "invalid task id string " + taskIdStr);
     String clusterId = taskIdStr.substring(0, index1);
 
     int index2 = taskIdStr.indexOf("-", index1 + 1);
-    Preconditions.checkArgument(index2 > 0, "invalid job id string " + taskIdStr);
+    Preconditions.checkArgument(index2 > 0, "invalid task id string " + taskIdStr);
     long jobNum = Long.valueOf(taskIdStr.substring(index1 + 1, index2));
 
-    Preconditions.checkArgument(taskIdStr.indexOf("-", index2 + 1) < 0, "invalid job id string " + taskIdStr);
+    Preconditions.checkArgument(taskIdStr.indexOf("-", index2 + 1) < 0, "invalid task id string " + taskIdStr);
     long taskNum = Long.valueOf(taskIdStr.substring(index2 + 1));
 
     return new TaskId(new JobId(clusterId, jobNum), taskNum);

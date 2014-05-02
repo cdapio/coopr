@@ -28,9 +28,6 @@ Gemfile.lock
 /integration-testing/target
 .gradle
 
-# Gem builds
-/provisioner/plugins/*/pkg/
-
 # Cookbooks tarball
 /provisioner/daemon/plugins/automators/chef_automator/chef_automator/*.tar.gz
 /provisioner/daemon/plugins/automators/shell_automator/*.tar.gz
@@ -38,12 +35,17 @@ Gemfile.lock
 # Chef client validator
 /provisioner/daemon/plugins/automators/shell_automator/scripts/validation.pem
 
+# Chef testing files
+Berksfile
+Vagrantfile
+chefignore
+
 # Environment
-.bash*
-.chef
-.gem
-.lesshst
-.m2
-.profile
-.ssh
-.viminfo
+/.bash*
+/.chef
+/.gem
+/.lesshst
+/.m2
+/.profile
+/.ssh
+/.viminfo

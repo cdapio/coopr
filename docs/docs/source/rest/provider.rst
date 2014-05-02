@@ -17,6 +17,7 @@
 
 .. index::
    single: REST API: Provider
+
 ==================
 REST API: Provider
 ==================
@@ -31,11 +32,13 @@ Openstack out of the box.
 Each provider configured in the system has a unique name, a short description, and a list of key-value pairs that are required by the backend hardware provisioner.
 
 .. _provider-create:
+
 Create a Provider
 ==================
 
 To create a new provider, make a HTTP POST request to URI:
 ::
+
  /providers
 
 POST Parameters
@@ -86,11 +89,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/providers
 
 .. _provider-retrieve:
+
 Retrieve a Provider
 ===================
 
 To retrieve details about a provider type, make a GET HTTP request to URI:
 ::
+
  /providers/{name}
 
 This resource request represents an individual provider for viewing.
@@ -120,11 +125,13 @@ Example
 
 
 .. _provider-delete:
+
 Delete a Provider
 =================
 
 To delete a provider type, make a DELETE HTTP request to URI:
 ::
+
  /providers/{name}
 
 This resource request represents an individual provider for deletion.
@@ -153,11 +160,13 @@ Example
         http://<loom-server>:<loom-port>/<version>/loom/providers/example
 
 .. _provider-modify:
+
 Update a Provider
 ==================
 
 To update a provider type, make a PUT HTTP request to URI:
 ::
+
  /providers/{name}
 
 Resource specified above respresents an individual provider that is being updated.
@@ -216,6 +225,7 @@ Example
  $ {"name":"example","description":"Updated example","providertype":"openstack","provisioner":{}}
 
 .. _provider-all-list:
+
 List All Providers
 =============================
 
@@ -225,6 +235,7 @@ the comprehensive set of providers configured within the Loom system.
 
 To list all the providers configured within Continuuity Loom, make GET HTTP request to URI:
 ::
+
  /providers
 
 HTTP Responses

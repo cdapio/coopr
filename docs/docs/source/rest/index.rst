@@ -17,6 +17,7 @@
 
 .. index::
    single: Web Services
+
 =============
 Web Services
 =============
@@ -35,6 +36,7 @@ Base URL
 
 All URLs referenced in the documentation have the following base:
 ::
+
  http://<loom-server>:<loom-port>/v1/loom
 
 In addition, two headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
@@ -75,7 +77,7 @@ Services
   * :ref:`Add a Service <service-create>`
   * :ref:`Retrieve a Service <service-retrieve>`
   * :ref:`Delete a Service <service-delete>`
-  * :ref:`Update a Service type <service-modify>`
+  * :ref:`Update a Service <service-modify>`
   * :ref:`List all Services <service-all-list>`
 
 Cluster Templates
@@ -88,21 +90,27 @@ Cluster Templates
 
 Import/Export
 -----------------
-  * :ref:`Exporting Template Metadata <entity-export>`
-  * :ref:`Importing Template Metadata <entity-import>`
+  * :ref:`Export Template Metadata <entity-export>`
+  * :ref:`Import Template Metadata <entity-import>`
 
 User APIs
 =========
-The User Web service provides methods that can be used to create, delete and get status of cluster 
-being created. 
+The User Web service provides methods that can be used to create, delete and manage clusters. 
 
 Clusters
 ------------
-  * :ref:`Creating a Cluster <cluster-create>`
-  * :ref:`Getting Cluster Details <cluster-details>`
-  * :ref:`Deleting a Cluster <cluster-delete>`
-  * :ref:`Getting Status of a Cluster <cluster-status>`
-  * :ref:`Getting a Cluster Action Plan <cluster-plan>`
+  * :ref:`Create a Cluster <cluster-create>`
+  * :ref:`Get Cluster Details <cluster-details>`
+  * :ref:`Delete a Cluster <cluster-delete>`
+  * :ref:`Get Cluster Status <cluster-status>`
+  * :ref:`Get a Cluster Action Plan <cluster-plan>`
+  * :ref:`Get Cluster Configuration <cluster-get-config>`
+  * :ref:`Update Cluster Configuration <cluster-update-config>`
+  * :ref:`Get Cluster Services <cluster-get-services>`
+  * :ref:`Add Services to a Cluster <cluster-add-services>`
+  * :ref:`Stop Services on a Cluster <cluster-stop-services>`
+  * :ref:`Start Services on a Cluster <cluster-start-services>`
+  * :ref:`Restart Services on a Cluster <cluster-restart-services>`
 
 RPC Calls
 =========
@@ -134,9 +142,12 @@ REST's proponents argue that the Web's scalability and growth are a direct resul
   * Application state and functionality are divided into resources
   * Every resource is uniquely addressable using a universal syntax for use in hypermedia links
   * All resources share a uniform interface for the transfer of state between client and resource, consisting of
+ 
    * A constrained set of well-defined operations
    * A constrained set of content types, optionally supporting code on demand
+
   * A protocol which is:
+
    * Client-server
    * Stateless
    * Cacheable

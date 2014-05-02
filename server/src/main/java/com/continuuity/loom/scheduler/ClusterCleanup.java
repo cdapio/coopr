@@ -57,8 +57,8 @@ public class ClusterCleanup implements Runnable {
   @Inject
   public ClusterCleanup(ClusterStore clusterStore, NodeService nodeService, ClusterService clusterService,
                         TaskService taskService,
-                        @Named("nodeprovisioner.queue") TrackingQueue provisionerQueue,
-                        @Named("internal.job.queue") TrackingQueue jobQueue,
+                        @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
+                        @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
                         @Named("task.timeout.seconds") long taskTimeout,
                         @Named(Constants.ID_START_NUM) long startId,
                         @Named(Constants.ID_INCREMENT_BY) long incrementBy) {
