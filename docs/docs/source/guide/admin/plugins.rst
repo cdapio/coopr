@@ -397,6 +397,6 @@ Included Plugins
 .. toctree::
    :maxdepth: 1
 
-   chef-automator-plugin
+   chef-solo-automator-plugin
    shell-automator-plugin
 
