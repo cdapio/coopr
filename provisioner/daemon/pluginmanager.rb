@@ -99,20 +99,18 @@ class PluginManager
   end
 
   def register_plugintype(name, json_obj, uri)
-    begin
-      log.debug "registering provider/automator type: #{name}"
-      json = JSON.generate(json_obj)
-      resp = RestClient.put("#{uri}", json, :'X-Loom-UserID' => "admin")
-      if(resp.code == 200)
-        log.info "Successfully registered #{name}"
-      else
-        log.error "Response code #{resp.code}, #{resp.to_str} when trying to register #{name}"
-      end
-    rescue => e
-      log.error "Caught exception registering plugins to loom server #{uri}"
-      log.error e.message
-      log.error e.backtrace.inspect
+    log.debug "registering provider/automator type: #{name}"
+    json = JSON.generate(json_obj)
+    resp = RestClient.put("#{uri}", json, :'X-Loom-UserID' => "admin")
+    if(resp.code == 200)
+      log.info "Successfully registered #{name}"
+    else
+      log.error "Response code #{resp.code}, #{resp.to_str} when trying to register #{name}"
     end
+  rescue => e
+    log.error "Caught exception registering plugins to loom server #{uri}"
+    log.error e.message
+    log.error e.backtrace.inspect
   end
 
   # returns registered class name for given provider plugin
