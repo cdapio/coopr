@@ -60,7 +60,7 @@ if loom_uri.nil? && !options[:file]
   exit(1)
 end
 
-if(loom_uri == nil && options[:register])
+if(loom_uri.nil? && options[:register])
   puts "--register option requires the --uri [server uri] option"
   exit(1)
 end
