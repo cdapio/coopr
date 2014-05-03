@@ -23,7 +23,7 @@ class ChefSoloAutomator < Automator
 
   def initialize(task)
     super(task)
-    @chef_primitives_path = "#{File.expand_path(File.dirname(__FILE__))}/chef_automator"
+    @chef_primitives_path = "#{File.expand_path(File.dirname(__FILE__))}/chef_solo_automator"
     @remote_cache_dir = "/var/cache/loom"
     @remote_chef_dir = "/var/chef"
   end
