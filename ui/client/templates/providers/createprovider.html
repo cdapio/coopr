@@ -1,168 +1,35 @@
-{% extends 'index.html' %}
-
-{% block title %}{% if provider %} Edit provider: {{provider.name}} {% else %}Create a provider{% endif %}{% endblock %}
-
-{% block header %}
-    {% include "page-header.html" %}
-{% endblock %}
-
-{% block content %}
-  <div id="content-body">
-    <div id="title">
-      <div class="pull-right">
-        <div id="global">
-          {% include "providers/topmenu.html" %}
-        </div>
+<form class="form-horizontal" role="form" id="create-provider-form" action="/providers/create" ng-submit="submitProvider($event)">
+    <div class="form-group">
+      <label for="inputName" class="col-sm-2 control-label">Name</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name" ng-model="inputName">
       </div>
-      <div style="clear: both"></div>
+    </div>
+    <div class="form-group">
+      <label for="inputDescription" class="col-sm-2 control-label">Description</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" id="inputDescription" name="inputDescription" placeholder="Description" ng-model="inputDescription">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="inputProvisioner" class="col-sm-2 control-label">Provider type</label>
+      <div class="col-sm-8">
+        <select class="form-control" name="inputProvisioner" id="provisioner-select" ng-model="providerType" ng-options="name for (name,item) in providerData">
+          <option></option>
+        </select>
+      </div>                
     </div>
 
-    <div id="panels">
-
-      <div class="panel spl-panel" style="clear: both;">
-        <div class="panel-head spl-panel-head clearfix">
-          <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if provider %} Edit provider: {{provider.name}} {% else %}Create a provider{% endif %}</h4>
-          <div class="pull-right">
-            {% if provider %}
-            <form role="form" method="POST" action="/providers/delete/{{provider.name}}" class="provider-delete-form">
-              <input type="hidden" value="{{entry.name}}" name="name" />
-              <button type="submit" class="btn-spl btn-delete"></button>
-            </form>
-            {% endif %}
-          </div>
-          </div>
-        </div>
-        <div class="panel-body spl-panel-body">
-          <form class="form-horizontal" role="form" id="create-provider-form" action="{% if provider %}/providers/update{% else %}/providers/create{% endif %}">
-            <div class="form-group">
-              <label for="inputName" class="col-sm-2 control-label">Name</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name" value="{{provider.name}}" {% if provider %} disabled {% endif %}>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="inputDescription" class="col-sm-2 control-label">Description</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="inputDescription" name="inputDescription" placeholder="Description" value="{{provider.description}}">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="inputProvisioner" class="col-sm-2 control-label">Provider type</label>
-              <div class="col-sm-8">
-                <select class="form-control" name="inputProvisioner" id="provisioner-select">
-                  <option></option>
-                  <option {% if provider.providertype == "rackspace" %} selected="selected" {% endif %}>rackspace</option>
-                  <option {% if provider.providertype == "joyent" %} selected="selected" {% endif %}>joyent</option>
-                  <option {% if provider.providertype == "openstack" %} selected="selected" {% endif %}>openstack</option>
-                </select>
-              </div>
-              <div id="rackspace-auth-fields" class="auth-group col-sm-offset-2 col-sm-8 top-margin" {% if provider.providertype == "rackspace" %} style="display: block" {% endif %}>
-                <div class="form-group">
-                  <label for="rackspace_username" class="col-sm-2 control-label">Username</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="rackspace_username" name="rackspace_username" placeholder="Username" value="{{provider.provisioner.auth.rackspace_username}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="rackspace_api_key" class="col-sm-2 control-label">Api key</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="rackspace_api_key" name="rackspace_api_key" placeholder="Api key" value="{{provider.provisioner.auth.rackspace_api_key}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="rackspace_region" class="col-sm-2 control-label">Region</label>
-                  <div class="col-sm-8">
-                    <select class="form-control" name="rackspace_region" id="rackspace_region">
-                      <option {% if provider.provisioner.auth.rackspace_region == "dfw" %} selected="selected" {% endif %}>dfw</option>
-                      <option {% if provider.provisioner.auth.rackspace_region == "iad" %} selected="selected" {% endif %}>iad</option>
-                      <option {% if provider.provisioner.auth.rackspace_region == "ord" %} selected="selected" {% endif %}>ord</option>
-                      <option {% if provider.provisioner.auth.rackspace_region == "hkg" %} selected="selected" {% endif %}>hkg</option>
-                      <option {% if provider.provisioner.auth.rackspace_region == "syd" %} selected="selected" {% endif %}>syd</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div id="joyent-auth-fields" class="auth-group col-sm-offset-2 col-sm-8 top-margin" {% if provider.providertype == "joyent" %} style="display: block" {% endif %}>
-                <div class="form-group">
-                  <label for="joyent_username" class="col-sm-2 control-label">Username</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_username" name="joyent_username" placeholder="Username" value="{{provider.provisioner.auth.joyent_username}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="joyent_keyname" class="col-sm-2 control-label">Api key name</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_keyname" name="joyent_keyname" placeholder="Api key name" value="{{provider.provisioner.auth.joyent_keyname}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="joyent_keyfile" class="col-sm-2 control-label">Api key file</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_keyfile" name="joyent_keyfile" placeholder="Api key file" value="{{provider.provisioner.auth.joyent_keyfile}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="joyent_api_url" class="col-sm-2 control-label">Api url</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_api_url" name="joyent_api_url" placeholder="Api url" value="{{provider.provisioner.auth.joyent_api_url}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="joyent_version" class="col-sm-2 control-label">Version</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="joyent_version" name="joyent_version" placeholder="Version" value="{{provider.provisioner.auth.joyent_version}}">
-                  </div>
-                </div>
-              </div>
-              <div id="openstack-auth-fields" class="auth-group col-sm-offset-2 col-sm-8 top-margin" {% if provider.providertype == "openstack" %} style="display: block" {% endif %}>
-                <div class="form-group">
-                  <label for="openstack_username" class="col-sm-2 control-label">Username</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="openstack_username" name="openstack_username" placeholder="Username" value="{{provider.provisioner.auth.openstack_username}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="openstack_password" class="col-sm-2 control-label">Password</label>
-                  <div class="col-sm-8">
-                    <input type="password" class="form-control" id="openstack_password" name="openstack_password" placeholder="Password" value="{{provider.provisioner.auth.openstack_password}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="openstack_tenant" class="col-sm-2 control-label">Tenant</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="openstack_tenant" name="openstack_tenant" placeholder="Tenant" value="{{provider.provisioner.auth.openstack_tenant}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="openstack_auth_url" class="col-sm-2 control-label">Api Url</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="openstack_auth_url" name="openstack_auth_url" placeholder="Api url" value="{{provider.provisioner.auth.openstack_auth_url}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="openstack_ssh_key_id" class="col-sm-2 control-label">SSH key id</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="openstack_ssh_key_id" name="openstack_ssh_key_id" placeholder="SSH key id" value="{{provider.provisioner.auth.openstack_ssh_key_id}}">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="identity_file" class="col-sm-2 control-label">Identity file</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="identity_file" name="identity_file" placeholder="Identity file" value="{{provider.provisioner.auth.identity_file}}">
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-offset-2 col-sm-8">
-                <button type="submit" class="btn-spl btn-info">{% if provider %} Save{% else %}Create{% endif %}</button>
-              </div>
-            </div>
-          </form>
-        </div>
+    <div class="form-group" ng-repeat="(name,fieldData) in providerInputs.parameters.admin.fields">
+      <label class="col-sm-2 control-label">[[fieldData.label]]</label>
+      <div class="col-sm-8">
+        <input class="form-control" type="[[fieldData.type]]" ng-model="fieldData.default" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'text' || fieldData.type == 'password'" />
+        <select class="form-control" type="[[fieldData.type]]" ng-model="fieldData.default" ng-options="region as region for region in fieldData.options" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'select'" ></select>
       </div>
-      
     </div>
-  </div>
-<script data-main="/static/js/createprovider" src="/static/third_party/require.js"></script>
-{% endblock %}
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-8">
+          <button type="submit" class="btn-spl btn-info">Submit</button>
+      </div> 
+    </div>
+</form>

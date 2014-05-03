@@ -9,10 +9,8 @@
         "description": "Rackspace Public Cloud",
         "providertype": "rackspace",
         "provisioner": {
-            "auth": {
-                "rackspace_username": "rackspace_user",
-                "rackspace_api_key": "abcdef1234"
-            }
+            "rackspace_username": "rackspace_user",
+            "rackspace_api_key": "abcdef1234"
         }
     },
     "clusterTemplate": {
@@ -79,13 +77,6 @@
                 "reactor"
             ]
         },
-        "administration": {
-          "leaseduration": {
-            "initial":86400000,
-            "max":864000000,
-            "step":86400000
-          }
-        },
         "constraints": {
             "layout": {
                 "mustcoexist": [
@@ -151,8 +142,52 @@
                     }
                 }
             }
+        },
+        "administration": {
+            "leaseduration": {
+                "initial": 86400000,
+                "max": 864000000,
+                "step": 86400000
+            }
         }
     },
+    "services": [
+        "base",
+        "hadoop-hdfs-namenode",
+        "hadoop-hdfs-datanode",
+        "hadoop-yarn-resourcemanager",
+        "hadoop-yarn-nodemanager",
+        "zookeeper-server",
+        "hbase-master",
+        "hbase-regionserver",
+        "reactor"
+    ],
+    "ownerId": "admin",
+    "status": "active",
+    "config": {
+        "hadoop": {
+            "core_site": {
+                "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%"
+            },
+            "hdfs_site": {
+                "dfs.datanode.max.xcievers": "4096"
+            },
+            "mapred_site": {
+                "mapreduce.framework.name": "yarn"
+            },
+            "yarn_site": {
+                "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%"
+            }
+        },
+        "hbase": {
+            "hbase_site": {
+                "hbase.rootdir": "hdfs://%host.service.hadoop-hdfs-namenode%/hbase",
+                "hbase.cluster.distributed": "true",
+                "hbase.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
+            }
+        }
+    },
+    "name": "test-woo",
     "nodes": [
         {
             "id": "317c84c3-e6ec-4dc8-a460-2433d6b61675",
@@ -161,29 +196,48 @@
                 {
                     "name": "hadoop-yarn-nodemanager",
                     "description": "Hadoop YARN NodeManager",
-                    "dependson": [
-                        "base",
-                        "hadoop-yarn-resourcemanager"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-yarn-resourcemanager"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -191,30 +245,49 @@
                 {
                     "name": "hbase-regionserver",
                     "description": "HBase RegionServer",
-                    "dependson": [
-                        "base",
-                        "hbase-master",
-                        "zookeeper-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hbase-master",
+                                "zookeeper-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hbase_regionserver]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hbase_regionserver]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -222,12 +295,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -235,29 +321,48 @@
                 {
                     "name": "hadoop-hdfs-datanode",
                     "description": "Hadoop HDFS DataNode",
-                    "dependson": [
-                        "base",
-                        "hadoop-hdfs-namenode"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-hdfs-namenode"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_hdfs_datanode]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hadoop_hdfs_datanode]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -378,32 +483,53 @@
                 {
                     "name": "zookeeper-server",
                     "description": "ZooKeeper Server",
-                    "dependson": [
-                        "base"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::zookeeper_server]"
+                                "fields": {
+                                    "script": "recipe[hadoop::zookeeper_server]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
+                                }
                             },
                             "initialize": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -411,37 +537,58 @@
                 {
                     "name": "hadoop-yarn-resourcemanager",
                     "description": "Hadoop YARN ResourceManager",
-                    "dependson": [
-                        "base",
-                        "hadoop-hdfs-datanode",
-                        "hadoop-hdfs-namenode"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-hdfs-datanode",
+                                "hadoop-hdfs-namenode"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_yarn_resourcemanager]",
-                                "data": ""
+                                "fields": {
+                                    "data": "",
+                                    "script": "recipe[hadoop::hadoop_yarn_resourcemanager]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]",
-                                "data": ""
+                                "fields": {
+                                    "data": "",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]"
+                                }
                             },
                             "initialize": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::hadoop_yarn_resourcemanager_init]",
-                                "data": ""
+                                "fields": {
+                                    "data": "",
+                                    "script": "recipe[hadoop_wrapper::hadoop_yarn_resourcemanager_init]"
+                                }
                             }
                         }
                     }
@@ -449,35 +596,56 @@
                 {
                     "name": "hbase-master",
                     "description": "HBase Master",
-                    "dependson": [
-                        "base",
-                        "hadoop-hdfs-namenode",
-                        "hadoop-hdfs-datanode",
-                        "zookeeper-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-hdfs-namenode",
+                                "hadoop-hdfs-datanode",
+                                "zookeeper-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hbase_master]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hbase_master]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                }
                             },
                             "initialize": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::hbase_master_init]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::hbase_master_init]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -485,12 +653,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -498,39 +679,60 @@
                 {
                     "name": "reactor",
                     "description": "Continuuity Reactor",
-                    "dependson": [
-                        "base",
-                        "hadoop-hdfs-namenode",
-                        "hadoop-hdfs-datanode",
-                        "hadoop-yarn-resourcemanager",
-                        "hadoop-yarn-nodemanager",
-                        "hbase-master",
-                        "hbase-regionserver",
-                        "zookeeper-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-hdfs-namenode",
+                                "hadoop-hdfs-datanode",
+                                "hadoop-yarn-resourcemanager",
+                                "hadoop-yarn-nodemanager",
+                                "hbase-master",
+                                "hbase-regionserver",
+                                "zookeeper-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack]"
+                                "fields": {
+                                    "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[reactor_wrapper::default],recipe[reactor::config]"
+                                "fields": {
+                                    "script": "recipe[reactor_wrapper::default],recipe[reactor::config]"
+                                }
                             },
                             "initialize": {
                                 "type": "chef",
-                                "script": "recipe[reactor_wrapper::default],recipe[reactor::init]"
+                                "fields": {
+                                    "script": "recipe[reactor_wrapper::default],recipe[reactor::init]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }",
+                                    "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }",
+                                    "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -538,32 +740,53 @@
                 {
                     "name": "hadoop-hdfs-namenode",
                     "description": "Hadoop HDFS NameNode",
-                    "dependson": [
-                        "base"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_hdfs_namenode]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hadoop_hdfs_namenode]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "initialize": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -761,29 +984,48 @@
                 {
                     "name": "hadoop-yarn-nodemanager",
                     "description": "Hadoop YARN NodeManager",
-                    "dependson": [
-                        "base",
-                        "hadoop-yarn-resourcemanager"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-yarn-resourcemanager"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -791,30 +1033,49 @@
                 {
                     "name": "hbase-regionserver",
                     "description": "HBase RegionServer",
-                    "dependson": [
-                        "base",
-                        "hbase-master",
-                        "zookeeper-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hbase-master",
+                                "zookeeper-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hbase_regionserver]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hbase_regionserver]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -822,12 +1083,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -835,29 +1109,48 @@
                 {
                     "name": "hadoop-hdfs-datanode",
                     "description": "Hadoop HDFS DataNode",
-                    "dependson": [
-                        "base",
-                        "hadoop-hdfs-namenode"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-hdfs-namenode"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_hdfs_datanode]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hadoop_hdfs_datanode]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -978,29 +1271,48 @@
                 {
                     "name": "hadoop-yarn-nodemanager",
                     "description": "Hadoop YARN NodeManager",
-                    "dependson": [
-                        "base",
-                        "hadoop-yarn-resourcemanager"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-yarn-resourcemanager"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -1008,30 +1320,49 @@
                 {
                     "name": "hbase-regionserver",
                     "description": "HBase RegionServer",
-                    "dependson": [
-                        "base",
-                        "hbase-master",
-                        "zookeeper-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hbase-master",
+                                "zookeeper-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hbase_regionserver]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hbase_regionserver]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -1039,12 +1370,25 @@
                 {
                     "name": "base",
                     "description": "Base service",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -1052,29 +1396,48 @@
                 {
                     "name": "hadoop-hdfs-datanode",
                     "description": "Hadoop HDFS DataNode",
-                    "dependson": [
-                        "base",
-                        "hadoop-hdfs-namenode"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-hdfs-namenode"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_hdfs_datanode]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hadoop_hdfs_datanode]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -1195,29 +1558,48 @@
                 {
                     "name": "hadoop-yarn-nodemanager",
                     "description": "Hadoop YARN NodeManager",
-                    "dependson": [
-                        "base",
-                        "hadoop-yarn-resourcemanager"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-yarn-resourcemanager"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -1225,30 +1607,49 @@
                 {
                     "name": "hbase-regionserver",
                     "description": "HBase RegionServer",
-                    "dependson": [
-                        "base",
-                        "hbase-master",
-                        "zookeeper-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hbase-master",
+                                "zookeeper-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hbase_regionserver]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hbase_regionserver]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -1256,12 +1657,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -1269,29 +1683,48 @@
                 {
                     "name": "hadoop-hdfs-datanode",
                     "description": "Hadoop HDFS DataNode",
-                    "dependson": [
-                        "base",
-                        "hadoop-hdfs-namenode"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base",
+                                "hadoop-hdfs-namenode"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::hadoop_hdfs_datanode]"
+                                "fields": {
+                                    "script": "recipe[hadoop::hadoop_hdfs_datanode]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -1405,50 +1838,9 @@
                 }
             ]
         }
-    ],
-    "services": [
-        "base",
-        "hadoop-hdfs-namenode",
-        "hadoop-hdfs-datanode",
-        "hadoop-yarn-resourcemanager",
-        "hadoop-yarn-nodemanager",
-        "zookeeper-server",
-        "hbase-master",
-        "hbase-regionserver",
-        "reactor"
-    ],
-    "jobs": [
-        "00000139-001",
-        "00000139-002"
-    ],
-    "ownerId": "admin",
-    "status": "active",
-    "config": {
-        "hadoop": {
-            "core_site": {
-                "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%"
-            },
-            "hdfs_site": {
-                "dfs.datanode.max.xcievers": "4096"
-            },
-            "mapred_site": {
-                "mapreduce.framework.name": "yarn"
-            },
-            "yarn_site": {
-                "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%"
-            }
-        },
-        "hbase": {
-            "hbase_site": {
-                "hbase.rootdir": "hdfs://%host.service.hadoop-hdfs-namenode%/hbase",
-                "hbase.cluster.distributed": "true",
-                "hbase.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
-            }
-        }
-    },
-    "name": "test-woo"
-  },
-  "00000138": {
+    ]
+},
+"00000138": {
     "id": "00000138",
     "description": "",
     "createTime": 1392064239597,
@@ -1458,10 +1850,8 @@
         "description": "Rackspace Public Cloud",
         "providertype": "rackspace",
         "provisioner": {
-            "auth": {
-                "rackspace_username": "rackspace_user",
-                "rackspace_api_key": "abcdef1234"
-            }
+            "rackspace_username": "rackspace_user",
+            "rackspace_api_key": "abcdef1234"
         }
     },
     "clusterTemplate": {
@@ -1527,13 +1917,6 @@
                 "loom-server",
                 "loom-ui"
             ]
-        },
-        "administration": {
-          "leaseduration": {
-            "initial":86400000,
-            "max":864000000,    
-            "step":86400000    
-          }     
         },
         "constraints": {
             "layout": {
@@ -1634,8 +2017,55 @@
                     }
                 }
             }
+        },
+        "administration": {
+            "leaseduration": {
+                "initial": 86400000,
+                "max": 864000000,
+                "step": 86400000
+            }
         }
     },
+    "services": [
+        "base",
+        "zookeeper-server",
+        "mysql-server",
+        "loom-provisioner",
+        "loom-server",
+        "loom-ui"
+    ],
+    "ownerId": "admin",
+    "status": "active",
+    "config": {
+        "zookeeper": {
+            "myid": "%instance.self.service.zookeeper-server%",
+            "zoocfg": {
+                "maxClientCnxns": "0",
+                "server.1": "%host.service.zookeeper-server[0]%:2888:3888",
+                "server.2": "%host.service.zookeeper-server[1]%:2888:3888",
+                "server.3": "%host.service.zookeeper-server[2]%:2888:3888",
+                "tickTime": "2000",
+                "initLimit": "5",
+                "syncLimit": "2"
+            }
+        },
+        "loom-server": {
+            "loom-server": {
+                "zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%",
+                "loom.host": "%ip.service.loom-server%",
+                "loom.jdbc.driver": "com.mysql.jdbc.Driver",
+                "loom.jdbc.connection.string": "jdbc:mysql://%ip.service.mysql-server%:3306/loom?useLegacyDatetimeCode=false",
+                "loom.db.user": "loom",
+                "loom.db.password": "12345"
+            }
+        },
+        "mysql": {
+            "server_debian_password": "12345",
+            "server_root_password": "12345",
+            "server_repl_password": "12345"
+        }
+    },
+    "name": "loom-prod",
     "nodes": [
         {
             "id": "06f8ca02-7223-43cc-b653-2601f4ac02ca",
@@ -1644,15 +2074,28 @@
                 {
                     "name": "loom-provisioner",
                     "description": "loom provisioners",
-                    "dependson": [
-                        "loom-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "loom-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "",
-                                "data": ""
+                                "fields": {
+                                    "data": "",
+                                    "script": ""
+                                }
                             }
                         }
                     }
@@ -1660,12 +2103,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -1730,15 +2186,28 @@
                 {
                     "name": "loom-ui",
                     "description": "loom ui",
-                    "dependson": [
-                        "loom-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "loom-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "",
-                                "data": ""
+                                "fields": {
+                                    "data": "",
+                                    "script": ""
+                                }
                             }
                         }
                     }
@@ -1746,12 +2215,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -1816,12 +2298,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -1829,15 +2324,28 @@
                 {
                     "name": "loom-server",
                     "description": "Loom server",
-                    "dependson": [
-                        "base"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "",
-                                "data": ""
+                                "fields": {
+                                    "data": "",
+                                    "script": ""
+                                }
                             }
                         }
                     }
@@ -1902,15 +2410,28 @@
                 {
                     "name": "loom-provisioner",
                     "description": "loom provisioners",
-                    "dependson": [
-                        "loom-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "loom-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "",
-                                "data": ""
+                                "fields": {
+                                    "data": "",
+                                    "script": ""
+                                }
                             }
                         }
                     }
@@ -1918,12 +2439,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -1988,32 +2522,53 @@
                 {
                     "name": "zookeeper-server",
                     "description": "ZooKeeper Server",
-                    "dependson": [
-                        "base"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::zookeeper_server]"
+                                "fields": {
+                                    "script": "recipe[hadoop::zookeeper_server]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
+                                }
                             },
                             "initialize": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -2021,12 +2576,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -2112,32 +2680,53 @@
                 {
                     "name": "zookeeper-server",
                     "description": "ZooKeeper Server",
-                    "dependson": [
-                        "base"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::zookeeper_server]"
+                                "fields": {
+                                    "script": "recipe[hadoop::zookeeper_server]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
+                                }
                             },
                             "initialize": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -2145,12 +2734,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -2236,12 +2838,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -2249,28 +2864,47 @@
                 {
                     "name": "mysql-server",
                     "description": "MySQL Server",
-                    "dependson": [
-                        "base"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[apt::default],recipe[mysql::server]"
+                                "fields": {
+                                    "script": "recipe[apt::default],recipe[mysql::server]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[mysql::server]"
+                                "fields": {
+                                    "script": "recipe[mysql::server]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[mysql::server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }",
+                                    "script": "recipe[mysql::server],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[mysql::server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }",
+                                    "script": "recipe[mysql::server],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -2349,15 +2983,28 @@
                 {
                     "name": "loom-provisioner",
                     "description": "loom provisioners",
-                    "dependson": [
-                        "loom-server"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "loom-server"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "",
-                                "data": ""
+                                "fields": {
+                                    "data": "",
+                                    "script": ""
+                                }
                             }
                         }
                     }
@@ -2365,12 +3012,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -2435,32 +3095,53 @@
                 {
                     "name": "zookeeper-server",
                     "description": "ZooKeeper Server",
-                    "dependson": [
-                        "base"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[hadoop::zookeeper_server]"
+                                "fields": {
+                                    "script": "recipe[hadoop::zookeeper_server]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
+                                }
                             },
                             "initialize": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
+                                "fields": {
+                                    "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -2468,12 +3149,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -2552,53 +3246,9 @@
                 }
             ]
         }
-    ],
-    "services": [
-        "base",
-        "zookeeper-server",
-        "mysql-server",
-        "loom-provisioner",
-        "loom-server",
-        "loom-ui"
-    ],
-    "jobs": [
-        "00000138-001",
-        "00000138-002"
-    ],
-    "ownerId": "admin",
-    "status": "active",
-    "config": {
-        "zookeeper": {
-            "myid": "%instance.self.service.zookeeper-server%",
-            "zoocfg": {
-                "maxClientCnxns": "0",
-                "server.1": "%host.service.zookeeper-server[0]%:2888:3888",
-                "server.2": "%host.service.zookeeper-server[1]%:2888:3888",
-                "server.3": "%host.service.zookeeper-server[2]%:2888:3888",
-                "tickTime": "2000",
-                "initLimit": "5",
-                "syncLimit": "2"
-            }
-        },
-        "loom-server": {
-            "loom-server": {
-                "zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%",
-                "loom.host": "%ip.service.loom-server%",
-                "loom.jdbc.driver": "com.mysql.jdbc.Driver",
-                "loom.jdbc.connection.string": "jdbc:mysql://%ip.service.mysql-server%:3306/loom?useLegacyDatetimeCode=false",
-                "loom.db.user": "loom",
-                "loom.db.password": "12345"
-            }
-        },
-        "mysql": {
-            "server_debian_password": "12345",
-            "server_root_password": "12345",
-            "server_repl_password": "12345"
-        }
-    },
-    "name": "loom-prod"
-  },
-  "00000135": {
+    ]
+},
+"00000135": {
     "id": "00000135",
     "description": "",
     "createTime": 1392053927127,
@@ -2608,10 +3258,8 @@
         "description": "Rackspace Public Cloud",
         "providertype": "rackspace",
         "provisioner": {
-            "auth": {
-                "rackspace_username": "rackspace_user",
-                "rackspace_api_key": "abcdef1234"
-            }
+            "rackspace_username": "rackspace_user",
+            "rackspace_api_key": "abcdef1234"
         }
     },
     "clusterTemplate": {
@@ -2661,13 +3309,6 @@
                 "mysql-server"
             ]
         },
-        "administration": {
-            "leaseduration": {
-              "initial":172800000,
-              "max":864000000,    
-              "step":86400000    
-           }     
-        },
         "constraints": {
             "layout": {
                 "mustcoexist": [
@@ -2694,8 +3335,38 @@
                     }
                 }
             }
+        },
+        "administration": {
+            "leaseduration": {
+                "initial": 172800000,
+                "max": 864000000,
+                "step": 86400000
+            }
         }
     },
+    "services": [
+        "base",
+        "apache-httpd",
+        "php"
+    ],
+    "ownerId": "nitin",
+    "status": "terminated",
+    "config": {
+        "apache": {
+            "default_site_enabled": "true"
+        },
+        "mysql": {
+            "server_debian_password": "12345",
+            "server_root_password": "12345",
+            "server_repl_password": "12345"
+        },
+        "php": {
+            "directives": {
+                "mysql.default_host": "%host.service.mysql-server%"
+            }
+        }
+    },
+    "name": "test-nitin",
     "nodes": [
         {
             "id": "cfd3b4bf-89d9-41ac-9a57-399e1d76a99d",
@@ -2704,12 +3375,25 @@
                 {
                     "name": "base",
                     "description": "Base services",
-                    "dependson": [],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[loom_base::default]"
+                                "fields": {
+                                    "script": "recipe[loom_base::default]"
+                                }
                             }
                         }
                     }
@@ -2717,28 +3401,47 @@
                 {
                     "name": "apache-httpd",
                     "description": "Apache HTTP Server",
-                    "dependson": [
-                        "base"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "base"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[apache2::default]"
+                                "fields": {
+                                    "script": "recipe[apache2::default]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[apache2::default]"
+                                "fields": {
+                                    "script": "recipe[apache2::default]"
+                                }
                             },
                             "start": {
                                 "type": "chef",
-                                "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }",
+                                    "script": "recipe[apache2::default],recipe[loom_service_runner::default]"
+                                }
                             },
                             "stop": {
                                 "type": "chef",
-                                "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
-                                "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }"
+                                "fields": {
+                                    "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }",
+                                    "script": "recipe[apache2::default],recipe[loom_service_runner::default]"
+                                }
                             }
                         }
                     }
@@ -2746,18 +3449,33 @@
                 {
                     "name": "php",
                     "description": "Adds PHP language support",
-                    "dependson": [
-                        "apache-httpd"
-                    ],
+                    "dependencies": {
+                        "provides": [],
+                        "conflicts": [],
+                        "install": {
+                            "requires": [],
+                            "uses": []
+                        },
+                        "runtime": {
+                            "requires": [
+                                "apache-httpd"
+                            ],
+                            "uses": []
+                        }
+                    },
                     "provisioner": {
                         "actions": {
                             "install": {
                                 "type": "chef",
-                                "script": "recipe[apt::default],recipe[php::default]"
+                                "fields": {
+                                    "script": "recipe[apt::default],recipe[php::default]"
+                                }
                             },
                             "configure": {
                                 "type": "chef",
-                                "script": "recipe[php::default]"
+                                "fields": {
+                                    "script": "recipe[php::default]"
+                                }
                             }
                         }
                     }
@@ -2835,34 +3553,6 @@
                 }
             ]
         }
-    ],
-    "services": [
-        "base",
-        "apache-httpd",
-        "php"
-    ],
-    "jobs": [
-        "00000135-001",
-        "00000135-002",
-        "00000135-004"
-    ],
-    "ownerId": "nitin",
-    "status": "terminated",
-    "config": {
-        "apache": {
-            "default_site_enabled": "true"
-        },
-        "mysql": {
-            "server_debian_password": "12345",
-            "server_root_password": "12345",
-            "server_repl_password": "12345"
-        },
-        "php": {
-            "directives": {
-                "mysql.default_host": "%host.service.mysql-server%"
-            }
-        }
-    },
-    "name": "test-nitin"
-  }   
+    ]
+}
 }

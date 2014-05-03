@@ -23,7 +23,6 @@ import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.macro.Expander;
-import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
@@ -66,13 +65,11 @@ public class JobScheduler implements Runnable {
   private final ZKClient zkClient;
   private final TaskService taskService;
   private final int maxTaskRetries;
-  private final LoomStats loomStats;
 
   @Inject
-  public JobScheduler(ClusterStore clusterStore, @Named("nodeprovisioner.queue") TrackingQueue provisionerQueue,
-                      JsonSerde jsonSerde, @Named("internal.job.queue") TrackingQueue jobQueue, ZKClient zkClient,
-                      TaskService taskService, @Named(Constants.MAX_ACTION_RETRIES) int maxTaskRetries,
-                      LoomStats loomStats) {
+  private JobScheduler(ClusterStore clusterStore, @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
+                       JsonSerde jsonSerde, @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
+                       TaskService taskService, @Named(Constants.MAX_ACTION_RETRIES) int maxTaskRetries) {
     this.clusterStore = clusterStore;
     this.provisionerQueue = provisionerQueue;
     this.jsonSerde = jsonSerde;
@@ -80,7 +77,6 @@ public class JobScheduler implements Runnable {
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.taskService = taskService;
     this.maxTaskRetries = maxTaskRetries;
-    this.loomStats = loomStats;
   }
 
   @Override
@@ -99,14 +95,23 @@ public class JobScheduler implements Runnable {
         try {
           lock.acquire();
           ClusterJob job = clusterStore.getClusterJob(jobId);
+          Cluster cluster = clusterStore.getCluster(job.getClusterId());
+          // this can happen if 2 tasks complete around the same time and the first one places the job in the queue,
+          // sees 0 in progress tasks, and sets the cluster status. The job is still in the queue as another element
+          // from the 2nd task and gets here.  In that case, no need to go further.
+          if (cluster.getStatus() != Cluster.Status.PENDING) {
+            continue;
+          }
           LOG.trace("Scheduling job {}", job);
           Set<String> currentStage = job.getCurrentStage();
 
           // Check how many tasks are completed/not-submitted
+          boolean jobFailed = job.getJobStatus() == ClusterJob.Status.FAILED;
           int completedTasks = 0;
           int inProgressTasks = 0;
           Set<ClusterTask> notSubmittedTasks = Sets.newHashSet();
           Set<ClusterTask> retryTasks = Sets.newHashSet();
+          // TODO: avoid looking up every single task every time
           LOG.debug("Verifying task statuses for stage {} for job {}", job.getCurrentStageNumber(), jobIdStr);
           for (String taskId : currentStage) {
             ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
@@ -121,17 +126,15 @@ public class JobScheduler implements Runnable {
               if (task.getNumAttempts() < maxTaskRetries) {
                 retryTasks.add(task);
               } else {
-                job.setJobStatus(ClusterJob.Status.FAILED);
+                jobFailed = true;
               }
             } else if (task.getStatus() == ClusterTask.Status.IN_PROGRESS) {
               ++inProgressTasks;
             }
           }
 
-          Cluster cluster = clusterStore.getCluster(job.getClusterId());
-
           // If the job has not failed continue with scheduling other tasks.
-          if (job.getJobStatus() != ClusterJob.Status.FAILED) {
+          if (!jobFailed) {
             Set<Node> clusterNodes = clusterStore.getClusterNodes(job.getClusterId());
             Map<String, Node> nodeMap = Maps.newHashMap();
             for (Node node : clusterNodes) {
@@ -147,43 +150,10 @@ public class JobScheduler implements Runnable {
 
             // Submit any tasks not yet submitted
             if (!notSubmittedTasks.isEmpty()) {
-              for (final ClusterTask task : notSubmittedTasks) {
-                Node taskNode = nodeMap.get(task.getNodeId());
-                TaskConfig.updateNodeProperties(task.getConfig(), taskNode);
-
-                // Add the node list
-                TaskConfig.addNodeList(task.getConfig(), clusterNodes);
-
-                // TODO: do this only once and save it
-                if (!task.getTaskName().isHardwareAction()) {
-                  try {
-                    task.setConfig(Expander.expand(task.getConfig(), null, clusterNodes, taskNode).getAsJsonObject());
-                  } catch (Throwable e) {
-                    LOG.error("Exception while expanding macros for task {}", task.getTaskId(), e);
-                    taskService.failTask(task, -1);
-                    job.setStatusMessage("Exception while expanding macros: " + e.getMessage());
-                    // no need to schedule more tasks since the job is considered failed even if one task fails.
-                    jobQueue.add(new Element(jobIdStr));
-                    break;
-                  }
-                }
-
-                LOG.debug("Submitting task {}", task.getTaskId());
-                LOG.trace("Task {}", task);
-                SchedulableTask schedulableTask = new SchedulableTask(task);
-                LOG.trace("Schedulable task {}", schedulableTask);
-
-                // Submit task
-                // Note: the job has to be scheduled for processing when the task is complete.
-                provisionerQueue.add(new Element(task.getTaskId(),
-                                                 jsonSerde.getGson().toJson(schedulableTask)));
-
-                job.setTaskStatus(task.getTaskId(), ClusterTask.Status.IN_PROGRESS);
-                taskService.startTask(task);
-              }
+              submitTasks(notSubmittedTasks, nodeMap, clusterNodes, job);
             }
 
-            // Note: before moving cluster out of pending state, make sure that all in progress jobs are done.
+            // Note: before moving cluster out of pending state, make sure that all in progress tasks are done.
             // If all tasks are completed then move to next stage
             if (completedTasks == currentStage.size()) {
               if (job.hasNextStage()) {
@@ -191,29 +161,17 @@ public class JobScheduler implements Runnable {
                 job.advanceStage();
                 jobQueue.add(new Element(jobIdStr));
               } else {
-                job.setJobStatus(ClusterJob.Status.COMPLETE);
-                LOG.debug("Job {} is complete", jobIdStr);
-
-                loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
-
-                // Update cluster status
-                if (job.getClusterAction() == ClusterAction.CLUSTER_DELETE) {
-                  cluster.setStatus(Cluster.Status.TERMINATED);
-                } else {
-                  cluster.setStatus(Cluster.Status.ACTIVE);
-                }
-                clusterStore.writeCluster(cluster);
+                taskService.completeJob(job, cluster);
               }
             }
+            clusterStore.writeClusterJob(job);
           } else if (inProgressTasks == 0) {
             // Job failed and no in progress tasks remaining, update cluster status
-            ClusterAction clusterAction = job.getClusterAction();
-            loomStats.getFailedClusterStats().incrementStat(clusterAction);
-            cluster.setStatus(clusterAction.getFailureStatus());
-            clusterStore.writeCluster(cluster);
+            taskService.failJobAndSetClusterStatus(job, cluster);
+          } else {
+            // Job failed but tasks are still in progress, wait for them to finish before setting cluster status
+            taskService.failJob(job);
           }
-
-          clusterStore.writeClusterJob(job);
         } finally {
           lock.release();
           jobQueue.recordProgress(consumerId, element.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
@@ -221,6 +179,45 @@ public class JobScheduler implements Runnable {
       }
     } catch (Throwable e) {
       LOG.error("Got exception: ", e);
+    }
+  }
+
+  private void submitTasks(Set<ClusterTask> notSubmittedTasks, Map<String, Node> nodeMap, Set<Node> clusterNodes,
+                           ClusterJob job) throws Exception {
+
+    for (final ClusterTask task : notSubmittedTasks) {
+      Node taskNode = nodeMap.get(task.getNodeId());
+      TaskConfig.updateNodeProperties(task.getConfig(), taskNode);
+
+      // Add the node list
+      TaskConfig.addNodeList(task.getConfig(), clusterNodes);
+
+      // TODO: do this only once and save it
+      if (!task.getTaskName().isHardwareAction()) {
+        try {
+          task.setConfig(Expander.expand(task.getConfig(), null, clusterNodes, taskNode).getAsJsonObject());
+        } catch (Throwable e) {
+          LOG.error("Exception while expanding macros for task {}", task.getTaskId(), e);
+          taskService.failTask(task, -1);
+          job.setStatusMessage("Exception while expanding macros: " + e.getMessage());
+          // no need to schedule more tasks since the job is considered failed even if one task fails.
+          jobQueue.add(new Element(job.getJobId()));
+          break;
+        }
+      }
+
+      LOG.debug("Submitting task {}", task.getTaskId());
+      LOG.trace("Task {}", task);
+      SchedulableTask schedulableTask = new SchedulableTask(task);
+      LOG.trace("Schedulable task {}", schedulableTask);
+
+      // Submit task
+      // Note: the job has to be scheduled for processing when the task is complete.
+      provisionerQueue.add(new Element(task.getTaskId(),
+                                       jsonSerde.getGson().toJson(schedulableTask)));
+
+      job.setTaskStatus(task.getTaskId(), ClusterTask.Status.IN_PROGRESS);
+      taskService.startTask(task);
     }
   }
 

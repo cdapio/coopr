@@ -19,12 +19,22 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Actions;
+import com.continuuity.loom.scheduler.ClusterAction;
+import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -32,14 +42,19 @@ import java.util.List;
  * Service for performing operations on {@link ClusterTask}s.
  */
 public class TaskService {
+  private static final Logger LOG = LoggerFactory.getLogger(TaskService.class);
+  private static final Gson GSON = new JsonSerde().getGson();
   private final ClusterStore clusterStore;
   private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
+  private final TrackingQueue callbackQueue;
 
   @Inject
-  public TaskService(ClusterStore clusterStore, LoomStats loomStats) {
+  public TaskService(ClusterStore clusterStore, LoomStats loomStats,
+                     @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue) {
     this.clusterStore = clusterStore;
     this.loomStats = loomStats;
+    this.callbackQueue = callbackQueue;
   }
 
   /**
@@ -130,14 +145,29 @@ public class TaskService {
    */
   public void failJobAndSetClusterStatus(ClusterJob job, Cluster cluster, Cluster.Status status, String message)
     throws Exception {
-    loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
-
     cluster.setStatus(status);
     clusterStore.writeCluster(cluster);
 
     job.setJobStatus(ClusterJob.Status.FAILED);
-    job.setStatusMessage(message);
+    if (message != null) {
+      job.setStatusMessage(message);
+    }
     clusterStore.writeClusterJob(job);
+
+    loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
+    callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.FAILURE, cluster, job))));
+  }
+
+  /**
+   * Sets the status of the given job to {@link ClusterJob.Status#FAILED} and the status of the cluster to the default
+   * failure status as given in {@link com.continuuity.loom.scheduler.ClusterAction#getFailureStatus()}.
+   *
+   * @param job Job to fail.
+   * @param cluster Cluster to set the status for.
+   * @throws Exception
+   */
+  public void failJobAndSetClusterStatus(ClusterJob job, Cluster cluster) throws Exception {
+    failJobAndSetClusterStatus(job, cluster, job.getClusterAction().getFailureStatus(), null);
   }
 
   /**
@@ -151,6 +181,59 @@ public class TaskService {
    */
   public void failJobAndTerminateCluster(ClusterJob job, Cluster cluster, String message) throws Exception {
     failJobAndSetClusterStatus(job, cluster, Cluster.Status.TERMINATED, message);
+  }
+
+  /**
+   * Sets the status of the given job to {@link ClusterJob.Status#FAILED} and persists it to the store.
+   *
+   * @param job Job to fail.
+   * @throws TaskException
+   */
+  public void failJob(ClusterJob job) throws TaskException {
+    job.setJobStatus(ClusterJob.Status.FAILED);
+    clusterStore.writeClusterJob(job);
+  }
+
+  /**
+   * Sets the status of the given job to {@link ClusterJob.Status#RUNNING} and add it to the queue to be run.
+   *
+   * @param job Job to start.
+   * @param cluster Cluster the job is for.
+   * @throws Exception
+   */
+  public void startJob(ClusterJob job, Cluster cluster) throws Exception {
+    // TODO: wrap in a transaction
+    LOG.debug("Starting job {} for cluster {}", job.getJobId(), cluster.getId());
+    job.setJobStatus(ClusterJob.Status.RUNNING);
+    // Note: writing job status as RUNNING, will allow other operations on the job
+    // (like cancel, etc.) to happen in parallel.
+    clusterStore.writeClusterJob(job);
+    callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.START, cluster, job))));
+  }
+
+  /**
+   * Sets the status of the given job to {@link ClusterJob.Status#COMPLETE} and the status of the given cluster to
+   * {@link com.continuuity.loom.cluster.Cluster.Status#ACTIVE}.
+   *
+   * @param job Job to complete.
+   * @param cluster Cluster the job was for.
+   * @throws Exception
+   */
+  public void completeJob(ClusterJob job, Cluster cluster) throws Exception {
+    job.setJobStatus(ClusterJob.Status.COMPLETE);
+    clusterStore.writeClusterJob(job);
+    LOG.debug("Job {} is complete", job.getJobId());
+
+    // Update cluster status
+    if (job.getClusterAction() == ClusterAction.CLUSTER_DELETE) {
+      cluster.setStatus(Cluster.Status.TERMINATED);
+    } else {
+      cluster.setStatus(Cluster.Status.ACTIVE);
+    }
+    clusterStore.writeCluster(cluster);
+
+    loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
+    callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.SUCCESS, cluster, job))));
   }
 
   /**

@@ -71,8 +71,8 @@ public class CreateServiceTest extends GenericTest {
     actionEntries.get(0).findElement(By.cssSelector(".inputCategory")).sendKeys("install");
     actionEntries.get(0).findElement(By.cssSelector(".inputType")).sendKeys("chef");
     actionEntries.get(0).findElement(By.cssSelector(".inputScript")).sendKeys(
-      service.getProvisionerActions().get(ProvisionerAction.INSTALL).getScript());
-    String data = service.getProvisionerActions().get(ProvisionerAction.INSTALL).getData();
+      service.getProvisionerActions().get(ProvisionerAction.INSTALL).getFields().get("script"));
+    String data = service.getProvisionerActions().get(ProvisionerAction.INSTALL).getFields().get("data");
     if (data != null) {
       actionEntries.get(0).findElement(By.cssSelector(".inputData")).sendKeys(data);
     }
@@ -80,8 +80,8 @@ public class CreateServiceTest extends GenericTest {
     actionEntries.get(1).findElement(By.cssSelector(".inputCategory")).sendKeys("configure");
     actionEntries.get(1).findElement(By.cssSelector(".inputType")).sendKeys("chef");
     actionEntries.get(1).findElement(By.cssSelector(".inputScript")).sendKeys(
-      service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getScript());
-    data = service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getData();
+      service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getFields().get("script"));
+    data = service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getFields().get("data");
     if (data != null) {
       actionEntries.get(1).findElement(By.cssSelector(".inputData")).sendKeys(data);
     }
@@ -89,8 +89,8 @@ public class CreateServiceTest extends GenericTest {
     actionEntries.get(2).findElement(By.cssSelector(".inputCategory")).sendKeys("start");
     actionEntries.get(2).findElement(By.cssSelector(".inputType")).sendKeys("chef");
     actionEntries.get(2).findElement(By.cssSelector(".inputScript")).sendKeys(
-      service.getProvisionerActions().get(ProvisionerAction.START).getScript());
-    data = service.getProvisionerActions().get(ProvisionerAction.START).getData();
+      service.getProvisionerActions().get(ProvisionerAction.START).getFields().get("script"));
+    data = service.getProvisionerActions().get(ProvisionerAction.START).getFields().get("data");
     if (data != null) {
       actionEntries.get(2).findElement(By.cssSelector(".inputData")).sendKeys(data);
     }
@@ -98,8 +98,8 @@ public class CreateServiceTest extends GenericTest {
     actionEntries.get(3).findElement(By.cssSelector(".inputCategory")).sendKeys("stop");
     actionEntries.get(3).findElement(By.cssSelector(".inputType")).sendKeys("chef");
     actionEntries.get(3).findElement(By.cssSelector(".inputScript")).sendKeys(
-      service.getProvisionerActions().get(ProvisionerAction.STOP).getScript());
-    data = service.getProvisionerActions().get(ProvisionerAction.STOP).getData();
+      service.getProvisionerActions().get(ProvisionerAction.STOP).getFields().get("script"));
+    data = service.getProvisionerActions().get(ProvisionerAction.STOP).getFields().get("data");
     if (data != null) {
       actionEntries.get(3).findElement(By.cssSelector(".inputData")).sendKeys(data);
     }

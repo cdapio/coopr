@@ -35,7 +35,6 @@ imagetypes.ubuntu12 = require('./imagetypes/ubuntu12.json');
 var services = {};
 services['apache-httpd'] = require('./services/apache-httpd.json');
 services['base'] = require('./services/base.json');
-services['fail2ban'] = require('./services/fail2ban.json');
 services['hadoop-hdfs-datanode'] = require('./services/hadoop-hdfs-datanode.json');
 services['hadoop-hdfs-namenode'] = require('./services/hadoop-hdfs-namenode.json');
 services['hadoop-yarn-nodemanager'] = require('./services/hadoop-yarn-nodemanager.json');
@@ -48,6 +47,7 @@ services['nodejs'] = require('./services/nodejs.json');
 services['php'] = require('./services/php.json');
 services['zookeeper-server'] = require('./services/zookeeper-server.json');
 services['reactor'] = require('./services/reactor.json');
+services['test-service'] = require('./services/test-service.json');
 
 var clustertemplates = {};
 clustertemplates['hadoop-distributed'] = require('./clustertemplates/hadoop-distributed.json');
@@ -61,12 +61,55 @@ var clusterDefinitions = require('./clusters/clusterdefinitions.json');
 var clusterStatuses = require('./clusters/clusterstatuses.json');
 var createCluster = require('./clusters/createcluster.json');
 
+var plugins = {};
+plugins['rackspace'] = require('./plugins/rackspace.json');
+plugins['openstack'] = require('./plugins/openstack.json');
+plugins['joyent'] = require('./plugins/joyent.json');
+
+var automators = {};
+automators['shell'] = require('./automators/shell.json');
+automators['chef'] = require('./automators/chef.json');
+
 module.exports = function (nock, argv, clientAddr) {
 
   /**
    * Set up nock environment. Disable net connection.
    */
   nock.disableNetConnect();
+
+  /**
+   * Automators call mocks.
+   */
+  var automatorsResponse = [];
+  for (var item in automators) {
+    nock(clientAddr)
+      .persist()
+      .get('/v1/loom/automatortypes/' + item)
+      .reply(200, automators[item]);
+    automatorsResponse.push(automators[item]);
+  }
+
+  nock(clientAddr)
+    .persist()
+    .get('/v1/loom/automatortypes')
+    .reply(200, automatorsResponse);
+
+  /**
+   * Plugins call mocks.
+   */
+  var pluginsResponse = [];
+  for (var item in plugins) {
+    nock(clientAddr)
+      .persist()
+      .get('/v1/loom/providertypes/' + item)
+      .reply(200, plugins[item]);
+    pluginsResponse.push(plugins[item]);
+  }
+
+  nock(clientAddr)
+    .persist()
+    .get('/v1/loom/providertypes')
+    .reply(200, pluginsResponse);
 
   /**
    * Clusters call mocks.

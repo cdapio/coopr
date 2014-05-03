@@ -87,6 +87,30 @@
                   </select>
                 </div>
               </div>
+              <div class="form-group" ng-show="defaultProvider">
+                <div class="col-sm-offset-2 col-sm-8">
+                  <div ng-repeat="(name,fieldData) in providerFields.parameters.admin.fields">
+                    <div class="form-group custom-form-field" ng-show="fieldData.override">
+                      <label class="col-sm-2 control-label">[[fieldData.tip]]</label>
+                      <div class="col-sm-8">
+                        <input class="form-control" type="[[fieldData.type]]" ng-model="defaultProviderInfo.provisioner[name]" placeholder="[[fieldData.tip]]" ng-show="(fieldData.type === 'text' || fieldData.type == 'password')" ng-disabled="clusterId"/>
+                        <select class="form-control" type="[[fieldData.type]]" ng-model="defaultProviderInfo.provisioner[name]" ng-options="region as region for region in fieldData.options" placeholder="[[fieldData.tip]]" ng-show=" fieldData.type === 'select'" ng-disabled="clusterId"></select>
+                        <input class="form-control" type="[[fieldData.type]]" ng-model="defaultProviderInfo.provisioner[name]" ng-show=" fieldData.type === 'checkbox'" ng-disabled="clusterId"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div ng-repeat="(name,fieldData) in providerFields.parameters.user.fields">
+                    <div class="form-group custom-form-field">
+                      <label class="col-sm-2 control-label">[[fieldData.tip]]</label>
+                      <div class="col-sm-8">
+                        <input class="form-control" type="[[fieldData.type]]" ng-model="defaultProviderInfo.provisioner[name]" placeholder="[[fieldData.tip]]" ng-show="(fieldData.type === 'text' || fieldData.type == 'password')"  ng-disabled="clusterId"/>
+                        <select class="form-control" type="[[fieldData.type]]" ng-model="defaultProviderInfo.provisioner[name]" ng-options="region as region for region in fieldData.options" placeholder="[[fieldData.tip]]" ng-show=" fieldData.type === 'select'" ng-disabled="clusterId"></select>
+                        <input class="form-control" type="[[fieldData.type]]" ng-model="defaultProviderInfo.provisioner[name]" ng-show=" fieldData.type === 'checkbox'" ng-disabled="clusterId"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div class="form-group">
                 <label for="inputHardwareType" class="col-sm-2 control-label">Hardware type</label>
                 <div class="col-sm-8">

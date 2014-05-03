@@ -15,6 +15,12 @@
  */
 package com.continuuity.loom.conf;
 
+import com.continuuity.loom.scheduler.ClusterAction;
+import com.continuuity.loom.scheduler.callback.HttpPostClusterCallback;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -96,4 +102,45 @@ public class Constants {
 
   public static final String ID_INCREMENT_BY = "loom.ids.increment.by";
   public static final long DEFAULT_ID_INCREMENT_BY = 1;
+
+  public static final String CALLBACK_CLASS = "loom.callback.class";
+  public static final String DEFAULT_CALLBACK_CLASS = HttpPostClusterCallback.class.getCanonicalName();
+
+  /**
+   * {@link HttpPostClusterCallback} config settings.
+   */
+  public static final class HttpCallback {
+    private static final String prefix = "loom.callback.http.";
+
+    public static final String START_URL = prefix + "start.url";
+    public static final String SUCCESS_URL = prefix + "success.url";
+    public static final String FAILURE_URL = prefix + "failure.url";
+
+    public static final String START_TRIGGERS = prefix + "start.triggers";
+    public static final String DEFAULT_START_TRIGGERS = Joiner.on(',').join(ClusterAction.values());
+
+    public static final String SUCCESS_TRIGGERS = prefix + "success.triggers";
+    public static final String DEFAULT_SUCCESS_TRIGGERS = Joiner.on(',').join(ClusterAction.values());
+
+    public static final String FAILURE_TRIGGERS = prefix + "failure.triggers";
+    public static final String DEFAULT_FAILURE_TRIGGERS = Joiner.on(',').join(ClusterAction.values());
+
+    public static final String SOCKET_TIMEOUT = prefix + "socket.timeout";
+    public static final int DEFAULT_SOCKET_TIMEOUT = 10000;
+
+    public static final String MAX_CONNECTIONS = prefix + "max.connections";
+    public static final int DEFAULT_MAX_CONNECTIONS = 100;
+  }
+
+  /**
+   * Queue related constants.
+   */
+  public static final class Queue {
+    public static final String PROVISIONER = "nodeprovisioner.queue";
+    public static final String CLUSTER = "cluster.queue";
+    public static final String SOLVER = "solver.queue";
+    public static final String JOB = "internal.job.queue";
+    public static final String CALLBACK = "callback.queue";
+    public static final Set<String> ALL = ImmutableSet.of(PROVISIONER, CLUSTER, SOLVER, JOB, CALLBACK);
+  }
 }

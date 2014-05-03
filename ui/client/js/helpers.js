@@ -67,6 +67,99 @@ Helpers.READABLE_ACTIONS = {
 };
 
 /**
+ * Path evaluator tool for assigning multi level variables.
+ */
+Helpers.PathAssigner = {};
+
+/**
+ * Looks up a multi level variable and assigns it a default value if it doesn't exist.
+ * var myObj = {}; Helpers.PathAssigner.getOrSetDefault(myObj, 'level1.level2.value', []);
+ * myObj => {
+ *   level1: {
+ *     level2: {
+ *       value: []
+ *     }
+ *   }
+ * }
+ * @param  {Object} rootObj to perform search for specified scope.
+ * @param  {String} varScope to search in object separated by '.' i.e. 'products.categories.items'
+ * @param  defaultValue to assign to scope if it doesn't already exist.
+ * @return value at scope being searched.
+ */
+Helpers.PathAssigner.getOrSetDefault = function (rootObj, varScope, defaultValue) {
+  var scopeTree = varScope.split('.');
+  this.evalPath(rootObj, scopeTree, defaultValue);
+
+  var curObj = $.extend({}, rootObj, true), scopeTree = varScope.split('.');
+  for (var i = 1; i <= scopeTree.length; i++) {
+    if (i === scopeTree.length) {
+      return curObj[scopeTree[i - 1]];
+    } else {
+      curObj = curObj[scopeTree[i - 1]];
+    }
+  }
+};
+
+/**
+ * Evaluate path and assign values for objects along a specified scope tree.
+ * @param  {Object} rootObj base object being modified.
+ * @param  {Array} scopeTree list of scopes to check or add i.e. ['products', 'category', 'item']
+ * @param  defaultValue to assign to scope if it doesn't already exist.
+ */
+Helpers.PathAssigner.evalPath = function (rootObj, scopeTree, defaultValue) {
+  var currScope = scopeTree.shift();
+  if (!scopeTree.length) {
+    if (!(currScope in rootObj)) {
+      rootObj[currScope] = defaultValue;  
+    }
+    return;
+  }
+  if (currScope in rootObj) {
+    this.evalPath(rootObj[currScope], scopeTree, defaultValue);
+  } else {
+    rootObj[currScope] = {};
+    this.evalPath(rootObj[currScope], scopeTree, defaultValue);
+  }
+};
+
+/**
+ * Compares 2 arrays and checks if required values are present in availableFields.
+ * @param  {Array} availableFields.
+ * @param  {Array} requiredFields.
+ * @return {Boolean} true or false whether they have same values.
+ */
+Helpers.compareArray = function(availableFields, requiredFields) {
+  for (var i = 0, len = requiredFields.length; i < len; i++) {
+    if (availableFields.indexOf(requiredFields[i]) === -1) {
+      return false;
+    }
+  }
+  return true;
+};
+
+/**
+ * Checks if input data is valid.
+ * @param  {Object}  input Form data fields to verify.
+ * @param  {Array<Array>}  required Possibilities for required combinations.
+ * @return {Boolean} Whether input is valid.
+ */
+Helpers.isInputValid = function (input, required) {
+  var inputEntries = [];
+  for (var item in input) {
+    if (input.hasOwnProperty(item) && input[item] !== '') {
+      inputEntries.push(item);  
+    }
+  }
+  // Compare array for all required possibilities.
+  for (var i = 0, len = required.length; i < len; i++) {
+    if (Helpers.compareArray(inputEntries, required[i])) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
  * Submits a post request.
  * @param  {Object|String} e Jquery submit event containing form data or url submit location.
  * @param  {String} redirectUrl Url for redirection.

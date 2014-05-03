@@ -15,10 +15,12 @@
  */
 package com.continuuity.loom.store;
 
+import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.google.common.base.Function;
@@ -71,6 +73,22 @@ public abstract class BaseEntityStore implements EntityStore {
         return codec.deserialize(input, ClusterTemplate.class);
       }
     };
+  private static final Function<byte[], ProviderType> PROVIDER_TYPE_TRANSFORM =
+    new Function<byte[], ProviderType>() {
+      @Nullable
+      @Override
+      public ProviderType apply(@Nullable byte[] input) {
+        return codec.deserialize(input, ProviderType.class);
+      }
+    };
+  private static final Function<byte[], AutomatorType> AUTOMATOR_TYPE_TRANSFORM =
+    new Function<byte[], AutomatorType>() {
+      @Nullable
+      @Override
+      public AutomatorType apply(@Nullable byte[] input) {
+        return codec.deserialize(input, AutomatorType.class);
+      }
+    };
 
   /**
    * Types of entities.
@@ -80,7 +98,9 @@ public abstract class BaseEntityStore implements EntityStore {
     HARDWARE_TYPE("hardwareType"),
     IMAGE_TYPE("imageType"),
     SERVICE("service"),
-    CLUSTER_TEMPLATE("clusterTemplate");
+    CLUSTER_TEMPLATE("clusterTemplate"),
+    PROVIDER_TYPE("providerType"),
+    AUTOMATOR_TYPE("automatorType");
     private final String id;
 
     EntityType(String id) {
@@ -191,6 +211,48 @@ public abstract class BaseEntityStore implements EntityStore {
   @Override
   public void deleteClusterTemplate(String clusterTemplateName) throws Exception {
     deleteEntity(EntityType.CLUSTER_TEMPLATE, clusterTemplateName);
+  }
+
+  @Override
+  public ProviderType getProviderType(String providerTypeName) throws Exception {
+    return get(EntityType.PROVIDER_TYPE, providerTypeName, PROVIDER_TYPE_TRANSFORM);
+  }
+
+  @Override
+  public Collection<ProviderType> getAllProviderTypes() throws Exception {
+    return getAllEntities(EntityType.PROVIDER_TYPE, PROVIDER_TYPE_TRANSFORM);
+  }
+
+  @Override
+  public void writeProviderType(ProviderType providerType) throws Exception {
+    writeEntity(EntityType.PROVIDER_TYPE, providerType.getName(),
+                codec.serialize(providerType, ProviderType.class));
+  }
+
+  @Override
+  public void deleteProviderType(String providerTypeName) throws Exception {
+    deleteEntity(EntityType.PROVIDER_TYPE, providerTypeName);
+  }
+
+  @Override
+  public AutomatorType getAutomatorType(String automatorTypeName) throws Exception {
+    return get(EntityType.AUTOMATOR_TYPE, automatorTypeName, AUTOMATOR_TYPE_TRANSFORM);
+  }
+
+  @Override
+  public Collection<AutomatorType> getAllAutomatorTypes() throws Exception {
+    return getAllEntities(EntityType.AUTOMATOR_TYPE, AUTOMATOR_TYPE_TRANSFORM);
+  }
+
+  @Override
+  public void writeAutomatorType(AutomatorType automatorType) throws Exception {
+    writeEntity(EntityType.AUTOMATOR_TYPE, automatorType.getName(),
+                codec.serialize(automatorType, AutomatorType.class));
+  }
+
+  @Override
+  public void deleteAutomatorType(String automatorTypeName) throws Exception {
+    deleteEntity(EntityType.AUTOMATOR_TYPE, automatorTypeName);
   }
 
   private <T> T get(EntityType entityType, String entityName, Function<byte[], T> transform) throws Exception {

@@ -1,0 +1,30 @@
+{
+    "name": "rackspace",
+    "parameters": {
+        "admin": {
+            "fields": {
+            "rackspace_username": {
+              "label": "User",
+              "type": "text",
+              "tip": "Your Rackspace user name"
+            },
+            "rackspace_api_key": {
+              "label": "API key",
+              "type": "password",
+              "tip": "Your Rackspace API key"
+            },
+            "rackspace_region": {
+              "label": "Region",
+              "type": "select",
+              "options": [ "dfw", "ord", "lon", "syd" ],
+              "default": "dfw",
+              "override": true,
+              "tip": "Rackspace region (DFW default)"
+            }
+          },
+          "required": [
+            [ "rackspace_username", "rackspace_api_key", "rackspace_region" ]
+          ]
+        }
+    }
+}

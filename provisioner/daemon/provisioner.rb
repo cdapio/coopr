@@ -31,21 +31,25 @@ $stdout.sync = true
 # Parse command line options. 
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: "
-  opts.on("-u", "--uri URI", "Loom web server uri") do |u|
+  opts.banner = 'Usage: '
+  opts.on('-u', '--uri URI', 'Loom web server uri') do |u|
     options[:uri] = u
   end
-  opts.on("-f", "--file FILE", "Full path to task json") do |f|
+  opts.on('-f', '--file FILE', 'Full path to task json') do |f|
     options[:file] = f
   end
-  opts.on("-L", "--log-level LEVEL", "Log level") do |f|
+  options[:register] = false
+  opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do
+    options[:register] = true
+  end
+  opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
     options[:log_level] = f
   end
-  opts.on("-l", "--log-file FILE", "Path to logfile") do |f|
+  opts.on('-l', '--log-file FILE', 'Path to logfile') do |f|
     options[:log_file] = f
   end
   options[:once] = false
-  opts.on("-o", "--once", "Only poll and run a single task") do 
+  opts.on('-o', '--once', 'Only poll and run a single task') do
     options[:once] = true 
   end
 end.parse!
@@ -53,6 +57,11 @@ end.parse!
 loom_uri = options[:uri]
 if(loom_uri == nil && !options[:file]) 
   puts "Either URI for loom server or --file must be specified"
+  exit(1)
+end
+
+if(loom_uri == nil && options[:register])
+  puts "--register option requires the --uri [server uri] option"
   exit(1)
 end
 
@@ -128,6 +137,14 @@ def delegate_task(task, pluginmanager)
   result
 end
 
+# register plugins with the server if --register flag passed
+if options[:register]
+  pluginmanager.register_plugins(loom_uri)
+  exit(0)
+end
+
+log.debug "provisioner starting with provider types: #{pluginmanager.providermap.keys}"
+log.debug "provisioner starting with automator types: #{pluginmanager.automatormap.keys}"
 
 if options[:file]
   # run a single task read from file

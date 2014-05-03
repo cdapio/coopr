@@ -2,7 +2,7 @@
   <li><a class="nav-link nav-dash btn-spl btn-default secondary-nav-home" href="/imagetypes">Home</a></li>
   <li>
     <div class="dropdown">
-      <a data-toggle="dropdown" class="btn-spl btn-default nav-dash secondary-nav-dropdown" href="#">Image types <span class="caret"></span></a>
+      <a data-toggle="dropdown" class="btn-spl btn-default nav-dash secondary-nav-dropdown">Image types <span class="caret"></span></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
         {% for item in imagetypes %}
           <li><a class="list-types" href="/imagetypes/imagetype/{{item.name}}">{{ item.name }}</a></li>

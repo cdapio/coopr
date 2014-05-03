@@ -3,12 +3,10 @@
   "description": "Joyent Compute Service",
   "providertype": "joyent",
   "provisioner": {
-    "auth": {
-      "joyent_username": "USERNAME",
-      "joyent_keyname": "KEYNAME",
-      "joyent_api_url": "https://us-sw-1.api.joyentcloud.com/",
-      "joyent_keyfile": "/opt/loom/provisioner/daemon/plugins/providers/joyent_provider/id_rsa_joyent",
-      "joyent_version": "~7.0"
-    }
+    "joyent_username": "USERNAME",
+    "joyent_keyname": "KEYNAME",
+    "joyent_api_url": "https://us-sw-1.api.joyentcloud.com/",
+    "joyent_keyfile": "/opt/loom/provisioner/daemon/plugins/providers/joyent_provider/id_rsa_joyent",
+    "joyent_version": "~7.0"
   }
 }

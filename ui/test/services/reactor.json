@@ -19,25 +19,35 @@
     "actions": {
       "install": {
         "type":"chef",
-        "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack]"
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack]"
+        }
       },
       "configure": {
         "type": "chef",
-        "script": "recipe[reactor_wrapper::default],recipe[reactor::config]"
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::config]"
+        }
       },
       "initialize": {
         "type": "chef",
-        "script": "recipe[reactor_wrapper::default],recipe[reactor::init]"
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::init]"
+        }
       },
       "start": {
         "type": "chef",
-        "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }" 
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }" 
+        }
       },
       "stop": {
         "type": "chef",
-        "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }" 
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }" 
+        }
       }
     }
   }

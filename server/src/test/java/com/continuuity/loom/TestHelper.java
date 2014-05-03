@@ -16,6 +16,7 @@
 package com.continuuity.loom;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -64,5 +65,16 @@ public class TestHelper {
       output.add(new JsonPrimitive(value));
     }
     return output;
+  }
+
+  public static Map<String, String> actionMapOf(String script, String data) {
+    Map<String, String> out = Maps.newHashMap();
+    if (script != null) {
+      out.put("script", script);
+    }
+    if (data != null) {
+      out.put("data", data);
+    }
+    return out;
   }
 }

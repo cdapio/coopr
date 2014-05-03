@@ -10,21 +10,29 @@
     "actions": {
       "install": {
         "type":"chef",
-        "script": "recipe[haproxy2::default]"
+        "fields": {
+          "run_list": "recipe[haproxy2::default]"
+        }
       },
       "configure": {
         "type": "chef",
-        "script": "recipe[haproxy2::default]"
+        "fields": {
+          "run_list": "recipe[haproxy2::default]"
+        }
       },
       "start": {
         "type": "chef",
-        "script": "recipe[haproxy2::default],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"haproxy\": \"start\" } } } }" 
+        "fields": {
+          "run_list": "recipe[haproxy2::default],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"haproxy\": \"start\" } } } }" 
+        }
       },
       "stop": {
         "type": "chef",
-        "script": "recipe[haproxy2::default],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"haproxy\": \"stop\" } } } }" 
+        "fields": {
+          "run_list": "recipe[haproxy2::default],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"haproxy\": \"stop\" } } } }" 
+        }
       }
     }
   }

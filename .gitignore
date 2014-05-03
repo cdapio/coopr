@@ -41,11 +41,11 @@ Vagrantfile
 chefignore
 
 # Environment
-.bash*
-.chef
-.gem
-.lesshst
-.m2
-.profile
-.ssh
-.viminfo
+/.bash*
+/.chef
+/.gem
+/.lesshst
+/.m2
+/.profile
+/.ssh
+/.viminfo
