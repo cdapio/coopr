@@ -349,6 +349,36 @@ ClusterView.app.controller('ClusterCtrl',
     return false;
   };
 
+  /**
+   * Starts a specific service.
+   * @param  {String} serviceName.
+   */
+  $scope.startService = function (serviceName) {
+    Helpers.submitPost('/user/clusters/cluster/' + $scope.cluster.id + '/services/' + serviceName
+      + '/start',
+      '/user/clusters/cluster/' + $scope.cluster.id);
+  };
+
+  /**
+   * Stops a specific service.
+   * @param  {String} serviceName.
+   */
+  $scope.stopService = function (serviceName) {
+    Helpers.submitPost('/user/clusters/cluster/' + $scope.cluster.id + '/services/' + serviceName
+      + '/stop',
+      '/user/clusters/cluster/' + $scope.cluster.id);
+  };
+
+  /**
+   * Restarts a specific service.
+   * @param  {String} serviceName.
+   */
+  $scope.restartService = function (serviceName) {
+    Helpers.submitPost('/user/clusters/cluster/' + $scope.cluster.id + '/services/' + serviceName
+      + '/restart',
+      '/user/clusters/cluster/' + $scope.cluster.id);
+  };
+
 }]);
 
 ClusterView.app.controller('ClusterProgressCtrl', ['$scope', '$interval', 'dataFactory', 'Globals',

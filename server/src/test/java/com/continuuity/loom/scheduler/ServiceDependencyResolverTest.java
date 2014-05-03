@@ -1,5 +1,6 @@
 package com.continuuity.loom.scheduler;
 
+import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
@@ -137,7 +138,7 @@ public class ServiceDependencyResolverTest {
    */
   @Test
   public void testClusterRuntimeDependencies() {
-    ServiceAction sAction = new ServiceAction(null, null, null);
+    ServiceAction sAction = new ServiceAction("shell", TestHelper.actionMapOf(null, null));
     // s1 has initialize and start
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
@@ -210,7 +211,7 @@ public class ServiceDependencyResolverTest {
    */
   @Test
   public void testClusterInstallDependencies() {
-    ServiceAction sAction = new ServiceAction(null, null, null);
+    ServiceAction sAction = new ServiceAction("shell", TestHelper.actionMapOf(null, null));
     Map<ProvisionerAction, ServiceAction> installActions = ImmutableMap.of(ProvisionerAction.INSTALL, sAction);
     Map<ProvisionerAction, ServiceAction> emptyActions = ImmutableMap.of();
     Service s1 =  new Service(
@@ -286,7 +287,7 @@ public class ServiceDependencyResolverTest {
 
   @Test
   public void testServiceUsesDependency() {
-    ServiceAction sAction = new ServiceAction(null, null, null);
+    ServiceAction sAction = new ServiceAction("shell", TestHelper.actionMapOf(null, null));
     Map<ProvisionerAction, ServiceAction> installActions = ImmutableMap.of(ProvisionerAction.INSTALL, sAction);
     Service s1 =  new Service(
       "s1", "", new ServiceDependencies(null,

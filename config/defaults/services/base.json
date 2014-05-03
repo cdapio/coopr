@@ -7,11 +7,15 @@
     "actions": {
       "install": {
         "type": "chef",
-        "script": "recipe[loom_base::default]"
+        "fields": {
+          "run_list": "recipe[loom_base::default]"
+        }
       },
       "configure": {
         "type": "chef",
-        "script": "recipe[loom_base::default]"
+        "fields": {
+          "run_list": "recipe[loom_base::default]"
+        }
       }
     }
   }

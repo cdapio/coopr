@@ -42,19 +42,13 @@ public class SQLEntityStore extends BaseEntityStore {
   public void clearData() throws SQLException {
     Connection conn = dbConnectionPool.getConnection();
     try {
-      Statement stmt = conn.createStatement();
-      try {
-        stmt.execute("DELETE FROM providers");
-        stmt = conn.createStatement();
-        stmt.execute("DELETE FROM hardwareTypes");
-        stmt = conn.createStatement();
-        stmt.execute("DELETE FROM imageTypes");
-        stmt = conn.createStatement();
-        stmt.execute("DELETE FROM services");
-        stmt = conn.createStatement();
-        stmt.execute("DELETE FROM clusterTemplates");
-      } finally {
-        stmt.close();
+      for (EntityType type : EntityType.values()) {
+        Statement stmt = conn.createStatement();
+        try {
+          stmt.execute("DELETE FROM " + type.getId() + "s");
+        } finally {
+          stmt.close();
+        }
       }
     } finally {
       conn.close();
@@ -73,11 +67,12 @@ public class SQLEntityStore extends BaseEntityStore {
   public void initDerbyDB() throws SQLException {
     LOG.warn("Initializing Derby DB... Tables are not optimized for performance.");
 
-    createDerbyTable("CREATE TABLE providers ( name VARCHAR(255), provider BLOB )");
-    createDerbyTable("CREATE TABLE hardwareTypes ( name VARCHAR(255), hardwareType BLOB )");
-    createDerbyTable("CREATE TABLE imageTypes ( name VARCHAR(255), imageType BLOB )");
-    createDerbyTable("CREATE TABLE services ( name VARCHAR(255), service BLOB )");
-    createDerbyTable("CREATE TABLE clusterTemplates ( name VARCHAR(255), clusterTemplate BLOB )");
+    for (EntityType entityType : EntityType.values()) {
+      String entityName = entityType.getId();
+      // immune to sql injection since it comes from the enum
+      String createString = "CREATE TABLE " + entityName + "s ( name VARCHAR(255), " + entityName + " BLOB )";
+      createDerbyTable(createString);
+    }
   }
 
   private void createDerbyTable(String createString) throws SQLException {
@@ -200,52 +195,20 @@ public class SQLEntityStore extends BaseEntityStore {
 
   private PreparedStatement getSelectStatement(Connection conn, EntityType entityType,
                                                String entityName) throws SQLException {
-    PreparedStatement statement;
-    switch (entityType) {
-      case PROVIDER:
-        statement = conn.prepareStatement("SELECT provider FROM providers WHERE name=?");
-        break;
-      case IMAGE_TYPE:
-        statement = conn.prepareStatement("SELECT imageType FROM imageTypes WHERE name=?");
-        break;
-      case HARDWARE_TYPE:
-        statement = conn.prepareStatement("SELECT hardwareType FROM hardwareTypes WHERE name=?");
-        break;
-      case SERVICE:
-        statement = conn.prepareStatement("SELECT service FROM services WHERE name=?");
-        break;
-      case CLUSTER_TEMPLATE:
-        statement = conn.prepareStatement("SELECT clusterTemplate FROM clusterTemplates WHERE name=?");
-        break;
-      default:
-        throw new IllegalArgumentException("unknown entity type " + entityType);
-    }
+    String entityTypeId = entityType.getId();
+    // immune to sql injection since it comes from the enum.
+    String queryStr = "SELECT " + entityTypeId + " FROM " + entityTypeId + "s WHERE name=?";
+    PreparedStatement statement = conn.prepareStatement(queryStr);
     statement.setString(1, entityName);
     return statement;
   }
 
   private PreparedStatement getInsertStatement(Connection conn, EntityType entityType,
                                                String entityName, byte[] data) throws SQLException {
-    PreparedStatement statement;
-    switch (entityType) {
-      case PROVIDER:
-        statement = conn.prepareStatement("INSERT INTO providers (name, provider) VALUES (?, ?)");
-        break;
-      case IMAGE_TYPE:
-        statement = conn.prepareStatement("INSERT INTO imageTypes (name, imageType) VALUES (?, ?)");
-        break;
-      case HARDWARE_TYPE:
-        statement = conn.prepareStatement("INSERT INTO hardwareTypes (name, hardwareType) VALUES (?, ?)");
-        break;
-      case SERVICE:
-        statement = conn.prepareStatement("INSERT INTO services (name, service) VALUES (?, ?)");
-        break;
-      case CLUSTER_TEMPLATE:
-        statement = conn.prepareStatement("INSERT INTO clusterTemplates (name, clusterTemplate) VALUES (?, ?)");
-        break;
-      default:
-        throw new IllegalArgumentException("unknown entity type " + entityType);
-    }
+    String entityTypeId = entityType.getId();
+    // immune to sql injection since it comes from the enum.
+    String queryStr = "INSERT INTO " + entityTypeId + "s (name, " + entityTypeId + ") VALUES (?, ?)";
+    PreparedStatement statement = conn.prepareStatement(queryStr);
     statement.setString(1, entityName);
     statement.setBlob(2, new ByteArrayInputStream(data));
     return statement;
@@ -253,26 +216,10 @@ public class SQLEntityStore extends BaseEntityStore {
 
   private PreparedStatement getUpdateStatement(Connection conn, EntityType entityType,
                                                String entityName, byte[] data) throws SQLException {
-    PreparedStatement statement;
-    switch (entityType) {
-      case PROVIDER:
-        statement = conn.prepareStatement("UPDATE providers SET provider=? WHERE name=?");
-        break;
-      case IMAGE_TYPE:
-        statement = conn.prepareStatement("UPDATE imageTypes SET imageType=? WHERE name=?");
-        break;
-      case HARDWARE_TYPE:
-        statement = conn.prepareStatement("UPDATE hardwareTypes SET hardwareType=? WHERE name=?");
-        break;
-      case SERVICE:
-        statement = conn.prepareStatement("UPDATE services SET service=? WHERE name=?");
-        break;
-      case CLUSTER_TEMPLATE:
-        statement = conn.prepareStatement("UPDATE clusterTemplates SET clusterTemplate=? WHERE name=?");
-        break;
-      default:
-        throw new IllegalArgumentException("unknown entity type " + entityType);
-    }
+    String entityTypeId = entityType.getId();
+    // immune to sql injection since it comes from the enum.
+    String queryStr = "UPDATE " + entityTypeId + "s SET " + entityTypeId + "=? WHERE name=?";
+    PreparedStatement statement = conn.prepareStatement(queryStr);
     statement.setBlob(1, new ByteArrayInputStream(data));
     statement.setString(2, entityName);
     return statement;
@@ -280,44 +227,17 @@ public class SQLEntityStore extends BaseEntityStore {
 
   private PreparedStatement getDeleteStatement(Connection conn, EntityType entityType,
                                                String entityName) throws SQLException {
-    PreparedStatement statement;
-    switch (entityType) {
-      case PROVIDER:
-        statement = conn.prepareStatement("DELETE FROM providers WHERE name=?");
-        break;
-      case IMAGE_TYPE:
-        statement = conn.prepareStatement("DELETE FROM imageTypes WHERE name=?");
-        break;
-      case HARDWARE_TYPE:
-        statement = conn.prepareStatement("DELETE FROM hardwareTypes WHERE name=?");
-        break;
-      case SERVICE:
-        statement = conn.prepareStatement("DELETE FROM services WHERE name=?");
-        break;
-      case CLUSTER_TEMPLATE:
-        statement = conn.prepareStatement("DELETE FROM clusterTemplates WHERE name=?");
-        break;
-      default:
-        throw new IllegalArgumentException("unknown entity type " + entityType);
-    }
+    String entityTypeId = entityType.getId();
+    // immune to sql injection since it comes from the enum.
+    String queryStr = "DELETE FROM " + entityTypeId + "s WHERE name=?";
+    PreparedStatement statement = conn.prepareStatement(queryStr);
     statement.setString(1, entityName);
     return statement;
   }
 
   private String getSelectAllStatement(EntityType entityType) throws SQLException {
-    switch (entityType) {
-      case PROVIDER:
-        return "SELECT provider FROM providers";
-      case IMAGE_TYPE:
-        return "SELECT imageType FROM imageTypes";
-      case HARDWARE_TYPE:
-        return "SELECT hardwareType FROM hardwareTypes";
-      case SERVICE:
-        return "SELECT service FROM services";
-      case CLUSTER_TEMPLATE:
-        return "SELECT clusterTemplate FROM clusterTemplates";
-      default:
-        throw new IllegalArgumentException("unknown entity type " + entityType);
-    }
+    String entityTypeId = entityType.getId();
+    // immune to sql injection since it comes from the enum.
+    return "SELECT " + entityTypeId + " FROM " + entityTypeId + "s";
   }
 }

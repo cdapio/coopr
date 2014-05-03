@@ -16,6 +16,7 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
@@ -50,8 +51,7 @@ public class TaskConfigTest {
     Map<String, String> providerConfig = ImmutableMap.of("openstack_api_url",
                                                          "http://1.2.3.4:5000/v2.0/tokens",
                                                          "openstack_username", "user");
-    Provider provider = new Provider("openstack-central", "Default provider", Provider.Type.OPENSTACK,
-                                     ImmutableMap.of("auth", providerConfig));
+    Provider provider = new Provider("openstack-central", "Default provider", Entities.OPENSTACK, providerConfig);
 
     JsonObject conf = Entities.ClusterTemplateExample.clusterConf;
     ClusterTemplate c1 = new ClusterTemplate(
@@ -92,26 +92,26 @@ public class TaskConfigTest {
     Service s1 = new Service("datanode", "hadoop datanode", ImmutableSet.of("namenode"),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.INSTALL,
-                               new ServiceAction("chef", "install recipe",
-                                                 "{\"foo\": { \"bar\": \"baz\" } }"),
+                               new ServiceAction(
+                                 "chef", TestHelper.actionMapOf("install recipe", "{\"foo\": { \"bar\": \"baz\" } }")),
                                ProvisionerAction.REMOVE,
-                               new ServiceAction("shell", "remove recipe", "arbitrary data")
+                               new ServiceAction("shell", TestHelper.actionMapOf("remove recipe", "arbitrary data"))
                              )
     );
     Service s2 = new Service("namenode", "hadoop namenode", ImmutableSet.of("hosts"),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.INSTALL,
-                               new ServiceAction("chef", "install recipe", null),
+                               new ServiceAction("chef", TestHelper.actionMapOf("install recipe", null)),
                                ProvisionerAction.REMOVE,
-                               new ServiceAction("chef", "remove recipe", "arbitrary data"),
+                               new ServiceAction("chef", TestHelper.actionMapOf("remove recipe", "arbitrary data")),
                                ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef", "configure recipe", null)
+                               new ServiceAction("chef", TestHelper.actionMapOf("configure recipe", null))
                              )
     );
     Service s3 = new Service("hosts", "for managing /etc/hosts", ImmutableSet.<String>of(),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef", "configure recipe", null)
+                               new ServiceAction("chef", TestHelper.actionMapOf("configure recipe", null))
                              )
     );
 
@@ -176,8 +176,10 @@ public class TaskConfigTest {
       "    \"name\": \"datanode\",\n" +
       "    \"action\": {\n" +
       "      \"type\": \"chef\",\n" +
-      "      \"script\": \"install recipe\",\n" +
-      "      \"data\": \"{\\\"foo\\\": { \\\"bar\\\": \\\"baz\\\" } }\"\n" +
+      "      \"fields\": {\n" +
+      "        \"script\": \"install recipe\",\n" +
+      "        \"data\": \"{\\\"foo\\\": { \\\"bar\\\": \\\"baz\\\" } }\"\n" +
+      "      }\n" +
       "    }\n" +
       "  },\n" +
       "  \"flavor\": \"5\",\n" +
@@ -190,10 +192,8 @@ public class TaskConfigTest {
       "    \"description\": \"Default provider\",\n" +
       "    \"providertype\": \"openstack\",\n" +
       "    \"provisioner\": {\n" +
-      "      \"auth\": {\n" +
-      "        \"openstack_api_url\": \"http://1.2.3.4:5000/v2.0/tokens\",\n" +
-      "        \"openstack_username\": \"user\"\n" +
-      "      }\n" +
+      "      \"openstack_api_url\": \"http://1.2.3.4:5000/v2.0/tokens\",\n" +
+      "      \"openstack_username\": \"user\"\n" +
       "    }\n" +
       "  }\n" +
       "}\n";
@@ -214,8 +214,10 @@ public class TaskConfigTest {
       "    \"name\": \"datanode\",\n" +
       "    \"action\": {\n" +
       "      \"type\": \"chef\",\n" +
-      "      \"script\": \"install recipe\",\n" +
-      "      \"data\": \"{\\\"foo\\\": { \\\"bar\\\": \\\"baz\\\" } }\"\n" +
+      "      \"fields\": {\n" +
+      "        \"script\": \"install recipe\",\n" +
+      "        \"data\": \"{\\\"foo\\\": { \\\"bar\\\": \\\"baz\\\" } }\"\n" +
+      "      }\n" +
       "    }\n" +
       "  },\n" +
       "  \"flavor\": \"5\",\n" +
@@ -228,10 +230,8 @@ public class TaskConfigTest {
       "    \"description\": \"Default provider\",\n" +
       "    \"providertype\": \"openstack\",\n" +
       "    \"provisioner\": {\n" +
-      "      \"auth\": {\n" +
-      "        \"openstack_api_url\": \"http://1.2.3.4:5000/v2.0/tokens\",\n" +
-      "        \"openstack_username\": \"user\"\n" +
-      "      }\n" +
+      "      \"openstack_api_url\": \"http://1.2.3.4:5000/v2.0/tokens\",\n" +
+      "      \"openstack_username\": \"user\"\n" +
       "    }\n" +
       "  }\n" +
       "}\n";

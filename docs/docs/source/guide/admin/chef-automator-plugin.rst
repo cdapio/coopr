@@ -52,35 +52,43 @@ nodes using the "apache2" community cookbook. We define a Loom service "apache-h
         "provisioner": {
             "actions": {
                 "install": {
-                    "script": "recipe[apache2::default]",
                     "type": "chef"
+                    "fields": {
+                        "run_list": "recipe[apache2::default]",
+                    }
                 },
                 "configure": {
-                    "script": "recipe[apache2::default]",
                     "type": "chef"
+                    "fields": {
+                        "run_list": "recipe[apache2::default]",
+                    }
                 },
                 "start": {
-                    "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }",
-                    "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
                     "type": "chef"
+                    "fields": {
+                        "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }",
+                        "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
+                    }
                 },
                 "stop": {
-                    "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }",
-                    "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
                     "type": "chef"
+                    "fields": {
+                        "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }",
+                        "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
+                    }
                 }
             }
         }
     }
 
-For each action, we define the type, script, and data fields. (defaults to empty string if not specified). The type
-field indicates to the provisioner to use the Chef Automator plugin to manage this action. The script field specifies
-the run-list to use. The data field is any additional JSON data we wish to include in the Chef run (more on this
+For each action, we define the ``type``, and the custom fields ``run_list`` and ``json_attributes``. (defaults to empty string if not specified). The ``type``
+field indicates to the provisioner to use the Chef Automator plugin to manage this action. The ``run_list`` field specifies
+the run-list to use. The ``json_attributes`` field is any additional JSON data we wish to include in the Chef run (more on this
 later). When the Chef Solo Automator plugin executes any of these actions for the apache-httpd service, it performs
 the following actions:
 
-        1. generate a task-specific JSON file containing any attributes defined in the data field, as well as base cluster attributes defined elsewhere in Continuuity Loom.
-        2. invoke chef-solo using the script field as the run-list using  ``chef-solo -o [script] -j [task-specific json]``
+        1. generate a task-specific JSON file containing any attributes defined in the json_attributes field, as well as base cluster attributes defined elsewhere in Continuuity Loom.
+        2. invoke chef-solo using the ``run_list`` field as the run-list as follows:  ``chef-solo -o [run_list] -j [task-specific json]``
 
 
 In this example, to execute an "install" task for the apache-httpd service, the provisioner will simply run the default
@@ -93,8 +101,8 @@ one may wonder why we need both 'install' and 'configure' when they perform iden
 keep them both, since configure may be run many times throughout the lifecycle of the cluster, and install is needed
 to satisfy dependencies.
 
-The "start" and "stop" tasks introduce a couple of features. They make use of the data field to specify custom JSON
-attributes. Note that the format is an escaped JSON string. The script field also contains an additional recipe,
+The "start" and "stop" tasks introduce a couple of features. They make use of the ``json_attributes`` field to specify custom JSON
+attributes. Note that the format is an escaped JSON string. The ``run_list`` field also contains an additional recipe,
 ``loom_service_runner::default``. More on this later, but essentially this is a helper cookbook that can operate on
 any Chef service resource. It looks for any service names listed in node['loom']['node']['services'], finds the
 corresponding Chef service resource, and invokes the specified action.
@@ -108,7 +116,7 @@ Continuuity Loom maintains significant JSON data for a cluster, and makes it ava
     * node data for each node of the cluster: hostname, ip, etc
     * service data, specified in the actions for each service
 
-The ChefAutomator plugin automatically merges this data into a single JSON file, which is then passed to chef-solo via
+The Chef Automator plugin automatically merges this data into a single JSON file, which is then passed to chef-solo via
 the ``--json-attributes argument``. Any custom cookbooks that want to make use of this Loom data need to be familiar
 with the JSON layout of the Loom data. In brief, cluster-wide configuration defined in cluster templates and
 service-level action data are merged together, and preserved at the top-level. Loom data is then also merged in under
@@ -136,7 +144,7 @@ Consider the following two rules of thumb:
 Bootstrap
 =========
 
-Each Loom Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs to be able to carry out further tasks. The ChefAutomator plugin performs the following actions for a bootstrap task:
+Each Loom Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs to be able to carry out further tasks. The Chef Automator plugin performs the following actions for a bootstrap task:
 	1. Bundle its local copy of the cookbooks/roles/data_bags directories into tarballs, ``cookbooks.tar.gz``, ``roles.tar.gz``, ``data_bags.tar.gz``.
 		* Unless the tarballs exist already and were created in the last 10 minutes.
 	2. Logs into the remote box and installs chef via the Opscode Omnibus installer (``curl -L https://www.opscode.com/chef/install.sh | bash``).
@@ -153,16 +161,15 @@ Adding your own Cookbooks
 =========================
 **Cookbook requirements**
 
-Since the ChefAutomator plugin is implemented using chef-solo, the following restrictions apply:
+Since the Chef Automator plugin is implemented using chef-solo, the following restrictions apply:
 
 	* No chef search capability
 	* No persistent attributes
 
-Cookbooks should be fully attribute-driven. At this time the ChefAutomator does not support chef-solo environments. 
+Cookbooks should be fully attribute-driven. At this time the Chef Automator does not support the chef-solo "environment" primitive. 
 Attributes normally specified in an environment can instead be populated in Loom primitives such as cluster templates or service action data.
 
-In order to add a cookbook for use by the provisioners, simply add it to the cookbooks directory for the ChefAutomator
-In order to add cookbooks, roles, or data-bags for use by the provisioners, simply add them to the local chef directories for the ChefAutomator
+In order to add cookbooks, roles, or data-bags for use by the provisioners, simply add them to the local chef directories for the Chef Automator
 plugin. If using the default package install, these directories are currently:
 ::
 
@@ -180,8 +187,8 @@ definition with the following parameters:
 
 	* Category: any action (install, configure, start, stop, etc)
 	* Type: chef
-	* Script: a run-list containing your cookbook's recipe(s) or roles. If your recipe depends on resources defined in other cookbooks which aren't declared dependencies in your cookbook's metadata, make sure to also add them to the run-list.
-	* Data: any additional custom attributes you want to specify, unique to this action
+	* run_list: a run-list containing your cookbook's recipe(s) or roles. If your recipe depends on resources defined in other cookbooks which aren't declared dependencies in your cookbook's metadata, make sure to also add them to the run-list.
+	* json_attributes: (optional), any additional custom attributes you want to specify, unique to this action
 
 Then simply add your service to a cluster template.
 
@@ -200,8 +207,8 @@ all the nodes in the cluster. It then simply utilizes the community "hostsfile" 
 each node.
 
 The example loom service definition invoking this cookbook is called "hosts". It simply sets up a "configure" service
-action of type "chef" and script ``recipe[loom_hosts::default]``. Note that the community "hostsfile" cookbook is not
-needed in the runlist since it is declared in loom_hosts's metadata.
+action of type "chef" and run_list ``recipe[loom_hosts::default]``. Note that the community "hostsfile" cookbook is not
+needed in the run-list since it is declared in loom_hosts's metadata.
 
 **loom_service_runner**
 -----------------------

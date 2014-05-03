@@ -177,6 +177,7 @@ site.app.use(function(err, req, res, next) {
 /**
  * Gets data for a given restful url.
  * @param  {String} path Request path.
+ * @param {String} user current logged in user id.
  */
 site.getEntity = function (path, user) {
   return function (callback) {
@@ -211,6 +212,7 @@ site.getEntity = function (path, user) {
 /**
  * Executes request for a given url and executes callback based on success or failure.
  * @param  {Object} options Request options object.
+ * @param {String} user current logged in user id.
  * @param  {Object} res Response handler.
  */
 site.sendRequestAndHandleResponse = function (options, user, res) {
@@ -303,6 +305,11 @@ site.determinePermissionLevel = function (username, password) {
   return permissionLevel;
 };
 
+/**
+ * Replaces date 
+ * @param  {[type]} timestamp [description]
+ * @return {[type]}           [description]
+ */
 site.formatDate = function (timestamp) {
   var dt = new Date(timestamp);
   return dt.toISOString().replace(/T/, ' ').replace(/\..+/, '');
@@ -849,7 +856,7 @@ site.app.get('/providers/create', function (req, res) {
     } else {
       context.providers = site.verifyData(results[0]);
     }
-    res.render('providers/createprovider.html', context);
+    res.render('providers/providerbase.html', context);
   });
 });
 
@@ -903,7 +910,7 @@ site.app.get('/providers/provider/:id', function (req, res) {
       context.providers = site.verifyData(results[0]);
       context.provider = results[1];
     }
-    res.render('providers/createprovider.html', context);
+    res.render('providers/providerbase.html', context);
   });
 });
 
@@ -982,11 +989,10 @@ site.app.get('/services/service/:id', function (req, res) {
   var serviceId = req.params.id;
   async.parallel([
     site.getEntity('/services', user),
-    site.getEntity('/services/' + serviceId, user)
   ], function (err, results) {
     res.render('services/createservice.html', {
       services: results[0],
-      service: results[1],
+      serviceId: serviceId,
       activeTab: 'services',
       authenticated: user,
       env: env,
@@ -1115,6 +1121,36 @@ site.app.post('/user/clusters/cluster/:id/services', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id + '/services',
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/cluster/:id/services/:serviceid/start', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/services/' + req.params.serviceid + '/start',
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/cluster/:id/services/:serviceid/stop', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/services/' + req.params.serviceid + '/stop',
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/cluster/:id/services/:serviceid/restart', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/services/' + req.params.serviceid + '/restart',
     method: 'POST',
     json: req.body
   };

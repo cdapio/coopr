@@ -38,6 +38,7 @@ import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.scheduler.CallbackScheduler;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.ClusterScheduler;
 import com.continuuity.loom.scheduler.JobScheduler;
@@ -91,6 +92,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   private static JobScheduler jobScheduler;
   private static ClusterScheduler clusterScheduler;
   private static SolverScheduler solverScheduler;
+  private static CallbackScheduler callbackScheduler;
   private static TrackingQueue jobQueue;
 
   @BeforeClass
@@ -98,8 +100,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     jobScheduler = injector.getInstance(JobScheduler.class);
     clusterScheduler = injector.getInstance(ClusterScheduler.class);
     solverScheduler = injector.getInstance(SolverScheduler.class);
+    callbackScheduler = injector.getInstance(CallbackScheduler.class);
     jobQueue = injector.getInstance(
-      Key.get(TrackingQueue.class, Names.named("internal.job.queue")));
+      Key.get(TrackingQueue.class, Names.named(Constants.Queue.JOB)));
 
     // We don't need scheduler to run for these test cases, we'll run them manually due to timing issues.
     Scheduler scheduler = injector.getInstance(Scheduler.class);
@@ -111,6 +114,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     // cleanup
     solverQueue.removeAll();
     clusterQueue.removeAll();
+    callbackQueue.removeAll();
   }
 
   @Test
@@ -126,7 +130,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals(clusterId, element.getId());
     ClusterCreateRequest expected =
       new ClusterCreateRequest(clusterName, "my cluster", reactorTemplate.getName(),
-                               5, null, null, null, null, -1L, null, null);
+                               5, null, null, null, null, null, -1L, null, null);
     SolverRequest expectedSolverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, GSON.toJson(expected));
     Assert.assertEquals(expectedSolverRequest, GSON.fromJson(element.getValue(), SolverRequest.class));
   }
@@ -135,7 +139,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testAddClusterWithOptionalArgs() throws Exception {
     String clusterName = "my-cluster";
     ClusterCreateRequest clusterCreateRequest =
-      new ClusterCreateRequest(clusterName, "my cluster", reactorTemplate.getName(), 5, "providerA",
+      new ClusterCreateRequest(clusterName, "my cluster", reactorTemplate.getName(), 5, "providerA", null,
                          ImmutableSet.of("service1", "service2"), "hardwareC", "imageB", -1L, null, null);
 
     HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
@@ -174,6 +178,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.CLUSTER_CREATE, 0, 0);
 
     clusterScheduler.run();
+    callbackScheduler.run();
 
     // Get the status - 0 tasks completed and RUNNING
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
@@ -209,6 +214,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.CLUSTER_CREATE, 0, 0);
 
     clusterScheduler.run();
+    callbackScheduler.run();
 
     // Get the status - 0 tasks completed and RUNNING
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
@@ -283,6 +289,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     clusterScheduler.run();
+    callbackScheduler.run();
 
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_DELETE, 2, 0);
 
@@ -347,6 +354,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     solverScheduler.run();
     clusterScheduler.run();
+    callbackScheduler.run();
 
     jobScheduler.run();
     jobScheduler.run();
@@ -388,6 +396,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     solverScheduler.run();
     clusterScheduler.run();
+    callbackScheduler.run();
 
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
     for (int i = 0; i < 3; ++i) {
@@ -506,6 +515,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.CLUSTER_CREATE, 0, 0);
 
     clusterScheduler.run();
+    callbackScheduler.run();
 
     // Get the status - 0 tasks completed and RUNNING
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 6, 0);
@@ -958,8 +968,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   private void verifyInitialLeaseDuration(long expectedExpireTime, Cluster.Status expectedStatus,
                                           long requestedLeaseDuration,
                                           String clusterTemplate) throws Exception {
-    ClusterCreateRequest clusterCreateRequest = new ClusterCreateRequest("test-lease", "test cluster initial lease", clusterTemplate, 4,
-                                                       null, null, null, null, requestedLeaseDuration, null, null);
+    ClusterCreateRequest clusterCreateRequest =
+      new ClusterCreateRequest("test-lease", "test cluster initial lease", clusterTemplate, 4,
+                               null, null, null, null, null, requestedLeaseDuration, null, null);
 
     HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -1388,13 +1399,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   protected static ClusterCreateRequest createClusterRequest(String name, String description,
                                                        String template, int numMachines) {
     return new ClusterCreateRequest(name, description, template, numMachines,
-                                    null, null, null, null, -1L, null, null);
+                                    null, null, null, null, null, -1L, null, null);
   }
 
   protected static ClusterCreateRequest createClusterRequest(String name, String description, String template,
                                                              int numMachines, JsonObject userConfig) {
     return new ClusterCreateRequest(name, description, template, numMachines,
-                                    null, null, null, null, -1L, null, userConfig);
+                                    null, null, null, null, null, -1L, null, userConfig);
   }
 
   @BeforeClass
@@ -1457,8 +1468,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                                          null, new Administration(new LeaseDuration(10000, 30000, 5000)));
 
     // create providers
-    entityStore.writeProvider(new Provider("joyent", "joyent provider", Provider.Type.JOYENT,
-                                     Collections.<String, Map<String, String>>emptyMap()));
+    entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
+                                           ImmutableMap.<String, String>of()));
+    entityStore.writeProviderType(Entities.ProviderTypeExample.JOYENT);
     // create hardware types
     entityStore.writeHardwareType(
       new HardwareType(

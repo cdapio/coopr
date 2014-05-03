@@ -25,14 +25,14 @@ class Provider
 
   def runTask
     case task['taskName'].downcase
-    when 'create'
-      create('flavor' => task['config']['flavor'], 'image' => task['config']['image'], 'hostname' => task['config']['hostname'])
+    when "create"
+      create({'flavor' => task['config']['flavor'], 'image' => task['config']['image'], 'hostname' => task['config']['hostname'], 'fields' => task['config']['provider']['provisioner']})
       return @result
-    when 'confirm'
-      confirm('providerid' => task['config']['providerid'])
+    when "confirm"
+      confirm({'providerid' => task['config']['providerid'], 'fields' => task['config']['provider']['provisioner']})
       return @result
-    when 'delete'
-      delete('providerid' => task['config']['providerid'])
+    when "delete"
+      delete({'providerid' => task['config']['providerid'], 'fields' => task['config']['provider']['provisioner']})
       return @result
     else
       fail "unhandled provider task type: #{task['taskName']}"

@@ -65,6 +65,13 @@ start ( ) {
   done
 }
 
+register ( ) {
+  echo "Registering provisioner plugins with server ${LOOM_SERVER_URI}"
+  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/provisioner.rb --uri ${LOOM_SERVER_URI} \
+      -L ${LOOM_LOG_LEVEL} --register >> ${LOOM_LOG_DIR}/${APP_NAME}${p}.log 2>&1
+}
+
+
 stop ( ) {
   local failed=0
   echo "Stopping Loom Provisioners ..."
@@ -151,8 +158,11 @@ case ${1} in
   restart)
     ${1}
     ;;
+  register)
+    ${1}
+    ;;
   *)
-    echo "Usage: $0 {start|stop|status|restart}"
+    echo "Usage: $0 {start|stop|status|restart|register}"
     exit 1
     ;;
 esac

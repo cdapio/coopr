@@ -1,0 +1,52 @@
+{
+    "name": "joyent",
+    "parameters": {
+        "admin": {
+            "fields": {
+              "joyent_username": {
+                "label": "User",
+                "type": "text",
+                "tip": "Your Joyent CloudAPI user name"
+              },
+              "joyent_password": {
+                "label": "Password",
+                "type": "password",
+                "tip": "Your Joyent CloudAPI password"
+              },
+              "joyent_keyname" : {
+                "label": "Key name",
+                "type": "text",
+                "tip": "Your Joyent SSH public key name"
+              },
+              "joyent_keyfile": {
+                "label": "Key file",
+                "type": "text",
+                "tip": "Full path and file name to your Joyent SSH private key"
+              },
+              "joyent_version": {
+                "label": "API version",
+                "type": "text",
+                "default": "~7.0",
+                "tip": "CloudAPI version (~7.0 default)"
+              },
+              "joyent_api_url": {
+                "label": "Region",
+                "type": "select",
+                "options": [
+                  "https://us-west-1.api.joyentcloud.com",
+                  "https://us-sw-1.api.joyentcloud.com",
+                  "https://us-east-1.api.joyentcloud.com",
+                  "https://eu-ams-1.api.joyentcloud.com"
+                ],
+                "default": "https://us-west-1.api.joyentcloud.com",
+                "override": true,
+                "tip": "Joyent Region (us-west-1 default)"
+              }
+            },
+            "required": [
+              [ "joyent_username", "joyent_password" ],
+              [ "joyent_username", "joyent_keyname", "joyent_keyfile" ]
+            ]
+        }
+    }
+}

@@ -158,6 +158,9 @@ function load_defaults () {
         $LOOM_HOME/server/config/defaults/load-defaults.sh && \
         touch $LOOM_DATA_DIR/.load_defaults
 
+        # register the default plugins with the server
+        $LOOM_HOME/bin/loom-provisioner.sh register
+
         echo
         echo "Go to http://localhost:8100. Have fun creating clusters!"
     fi

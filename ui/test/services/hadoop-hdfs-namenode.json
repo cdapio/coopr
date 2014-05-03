@@ -10,25 +10,35 @@
     "actions": {
       "install": {
         "type":"chef",
-        "script": "recipe[hadoop::hadoop_hdfs_namenode]"
+        "fields": {
+          "run_list": "recipe[hadoop::hadoop_hdfs_namenode]"
+        }
       },
       "configure": {
         "type": "chef",
-        "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+        }
       },
       "initialize": {
         "type": "chef",
-        "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
+        }
       },
       "start": {
         "type": "chef",
-        "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }" 
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }" 
+        }
       },
       "stop": {
         "type": "chef",
-        "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
-        "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }" 
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }" 
+        }
       }
     }
   }

@@ -63,8 +63,12 @@ class ShellAutomator < Automator
     sshauth = inputmap['sshauth']
     hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
-    shellscript = inputmap['actionscript']
-    shellargs = inputmap['actiondata']
+    fields = inputmap['fields']
+
+    raise "required parameter \"script\" not found in input: #{fields}" if fields['script'].nil?
+    shellscript = fields['script']
+    shellargs = fields['args']
+
     set_credentials(sshauth)
 
     jsondata = JSON.generate(task)
@@ -119,6 +123,35 @@ class ShellAutomator < Automator
     set_credentials(sshauth)
 
     generate_scripts_tar()
+
+    # check to ensure scp is installed and attempt to install it
+    begin
+      Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
+
+        log.debug "Checking for scp installation"
+        begin
+          ssh_exec!(ssh, "which scp")
+        rescue
+          log.warn "scp not found, attempting to install openssh-client"
+          scp_install_cmd = "yum -qy install openssh-clients"
+          begin
+            ssh_exec!(ssh, "which yum")
+          rescue
+            scp_install_cmd = "apt-get -qy install openssh-client"
+          end
+
+          begin
+            log.debug "installing openssh-client via #{scp_install_cmd}"
+            ssh_exec!(ssh, scp_install_cmd)
+          rescue => e
+            raise $!, "Could not install scp on #{ipaddress}: #{$!}", $!.backtrace
+          end
+        end
+        log.debug "scp found on remote"
+      end
+    rescue Net::SSH::AuthenticationFailed => e
+      raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
+    end
 
     begin
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|

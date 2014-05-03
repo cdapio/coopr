@@ -17,9 +17,12 @@ package com.continuuity.loom.layout;
 
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
+import com.continuuity.loom.admin.FieldSchema;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
+import com.continuuity.loom.admin.ParameterType;
 import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
@@ -135,6 +138,13 @@ public class Solver {
       throw new IllegalArgumentException("provider " + providerName + " does not exist.");
     }
 
+    ProviderType providerType = entityStore.getProviderType(provider.getProviderType());
+    if (providerType == null) {
+      throw new IllegalArgumentException("provider type " + providerType + " does not exist.");
+    }
+
+    // add user given provider fields to the provider object
+    provider.addUserFields(request.getProviderFields(), providerType);
     cluster.setProvider(provider);
 
     // make sure there are hardware types that can be used

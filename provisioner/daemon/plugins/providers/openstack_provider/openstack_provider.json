@@ -1,6 +1,79 @@
 {
-  "openstack" : {
-    "classname": "OpenstackProvider"
+  "name": "openstack",
+  "description": "Openstack cloud provider",
+  "providertypes": [ "openstack" ],
+  "openstack": {
+    "name": "openstack",
+    "classname": "OpenstackProvider",
+    "parameters": { 
+      "admin": {
+        "fields": {
+          "openstack_username": {
+            "label": "User",
+            "type": "text",
+            "tip": "Your Openstack user name"
+          },
+          "openstack_password": {
+            "label": "Password",
+            "type": "password",
+            "tip": "Your Openstack password"
+          },
+          "openstack_tenant": {
+            "label": "Tenant",
+            "type": "text",
+            "tip": "Your Openstack tenant"
+          },
+          "openstack_auth_url": {
+            "label": "Auth URL",
+            "type": "text",
+            "default": "http://EXAMPLE.DOMAIN.COM:5000/v2.0/tokens",
+            "tip": "Your Openstack Keystone API URL"
+          },
+          "openstack_ssh_key_id" : {
+            "label": "Key name",
+            "type": "text",
+            "tip": "Your Openstack SSH public key name"
+          },
+          "identity_file" : {
+            "label": "Key file",
+            "type": "text",
+            "tip": "Path to your Openstack SSH private key file"
+          }
+        },
+        "required": [
+          [
+            "openstack_username",
+            "openstack_password",
+            "openstack_tenant",
+            "openstack_auth_url",
+            "openstack_ssh_key_id",
+            "identity_file"
+          ]
+        ]
+      },
+      "user": {
+        "fields": {
+          "security_groups": {
+            "type": "text",
+            "label": "Security Group",
+            "default": "default",
+            "tip": "Openstack security groups (comma separated)"
+          },
+          "availability_zone": {
+            "type": "text",
+            "label": "Availability Zone",
+            "tip": "Openstack Availability Zone"
+          },
+          "floating_ip": {
+            "type": "checkbox",
+            "label": "Floating IP",
+            "tip": "Request a floating IP address for each node"
+          }
+        },
+        "required": [
+          [ "security_groups" ]
+        ]
+      }
+    }
   }
 }
-

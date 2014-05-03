@@ -57,11 +57,10 @@ class ChefAutomator < Automator
   end
 
   # generate the chef run json_attributes from the loom task metadata
-  def generate_chef_json_attributes()
+  def generate_chef_json_attributes(servicestring)
 
     servicedata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
 
-    servicestring = @task['config']['service']['action']['data']
     if (servicestring.nil? || servicestring == "")
       servicestring = "{}"
     end
@@ -114,9 +113,19 @@ class ChefAutomator < Automator
         log.debug "Validating connectivity to #{hostname}"
         output = ssh_exec!(ssh, "hostname")
 
+        # determine if curl is installed, else default to wget
+        log.debug "Checking for curl"
+        chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | bash"
+        begin
+          ssh_exec!(ssh, "which curl")
+        rescue
+          log.debug "curl not found, defaulting to wget"
+          chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | bash"
+        end
+
         # install chef
         log.debug "Install chef..."
-        output = ssh_exec!(ssh, "curl -L https://www.opscode.com/chef/install.sh | bash")
+        output = ssh_exec!(ssh, chef_install_cmd)
         if (output[2] != 0 )
           log.error "Chef install failed: #{output}"
           raise "Chef install failed: #{output}"
@@ -145,6 +154,35 @@ class ChefAutomator < Automator
           raise "Unable to create #{@remote_chef_dir} on #{hostname} : #{output}"
         end
 
+      end
+    rescue Net::SSH::AuthenticationFailed => e
+      raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
+    end
+
+    # check to ensure scp is installed and attempt to install it
+    begin
+      Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
+
+        log.debug "Checking for scp installation"
+        begin
+          ssh_exec!(ssh, "which scp")
+        rescue
+          log.warn "scp not found, attempting to install openssh-client"
+          scp_install_cmd = "yum -qy install openssh-clients"
+          begin
+            ssh_exec!(ssh, "which yum")
+          rescue
+            scp_install_cmd = "apt-get -qy install openssh-client"
+          end
+
+          begin
+            log.debug "installing openssh-client via #{scp_install_cmd}"
+            ssh_exec!(ssh, scp_install_cmd)
+          rescue => e
+            raise $!, "Could not install scp on #{ipaddress}: #{$!}", $!.backtrace
+          end
+        end
+        log.debug "scp found on remote"
       end
     rescue Net::SSH::AuthenticationFailed => e
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -188,15 +226,22 @@ class ChefAutomator < Automator
     sshauth = inputmap['sshauth']
     hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
-    actionscript = inputmap['actionscript']
-    actiondata = inputmap['actiondata']
+    fields = inputmap['fields']
+
+    raise "required parameter \"run_list\" not found in input: #{fields}" if fields['run_list'].nil?
+    # run_list as specified by user
+    run_list = fields['run_list']
+    # whitespace in the runlist is not allowed
+    run_list.gsub!(/\s+/, "")
+
+    # additional json attributes defined for this service action
+    json_attributes = fields['json_attributes']
+
+    # merge together json_attributes, cluster config, loom node data
+    jsondata = generate_chef_json_attributes(json_attributes)
 
     set_credentials(sshauth)
 
-    jsondata = generate_chef_json_attributes()
-
-    # whitespace in the runlist is not allowed
-    actionscript.gsub!(/\s+/, "")
 
     begin
       # write json attributes to a local tmp file
@@ -223,7 +268,7 @@ class ChefAutomator < Automator
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
 
         log.debug "Running chef-solo"
-        output = ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{actionscript}'")
+        output = ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'")
         if (output[2] != 0 )
           log.error "Chef run did not complete successfully: #{output}"
           raise "Chef run did not complete successfully: #{output}"

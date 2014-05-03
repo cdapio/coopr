@@ -18,36 +18,26 @@ package com.continuuity.loom.admin;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import java.util.Map;
 
 /**
- * Machine providers are instances of openstack, aws, rackspace, or joyent that can provision machines.  Providers are
- * referenced by {@link ImageType} and {@link HardwareType}.
+ * Machine providers are instances of some {@link ProviderType} like openstack, aws, rackspace, or joyent that can
+ * provision machines.  Providers are referenced by {@link ImageType} and {@link HardwareType}.
  */
 public final class Provider extends NamedEntity {
   private final String description;
-  private final Provider.Type providerType;
-  private final Map<String, Map<String, String>> provisionerData;
+  private final String providerType;
+  private final Map<String, String> provisionerFields;
 
-  public Provider(String name, String description, Provider.Type providerType,
-                         Map<String, Map<String, String>> provisionerData) {
+  public Provider(String name, String description, String providerType, Map<String, String> provisionerFields) {
     super(name);
     Preconditions.checkArgument(providerType != null, "invalid provider type.");
     this.description = description;
     this.providerType = providerType;
-    this.provisionerData = provisionerData == null ? ImmutableMap.<String, Map<String, String>>of() : provisionerData;
-  }
-
-  /**
-   * Types of providers.
-   * NOTE: enum name has to match knife plugin name.
-   */
-  public static enum Type {
-    OPENSTACK,
-    EC2,
-    RACKSPACE,
-    JOYENT
+    this.provisionerFields = provisionerFields == null ?
+      Maps.<String, String>newHashMap() : Maps.newHashMap(provisionerFields);
   }
 
   /**
@@ -60,22 +50,49 @@ public final class Provider extends NamedEntity {
   }
 
   /**
-   * Get the {@link Provider.Type} of the provider.
+   * Get the type of the provider.
    *
-   * @return {@link Provider.Type} of the provider.
+   * @return Type of the provider.
    */
-  public Type getProviderType() {
+  public String getProviderType() {
     return providerType;
   }
 
   /**
-   * Get data needed by provisioners for this provider.  This will almost always include an 'auth' key that contains
-   * a mapping of provider specific details required for provisioning, such as api endpoints, usernames, keys, etc.
+   * Get fields needed by provisioners for this provider.  This should include fields defined in the corresponding
+   * {@link ProviderType}.
    *
-   * @return Data needed to provision machines from this provider.
+   * @return Fields needed to provision machines from this provider.
    */
-  public Map<String, Map<String, String>> getProvisionerData() {
-    return provisionerData;
+  public Map<String, String> getProvisionerFields() {
+    return provisionerFields;
+  }
+
+  /**
+   * Add some user defined fields to the provider's fields, checking that the provider type for this provider allows
+   * those fields as user specified fields.
+   *
+   * @param userFields User specified fields to add.
+   * @param providerType Provider type for this provider.
+   */
+  public void addUserFields(Map<String, String> userFields, ProviderType providerType) {
+    Preconditions.checkArgument(providerType != null, "Provider type must be specified.");
+    Preconditions.checkArgument(this.providerType.equals(providerType.getName()),
+                                "Invalid provider type " + providerType.getName());
+    Map<String, FieldSchema> typeAdminFields = providerType.getParameters().containsKey(ParameterType.ADMIN) ?
+      providerType.getParameters().get(ParameterType.ADMIN).getFields() :
+      ImmutableMap.<String, FieldSchema>of();
+    Map<String, FieldSchema> typeUserFields = providerType.getParameters().containsKey(ParameterType.USER) ?
+      providerType.getParameters().get(ParameterType.USER).getFields() :
+      ImmutableMap.<String, FieldSchema>of();
+    for (Map.Entry<String, String> fieldEntry : userFields.entrySet()) {
+      String field = fieldEntry.getKey();
+      // if this is a user field or an overridable field.
+      if (typeUserFields.containsKey(field) ||
+        (typeAdminFields.containsKey(field) && typeAdminFields.get(field).getOverride())) {
+        provisionerFields.put(field, fieldEntry.getValue());
+      }
+    }
   }
 
   @Override
@@ -87,12 +104,12 @@ public final class Provider extends NamedEntity {
     return Objects.equal(name, other.name) &&
       Objects.equal(description, other.description) &&
       Objects.equal(providerType, other.providerType) &&
-      Objects.equal(provisionerData, other.provisionerData);
+      Objects.equal(provisionerFields, other.provisionerFields);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, providerType, provisionerData);
+    return Objects.hashCode(name, description, providerType, provisionerFields);
   }
 
   @Override
@@ -100,7 +117,7 @@ public final class Provider extends NamedEntity {
     return Objects.toStringHelper(this)
       .add("description", description)
       .add("providerType", providerType)
-      .add("provisionerData", provisionerData)
+      .add("provisionerFields", provisionerFields)
       .toString();
   }
 }

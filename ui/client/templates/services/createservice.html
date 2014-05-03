@@ -1,13 +1,20 @@
 {% extends 'index.html' %}
 
-{% block title %}{% if service %} Edit service: {{service.name}} {% else %}Create a service{% endif %}{% endblock %}
+{% block title %}{% if serviceId %} Edit service: {{serviceId}} {% else %}Create a service{% endif %}{% endblock %}
+
+{% block headscript %}
+<script src="/static/third_party/angular/angular.js" type="text/javascript"></script>
+<script src="/static/third_party/angular/angular-route.js"></script>
+<script src="/static/js/createservice.js" type="text/javascript"></script>
+{% endblock %}
 
 {% block header %}
     {% include "page-header.html" %}
 {% endblock %}
 
 {% block content %}
-    <div id="content-body">
+  <div ng-app="CreateServiceApp">
+    <div id="content-body" ng-controller="ServiceCtrl">
       <div id="title">
         <div class="pull-right">
           <div id="global">
@@ -21,150 +28,217 @@
 
         <div class="panel spl-panel" style="clear: both;">
           <div class="panel-head spl-panel-head clearfix">
-            <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if service %} Edit service: {{service.name}} {% else %}Create a service{% endif %}</h4>
-            <div class="pull-right">
-              {% if service %}
-              <form role="form" method="POST" action="/services/delete/{{service.name}}" class="service-delete-form">
-                <input type="hidden" value="{{service.name}}" name="name" />
-                <button type="submit" class="btn-spl btn-delete"></button>
-              </form>
-              {% endif %}
-            </div>
+            <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if serviceId %} Edit service: {{serviceId}} {% else %}Create a service{% endif %}</h4>
+              <div class="pull-right">
+                {% if serviceId %}
+                <form role="form" method="POST" action="/services/delete/{{serviceId}}" class="service-delete-form" ng-submit="handleDeletion($event)">
+                  <input type="hidden" value="{{serviceId}}" name="name" />
+                  <button type="submit" class="btn-spl btn-delete"></button>
+                </form>
+                {% endif %}
+              </div>
             </div>
           </div>
 
           <div class="panel-body spl-panel-body">
-            <form class="form-horizontal" role="form" id="create-service-form" action="{% if service %}/services/update{% else %}/services/create{% endif %}">
+            <input type="hidden" id="inputName" value="{{serviceId}}" />
+            <form class="form-horizontal" method="POST" role="form" id="create-service-form" action="{% if serviceId %}/services/update{% else %}/services/create{% endif %}" ng-submit="handleFormSubmit($event)">
               <div class="form-group">
                 <label for="inputName" class="col-sm-2 control-label">Name</label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name" value="{{service.name}}" {% if service %} disabled {% endif %}>
+                  <input type="text" class="form-control" name="inputName" placeholder="Name" ng-disabled="serviceExists" ng-model="name">
                 </div>
               </div>
               <div class="form-group">
                 <label for="inputDescription" class="col-sm-2 control-label">Description</label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="inputDescription" name="inputDescription" placeholder="Description" value="{{service.description}}">
+                  <input type="text" class="form-control" id="inputDescription" name="inputDescription" placeholder="Description" ng-model="description">
                 </div>
               </div>
               <h4>Dependencies</h4>
               <br>
+
+              <!-- Provides dependency lists -->
               <div class="form-group">
-                <label for="inputRuntimeRequires" class="col-sm-2 control-label">Runtime Requires</label>
+                <label for="provides" class="col-sm-2 control-label">Provides</label>
                 <div class="col-sm-6">
-                  <select class="form-control" name="inputRuntimeRequires" id="inputRuntimeRequires">
-                    <option></option>
-                    {% for itr in services %}
-                      <option>{{itr.name}}</option>
-                    {% endfor %}
-                  </select>
+                  <input class="form-control" name="provides" id="provides" type="text" ng-model="currProvide" />
                 </div>
                 <div class="col-sm-2">
-                  <button type="button" class="btn-spl btn-default" id="add-service">Add service</button>
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currProvide, provides)">Add service</button>
                 </div>
               </div>
               <div class="form-group">
                 <label class="col-sm-2 control-label"></label>
                 <div class="col-sm-6 service-entries">
-                  {% for item in service.dependencies.runtime.requires %}
-                    <div class="form-control"><span class="service-name">{{item}}</span><span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus"></span></div>
-                  {% endfor %}
+                    <div class="form-control" ng-repeat="service in provides">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, provides)"></span>
+                    </div>
                 </div>
               </div>
+
+              <!-- Conflicts dependencies -->
+              <div class="form-group">
+                <label for="conflicts" class="col-sm-2 control-label">Conflicts</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="conflicts" id="conflicts" ng-options="item for item in availableServices" ng-model="currConflict">
+                    <option></option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currConflict, conflicts)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in conflicts">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, conflicts)"></span>
+                    </div>
+                </div>
+              </div>
+
+              <!-- Install requires dependencies  -->
+              <div class="form-group">
+                <label for="installRequires" class="col-sm-2 control-label">Install Requires</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="installRequires" id="installRequires" ng-options="item for item in availableServices" ng-model="currInstallRequire">
+                    <option></option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currInstallRequire, installRequires)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in installRequires">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, installRequires)"></span>
+                    </div>
+                </div>
+              </div>
+
+              <!-- Install uses dependencies -->
+              <div class="form-group">
+                <label for="installUses" class="col-sm-2 control-label">Install Uses</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="installUses" id="installUses" ng-options="item for item in availableServices" ng-model="currInstallUse">
+                    <option></option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currInstallUse, installUses)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in installUses">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, installUses)"></span>
+                    </div>
+                </div>
+              </div>
+              
+              <!-- Runtime requires dependency lists  -->
+              <div class="form-group">
+                <label for="inputRuntimeRequires" class="col-sm-2 control-label">Runtime Requires</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="inputRuntimeRequires" id="inputRuntimeRequires" ng-options="item for item in availableServices" ng-model="currService">
+                    <option></option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" id="add-service" ng-click="addService(currService, selectedServices)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in selectedServices">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, selectedServices)"></span>
+                    </div>
+                </div>
+              </div>
+
+              <!-- Runtime uses dependencies -->
+              <div class="form-group">
+                <label for="runtimeUses" class="col-sm-2 control-label">Runtime Uses</label>
+                <div class="col-sm-6">
+                  <select class="form-control" name="runtimeUses" id="runtimeUses" ng-options="item for item in availableServices" ng-model="currRuntimeUse">
+                    <option></option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <button type="button" class="btn-spl btn-default" ng-click="addService(currRuntimeUse, runtimeUses)">Add service</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-6 service-entries">
+                    <div class="form-control" ng-repeat="service in runtimeUses">
+                      <span class="service-name">[[service]]</span>
+                      <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeService(service, runtimeUses)"></span>
+                    </div>
+                </div>
+              </div>
+
+              
+
+
               <h4>Automator Details</h4>
               <br>
               <div class="form-group">
                 <label class="col-sm-2 control-label">Actions</label>
                 <div class="col-sm-8">
-                  <button type="button" class="btn-spl btn-default" id="add-action">Add</button>
+                  <button type="button" class="btn-spl btn-default" id="add-action" ng-click="addEmptyAction()">Add</button>
                 </div>
               </div>
               <div class="form-group action-entries">
-                {% if service.provisioner.actions %}
-                  {% for item in service.provisioner.actions %}
-                  <div class="action-entry">
-                    <div class="col-sm-offset-2 col-sm-8">
-                      <div class="form-group">
-                        <label for="inputCategory" class="col-sm-2 control-label">Category</label>
-                        <div class="col-sm-8">
-                          <select class="form-control inputCategory" name="inputCategory">
-                            <option {% if loop.key === 'install' %}selected="selected"{% endif %}>install</option>
-                            <option {% if loop.key === 'remove' %}selected="selected"{% endif %}>remove</option>
-                            <option {% if loop.key === 'initialize' %}selected="selected"{% endif %}>initialize</option>
-                            <option {% if loop.key === 'configure' %}selected="selected"{% endif %}>configure</option>
-                            <option {% if loop.key === 'start' %}selected="selected"{% endif %}>start</option>
-                            <option {% if loop.key === 'stop' %}selected="selected"{% endif %}>stop</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="inputType" class="col-sm-2 control-label">Type</label>
-                        <div class="col-sm-8">
-                          <select class="form-control inputType" name="inputType">
-                            <option {% if item.type === 'chef' %}selected="selected"{% endif %}>chef</option>
-                            <option {% if item.type === 'shell' %}selected="selected"{% endif %}>shell</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="inputScript" class="col-sm-2 control-label">Script</label>
-                        <div class="col-sm-8">
-                          <input type="text" class="form-control inputScript" name="inputScript" value="{{item.script}}">
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="inputData" class="col-sm-2 control-label">Data</label>
-                        <div class="col-sm-8">
-                          <input type="text" class="form-control inputData" name="inputData" value="{{item.data}}">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {% endfor %}
-                {% else %}
-                <div class="action-entry">
+                <div class="action-entry" ng-repeat="action in actions">
                   <div class="col-sm-offset-2 col-sm-8">
                     <div class="form-group">
                       <label for="inputCategory" class="col-sm-2 control-label">Category</label>
                       <div class="col-sm-8">
-                        <select class="form-control inputCategory" name="inputCategory">
-                          <option>install</option>
-                          <option>remove</option>
-                          <option>initialize</option>
-                          <option>configure</option>
-                          <option>start</option>
-                          <option>stop</option>
+                        <select class="form-control inputCategory" name="inputCategory" ng-model="action.category" ng-options="item for item in categoryOptions">
+                          <option></option>
                         </select>
                       </div>
                     </div>
                     <div class="form-group">
                       <label for="inputType" class="col-sm-2 control-label">Type</label>
                       <div class="col-sm-8">
-                        <select class="form-control inputType" name="inputType">
-                          <option>chef</option>
-                          <option>shell</option>
+                        <select class="form-control inputType" name="inputType" ng-options="type as type for (type, data) in automatorData" ng-model="action.type">
+                          <option></option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group" ng-repeat="(field, fieldData) in automatorData[action.type].parameters.admin.fields">
+                      <label for="inputScript" class="col-sm-2 control-label">[[fieldData.label]]</label>
+                      <div class="col-sm-8">
+                        <input class="form-control" type="[[fieldData.type]]" ng-model="action.fields[field]" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'text' || fieldData.type == 'password'" />
+                        <select class="form-control" type="[[fieldData.type]]" ng-model="action.fields[field]" ng-options="region as region for region in fieldData.options" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'select'" >
+                          <option></option>
                         </select>
                       </div>
                     </div>
                     <div class="form-group">
-                      <label for="inputScript" class="col-sm-2 control-label">Script</label>
-                      <div class="col-sm-8">
-                        <input type="text" class="form-control inputScript" name="inputScript">
+                      <div class="col-sm-offset-2 col-sm-8">
+                        <button type="button" class="btn-spl btn-default" id="remove-action" ng-click="removeAction($index)">Remove</button>
                       </div>
                     </div>
-                    <div class="form-group">
-                      <label for="inputData" class="col-sm-2 control-label">Data</label>
-                      <div class="col-sm-8">
-                        <input type="text" class="form-control inputData" name="inputData">
-                      </div>
-                    </div>
+                    
                   </div>
                 </div>
-                {% endif %}
               </div>
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-8">
-                  <button type="submit" class="btn-spl btn-info">{% if service %} Save{% else %}Create{% endif %}</button>
+                  <button type="submit" class="btn-spl btn-info">{% if serviceId %} Save{% else %}Create{% endif %}</button>
                 </div>
               </div>
             </form>
@@ -173,6 +247,5 @@
         
       </div>
     </div>
-
-<script data-main="/static/js/createservice" src="/static/third_party/require.js"></script>
+  </div>
 {% endblock %}

@@ -2,7 +2,7 @@
   <li><a class="nav-link nav-dash btn-spl btn-default secondary-nav-home" href="/services">Home</a></li>
   <li>
     <div class="dropdown">
-      <a data-toggle="dropdown" class="btn-spl btn-default nav-dash secondary-nav-dropdown" href="#">Services <span class="caret"></span></a>
+      <a data-toggle="dropdown" class="btn-spl btn-default nav-dash secondary-nav-dropdown" >Services <span class="caret"></span></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
         {% for item in services %}
           <li><a class="list-types" href="/services/service/{{item.name}}">{{ item.name }}</a></li>
