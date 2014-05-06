@@ -6,20 +6,20 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "script": "recipe[fail2ban::default]"
       },
       "configure": {
-        "type":"chef",
+        "type":"chef-solo",
         "script": "recipe[fail2ban::default]"
       },
       "start": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[fail2ban::default],recipe[loom_service_runner::default]",
         "data": "{\"loom\": { \"node\": { \"services\": { \"fail2ban\": \"start\" } } } }" 
       },
       "stop": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[fail2ban::default],recipe[loom_service_runner::default]",
         "data": "{\"loom\": { \"node\": { \"services\": { \"fail2ban\": \"stop\" } } } }" 
       }

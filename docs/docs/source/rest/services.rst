@@ -28,7 +28,7 @@ Loom REST APIs allow the administrator to add services. A service is some piece 
 that can be placed on a cluster. Examples include a mysql server, a Hadoop namenode, a 
 Lucene indexer, and much more. The administrator defines the service entirely, so any software
 supported by the underlying provisioners can be added to Continuuity Loom. By writing a provisioner
-automator plugin, or by using the included chef and shell plugins, an administrator can manage
+automator plugin, or by using the included chef-solo and shell plugins, an administrator can manage
 any service they want.
 
 A service is uniquely identified by its name. It also contains a short description and a section for
@@ -56,7 +56,7 @@ which defines which automator type to use for that action, and ``fields``. Field
 contains another JSON object which is a set of key-value pairs required by the 
 automator plugin.
 
-This example is taken from an example Hadoop namenode service. It uses chef as the 
+This example is taken from an example Hadoop namenode service. It uses chef-solo as the 
 automator type, which requires a run_list field and also allows an optional json_attributes field.
 
 .. code-block:: bash
@@ -64,32 +64,32 @@ automator type, which requires a run_list field and also allows an optional json
   "provisioner": {
     "actions": {
         "configure": {
-            "type": "chef",
+            "type": "chef-solo",
             "fields": {
                 "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
             }
         },
         "initialize": {
-            "type": "chef",
+            "type": "chef-solo",
             "fields": {
                 "run_list": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
             }
         },
         "install": {
-            "type": "chef",
+            "type": "chef-solo",
             "fields": {
                 "run_list": "recipe[hadoop::hadoop_hdfs_namenode]"
             }
         },
         "start": {
-            "type": "chef",
+            "type": "chef-solo",
             "fields": {
                 "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
                 "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
             }
         },
         "stop": {
-            "type": "chef",
+            "type": "chef-solo",
             "fields": {
                 "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
                 "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
@@ -242,13 +242,13 @@ Example
                 "provisioner": {
                     "actions": {
                         "configure": {
-                            "type": "chef",
+                            "type": "chef-solo",
                             "fields": {
                                 "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                             }
                         },
                         "initialize": {
-                            "type": "chef",
+                            "type": "chef-solo",
                             "fields": {
                                 "run_list": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
                             },
@@ -310,13 +310,13 @@ Example
        "provisioner": {
            "actions": {
                "configure": {
-                   "type": "chef",
+                   "type": "chef-solo",
                    "fields": {
                        "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                    }
                },
                "initialize": {
-                   "type": "chef",
+                   "type": "chef-solo",
                    "fields": {
                        "run_list": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
                    },
@@ -422,13 +422,13 @@ Example
                  "provisioner": {
                      "actions": {
                          "configure": {
-                             "type": "chef",
+                             "type": "chef-solo",
                              "fields": {
                                  "run_list": "recipe[apt::default]"
                              }
                          },
                          "install": {
-                             "type": "chef",
+                             "type": "chef-solo",
                              "fields": {
                                  "run_list": "recipe[apt::default]"
                              }

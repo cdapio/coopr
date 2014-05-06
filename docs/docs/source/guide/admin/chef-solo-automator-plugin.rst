@@ -19,11 +19,11 @@
 
 
 .. index::
-   single: Chef Automator Plugin
+   single: Chef Solo Automator Plugin
 
-========================
-Chef Automator Plugin
-========================
+==========================
+Chef Solo Automator Plugin
+==========================
 
 .. include:: /guide/admin/admin-links.rst
 
@@ -33,7 +33,7 @@ Overview
 ========
 
 The Chef Solo Automator plugin, like all automator plugins, is responsible for performing the installation and
-operation of services on remote hosts. The Chef Automator plugin achieves this by running chef-solo on the remote host
+operation of services on remote hosts. The Chef Solo Automator plugin achieves this by running chef-solo on the remote host
 with a custom run-list and set of JSON attributes. The attributes provided to each chef-solo run will be a combination
 of cluster-wide configuration attributes, as well as service-specific attributes definable for each action. Each
 chef-solo run is self-contained and intended to perform a specific task such as starting a service. This differs from
@@ -52,26 +52,26 @@ nodes using the "apache2" community cookbook. We define a Loom service "apache-h
         "provisioner": {
             "actions": {
                 "install": {
-                    "type": "chef"
+                    "type": "chef-solo"
                     "fields": {
                         "run_list": "recipe[apache2::default]",
                     }
                 },
                 "configure": {
-                    "type": "chef"
+                    "type": "chef-solo"
                     "fields": {
                         "run_list": "recipe[apache2::default]",
                     }
                 },
                 "start": {
-                    "type": "chef"
+                    "type": "chef-solo"
                     "fields": {
                         "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }",
                         "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
                     }
                 },
                 "stop": {
-                    "type": "chef"
+                    "type": "chef-solo"
                     "fields": {
                         "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }",
                         "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
@@ -82,7 +82,7 @@ nodes using the "apache2" community cookbook. We define a Loom service "apache-h
     }
 
 For each action, we define the ``type``, and the custom fields ``run_list`` and ``json_attributes``. (defaults to empty string if not specified). The ``type``
-field indicates to the provisioner to use the Chef Automator plugin to manage this action. The ``run_list`` field specifies
+field indicates to the provisioner to use the Chef Solo Automator plugin to manage this action. The ``run_list`` field specifies
 the run-list to use. The ``json_attributes`` field is any additional JSON data we wish to include in the Chef run (more on this
 later). When the Chef Solo Automator plugin executes any of these actions for the apache-httpd service, it performs
 the following actions:
@@ -116,7 +116,7 @@ Continuuity Loom maintains significant JSON data for a cluster, and makes it ava
     * node data for each node of the cluster: hostname, ip, etc
     * service data, specified in the actions for each service
 
-The Chef Automator plugin automatically merges this data into a single JSON file, which is then passed to chef-solo via
+The Chef Solo Automator plugin automatically merges this data into a single JSON file, which is then passed to chef-solo via
 the ``--json-attributes argument``. Any custom cookbooks that want to make use of this Loom data need to be familiar
 with the JSON layout of the Loom data. In brief, cluster-wide configuration defined in cluster templates and
 service-level action data are merged together, and preserved at the top-level. Loom data is then also merged in under
@@ -144,7 +144,7 @@ Consider the following two rules of thumb:
 Bootstrap
 =========
 
-Each Loom Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs to be able to carry out further tasks. The Chef Automator plugin performs the following actions for a bootstrap task:
+Each Loom Automator plugin is responsible for implementing a bootstrap method in which it performs any actions it needs to be able to carry out further tasks. The Chef Solo Automator plugin performs the following actions for a bootstrap task:
 	1. Bundle its local copy of the cookbooks/roles/data_bags directories into tarballs, ``cookbooks.tar.gz``, ``roles.tar.gz``, ``data_bags.tar.gz``.
 		* Unless the tarballs exist already and were created in the last 10 minutes.
 	2. Logs into the remote box and installs chef via the Opscode Omnibus installer (``curl -L https://www.opscode.com/chef/install.sh | bash``).
@@ -154,39 +154,39 @@ Each Loom Automator plugin is responsible for implementing a bootstrap method in
 
 The most important things to note are that:
 	* Upon adding any new cookbooks, roles, or data_bags to the local directories, the tarballs will be regenerated within 10 minutes and used by all running provisioners.
-	* This implementation of a Chef automator requires internet access to install Chef (and also required by the cookbooks used within).
+	* This implementation requires internet access to install Chef (and also required by the cookbooks used within).
 
 
 Adding your own Cookbooks
 =========================
 **Cookbook requirements**
 
-Since the Chef Automator plugin is implemented using chef-solo, the following restrictions apply:
+Since the Chef Solo Automator plugin is implemented using chef-solo, the following restrictions apply:
 
-	* No chef search capability
+	* No Chef search capability
 	* No persistent attributes
 
-Cookbooks should be fully attribute-driven. At this time the Chef Automator does not support the chef-solo "environment" primitive. 
+Cookbooks should be fully attribute-driven. At this time the Chef Solo Automator does not support the chef-solo "environment" primitive. 
 Attributes normally specified in an environment can instead be populated in Loom primitives such as cluster templates or service action data.
 
-In order to add cookbooks, roles, or data-bags for use by the provisioners, simply add them to the local chef directories for the Chef Automator
+In order to add cookbooks, roles, or data-bags for use by the provisioners, simply add them to the local chef directories for the Chef Solo Automator
 plugin. If using the default package install, these directories are currently:
 ::
 
-    /opt/loom/provisioner/daemon/plugins/automators/chef_automator/chef_automator/cookbooks
-    /opt/loom/provisioner/daemon/plugins/automators/chef_automator/chef_automator/roles
-    /opt/loom/provisioner/daemon/plugins/automators/chef_automator/chef_automator/data_bags
+    /opt/loom/provisioner/daemon/plugins/automators/chef_solo_automator/chef_solo_automator/cookbooks
+    /opt/loom/provisioner/daemon/plugins/automators/chef_solo_automator/chef_solo_automator/roles
+    /opt/loom/provisioner/daemon/plugins/automators/chef_solo_automator/chef_solo_automator/data_bags
 
 Your cookbook should be readable by the 'loom-provisioner' user (default: 'loom'). The next provisioner which runs a
 bootstrap task will regenerate the local tarballs
-(for example ``/opt/loom/provisioner/daemon/plugins/automators/chef_automator/chef_automator/cookbooks.tar.gz``) and it will be
+(for example ``/opt/loom/provisioner/daemon/plugins/automators/chef_solo_automator/chef_solo_automator/cookbooks.tar.gz``) and it will be
 available for use when chef-solo runs on the remote box.
 
 In order to actually invoke your cookbook or role as part of a cluster provision, you will need to define a Loom service
 definition with the following parameters:
 
 	* Category: any action (install, configure, start, stop, etc)
-	* Type: chef
+	* Type: chef-solo
 	* run_list: a run-list containing your cookbook's recipe(s) or roles. If your recipe depends on resources defined in other cookbooks which aren't declared dependencies in your cookbook's metadata, make sure to also add them to the run-list.
 	* json_attributes: (optional), any additional custom attributes you want to specify, unique to this action
 
@@ -198,6 +198,17 @@ Helper Cookbooks
 
 Continuuity Loom ships with several helper cookbooks.
 
+
+**loom_base**
+--------------
+This is a convenience cookbook which is intended to provide base functionality for all hosts provisioned by loom.  It currently 
+does the following:
+
+	* run ``apt-get update`` (on Ubuntu hosts)
+	* include ``loom_hosts::default`` (discussed below)
+	* include ``loom_firewall::default`` (discussed below)
+	* include ``ulimit::default`` to enable user-defined ulimits
+
 **loom_hosts**
 ---------------
 
@@ -206,9 +217,9 @@ It achieves this by accessing the ``loom-populated`` attributes at ``node['loom'
 all the nodes in the cluster. It then simply utilizes the community "hostsfile" cookbook's LWRP to write entries for
 each node.
 
-The example loom service definition invoking this cookbook is called "hosts". It simply sets up a "configure" service
-action of type "chef" and run_list ``recipe[loom_hosts::default]``. Note that the community "hostsfile" cookbook is not
-needed in the run-list since it is declared in loom_hosts's metadata.
+The example loom service definition invoking this cookbook is called "base". It simply sets up a "configure" service
+action of type "chef-solo" and run_list ``recipe[loom_base::default]`` (which includes ``recipe[loom_hosts::default]``).
+Note that the community "hostsfile" cookbook is not needed in the run-list since it is declared in loom_hosts's metadata.
 
 **loom_service_runner**
 -----------------------

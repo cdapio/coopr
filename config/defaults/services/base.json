@@ -6,13 +6,13 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[loom_base::default]"
         }
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[loom_base::default]"
         }
