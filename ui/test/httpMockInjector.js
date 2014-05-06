@@ -22,6 +22,7 @@ var providers = {};
 providers.joyent = require('./providers/joyent.json');
 providers.openstack = require('./providers/openstack.json');
 providers.rackspace = require('./providers/rackspace.json');
+providers['awesome'] = require('./providers/awesome.json');
 
 var hardwaretypes = {};
 hardwaretypes.small = require('./hardwaretypes/small.json');
