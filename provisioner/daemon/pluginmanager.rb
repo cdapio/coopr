@@ -19,11 +19,20 @@ require_relative 'automator'
 require_relative 'provider'
 
 class PluginManager
-  attr_accessor :providermap, :automatormap, :tasks
+  attr_accessor :providermap, :automatormap, :tasks, :load_errors, :register_errors
   def initialize()
+    @load_errors = Array.new
+    @register_errors = Array.new
     @providermap = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     @automatormap = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     scan_plugins()
+  end
+
+  def load_errors?
+    return !@load_errors.empty?
+  end
+  def register_errors?
+    return !@load_errors.empty?
   end
 
   # scan plugins directory for json plugin definitions, load plugins 
@@ -79,11 +88,13 @@ class PluginManager
         log.error "Could not load plugin, invalid json at #{jsonfile}"
         log.error e.message
         log.error e.backtrace.inspect
+        @load_errors.push("Could not load plugin, invalid json at #{jsonfile}")
         next
       rescue => e
         log.error "Could not load plugin at #{jsonfile}"
         log.error e.message
         log.error e.backtrace.inspect
+        @load_errors.push("Could not load plugin at #{jsonfile}")
         next
       end 
     end
@@ -107,11 +118,13 @@ class PluginManager
         log.info "Successfully registered #{name}"
       else
         log.error "Response code #{resp.code}, #{resp.to_str} when trying to register #{name}"
+        @register_errors.push("Response code #{resp.code}, #{resp.to_str} when trying to register #{name}")
       end
     rescue => e
       log.error "Caught exception registering plugins to loom server #{uri}"
       log.error e.message
       log.error e.backtrace.inspect
+      @register_errors.push("Caught exception registering plugins to loom server #{uri}")
     end
   end
 
