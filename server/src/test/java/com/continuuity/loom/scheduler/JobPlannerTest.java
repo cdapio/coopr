@@ -43,7 +43,7 @@ import java.util.Set;
  *
  */
 public class JobPlannerTest {
-  private static final ServiceAction CHEF_ACTION = new ServiceAction("chef", TestHelper.actionMapOf("script", "data"));
+  private static final ServiceAction CHEF_ACTION = new ServiceAction("chef-solo", TestHelper.actionMapOf("script", "data"));
 
   @Test
   public void testDedupNodesPerStage() throws Exception {

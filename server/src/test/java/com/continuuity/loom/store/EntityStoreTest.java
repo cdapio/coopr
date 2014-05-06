@@ -354,25 +354,25 @@ public abstract class EntityStoreTest {
     Service s1 = new Service("datanode", "hadoop datanode", ImmutableSet.of("namenode"),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.INSTALL,
-                               new ServiceAction("chef", TestHelper.actionMapOf("install recipe", null)),
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("install recipe", null)),
                                ProvisionerAction.REMOVE,
-                               new ServiceAction("chef", TestHelper.actionMapOf("remove recipe", "arbitrary data"))
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("remove recipe", "arbitrary data"))
                              )
     );
     Service s2 = new Service("namenode", "hadoop namenode", ImmutableSet.of("hosts"),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.INSTALL,
-                               new ServiceAction("chef", TestHelper.actionMapOf("install recipe", null)),
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("install recipe", null)),
                                ProvisionerAction.REMOVE,
-                               new ServiceAction("chef", TestHelper.actionMapOf("remove recipe", "arbitrary data")),
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("remove recipe", "arbitrary data")),
                                ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef", TestHelper.actionMapOf("configure recipe", null))
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("configure recipe", null))
                              )
     );
     Service s3 = new Service("hosts", "for managing /etc/hosts", ImmutableSet.<String>of(),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef", TestHelper.actionMapOf("configure recipe", null))
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("configure recipe", null))
                              )
     );
     List<Service> services = ImmutableList.of(s1, s2, s3);

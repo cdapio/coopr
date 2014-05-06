@@ -7,20 +7,20 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "script": "recipe[apache2::default]"
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[apache2::default]"
       },
       "start": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
         "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }" 
       },
       "stop": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
         "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }" 
       }

@@ -7,26 +7,26 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "fields": {
           "run_list": "recipe[mysql::server]"
         }
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[mysql::server]"
         }
       },
       "start": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[mysql::server],recipe[loom_service_runner::default]",
           "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }" 
         }
       },
       "stop": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[mysql::server],recipe[loom_service_runner::default]",
           "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }" 

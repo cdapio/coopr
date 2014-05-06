@@ -7,11 +7,11 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "script": "recipe[php::default]"
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[php::default]"
       }
     }
