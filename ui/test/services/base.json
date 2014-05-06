@@ -4,7 +4,7 @@
   "provisioner": {
     "actions": {
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[loom_base::default]"
         }

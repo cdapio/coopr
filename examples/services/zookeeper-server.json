@@ -7,24 +7,24 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "script": "recipe[hadoop::zookeeper_server]"
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
       },
       "initialize": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
       },
       "start": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
         "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }" 
       },
       "stop": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]",
         "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }" 
       }

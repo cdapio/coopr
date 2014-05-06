@@ -250,7 +250,7 @@ public class Entities {
         "}";
     public static final JsonObject SHELL_JSON = GSON.fromJson(SHELL_STRING, JsonObject.class);
     public static final AutomatorType CHEF =
-      new AutomatorType("chef", "chef automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
+      new AutomatorType("chef-solo", "chef automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -266,7 +266,7 @@ public class Entities {
       ));
     public static final String CHEF_STRING =
       "{\n" +
-        "    \"name\": \"chef\",\n" +
+        "    \"name\": \"chef-solo\",\n" +
         "    \"description\": \"chef automator\",\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
@@ -464,7 +464,7 @@ public class Entities {
                   ),
                   ImmutableMap.<ProvisionerAction, ServiceAction>of(
                     ProvisionerAction.CONFIGURE,
-                    new ServiceAction("chef", TestHelper.actionMapOf("recipe[loom_hosts::default]", null))
+                    new ServiceAction("chef-solo", TestHelper.actionMapOf("recipe[loom_hosts::default]", null))
                   ));
     public static final String HOSTS_STRING =
       "{\n" +
@@ -485,7 +485,7 @@ public class Entities {
       "  \"provisioner\": {\n" +
       "    \"actions\": {\n" +
       "      \"configure\": {\n" +
-      "        \"type\": \"chef\",\n" +
+      "        \"type\": \"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[loom_hosts::default]\"\n" +
       "        }\n" +
@@ -499,19 +499,19 @@ public class Entities {
                   ImmutableSet.<String>of("hosts"),
                   ImmutableMap.<ProvisionerAction, ServiceAction>of(
                     ProvisionerAction.INSTALL,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[hadoop::hadoop_hdfs_namenode]", null)),
                     ProvisionerAction.INITIALIZE,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]", null)),
                     ProvisionerAction.CONFIGURE,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[hadoop::default]", null)),
                     ProvisionerAction.START,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[loom_service_runner::default]", "start data")),
                     ProvisionerAction.STOP,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[loom_service_runner::default]", "stop data"))
                   ));
     public static final String NAMENODE_STRING =
@@ -533,32 +533,32 @@ public class Entities {
       "  \"provisioner\": {\n" +
       "    \"actions\": {\n" +
       "      \"install\": {\n" +
-      "        \"type\":\"chef\",\n" +
+      "        \"type\":\"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[hadoop::hadoop_hdfs_namenode]\"\n" +
       "        }\n" +
       "      },\n" +
       "      \"initialize\": {\n" +
-      "        \"type\": \"chef\",\n" +
+      "        \"type\": \"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]\"\n" +
       "        }\n" +
       "      },\n" +
       "      \"configure\": {\n" +
-      "        \"type\": \"chef\",\n" +
+      "        \"type\": \"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[hadoop::default]\"\n" +
       "        }\n" +
       "      },\n" +
       "      \"start\": {\n" +
-      "        \"type\": \"chef\",\n" +
+      "        \"type\": \"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[loom_service_runner::default]\",\n" +
       "          \"data\": \"start data\"\n" +
       "        }\n" +
       "      },\n" +
       "      \"stop\": {\n" +
-      "        \"type\": \"chef\",\n" +
+      "        \"type\": \"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[loom_service_runner::default]\",\n" +
       "          \"data\": \"stop data\"\n" +
@@ -573,19 +573,19 @@ public class Entities {
                   ImmutableSet.<String>of("hosts", "namenode"),
                   ImmutableMap.<ProvisionerAction, ServiceAction>of(
                     ProvisionerAction.INSTALL,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[hadoop::hadoop_hdfs_datanode]", null)),
                     ProvisionerAction.INITIALIZE,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[hadoop_wrapper::hadoop_hdfs_datanode_init]", null)),
                     ProvisionerAction.CONFIGURE,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[hadoop::default]", null)),
                     ProvisionerAction.START,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[loom_service_runner::default]", "start data")),
                     ProvisionerAction.STOP,
-                    new ServiceAction("chef",
+                    new ServiceAction("chef-solo",
                                       TestHelper.actionMapOf("recipe[loom_service_runner::default]", "stop data"))
                   ));
     public static final String DATANODE_STRING =
@@ -607,26 +607,26 @@ public class Entities {
       "  \"provisioner\": {\n" +
       "    \"actions\": {\n" +
       "      \"install\": {\n" +
-      "        \"type\":\"chef\",\n" +
+      "        \"type\":\"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[hadoop::hadoop_hdfs_datanode]\"\n" +
       "        }\n" +
       "      },\n" +
       "      \"configure\": {\n" +
-      "        \"type\": \"chef\",\n" +
+      "        \"type\": \"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[hadoop::default]\"\n" +
       "        }\n" +
       "      },\n" +
       "      \"start\": {\n" +
-      "        \"type\": \"chef\",\n" +
+      "        \"type\": \"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[loom_service_runner::default]\",\n" +
       "          \"data\": \"start data\"\n" +
       "        }\n" +
       "      },\n" +
       "      \"stop\": {\n" +
-      "        \"type\": \"chef\",\n" +
+      "        \"type\": \"chef-solo\",\n" +
       "        \"fields\": {\n" +
       "          \"script\": \"recipe[loom_service_runner::default]\",\n" +
       "          \"data\": \"stop data\"\n" +

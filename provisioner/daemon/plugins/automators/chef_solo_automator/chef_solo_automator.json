@@ -1,17 +1,17 @@
 {
   "name": "chef-solo",
   "description": "Automate all the things with chef-solo",
-  "automatortypes": [ "chef" ],
-  "chef": {
-    "name": "chef",
-    "classname": "ChefAutomator",
+  "automatortypes": [ "chef-solo" ],
+  "chef-solo": {
+    "name": "chef-solo",
+    "classname": "ChefSoloAutomator",
     "parameters": {
       "admin": {
         "fields": {
           "run_list": {
-            "label": "run_list",
+            "label": "run-list",
             "type": "text",
-            "tip": "The chef-solo run_list for this Action"
+            "tip": "The chef-solo run-list for this action"
           },
           "json_attributes": {
             "label": "JSON attributes",
