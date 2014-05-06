@@ -9,32 +9,32 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "fields": {
           "run_list": "recipe[hadoop::hadoop_hdfs_namenode]"
         }
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
         }
       },
       "initialize": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
         }
       },
       "start": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
           "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }" 
         }
       },
       "stop": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
           "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }" 

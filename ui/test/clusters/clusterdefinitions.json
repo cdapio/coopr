@@ -214,26 +214,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
@@ -264,26 +264,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hbase_regionserver]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
@@ -310,7 +310,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -339,26 +339,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hadoop_hdfs_datanode]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
@@ -500,32 +500,32 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::zookeeper_server]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
                                 }
                             },
                             "initialize": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
@@ -556,35 +556,35 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "",
                                     "script": "recipe[hadoop::hadoop_yarn_resourcemanager]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]"
                                 }
                             },
                             "initialize": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "",
                                     "script": "recipe[hadoop_wrapper::hadoop_yarn_resourcemanager_init]"
@@ -616,32 +616,32 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hbase_master]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
                                 }
                             },
                             "initialize": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::hbase_master_init]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]"
@@ -668,7 +668,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -703,32 +703,32 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[reactor_wrapper::default],recipe[reactor::config]"
                                 }
                             },
                             "initialize": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[reactor_wrapper::default],recipe[reactor::init]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }",
                                     "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }",
                                     "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]"
@@ -757,32 +757,32 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hadoop_hdfs_namenode]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "initialize": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
@@ -1002,26 +1002,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
@@ -1052,26 +1052,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hbase_regionserver]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
@@ -1098,7 +1098,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -1127,26 +1127,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hadoop_hdfs_datanode]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
@@ -1289,26 +1289,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
@@ -1339,26 +1339,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hbase_regionserver]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
@@ -1385,7 +1385,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -1414,26 +1414,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hadoop_hdfs_datanode]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
@@ -1576,26 +1576,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
@@ -1626,26 +1626,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hbase_regionserver]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
@@ -1672,7 +1672,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -1701,26 +1701,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::hadoop_hdfs_datanode]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
@@ -2091,7 +2091,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "",
                                     "script": ""
@@ -2118,7 +2118,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -2203,7 +2203,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "",
                                     "script": ""
@@ -2230,7 +2230,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -2313,7 +2313,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -2341,7 +2341,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "",
                                     "script": ""
@@ -2427,7 +2427,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "",
                                     "script": ""
@@ -2454,7 +2454,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -2539,32 +2539,32 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::zookeeper_server]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
                                 }
                             },
                             "initialize": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
@@ -2591,7 +2591,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -2697,32 +2697,32 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::zookeeper_server]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
                                 }
                             },
                             "initialize": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
@@ -2749,7 +2749,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -2853,7 +2853,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -2881,26 +2881,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[apt::default],recipe[mysql::server]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[mysql::server]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }",
                                     "script": "recipe[mysql::server],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }",
                                     "script": "recipe[mysql::server],recipe[loom_service_runner::default]"
@@ -3000,7 +3000,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "",
                                     "script": ""
@@ -3027,7 +3027,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -3112,32 +3112,32 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop::zookeeper_server]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server]"
                                 }
                             },
                             "initialize": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[hadoop_wrapper::zookeeper_server_init]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
                                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
@@ -3164,7 +3164,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -3390,7 +3390,7 @@
                     "provisioner": {
                         "actions": {
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[loom_base::default]"
                                 }
@@ -3418,26 +3418,26 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[apache2::default]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[apache2::default]"
                                 }
                             },
                             "start": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }",
                                     "script": "recipe[apache2::default],recipe[loom_service_runner::default]"
                                 }
                             },
                             "stop": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }",
                                     "script": "recipe[apache2::default],recipe[loom_service_runner::default]"
@@ -3466,13 +3466,13 @@
                     "provisioner": {
                         "actions": {
                             "install": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[apt::default],recipe[php::default]"
                                 }
                             },
                             "configure": {
-                                "type": "chef",
+                                "type": "chef-solo",
                                 "fields": {
                                     "script": "recipe[php::default]"
                                 }

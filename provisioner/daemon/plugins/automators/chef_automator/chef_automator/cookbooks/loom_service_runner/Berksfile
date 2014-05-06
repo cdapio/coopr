@@ -1,8 +1,0 @@
-site :opscode
-
-group :integration do
-  cookbook 'minitest-handler'
-  cookbook 'apache2'
-end
-
-metadata

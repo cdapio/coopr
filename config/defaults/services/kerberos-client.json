@@ -6,15 +6,15 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "script": "recipe[krb5::default]"
       },
       "initialize": {
-        "type":"chef",
+        "type":"chef-solo",
         "script": "recipe[krb5_utils::default]"
       },
       "configure": {
-        "type":"chef",
+        "type":"chef-solo",
         "script": "recipe[krb5::default]"
       }
     }
