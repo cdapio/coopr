@@ -9,3 +9,7 @@ group :dependencies do
   gem 'rest_client'
   gem 'socket'
 end
+
+group :test do
+  gem 'rspec'
+end
