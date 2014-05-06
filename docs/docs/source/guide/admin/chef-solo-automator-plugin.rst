@@ -163,7 +163,7 @@ Adding your own Cookbooks
 
 Since the Chef Solo Automator plugin is implemented using chef-solo, the following restrictions apply:
 
-	* No chef search capability
+	* No Chef search capability
 	* No persistent attributes
 
 Cookbooks should be fully attribute-driven. At this time the Chef Solo Automator does not support the chef-solo "environment" primitive. 
@@ -198,6 +198,17 @@ Helper Cookbooks
 
 Continuuity Loom ships with several helper cookbooks.
 
+
+**loom_base**
+--------------
+This is a convenience cookbook which is intended to provide base functionality for all hosts provisioned by loom.  It currently 
+does the following:
+
+	* run ``apt-get update`` (on Ubuntu hosts)
+	* include ``loom_hosts::default`` (discussed below)
+	* include ``loom_firewall::default`` (discussed below)
+	* include ``ulimit::default`` to enable user-defined ulimits
+
 **loom_hosts**
 ---------------
 
@@ -206,9 +217,9 @@ It achieves this by accessing the ``loom-populated`` attributes at ``node['loom'
 all the nodes in the cluster. It then simply utilizes the community "hostsfile" cookbook's LWRP to write entries for
 each node.
 
-The example loom service definition invoking this cookbook is called "hosts". It simply sets up a "configure" service
-action of type "chef-solo" and run_list ``recipe[loom_hosts::default]``. Note that the community "hostsfile" cookbook is not
-needed in the run-list since it is declared in loom_hosts's metadata.
+The example loom service definition invoking this cookbook is called "base". It simply sets up a "configure" service
+action of type "chef-solo" and run_list ``recipe[loom_base::default]`` (which includes ``recipe[loom_hosts::default]``).
+Note that the community "hostsfile" cookbook is not needed in the run-list since it is declared in loom_hosts's metadata.
 
 **loom_service_runner**
 -----------------------
