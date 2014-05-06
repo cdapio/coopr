@@ -68,7 +68,7 @@ start ( ) {
 register ( ) {
   echo "Registering provisioner plugins with server ${LOOM_SERVER_URI}"
   nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/provisioner.rb --uri ${LOOM_SERVER_URI} \
-      -L ${LOOM_LOG_LEVEL} --register >> ${LOOM_LOG_DIR}/${APP_NAME}${p}.log 2>&1
+      -L ${LOOM_LOG_LEVEL} --register 
 }
 
 
