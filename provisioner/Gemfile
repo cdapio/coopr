@@ -1,0 +1,11 @@
+source 'https://rubygems.org'
+
+# These gems are used by the provisioner
+group :dependencies do
+  gem 'json'
+  gem 'logger'
+  gem 'net/scp'
+  gem 'optparse'
+  gem 'rest_client'
+  gem 'socket'
+end
