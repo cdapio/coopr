@@ -93,7 +93,7 @@ public class TaskConfigTest {
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.INSTALL,
                                new ServiceAction(
-                                 "chef", TestHelper.actionMapOf("install recipe", "{\"foo\": { \"bar\": \"baz\" } }")),
+                                 "chef-solo", TestHelper.actionMapOf("install recipe", "{\"foo\": { \"bar\": \"baz\" } }")),
                                ProvisionerAction.REMOVE,
                                new ServiceAction("shell", TestHelper.actionMapOf("remove recipe", "arbitrary data"))
                              )
@@ -101,17 +101,17 @@ public class TaskConfigTest {
     Service s2 = new Service("namenode", "hadoop namenode", ImmutableSet.of("hosts"),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.INSTALL,
-                               new ServiceAction("chef", TestHelper.actionMapOf("install recipe", null)),
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("install recipe", null)),
                                ProvisionerAction.REMOVE,
-                               new ServiceAction("chef", TestHelper.actionMapOf("remove recipe", "arbitrary data")),
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("remove recipe", "arbitrary data")),
                                ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef", TestHelper.actionMapOf("configure recipe", null))
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("configure recipe", null))
                              )
     );
     Service s3 = new Service("hosts", "for managing /etc/hosts", ImmutableSet.<String>of(),
                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef", TestHelper.actionMapOf("configure recipe", null))
+                               new ServiceAction("chef-solo", TestHelper.actionMapOf("configure recipe", null))
                              )
     );
 
@@ -175,7 +175,7 @@ public class TaskConfigTest {
       "  \"service\": {\n" +
       "    \"name\": \"datanode\",\n" +
       "    \"action\": {\n" +
-      "      \"type\": \"chef\",\n" +
+      "      \"type\": \"chef-solo\",\n" +
       "      \"fields\": {\n" +
       "        \"script\": \"install recipe\",\n" +
       "        \"data\": \"{\\\"foo\\\": { \\\"bar\\\": \\\"baz\\\" } }\"\n" +
@@ -186,7 +186,7 @@ public class TaskConfigTest {
       "  \"hostname\": \"node1.loom.continuuity.net\",\n" +
       "  \"bootstrap_keypair\": \"iad-root\",\n" +
       "  \"image\": \"f70ed7c7-b42e-4d77-83d8-40fa29825b85\",\n" +
-      "  \"automators\": [\"chef\", \"shell\"],\n" +
+      "  \"automators\": [\"chef-solo\", \"shell\"],\n" +
       "  \"provider\": {\n" +
       "    \"name\": \"openstack-central\",\n" +
       "    \"description\": \"Default provider\",\n" +
@@ -213,7 +213,7 @@ public class TaskConfigTest {
       "  \"service\": {\n" +
       "    \"name\": \"datanode\",\n" +
       "    \"action\": {\n" +
-      "      \"type\": \"chef\",\n" +
+      "      \"type\": \"chef-solo\",\n" +
       "      \"fields\": {\n" +
       "        \"script\": \"install recipe\",\n" +
       "        \"data\": \"{\\\"foo\\\": { \\\"bar\\\": \\\"baz\\\" } }\"\n" +
@@ -224,7 +224,7 @@ public class TaskConfigTest {
       "  \"hostname\": \"node1.loom.continuuity.net\",\n" +
       "  \"bootstrap_keypair\": \"iad-root\",\n" +
       "  \"image\": \"f70ed7c7-b42e-4d77-83d8-40fa29825b85\",\n" +
-      "  \"automators\": [\"chef\", \"shell\"],\n" +
+      "  \"automators\": [\"chef-solo\", \"shell\"],\n" +
       "  \"provider\": {\n" +
       "    \"name\": \"openstack-central\",\n" +
       "    \"description\": \"Default provider\",\n" +

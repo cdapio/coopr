@@ -126,7 +126,7 @@ Example
             "service": {
                 "name": "hbase-regionserver",
                 "action": {
-                    "type": "chef",
+                    "type": "chef-solo",
                     "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]",
                     "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }"
                 }
@@ -142,7 +142,7 @@ Example
                 "name": "ubuntu12",
                 "image": "80fbcb55-b206-41f9-9bc2-2dd7aac6c061"
             },
-            "automators": [ "chef" ],
+            "automators": [ "chef-solo" ],
             "provider": {
                 "name": "rackspace",
                 "description": "Rackspace Public Cloud",
@@ -168,7 +168,7 @@ Example
                         "name": "ubuntu12",
                         "image": "80fbcb55-b206-41f9-9bc2-2dd7aac6c061"
                     },
-                    "automators": [ "chef" ]
+                    "automators": [ "chef-solo" ]
                 },
                 "9b167e5d-02a9-4a64-afba-cf4806ca0d71": {
                     "hostname": "test1-1001.local",
@@ -182,7 +182,7 @@ Example
                         "name": "ubuntu12",
                         "image": "80fbcb55-b206-41f9-9bc2-2dd7aac6c061"
                     },
-                    "automators": [ "chef" ]
+                    "automators": [ "chef-solo" ]
                 }
             }
         }

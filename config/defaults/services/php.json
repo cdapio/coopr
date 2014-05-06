@@ -7,13 +7,13 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "fields": {
           "run_list": "recipe[php::default]"
         }
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[php::default]"
         }

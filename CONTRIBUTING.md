@@ -9,6 +9,8 @@ Are you interested in making Continuuity Loom better? Our development model is a
  * Address all the review comments
  * Once addressed, the changes will be committed to the continuuity/loom repo.
 
+Bugs and suggestions should be made by filing a [GitHub Issue](https://github.com/continuuity/loom/issues) against this repository.
+
 ## License
 
 By contributing to Continuuity Loom, you agree that your contributions will be licensed under the [Apache License Version 2.0 (APLv2)](LICENSE).

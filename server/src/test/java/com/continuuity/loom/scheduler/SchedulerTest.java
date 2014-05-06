@@ -408,24 +408,24 @@ public class SchedulerTest extends BaseTest {
       "               \"provisioner\":{\n" +
       "                  \"actions\":{\n" +
       "                     \"install\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[hadoop::hadoop_hdfs_namenode]\"\n" +
       "                     },\n" +
       "                     \"initialize\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]\"\n" +
       "                     },\n" +
       "                     \"configure\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[hadoop::default]\"\n" +
       "                     },\n" +
       "                     \"start\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[loom_service_runner::default]\",\n" +
       "                        \"data\":\"{\\\"loom\\\": { \\\"node\\\": { \\\"services\\\": [ \\\"hadoop-hdfs-namenode\\\": \\\"start\\\" ] } } }\"\n" +
       "                     },\n" +
       "                     \"stop\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[loom_service_runner::default]\",\n" +
       "                        \"data\":\"{\\\"loom\\\": { \\\"node\\\": { \\\"services\\\": [ \\\"hadoop-hdfs-namenode\\\": \\\"stop\\\" ] } } }\"\n" +
       "                     }\n" +
@@ -441,7 +441,7 @@ public class SchedulerTest extends BaseTest {
       "               \"provisioner\":{\n" +
       "                  \"actions\":{\n" +
       "                     \"configure\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[loom_hosts::default]\"\n" +
       "                     }\n" +
       "                  }\n" +
@@ -471,24 +471,24 @@ public class SchedulerTest extends BaseTest {
       "               \"provisioner\":{\n" +
       "                  \"actions\":{\n" +
       "                     \"install\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[hadoop::hadoop_hdfs_datanode]\"\n" +
       "                     },\n" +
         "                     \"initialize\":{\n" +
-        "                        \"type\":\"chef\",\n" +
+        "                        \"type\":\"chef-solo\",\n" +
         "                        \"script\":\"recipe[hadoop_wrapper::hadoop_hdfs_datanode_init]\"\n" +
         "                     },\n" +
       "                     \"configure\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[hadoop::default]\"\n" +
       "                     },\n" +
       "                     \"start\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[loom_service_runner::default]\",\n" +
       "                        \"data\":\"{\\\"loom\\\": { \\\"node\\\": { \\\"services\\\": [ \\\"hadoop-hdfs-datanode\\\": \\\"start\\\" ] } } }\"\n" +
       "                     },\n" +
       "                     \"stop\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[loom_service_runner::default]\",\n" +
       "                        \"data\":\"{\\\"loom\\\": { \\\"node\\\": { \\\"services\\\": [ \\\"hadoop-hdfs-datanode\\\": \\\"stop\\\" ] } } }\"\n" +
       "                     }\n" +
@@ -504,7 +504,7 @@ public class SchedulerTest extends BaseTest {
       "               \"provisioner\":{\n" +
       "                  \"actions\":{\n" +
       "                     \"configure\":{\n" +
-      "                        \"type\":\"chef\",\n" +
+      "                        \"type\":\"chef-solo\",\n" +
       "                        \"script\":\"recipe[loom_hosts::default]\"\n" +
       "                     }\n" +
       "                  }\n" +

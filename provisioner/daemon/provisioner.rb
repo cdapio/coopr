@@ -139,6 +139,14 @@ end
 # register plugins with the server if --register flag passed
 if options[:register]
   pluginmanager.register_plugins(loom_uri)
+  if (pluginmanager.load_errors?)
+    log.error "There was at least one provisioner plugin load failure"
+    exit(1)
+  end
+  if (pluginmanager.register_errors?)
+    log.error "There was at least one provisioner plugin register failure"
+    exit(1)
+  end
   exit(0)
 end
 
