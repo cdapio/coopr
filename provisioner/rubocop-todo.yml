@@ -212,8 +212,8 @@ SpecialGlobalVars:
 
 # Offense count: 3
 # Cop supports --auto-correct.
-StringConversionInInterpolation:
-  Enabled: false
+#StringConversionInInterpolation:
+#  Enabled: false
 
 # Offense count: 169
 # Cop supports --auto-correct.
