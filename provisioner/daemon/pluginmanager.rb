@@ -1,3 +1,4 @@
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
@@ -126,39 +127,40 @@ class PluginManager
       log.error e.backtrace.inspect
       @register_errors.push("Caught exception registering plugins to loom server #{uri}")
     end
+  rescue => e
+    log.error "Caught exception registering plugins to loom server #{uri}"
+    log.error e.message
+    log.error e.backtrace.inspect
   end
 
   # returns registered class name for given provider plugin
   def getHandlerActionObjectForProvider(providerName)
-    if @providermap.has_key?(providerName) 
-      if @providermap[providerName].has_key?('classname')
+    if @providermap.key?(providerName)
+      if @providermap[providerName].key?('classname')
         return @providermap[providerName]['classname']
       end
     end
-    raise "No registered provider for #{providerName}"
+    fail "No registered provider for #{providerName}"
   end
 
   # returns registered class name for given automator plugin
   def getHandlerActionObjectForAutomator(automatorName)
-    if @automatormap.has_key?(automatorName) 
-      if @automatormap[automatorName].has_key?('classname')
+    if @automatormap.key?(automatorName)
+      if @automatormap[automatorName].key?('classname')
         return @automatormap[automatorName]['classname']
       end
     end
-    raise "No registered automator for #{automatorName}"
+    fail "No registered automator for #{automatorName}"
   end
 
   # returns all registered automators, used for bootstrap task
   def getAllHandlerActionObjectsForAutomators
-    results = Array.new
+    results = []
     @automatormap.each do |k, v|
-      if (v.has_key?('classname')) 
+      if v.key?('classname')
         results.push(v['classname'])
       end
     end
     results
   end
-
 end
-    
-

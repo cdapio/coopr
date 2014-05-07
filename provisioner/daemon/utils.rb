@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
@@ -20,10 +21,10 @@ require 'net/scp'
 class SignalHandler
   def initialize(signal)
     @interuptable = false
-    @enqueued     = [ ]
+    @enqueued     = []
     trap(signal) do
-      if(@interuptable)
-        log.info "Gracefully shutting down provisioner..."
+      if @interuptable
+        log.info 'Gracefully shutting down provisioner...'
         exit 0
       else
         @enqueued.push(signal)
@@ -36,11 +37,11 @@ class SignalHandler
   # the flag and the caller can call `allow_interuptions` themselves.
   def dont_interupt
     @interuptable = false
-    @enqueued     = [ ]
-      if(block_given?)
-        yield
-        allow_interuptions
-      end
+    @enqueued     = []
+    if block_given?
+      yield
+      allow_interuptions
+    end
   end
 
   def allow_interuptions
@@ -51,7 +52,7 @@ class SignalHandler
   end
 end
 
-# Exception class used to return remote command stderr 
+# Exception class used to return remote command stderr
 class CommandExecutionError < RuntimeError
   attr_reader :cmdoutput
 
@@ -61,8 +62,8 @@ class CommandExecutionError < RuntimeError
 end
 
 def ssh_exec!(ssh, command)
-  stdout_data = ""
-  stderr_data = ""
+  stdout_data = ''
+  stderr_data = ''
   exit_code = nil
   exit_signal = nil
   log.debug "---ssh-exec command: #{command}"
@@ -71,19 +72,19 @@ def ssh_exec!(ssh, command)
       unless success
         abort "FAILED: couldn't execute command (ssh.channel.exec)"
       end
-      channel.on_data do |ch,data|
-        stdout_data+=data
+      channel.on_data do |ch, data|
+        stdout_data += data
       end
 
-      channel.on_extended_data do |ch,type,data|
-        stderr_data+=data
+      channel.on_extended_data do |ch, type, data|
+        stderr_data += data
       end
 
-      channel.on_request("exit-status") do |ch,data|
+      channel.on_request('exit-status') do |ch, data|
         exit_code = data.read_long
       end
 
-      channel.on_request("exit-signal") do |ch, data|
+      channel.on_request('exit-signal') do |ch, data|
         exit_signal = data.read_long
       end
     end
@@ -93,11 +94,10 @@ def ssh_exec!(ssh, command)
   log.debug "stderr: #{stderr_data}"
   log.debug "stdout: #{stdout_data}"
 
-  raise CommandExecutionError.new([stdout_data, stderr_data, exit_code, exit_signal]), "Command execution failed" unless exit_code == 0
+  fail CommandExecutionError.new([stdout_data, stderr_data, exit_code, exit_signal]), 'Command execution failed' unless exit_code == 0
 
   [stdout_data, stderr_data, exit_code, exit_signal]
 end
-
 
 # shared logging module
 module Logging
@@ -108,7 +108,7 @@ module Logging
   end
 
   def configure(out)
-    if out != 'STDOUT' 
+    if out != 'STDOUT'
       @out = out
     end
   end
@@ -131,8 +131,8 @@ module Logging
   end
 
   def self.log
-    if !@logger 
-      if(@out)
+    unless @logger
+      if @out
         @logger = Logger.new(@out, 'daily')
       else
         @logger = Logger.new(STDOUT)
@@ -145,4 +145,3 @@ module Logging
     @logger
   end
 end
-

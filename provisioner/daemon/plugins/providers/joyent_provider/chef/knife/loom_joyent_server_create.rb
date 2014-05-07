@@ -1,3 +1,4 @@
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
