@@ -18,6 +18,7 @@ require 'json'
 require 'rest_client'
 require_relative 'automator'
 require_relative 'provider'
+require_relative 'utils'
 
 class PluginManager
   attr_accessor :providermap, :automatormap, :tasks, :load_errors, :register_errors
