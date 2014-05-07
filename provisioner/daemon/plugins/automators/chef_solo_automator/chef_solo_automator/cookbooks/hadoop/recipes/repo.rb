@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: repo
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,15 +31,18 @@ end
 case node['hadoop']['distribution']
 when 'hdp'
   case node['hadoop']['distribution_version']
-  when '2.0.4.0', '2.0.5.0', '2.0.6.0', '2.0.6.1', '2.0.10.0', '2.0.11.0'
+  when '2.0.5.0', '2.0.6.0', '2.0.6.1', '2.0.10.0', '2.0.11.0'
     hdp_version = '2.0.4.0'
     hdp_update_version = node['hadoop']['distribution_version']
   when '2.0'
     hdp_version = '2.0.4.0'
     hdp_update_version = '2.0.11.0'
-  when '2.1.1.0', '2.1', '2'
-    hdp_version = '2.1.1.0'
+  when '2.1.1.0', '2.0.4.0'
+    hdp_version = node['hadoop']['distribution_version']
     hdp_update_version = nil
+  when '2.1.2.0', '2.1', '2'
+    hdp_version = '2.1.1.0'
+    hdp_update_version = '2.1.2.0'
   else
     Chef::Application.fatal!('This cookbook only supports HDP 2.x')
   end
@@ -84,7 +87,7 @@ when 'hdp'
     end
 
   when 'debian'
-    Chef::Log.warn('HDP only supports version 2.0 on Ubuntu at this time')
+    Chef::Log.warn('HDP only supports version 2.0 on Ubuntu at this time') unless node['hadoop']['distribution_version'] == '2.0'
     apt_base_url = 'http://public-repo-1.hortonworks.com/HDP'
     os = "ubuntu#{major_platform_version}"
     apt_repo_url = node['hadoop']['apt_repo_url'] ? node['hadoop']['apt_repo_url'] : "#{apt_base_url}/#{os}/2.x"
