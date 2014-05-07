@@ -15,9 +15,6 @@
 # limitations under the License.
 #
 
-# require 'json'
-# require 'net/scp'
-
 # base class for all automator plugins.  This should be extended, not modified
 class Automator
   attr_accessor :task, :flavor, :image, :hostname, :providerid, :result
