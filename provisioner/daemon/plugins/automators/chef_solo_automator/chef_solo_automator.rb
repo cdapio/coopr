@@ -112,7 +112,7 @@ class ChefSoloAutomator < Automator
 
         # validate connectivity
         log.debug "Validating connectivity to #{hostname}"
-        output = ssh_exec!(ssh, "hostname")
+        ssh_exec!(ssh, "hostname")
 
         # determine if curl is installed, else default to wget
         log.debug "Checking for curl"
@@ -225,7 +225,6 @@ class ChefSoloAutomator < Automator
 
   def runchef(inputmap)
     sshauth = inputmap['sshauth']
-    hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
 
@@ -255,7 +254,7 @@ class ChefSoloAutomator < Automator
       begin
         Net::SCP.upload!(ipaddress, inputmap['sshauth']['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
           @credentials)
-      rescue Net::SSH::AuthenticationFailed => e
+      rescue Net::SSH::AuthenticationFailed
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
       log.debug "Copy json attributes complete"
@@ -275,7 +274,7 @@ class ChefSoloAutomator < Automator
           raise "Chef-solo run did not complete successfully: #{output}"
         end
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 

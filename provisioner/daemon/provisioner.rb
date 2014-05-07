@@ -81,9 +81,9 @@ end
 
 def delegate_task(task, pluginmanager)
   task_id = nil
-  providerName = nil
-  automatorName = nil
-  clazz = nil
+  providerName = nil # rubocop:disable UselessAssignment
+  automatorName = nil # rubocop:disable UselessAssignment
+  clazz = nil # rubocop:disable UselessAssignment
   object = nil
   result = nil
   classes = nil
