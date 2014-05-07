@@ -54,11 +54,15 @@ end
 
 # Exception class used to return remote command stderr
 class CommandExecutionError < RuntimeError
-  attr_reader :cmdoutput
+  attr_reader :stdout, :stderr, :exit_code, :exit_signal
 
-  def initialize(cmdoutput)
-    @cmdoutput = cmdoutput
+  def initialize(stdout, stderr, exit_code, exit_signal)
+    @stdout = stdout
+    @stderr = stderr
+    @exit_code = exit_code
+    @exit_signal = exit_signal
   end
+
 end
 
 def ssh_exec!(ssh, command)
@@ -94,7 +98,7 @@ def ssh_exec!(ssh, command)
   log.debug "stderr: #{stderr_data}"
   log.debug "stdout: #{stdout_data}"
 
-  fail CommandExecutionError.new([stdout_data, stderr_data, exit_code, exit_signal]), 'Command execution failed' unless exit_code == 0
+  fail CommandExecutionError.new(stdout_data, stderr_data, exit_code, exit_signal), 'Command execution failed' unless exit_code == 0
 
   [stdout_data, stderr_data, exit_code, exit_signal]
 end

@@ -159,7 +159,6 @@ if options[:file]
   begin
     result = nil
     task = nil
-    cmdoutput = nil
     log.info "Start Provisioner run for file #{options[:file]}"
     task = JSON.parse(IO.read(options[:file]))
 
@@ -174,9 +173,8 @@ if options[:file]
     result = {} if result.nil? == true
     result['status'] = '1'
     if e.class.name == 'CommandExecutionError'
-      cmdoutput = e.cmdoutput
-      result['stdout'] = cmdoutput[0]
-      result['stderr'] = cmdoutput[1]
+      result['stdout'] = e.stdout
+      result['stderr'] = e.stderr
     else
       result['stdout'] = e.inspect
       result['stderr'] = "#{e.inspect}\n#{e.backtrace.join("\n")}"
@@ -196,7 +194,6 @@ else
     result = nil
     response = nil
     task = nil
-    cmdoutput = nil
     begin
       response = RestClient.post "#{loom_uri}/v1/loom/tasks/take", { 'workerId' => myid }.to_json
     rescue => e
@@ -246,9 +243,8 @@ else
         result['workerId'] = myid
         result['taskId'] = task['taskId']
         if e.class.name == 'CommandExecutionError'
-          cmdoutput = e.cmdoutput
-          result['stdout'] = cmdoutput[0]
-          result['stderr'] = cmdoutput[1]
+          result['stdout'] = e.stdout
+          result['stderr'] = e.stderr
         else
           result['stdout'] = e.inspect
           result['stderr'] = "#{e.inspect}\n#{e.backtrace.join("\n")}"

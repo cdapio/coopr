@@ -112,7 +112,12 @@ class ChefSoloAutomator < Automator
 
         # validate connectivity
         log.debug "Validating connectivity to #{hostname}"
-        output = ssh_exec!(ssh, "hostname")
+        begin
+          ssh_exec!(ssh, "hostname")
+        rescue CommandExecutionError => e
+          e.message = "Could not execute 'hostname' remotely"
+          log.error e.message
+        end
 
         # determine if curl is installed, else default to wget
         log.debug "Checking for curl"
@@ -130,6 +135,19 @@ class ChefSoloAutomator < Automator
         if (output[2] != 0 )
           log.error "Chef install failed: #{output}"
           raise "Chef install failed: #{output}"
+        end
+        log.debug "Chef installed successfully..."
+
+        # install chef
+        log.debug "Install chef..."
+        begin
+          ssh_exec!(ssh, chef_install_cmd)
+        rescue CommandExecutionError => e
+          e.message = "Chef install failed"
+          # should we even log here?
+          # should i just override e.to_s
+          log.error "#{e.message}: #{e.stdout}, #{e.stderr}, #{e.exit_code}, #{e.exit_signal}"
+          raise e
         end
         log.debug "Chef installed successfully..."
 
