@@ -4,10 +4,8 @@ source 'https://rubygems.org'
 group :dependencies do
   gem 'json'
   gem 'logger'
-  gem 'net/scp'
-  gem 'optparse'
+  gem 'net-scp'
   gem 'rest_client'
-  gem 'socket'
 end
 
 group :test do
