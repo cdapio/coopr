@@ -47,7 +47,7 @@ class PluginManager
 
         raise "missing 'name' field when loading plugin #{jsonfile}" unless jsondata.key?('name')
         p_name = jsondata['name']
-        p_description = jsondata['description'] || "No description found"
+        # p_description = jsondata['description'] || "No description found"
         p_providertypes = jsondata['providertypes'] || Array.new
         p_automatortypes = jsondata['automatortypes'] || Array.new
 

@@ -111,10 +111,10 @@ class JoyentProvider < Provider
       Net::SSH.start(kniferesult['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         # validate connectivity
         log.debug "Validating dns resolution/connectivity"
-        output = ssh_exec!(ssh, "ping -c1 www.opscode.com")
+        ssh_exec!(ssh, "ping -c1 www.opscode.com")
 
         log.debug "Temporarily setting hostname.  this will not surive a reboot!"
-        output = ssh_exec!(ssh, "hostname #{@task['config']['hostname']}")
+        ssh_exec!(ssh, "hostname #{@task['config']['hostname']}")
       end
 
       @result['status'] = 0
@@ -138,7 +138,7 @@ class JoyentProvider < Provider
     begin
       knife_instance = Chef::Knife::JoyentServerDelete.new
       knife_instance.configure_chef
-      knife_instance.name_args.push(@task["config"]["providerid"])
+      knife_instance.name_args.push(providerid)
       knife_instance.config[:yes] = true
 
       # our plugin-defined fields are chef knife configs
@@ -148,11 +148,11 @@ class JoyentProvider < Provider
 
       # invoke knife
       log.debug "Invoking server delete"
-      kniferesult = knife_instance.run
+      knife_instance.run
       @result['status'] = 0
     # joyent plugin always attempts to delete from chef server
     # handle no chef server configured
-    rescue Chef::Exceptions::PrivateKeyMissing => e
+    rescue Chef::Exceptions::PrivateKeyMissing
       @result['status'] = 0
     # handle chef server configured but node not found
     rescue Net::HTTPServerException => e 

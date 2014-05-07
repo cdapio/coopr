@@ -36,7 +36,7 @@ class ChefSoloAutomator < Automator
     chef_primitive_tar = "#{@chef_primitives_path}/#{chef_primitive}.tar.gz"
 
     # limit tarball regeneration to once per 10min
-    if !File.exists?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
+    if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
       log.debug "Generating #{chef_primitive_tar} from #{chef_primitive_path}"
       `tar -czf "#{chef_primitive_tar}.new" -C "#{@chef_primitives_path}" #{chef_primitive}`
       `mv "#{chef_primitive_tar}.new" "#{chef_primitive_tar}"`
@@ -112,7 +112,7 @@ class ChefSoloAutomator < Automator
 
         # validate connectivity
         log.debug "Validating connectivity to #{hostname}"
-        output = ssh_exec!(ssh, "hostname")
+        ssh_exec!(ssh, "hostname")
 
         # determine if curl is installed, else default to wget
         log.debug "Checking for curl"
@@ -225,7 +225,6 @@ class ChefSoloAutomator < Automator
 
   def runchef(inputmap)
     sshauth = inputmap['sshauth']
-    hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
 
@@ -255,7 +254,7 @@ class ChefSoloAutomator < Automator
       begin
         Net::SCP.upload!(ipaddress, inputmap['sshauth']['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
           @credentials)
-      rescue Net::SSH::AuthenticationFailed => e
+      rescue Net::SSH::AuthenticationFailed
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
       log.debug "Copy json attributes complete"
@@ -275,7 +274,7 @@ class ChefSoloAutomator < Automator
           raise "Chef-solo run did not complete successfully: #{output}"
         end
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 

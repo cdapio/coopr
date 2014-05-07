@@ -95,7 +95,7 @@ class RackspaceProvider < Provider
       Net::SSH.start(kniferesult['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         # validate connectivity
         log.debug "Validating dns resolution/connectivity"
-        output = ssh_exec!(ssh, "ping -c1 www.opscode.com")
+        ssh_exec!(ssh, "ping -c1 www.opscode.com")
       end
 
       @result['status'] = 0
@@ -120,7 +120,7 @@ class RackspaceProvider < Provider
     begin
       knife_instance = Chef::Knife::RackspaceServerDelete.new
       knife_instance.configure_chef
-      knife_instance.name_args.push(@task["config"]["providerid"])
+      knife_instance.name_args.push(providerid)
       knife_instance.config[:yes] = true
 
       # our plugin-defined fields are chef knife configs
@@ -130,7 +130,7 @@ class RackspaceProvider < Provider
 
       # invoke knife
       log.debug "Invoking server delete"
-      kniferesult = knife_instance.run
+      knife_instance.run
 
       @result['status'] = 0
 

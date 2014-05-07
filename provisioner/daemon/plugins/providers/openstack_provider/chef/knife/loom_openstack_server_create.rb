@@ -89,7 +89,7 @@ class Chef
         msg_pair("SSH Keypair", server.key_name) if server.key_name
         msg_pair("SSH Password", server.password) if (server.password && !server.key_name)
 
-        puts "SERVERID: #{server.id.to_s}"
+        puts "SERVERID: #{server.id}"
         if (server.password && !server.key_name)
           return { "status" => 0, "providerid" => server.id.to_s, "rootpassword" => server.password }
         else

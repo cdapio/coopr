@@ -79,7 +79,7 @@ class Chef
         msg_pair("Password", server.password)
         msg_pair("SSH Key", Chef::Config[:knife][:rackspace_ssh_keypair])
 
-        puts "SERVERID: #{server.id.to_s}"
+        puts "SERVERID: #{server.id}"
 
         if (server.password && !server.key_name)
           return { "status" => 0, "providerid" => server.id.to_s, "rootpassword" => server.password }
