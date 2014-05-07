@@ -1,8 +1,6 @@
 #!/usr/bin/env rake
 
 require 'rspec/core/rake_task'
-RSpec::Core::RakeTask.new(:rspec) do |t|
-  t.rspec_opts = ['--color', '--format d']
-end
+RSpec::Core::RakeTask.new(:rspec)
 
 task :default => :rspec
