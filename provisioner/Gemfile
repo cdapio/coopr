@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'rake'
+
 # These gems are used by the provisioner
 group :dependencies do
   gem 'json'
@@ -10,4 +12,5 @@ end
 
 group :test do
   gem 'rspec'
+  gem 'simplecov', '~> 0.7.1', :require => false
 end
