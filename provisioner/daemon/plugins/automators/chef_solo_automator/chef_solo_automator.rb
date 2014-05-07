@@ -36,7 +36,7 @@ class ChefSoloAutomator < Automator
     chef_primitive_tar = "#{@chef_primitives_path}/#{chef_primitive}.tar.gz"
 
     # limit tarball regeneration to once per 10min
-    if !File.exists?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
+    if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
       log.debug "Generating #{chef_primitive_tar} from #{chef_primitive_path}"
       `tar -czf "#{chef_primitive_tar}.new" -C "#{@chef_primitives_path}" #{chef_primitive}`
       `mv "#{chef_primitive_tar}.new" "#{chef_primitive_tar}"`

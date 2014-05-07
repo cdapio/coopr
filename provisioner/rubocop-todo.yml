@@ -51,11 +51,6 @@ DefWithParentheses:
 
 # Offense count: 2
 # Cop supports --auto-correct.
-DeprecatedClassMethods:
-  Enabled: false
-
-# Offense count: 2
-# Cop supports --auto-correct.
 DeprecatedHashMethods:
   Enabled: false
 

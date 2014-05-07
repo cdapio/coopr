@@ -38,7 +38,7 @@ class ShellAutomator < Automator
   end
 
   def generate_scripts_tar
-    if !File.exists?(@scripts_tar) or ((Time.now - File.stat(@scripts_tar).mtime).to_i > 600)
+    if !File.exist?(@scripts_tar) or ((Time.now - File.stat(@scripts_tar).mtime).to_i > 600)
       log.debug "Generating #{@scripts_tar} from #{@scripts_dir}"
       scripts_tar_path = File.dirname(@scripts_dir)
       scripts_parent_dir = File.basename(@scripts_dir)
