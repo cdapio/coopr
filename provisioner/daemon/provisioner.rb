@@ -111,9 +111,9 @@ def delegate_task(task, pluginmanager)
     classes = []
     if task['config'].key? 'automators' and !task['config']['automators'].empty?
       # server has specified which bootstrap handlers need to run
-      task['config']['automators'].each do |automatorName|
+      task['config']['automators'].each do |automator|
         log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
-        classes.push(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
+        classes.push(pluginmanager.getHandlerActionObjectForAutomator(automator))
       end
     else
       # default to running all registered bootstrap handlers
@@ -122,9 +122,9 @@ def delegate_task(task, pluginmanager)
     end
     fail 'No bootstrappers configured' if classes.empty?
 
-    classes.each do |clazz|
-      clazz = Object.const_get(clazz)
-      object = clazz.new(task)
+    classes.each do |klass|
+      klass = Object.const_get(klass)
+      object = klass.new(task)
       result = object.runTask
       combinedresult.merge!(result)
     end
