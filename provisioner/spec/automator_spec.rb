@@ -27,6 +27,15 @@ describe Automator do
           expect(instance_variable_get("@automator_#{taskname}").result).to be_empty
         end
       end
+
+# TODO:
+# This does not work and I don't know why. Leaving it here until I can fix this. Do not remove.
+#      describe '#runTask' do
+#        it 'errors when run' do
+#          expect(instance_variable_get("@automator_#{taskname}").runTask).to raise_error
+#        end
+#      end
+
     end
   end
 end
