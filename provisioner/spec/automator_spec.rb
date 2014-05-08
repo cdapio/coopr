@@ -28,7 +28,7 @@ describe Automator do
         end
       end
 
-# TODO:
+# TODO: fix this
 # This does not work and I don't know why. Leaving it here until I can fix this. Do not remove.
 #      describe '#runTask' do
 #        it 'errors when run' do
