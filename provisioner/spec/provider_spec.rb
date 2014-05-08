@@ -8,7 +8,7 @@ describe Provider do
   # Set these up once
   before :all do
     %w(create confirm delete).each do |taskname|
-      instance_variable_set("@task_#{taskname}", JSON.parse(response.to_str.gsub('BOOTSTRAP', taskname)))
+      instance_variable_set("@task_#{taskname}", JSON.parse(response.gsub('BOOTSTRAP', taskname)))
       instance_variable_set("@provider_#{taskname}", Provider.new(instance_variable_get("@task_#{taskname}")))
     end
   end
