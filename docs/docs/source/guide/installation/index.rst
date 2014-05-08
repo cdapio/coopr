@@ -214,7 +214,7 @@ After the install, the MySQL JAR is placed in ``/usr/share/java/``. Copy the ins
 **Setup database**
 
 You will need to set up an account and a database in MySQL. An example schema file (for MySQL) for this can be found at
-``/opt/loom/server/docs/sql``.
+``/opt/loom/server/config/sql``.
 
 If you are setting up a MySQL database from scratch you can run the following on your mysql machine to complete the database setup:
 
@@ -344,7 +344,7 @@ recommend installing these defaults as a starting point for template definition.
 the example in the :doc:`Quick Start Guide </guide/quickstart/index>`. To load these templates, run:
 ::
 
-  $ export LOOM_SERVER_URI=http://<loom-server>:<loom-port>/v1/loom
+  $ export LOOM_SERVER_URI=http://<loom-server>:<loom-port>
   $ /opt/loom/server/config/defaults/load-defaults.sh
 
 .. note::
