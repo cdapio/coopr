@@ -73,22 +73,30 @@ public final class Cluster extends NamedEntity {
   private Status status;
   private JsonObject config;
 
-  public Cluster(String id, String ownerId, String name, long createTime, String description, Provider provider,
-                 ClusterTemplate clusterTemplate, Set<String> nodes, Set<String> services, JsonObject config) {
+  public Cluster(String id, String ownerId, String name, long createTime,
+                 long expireTime, String description, Provider provider,
+                 ClusterTemplate clusterTemplate, Set<String> nodes,
+                 Set<String> services, JsonObject config, Cluster.Status status, String latestJobId) {
     super(name);
     Preconditions.checkArgument(ownerId != null, "owner id must not be null");
     this.id = id;
     this.ownerId = ownerId;
     this.description = description;
     this.createTime = createTime;
-    this.expireTime = 0;
+    this.expireTime = expireTime;
     this.provider = provider;
     this.clusterTemplate = clusterTemplate;
     this.nodes = nodes;
     this.services = Sets.newHashSet(services);
-    this.latestJobId = null;
-    this.status = Status.PENDING;
+    this.latestJobId = latestJobId;
+    this.status = status;
     this.config = config;
+  }
+
+  public Cluster(String id, String ownerId, String name, long createTime, String description, Provider provider,
+                 ClusterTemplate clusterTemplate, Set<String> nodes, Set<String> services, JsonObject config) {
+    this(id, ownerId, name, createTime, 0, description, provider,
+         clusterTemplate, nodes, services, config, Status.PENDING, null);
   }
 
   public Cluster(String id, String ownerId, String name, long createTime, String description, Provider provider,
