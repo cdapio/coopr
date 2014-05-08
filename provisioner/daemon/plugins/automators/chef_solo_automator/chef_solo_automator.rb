@@ -124,19 +124,10 @@ class ChefSoloAutomator < Automator
         chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | bash"
         begin
           ssh_exec!(ssh, "which curl")
-        rescue
+        rescue CommandExecutionError
           log.debug "curl not found, defaulting to wget"
           chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | bash"
         end
-
-        # install chef
-        log.debug "Install chef..."
-        output = ssh_exec!(ssh, chef_install_cmd)
-        if (output[2] != 0 )
-          log.error "Chef install failed: #{output}"
-          raise "Chef install failed: #{output}"
-        end
-        log.debug "Chef installed successfully..."
 
         # install chef
         log.debug "Install chef..."
@@ -152,25 +143,31 @@ class ChefSoloAutomator < Automator
         log.debug "Chef installed successfully..."
 
        # confirm chef installation
-        output = ssh_exec!(ssh, "type chef-solo")
-        if (output[2] != 0 )
-          log.error "Chef install validation failed: #{output}"
-          raise "Chef install validation failed: #{output}"
+        begin
+          ssh_exec!(ssh, "type chef-solo")
+        rescue CommandExecutionError => e
+          e.message = "Chef install validation failed"
+          log.error "#{e.message}: #{e.stdout}, #{e.stderr}, #{e.exit_code}, #{e.exit_signal}"
+          raise e
         end
         log.debug "Chef install validated successfully..."
 
         # create @remote_cache_dir
-        output = ssh_exec!(ssh, "mkdir -p #{@remote_cache_dir}")
-        if (output[2] != 0 )
-          log.error "Unable to create #{@remote_cache_dir} on #{hostname} : #{output}"
-          raise "Unable to create #{@remote_cache_dir} on #{hostname} : #{output}"
+        begin
+          ssh_exec!(ssh, "mkdir -p #{@remote_cache_dir}")
+        rescue CommandExecutionError => e
+          e.message = "Unable to create #{@remote_cache_dir} on #{hostname}"
+          log.error "#{e.message}: #{e.stdout}, #{e.stderr}, #{e.exit_code}, #{e.exit_signal}"
+          raise e
         end
 
         # create @remote_chef_dir
-        output = ssh_exec!(ssh, "mkdir -p #{@remote_chef_dir}")
-        if (output[2] != 0 )
-          log.error "Unable to create #{@remote_chef_dir} on #{hostname} : #{output}"
-          raise "Unable to create #{@remote_chef_dir} on #{hostname} : #{output}"
+        begin
+          ssh_exec!(ssh, "mkdir -p #{@remote_chef_dir}")
+        rescue
+          e.message = "Unable to create #{@remote_chef_dir} on #{hostname}"
+          log.error "#{e.message}: #{e.stdout}, #{e.stderr}, #{e.exit_code}, #{e.exit_signal}"
+          raise e
         end
 
       end
@@ -185,19 +182,19 @@ class ChefSoloAutomator < Automator
         log.debug "Checking for scp installation"
         begin
           ssh_exec!(ssh, "which scp")
-        rescue
+        rescue CommandExecutionError
           log.warn "scp not found, attempting to install openssh-client"
           scp_install_cmd = "yum -qy install openssh-clients"
           begin
             ssh_exec!(ssh, "which yum")
-          rescue
+          rescue CommandExecutionError
             scp_install_cmd = "apt-get -qy install openssh-client"
           end
 
           begin
             log.debug "installing openssh-client via #{scp_install_cmd}"
             ssh_exec!(ssh, scp_install_cmd)
-          rescue => e
+          rescue CommandExecutionError
             raise $!, "Could not install scp on #{ipaddress}: #{$!}", $!.backtrace
           end
         end
@@ -286,11 +283,18 @@ class ChefSoloAutomator < Automator
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
 
         log.debug "Running chef-solo"
-        output = ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'")
-        if (output[2] != 0 )
-          log.error "Chef-solo run did not complete successfully: #{output}"
-          raise "Chef-solo run did not complete successfully: #{output}"
+        #output = ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'")
+        begin
+          ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'")
+        rescue CommandExecutionError => e
+          e.message = "Chef-solo run did not complete successfully"
+          log.error "#{e.message}: #{e.stdout}, #{e.stderr}, #{e.exit_code}, #{e.exit_signal}"
+          raise e
         end
+        #if (output[2] != 0 )
+        #  log.error "Chef-solo run did not complete successfully: #{output}"
+        #  raise "Chef-solo run did not complete successfully: #{output}"
+        #end
       end
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
