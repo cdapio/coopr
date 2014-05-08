@@ -6,7 +6,6 @@
   color: white;
   background: #121E39;
   cursor: pointer;
-  display: flex;
 }
 
 .services-number {
@@ -24,15 +23,25 @@
   padding: 10px;
   border-right: 1px solid #4E4E4E;
   padding-right: 0px;
-
+  display: inline-block;
 }
 
 .service-name-holder {
   color: #B9BABB;
+  font-size: 1em;
+  display: inline-block;
+}
+
+.service-name-container {
+  padding: 10px;
   padding: 10px;
   border-right: 1px solid #4E4E4E;
-  font-size: 13px;
-  line-height: 19px;
+  display: inline-block;
+}
+
+.serviceset-nodes-showhide {
+  margin-top: 10px;
+  margin-right: 10px;
 }
 
 .btn-empty {

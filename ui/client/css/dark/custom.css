@@ -271,7 +271,7 @@ a:visited {
 }
 #nav {
   height: 100px;
-  background: #374760;
+  background: #121E39;
 }
 #product-name {
   display: block;
@@ -364,7 +364,7 @@ table.tablesorter thead tr .headerSortUp {
   border-radius: 5px;
 }
 #nav ul li {
-  background: #374760;
+  background: #121E39;
 }
 .dropdown-menu {
   margin: 0;
@@ -616,16 +616,16 @@ a strong {
   padding: 0px !important;
 }
 .nav-item {
-  border-left: 1px solid #2A3546;
-  box-shadow: 0px 0px 1px 1px #4B5F7B;
-  opacity: 0.5;
+  border-left: 1px solid #808080;
+  box-shadow: 0px 0px 1px 1px #121E39;
+  opacity: 0.7;
 }
 .nav-item:hover {
   opacity: 1;
 }
 .nav-item.last {
-  border-left: 1px solid #2A3546;
-  border-right: 1px solid #2A3546;
+  border-left: 1px solid #808080;
+  border-right: 1px solid #808080;
 }
 .nav-home {
   background-image: url('/static/img/icons/cc/white/png/home_icon&48.png');
@@ -711,7 +711,7 @@ a strong {
   padding-left: 30px !important;
   line-height: 26px !important;
   background-position: 10px;
-  opacity: 0.5;
+  opacity: 0.7;
   background-repeat: no-repeat;
 }
 .right-nav-link:hover {
@@ -732,11 +732,6 @@ a strong {
 .ellipsified-cell {
   width: 50px;
   text-overflow: ellipsis;
-}
-.serviceset-name {
-  color: white;
-  background: #4F4F4F;
-  cursor: pointer;
 }
 .serviceset-node-table {
   font-size: 12px;
@@ -869,8 +864,8 @@ a strong {
   font-family: Arial;
   background: #3C4355;
   padding-left: 15px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   color: white;
   font-size: 16px;
 }
@@ -900,7 +895,7 @@ h5 {
   background: url("/static/img/v2-assets/delete_active.png") no-repeat;
   border: none;
   background-position: 2px 3px;
-  opacity: 0.5;
+  opacity: 0.7;
 }
 .btn-delete:hover {
   background: #ffffff url("/static/img/v2-assets/delete_active_r.png") no-repeat;
@@ -914,14 +909,14 @@ h5 {
 #nav .login-dropdown li {
   margin: 0;
   padding: 0;
-  border-bottom: 1px solid #2A3546;
-  box-shadow: 0px 0px 1px 1px #4B5F7B;
+  border-bottom: 1px solid #121E39;
+  box-shadow: 0px 0px 1px 1px #606163;
 }
 #nav .login-dropdown li:last-child {
   border-bottom: none;
 }
 #nav .login-dropdown li:first-child {
-  box-shadow: 0px 0px 1px 1px #4B5F7B;
+  box-shadow: 0px 0px 1px 1px #606163;
 }
 #nav .login-dropdown li a {
   padding-left: 33px;
