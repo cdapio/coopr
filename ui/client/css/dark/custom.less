@@ -373,8 +373,8 @@ a, a:visited {
  * Tablesorter overrides.
  */
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-	background-color: #EAEAEA;
-	color: #4279CC;
+  background-color: #3C4355;
+  color: white;
 }
 
 /*************************/
@@ -408,7 +408,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 }
 
 .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
-	background-color: #626A7F;
+	background-color: #707991;
 	color: rgb(192, 205, 221);
 }
 
@@ -835,6 +835,15 @@ a strong {
 	text-overflow: ellipsis;
 }
 
+.serviceset-name {
+  color: white;
+  background: #121E39;
+  cursor: pointer;
+  border-radius: 5px 5px 0px 0px;
+  -moz-border-radius: 5px 5px 0px 0px;
+  -webkit-border-radius: 5px 5px 0px 0px;
+}
+
 .serviceset-node-table {
 	font-size: 12px;
 }
@@ -1119,4 +1128,38 @@ a strong {
 
 .skin-container {
 	width: 300px;
+}
+
+.toggle-delete-cluster {
+  background: url('/static/img/v2-assets/icon_contract.png') no-repeat;
+  height: 14px;
+  width: 14px;
+}
+
+.toggle-delete-cluster.open {
+  background: url('/static/img/v2-assets/icon_expand.png') no-repeat;
+}
+
+.btn-service-start {
+  background: url('/static/img/v2-assets/icon_start.png');
+}
+
+.btn-service-start:hover {
+  background: url('/static/img/v2-assets/icon_start_active.png');
+}
+
+.btn-service-stop {
+  background: url('/static/img/v2-assets/icon_stop.png');
+}
+
+.btn-service-stop:hover {
+  background: url('/static/img/v2-assets/icon_stop_active.png');
+}
+
+.btn-service-restart {
+  background: url('/static/img/v2-assets/icon_refresh.png');
+}
+
+.btn-service-restart:hover {
+  background: url('/static/img/v2-assets/icon_refresh_active.png');
 }

@@ -2,12 +2,6 @@
  * Common shared style elements between all skins.
  */
 
-.serviceset-name {
-  color: white;
-  background: #121E39;
-  cursor: pointer;
-}
-
 .services-number {
   background: white;
   font-size: 16px;
@@ -21,7 +15,7 @@
 
 .services-number-holder {
   padding: 10px;
-  border-right: 1px solid #4E4E4E;
+  border-right: 1px solid #747474;
   padding-right: 0px;
   display: inline-block;
 }
@@ -34,31 +28,40 @@
 
 .service-name-container {
   padding: 10px;
-  padding: 10px;
-  border-right: 1px solid #4E4E4E;
+  border-right: 1px solid #747474;
   display: inline-block;
 }
 
 .serviceset-nodes-showhide {
   margin-top: 10px;
   margin-right: 10px;
+  margin-left: 10px;
+}
+
+.smallmargin-nodes-showhide {
+  margin-top: 4px;
+  margin-right: 10px;
 }
 
 .btn-empty {
-  background: transparent;
   border: 0;
   width: 38px;
   height: 28px;
 }
 
-.btn-service-start {
-  background: url('/static/img/v2-assets/icon_start.png');
+.left-float {
+  float: left;
 }
 
-.btn-service-stop {
-  background: url('/static/img/v2-assets/icon_stop.png');
+/**
+ * Tablesorter overrides for all skins.
+ */
+table.tablesorter thead tr .header {
+  background-image: url('/static/img/v2-assets/icon_dropdown.png');
 }
 
-.btn-service-restart {
-  background: url('/static/img/v2-assets/icon_refresh.png');
+table.tablesorter thead tr .header {
+  background-position: 95% 14px;
 }
+
+/******************************************************/

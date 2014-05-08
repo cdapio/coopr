@@ -177,25 +177,25 @@
               <div ng-repeat="(name, nodes) in serviceSets" class="serviceset-entry">
                 <div class="service-holder">
                   <div class="serviceset-name" ng-hide="serviceDisplayMapping[name]" ng-click="toggleNodes(name)">
+                    <div class="serviceset-nodes-showhide left-float">
+                      <img src="/static/img/v2-assets/icon_contract.png" />
+                    </div>
                     <div class="services-number-holder inline-display">
                       <span class="services-number">[[nodes.length]]</span>
                     </div>
                     <div class="service-name-container inline-display" ng-repeat="sname in name.split(',')">
                       <div class="service-name-holder">[[sname]]</div>
-                    </div>
-                    <div class="serviceset-nodes-showhide right-float">
-                      <img src="/static/img/v2-assets/icon_contract.png" />
                     </div>
                   </div>
                   <div class="serviceset-name" ng-show="serviceDisplayMapping[name]" ng-click="toggleNodes(name)">
+                    <div class="serviceset-nodes-showhide left-float">
+                      <img src="/static/img/v2-assets/icon_expand.png" />
+                    </div>
                     <div class="services-number-holder inline-display">
                       <span class="services-number">[[nodes.length]]</span>
                     </div>
                     <div class="service-name-container inline-display" ng-repeat="sname in name.split(',')">
                       <div class="service-name-holder">[[sname]]</div>
-                    </div>
-                    <div class="serviceset-nodes-showhide right-float">
-                      <img src="/static/img/v2-assets/icon_expand.png" />
                     </div>
                   </div>
 
