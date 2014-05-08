@@ -344,7 +344,7 @@ recommend installing these defaults as a starting point for template definition.
 the example in the :doc:`Quick Start Guide </guide/quickstart/index>`. To load these templates, run:
 ::
 
-  $ export LOOM_SERVER_URI=http://<loom-server>:<loom-port>/v1/loom
+  $ export LOOM_SERVER_URI=http://<loom-server>:<loom-port>
   $ /opt/loom/server/config/defaults/load-defaults.sh
 
 .. note::
