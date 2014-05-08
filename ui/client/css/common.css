@@ -1,0 +1,55 @@
+/**
+ * Common shared style elements between all skins.
+ */
+
+.serviceset-name {
+  color: white;
+  background: #121E39;
+  cursor: pointer;
+  display: flex;
+}
+
+.services-number {
+  background: white;
+  font-size: 16px;
+  color: #5D6479;
+  padding: 8px;
+  border-radius: 3px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-right: 10px;
+}
+
+.services-number-holder {
+  padding: 10px;
+  border-right: 1px solid #4E4E4E;
+  padding-right: 0px;
+
+}
+
+.service-name-holder {
+  color: #B9BABB;
+  padding: 10px;
+  border-right: 1px solid #4E4E4E;
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.btn-empty {
+  background: transparent;
+  border: 0;
+  width: 38px;
+  height: 28px;
+}
+
+.btn-service-start {
+  background: url('/static/img/v2-assets/icon_start.png');
+}
+
+.btn-service-stop {
+  background: url('/static/img/v2-assets/icon_stop.png');
+}
+
+.btn-service-restart {
+  background: url('/static/img/v2-assets/icon_refresh.png');
+}
