@@ -1,36 +1,41 @@
 {
-    "name": "sample",
-    "clusterTemplate": "hadoop-distributed",
-    "numMachines": "5",
-    "provider": "rackspace",
-    "hardwaretype": "medium",
-    "imagetype": "ubuntu12",
-    "services": [
-        "base",
-        "hadoop-hdfs-namenode",
-        "hadoop-hdfs-datanode",
-        "hadoop-yarn-resourcemanager",
-        "hadoop-yarn-nodemanager"
-    ],
-    "initialLeaseDuration": "0",
-    "config": {
-        "hadoop": {
-            "core_site": {
-                "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%"
-            },
-            "hdfs_site": {
-                "dfs.replication": "2"
-            },
-            "mapred_site": {
-                "mapreduce.framework.name": "yarn"
-            },
-            "yarn_site": {
-                "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
-                "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
-                "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
-                "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
-                "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
-            }
-        }
+  "name": "sample",
+  "clusterTemplate": "hadoop-distributed",
+  "numMachines": "5",
+  "provider": "rackspace",
+  "providerFields": {
+    "rackspace_username": "EXAMPLE_USERNAME",
+    "rackspace_api_key": "EXAMPLE_API_KEY",
+    "rackspace_region": "dfw"
+  },
+  "hardwaretype": "medium",
+  "imagetype": "ubuntu12",
+  "services": [
+    "base",
+    "hadoop-hdfs-namenode",
+    "hadoop-hdfs-datanode",
+    "hadoop-yarn-resourcemanager",
+    "hadoop-yarn-nodemanager"
+  ],
+  "initialLeaseDuration": 0,
+  "config": {
+    "hadoop": {
+      "core_site": {
+        "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%"
+      },
+      "hdfs_site": {
+        "dfs.replication": "2"
+      },
+      "mapred_site": {
+        "mapreduce.framework.name": "yarn"
+      },
+      "yarn_site": {
+        "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+        "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
+        "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+        "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
+        "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+      }
     }
+  }
 }

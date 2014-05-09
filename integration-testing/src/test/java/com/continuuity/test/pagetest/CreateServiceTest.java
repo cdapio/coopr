@@ -47,7 +47,7 @@ public class CreateServiceTest extends GenericTest {
   public void test_01_submitHadoopHdfsDatanode() throws Exception {
     globalDriver.get(Constants.SERVICE_CREATE_URI);
     Service service = EXAMPLE_READER.getServices(Constants.SERVICES_PATH).get("hadoop-hdfs-datanode");
-    WebElement inputName = globalDriver.findElement(By.cssSelector("#inputName"));
+    WebElement inputName = globalDriver.findElement(By.name("inputName"));
     inputName.sendKeys(service.getName());
     WebElement inputDescription = globalDriver.findElement(By.cssSelector("#inputDescription"));
     inputDescription.sendKeys(service.getDescription());
@@ -64,44 +64,45 @@ public class CreateServiceTest extends GenericTest {
     addAction.click();
     addAction.click();
     addAction.click();
+    addAction.click();
 
 
     List<WebElement> actionEntries = globalDriver.findElements(By.cssSelector(".action-entry"));
 
     actionEntries.get(0).findElement(By.cssSelector(".inputCategory")).sendKeys("install");
     actionEntries.get(0).findElement(By.cssSelector(".inputType")).sendKeys("chef");
-    actionEntries.get(0).findElement(By.cssSelector(".inputScript")).sendKeys(
-      service.getProvisionerActions().get(ProvisionerAction.INSTALL).getFields().get("script"));
-    String data = service.getProvisionerActions().get(ProvisionerAction.INSTALL).getFields().get("data");
+    actionEntries.get(0).findElement(By.name("run_list")).sendKeys(
+      service.getProvisionerActions().get(ProvisionerAction.INSTALL).getFields().get("run_list"));
+    String data = service.getProvisionerActions().get(ProvisionerAction.INSTALL).getFields().get("json_attributes");
     if (data != null) {
-      actionEntries.get(0).findElement(By.cssSelector(".inputData")).sendKeys(data);
+      actionEntries.get(0).findElement(By.name("json_attributes")).sendKeys(data);
     }
 
     actionEntries.get(1).findElement(By.cssSelector(".inputCategory")).sendKeys("configure");
     actionEntries.get(1).findElement(By.cssSelector(".inputType")).sendKeys("chef");
-    actionEntries.get(1).findElement(By.cssSelector(".inputScript")).sendKeys(
-      service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getFields().get("script"));
-    data = service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getFields().get("data");
+    actionEntries.get(1).findElement(By.name("run_list")).sendKeys(
+      service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getFields().get("run_list"));
+    data = service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getFields().get("json_attributes");
     if (data != null) {
-      actionEntries.get(1).findElement(By.cssSelector(".inputData")).sendKeys(data);
+      actionEntries.get(1).findElement(By.name("json_attributes")).sendKeys(data);
     }
 
     actionEntries.get(2).findElement(By.cssSelector(".inputCategory")).sendKeys("start");
     actionEntries.get(2).findElement(By.cssSelector(".inputType")).sendKeys("chef");
-    actionEntries.get(2).findElement(By.cssSelector(".inputScript")).sendKeys(
-      service.getProvisionerActions().get(ProvisionerAction.START).getFields().get("script"));
-    data = service.getProvisionerActions().get(ProvisionerAction.START).getFields().get("data");
+    actionEntries.get(2).findElement(By.name("run_list")).sendKeys(
+      service.getProvisionerActions().get(ProvisionerAction.START).getFields().get("run_list"));
+    data = service.getProvisionerActions().get(ProvisionerAction.START).getFields().get("json_attributes");
     if (data != null) {
-      actionEntries.get(2).findElement(By.cssSelector(".inputData")).sendKeys(data);
+      actionEntries.get(2).findElement(By.name("json_attributes")).sendKeys(data);
     }
 
     actionEntries.get(3).findElement(By.cssSelector(".inputCategory")).sendKeys("stop");
     actionEntries.get(3).findElement(By.cssSelector(".inputType")).sendKeys("chef");
-    actionEntries.get(3).findElement(By.cssSelector(".inputScript")).sendKeys(
-      service.getProvisionerActions().get(ProvisionerAction.STOP).getFields().get("script"));
-    data = service.getProvisionerActions().get(ProvisionerAction.STOP).getFields().get("data");
+    actionEntries.get(3).findElement(By.name("run_list")).sendKeys(
+      service.getProvisionerActions().get(ProvisionerAction.STOP).getFields().get("run_list"));
+    data = service.getProvisionerActions().get(ProvisionerAction.STOP).getFields().get("json_attributes");
     if (data != null) {
-      actionEntries.get(3).findElement(By.cssSelector(".inputData")).sendKeys(data);
+      actionEntries.get(3).findElement(By.name("json_attributes")).sendKeys(data);
     }
 
     globalDriver.findElement(By.cssSelector("#create-service-form")).submit();
@@ -113,7 +114,7 @@ public class CreateServiceTest extends GenericTest {
   public void test_02_submitServiceError() throws Exception {
     globalDriver.get(Constants.SERVICE_CREATE_URI);
     assertFalse(globalDriver.findElement(By.cssSelector("#notification")).isDisplayed());
-    WebElement inputName = globalDriver.findElement(By.cssSelector("#inputName"));
+    WebElement inputName = globalDriver.findElement(By.name("inputName"));
     inputName.sendKeys("asdf");
     WebElement inputDescription = globalDriver.findElement(By.cssSelector("#inputDescription"));
     inputDescription.sendKeys("asdf");

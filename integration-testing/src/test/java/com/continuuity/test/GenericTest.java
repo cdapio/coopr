@@ -16,7 +16,6 @@
 package com.continuuity.test;
 
 
-import com.continuuity.test.drivers.Global;
 import org.junit.BeforeClass;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -24,6 +23,7 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 
 import static com.continuuity.test.drivers.Global.driverWait;
+import static com.continuuity.test.drivers.Global.getDriver;
 import static com.continuuity.test.drivers.Global.globalDriver;
 
 /** Generic Test is parent object for all tests classes
@@ -34,9 +34,9 @@ public class GenericTest {
 
   @BeforeClass
   public static void setUp() throws Exception {
-    Global.getDriver();
+    getDriver();
     globalDriver.get(Constants.LOGIN_URL);
-    Global.driverWait(1);
+    driverWait(1);
     globalDriver.findElement(By.cssSelector("#username")).sendKeys("admin");
     globalDriver.findElement(By.cssSelector("#password")).sendKeys("admin");
     globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();

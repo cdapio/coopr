@@ -81,16 +81,16 @@ public class ProvidersTest extends GenericTest {
 
   @Test
   public void test_06_topmenu() {
-    assertEquals("The list of the topmenu is not correct.", ImmutableSet.of("rackspace", "joyent", "openstack"),
+    assertEquals("The list of the topmenu is not correct.", Constants.PROVIDERS_SET,
                  TEST_UTIL.getTopList(globalDriver));
   }
 
   @Test
   public void test_07_testProvidersSelected() {
-    ImmutableSet<String> expectedTopList = ImmutableSet.of("rackspace", "joyent", "openstack");
+    ImmutableSet<String> expectedTopList = Constants.PROVIDERS_SET;
     assertEquals("The list of the topmenu is not correct.", expectedTopList, new TestUtil().getTopList(globalDriver));
     String uriPrefix = Constants.PROVIDERS_URL + "/provider/";
-    assertEquals("The uri of top list is not correct.", TEST_UTIL.getTopListUri(expectedTopList, uriPrefix),
+    assertEquals("The uri of top list is not correct.", TEST_UTIL.getTopListUri(expectedTopList, uriPrefix, "/#/edit"),
                  TEST_UTIL.getTopListUri(globalDriver));
   }
 
