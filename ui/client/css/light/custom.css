@@ -713,11 +713,6 @@ a strong {
   width: 50px;
   text-overflow: ellipsis;
 }
-.serviceset-name {
-  color: white;
-  background: #4F4F4F;
-  cursor: pointer;
-}
 .serviceset-node-table {
   font-size: 12px;
 }
@@ -843,8 +838,8 @@ a strong {
   font-family: Arial;
   background: #CE354A;
   padding-left: 15px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   font-size: 16px;
   color: white;
 }

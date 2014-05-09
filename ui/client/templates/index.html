@@ -31,6 +31,7 @@
         {% else %}
             <link rel="stylesheet/less" type="text/css" href="/static/css/{{skin}}/custom.less">
         {% endif %}
+        <link rel="stylesheet" type="text/css" href="/static/css/common.css">
         <link rel="shortcut icon" href="/static/favicon.ico">
         <link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,500,700,900' rel='stylesheet' type='text/css'>
 
@@ -85,9 +86,7 @@
         </div>
       {% endblock %}
       <div id="content">
-        <div id="notification-div" class="clearfix">
-          <div id="notification">{{ err }}</div>
-        </div>
+        {% include "partials/notification-div.html" %}
       {% block content %}
         <div id="content-body">
           <div id="title clearfix">

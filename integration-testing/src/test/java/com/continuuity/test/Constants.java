@@ -36,8 +36,8 @@ public class Constants {
   public static final String IMAGETYPES_URL = ROOT_URL + "/imagetypes";
   public static final String CLUSTERTEMPLATES_URL = ROOT_URL + "/clustertemplates";
   public static final String SERVICES_URL = ROOT_URL + "/services";
-  public static final String PROVIDER_INSTANCE_URI = PROVIDERS_URL + "/provider/joyent";
-  public static final String PROVIDER_CREATE_URI = PROVIDERS_URL + "/create";
+  public static final String PROVIDER_INSTANCE_URI = PROVIDERS_URL + "/provider/joyent/#/edit";
+  public static final String PROVIDER_CREATE_URI = PROVIDERS_URL + "/create#/";
   public static final String HARDWARETYPE_CREATE_URI = HARDWARETYPES_URL + "/create";
   public static final String HARDWARETYPE_INSTANCE_URI = HARDWARETYPES_URL + "/hardwaretype/small";
   public static final String IMAGETYPE_INSTANCE_URI = IMAGETYPES_URL + "/imagetype/centos6";
@@ -96,6 +96,8 @@ public class Constants {
   public static final String CLUSTER_CREATE_FILE_NAME = PARENT_PATH + "/ui/test/clusters/createcluster.json";
 
   public static final String ACTION_TABLE_CLASSNAME = ".node-actions-table";
+  public static final ImmutableSet<String> PROVIDERS_SET = ImmutableSet.of(
+    "awesome", "rackspace", "joyent", "openstack");
 
   public static int getPort() {
     int port = -1;
