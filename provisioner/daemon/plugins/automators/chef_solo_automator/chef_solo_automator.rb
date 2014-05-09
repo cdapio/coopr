@@ -182,7 +182,7 @@ class ChefSoloAutomator < Automator
 
     @result['status'] = 0
 
-    log.info "ChefSoloAutomator.bootstrap completed successfully: #{@result}"
+    log.info "ChefSoloAutomator bootstrap completed successfully: #{@result}"
     @result
   end
 
