@@ -47,9 +47,7 @@
     </div>
   {% endblock %}
   <div id="content">
-    <div id="notification-div">
-      <div id="notification">{{ err }}</div>
-    </div>
+    {% include "partials/notification-div.html" %}
   {% block content %}
   {% endblock %}
   <div id="footer" style="clear: both;"><span id="copyright">COPYRIGHT © 2014 CONTINUUITY INC. ALL RIGHTS RESERVED.</span><br>

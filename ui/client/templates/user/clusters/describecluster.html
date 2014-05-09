@@ -130,9 +130,9 @@
                             </div>
                           </div>
                           <div class="col-sm-6">
-                              <button type="button" class="btn-spl btn-success" ng-click="startService(service)"><span class="glyphicon glyphicon-play"></span></button>
-                              <button type="button" class="btn-spl btn-danger" ng-click="stopService(service)"><span class="glyphicon glyphicon-stop"></span></button>
-                              <button type="button" class="btn-spl btn-info" ng-click="restartService(service)"><span class="glyphicon glyphicon-repeat"></span></button>
+                              <button type="button" class="btn-empty btn-service-start" ng-click="startService(service)"></button>
+                              <button type="button" class="btn-empty btn-service-stop" ng-click="stopService(service)"></button>
+                              <button type="button" class="btn-empty btn-service-restart" ng-click="restartService(service)"></button>
                           </div>
                         </div>
                       </div>
@@ -176,8 +176,29 @@
               <p ng-hide="checkIfEmpty(serviceSets)">No service sets.</p>
               <div ng-repeat="(name, nodes) in serviceSets" class="serviceset-entry">
                 <div class="service-holder">
-                  <div class="serviceset-name alert" ng-hide="serviceDisplayMapping[name]" ng-click="toggleNodes(name)"><span class="caret large left-float"></span>[[name]] ([[nodes.length]])</div>
-                  <div class="serviceset-name alert" ng-show="serviceDisplayMapping[name]" ng-click="toggleNodes(name)"><span class="open caret large left-float"></span>[[name]] ([[nodes.length]])</div>
+                  <div class="serviceset-name" ng-hide="serviceDisplayMapping[name]" ng-click="toggleNodes(name)">
+                    <div class="serviceset-nodes-showhide left-float">
+                      <img src="/static/img/v2-assets/icon_contract.png" />
+                    </div>
+                    <div class="services-number-holder inline-display">
+                      <span class="services-number">[[nodes.length]]</span>
+                    </div>
+                    <div class="service-name-container inline-display" ng-repeat="sname in name.split(',')">
+                      <div class="service-name-holder">[[sname]]</div>
+                    </div>
+                  </div>
+                  <div class="serviceset-name" ng-show="serviceDisplayMapping[name]" ng-click="toggleNodes(name)">
+                    <div class="serviceset-nodes-showhide left-float">
+                      <img src="/static/img/v2-assets/icon_expand.png" />
+                    </div>
+                    <div class="services-number-holder inline-display">
+                      <span class="services-number">[[nodes.length]]</span>
+                    </div>
+                    <div class="service-name-container inline-display" ng-repeat="sname in name.split(',')">
+                      <div class="service-name-holder">[[sname]]</div>
+                    </div>
+                  </div>
+
                   <table class="table table-striped tablesorter serviceset-node-table spl-panel-table" ng-show="serviceDisplayMapping[name]">
                     <thead>
                       <tr>

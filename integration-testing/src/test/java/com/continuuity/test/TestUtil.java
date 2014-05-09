@@ -104,6 +104,14 @@ public class TestUtil {
     return expectedTopListUri;
   }
 
+  public Set<String> getTopListUri(Set<String> topList, String uriPrefix, String uriSuffix) {
+    Set<String> expectedTopListUri = Sets.newHashSet();
+    for (String element : topList) {
+      expectedTopListUri.add(uriPrefix + element + uriSuffix);
+    }
+    return expectedTopListUri;
+  }
+
   public Set<String> getTopListUri(WebDriver driver) {
     Set<String> topListUri = Sets.newHashSet();
     for (WebElement element : driver.findElements(TYPES)) {

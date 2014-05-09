@@ -81,10 +81,11 @@ public class ServicesTest extends GenericTest {
 
   @Test
   public void test_04_topmenu() {
-    ImmutableSet<String> expectedServiceSet = ImmutableSet.of("reactor", "haproxy", "fail2ban",
-                "mysql-server", "zookeeper-server", "apache-httpd",
-                "hadoop-yarn-resourcemanager", "php", "base", "hbase-regionserver", "hadoop-yarn-nodemanager",
-                "hadoop-hdfs-datanode", "hadoop-hdfs-namenode", "hbase-master", "nodejs");
+    ImmutableSet<String> expectedServiceSet = ImmutableSet.of(
+      "reactor", "haproxy", "mysql-server", "zookeeper-server", "apache-httpd", "hadoop-yarn-resourcemanager", "php",
+      "base", "hbase-regionserver", "hadoop-hdfs-datanode", "hadoop-yarn-nodemanager", "test-service",
+      "hadoop-hdfs-namenode", "nodejs", "hbase-master"
+    );
     String uriPrefix = Constants.SERVICES_URL + "/service/";
     assertEquals("The list of the topmenu is not correct.", expectedServiceSet, TEST_UTIL.getTopList(globalDriver));
     assertEquals("The uri of top list is not correct.", TEST_UTIL.getTopListUri(expectedServiceSet, uriPrefix),
@@ -93,7 +94,8 @@ public class ServicesTest extends GenericTest {
 
   @Test
   public void test_05_testServicesSelected() {
-    assertEquals("Services menu item is not selected", "active nav-item", TEST_UTIL.getHTMLClasses("#nav-services-container"));
+    assertEquals(
+      "Services menu item is not selected", "active nav-item", TEST_UTIL.getHTMLClasses("#nav-services-container"));
   }
 
   @Test

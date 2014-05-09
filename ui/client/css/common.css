@@ -1,0 +1,67 @@
+/**
+ * Common shared style elements between all skins.
+ */
+
+.services-number {
+  background: white;
+  font-size: 16px;
+  color: #5D6479;
+  padding: 8px;
+  border-radius: 3px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-right: 10px;
+}
+
+.services-number-holder {
+  padding: 10px;
+  border-right: 1px solid #747474;
+  padding-right: 0px;
+  display: inline-block;
+}
+
+.service-name-holder {
+  color: #B9BABB;
+  font-size: 1em;
+  display: inline-block;
+}
+
+.service-name-container {
+  padding: 10px;
+  border-right: 1px solid #747474;
+  display: inline-block;
+}
+
+.serviceset-nodes-showhide {
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.smallmargin-nodes-showhide {
+  margin-top: 4px;
+  margin-right: 10px;
+}
+
+.btn-empty {
+  border: 0;
+  width: 38px;
+  height: 28px;
+}
+
+.left-float {
+  float: left;
+}
+
+/**
+ * Tablesorter overrides for all skins.
+ */
+table.tablesorter thead tr .header {
+  background-image: url('/static/img/v2-assets/icon_dropdown.png');
+}
+
+table.tablesorter thead tr .header {
+  background-position: 95% 14px;
+}
+
+/******************************************************/

@@ -27,6 +27,7 @@ import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import static com.continuuity.test.drivers.Global.globalDriver;
 import static org.junit.Assert.assertEquals;
@@ -43,9 +44,10 @@ public class CreateProviderTest extends GenericTest {
   @Test
   public void test_01_submitJoyent() throws Exception {
     globalDriver.get(Constants.PROVIDER_CREATE_URI);
+    JavascriptExecutor executor = (JavascriptExecutor) globalDriver;
     Provider joyent = EXAMPLE_READER.getProviders(Constants.PROVIDERS_PATH).get("joyent");
 
-    WebElement inputName = globalDriver.findElement(By.cssSelector("#inputName"));
+    WebElement inputName = globalDriver.findElement(By.cssSelector("#providerName"));
     inputName.sendKeys(joyent.getName());
 
     WebElement inputDescription = globalDriver.findElement(By.cssSelector("#inputDescription"));
@@ -53,24 +55,22 @@ public class CreateProviderTest extends GenericTest {
 
     WebElement inputProvisioner = globalDriver.findElement(By.cssSelector("#provisioner-select"));
     inputProvisioner.sendKeys(joyent.getProviderType().toString().toLowerCase());
-    Global.driverWait(1);
-    JavascriptExecutor executor = (JavascriptExecutor) globalDriver;
-    executor.executeScript("document.getElementById('joyent_username').value = '"
-      + joyent.getProvisionerFields().get("joyent_username") + "'");
+    Global.driverWait(2);
 
-    executor.executeScript("document.getElementById('joyent_keyname').value = '"
-      + joyent.getProvisionerFields().get("joyent_keyname") + "'");
+    WebElement username = globalDriver.findElement(By.cssSelector("#joyent_username"));
+    username.sendKeys(joyent.getProvisionerFields().get("joyent_username"));
 
-    executor.executeScript("document.getElementById('joyent_keyfile').value = '"
-      + joyent.getProvisionerFields().get("joyent_keyfile") + "'");
+    WebElement keyname = globalDriver.findElement(By.cssSelector("#joyent_keyname"));
+    keyname.sendKeys(joyent.getProvisionerFields().get("joyent_keyname"));
 
+    WebElement keyfile = globalDriver.findElement(By.cssSelector("#joyent_keyfile"));
+    keyfile.sendKeys(joyent.getProvisionerFields().get("joyent_keyfile"));
 
-    executor.executeScript("document.getElementById('joyent_api_url').value = '"
-      + joyent.getProvisionerFields().get("joyent_api_url") + "'");
+    Select apiUrl = new Select(globalDriver.findElement(By.cssSelector("#joyent_api_url")));
+    apiUrl.selectByVisibleText(joyent.getProvisionerFields().get("joyent_api_url"));
 
-    executor.executeScript("document.getElementById('joyent_version').value = '"
-      + joyent.getProvisionerFields().get("joyent_version") + "'");
-
+    WebElement version = globalDriver.findElement(By.cssSelector("#joyent_version"));
+    version.sendKeys(joyent.getProvisionerFields().get("joyent_version" ));
 
     globalDriver.findElement(By.cssSelector("#create-provider-form")).submit();
     Global.driverWait(1);
@@ -81,7 +81,7 @@ public class CreateProviderTest extends GenericTest {
   public void test_02_submitRacksapce() throws Exception {
     globalDriver.get(Constants.PROVIDER_CREATE_URI);
     Provider rackspace = EXAMPLE_READER.getProviders(Constants.PROVIDERS_PATH).get("rackspace");
-    WebElement inputName = globalDriver.findElement(By.cssSelector("#inputName"));
+    WebElement inputName = globalDriver.findElement(By.cssSelector("#providerName"));
     inputName.sendKeys(rackspace.getName());
     WebElement inputDescription = globalDriver.findElement(By.cssSelector("#inputDescription"));
     inputDescription.sendKeys(rackspace.getDescription());
@@ -106,7 +106,7 @@ public class CreateProviderTest extends GenericTest {
   public void test_03_submitProviderError() throws Exception {
     globalDriver.get(Constants.PROVIDER_CREATE_URI);
     assertFalse(globalDriver.findElement(By.cssSelector("#notification")).isDisplayed());
-    WebElement inputName = globalDriver.findElement(By.cssSelector("#inputName"));
+    WebElement inputName = globalDriver.findElement(By.cssSelector("#providerName"));
     inputName.sendKeys("asdf");
     WebElement inputDescription = globalDriver.findElement(By.cssSelector("#inputDescription"));
     inputDescription.sendKeys("asdf");

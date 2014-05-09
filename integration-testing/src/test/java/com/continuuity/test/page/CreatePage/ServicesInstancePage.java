@@ -18,7 +18,6 @@ package com.continuuity.test.page.CreatePage;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.test.Constants;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.openqa.selenium.By;
@@ -38,14 +37,12 @@ public class ServicesInstancePage extends GenericPage {
   private static final By DEPENDSON = By.cssSelector("#inputDependsOn");
   private static final By CATEGORY = By.name("inputCategory");
   private static final By TYPE = By.name("inputType");
-  private static final By SCRIPT = By.name("inputScript");
-  private static final By DATA = By.name("inputData");
   private static final By SERVICE_ENTRIES = By.cssSelector(".service-entries");
   private static final By SERVICE_NAME = By.cssSelector(".service-name");
 
   public Set<String> getDependsOn() {
     Set<String> dependsOn = Sets.newHashSet();
-    for (WebElement element : globalDriver.findElement(SERVICE_ENTRIES).findElements(SERVICE_NAME)) {
+    for (WebElement element : globalDriver.findElements(SERVICE_ENTRIES).get(4).findElements(SERVICE_NAME)) {
       dependsOn.add(element.getAttribute(Constants.INNER_HTML));
     }
     return dependsOn;
@@ -53,25 +50,22 @@ public class ServicesInstancePage extends GenericPage {
 
   public Map<ProvisionerAction, ServiceAction> getProvisionerActions() {
     Map<ProvisionerAction, ServiceAction> provisionerActions = Maps.newHashMap();
-    List<WebElement> categories = globalDriver.findElements(CATEGORY);
-    List<WebElement> types = globalDriver.findElements(TYPE);
-    List<WebElement> scripts = globalDriver.findElements(SCRIPT);
-    List<WebElement> dataList = globalDriver.findElements(DATA);
-    for (int i = 0; i < categories.size(); i++) {
-      Select actionSelect = new Select(categories.get(i));
-      ProvisionerAction action = ProvisionerAction.valueOf(actionSelect.getFirstSelectedOption()
-                                                                        .getText().toUpperCase());
-      String type = new Select(types.get(i)).getFirstSelectedOption().getText();
-      String script = scripts.get(i).getAttribute(Constants.VALUE);
-      String data = dataList.get(i).getAttribute(Constants.VALUE);
+    List<WebElement> actions = globalDriver.findElements(By.cssSelector(".action-entry" ));
+    for (WebElement actionEntry : actions) {
+      Select actionSelect = new Select(actionEntry.findElement(CATEGORY));
+      ProvisionerAction category = ProvisionerAction.valueOf(actionSelect.getFirstSelectedOption()
+                                                             .getText().toUpperCase());
+      Select actionType = new Select(actionEntry.findElement(TYPE));
+      String type = actionType.getFirstSelectedOption().getText();
+      List<WebElement> automatorDetails = actionEntry.findElements(By.cssSelector(".automator-field input"));
       Map<String, String> fields = Maps.newHashMap();
-      if (script != null && !script.isEmpty()) {
-        fields.put("script", script);
+      for (WebElement automator : automatorDetails) {
+        String value = automator.getAttribute(Constants.VALUE);
+        if (!value.equals("")) {
+          fields.put(automator.getAttribute("name"), automator.getAttribute(Constants.VALUE));
+        }
       }
-      if (data != null && !data.isEmpty()) {
-        fields.put("data", data);
-      }
-      provisionerActions.put(action, new ServiceAction(type, fields));
+      provisionerActions.put(category, new ServiceAction(type, fields));
     }
     return provisionerActions;
   }

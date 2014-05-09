@@ -98,6 +98,11 @@ site.TEMPLATE_DIR = __dirname + '/templates';
 site.HOME_MAX_ITEMS = 5;
 
 /**
+ * Cookie name for continuuity loom.
+ */
+site.COOKIE_NAME = 'continuuity-loom-session';
+
+/**
  * App framework.
  */
 site.app = express();
@@ -106,7 +111,8 @@ site.app = express();
  * Temporary skins related data. Each server instance maintains a record of users
  * and their selected skins.
  */
-
+site.AVAILABLE_SKINS = ['dark', 'light'];
+site.DEFAULT_SKIN = 'dark';
 site.skins = {};
 
 /**
@@ -167,7 +173,7 @@ site.app.use(function(err, req, res, next) {
     res.render('500.html', {
       url: req.url,
       env: env,
-      skin: site.getSkin()
+      skin: site.getSkin(req)
     });
     return;
   }
@@ -261,18 +267,18 @@ site.verifyData = function (arr) {
 };
 
 /**
+ * !! This is not a secure auth checker and can be easily broken.
  * Mock auth checker to sign each request and redirect the user.
- * !! This is not a real auth checker and can be easily fooled.
  * @param  {Boolean} admin Admin previlage required.
  * @return {Boolean} Whether user is authenticated.
  */
 site.checkAuth = function (req, res, admin) {
-  var authenticated = 'continuuity-loom-session' in req.cookies;
+  var authenticated = site.COOKIE_NAME in req.cookies;
   if (!authenticated) {
     res.redirect('/login');
     return;
   }
-  var auth = req.cookies['continuuity-loom-session'];
+  var auth = req.cookies[site.COOKIE_NAME];
   if (!('user' in auth)) {
     res.redirect('/login');
     return;
@@ -287,6 +293,7 @@ site.checkAuth = function (req, res, admin) {
 };
 
 /**
+ * !!This is not a secure way of determining permission level.
  * Determines permission level based on username and password.
  * @param  {String} username.
  * @param  {String} password.
@@ -345,10 +352,10 @@ site.parseClusterData = function (clusters) {
  * @param  {String} username.
  * @return {String} skin name.
  */
-site.getSkin = function (username) {
-  var selectedSkin = 'dark';
-  if (username && username in site.skins) {
-    selectedSkin = site.skins[username];
+site.getSkin = function (req) {
+  var selectedSkin = site.DEFAULT_SKIN;
+  if (site.COOKIE_NAME in req.cookies && 'skin' in req.cookies[site.COOKIE_NAME]){
+    selectedSkin = req.cookies[site.COOKIE_NAME].skin;
   }
   return selectedSkin;
 };
@@ -381,7 +388,7 @@ site.app.post('/import', function (req, res) {
         var context = {
           authenticated: user,
           env: env,
-          skin: site.getSkin(user)
+          skin: site.getSkin(req)
         };
         if (err) {
           context.err = err;
@@ -469,7 +476,7 @@ site.app.get('/', function (req, res) {
     var context = {
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -501,17 +508,36 @@ site.app.get('/profile', function (req, res) {
   var context = {
     authenticated: user,
     env: env,
-    skin: site.getSkin(user)
+    skin: site.getSkin(req)
   };
   res.render('profile.html', context);
 });
 
 site.app.post('/setskin', function (req, res) {
   var user = site.checkAuth(req, res, false);
-  if ('skin' in req.body) {
-    site.skins[user] = req.body.skin;
+  var myCookie = {};
+  for (item in req.cookies) {
+    if (item === site.COOKIE_NAME) {
+      myCookie = req.cookies[item];
+    }
   }
-  res.redirect('/profile');
+  var packageBody = {
+    id: user,
+    skin: req.body.skin,
+    mods: {}
+  }
+  var options = {
+    uri: BOX_ADDR + '/profiles/' + user,
+    method: 'PUT',
+    json: packageBody
+  };
+  request(options, function (err, response, body) {
+    if(!err) {
+      myCookie.skin = req.body.skin;
+      res.cookie(site.COOKIE_NAME, myCookie);
+      res.redirect('/profile');
+    }
+  });
 });
 
 site.app.get('/clustertemplates', function (req, res) {
@@ -523,7 +549,7 @@ site.app.get('/clustertemplates', function (req, res) {
       activeTab: 'clustertemplates',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)  
+      skin: site.getSkin(req)  
     };
     if (err) {
       context.err = err;
@@ -547,7 +573,7 @@ site.app.get('/clustertemplates/create', function (req, res) {
       activeTab: 'clustertemplates',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -606,7 +632,7 @@ site.app.get('/clustertemplates/clustertemplate/:id', function (req, res) {
       activeTab: 'clustertemplates',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -631,7 +657,7 @@ site.app.get('/hardwaretypes', function (req, res) {
       activeTab: 'hardwaretypes',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -652,7 +678,7 @@ site.app.get('/hardwaretypes/create', function (req, res) {
       activeTab: 'hardwaretypes',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -706,7 +732,7 @@ site.app.get('/hardwaretypes/hardwaretype/:id', function (req, res) {
       activeTab: 'hardwaretypes',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -728,7 +754,7 @@ site.app.get('/imagetypes', function (req, res) {
       activeTab: 'imagetypes',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -749,7 +775,7 @@ site.app.get('/imagetypes/create', function (req, res) {
       activeTab: 'imagetypes',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -803,7 +829,7 @@ site.app.get('/imagetypes/imagetype/:id', function (req, res) {
       activeTab: 'imagetypes',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -825,7 +851,7 @@ site.app.get('/providers', function (req, res) {
       activeTab: 'providers',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -849,7 +875,7 @@ site.app.get('/providers/create', function (req, res) {
       activeTab: 'providers',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -902,7 +928,7 @@ site.app.get('/providers/provider/:id', function (req, res) {
       activeTab: 'providers',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -923,7 +949,7 @@ site.app.get('/services', function (req, res) {
       activeTab: 'services',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -943,7 +969,7 @@ site.app.get('/services/create', function (req, res) {
       activeTab: 'services',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -996,7 +1022,7 @@ site.app.get('/services/service/:id', function (req, res) {
       activeTab: 'services',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     });
   });
 });
@@ -1010,7 +1036,7 @@ site.app.get('/admin/clusters', function (req, res) {
       activeTab: 'clusters',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -1037,7 +1063,7 @@ site.app.get('/user/clusters', function (req, res) {
       activeTab: 'clusters',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -1061,7 +1087,7 @@ site.app.get('/user/clusters/cluster/:id', function (req, res) {
       activeTab: 'clusters',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -1084,7 +1110,7 @@ site.app.get('/user/clusters/cluster/:id/reconfigure', function (req, res) {
       activeTab: 'clusters',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -1167,7 +1193,7 @@ site.app.get('/user/clusters/create', function (req, res) {
       activeTab: 'clusters',
       authenticated: user,
       env: env,
-      skin: site.getSkin(user)
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -1232,12 +1258,12 @@ site.app.get('/user/clusters/status/:id', function (req, res) {
  * !This is not a real auth system and can be easily duped, replace completely when appropriate.
  */
 site.app.get('/login', function (req, res) {
-  res.clearCookie('continuuity-loom-session');
+  res.clearCookie(site.COOKIE_NAME);
   var authenticated = false;
   res.render('login.html', {
     authenticated: authenticated,
     env: env,
-    skin: site.getSkin()
+    skin: site.getSkin(req)
   });
 });
 
@@ -1252,14 +1278,37 @@ site.app.post('/login', function (req, res) {
     res.redirect('/login');
     return;
   }
-  var permissionLevel = site.determinePermissionLevel(user, password);
-  res.cookie('continuuity-loom-session', { user: user, permission: permissionLevel });
-  var authenticated = true;
-  if (permissionLevel === 'admin') {
-    res.redirect('/');
-  } else {
-    res.redirect('/user');
-  }
+  var selectedSkin = site.DEFAULT_SKIN;
+  var options = {
+    url: BOX_ADDR + '/profiles/' + user,
+    method: 'GET',
+    headers: {
+      'X-Loom-UserID': user,
+      'X-Loom-ApiKey': DEFAULT_API_KEY
+    }
+  };
+  request(options, function (err, response, body) {
+    if (body) {
+      try {
+        var profile = JSON.parse(body);
+        selectedSkin = profile.skin;
+      } catch (err) {
+        site.logger.info('Improper JSON for profiles call ' + body);
+      }
+      var permissionLevel = site.determinePermissionLevel(user, password);
+      res.cookie(site.COOKIE_NAME, { 
+        user: user,
+        permission: permissionLevel,
+        skin: selectedSkin
+      });
+      var authenticated = true;
+      if (permissionLevel === 'admin') {
+        res.redirect('/');
+      } else {
+        res.redirect('/user');
+      }
+    }
+  });
 });
 
 /**
@@ -1273,7 +1322,7 @@ site.app.get('/error', function (req, res) {
   res.render('404.html', {
     url: req.url,
     env: env,
-    skin: site.getSkin()
+    skin: site.getSkin(req)
   });
   return;
 });
@@ -1292,7 +1341,7 @@ site.app.get('/*', function(req, res) {
     res.render('404.html', {
       url: req.url,
       env: env,
-      skin: site.getSkin()
+      skin: site.getSkin(req)
     });
     return;
   }
@@ -1311,7 +1360,7 @@ site.app.use(function (req, res, next) {
     res.render('404.html', {
       url: req.url,
       env: env,
-      skin: site.getSkin()
+      skin: site.getSkin(req)
     });
     return;
   }
