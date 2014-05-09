@@ -141,8 +141,8 @@ contact your OpenStack administrator to get this information.
 Provisioning your First Cluster
 ===============================
 
-Click on the 'Clusters' icon on the sidebar to the left. For an administrator, this page lists all the clusters
-that have been provisioned across all Loom user accounts.
+Click on the 'Clusters' icon on the left most icon on the top bar. This page lists all the clusters
+that have been provisioned that are accessible to the logged in user.
 
 .. figure:: /guide/quickstart/quickstart-screenshot-3.png
     :align: center
@@ -150,12 +150,12 @@ that have been provisioned across all Loom user accounts.
     :alt: Creating a cluster
     :figclass: align-center
 
-Click on 'Create a cluster' on the top menu bar to enter the cluster creation page. In the 'Name' field,
+Click on the 'Create' buttom at the top right to enter the cluster creation page. In the 'Name' field,
 enter 'loom-quickstart-01' as the name of the cluster to create. The 'Template' field
 specifies which template in the catalog to use for this cluster. For this tutorial, let's
 create a distributed Hadoop and HBase cluster.
 
-Select 'hadoop-hbase-distributed' from the 'Template' drop down box. Enter the number of nodes you want your cluster
+Select 'hadoop-distributed' from the 'Template' drop down box. Enter the number of nodes you want your cluster
 to have (for example, 5) in the field labeled 'Number of machines'.
 
 Display the advanced settings menu by clicking on the small triangle next to the label 'Advanced'. This lists
