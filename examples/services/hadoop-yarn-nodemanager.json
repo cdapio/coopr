@@ -8,20 +8,20 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "script": "recipe[hadoop::hadoop_yarn_nodemanager]"
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
       },
       "start": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
         "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }" 
       },
       "stop": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
         "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }" 
       }

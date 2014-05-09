@@ -1,3 +1,4 @@
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
@@ -39,7 +40,7 @@ class Chef
         puts ui.color("Creating machine #{@node_name}", :cyan)
 
         server = connection.servers.create(server_creation_options)
-        puts "SERVERID: #{server.id.to_s}"
+        puts "SERVERID: #{server.id}"
         return { "status" => 0, "providerid" => server.id.to_s }
       end
     end

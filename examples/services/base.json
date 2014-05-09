@@ -6,11 +6,11 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[loom_base::default]"
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "script": "recipe[loom_base::default]"
       }
     }

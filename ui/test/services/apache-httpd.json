@@ -9,26 +9,26 @@
   "provisioner": {
     "actions": {
       "install": {
-        "type":"chef",
+        "type":"chef-solo",
         "fields": {
           "run_list": "recipe[apache2::default]"
         }
       },
       "configure": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[apache2::default]"
         }
       },
       "start": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
           "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }" 
         }
       },
       "stop": {
-        "type": "chef",
+        "type": "chef-solo",
         "fields": {
           "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
           "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }" 

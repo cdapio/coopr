@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
@@ -28,7 +29,7 @@ require_relative 'automator.rb'
 
 $stdout.sync = true
 
-# Parse command line options. 
+# Parse command line options.
 options = {}
 OptionParser.new do |opts|
   opts.banner = 'Usage: '
@@ -50,17 +51,17 @@ OptionParser.new do |opts|
   end
   options[:once] = false
   opts.on('-o', '--once', 'Only poll and run a single task') do
-    options[:once] = true 
+    options[:once] = true
   end
 end.parse!
 
 loom_uri = options[:uri]
-if(loom_uri == nil && !options[:file]) 
-  puts "Either URI for loom server or --file must be specified"
+if loom_uri.nil? && !options[:file]
+  puts 'Either URI for loom server or --file must be specified'
   exit(1)
 end
 
-if(loom_uri == nil && options[:register])
+if(loom_uri.nil? && options[:register])
   puts "--register option requires the --uri [server uri] option"
   exit(1)
 end
@@ -73,21 +74,20 @@ Logging.level = options[:log_level]
 pluginmanager = PluginManager.new
 
 # ensure we have at least one plugin of each type for task coverage
-if (pluginmanager.providermap.empty? or pluginmanager.automatormap.empty?)
-  log.fatal "Error: at least one provider plugin and one automator plugin must be installed"
+if pluginmanager.providermap.empty? or pluginmanager.automatormap.empty?
+  log.fatal 'Error: at least one provider plugin and one automator plugin must be installed'
   exit(1)
 end
 
-
 def delegate_task(task, pluginmanager)
   task_id = nil
-  providerName = nil
-  automatorName = nil
-  clazz = nil
+  providerName = nil # rubocop:disable UselessAssignment
+  automatorName = nil # rubocop:disable UselessAssignment
+  clazz = nil # rubocop:disable UselessAssignment
   object = nil
   result = nil
   classes = nil
-  task_id = task["taskId"]
+  task_id = task['taskId']
 
   log.debug "Processing task with id #{task_id} ..."
 
@@ -107,24 +107,24 @@ def delegate_task(task, pluginmanager)
     object = clazz.new(task)
     result = object.runTask
   when 'bootstrap'
-    combinedresult = Hash.new  
-    classes = Array.new
-    if task['config'].has_key? 'automators' and !task['config']['automators'].empty?
+    combinedresult = {}
+    classes = []
+    if task['config'].key? 'automators' and !task['config']['automators'].empty?
       # server has specified which bootstrap handlers need to run
-      task['config']['automators'].each do |automatorName|
+      task['config']['automators'].each do |automator|
         log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
-        classes.push(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
+        classes.push(pluginmanager.getHandlerActionObjectForAutomator(automator))
       end
     else
       # default to running all registered bootstrap handlers
-      classes = pluginmanager.getAllHandlerActionObjectsForAutomators()
+      classes = pluginmanager.getAllHandlerActionObjectsForAutomators
       log.debug "Task #{task_id} running bootstrap handlers: #{classes}"
     end
-    raise "No bootstrappers configured" if classes.empty?
+    fail 'No bootstrappers configured' if classes.empty?
 
-    classes.each do |clazz|
-      clazz = Object.const_get(clazz)
-      object = clazz.new(task)
+    classes.each do |klass|
+      klass = Object.const_get(klass)
+      object = klass.new(task)
       result = object.runTask
       combinedresult.merge!(result)
     end
@@ -132,7 +132,7 @@ def delegate_task(task, pluginmanager)
     result = combinedresult
   else
     log.error "Unhandled task of type #{task['taskName']}"
-    raise "Unhandled task of type #{task['taskName']}"
+    fail "Unhandled task of type #{task['taskName']}"
   end
   result
 end
@@ -140,6 +140,14 @@ end
 # register plugins with the server if --register flag passed
 if options[:register]
   pluginmanager.register_plugins(loom_uri)
+  if (pluginmanager.load_errors?)
+    log.error "There was at least one provisioner plugin load failure"
+    exit(1)
+  end
+  if (pluginmanager.register_errors?)
+    log.error "There was at least one provisioner plugin register failure"
+    exit(1)
+  end
   exit(0)
 end
 
@@ -153,7 +161,7 @@ if options[:file]
     task = nil
     cmdoutput = nil
     log.info "Start Provisioner run for file #{options[:file]}"
-    task = JSON.parse( IO.read(options[:file]) )
+    task = JSON.parse(IO.read(options[:file]))
 
     # While provisioning, don't allow the provisioner to terminate by disabling signal
     sigterm = SignalHandler.new('TERM')
@@ -163,24 +171,24 @@ if options[:file]
   rescue Exception => e
     log.error "Caught exception when running task from file #{options[:file]}"
 
-    result = Hash.new if result.nil? == true
+    result = {} if result.nil? == true
     result['status'] = '1'
-    if e.class.name == "CommandExecutionError"
+    if e.class.name == 'CommandExecutionError'
       cmdoutput = e.cmdoutput
       result['stdout'] = cmdoutput[0]
       result['stderr'] = cmdoutput[1]
-    else 
+    else
       result['stdout'] = e.inspect
       result['stderr'] = "#{e.inspect}\n#{e.backtrace.join("\n")}"
-    end 
+    end
     log.error "Provisioner run failed, result: #{result}"
   end
 else
   # run in server polling mode
 
-  pid=$$
-  host=Socket.gethostname.downcase
-  myid="#{host}.#{pid}"
+  pid = $PROCESS_ID
+  host = Socket.gethostname.downcase
+  myid = "#{host}.#{pid}"
 
   log.info "Starting provisioner with id #{myid}, connecting to server #{loom_uri}"
 
@@ -190,7 +198,7 @@ else
     task = nil
     cmdoutput = nil
     begin
-      response = RestClient.post "#{loom_uri}/v1/loom/tasks/take", { 'workerId' => myid}.to_json
+      response = RestClient.post "#{loom_uri}/v1/loom/tasks/take", { 'workerId' => myid }.to_json
     rescue => e
       log.error "Caught exception connecting to loom server #{loom_uri}/v1/loom/tasks/take: #{e}"
       sleep 10
@@ -198,10 +206,10 @@ else
     end
 
     begin
-      if(response.code == 200 && response.to_str != nil && response.to_str != "")
+      if response.code == 200 && response.to_str && response.to_str != ''
         task = JSON.parse(response.to_str)
         log.debug "Received task from server <#{response.to_str}>"
-      elsif(response.code == 204)
+      elsif response.code == 204
         break if options[:once]
         sleep 1
         next
@@ -219,10 +227,10 @@ else
     sigterm.dont_interupt {
       begin
         result = delegate_task(task, pluginmanager)
-      
+
         result = Hash.new if result.nil? == true
         result['workerId'] = myid
-        result['taskId'] = task["taskId"]
+        result['taskId'] = task['taskId']
 
         log.debug "Task <#{task["taskId"]}> completed, updating results <#{result}>"
         begin
@@ -236,8 +244,8 @@ else
         result = Hash.new if result.nil? == true
         result['status'] = '1'
         result['workerId'] = myid
-        result['taskId'] = task["taskId"]
-        if e.class.name == "CommandExecutionError"
+        result['taskId'] = task['taskId']
+        if e.class.name == 'CommandExecutionError'
           cmdoutput = e.cmdoutput
           result['stdout'] = cmdoutput[0]
           result['stderr'] = cmdoutput[1]
