@@ -63,5 +63,18 @@ loom_lookup_key () {
   fi
 }
 
-. $USERSCRIPT $*
+if [ -f ${USERSCRIPT} ]; then
+  # USERSCRIPT is a file.  Check if it is a shell script
+  file ${USERSCRIPT} | grep "shell.*executable" 2>&1 >/dev/null
+  if [ $? == 0 ]; then
+    # source it, so that it can make use of the function(s) above
+    . ${USERSCRIPT} $*
+  else
+    # not a shell script, just execute it
+    ./${USERSCRIPT} $*
+  fi
+else
+  # default to running it as a command
+  ${USERSCRIPT} $*
+fi
 
