@@ -173,6 +173,7 @@ if options[:file]
     result = {} if result.nil? == true
     result['status'] = '1'
     if e.class.name == 'CommandExecutionError'
+      log.error "#{e.class.name}: #{e.to_json}"
       result['stdout'] = e.stdout
       result['stderr'] = e.stderr
     else
@@ -243,6 +244,7 @@ else
         result['workerId'] = myid
         result['taskId'] = task['taskId']
         if e.class.name == 'CommandExecutionError'
+          log.error "#{e.class.name}: #{e.to_json}"
           result['stdout'] = e.stdout
           result['stderr'] = e.stderr
         else
