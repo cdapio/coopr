@@ -111,8 +111,8 @@ def delegate_task(task, pluginmanager)
     classes = []
     if task['config'].key? 'automators' and !task['config']['automators'].empty?
       # server has specified which bootstrap handlers need to run
+      log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
       task['config']['automators'].each do |automator|
-        log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
         classes.push(pluginmanager.getHandlerActionObjectForAutomator(automator))
       end
     else
