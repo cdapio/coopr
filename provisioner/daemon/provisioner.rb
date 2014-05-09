@@ -238,7 +238,6 @@ else
         end
 
       rescue => e
-        puts e.inspect
         result = Hash.new if result.nil? == true
         result['status'] = '1'
         result['workerId'] = myid
