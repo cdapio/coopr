@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -63,13 +64,22 @@ public class NodeLayoutGenerator {
    */
   static boolean isValidServiceSet(Set<String> serviceSet, LayoutConstraint layoutConstraint,
                                    Set<String> clusterServices) {
+    return satisfiesCantCoexist(serviceSet, layoutConstraint) &&
+      satisfiesMustCoexist(serviceSet, layoutConstraint, clusterServices);
+  }
+
+  private static boolean satisfiesCantCoexist(Set<String> serviceSet, LayoutConstraint layoutConstraint) {
     // a valid service set must not be a superset of any of the cant coexist constraints
     for (Set<String> cantCoexist : layoutConstraint.getServicesThatMustNotCoexist()) {
       if (serviceSet.containsAll(cantCoexist)) {
         return false;
       }
     }
+    return true;
+  }
 
+  private static boolean satisfiesMustCoexist(Set<String> serviceSet, LayoutConstraint layoutConstraint,
+                                              Set<String> clusterServices) {
     // if the service set contains at least one service in a must coexist constraint, but not all clusterServices in the
     // constraint, then it is invalid.  Ignore clusterServices that are not on the cluster.
     for (Set<String> mustCoexist : layoutConstraint.getServicesThatMustCoexist()) {
@@ -142,26 +152,37 @@ public class NodeLayoutGenerator {
   // search through all possible service combinations, keeping track of valid service combinations.
   Set<Set<String>> findValidServiceSets(Set<String> services) {
     Set<Set<String>> validServiceSets = Sets.newHashSet();
+
     if (!services.isEmpty()) {
       LayoutConstraint layoutConstraint = clusterTemplate.getConstraints().getLayoutConstraint();
-      Queue<Set<String>> nodes = Lists.newLinkedList();
+      int[] maxCounts = new int[services.size()];
+      for (int i = 0; i < maxCounts.length; i++) {
+        maxCounts[i] = 1;
+      }
 
-      // starting with the full set of allowed clusterServices, systematically remove clusterServices
-      // until we go through all combinations.
-      nodes.add(services);
-      while (!nodes.isEmpty()) {
-        Set<String> serviceSet = nodes.remove();
-        if (isValidServiceSet(serviceSet, layoutConstraint, clusterServices)) {
-          validServiceSets.add(serviceSet);
-        }
-        if (serviceSet.size() > 1) {
-          nodes.addAll(getOneSmallerSubsets(serviceSet));
+      List<String> serviceList = Lists.newArrayList(services);
+      for (int i = 1; i <= services.size(); i++) {
+        Iterator<int[]> serviceIter = new SlottedCombinationIterator(services.size(), i, maxCounts);
+        while (serviceIter.hasNext()) {
+          int[] serviceCounts = serviceIter.next();
+          Set<String> candidateSet = Sets.newHashSet();
+          for (int j = 0; j < serviceCounts.length; j++) {
+            if (serviceCounts[j] == 1) {
+              candidateSet.add(serviceList.get(j));
+            }
+          }
+
+          if (isValidServiceSet(candidateSet, layoutConstraint, clusterServices)) {
+            validServiceSets.add(candidateSet);
+          }
         }
       }
     }
 
     return validServiceSets;
   }
+
+
 
   // given a set of valid service sets, a collection of available hardware types, and a collection of available
   // image types, find the set of all node layouts that are valid given the constraints in the cluster template.
@@ -229,17 +250,5 @@ public class NodeLayoutGenerator {
       }
     }
     return false;
-  }
-
-  // given a set like [i1, i2, i3, i4], return all the subsets that are one element smaller:
-  // [i2, i3, i4], [i1, i3, i4], [i1, i2, i4], [i1, i2, i3]
-  static Set<Set<String>> getOneSmallerSubsets(Set<String> set) {
-    Set<Set<String>> subsets = Sets.newHashSet();
-    for (String element : set) {
-      Set<String> subset = Sets.newHashSet(set);
-      subset.remove(element);
-      subsets.add(subset);
-    }
-    return subsets;
   }
 }

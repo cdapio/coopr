@@ -174,27 +174,6 @@ public class SlottedCombinationIterator implements Iterator<int[]> {
     int amountOverMax = counts[index] - maxCounts[index];
     int numToMove = Math.max(amountOverMax, 1);
     moveItemsRight(index, numToMove);
-    /*
-    int end = counts.length - 1;
-    for (int i = end - 1; i >= 0; i--) {
-      // we've found the first non-zero
-      if (counts[i] > 0) {
-        // this part takes 1 from the non-zero and moves it to the right one slot
-        counts[i]--;
-
-        // add count[end] because we want as many in slot i+1 as possible
-        // ex: going from 2, 0, 0, 1 -> 1, 2, 0, 0
-        int inc = 1 + counts[end] - counts[i + 1];
-        counts[i + 1] += inc;
-
-        // need to zero out counts[end] if we've added it to slot i+1
-        if (i < end - 1) {
-          counts[end] = 0;
-        }
-        return;
-      }
-    }
-    stillSearching = false;*/
   }
 
   /**
@@ -227,14 +206,14 @@ public class SlottedCombinationIterator implements Iterator<int[]> {
    * moveItemsRight(1, 3)
    * count:  1, 5, 3
    *
-   * Additionally, if we're moving items from the front, we need to take one item from the front plus all items in the
-   * last slot and move them one slot to the right of the front. For example:
+   * Additionally, if we're moving items from a slot, and there are counts in slots to the right, we need to take all
+   * the counts to the right plus the one item in our slot, and move them all one slot to the right. For example:
    *
-   * count: 1, 0, 0, 2
+   * count: 0, 1, 0, 1, 2
    *
-   * should transition to
+   * If we're moving the item in slot1, it should transition to
    *
-   * count: 0, 3, 0, 0
+   * count: 0, 0, 4, 0, 0
    *
    * Finally, if we ever get to the end and can't move anymore, we're done and there are no more combinations to
    * iterate through.
@@ -243,23 +222,21 @@ public class SlottedCombinationIterator implements Iterator<int[]> {
    * @param count number of items to move from the slot.
    */
   private void moveItemsRight(int slot, int count) {
-    // if we're at the front
     int frontSlot = leftMostOccupiedSlot();
-    if (slot == frontSlot) {
-      counts[slot] -= count;
-      int itemsToAdd = count + counts[lastSlot];
-      counts[lastSlot] = 0;
-      addItemsToSlot(slot + 1, itemsToAdd);
-    } else if (slot == lastSlot) {
+    if (slot == lastSlot) {
       if (atEnd(frontSlot)) {
         stillSearching = false;
         return;
       }
       moveItemsRight(frontSlot, 1);
     } else {
-      // we're not at the end yet. Take the count from this slot and try and move it one over to the right
       counts[slot] -= count;
-      addItemsToSlot(slot + 1, count);
+      int itemsToAdd = count;
+      for (int i = slot + 1; i < counts.length; i++) {
+        itemsToAdd += counts[i];
+        counts[i] = 0;
+      }
+      addItemsToSlot(slot + 1, itemsToAdd);
     }
   }
 
@@ -301,7 +278,7 @@ public class SlottedCombinationIterator implements Iterator<int[]> {
   }
 
   /**
-   * Starting at the 2 slot from the right, move left and check if items in that slot can be moved to the right.
+   * Starting at 2 slots from the right, move left and check if items in that slot can be moved to the right.
    *
    * @return index of the right most movable slot, or the last slot if nothing is movable.
    */
