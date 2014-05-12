@@ -162,16 +162,22 @@ public class NodeLayoutGenerator {
 
       List<String> serviceList = Lists.newArrayList(services);
       for (int i = 1; i <= services.size(); i++) {
+        // This iterator will go through all combinations of service sets of size i.
         Iterator<int[]> serviceIter = new SlottedCombinationIterator(services.size(), i, maxCounts);
         while (serviceIter.hasNext()) {
+          // build the candidate service set
           int[] serviceCounts = serviceIter.next();
           Set<String> candidateSet = Sets.newHashSet();
+          // the j'th int in serviceCounts indicates whether or not the j'th service in serviceList is in the
+          // candidate set.
           for (int j = 0; j < serviceCounts.length; j++) {
+            // j'th service is in the candidate set, add it.
             if (serviceCounts[j] == 1) {
               candidateSet.add(serviceList.get(j));
             }
           }
 
+          // if the candidate set satisfies layout constraints, add it to the list of valid sets.
           if (isValidServiceSet(candidateSet, layoutConstraint, clusterServices)) {
             validServiceSets.add(candidateSet);
           }
@@ -181,8 +187,6 @@ public class NodeLayoutGenerator {
 
     return validServiceSets;
   }
-
-
 
   // given a set of valid service sets, a collection of available hardware types, and a collection of available
   // image types, find the set of all node layouts that are valid given the constraints in the cluster template.
