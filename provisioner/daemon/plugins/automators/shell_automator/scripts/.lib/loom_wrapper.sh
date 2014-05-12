@@ -63,5 +63,22 @@ loom_lookup_key () {
   fi
 }
 
-. $USERSCRIPT $*
-
+if [ -f ${USERSCRIPT} ]; then
+  # USERSCRIPT is a file.  Check if it is a shell script
+  file ${USERSCRIPT} | grep "shell.*executable" 2>&1 >/dev/null
+  if [ $? == 0 ]; then
+    # source it, so that it can make use of the function(s) above
+    . ${USERSCRIPT} $*
+  else
+    # not a shell script, check if executable
+    if [ -x ${USERSCRIPT} ]; then
+      ./${USERSCRIPT} $*
+    else
+      echo "Argument #{USERSCRIPT} must be executable or a bash script with a proper sha-bang header"
+      exit 1
+    fi
+  fi
+else
+  # not a file, try running it as a command
+  ${USERSCRIPT} $*
+fi
