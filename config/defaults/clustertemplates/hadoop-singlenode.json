@@ -86,6 +86,7 @@
     "layout": {
       "mustcoexist": [
         [
+          "base",
           "hadoop-hdfs-datanode",
           "hadoop-yarn-nodemanager",
           "hbase-regionserver",
