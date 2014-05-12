@@ -1,6 +1,6 @@
 {
-  "name": "hadoop-hbase-singlenode",
-  "description": "Hadoop stack with HBase on a single node",
+  "name": "hadoop-singlenode",
+  "description": "Hadoop stack with YARN, ZooKeeper, HBase, and Hive support on a single node",
   "defaults": {
     "services": [
       "base",
@@ -33,7 +33,6 @@
           "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
           "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
           "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
-
         }
       },
       "hbase": {
@@ -42,6 +41,21 @@
           "hbase.cluster.distributed": "true",
           "hbase.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
         }
+      },
+      "hive": {
+        "hive_site": {
+          "javax.jdo.option.ConnectionURL": "jdbc:mysql://%host.service.mysql-server%:3306/hive",
+          "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
+          "javax.jdo.option.ConnectionUserName": "dbuser",
+          "javax.jdo.option.ConnectionPassword": "dbuserpassword",
+          "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%"
+        }
+      },
+      "mysql": {
+        "server_debian_password": "somedefaultpassword",
+        "server_root_password": "somedefaultpassword",
+        "server_repl_password": "somedefaultpassword",
+        "bind_address": "%ip.service.mysql-server%"
       }
     }
   },
@@ -61,7 +75,11 @@
       "hadoop-yarn-nodemanager",
       "zookeeper-server",
       "hbase-master",
-      "hbase-regionserver"
+      "hbase-regionserver",
+      "mysql-server",
+      "hive-metastore-database",
+      "hive-metastore",
+      "hive-server2"
     ]
   },
   "constraints": {
@@ -74,7 +92,11 @@
           "hadoop-hdfs-namenode",
           "hadoop-yarn-resourcemanager",
           "zookeeper-server",
-          "hbase-master"
+          "hbase-master",
+          "mysql-server",
+          "hive-metastore-database",
+          "hive-metastore",
+          "hive-server2"
         ]
       ]
     },
