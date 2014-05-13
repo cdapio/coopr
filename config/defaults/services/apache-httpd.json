@@ -1,9 +1,18 @@
 {
   "name": "apache-httpd",
   "description": "Apache HTTP Server",
-  "dependson": [
-    "base"
-  ],
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [ "base" ],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": []
+      "uses": []
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

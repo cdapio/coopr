@@ -1,9 +1,18 @@
 {
   "name": "hadoop-yarn-resourcemanager",
   "description": "Hadoop YARN ResourceManager",
-  "dependson": [
-    "base"
-  ],
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [ "base" ],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [ "hadoop-hdfs-namenode", "hadoop-hdfs-datanode" ]
+      "uses": []
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

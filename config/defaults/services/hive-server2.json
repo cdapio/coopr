@@ -1,4 +1,6 @@
 {
+  "name": "hive-server2",
+  "description": "HiveServer2 (multi-user) Hive Server",
   "dependencies": {
     "conflicts": [],
     "install": {
@@ -18,8 +20,6 @@
       "uses": []
     }
   },
-  "description": "HiveServer2 (multi-user) Hive Server",
-  "name": "hive-server2",
   "provisioner": {
     "actions": {
       "configure": {

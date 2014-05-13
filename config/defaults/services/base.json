@@ -1,8 +1,18 @@
 {
   "name": "base",
   "description": "Base services, such as host management and firewall",
-  "dependson": [
-  ],
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": []
+      "uses": []
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {
