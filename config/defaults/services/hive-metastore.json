@@ -4,7 +4,9 @@
   "dependencies": {
     "conflicts": [],
     "install": {
-      "requires": [],
+      "requires": [
+        "base"
+      ],
       "uses": []
     },
     "provides": [],
@@ -13,8 +15,7 @@
         "hadoop-hdfs-namenode",
         "hadoop-hdfs-datanode",
         "hadoop-yarn-resourcemanager",
-        "hadoop-yarn-nodemanager",
-        "base"
+        "hadoop-yarn-nodemanager"
       ],
       "uses": [
         "mysql-server",
