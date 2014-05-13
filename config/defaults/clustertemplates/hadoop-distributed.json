@@ -1,16 +1,19 @@
 {
   "name": "hadoop-distributed",
-  "description": "Hadoop cluster without high-availability",
+  "description": "Hadoop cluster with YARN, ZooKeeper, HBase, and Hive support",
   "defaults": {
     "services": [
       "base",
       "hadoop-hdfs-namenode",
       "hadoop-hdfs-datanode",
       "hadoop-yarn-resourcemanager",
-      "hadoop-yarn-nodemanager"
+      "hadoop-yarn-nodemanager",
+      "zookeeper-server",
+      "hbase-master",
+      "hbase-regionserver"
     ],
     "provider": "rackspace",
-    "hardwaretype": "medium",
+    "hardwaretype": "large",
     "imagetype": "ubuntu12",
     "config": {
       "hadoop": {
@@ -18,6 +21,7 @@
           "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%"
         },
         "hdfs_site": {
+          "dfs.datanode.max.transfer.threads": "4096",
           "dfs.replication": "2"
         },
         "mapred_site": {
@@ -29,8 +33,29 @@
           "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
           "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
           "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
-
         }
+      },
+      "hbase": {
+        "hbase_site": {
+          "hbase.rootdir": "hdfs://%host.service.hadoop-hdfs-namenode%/hbase",
+          "hbase.cluster.distributed": "true",
+          "hbase.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
+        }
+      },
+      "hive": {
+        "hive_site": {
+          "javax.jdo.option.ConnectionURL": "jdbc:mysql://%host.service.mysql-server%:3306/hive",
+          "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
+          "javax.jdo.option.ConnectionUserName": "dbuser",
+          "javax.jdo.option.ConnectionPassword": "dbuserpassword",
+          "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%"
+        }
+      },
+      "mysql": {
+        "server_debian_password": "somedefaultpassword",
+        "server_root_password": "somedefaultpassword",
+        "server_repl_password": "somedefaultpassword",
+        "bind_address": "%ip.service.mysql-server%"
       }
     }
   },
@@ -49,17 +74,40 @@
       "hadoop-hdfs-namenode",
       "hadoop-hdfs-datanode",
       "hadoop-yarn-resourcemanager",
-      "hadoop-yarn-nodemanager"
+      "hadoop-yarn-nodemanager",
+      "zookeeper-server",
+      "hbase-master",
+      "hbase-regionserver",
+      "mysql-server",
+      "hive-metastore-database",
+      "hive-metastore",
+      "hive-server2"
     ]
   },
   "constraints": {
     "layout": {
       "mustcoexist": [
-        [ "hadoop-hdfs-datanode", "hadoop-yarn-nodemanager" ]
+        [
+          "hadoop-hdfs-datanode",
+          "hadoop-yarn-nodemanager",
+          "hbase-regionserver",
+          "hive-metastore"
+        ],
+        [
+          "hadoop-hdfs-namenode",
+          "hadoop-yarn-resourcemanager",
+          "hbase-master",
+          "mysql-server",
+          "hive-metastore-database",
+          "zookeeper-server",
+          "hive-server2"
+        ]
       ],
       "cantcoexist": [
         [ "hadoop-yarn-resourcemanager", "hadoop-yarn-nodemanager" ],
-        [ "hadoop-hdfs-namenode", "hadoop-hdfs-datanode" ]
+        [ "hadoop-hdfs-namenode", "hadoop-hdfs-datanode" ],
+        [ "hbase-master", "hbase-regionserver" ],
+        [ "hive-metastore", "hive-server2" ]
       ]
     },
     "services": {
@@ -73,6 +121,35 @@
         "quantities": {
           "min": "1",
           "max": "1"
+        }
+      },
+      "zookeeper-server": {
+        "quantities": {
+          "min": "1",
+          "max": "1"
+        }
+      },
+      "hbase-master": {
+        "quantities": {
+          "min": "1",
+          "max": "1"
+        }
+      },
+      "mysql-server": {
+        "quantities": {
+          "min": 1,
+          "max": 1,
+        }
+      },
+      "hive-server2": {
+        "quantities": {
+          "min": 1,
+          "max": 1,
+        }
+      },
+      "hadoop-hdfs-datanode": {
+        "quantities": {
+          "min": 2,
         }
       }
     }

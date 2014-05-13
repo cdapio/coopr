@@ -1,0 +1,53 @@
+{
+  "name": "hive-server2",
+  "description": "HiveServer2 (multi-user) Hive Server",
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [
+        "hadoop-hdfs-namenode",
+        "hadoop-hdfs-datanode",
+        "hadoop-yarn-resourcemanager",
+        "hadoop-yarn-nodemanager",
+        "zookeeper-server",
+        "hive-metastore"
+      ],
+      "uses": []
+    }
+  },
+  "provisioner": {
+    "actions": {
+      "configure": {
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive]"
+        },
+        "type": "chef-solo"
+      },
+      "install": {
+        "fields": {
+          "run_list": "recipe[hadoop::hive_server2]"
+        },
+        "type": "chef-solo"
+      },
+      "start": {
+        "fields": {
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hive-server2\": \"start\" } } } }",
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive_server2],recipe[loom_service_runner::default]"
+        },
+        "type": "chef-solo"
+      },
+      "stop": {
+        "fields": {
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hive-server2\": \"stop\" } } } }",
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive_server2],recipe[loom_service_runner::default]"
+        },
+        "type": "chef-solo"
+      }
+    }
+  }
+}
