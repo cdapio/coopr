@@ -9,7 +9,7 @@
     },
     "provides": [],
     "runtime": {
-      "requires": [ "kerberos-client" ]
+      "requires": [ "kerberos-client" ],
       "uses": []
     }
   },

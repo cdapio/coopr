@@ -9,7 +9,7 @@
     },
     "provides": [],
     "runtime": {
-      "requires": [ "hadoop-hdfs-namenode" ]
+      "requires": [ "hadoop-hdfs-namenode" ],
       "uses": []
     }
   },

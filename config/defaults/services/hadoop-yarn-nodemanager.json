@@ -9,7 +9,7 @@
     },
     "provides": [],
     "runtime": {
-      "requires": [ "hadoop-yarn-resourcemanager" ]
+      "requires": [ "hadoop-yarn-resourcemanager" ],
       "uses": []
     }
   },

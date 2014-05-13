@@ -9,7 +9,7 @@
     },
     "provides": [],
     "runtime": {
-      "requires": [ "apache-httpd" ]
+      "requires": [ "apache-httpd" ],
       "uses": []
     }
   },
