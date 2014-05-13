@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: hadoop_wrapper
-# Recipe:: jce
+# Recipe:: _jce
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,6 +64,6 @@ if node['java'].key? 'jdk_version'
     code <<-CODE
       find -name '*.jar' -exec cp '{}' #{jce_dir} \\;
     CODE
-    not_if { ::FileUtils.compare_file("#{jce_tmp}/jce/US_export_policy.jar", "#{jce_dir}/US_export_policy.jar") }
+    not_if "diff -q #{jce_tmp}/jce/US_export_policy.jar #{jce_dir}/US_export_policy.jar"
   end
 end

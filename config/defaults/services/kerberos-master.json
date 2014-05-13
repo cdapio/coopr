@@ -1,9 +1,18 @@
 {
   "name": "kerberos-master",
   "description": "Configures Kerberos v5 Administration server and KDC",
-  "dependson": [
-    "kerberos-client"
-  ],
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [ "base" ],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [ "kerberos-client" ],
+      "uses": []
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

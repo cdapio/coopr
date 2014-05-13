@@ -367,6 +367,7 @@ public class SchedulerTest extends BaseTest {
       "   \"name\":\"ashau-dev\",\n" +
       "   \"description\":\"\",\n" +
       "   \"status\":\"pending\",\n" +
+      "   \"createTime\":1234567890,\n" +
       "   \"provider\":{\n" +
       "      \"name\":\"joyent\",\n" +
       "      \"description\":\"Joyent Compute Service\",\n" +
