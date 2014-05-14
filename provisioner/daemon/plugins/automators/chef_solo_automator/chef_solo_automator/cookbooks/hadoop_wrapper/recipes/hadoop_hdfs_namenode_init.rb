@@ -36,7 +36,7 @@ end
 dfs = node['hadoop']['core_site']['fs.defaultFS']
 ruby_block 'initaction-create-hdfs-tmpdir' do
   block do
-    resources('execute[hdfs-tmpdir').run_action(:run)
+    resources('execute[hdfs-tmpdir]').run_action(:run)
   end
   not_if "hdfs dfs -ls #{dfs} | grep ' /tmp' | grep -e '^drwxrwxrwt'", :user => 'hdfs'
 end
