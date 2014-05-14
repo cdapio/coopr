@@ -5,12 +5,12 @@
     "conflicts": [],
     "install": {
       "requires": [ "base" ],
-      "uses": []
+      "uses": [ "kerberos-client" ]
     },
     "provides": [],
     "runtime": {
       "requires": [ "hadoop-yarn-resourcemanager" ],
-      "uses": []
+      "uses": [ "kerberos-master" ]
     }
   },
   "provisioner": {

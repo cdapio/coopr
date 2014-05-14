@@ -4,8 +4,8 @@
   "dependencies": {
     "conflicts": [],
     "install": {
-      "requires": [],
-      "uses": []
+      "requires": [ "base" ],
+      "uses": [ "kerberos-client" ]
     },
     "provides": [],
     "runtime": {
@@ -17,7 +17,7 @@
         "zookeeper-server",
         "hive-metastore"
       ],
-      "uses": []
+      "uses": [ "kerberos-master" ]
     }
   },
   "provisioner": {
