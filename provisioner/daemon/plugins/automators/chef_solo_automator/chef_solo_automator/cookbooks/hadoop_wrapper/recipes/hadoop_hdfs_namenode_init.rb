@@ -32,3 +32,11 @@ ruby_block 'initaction-format-namenode' do
   ### TODO: this should check all dfs name dirs, not just the first
   # only_if { (Dir.entries("#{node['hadoop']['hdfs_site']['dfs.name.dir'].split(',').first}") - %w{ . .. }).empty? }
 end
+
+dfs = node['hadoop']['core_site']['fs.defaultFS']
+ruby_block 'initaction-create-hdfs-tmpdir' do
+  block do
+    resources('execute[hdfs-tmpdir').run_action(:run)
+  end
+  not_if "hdfs dfs -ls #{dfs} | grep ' /tmp' | grep -e '^drwxrwxrwt'", :user => 'hdfs'
+end

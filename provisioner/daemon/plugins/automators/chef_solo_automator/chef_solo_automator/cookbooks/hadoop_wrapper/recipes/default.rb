@@ -35,17 +35,4 @@ if node.key?('java') && node['java'].key?('java_home')
 end
 
 include_recipe 'hadoop::default'
-
-# HBase needs snappy
-pkg =
-  case node['platform_family']
-  when 'debian'
-    'libsnappy1'
-  when 'rhel'
-    'snappy'
-  end
-package pkg do
-  action :install
-end
-
 include_recipe 'hadoop_wrapper::_kerberos_init'

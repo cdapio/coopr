@@ -67,10 +67,20 @@ if node['hadoop'].key?('hdfs_site') && node['hadoop']['hdfs_site'].key?('dfs.ha.
 end
 
 execute 'hdfs-namenode-format' do
-  command 'hdfs namenode -format'
+  command 'hdfs namenode -format -nonInteractive' + (node['hadoop']['force_format'] ? ' -force' : '')
   action :nothing
   group 'hdfs'
   user 'hdfs'
+end
+
+# We need a /tmp in HDFS
+dfs = node['hadoop']['core_site']['fs.defaultFS']
+execute 'hdfs-tmpdir' do
+  command "hdfs dfs -mkdir -p #{dfs}/tmp && hdfs dfs -chmod 1777 #{dfs}/tmp"
+  timeout 300
+  user 'hdfs'
+  group 'hdfs'
+  action :nothing
 end
 
 service 'hadoop-hdfs-namenode' do
