@@ -301,7 +301,7 @@ public class ServiceDependencyResolverTest {
                                         null,
                                         new ServiceStageDependencies(
                                           ImmutableSet.<String>of(),
-                                          ImmutableSet.<String>of("s1")),
+                                          ImmutableSet.<String>of("s1", "s3")),
                                         null), installActions);
 
     Map<String, Service> serviceMap = Maps.newHashMap();
