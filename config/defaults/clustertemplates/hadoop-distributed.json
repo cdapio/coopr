@@ -138,18 +138,18 @@
       "mysql-server": {
         "quantities": {
           "min": 1,
-          "max": 1,
+          "max": 1
         }
       },
       "hive-server2": {
         "quantities": {
           "min": 1,
-          "max": 1,
+          "max": 1
         }
       },
       "hadoop-hdfs-datanode": {
         "quantities": {
-          "min": 2,
+          "min": 2
         }
       }
     }
