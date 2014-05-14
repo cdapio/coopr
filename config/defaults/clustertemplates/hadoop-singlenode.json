@@ -48,7 +48,9 @@
           "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
           "javax.jdo.option.ConnectionUserName": "dbuser",
           "javax.jdo.option.ConnectionPassword": "dbuserpassword",
-          "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%"
+          "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%",
+          "hive.support.concurrency": "true",
+          "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
         }
       },
       "mysql": {
