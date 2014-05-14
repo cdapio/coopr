@@ -122,9 +122,11 @@ public class HttpPostClusterCallback implements ClusterCallback {
   public boolean onStart(CallbackData data) {
     ClusterAction jobAction = data.getJob().getClusterAction();
     if (startTriggerActions.contains(jobAction)) {
-      LOG.debug("sending request to {} before performing {} on cluster {}",
-                onStartUrl, jobAction, data.getCluster().getId());
-      sendPost(onStartUrl, data);
+      if (onStartUrl != null) {
+        LOG.debug("sending request to {} before performing {} on cluster {}",
+                  onStartUrl, jobAction, data.getCluster().getId());
+        sendPost(onStartUrl, data);
+      }
     }
     return true;
   }
@@ -132,9 +134,11 @@ public class HttpPostClusterCallback implements ClusterCallback {
   public void onSuccess(CallbackData data) {
     ClusterAction jobAction = data.getJob().getClusterAction();
     if (successTriggerActions.contains(data.getJob().getClusterAction())) {
-      LOG.debug("{} completed successfully on cluster {}, sending request to {}",
-                jobAction, data.getCluster().getId(), onSuccessUrl);
-      sendPost(onSuccessUrl, data);
+      if (onSuccessUrl != null) {
+        LOG.debug("{} completed successfully on cluster {}, sending request to {}",
+                  jobAction, data.getCluster().getId(), onSuccessUrl);
+        sendPost(onSuccessUrl, data);
+      }
     }
   }
 
@@ -142,41 +146,41 @@ public class HttpPostClusterCallback implements ClusterCallback {
   public void onFailure(CallbackData data) {
     ClusterAction jobAction = data.getJob().getClusterAction();
     if (failureTriggerActions.contains(data.getJob().getClusterAction())) {
-      LOG.debug("{} failed on cluster {}, sending request to {}",
-                jobAction, data.getCluster().getId(), onFailureUrl);
-      sendPost(onFailureUrl, data);
+      if (onFailureUrl != null) {
+        LOG.debug("{} failed on cluster {}, sending request to {}",
+                  jobAction, data.getCluster().getId(), onFailureUrl);
+        sendPost(onFailureUrl, data);
+      }
     }
   }
 
   private void sendPost(String url, CallbackData data) {
-    if (url != null) {
-      HttpPost post = new HttpPost(url);
-      Set<Node> nodes = null;
-      try {
-        nodes = clusterStore.getClusterNodes(data.getCluster().getId());
-      } catch (Exception e) {
-        LOG.error("Unable to fetch nodes for cluster {}, not sending post request.", data.getCluster().getId());
-        return;
-      }
+    HttpPost post = new HttpPost(url);
+    Set<Node> nodes = null;
+    try {
+      nodes = clusterStore.getClusterNodes(data.getCluster().getId());
+    } catch (Exception e) {
+      LOG.error("Unable to fetch nodes for cluster {}, not sending post request.", data.getCluster().getId());
+      return;
+    }
 
-      try {
-        JsonObject body = new JsonObject();
-        body.add("cluster", GSON.toJsonTree(data.getCluster()));
-        body.add("job", GSON.toJsonTree(data.getJob()));
-        body.add("nodes", GSON.toJsonTree(nodes));
-        post.setEntity(new StringEntity(GSON.toJson(body)));
-        httpClient.execute(post);
-      } catch (UnsupportedEncodingException e) {
-        LOG.warn("Exception setting http post body", e);
-      } catch (ClientProtocolException e) {
-        LOG.warn("Exception executing http post callback to " + url, e);
-      } catch (IOException e) {
-        LOG.warn("Exception executing http post callback to " + url, e);
-      } catch (Exception e) {
-        LOG.warn("Exception executing http post callback to " + url, e);
-      } finally {
-        post.releaseConnection();
-      }
+    try {
+      JsonObject body = new JsonObject();
+      body.add("cluster", GSON.toJsonTree(data.getCluster()));
+      body.add("job", GSON.toJsonTree(data.getJob()));
+      body.add("nodes", GSON.toJsonTree(nodes));
+      post.setEntity(new StringEntity(GSON.toJson(body)));
+      httpClient.execute(post);
+    } catch (UnsupportedEncodingException e) {
+      LOG.warn("Exception setting http post body", e);
+    } catch (ClientProtocolException e) {
+      LOG.warn("Exception executing http post callback to " + url, e);
+    } catch (IOException e) {
+      LOG.warn("Exception executing http post callback to " + url, e);
+    } catch (Exception e) {
+      LOG.warn("Exception executing http post callback to " + url, e);
+    } finally {
+      post.releaseConnection();
     }
   }
 }
