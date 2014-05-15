@@ -13,16 +13,56 @@ Add to your repo, then depend upon this cookbook from wherever you need to overr
 Attributes
 ==========
 
-* `node['ulimit']['pam_su_template_cookbook'] - Defaults to nil (current cookbook).  Determines what cookbook the su pam.d template is taken from
+* `node['ulimit']['pam_su_template_cookbook']` - Defaults to nil (current cookbook).  Determines what cookbook the su pam.d template is taken from
+* `node['ulimit']['users']` - Defaults to empty Hash.  List of users with their limits
 
 Usage
 =====
 
 Consume the user_ulimit resource like so:
+```ruby
+user_ulimit "tomcat" do
+  filehandle_limit 8192 # optional
+  filehandle_soft_limit 8192 # optional; not used if filehandle_limit is set)
+  filehandle_hard_limit 8192 # optional; not used if filehandle_limit is set)
+  process_limit 61504 # optional
+  memory_limit 1024 # optional
+  core_limit 2048 # optional
+end
+```
 
-    user_ulimit "tomcat" do
-      filehandle_limit 8192 # optional
-      process_limit 61504 # optional
-      memory_limit 1024 # optional
-    end
+You can also define limits using attributes on roles or nodes:
 
+```
+"default_attributes": {
+   "ulimit": {
+      "users": {
+         "tomcat": {
+            "filehandle_limit": 8193,
+               "process_limit": 61504
+             },
+            "hbase": {
+               "filehandle_limit": 32768
+             }
+       }
+    }
+ }
+ ```
+
+Domain LWRP
+===========
+
+```ruby
+ulimit_domain 'my_user' do
+  rule do
+    item :nofile
+    type :hard
+    value 10000
+  end
+  rule do
+    item :nofile
+    type :soft
+    value 5000
+  end
+end
+```
