@@ -187,6 +187,7 @@ public class TaskConfigTest {
       "  \"bootstrap_keypair\": \"iad-root\",\n" +
       "  \"image\": \"f70ed7c7-b42e-4d77-83d8-40fa29825b85\",\n" +
       "  \"automators\": [\"chef-solo\", \"shell\"],\n" +
+      "  \"services\": [\"datanode\", \"namenode\"],\n" +
       "  \"provider\": {\n" +
       "    \"name\": \"openstack-central\",\n" +
       "    \"description\": \"Default provider\",\n" +
@@ -225,6 +226,7 @@ public class TaskConfigTest {
       "  \"bootstrap_keypair\": \"iad-root\",\n" +
       "  \"image\": \"f70ed7c7-b42e-4d77-83d8-40fa29825b85\",\n" +
       "  \"automators\": [\"chef-solo\", \"shell\"],\n" +
+      "  \"services\": [\"datanode\", \"namenode\"],\n" +
       "  \"provider\": {\n" +
       "    \"name\": \"openstack-central\",\n" +
       "    \"description\": \"Default provider\",\n" +
