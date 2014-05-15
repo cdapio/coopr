@@ -48,7 +48,9 @@
           "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
           "javax.jdo.option.ConnectionUserName": "dbuser",
           "javax.jdo.option.ConnectionPassword": "dbuserpassword",
-          "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%"
+          "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%",
+          "hive.support.concurrency": "true",
+          "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
         }
       },
       "mysql": {
@@ -90,8 +92,7 @@
         [
           "hadoop-hdfs-datanode",
           "hadoop-yarn-nodemanager",
-          "hbase-regionserver",
-          "hive-metastore"
+          "hbase-regionserver"
         ],
         [
           "hadoop-hdfs-namenode",
@@ -99,6 +100,7 @@
           "hbase-master",
           "mysql-server",
           "hive-metastore-database",
+          "hive-metastore",
           "zookeeper-server",
           "hive-server2"
         ]
@@ -106,8 +108,7 @@
       "cantcoexist": [
         [ "hadoop-yarn-resourcemanager", "hadoop-yarn-nodemanager" ],
         [ "hadoop-hdfs-namenode", "hadoop-hdfs-datanode" ],
-        [ "hbase-master", "hbase-regionserver" ],
-        [ "hive-metastore", "hive-server2" ]
+        [ "hbase-master", "hbase-regionserver" ]
       ]
     },
     "services": {

@@ -153,7 +153,7 @@ body {
   top: 0% !important;
 }
 .progress-bar.text-danger {
-  background: #ED8583;
+  background: #E74D4A;
 }
 .progress-bar.text-success {
   background-color: #77b300;
@@ -162,7 +162,7 @@ body {
   background: #31708f;
 }
 .text-danger {
-  color: #ED8583 !important;
+  color: #E74D4A !important;
 }
 .text-success {
   color: #77b300 !important;
@@ -337,8 +337,8 @@ a:visited {
  */
 table.tablesorter thead tr .headerSortDown,
 table.tablesorter thead tr .headerSortUp {
-  background-color: #EAEAEA;
-  color: #4279CC;
+  background-color: #CE354A;
+  color: white;
 }
 /*************************/
 /*
@@ -713,6 +713,14 @@ a strong {
   width: 50px;
   text-overflow: ellipsis;
 }
+.serviceset-name {
+  color: white;
+  background: #4A4A4A;
+  cursor: pointer;
+  border-radius: 5px 5px 0px 0px;
+  -moz-border-radius: 5px 5px 0px 0px;
+  -webkit-border-radius: 5px 5px 0px 0px;
+}
 .serviceset-node-table {
   font-size: 12px;
 }
@@ -929,4 +937,30 @@ h5 {
 }
 .skin-container {
   width: 300px;
+}
+.toggle-delete-cluster {
+  background: url('/static/img/v2-assets/dark/icon_contract.png') no-repeat;
+  height: 14px;
+  width: 14px;
+}
+.toggle-delete-cluster.open {
+  background: url('/static/img/v2-assets/dark/icon_expand.png') no-repeat;
+}
+.btn-service-start {
+  background: url('/static/img/v2-assets/dark/icon_start.png');
+}
+.btn-service-start:hover {
+  background: url('/static/img/v2-assets/dark/icon_start_active.png');
+}
+.btn-service-stop {
+  background: url('/static/img/v2-assets/dark/icon_stop.png');
+}
+.btn-service-stop:hover {
+  background: url('/static/img/v2-assets/dark/icon_stop_active.png');
+}
+.btn-service-restart {
+  background: url('/static/img/v2-assets/dark/icon_refresh.png');
+}
+.btn-service-restart:hover {
+  background: url('/static/img/v2-assets/dark/icon_refresh_active.png');
 }

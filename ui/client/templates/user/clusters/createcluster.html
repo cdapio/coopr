@@ -157,8 +157,12 @@
                 </div>
               </div>
               <div class="form-group" ng-show="clusterId">
-                <div class="col-sm-offset-2 col-sm-10">
-                  <div type="button" class="btn-spl btn-default" ng-class="{'valid-json-icon btn-success': restart, 'invalid-json-icon btn-danger': !restart}" ng-click="toggleRestart()" id="restart-server">Restart</div>
+                <label class="col-sm-2 control-label">Restart</label>
+                <div class="col-sm-8">
+                  <div class="slideThree">  
+                    <input type="checkbox" value="None" id="slideThree" name="check" ng-model="restart" />
+                    <label for="slideThree"></label>
+                  </div>
                 </div>
               </div>
             </div>

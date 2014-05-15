@@ -148,11 +148,14 @@ public class ServiceDependencyResolver {
         Set<String> newIndirectDependencies = Sets.newHashSet();
         // for each new dependent service
         for (String dependentServiceName : newDependencies) {
-          // find the dependencies of the dependent service
-          Service dependentService = clusterServices.get(dependentServiceName);
-          Set<String> dependenciesOfDependency = getDependencies.apply(dependentService);
-          // if any of these dependencies are not already in the set of indirect dependencies, we need to check them
-          newIndirectDependencies.addAll(Sets.difference(dependenciesOfDependency, indirectDependencies));
+          // this is not true if svc A uses svc B, and svc B is not on the cluster.
+          if (clusterServices.containsKey(dependentServiceName)) {
+            // find the dependencies of the dependent service
+            Service dependentService = clusterServices.get(dependentServiceName);
+            Set<String> dependenciesOfDependency = getDependencies.apply(dependentService);
+            // if any of these dependencies are not already in the set of indirect dependencies, we need to check them
+            newIndirectDependencies.addAll(Sets.difference(dependenciesOfDependency, indirectDependencies));
+          }
         }
         // add any new indirect dependencies
         indirectDependencies.addAll(newIndirectDependencies);
@@ -216,14 +219,17 @@ public class ServiceDependencyResolver {
     while (!nextLevel.isEmpty()) {
       // parent service is one that this service depends on, whether its directly or indirectly
       String parentServiceName = nextLevel.remove();
-      Service parentService = clusterServices.get(parentServiceName);
-      // check if we depend on this service and action
-      if (parentService.getProvisionerActions().containsKey(fromAction)) {
-        directDependencies.add(new ActionOnService(fromAction, parentServiceName));
-      } else {
-        // we only depend on the service, but the action is undefined.  Add the service's dependencies to check their
-        // actions as well
-        nextLevel.addAll(serviceDependencies.get(parentServiceName));
+      // if the parent service is not on the cluster, no need to consider it
+      if (clusterServices.containsKey(parentServiceName)) {
+        Service parentService = clusterServices.get(parentServiceName);
+        // check if we depend on this service and action
+        if (parentService.getProvisionerActions().containsKey(fromAction)) {
+          directDependencies.add(new ActionOnService(fromAction, parentServiceName));
+        } else {
+          // we only depend on the service, but the action is undefined.  Add the service's dependencies to check their
+          // actions as well
+          nextLevel.addAll(serviceDependencies.get(parentServiceName));
+        }
       }
     }
 
