@@ -2,6 +2,12 @@ build-essential Cookbook CHANGELOG
 ==================================
 This file is used to list changes made in each version of the build-essential cookbook.
 
+v2.0.2 (2014-05-02)
+-------------------
+- Updated documentation about older Chef versions
+- Added new SVG badges to the README
+- Fix a bug where `potentially_at_compile_time` fails on non-resources
+
 v2.0.0 (2014-03-13)
 -------------------
 - Updated tested harnesses to use latest ecosystem tools
@@ -17,6 +23,7 @@ v2.0.0 (2014-03-13)
 - OSX no longer downloads OSX GCC and uses XCode CLI tools instead
 - `build_essential` -> `build-essential` in node attributes
 - `compiletime` -> `compile_time` in node attributes
+- Cookbook version 2.x no longer supports Chef 10.x
 
 v1.4.4 (2014-02-27)
 -------------------

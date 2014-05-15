@@ -3,12 +3,12 @@
     },
     "attributes": {
     },
-    "maintainer": "Brightcove, Inc.",
+    "maintainer": "Brian Hatfield",
     "suggestions": {
     },
     "dependencies": {
     },
-    "maintainer_email": "bhatfield@brightcove.com",
+    "maintainer_email": "bmhatfield@gmail.com",
     "conflicting": {
     },
     "platforms": {
@@ -32,7 +32,7 @@
       ]
     },
     "license": "Apache 2.0",
-    "version": "0.1.4",
+    "version": "0.3.2",
     "providing": {
     },
     "recipes": {
