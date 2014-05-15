@@ -44,6 +44,7 @@ public final class Node implements Comparable<Node> {
 
   /**
    * Node properties.
+   * TODO: these should just be fields instead of keys in the properties
    */
   public enum Properties {
     IPADDRESS,
@@ -52,6 +53,7 @@ public final class Node implements Comparable<Node> {
     AUTOMATORS,
     HARDWARETYPE,
     IMAGETYPE,
+    SERVICES,
     FLAVOR,
     IMAGE
   }
@@ -74,8 +76,10 @@ public final class Node implements Comparable<Node> {
     for (Map.Entry<String, String> entry : properties.entrySet()) {
       this.properties.addProperty(entry.getKey(), entry.getValue());
     }
+
     // get the set of automators required on the node. Used during bootstrap tasks.
     Set<String> automatorSet = Sets.newHashSet();
+    JsonArray serviceNames = new JsonArray();
     JsonArray automators = new JsonArray();
     for (Service service : services) {
       for (ServiceAction serviceAction : service.getProvisionerActions().values()) {
@@ -85,8 +89,10 @@ public final class Node implements Comparable<Node> {
           automatorSet.add(automatorType);
         }
       }
+      serviceNames.add(new JsonPrimitive(service.getName()));
     }
     this.properties.add(Properties.AUTOMATORS.name().toLowerCase(), automators);
+    this.properties.add(Properties.SERVICES.name().toLowerCase(), serviceNames);
 
     this.actions = Lists.newArrayList();
   }
