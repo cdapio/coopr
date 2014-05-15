@@ -92,6 +92,7 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     provisionerResult.addProperty("ip", "127.0.0.1");
     provisionerResult.addProperty("ssh_key", "id-rsa");
     provisionerResult.add(Node.Properties.AUTOMATORS.name().toLowerCase(), new JsonArray());
+    provisionerResult.add(Node.Properties.SERVICES.name().toLowerCase(), new JsonArray());
     finishResponse.add("result", provisionerResult);
 
     TestHelper.finishTask(getBaseUrl(), finishResponse);
