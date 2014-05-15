@@ -150,7 +150,7 @@ body {
   top: 0% !important;
 }
 .progress-bar.text-danger {
-  background: #ED8583;
+  background: #E74D4A;
 }
 .progress-bar.text-success {
   background: #78EF7B;
@@ -159,7 +159,7 @@ body {
   background: #31708f;
 }
 .text-danger {
-  color: #ED8583 !important;
+  color: #E74D4A !important;
 }
 .text-success {
   color: #78EF7B !important;
