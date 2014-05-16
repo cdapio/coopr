@@ -9,8 +9,8 @@
     },
     "provides": [],
     "runtime": {
-      "requires": [ "kerberos-master" ],
-      "uses": []
+      "requires": [],
+      "uses": [ "kerberos-master" ]
     }
   },
   "provisioner": {
