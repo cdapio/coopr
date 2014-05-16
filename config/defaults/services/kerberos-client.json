@@ -9,7 +9,7 @@
     },
     "provides": [],
     "runtime": {
-      "requires": [],
+      "requires": [ "kerberos-master" ],
       "uses": []
     }
   },
@@ -17,15 +17,21 @@
     "actions": {
       "install": {
         "type":"chef-solo",
-        "script": "recipe[krb5::default]"
+        "fields": {
+          "run_list": "recipe[krb5::default]"
+        }
       },
       "initialize": {
         "type":"chef-solo",
-        "script": "recipe[krb5_utils::default]"
+        "fields": {
+          "run_list": "recipe[krb5_utils::default]"
+        }
       },
       "configure": {
         "type":"chef-solo",
-        "script": "recipe[krb5::default]"
+        "fields": {
+          "run_list": "recipe[krb5::default]"
+        }
       }
     }
   }

@@ -5,7 +5,7 @@
     "conflicts": [],
     "install": {
       "requires": [ "base" ],
-      "uses": []
+      "uses": [ "kerberos-client" ]
     },
     "provides": [],
     "runtime": {
@@ -14,7 +14,7 @@
         "hadoop-hdfs-datanode",
         "zookeeper-server"
       ],
-      "uses": []
+      "uses": [ "kerberos-master" ]
     }
   },
   "provisioner": {

@@ -5,7 +5,7 @@
     "conflicts": [],
     "install": {
       "requires": [ "base" ],
-      "uses": []
+      "uses": [ "kerberos-client" ]
     },
     "provides": [],
     "runtime": {
@@ -13,7 +13,7 @@
         "hbase-master",
         "zookeeper-server"
       ],
-      "uses": []
+      "uses": [ "kerberos-master" ]
     }
   },
   "provisioner": {
