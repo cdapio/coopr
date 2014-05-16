@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
@@ -37,7 +38,7 @@ class ShellAutomator < Automator
   end
 
   def generate_scripts_tar
-    if !File.exists?(@scripts_tar) or ((Time.now - File.stat(@scripts_tar).mtime).to_i > 600)
+    if !File.exist?(@scripts_tar) or ((Time.now - File.stat(@scripts_tar).mtime).to_i > 600)
       log.debug "Generating #{@scripts_tar} from #{@scripts_dir}"
       scripts_tar_path = File.dirname(@scripts_dir)
       scripts_parent_dir = File.basename(@scripts_dir)
@@ -61,7 +62,6 @@ class ShellAutomator < Automator
 
   def runshell(inputmap)
     sshauth = inputmap['sshauth']
-    hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
 
@@ -85,7 +85,7 @@ class ShellAutomator < Automator
       begin
         Net::SCP.upload!(ipaddress, inputmap['sshauth']['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
           @credentials)
-      rescue Net::SSH::AuthenticationFailed => e
+      rescue Net::SSH::AuthenticationFailed
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
       log.debug "Copy json attributes complete"
@@ -107,7 +107,7 @@ class ShellAutomator < Automator
         @result['stdout'] = output[0]
         @result['stderr'] = output[1]
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
@@ -143,13 +143,13 @@ class ShellAutomator < Automator
           begin
             log.debug "installing openssh-client via #{scp_install_cmd}"
             ssh_exec!(ssh, scp_install_cmd)
-          rescue => e
+          rescue
             raise $!, "Could not install scp on #{ipaddress}: #{$!}", $!.backtrace
           end
         end
         log.debug "scp found on remote"
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
@@ -164,7 +164,7 @@ class ShellAutomator < Automator
           raise "Unable to create #{@remote_cache_dir} on #{hostname} : #{output}"
         end
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
@@ -174,7 +174,7 @@ class ShellAutomator < Automator
     begin
       Net::SCP.upload!(ipaddress, sshauth["user"], "#{@scripts_tar}", "#{@remote_cache_dir}/scripts.tar.gz", :ssh =>
           @credentials, :verbose => true)
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
@@ -187,7 +187,7 @@ class ShellAutomator < Automator
           raise "Error extracting remote #{@remote_cache_dir}/scripts.tar.gz: #{output}"
         end
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 

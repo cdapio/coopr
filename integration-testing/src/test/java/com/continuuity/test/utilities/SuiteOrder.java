@@ -28,7 +28,6 @@ import com.continuuity.test.pagetest.CreateClusterTest;
 import com.continuuity.test.pagetest.CreateClustertemplateTest;
 import com.continuuity.test.pagetest.CreateHardwaretypeTest;
 import com.continuuity.test.pagetest.CreateImagetypeTest;
-import com.continuuity.test.pagetest.CreateServiceTest;
 import com.continuuity.test.pagetest.HardwaretypesInstanceTest;
 import com.continuuity.test.pagetest.HardwaretypesTest;
 import com.continuuity.test.pagetest.ImagetypesInstanceTest;

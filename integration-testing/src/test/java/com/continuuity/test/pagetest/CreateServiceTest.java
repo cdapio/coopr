@@ -70,7 +70,7 @@ public class CreateServiceTest extends GenericTest {
     List<WebElement> actionEntries = globalDriver.findElements(By.cssSelector(".action-entry"));
 
     actionEntries.get(0).findElement(By.cssSelector(".inputCategory")).sendKeys("install");
-    actionEntries.get(0).findElement(By.cssSelector(".inputType")).sendKeys("chef");
+    actionEntries.get(0).findElement(By.cssSelector(".inputType")).sendKeys("chef-solo");
     actionEntries.get(0).findElement(By.name("run_list")).sendKeys(
       service.getProvisionerActions().get(ProvisionerAction.INSTALL).getFields().get("run_list"));
     String data = service.getProvisionerActions().get(ProvisionerAction.INSTALL).getFields().get("json_attributes");
@@ -79,7 +79,7 @@ public class CreateServiceTest extends GenericTest {
     }
 
     actionEntries.get(1).findElement(By.cssSelector(".inputCategory")).sendKeys("configure");
-    actionEntries.get(1).findElement(By.cssSelector(".inputType")).sendKeys("chef");
+    actionEntries.get(1).findElement(By.cssSelector(".inputType")).sendKeys("chef-solo");
     actionEntries.get(1).findElement(By.name("run_list")).sendKeys(
       service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getFields().get("run_list"));
     data = service.getProvisionerActions().get(ProvisionerAction.CONFIGURE).getFields().get("json_attributes");
@@ -88,7 +88,7 @@ public class CreateServiceTest extends GenericTest {
     }
 
     actionEntries.get(2).findElement(By.cssSelector(".inputCategory")).sendKeys("start");
-    actionEntries.get(2).findElement(By.cssSelector(".inputType")).sendKeys("chef");
+    actionEntries.get(2).findElement(By.cssSelector(".inputType")).sendKeys("chef-solo");
     actionEntries.get(2).findElement(By.name("run_list")).sendKeys(
       service.getProvisionerActions().get(ProvisionerAction.START).getFields().get("run_list"));
     data = service.getProvisionerActions().get(ProvisionerAction.START).getFields().get("json_attributes");
@@ -97,7 +97,7 @@ public class CreateServiceTest extends GenericTest {
     }
 
     actionEntries.get(3).findElement(By.cssSelector(".inputCategory")).sendKeys("stop");
-    actionEntries.get(3).findElement(By.cssSelector(".inputType")).sendKeys("chef");
+    actionEntries.get(3).findElement(By.cssSelector(".inputType")).sendKeys("chef-solo");
     actionEntries.get(3).findElement(By.name("run_list")).sendKeys(
       service.getProvisionerActions().get(ProvisionerAction.STOP).getFields().get("run_list"));
     data = service.getProvisionerActions().get(ProvisionerAction.STOP).getFields().get("json_attributes");
