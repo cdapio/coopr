@@ -226,12 +226,14 @@ If you are setting up a MySQL database from scratch you can run the following on
   +------------------+
   | Tables_in_loom   |
   +------------------+
+  | automatorTypes   |
   | clusterTemplates |
   | clusters         |
   | hardwareTypes    |
   | imageTypes       |
   | jobs             |
   | nodes            |
+  | providerTypes    |
   | providers        |
   | services         |
   | tasks            |

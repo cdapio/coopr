@@ -44,7 +44,7 @@ description and detailed cluster information.
 
 Provisioning a new Cluster
 ==========================
-Users can provision a machine by selecting 'Create a cluster' on the top menu bar. Through this page, a user
+Users can provision a cluster by clicking the 'Create' button on the top-right of the screen. Through this page, a user
 can create a cluster with a given name and template setting (as defined by the system administrator), and specify the
 number of nodes to allocate to the cluster.
 
@@ -121,3 +121,18 @@ Deleting a Cluster
 The 'Delete' button on the cluster description page deletes the data on the cluster and decommissions the associated
 nodes. Clusters that are successfully deleted are moved from the 'Live clusters' list to 'Inactive clusters' on the
 user's home screen.
+
+User Profile
+============
+
+Users can bring up a user menu by clicking on the button on the very top-right of the screen. This brings up a menu
+for editing their profile, bringing up documentation, contacting support, and logging out. Clicking on the profile 
+button brings you to a page where you can edit your profile. For the time being, this only contains the ability to 
+change the skin of your UI. In the future, skins will be more customizable and additional settings will be available
+to edit. 
+
+.. figure:: user-profile-screenshot.png
+    :align: center
+    :width: 800px
+    :alt: User Profile
+    :figclass: align-center

@@ -28,7 +28,7 @@
     <parent>
         <groupId>com.continuuity</groupId>
         <artifactId>loom-parent</artifactId>
-        <version>0.9.7-SNAPSHOT</version>
+        <version>0.9.7</version>
     </parent>
 
     <modules>

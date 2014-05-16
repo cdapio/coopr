@@ -5,12 +5,12 @@
     "conflicts": [],
     "install": {
       "requires": [ "base" ],
-      "uses": []
+      "uses": [ "kerberos-client" ]
     },
     "provides": [],
     "runtime": {
       "requires": [ "hadoop-hdfs-namenode", "hadoop-hdfs-datanode" ],
-      "uses": []
+      "uses": [ "kerberos-master" ]
     }
   },
   "provisioner": {

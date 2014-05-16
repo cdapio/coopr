@@ -23,6 +23,7 @@ Administration Guide
    overview
    ../installation/index
    server-config
+   callbacks
    ui
    macros
    plugins
