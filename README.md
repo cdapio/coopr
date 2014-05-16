@@ -6,7 +6,7 @@ Continuuity Loom is cluster management software that manages clusters on public,
 
 To learn more about Continuuity Loom, here are the resources available:
    * [Introduction](http://continuuity.github.io/loom/) to Continuuity Loom
-   * Continuuity Loom [User Guide](http://www.continuuity.com/docs/loom/0.9.5/en/index.html)
+   * Continuuity Loom [User Guide](http://www.continuuity.com/docs/loom/current/en/index.html)
    * [Technical Document](http://continuuity.github.io/loom/tech-docs/index.html) describing internals of Continuuity Loom
 
 ## Contributing to Continuuity Loom
