@@ -50,7 +50,7 @@
           "javax.jdo.option.ConnectionPassword": "dbuserpassword",
           "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%",
           "hive.support.concurrency": "true",
-          "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%"
+          "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$'),',')%"
         }
       },
       "mysql": {
