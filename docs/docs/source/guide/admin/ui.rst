@@ -81,7 +81,7 @@ Clicking on a template name will take you to the 'Edit template' page, where you
 Creating a Template
 ^^^^^^^^^^^^^^^^^^^
 
-To create a new **Template**, click on 'Create a template' on the top-left of the home screen. This action will display the Templates' creation page.
+To create a new **Template**, click on the 'Create' button on the top-right the screen. This action will display the Templates' creation page.
 In addition to specifying a name and description for the template, the initialization screen allows you to set parameters
 for the 'Lease Duration'. This field allows an administrator to specify the initial and maximum lease durations to be applied
 to clusters created using this template, as well as a step size for use when extending a cluster lease.
@@ -132,7 +132,7 @@ that novice users may not change default configurations.)
     :figclass: align-center
 
 The **Constraints** tab allows the administrator to set rules for the sets of services that are installed on a cluster.
-The 'Must coexist' is used to specify services that must be placed together on the same node. For example, in a Hadoop
+A 'Must coexist' constraint is used to specify services that must be placed together on the same node. For example, in a Hadoop
 cluster, you generally want datanodes, regionservers, and nodemanagers to all be placed together, so
 you would put all 3 services in the same 'Must coexist' constraint. The 'Must coexist' constraints are not transitive. 
 If there is one constraint saying service A must coexist with service B, and another constraint saying service B must
@@ -205,7 +205,7 @@ To add the new setting to the list of templates, click 'Create'.
 Managing Existing Templates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A user can view/edit a template by clicking on the template's name on the Home screen, or selecting 'Templates'
-**->** <name of the template> on the top-left of the page.
+**->** <name of the template> at the top-right of the page.
 
 The edit template page provides a similar interface to the 'Create a template' screen. Current settings for the
 template can be modified and deleted accordingly.
@@ -245,7 +245,7 @@ editing provider configurations.
 Creating a Provider
 ^^^^^^^^^^^^^^^^^^^
 
-Click on 'Create a provider' on the top-left of the home screen to go to the Providers creation
+Click on the 'Create' button on the top-right of the screen to go to the Providers creation
 page. On this page, administrators can configure the Name, Description, and Provider type of the service.
 
 .. figure:: providers-screenshot-2.png
@@ -255,7 +255,7 @@ page. On this page, administrators can configure the Name, Description, and Prov
     :figclass: align-center
 
 When selecting a Provider type, additional parameters will appear on a provider specific screen, where an administrator can
-manage its credentials.
+manage its credentials and include any other information needed.
 
 .. figure:: providers-screenshot-3.png
     :align: center
@@ -271,7 +271,7 @@ Managing Existing Providers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A user can view/edit a provider by clicking on the provider's name on the Home screen, or selecting 'Providers' **->**
-<name of the provider> on the top-left of the page.
+<name of the provider> on the top-right of the page.
 
 The provider edit page renders a similar interface to the 'Create a provider' screen. Current settings for the
 provider can be modified and deleted accordingly.
@@ -309,7 +309,7 @@ and for editing its configurations.
 Creating a Hardware Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Click on 'Create a hardware type' on the top-left of the home screen to go to the Hardware
+Click on the 'Create' button on the top-right of the screen to go to the Hardware
 types creation page.
 
 On this page, administrators can configure the Name, Description, and how the hardware setting is specified on a provider.
@@ -344,7 +344,7 @@ Managing Existing Hardware Configurations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A user can view/edit a hardware type by clicking on the hardware type's name on the Home screen or by selecting
-'Hardware types' **->** <name of the hardware type> on the top-left of the page.
+'Hardware types' **->** <name of the hardware type> on the top-right of the page.
 
 The edit hardware type page provides a similar interface to the 'Create a hardware type' screen. Current
 settings for the hardware type can be modified and deleted accordingly.
@@ -379,7 +379,7 @@ editing its configurations.
 
 Creating an Image Type
 ^^^^^^^^^^^^^^^^^^^^^^
-Click on 'Create an image type' on the top-left of the home screen to go to the Image types creation page.
+Click on the 'Create' button on the top-right of the home screen to go to the Image types creation page.
 
 On this page, administrators can configure the Name, Description, and how the image type is specified on a provider. The
 'Providers' section can be used to define how the image type maps to the identifiers used on each provider.
@@ -400,7 +400,7 @@ Managing Existing Images
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 An administrator can view/edit an image type by clicking on the image type's name on the Home screen or by selecting 'Image types'
-**->** <name of the image type> on the top-left of the page.
+**->** <name of the image type> on the top-right of the page.
 
 The edit image type page provides a similar interface to the 'Create an image type' screen. Current settings for the
 image type can be modified and deleted accordingly.
@@ -436,31 +436,86 @@ editing its configurations.
 Creating a Service 
 ^^^^^^^^^^^^^^^^^^
 
-Click on 'Create a service' on the top-left of the home screen to go to the Service creation page.
-When adding a service, an administrator specifies the dependencies of the service on other services. In the
-'Depends on' section, add each of the services which the current service depends upon. For example, Hadoop HDFS
-DataNode requires a working Hadoop HDFS NameNode.
+Click on the 'Create' button on the top-right of the home screen to go to the Service creation page.
+When adding a service, an administrator specifies dependencies for the service and a list of actions that can
+be executed on the service.
 
-The administrator then defines the list of actions to occur or execute in order to make the service available
-and operational on a cluster. Such actions may include install, remove, initialize, start, and stop. Continuuity Loom currently supports
-actions being performed through Chef recipes and shell scripts.  For each action, you enter the data required by the underlying
-plugin.  For example, for the "chef-solo" plugin, you enter the run_list and json_attributes in their respective fields.  These fields
-vary depending on which automator type is selected (chef-solo or shell).  To add another action, click on 'Add,' and an additional section 
-will be added below. Follow the same steps.
+Dependencies
+------------
+Dependencies serve two general purposes. The first is to enforce that a service
+cannot be placed onto a cluster without also placing the services it requires. The second is to enforce a safe
+ordering of service actions while performing cluster operations. It is easiest to understand the different
+types of dependencies by going through example. In this example we have a service called "myapp-2.0".
 
-.. figure:: services-screenshot-2.png
+.. figure:: service-dependencies-screenshot.png
     :align: center
     :width: 800px
-    :alt: Creating a service
+    :alt: Service Dependencies
     :figclass: align-center
 
-To add the new configuration to the list of services, click 'Create'.
+Conflicts
+---------
+The ``Conflicts`` field specifies a list of services that cannot be placed on a cluster with the given service.
+In this example, that means that "myapp-2.0" cannot be placed on a cluster with "myapp-1.0" or "myapp-1.5".
+
+Install time
+------------
+Install dependencies are dependencies that take effect for the INSTALL and REMOVE
+service actions. The ``Install Requires`` field specifies a list of services that the given service
+requires for its installation. In this example, "myapp-2.0" *requires* the "base" service at install time. This
+means that the installation of the "base" service will occur before the install of the "myapp-2.0" service. Similarly,
+the removal of the "myapp-2.0" service will occur before the removal of the "base" service. This also means that
+the "myapp-2.0" service cannot be placed on a cluster without the "base" service also being placed on the cluster.
+The ``Install Uses`` key is like the ``Install Requires`` key in that it enforces the same ordering of service actions. However,
+``Install Uses`` will not enforce the presence of the dependent service. In this example, "myapp-2.0" *uses* the "ntp" service
+at install time. This means that if the "ntp" service is also on the cluster, the installation of "ntp" will occur
+before the installation of "myapp-2.0". However, "ntp" does not have to be placed on the cluster in order for "myapp-2.0"
+to be placed on the cluster.
+
+Runtime
+-------
+Runtime dependencies contain fields that are analagous to those
+in the install section. The only difference is the service actions that they apply to. Install dependencies affect
+the INSTALL and REMOVE service actions, whereas runtime dependencies affect the INITIALIZE, START, and STOP service actions.
+In this example, "myapp-2.0" *requires* the "sql-db" service. This means that "myapp-2.0" cannot be placed on a cluster
+without a "sql-db" service. It also means that the initialization of "myapp-2.0" will occur after the start of "sql-db".
+It also means the start of "myapp-2.0" will occur after the start of "sql-db" and that the stop of "myapp-2.0"
+will occur before the stop of "sql-db". Similarly, because "myapp-2.0" *uses* "load-balancer", initialization and start of
+"myapp-2.0" will occur after the start of "load-balancer". Similarly, the stop of "myapp-2.0" will occur before the stop
+of "load-balancer". Since it is in ``uses``, enforcement of this ordering only applies if "load-balancer" is present on the
+same cluster as "myapp-2.0". The "myapp-2.0" service can be placed on a cluster without the "load-balancer" service.
+
+Provides
+--------
+The ``Provides`` field define an extra level of indirection when specifying dependencies. In this example, the "myapp-2.0"
+service provides the "myapp" service. This means that other services can put "myapp" in their runtime or install dependencies,
+and "myapp-2.0" will satisfy that dependency. As another example, "myapp-2.0" *requires* the "sql-db" service. If there was a
+service called "mysql-db" that provides "sql-db", then it would be fine for "mysql-db" and "myapp-2.0" to be on the same
+cluster. All the ordering enforced by that runtime *requires* dependency would be enforced between the "myapp-2.0" and "mysql-db"
+services.
+
+Automator Details
+-----------------
+The administrator then defines the list of actions to occur or execute in order to make the service available
+and operational on a cluster. Such actions may include INSTALL, REMOVE, INITIALIZE, CONFIGURE, START, and STOP.
+For each action, you enter the data required by the underlying automator plugin.  For example, for the "chef-solo" plugin, 
+you enter the run_list and json_attributes in their respective fields.  These fields
+vary depending on which automator type is selected. Chef-solo and shell automator types are included by default.
+To add another action, click on 'Add,' and an additional section will be added below. Follow the same steps.
+
+.. figure:: service-automator-details-screenshot.png
+    :align: center
+    :width: 800px
+    :alt: Service Automator Details
+    :figclass: align-center
+
+To add the new service to the list of services, click 'Create'.
 
 Managing Existing Services
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 An administrator can view/edit a provider by clicking on the service's name on the Home screen, or selecting 'Services'
-**->** <name of the service> on the top-left of the page.
+**->** <name of the service> on the top-right of the page.
 
 The edit service page provides a similar interface to the 'Create a service' screen. Current
 settings for the service can be modified and deleted accordingly.

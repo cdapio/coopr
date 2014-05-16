@@ -36,7 +36,7 @@ To create a new cluster, make a HTTP POST request to URI:
 
  /clusters
 
-The request body must contain name, numMachines, and clusterTemplate.  Optionally, it can contain imagetype, hardwaretype, provider, services, initialLeaseDuration, dnsSuffix, and config.  If the user specifies any optional value, it will override the corresponding default value in the cluster template.
+The request body must contain name, numMachines, and clusterTemplate.  Optionally, it can contain imagetype, hardwaretype, provider, providerFields, services, initialLeaseDuration, dnsSuffix, and config.  If the user specifies any optional value, it will override the corresponding default value in the cluster template.
 
 POST Parameters
 ^^^^^^^^^^^^^^^^
@@ -63,6 +63,8 @@ Required Parameters
      - Optional hardware type to use across the entire cluster.  Overrides default in the given cluster template.
    * - provider 
      - Optional provider to use to create nodes. Overrides default in the given cluster template.
+   * - providerFields
+     - JSON Object containing key-values to be used by the provider plugin when provisioning nodes.
    * - services 
      - Optional array of services to place on the cluster.  Overrides default in the given cluster template.  Must be a subset of compatible services specified in cluster template.
    * - initialLeaseDuration

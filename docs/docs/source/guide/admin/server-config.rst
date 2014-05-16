@@ -86,6 +86,54 @@ pooling.  The query will change based on which database you are using.
     </property>
   </configuration>
 
+Callbacks
+^^^^^^^^^
+The Server can be configured to run callbacks before any cluster operation begins, after an
+operation succeeds, and after an operation fails. By default, no callbacks are run. Out of the
+box, the Server supports sending an HTTP POST request containing cluster and job information to
+configurable endpoints. You can also write your own custom callback and plug it in.
+See :doc:`Cluster Callbacks </guide/admin/callbacks>` for more information on how to write your own custom callbacks.
+
+To enable HTTP POST callbacks you must specify a url to send the request to.  There is a configuration
+setting for the url to use on start, success, and failure of a cluster operation. If a url is not given,
+no request will be sent. By default, a request will be for every type of cluster operation, but the Server
+can be configured to only send the request for certain types of cluster operations by providing a comma
+separated list of operations in the configuration. An example of configuration settings is shown below.
+::
+
+  <?xml version="1.0"?>
+  <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+  <configuration>
+    <property>
+      <name>loom.callback.http.start.url</name>
+      <value>http://host:port/start/path</value>
+      <description>URL to send POST request to at the start of a cluster operation</description>
+    </property>
+    <property>
+      <name>loom.callback.http.start.triggers</name>
+      <value>cluster_create,restart_services,stop_services,cluster_configure_with_restart</value>
+      <description>comma separated list of cluster operations that will trigger the HTTP POST call</description>
+    </property>
+    <property>
+      <name>loom.callback.http.failure.url</name>
+      <value>http://host:port/failure/path</value>
+      <description>URL to send POST request to if a cluster operation fails</description>
+    </property>
+    <property>
+      <name>loom.callback.http.failure.triggers</name>
+      <value>cluster_create</value>
+      <description>comma separated list of cluster operations that will trigger the HTTP POST call</description>
+    </property>
+  </configuration>
+
+With the configuration above, a HTTP Post request will be sent to http://host:port/start/path before the start of every 
+CLUSTER_CREATE, RESTART_SERVICES, STOP_SERVICES, and CLUSTER_CONFIGURE_WITH_RESTART operation. If no triggers are given, 
+the request is sent before the start of every cluster operation. Similarly, a HTTP POST request will be sent to 
+http://host:port/failure/path if a CLUSTER_CREATE operation fails. Since no success url is given, no request is sent when
+cluster operations complete successfully. The full list of cluster operations are: 
+CLUSTER_CREATE, CLUSTER_DELETE, CLUSTER_CONFIGURE, CLUSTER_CONFIGURE_WITH_RESTART, STOP_SERVICES, START_SERVICES, 
+RESTART_SERVICES, and ADD_SERVICES. 
+
 Configuration
 ^^^^^^^^^^^^^
 
@@ -169,3 +217,30 @@ A full list of available configuration settings and their default values are giv
    * - loom.ids.increment.by
      - 1
      - Along with ``loom.ids.start.num``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The IDs will increment by this number in a datacenter. All datacenters have to share the same value of ``loom.ids.increment.by`` to prevent overlapping of IDs. This number has to be large enough to enable future datacenter expansion.
+   * - loom.callback.class 
+     - com.continuuity.loom.scheduler.callback.HttpPostClusterCallback
+     - Class to use for executing cluster callbacks.
+   * - loom.callback.http.start.url
+     - none
+     - If HttpPostClusterCallback is in use, url to send cluster and job information to before cluster operations start. Leave unset if no request should be sent.
+   * - loom.callback.http.success.url 
+     - none
+     - If HttpPostClusterCallback is in use, url to send cluster and job information to after cluster operations complete successfully. Leave unset if no request should be sent.
+   * - loom.callback.http.failure.url 
+     - none
+     - If HttpPostClusterCallback is in use, url to send cluster and job information to after cluster operations fail. Leave unset if no request should be sent.
+   * - loom.callback.http.start.triggers
+     - all operations
+     - comma separated list of cluster operations that should trigger an HTTP POST request to be sent before start of the operation. 
+   * - loom.callback.http.success.triggers
+     - all operations
+     - comma separated list of cluster operations that should trigger an HTTP POST request to be sent after the operation completes successfully. 
+   * - loom.callback.http.failure.triggers
+     - all operations
+     - comma separated list of cluster operations that should trigger an HTTP POST request to be sent after the operation fails. 
+   * - loom.callback.http.socket.timeout 
+     - 10000
+     - socket timeout in milliseconds for http callbacks. 
+   * - loom.callback.http.max.connections
+     - 100
+     - max number of concurrent http connections for callbacks. If the max is reached, the next callback to try and send a request blocks until an open connection frees up.
