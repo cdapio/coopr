@@ -27,6 +27,12 @@
           "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
         }
       },
+      "initialize": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::hadoop_yarn_resourcemanager_init]"
+        }
+      },
       "start": {
         "type": "chef-solo",
         "fields": {
