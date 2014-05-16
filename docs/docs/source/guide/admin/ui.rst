@@ -476,7 +476,7 @@ Runtime
 -------
 Runtime dependencies contain fields that are analagous to those
 in the install section. The only difference is the service actions that they apply to. Install dependencies affect
-the INSTALL and REMOVE service actions, whereas runtime dependencies affect the INITIALIZE, START, and STOP dependencies.
+the INSTALL and REMOVE service actions, whereas runtime dependencies affect the INITIALIZE, START, and STOP service actions.
 In this example, "myapp-2.0" *requires* the "sql-db" service. This means that "myapp-2.0" cannot be placed on a cluster
 without a "sql-db" service. It also means that the initialization of "myapp-2.0" will occur after the start of "sql-db".
 It also means the start of "myapp-2.0" will occur after the start of "sql-db" and that the stop of "myapp-2.0"
@@ -488,8 +488,8 @@ same cluster as "myapp-2.0". The "myapp-2.0" service can be placed on a cluster 
 Provides
 --------
 The ``Provides`` field define an extra level of indirection when specifying dependencies. In this example, the "myapp-2.0"
-service provides the "myapp" service. This means that if other services can put "myapp" in their runtime or install dependencies,
-"myapp-2.0" can satisfy that dependency. As another example, "myapp-2.0" *requires* the "sql-db" service. If there was a
+service provides the "myapp" service. This means that other services can put "myapp" in their runtime or install dependencies,
+and "myapp-2.0" will satisfy that dependency. As another example, "myapp-2.0" *requires* the "sql-db" service. If there was a
 service called "mysql-db" that provides "sql-db", then it would be fine for "mysql-db" and "myapp-2.0" to be on the same
 cluster. All the ordering enforced by that runtime *requires* dependency would be enforced between the "myapp-2.0" and "mysql-db"
 services.

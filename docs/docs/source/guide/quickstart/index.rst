@@ -141,7 +141,7 @@ contact your OpenStack administrator to get this information.
 Provisioning your First Cluster
 ===============================
 
-Click on the 'Clusters' icon on the left most icon on the top bar. This page lists all the clusters
+Click on the 'Clusters' icon on the right most icon on the top bar. This page lists all the clusters
 that have been provisioned that are accessible to the logged in user.
 
 .. figure:: /guide/quickstart/quickstart-screenshot-3.png
