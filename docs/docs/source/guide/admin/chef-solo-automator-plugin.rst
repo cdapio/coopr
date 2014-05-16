@@ -120,7 +120,7 @@ The Chef Solo Automator plugin automatically merges this data into a single JSON
 the ``--json-attributes argument``. Any custom cookbooks that want to make use of this Loom data need to be familiar
 with the JSON layout of the Loom data. In brief, cluster-wide configuration defined in cluster templates and
 service-level action data are merged together, and preserved at the top-level. Loom data is then also merged in under
-``loom/cluster``. For example:
+``loom/cluster`` and ``loom/services``. For example:
 ::
 
     {
@@ -133,7 +133,10 @@ service-level action data are merged together, and preserved at the top-level. L
                     // node data
                 }
             },
-        },
+            "services": [
+              // list of loom services on this node
+            ]
+        }
     }
 
 
