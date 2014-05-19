@@ -66,7 +66,8 @@ To access the advanced options, Click on the gray triangle next to the label 'Ad
 explicitly specify the provider and image type to be used for the current cluster. The 'Config' field allows the user
 to specify additional custom configurations in a JSON-formatted input (for more information, see
 :doc:`Macros </guide/admin/macros>`). In addition, the 'Lease Duration' field allows the user to specify the duration,
-in days, hours and minutes, that they want to lease the cluster for.
+in days, hours and minutes, that they want to lease the cluster for.  Services to place on the cluster can also be 
+modified from this screen.
 
 .. figure:: user-screenshot-3.png
     :align: center
@@ -118,9 +119,67 @@ accessed using the corresponding IP addresses, usernames and passwords (through 
 
 Deleting a Cluster
 ------------------
-The 'Delete' button on the cluster description page deletes the data on the cluster and decommissions the associated
+The trash can icon on the top right of the cluster description page deletes the cluster and decommissions the associated
 nodes. Clusters that are successfully deleted are moved from the 'Live clusters' list to 'Inactive clusters' on the
 user's home screen.
+
+Reconfiguring Services
+----------------------
+Services can be reconfigured by clicking on the 'Reconfigure' button on the top right of the cluster description page.
+Clicking on the button brings you to the reconfigure page. 
+
+.. figure:: user-reconfigure-screenshot-1.png
+    :align: center
+    :width: 800px
+    :alt: Reconfigure cluster
+    :figclass: align-center
+
+Click on 'Advanced' to bring up the advanced options. At this
+point, though many other settings are shown on the screen, only the config section can be changed. Edit the config as
+desired. There is also a restart toggle at the bottom of the page. If restart is on, all cluster services will be restarted
+after they are reconfigured. If it is off, all service will be reconfigured, but they will not be restarted. You may have to 
+restart them yourself in order for the changes to take place.  
+
+.. figure:: user-reconfigure-screenshot-2.png
+    :align: center
+    :width: 800px
+    :alt: Reconfigure cluster
+    :figclass: align-center
+
+Starting, Stopping, and Restarting Services
+-------------------------------------------
+Services can be started, stopped, and restarted from the cluster description page screen as well. To start a service,
+click on the green triangle next to the service name. To stop a service, click on the red square next to the 
+service name. To restart a service, click on the white circular arrows next to the service. When a start, stop, or 
+restart is performed on a cluster service, service runtime dependencies are examined in order to determine if 
+other cluster services also need to be started, stopped, or restarted. For example, suppose service A depends on
+service B. A request to stop service B is made. Since service A depends on service B, service A will be stopped
+before service B is stopped. Similarly, if a request to restart service B is made, service A will be stopped, then
+service B will be stopped, then service B will be start, and finally service A will be started. If a request to 
+start service A is made, service B will first be started, and then service A will be started. It should be noted 
+that at this time, the system does not track or monitor the status of services. This is why additional starting
+and stopping of dependent services may occur. Services can only be started, stopped, or restarted if they are 
+in an active state. 
+
+.. figure:: user-service-actions-screenshot.png
+    :align: center
+    :width: 800px
+    :alt: Service actions
+    :figclass: align-center
+
+Adding Services
+---------------
+Services can be added to an active cluster from the cluster description screen. Services that can be added are 
+services in the template's compatibility list that are not already on the cluster. To add services to a cluster,
+click on the 'Add' button and select a service from the drop down menu. Multiple services can be added at once.
+After selecting all the services to add, click on the 'Submit' button.
+
+.. figure:: user-add-services-screenshot.png
+    :align: center
+    :width: 800px
+    :alt: Adding services
+    :figclass: align-center
+
 
 User Profile
 ============
