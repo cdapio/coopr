@@ -494,6 +494,22 @@ public class JobPlannerTest {
     expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
                            new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
     Assert.assertEquals(expected, planner.createTaskDag());
+
+    // request to stop just s1, which will stop s3 then s2 then s1.
+    job = new ClusterJob(JobId.fromString("123-002"), ClusterAction.STOP_SERVICES,
+                         ImmutableSet.of(s1.getName()), null);
+    planner = new JobPlanner(job, clusterNodes);
+
+    expected = new TaskDag();
+    // s3 needs to be stopped first, then s2
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
+    // s2 needs to be stopped before s1
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node1.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    Assert.assertEquals(expected, planner.createTaskDag());
   }
 
   @Test
@@ -540,6 +556,22 @@ public class JobPlannerTest {
                            new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
     expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()),
                            new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    Assert.assertEquals(expected, planner.createTaskDag());
+
+    // request to start just s3, which will start s1 then s2 then s3.
+    job = new ClusterJob(JobId.fromString("123-002"), ClusterAction.START_SERVICES,
+                         ImmutableSet.of(s3.getName()), null);
+    planner = new JobPlanner(job, clusterNodes);
+
+    expected = new TaskDag();
+    // s1 needs to be started first, then s2
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    // s2 needs to be started before s3
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
     Assert.assertEquals(expected, planner.createTaskDag());
   }
 

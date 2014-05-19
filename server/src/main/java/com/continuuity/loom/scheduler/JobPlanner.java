@@ -54,8 +54,7 @@ public class JobPlanner {
 
     this.dependencyResolver = new ServiceDependencyResolver(actions, serviceMap);
     if (job.getPlannedServices() != null) {
-      this.servicesToPlan = clusterAction == ClusterAction.RESTART_SERVICES ?
-        ImmutableSet.copyOf(expandServicesToRestart(job.getPlannedServices())) : job.getPlannedServices();
+      this.servicesToPlan = ImmutableSet.copyOf(expandServices(job.getPlannedServices(), clusterAction));
     } else {
       this.servicesToPlan = null;
     }
@@ -203,21 +202,57 @@ public class JobPlanner {
     return servicesToPlan == null || servicesToPlan.contains(service.getName());
   }
 
-  // if svc A depends on svc B and we're asked to restart svc B, we actually need to restart both svc A and svc B.
-  private Set<String> expandServicesToRestart(Set<String> servicesToRestart) {
-    Set<String> expandedServices = Sets.newHashSet(servicesToRestart);
-    Set<String> additionalServicesToRestart = Sets.newHashSet();
+  private Set<String> expandServices(Set<String> services, ClusterAction action) {
+    switch (action) {
+      case START_SERVICES:
+        return expandStartServices(services);
+      case STOP_SERVICES:
+      case RESTART_SERVICES:
+        return expandStopServices(services);
+      default:
+        return services;
+    }
+  }
+
+  private Set<String> expandStopServices(Set<String> services) {
+    Set<String> expandedServices = Sets.newHashSet(services);
+    // if svc A depends on svc B and we're asked to restart svc B, we actually need to restart both svc A and svc B.
+    // similarly, if svc A depends on svc B and we're asked to stop svc B, we actually need to stop both svc A and B.
+    Set<String> additionalServicesToStop = Sets.newHashSet();
     do {
-      additionalServicesToRestart.clear();
-      for (String service : Sets.difference(serviceMap.keySet(), expandedServices)) {
-        for (String serviceToRestart : expandedServices) {
-          if (dependencyResolver.runtimeDependsOn(service, serviceToRestart)) {
-            additionalServicesToRestart.add(service);
+      additionalServicesToStop.clear();
+      for (String otherService : Sets.difference(serviceMap.keySet(), expandedServices)) {
+        for (String expandedService : expandedServices) {
+          // if the other service depends on the expanded service, we need to add it to the list of services to stop.
+          // ex: otherService=A and expandedService=B, A depends on B, and B is being stopped/restarted
+          if (dependencyResolver.runtimeDependsOn(otherService, expandedService)) {
+            additionalServicesToStop.add(otherService);
           }
         }
       }
-      expandedServices.addAll(additionalServicesToRestart);
-    } while (!additionalServicesToRestart.isEmpty());
+      expandedServices.addAll(additionalServicesToStop);
+    } while (!additionalServicesToStop.isEmpty());
+    return expandedServices;
+  }
+
+  private Set<String> expandStartServices(Set<String> services) {
+    Set<String> expandedServices = Sets.newHashSet(services);
+    // if svc A depends on svc B and we're asked to start svc A, we need to start svc B first.
+    Set<String> additionalServicesToStart = Sets.newHashSet();
+    do {
+      additionalServicesToStart.clear();
+      for (String otherService : Sets.difference(serviceMap.keySet(), expandedServices)) {
+        for (String expandedService : expandedServices) {
+          // if the other service is one the expanded service depends on,
+          // we need to add it to the list of services to start.
+          // ex: other=A, expanded=B, A depends on B, and A is being started
+          if (dependencyResolver.runtimeDependsOn(expandedService, otherService)) {
+            additionalServicesToStart.add(otherService);
+          }
+        }
+      }
+      expandedServices.addAll(additionalServicesToStart);
+    } while (!additionalServicesToStart.isEmpty());
     return expandedServices;
   }
 }
