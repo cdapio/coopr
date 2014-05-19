@@ -30,7 +30,7 @@ Configuring the server
 ----------------------
 
 Loom server uses Zookeeper for task coordination and a database for persistent data. The server will work out of the box
-without any configuration options with an in memory Zookeeper and an embedded Derby DB; however, we 
+without any configuration options with an in process Zookeeper and an embedded Derby DB; however, we 
 strongly recommend that administrators supply their own Zookeeper quorum and database outside of Continuuity Loom for performance and
 maintainability. Below we indicate how you can supply your own database (in this case MySQL server) for storage, 
 and the associated JDBC connector in the server configuration file.
