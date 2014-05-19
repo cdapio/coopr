@@ -150,7 +150,7 @@ Starting, Stopping, and Restarting Services
 -------------------------------------------
 Services can be started, stopped, and restarted from the cluster description page screen as well. To start a service,
 click on the green triangle next to the service name. To stop a service, click on the red square next to the 
-service name. It restart a service, click on the white circular arrows next to the service. When a start, stop, or 
+service name. To restart a service, click on the white circular arrows next to the service. When a start, stop, or 
 restart is performed on a cluster service, service runtime dependencies are examined in order to determine if 
 other cluster services also need to be started, stopped, or restarted. For example, suppose service A depends on
 service B. A request to stop service B is made. Since service A depends on service B, service A will be stopped
