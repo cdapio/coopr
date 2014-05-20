@@ -97,11 +97,11 @@ public class JobPlanner {
     List<ProvisionerAction> actionOrder = actions.getActionOrder().get(clusterAction);
 
     for (Node node : nodeMap.values()) {
-      if (!shouldPlanNode(node)) {
+      if (!shouldPlanNode(node.getId())) {
         continue;
       }
       for (Service service : node.getServices()) {
-        if (!shouldPlanService(service)) {
+        if (!shouldPlanService(service.getName())) {
           continue;
         }
 
@@ -142,7 +142,7 @@ public class JobPlanner {
         // skip this dependency. For example, suppose service A install depends on service B install. Service B is
         // already on the cluster and we're adding service A. We don't need to install service B again since it's
         // already installed.
-        if (!servicesToPlan.contains(dependentServiceName) && task.isInstallTimeAction()) {
+        if (!shouldPlanService(dependentServiceName) && task.isInstallTimeAction()) {
           continue;
         }
         ProvisionerAction dependentAction = dependentServiceAction.getAction();
@@ -201,12 +201,12 @@ public class JobPlanner {
     };
 
 
-  private boolean shouldPlanNode(Node node) {
-    return nodesToPlan == null || nodesToPlan.contains(node.getId());
+  private boolean shouldPlanNode(String nodeId) {
+    return nodesToPlan == null || nodesToPlan.contains(nodeId);
   }
 
-  private boolean shouldPlanService(Service service) {
-    return servicesToPlan == null || servicesToPlan.contains(service.getName());
+  private boolean shouldPlanService(String serviceName) {
+    return servicesToPlan == null || servicesToPlan.contains(serviceName);
   }
 
   private Set<String> expandServices(Set<String> services, ClusterAction action) {
