@@ -121,7 +121,7 @@ public class JobPlanner {
       // Hardware tasks remain the same for a node for all services.
       String effectiveService = task.isHardwareAction() ? "" : service.getName();
       // if this is a hardware task, or if the service has defined this provisioner action, add a node or edge
-      // to the tag.  In other words, if the service does not have this provisioner action defined, no need to
+      // to the dag.  In other words, if the service does not have this provisioner action defined, no need to
       // add a node to the dag for it.
       if (task.isHardwareAction() || service.getProvisionerActions().containsKey(task)) {
         if (prevTask != null) {
@@ -138,6 +138,13 @@ public class JobPlanner {
         dependencyResolver.getDirectDependentActions(service.getName(), task)) {
 
         String dependentServiceName = dependentServiceAction.getService();
+        // if the dependent service is not in the list to plan, and the action is an install time action, we can
+        // skip this dependency. For example, suppose service A install depends on service B install. Service B is
+        // already on the cluster and we're adding service A. We don't need to install service B again since it's
+        // already installed.
+        if (!servicesToPlan.contains(dependentServiceName) && task.isInstallTimeAction()) {
+          continue;
+        }
         ProvisionerAction dependentAction = dependentServiceAction.getAction();
         // each node that the dependent service exist on must perform the from action before we perform the
         // to action for the service on this node.
