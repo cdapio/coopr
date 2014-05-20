@@ -97,11 +97,11 @@ public class JobPlanner {
     List<ProvisionerAction> actionOrder = actions.getActionOrder().get(clusterAction);
 
     for (Node node : nodeMap.values()) {
-      if (!shouldPlanNode(node.getId())) {
+      if (!shouldPlanNode(node)) {
         continue;
       }
       for (Service service : node.getServices()) {
-        if (!shouldPlanService(service.getName())) {
+        if (!shouldPlanService(service)) {
           continue;
         }
 
