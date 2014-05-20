@@ -27,8 +27,8 @@
                 <div class="pull-right">
                   <form role="form" method="POST" ng-submit="deleteCluster($event)" action = "[[ '/user/clusters/delete/' + cluster.id ]]" class="cluster-delete-form">
                     <input type="hidden" value="[[cluster.id]]" name="name" />
-                    <a href="/user/clusters/cluster/[[cluster.id]]/reconfigure" class="btn-spl btn-info" ng-show="cluster.status !== 'DELETED'" id="reconfigure-cluster-link">Reconfigure</a>
-                    <button type="submit" class="btn-spl btn-delete" ng-show="cluster.status !== 'DELETED'"></button>
+                    <a href="/user/clusters/cluster/[[cluster.id]]/reconfigure" class="btn-spl btn-info" ng-show="cluster.status !== 'DELETED' && status.data.status !== 'TERMINATED'" id="reconfigure-cluster-link">Reconfigure</a>
+                    <button type="submit" class="btn-spl btn-delete" ng-show="cluster.status !== 'DELETED' && status.data.status !== 'TERMINATED'"></button>
                   </form>
                 </div>
               </div>
@@ -92,7 +92,7 @@
                     <td>Template description</td>
                     <td>[[cluster.clusterTemplate.description]]</td>
                   </tr>
-                  <tr ng-if="cluster.expireTime !== 0">
+                  <tr ng-if="cluster.expireTime !== 0 && status.data.status !== 'TERMINATED'">
                     <td>Extend lease</td>
                     <td>
                       <table>
@@ -130,15 +130,15 @@
                             </div>
                           </div>
                           <div class="col-sm-6">
-                              <button type="button" class="btn-empty btn-service-start" ng-click="startService(service)"></button>
-                              <button type="button" class="btn-empty btn-service-stop" ng-click="stopService(service)"></button>
-                              <button type="button" class="btn-empty btn-service-restart" ng-click="restartService(service)"></button>
+                              <button type="button" class="btn-empty btn-service-start" ng-click="startService(service)" ng-hide="status.data.status == 'TERMINATED'"></button>
+                              <button type="button" class="btn-empty btn-service-stop" ng-click="stopService(service)" ng-hide="status.data.status == 'TERMINATED'"></button>
+                              <button type="button" class="btn-empty btn-service-restart" ng-click="restartService(service)" ng-hide="status.data.status == 'TERMINATED'"></button>
                           </div>
                         </div>
                       </div>
                     </td>
                   </tr>
-                  <tr>
+                  <tr ng-hide="status.data.status == 'TERMINATED'">
                     <td>Add services</td>
                     <td>
                       <div class="form-group" ng-show="remainingServices">

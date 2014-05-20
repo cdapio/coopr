@@ -130,6 +130,15 @@ ClusterView.app.controller('ClusterCtrl',
   $scope.extendLeaseInvalid = false;
 
   /**
+   * Listen for any broadcast message with STATUS tag and assign to ClusterCtrl's scope.
+   * @param  {Object} event being broadcasted.
+   * @param  {ClusterProgressCtrl $scope.status} response data received from broadcast.
+   */
+  $scope.$on('STATUS', function (event, response) {
+    $scope.status = response;
+  });
+
+  /**
    * Reset services controls.
    */
   ClusterView.resetServiceAddControls($scope);
@@ -283,8 +292,8 @@ ClusterView.app.controller('ClusterCtrl',
 
 }]);
 
-ClusterView.app.controller('ClusterProgressCtrl', ['$scope', '$interval', 'dataFactory', 'Globals',
-  function ($scope, $interval, dataFactory, Globals) {
+ClusterView.app.controller('ClusterProgressCtrl', ['$rootScope', '$scope', '$interval',
+ 'dataFactory', 'Globals', function ($rootScope, $scope, $interval, dataFactory, Globals) {
   $scope.status = {
     progressPercent: '',
     statusText: '',
@@ -293,9 +302,10 @@ ClusterView.app.controller('ClusterProgressCtrl', ['$scope', '$interval', 'dataF
   };
 
   // Get status first before going into interval.
-  ClusterView.getStatusFn($scope, dataFactory, Globals)();
+  ClusterView.getStatusFn($rootScope, $scope, dataFactory, Globals)();
 
-  $interval(ClusterView.getStatusFn($scope, dataFactory, Globals), Globals.CALL_INTERVAL);
+  $interval(ClusterView.getStatusFn($rootScope, $scope, dataFactory, Globals),
+    Globals.CALL_INTERVAL);
 }]);
 
 /**
@@ -338,24 +348,26 @@ ClusterView.getRemainingServices = function (clusterData) {
 
 /**
  * Gets status of cluster and updates progress.
- * @param  {Object} $scope Angular Js scope.
+ * @param  {Object} rootScope for app.
+ * @param  {Object} scope for ClusterProgressCtrl.
  * @param  {Object} dataFactory Service.
  * @return {Function} Function to get status of cluster.
  */
-ClusterView.getStatusFn = function ($scope, dataFactory, Globals) {
+ClusterView.getStatusFn = function (rootScope, scope, dataFactory, Globals) {
   return function () {
     dataFactory.getClusterStatus(function (data) {
-      $scope.status.data = data;
-      $scope.status.progressPercent = 0;
+      scope.status.data = data;
+      scope.status.progressPercent = 0;
       var progressPercent = data.stepscompleted * 100 / data.stepstotal;
       if (!isNaN(progressPercent)) {
-        $scope.status.progressPercent = progressPercent.toFixed(0);
+        scope.status.progressPercent = progressPercent.toFixed(0);
       }
       if (data.actionstatus in Helpers.FRIENDLY_STATUS) {
-        $scope.status.statusText = Helpers.FRIENDLY_STATUS[data.actionstatus];
-        $scope.status.class= Globals.STATUS_CLASSES[data.actionstatus];
-        $scope.status.action = Globals.READABLE_ACTIONS[data.action];
+        scope.status.statusText = Helpers.FRIENDLY_STATUS[data.actionstatus];
+        scope.status.class= Globals.STATUS_CLASSES[data.actionstatus];
+        scope.status.action = Globals.READABLE_ACTIONS[data.action];
       }
+      rootScope.$broadcast('STATUS', scope.status);
     });
   }
 };
