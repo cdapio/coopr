@@ -58,9 +58,9 @@ public class ClusterService {
   private final Solver solver;
 
   @Inject
-  public ClusterService(ClusterStore store, @Named(Constants.Queue.CLUSTER) TrackingQueue clusterQueue,
-                        @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue, ZKClient zkClient,
-                        LoomStats loomStats, Solver solver) {
+  private ClusterService(ClusterStore store, @Named(Constants.Queue.CLUSTER) TrackingQueue clusterQueue,
+                         @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue, ZKClient zkClient,
+                         LoomStats loomStats, Solver solver) {
     this.store = store;
     this.clusterQueue = clusterQueue;
     this.solverQueue = solverQueue;

@@ -24,12 +24,9 @@ import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -43,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -156,7 +152,7 @@ public class HttpPostClusterCallback implements ClusterCallback {
 
   private void sendPost(String url, CallbackData data) {
     HttpPost post = new HttpPost(url);
-    Set<Node> nodes = null;
+    Set<Node> nodes;
     try {
       nodes = clusterStore.getClusterNodes(data.getCluster().getId());
     } catch (Exception e) {

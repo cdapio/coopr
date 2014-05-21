@@ -18,6 +18,7 @@ package com.continuuity.loom.store;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -83,10 +84,9 @@ public class SQLClusterStore extends BaseClusterStore {
   }
 
   @Inject
-  SQLClusterStore(ZKClient zkClient, DBConnectionPool dbConnectionPool,
-                  @Named(Constants.ID_START_NUM) long startId,
-                  @Named(Constants.ID_INCREMENT_BY) long incrementBy) throws SQLException, ClassNotFoundException {
-    super(zkClient, startId, incrementBy);
+  SQLClusterStore(ZKClient zkClient, DBConnectionPool dbConnectionPool, Configuration conf)
+    throws SQLException, ClassNotFoundException {
+    super(zkClient, conf.getLong(Constants.ID_START_NUM), conf.getLong(Constants.ID_INCREMENT_BY));
     this.dbConnectionPool = dbConnectionPool;
 
     if (dbConnectionPool.isEmbeddedDerbyDB()) {

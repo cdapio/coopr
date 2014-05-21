@@ -17,10 +17,10 @@ package com.continuuity.loom.http;
 
 import com.continuuity.http.HttpHandler;
 import com.continuuity.http.NettyHttpService;
+import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +36,12 @@ public class LoomService extends AbstractIdleService {
   private final NettyHttpService httpService;
 
   @Inject
-  public LoomService(@Named("loom.host") String host, @Named("loom.port") int port, Set<HttpHandler> handlers,
-                     @Named(Constants.NETTY_EXEC_NUM_THREADS) int nettyExecNumThreads,
-                     @Named(Constants.NETTY_WORKER_NUM_THREADS) int nettyWorkerNumThreads) {
+  private LoomService(Set<HttpHandler> handlers, Configuration conf) {
+    String host = conf.get(Constants.HOST);
+    int port = conf.getInt(Constants.PORT);
+    int numExecThreads = conf.getInt(Constants.NETTY_EXEC_NUM_THREADS);
+    int numWorkerThreads = conf.getInt(Constants.NETTY_WORKER_NUM_THREADS);
+
     NettyHttpService.Builder builder = NettyHttpService.builder();
     builder.addHttpHandlers(handlers);
 
@@ -46,9 +49,9 @@ public class LoomService extends AbstractIdleService {
     builder.setPort(port);
 
     builder.setConnectionBacklog(20000);
-    builder.setExecThreadPoolSize(nettyExecNumThreads);
+    builder.setExecThreadPoolSize(numExecThreads);
     builder.setBossThreadPoolSize(1);
-    builder.setWorkerThreadPoolSize(nettyWorkerNumThreads);
+    builder.setWorkerThreadPoolSize(numWorkerThreads);
 
     this.httpService = builder.build();
   }

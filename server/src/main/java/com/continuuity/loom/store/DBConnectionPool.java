@@ -42,23 +42,18 @@ public class DBConnectionPool {
     String dbUser = conf.get(Constants.DB_USER);
     String dbPassword = conf.get(Constants.DB_PASSWORD);
     String validationQuery = conf.get(Constants.DB_VALIDATION_QUERY);
-    int maxConnections = conf.getInt(Constants.DB_MAX_ACTIVE_CONNECTIONS,
-                                     Constants.DEFAULT_DB_MAX_ACTIVE_CONNECTIONS);
+    int maxConnections = conf.getInt(Constants.DB_MAX_ACTIVE_CONNECTIONS);
 
     if (driverClass == null || connectionString == null) {
-      String localDataDir = conf.get(Constants.LOCAL_DATA_DIR, Constants.DEFAULT_LOCAL_DATA_DIR);
+      String localDataDir = conf.get(Constants.LOCAL_DATA_DIR);
       connectionString = "jdbc:derby:" + localDataDir + "/db/loom;create=true";
-      driverClass = Constants.DEFAULT_JDBC_DRIVER;
-      validationQuery = Constants.DEFAULT_DB_VALIDATION_QUERY;
+      driverClass = Constants.EMBEDDED_DERBY_DRIVER;
+      validationQuery = "VALUES 1";
 
       LOG.warn("{} or {} was not specified, defaulting to JDBC driver {} and connection string {}",
                Constants.JDBC_DRIVER, Constants.JDBC_CONNECTION_STRING, driverClass, connectionString);
     }
 
-    if (dbUser == null) {
-      LOG.warn(Constants.DB_USER + " was not specified, defaulting to " + Constants.DEFAULT_DB_USER);
-      dbUser = Constants.DEFAULT_DB_USER;
-    }
     if (dbPassword == null) {
       LOG.warn(Constants.DB_PASSWORD + " was not specified");
     }
@@ -101,7 +96,7 @@ public class DBConnectionPool {
 
     this.datasource = new DataSource();
     datasource.setPoolProperties(poolProperties);
-    this.isEmbeddedDerbyDB = driverClass == Constants.DEFAULT_JDBC_DRIVER;
+    this.isEmbeddedDerbyDB = driverClass.equals(Constants.EMBEDDED_DERBY_DRIVER);
   }
 
   /**

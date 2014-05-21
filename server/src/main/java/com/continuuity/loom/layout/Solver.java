@@ -57,7 +57,7 @@ public class Solver {
   private final ClusterLayoutUpdater updater;
 
   @Inject
-  Solver(EntityStore entityStore, ClusterLayoutUpdater updater) {
+  private Solver(EntityStore entityStore, ClusterLayoutUpdater updater) {
     this.entityStore = entityStore;
     this.updater = updater;
   }
