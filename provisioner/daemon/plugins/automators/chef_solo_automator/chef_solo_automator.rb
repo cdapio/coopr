@@ -81,7 +81,7 @@ class ChefSoloAutomator < Automator
 
     # services is a list of services on this node
     node_services_data = @task['config']['services']
-    if (node_services_data.nil? || node_servicesdata == "")
+    if (node_services_data.nil? || node_services_data == "")
       node_services_data = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     end
 

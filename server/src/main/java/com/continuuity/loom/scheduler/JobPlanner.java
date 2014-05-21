@@ -54,8 +54,7 @@ public class JobPlanner {
 
     this.dependencyResolver = new ServiceDependencyResolver(actions, serviceMap);
     if (job.getPlannedServices() != null) {
-      this.servicesToPlan = clusterAction == ClusterAction.RESTART_SERVICES ?
-        ImmutableSet.copyOf(expandServicesToRestart(job.getPlannedServices())) : job.getPlannedServices();
+      this.servicesToPlan = ImmutableSet.copyOf(expandServices(job.getPlannedServices(), clusterAction));
     } else {
       this.servicesToPlan = null;
     }
@@ -98,11 +97,11 @@ public class JobPlanner {
     List<ProvisionerAction> actionOrder = actions.getActionOrder().get(clusterAction);
 
     for (Node node : nodeMap.values()) {
-      if (!shouldPlanNode(node)) {
+      if (!shouldPlanNode(node.getId())) {
         continue;
       }
       for (Service service : node.getServices()) {
-        if (!shouldPlanService(service)) {
+        if (!shouldPlanService(service.getName())) {
           continue;
         }
 
@@ -122,7 +121,7 @@ public class JobPlanner {
       // Hardware tasks remain the same for a node for all services.
       String effectiveService = task.isHardwareAction() ? "" : service.getName();
       // if this is a hardware task, or if the service has defined this provisioner action, add a node or edge
-      // to the tag.  In other words, if the service does not have this provisioner action defined, no need to
+      // to the dag.  In other words, if the service does not have this provisioner action defined, no need to
       // add a node to the dag for it.
       if (task.isHardwareAction() || service.getProvisionerActions().containsKey(task)) {
         if (prevTask != null) {
@@ -139,6 +138,13 @@ public class JobPlanner {
         dependencyResolver.getDirectDependentActions(service.getName(), task)) {
 
         String dependentServiceName = dependentServiceAction.getService();
+        // if the dependent service is not in the list to plan, and the action is an install time action, we can
+        // skip this dependency. For example, suppose service A install depends on service B install. Service B is
+        // already on the cluster and we're adding service A. We don't need to install service B again since it's
+        // already installed.
+        if (!shouldPlanService(dependentServiceName) && task.isInstallTimeAction()) {
+          continue;
+        }
         ProvisionerAction dependentAction = dependentServiceAction.getAction();
         // each node that the dependent service exist on must perform the from action before we perform the
         // to action for the service on this node.
@@ -195,29 +201,65 @@ public class JobPlanner {
     };
 
 
-  private boolean shouldPlanNode(Node node) {
-    return nodesToPlan == null || nodesToPlan.contains(node.getId());
+  private boolean shouldPlanNode(String nodeId) {
+    return nodesToPlan == null || nodesToPlan.contains(nodeId);
   }
 
-  private boolean shouldPlanService(Service service) {
-    return servicesToPlan == null || servicesToPlan.contains(service.getName());
+  private boolean shouldPlanService(String serviceName) {
+    return servicesToPlan == null || servicesToPlan.contains(serviceName);
   }
 
-  // if svc A depends on svc B and we're asked to restart svc B, we actually need to restart both svc A and svc B.
-  private Set<String> expandServicesToRestart(Set<String> servicesToRestart) {
-    Set<String> expandedServices = Sets.newHashSet(servicesToRestart);
-    Set<String> additionalServicesToRestart = Sets.newHashSet();
+  private Set<String> expandServices(Set<String> services, ClusterAction action) {
+    switch (action) {
+      case START_SERVICES:
+        return expandStartServices(services);
+      case STOP_SERVICES:
+      case RESTART_SERVICES:
+        return expandStopServices(services);
+      default:
+        return services;
+    }
+  }
+
+  private Set<String> expandStopServices(Set<String> services) {
+    Set<String> expandedServices = Sets.newHashSet(services);
+    // if svc A depends on svc B and we're asked to restart svc B, we actually need to restart both svc A and svc B.
+    // similarly, if svc A depends on svc B and we're asked to stop svc B, we actually need to stop both svc A and B.
+    Set<String> additionalServicesToStop = Sets.newHashSet();
     do {
-      additionalServicesToRestart.clear();
-      for (String service : Sets.difference(serviceMap.keySet(), expandedServices)) {
-        for (String serviceToRestart : expandedServices) {
-          if (dependencyResolver.runtimeDependsOn(service, serviceToRestart)) {
-            additionalServicesToRestart.add(service);
+      additionalServicesToStop.clear();
+      for (String otherService : Sets.difference(serviceMap.keySet(), expandedServices)) {
+        for (String expandedService : expandedServices) {
+          // if the other service depends on the expanded service, we need to add it to the list of services to stop.
+          // ex: otherService=A and expandedService=B, A depends on B, and B is being stopped/restarted
+          if (dependencyResolver.runtimeDependsOn(otherService, expandedService)) {
+            additionalServicesToStop.add(otherService);
           }
         }
       }
-      expandedServices.addAll(additionalServicesToRestart);
-    } while (!additionalServicesToRestart.isEmpty());
+      expandedServices.addAll(additionalServicesToStop);
+    } while (!additionalServicesToStop.isEmpty());
+    return expandedServices;
+  }
+
+  private Set<String> expandStartServices(Set<String> services) {
+    Set<String> expandedServices = Sets.newHashSet(services);
+    // if svc A depends on svc B and we're asked to start svc A, we need to start svc B first.
+    Set<String> additionalServicesToStart = Sets.newHashSet();
+    do {
+      additionalServicesToStart.clear();
+      for (String otherService : Sets.difference(serviceMap.keySet(), expandedServices)) {
+        for (String expandedService : expandedServices) {
+          // if the other service is one the expanded service depends on,
+          // we need to add it to the list of services to start.
+          // ex: other=A, expanded=B, A depends on B, and A is being started
+          if (dependencyResolver.runtimeDependsOn(expandedService, otherService)) {
+            additionalServicesToStart.add(otherService);
+          }
+        }
+      }
+      expandedServices.addAll(additionalServicesToStart);
+    } while (!additionalServicesToStart.isEmpty());
     return expandedServices;
   }
 }

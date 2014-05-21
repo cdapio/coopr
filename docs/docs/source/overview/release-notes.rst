@@ -29,6 +29,8 @@ We hope you enjoy this release.  If you encounter any issues, please don't hesit
 <https://continuuity.uservoice.com/clients/widgets/classic_widget?mode=support&link_color=162e52&primary_color=42afcf&embed
 _type=lightbox&trigger_method=custom_trigger&contact_enabled=true&feedback_enabled=false&smartvote=true&referrer=http%3A%2F%2Fcontinuuity.com%2F#contact_us>`_.
 
+More information about this and previous releases can be found at on the github project `here <https://github.com/continuuity/loom/releases>`_.
+
 Fixed Issues
 ^^^^^^^^^^^^^
 • Unbounded job list stored in cluster object 
