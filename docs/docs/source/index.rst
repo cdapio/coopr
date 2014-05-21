@@ -51,6 +51,7 @@ Contents
    /faq/index
    /overview/release-notes
    /overview/glossary
+   /javadocs/index
 
 Indices and tables
 ==================
