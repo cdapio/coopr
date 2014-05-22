@@ -53,7 +53,7 @@ The following conversions are made to the JSON:
             "description": "Apache HTTP Server",
             "name": "apache-httpd",
 
---- service action for providertype chef
+--- service action for providertype chef, and renaming to chef-solo
   old:
             "provisioner": {
                 "actions": {
@@ -67,7 +67,7 @@ The following conversions are made to the JSON:
       "provisioner": {
         "actions": {
           "start": {
-            "type": "chef",
+            "type": "chef-solo",
             "fields": {
               "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
               "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }"
@@ -138,6 +138,8 @@ begin
           s['provisioner']['actions'].each do |k, v|
             case v['type']
             when "chef", "chef-solo"
+              #standardize on 'chef-solo'
+              v['type'] = 'chef-solo'
               if v.key?('script') 
                 v['fields'] = Hash.new unless v.key?('fields')
                 v['fields']['run_list'] = v['script']
