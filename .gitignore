@@ -8,6 +8,8 @@ Berksfile.lock
 *.un~
 /cookbooks
 .DS_Store
+*.py[co]
+*.egg
 
 # Bundler
 Gemfile.lock
