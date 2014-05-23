@@ -50,6 +50,7 @@ Contents
    /overview/security
    /faq/index
    /overview/release-notes
+   /overview/upgrade-guide
    /overview/glossary
    /javadocs/index
 
