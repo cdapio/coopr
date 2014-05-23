@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.scheduler.task;
+package com.continuuity.loom.layout;
 
 /**
- * Thrown to indicate that there was a problem creating a cluster job or task.
+ * Thrown to indicate that a cluster is invalid.
  */
-public class MissingClusterException extends MissingEntityException {
+public class InvalidClusterException extends Exception {
 
   /**
    * New exception with error message.
    * @param message the error message
    */
-  public MissingClusterException(String message) {
+  public InvalidClusterException(String message) {
     super(message);
   }
 
-  public MissingClusterException(String message, Throwable cause) {
+  public InvalidClusterException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public MissingClusterException(Throwable cause) {
+  public InvalidClusterException(Throwable cause) {
     super(cause);
   }
 }

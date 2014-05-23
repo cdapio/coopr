@@ -62,6 +62,64 @@ public final class Compatibilities {
     return services;
   }
 
+  /**
+   * Return whether or not the given services are compatible.
+   *
+   * @param services Services to check compatibility of.
+   * @return True if all services are compatible, false if not.
+   */
+  public boolean compatibleWithServices(Set<String> services) {
+    return this.services.isEmpty() || this.services.containsAll(services);
+  }
+
+  /**
+   * Return whether or not the given service is compatible.
+   *
+   * @param service Service to check compatibility of.
+   * @return True if the service is compatible, false if not.
+   */
+  public boolean compatibleWithService(String service) {
+    return services.isEmpty() || services.contains(service);
+  }
+
+  /**
+   * Return whether or not the given image types are compatible.
+   *
+   * @param imagetypes Image types to check compatibility of.
+   * @return True if the image types are compatible, false if not.
+   */
+  public boolean compatibleWithImageTypes(Set<String> imagetypes) {
+    return this.imagetypes.isEmpty() || this.imagetypes.containsAll(imagetypes);
+  }
+  /**
+   * Return whether or not the given image type is compatible.
+   *
+   * @param imageType Image type to check compatibility of.
+   * @return True if the image type is compatible, false if not.
+   */
+  public boolean compatibleWithImageType(String imageType) {
+    return imagetypes.isEmpty() || imagetypes.contains(imageType);
+  }
+
+  /**
+   * Return whether or not the given hardware types are compatible.
+   *
+   * @param hardwaretypes Hardware types to check compatibility of.
+   * @return True if the hardware types are compatible, false if not.
+   */
+  public boolean compatibleWithHardwareTypes(Set<String> hardwaretypes) {
+    return this.hardwaretypes.isEmpty() || this.hardwaretypes.containsAll(hardwaretypes);
+  }
+  /**
+   * Return whether or not the given hardware type is compatible.
+   *
+   * @param hardwareType Hardware type to check compatibility of.
+   * @return True if the hardware type is compatible, false if not.
+   */
+  public boolean compatibleWithHardwareType(String hardwareType) {
+    return hardwaretypes.isEmpty() || hardwaretypes.contains(hardwareType);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof Compatibilities)) {

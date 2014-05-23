@@ -24,6 +24,7 @@ import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.layout.InvalidClusterException;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.SolverRequest;
@@ -32,6 +33,7 @@ import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.MissingClusterException;
+import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Charsets;
@@ -788,6 +790,38 @@ public class LoomClusterHandler extends LoomAuthHandler {
                                     @PathParam("cluster-id") String clusterId,
                                     @PathParam("service-id") String serviceId) throws Exception {
     requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.RESTART_SERVICES);
+  }
+
+  /**
+   * Sync the cluster template of the cluster to the current version of the cluster template. The cluster must be
+   * active in order for this to work, and the cluster must be modifiable by the user making the request.
+   *
+   * @param request Request to sync the cluster template.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster that should be synced.
+   */
+  @POST
+  @Path("/{cluster-id}/clustertemplate/sync")
+  public void syncClusterTemplate(HttpRequest request, HttpResponder responder,
+                                  @PathParam("cluster-id") String clusterId) {
+    String userId = getAndAuthenticateUser(request, responder);
+    if (userId == null) {
+      return;
+    }
+
+    try {
+      clusterService.syncClusterToCurrentTemplate(clusterId, userId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT, "Cluster is not in a state where the template can by synced");
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
+    } catch (InvalidClusterException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    } catch (Exception e) {
+      LOG.error("Exception syncing template for cluster {}", clusterId, e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal error while syncing cluster template");
+    }
   }
 
   private void requestServiceAction(HttpRequest request, HttpResponder responder, String clusterId,
