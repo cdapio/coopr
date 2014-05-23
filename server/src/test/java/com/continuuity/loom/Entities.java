@@ -1151,12 +1151,18 @@ public class Entities {
       new Node(node1,
                CLUSTER.getId(),
                ImmutableSet.of(ServiceExample.NAMENODE),
-               ImmutableMap.<String, String>of());
+               ImmutableMap.<String, String>of(
+                 Node.Properties.HARDWARETYPE.name().toLowerCase(), HardwareTypeExample.LARGE.getName(),
+                 Node.Properties.IMAGETYPE.name().toLowerCase(), ImageTypeExample.CENTOS_6.getName()
+               ));
     public static Node NODE2 =
       new Node(node2,
                CLUSTER.getId(),
                ImmutableSet.of(ServiceExample.DATANODE),
-               ImmutableMap.<String, String>of());
+               ImmutableMap.<String, String>of(
+                 Node.Properties.HARDWARETYPE.name().toLowerCase(), HardwareTypeExample.LARGE.getName(),
+                 Node.Properties.IMAGETYPE.name().toLowerCase(), ImageTypeExample.CENTOS_6.getName()
+               ));
   }
 
   protected static JsonObject json(String key, JsonObject val) {

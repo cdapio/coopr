@@ -15,6 +15,8 @@
  */
 package com.continuuity.loom.layout;
 
+import com.continuuity.loom.admin.ClusterTemplate;
+import com.continuuity.loom.admin.Compatibilities;
 import com.continuuity.loom.admin.Constraints;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceConstraint;
@@ -66,28 +68,29 @@ public class ClusterLayout {
    * @return True if the cluster layout is valid, false if not.
    */
   public boolean isValid() {
-    // check node layouts
-    Set<String> clusterServices = serviceCounts.elementSet();
+    return satisfiesConstraints(constraints);
+  }
+
+  public boolean isCompatibleWithTemplate(ClusterTemplate template) {
+    // check all services are compatible
+    Compatibilities compatibilities = template.getCompatibilities();
+    if (!compatibilities.compatibleWithServices(serviceCounts.elementSet())) {
+      return false;
+    }
+    // check all image types and hardware types are compatible
+    Set<String> imageTypes = Sets.newHashSet();
+    Set<String> hardwareTypes = Sets.newHashSet();
     for (NodeLayout nodeLayout : layout.elementSet()) {
-      if (!nodeLayout.satisfiesConstraints(constraints, clusterServices)) {
-        return false;
-      }
+      imageTypes.add(nodeLayout.getImageTypeName());
+      hardwareTypes.add(nodeLayout.getHardwareTypeName());
+    }
+    // check all hardware types are compatible
+    if (!compatibilities.compatibleWithImageTypes(imageTypes) ||
+      !compatibilities.compatibleWithHardwareTypes(hardwareTypes)) {
+      return false;
     }
 
-    // check service counts
-    Map<String, ServiceConstraint> serviceConstraints = constraints.getServiceConstraints();
-    for (Multiset.Entry<String> entry : serviceCounts.entrySet()) {
-      ServiceConstraint constraint = serviceConstraints.get(entry.getElement());
-      if (constraint != null) {
-        int serviceCount = entry.getCount();
-        // TODO: ratio constraint
-        if (serviceCount < constraint.getMinCount() || serviceCount > constraint.getMaxCount()
-          || serviceCount > layout.size()) {
-          return false;
-        }
-      }
-    }
-    return true;
+    return satisfiesConstraints(template.getConstraints());
   }
 
   /**
@@ -110,6 +113,31 @@ public class ClusterLayout {
       nodeLayoutCounts.add(new NodeLayout(hardwareType, imageType, nodeServices));
     }
     return new ClusterLayout(constraints, nodeLayoutCounts);
+  }
+
+  private boolean satisfiesConstraints(Constraints constraints) {
+    // check node layouts
+    Set<String> clusterServices = serviceCounts.elementSet();
+    for (NodeLayout nodeLayout : layout.elementSet()) {
+      if (!nodeLayout.satisfiesConstraints(constraints, clusterServices)) {
+        return false;
+      }
+    }
+
+    // check service counts
+    Map<String, ServiceConstraint> serviceConstraints = constraints.getServiceConstraints();
+    for (Multiset.Entry<String> entry : serviceCounts.entrySet()) {
+      ServiceConstraint constraint = serviceConstraints.get(entry.getElement());
+      if (constraint != null) {
+        int serviceCount = entry.getCount();
+        // TODO: ratio constraint
+        if (serviceCount < constraint.getMinCount() || serviceCount > constraint.getMaxCount()
+          || serviceCount > layout.size()) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   @Override

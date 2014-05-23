@@ -15,6 +15,9 @@
  */
 package com.continuuity.loom.layout;
 
+import com.continuuity.loom.Entities;
+import com.continuuity.loom.admin.ClusterTemplate;
+import com.continuuity.loom.admin.Compatibilities;
 import com.continuuity.loom.admin.Constraints;
 import com.continuuity.loom.admin.LayoutConstraint;
 import com.continuuity.loom.admin.ServiceConstraint;
@@ -73,6 +76,51 @@ public class ClusterLayoutTest {
     counts.add(slaveLayout, 50);
     ClusterLayout layout = new ClusterLayout(constraints, counts);
     Assert.assertTrue(layout.isValid());
+  }
+
+  @Test
+  public void testCompatibleWithTemplate() {
+    ClusterTemplate template = Entities.ClusterTemplateExample.REACTOR;
+    NodeLayout masterNodeLayout = new NodeLayout("large", "centos6", ImmutableSet.of("namenode"));
+    NodeLayout slaveLayout = new NodeLayout("medium", "centos6", ImmutableSet.of("datanode"));
+    NodeLayout reactorLayout = new NodeLayout("medium", "centos6", ImmutableSet.of("reactor", "zookeeper"));
+    Multiset<NodeLayout> counts = HashMultiset.create();
+    counts.add(masterNodeLayout);
+    counts.add(reactorLayout);
+    counts.add(slaveLayout, 50);
+    ClusterLayout layout = new ClusterLayout(template.getConstraints(), counts);
+
+    Assert.assertTrue(layout.isCompatibleWithTemplate(template));
+
+    // test if service compatibilities are violated.
+    Compatibilities newCompatibilities = new Compatibilities(
+      template.getCompatibilities().getHardwaretypes(),
+      template.getCompatibilities().getImagetypes(),
+      ImmutableSet.<String>of("namenode", "datanode", "zookeeper")
+    );
+    template = new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
+                                   newCompatibilities, template.getConstraints(), template.getAdministration());
+    Assert.assertFalse(layout.isCompatibleWithTemplate(template));
+
+    // test if hardware type compatibilities are violated
+    newCompatibilities = new Compatibilities(
+      ImmutableSet.<String>of("large"),
+      template.getCompatibilities().getImagetypes(),
+      template.getCompatibilities().getServices()
+    );
+    template = new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
+                                   newCompatibilities, template.getConstraints(), template.getAdministration());
+    Assert.assertFalse(layout.isCompatibleWithTemplate(template));
+
+    // test if image type compatibilities are violated
+    newCompatibilities = new Compatibilities(
+      template.getCompatibilities().getHardwaretypes(),
+      ImmutableSet.<String>of("ubuntu12"),
+      template.getCompatibilities().getServices()
+    );
+    template = new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
+                                   newCompatibilities, template.getConstraints(), template.getAdministration());
+    Assert.assertFalse(layout.isCompatibleWithTemplate(template));
   }
 
   @BeforeClass
