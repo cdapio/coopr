@@ -81,7 +81,7 @@ Checklist
 
 * 7 - Update JSON with new layout
 
-  * Continuuity Loom |release| modified the JSON layout for Automator and Provider plugins, this fixes them
+  * Continuuity Loom |release| modified the JSON layout for Automator and Provider plugins, this updates them
 
   .. parsed-literal::
    $ /opt/loom/server/bin/loom-0.9.7-upgrade.rb -f export.json -o upload.json
