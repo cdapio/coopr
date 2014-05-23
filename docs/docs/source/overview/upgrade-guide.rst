@@ -48,7 +48,7 @@ Checklist
   * The embedded Derby database and ZooKeeper server are stopped when Loom Server is stopped
   * If you are using another database, such as MySQL, follow your standard procedures for backing up the Loom database
   * If you are using the embedded Derby database or ZooKeeper, perform the following
-  * Replace ``/var/loom/data`` below with the location from ``loom.local.data.dir`` in ``/etc/loom/conf/loom-site.xml`` if you have modified it from default
+     * Replace ``/var/loom/data`` below with the location from ``loom.local.data.dir`` in ``/etc/loom/conf/loom-site.xml`` if you have modified it from default
 
   .. parsed-literal::
    $ sudo cp -R /var/loom/data /var/loom/data.backup
