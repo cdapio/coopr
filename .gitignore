@@ -10,6 +10,8 @@ Berksfile.lock
 .DS_Store
 *.py[co]
 *.egg
+PKG-INFO
+build/
 
 # Bundler
 Gemfile.lock
