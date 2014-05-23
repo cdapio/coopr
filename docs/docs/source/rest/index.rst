@@ -111,6 +111,7 @@ Clusters
   * :ref:`Stop Services on a Cluster <cluster-stop-services>`
   * :ref:`Start Services on a Cluster <cluster-start-services>`
   * :ref:`Restart Services on a Cluster <cluster-restart-services>`
+  * :ref:`Sync Cluster Template to Current Version <cluster-sync-template>`
 
 RPC Calls
 =========

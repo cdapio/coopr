@@ -844,3 +844,48 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/restart
+
+.. _cluster-sync-template:
+
+Sync Cluster Template to Current Version
+========================================
+When a cluster is created, a copy of the template used to create the cluster is copied into the 
+cluster. Any future operations are based off the copy of the template. As templates evolve, it is
+sometimes desirable to sync an existing cluster to the current version of the template used to 
+create it. To sync a cluster's template to the current version, make a POST HTTP request to URI:
+::
+
+ /clusters/{cluster-id}/clustertemplate/sync
+
+There is no POST body expected. A cluster must be in the ACTIVE state in order for the sync
+to be allowed. If the template used to create the cluster no longer exists, the sync will not
+be allowed. If syncing the template would cause the cluster to become invalid according to the
+updated template, the sync will not be allowed.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 400 (BAD REQUEST)
+     - If the template sync would result in an invalid cluster.
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found, its template is not found, or its nodes are not found.
+   * - 409 (CONFLICT)
+     - If the cluster is not in a state where its template can be synced to the current version.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -X POST
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/clustertemplate/sync
