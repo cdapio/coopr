@@ -30,7 +30,7 @@ Overview
 --------
 
 The Server can perform custom callbacks before the start of any cluster operation, after an operation has successfully
-completed, and after an operation has failed. To activate callbacks, you must set the ``loom.callback.class`` setting
+completed, and after an operation has failed. To activate callbacks, you must set the ``server.callback.class`` setting
 in the server config to the fully qualified name of the class you want to use. The class must implement the 
 ``ClusterCallback`` interface, and the jar containing the class must be included in the lib directory for the Server. 
 
