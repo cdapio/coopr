@@ -3,6 +3,9 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
+- Nginx support for clusters ( Issues: #131 )
+- Sensu monitoring support ( Issues: #167 )
 
 v0.9.7 (May 27, 2014)
 ---------------------
@@ -26,3 +29,5 @@ v0.9.7 (May 27, 2014)
 - Remove redundant example directory ( Issues: #148 )
 - Add service list to node properties ( Issues: #172 #177 )
 - Upgrade script ( Issues: #195 )
+
+There is no CHANGELOG for versions of Continuuity Loom prior to 0.9.7 release.
