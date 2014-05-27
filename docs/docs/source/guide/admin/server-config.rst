@@ -167,7 +167,7 @@ A full list of available configuration settings and their default values are giv
      - "jdbc:derby:/var/loom/data/db/loom;create=true"
      - JDBC connection string to user for database operations.
    * - server.jdbc.validation.query
-     - "VALUES 1" when using default for loom.jdbc.driver (Derby), null otherwise.
+     - "VALUES 1" when using default for server.jdbc.driver (Derby), null otherwise.
      - Validation query used by JDBC connection pool to validate new DB connections.  mysql, postgres, and microsoft sql server can use "select 1".  oracle can use "select 1 from dual".
    * - server.jdbc.max.active.connections
      - 100
@@ -213,10 +213,10 @@ A full list of available configuration settings and their default values are giv
      - Interval, in seconds, various runs are scheduled on the server.
    * - server.ids.start.num
      - 1
-     - Along with ``loom.ids.increment.by``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The ID generation in a datacenter will start from this number. Each datacenter will need to have a different start number so that the IDs do not overlap. All Loom Servers in a datacenter should share the same value of ``loom.ids.start.num``.
+     - Along with ``server.ids.increment.by``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The ID generation in a datacenter will start from this number. Each datacenter will need to have a different start number so that the IDs do not overlap. All Loom Servers in a datacenter should share the same value of ``server.ids.start.num``.
    * - server.ids.increment.by
      - 1
-     - Along with ``loom.ids.start.num``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The IDs will increment by this number in a datacenter. All datacenters have to share the same value of ``loom.ids.increment.by`` to prevent overlapping of IDs. This number has to be large enough to enable future datacenter expansion.
+     - Along with ``server.ids.start.num``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The IDs will increment by this number in a datacenter. All datacenters have to share the same value of ``server.ids.increment.by`` to prevent overlapping of IDs. This number has to be large enough to enable future datacenter expansion.
    * - server.callback.class 
      - com.continuuity.loom.scheduler.callback.HttpPostClusterCallback
      - Class to use for executing cluster callbacks.
