@@ -45,7 +45,7 @@ public final class LoomTaskHandler extends AbstractHttpHandler {
   private TaskQueueService taskQueueService;
 
   @Inject
-  public LoomTaskHandler(TaskQueueService taskQueueService) {
+  private LoomTaskHandler(TaskQueueService taskQueueService) {
     this.taskQueueService = taskQueueService;
   }
 

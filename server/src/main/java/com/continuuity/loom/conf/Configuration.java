@@ -17,6 +17,7 @@ package com.continuuity.loom.conf;
 
 import com.continuuity.loom.common.utils.ReflectionUtils;
 import com.continuuity.loom.common.utils.StringUtils;
+import com.google.common.base.Preconditions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonFactory;
@@ -286,7 +287,7 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
    *         the <code>name</code> or the <code>name</code> itself.
    */
   private String[] handleDeprecation(String name) {
-    ArrayList<String > names = new ArrayList<String>();
+    ArrayList<String> names = new ArrayList<String>();
     if (isDeprecated(name)) {
       DeprecatedKeyInfo keyInfo = deprecatedKeyMap.get(name);
       warnOnceIfDeprecated(name);
@@ -365,6 +366,19 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
     }
     this.classLoader = other.classLoader;
     setQuietMode(other.getQuietMode());
+  }
+
+  /**
+   * Creates an instance of configuration with default and site values.
+   *
+   * @return an instance of Configuration.
+   */
+  public static Configuration create() {
+    // Create a new configuration instance
+    Configuration conf = new Configuration();
+    conf.addResource("loom-default.xml");
+    conf.addResource("loom-site.xml");
+    return conf;
   }
 
   /**
@@ -581,7 +595,7 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
   }
 
   private synchronized Properties getOverlay() {
-    if (overlay == null){
+    if (overlay == null) {
       overlay = new Properties();
     }
     return overlay;
@@ -606,6 +620,25 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
       result = substituteVars(getProps().getProperty(n, defaultValue));
     }
     return result;
+  }
+
+  /**
+   * Get the value of the {@code name} configuration property as an {@code int}.  If the property is missing
+   * from the configuration or is not a valid {@code int}, then an exception is thrown.
+   *
+   * @param name the configuration property name
+   * @throws NumberFormatException if the configured value is not a valid {@code int}
+   * @throws NullPointerException if the configuration property is not present in the loaded config
+   * @return the configuration property value as an {@code int}
+   */
+  public int getInt(String name) {
+    String valueString = getTrimmed(name);
+    Preconditions.checkNotNull(valueString);
+    String hexString = getHexDigits(valueString);
+    if (hexString != null) {
+      return Integer.parseInt(hexString, 16);
+    }
+    return Integer.parseInt(valueString);
   }
 
   /**
@@ -643,6 +676,24 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
     set(name, Integer.toString(value));
   }
 
+  /**
+   * Get the value of the {@code name} configuration property as a {@code long}.  If the config property does
+   * does not exist or is not a valid {@code long}, then an exception is thrown.
+   *
+   * @param name the configuration property name
+   * @throws NumberFormatException if the configured value is not a valid {@code long}
+   * @throws NullPointerException if the configuration property is not present in the loaded config
+   * @return the configuration property value as a {@code long}
+   */
+  public long getLong(String name) {
+    String valueString = getTrimmed(name);
+    Preconditions.checkNotNull(valueString);
+    String hexString = getHexDigits(valueString);
+    if (hexString != null) {
+      return Long.parseLong(hexString, 16);
+    }
+    return Long.parseLong(valueString);
+  }
 
   /**
    * Get the value of the <code>name</code> property as a <code>long</code>.
@@ -666,6 +717,24 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
       return Long.parseLong(hexString, 16);
     }
     return Long.parseLong(valueString);
+  }
+
+  /**
+   * Get the value of the <code>name</code> property as a <code>long</code> or
+   * human readable format. If no such property exists or if the specified value is not a valid
+   * <code>long</code> or human readable format, then an error is thrown. You
+   * can use the following suffix (case insensitive): k(kilo), m(mega), g(giga),
+   * t(tera), p(peta), e(exa)
+   *
+   * @param name property name.
+   * @throws NumberFormatException when the value is invalid
+   * @throws NullPointerException if the configuration property does not exist
+   * @return property value as a <code>long</code>
+   */
+  public long getLongBytes(String name) {
+    String valueString = getTrimmed(name);
+    Preconditions.checkNotNull(valueString);
+    return StringUtils.TraditionalBinaryPrefix.string2long(valueString);
   }
 
   /**
@@ -720,6 +789,22 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
 
   /**
    * Get the value of the <code>name</code> property as a <code>float</code>.
+   * If no such property exists or if the specified value is not a valid <code>float</code>,
+   * then an error is thrown.
+   *
+   * @param name property name.
+   * @throws NumberFormatException when the value is invalid
+   * @throws NullPointerException if the configuration property does not exist
+   * @return property value as a <code>float</code>
+   */
+  public float getFloat(String name) {
+    String valueString = getTrimmed(name);
+    Preconditions.checkNotNull(valueString);
+    return Float.parseFloat(valueString);
+  }
+
+  /**
+   * Get the value of the <code>name</code> property as a <code>float</code>.
    * If no such property exists, the provided default value is returned,
    * or if the specified value is not a valid <code>float</code>,
    * then an error is thrown.
@@ -745,6 +830,31 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
    */
   public void setFloat(String name, float value) {
     set(name, Float.toString(value));
+  }
+
+  /**
+   * Get the value of the <code>name</code> property as a <code>boolean</code>.
+   * If no such property is specified, or if the specified value is not a valid
+   * <code>boolean</code>, then an exception is thrown.
+   *
+   * @param name property name.
+   * @throws NullPointerException if the configuration property does not exist
+   * @throws IllegalArgumentException if the configured value is not a valid {@code boolean}
+   * @return property value as a <code>boolean</code>
+   */
+  public boolean getBoolean(String name) {
+    String valueString = getTrimmed(name);
+    Preconditions.checkNotNull(valueString);
+
+    valueString = valueString.toLowerCase();
+
+    if ("true".equals(valueString)) {
+      return true;
+    } else if ("false".equals(valueString)) {
+      return false;
+    }
+    throw new IllegalArgumentException("Configured property is not a valid boolean: name="
+                                         + name + ", value=" + valueString);
   }
 
   /**
@@ -806,6 +916,19 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
   /**
    * Return value matching this enumerated type.
    * @param name Property name
+   * @throws NullPointerException if the configuration property does not exist
+   * @throws IllegalArgumentException If mapping is illegal for the type
+   * provided
+   */
+  public <T extends Enum<T>> T getEnum(String name, Class<T> declaringClass) {
+    final String val = get(name);
+    Preconditions.checkNotNull(val);
+    return Enum.valueOf(declaringClass, val);
+  }
+
+  /**
+   * Return value matching this enumerated type.
+   * @param name Property name
    * @param defaultValue Value returned if no mapping exists
    * @throws IllegalArgumentException If mapping is illegal for the type
    * provided
@@ -815,6 +938,22 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
     return null == val
       ? defaultValue
       : Enum.valueOf(defaultValue.getDeclaringClass(), val);
+  }
+
+  /**
+   * Get the value of the <code>name</code> property as a <code>Pattern</code>.
+   * If no such property is specified, or if the specified value is not a valid
+   * <code>Pattern</code>, then an exception is thrown.
+   *
+   * @param name property name
+   * @throws NullPointerException if the configuration property does not exist
+   * @throws PatternSyntaxException if the configured value is not a valid {@code Pattern}
+   * @return property value as a compiled Pattern
+   */
+  public Pattern getPattern(String name) {
+    String valString = get(name);
+    Preconditions.checkNotNull(valString);
+    return Pattern.compile(valString);
   }
 
   /**
@@ -863,7 +1002,7 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
    * bound may be omitted meaning all values up to or over. So the string
    * above means 2, 3, 5, and 7, 8, 9, ...
    */
-  public static class IntegerRanges implements Iterable<Integer>{
+  public static class IntegerRanges implements Iterable<Integer> {
     private static class Range {
       int start;
       int end;
@@ -886,7 +1025,7 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
       public boolean hasNext() {
         if (at <= end) {
           return true;
-        } else if (internal != null){
+        } else if (internal != null) {
           return internal.hasNext();
         }
         return false;
@@ -897,7 +1036,7 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
         if (at <= end) {
           at++;
           return at - 1;
-        } else if (internal != null){
+        } else if (internal != null) {
           Range found = internal.next();
           if (found != null) {
             at = found.start;
@@ -1001,6 +1140,18 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
       return new RangeNumberIterator(ranges);
     }
 
+  }
+
+  /**
+   * Parse the given attribute as a set of integer ranges.
+   * @param name the attribute name
+   * @throws NullPointerException if the configuration property does not exist
+   * @return a new set of ranges from the configured value
+   */
+  public IntegerRanges getRange(String name) {
+    String valueString = get(name);
+    Preconditions.checkNotNull(valueString);
+    return new IntegerRanges(valueString);
   }
 
   /**
@@ -1772,7 +1923,7 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
    * A unique class which is used as a sentinel value in the caching
    * for getClassByName. {@see Configuration#getClassByNameOrNull(String)}
    */
-  private abstract static class NegativeCacheSentinel {}
+  private abstract static class NegativeCacheSentinel { }
 
   private class ConfigurationIterator implements Iterator<Map.Entry<String, String>> {
     private String currentName;
