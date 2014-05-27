@@ -6,6 +6,7 @@ Unreleased
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 )
 - Sensu monitoring support ( Issues: #167 )
+- Configuration settings renamed ( Issues: #213 )
 
 v0.9.7 (May 27, 2014)
 ---------------------
