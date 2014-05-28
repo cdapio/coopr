@@ -16,10 +16,10 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +36,10 @@ public class NodeService {
   private final int maxLogLength;
 
   @Inject
-  public NodeService(ClusterStore clusterStore,
-                     @Named(Constants.MAX_PER_NODE_NUM_ACTIONS) int maxActions,
-                     @Named(Constants.MAX_PER_NODE_LOG_LENGTH) int maxLogLength) {
+  private NodeService(ClusterStore clusterStore, Configuration conf) {
     this.clusterStore = clusterStore;
-    this.maxActions = maxActions;
-    this.maxLogLength = maxLogLength;
+    this.maxActions = conf.getInt(Constants.MAX_PER_NODE_NUM_ACTIONS);
+    this.maxLogLength = conf.getInt(Constants.MAX_PER_NODE_LOG_LENGTH);
   }
 
   /**

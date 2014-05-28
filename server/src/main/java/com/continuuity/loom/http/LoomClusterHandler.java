@@ -22,6 +22,7 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
+import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.layout.InvalidClusterException;
@@ -85,17 +86,17 @@ public class LoomClusterHandler extends LoomAuthHandler {
   private final LoomStats loomStats;
 
   @Inject
-  public LoomClusterHandler(ClusterStore store, @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
-                            @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
-                            ClusterService clusterService, @Named(Constants.MAX_CLUSTER_SIZE) int maxClusterSize,
-                            LoomStats loomStats) {
+  private LoomClusterHandler(ClusterStore store, @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
+                             @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
+                             ClusterService clusterService, Configuration conf,
+                             LoomStats loomStats) {
     this.store = store;
     this.jobQueue = jobQueue;
     this.codec = new JsonSerde();
     this.solverQueue = solverQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.clusterService = clusterService;
-    this.maxClusterSize = maxClusterSize;
+    this.maxClusterSize = conf.getInt(Constants.MAX_CLUSTER_SIZE);
     this.loomStats = loomStats;
   }
 

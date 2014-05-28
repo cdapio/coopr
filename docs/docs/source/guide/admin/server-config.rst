@@ -50,37 +50,37 @@ pooling.  The query will change based on which database you are using.
   <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
   <configuration>
     <property>
-      <name>loom.host</name>
+      <name>server.host</name>
       <value>127.0.0.1</value>
       <description>Specifies the hostname/IP address for the server to bind to</description>
     </property>
     <property>
-      <name>zookeeper.quorum</name>
+      <name>server.zookeeper.quorum</name>
       <value>127.0.0.1:2181</value>
       <description>Specifies the zookeeper host:port</description>
     </property>
     <property>
-      <name>loom.jdbc.driver</name>
+      <name>server.jdbc.driver</name>
       <value>com.mysql.jdbc.Driver</value>
       <description>Specifies DB driver</description>
     </property>
     <property>
-      <name>loom.jdbc.connection.string</name>
+      <name>server.jdbc.connection.string</name>
       <value>jdbc:mysql://127.0.0.1:3306/loom?useLegacyDatetimeCode=false</value>
       <description>Specifies DB connection string</description>
     </property>
     <property>
-      <name>loom.db.user</name>
+      <name>server.db.user</name>
       <value>loom</value>
       <description>DB user</description>
     </property>
     <property>
-      <name>loom.db.password</name>
+      <name>server.db.password</name>
       <value>loomers</value>
       <description>DB user password</description>
     </property>
     <property>
-      <name>loom.jdbc.validation.query</name>
+      <name>server.jdbc.validation.query</name>
       <value>SELECT 1</value>
       <description>query used with connection pools to validate a jdbc connection taken from a pool</description>
     </property>
@@ -105,22 +105,22 @@ separated list of operations in the configuration. An example of configuration s
   <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
   <configuration>
     <property>
-      <name>loom.callback.http.start.url</name>
+      <name>server.callback.http.start.url</name>
       <value>http://host:port/start/path</value>
       <description>URL to send POST request to at the start of a cluster operation</description>
     </property>
     <property>
-      <name>loom.callback.http.start.triggers</name>
+      <name>server.callback.http.start.triggers</name>
       <value>cluster_create,restart_services,stop_services,cluster_configure_with_restart</value>
       <description>comma separated list of cluster operations that will trigger the HTTP POST call</description>
     </property>
     <property>
-      <name>loom.callback.http.failure.url</name>
+      <name>server.callback.http.failure.url</name>
       <value>http://host:port/failure/path</value>
       <description>URL to send POST request to if a cluster operation fails</description>
     </property>
     <property>
-      <name>loom.callback.http.failure.triggers</name>
+      <name>server.callback.http.failure.triggers</name>
       <value>cluster_create</value>
       <description>comma separated list of cluster operations that will trigger the HTTP POST call</description>
     </property>
@@ -145,102 +145,102 @@ A full list of available configuration settings and their default values are giv
    * - Config setting
      - Default
      - Description
-   * - zookeeper.quorum
+   * - server.zookeeper.quorum
      - A local value determined by an in-memory Zookeeper.
      - Zookeeper quorum for the server.
-   * - zookeeper.namespace
+   * - server.zookeeper.namespace
      - "/loom"
      - Namespace to use in Zookeeper
-   * - zookeeper.session.timeout.millis
+   * - server.zookeeper.session.timeout.millis
      - 40000
      - Zookeeper session timeout value in milliseconds.
-   * - loom.port
+   * - server.port
      - 55054
      - Port for the server.
-   * - loom.host
+   * - server.host
      - "localhost"
      - Hostname/IP address for the server to bind to.
-   * - loom.jdbc.driver
+   * - server.jdbc.driver
      - org.apache.derby.jdbc.EmbeddedDriver
      - JDBC driver to use for database operations.
-   * - loom.jdbc.connection.string
+   * - server.jdbc.connection.string
      - "jdbc:derby:/var/loom/data/db/loom;create=true"
      - JDBC connection string to user for database operations.
-   * - loom.jdbc.validation.query
-     - "VALUES 1" when using default for loom.jdbc.driver (Derby), null otherwise.
+   * - server.jdbc.validation.query
+     - "VALUES 1" when using default for server.jdbc.driver (Derby), null otherwise.
      - Validation query used by JDBC connection pool to validate new DB connections.  mysql, postgres, and microsoft sql server can use "select 1".  oracle can use "select 1 from dual".
-   * - loom.jdbc.max.active.connections
+   * - server.jdbc.max.active.connections
      - 100
      - Maximum active JDBC connections.
-   * - loom.db.user
+   * - server.db.user
      - "loom"
      - Database user.
-   * - loom.db.password
+   * - server.db.password
      - null
      - Database password.
-   * - loom.solver.num.threads
+   * - server.solver.num.threads
      - 20
      - Number of threads used for solving cluster layout.
-   * - loom.local.data.dir
+   * - server.local.data.dir
      - "/var/loom/data"
      - Local data directory that default in-memory Zookeeper and embedded Derby will use.
-   * - loom.task.timeout.seconds
+   * - server.task.timeout.seconds
      - 1800
      - Number of seconds the server will wait before timing out a provisioner task and marking it as failed.
-   * - loom.cluster.cleanup.seconds
+   * - server.cluster.cleanup.seconds
      - 180
      - Interval, in seconds, between server housekeeping runs. Housekeeping includes timing out tasks, expiring clusters, etc.
-   * - loom.netty.exec.num.threads
+   * - server.netty.exec.num.threads
      - 50
      - Number of execution threads for the server.
-   * - loom.netty.worker.num.threads
+   * - server.netty.worker.num.threads
      - 20
      - Number of worker threads for the server.
-   * - loom.node.max.log.length
+   * - server.node.max.log.length
      - 2048
      - Maximum log size in bytes for capturing stdout and stderr for actions performed on cluster nodes. Logs longer than set limit will be trimmed from the head of the file.
-   * - loom.node.max.num.actions
+   * - server.node.max.num.actions
      - 200
      - Maximum number of actions saved for a node. Oldest action will be removed when actions exceeding this limit are performed on a node.
-   * - loom.max.cluster.size
+   * - server.max.cluster.size
      - 10000
      - Maximum number of nodes that a given cluster can be created with.
-   * - loom.max.action.retries
+   * - server.max.action.retries
      - 3
      - Maximum number of times a task gets retried when it fails.
-   * - scheduler.run.interval.seconds
+   * - server.scheduler.run.interval.seconds
      - 1
      - Interval, in seconds, various runs are scheduled on the server.
-   * - loom.ids.start.num
+   * - server.ids.start.num
      - 1
-     - Along with ``loom.ids.increment.by``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The ID generation in a datacenter will start from this number. Each datacenter will need to have a different start number so that the IDs do not overlap. All Loom Servers in a datacenter should share the same value of ``loom.ids.start.num``.
-   * - loom.ids.increment.by
+     - Along with ``server.ids.increment.by``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The ID generation in a datacenter will start from this number. Each datacenter will need to have a different start number so that the IDs do not overlap. All Loom Servers in a datacenter should share the same value of ``server.ids.start.num``.
+   * - server.ids.increment.by
      - 1
-     - Along with ``loom.ids.start.num``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The IDs will increment by this number in a datacenter. All datacenters have to share the same value of ``loom.ids.increment.by`` to prevent overlapping of IDs. This number has to be large enough to enable future datacenter expansion.
-   * - loom.callback.class 
+     - Along with ``server.ids.start.num``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The IDs will increment by this number in a datacenter. All datacenters have to share the same value of ``server.ids.increment.by`` to prevent overlapping of IDs. This number has to be large enough to enable future datacenter expansion.
+   * - server.callback.class 
      - com.continuuity.loom.scheduler.callback.HttpPostClusterCallback
      - Class to use for executing cluster callbacks.
-   * - loom.callback.http.start.url
+   * - server.callback.http.start.url
      - none
      - If HttpPostClusterCallback is in use, url to send cluster and job information to before cluster operations start. Leave unset if no request should be sent.
-   * - loom.callback.http.success.url 
+   * - server.callback.http.success.url 
      - none
      - If HttpPostClusterCallback is in use, url to send cluster and job information to after cluster operations complete successfully. Leave unset if no request should be sent.
-   * - loom.callback.http.failure.url 
+   * - server.callback.http.failure.url 
      - none
      - If HttpPostClusterCallback is in use, url to send cluster and job information to after cluster operations fail. Leave unset if no request should be sent.
-   * - loom.callback.http.start.triggers
+   * - server.callback.http.start.triggers
      - all operations
      - comma separated list of cluster operations that should trigger an HTTP POST request to be sent before start of the operation. 
-   * - loom.callback.http.success.triggers
+   * - server.callback.http.success.triggers
      - all operations
      - comma separated list of cluster operations that should trigger an HTTP POST request to be sent after the operation completes successfully. 
-   * - loom.callback.http.failure.triggers
+   * - server.callback.http.failure.triggers
      - all operations
      - comma separated list of cluster operations that should trigger an HTTP POST request to be sent after the operation fails. 
-   * - loom.callback.http.socket.timeout 
+   * - server.callback.http.socket.timeout 
      - 10000
      - socket timeout in milliseconds for http callbacks. 
-   * - loom.callback.http.max.connections
+   * - server.callback.http.max.connections
      - 100
      - max number of concurrent http connections for callbacks. If the max is reached, the next callback to try and send a request blocks until an open connection frees up.

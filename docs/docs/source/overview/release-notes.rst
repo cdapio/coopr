@@ -23,47 +23,51 @@ Release Notes
 =============
 .. _release-notes:
 
-Welcome to Continuuity Loom |release| Release. In today's release, we have updated Loom Server, Loom Provisioners, and Loom UI. Continuuity Loom overall has new and improved functionality and ton of bug fixes.
+Welcome to Continuuity Loom |release| release. Release notes with links to issue details can be seen from the github project at https://github.com/continuuity/loom/releases.
 
-We hope you enjoy this release.  If you encounter any issues, please don't hesitate to post on our `Continuuity support portal
-<https://continuuity.uservoice.com/clients/widgets/classic_widget?mode=support&link_color=162e52&primary_color=42afcf&embed
-_type=lightbox&trigger_method=custom_trigger&contact_enabled=true&feedback_enabled=false&smartvote=true&referrer=http%3A%2F%2Fcontinuuity.com%2F#contact_us>`_.
+Release Theme : Extensibility 
+--------------------------------
 
-More information about this and previous releases can be found at on the github project `here <https://github.com/continuuity/loom/releases>`_.
+Release Highlights
+------------------
+  * Plugin registration to support surfacing of plugin-defined fields for configuring providers and automators
+  * Finer grained dependencies for service life-cycle hooks. This allows specifying install time, runtime, and optional dependencies. E.g. You may want some service X to be installed before service Y, or start service X after service Y but only if service Y is installed on the cluster
+  * Life-cycle callbacks for clusters for integrating with enterprise assets (e.g. Metering, Monitoring, ...)
+  * Ability to add additional configured services to an existing live cluster. (e.g. Create a Hadoop cluster with only HDFS and MapReduce and then later installing HBase on the cluster)
+  * Support for starting, stopping and restarting services 
+  * Personalizable UI skins
+  * More out-of-box cookbooks
 
-Fixed Issues
-^^^^^^^^^^^^^
-• Unbounded job list stored in cluster object 
-• Provisioner bootstrapping performing unnecessary work 
-• Various cookbook improvements, updates, and fixes.
+    * Apache Hive(tm) support for clusters
+    * Enable a secure cluster with support for Kerberos
 
-New Features
-^^^^^^^^^^^^^
-• UI Skin updated and selectable 
-• Add a compatible service to an active cluster 
-• Start, stop, and restart services on an active cluster 
-• Reconfigure services on an active cluster 
-• Plugin authors can specify what fields their plugin needs from the admin and user 
-• Users able to provide provider related information at cluster create time 
-• Extended cookbook support for Hadoop clusters with Kerberos and Hive 
-• Customizable callbacks on start, success, and failure of cluster operations 
-• Expanded service dependency capabilities 
+  * Lot of bug fixes
+  * Lot of testing
 
-Released Versions
-^^^^^^^^^^^^^^^^^
-• |release|
-• 0.9.6 Beta
-• 0.9.5 Beta
-• 0.5.0 Alpha
-• 0.1.0  
+Change List
+-----------
+  * Finer Grained Dependencies ( Issues: #1 #70 #87 #96 #149 )
+  * Plugin Registry ( Issues: #5 #102 #111 #117 )
+  * Updated UI with skins support ( Issues: #9 #10 #160 #188 )
+  * Updated Rackspace support ( Issues: #38 #54 #88 #194 )
+  * Updated Joyent support ( Issues: #39 #54 ) 
+  * Cluster reconfiguration support ( Issues: #55 #64 ) 
+  * Hive Support ( Issues: #63 #86 #91 #92 #103 #108 #134 #146 #157 #190 )
+  * Add services to existing cluster ( Issues: #65 #66 #69 #78 #79 #83 )
+  * Start/Stop/Restart services ( Issues: #71 #79 )
+  * Prevent database column overflow ( Issues: #81 )
+  * Lifecycle callback hooks ( Issues: #93 )
+  * Kerberos client and server support ( Issues: #94 #99 )
+  * Secure Hadoop cluster support ( Issues: #95 #97 #99 #110 #144 #150 )
+  * Update /etc/hosts support for DNS Suffix ( Issues: #107 )
+  * Heartbleed OpenSSL security fix for Rackspace/Joyent images ( Issues: #114 #118 )
+  * Rename Chef Automator to Chef Solo Automator ( Issues: #124 )
+  * Solver performance improvements ( Issues: #147 )
+  * Remove redundant example directory ( Issues: #148 )
+  * Add service list to node properties ( Issues: #172 #177 )
+  * Upgrade script ( Issues: #195 )
 
-Known Issues
-^^^^^^^^^^^^
-• Minimal authentication 
-• Key files must be stored in plugin 
-• Provisioner does not enforce timeouts 
-
-Licenses
-^^^^^^^^
-This section specifies all the components and their respective :doc:`licenses <licenses>` that are used in Loom Server, Loom UI and Loom Provisioner
+Upgrade procedure from Release 0.9.6 to 0.9.7
+---------------------------------------------
+This release changes the services JSON format. In order to upgrade from 0.9.6 to 0.9.7 please following the procedure defined :doc:`here </overview/upgrade-guide>`.
 

@@ -69,11 +69,13 @@ public class BaseClusterStoreTest {
 
   @Test
   public void testIds() throws InterruptedException, SQLException, ClassNotFoundException {
-    Configuration conf = new Configuration();
+    Configuration conf = Configuration.create();
     conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+    conf.setLong(Constants.ID_START_NUM, 3);
+    conf.setLong(Constants.ID_INCREMENT_BY, 10);
     DBConnectionPool dbConnectionPool = new DBConnectionPool(conf);
-    final SQLClusterStore store = new SQLClusterStore(zkClient, dbConnectionPool, 3, 10);
+    final SQLClusterStore store = new SQLClusterStore(zkClient, dbConnectionPool, conf);
     store.initialize();
     store.initDerbyDB();
     store.clearData();

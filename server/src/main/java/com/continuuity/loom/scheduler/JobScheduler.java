@@ -21,6 +21,7 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
+import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.macro.Expander;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -69,14 +70,14 @@ public class JobScheduler implements Runnable {
   @Inject
   private JobScheduler(ClusterStore clusterStore, @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
                        JsonSerde jsonSerde, @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
-                       TaskService taskService, @Named(Constants.MAX_ACTION_RETRIES) int maxTaskRetries) {
+                       TaskService taskService, Configuration conf) {
     this.clusterStore = clusterStore;
     this.provisionerQueue = provisionerQueue;
     this.jsonSerde = jsonSerde;
     this.jobQueue = jobQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.taskService = taskService;
-    this.maxTaskRetries = maxTaskRetries;
+    this.maxTaskRetries = conf.getInt(Constants.MAX_ACTION_RETRIES);
   }
 
   @Override

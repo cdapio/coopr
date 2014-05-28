@@ -20,6 +20,7 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.AddServicesRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
@@ -64,11 +65,11 @@ public class SolverScheduler implements Runnable {
   private final LoomStats loomStats;
 
   @Inject
-  SolverScheduler(@Named("scheduler.id") String id, Solver solver, ClusterStore clusterStore,
-                  @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
-                  @Named(Constants.Queue.CLUSTER) TrackingQueue clusterQueue,
-                  @Named("solver.executor.service") ListeningExecutorService executorService,
-                  TaskService taskService, LoomStats loomStats) {
+  private SolverScheduler(@Named("scheduler.id") String id, Solver solver, ClusterStore clusterStore,
+                          @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
+                          @Named(Constants.Queue.CLUSTER) TrackingQueue clusterQueue,
+                          @Named("solver.executor.service") ListeningExecutorService executorService,
+                          TaskService taskService, LoomStats loomStats) {
     this.id = id;
     this.solver = solver;
     this.clusterStore = clusterStore;

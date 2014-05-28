@@ -16,21 +16,21 @@
 package com.continuuity.loom;
 
 import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.scheduler.callback.ClusterCallback;
-import com.continuuity.loom.scheduler.callback.MockClusterCallback;
-import com.continuuity.loom.store.EntityStore;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.guice.LoomModules;
+import com.continuuity.loom.scheduler.callback.ClusterCallback;
+import com.continuuity.loom.scheduler.callback.MockClusterCallback;
 import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.EntityStore;
 import com.continuuity.loom.store.SQLClusterStore;
+import com.google.common.base.Throwables;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.ZKClientService;
-import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -65,7 +65,7 @@ public class BaseTest {
     zkClientService = ZKClientService.Builder.of(zkServer.getConnectionStr()).build();
     zkClientService.startAndWait();
 
-    conf = new Configuration();
+    conf = Configuration.create();
     conf.set(Constants.PORT, "0");
     conf.set(Constants.HOST, HOSTNAME);
     conf.set(Constants.SCHEDULER_INTERVAL_SECS, "1");

@@ -36,6 +36,7 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.CallbackScheduler;
@@ -944,8 +945,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testMaxClusterSize() throws Exception {
+    Configuration conf = Configuration.create();
+    int maxClusterSize = conf.getInt(Constants.MAX_CLUSTER_SIZE);
     ClusterCreateRequest clusterCreateRequest =
-      createClusterRequest("cluster", "desc", smallTemplate.getName(), Constants.DEFAULT_MAX_CLUSTER_SIZE + 1);
+      createClusterRequest("cluster", "desc", smallTemplate.getName(), maxClusterSize + 1);
     assertResponseStatus(doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }

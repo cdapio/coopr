@@ -44,10 +44,10 @@ public class TaskQueueService {
   private final LoomStats loomStats;
 
   @Inject
-  public TaskQueueService(@Named(Constants.Queue.PROVISIONER) TrackingQueue taskQueue,
-                          @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
-                          ClusterStore clusterStore, TaskService taskService, NodeService nodeService,
-                          LoomStats loomStats) {
+  private TaskQueueService(@Named(Constants.Queue.PROVISIONER) TrackingQueue taskQueue,
+                           @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
+                           ClusterStore clusterStore, TaskService taskService, NodeService nodeService,
+                           LoomStats loomStats) {
     this.taskQueue = taskQueue;
     this.clusterStore = clusterStore;
     this.jobQueue = jobQueue;

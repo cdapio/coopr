@@ -33,7 +33,7 @@ public class SQLEntityStoreTest extends EntityStoreTest {
 
   @BeforeClass
   public static void beforeClass() throws SQLException, ClassNotFoundException {
-    Configuration sqlConf = new Configuration();
+    Configuration sqlConf = Configuration.create();
     sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
     DBConnectionPool dbConnectionPool = new DBConnectionPool(sqlConf);
