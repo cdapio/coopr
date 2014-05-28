@@ -1,9 +1,18 @@
 {
   "name": "hadoop-hdfs-namenode",
   "description": "Hadoop HDFS NameNode",
-  "dependson": [
-    "base"
-  ],
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [ "base" ],
+      "uses": [ "kerberos-client" ]
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [],
+      "uses": [ "kerberos-master" ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

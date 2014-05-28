@@ -70,9 +70,9 @@ public class Global {
   }
   public static OS detectOs() {
     String osVersion = System.getProperty("os.name").toLowerCase();
-    if (osVersion.indexOf("mac") >= 0) {
+    if (osVersion.contains("mac")) {
       return OS.MAC_OS;
-    } else if (osVersion.indexOf("nux") >= 0) {
+    } else if (osVersion.contains("nux")) {
       return OS.LINUX;
     } else {
       System.err.println("Wrong os");

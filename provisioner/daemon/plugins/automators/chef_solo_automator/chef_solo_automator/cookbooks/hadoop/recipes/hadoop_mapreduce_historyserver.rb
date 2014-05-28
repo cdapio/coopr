@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: hadoop_mapreduce_historyserver
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ package 'hadoop-mapreduce-historyserver' do
 end
 
 service 'hadoop-mapreduce-historyserver' do
+  status_command 'service hadoop-mapreduce-historyserver status'
   supports [:restart => true, :reload => false, :status => true]
   action :nothing
 end

@@ -67,7 +67,6 @@
             "services": [
                 "base",
                 "hadoop-hdfs-namenode",
-                "hadoop-hdfs-secondarynamenode",
                 "hadoop-hdfs-datanode",
                 "hadoop-yarn-resourcemanager",
                 "hadoop-yarn-nodemanager",

@@ -2,6 +2,8 @@
 
 <% unless @filehandle_limit.nil? -%>
 <%= @ulimit_user -%> - nofile <%= @filehandle_limit %>
+<% else -%><% unless @filehandle_soft_limit.nil? -%><%= @ulimit_user -%> soft nofile <%= @filehandle_soft_limit %><% end -%>
+<% unless @filehandle_hard_limit.nil? -%><%= @ulimit_user -%> hard nofile <%= @filehandle_hard_limit %><% end -%>
 <% end -%>
 
 <% unless @process_limit.nil? -%>
@@ -12,3 +14,6 @@
 <%= @ulimit_user -%> - memlock <%= @memory_limit %>
 <% end -%>
 
+<% unless @core_limit.nil? -%>
+<%= @ulimit_user -%> - core <%= @core_limit %>
+<% end -%>

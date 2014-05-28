@@ -218,11 +218,11 @@
                         </select>
                       </div>
                     </div>
-                    <div class="form-group" ng-repeat="(field, fieldData) in automatorData[action.type].parameters.admin.fields">
+                    <div class="form-group automator-field" ng-repeat="(field, fieldData) in automatorData[action.type].parameters.admin.fields">
                       <label for="inputScript" class="col-sm-2 control-label">[[fieldData.label]]</label>
                       <div class="col-sm-8">
-                        <input class="form-control" type="[[fieldData.type]]" ng-model="action.fields[field]" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'text' || fieldData.type == 'password'" />
-                        <select class="form-control" type="[[fieldData.type]]" ng-model="action.fields[field]" ng-options="region as region for region in fieldData.options" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'select'" >
+                        <input name="[[field]]" class="form-control" type="[[fieldData.type]]" ng-model="action.fields[field]" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'text' || fieldData.type == 'password'" />
+                        <select name="[[field]]" class="form-control" type="[[fieldData.type]]" ng-model="action.fields[field]" ng-options="region as region for region in fieldData.options" placeholder="[[fieldData.tip]]" ng-show="fieldData.type === 'select'" >
                           <option></option>
                         </select>
                       </div>

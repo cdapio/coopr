@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: hadoop_hdfs_secondarynamenode
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@ snn_dirs.each do |dirs|
 end
 
 service 'hadoop-hdfs-secondarynamenode' do
+  status_command 'service hadoop-hdfs-secondarynamenode status'
   supports [:restart => true, :reload => false, :status => true]
   action :nothing
 end

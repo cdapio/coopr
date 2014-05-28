@@ -28,8 +28,6 @@ import com.continuuity.test.pagetest.CreateClusterTest;
 import com.continuuity.test.pagetest.CreateClustertemplateTest;
 import com.continuuity.test.pagetest.CreateHardwaretypeTest;
 import com.continuuity.test.pagetest.CreateImagetypeTest;
-import com.continuuity.test.pagetest.CreateProviderTest;
-import com.continuuity.test.pagetest.CreateServiceTest;
 import com.continuuity.test.pagetest.HardwaretypesInstanceTest;
 import com.continuuity.test.pagetest.HardwaretypesTest;
 import com.continuuity.test.pagetest.ImagetypesInstanceTest;
@@ -51,11 +49,25 @@ import java.io.InputStreamReader;
  
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ClustersInstanceTest.class, ClustersTest.class, ClustertemplatesInstanceTest.class, ClustertemplatesTest.class,
-    CreateClustertemplateTest.class, CreateClusterTest.class, CreateHardwaretypeTest.class, CreateImagetypeTest.class,
-    CreateProviderTest.class, CreateServiceTest.class, HardwaretypesInstanceTest.class, HardwaretypesTest.class,
-    ImagetypesInstanceTest.class, ImagetypesTest.class, ProvidersInstanceTest.class, ProvidersTest.class,
-    ServicesInstanceTest.class, ServicesTest.class, CloseDriverTest.class
+    ClustersInstanceTest.class,
+    ClustersTest.class,
+    ClustertemplatesInstanceTest.class,
+    ClustertemplatesTest.class,
+    CreateClustertemplateTest.class,
+    CreateClusterTest.class,
+    CreateHardwaretypeTest.class,
+    CreateImagetypeTest.class,
+//  CreateProviderTest.class,
+//  CreateServiceTest.class,
+    HardwaretypesInstanceTest.class,
+    HardwaretypesTest.class,
+    ImagetypesInstanceTest.class,
+    ImagetypesTest.class,
+    ProvidersInstanceTest.class,
+    ProvidersTest.class,
+    ServicesInstanceTest.class,
+    ServicesTest.class,
+    CloseDriverTest.class
 })
 public class SuiteOrder {
 

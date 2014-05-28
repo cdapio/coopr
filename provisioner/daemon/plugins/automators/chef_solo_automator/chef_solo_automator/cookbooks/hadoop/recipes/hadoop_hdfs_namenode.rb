@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: hadoop_hdfs_namenode
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,13 +67,14 @@ if node['hadoop'].key?('hdfs_site') && node['hadoop']['hdfs_site'].key?('dfs.ha.
 end
 
 execute 'hdfs-namenode-format' do
-  command 'hdfs namenode -format'
+  command 'hdfs namenode -format -nonInteractive' + (node['hadoop']['force_format'] ? ' -force' : '')
   action :nothing
   group 'hdfs'
   user 'hdfs'
 end
 
 service 'hadoop-hdfs-namenode' do
+  status_command 'service hadoop-hdfs-namenode status'
   supports [:restart => true, :reload => false, :status => true]
   action :nothing
 end

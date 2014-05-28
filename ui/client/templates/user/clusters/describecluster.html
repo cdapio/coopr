@@ -27,8 +27,8 @@
                 <div class="pull-right">
                   <form role="form" method="POST" ng-submit="deleteCluster($event)" action = "[[ '/user/clusters/delete/' + cluster.id ]]" class="cluster-delete-form">
                     <input type="hidden" value="[[cluster.id]]" name="name" />
-                    <a href="/user/clusters/cluster/[[cluster.id]]/reconfigure" class="btn-spl btn-info" ng-show="cluster.status !== 'DELETED'" id="reconfigure-cluster-link">Reconfigure</a>
-                    <button type="submit" class="btn-spl btn-delete" ng-show="cluster.status !== 'DELETED'"></button>
+                    <a href="/user/clusters/cluster/[[cluster.id]]/reconfigure" class="btn-spl btn-info" ng-show="cluster.status !== 'DELETED' && status.data.status !== 'TERMINATED'" id="reconfigure-cluster-link">Reconfigure</a>
+                    <button type="submit" class="btn-spl btn-delete" ng-show="cluster.status !== 'DELETED' && status.data.status !== 'TERMINATED'"></button>
                   </form>
                 </div>
               </div>
@@ -92,7 +92,7 @@
                     <td>Template description</td>
                     <td>[[cluster.clusterTemplate.description]]</td>
                   </tr>
-                  <tr ng-if="cluster.expireTime !== 0">
+                  <tr ng-if="cluster.expireTime !== 0 && status.data.status !== 'TERMINATED'">
                     <td>Extend lease</td>
                     <td>
                       <table>
@@ -130,18 +130,18 @@
                             </div>
                           </div>
                           <div class="col-sm-6">
-                              <button type="button" class="btn-spl btn-success" ng-click="startService(service)"><span class="glyphicon glyphicon-play"></span></button>
-                              <button type="button" class="btn-spl btn-danger" ng-click="stopService(service)"><span class="glyphicon glyphicon-stop"></span></button>
-                              <button type="button" class="btn-spl btn-info" ng-click="restartService(service)"><span class="glyphicon glyphicon-repeat"></span></button>
+                              <button type="button" class="btn-empty btn-service-start" ng-click="startService(service)" ng-hide="status.data.status == 'TERMINATED'"></button>
+                              <button type="button" class="btn-empty btn-service-stop" ng-click="stopService(service)" ng-hide="status.data.status == 'TERMINATED'"></button>
+                              <button type="button" class="btn-empty btn-service-restart" ng-click="restartService(service)" ng-hide="status.data.status == 'TERMINATED'"></button>
                           </div>
                         </div>
                       </div>
                     </td>
                   </tr>
-                  <tr>
+                  <tr ng-hide="status.data.status == 'TERMINATED'">
                     <td>Add services</td>
                     <td>
-                      <div class="form-group">
+                      <div class="form-group" ng-show="remainingServices">
                         <div class="row">
                           <div class="col-sm-4">
                             <select class="form-control" ng-model="curRemainingService" ng-options="service for service in remainingServices"></select>
@@ -166,6 +166,9 @@
                           </div>
                         </div>
                       </div>
+                      <div class="form-group" ng-hide="remainingServices">
+                        No services available to add.
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -176,8 +179,29 @@
               <p ng-hide="checkIfEmpty(serviceSets)">No service sets.</p>
               <div ng-repeat="(name, nodes) in serviceSets" class="serviceset-entry">
                 <div class="service-holder">
-                  <div class="serviceset-name alert" ng-hide="serviceDisplayMapping[name]" ng-click="toggleNodes(name)"><span class="caret large left-float"></span>[[name]] ([[nodes.length]])</div>
-                  <div class="serviceset-name alert" ng-show="serviceDisplayMapping[name]" ng-click="toggleNodes(name)"><span class="open caret large left-float"></span>[[name]] ([[nodes.length]])</div>
+                  <div class="serviceset-name" ng-hide="serviceDisplayMapping[name]" ng-click="toggleNodes(name)">
+                    <div class="serviceset-nodes-showhide left-float">
+                      <img src="/static/img/v2-assets/icon_contract.png" />
+                    </div>
+                    <div class="services-number-holder inline-display">
+                      <span class="services-number">[[nodes.length]]</span>
+                    </div>
+                    <div class="service-name-container inline-display" ng-repeat="sname in name.split(',')">
+                      <div class="service-name-holder">[[sname]]</div>
+                    </div>
+                  </div>
+                  <div class="serviceset-name" ng-show="serviceDisplayMapping[name]" ng-click="toggleNodes(name)">
+                    <div class="serviceset-nodes-showhide left-float">
+                      <img src="/static/img/v2-assets/icon_expand.png" />
+                    </div>
+                    <div class="services-number-holder inline-display">
+                      <span class="services-number">[[nodes.length]]</span>
+                    </div>
+                    <div class="service-name-container inline-display" ng-repeat="sname in name.split(',')">
+                      <div class="service-name-holder">[[sname]]</div>
+                    </div>
+                  </div>
+
                   <table class="table table-striped tablesorter serviceset-node-table spl-panel-table" ng-show="serviceDisplayMapping[name]">
                     <thead>
                       <tr>

@@ -85,7 +85,7 @@ Enter the necessary fields and click on 'Save' to persist them.
 
 Joyent
 ^^^^^^
-Joyent request a username, api key name, an api key file, api url, and version. The key file must be present on all machines
+Joyent requires a region, key file, key name, user, and api version. The key file must be present on all machines
 running the Provisioner, must be owned by the user running Continuuity Loom, and must be readable only by the user that owns it
 (0400 permissions). 
 
@@ -103,7 +103,7 @@ OpenStack has been extensively tested on Havana, but it also supports Grizzly ou
 some limitations that are described :doc:`here </guide/installation/openstack-config>`.
 Several of these limitations will be eliminated in future releases of Continuuity Loom.
 The first step is to configure the openstack provider to use your credentials. 
-OpenStack requires a username, password, tenant, api url, ssh key id, and identity file. The identity file must be 
+OpenStack requires a key file, auth url, password, key name, tenant, and user. The key file must be 
 present on all machines running the Provisioner, must be owned by the user running Continuuity Loom, and must be readable only by
 the user that owns it (0400 permissions).
 
@@ -114,7 +114,7 @@ the user that owns it (0400 permissions).
     :figclass: align-center
 
 Next, we need to configure the default hardware types and image types to be able to use your instance of OpenStack. Navigate
-to the Hardware tab on the left and edit each hardware type in the list (small, medium, and large). You will notice that 
+to the Hardware tab on the top of the screen and edit each hardware type in the list (small, medium, and large). You will notice that 
 joyent and rackspace are already configured for each hardware type with their corresponding flavor. They are already 
 configured because their flavors are public and unchanging, whereas your OpenStack instance may use its own flavors. Click on the 
 'Add Provider' button, change the provider to openstack, and input your OpenStack's flavor identifier for the corresponding hardware 
@@ -126,7 +126,7 @@ type. You may need to contact your OpenStack administrator to get this informati
     :alt: Configuring an OpenStack hardware type
     :figclass: align-center
 
-Next, we need to configure the default image types to be able to use your instance of OpenStack. Navigate to the 
+Next, we need to configure the default image types. Navigate to the 
 Images tab of the left and edit each image type in the list (centos6 and ubuntu12). Click on the 'Add Provider' button,
 change the provider to openstack, and input your OpenStack's image identifier for the corresponding image type. You may need to 
 contact your OpenStack administrator to get this information.
@@ -141,8 +141,8 @@ contact your OpenStack administrator to get this information.
 Provisioning your First Cluster
 ===============================
 
-Click on the 'Clusters' icon on the sidebar to the left. For an administrator, this page lists all the clusters
-that have been provisioned across all Loom user accounts.
+Click on the 'Clusters' icon on the right most icon on the top bar. This page lists all the clusters
+that have been provisioned that are accessible to the logged in user.
 
 .. figure:: /guide/quickstart/quickstart-screenshot-3.png
     :align: center
@@ -150,12 +150,12 @@ that have been provisioned across all Loom user accounts.
     :alt: Creating a cluster
     :figclass: align-center
 
-Click on 'Create a cluster' on the top menu bar to enter the cluster creation page. In the 'Name' field,
+Click on the 'Create' buttom at the top right to enter the cluster creation page. In the 'Name' field,
 enter 'loom-quickstart-01' as the name of the cluster to create. The 'Template' field
 specifies which template in the catalog to use for this cluster. For this tutorial, let's
 create a distributed Hadoop and HBase cluster.
 
-Select 'hadoop-hbase-distributed' from the 'Template' drop down box. Enter the number of nodes you want your cluster
+Select 'hadoop-distributed' from the 'Template' drop down box. Enter the number of nodes you want your cluster
 to have (for example, 5) in the field labeled 'Number of machines'.
 
 Display the advanced settings menu by clicking on the small triangle next to the label 'Advanced'. This lists

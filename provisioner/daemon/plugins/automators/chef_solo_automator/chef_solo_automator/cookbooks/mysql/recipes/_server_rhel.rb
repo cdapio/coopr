@@ -76,7 +76,7 @@ template 'final-my.cnf' do
   owner 'root'
   group 'root'
   mode '0644'
-  notifies :reload, 'service[mysql]', :immediately
+  notifies :restart, 'service[mysql]', :immediately
 end
 
 service 'mysql' do

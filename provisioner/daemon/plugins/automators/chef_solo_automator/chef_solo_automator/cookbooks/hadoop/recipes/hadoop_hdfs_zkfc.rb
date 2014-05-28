@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: hadoop_hdfs_zkfc
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ package 'hadoop-hdfs-zkfc' do
 end
 
 service 'hadoop-hdfs-zkfc' do
+  status_command 'service hadoop-hdfs-zkfc status'
   supports [:restart => true, :reload => false, :status => true]
   action :nothing
 end

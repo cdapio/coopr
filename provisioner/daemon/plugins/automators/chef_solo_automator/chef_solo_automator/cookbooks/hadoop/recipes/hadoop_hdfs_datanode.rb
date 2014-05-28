@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: hadoop_hdfs_datanode
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ dfs_data_dirs.split(',').each do |dir|
 end
 
 service 'hadoop-hdfs-datanode' do
+  status_command 'service hadoop-hdfs-datanode status'
   supports [:restart => true, :reload => false, :status => true]
   action :nothing
 end

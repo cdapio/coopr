@@ -21,10 +21,9 @@ include_recipe 'hadoop_wrapper::default'
 include_recipe 'hadoop::hadoop_yarn_resourcemanager'
 
 dfs = node['hadoop']['core_site']['fs.defaultFS']
-
-ruby_block 'initaction-create-yarn-hdfs-tmpdir' do
+ruby_block 'initaction-create-hdfs-tmpdir' do
   block do
-    resources('execute[yarn-hdfs-tmpdir').run_action(:run)
+    resources('execute[hdfs-tmpdir]').run_action(:run)
   end
-  not_if "hdfs dfs -test -d #{dfs}/tmp", :user => 'hdfs'
+  not_if "hdfs dfs -ls #{dfs} | grep ' /tmp' | grep -e '^drwxrwxrwt'", :user => 'hdfs'
 end

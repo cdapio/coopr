@@ -13,6 +13,9 @@ Berksfile.lock
 Gemfile.lock
 .bundle/*
 
+# Coverage reports
+coverage
+
 .kitchen/
 .kitchen.local.yml
 

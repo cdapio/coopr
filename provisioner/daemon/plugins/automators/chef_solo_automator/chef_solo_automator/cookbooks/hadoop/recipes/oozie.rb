@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: oozie
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -103,6 +103,7 @@ if node['oozie'].key? 'oozie_site'
 end
 
 service 'oozie' do
+  status_command 'service oozie status'
   supports [:restart => true, :reload => false, :status => true]
   action :nothing
 end

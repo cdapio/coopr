@@ -142,6 +142,34 @@ public class SlottedCombinationIteratorTest {
     Assert.assertTrue(Arrays.equals(new int[]{1, 1}, iter.next()));
   }
 
+  @Test
+  public void testWrapAround() {
+    Iterator<int[]> iter = new SlottedCombinationIterator(6, 3, new int[]{1, 1, 1, 1, 1, 1});
+    List<int[]> expected = ImmutableList.of(
+      new int[]{1, 1, 1, 0, 0, 0},
+      new int[]{1, 1, 0, 1, 0, 0},
+      new int[]{1, 1, 0, 0, 1, 0},
+      new int[]{1, 1, 0, 0, 0, 1},
+      new int[]{1, 0, 1, 1, 0, 0},
+      new int[]{1, 0, 1, 0, 1, 0},
+      new int[]{1, 0, 1, 0, 0, 1},
+      new int[]{1, 0, 0, 1, 1, 0},
+      new int[]{1, 0, 0, 1, 0, 1},
+      new int[]{1, 0, 0, 0, 1, 1},
+      new int[]{0, 1, 1, 1, 0, 0},
+      new int[]{0, 1, 1, 0, 1, 0},
+      new int[]{0, 1, 1, 0, 0, 1},
+      new int[]{0, 1, 0, 1, 1, 0},
+      new int[]{0, 1, 0, 1, 0, 1},
+      new int[]{0, 1, 0, 0, 1, 1},
+      new int[]{0, 0, 1, 1, 1, 0},
+      new int[]{0, 0, 1, 1, 0, 1},
+      new int[]{0, 0, 1, 0, 1, 1},
+      new int[]{0, 0, 0, 1, 1, 1}
+    );
+    assertIteratorIsExpected(expected, iter);
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testInvalidSlotsThrowsException() {
     new SlottedCombinationIterator(0, 1);

@@ -21,10 +21,10 @@
           "rackspace_region": {
             "label": "Region",
             "type": "select",
-            "options": [ "dfw", "ord", "lon", "syd" ],
+            "options": [ "dfw", "ord", "iad", "lon", "syd", "hkg" ],
             "default": "dfw",
             "override": true,
-            "tip": "Rackspace region (DFW default)"
+            "tip": "Rackspace region"
           }
         },
         "required": [

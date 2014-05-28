@@ -29,38 +29,36 @@ We hope you enjoy this release.  If you encounter any issues, please don't hesit
 <https://continuuity.uservoice.com/clients/widgets/classic_widget?mode=support&link_color=162e52&primary_color=42afcf&embed
 _type=lightbox&trigger_method=custom_trigger&contact_enabled=true&feedback_enabled=false&smartvote=true&referrer=http%3A%2F%2Fcontinuuity.com%2F#contact_us>`_.
 
+More information about this and previous releases can be found at on the github project `here <https://github.com/continuuity/loom/releases>`_.
+
 Fixed Issues
 ^^^^^^^^^^^^^
-• Layout solver used to take minutes for solving large (> 400) node clusters
-• Resistance to transient zookeeper connection loss
-• Provisioner was made more resilient to transient issues.
+• Unbounded job list stored in cluster object 
+• Provisioner bootstrapping performing unnecessary work 
+• Various cookbook improvements, updates, and fixes.
 
 New Features
 ^^^^^^^^^^^^^
-• On-demand cluster provisioning 
-• Support for any type of cluster with constraint based templates 
-• Pre-defined templates for clusters like Hadoop and LAMP  
-• Integration with OpenStack and IaaS providers
-• Pluggable automation platform (e.g. Chef, Puppet)
-• Scalability to hundreds of clusters
-• Modular approach to configuration and service management 
-• Out of the box startup with in-memory zookeeper and embedded DB 
-• User defineable configuration for cluster creation
-• Uses Chef solo as SCM engine, hence not dependent on a Chef server
-• Push model for provisioning and installing, hence can provision clusters outside firewall
-• UI for administrators to create and manage configuration, and for users to customize and create clusters. 
-• Fully driven by REST APIs 
+• UI Skin updated and selectable 
+• Add a compatible service to an active cluster 
+• Start, stop, and restart services on an active cluster 
+• Reconfigure services on an active cluster 
+• Plugin authors can specify what fields their plugin needs from the admin and user 
+• Users able to provide provider related information at cluster create time 
+• Extended cookbook support for Hadoop clusters with Kerberos and Hive 
+• Customizable callbacks on start, success, and failure of cluster operations 
+• Expanded service dependency capabilities 
 
 Released Versions
 ^^^^^^^^^^^^^^^^^
 • |release|
+• 0.9.6 Beta
 • 0.9.5 Beta
 • 0.5.0 Alpha
 • 0.1.0  
 
 Known Issues
-^^^^^^^^^^^^^
-• Potential for node data to grow beyond persistent store cell limit  
+^^^^^^^^^^^^
 • Minimal authentication 
 • Key files must be stored in plugin 
 • Provisioner does not enforce timeouts 

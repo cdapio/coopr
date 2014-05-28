@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: hive_metastore
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ unless scratch_dir == '/tmp/hive-${user.name}'
 end
 
 execute 'hive-hdfs-warehousedir' do
-  command "hdfs dfs -mkdir -p #{dfs}/#{warehouse_dir} && hdfs dfs -chown hive:hdfs #{dfs}/#{warehouse_dir}"
+  command "hdfs dfs -mkdir -p #{dfs}/#{warehouse_dir} && hdfs dfs -chown hive:hdfs #{dfs}/#{warehouse_dir} && hdfs dfs -chmod 1777 #{dfs}/#{warehouse_dir}"
   timeout 300
   user 'hdfs'
   group 'hdfs'
@@ -63,6 +63,7 @@ execute 'hive-hdfs-warehousedir' do
 end
 
 service 'hive-metastore' do
+  status_command 'service hive-metastore status'
   supports [:restart => true, :reload => false, :status => true]
   action :nothing
 end

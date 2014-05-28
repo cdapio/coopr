@@ -79,9 +79,19 @@ class ChefSoloAutomator < Automator
       nodesdata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     end
 
+    # services is a list of services on this node
+    node_services_data = @task['config']['services']
+    if (node_services_data.nil? || node_services_data == "")
+      node_services_data = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
+    end
+
     # merge data together into expected layout for json_attributes
     clusterdata['nodes'] = nodesdata
     servicedata['loom']['cluster'] = clusterdata
+    servicedata['loom']['services'] = node_services_data
+
+    # include the clusterId
+    servicedata['loom']['clusterId'] = @task['clusterId']
 
     # we also need to merge cluster config top-level
     servicedata.merge!(clusterdata)

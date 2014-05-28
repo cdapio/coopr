@@ -1,0 +1,41 @@
+{
+  "name": "sensu",
+  "description": "Installs/Configures Sensu",
+  "long_description": "## DESCRIPTION\n\nProvides LWRP's and service recipes to install and configure\n[Sensu](https://github.com/sensu/sensu/wiki), a monitoring framework.\n\nThis cookbook provides the building blocks for creating a monitoring\ncookbook specific to your environment (wrapper). Without such a\nwrapper, no Sensu configuration files will be created for your nodes.\n\nAn example wrapper cookbook can be found\n[HERE](https://github.com/portertech/chef-monitor).\n\n[How to Write Reusable Chef Cookbooks](http://bit.ly/10r993N)\n\n## TESTING\n\nThis cookbook comes with a Gemfile, Cheffile, and a Vagrantfile for\ntesting and evaluating Sensu.\n\n```\ncd examples\ngem install bundler\nbundle install\nlibrarian-chef install\nvagrant up\nvagrant ssh\n```\n\n## COOKBOOK DEPENDENCIES\n\n* [APT](http://community.opscode.com/cookbooks/apt)\n* [YUM](http://community.opscode.com/cookbooks/yum)\n* [Windows](http://community.opscode.com/cookbooks/windows)\n* [RabbitMQ](http://community.opscode.com/cookbooks/rabbitmq)\n* [RedisIO](http://community.opscode.com/cookbooks/redisio)\n\n## REQUIREMENTS\n\n### SSL configuration\n\nRunning Sensu with SSL is recommended; this cookbook uses a data bag\n`sensu`, with an item `ssl`, containing the SSL certificates required.\nSensu data bag items may be encrypted. This cookbook comes with a tool\nto generate the certificates and data bag item. If the integrity of\nthe certificates is ever compromised, you must regenerate and redeploy\nthem.\n\n```\ncd examples/ssl\n./ssl_certs.sh generate\nknife data bag create sensu\n```\n\nUse the plain-text data bag item:\n\n``` shell\nknife data bag from file sensu ssl.json\n```\n\nOr, encrypted it with your data bag secret. See [Encrypt a Data\nBag](http://docs.opscode.com/essentials_data_bags_encrypt.html) for\nmore information.\n\n```\nknife data bag --secret-file /path/to/your/secret from file sensu ssl.json\n```\n\n``` shell\n./ssl_certs.sh clean\n```\n\n## RECIPES\n\n### sensu::default\n\nInstalls Sensu and creates a base configuration file, intended to be\nextended. This recipe must be included before any of the Sensu LWRP's\ncan be used. This recipe does not enable or start any services.\n\n### sensu::rabbitmq\n\nInstalls and configures RabbitMQ for Sensu, from configuring SSL to\ncreating a vhost and credentials. This recipe relies heavily on the\ncommunity RabbitMQ cookbook LWRP's.\n\n### sensu::redis\n\nInstalls and configures Redis for Sensu. This recipe uses the\nRedisIO cookbook and installs Redis from source.\n\n### sensu::server_service\n\nEnables and starts the Sensu server.\n\n### sensu::client_service\n\nEnables and starts the Sensu client.\n\n### sensu::api_service\n\nEnables and starts the Sensu API.\n\n### sensu::dashboard_service\n\nEnables and starts the Sensu dashboard.\n\n## ATTRIBUTES\n\n### Installation\n\n`node.sensu.version` - Sensu build to install.\n\n`node.sensu.use_unstable_repo` - If the build resides on the\n\"unstable\" repository.\n\n`node.sensu.directory` - Sensu configuration directory.\n\n`node.sensu.log_directory` - Sensu log directory.\n\n`node.sensu.log_level` - Sensu log level (eg. \"warn\").\n\n`node.sensu.use_ssl` - If Sensu and RabbitMQ are to use SSL.\n\n`node.sensu.use_embedded_ruby` - If Sensu Ruby handlers and plugins\nuse the embedded Ruby in the Sensu package.\n\n`node.sensu.init_style` - Style of init to be used when configuring\nSensu services, \"sysv\" and \"runit\" are currently supported.\n\n`node.sensu.service_max_wait` - How long service scripts should wait\nfor Sensu to start/stop.\n\n### RabbitMQ\n\n`node.sensu.rabbitmq.host` - RabbitMQ host.\n\n`node.sensu.rabbitmq.port` - RabbitMQ port, usually for SSL.\n\n`node.sensu.rabbitmq.ssl` - RabbitMQ SSL configuration, DO NOT EDIT THIS.\n\n`node.sensu.rabbitmq.vhost` - RabbitMQ vhost for Sensu.\n\n`node.sensu.rabbitmq.user` - RabbitMQ user for Sensu.\n\n`node.sensu.rabbitmq.password` - RabbitMQ password for Sensu.\n\n### Redis\n\n`node.sensu.redis.host` - Redis host.\n\n`node.sensu.redis.port` - Redis port.\n\n### Sensu API\n\n`node.sensu.api.host` - Sensu API host, for other services to reach it.\n\n`node.sensu.api.bind` - Sensu API bind address.\n\n`node.sensu.api.port` - Sensu API port.\n\n### Sensu Dashboard\n\n`node.sensu.dashboard.bind` - Sensu Dashboard bind address.\n\n`node.sensu.dashboard.port` - Sensu Dashboard port.\n\n`node.sensu.dashboard.user` - Sensu basic authentication username.\n\n`node.sensu.dashboard.password` - Sensu basic authentication password.\n\n## LWRP'S\n\n### Define a client\n\n```ruby\nsensu_client node.name do\n  address node.ipaddress\n  subscriptions node.roles + [\"all\"]\n  additional(:cluster => node.cluster)\nend\n```\n\n### Define a handler\n\n```ruby\nsensu_handler \"pagerduty\" do\n  type \"pipe\"\n  command \"pagerduty.rb\"\n  severities [\"ok\", \"critical\"]\nend\n```\n\n### Define a check\n\n```ruby\nsensu_check \"redis_process\" do\n  command \"check-procs.rb -p redis-server -C 1\"\n  handlers [\"default\"]\n  subscribers [\"redis\"]\n  interval 30\n  additional(:notification => \"Redis is not running\", :occurrences => 5)\nend\n```\n\n### Define a filter\n\n```ruby\nsensu_filter \"environment\" do\n  attributes(:client => {:environment => \"development\"})\n  negate true\nend\n```\n\n### Define a mutator\n\n```ruby\nsensu_mutator \"opentsdb\" do\n  command \"opentsdb.rb\"\nend\n```\n\n### Define a custom configuration snippet\n\n```ruby\nsensu_snippet \"irc\" do\n  content(:uri => \"irc://sensu:password@irc.freenode.net:6667#channel\")\nend\n```\n\n## SUPPORT\n\nPlease visit [sensuapp.org/support](http://sensuapp.org/support) for details on community and commercial\nsupport resources, including the official IRC channel.\n",
+  "maintainer": "Sonian, Inc.",
+  "maintainer_email": "chefs@sonian.net",
+  "license": "Apache 2.0",
+  "platforms": {
+    "ubuntu": ">= 0.0.0",
+    "debian": ">= 0.0.0",
+    "centos": ">= 0.0.0",
+    "redhat": ">= 0.0.0",
+    "fedora": ">= 0.0.0",
+    "amazon": ">= 0.0.0",
+    "windows": ">= 0.0.0"
+  },
+  "dependencies": {
+    "apt": ">= 0.0.0",
+    "yum": ">= 0.0.0",
+    "windows": ">= 1.8.8",
+    "rabbitmq": ">= 2.0.0",
+    "redisio": ">= 1.7.0"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "1.0.0"
+}
