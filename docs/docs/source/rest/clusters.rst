@@ -852,7 +852,14 @@ Sync Cluster Template to Current Version
 When a cluster is created, a copy of the template used to create the cluster is copied into the 
 cluster. Any future operations are based off the copy of the template. As templates evolve, it is
 sometimes desirable to sync an existing cluster to the current version of the template used to 
-create it. To sync a cluster's template to the current version, make a POST HTTP request to URI:
+create it. For example, cluster 123 is created with a template. As the template evolves, service A 
+is added to the compatibility list of the template. Since cluster 123 has a copy of a previous version
+of the template, service A cannot be added to the cluster. In order to allow service A to be added to
+cluster 123, the owner of the cluster syncs the template to its current version. It should be noted 
+that things like a templates defaults section will have no effect on existing clusters, since those are
+default values used during cluster creation. In effect, only template compatibilities and constraints
+will have any effect on what can and cant be done to an existing cluster. 
+To sync a cluster's template to the current version, make a POST HTTP request to URI:
 ::
 
  /clusters/{cluster-id}/clustertemplate/sync
