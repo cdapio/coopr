@@ -13,7 +13,7 @@ To learn more about Continuuity Loom, here are the resources available:
    * [Introduction](http://continuuity.github.io/loom/) to Continuuity Loom
    * Continuuity Loom [User Guide](http://www.continuuity.com/docs/loom/current/en/index.html)
    * [Technical Document](http://continuuity.github.io/loom/tech-docs/index.html) describing internals of Continuuity Loom
-   * ## Release Documentation
+   * Release Documentation
       * [Documentation 0.9.7](http://www.continuuity.com/docs/loom/0.9.7/en/index.html)
       * [Documentation 0.9.6](http://www.continuuity.com/docs/loom/0.9.6/en/index.html)
       * [Documentation 0.9.5](http://www.continuuity.com/docs/loom/0.9.5/en/index.html)
