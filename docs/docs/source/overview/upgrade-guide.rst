@@ -23,7 +23,7 @@ Upgrade Guide
 =============
 .. _upgrade-guide:
 
-This guide describes how to upgrade Continuuity Loom from 0.9.6 to the |release| Release.
+This guide describes how to upgrade Continuuity Loom from 0.9.7 to the |release| Release.
 
 Checklist
 =========
@@ -53,7 +53,7 @@ Checklist
   .. parsed-literal::
    $ sudo cp -R /var/loom/data /var/loom/data.backup
 
-* 4 - Verify configuration path
+* 4 - Verify and update configuration
 
   * Double check that ``/etc/loom/conf.loom`` is the active configuration
 
@@ -64,6 +64,8 @@ Checklist
 
   .. parsed-literal::
    $ update-alternatives --install /etc/loom/conf loom-conf /etc/loom/conf.loom 20
+
+  * Configuration settings have been standardized, with ``server`` replacing ``loom`` as the prefix for server configuration settings. Additionally, any server settings that did not start with ``loom`` now start with ``server``. Update your loom configuration with the new configuration names. 
 
 * 5 - Upgrade Loom packages
 
@@ -81,10 +83,10 @@ Checklist
 
 * 7 - Update JSON with new layout
 
-  * Continuuity Loom |release| modified the JSON layout for Automator and Provider plugins, this updates them
+  * Continuuity Loom |release| modified the JSON layout for some entities, this updates them
 
   .. parsed-literal::
-   $ /opt/loom/server/bin/loom-0.9.7-upgrade.rb -f export.json -o upload.json
+   $ /opt/loom/server/bin/loom-0.9.8-upgrade.rb -f export.json -o upload.json
 
 * 8 - Start Loom Server
 
