@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import java.util.Set;
 
+import static com.continuuity.loom.macro.Expression.Type.CLUSTER_OWNER;
 import static com.continuuity.loom.macro.Expression.Type.HOST_OF_SERVICE;
 import static com.continuuity.loom.macro.Expression.Type.IP_OF_SERVICE;
 
@@ -70,101 +71,114 @@ public class ExpressionTest {
 
   @Test(expected = IncompleteClusterException.class)
   public void testNoHost() throws Exception {
-    new Expression(HOST_OF_SERVICE, "svc3", null, null, null).evaluate(clusterNodes, node1);
+    new Expression(HOST_OF_SERVICE, "svc3", null, null, null).evaluate(cluster, clusterNodes, node1);
   }
 
   @Test(expected = IncompleteClusterException.class)
   public void testNoIp() throws Exception {
-    new Expression(Expression.Type.IP_OF_SERVICE, "svc2", null, null, null).evaluate(clusterNodes, node1);
+    new Expression(Expression.Type.IP_OF_SERVICE, "svc2", null, null, null).evaluate(cluster, clusterNodes, node1);
   }
 
   @Test(expected = IncompleteClusterException.class)
   public void testOutOfBounds() throws Exception {
-    new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, 3).evaluate(clusterNodes, node1);
+    new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, 3).evaluate(cluster, clusterNodes, node1);
   }
 
   @Test
   public void testNoService() throws Exception {
     Assert.assertNull(
-      new Expression(Expression.Type.IP_OF_SERVICE, "svc4", null, null, null).evaluate(clusterNodes, node1));
+      new Expression(Expression.Type.IP_OF_SERVICE, "svc4", null, null, null).evaluate(cluster, clusterNodes, node1));
+  }
+
+  @Test
+  public void testClusterOwner() throws Exception {
+    Assert.assertEquals(
+      cluster.getOwnerId(),
+      new Expression(Expression.Type.CLUSTER_OWNER, null, null, null, null).evaluate(cluster, clusterNodes, node1));
   }
 
   @Test
   public void testPlain() throws Exception {
     Assert.assertEquals(
       "9.6.8.1,9.7.8.4,9.1.3.4",
-      new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, null).evaluate(clusterNodes, node1));
+      new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, null).evaluate(cluster, clusterNodes, node1));
   }
 
   @Test
   public void testSelfServiceInstanceNum() throws Exception {
     Assert.assertEquals(
       "1",
-      new Expression(Expression.Type.SELF_INSTANCE_OF_SERVICE, "svc1", null, null, null).evaluate(clusterNodes, node1));
+      new Expression(Expression.Type.SELF_INSTANCE_OF_SERVICE, "svc1", null, null, null)
+        .evaluate(cluster, clusterNodes, node1));
     Assert.assertEquals(
       "2",
-      new Expression(Expression.Type.SELF_INSTANCE_OF_SERVICE, "svc1", null, null, null).evaluate(clusterNodes, node2));
+      new Expression(Expression.Type.SELF_INSTANCE_OF_SERVICE, "svc1", null, null, null)
+        .evaluate(cluster, clusterNodes, node2));
   }
 
   @Test
   public void testSelfServiceHost() throws Exception {
     Assert.assertEquals(
       node1.getProperties().get(Node.Properties.HOSTNAME.name().toLowerCase()).getAsString(),
-      new Expression(Expression.Type.SELF_HOST_OF_SERVICE, "svc1", null, null, null).evaluate(clusterNodes, node1));
+      new Expression(Expression.Type.SELF_HOST_OF_SERVICE, "svc1", null, null, null)
+        .evaluate(cluster, clusterNodes, node1));
     Assert.assertEquals(
       node2.getProperties().get(Node.Properties.HOSTNAME.name().toLowerCase()).getAsString(),
-      new Expression(Expression.Type.SELF_HOST_OF_SERVICE, "svc1", null, null, null).evaluate(clusterNodes, node2));
+      new Expression(Expression.Type.SELF_HOST_OF_SERVICE, "svc1", null, null, null)
+        .evaluate(cluster, clusterNodes, node2));
   }
 
   @Test
   public void testServiceInstanceHost() throws Exception {
     Assert.assertEquals(
       node1.getProperties().get(Node.Properties.HOSTNAME.name().toLowerCase()).getAsString(),
-      new Expression(Expression.Type.HOST_OF_SERVICE, "svc1", null, null, 0).evaluate(clusterNodes, node1));
+      new Expression(Expression.Type.HOST_OF_SERVICE, "svc1", null, null, 0).evaluate(cluster, clusterNodes, node1));
     Assert.assertEquals(
       node2.getProperties().get(Node.Properties.HOSTNAME.name().toLowerCase()).getAsString(),
-      new Expression(Expression.Type.HOST_OF_SERVICE, "svc1", null, null, 1).evaluate(clusterNodes, node1));
+      new Expression(Expression.Type.HOST_OF_SERVICE, "svc1", null, null, 1).evaluate(cluster, clusterNodes, node1));
   }
 
   @Test
   public void testSelfServiceIp() throws Exception {
     Assert.assertEquals(
       node1.getProperties().get(Node.Properties.IPADDRESS.name().toLowerCase()).getAsString(),
-      new Expression(Expression.Type.SELF_IP_OF_SERVICE, "svc1", null, null, null).evaluate(clusterNodes, node1));
+      new Expression(Expression.Type.SELF_IP_OF_SERVICE, "svc1", null, null, null)
+        .evaluate(cluster, clusterNodes, node1));
     Assert.assertEquals(
       node2.getProperties().get(Node.Properties.IPADDRESS.name().toLowerCase()).getAsString(),
-      new Expression(Expression.Type.SELF_IP_OF_SERVICE, "svc1", null, null, null).evaluate(clusterNodes, node2));
+      new Expression(Expression.Type.SELF_IP_OF_SERVICE, "svc1", null, null, null)
+        .evaluate(cluster, clusterNodes, node2));
   }
 
   @Test
   public void testServiceIpInstance() throws Exception {
     Assert.assertEquals(
       node1.getProperties().get(Node.Properties.IPADDRESS.name().toLowerCase()).getAsString(),
-      new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, 0).evaluate(clusterNodes, node1));
+      new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, 0).evaluate(cluster, clusterNodes, node1));
     Assert.assertEquals(
       node2.getProperties().get(Node.Properties.IPADDRESS.name().toLowerCase()).getAsString(),
-      new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, 1).evaluate(clusterNodes, node1));
+      new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, 1).evaluate(cluster, clusterNodes, node1));
   }
 
   @Test
   public void testFormatOnly() throws Exception {
     Assert.assertEquals(
       "oof:2181,owt:2181",
-      new Expression(HOST_OF_SERVICE, "svc2", "$:2181", null, null).evaluate(clusterNodes, node1));
+      new Expression(HOST_OF_SERVICE, "svc2", "$:2181", null, null).evaluate(cluster, clusterNodes, node1));
   }
 
   @Test
   public void testJoinOnly() throws Exception {
     Assert.assertEquals(
       "rab-oof-eno",
-      new Expression(HOST_OF_SERVICE, "svc1", null, "-", null).evaluate(clusterNodes, node1));
+      new Expression(HOST_OF_SERVICE, "svc1", null, "-", null).evaluate(cluster, clusterNodes, node1));
   }
 
   @Test
   public void testFormatJoin() throws Exception {
     Assert.assertEquals(
       "oof:2181++owt:2181",
-      new Expression(HOST_OF_SERVICE, "svc2", "$:2181", "++", null).evaluate(clusterNodes, node1));
+      new Expression(HOST_OF_SERVICE, "svc2", "$:2181", "++", null).evaluate(cluster, clusterNodes, node1));
   }
 
   @Test
@@ -189,6 +203,7 @@ public class ExpressionTest {
   public void testParseMacroName() throws SyntaxException {
     Assert.assertEquals(ImmutablePair.of(HOST_OF_SERVICE, "abc"), Expression.typeAndNameOf("host.service.abc"));
     Assert.assertEquals(ImmutablePair.of(IP_OF_SERVICE, "abc"), Expression.typeAndNameOf("ip.service.abc"));
+    Assert.assertEquals(ImmutablePair.of(CLUSTER_OWNER, null), Expression.typeAndNameOf("cluster.owner"));
     for (String macro : ImmutableList.of("", "host.service.", "IP_OF_SERVICE.abc", "SERVICE_BULLSHIT_abc")) {
       try {
         Expression.typeAndNameOf(macro);

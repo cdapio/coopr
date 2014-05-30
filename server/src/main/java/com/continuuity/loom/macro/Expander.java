@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.macro;
 
+import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -28,6 +29,7 @@ import java.util.Set;
 /**
  * A simple macro expander. Supported macros are:
  * <ul>
+ *   <li>%cluster.owner% - owner id of the cluster</li>
  *   <li>%host.service.&ltservice name&gt% - comma separated list of hostnames of nodes with the service</li>
  *   <li>%ip.service.&ltservice name&gt% - comma separated list of ips of nodes with the service</li>
  *   <li>%num.service.&ltservice name&gt% - number of nodes with the service</li>
@@ -53,7 +55,7 @@ public final class Expander {
    */
   public static void validate(String textWithMacros) throws SyntaxException {
     try {
-      expand(textWithMacros, null, null);
+      expand(textWithMacros, null, null, null);
     } catch (IncompleteClusterException e) {
       // can never happen because expansion is skipped
     }
@@ -62,10 +64,15 @@ public final class Expander {
   /**
    * Given a text that may contain macros, validate and expand all macros in the context of the given cluster nodes,
    * and on the specified node.
+   * @param textWithMacros text that may contain macros.
+   * @param cluster cluster to evaluate macros for.
+   * @param nodes cluster nodes to evaluate macros for.
+   * @param node cluster node to evaluate macros for.
+   * @return text with any relevant macros expanded.
    * @throws SyntaxException if a macro is not wellformed.
    * @throws IncompleteClusterException if a macro cannot be expanded because the cluster lacks the information.
    */
-  public static String expand(String textWithMacros, Set<Node> nodes, Node node)
+  public static String expand(String textWithMacros, Cluster cluster, Set<Node> nodes, Node node)
     throws SyntaxException, IncompleteClusterException {
     int pos = 0;
     StringBuilder builder = nodes == null ? null : new StringBuilder();
@@ -86,7 +93,7 @@ public final class Expander {
           Expression expression = new Parser(macro).parse();
           // if cluster is given, expand macro
           if (builder != null) {
-            String expansion = expression.evaluate(nodes, node);
+            String expansion = expression.evaluate(cluster, nodes, node);
             if (expansion != null) {
               builder.append(expansion);
               expansionHappened = true;
@@ -134,14 +141,15 @@ public final class Expander {
    *
    * @param json A JSON tree
    * @param path the path to expand under
+   * @param cluster the cluster to use for expanding macros.
    * @param nodes the cluster nodes to use for expanding macros.
    * @param node the cluster node to use for expanding macros.
    * @return a new JSON tree if any expansion took place, and the original JSON tree otherwise.
    * @throws SyntaxException if a macro expression is ill-formed.
    * @throws IncompleteClusterException if the cluster does not have the meta data to expand all macros.
    */
-  public static JsonElement expand(JsonElement json, @Nullable java.util.List<String> path, Set<Node> nodes, Node node)
-    throws SyntaxException, IncompleteClusterException {
+  public static JsonElement expand(JsonElement json, @Nullable java.util.List<String> path, Cluster cluster,
+                                   Set<Node> nodes, Node node) throws SyntaxException, IncompleteClusterException {
 
     // if path is given,
     if (path != null && !path.isEmpty()) {
@@ -150,7 +158,7 @@ public final class Expander {
         JsonObject object = json.getAsJsonObject();
         JsonElement json1 = object.get(first);
         if (json1 != null) {
-          JsonElement expanded = expand(json1, path.subList(1, path.size()), nodes, node);
+          JsonElement expanded = expand(json1, path.subList(1, path.size()), cluster, nodes, node);
           if (expanded != json1) {
             // only construct new json object if actual expansion happened
             JsonObject object1 = new JsonObject();
@@ -169,7 +177,7 @@ public final class Expander {
       JsonPrimitive primitive = json.getAsJsonPrimitive();
       if (primitive.isString()) {
         String value = primitive.getAsString();
-        String expanded = expand(value, nodes, node);
+        String expanded = expand(value, cluster, nodes, node);
         if (!expanded.equals(value)) {
           // only return a new json element if actual expansion happened
           return new JsonPrimitive(expanded);
@@ -182,7 +190,7 @@ public final class Expander {
       JsonArray array1 = new JsonArray();
       boolean expansionHappened = false;
       for (JsonElement element : array) {
-        JsonElement expanded = expand(element, path, nodes, node);
+        JsonElement expanded = expand(element, path, cluster, nodes, node);
         if (expanded != element) {
           expansionHappened = true;
         }
@@ -199,11 +207,11 @@ public final class Expander {
       JsonObject object1 = new JsonObject();
       boolean expansionHappened = false;
       for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-        JsonElement expanded = expand(entry.getValue(), path, nodes, node);
+        JsonElement expanded = expand(entry.getValue(), path, cluster, nodes, node);
         if (expanded != entry.getValue()) {
           expansionHappened = true;
         }
-        object1.add(entry.getKey(), expand(entry.getValue(), path, nodes, node));
+        object1.add(entry.getKey(), expand(entry.getValue(), path, cluster, nodes, node));
       }
       if (expansionHappened) {
         return object1;

@@ -7,6 +7,7 @@ Unreleased
 - Nginx support for clusters ( Issues: #131 )
 - Sensu monitoring support ( Issues: #167 )
 - Configuration settings renamed ( Issues: #213 )
+- Cluster owner macro ( Issues: #221 )
 
 v0.9.7 (May 27, 2014)
 ---------------------

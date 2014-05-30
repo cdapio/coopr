@@ -16,6 +16,7 @@
 package com.continuuity.loom.macro;
 
 import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.utils.ImmutablePair;
 import com.google.common.base.Objects;
@@ -53,7 +54,8 @@ public class Expression {
     NUM_OF_SERVICE("num.service."),
     SELF_INSTANCE_OF_SERVICE("instance.self.service."),
     SELF_HOST_OF_SERVICE("host.self.service."),
-    SELF_IP_OF_SERVICE("ip.self.service.");
+    SELF_IP_OF_SERVICE("ip.self.service."),
+    CLUSTER_OWNER("cluster.owner");
 
     private String representation;
 
@@ -63,6 +65,10 @@ public class Expression {
 
     public String getRepresentation() {
       return representation;
+    }
+
+    public boolean isClusterType() {
+      return this == CLUSTER_OWNER;
     }
   }
 
@@ -99,6 +105,9 @@ public class Expression {
   public static ImmutablePair<Type, String> typeAndNameOf(String macroName) throws SyntaxException {
     for (Type type : Type.values()) {
       String prefix = type.getRepresentation();
+      if (type.isClusterType() && macroName.equals(type.getRepresentation())) {
+        return new ImmutablePair<Type, String>(type, null);
+      }
       if (!macroName.startsWith(prefix)) {
         continue;
       }
@@ -118,7 +127,7 @@ public class Expression {
    * @param separator the list separator.
    * @param instanceNum the instance number of the service.
    */
-  public Expression(Type type, String name, @Nullable String format,
+  public Expression(Type type, @Nullable String name, @Nullable String format,
                     @Nullable String separator, @Nullable Integer instanceNum) {
     this.type = type;
     this.name = name;
@@ -130,13 +139,17 @@ public class Expression {
   /**
    * Evaluate the expression for a given cluster. Looks up the service name in the cluster to find all nodes that run
    * the service, then formats and joins all results into a string.
+   * @param cluster the cluster to evaluate for.
    * @param clusterNodes the nodes of the cluster to evaluate for.
    * @param node the node of the cluster to evaluate the expression for.
    * @return the replacement string for the expression, or null if the service required for replacement is not in
    *         the cluster.
    * @throws IncompleteClusterException if a node is missing the property that is required for the lookup type.
    */
-  public String evaluate(Set<Node> clusterNodes, Node node) throws IncompleteClusterException {
+  public String evaluate(Cluster cluster, Set<Node> clusterNodes, Node node) throws IncompleteClusterException {
+    if (name == null) {
+      return evaluateClusterProperty(cluster);
+    }
     List<Node> serviceNodes = nodesForService(clusterNodes, name);
     if (serviceNodes.isEmpty()) {
       return null;
@@ -160,6 +173,16 @@ public class Expression {
       format(json.getAsString(), builder);
     }
     return builder.toString();
+  }
+
+  private String evaluateClusterProperty(Cluster cluster) {
+    switch (type) {
+      case CLUSTER_OWNER:
+        return cluster.getOwnerId();
+      default:
+        // shouldn't ever happen
+        return type.getRepresentation();
+    }
   }
 
   private String evaluateSingle(List<Node> serviceNodes, Node node) throws IncompleteClusterException {

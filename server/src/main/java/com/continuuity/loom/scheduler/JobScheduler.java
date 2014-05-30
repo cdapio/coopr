@@ -151,7 +151,7 @@ public class JobScheduler implements Runnable {
 
             // Submit any tasks not yet submitted
             if (!notSubmittedTasks.isEmpty()) {
-              submitTasks(notSubmittedTasks, nodeMap, clusterNodes, job);
+              submitTasks(notSubmittedTasks, cluster, nodeMap, clusterNodes, job);
             }
 
             // Note: before moving cluster out of pending state, make sure that all in progress tasks are done.
@@ -183,8 +183,8 @@ public class JobScheduler implements Runnable {
     }
   }
 
-  private void submitTasks(Set<ClusterTask> notSubmittedTasks, Map<String, Node> nodeMap, Set<Node> clusterNodes,
-                           ClusterJob job) throws Exception {
+  private void submitTasks(Set<ClusterTask> notSubmittedTasks, Cluster cluster, Map<String, Node> nodeMap,
+                           Set<Node> clusterNodes, ClusterJob job) throws Exception {
 
     for (final ClusterTask task : notSubmittedTasks) {
       Node taskNode = nodeMap.get(task.getNodeId());
@@ -196,7 +196,7 @@ public class JobScheduler implements Runnable {
       // TODO: do this only once and save it
       if (!task.getTaskName().isHardwareAction()) {
         try {
-          task.setConfig(Expander.expand(task.getConfig(), null, clusterNodes, taskNode).getAsJsonObject());
+          task.setConfig(Expander.expand(task.getConfig(), null, cluster, clusterNodes, taskNode).getAsJsonObject());
         } catch (Throwable e) {
           LOG.error("Exception while expanding macros for task {}", task.getTaskId(), e);
           taskService.failTask(task, -1);
