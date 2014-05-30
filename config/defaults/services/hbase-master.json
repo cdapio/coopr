@@ -14,7 +14,10 @@
         "hadoop-hdfs-datanode",
         "zookeeper-server"
       ],
-      "uses": [ "kerberos-master" ]
+      "uses": [
+        "hadoop-kerberos",
+        "kerberos-master"
+      ]
     }
   },
   "provisioner": {

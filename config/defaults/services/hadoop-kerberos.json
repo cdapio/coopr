@@ -9,11 +9,11 @@
     },
     "provides": [],
     "runtime": {
-      "requires": [],
-      "uses": [
+      "requires": [
         "kerberos-client",
         "kerberos-master"
-      ]
+      ],
+      "uses": []
     }
   },
   "provisioner": {
