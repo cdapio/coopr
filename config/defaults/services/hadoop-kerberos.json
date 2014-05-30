@@ -1,0 +1,29 @@
+{
+  "name": "hadoop-kerberos",
+  "description": "Sets up Hadoop Kerberos keytabs",
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [ "kerberos-client" ],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [],
+      "uses": [
+        "kerberos-client",
+        "kerberos-master"
+      ]
+    }
+  },
+  "provisioner": {
+    "actions": {
+      "initialize": {
+        "type":"chef-solo",
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::_kerberos_init]"
+        }
+      }
+    }
+  }
+}
