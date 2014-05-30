@@ -7,17 +7,17 @@ Continuuity Loom is cluster management software that manages clusters on public,
    * [Theme: Extensibility, 0.9.7](https://github.com/continuuity/loom/releases/tag/0.9.7)
    * [Theme: Open Source, 0.9.6](https://github.com/continuuity/loom/releases/tag/0.9.6)
 
-## Release Documentation
-   * [Documentation 0.9.7](http://www.continuuity.com/docs/loom/0.9.7/en/index.html)
-   * [Documentation 0.9.6](http://www.continuuity.com/docs/loom/0.9.6/en/index.html)
-   * [Documentation 0.9.5](http://www.continuuity.com/docs/loom/0.9.5/en/index.html)
-
 ## Documentation
 
 To learn more about Continuuity Loom, here are the resources available:
    * [Introduction](http://continuuity.github.io/loom/) to Continuuity Loom
    * Continuuity Loom [User Guide](http://www.continuuity.com/docs/loom/current/en/index.html)
    * [Technical Document](http://continuuity.github.io/loom/tech-docs/index.html) describing internals of Continuuity Loom
+   * ## Release Documentation
+      * [Documentation 0.9.7](http://www.continuuity.com/docs/loom/0.9.7/en/index.html)
+      * [Documentation 0.9.6](http://www.continuuity.com/docs/loom/0.9.6/en/index.html)
+      * [Documentation 0.9.5](http://www.continuuity.com/docs/loom/0.9.5/en/index.html)
+
 
 ## Contributing to Continuuity Loom
 
