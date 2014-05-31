@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-if node.has_key? 'loom_firewall'
+if node.key?('loom_firewall')
   include_recipe 'loom_firewall::iptables'
 else
   include_recipe 'loom_firewall::disable'
