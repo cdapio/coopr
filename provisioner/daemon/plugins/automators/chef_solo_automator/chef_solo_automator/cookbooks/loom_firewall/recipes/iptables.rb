@@ -17,34 +17,34 @@
 # limitations under the License.
 #
 
-package "iptables"
+package 'iptables'
 
 case node['platform_family']
 when 'debian'
   iptable_rules = '/etc/iptables-rules'
   file "/etc/network/if-up.d/iptables-rules" do
-    owner "root"
-    group "root"
-    mode "0755"
+    owner 'root'
+    group 'root'
+    mode '0755'
     content "#!/bin/bash\niptables-restore < #{iptable_rules}\n"
     action :create
   end
 when 'rhel'
   iptable_rules = '/etc/sysconfig/iptables'
-  service "iptables" do
+  service 'iptables' do
     supports [:restart, :reload, :status]
     action :enable
   end
 end
 
-execute "reload-iptables" do
+execute 'reload-iptables' do
   command "iptables-restore < #{iptable_rules}"
-  user "root"
+  user 'root'
   action :nothing
 end
 
 template iptable_rules do
-  source "iptables.erb"
-  notifies :run, "execute[reload-iptables]"
+  source 'iptables.erb'
+  notifies :run, 'execute[reload-iptables]'
   action :create
 end
