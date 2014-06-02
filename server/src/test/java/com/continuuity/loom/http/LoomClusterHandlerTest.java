@@ -968,6 +968,111 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     verifyInitialLeaseDuration(10000, Cluster.Status.PENDING, -1, smallTemplate.getName());
   }
 
+  @Test
+  public void testClusterTemplateSync() throws Exception {
+    ClusterTemplate template = Entities.ClusterTemplateExample.HDFS;
+    Cluster cluster =
+      new Cluster("123", USER1, "name", System.currentTimeMillis(), "description", Entities.ProviderExample.RACKSPACE,
+                  template, ImmutableSet.<String>of(), ImmutableSet.<String>of());
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    clusterStore.writeNode(Entities.ClusterExample.NODE1);
+    clusterStore.writeNode(Entities.ClusterExample.NODE2);
+
+    // now edit the template
+    Set<String> newCompatibleServices = Sets.newHashSet(template.getCompatibilities().getServices());
+    newCompatibleServices.add("new-service");
+    Compatibilities newCompatibilities =
+      new Compatibilities(template.getCompatibilities().getHardwaretypes(),
+                          template.getCompatibilities().getImagetypes(),
+                          newCompatibleServices);
+    ClusterTemplate updatedTemplate =
+      new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
+                          newCompatibilities, template.getConstraints(), template.getAdministration());
+    entityStore.writeClusterTemplate(updatedTemplate);
+
+    // now sync the cluster
+    String path = "/v1/loom/clusters/" + cluster.getId() + "/clustertemplate/sync";
+    assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.OK);
+
+    // now check the cluster's template is as expected
+    cluster = clusterStore.getCluster(cluster.getId(), cluster.getOwnerId());
+    Assert.assertEquals(updatedTemplate, cluster.getClusterTemplate());
+  }
+
+  @Test
+  public void testClusterTemplateSync404Conditions() throws Exception {
+    Cluster cluster = Entities.ClusterExample.CLUSTER;
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    clusterStore.writeNode(Entities.ClusterExample.NODE1);
+    clusterStore.writeNode(Entities.ClusterExample.NODE2);
+    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+    String path = "/v1/loom/clusters/" + cluster.getId() + "/clustertemplate/sync";
+
+    // test cluster that does not exist returns 404
+    assertResponseStatus(
+      doPost("/v1/loom/clusters/" + cluster.getId() + "1" + "/clustertemplate/sync", "", USER1_HEADERS),
+      HttpResponseStatus.NOT_FOUND);
+
+    // test cluster owned by another user returns 404
+    assertResponseStatus(doPost(path, "", USER2_HEADERS), HttpResponseStatus.NOT_FOUND);
+
+    // test missing template returns 404
+    entityStore.deleteClusterTemplate(cluster.getClusterTemplate().getName());
+    assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
+
+    // test missing nodes returns 404
+    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+    clusterStore.deleteNode(Entities.ClusterExample.NODE1.getId());
+    clusterStore.deleteNode(Entities.ClusterExample.NODE2.getId());
+    assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
+  }
+
+  @Test
+  public void testClusterTemplateSyncOnlyAllowedOnActiveClusters() throws Exception {
+    Cluster cluster = Entities.ClusterExample.CLUSTER;
+    clusterStore.writeCluster(cluster);
+    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+    String path = "/v1/loom/clusters/" + cluster.getId() + "/clustertemplate/sync";
+
+    // test cluster in bad state return 409
+    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+    for (Cluster.Status status : Cluster.Status.values()) {
+      if (status != Cluster.Status.ACTIVE) {
+        cluster.setStatus(status);
+        clusterStore.writeCluster(cluster);
+        assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.CONFLICT);
+      }
+    }
+  }
+
+  @Test
+  public void testClusterTemplateSyncDisallowsIncompatibilities() throws Exception {
+    Cluster cluster = Entities.ClusterExample.CLUSTER;
+    ClusterTemplate template = cluster.getClusterTemplate();
+    cluster.setStatus(Cluster.Status.ACTIVE);
+    clusterStore.writeCluster(cluster);
+    clusterStore.writeNode(Entities.ClusterExample.NODE1);
+    clusterStore.writeNode(Entities.ClusterExample.NODE2);
+    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+
+    // now edit the template, making centos incompatible with the template
+    Set<String> newCompatibleImages = ImmutableSet.of(Entities.ImageTypeExample.UBUNTU_12.getName());
+    Compatibilities newCompatibilities =
+      new Compatibilities(template.getCompatibilities().getHardwaretypes(),
+                          newCompatibleImages,
+                          template.getCompatibilities().getServices());
+    ClusterTemplate updatedTemplate =
+      new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
+                          newCompatibilities, template.getConstraints(), template.getAdministration());
+    entityStore.writeClusterTemplate(updatedTemplate);
+
+    // syncing the cluster would make it invalid, should not be allowed
+    String path = "/v1/loom/clusters/" + cluster.getId() + "/clustertemplate/sync";
+    assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.BAD_REQUEST);
+  }
+
   private void verifyInitialLeaseDuration(long expectedExpireTime, Cluster.Status expectedStatus,
                                           long requestedLeaseDuration,
                                           String clusterTemplate) throws Exception {
