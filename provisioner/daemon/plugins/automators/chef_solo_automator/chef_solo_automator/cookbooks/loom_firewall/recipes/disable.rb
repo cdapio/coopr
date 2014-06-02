@@ -20,7 +20,7 @@
 # Currently, we simply disable the firewall on RHEL
 case node['platform_family']
 when 'rhel'
-  service "iptables" do
+  service 'iptables' do
     action [ :disable, :stop ]
   end
 end
