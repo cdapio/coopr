@@ -11,7 +11,7 @@ dirs="clustertemplates hardwaretypes imagetypes providers services"
 
 if [ "x$LOOM_USE_DUMMY_PROVISIONER" == "xtrue" ]
 then
-  dirs="$dirs providertypes"
+  dirs="$dirs providertypes automatortypes"
 fi
 
 for d in ${dirs} ; do
