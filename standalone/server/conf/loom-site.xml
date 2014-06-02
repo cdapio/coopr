@@ -3,7 +3,7 @@
 <!-- Copyright 2012-2013 Continuuity,Inc. All Rights Reserved.  -->
 <configuration>
   <property>
-    <name>loom.local.data.dir</name>
+    <name>server.local.data.dir</name>
     <value>LOOM_DATA_DIR</value>
   </property>
 </configuration>
