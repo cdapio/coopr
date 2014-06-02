@@ -38,9 +38,7 @@ import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -163,9 +161,9 @@ public class LoomClusterHandler extends LoomAuthHandler {
       responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
       return;
     }
-    
+
     JsonObject jsonObject = GSON.toJsonTree(cluster).getAsJsonObject();
-    
+
     // Update cluster Json with node information.
     Set<Node> clusterNodes = store.getClusterNodes(clusterId);
     jsonObject.add("nodes", GSON.toJsonTree(clusterNodes));

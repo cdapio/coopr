@@ -42,10 +42,11 @@ specific service. The basic macros available are:
   %host.service.<service name>%
   %ip.service.<service name>%
   %num.service.<service name>%
+  %cluster.owner%
 
 Basic macros return a comma separated list of the specified entity for all nodes that contain the specified service.
 For example, '%host.service.datanode%' will be replaced with a comma separated list of all nodes in the cluster that
-have the datanode service.
+have the datanode service. '%cluster.owner%' will be replaced with the owner of the cluster.
 
 Basic Macro Instances
 =====================

@@ -26,6 +26,7 @@ import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.LoomService;
+import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
@@ -49,6 +50,7 @@ import org.junit.Test;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Test ClusterScheduler
@@ -121,7 +123,7 @@ public class SchedulerTest extends BaseTest {
     clusterStore.writeNode(node);
   }
 
-  @Test
+  @Test(timeout = 20000)
   public void testScheduler() throws Exception {
     ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
     CallbackScheduler callbackScheduler = injector.getInstance(CallbackScheduler.class);
@@ -155,7 +157,7 @@ public class SchedulerTest extends BaseTest {
       );
 
     List<Multiset<ActionService>> actualStages = Lists.newArrayList();
-    callbackScheduler.run();
+    waitForCallback(callbackScheduler);
 
     Assert.assertEquals(1, jobQueue.size());
     String consumerId = "testJobScheduler";
@@ -163,11 +165,9 @@ public class SchedulerTest extends BaseTest {
     String jobId = jobQueueElement.getValue();
     job = clusterStore.getClusterJob(JobId.fromString(jobId));
     while (true) {
-      System.out.println("Stage " + job.getCurrentStageNumber());
       Multiset<ActionService> actionServices = HashMultiset.create();
       for (String taskId : job.getCurrentStage()) {
         ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
-        System.out.println(GSON.toJson(task));
         actionServices.add(new ActionService(task.getTaskName().name(), task.getService()));
       }
 
@@ -196,7 +196,6 @@ public class SchedulerTest extends BaseTest {
 
     // Two tasks should have been submitted for provisioning.
     JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
-    System.out.println("Got task " + taskJson);
 
     JsonObject returnJson = new JsonObject();
     returnJson.addProperty("status", 0);
@@ -206,7 +205,6 @@ public class SchedulerTest extends BaseTest {
     TestHelper.finishTask(getLoomUrl(), returnJson);
 
     taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
-    System.out.println("Got task " + taskJson);
     returnJson = new JsonObject();
     returnJson.addProperty("status", 0);
     returnJson.addProperty("workerId", "consumer1");
@@ -214,8 +212,7 @@ public class SchedulerTest extends BaseTest {
     returnJson.add("result", GSON.toJsonTree(ImmutableMap.of("ipaddress", "456.789.123.123")));
     TestHelper.finishTask(getLoomUrl(), returnJson);
 
-    taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
-    System.out.println("Got task " + taskJson);
+    TestHelper.takeTask(getLoomUrl(), "consumer1");
 
     Assert.assertEquals(2, jobQueue.size());
 
@@ -226,7 +223,6 @@ public class SchedulerTest extends BaseTest {
 
     for (int i = 0; i < 5; i++) {
       taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
-      System.out.println("Got task " + taskJson);
       returnJson = new JsonObject();
       returnJson.addProperty("status", 0);
       returnJson.addProperty("workerId", "consumer1");
@@ -237,17 +233,17 @@ public class SchedulerTest extends BaseTest {
     }
   }
 
-  @Test
+  @Test(timeout = 20000)
   public void testSuccessCallbacks() throws Exception {
     testCallbacks(false);
   }
 
-  @Test
+  @Test(timeout = 20000)
   public void testFailureCallbacks() throws Exception {
     testCallbacks(true);
   }
 
-  @Test
+  @Test(timeout = 20000)
   public void testFalseOnStartStopsJob() throws Exception {
     ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
 
@@ -260,15 +256,29 @@ public class SchedulerTest extends BaseTest {
 
     // tell mock callback to return false for onStart callback
     mockClusterCallback.setReturnOnStart(false);
-    callbackScheduler.run();
+    // wait for start callback to finish
+    waitForCallback(callbackScheduler);
+    Assert.assertEquals(CallbackData.Type.START, mockClusterCallback.getReceivedCallbacks().get(0).getType());
 
-    // at this point, the start callback should have run, but not the after callbacks
-    Assert.assertEquals(1, mockClusterCallback.getStartCallbacks().size());
-    Assert.assertEquals(0, mockClusterCallback.getSuccessCallbacks().size());
-    Assert.assertEquals(0, mockClusterCallback.getFailureCallbacks().size());
+    JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
+    jobScheduler.run();
+
+    // wait for fail callback to finish
+    waitForCallback(callbackScheduler);
+    Assert.assertEquals(CallbackData.Type.FAILURE, mockClusterCallback.getReceivedCallbacks().get(1).getType());
 
     // there also should not be any jobs in the queue
     Assert.assertEquals(0, jobQueue.size());
+  }
+
+  private void waitForCallback(CallbackScheduler callbackScheduler) throws InterruptedException {
+    int initialSize = mockClusterCallback.getReceivedCallbacks().size();
+    int size = initialSize;
+    callbackScheduler.run();
+    while (size == initialSize) {
+      size = mockClusterCallback.getReceivedCallbacks().size();
+      TimeUnit.MILLISECONDS.sleep(20);
+    }
   }
 
   private void testCallbacks(boolean failJob) throws Exception {
@@ -280,11 +290,9 @@ public class SchedulerTest extends BaseTest {
     CallbackScheduler callbackScheduler = injector.getInstance(CallbackScheduler.class);
     // should be no job in the queue until the start callback runs
     Assert.assertEquals(0, jobQueue.size());
-    callbackScheduler.run();
-    // at this point, the start callback should have run, but not the after callbacks
-    Assert.assertEquals(1, mockClusterCallback.getStartCallbacks().size());
-    Assert.assertEquals(0, mockClusterCallback.getSuccessCallbacks().size());
-    Assert.assertEquals(0, mockClusterCallback.getFailureCallbacks().size());
+    waitForCallback(callbackScheduler);
+
+    Assert.assertEquals(CallbackData.Type.START, mockClusterCallback.getReceivedCallbacks().get(0).getType());
 
     JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
     jobScheduler.run();
@@ -292,7 +300,6 @@ public class SchedulerTest extends BaseTest {
     // take tasks until there are no more
     JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
     while (taskJson.entrySet().size() > 0) {
-      System.out.println("Got task " + taskJson);
       JsonObject returnJson = new JsonObject();
       returnJson.addProperty("status", failJob ? 1 : 0);
       returnJson.addProperty("workerId", "consumer1");
@@ -300,17 +307,14 @@ public class SchedulerTest extends BaseTest {
       TestHelper.finishTask(getLoomUrl(), returnJson);
       jobScheduler.run();
       jobScheduler.run();
-      callbackScheduler.run();
-
       taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
     }
     jobScheduler.run();
-    callbackScheduler.run();
+    waitForCallback(callbackScheduler);
 
     // at this point, the failure callback should have run
-    Assert.assertEquals(1, mockClusterCallback.getStartCallbacks().size());
-    Assert.assertEquals(failJob ? 0 : 1, mockClusterCallback.getSuccessCallbacks().size());
-    Assert.assertEquals(failJob ? 1 : 0, mockClusterCallback.getFailureCallbacks().size());
+    Assert.assertEquals(failJob ? CallbackData.Type.FAILURE : CallbackData.Type.SUCCESS,
+                        mockClusterCallback.getReceivedCallbacks().get(1).getType());
   }
 
 

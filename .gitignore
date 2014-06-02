@@ -12,6 +12,7 @@ Berksfile.lock
 *.egg
 PKG-INFO
 build/
+target/
 
 # Bundler
 Gemfile.lock
