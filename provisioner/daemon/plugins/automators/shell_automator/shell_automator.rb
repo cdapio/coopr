@@ -113,7 +113,6 @@ class ShellAutomator < Automator
 
   def bootstrap(inputmap)
     sshauth = inputmap['sshauth']
-    hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
     set_credentials(sshauth)
 
