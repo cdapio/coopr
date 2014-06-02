@@ -88,6 +88,7 @@ COMMIT
 ## Nodes
 ###
 
+# This cluster (automatic)
 <% node['loom']['cluster']['nodes'].each do |n, v| %>
 -A INPUT -s <%= v.ipaddress =%> -j ACCEPT
 <% end %>
