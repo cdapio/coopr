@@ -94,8 +94,7 @@ class RackspaceProvider < Provider
 
       Net::SSH.start(kniferesult['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         # validate connectivity
-        log.debug "Validating dns resolution/connectivity"
-        ssh_exec!(ssh, "ping -c1 www.opscode.com")
+        ssh_exec!(ssh, "ping -c1 www.opscode.com", "Validating external connectivity and DNS resolution via ping")
       end
 
       @result['status'] = 0

@@ -54,18 +54,35 @@ end
 
 # Exception class used to return remote command stderr
 class CommandExecutionError < RuntimeError
-  attr_reader :cmdoutput
+  attr_reader :command, :stdout, :stderr, :exit_code, :exit_signal
 
-  def initialize(cmdoutput)
-    @cmdoutput = cmdoutput
+  def initialize(command, stdout, stderr, exit_code, exit_signal)
+    @command = command
+    @stdout = stdout
+    @stderr = stderr
+    @exit_code = exit_code
+    @exit_signal = exit_signal
+  end
+
+  def to_json(*a)
+    result = {
+      "message" => message,
+      "command" => command,
+      "stdout" => @stdout,
+      "stderr" => @stderr,
+      "exit_code" => @exit_code,
+      "exit_signal" => @exit_signal
+    }
+    result.to_json(*a)
   end
 end
 
-def ssh_exec!(ssh, command)
+def ssh_exec!(ssh, command, message = command)
   stdout_data = ''
   stderr_data = ''
   exit_code = nil
   exit_signal = nil
+  log.debug message if message != command
   log.debug "---ssh-exec command: #{command}"
   ssh.open_channel do |channel|
     channel.exec(command) do |ch, success|
@@ -94,7 +111,7 @@ def ssh_exec!(ssh, command)
   log.debug "stderr: #{stderr_data}"
   log.debug "stdout: #{stdout_data}"
 
-  fail CommandExecutionError.new([stdout_data, stderr_data, exit_code, exit_signal]), 'Command execution failed' unless exit_code == 0
+  fail CommandExecutionError.new(command, stdout_data, stderr_data, exit_code, exit_signal), message unless exit_code == 0
 
   [stdout_data, stderr_data, exit_code, exit_signal]
 end

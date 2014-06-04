@@ -111,8 +111,8 @@ def delegate_task(task, pluginmanager)
     classes = []
     if task['config'].key? 'automators' and !task['config']['automators'].empty?
       # server has specified which bootstrap handlers need to run
+      log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
       task['config']['automators'].each do |automator|
-        log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
         classes.push(pluginmanager.getHandlerActionObjectForAutomator(automator))
       end
     else
@@ -159,7 +159,6 @@ if options[:file]
   begin
     result = nil
     task = nil
-    cmdoutput = nil
     log.info "Start Provisioner run for file #{options[:file]}"
     task = JSON.parse(IO.read(options[:file]))
 
@@ -174,9 +173,9 @@ if options[:file]
     result = {} if result.nil? == true
     result['status'] = '1'
     if e.class.name == 'CommandExecutionError'
-      cmdoutput = e.cmdoutput
-      result['stdout'] = cmdoutput[0]
-      result['stderr'] = cmdoutput[1]
+      log.error "#{e.class.name}: #{e.to_json}"
+      result['stdout'] = e.stdout
+      result['stderr'] = e.stderr
     else
       result['stdout'] = e.inspect
       result['stderr'] = "#{e.inspect}\n#{e.backtrace.join("\n")}"
@@ -196,7 +195,6 @@ else
     result = nil
     response = nil
     task = nil
-    cmdoutput = nil
     begin
       response = RestClient.post "#{loom_uri}/v1/loom/tasks/take", { 'workerId' => myid }.to_json
     rescue => e
@@ -240,15 +238,14 @@ else
         end
 
       rescue => e
-        puts e.inspect
         result = Hash.new if result.nil? == true
         result['status'] = '1'
         result['workerId'] = myid
         result['taskId'] = task['taskId']
         if e.class.name == 'CommandExecutionError'
-          cmdoutput = e.cmdoutput
-          result['stdout'] = cmdoutput[0]
-          result['stderr'] = cmdoutput[1]
+          log.error "#{e.class.name}: #{e.to_json}"
+          result['stdout'] = e.stdout
+          result['stderr'] = e.stderr
         else
           result['stdout'] = e.inspect
           result['stderr'] = "#{e.inspect}\n#{e.backtrace.join("\n")}"
