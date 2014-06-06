@@ -15,8 +15,6 @@
  */
 package com.continuuity.loom.store;
 
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
 import com.google.common.base.Throwables;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.ZKClientService;
@@ -28,7 +26,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -38,7 +35,7 @@ import java.util.concurrent.Executors;
 /**
  *
  */
-public class BaseClusterStoreTest {
+public class IdServiceTest {
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
   private static InMemoryZKServer zkServer;
@@ -57,29 +54,12 @@ public class BaseClusterStoreTest {
   public static void afterClass() {
     zkClient.stopAndWait();
     zkServer.stopAndWait();
-    try {
-      DriverManager.getConnection("jdbc:derby:memory:loom;drop=true");
-    } catch (SQLException e) {
-      // this is normal when a drop happens
-      if (!e.getSQLState().equals("08006") ) {
-        Throwables.propagate(e);
-      }
-    }
   }
 
   @Test
   public void testIds() throws InterruptedException, SQLException, ClassNotFoundException {
-    Configuration conf = Configuration.create();
-    conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
-    conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
-    conf.setLong(Constants.ID_START_NUM, 3);
-    conf.setLong(Constants.ID_INCREMENT_BY, 10);
-    DBConnectionPool dbConnectionPool = new DBConnectionPool(conf);
-    final SQLClusterStore store = new SQLClusterStore(zkClient, dbConnectionPool, conf);
-    store.initialize();
-    store.initDerbyDB();
-    store.clearData();
-
+    final IdService idService = new IdService(zkClient, 3, 10);
+    idService.startAndWait();
     final int incrementsPerThread = 100;
     final int numThreads = 20;
     final CyclicBarrier barrier = new CyclicBarrier(numThreads);
@@ -93,7 +73,7 @@ public class BaseClusterStoreTest {
           for (int j = 0; j < incrementsPerThread; j++) {
             try {
               barrier.await();
-              store.getNewClusterId();
+              idService.getNewClusterId();
             } catch (Exception e) {
               Throwables.propagate(e);
             }
@@ -107,7 +87,7 @@ public class BaseClusterStoreTest {
 
     // counter starts at 3, goes up by 10 each time
     long expected = 3 + numThreads * incrementsPerThread * 10;
-    long actual = Long.valueOf(store.getNewClusterId());
+    long actual = Long.valueOf(idService.getNewClusterId());
     Assert.assertEquals(expected, actual);
   }
 

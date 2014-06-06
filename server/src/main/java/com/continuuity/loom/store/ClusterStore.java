@@ -38,29 +38,6 @@ public interface ClusterStore {
   void initialize();
 
   /**
-   * Get a unique id that can be used for a new cluster.
-   *
-   * @return Unique id that can be used for a new cluster.
-   */
-  String getNewClusterId();
-
-  /**
-   * Get a unique job id that can be used for new {@link ClusterJob}s.
-   *
-   * @param clusterId Id of the cluster the job is for.
-   * @return Unique job id.
-   */
-  JobId getNewJobId(String clusterId);
-
-  /**
-   * Get a unique task id that can be used for new {@link ClusterTask}s.
-   *
-   * @param jobId Id of the job the task is a part of.
-   * @return Unique task id.
-   */
-  TaskId getNewTaskId(JobId jobId);
-
-  /**
    * Get an immutable list of all clusters in the store.
    * @return All clusters in the store.
    * @throws Exception if there was a problem getting the clusters.

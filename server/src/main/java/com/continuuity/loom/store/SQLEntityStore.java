@@ -71,26 +71,7 @@ public class SQLEntityStore extends BaseEntityStore {
       String entityName = entityType.getId();
       // immune to sql injection since it comes from the enum
       String createString = "CREATE TABLE " + entityName + "s ( name VARCHAR(255), " + entityName + " BLOB )";
-      createDerbyTable(createString);
-    }
-  }
-
-  private void createDerbyTable(String createString) throws SQLException {
-    Connection conn = dbConnectionPool.getConnection();
-    try {
-      Statement statement = conn.createStatement();
-      try {
-        statement.executeUpdate(createString);
-      } catch (SQLException e) {
-        // code for the table already exists in derby.
-        if (!e.getSQLState().equals("X0Y32")) {
-          throw Throwables.propagate(e);
-        }
-      } finally {
-        statement.close();
-      }
-    } finally {
-      conn.close();
+      DBQueryHelper.createDerbyTable(createString, dbConnectionPool);
     }
   }
 

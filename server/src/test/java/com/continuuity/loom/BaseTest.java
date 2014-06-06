@@ -21,9 +21,11 @@ import com.continuuity.loom.guice.LoomModules;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;
 import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.DBQueryHelper;
 import com.continuuity.loom.store.EntityStore;
+import com.continuuity.loom.store.IdService;
 import com.continuuity.loom.store.SQLClusterStore;
-import com.google.common.base.Throwables;
+import com.continuuity.loom.store.SQLTenantStore;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -37,7 +39,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
@@ -46,6 +47,7 @@ import java.sql.SQLException;
 public class BaseTest {
   private static InMemoryZKServer zkServer;
   private static SQLClusterStore sqlClusterStore;
+  private static SQLTenantStore sqlTenantStore;
   protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
   protected static ZKClientService zkClientService;
@@ -53,6 +55,7 @@ public class BaseTest {
   protected static ClusterStore clusterStore;
   protected static Configuration conf;
   protected static MockClusterCallback mockClusterCallback;
+  protected static IdService idService;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -86,10 +89,13 @@ public class BaseTest {
       )
     );
 
+    idService = injector.getInstance(IdService.class);
+    idService.startAndWait();
     entityStore = injector.getInstance(EntityStore.class);
     sqlClusterStore = injector.getInstance(SQLClusterStore.class);
     sqlClusterStore.initialize();
-    sqlClusterStore.initDerbyDB();
+    sqlTenantStore = injector.getInstance(SQLTenantStore.class);
+    sqlTenantStore.startAndWait();
     clusterStore = sqlClusterStore;
   }
 
@@ -97,18 +103,12 @@ public class BaseTest {
   public static void teardownBase() {
     zkClientService.stopAndWait();
     zkServer.stopAndWait();
-    try {
-      DriverManager.getConnection("jdbc:derby:memory:loom;drop=true");
-    } catch (SQLException e) {
-      // this is normal when a drop happens
-      if (!e.getSQLState().equals("08006") ) {
-        Throwables.propagate(e);
-      }
-    }
+    DBQueryHelper.dropDerbyDB();
   }
 
   @Before
   public void setupBaseTest() throws SQLException {
     sqlClusterStore.clearData();
+    sqlTenantStore.clearData();
   }
 }

@@ -30,6 +30,7 @@ import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
 import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.IdService;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -57,8 +58,8 @@ public class ClusterScheduler implements Runnable {
   private final String id;
   private final ClusterStore clusterStore;
   private final TrackingQueue inputQueue;
-  private final TrackingQueue jobQueue;
   private final TaskService taskService;
+  private final IdService idService;
 
   private final Actions actions = Actions.getInstance();
 
@@ -66,12 +67,13 @@ public class ClusterScheduler implements Runnable {
   private ClusterScheduler(@Named("scheduler.id") String id, ClusterStore clusterStore,
                            @Named(Constants.Queue.CLUSTER) TrackingQueue inputQueue,
                            @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
-                           TaskService taskService) {
+                           TaskService taskService,
+                           IdService idService) {
     this.id = id;
     this.clusterStore = clusterStore;
     this.inputQueue = inputQueue;
-    this.jobQueue = jobQueue;
     this.taskService = taskService;
+    this.idService = idService;
   }
 
   @Override
@@ -170,7 +172,7 @@ public class ClusterScheduler implements Runnable {
           continue;
         }
 
-        TaskId taskId = clusterStore.getNewTaskId(JobId.fromString(job.getJobId()));
+        TaskId taskId = idService.getNewTaskId(JobId.fromString(job.getJobId()));
         ClusterTask task = new ClusterTask(ProvisionerAction.valueOf(taskNode.getTaskName()), taskId,
                                            taskNode.getHostId(), taskNode.getService(), clusterAction,
                                            taskConfig);

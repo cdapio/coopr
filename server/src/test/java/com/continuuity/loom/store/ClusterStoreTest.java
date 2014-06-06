@@ -32,18 +32,23 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- *
+ * Tests for getting and setting cluster objects.  Test classes for different types of stores must set the
+ * protected store field before each test and make sure state is wiped out between tests.
  */
 public abstract class ClusterStoreTest {
   private static final Gson GSON = new JsonSerde().getGson();
 
   protected static ClusterStore store;
+
+  @Before
+  public abstract void clearState() throws Exception;
 
   @Test
   public void testGetStoreDeleteCluster() throws Exception {
@@ -174,7 +179,7 @@ public abstract class ClusterStoreTest {
   public void testGetAllClusters() throws Exception {
     Assert.assertEquals(0, store.getAllClusters().size());
 
-    String clusterId1 = store.getNewClusterId();
+    String clusterId1 = "123";
     Cluster cluster1 = new Cluster(
       clusterId1, "user", "example-hdfs", System.currentTimeMillis(), "hdfs cluster",
       Entities.ProviderExample.RACKSPACE,
@@ -185,7 +190,7 @@ public abstract class ClusterStoreTest {
 
     // Make sure new cluster is at least 1ms older than the previous one.
     Cluster cluster2 = new Cluster(
-      store.getNewClusterId(), "user", "example-hdfs2", System.currentTimeMillis() + 1, "hdfs cluster",
+      "1234", "user", "example-hdfs2", System.currentTimeMillis() + 1, "hdfs cluster",
       Entities.ProviderExample.RACKSPACE,
       Entities.ClusterTemplateExample.HDFS,
       ImmutableSet.of("node3", "node4"),

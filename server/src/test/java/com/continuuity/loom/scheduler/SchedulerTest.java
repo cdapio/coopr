@@ -31,6 +31,7 @@ import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
+import com.continuuity.loom.store.IdService;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
@@ -69,6 +70,8 @@ public class SchedulerTest extends BaseTest {
 
   @BeforeClass
   public static void start() throws Exception {
+    injector.getInstance(IdService.class).startAndWait();
+
     inputQueue = injector.getInstance(
       Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
     inputQueue.start();

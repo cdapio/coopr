@@ -32,6 +32,7 @@ import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.EntityStore;
+import com.continuuity.loom.store.IdService;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -60,6 +61,7 @@ public class ClusterService {
   private final ZKClient zkClient;
   private final LoomStats loomStats;
   private final Solver solver;
+  private final IdService idService;
 
   @Inject
   public ClusterService(ClusterStore clusterStore,
@@ -68,7 +70,8 @@ public class ClusterService {
                         @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
                         ZKClient zkClient,
                         LoomStats loomStats,
-                        Solver solver) {
+                        Solver solver,
+                        IdService idService) {
     this.clusterStore = clusterStore;
     this.entityStore = entityStore;
     this.clusterQueue = clusterQueue;
@@ -76,6 +79,7 @@ public class ClusterService {
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.loomStats = loomStats;
     this.solver = solver;
+    this.idService = idService;
   }
 
   /**
@@ -90,7 +94,7 @@ public class ClusterService {
     lock.acquire();
     try {
       Cluster cluster = getUserCluster(clusterId, userId);
-      JobId deleteJobId = clusterStore.getNewJobId(clusterId);
+      JobId deleteJobId = idService.getNewJobId(clusterId);
       ClusterJob deleteJob = new ClusterJob(deleteJobId, ClusterAction.CLUSTER_DELETE);
       deleteJob.setJobStatus(ClusterJob.Status.RUNNING);
       cluster.setLatestJobId(deleteJobId.getId());
@@ -130,7 +134,7 @@ public class ClusterService {
       if (!Cluster.Status.CONFIGURABLE_STATES.contains(cluster.getStatus())) {
         throw new IllegalStateException("cluster " + clusterId + " is not in a configurable state");
       }
-      JobId configureJobId = clusterStore.getNewJobId(clusterId);
+      JobId configureJobId = idService.getNewJobId(clusterId);
 
       ClusterAction action =
         restartServices ? ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART : ClusterAction.CLUSTER_CONFIGURE;
@@ -177,7 +181,7 @@ public class ClusterService {
         throw new IllegalStateException(
           "cluster " + clusterId + " is not in a state where service actions can be performed");
       }
-      JobId jobId = clusterStore.getNewJobId(clusterId);
+      JobId jobId = idService.getNewJobId(clusterId);
 
       ClusterJob job = new ClusterJob(jobId, action, service == null ? null : ImmutableSet.of(service), null);
       job.setJobStatus(ClusterJob.Status.RUNNING);
@@ -216,7 +220,7 @@ public class ClusterService {
         throw new IllegalStateException(
           "cluster " + clusterId + " is not in a state where services can be added to it.");
       }
-      JobId jobId = clusterStore.getNewJobId(clusterId);
+      JobId jobId = idService.getNewJobId(clusterId);
       solver.validateServicesToAdd(cluster, addRequest.getServices());
 
       ClusterAction action = ClusterAction.ADD_SERVICES;

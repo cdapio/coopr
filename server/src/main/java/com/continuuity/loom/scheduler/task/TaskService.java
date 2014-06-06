@@ -28,6 +28,7 @@ import com.continuuity.loom.scheduler.Actions;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.IdService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -48,13 +49,16 @@ public class TaskService {
   private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
   private final TrackingQueue callbackQueue;
+  private final IdService idService;
 
   @Inject
   private TaskService(ClusterStore clusterStore, LoomStats loomStats,
-                      @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue) {
+                      @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,
+                      IdService idService) {
     this.clusterStore = clusterStore;
     this.loomStats = loomStats;
     this.callbackQueue = callbackQueue;
+    this.idService = idService;
   }
 
   /**
@@ -74,7 +78,7 @@ public class TaskService {
     // There are cases when we don't associate a nodeId with a task so that the node properties don't get overridden
     // by the task output.
     // Eg. deleting a box during a rollback operation since we reuse nodeIds.
-    TaskId rollbackTaskId = clusterStore.getNewTaskId(JobId.fromString(task.getJobId()));
+    TaskId rollbackTaskId = idService.getNewTaskId(JobId.fromString(task.getJobId()));
     ClusterTask rollbackTask = new ClusterTask(rollback, rollbackTaskId, null,
                                                task.getService(), task.getClusterAction(),
                                                task.getAttempts().get(task.currentAttemptIndex()).getConfig());
@@ -123,7 +127,7 @@ public class TaskService {
     int currentActionIndex = taskOrder.indexOf(task.getTaskName());
     for (int i = retryActionIndex; i < currentActionIndex; ++i) {
       ProvisionerAction action = taskOrder.get(i);
-      TaskId retryTaskId = clusterStore.getNewTaskId(JobId.fromString(task.getJobId()));
+      TaskId retryTaskId = idService.getNewTaskId(JobId.fromString(task.getJobId()));
       ClusterTask retry = new ClusterTask(action, retryTaskId, task.getNodeId(), task.getService(),
                                           task.getClusterAction(),
                                           TaskConfig.getConfig(cluster, node, serviceObj, action));

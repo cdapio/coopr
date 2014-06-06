@@ -43,20 +43,13 @@ public class SQLEntityStoreTest extends EntityStoreTest {
     entityStore = sqlStore;
   }
 
-  @Before
-  public void before() throws SQLException {
+  @Override
+  public void clearState() throws Exception {
     sqlStore.clearData();
   }
 
   @AfterClass
   public static void afterClass() {
-    try {
-      DriverManager.getConnection("jdbc:derby:memory:loom;drop=true");
-    } catch (SQLException e) {
-      // this is normal when a drop happens
-      if (!e.getSQLState().equals("08006") ) {
-        Throwables.propagate(e);
-      }
-    }
+    DBQueryHelper.dropDerbyDB();
   }
 }

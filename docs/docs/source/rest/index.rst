@@ -39,11 +39,24 @@ All URLs referenced in the documentation have the following base:
 
  http://<loom-server>:<loom-port>/v1/loom
 
-In addition, two headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
-the id of the user making the request.  The second is ``X-Loom-ApiKey`` and is used to specify the api key used to
-communicate with the server.
+In addition, three headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
+the id of the user making the request. The second is ``X-Loom-ApiKey`` and is used to specify the api key used to
+communicate with the server. The third is ``X-Loom-TenantID`` and is used to specify the id of the tenant that the
+user belongs to.
 
 .. note:: The Loom REST API is served over HTTP. In the near future, the Loom APIs will be served on HTTPS to ensure data privacy, and unencrypted HTTP will not be supported.
+
+Super admin APIs
+================
+
+Tenants
+-------
+  * :ref:`Create a Tenant <tenants-create>`
+  * :ref:`View a Tenant <tenants-retrieve>`
+  * :ref:`View all Tenants <tenants-all-list>`
+  * :ref:`Update a Tenant <tenants-modify>`
+  * :ref:`Delete a Tenant <tenants-delete>`
+
 
 Administration APIs
 ====================

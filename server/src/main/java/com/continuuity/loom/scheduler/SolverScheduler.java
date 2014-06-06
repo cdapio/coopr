@@ -20,7 +20,6 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.AddServicesRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
@@ -30,6 +29,7 @@ import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskService;
 import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.IdService;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -63,13 +63,14 @@ public class SolverScheduler implements Runnable {
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
   private final LoomStats loomStats;
+  private final IdService idService;
 
   @Inject
   private SolverScheduler(@Named("scheduler.id") String id, Solver solver, ClusterStore clusterStore,
                           @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
                           @Named(Constants.Queue.CLUSTER) TrackingQueue clusterQueue,
                           @Named("solver.executor.service") ListeningExecutorService executorService,
-                          TaskService taskService, LoomStats loomStats) {
+                          TaskService taskService, LoomStats loomStats, IdService idService) {
     this.id = id;
     this.solver = solver;
     this.clusterStore = clusterStore;
@@ -78,6 +79,7 @@ public class SolverScheduler implements Runnable {
     this.executorService = executorService;
     this.taskService = taskService;
     this.loomStats = loomStats;
+    this.idService = idService;
   }
 
   @Override
@@ -208,7 +210,7 @@ public class SolverScheduler implements Runnable {
       clusterStore.writeCluster(cluster);
 
       // Create new Job for creating cluster.
-      JobId clusterJobId = clusterStore.getNewJobId(cluster.getId());
+      JobId clusterJobId = idService.getNewJobId(cluster.getId());
       ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.ADD_SERVICES,
                                             request.getServices(), changedNodeIds);
       cluster.setLatestJobId(createJob.getJobId());
@@ -262,7 +264,7 @@ public class SolverScheduler implements Runnable {
       }
 
       // Create new Job for creating cluster.
-      JobId clusterJobId = clusterStore.getNewJobId(cluster.getId());
+      JobId clusterJobId = idService.getNewJobId(cluster.getId());
       ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.CLUSTER_CREATE);
       cluster.setLatestJobId(createJob.getJobId());
       clusterStore.writeClusterJob(createJob);
