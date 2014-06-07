@@ -42,6 +42,7 @@
       "base",
       "haproxy",
       "apache-httpd",
+      "memcached",
       "php",
       "mysql-server"
     ]
