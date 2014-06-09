@@ -30,7 +30,10 @@
           "negotiation",
           "setenvif",
           "log_config",
-          "logio"
+          "logio",
+          "perl",
+          "php5",
+          "python"
         ]
       },
       "mysql": {
