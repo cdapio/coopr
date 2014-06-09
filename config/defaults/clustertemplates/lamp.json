@@ -14,6 +14,24 @@
     "config": {
       "apache": {
         "default_site_enabled": "true"
+        "default_modules": [
+          "status",
+          "alias",
+          "auth_basic",
+          "authn_file",
+          "authz_default",
+          "authz_groupfile",
+          "authz_host",
+          "authz_user",
+          "autoindex",
+          "dir",
+          "env",
+          "mime",
+          "negotiation",
+          "setenvif",
+          "log_config",
+          "logio"
+        ]
       },
       "mysql": {
         "server_debian_password": "somedefaultpassword",
