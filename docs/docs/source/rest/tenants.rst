@@ -229,7 +229,7 @@ Example
         -H 'X-Loom-UserID:superadmin' 
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
-        -d '{ "name":"my-company", "workers":20 }'  
+        -d '{ "id":"f78dae92-a27b-4e3b-8c6a-cfc19f844259", "name":"my-company", "workers":20 }'  
         http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
  $ curl -X GET 
         -H 'X-Loom-UserID:superadmin' 

@@ -102,7 +102,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
         responder.sendError(HttpResponseStatus.NOT_FOUND, "tenant " + tenantId + " not found");
         return;
       }
-      responder.sendJson(HttpResponseStatus.OK, tenant, new TypeToken<Tenant>() {}.getType());
+      responder.sendJson(HttpResponseStatus.OK, tenant);
     } catch (IOException e) {
       LOG.error("Exception while getting tenant {}." , tenantId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while getting tenant " + tenantId);
@@ -188,7 +188,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
       }
     }
 
-    if (tenant.getId() != null && !tenant.getId().equals(tenantId)) {
+    if (tenant.getId() == null || !tenant.getId().equals(tenantId)) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "tenant id does not match id in path.");
       return;
     }

@@ -135,6 +135,11 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
     Tenant tenant = new Tenant("name", "id123", 10, 10, 10);
     assertResponseStatus(doPut("/v1/tenants/10", GSON.toJson(tenant), SUPERADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
+
+    // missing id in object
+    tenant = new Tenant("name", null, 10, 10, 10);
+    assertResponseStatus(doPut("/v1/tenants/10", GSON.toJson(tenant), SUPERADMIN_HEADERS),
+                         HttpResponseStatus.BAD_REQUEST);
   }
 
   @Test
