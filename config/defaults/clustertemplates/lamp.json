@@ -44,7 +44,6 @@
       "apache-httpd",
       "memcached",
       "php",
-      "php-memcache",
       "mysql-server"
     ]
   },
