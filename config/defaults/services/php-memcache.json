@@ -12,7 +12,10 @@
     },
     "provides": [],
     "runtime": {
-      "requires": [ "php" ],
+      "requires": [
+        "php",
+        "memcached"
+      ],
       "uses": []
     }
   },
