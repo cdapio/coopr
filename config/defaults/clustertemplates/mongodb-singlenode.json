@@ -4,7 +4,7 @@
   "defaults": {
     "services": [
       "base",
-      "mongodb"
+      "mongodb-single"
     ],
     "provider": "rackspace",
     "hardwaretype": "medium",
