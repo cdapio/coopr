@@ -1,6 +1,6 @@
 {
   "name": "lamp",
-  "description": "LAMP stack (Linux, Apache, MySQL, PHP) with HAproxy support",
+  "description": "LAMP stack (Linux, Apache, MySQL, PHP) with SSL and HAproxy support",
   "defaults": {
     "services": [
       "base",
@@ -33,7 +33,8 @@
           "logio",
           "perl",
           "php5",
-          "python"
+          "python",
+          "ssl"
         ]
       },
       "mysql": {
