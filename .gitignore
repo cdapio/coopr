@@ -8,10 +8,18 @@ Berksfile.lock
 *.un~
 /cookbooks
 .DS_Store
+*.py[co]
+*.egg
+PKG-INFO
+build/
+target/
 
 # Bundler
 Gemfile.lock
 .bundle/*
+
+# Coverage reports
+coverage
 
 .kitchen/
 .kitchen.local.yml

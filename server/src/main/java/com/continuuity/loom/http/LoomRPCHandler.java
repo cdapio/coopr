@@ -54,7 +54,7 @@ public class LoomRPCHandler extends LoomAuthHandler {
   private ClusterService clusterService;
 
   @Inject
-  public LoomRPCHandler(ClusterStore store, ClusterService clusterService) {
+  private LoomRPCHandler(ClusterStore store, ClusterService clusterService) {
     this.store = store;
     this.clusterService = clusterService;
   }

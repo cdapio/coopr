@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.macro;
 
+import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
@@ -31,6 +32,7 @@ import java.util.Set;
 public class ExpanderTest {
 
   private static Set<Node> clusterNodes = ExpressionTest.clusterNodes;
+  private static Cluster cluster = ExpressionTest.cluster;
   private static Node node1 = ExpressionTest.node1;
   private static Node node2 = ExpressionTest.node2;
 
@@ -46,13 +48,14 @@ public class ExpanderTest {
     Expander expander = new Expander();
     Assert.assertEquals(
       "service one: rab:2181,oof:2181,eno:2181",
-      expander.expand("service one: %join(map(host.service.svc1,'$:2181'),',')%", clusterNodes, node1));
+      expander.expand("service one: %join(map(host.service.svc1,'$:2181'),',')%", cluster, clusterNodes, node1));
   }
 
   @Test
   public void testJsonExpansion() throws SyntaxException, IncompleteClusterException {
     JsonElement json = new Gson().fromJson(jsonIn, JsonElement.class);
-    JsonElement json1 = new Expander().expand(json, ImmutableList.of("defaults", "config"), clusterNodes, node2);
+    JsonElement json1 = new Expander().expand(
+      json, ImmutableList.of("defaults", "config"), cluster, clusterNodes, node2);
     System.out.println(json1);
     Assert.assertNotSame(json, json1);
     Assert.assertTrue(json1.toString().contains("hdfs://rab,oof,eno"));
@@ -62,6 +65,7 @@ public class ExpanderTest {
     Assert.assertTrue(json1.toString().contains("server.3\":\"eno:2888:3888\""));
     Assert.assertTrue(json1.toString().contains("myid\":\"2\""));
     Assert.assertTrue(json1.toString().contains("quorum.size\":\"3\""));
+    Assert.assertTrue(json1.toString().contains("email\":\"" + cluster.getOwnerId() + "@company.net\""));
     // should not expand if the self macro is not for the node
     Assert.assertTrue(json1.toString().contains("dummyvar\":\"%instance.self.service.svc2%\""));
   }
@@ -70,7 +74,7 @@ public class ExpanderTest {
   public void testJsonExpansionSkipsUnexpandableMacros() throws SyntaxException, IncompleteClusterException {
     JsonObject input = new Gson().fromJson(jsonIn, JsonObject.class);
     input.addProperty("invalid-cluster-macro", "%host.service.svc4%");
-    JsonElement expanded = new Expander().expand(input, null, clusterNodes, node1);
+    JsonElement expanded = new Expander().expand(input, null, cluster, clusterNodes, node1);
     Assert.assertEquals("%host.service.svc4%", expanded.getAsJsonObject().get("invalid-cluster-macro").getAsString());
   }
 
@@ -111,6 +115,9 @@ public class ExpanderTest {
     "          \"server.2\": \"%host.service.svc1[1]%:2888:3888\",\n" +
     "          \"server.3\": \"%host.service.svc1[2]%:2888:3888\"\n" +
     "        }\n" +
+    "      },\n" +
+    "      \"myapp\": {\n" +
+    "        \"email\": \"%cluster.owner%@company.net\"\n" +
     "      }\n" +
     "    }\n" +
     "  }\n" +

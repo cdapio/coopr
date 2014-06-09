@@ -24,7 +24,7 @@
     <groupId>com.continuuity</groupId>
     <artifactId>loom-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.7-SNAPSHOT</version>
+    <version>0.9.8-SNAPSHOT</version>
     <name>Continuuity Loom</name>
 
     <modules>

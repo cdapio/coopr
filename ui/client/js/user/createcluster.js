@@ -114,7 +114,7 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
   $scope.$watch('defaultProvider', function () {
     if ($scope.defaultProvider) {
       dataFactory.getProviderFields($scope.defaultProvider, function (providerInfo) {
-        $scope.providerFields = $scope.providerData[providerInfo.name];
+        $scope.providerFields = $scope.providerData[providerInfo.providertype];
         $scope.defaultProviderInfo = providerInfo;
       });  
     }

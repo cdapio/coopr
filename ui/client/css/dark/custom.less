@@ -126,7 +126,7 @@ body {
 }
 
 .progress-bar.text-danger {
-	background: #ED8583;
+	background: #E74D4A;
 }
 
 .progress-bar.text-success {
@@ -138,7 +138,7 @@ body {
 }
 
 .text-danger {
-	color: #ED8583 !important;
+	color: #E74D4A !important;
 }
 
 .text-success {
@@ -274,7 +274,7 @@ a, a:visited {
 
 #nav {
 	height: 100px;
-	background: #374760;
+	background: #121E39;
 }
 
 #product-name {
@@ -373,8 +373,8 @@ a, a:visited {
  * Tablesorter overrides.
  */
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-	background-color: #EAEAEA;
-	color: #4279CC;
+  background-color: #3C4355;
+  color: white;
 }
 
 /*************************/
@@ -389,7 +389,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 }
 
 #nav ul li {
-	background: #374760
+	background: #121E39;
 }
 
 .dropdown-menu {
@@ -408,7 +408,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 }
 
 .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
-	background-color: #626A7F;
+	background-color: #707991;
 	color: rgb(192, 205, 221);
 }
 
@@ -690,9 +690,9 @@ a strong {
 }
 
 .nav-item {
-	border-left: 1px solid #2A3546;
-	box-shadow: 0px 0px 1px 1px #4B5F7B;
-	opacity: 0.5;
+    border-left: 1px solid #808080;
+    box-shadow: 0px 0px 1px 1px #121E39;
+    opacity: 0.7;
 }
 
 .nav-item:hover {
@@ -700,8 +700,8 @@ a strong {
 }
 
 .nav-item.last {
-	border-left: 1px solid #2A3546;
-	border-right: 1px solid #2A3546;
+	border-left: 1px solid #808080;
+	border-right: 1px solid #808080;
 }
 
 .nav-home {
@@ -806,7 +806,7 @@ a strong {
 	padding-left: 30px !important;
 	line-height: 26px !important;
 	background-position: 10px;
-	opacity: 0.5;
+	opacity: 0.7;
 	background-repeat:  no-repeat;
 }
 
@@ -836,9 +836,12 @@ a strong {
 }
 
 .serviceset-name {
-	color: white;
-	background: #4F4F4F;
-	cursor: pointer;
+  color: white;
+  background: #121E39;
+  cursor: pointer;
+  border-radius: 5px 5px 0px 0px;
+  -moz-border-radius: 5px 5px 0px 0px;
+  -webkit-border-radius: 5px 5px 0px 0px;
 }
 
 .serviceset-node-table {
@@ -1002,16 +1005,20 @@ a strong {
 	font-family: Arial;
 	background: #3C4355;
 	padding-left: 15px;
-	padding-top: 20px;
-	padding-bottom: 20px;
+	padding-top: 10px;
+	padding-bottom: 10px;
 	color: white;	
 	font-size: 16px;
 }
 
-.spl-panel-table>tbody>tr>td{
+.spl-panel-table>tbody>tr>td {
 	padding-top: 20px;
 	padding-bottom: 20px;
 	background: #575F74;
+	color: rgb(192, 205, 221);
+}
+
+.spl-panel-table>tbody>tr>td span {
 	color: rgb(192, 205, 221);
 }
 
@@ -1034,7 +1041,7 @@ a strong {
 	background: url("/static/img/v2-assets/delete_active.png") no-repeat;
 	border: none;
 	background-position: 2px 3px;
-	opacity: 0.5;
+	opacity: 0.7;
 }
 
 .btn-delete:hover {
@@ -1049,10 +1056,10 @@ a strong {
 }
 
 #nav .login-dropdown li {
-	margin: 0;
-	padding: 0;
-	border-bottom: 1px solid #2A3546;
-	box-shadow: 0px 0px 1px 1px #4B5F7B;
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid #121E39;
+  box-shadow: 0px 0px 1px 1px #606163;
 }
 
 #nav .login-dropdown li:last-child {
@@ -1060,7 +1067,7 @@ a strong {
 }
 
 #nav .login-dropdown li:first-child {
-	box-shadow: 0px 0px 1px 1px #4B5F7B;
+  box-shadow: 0px 0px 1px 1px #606163;
 }
 
 #nav .login-dropdown li a {
@@ -1125,4 +1132,38 @@ a strong {
 
 .skin-container {
 	width: 300px;
+}
+
+.toggle-delete-cluster {
+  background: url('/static/img/v2-assets/icon_contract.png') no-repeat;
+  height: 14px;
+  width: 14px;
+}
+
+.toggle-delete-cluster.open {
+  background: url('/static/img/v2-assets/icon_expand.png') no-repeat;
+}
+
+.btn-service-start {
+  background: url('/static/img/v2-assets/icon_start.png');
+}
+
+.btn-service-start:hover {
+  background: url('/static/img/v2-assets/icon_start_active.png');
+}
+
+.btn-service-stop {
+  background: url('/static/img/v2-assets/icon_stop.png');
+}
+
+.btn-service-stop:hover {
+  background: url('/static/img/v2-assets/icon_stop_active.png');
+}
+
+.btn-service-restart {
+  background: url('/static/img/v2-assets/icon_refresh.png');
+}
+
+.btn-service-restart:hover {
+  background: url('/static/img/v2-assets/icon_refresh_active.png');
 }

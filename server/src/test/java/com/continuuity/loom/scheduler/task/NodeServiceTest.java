@@ -17,6 +17,7 @@ package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.LoomServiceTestBase;
 import com.continuuity.loom.store.ClusterStore;
 import com.google.common.base.Function;
@@ -64,7 +65,9 @@ public class NodeServiceTest extends LoomServiceTestBase {
 
   @Test
   public void testNodeMaxActions() throws Exception {
-    NodeService nodeService = new NodeService(clusterStore, 3, 100);
+    conf.setInt(Constants.MAX_PER_NODE_NUM_ACTIONS, 3);
+    conf.setInt(Constants.MAX_PER_NODE_LOG_LENGTH, 100);
+    NodeService nodeService = injector.getInstance(NodeService.class);
 
     Node node = new Node("1", "1", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
     Assert.assertTrue(node.getActions().isEmpty());
@@ -93,7 +96,9 @@ public class NodeServiceTest extends LoomServiceTestBase {
 
   @Test
   public void testTruncateLog1() throws Exception {
-    NodeService nodeService = new NodeService(clusterStore, 3, 8);
+    conf.setInt(Constants.MAX_PER_NODE_NUM_ACTIONS, 3);
+    conf.setInt(Constants.MAX_PER_NODE_LOG_LENGTH, 8);
+    NodeService nodeService = injector.getInstance(NodeService.class);
 
     Node node = new Node("1", "1", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
     nodeService.startAction(node, "taskId", "service", "action");
@@ -106,7 +111,9 @@ public class NodeServiceTest extends LoomServiceTestBase {
 
   @Test
   public void testTruncateLog2() throws Exception {
-    NodeService nodeService = new NodeService(clusterStore, 3, 10);
+    conf.setInt(Constants.MAX_PER_NODE_NUM_ACTIONS, 3);
+    conf.setInt(Constants.MAX_PER_NODE_LOG_LENGTH, 10);
+    NodeService nodeService = injector.getInstance(NodeService.class);
 
     Node node = new Node("1", "1", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
     nodeService.startAction(node, "taskId", "service", "action");

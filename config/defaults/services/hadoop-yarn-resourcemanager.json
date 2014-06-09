@@ -1,9 +1,18 @@
 {
   "name": "hadoop-yarn-resourcemanager",
   "description": "Hadoop YARN ResourceManager",
-  "dependson": [
-    "base"
-  ],
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [ "base" ],
+      "uses": [ "kerberos-client" ]
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [ "hadoop-hdfs-namenode", "hadoop-hdfs-datanode" ],
+      "uses": [ "kerberos-master" ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {
@@ -16,6 +25,12 @@
         "type": "chef-solo",
         "fields": {
           "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+        }
+      },
+      "initialize": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::hadoop_yarn_resourcemanager_init]"
         }
       },
       "start": {

@@ -40,9 +40,15 @@ COMMIT
 ###
 *filter
 # node['loom_firewall']['INPUT_policy']
+<% if node['loom_firewall']['INPUT_policy'] %>
 :INPUT <%= node['loom_firewall']['INPUT_policy'] =%> [0:0]
+<% end %>
+<% if node['loom_firewall']['FORWARD_policy'] %>
 :FORWARD <%= node['loom_firewall']['FORWARD_policy'] =%> [0:0]
+<% end %>
+<% if node['loom_firewall']['OUTPUT_policy'] %>
 :OUTPUT <%= node['loom_firewall']['OUTPUT_policy'] =%> [0:0]
+<% end %>
 
 ## Allow traffic that is a part of an ongoing connection
 -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
@@ -82,8 +88,23 @@ COMMIT
 ## Nodes
 ###
 
-<% (node['loom']['cluster']['nodes'].sort_by {|n, v| v}).each do |n, v| %>
+# This cluster (automatic)
+<% node['loom']['cluster']['nodes'].each do |n, v| %>
 -A INPUT -s <%= v.ipaddress =%> -j ACCEPT
+<% end %>
+
+<% if node['loom_firewall']['whitelist_nodes'] %>
+# Whitelisted nodes
+<% node['loom_firewall']['whitelist_nodes'].each do |n| %>
+-A INPUT -s <%= n =%> -j ACCEPT
+<% end %>
+<% end %>
+
+<% if node['loom_firewall']['blacklist_nodes'] %>
+# Blacklisted nodes
+<% node['loom_firewall']['blacklist_nodes'].each do |n| %>
+-A INPUT -s <%= n =%> -j DROP
+<% end %>
 <% end %>
 
 ###

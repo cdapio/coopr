@@ -16,6 +16,7 @@ export LOOM_NODE=${LOOM_NODE:-node}
 
 # Provisioner environment
 export LOOM_RUBY=${LOOM_RUBY:-ruby}
+export LOOM_USE_DUMMY_PROVISIONER=${LOOM_USE_DUMMY_PROVISIONER:-false}
 
 APP_NAME="loom-standalone"
 APP_BASE_NAME=`basename "$0"`
@@ -141,25 +142,17 @@ fi
 
 # Load default configuration
 function load_defaults () {
+    shift;
     if [ ! -f $LOOM_DATA_DIR/.load_defaults ]; then
-        RETRIES=0
         echo "Waiting for server to start before loading default configuration..."
-        # Wait for server to start
-        until [[ $(curl http://localhost:55054/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
-            sleep 2
-            RETRIES=$[$RETRIES + 1]
-        done
-
-        if [ $RETRIES -gt 60 ]; then
-            die "ERROR: Could not load defaults because server did not successfully start" 
-        fi 
+        wait_for_server
 
         echo "Loading default configuration..."
         $LOOM_HOME/server/config/defaults/load-defaults.sh && \
         touch $LOOM_DATA_DIR/.load_defaults
 
         # register the default plugins with the server
-        $LOOM_HOME/bin/loom-provisioner.sh register
+        provisioner register
 
         echo
         echo "Go to http://localhost:8100. Have fun creating clusters!"
@@ -168,30 +161,56 @@ function load_defaults () {
     return 0;
 }
 
+function wait_for_server () {
+    RETRIES=0
+    until [[ $(curl http://localhost:55054/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
+        sleep 2
+        RETRIES=$[$RETRIES + 1]
+    done
+
+    if [ $RETRIES -gt 60 ]; then
+        die "ERROR: Server did not successfully start" 
+    fi 
+}
+
+function provisioner () {
+    if [ "x${LOOM_USE_DUMMY_PROVISIONER}" == "xtrue" ] 
+    then
+        if [ "x$1" == "xstart" ]
+        then
+            echo "Waiting for server to start before running dummy provisioner..."
+            wait_for_server
+        fi
+        $LOOM_HOME/bin/loom-dummy-provisioner.sh $1 
+    else
+        $LOOM_HOME/bin/loom-provisioner.sh $1
+    fi
+}
+
 case "$1" in
   start)
     $LOOM_HOME/bin/loom-server.sh start && \
     $LOOM_HOME/bin/loom-ui.sh start && \
-    $LOOM_HOME/bin/loom-provisioner.sh start && \
-    load_defaults
+    provisioner start && \
+    load_defaults 
   ;;
 
   stop)
+    provisioner stop
     $LOOM_HOME/bin/loom-server.sh stop
     $LOOM_HOME/bin/loom-ui.sh stop
-    $LOOM_HOME/bin/loom-provisioner.sh stop
   ;;
 
   restart)
     $LOOM_HOME/bin/loom-server.sh restart
     $LOOM_HOME/bin/loom-ui.sh restart
-    $LOOM_HOME/bin/loom-provisioner.sh restart
+    provisioner restart
   ;;
 
   status)
     $LOOM_HOME/bin/loom-server.sh status
     $LOOM_HOME/bin/loom-ui.sh status
-    $LOOM_HOME/bin/loom-provisioner.sh status
+    provisioner status
   ;;
 
   *)

@@ -17,11 +17,12 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.common.zookeeper.ElectionHandler;
 import com.continuuity.loom.common.zookeeper.LeaderElection;
+import com.continuuity.loom.conf.Configuration;
+import com.continuuity.loom.conf.Constants;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.apache.twill.common.Threads;
 import org.apache.twill.zookeeper.ZKClient;
 import org.slf4j.Logger;
@@ -54,14 +55,15 @@ public class Scheduler extends AbstractIdleService {
   private final LeaderElection leaderElection;
 
   @Inject
-  public Scheduler(@Named("scheduler.run.interval.seconds") int schedulerRunInterval,
-                   @Named("cluster.cleanup.run.interval.seconds") long clusterCleanupRunInterval,
-                   JobScheduler jobScheduler,
-                   ClusterScheduler clusterScheduler,
-                   SolverScheduler solverScheduler,
-                   CallbackScheduler callbackScheduler,
-                   ClusterCleanup clusterCleanup,
-                   ZKClient zkClient) {
+  private Scheduler(Configuration conf,
+                    JobScheduler jobScheduler,
+                    ClusterScheduler clusterScheduler,
+                    SolverScheduler solverScheduler,
+                    CallbackScheduler callbackScheduler,
+                    ClusterCleanup clusterCleanup,
+                    ZKClient zkClient) {
+    int schedulerRunInterval = conf.getInt(Constants.SCHEDULER_INTERVAL_SECS);
+    long clusterCleanupRunInterval = conf.getLong(Constants.CLUSTER_CLEANUP_SECS);
     this.executorService = Executors.newScheduledThreadPool(5,
                                                             new ThreadFactoryBuilder()
                                                               .setNameFormat("scheduler-%d")

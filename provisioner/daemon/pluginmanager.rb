@@ -1,3 +1,4 @@
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
@@ -17,13 +18,23 @@ require 'json'
 require 'rest_client'
 require_relative 'automator'
 require_relative 'provider'
+require_relative 'utils'
 
 class PluginManager
-  attr_accessor :providermap, :automatormap, :tasks
+  attr_accessor :providermap, :automatormap, :tasks, :load_errors, :register_errors
   def initialize()
+    @load_errors = Array.new
+    @register_errors = Array.new
     @providermap = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     @automatormap = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     scan_plugins()
+  end
+
+  def load_errors?
+    return !@load_errors.empty?
+  end
+  def register_errors?
+    return !@load_errors.empty?
   end
 
   # scan plugins directory for json plugin definitions, load plugins 
@@ -36,7 +47,7 @@ class PluginManager
 
         raise "missing 'name' field when loading plugin #{jsonfile}" unless jsondata.key?('name')
         p_name = jsondata['name']
-        p_description = jsondata['description'] || "No description found"
+        # p_description = jsondata['description'] || "No description found"
         p_providertypes = jsondata['providertypes'] || Array.new
         p_automatortypes = jsondata['automatortypes'] || Array.new
 
@@ -79,11 +90,13 @@ class PluginManager
         log.error "Could not load plugin, invalid json at #{jsonfile}"
         log.error e.message
         log.error e.backtrace.inspect
+        @load_errors.push("Could not load plugin, invalid json at #{jsonfile}")
         next
       rescue => e
         log.error "Could not load plugin at #{jsonfile}"
         log.error e.message
         log.error e.backtrace.inspect
+        @load_errors.push("Could not load plugin at #{jsonfile}")
         next
       end 
     end
@@ -107,45 +120,48 @@ class PluginManager
         log.info "Successfully registered #{name}"
       else
         log.error "Response code #{resp.code}, #{resp.to_str} when trying to register #{name}"
+        @register_errors.push("Response code #{resp.code}, #{resp.to_str} when trying to register #{name}")
       end
     rescue => e
       log.error "Caught exception registering plugins to loom server #{uri}"
       log.error e.message
       log.error e.backtrace.inspect
+      @register_errors.push("Caught exception registering plugins to loom server #{uri}")
     end
+  rescue => e
+    log.error "Caught exception registering plugins to loom server #{uri}"
+    log.error e.message
+    log.error e.backtrace.inspect
   end
 
   # returns registered class name for given provider plugin
   def getHandlerActionObjectForProvider(providerName)
-    if @providermap.has_key?(providerName) 
-      if @providermap[providerName].has_key?('classname')
+    if @providermap.key?(providerName)
+      if @providermap[providerName].key?('classname')
         return @providermap[providerName]['classname']
       end
     end
-    raise "No registered provider for #{providerName}"
+    fail "No registered provider for #{providerName}"
   end
 
   # returns registered class name for given automator plugin
   def getHandlerActionObjectForAutomator(automatorName)
-    if @automatormap.has_key?(automatorName) 
-      if @automatormap[automatorName].has_key?('classname')
+    if @automatormap.key?(automatorName)
+      if @automatormap[automatorName].key?('classname')
         return @automatormap[automatorName]['classname']
       end
     end
-    raise "No registered automator for #{automatorName}"
+    fail "No registered automator for #{automatorName}"
   end
 
   # returns all registered automators, used for bootstrap task
   def getAllHandlerActionObjectsForAutomators
-    results = Array.new
+    results = []
     @automatormap.each do |k, v|
-      if (v.has_key?('classname')) 
+      if v.key?('classname')
         results.push(v['classname'])
       end
     end
     results
   end
-
 end
-    
-

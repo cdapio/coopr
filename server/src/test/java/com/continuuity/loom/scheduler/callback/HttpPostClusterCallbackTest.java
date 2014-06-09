@@ -35,7 +35,7 @@ public class HttpPostClusterCallbackTest extends BaseTest {
     HttpPostClusterCallback callback = new HttpPostClusterCallback();
 
     String base = "http://" + host + ":" + port;
-    conf = new Configuration();
+    conf = Configuration.create();
     conf.set(Constants.HttpCallback.START_URL, base + "/start/endpoint");
     conf.set(Constants.HttpCallback.SUCCESS_URL, base + "/success/endpoint");
     conf.set(Constants.HttpCallback.FAILURE_URL, base + "/failure/endpoint");
@@ -58,7 +58,7 @@ public class HttpPostClusterCallbackTest extends BaseTest {
     HttpPostClusterCallback callback = new HttpPostClusterCallback();
 
     String base = "http://" + host + ":" + port;
-    conf = new Configuration();
+    conf = Configuration.create();
     conf.set(Constants.HttpCallback.START_URL, base + "/start/endpoint");
     conf.set(Constants.HttpCallback.START_TRIGGERS, ClusterAction.CLUSTER_CONFIGURE.name());
 
@@ -81,7 +81,7 @@ public class HttpPostClusterCallbackTest extends BaseTest {
   public void testOnStartIsTrueWithBadURL() {
     HttpPostClusterCallback callback = new HttpPostClusterCallback();
 
-    conf = new Configuration();
+    conf = Configuration.create();
     conf.set(Constants.HttpCallback.START_URL, "malformed-url");
 
     callback.initialize(conf, clusterStore);
@@ -98,7 +98,7 @@ public class HttpPostClusterCallbackTest extends BaseTest {
 
   @BeforeClass
   public static void setupTestClass() throws Exception {
-    Configuration conf = new Configuration();
+    Configuration conf = Configuration.create();
     conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
     injector = Guice.createInjector(LoomModules.createModule(

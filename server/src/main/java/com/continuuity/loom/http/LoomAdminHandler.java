@@ -71,7 +71,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
   private final JsonSerde codec;
 
   @Inject
-  public LoomAdminHandler(EntityStore entityStore) {
+  private LoomAdminHandler(EntityStore entityStore) {
     this.entityStore = entityStore;
     this.codec = new JsonSerde();
   }

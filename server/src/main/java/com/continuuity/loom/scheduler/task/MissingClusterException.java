@@ -18,7 +18,7 @@ package com.continuuity.loom.scheduler.task;
 /**
  * Thrown to indicate that there was a problem creating a cluster job or task.
  */
-public class MissingClusterException extends Exception {
+public class MissingClusterException extends MissingEntityException {
 
   /**
    * New exception with error message.

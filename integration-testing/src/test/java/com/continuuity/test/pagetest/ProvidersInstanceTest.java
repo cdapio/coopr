@@ -30,6 +30,7 @@ import org.junit.runners.MethodSorters;
 
 import java.util.Map;
 
+import static com.continuuity.test.drivers.Global.driverWait;
 import static com.continuuity.test.drivers.Global.globalDriver;
 import static org.junit.Assert.assertEquals;
 
@@ -50,6 +51,7 @@ public class ProvidersInstanceTest extends GenericTest {
   @BeforeClass
   public static void runInitial() throws Exception {
     globalDriver.get(Constants.PROVIDER_INSTANCE_URI);
+    driverWait(3);
   }
 
   @Test
@@ -73,10 +75,10 @@ public class ProvidersInstanceTest extends GenericTest {
 
   @Test
   public void test_06_topmenu() {
-    ImmutableSet<String> expectedTopList = ImmutableSet.of("rackspace", "joyent", "openstack");
+    ImmutableSet<String> expectedTopList = Constants.PROVIDERS_SET;
     assertEquals("The list of the topmenu is not correct.", expectedTopList, new TestUtil().getTopList(globalDriver));
     String uriPrefix = Constants.PROVIDERS_URL + "/provider/";
-    assertEquals("The uri of top list is not correct.", TEST_UTIL.getTopListUri(expectedTopList, uriPrefix),
+    assertEquals("The uri of top list is not correct.", TEST_UTIL.getTopListUri(expectedTopList, uriPrefix, "/#/edit"),
                  TEST_UTIL.getTopListUri(globalDriver));
   }
 

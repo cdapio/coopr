@@ -23,7 +23,6 @@ import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.store.ClusterStore;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -43,7 +42,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.io.File;
 import java.lang.management.ManagementFactory;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -69,21 +67,19 @@ public final class LoomServerMain extends DaemonMain {
   @Override
   public void init(String[] args) {
     try {
-      // TODO: switch config class, dont use hadoop.
-      conf = new Configuration();
-      conf.addResource("loom-site.xml");
+      conf = Configuration.create();
 
-      String zkQuorum = conf.get(Constants.Zookeeper.QUORUM);
+      String zkQuorum = conf.get(Constants.ZOOKEEPER_QUORUM);
       if (zkQuorum == null) {
-        String dataPath = conf.get(Constants.LOCAL_DATA_DIR, Constants.DEFAULT_LOCAL_DATA_DIR) + "/zookeeper";
+        String dataPath = conf.get(Constants.LOCAL_DATA_DIR) + "/zookeeper";
         inMemoryZKServer = InMemoryZKServer.builder().setDataDir(new File(dataPath)).setTickTime(2000).build();
-        LOG.warn(Constants.Zookeeper.QUORUM + " not specified, defaulting to in memory zookeeper with data dir "
+        LOG.warn(Constants.ZOOKEEPER_QUORUM + " not specified, defaulting to in memory zookeeper with data dir "
                    + dataPath);
       } else {
-        zkClientService = getZKService(conf.get(Constants.Zookeeper.QUORUM));
+        zkClientService = getZKService(conf.get(Constants.ZOOKEEPER_QUORUM));
       }
 
-      solverNumThreads = conf.getInt(Constants.SOLVER_NUM_THREADS, Constants.DEFAULT_SOLVER_NUM_THREADS);
+      solverNumThreads = conf.getInt(Constants.SOLVER_NUM_THREADS);
     } catch (Exception e) {
       LOG.error("Exception initializing loom", e);
     }
@@ -180,9 +176,8 @@ public final class LoomServerMain extends DaemonMain {
       ZKClients.reWatchOnExpire(
         ZKClients.retryOnFailure(
           ZKClientService.Builder.of(connectString)
-            .setSessionTimeout(conf.getInt(Constants.Zookeeper.CFG_SESSION_TIMEOUT_MILLIS,
-                                           Constants.Zookeeper.DEFAULT_SESSION_TIMEOUT_MILLIS)
-            ).build(),
+            .setSessionTimeout(conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT_MILLIS))
+            .build(),
           RetryStrategies.fixDelay(2, TimeUnit.SECONDS)
         )
       )

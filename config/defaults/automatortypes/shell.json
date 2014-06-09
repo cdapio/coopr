@@ -1,0 +1,27 @@
+{
+    "description": "",
+    "name": "shell",
+    "parameters": {
+        "admin": {
+            "fields": {
+                "args": {
+                    "label": "Arguments",
+                    "override": false,
+                    "tip": "The arguments to the script",
+                    "type": "text"
+                },
+                "script": {
+                    "label": "Script",
+                    "override": false,
+                    "tip": "The script or command to run",
+                    "type": "text"
+                }
+            },
+            "required": [
+                [
+                    "script"
+                ]
+            ]
+        }
+    }
+}

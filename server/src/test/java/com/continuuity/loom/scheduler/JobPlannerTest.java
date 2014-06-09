@@ -19,6 +19,8 @@ import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
+import com.continuuity.loom.admin.ServiceDependencies;
+import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.scheduler.dag.TaskDag;
 import com.continuuity.loom.scheduler.dag.TaskNode;
@@ -349,6 +351,218 @@ public class JobPlannerTest {
   }
 
   @Test
+  public void testAddServicesDoesNotInstallDependentServices() {
+    Service s1 =  new Service("s1", "",
+                              new ServiceDependencies(
+                                ImmutableSet.<String>of(),
+                                ImmutableSet.<String>of(),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of()
+                                ),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of()
+                                )
+                              ),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s2 =  new Service("s2", "",
+                              new ServiceDependencies(
+                                ImmutableSet.<String>of(),
+                                ImmutableSet.<String>of(),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of("s1"),
+                                  ImmutableSet.<String>of()
+                                ),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of()
+                                )
+                              ),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s3 =  new Service("s3", "",
+                              new ServiceDependencies(
+                                ImmutableSet.<String>of(),
+                                ImmutableSet.<String>of(),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of("s2", "s1")
+                                ),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of()
+                                )
+                              ),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+
+    Set<Node> clusterNodes = ImmutableSet.of(node1);
+
+    // Add s3 to the node
+    ClusterJob job = new ClusterJob(JobId.fromString("123-001"), ClusterAction.ADD_SERVICES,
+                                    ImmutableSet.<String>of(s3.getName()), null);
+    JobPlanner planner = new JobPlanner(job, clusterNodes);
+    TaskDag expected = new TaskDag();
+
+    // bootstrap -> install s3 -> configure s3 -> initialize s3 -> start s3
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s3"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s3"),
+                           new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), "s3"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), "s3"),
+                           new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s3"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s3"),
+                           new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s3"));
+
+    Assert.assertEquals(expected, planner.createTaskDag());
+  }
+
+
+  @Test
+  public void test1NodeDependencyOrdering() {
+    Service s1 =  new Service("s1", "",
+                              new ServiceDependencies(
+                                ImmutableSet.<String>of(),
+                                ImmutableSet.<String>of(),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of()
+                                ),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of()
+                                )
+                              ),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s2 =  new Service("s2", "",
+                              new ServiceDependencies(
+                                ImmutableSet.<String>of(),
+                                ImmutableSet.<String>of(),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of("s1"),
+                                  ImmutableSet.<String>of()
+                                ),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of()
+                                )
+                              ),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s3 =  new Service("s3", "",
+                              new ServiceDependencies(
+                                ImmutableSet.<String>of(),
+                                ImmutableSet.<String>of(),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of("s2", "s1")
+                                ),
+                                new ServiceStageDependencies(
+                                  ImmutableSet.<String>of(),
+                                  ImmutableSet.<String>of("s1", "s2")
+                                )
+                              ),
+                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
+                                ProvisionerAction.INSTALL, CHEF_ACTION,
+                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
+                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
+                                ProvisionerAction.START, CHEF_ACTION,
+                                ProvisionerAction.STOP, CHEF_ACTION));
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+
+    Set<Node> clusterNodes = ImmutableSet.of(node1);
+
+    ClusterJob job = new ClusterJob(JobId.fromString("123-001"), ClusterAction.CLUSTER_CREATE, null, null);
+    JobPlanner planner = new JobPlanner(job, clusterNodes);
+    TaskDag expected = new TaskDag();
+
+    // bootstrap -> install s3 -> configure s3 -> initialize s3 -> start s3
+    // create -> confirm -> bootstrap
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.CREATE.name(), ""),
+                           new TaskNode(node1.getId(), ProvisionerAction.CONFIRM.name(), ""));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.CONFIRM.name(), ""),
+                           new TaskNode(node1.getId(), ProvisionerAction.BOOTSTRAP.name(), ""));
+    // bootstrap -> install s1 -> install s2 -> install s3
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s1"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s2"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.BOOTSTRAP.name(), ""),
+                           new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s3"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s1"),
+                           new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s2"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s2"),
+                           new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s3"));
+    // install s1 -> configure s1
+    // install s2 -> configure s2
+    // install s3 -> configure s3
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s1"),
+                           new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), "s1"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s2"),
+                           new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), "s2"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INSTALL.name(), "s3"),
+                           new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), "s3"));
+    // configure s1 -> initialize s1
+    // configure s2 -> initialize s2
+    // configure s3 -> initialize s3
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), "s1"),
+                           new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s1"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), "s2"),
+                           new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s2"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.CONFIGURE.name(), "s3"),
+                           new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s3"));
+    // initialize s1 -> start s1
+    // initialize s2 -> start s2
+    // initialize s3 -> start s3
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s1"),
+                           new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s1"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s2"),
+                           new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s2"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s3"),
+                           new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s3"));
+
+    // start s1 -> initialize s3
+    // start s2 -> initialize s3
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s1"),
+                           new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s3"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s2"),
+                           new TaskNode(node1.getId(), ProvisionerAction.INITIALIZE.name(), "s3"));
+
+    // start s1 -> start s3
+    // start s2 -> start s3
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s1"),
+                           new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s3"));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s2"),
+                           new TaskNode(node1.getId(), ProvisionerAction.START.name(), "s3"));
+
+    Assert.assertEquals(expected, planner.createTaskDag());
+  }
+
+  @Test
   public void testConfigureTaskDag() {
     Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
@@ -494,6 +708,22 @@ public class JobPlannerTest {
     expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
                            new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
     Assert.assertEquals(expected, planner.createTaskDag());
+
+    // request to stop just s1, which will stop s3 then s2 then s1.
+    job = new ClusterJob(JobId.fromString("123-002"), ClusterAction.STOP_SERVICES,
+                         ImmutableSet.of(s1.getName()), null);
+    planner = new JobPlanner(job, clusterNodes);
+
+    expected = new TaskDag();
+    // s3 needs to be stopped first, then s2
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s3.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()));
+    // s2 needs to be stopped before s1
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.STOP.name(), s2.getName()),
+                           new TaskNode(node1.getId(), ProvisionerAction.STOP.name(), s1.getName()));
+    Assert.assertEquals(expected, planner.createTaskDag());
   }
 
   @Test
@@ -540,6 +770,22 @@ public class JobPlannerTest {
                            new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
     expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()),
                            new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    Assert.assertEquals(expected, planner.createTaskDag());
+
+    // request to start just s3, which will start s1 then s2 then s3.
+    job = new ClusterJob(JobId.fromString("123-002"), ClusterAction.START_SERVICES,
+                         ImmutableSet.of(s3.getName()), null);
+    planner = new JobPlanner(job, clusterNodes);
+
+    expected = new TaskDag();
+    // s1 needs to be started first, then s2
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    expected.addDependency(new TaskNode(node1.getId(), ProvisionerAction.START.name(), s1.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()));
+    // s2 needs to be started before s3
+    expected.addDependency(new TaskNode(node2.getId(), ProvisionerAction.START.name(), s2.getName()),
+                           new TaskNode(node2.getId(), ProvisionerAction.START.name(), s3.getName()));
     Assert.assertEquals(expected, planner.createTaskDag());
   }
 

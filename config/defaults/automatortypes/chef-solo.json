@@ -1,0 +1,27 @@
+{
+    "description": "",
+    "name": "chef-solo",
+    "parameters": {
+        "admin": {
+            "fields": {
+                "json_attributes": {
+                    "label": "JSON attributes",
+                    "override": false,
+                    "tip": "Custom JSON data for this chef-solo run",
+                    "type": "text"
+                },
+                "run_list": {
+                    "label": "run-list",
+                    "override": false,
+                    "tip": "The chef-solo run-list for this action",
+                    "type": "text"
+                }
+            },
+            "required": [
+                [
+                    "run_list"
+                ]
+            ]
+        }
+    }
+}

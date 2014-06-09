@@ -20,6 +20,7 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueuedElement;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -55,11 +56,30 @@ public class ClusterCleanup implements Runnable {
   private final long incrementBy;
 
   @Inject
-  public ClusterCleanup(ClusterStore clusterStore, NodeService nodeService, ClusterService clusterService,
+  private ClusterCleanup(ClusterStore clusterStore, NodeService nodeService, ClusterService clusterService,
+                         TaskService taskService,
+                         @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
+                         @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
+                         Configuration conf) {
+    this.clusterStore = clusterStore;
+    this.nodeService = nodeService;
+    this.clusterService = clusterService;
+    this.taskService = taskService;
+    this.provisionerQueue = provisionerQueue;
+    this.jobQueue = jobQueue;
+    this.taskTimeout = conf.getLong(Constants.TASK_TIMEOUT_SECS);
+    this.incrementBy = conf.getLong(Constants.ID_INCREMENT_BY);
+    this.myMod = conf.getLong(Constants.ID_START_NUM) % this.incrementBy;
+
+    LOG.info("Task timeout in seconds = {}", this.taskTimeout);
+  }
+
+  // for unit tests
+  ClusterCleanup(ClusterStore clusterStore, NodeService nodeService, ClusterService clusterService,
                         TaskService taskService,
                         @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
                         @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
-                        @Named("task.timeout.seconds") long taskTimeout,
+                        @Named(Constants.TASK_TIMEOUT_SECS) long taskTimeout,
                         @Named(Constants.ID_START_NUM) long startId,
                         @Named(Constants.ID_INCREMENT_BY) long incrementBy) {
     this.clusterStore = clusterStore;
@@ -69,10 +89,8 @@ public class ClusterCleanup implements Runnable {
     this.provisionerQueue = provisionerQueue;
     this.jobQueue = jobQueue;
     this.taskTimeout = taskTimeout;
-    this.myMod = startId % incrementBy;
     this.incrementBy = incrementBy;
-
-    LOG.info("Task timeout in seconds = {}", taskTimeout);
+    this.myMod = startId % incrementBy;
   }
 
   @Override

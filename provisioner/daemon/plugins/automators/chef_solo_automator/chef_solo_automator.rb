@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
@@ -35,7 +36,7 @@ class ChefSoloAutomator < Automator
     chef_primitive_tar = "#{@chef_primitives_path}/#{chef_primitive}.tar.gz"
 
     # limit tarball regeneration to once per 10min
-    if !File.exists?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
+    if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
       log.debug "Generating #{chef_primitive_tar} from #{chef_primitive_path}"
       `tar -czf "#{chef_primitive_tar}.new" -C "#{@chef_primitives_path}" #{chef_primitive}`
       `mv "#{chef_primitive_tar}.new" "#{chef_primitive_tar}"`
@@ -78,9 +79,19 @@ class ChefSoloAutomator < Automator
       nodesdata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     end
 
+    # services is a list of services on this node
+    node_services_data = @task['config']['services']
+    if (node_services_data.nil? || node_services_data == "")
+      node_services_data = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
+    end
+
     # merge data together into expected layout for json_attributes
     clusterdata['nodes'] = nodesdata
     servicedata['loom']['cluster'] = clusterdata
+    servicedata['loom']['services'] = node_services_data
+
+    # include the clusterId
+    servicedata['loom']['clusterId'] = @task['clusterId']
 
     # we also need to merge cluster config top-level
     servicedata.merge!(clusterdata)
@@ -109,51 +120,24 @@ class ChefSoloAutomator < Automator
     begin
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
 
-        # validate connectivity
-        log.debug "Validating connectivity to #{hostname}"
-        output = ssh_exec!(ssh, "hostname")
+        ssh_exec!(ssh, "hostname", "Validating connectivity to #{hostname}")
 
         # determine if curl is installed, else default to wget
-        log.debug "Checking for curl"
         chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | bash"
         begin
-          ssh_exec!(ssh, "which curl")
-        rescue
+          ssh_exec!(ssh, "which curl", "Checking for curl")
+        rescue CommandExecutionError
           log.debug "curl not found, defaulting to wget"
           chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | bash"
         end
 
-        # install chef
-        log.debug "Install chef..."
-        output = ssh_exec!(ssh, chef_install_cmd)
-        if (output[2] != 0 )
-          log.error "Chef install failed: #{output}"
-          raise "Chef install failed: #{output}"
-        end
-        log.debug "Chef installed successfully..."
+        ssh_exec!(ssh, chef_install_cmd, "Installing chef")
 
-       # confirm chef installation
-        output = ssh_exec!(ssh, "type chef-solo")
-        if (output[2] != 0 )
-          log.error "Chef install validation failed: #{output}"
-          raise "Chef install validation failed: #{output}"
-        end
-        log.debug "Chef install validated successfully..."
+        ssh_exec!(ssh, "type chef-solo", "Chef install validation")
 
-        # create @remote_cache_dir
-        output = ssh_exec!(ssh, "mkdir -p #{@remote_cache_dir}")
-        if (output[2] != 0 )
-          log.error "Unable to create #{@remote_cache_dir} on #{hostname} : #{output}"
-          raise "Unable to create #{@remote_cache_dir} on #{hostname} : #{output}"
-        end
+        ssh_exec!(ssh, "mkdir -p #{@remote_cache_dir}", "Create remote cache dir")
 
-        # create @remote_chef_dir
-        output = ssh_exec!(ssh, "mkdir -p #{@remote_chef_dir}")
-        if (output[2] != 0 )
-          log.error "Unable to create #{@remote_chef_dir} on #{hostname} : #{output}"
-          raise "Unable to create #{@remote_chef_dir} on #{hostname} : #{output}"
-        end
-
+        ssh_exec!(ssh, "mkdir -p #{@remote_chef_dir}", "Create remote Chef dir")
       end
     rescue Net::SSH::AuthenticationFailed => e
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -166,23 +150,18 @@ class ChefSoloAutomator < Automator
         log.debug "Checking for scp installation"
         begin
           ssh_exec!(ssh, "which scp")
-        rescue
+        rescue CommandExecutionError
           log.warn "scp not found, attempting to install openssh-client"
           scp_install_cmd = "yum -qy install openssh-clients"
           begin
             ssh_exec!(ssh, "which yum")
-          rescue
+          rescue CommandExecutionError
             scp_install_cmd = "apt-get -qy install openssh-client"
           end
-
-          begin
-            log.debug "installing openssh-client via #{scp_install_cmd}"
-            ssh_exec!(ssh, scp_install_cmd)
-          rescue => e
-            raise $!, "Could not install scp on #{ipaddress}: #{$!}", $!.backtrace
-          end
+          ssh_exec!(ssh, scp_install_cmd, "installing openssh-client via #{scp_install_cmd}")
+        else
+          log.debug "scp found on remote"
         end
-        log.debug "scp found on remote"
       end
     rescue Net::SSH::AuthenticationFailed => e
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -204,11 +183,7 @@ class ChefSoloAutomator < Automator
     %w[cookbooks data_bags roles].each do |chef_primitive|
       begin
         Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
-          output = ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/#{chef_primitive}.tar.gz -C #{@remote_chef_dir}")
-          if (output[2] != 0 )
-            log.error "Error extracting remote #{@remote_cache_dir}/#{chef_primitive}.tar.gz: #{output}"
-            raise "Error extracting remote #{@remote_cache_dir}/#{chef_primitive}.tar.gz: #{output}"
-          end
+          ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/#{chef_primitive}.tar.gz -C #{@remote_chef_dir}", "Extracting remote #{@remote_cache_dir}/#{chef_primitive}.tar.gz")
         end
       rescue Net::SSH::AuthenticationFailed => e
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -217,14 +192,13 @@ class ChefSoloAutomator < Automator
 
     @result['status'] = 0
 
-    log.info "ChefSoloAutomator.bootstrap completed successfully: #{@result}"
+    log.info "ChefSoloAutomator bootstrap completed successfully: #{@result}"
     @result
   end
 
 
   def runchef(inputmap)
     sshauth = inputmap['sshauth']
-    hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
 
@@ -254,7 +228,7 @@ class ChefSoloAutomator < Automator
       begin
         Net::SCP.upload!(ipaddress, inputmap['sshauth']['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
           @credentials)
-      rescue Net::SSH::AuthenticationFailed => e
+      rescue Net::SSH::AuthenticationFailed
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
       log.debug "Copy json attributes complete"
@@ -267,14 +241,9 @@ class ChefSoloAutomator < Automator
     begin
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
 
-        log.debug "Running chef-solo"
-        output = ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'")
-        if (output[2] != 0 )
-          log.error "Chef-solo run did not complete successfully: #{output}"
-          raise "Chef-solo run did not complete successfully: #{output}"
-        end
+        ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'", "Running Chef-solo")
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 

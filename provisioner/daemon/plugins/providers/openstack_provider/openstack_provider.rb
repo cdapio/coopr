@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
@@ -93,7 +94,7 @@ class OpenstackProvider < Provider
       Net::SSH.start(kniferesult['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         # validate connectivity
         log.debug "Validating dns resolution/connectivity"
-        output = ssh_exec!(ssh, "ping -c1 www.opscode.com")
+        ssh_exec!(ssh, "ping -c1 www.opscode.com")
       end
 
       @result['status'] = 0
@@ -128,7 +129,7 @@ class OpenstackProvider < Provider
 
       # invoke knife
       log.debug "Invoking server delete"
-      kniferesult = knife_instance.run
+      knife_instance.run
 
       @result['status'] = 0
 

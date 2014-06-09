@@ -21,6 +21,7 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
+import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.macro.Expander;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -69,14 +70,14 @@ public class JobScheduler implements Runnable {
   @Inject
   private JobScheduler(ClusterStore clusterStore, @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
                        JsonSerde jsonSerde, @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
-                       TaskService taskService, @Named(Constants.MAX_ACTION_RETRIES) int maxTaskRetries) {
+                       TaskService taskService, Configuration conf) {
     this.clusterStore = clusterStore;
     this.provisionerQueue = provisionerQueue;
     this.jsonSerde = jsonSerde;
     this.jobQueue = jobQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.taskService = taskService;
-    this.maxTaskRetries = maxTaskRetries;
+    this.maxTaskRetries = conf.getInt(Constants.MAX_ACTION_RETRIES);
   }
 
   @Override
@@ -150,7 +151,7 @@ public class JobScheduler implements Runnable {
 
             // Submit any tasks not yet submitted
             if (!notSubmittedTasks.isEmpty()) {
-              submitTasks(notSubmittedTasks, nodeMap, clusterNodes, job);
+              submitTasks(notSubmittedTasks, cluster, nodeMap, clusterNodes, job);
             }
 
             // Note: before moving cluster out of pending state, make sure that all in progress tasks are done.
@@ -182,8 +183,8 @@ public class JobScheduler implements Runnable {
     }
   }
 
-  private void submitTasks(Set<ClusterTask> notSubmittedTasks, Map<String, Node> nodeMap, Set<Node> clusterNodes,
-                           ClusterJob job) throws Exception {
+  private void submitTasks(Set<ClusterTask> notSubmittedTasks, Cluster cluster, Map<String, Node> nodeMap,
+                           Set<Node> clusterNodes, ClusterJob job) throws Exception {
 
     for (final ClusterTask task : notSubmittedTasks) {
       Node taskNode = nodeMap.get(task.getNodeId());
@@ -195,7 +196,7 @@ public class JobScheduler implements Runnable {
       // TODO: do this only once and save it
       if (!task.getTaskName().isHardwareAction()) {
         try {
-          task.setConfig(Expander.expand(task.getConfig(), null, clusterNodes, taskNode).getAsJsonObject());
+          task.setConfig(Expander.expand(task.getConfig(), null, cluster, clusterNodes, taskNode).getAsJsonObject());
         } catch (Throwable e) {
           LOG.error("Exception while expanding macros for task {}", task.getTaskId(), e);
           taskService.failTask(task, -1);

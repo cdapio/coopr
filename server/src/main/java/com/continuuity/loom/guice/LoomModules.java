@@ -72,33 +72,17 @@ public final class LoomModules {
                                     final ListeningExecutorService executorService,
                                     final Configuration conf) throws Exception {
 
-    final String namespace = conf.get(Constants.Zookeeper.NAMESPACE, Constants.Zookeeper.DEFAULT_NAMESPACE);
-    final int port = conf.getInt(Constants.PORT, Constants.DEFAULT_PORT);
-    final String host = conf.get(Constants.HOST, Constants.DEFAULT_HOST);
-    final int schedulerIntervalSecs = conf.getInt(Constants.SCHEDULER_INTERVAL_SECS,
-                                                  Constants.DEFAULT_SCHEDULER_INTERVAL_SECS);
-    final long cleanupIntervalSecs = conf.getLong(Constants.CLUSTER_CLEANUP_SECS,
-                                                  Constants.DEFAULT_CLUSTER_CLEANUP_SECS);
-    final long taskTimeoutSecs = conf.getLong(Constants.TASK_TIMEOUT_SECS,
-                                              Constants.DEFAULT_TASK_TIMEOUT_SECS);
+    final String namespace = conf.get(Constants.ZOOKEEPER_NAMESPACE);
+    final String host = conf.get(Constants.HOST);
+    final int schedulerIntervalSecs = conf.getInt(Constants.SCHEDULER_INTERVAL_SECS);
+    final long cleanupIntervalSecs = conf.getLong(Constants.CLUSTER_CLEANUP_SECS);
+    final long taskTimeoutSecs = conf.getLong(Constants.TASK_TIMEOUT_SECS);
     final long queueMsBetweenChecks = TimeUnit.SECONDS.toMillis(100);
     final long queueMsRescheduleTimeout = TimeUnit.SECONDS.toMillis(6000);
-    final int nettyExecNumThreads = conf.getInt(Constants.NETTY_EXEC_NUM_THREADS,
-                                                Constants.DEFAULT_NETTY_EXEC_NUM_THREADS);
-    final int nettyWorkerNumThreads = conf.getInt(Constants.NETTY_WORKER_NUM_THREADS,
-                                                  Constants.DEFAULT_NETTY_WORKER_NUM_THREADS);
-    final int maxPerNodeLogLength = conf.getInt(Constants.MAX_PER_NODE_LOG_LENGTH,
-                                                Constants.DEFAULT_MAX_PER_NODE_LOG_LENGTH);
-    final int maxPerNodeNumActions = conf.getInt(Constants.MAX_PER_NODE_NUM_ACTIONS,
-                                                 Constants.DEFAULT_MAX_PER_NODE_NUM_ACTIONS);
-    final int maxActionRetries = conf.getInt(Constants.MAX_ACTION_RETRIES,
-                                             Constants.DEFAULT_MAX_ACTION_RETRIES);
-    final int maxClusterSize = conf.getInt(Constants.MAX_CLUSTER_SIZE,
-                                           Constants.DEFAULT_MAX_CLUSTER_SIZE);
     // ids will start from this number
-    final long idStartNum = conf.getLong(Constants.ID_START_NUM, Constants.DEFAULT_ID_START_NUM);
+    final long idStartNum = conf.getLong(Constants.ID_START_NUM);
     // ids will increment by this
-    final long idIncrementBy = conf.getLong(Constants.ID_INCREMENT_BY, Constants.DEFAULT_ID_INCREMENT_BY);
+    final long idIncrementBy = conf.getLong(Constants.ID_INCREMENT_BY);
     Preconditions.checkArgument(idStartNum >= 0, Constants.ID_START_NUM + " must not be negative");
     Preconditions.checkArgument(idIncrementBy > 0, Constants.ID_INCREMENT_BY + " must be at least 1");
 
@@ -131,7 +115,7 @@ public final class LoomModules {
                                       .setDaemon(true)
                                       .build()));
 
-    final Class callbackClass = Class.forName(conf.get(Constants.CALLBACK_CLASS, Constants.DEFAULT_CALLBACK_CLASS));
+    final Class callbackClass = Class.forName(conf.get(Constants.CALLBACK_CLASS));
 
     return new AbstractModule() {
         @Override
@@ -163,20 +147,16 @@ public final class LoomModules {
           bind(EntityStore.class).to(SQLEntityStore.class).in(Scopes.SINGLETON);
           bind(ClusterStore.class).to(SQLClusterStore.class).in(Scopes.SINGLETON);
           bind(ZKClient.class).toInstance(zkClient);
-          bind(Integer.class)
-            .annotatedWith(Names.named("loom.port")).toInstance(port);
-          bind(String.class)
-            .annotatedWith(Names.named("loom.host")).toInstance(host);
           bind(String.class)
             .annotatedWith(Names.named("scheduler.id")).toInstance("scheduler-" + host);
           bind(Integer.class)
             .annotatedWith(Names.named(Constants.SCHEDULER_INTERVAL_SECS)).toInstance(schedulerIntervalSecs);
 
           bind(Long.class)
-            .annotatedWith(Names.named("cluster.cleanup.run.interval.seconds"))
+            .annotatedWith(Names.named(Constants.CLUSTER_CLEANUP_SECS))
             .toInstance(cleanupIntervalSecs);
           bind(Long.class)
-            .annotatedWith(Names.named("task.timeout.seconds"))
+            .annotatedWith(Names.named(Constants.TASK_TIMEOUT_SECS))
             .toInstance(taskTimeoutSecs);
 
           bind(ListeningExecutorService.class)
@@ -185,24 +165,6 @@ public final class LoomModules {
           bind(ListeningExecutorService.class)
             .annotatedWith(Names.named("callback.executor.service"))
             .toInstance(callbackExecutorService);
-
-          bind(Integer.class)
-            .annotatedWith(Names.named(Constants.NETTY_EXEC_NUM_THREADS)).toInstance(nettyExecNumThreads);
-          bind(Integer.class)
-            .annotatedWith(Names.named(Constants.NETTY_WORKER_NUM_THREADS)).toInstance(nettyWorkerNumThreads);
-
-          bind(Integer.class)
-            .annotatedWith(Names.named(Constants.MAX_PER_NODE_LOG_LENGTH)).toInstance(maxPerNodeLogLength);
-          bind(Integer.class)
-            .annotatedWith(Names.named(Constants.MAX_PER_NODE_NUM_ACTIONS)).toInstance(maxPerNodeNumActions);
-          bind(Integer.class)
-            .annotatedWith(Names.named(Constants.MAX_ACTION_RETRIES)).toInstance(maxActionRetries);
-          bind(Integer.class)
-            .annotatedWith(Names.named(Constants.MAX_CLUSTER_SIZE)).toInstance(maxClusterSize);
-          bind(Long.class)
-            .annotatedWith(Names.named(Constants.ID_START_NUM)).toInstance(idStartNum);
-          bind(Long.class)
-            .annotatedWith(Names.named(Constants.ID_INCREMENT_BY)).toInstance(idIncrementBy);
 
           bind(JobScheduler.class).in(Scopes.SINGLETON);
           bind(ClusterScheduler.class).in(Scopes.SINGLETON);

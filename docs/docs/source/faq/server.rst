@@ -55,22 +55,22 @@ Following are the configuration required for enabling Loom Server to connect to 
 
  ...
  <property>
-    <name>loom.jdbc.driver</name>
+    <name>server.jdbc.driver</name>
     <value>com.mysql.jdbc.Driver</value>
     <description>specifies db driver</description>
   </property>
   <property>
-    <name>loom.jdbc.connection.string</name>
+    <name>server.jdbc.connection.string</name>
     <value>jdbc:mysql://127.0.0.1:3306/loom?useLegacyDatetimeCode=false</value>
     <description>specifies how to connect to mysql</description>
   </property>
   <property>
-    <name>loom.db.user</name>
+    <name>server.db.user</name>
     <value>loom</value>
     <description>mysql user</description>
   </property>
   <property>
-    <name>loom.db.password</name>
+    <name>server.db.password</name>
     <value>looming</value>
     <description>mysql user password</description>
   </property>

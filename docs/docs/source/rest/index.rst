@@ -111,6 +111,7 @@ Clusters
   * :ref:`Stop Services on a Cluster <cluster-stop-services>`
   * :ref:`Start Services on a Cluster <cluster-start-services>`
   * :ref:`Restart Services on a Cluster <cluster-restart-services>`
+  * :ref:`Sync Cluster Template to Current Version <cluster-sync-template>`
 
 RPC Calls
 =========
@@ -120,15 +121,6 @@ RPC
 ---
   * :ref:`Getting Status of All Clusters <rpc-statuses>`
   * :ref:`Getting Properties of Nodes in a Cluster <rpc-properties>`
-
-Provisioner APIs
-================
-The Server communicates with Provisioners through these APIs. At a high level, there are two types of methods:
-one for taking tasks, and one for finishing tasks. These APIs only concern those who want to add provisioner
-plugins.
-
-  * :ref:`Taking Tasks <tasks-take>`
-  * :ref:`Finishing Tasks <tasks-finish>` 
 
 About REST (REpresentational State Transfer)
 ===============================================

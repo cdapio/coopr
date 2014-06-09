@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
 #
@@ -37,7 +38,7 @@ class ShellAutomator < Automator
   end
 
   def generate_scripts_tar
-    if !File.exists?(@scripts_tar) or ((Time.now - File.stat(@scripts_tar).mtime).to_i > 600)
+    if !File.exist?(@scripts_tar) or ((Time.now - File.stat(@scripts_tar).mtime).to_i > 600)
       log.debug "Generating #{@scripts_tar} from #{@scripts_dir}"
       scripts_tar_path = File.dirname(@scripts_dir)
       scripts_parent_dir = File.basename(@scripts_dir)
@@ -61,7 +62,6 @@ class ShellAutomator < Automator
 
   def runshell(inputmap)
     sshauth = inputmap['sshauth']
-    hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
 
@@ -85,7 +85,7 @@ class ShellAutomator < Automator
       begin
         Net::SCP.upload!(ipaddress, inputmap['sshauth']['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
           @credentials)
-      rescue Net::SSH::AuthenticationFailed => e
+      rescue Net::SSH::AuthenticationFailed
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
       log.debug "Copy json attributes complete"
@@ -98,16 +98,11 @@ class ShellAutomator < Automator
     # execute the defined shell script
     begin
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
-        log.debug "Running shell command: #{shellscript} #{shellargs}"
-        output = ssh_exec!(ssh, "cd #{@remote_scripts_dir}; export PATH=$PATH:#{@remote_scripts_dir}; #{@wrapper_script} #{@remote_cache_dir}/#{@task['taskId']}.json #{shellscript} #{shellargs}")
-        if (output[2] != 0 )
-          log.error "Shell command did not complete successfully: #{output}"
-          raise "Shell command did not complete successfully: #{output}"
-        end
-        @result['stdout'] = output[0]
-        @result['stderr'] = output[1]
+        ssh_exec!(ssh, 
+                  "cd #{@remote_scripts_dir}; export PATH=$PATH:#{@remote_scripts_dir}; #{@wrapper_script} #{@remote_cache_dir}/#{@task['taskId']}.json #{shellscript} #{shellargs}",
+                  "Running shell command #{shellscript} #{shellargs}")
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
@@ -118,7 +113,6 @@ class ShellAutomator < Automator
 
   def bootstrap(inputmap)
     sshauth = inputmap['sshauth']
-    hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
     set_credentials(sshauth)
 
@@ -127,44 +121,31 @@ class ShellAutomator < Automator
     # check to ensure scp is installed and attempt to install it
     begin
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
-
         log.debug "Checking for scp installation"
         begin
-          ssh_exec!(ssh, "which scp")
-        rescue
+          ssh_exec!(ssh, "which scp", "Checking for scp")
+        rescue CommandExecutionException
           log.warn "scp not found, attempting to install openssh-client"
           scp_install_cmd = "yum -qy install openssh-clients"
           begin
-            ssh_exec!(ssh, "which yum")
-          rescue
+            ssh_exec!(ssh, "which yum", "Checking for yum")
+          rescue CommandExecutionException
             scp_install_cmd = "apt-get -qy install openssh-client"
           end
-
-          begin
-            log.debug "installing openssh-client via #{scp_install_cmd}"
-            ssh_exec!(ssh, scp_install_cmd)
-          rescue => e
-            raise $!, "Could not install scp on #{ipaddress}: #{$!}", $!.backtrace
-          end
+          ssh_exec!(ssh, scp_install_cmd, "installing openssh-client via #{scp_install_cmd}")
+        else
+          log.debug "scp found on remote"
         end
-        log.debug "scp found on remote"
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
     begin
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
-
-        # create @remote_cache_dir
-        log.debug "Creating remote cache dir..."
-        output = ssh_exec!(ssh, "mkdir -p #{@remote_cache_dir}")
-        if (output[2] != 0 )
-          log.error "Unable to create #{@remote_cache_dir} on #{hostname} : #{output}"
-          raise "Unable to create #{@remote_cache_dir} on #{hostname} : #{output}"
-        end
+        ssh_exec!(ssh, "mkdir -p #{@remote_cache_dir}", "Creating remote cache dir")
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
@@ -174,20 +155,16 @@ class ShellAutomator < Automator
     begin
       Net::SCP.upload!(ipaddress, sshauth["user"], "#{@scripts_tar}", "#{@remote_cache_dir}/scripts.tar.gz", :ssh =>
           @credentials, :verbose => true)
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
     # extract scripts tarball on remote machine
     begin
       Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
-        output = ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/scripts.tar.gz -C #{@remote_cache_dir}")
-        if (output[2] != 0 )
-          log.error "Error extracting remote #{@remote_cache_dir}/scripts.tar.gz: #{output}"
-          raise "Error extracting remote #{@remote_cache_dir}/scripts.tar.gz: #{output}"
-        end
+        ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/scripts.tar.gz -C #{@remote_cache_dir}", "Extract remote #{@remote_cache_dir}/scripts.tar.gz")
       end
-    rescue Net::SSH::AuthenticationFailed => e
+    rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 

@@ -22,6 +22,7 @@ var providers = {};
 providers.joyent = require('./providers/joyent.json');
 providers.openstack = require('./providers/openstack.json');
 providers.rackspace = require('./providers/rackspace.json');
+providers.awesome = require('./providers/awesome.json');
 
 var hardwaretypes = {};
 hardwaretypes.small = require('./hardwaretypes/small.json');
@@ -70,12 +71,36 @@ var automators = {};
 automators['shell'] = require('./automators/shell.json');
 automators['chef'] = require('./automators/chef.json');
 
+var profiles = {};
+profiles['user'] = require('./profiles/user.json');
+profiles['admin'] = require('./profiles/admin.json');
+
 module.exports = function (nock, argv, clientAddr) {
 
   /**
    * Set up nock environment. Disable net connection.
    */
   nock.disableNetConnect();
+
+  /**
+   * Profiles call mocks.
+   */
+  for (var item in profiles) {
+    nock(clientAddr)
+      .persist()
+      .get('/v1/loom/profiles/' + item)
+      .reply(200, profiles[item]);
+
+    nock(clientAddr)
+      .persist()
+      .put('/v1/loom/profiles', profiles[item])
+      .reply(200);
+
+    nock(clientAddr)
+      .persist()
+      .delete('/v1/loom/profiles/' + item)
+      .reply(200);
+  }
 
   /**
    * Automators call mocks.

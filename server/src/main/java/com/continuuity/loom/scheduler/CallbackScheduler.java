@@ -63,13 +63,13 @@ public class CallbackScheduler implements Runnable {
   private final TaskService taskService;
 
   @Inject
-  CallbackScheduler(@Named("scheduler.id") String id,
-                    @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,
-                    @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
-                    @Named("callback.executor.service") ListeningExecutorService executorService,
-                    TaskService taskService,
-                    ClusterCallback clusterCallback,
-                    Configuration conf, ClusterStore clusterStore) {
+  private CallbackScheduler(@Named("scheduler.id") String id,
+                            @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,
+                            @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
+                            @Named("callback.executor.service") ListeningExecutorService executorService,
+                            TaskService taskService,
+                            ClusterCallback clusterCallback,
+                            Configuration conf, ClusterStore clusterStore) {
     this.id = id;
     this.callbackQueue = callbackQueue;
     this.jobQueue = jobQueue;

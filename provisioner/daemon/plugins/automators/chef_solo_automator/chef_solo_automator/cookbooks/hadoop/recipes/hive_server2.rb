@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: hive_server
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ template '/etc/init.d/hive-server2' do
 end
 
 service 'hive-server2' do
+  status_command 'service hive-server2 status'
   supports [:restart => true, :reload => false, :status => true]
   action :nothing
 end

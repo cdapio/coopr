@@ -50,8 +50,8 @@ public class TaskService {
   private final TrackingQueue callbackQueue;
 
   @Inject
-  public TaskService(ClusterStore clusterStore, LoomStats loomStats,
-                     @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue) {
+  private TaskService(ClusterStore clusterStore, LoomStats loomStats,
+                      @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue) {
     this.clusterStore = clusterStore;
     this.loomStats = loomStats;
     this.callbackQueue = callbackQueue;

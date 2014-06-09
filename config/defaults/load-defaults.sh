@@ -9,6 +9,11 @@ MAINDIR=${LOOM_SERVER_HOME}/config/defaults
 
 dirs="clustertemplates hardwaretypes imagetypes providers services"
 
+if [ "x$LOOM_USE_DUMMY_PROVISIONER" == "xtrue" ]
+then
+  dirs="$dirs providertypes automatortypes"
+fi
+
 for d in ${dirs} ; do
 	cd ${MAINDIR}
 	[[ -d ${d} ]] && cd ${d} || continue

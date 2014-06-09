@@ -1,11 +1,21 @@
 {
   "name": "hbase-regionserver",
   "description": "HBase RegionServer",
-  "dependson": [
-    "base",
-    "hbase-master",
-    "zookeeper-server"
-  ],
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [ "base" ],
+      "uses": [ "kerberos-client" ]
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [
+        "hbase-master",
+        "zookeeper-server"
+      ],
+      "uses": [ "kerberos-master" ]
+    }
+  },
   "provisioner": {
     "actions": {
       "install": {

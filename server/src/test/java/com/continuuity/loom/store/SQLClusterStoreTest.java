@@ -48,11 +48,13 @@ public class SQLClusterStoreTest extends ClusterStoreTest {
     zkClient = ZKClientService.Builder.of(zkServer.getConnectionStr()).build();
     zkClient.startAndWait();
 
-    Configuration sqlConf = new Configuration();
+    Configuration sqlConf = Configuration.create();
     sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+    sqlConf.setLong(Constants.ID_START_NUM, 1);
+    sqlConf.setLong(Constants.ID_INCREMENT_BY, 1);
     DBConnectionPool dbConnectionPool = new DBConnectionPool(sqlConf);
-    clusterStore = new SQLClusterStore(zkClient, dbConnectionPool, 1, 1);
+    clusterStore = new SQLClusterStore(zkClient, dbConnectionPool, sqlConf);
     clusterStore.initialize();
     clusterStore.initDerbyDB();
     store = clusterStore;

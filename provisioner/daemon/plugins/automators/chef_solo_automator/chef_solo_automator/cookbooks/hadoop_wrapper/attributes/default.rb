@@ -13,13 +13,13 @@ default['hadoop']['mapred_site']['mapreduce.framework.name'] = 'yarn'
 # yarn-site.xml
 default['hadoop']['yarn_site']['yarn.log-aggregation-enable'] = 'true'
 default['hadoop']['yarn_site']['yarn.scheduler.minimum-allocation-mb'] = '512'
+default['hadoop']['yarn_site']['yarn.nodemanager.resourcemanager.connect.wait.secs'] = '-1'
 default['hadoop']['yarn_site']['yarn.nodemanager.vmem-check-enabled'] = 'false'
 default['hadoop']['yarn_site']['yarn.nodemanager.vmem-pmem-ratio'] = '5.1'
 default['hadoop']['yarn_site']['yarn.nodemanager.delete.debug-delay-sec'] = '86400'
-default['hadoop']['yarn_site']['yarn.nodemanager.resource.memory-mb'] = (node[:memory][:total].to_i / 1024) / 2
+default['hadoop']['yarn_site']['yarn.nodemanager.resource.memory-mb'] = (node['memory']['total'].to_i / 1000) / 2
 # Do the right thing, based on distribution
-case node['hadoop']['distribution']
-when 'cdh'
+if node['hadoop']['distribution'] == 'cdh' && node['hadoop']['distribution_version'].to_i == 4
   # CDH4 doesn't have https://issues.apache.org/jira/browse/YARN-9 fixed
   default['hadoop']['yarn_site']['yarn.application.classpath'] = '$HADOOP_CONF_DIR, $HADOOP_COMMON_HOME/*, $HADOOP_COMMON_HOME/lib/*, $HADOOP_HDFS_HOME/*, $HADOOP_HDFS_HOME/lib/*, $HADOOP_MAPRED_HOME/*, $HADOOP_MAPRED_HOME/lib/*, $YARN_HOME/*, $YARN_HOME/lib/*'
   # CDH4 doesn't have https://issues.apache.org/jira/browse/YARN-1229 fixed

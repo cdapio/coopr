@@ -28,83 +28,37 @@ import java.util.concurrent.TimeUnit;
  */
 public class Constants {
 
-  /**
-   * Zookeeper Constants.
-   */
-  public static final class Zookeeper {
-    public static final String QUORUM = "zookeeper.quorum";
-    public static final String CFG_SESSION_TIMEOUT_MILLIS = "zookeeper.session.timeout.millis";
-    public static final int DEFAULT_SESSION_TIMEOUT_MILLIS = 40000;
-    public static final String NAMESPACE = "zookeeper.namespace";
-    public static final String DEFAULT_NAMESPACE = "/loom";
-  }
+  public static final String PORT = "server.port";
+  public static final String HOST = "server.host";
+  public static final String ZOOKEEPER_QUORUM = "server.zookeeper.quorum";
+  public static final String ZOOKEEPER_SESSION_TIMEOUT_MILLIS = "server.zookeeper.session.timeout.millis";
+  public static final String ZOOKEEPER_NAMESPACE = "server.zookeeper.namespace";
 
-  public static final String PORT = "loom.port";
-  public static final int DEFAULT_PORT = 55054;
+  public static final String JDBC_DRIVER = "server.jdbc.driver";
+  public static final String JDBC_CONNECTION_STRING = "server.jdbc.connection.string";
+  public static final String DB_USER = "server.db.user";
+  public static final String DB_PASSWORD = "server.db.password";
+  public static final String DB_VALIDATION_QUERY = "server.jdbc.validation.query";
+  public static final String DB_MAX_ACTIVE_CONNECTIONS = "server.jdbc.max.active.connections";
+  public static final String LOCAL_DATA_DIR = "server.local.data.dir";
+  public static final String EMBEDDED_DERBY_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
 
-  public static final String HOST = "loom.host";
-  public static final String DEFAULT_HOST = "localhost";
+  public static final String SCHEDULER_INTERVAL_SECS = "server.scheduler.run.interval.seconds";
+  public static final String SOLVER_NUM_THREADS = "server.solver.num.threads";
+  public static final String TASK_TIMEOUT_SECS = "server.task.timeout.seconds";
+  public static final String CLUSTER_CLEANUP_SECS = "server.cluster.cleanup.seconds";
+  public static final String NETTY_EXEC_NUM_THREADS = "server.netty.exec.num.threads";
+  public static final String NETTY_WORKER_NUM_THREADS = "server.netty.worker.num.threads";
 
-  public static final String SCHEDULER_INTERVAL_SECS = "scheduler.run.interval.seconds";
-  public static final int DEFAULT_SCHEDULER_INTERVAL_SECS = 1;
+  public static final String MAX_PER_NODE_LOG_LENGTH = "server.node.max.log.length";
+  public static final String MAX_PER_NODE_NUM_ACTIONS = "server.node.max.num.actions";
+  public static final String MAX_ACTION_RETRIES = "server.max.action.retries";
+  public static final String MAX_CLUSTER_SIZE = "server.max.cluster.size";
 
-  public static final String TASK_NAMESPACE = "/tasks";
-  public static final String LOCK_NAMESPACE = TASK_NAMESPACE + "/lock";
+  public static final String ID_START_NUM = "server.ids.start.num";
+  public static final String ID_INCREMENT_BY = "server.ids.increment.by";
 
-  public static final String JDBC_DRIVER = "loom.jdbc.driver";
-  public static final String DEFAULT_JDBC_DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
-  public static final String JDBC_CONNECTION_STRING = "loom.jdbc.connection.string";
-  public static final String DB_USER = "loom.db.user";
-  public static final String DEFAULT_DB_USER = "loom";
-  public static final String DB_PASSWORD = "loom.db.password";
-  public static final String DB_VALIDATION_QUERY = "loom.jdbc.validation.query";
-  public static final String DEFAULT_DB_VALIDATION_QUERY = "VALUES 1";
-  public static final String DB_MAX_ACTIVE_CONNECTIONS = "loom.jdbc.max.active.connections";
-  public static final int DEFAULT_DB_MAX_ACTIVE_CONNECTIONS = 100;
-
-  public static final String USER_HEADER = "X-Loom-UserID";
-  public static final String API_KEY_HEADER = "X-Loom-ApiKey";
-  public static final String ADMIN_USER = "admin";
-  public static final String SYSTEM_USER = "system";
-
-  public static final String SOLVER_NUM_THREADS = "loom.solver.num.threads";
-  public static final int DEFAULT_SOLVER_NUM_THREADS = 20;
-
-  public static final String LOCAL_DATA_DIR = "loom.local.data.dir";
-  public static final String DEFAULT_LOCAL_DATA_DIR = "/var/loom/data";
-
-  public static final String TASK_TIMEOUT_SECS = "loom.task.timeout.seconds";
-  public static final long DEFAULT_TASK_TIMEOUT_SECS = TimeUnit.SECONDS.convert(30, TimeUnit.MINUTES);
-
-  public static final String CLUSTER_CLEANUP_SECS = "loom.cluster.cleanup.seconds";
-  public static final long DEFAULT_CLUSTER_CLEANUP_SECS = TimeUnit.SECONDS.convert(3, TimeUnit.MINUTES);
-
-  public static final String NETTY_EXEC_NUM_THREADS = "loom.netty.exec.num.threads";
-  public static final int DEFAULT_NETTY_EXEC_NUM_THREADS = 50;
-
-  public static final String NETTY_WORKER_NUM_THREADS = "loom.netty.worker.num.threads";
-  public static final int DEFAULT_NETTY_WORKER_NUM_THREADS = 20;
-
-  public static final String MAX_PER_NODE_LOG_LENGTH = "loom.node.max.log.length";
-  public static final int DEFAULT_MAX_PER_NODE_LOG_LENGTH = 2 * 1024;
-
-  public static final String MAX_PER_NODE_NUM_ACTIONS = "loom.node.max.num.actions";
-  public static final int DEFAULT_MAX_PER_NODE_NUM_ACTIONS = 200;
-
-  public static final String MAX_ACTION_RETRIES = "loom.max.action.retries";
-  public static final int DEFAULT_MAX_ACTION_RETRIES = 3;
-
-  public static final String MAX_CLUSTER_SIZE = "loom.max.cluster.size";
-  public static final int DEFAULT_MAX_CLUSTER_SIZE = 10000;
-
-  public static final String ID_START_NUM = "loom.ids.start.num";
-  public static final long DEFAULT_ID_START_NUM = 1;
-
-  public static final String ID_INCREMENT_BY = "loom.ids.increment.by";
-  public static final long DEFAULT_ID_INCREMENT_BY = 1;
-
-  public static final String CALLBACK_CLASS = "loom.callback.class";
-  public static final String DEFAULT_CALLBACK_CLASS = HttpPostClusterCallback.class.getCanonicalName();
+  public static final String CALLBACK_CLASS = "server.callback.class";
 
   /**
    * {@link HttpPostClusterCallback} config settings.
@@ -143,4 +97,11 @@ public class Constants {
     public static final String CALLBACK = "callback.queue";
     public static final Set<String> ALL = ImmutableSet.of(PROVISIONER, CLUSTER, SOLVER, JOB, CALLBACK);
   }
+
+  public static final String TASK_NAMESPACE = "/tasks";
+  public static final String LOCK_NAMESPACE = TASK_NAMESPACE + "/lock";
+  public static final String USER_HEADER = "X-Loom-UserID";
+  public static final String API_KEY_HEADER = "X-Loom-ApiKey";
+  public static final String ADMIN_USER = "admin";
+  public static final String SYSTEM_USER = "system";
 }

@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.runtime;
 
-import com.continuuity.loom.conf.Constants;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -72,7 +71,7 @@ public final class DummyProvisioner {
       CommandLineParser parser = new BasicParser();
       CommandLine cmd = parser.parse(options, args);
       host = cmd.hasOption('h') ? cmd.getOptionValue('h') : "localhost";
-      port = cmd.hasOption('p') ? Integer.valueOf(cmd.getOptionValue('p')) : Constants.DEFAULT_PORT;
+      port = cmd.hasOption('p') ? Integer.valueOf(cmd.getOptionValue('p')) : 55054;
       concurrency = cmd.hasOption('c') ? Integer.valueOf(cmd.getOptionValue('c')) : 5;
       failurePercent = cmd.hasOption('f') ? Integer.valueOf(cmd.getOptionValue('f')) : 0;
       runOnce = cmd.hasOption('o');

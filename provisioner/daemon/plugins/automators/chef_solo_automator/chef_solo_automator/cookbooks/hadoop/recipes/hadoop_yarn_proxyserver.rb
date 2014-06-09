@@ -2,7 +2,7 @@
 # Cookbook Name:: hadoop
 # Recipe:: hadoop_yarn_proxyserver
 #
-# Copyright (C) 2013 Continuuity, Inc.
+# Copyright (C) 2013-2014 Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ package 'hadoop-yarn-proxyserver' do
 end
 
 service 'hadoop-yarn-proxyserver' do
+  status_command 'service hadoop-yarn-proxyserver status'
   supports [:restart => true, :reload => false, :status => true]
   action :nothing
 end

@@ -17,10 +17,8 @@ package com.continuuity.loom.layout;
 
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.FieldSchema;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.ParameterType;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
@@ -57,7 +55,7 @@ public class Solver {
   private final ClusterLayoutUpdater updater;
 
   @Inject
-  Solver(EntityStore entityStore, ClusterLayoutUpdater updater) {
+  private Solver(EntityStore entityStore, ClusterLayoutUpdater updater) {
     this.entityStore = entityStore;
     this.updater = updater;
   }
@@ -245,15 +243,15 @@ public class Solver {
                                                  String requiredHardwareType) throws Exception {
     Map<String, String> flavorMap = Maps.newHashMap();
 
-    Set<String> allowedHardwareTypes = template.getCompatibilities().getHardwaretypes();
+    Compatibilities compatibilities = template.getCompatibilities();
     if (requiredHardwareType != null) {
-      addProviderFlavor(flavorMap, providerName, allowedHardwareTypes,
+      addProviderFlavor(flavorMap, providerName, compatibilities,
                         entityStore.getHardwareType(requiredHardwareType));
       return flavorMap;
     }
 
     for (HardwareType hardwareType : entityStore.getAllHardwareTypes()) {
-      addProviderFlavor(flavorMap, providerName, allowedHardwareTypes, hardwareType);
+      addProviderFlavor(flavorMap, providerName, compatibilities, hardwareType);
     }
 
     return flavorMap;
@@ -263,12 +261,12 @@ public class Solver {
   // a whitelist of allowed hardware types.  If the flavor does not exist for the provider and whitelisted
   // hardware type, nothing is added.
   private void addProviderFlavor(Map<String, String> map, String providerName,
-                                 Set<String> allowedTypes, HardwareType hardwareType) {
+                                 Compatibilities compatibilities, HardwareType hardwareType) {
     if (hardwareType != null) {
       Map<String, Map<String, String>> providerMap = hardwareType.getProviderMap();
       String name = hardwareType.getName();
       // empty allowed types means all types are allowed
-      if ((allowedTypes.isEmpty() || allowedTypes.contains(name)) && providerMap.containsKey(providerName)) {
+      if (compatibilities.compatibleWithHardwareType(name) && providerMap.containsKey(providerName)) {
         String flavor = providerMap.get(providerName).get("flavor");
         if (flavor != null) {
           map.put(name, flavor);
@@ -282,26 +280,26 @@ public class Solver {
                                               String requiredImageType) throws Exception {
     Map<String, String> imageMap = Maps.newHashMap();
 
-    Set<String> allowedImageTypes = template.getCompatibilities().getImagetypes();
+    Compatibilities compatibilities = template.getCompatibilities();
     if (requiredImageType != null) {
-      addProviderImage(imageMap, providerName, allowedImageTypes, entityStore.getImageType(requiredImageType));
+      addProviderImage(imageMap, providerName, compatibilities, entityStore.getImageType(requiredImageType));
       return imageMap;
     }
 
     for (ImageType imageType : entityStore.getAllImageTypes()) {
-      addProviderImage(imageMap, providerName, allowedImageTypes, imageType);
+      addProviderImage(imageMap, providerName, compatibilities, imageType);
     }
 
     return imageMap;
   }
 
   private void addProviderImage(Map<String, String> map, String providerName,
-                                Set<String> allowedTypes, ImageType imageType) {
+                                Compatibilities compatibilities, ImageType imageType) {
     if (imageType != null) {
       Map<String, Map<String, String>> providerMap = imageType.getProviderMap();
       String name = imageType.getName();
       // empty allowed types means all types are allowed
-      if ((allowedTypes.isEmpty() || allowedTypes.contains(name)) && providerMap.containsKey(providerName)) {
+      if (compatibilities.compatibleWithImageType(name) && providerMap.containsKey(providerName)) {
         String image = providerMap.get(providerName).get("image");
         if (image != null) {
           map.put(name, image);
@@ -311,8 +309,7 @@ public class Solver {
   }
 
   private void validateServiceCompatibilities(Compatibilities compatibilities, Set<String> services) {
-    Set<String> compatibleServices = compatibilities.getServices();
-    if (compatibleServices != null && !compatibleServices.isEmpty()) {
+    if (!compatibilities.compatibleWithServices(services)) {
       Set<String> incompatibleServices = Sets.difference(services, compatibilities.getServices());
       if (!incompatibleServices.isEmpty()) {
         String incompatibleStr = Joiner.on(',').join(incompatibleServices);
