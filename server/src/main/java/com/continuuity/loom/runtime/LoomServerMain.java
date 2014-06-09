@@ -24,6 +24,7 @@ import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.IdService;
+import com.continuuity.loom.store.TenantStore;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -61,6 +62,7 @@ public final class LoomServerMain extends DaemonMain {
   private int solverNumThreads;
   private ListeningExecutorService executorService;
   private IdService idService;
+  private TenantStore tenantStore;
 
   public static void main(final String[] args) throws Exception {
     new LoomServerMain().doMain(args);
@@ -82,7 +84,6 @@ public final class LoomServerMain extends DaemonMain {
       }
 
       solverNumThreads = conf.getInt(Constants.SOLVER_NUM_THREADS);
-      idService = injector.getInstance(IdService.class);
     } catch (Exception e) {
       LOG.error("Exception initializing loom", e);
     }
@@ -97,7 +98,6 @@ public final class LoomServerMain extends DaemonMain {
       zkClientService = getZKService(inMemoryZKServer.getConnectionStr());
     }
     zkClientService.startAndWait();
-    idService.startAndWait();
 
     executorService = MoreExecutors.listeningDecorator(
       Executors.newFixedThreadPool(solverNumThreads,
@@ -111,6 +111,10 @@ public final class LoomServerMain extends DaemonMain {
       // TODO: move everything that needs zk started out of the module
       injector = Guice.createInjector(LoomModules.createModule(zkClientService, executorService, conf));
 
+      idService = injector.getInstance(IdService.class);
+      idService.startAndWait();
+      tenantStore = injector.getInstance(TenantStore.class);
+      tenantStore.startAndWait();
       ClusterStore clusterStore = injector.getInstance(ClusterStore.class);
       clusterStore.initialize();
       for (String queueName : Constants.Queue.ALL) {

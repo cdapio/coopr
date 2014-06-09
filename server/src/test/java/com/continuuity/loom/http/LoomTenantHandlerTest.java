@@ -26,10 +26,10 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  *
@@ -48,14 +48,13 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
   @Test
   public void testCreateTenant() throws Exception {
     Tenant requestedTenant = new Tenant("companyX", null, 10, 100, 1000);
-    AddTenantRequest request = new AddTenantRequest(requestedTenant, null);
-    HttpResponse response = doPost("/v1/tenants", GSON.toJson(request), SUPERADMIN_HEADERS);
+    HttpResponse response = doPost("/v1/tenants", GSON.toJson(requestedTenant), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     JsonObject responseObj = GSON.fromJson(reader, JsonObject.class);
-    long id = responseObj.get("id").getAsLong();
+    String id = responseObj.get("id").getAsString();
 
     // make sure tenant was actually written
     Tenant tenant = tenantStore.getTenant(id);
@@ -68,12 +67,13 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
   @Test
   public void testWriteTenant() throws Exception {
     // write tenant to store
-    Tenant actualTenant = new Tenant("companyX", 123L, 10, 100, 1000);
+    String id = UUID.randomUUID().toString();
+    Tenant actualTenant = new Tenant("companyX", id, 10, 100, 1000);
     tenantStore.writeTenant(actualTenant);
 
     // perform request to delete tenant
-    Tenant updatedTenant = new Tenant("companyX", 123L, 10, 100, 500);
-    HttpResponse response = doPut("/v1/tenants/123", GSON.toJson(updatedTenant), SUPERADMIN_HEADERS);
+    Tenant updatedTenant = new Tenant("companyX", id, 10, 100, 500);
+    HttpResponse response = doPut("/v1/tenants/" + id, GSON.toJson(updatedTenant), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     Assert.assertEquals(updatedTenant, tenantStore.getTenant(updatedTenant.getId()));
@@ -82,11 +82,12 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
   @Test
   public void testDeleteTenant() throws Exception {
     // write tenant to store
-    Tenant actualTenant = new Tenant("companyX", 123L, 10, 100, 1000);
+    String id = UUID.randomUUID().toString();
+    Tenant actualTenant = new Tenant("companyX", id, 10, 100, 1000);
     tenantStore.writeTenant(actualTenant);
 
     // perform request to delete tenant
-    HttpResponse response = doDelete("/v1/tenants/123", SUPERADMIN_HEADERS);
+    HttpResponse response = doDelete("/v1/tenants/" + id, SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     Assert.assertNull(tenantStore.getTenant(actualTenant.getId()));
@@ -95,11 +96,12 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
   @Test
   public void testGetTenant() throws Exception {
     // write tenant to store
-    Tenant actualTenant = new Tenant("companyX", 123L, 10, 100, 1000);
+    String id = UUID.randomUUID().toString();
+    Tenant actualTenant = new Tenant("companyX", id, 10, 100, 1000);
     tenantStore.writeTenant(actualTenant);
 
     // perform request to get tenant
-    HttpResponse response = doGet("/v1/tenants/123", SUPERADMIN_HEADERS);
+    HttpResponse response = doGet("/v1/tenants/" + id, SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     Assert.assertEquals(actualTenant, GSON.fromJson(reader, Tenant.class));
@@ -108,8 +110,10 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
   @Test
   public void testGetAllTenants() throws Exception {
     // write tenants to store
-    Tenant expectedTenant1 = new Tenant("companyX", 123L, 10, 100, 1000);
-    Tenant expectedTenant2 = new Tenant("companyY", 543L, 500, 1000, 10000);
+    String id1 = UUID.randomUUID().toString();
+    String id2 = UUID.randomUUID().toString();
+    Tenant expectedTenant1 = new Tenant("companyX", id1, 10, 100, 1000);
+    Tenant expectedTenant2 = new Tenant("companyY", id2, 500, 1000, 10000);
     tenantStore.writeTenant(expectedTenant1);
     tenantStore.writeTenant(expectedTenant2);
 
@@ -128,13 +132,8 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(doPost("/v1/tenants", "", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
 
     // id in object does not match id in path
-    Tenant tenant = new Tenant("name", 1L, 10, 10, 10);
+    Tenant tenant = new Tenant("name", "id123", 10, 10, 10);
     assertResponseStatus(doPut("/v1/tenants/10", GSON.toJson(tenant), SUPERADMIN_HEADERS),
-                         HttpResponseStatus.BAD_REQUEST);
-
-    // invalid ids
-    assertResponseStatus(doGet("/v1/tenants/asdf", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
-    assertResponseStatus(doPut("/v1/tenants/asdf", GSON.toJson(tenant), SUPERADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 

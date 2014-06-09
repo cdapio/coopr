@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Tests for the tenant store.  Test classes for different types of stores must set the
@@ -34,12 +35,12 @@ public abstract class TenantStoreTest {
 
   @Test
   public void testGetNonExistantTenantReturnsNull() throws IOException {
-    Assert.assertNull(store.getTenant(123L));
+    Assert.assertNull(store.getTenant(UUID.randomUUID().toString()));
   }
 
   @Test
   public void testAddWriteDelete() throws IOException {
-    Tenant tenant = new Tenant("name", 1L, 10, 100, 1000);
+    Tenant tenant = new Tenant("name", UUID.randomUUID().toString(), 10, 100, 1000);
     store.writeTenant(tenant);
 
     Assert.assertEquals(tenant, store.getTenant(tenant.getId()));
@@ -50,9 +51,9 @@ public abstract class TenantStoreTest {
 
   @Test
   public void testOverwrite() throws IOException {
-    Tenant tenant = new Tenant("name", 1L, 10, 100, 1000);
+    Tenant tenant = new Tenant("name", UUID.randomUUID().toString(), 10, 100, 1000);
     store.writeTenant(tenant);
-    tenant = new Tenant("name", 1L, 10, 100, 500);
+    tenant = new Tenant("name", tenant.getId(), 10, 100, 500);
     store.writeTenant(tenant);
     Assert.assertEquals(tenant, store.getTenant(tenant.getId()));
   }

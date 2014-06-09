@@ -33,7 +33,7 @@ public interface TenantStore extends Service {
    * @return Tenant for the given id or null if no such tenant exists.
    * @throws IOException
    */
-  Tenant getTenant(long id) throws IOException;
+  Tenant getTenant(String id) throws IOException;
 
   /**
    * Get all {@link com.continuuity.loom.admin.Tenant}s.
@@ -58,5 +58,5 @@ public interface TenantStore extends Service {
    * @param id Id of the tenant to delete.
    * @throws Exception
    */
-  void deleteTenant(long id) throws IOException;
+  void deleteTenant(String id) throws IOException;
 }

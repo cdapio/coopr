@@ -33,6 +33,7 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.admin.ServiceDependencies;
 import com.continuuity.loom.admin.ServiceStageDependencies;
+import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.http.AddServicesRequest;
 import com.continuuity.loom.http.ClusterConfigureRequest;
@@ -74,6 +75,7 @@ public class JsonSerde {
       .registerTypeAdapter(ServiceConstraint.class, new ServiceConstraintCodec())
       .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
       .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
+      .registerTypeAdapter(Tenant.class, new TenantCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
       .enableComplexMapKeySerialization()
       .create();

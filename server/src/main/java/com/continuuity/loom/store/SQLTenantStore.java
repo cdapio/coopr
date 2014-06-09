@@ -17,7 +17,6 @@ package com.continuuity.loom.store;
 
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.codec.json.JsonSerde;
-import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -61,34 +60,11 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     this.dbConnectionPool = dbConnectionPool;
   }
 
-  public void initDerbyDB() throws SQLException {
-    LOG.warn("Initializing Derby DB... Tables are not optimized for performance.");
-  }
-
-  private void createDerbyTable(String createString) throws SQLException {
-    Connection conn = dbConnectionPool.getConnection();
-    try {
-      Statement statement = conn.createStatement();
-      try {
-        statement.executeUpdate(createString);
-      } catch (SQLException e) {
-        // code for the table already exists in derby.
-        if (!e.getSQLState().equals("X0Y32")) {
-          throw Throwables.propagate(e);
-        }
-      } finally {
-        statement.close();
-      }
-    } finally {
-      conn.close();
-    }
-  }
-
   @Override
   protected void startUp() throws Exception {
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
-      DBQueryHelper.createDerbyTable("CREATE TABLE tenants ( id BIGINT, name VARCHAR(255), workers INT, tenant BLOB )",
-                                     dbConnectionPool);
+      DBQueryHelper.createDerbyTable(
+        "CREATE TABLE tenants ( id VARCHAR(255), name VARCHAR(255), workers INT, tenant BLOB )", dbConnectionPool);
     }
   }
 
@@ -98,12 +74,12 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   }
 
   @Override
-  public Tenant getTenant(long id) throws IOException {
+  public Tenant getTenant(String id) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants WHERE id=?");
-        statement.setLong(1, id);
+        statement.setString(1, id);
         try {
           return DBQueryHelper.getQueryItem(statement, Tenant.class);
         } finally {
@@ -113,6 +89,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
         conn.close();
       }
     } catch (SQLException e) {
+      LOG.error("Exception getting tenant {}", id, e);
       throw new IOException(e);
     }
   }
@@ -132,6 +109,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
         conn.close();
       }
     } catch (SQLException e) {
+      LOG.error("Exception getting all tenants", e);
       throw new IOException(e);
     }
   }
@@ -140,10 +118,10 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   public void writeTenant(Tenant tenant) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
-      long tenantId = tenant.getId();
+      String tenantId = tenant.getId();
       try {
         PreparedStatement checkStatement = conn.prepareStatement("SELECT id FROM tenants WHERE id=?");
-        checkStatement.setLong(1, tenantId);
+        checkStatement.setString(1, tenantId);
         PreparedStatement writeStatement;
         try {
           ResultSet rs = checkStatement.executeQuery();
@@ -154,12 +132,12 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
                 "UPDATE tenants SET tenant=?, workers=? WHERE id=?");
               writeStatement.setBlob(1, new ByteArrayInputStream(codec.serialize(tenant, Tenant.class)));
               writeStatement.setInt(2, tenant.getWorkers());
-              writeStatement.setLong(3, tenantId);
+              writeStatement.setString(3, tenantId);
             } else {
               // cluster does not exist, perform an insert.
               writeStatement = conn.prepareStatement(
                 "INSERT INTO tenants (id, workers, tenant) VALUES (?, ?, ?)");
-              writeStatement.setLong(1, tenantId);
+              writeStatement.setString(1, tenantId);
               writeStatement.setInt(2, tenant.getWorkers());
               writeStatement.setBlob(3, new ByteArrayInputStream(codec.serialize(tenant, Tenant.class)));
             }
@@ -179,17 +157,18 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
         conn.close();
       }
     } catch (SQLException e) {
+      LOG.error("Exception writing tenant {}", tenant);
       throw new IOException(e);
     }
   }
 
   @Override
-  public void deleteTenant(long id) throws IOException {
+  public void deleteTenant(String id) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("DELETE FROM tenants WHERE id=? ");
-        statement.setLong(1, id);
+        statement.setString(1, id);
         try {
           statement.executeUpdate();
         } finally {
@@ -199,6 +178,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
         conn.close();
       }
     } catch (SQLException e) {
+      LOG.error("Exception deleting tenant {}", id);
       throw new IOException(e);
     }
   }

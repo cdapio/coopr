@@ -90,7 +90,7 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"my-company", "workers":10}' 
         http://<loom-server>:<superadmin-port>/<version>/tenants
- $ { "id": "00000001" }
+ $ { "id": "f78dae92-a27b-4e3b-8c6a-cfc19f844259" }
 
 .. _tenants-retrieve:
 
@@ -129,8 +129,8 @@ Example
         -H 'X-Loom-UserID:superadmin' 
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/tenants/00000001
- $ { "id":"00000001", "name":"my-company", "workers":10 }
+        http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
+ $ { "id":"f78dae92-a27b-4e3b-8c6a-cfc19f844259", "name":"my-company", "workers":10 }
 
 
 .. _tenants-delete:
@@ -167,7 +167,7 @@ Example
         -H 'X-Loom-UserID:superadmin' 
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/tenants/00000001
+        http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
 
 .. _tenants-modify:
 
@@ -229,14 +229,14 @@ Example
         -H 'X-Loom-UserID:superadmin' 
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
-        -d '{ "id":"00000001", "name":"my-company", "workers":20 }'  
-        http://<loom-server>:<superadmin-port>/<version>/tenants/00000001
+        -d '{ "name":"my-company", "workers":20 }'  
+        http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
  $ curl -X GET 
         -H 'X-Loom-UserID:superadmin' 
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/tenants/00000001
- $ { "id":"00000001", "name":"my-company", "workers":20 }
+        http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
+ $ { "id":"f78dae92-a27b-4e3b-8c6a-cfc19f844259", "name":"my-company", "workers":20 }
 
 .. _tenants-all-list:
 

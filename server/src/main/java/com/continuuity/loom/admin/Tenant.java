@@ -16,18 +16,17 @@
 package com.continuuity.loom.admin;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 
 /**
  * A tenant contains the id, name, and settings for a tenant.
  */
 public final class Tenant extends NamedEntity {
-  private final Long id;
+  private final String id;
   private final int workers;
   private final int maxClusters;
   private final int maxNodes;
 
-  public Tenant(String name, Long id, Integer workers, Integer maxClusters, Integer maxNodes) {
+  public Tenant(String name, String id, Integer workers, Integer maxClusters, Integer maxNodes) {
     super(name);
     this.id = id;
     this.workers = workers == null ? 0 : workers;
@@ -35,7 +34,7 @@ public final class Tenant extends NamedEntity {
     this.maxNodes = maxNodes == null ? Integer.MAX_VALUE : maxClusters;
   }
 
-  public Long getId() {
+  public String getId() {
     return id;
   }
 
@@ -67,5 +66,16 @@ public final class Tenant extends NamedEntity {
   @Override
   public int hashCode() {
     return Objects.hashCode(name, id, workers, maxClusters, maxNodes);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("name", name)
+      .add("id", id)
+      .add("workers", workers)
+      .add("maxClusters", maxClusters)
+      .add("maxNodes", maxNodes)
+      .toString();
   }
 }

@@ -24,7 +24,6 @@ import com.continuuity.loom.store.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
@@ -42,6 +41,7 @@ import javax.ws.rs.PathParam;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.UUID;
 
 /**
  * Handler for performing tenant operations.
@@ -97,14 +97,12 @@ public class LoomTenantHandler extends LoomAuthHandler {
     }
 
     try {
-      Tenant tenant = store.getTenant(Long.parseLong(tenantId));
+      Tenant tenant = store.getTenant(tenantId);
       if (tenant == null) {
         responder.sendError(HttpResponseStatus.NOT_FOUND, "tenant " + tenantId + " not found");
         return;
       }
       responder.sendJson(HttpResponseStatus.OK, tenant, new TypeToken<Tenant>() {}.getType());
-    } catch (NumberFormatException e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid tenant id " + tenantId);
     } catch (IOException e) {
       LOG.error("Exception while getting tenant {}." , tenantId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while getting tenant " + tenantId);
@@ -127,8 +125,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
     Tenant requestedTenant;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      AddTenantRequest addRequest = GSON.fromJson(reader, AddTenantRequest.class);
-      requestedTenant = addRequest.getTenant();
+      requestedTenant = GSON.fromJson(reader, Tenant.class);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
       return;
@@ -148,10 +145,10 @@ public class LoomTenantHandler extends LoomAuthHandler {
     }
 
     try {
-      Tenant tenant = new Tenant(requestedTenant.getName(), idService.getNewTenantId(), requestedTenant.getWorkers(),
+      Tenant tenant = new Tenant(requestedTenant.getName(), UUID.randomUUID().toString(), requestedTenant.getWorkers(),
                                  requestedTenant.getMaxClusters(), requestedTenant.getMaxNodes());
       store.writeTenant(tenant);
-      responder.sendJson(HttpResponseStatus.OK, ImmutableMap.<String, Long>of("id", tenant.getId()));
+      responder.sendJson(HttpResponseStatus.OK, ImmutableMap.<String, String>of("id", tenant.getId()));
     } catch (IOException e) {
       LOG.error("Exception adding tenant.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding tenant");
@@ -173,14 +170,6 @@ public class LoomTenantHandler extends LoomAuthHandler {
       return;
     }
 
-    long id;
-    try {
-      id = Long.parseLong(tenantId);
-    } catch (NumberFormatException e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid tenant id " + tenantId);
-      return;
-    }
-
     Tenant tenant = null;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
@@ -199,7 +188,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
       }
     }
 
-    if (tenant.getId() != id) {
+    if (tenant.getId() != null && !tenant.getId().equals(tenantId)) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "tenant id does not match id in path.");
       return;
     }
@@ -231,10 +220,8 @@ public class LoomTenantHandler extends LoomAuthHandler {
     }
 
     try {
-      store.deleteTenant(Long.parseLong(tenantId));
+      store.deleteTenant(tenantId);
       responder.sendStatus(HttpResponseStatus.OK);
-    } catch (NumberFormatException e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid tenant id " + tenantId);
     } catch (IOException e) {
       LOG.error("Exception while deleting tenant {}", tenantId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while deleting tenant " + tenantId);
