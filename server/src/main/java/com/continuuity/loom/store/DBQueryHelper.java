@@ -51,7 +51,7 @@ public final class DBQueryHelper {
       DriverManager.getConnection("jdbc:derby:memory:loom;drop=true");
     } catch (SQLException e) {
       // this is normal when a drop happens
-      if (!e.getSQLState().equals("08006") ) {
+      if (!e.getSQLState().equals("08006")) {
         Throwables.propagate(e);
       }
     }
