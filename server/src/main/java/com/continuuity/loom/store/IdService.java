@@ -41,6 +41,9 @@ public final class IdService extends AbstractIdleService {
 
   private final ZKClient zkClient;
 
+  /**
+   * Different types of objects that require Ids.
+   */
   public enum Type {
     JOB(IDS_BASEPATH + "/jobs"),
     TASK(IDS_BASEPATH + "/tasks"),
