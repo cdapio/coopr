@@ -141,7 +141,7 @@ Delete a Tenant
 To delete a tenant, make a DELETE HTTP request to URI:
 ::
 
- /tenants/{name}
+ /tenants/{id}
 
 This resource request represents an individual tenant for deletion.
 
@@ -179,9 +179,9 @@ To update a tenant, make a PUT HTTP request to URI:
 
  /tenants/{id}
 
-Resource specified above respresents an individual tenant that is being updated.
-Currently, the update of a tenant resource requires the complete tenant object to be 
-returned back rather than individual fields.
+The resource specified above respresents an individual tenant that is being updated.
+Currently, the update of a tenant resource requires the complete tenant object to in
+the request body. 
 
 PUT Parameters
 ^^^^^^^^^^^^^^^^
@@ -195,9 +195,9 @@ Required Parameters
    * - Parameter
      - Description
    * - id 
-     - Id of the resource to be updated.
+     - Id of the resource to be updated. Id must match.
    * - name
-     - Name of the resource to be updated. The name should match. 
+     - Name of the resource to be updated. 
    * - workers
      - New number of workers assigned to the tenant.
    * - maxClusters
@@ -217,7 +217,7 @@ HTTP Responses
    * - 200 (OK)
      - If update was successful
    * - 400 (BAD REQUEST)
-     - If the resource requested is invalid
+     - If the resource in the request is invalid
    * - 404 (NOT FOUND)
      - If the resource requested is not found
 
@@ -274,4 +274,7 @@ Example
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<superadmin-port>/<version>/tenants
-
+ $ [
+     { "id":"f78dae92-a27b-4e3b-8c6a-cfc19f844259", "name":"my-company", "workers":10 },
+     { "id":"e94ndl34-b38d-3n7a-0c1e-dpl84q438920", "name":"companyX", "workers":100 }
+   ]

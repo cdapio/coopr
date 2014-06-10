@@ -167,7 +167,7 @@ To update a hardware type, make a PUT HTTP request to URI:
 
 The resource specified above respresents an individual hardware type request for an update.
 Currently, the update of hardware type resource requires complete hardware type object to be 
-returned back rather than individual fields.
+in the request body.
 
 PUT Parameters
 ^^^^^^^^^^^^^^^^
