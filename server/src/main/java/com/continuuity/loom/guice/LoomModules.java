@@ -26,6 +26,7 @@ import com.continuuity.loom.http.LoomClusterHandler;
 import com.continuuity.loom.http.LoomRPCHandler;
 import com.continuuity.loom.http.LoomStatusHandler;
 import com.continuuity.loom.http.LoomTaskHandler;
+import com.continuuity.loom.http.LoomTenantHandler;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterScheduler;
 import com.continuuity.loom.scheduler.JobScheduler;
@@ -35,8 +36,11 @@ import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.EntityStore;
+import com.continuuity.loom.store.IdService;
 import com.continuuity.loom.store.SQLClusterStore;
 import com.continuuity.loom.store.SQLEntityStore;
+import com.continuuity.loom.store.SQLTenantStore;
+import com.continuuity.loom.store.TenantStore;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -146,6 +150,7 @@ public final class LoomModules {
           bind(ClusterCallback.class).to(callbackClass).in(Scopes.SINGLETON);
           bind(EntityStore.class).to(SQLEntityStore.class).in(Scopes.SINGLETON);
           bind(ClusterStore.class).to(SQLClusterStore.class).in(Scopes.SINGLETON);
+          bind(TenantStore.class).to(SQLTenantStore.class).in(Scopes.SINGLETON);
           bind(ZKClient.class).toInstance(zkClient);
           bind(String.class)
             .annotatedWith(Names.named("scheduler.id")).toInstance("scheduler-" + host);
@@ -174,6 +179,8 @@ public final class LoomModules {
           bind(DBConnectionPool.class).in(Scopes.SINGLETON);
           bind(SQLClusterStore.class).in(Scopes.SINGLETON);
           bind(SQLEntityStore.class).in(Scopes.SINGLETON);
+          bind(SQLTenantStore.class).in(Scopes.SINGLETON);
+          bind(IdService.class).in(Scopes.SINGLETON);
 
           Multibinder<HttpHandler> handlerBinder = Multibinder.newSetBinder(binder(), HttpHandler.class);
           handlerBinder.addBinding().to(LoomAdminHandler.class);
@@ -181,6 +188,7 @@ public final class LoomModules {
           handlerBinder.addBinding().to(LoomTaskHandler.class);
           handlerBinder.addBinding().to(LoomStatusHandler.class);
           handlerBinder.addBinding().to(LoomRPCHandler.class);
+          handlerBinder.addBinding().to(LoomTenantHandler.class);
         }
       };
   }

@@ -37,6 +37,7 @@ import com.continuuity.loom.scheduler.task.MissingClusterException;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.IdService;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -82,12 +83,13 @@ public class LoomClusterHandler extends LoomAuthHandler {
   private ClusterService clusterService;
   private final int maxClusterSize;
   private final LoomStats loomStats;
+  private final IdService idService;
 
   @Inject
   private LoomClusterHandler(ClusterStore store, @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
                              @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
                              ClusterService clusterService, Configuration conf,
-                             LoomStats loomStats) {
+                             LoomStats loomStats, IdService idService) {
     this.store = store;
     this.jobQueue = jobQueue;
     this.codec = new JsonSerde();
@@ -96,6 +98,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
     this.clusterService = clusterService;
     this.maxClusterSize = conf.getInt(Constants.MAX_CLUSTER_SIZE);
     this.loomStats = loomStats;
+    this.idService = idService;
   }
 
   /**
@@ -310,12 +313,12 @@ public class LoomClusterHandler extends LoomAuthHandler {
       String templateName = clusterCreateRequest.getClusterTemplate();
       LOG.debug(String.format("Received a request to create cluster %s with %d machines from template %s", name,
                              numMachines, templateName));
-      String clusterId = store.getNewClusterId();
+      String clusterId = idService.getNewClusterId();
       Cluster cluster = new Cluster(clusterId, userId, name, System.currentTimeMillis(),
                                     clusterCreateRequest.getDescription(), null, null,
                                     ImmutableSet.<String>of(), ImmutableSet.<String>of(),
                                     clusterCreateRequest.getConfig());
-      JobId clusterJobId = store.getNewJobId(clusterId);
+      JobId clusterJobId = idService.getNewJobId(clusterId);
       ClusterJob clusterJob = new ClusterJob(clusterJobId, ClusterAction.SOLVE_LAYOUT);
       cluster.setLatestJobId(clusterJob.getJobId());
 

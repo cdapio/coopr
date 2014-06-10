@@ -21,6 +21,8 @@ import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.IdService;
+import com.continuuity.loom.store.TenantStore;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -43,14 +45,18 @@ import org.junit.BeforeClass;
 public class LoomServiceTestBase extends BaseTest {
   protected static final String USER1 = "user1";
   protected static final String USER2 = "user2";
-  protected static final String ADMIN_USERID = "admin";
   protected static final String API_KEY = "apikey";
   protected static final Header[] USER1_HEADERS =
     { new BasicHeader(Constants.USER_HEADER, USER1), new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
   protected static final Header[] USER2_HEADERS =
     { new BasicHeader(Constants.USER_HEADER, USER2), new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
   protected static final Header[] ADMIN_HEADERS =
-    { new BasicHeader(Constants.USER_HEADER, ADMIN_USERID), new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
+    { new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
+      new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
+  protected static final Header[] SUPERADMIN_HEADERS =
+    { new BasicHeader(Constants.USER_HEADER, Constants.SUPERADMIN_USER),
+      new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+      new BasicHeader(Constants.TENANT_HEADER, Constants.SUPERADMIN_TENANT) };
   private static int port;
   protected static LoomService loomService;
   protected static TimeoutTrackingQueue nodeProvisionTaskQueue;
@@ -59,12 +65,14 @@ public class LoomServiceTestBase extends BaseTest {
   protected static TimeoutTrackingQueue jobQueue;
   protected static TimeoutTrackingQueue callbackQueue;
   protected static ClusterStore clusterStore;
+  protected static TenantStore tenantStore;
   protected static Scheduler scheduler;
   protected static JobScheduler jobScheduler;
 
 
   @BeforeClass
   public static void setupServiceBase() throws Exception {
+    injector.getInstance(IdService.class).startAndWait();
     nodeProvisionTaskQueue = injector.getInstance(
       Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.PROVISIONER)));
     nodeProvisionTaskQueue.start();
@@ -88,6 +96,8 @@ public class LoomServiceTestBase extends BaseTest {
     scheduler = injector.getInstance(Scheduler.class);
     scheduler.startAndWait();
     jobScheduler = injector.getInstance(JobScheduler.class);
+    tenantStore = injector.getInstance(TenantStore.class);
+    tenantStore.startAndWait();
   }
 
   @AfterClass

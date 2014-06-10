@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -44,6 +45,9 @@ import java.util.Map;
  */
 public abstract class EntityStoreTest {
   protected static EntityStore entityStore;
+
+  @Before
+  public abstract void clearState() throws Exception;
 
   @Test
   public void testGetStoreDeleteProvider() throws Exception {

@@ -373,7 +373,7 @@ To update a service, make a PUT HTTP request to URI:
 
 Resource specified above respresents an individual services request for an update operation.
 Currently, the update of services resource requires complete services object to be
-returned back rather than individual fields.
+in the request body.
 
 PUT Parameters
 ^^^^^^^^^^^^^^^^
