@@ -16,7 +16,7 @@
 package com.continuuity.loom.scheduler.callback;
 
 import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.collect.Lists;
 
 import java.util.Collections;
@@ -44,7 +44,7 @@ public class MockClusterCallback implements ClusterCallback {
   }
 
   @Override
-  public void initialize(Configuration conf, ClusterStore clusterStore) {
+  public void initialize(Configuration conf, ClusterStoreService clusterStore) {
   }
 
   @Override

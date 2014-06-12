@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store;
+package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.admin.Tenant;
 import com.google.common.util.concurrent.Service;

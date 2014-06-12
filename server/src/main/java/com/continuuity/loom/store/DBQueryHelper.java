@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +28,7 @@ import java.util.Set;
 public final class DBQueryHelper {
   private static final JsonSerde codec = new JsonSerde();
 
-  static void createDerbyTable(String createString, DBConnectionPool connectionPool) throws SQLException {
+  public static void createDerbyTable(String createString, DBConnectionPool connectionPool) throws SQLException {
     Connection conn = connectionPool.getConnection();
     try {
       Statement statement = conn.createStatement();
@@ -67,7 +68,7 @@ public final class DBQueryHelper {
    * @return
    * @throws java.sql.SQLException
    */
-  static <T> ImmutableSet<T> getQuerySet(PreparedStatement statement, Class<T> clazz) throws SQLException {
+  public static <T> ImmutableSet<T> getQuerySet(PreparedStatement statement, Class<T> clazz) throws SQLException {
     try {
       ResultSet rs = statement.executeQuery();
       try {
@@ -85,8 +86,7 @@ public final class DBQueryHelper {
     }
   }
 
-
-  static <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
+  public static <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
     return getQueryList(statement, clazz, Integer.MAX_VALUE);
   }
 
@@ -101,7 +101,7 @@ public final class DBQueryHelper {
    * @return
    * @throws SQLException
    */
-  static <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz, int limit)
+  public static <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz, int limit)
     throws SQLException {
     ResultSet rs = statement.executeQuery();
     try {
@@ -128,7 +128,7 @@ public final class DBQueryHelper {
    * @return
    * @throws SQLException
    */
-  static <T> T getQueryItem(PreparedStatement statement, Class<T> clazz) throws SQLException {
+  public static <T> T getQueryItem(PreparedStatement statement, Class<T> clazz) throws SQLException {
     ResultSet rs = statement.executeQuery();
     try {
       if (rs.next()) {
@@ -149,7 +149,7 @@ public final class DBQueryHelper {
    * @return True if the query has results, false if not.
    * @throws SQLException
    */
-  static boolean hasResults(PreparedStatement statement) throws SQLException {
+  public static boolean hasResults(PreparedStatement statement) throws SQLException {
     ResultSet rs = statement.executeQuery();
     try {
       return rs.next();
@@ -158,7 +158,7 @@ public final class DBQueryHelper {
     }
   }
 
-  static <T> T deserializeBlob(Blob blob, Class<T> clazz) throws SQLException {
+  public static <T> T deserializeBlob(Blob blob, Class<T> clazz) throws SQLException {
     Reader reader = new InputStreamReader(blob.getBinaryStream(), Charsets.UTF_8);
     T object;
     try {
@@ -169,4 +169,8 @@ public final class DBQueryHelper {
     return object;
   }
 
+  // mysql will error if you give it a timestamp of 0...
+  public static Timestamp getTimestamp(long ts) {
+    return ts > 0 ? new Timestamp(ts) : null;
+  }
 }

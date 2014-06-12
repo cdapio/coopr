@@ -13,26 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.scheduler.task;
 
 /**
- * Thrown to indicate that there was a problem creating a cluster job or task.
+ * User account related classes.
  */
-public class TaskException extends Exception {
+package com.continuuity.loom.account;
 
-  /**
-   * New exception with error message.
-   * @param message the error message
-   */
-  public TaskException(String message) {
-    super(message);
-  }
-
-  public TaskException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public TaskException(Throwable cause) {
-    super(cause);
-  }
-}

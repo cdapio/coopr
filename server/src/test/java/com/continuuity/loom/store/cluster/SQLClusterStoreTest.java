@@ -13,39 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store;
+package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
-import com.google.common.base.Throwables;
+import com.continuuity.loom.store.DBConnectionPool;
+import com.continuuity.loom.store.DBQueryHelper;
+import org.apache.twill.internal.zookeeper.InMemoryZKServer;
+import org.apache.twill.zookeeper.ZKClientService;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.rules.TemporaryFolder;
 
-import java.sql.DriverManager;
+import java.io.IOException;
 import java.sql.SQLException;
 
 /**
  *
  */
-public class SQLEntityStoreTest extends EntityStoreTest {
-  private static SQLEntityStore sqlStore;
+public class SQLClusterStoreTest extends ClusterStoreTest {
+  private static SQLClusterStoreService sqlClusterStoreService;
 
   @BeforeClass
-  public static void beforeClass() throws SQLException, ClassNotFoundException {
+  public static void setupSQLClusterStoreTest() throws SQLException {
     Configuration sqlConf = Configuration.create();
     sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+    sqlConf.setLong(Constants.ID_START_NUM, 1);
+    sqlConf.setLong(Constants.ID_INCREMENT_BY, 1);
     DBConnectionPool dbConnectionPool = new DBConnectionPool(sqlConf);
-    sqlStore = new SQLEntityStore(dbConnectionPool);
-    sqlStore.initDerbyDB();
-    sqlStore.clearData();
-    entityStore = sqlStore;
+    sqlClusterStoreService = new SQLClusterStoreService(dbConnectionPool);
+    sqlClusterStoreService.startAndWait();
   }
 
   @Override
   public void clearState() throws Exception {
-    sqlStore.clearData();
+    sqlClusterStoreService.clearData();
+  }
+
+  @Override
+  public ClusterStoreService getClusterStoreService() throws Exception {
+    return sqlClusterStoreService;
   }
 
   @AfterClass

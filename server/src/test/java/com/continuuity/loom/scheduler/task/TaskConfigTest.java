@@ -17,6 +17,7 @@ package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
@@ -129,7 +130,7 @@ public class TaskConfigTest {
                                                "bootstrap_keypair", "iad-root",
                                                "image", "f70ed7c7-b42e-4d77-83d8-40fa29825b85")));
 
-    Cluster defaultCluster = new Cluster("1", "user", "cluster1", System.currentTimeMillis(),
+    Cluster defaultCluster = new Cluster("1", new Account("user", "tenant"), "cluster1", System.currentTimeMillis(),
                                          "Test cluster", provider,
                                          c1, nodeMap.keySet(),
                                          ImmutableSet.of(s1.getName(), s2.getName(), s3.getName()));
@@ -142,7 +143,7 @@ public class TaskConfigTest {
     // Test user config
     JsonObject userConf = new JsonObject();
     userConf.add("hadoop", conf.get("hadoop"));
-    Cluster userCluster = new Cluster("1", "user", "cluster1", System.currentTimeMillis(),
+    Cluster userCluster = new Cluster("1", new Account("user", "tenant"), "cluster1", System.currentTimeMillis(),
                                       "Test cluster", provider,
                                       c1, nodeMap.keySet(),
                                       ImmutableSet.of(s1.getName(), s2.getName(), s3.getName()), userConf);

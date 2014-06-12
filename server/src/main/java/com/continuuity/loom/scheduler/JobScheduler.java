@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.scheduler;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
@@ -30,7 +31,8 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -58,22 +60,26 @@ import java.util.Set;
 public class JobScheduler implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(JobScheduler.class);
   private static final String consumerId = "jobscheduler";
+  private static final JsonSerde jsonSerde = new JsonSerde();
 
-  private final ClusterStore clusterStore;
+  private final ClusterStoreService clusterStoreService;
+  private final ClusterStoreView clusterStore;
   private final TrackingQueue provisionerQueue;
-  private final JsonSerde jsonSerde;
   private final TrackingQueue jobQueue;
   private final ZKClient zkClient;
   private final TaskService taskService;
   private final int maxTaskRetries;
 
   @Inject
-  private JobScheduler(ClusterStore clusterStore, @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
-                       JsonSerde jsonSerde, @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
-                       TaskService taskService, Configuration conf) {
-    this.clusterStore = clusterStore;
+  private JobScheduler(ClusterStoreService clusterStoreService,
+                       @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
+                       @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
+                       ZKClient zkClient,
+                       TaskService taskService,
+                       Configuration conf) {
+    this.clusterStoreService = clusterStoreService;
+    this.clusterStore = clusterStoreService.getView(Account.SYSTEM_ACCOUNT);
     this.provisionerQueue = provisionerQueue;
-    this.jsonSerde = jsonSerde;
     this.jobQueue = jobQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.taskService = taskService;
@@ -95,7 +101,7 @@ public class JobScheduler implements Runnable {
         ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + jobId.getClusterId());
         try {
           lock.acquire();
-          ClusterJob job = clusterStore.getClusterJob(jobId);
+          ClusterJob job = clusterStoreService.getClusterJob(jobId);
           Cluster cluster = clusterStore.getCluster(job.getClusterId());
           // this can happen if 2 tasks complete around the same time and the first one places the job in the queue,
           // sees 0 in progress tasks, and sets the cluster status. The job is still in the queue as another element
@@ -115,7 +121,7 @@ public class JobScheduler implements Runnable {
           // TODO: avoid looking up every single task every time
           LOG.debug("Verifying task statuses for stage {} for job {}", job.getCurrentStageNumber(), jobIdStr);
           for (String taskId : currentStage) {
-            ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
+            ClusterTask task = clusterStoreService.getClusterTask(TaskId.fromString(taskId));
             job.setTaskStatus(task.getTaskId(), task.getStatus());
             LOG.debug("Status of task {} is {}", taskId, task.getStatus());
             if (task.getStatus() == ClusterTask.Status.COMPLETE) {
@@ -165,7 +171,7 @@ public class JobScheduler implements Runnable {
                 taskService.completeJob(job, cluster);
               }
             }
-            clusterStore.writeClusterJob(job);
+            clusterStoreService.writeClusterJob(job);
           } else if (inProgressTasks == 0) {
             // Job failed and no in progress tasks remaining, update cluster status
             taskService.failJobAndSetClusterStatus(job, cluster);
@@ -236,7 +242,7 @@ public class JobScheduler implements Runnable {
 
     // store all retry tasks
     for (ClusterTask t : retryTasks) {
-      clusterStore.writeClusterTask(t);
+      clusterStoreService.writeClusterTask(t);
     }
 
     // Remove self from current stage
@@ -259,7 +265,7 @@ public class JobScheduler implements Runnable {
       return;
     }
 
-    clusterStore.writeClusterTask(rollbackTask);
+    clusterStoreService.writeClusterTask(rollbackTask);
 
     SchedulableTask schedulableTask = new SchedulableTask(rollbackTask);
     LOG.debug("Submitting rollback task {} for task {}", rollbackTask.getTaskId(), task.getTaskId());

@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.cluster;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.NamedEntity;
 import com.continuuity.loom.admin.Provider;
@@ -69,18 +70,18 @@ public final class Cluster extends NamedEntity {
   private Set<String> nodes;
   private Set<String> services;
   private String latestJobId;
-  private String ownerId;
+  private Account account;
   private Status status;
   private JsonObject config;
 
-  public Cluster(String id, String ownerId, String name, long createTime,
+  public Cluster(String id, Account account, String name, long createTime,
                  long expireTime, String description, Provider provider,
                  ClusterTemplate clusterTemplate, Set<String> nodes,
                  Set<String> services, JsonObject config, Cluster.Status status, String latestJobId) {
     super(name);
-    Preconditions.checkArgument(ownerId != null, "owner id must not be null");
+    Preconditions.checkArgument(account != null, "account must not be null");
     this.id = id;
-    this.ownerId = ownerId;
+    this.account = account;
     this.description = description;
     this.createTime = createTime;
     this.expireTime = expireTime;
@@ -93,15 +94,15 @@ public final class Cluster extends NamedEntity {
     this.config = config;
   }
 
-  public Cluster(String id, String ownerId, String name, long createTime, String description, Provider provider,
+  public Cluster(String id, Account account, String name, long createTime, String description, Provider provider,
                  ClusterTemplate clusterTemplate, Set<String> nodes, Set<String> services, JsonObject config) {
-    this(id, ownerId, name, createTime, 0, description, provider,
+    this(id, account, name, createTime, 0, description, provider,
          clusterTemplate, nodes, services, config, Status.PENDING, null);
   }
 
-  public Cluster(String id, String ownerId, String name, long createTime, String description, Provider provider,
+  public Cluster(String id, Account account, String name, long createTime, String description, Provider provider,
                  ClusterTemplate clusterTemplate, Set<String> nodes, Set<String> services) {
-    this(id, ownerId, name, createTime, description, provider, clusterTemplate,
+    this(id, account, name, createTime, description, provider, clusterTemplate,
          nodes, services, new JsonObject());
   }
 
@@ -115,12 +116,12 @@ public final class Cluster extends NamedEntity {
   }
 
   /**
-   * Get the id of the owner of the cluster.
+   * Get the account of the owner of the cluster.
    *
-   * @return Id of the owner of the cluster.
+   * @return Account of the owner of the cluster.
    */
-  public String getOwnerId() {
-    return ownerId;
+  public Account getAccount() {
+    return account;
   }
 
   /**
@@ -249,14 +250,14 @@ public final class Cluster extends NamedEntity {
   }
 
   /**
-   * Set the owner of the cluster. Only sets the owner id in this Java object. A separate call must be made to
-   * persistently store changes in owner id.
+   * Set the account of the owner of the cluster. Only sets the account in this Java object. A separate call must
+   * be made to persistently store changes.
    *
-   * @param ownerId Id of the owner of the cluster.
+   * @param account Account of the owner of the cluster.
    */
-  public void setOwnerId(String ownerId) {
-    Preconditions.checkArgument(ownerId != null, "owner id must not be null");
-    this.ownerId = ownerId;
+  public void setAccount(Account account) {
+    Preconditions.checkArgument(account != null, "account must not be null");
+    this.account = account;
   }
 
   /**
@@ -313,7 +314,7 @@ public final class Cluster extends NamedEntity {
   public String toString() {
     return Objects.toStringHelper(this)
       .add("id", id)
-      .add("ownerid", ownerId)
+      .add("account", account)
       .add("name", getName())
       .add("description", description)
       .add("createTime", createTime)

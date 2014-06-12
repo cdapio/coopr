@@ -16,13 +16,15 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.JobId;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -50,12 +52,14 @@ import java.util.Set;
 public class LoomRPCHandler extends LoomAuthHandler {
   private static final Gson GSON = new GsonBuilder()
     .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec()).create();
-  private final ClusterStore store;
+  private final ClusterStoreService clusterStoreService;
   private ClusterService clusterService;
 
   @Inject
-  private LoomRPCHandler(ClusterStore store, ClusterService clusterService) {
-    this.store = store;
+  private LoomRPCHandler(TenantStore tenantStore, ClusterStoreService clusterStoreService,
+                         ClusterService clusterService) {
+    super(tenantStore);
+    this.clusterStoreService = clusterStoreService;
     this.clusterService = clusterService;
   }
 
@@ -69,14 +73,14 @@ public class LoomRPCHandler extends LoomAuthHandler {
   @POST
   @Path("/getClusterStatuses")
   public void getClusterStatuses(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
     // TODO: Improve this logic by using a table join instead of separate calls for cluster and jobId
 
-    List<Cluster> clusters = clusterService.getAllUserClusters(userId);
+    List<Cluster> clusters = clusterStoreService.getView(account).getAllClusters();
     if (clusters.size() == 0) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, String.format("No clusters found"));
       return;
@@ -89,7 +93,7 @@ public class LoomRPCHandler extends LoomAuthHandler {
       clusterMap.put(JobId.fromString(cluster.getLatestJobId()), cluster);
     }
 
-    Map<JobId, ClusterJob> jobs = store.getClusterJobs(clusterMap.keySet());
+    Map<JobId, ClusterJob> jobs = clusterStoreService.getClusterJobs(clusterMap.keySet(), account.getTenantId());
 
     if (jobs.size() == 0) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, String.format("No jobs found for clusters"));
@@ -118,8 +122,8 @@ public class LoomRPCHandler extends LoomAuthHandler {
   @POST
   @Path("/getNodeProperties")
   public void getNodeProperties(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
@@ -135,7 +139,7 @@ public class LoomRPCHandler extends LoomAuthHandler {
     }
 
     Map<String, JsonObject> output = Maps.newHashMap();
-    Set<Node> clusterNodes = clusterService.getClusterNodes(nodeRequest.getClusterId(), userId);
+    Set<Node> clusterNodes = clusterStoreService.getView(account).getClusterNodes(nodeRequest.getClusterId());
     Set<String> properties = nodeRequest.getProperties();
     Set<String> requiredServices = nodeRequest.getServices();
 

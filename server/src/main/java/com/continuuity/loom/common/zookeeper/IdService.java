@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store;
+package com.continuuity.loom.common.zookeeper;
 
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.conf.Configuration;
@@ -47,8 +47,7 @@ public final class IdService extends AbstractIdleService {
   public enum Type {
     JOB(IDS_BASEPATH + "/jobs"),
     TASK(IDS_BASEPATH + "/tasks"),
-    CLUSTER(IDS_BASEPATH + "/clusters"),
-    TENANT(IDS_BASEPATH + "/tenants");
+    CLUSTER(IDS_BASEPATH + "/clusters");
     private final String path;
 
     private Type(String path) {
@@ -120,15 +119,6 @@ public final class IdService extends AbstractIdleService {
    */
   public TaskId getNewTaskId(JobId jobId) {
     return new TaskId(jobId, generateId(Type.TASK));
-  }
-
-  /**
-   * Get a unique tenant id that can be used for new {@link com.continuuity.loom.admin.Tenant}s.
-   *
-   * @return Unique tenant id.
-   */
-  public long getNewTenantId() {
-    return generateId(Type.TENANT);
   }
 
   // This generally should not be a noticeable amount of time compared to the time it takes to perform tasks

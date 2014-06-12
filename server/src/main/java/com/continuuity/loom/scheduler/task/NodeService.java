@@ -18,7 +18,7 @@ package com.continuuity.loom.scheduler.task;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +31,13 @@ import java.util.List;
 public class NodeService {
   private static final Logger LOG = LoggerFactory.getLogger(NodeService.class);
 
-  private final ClusterStore clusterStore;
+  private final ClusterStoreService clusterStoreService;
   private final int maxActions;
   private final int maxLogLength;
 
   @Inject
-  private NodeService(ClusterStore clusterStore, Configuration conf) {
-    this.clusterStore = clusterStore;
+  private NodeService(ClusterStoreService clusterStoreService, Configuration conf) {
+    this.clusterStoreService = clusterStoreService;
     this.maxActions = conf.getInt(Constants.MAX_PER_NODE_NUM_ACTIONS);
     this.maxLogLength = conf.getInt(Constants.MAX_PER_NODE_LOG_LENGTH);
   }
@@ -58,7 +58,7 @@ public class NodeService {
                 removed, node.getId(), maxActions);
     }
     node.addAction(new Node.Action(taskId, service, action));
-    clusterStore.writeNode(node);
+    clusterStoreService.writeNode(node);
   }
 
   /**
@@ -71,7 +71,7 @@ public class NodeService {
     Node.Action action = validateAndGetAction(node);
     action.setStatus(Node.Status.COMPLETE);
     action.setStatusTime(System.currentTimeMillis());
-    clusterStore.writeNode(node);
+    clusterStoreService.writeNode(node);
   }
 
   /**
@@ -88,7 +88,7 @@ public class NodeService {
     action.setStatusTime(System.currentTimeMillis());
     action.setStdout(truncateLog(stdout, maxLogLength));
     action.setStderr(truncateLog(stderr, maxLogLength));
-    clusterStore.writeNode(node);
+    clusterStoreService.writeNode(node);
   }
 
   private Node.Action validateAndGetAction(Node node) {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store;
+package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
@@ -26,12 +26,13 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.google.common.base.Function;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Collection;
 
 /**
- * Abstract {@link EntityStore} that represents entities as json.
+ * Abstract {@link EntityStoreView} that represents entities as json.
  */
-public abstract class BaseEntityStore implements EntityStore {
+public abstract class BaseEntityStoreView implements EntityStoreView {
   private static final JsonSerde codec = new JsonSerde();
   private static final Function<byte[], Provider> PROVIDER_TRANSFORM =
     new Function<byte[], Provider>() {
@@ -113,149 +114,148 @@ public abstract class BaseEntityStore implements EntityStore {
   }
 
   @Override
-  public Provider getProvider(String providerName) throws Exception {
+  public Provider getProvider(String providerName) throws IOException {
     return get(EntityType.PROVIDER, providerName, PROVIDER_TRANSFORM);
   }
 
   @Override
-  public Collection<Provider> getAllProviders() throws Exception {
+  public Collection<Provider> getAllProviders() throws IOException {
     return getAllEntities(EntityType.PROVIDER, PROVIDER_TRANSFORM);
   }
 
   @Override
-  public void writeProvider(Provider provider) throws Exception {
+  public void writeProvider(Provider provider) throws IOException, IllegalAccessException {
     writeEntity(EntityType.PROVIDER, provider.getName(), codec.serialize(provider, Provider.class));
   }
 
   @Override
-  public void deleteProvider(String providerName) throws Exception {
+  public void deleteProvider(String providerName) throws IOException, IllegalAccessException {
     deleteEntity(EntityType.PROVIDER, providerName);
   }
 
   @Override
-  public HardwareType getHardwareType(String hardwareTypeName) throws Exception {
+  public HardwareType getHardwareType(String hardwareTypeName) throws IOException {
     return get(EntityType.HARDWARE_TYPE, hardwareTypeName, HARDWARE_TYPE_TRANSFORM);
   }
 
   @Override
-  public Collection<HardwareType> getAllHardwareTypes() throws Exception {
+  public Collection<HardwareType> getAllHardwareTypes() throws IOException {
     return getAllEntities(EntityType.HARDWARE_TYPE, HARDWARE_TYPE_TRANSFORM);
   }
 
   @Override
-  public void writeHardwareType(HardwareType hardwareType) throws Exception {
+  public void writeHardwareType(HardwareType hardwareType) throws IOException, IllegalAccessException {
     writeEntity(EntityType.HARDWARE_TYPE, hardwareType.getName(), codec.serialize(hardwareType, HardwareType.class));
   }
 
   @Override
-  public void deleteHardwareType(String hardwareTypeName) throws Exception {
+  public void deleteHardwareType(String hardwareTypeName) throws IOException, IllegalAccessException {
     deleteEntity(EntityType.HARDWARE_TYPE, hardwareTypeName);
   }
 
   @Override
-  public ImageType getImageType(String imageTypeName) throws Exception {
+  public ImageType getImageType(String imageTypeName) throws IOException {
     return get(EntityType.IMAGE_TYPE, imageTypeName, IMAGE_TYPE_TRANSFORM);
   }
 
   @Override
-  public Collection<ImageType> getAllImageTypes() throws Exception {
+  public Collection<ImageType> getAllImageTypes() throws IOException {
     return getAllEntities(EntityType.IMAGE_TYPE, IMAGE_TYPE_TRANSFORM);
   }
 
   @Override
-  public void writeImageType(ImageType imageType) throws Exception {
+  public void writeImageType(ImageType imageType) throws IOException, IllegalAccessException {
     writeEntity(EntityType.IMAGE_TYPE, imageType.getName(), codec.serialize(imageType, ImageType.class));
   }
 
   @Override
-  public void deleteImageType(String imageTypeName) throws Exception {
+  public void deleteImageType(String imageTypeName) throws IOException, IllegalAccessException {
     deleteEntity(EntityType.IMAGE_TYPE, imageTypeName);
   }
 
   @Override
-  public Service getService(String serviceName) throws Exception {
+  public Service getService(String serviceName) throws IOException {
     return get(EntityType.SERVICE, serviceName, SERVICE_TRANSFORM);
   }
 
   @Override
-  public Collection<Service> getAllServices() throws Exception {
+  public Collection<Service> getAllServices() throws IOException {
     return getAllEntities(EntityType.SERVICE, SERVICE_TRANSFORM);
   }
 
   @Override
-  public void writeService(Service service) throws Exception {
+  public void writeService(Service service) throws IOException, IllegalAccessException {
     writeEntity(EntityType.SERVICE, service.getName(), codec.serialize(service, Service.class));
   }
 
   @Override
-  public void deleteService(String serviceName) throws Exception {
+  public void deleteService(String serviceName) throws IOException, IllegalAccessException {
     deleteEntity(EntityType.SERVICE, serviceName);
   }
 
   @Override
-  public ClusterTemplate getClusterTemplate(String clusterTemplateName) throws Exception {
+  public ClusterTemplate getClusterTemplate(String clusterTemplateName) throws IOException {
     return get(EntityType.CLUSTER_TEMPLATE, clusterTemplateName, CLUSTER_TEMPLATE_TRANSFORM);
   }
 
   @Override
-  public Collection<ClusterTemplate> getAllClusterTemplates() throws Exception {
+  public Collection<ClusterTemplate> getAllClusterTemplates() throws IOException {
     return getAllEntities(EntityType.CLUSTER_TEMPLATE, CLUSTER_TEMPLATE_TRANSFORM);
   }
 
   @Override
-  public void writeClusterTemplate(ClusterTemplate clusterTemplate) throws Exception {
+  public void writeClusterTemplate(ClusterTemplate clusterTemplate) throws IOException, IllegalAccessException {
     writeEntity(EntityType.CLUSTER_TEMPLATE, clusterTemplate.getName(),
                 codec.serialize(clusterTemplate, ClusterTemplate.class));
   }
 
   @Override
-  public void deleteClusterTemplate(String clusterTemplateName) throws Exception {
+  public void deleteClusterTemplate(String clusterTemplateName) throws IOException, IllegalAccessException {
     deleteEntity(EntityType.CLUSTER_TEMPLATE, clusterTemplateName);
   }
 
   @Override
-  public ProviderType getProviderType(String providerTypeName) throws Exception {
+  public ProviderType getProviderType(String providerTypeName) throws IOException {
     return get(EntityType.PROVIDER_TYPE, providerTypeName, PROVIDER_TYPE_TRANSFORM);
   }
 
   @Override
-  public Collection<ProviderType> getAllProviderTypes() throws Exception {
+  public Collection<ProviderType> getAllProviderTypes() throws IOException {
     return getAllEntities(EntityType.PROVIDER_TYPE, PROVIDER_TYPE_TRANSFORM);
   }
 
   @Override
-  public void writeProviderType(ProviderType providerType) throws Exception {
-    writeEntity(EntityType.PROVIDER_TYPE, providerType.getName(),
-                codec.serialize(providerType, ProviderType.class));
+  public void writeProviderType(ProviderType providerType) throws IOException, IllegalAccessException {
+    writeEntity(EntityType.PROVIDER_TYPE, providerType.getName(), codec.serialize(providerType, ProviderType.class));
   }
 
   @Override
-  public void deleteProviderType(String providerTypeName) throws Exception {
+  public void deleteProviderType(String providerTypeName) throws IOException, IllegalAccessException {
     deleteEntity(EntityType.PROVIDER_TYPE, providerTypeName);
   }
 
   @Override
-  public AutomatorType getAutomatorType(String automatorTypeName) throws Exception {
+  public AutomatorType getAutomatorType(String automatorTypeName) throws IOException {
     return get(EntityType.AUTOMATOR_TYPE, automatorTypeName, AUTOMATOR_TYPE_TRANSFORM);
   }
 
   @Override
-  public Collection<AutomatorType> getAllAutomatorTypes() throws Exception {
+  public Collection<AutomatorType> getAllAutomatorTypes() throws IOException {
     return getAllEntities(EntityType.AUTOMATOR_TYPE, AUTOMATOR_TYPE_TRANSFORM);
   }
 
   @Override
-  public void writeAutomatorType(AutomatorType automatorType) throws Exception {
+  public void writeAutomatorType(AutomatorType automatorType) throws IOException, IllegalAccessException {
     writeEntity(EntityType.AUTOMATOR_TYPE, automatorType.getName(),
                 codec.serialize(automatorType, AutomatorType.class));
   }
 
   @Override
-  public void deleteAutomatorType(String automatorTypeName) throws Exception {
+  public void deleteAutomatorType(String automatorTypeName) throws IOException, IllegalAccessException {
     deleteEntity(EntityType.AUTOMATOR_TYPE, automatorTypeName);
   }
 
-  private <T> T get(EntityType entityType, String entityName, Function<byte[], T> transform) throws Exception {
+  private <T> T get(EntityType entityType, String entityName, Function<byte[], T> transform) throws IOException {
     byte[] data = getEntity(entityType, entityName);
     return (data == null) ? null : transform.apply(data);
   }
@@ -267,7 +267,8 @@ public abstract class BaseEntityStore implements EntityStore {
    * @param entityName Unique name of entity.
    * @param data Representation of the entity as bytes.
    */
-  protected abstract void writeEntity(EntityType entityType, String entityName, byte[] data) throws Exception;
+  protected abstract void writeEntity(EntityType entityType, String entityName, byte[] data)
+    throws IOException, IllegalAccessException;
 
   /**
    * Get the specified entity from some persistent store.
@@ -276,7 +277,7 @@ public abstract class BaseEntityStore implements EntityStore {
    * @param entityName Unique name of entity.
    * @return Entity of given type and name as bytes.
    */
-  protected abstract byte[] getEntity(EntityType entityType, String entityName) throws Exception;
+  protected abstract byte[] getEntity(EntityType entityType, String entityName) throws IOException;
 
   /**
    * Get all entities of the given type from persistent store.
@@ -286,8 +287,8 @@ public abstract class BaseEntityStore implements EntityStore {
    * @param <T> Class of entity to get.
    * @return Collection of entities.
    */
-  protected abstract <T> Collection<T> getAllEntities(EntityType entityType, Function<byte[], T> transform)
-    throws Exception;
+  protected abstract <T> Collection<T> getAllEntities(EntityType entityType,
+                                                      Function<byte[], T> transform) throws IOException;
 
   /**
    * Delete the entity of given type and name from persistent store.
@@ -295,5 +296,6 @@ public abstract class BaseEntityStore implements EntityStore {
    * @param entityType Type of entity.
    * @param entityName Unique name of entity.
    */
-  protected abstract void deleteEntity(EntityType entityType, String entityName) throws Exception;
+  protected abstract void deleteEntity(EntityType entityType, String entityName)
+    throws IOException, IllegalAccessException;
 }

@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.scheduler.task;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
@@ -22,13 +23,14 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Actions;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.CallbackData;
-import com.continuuity.loom.store.ClusterStore;
-import com.continuuity.loom.store.IdService;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -37,6 +39,7 @@ import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -45,17 +48,20 @@ import java.util.List;
 public class TaskService {
   private static final Logger LOG = LoggerFactory.getLogger(TaskService.class);
   private static final Gson GSON = new JsonSerde().getGson();
-  private final ClusterStore clusterStore;
+  private final ClusterStoreService clusterStoreService;
+  private final ClusterStoreView clusterStore;
   private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
   private final TrackingQueue callbackQueue;
   private final IdService idService;
 
   @Inject
-  private TaskService(ClusterStore clusterStore, LoomStats loomStats,
+  private TaskService(ClusterStoreService clusterStoreService,
+                      LoomStats loomStats,
                       @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,
                       IdService idService) {
-    this.clusterStore = clusterStore;
+    this.clusterStoreService = clusterStoreService;
+    this.clusterStore = clusterStoreService.getView(Account.SYSTEM_ACCOUNT);
     this.loomStats = loomStats;
     this.callbackQueue = callbackQueue;
     this.idService = idService;
@@ -66,9 +72,8 @@ public class TaskService {
    *
    * @param task Task that needs to get rolled back.
    * @return Cluster task that will roll back the given failed task.
-   * @throws TaskException
    */
-  public ClusterTask getRollbackTask(ClusterTask task) throws TaskException {
+  public ClusterTask getRollbackTask(ClusterTask task) {
     ProvisionerAction rollback = actions.getRollbackActions().get(task.getTaskName());
     if (rollback == null) {
       return null;
@@ -98,9 +103,8 @@ public class TaskService {
    * @param task Task that failed and must be retried.
    * @param node Node the task failed on.
    * @return List of tasks that must be executed to retry the given failed task.
-   * @throws TaskException
    */
-  public List<ClusterTask> getRetryTask(Cluster cluster, ClusterTask task, Node node) throws TaskException {
+  public List<ClusterTask> getRetryTask(Cluster cluster, ClusterTask task, Node node) {
     ProvisionerAction retryAction = actions.getRetryAction().get(task.getTaskName());
 
     // If no retry action, return self.
@@ -145,10 +149,11 @@ public class TaskService {
    * @param cluster Cluster to set the status for.
    * @param status Status to set the cluster to.
    * @param message Error message.
-   * @throws Exception
+   * @throws IOException
+   * @throws IllegalAccessException
    */
   public void failJobAndSetClusterStatus(ClusterJob job, Cluster cluster, Cluster.Status status, String message)
-    throws Exception {
+    throws IOException, IllegalAccessException {
     cluster.setStatus(status);
     clusterStore.writeCluster(cluster);
 
@@ -156,7 +161,7 @@ public class TaskService {
     if (message != null) {
       job.setStatusMessage(message);
     }
-    clusterStore.writeClusterJob(job);
+    clusterStoreService.writeClusterJob(job);
 
     loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
     callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.FAILURE, cluster, job))));
@@ -168,9 +173,9 @@ public class TaskService {
    *
    * @param job Job to fail.
    * @param cluster Cluster to set the status for.
-   * @throws Exception
+   * @throws IOException
    */
-  public void failJobAndSetClusterStatus(ClusterJob job, Cluster cluster) throws Exception {
+  public void failJobAndSetClusterStatus(ClusterJob job, Cluster cluster) throws IOException, IllegalAccessException {
     failJobAndSetClusterStatus(job, cluster, job.getClusterAction().getFailureStatus(), null);
   }
 
@@ -181,9 +186,10 @@ public class TaskService {
    * @param job Job to fail.
    * @param cluster Cluster to terminate.
    * @param message Error message.
-   * @throws Exception
+   * @throws IOException
    */
-  public void failJobAndTerminateCluster(ClusterJob job, Cluster cluster, String message) throws Exception {
+  public void failJobAndTerminateCluster(ClusterJob job, Cluster cluster, String message)
+    throws IOException, IllegalAccessException {
     failJobAndSetClusterStatus(job, cluster, Cluster.Status.TERMINATED, message);
   }
 
@@ -191,11 +197,11 @@ public class TaskService {
    * Sets the status of the given job to {@link ClusterJob.Status#FAILED} and persists it to the store.
    *
    * @param job Job to fail.
-   * @throws TaskException
+   * @throws IOException
    */
-  public void failJob(ClusterJob job) throws TaskException {
+  public void failJob(ClusterJob job) throws IOException {
     job.setJobStatus(ClusterJob.Status.FAILED);
-    clusterStore.writeClusterJob(job);
+    clusterStoreService.writeClusterJob(job);
   }
 
   /**
@@ -203,15 +209,15 @@ public class TaskService {
    *
    * @param job Job to start.
    * @param cluster Cluster the job is for.
-   * @throws Exception
+   * @throws IOException
    */
-  public void startJob(ClusterJob job, Cluster cluster) throws Exception {
+  public void startJob(ClusterJob job, Cluster cluster) throws IOException {
     // TODO: wrap in a transaction
     LOG.debug("Starting job {} for cluster {}", job.getJobId(), cluster.getId());
     job.setJobStatus(ClusterJob.Status.RUNNING);
     // Note: writing job status as RUNNING, will allow other operations on the job
     // (like cancel, etc.) to happen in parallel.
-    clusterStore.writeClusterJob(job);
+    clusterStoreService.writeClusterJob(job);
     callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.START, cluster, job))));
   }
 
@@ -221,11 +227,11 @@ public class TaskService {
    *
    * @param job Job to complete.
    * @param cluster Cluster the job was for.
-   * @throws Exception
+   * @throws IOException
    */
-  public void completeJob(ClusterJob job, Cluster cluster) throws Exception {
+  public void completeJob(ClusterJob job, Cluster cluster) throws IOException, IllegalAccessException {
     job.setJobStatus(ClusterJob.Status.COMPLETE);
-    clusterStore.writeClusterJob(job);
+    clusterStoreService.writeClusterJob(job);
     LOG.debug("Job {} is complete", job.getJobId());
 
     // Update cluster status
@@ -245,12 +251,12 @@ public class TaskService {
    * to the current timestamp.
    *
    * @param clusterTask Task to start.
-   * @throws Exception
+   * @throws IOException
    */
-  public void startTask(ClusterTask clusterTask) throws Exception {
+  public void startTask(ClusterTask clusterTask) throws IOException {
     clusterTask.setStatus(ClusterTask.Status.IN_PROGRESS);
     clusterTask.setSubmitTime(System.currentTimeMillis());
-    clusterStore.writeClusterTask(clusterTask);
+    clusterStoreService.writeClusterTask(clusterTask);
 
     // Update stats
     loomStats.getProvisionerStats().incrementStat(clusterTask.getTaskName());
@@ -263,12 +269,12 @@ public class TaskService {
    * unexecuted task in the job.
    *
    * @param clusterTask Task to drop.
-   * @throws Exception
+   * @throws IOException
    */
-  public void dropTask(ClusterTask clusterTask) throws Exception {
+  public void dropTask(ClusterTask clusterTask) throws IOException {
     clusterTask.setStatus(ClusterTask.Status.DROPPED);
     clusterTask.setStatusTime(System.currentTimeMillis());
-    clusterStore.writeClusterTask(clusterTask);
+    clusterStoreService.writeClusterTask(clusterTask);
 
     // Update stats
     loomStats.getDroppedProvisionerStats().incrementStat(clusterTask.getTaskName());
@@ -280,13 +286,13 @@ public class TaskService {
    *
    * @param clusterTask Task to fail.
    * @param status Status code of the failed task.
-   * @throws Exception
+   * @throws IOException
    */
-  public void failTask(ClusterTask clusterTask, int status) throws Exception {
+  public void failTask(ClusterTask clusterTask, int status) throws IOException {
     clusterTask.setStatus(ClusterTask.Status.FAILED);
     clusterTask.setStatusCode(status);
     clusterTask.setStatusTime(System.currentTimeMillis());
-    clusterStore.writeClusterTask(clusterTask);
+    clusterStoreService.writeClusterTask(clusterTask);
 
     // Update stats
     loomStats.getFailedProvisionerStats().incrementStat(clusterTask.getTaskName());
@@ -298,13 +304,13 @@ public class TaskService {
    *
    * @param clusterTask Task to complete.
    * @param status Status code of the completed task.
-   * @throws Exception
+   * @throws IOException
    */
-  public void completeTask(ClusterTask clusterTask, int status) throws Exception {
+  public void completeTask(ClusterTask clusterTask, int status) throws IOException {
     clusterTask.setStatus(ClusterTask.Status.COMPLETE);
     clusterTask.setStatusCode(status);
     clusterTask.setStatusTime(System.currentTimeMillis());
-    clusterStore.writeClusterTask(clusterTask);
+    clusterStoreService.writeClusterTask(clusterTask);
 
     // update stats
     loomStats.getSuccessfulProvisionerStats().incrementStat(clusterTask.getTaskName());

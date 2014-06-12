@@ -17,6 +17,7 @@ package com.continuuity.loom.http;
 
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.store.tenant.SQLTenantStore;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -24,10 +25,12 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,12 +40,17 @@ import java.util.UUID;
 public class LoomTenantHandlerTest extends LoomServiceTestBase {
   private static final Gson GSON = new JsonSerde().getGson();
 
+  @Before
+  public void clearData() throws SQLException {
+    ((SQLTenantStore) tenantStore).clearData();
+  }
+
   @Test
   public void testNonSuperadminReturnsError() throws Exception {
-    assertResponseStatus(doGet("/v1/tenants", ADMIN_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doGet("/v1/tenants/123", ADMIN_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doPost("/v1/tenants", "", ADMIN_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doPut("/v1/tenants/123", "", ADMIN_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGet("/v1/tenants", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGet("/v1/tenants/123", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPost("/v1/tenants", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPut("/v1/tenants/123", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
   }
 
   @Test
@@ -150,35 +158,5 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
   @Test
   public void testAddTenantWithDefaults() {
     // TODO: implement once bootstrapping with defaults is implemented
-  }
-
-  @Test
-  public void testNonAdminUserGetsForbiddenStatus() throws Exception {
-    String base = "/v1/loom/";
-    String[] resources = { "providers", "hardwaretypes", "imagetypes", "services", "clustertemplates" };
-    for (String resource : resources) {
-      assertResponseStatus(doGet(base + resource, USER1_HEADERS), HttpResponseStatus.OK);
-      assertResponseStatus(doGet(base + resource + "/id", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
-      assertResponseStatus(doPut(base + resource + "/id", "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-      assertResponseStatus(doPost(base + resource, "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    }
-    assertResponseStatus(doGet(base + "export", USER1_HEADERS), HttpResponseStatus.OK);
-    assertResponseStatus(doPost(base + "import", "{}", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-  }
-
-  @Test
-  public void testInvalidProviderReturns400() throws Exception {
-    // test an empty object
-    JsonObject provider = new JsonObject();
-    assertResponseStatus(doPost("/v1/loom/providers", provider.toString(), ADMIN_HEADERS),
-                         HttpResponseStatus.BAD_REQUEST);
-
-    // test invalid json
-    assertResponseStatus(doPost("/v1/loom/providers", "[dsfmqo", ADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
-
-    // test an invalid name
-    provider.addProperty("name", "?");
-    assertResponseStatus(doPost("/v1/loom/providers", provider.toString(), ADMIN_HEADERS),
-                         HttpResponseStatus.BAD_REQUEST);
   }
 }

@@ -16,6 +16,7 @@
 package com.continuuity.loom.layout;
 
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.google.common.collect.HashMultiset;
@@ -102,7 +103,7 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
                          ImmutableMap.<String, String>of(
                            Node.Properties.HARDWARETYPE.name().toLowerCase(), "large-mem",
                            Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
-    clusterStore.writeNode(node);
+    clusterStoreService.writeNode(node);
     nodeIds.add(node.getId());
     nodes.add(node);
     // slave nodes
@@ -111,12 +112,12 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
                       ImmutableMap.<String, String>of(
                         Node.Properties.HARDWARETYPE.name().toLowerCase(), "medium",
                         Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
-      clusterStore.writeNode(node);
+      clusterStoreService.writeNode(node);
       nodeIds.add(node.getId());
       nodes.add(node);
     }
-    cluster = new Cluster(clusterId, "user1", "hadoop", System.currentTimeMillis(), "hadoop cluster",
-                          Entities.ProviderExample.RACKSPACE, reactorTemplate, nodeIds,
+    cluster = new Cluster(clusterId, new Account("user1", "tenant1"), "hadoop", System.currentTimeMillis(),
+                          "hadoop cluster", Entities.ProviderExample.RACKSPACE, reactorTemplate, nodeIds,
                           ImmutableSet.of(namenode.getName(), datanode.getName()));
   }
 }

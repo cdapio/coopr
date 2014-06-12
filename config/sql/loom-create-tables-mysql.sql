@@ -19,6 +19,7 @@
 CREATE TABLE IF NOT EXISTS clusters (
     id BIGINT,
     owner_id VARCHAR(255),
+    tenant_id VARCHAR(255),
     name VARCHAR(255),
     create_time TIMESTAMP DEFAULT '0000-00-00 00:00:00',
     expire_time TIMESTAMP NULL,
@@ -67,42 +68,49 @@ CREATE TABLE IF NOT EXISTS nodes (
 
 CREATE TABLE IF NOT EXISTS providerTypes (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     providerType MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (name, tenant_id)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS automatorTypes (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     automatorType MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (name, tenant_id)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS providers (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     provider MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (name, tenant_id)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS hardwareTypes (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     hardwareType MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (name, tenant_id)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS imageTypes (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     imageType MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (name, tenant_id)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS services (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     service MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (name, tenant_id)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS clusterTemplates (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     clusterTemplate MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (name, tenant_id)
 ) ENGINE = InnoDB;

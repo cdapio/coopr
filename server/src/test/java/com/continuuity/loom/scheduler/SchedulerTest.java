@@ -31,7 +31,7 @@ import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
-import com.continuuity.loom.store.IdService;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
@@ -116,14 +116,14 @@ public class SchedulerTest extends BaseTest {
     cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
     job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
-    clusterStore.writeCluster(cluster);
-    clusterStore.writeClusterJob(job);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
+    clusterStoreService.writeClusterJob(job);
 
     Node node = GSON.fromJson(NODE1, Node.class);
-    clusterStore.writeNode(node);
+    clusterStoreService.writeNode(node);
 
     node = GSON.fromJson(NODE2, Node.class);
-    clusterStore.writeNode(node);
+    clusterStoreService.writeNode(node);
   }
 
   @Test(timeout = 20000)
@@ -166,11 +166,11 @@ public class SchedulerTest extends BaseTest {
     String consumerId = "testJobScheduler";
     Element jobQueueElement = jobQueue.take(consumerId);
     String jobId = jobQueueElement.getValue();
-    job = clusterStore.getClusterJob(JobId.fromString(jobId));
+    job = clusterStoreService.getClusterJob(JobId.fromString(jobId));
     while (true) {
       Multiset<ActionService> actionServices = HashMultiset.create();
       for (String taskId : job.getCurrentStage()) {
-        ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
+        ClusterTask task = clusterStoreService.getClusterTask(TaskId.fromString(taskId));
         actionServices.add(new ActionService(task.getTaskName().name(), task.getService()));
       }
 
@@ -370,7 +370,10 @@ public class SchedulerTest extends BaseTest {
   public static final String TEST_CLUSTER =
     "{\n" +
       "   \"id\":\"2\",\n" +
-      "   \"ownerId\":\"user1\",\n" +
+      "   \"account\":{\n" +
+      "     \"userId\":\"user1\",\n" +
+      "     \"tenantId\":\"tenant1\"\n" +
+      "   },\n" +
       "   \"name\":\"ashau-dev\",\n" +
       "   \"description\":\"\",\n" +
       "   \"status\":\"pending\",\n" +

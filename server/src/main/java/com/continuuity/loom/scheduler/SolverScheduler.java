@@ -15,11 +15,13 @@
  */
 package com.continuuity.loom.scheduler;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.AddServicesRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
@@ -28,8 +30,8 @@ import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
-import com.continuuity.loom.store.IdService;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -57,7 +59,8 @@ public class SolverScheduler implements Runnable {
 
   private final String id;
   private final Solver solver;
-  private final ClusterStore clusterStore;
+  private final ClusterStoreService clusterStoreService;
+  private final ClusterStoreView clusterStore;
   private final TrackingQueue solverQueue;
   private final TrackingQueue clusterQueue;
   private final ListeningExecutorService executorService;
@@ -66,14 +69,16 @@ public class SolverScheduler implements Runnable {
   private final IdService idService;
 
   @Inject
-  private SolverScheduler(@Named("scheduler.id") String id, Solver solver, ClusterStore clusterStore,
+  private SolverScheduler(@Named("scheduler.id") String id, Solver solver,
+                          ClusterStoreService clusterStoreService,
                           @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
                           @Named(Constants.Queue.CLUSTER) TrackingQueue clusterQueue,
                           @Named("solver.executor.service") ListeningExecutorService executorService,
                           TaskService taskService, LoomStats loomStats, IdService idService) {
     this.id = id;
     this.solver = solver;
-    this.clusterStore = clusterStore;
+    this.clusterStoreService = clusterStoreService;
+    this.clusterStore = clusterStoreService.getView(Account.SYSTEM_ACCOUNT);
     this.solverQueue = solverQueue;
     this.clusterQueue = clusterQueue;
     this.executorService = executorService;
@@ -134,11 +139,11 @@ public class SolverScheduler implements Runnable {
         }
 
         // Get cluster job for solving.
-        solverJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+        solverJob = clusterStoreService.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
         SolverRequest solverRequest = GSON.fromJson(solveElement.getValue(), SolverRequest.class);
         try {
           solverJob.setJobStatus(ClusterJob.Status.RUNNING);
-          clusterStore.writeClusterJob(solverJob);
+          clusterStoreService.writeClusterJob(solverJob);
 
           switch (solverRequest.getType()) {
             case CREATE_CLUSTER:
@@ -196,7 +201,7 @@ public class SolverScheduler implements Runnable {
 
       // Solving succeeded, schedule planning.
       solverJob.setJobStatus(ClusterJob.Status.COMPLETE);
-      clusterStore.writeClusterJob(solverJob);
+      clusterStoreService.writeClusterJob(solverJob);
 
       // TODO: loom status update should happen in TaskService.
       loomStats.getSuccessfulClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
@@ -204,7 +209,7 @@ public class SolverScheduler implements Runnable {
       // TODO: stuff like this should be wrapped in a transaction
       Set<String> changedNodeIds = Sets.newHashSet();
       for (Node node : changedNodes) {
-        clusterStore.writeNode(node);
+        clusterStoreService.writeNode(node);
         changedNodeIds.add(node.getId());
       }
       clusterStore.writeCluster(cluster);
@@ -214,7 +219,7 @@ public class SolverScheduler implements Runnable {
       ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.ADD_SERVICES,
                                             request.getServices(), changedNodeIds);
       cluster.setLatestJobId(createJob.getJobId());
-      clusterStore.writeClusterJob(createJob);
+      clusterStoreService.writeClusterJob(createJob);
 
       clusterStore.writeCluster(cluster);
 
@@ -254,20 +259,20 @@ public class SolverScheduler implements Runnable {
 
       // Solving succeeded, schedule cluster creation.
       solverJob.setJobStatus(ClusterJob.Status.COMPLETE);
-      clusterStore.writeClusterJob(solverJob);
+      clusterStoreService.writeClusterJob(solverJob);
 
       // TODO: loom status update should happen in TaskService.
       loomStats.getSuccessfulClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
 
       for (Node node : clusterNodes.values()) {
-        clusterStore.writeNode(node);
+        clusterStoreService.writeNode(node);
       }
 
       // Create new Job for creating cluster.
       JobId clusterJobId = idService.getNewJobId(cluster.getId());
       ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.CLUSTER_CREATE);
       cluster.setLatestJobId(createJob.getJobId());
-      clusterStore.writeClusterJob(createJob);
+      clusterStoreService.writeClusterJob(createJob);
 
       clusterStore.writeCluster(cluster);
 
