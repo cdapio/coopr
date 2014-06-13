@@ -29,6 +29,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -60,20 +61,21 @@ import java.util.Map;
 @Path("/v1/loom")
 public class LoomAdminHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomAdminHandler.class);
+  private static final Gson GSON = new JsonSerde().getGson();
 
   public static final String PROVIDERS = "providers";
   public static final String HARDWARE_TYPES = "hardwaretypes";
   public static final String IMAGE_TYPES = "imagetypes";
   public static final String CLUSTER_TEMPLATES = "clustertemplates";
   public static final String SERVICES = "services";
+  public static final String AUTOMATOR_TYPES = "automatortypes";
+  public static final String PROVIDER_TYPES = "providertypes";
 
   private final EntityStore entityStore;
-  private final JsonSerde codec;
 
   @Inject
   private LoomAdminHandler(EntityStore entityStore) {
     this.entityStore = entityStore;
-    this.codec = new JsonSerde();
   }
 
   /**
@@ -236,9 +238,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, entityStore.getAllProviders(),
-                       new TypeToken<Collection<Provider>>() {}.getType(),
-                       codec.getGson());
+    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllProviders()));
   }
 
   /**
@@ -256,9 +256,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, entityStore.getAllHardwareTypes(),
-                       new TypeToken<Collection<HardwareType>>() {}.getType(),
-                       codec.getGson());
+    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllHardwareTypes()));
   }
 
   /**
@@ -276,9 +274,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, entityStore.getAllImageTypes(),
-                       new TypeToken<Collection<ImageType>>() {}.getType(),
-                       codec.getGson());
+    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllImageTypes()));
   }
 
   /**
@@ -296,9 +292,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, entityStore.getAllServices(),
-                       new TypeToken<Collection<Service>>() {}.getType(),
-                       codec.getGson());
+    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllServices()));
   }
 
   /**
@@ -316,9 +310,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, entityStore.getAllProviderTypes(),
-                       new TypeToken<Collection<ProviderType>>() {}.getType(),
-                       codec.getGson());
+    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllProviderTypes()));
   }
 
   /**
@@ -336,9 +328,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, entityStore.getAllAutomatorTypes(),
-                       new TypeToken<Collection<AutomatorType>>() {}.getType(),
-                       codec.getGson());
+    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllAutomatorTypes()));
   }
 
   /**
@@ -357,9 +347,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, entityStore.getAllClusterTemplates(),
-                       new TypeToken<Collection<ClusterTemplate>>() {}.getType(),
-                       codec.getGson());
+    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllClusterTemplates()));
   }
 
   /**
@@ -883,28 +871,31 @@ public class LoomAdminHandler extends LoomAuthHandler {
 
     Collection<Provider> providers = entityStore.getAllProviders();
     LOG.debug("Exporting {} providers", providers.size());
-    outJson.put(PROVIDERS, codec.getGson().toJsonTree(providers,
-                                                        new TypeToken<Collection<Provider>>() {}.getType()));
+    outJson.put(PROVIDERS, GSON.toJsonTree(providers));
 
     Collection<HardwareType> hardwareTypes = entityStore.getAllHardwareTypes();
     LOG.debug("Exporting {} hardware types", hardwareTypes.size());
-    outJson.put(HARDWARE_TYPES, codec.getGson().toJsonTree(hardwareTypes,
-                                                            new TypeToken<Collection<HardwareType>>() {}.getType()));
+    outJson.put(HARDWARE_TYPES, GSON.toJsonTree(hardwareTypes));
 
     Collection<ImageType> imageTypes = entityStore.getAllImageTypes();
     LOG.debug("Exporting {} image types", imageTypes.size());
-    outJson.put(IMAGE_TYPES, codec.getGson().toJsonTree(imageTypes,
-                                                        new TypeToken<Collection<ImageType>>() {}.getType()));
+    outJson.put(IMAGE_TYPES, GSON.toJsonTree(imageTypes));
 
     Collection<Service> services = entityStore.getAllServices();
     LOG.debug("Exporting {} services", services.size());
-    outJson.put(SERVICES, codec.getGson().toJsonTree(services,
-                                                       new TypeToken<Collection<Service>>() {}.getType()));
+    outJson.put(SERVICES, GSON.toJsonTree(services));
 
     Collection<ClusterTemplate> clusterTemplates = entityStore.getAllClusterTemplates();
     LOG.debug("Exporting {} cluster templates", clusterTemplates.size());
-    outJson.put(CLUSTER_TEMPLATES, codec.getGson().toJsonTree(clusterTemplates,
-                                                               new TypeToken<Collection<Service>>() {}.getType()));
+    outJson.put(CLUSTER_TEMPLATES, GSON.toJsonTree(clusterTemplates));
+
+    Collection<AutomatorType> automatorTypes = entityStore.getAllAutomatorTypes();
+    LOG.debug("Exporting {} automator types", automatorTypes.size());
+    outJson.put(AUTOMATOR_TYPES, GSON.toJsonTree(automatorTypes));
+
+    Collection<ProviderType> providerTypes = entityStore.getAllProviderTypes();
+    LOG.debug("Exporting {} provider types", providerTypes.size());
+    outJson.put(PROVIDER_TYPES, GSON.toJsonTree(providerTypes));
 
     LOG.trace("Exporting {}", outJson);
 
@@ -932,6 +923,8 @@ public class LoomAdminHandler extends LoomAuthHandler {
     List<ImageType> newImageTypes;
     List<Service> newServices;
     List<ClusterTemplate> newClusterTemplates;
+    List<AutomatorType> newAutomatorTypes;
+    List<ProviderType> newProviderTypes;
 
     try {
       Map<String, JsonElement> inJson = getEntityFromRequest(request, responder,
@@ -943,23 +936,35 @@ public class LoomAdminHandler extends LoomAuthHandler {
       LOG.trace("Importing {}", inJson);
 
       newProviders = !inJson.containsKey(PROVIDERS) ? ImmutableList.<Provider>of() :
-        codec.getGson().<List<Provider>>fromJson(inJson.get(PROVIDERS), new TypeToken<List<Provider>>() {}.getType());
+        GSON.<List<Provider>>fromJson(inJson.get(PROVIDERS), new TypeToken<List<Provider>>() {}.getType());
 
       newHardwareTypes = !inJson.containsKey(HARDWARE_TYPES) ? ImmutableList.<HardwareType>of() :
-        codec.getGson().<List<HardwareType>>fromJson(inJson.get(HARDWARE_TYPES),
+        GSON.<List<HardwareType>>fromJson(inJson.get(HARDWARE_TYPES),
                                                      new TypeToken<List<HardwareType>>() {}.getType());
 
       newImageTypes = !inJson.containsKey(IMAGE_TYPES) ? ImmutableList.<ImageType>of() :
-        codec.getGson().<List<ImageType>>fromJson(inJson.get(IMAGE_TYPES),
+        GSON.<List<ImageType>>fromJson(inJson.get(IMAGE_TYPES),
                                                   new TypeToken<List<ImageType>>() {}.getType());
 
       newServices = !inJson.containsKey(SERVICES) ? ImmutableList.<Service>of() :
-        codec.getGson().<List<Service>>fromJson(inJson.get(SERVICES), new TypeToken<List<Service>>() {}.getType());
+        GSON.<List<Service>>fromJson(inJson.get(SERVICES), new TypeToken<List<Service>>() {}.getType());
 
       newClusterTemplates = !inJson.containsKey(CLUSTER_TEMPLATES) ?
         ImmutableList.<ClusterTemplate>of() :
-        codec.getGson().<List<ClusterTemplate>>fromJson(inJson.get(CLUSTER_TEMPLATES),
+        GSON.<List<ClusterTemplate>>fromJson(inJson.get(CLUSTER_TEMPLATES),
                                                         new TypeToken<List<ClusterTemplate>>() {}.getType());
+
+      newAutomatorTypes = !inJson.containsKey(AUTOMATOR_TYPES) ?
+        ImmutableList.<AutomatorType>of() :
+        GSON.<List<AutomatorType>>fromJson(inJson.get(AUTOMATOR_TYPES),
+                                           new TypeToken<List<AutomatorType>>() {}.getType());
+
+      newProviderTypes = !inJson.containsKey(PROVIDER_TYPES) ?
+        ImmutableList.<ProviderType>of() :
+        GSON.<List<ProviderType>>fromJson(inJson.get(PROVIDER_TYPES),
+                                          new TypeToken<List<ProviderType>>() {}.getType());
+
+
     } catch (JsonSyntaxException e) {
       LOG.error("Got exception while importing config", e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Json syntax error");
@@ -987,6 +992,14 @@ public class LoomAdminHandler extends LoomAuthHandler {
       entityStore.deleteClusterTemplate(clusterTemplate.getName());
     }
 
+    for (AutomatorType automatorType : entityStore.getAllAutomatorTypes()) {
+      entityStore.deleteAutomatorType(automatorType.getName());
+    }
+
+    for (ProviderType providerType : entityStore.getAllProviderTypes()) {
+      entityStore.deleteProviderType(providerType.getName());
+    }
+
     // Add new config data
     LOG.debug("Importing {} providers", newProviders.size());
     for (Provider provider : newProviders) {
@@ -1008,9 +1021,19 @@ public class LoomAdminHandler extends LoomAuthHandler {
       entityStore.writeService(service);
     }
 
-    LOG.debug("Importing {} cluster types", newClusterTemplates.size());
+    LOG.debug("Importing {} cluster templates", newClusterTemplates.size());
     for (ClusterTemplate clusterTemplate : newClusterTemplates) {
       entityStore.writeClusterTemplate(clusterTemplate);
+    }
+
+    LOG.debug("Importing {} automator types", newAutomatorTypes.size());
+    for (AutomatorType automatorType : newAutomatorTypes) {
+      entityStore.writeAutomatorType(automatorType);
+    }
+
+    LOG.debug("Importing {} provider types", newProviderTypes.size());
+    for (ProviderType providerType : newProviderTypes) {
+      entityStore.writeProviderType(providerType);
     }
 
     responder.sendStatus(HttpResponseStatus.OK);
@@ -1021,7 +1044,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
     try {
       Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
       try {
-        result = codec.deserialize(reader, tClass);
+        result = GSON.fromJson(reader, tClass);
       } finally {
         try {
           reader.close();
@@ -1042,7 +1065,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
     if (entity == null) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, Joiner.on(" ").join(entityType, entityId, " not found."));
     } else {
-      responder.sendString(HttpResponseStatus.OK, codec.getGson().toJson(entity, entityClass));
+      responder.sendString(HttpResponseStatus.OK, GSON.toJson(entity, entityClass));
     }
   }
 
