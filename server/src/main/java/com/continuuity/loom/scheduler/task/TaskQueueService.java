@@ -17,6 +17,7 @@ package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
@@ -37,26 +38,26 @@ import java.util.Map;
 public class TaskQueueService {
   private static final Logger LOG = LoggerFactory.getLogger(TaskQueueService.class);
 
-  private final TrackingQueue taskQueue;
   private final ClusterStore clusterStore;
-  private final TrackingQueue jobQueue;
   private final TaskService taskService;
   private final NodeService nodeService;
   private final LoomStats loomStats;
+  private final QueueGroup taskQueues;
+  private final QueueGroup jobQueues;
 
   @Inject
-  private TaskQueueService(@Named(Constants.Queue.PROVISIONER) TrackingQueue taskQueue,
-                           @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
+  private TaskQueueService(@Named(Constants.Queue.PROVISIONER) QueueGroup taskQueues,
+                           @Named(Constants.Queue.JOB) QueueGroup jobQueues,
                            ClusterStoreService clusterStoreService,
                            TaskService taskService,
                            NodeService nodeService,
                            LoomStats loomStats) {
-    this.taskQueue = taskQueue;
     this.clusterStore = clusterStoreService.getSystemView();
-    this.jobQueue = jobQueue;
     this.taskService = taskService;
     this.nodeService = nodeService;
     this.loomStats = loomStats;
+    this.taskQueues = taskQueues;
+    this.jobQueues = jobQueues;
   }
 
   /**
@@ -68,14 +69,14 @@ public class TaskQueueService {
    * @return Task JSON to be handed over to the provisioner.
    * @throws Exception
    */
-  public String takeNextClusterTask(String workerId) throws Exception {
-    loomStats.setQueueLength(taskQueue.size());
+  public String takeNextClusterTask(String workerId, String queueName) throws Exception {
+    //loomStats.setQueueLength(taskQueues.size(queueName));
 
     ClusterTask clusterTask = null;
     String taskJson = null;
 
     while (clusterTask == null) {
-      Element task = taskQueue.take(workerId);
+      Element task = taskQueues.take(queueName, workerId);
       if (task == null) {
         break;
       }
@@ -87,10 +88,11 @@ public class TaskQueueService {
 
         if (clusterJob == null || clusterJob.getJobStatus() == ClusterJob.Status.FAILED) {
           // we don't want to give out tasks for failed jobs.  Remove from the queue and move on.
-          taskQueue.recordProgress(workerId, clusterTask.getTaskId(),
-                                   TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "Skipped due to job failure.");
+          taskQueues.recordProgress(workerId, queueName, clusterTask.getTaskId(),
+                                    TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
+                                    "Skipped due to job failure.");
           taskService.dropTask(clusterTask);
-          jobQueue.add(new Element(clusterTask.getJobId()));
+          jobQueues.add(queueName, new Element(clusterTask.getJobId()));
           clusterTask = null;
         } else {
           taskJson = task.getValue();
@@ -98,8 +100,9 @@ public class TaskQueueService {
         }
       } else {
         LOG.error("Got empty task JSON for {}, skipping it.", task.getId());
-        taskQueue.recordProgress(workerId, task.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
-                                 "Skipped due to empty task JSON.");
+        taskQueues.recordProgress(workerId, queueName, task.getId(),
+                                  TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
+                                  "Skipped due to empty task JSON.");
       }
     }
 
@@ -121,11 +124,12 @@ public class TaskQueueService {
    * @throws Exception
    */
   public void finishClusterTask(String taskId, String workerId, int status, JsonObject result,
-                                String stdout, String stderr) throws Exception {
-    loomStats.setQueueLength(taskQueue.size());
+                                String stdout, String stderr, String queueName) throws Exception {
+    // TODO: implement per tenant queue statistics
+    //loomStats.setQueueLength(taskQueue.size());
 
     TrackingQueue.PossessionState state =
-      taskQueue.recordProgress(workerId, taskId, TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
+      taskQueues.recordProgress(workerId, queueName, taskId, TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
 
     if (state != TrackingQueue.PossessionState.POSSESSES) {
       LOG.warn("Worker {} is not owner of task {}", workerId, taskId);
@@ -146,7 +150,7 @@ public class TaskQueueService {
     finishNodeAction(clusterTask, result, stdout, stderr);
 
     // Schedule the job for processing
-    jobQueue.add(new Element(clusterTask.getJobId()));
+    jobQueues.add(queueName, new Element(clusterTask.getJobId()));
   }
 
   void startNodeAction(ClusterTask clusterTask) throws Exception {

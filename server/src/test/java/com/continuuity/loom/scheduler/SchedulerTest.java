@@ -22,8 +22,8 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.scheduler.callback.CallbackData;
@@ -59,12 +59,12 @@ import java.util.concurrent.TimeUnit;
 public class SchedulerTest extends BaseTest {
   private static final Gson GSON = new JsonSerde().getGson();
 
-  private static TimeoutTrackingQueue inputQueue;
-  private static TimeoutTrackingQueue provisionQueue;
-  private static TimeoutTrackingQueue callbackQueue;
-  private static TimeoutTrackingQueue solverQueue;
+  private static QueueGroup clusterQueues;
+  private static QueueGroup provisionerQueues;
+  private static QueueGroup callbackQueues;
+  private static QueueGroup solverQueues;
+  private static QueueGroup jobQueues;
   private static LoomService loomService;
-  private static TimeoutTrackingQueue jobQueue;
   private static Cluster cluster;
   private static ClusterJob job;
 
@@ -72,45 +72,28 @@ public class SchedulerTest extends BaseTest {
   public static void start() throws Exception {
     injector.getInstance(IdService.class).startAndWait();
 
-    inputQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
-    inputQueue.start();
-
-    provisionQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.PROVISIONER)));
-    provisionQueue.start();
-
-    solverQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.SOLVER)));
-    solverQueue.start();
+    clusterQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
+    provisionerQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.PROVISIONER)));
+    solverQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
+    jobQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.JOB)));
+    callbackQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CALLBACK)));
 
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
-
-    jobQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.JOB)));
-    jobQueue.start();
-
-    callbackQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CALLBACK)));
-    callbackQueue.start();
   }
 
   @AfterClass
   public static void stop() throws Exception {
     loomService.stopAndWait();
-    inputQueue.stop();
-    provisionQueue.stop();
-    solverQueue.stop();
   }
 
   @Before
   public void beforeTest() throws Exception {
-    jobQueue.removeAll();
-    inputQueue.removeAll();
-    solverQueue.removeAll();
-    provisionQueue.removeAll();
-    callbackQueue.removeAll();
+    jobQueues.removeAll();
+    clusterQueues.removeAll();
+    solverQueues.removeAll();
+    provisionerQueues.removeAll();
+    callbackQueues.removeAll();
     mockClusterCallback.clear();
 
     cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
@@ -128,10 +111,11 @@ public class SchedulerTest extends BaseTest {
 
   @Test(timeout = 20000)
   public void testScheduler() throws Exception {
+    String tenantId = cluster.getAccount().getTenantId();
     ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
     CallbackScheduler callbackScheduler = injector.getInstance(CallbackScheduler.class);
 
-    inputQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
+    clusterQueues.add(tenantId, new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
     clusterScheduler.run();
 
     // Verify stages and actions
@@ -162,9 +146,9 @@ public class SchedulerTest extends BaseTest {
     List<Multiset<ActionService>> actualStages = Lists.newArrayList();
     waitForCallback(callbackScheduler);
 
-    Assert.assertEquals(1, jobQueue.size());
+    Assert.assertEquals(1, jobQueues.size(tenantId));
     String consumerId = "testJobScheduler";
-    Element jobQueueElement = jobQueue.take(consumerId);
+    Element jobQueueElement = jobQueues.take(tenantId, consumerId);
     String jobId = jobQueueElement.getValue();
     job = clusterStore.getClusterJob(JobId.fromString(jobId));
     while (true) {
@@ -187,37 +171,39 @@ public class SchedulerTest extends BaseTest {
     actualStages.get(3).addAll(actionServices);
 
     Assert.assertEquals(expectedStages, actualStages);
-    jobQueue.recordProgress(consumerId, jobQueueElement.getId(),
-                            TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
+    jobQueues.recordProgress(consumerId, tenantId, jobQueueElement.getId(),
+                             TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
 
 
-    // Add the job back into the jobQueue, and run job scheduler
-    jobQueue.add(new Element(jobId));
+    // Add the job back into the jobQueues, and run job scheduler
+    jobQueues.add(tenantId, new Element(jobId));
     JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
     jobScheduler.run();
-    Assert.assertEquals(0, jobQueue.size());
+    Assert.assertEquals(0, jobQueues.size(tenantId));
 
     // Two tasks should have been submitted for provisioning.
-    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
+    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
 
     JsonObject returnJson = new JsonObject();
     returnJson.addProperty("status", 0);
     returnJson.addProperty("workerId", "consumer1");
+    returnJson.addProperty("tenantId", tenantId);
     returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
     returnJson.add("result", GSON.toJsonTree(ImmutableMap.of("ipaddress", "123.456.789.123")));
     TestHelper.finishTask(getLoomUrl(), returnJson);
 
-    taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
+    taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
     returnJson = new JsonObject();
     returnJson.addProperty("status", 0);
     returnJson.addProperty("workerId", "consumer1");
+    returnJson.addProperty("tenantId", tenantId);
     returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
     returnJson.add("result", GSON.toJsonTree(ImmutableMap.of("ipaddress", "456.789.123.123")));
     TestHelper.finishTask(getLoomUrl(), returnJson);
 
-    TestHelper.takeTask(getLoomUrl(), "consumer1");
+    TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
 
-    Assert.assertEquals(2, jobQueue.size());
+    Assert.assertEquals(2, jobQueues.size(tenantId));
 
     jobScheduler.run();
     jobScheduler.run();
@@ -225,10 +211,11 @@ public class SchedulerTest extends BaseTest {
     jobScheduler.run();
 
     for (int i = 0; i < 5; i++) {
-      taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
+      taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
       returnJson = new JsonObject();
       returnJson.addProperty("status", 0);
       returnJson.addProperty("workerId", "consumer1");
+      returnJson.addProperty("tenantId", tenantId);
       returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
       TestHelper.finishTask(getLoomUrl(), returnJson);
       jobScheduler.run();
@@ -248,14 +235,15 @@ public class SchedulerTest extends BaseTest {
 
   @Test(timeout = 20000)
   public void testFalseOnStartStopsJob() throws Exception {
+    String tenantId = "q";
     ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
 
-    inputQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
+    clusterQueues.add(tenantId, new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
     clusterScheduler.run();
 
     CallbackScheduler callbackScheduler = injector.getInstance(CallbackScheduler.class);
     // should be no job in the queue until the start callback runs
-    Assert.assertEquals(0, jobQueue.size());
+    Assert.assertEquals(0, jobQueues.size(tenantId));
 
     // tell mock callback to return false for onStart callback
     mockClusterCallback.setReturnOnStart(false);
@@ -271,7 +259,7 @@ public class SchedulerTest extends BaseTest {
     Assert.assertEquals(CallbackData.Type.FAILURE, mockClusterCallback.getReceivedCallbacks().get(1).getType());
 
     // there also should not be any jobs in the queue
-    Assert.assertEquals(0, jobQueue.size());
+    Assert.assertEquals(0, jobQueues.size(tenantId));
   }
 
   private void waitForCallback(CallbackScheduler callbackScheduler) throws InterruptedException {
@@ -286,13 +274,14 @@ public class SchedulerTest extends BaseTest {
 
   private void testCallbacks(boolean failJob) throws Exception {
     ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
+    String tenantId = cluster.getAccount().getTenantId();
 
-    inputQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
+    clusterQueues.add(tenantId, new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
     clusterScheduler.run();
 
     CallbackScheduler callbackScheduler = injector.getInstance(CallbackScheduler.class);
     // should be no job in the queue until the start callback runs
-    Assert.assertEquals(0, jobQueue.size());
+    Assert.assertEquals(0, jobQueues.size(tenantId));
     waitForCallback(callbackScheduler);
 
     Assert.assertEquals(CallbackData.Type.START, mockClusterCallback.getReceivedCallbacks().get(0).getType());
@@ -301,16 +290,17 @@ public class SchedulerTest extends BaseTest {
     jobScheduler.run();
 
     // take tasks until there are no more
-    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
+    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
     while (taskJson.entrySet().size() > 0) {
       JsonObject returnJson = new JsonObject();
       returnJson.addProperty("status", failJob ? 1 : 0);
       returnJson.addProperty("workerId", "consumer1");
+      returnJson.addProperty("tenantId", tenantId);
       returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
       TestHelper.finishTask(getLoomUrl(), returnJson);
       jobScheduler.run();
       jobScheduler.run();
-      taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
+      taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
     }
     jobScheduler.run();
     waitForCallback(callbackScheduler);

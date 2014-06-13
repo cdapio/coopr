@@ -66,10 +66,9 @@ import java.util.Set;
  */
 @Path("/v1/loom/clusters")
 public class LoomClusterHandler extends LoomAuthHandler {
-  private static final Logger LOG  = LoggerFactory.getLogger(LoomClusterHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LoomClusterHandler.class);
   private static final Gson GSON = new JsonSerde().getGson();
 
-  private final JsonSerde codec;
   private final ClusterService clusterService;
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
@@ -81,7 +80,6 @@ public class LoomClusterHandler extends LoomAuthHandler {
                              ClusterStoreService clusterStoreService,
                              Configuration conf) {
     super(tenantStore);
-    this.codec = new JsonSerde();
     this.clusterService = clusterService;
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
@@ -301,12 +299,13 @@ public class LoomClusterHandler extends LoomAuthHandler {
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
 
     try {
-      ClusterCreateRequest clusterCreateRequest = codec.getGson().fromJson(reader, ClusterCreateRequest.class);
+      ClusterCreateRequest clusterCreateRequest = GSON.fromJson(reader, ClusterCreateRequest.class);
 
       if (clusterCreateRequest.getNumMachines() > maxClusterSize) {
         responder.sendError(HttpResponseStatus.BAD_REQUEST, "numMachines above max cluster size " + maxClusterSize);
         return;
       }
+
       String id = clusterService.requestClusterCreate(clusterCreateRequest, account);
       JsonObject response = new JsonObject();
       response.addProperty("id", id);
@@ -401,6 +400,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
       responder.sendError(HttpResponseStatus.CONFLICT, "Cannot be aborted at this time.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error aborting cluster.");
+      return;
     }
   }
 

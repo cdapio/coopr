@@ -16,6 +16,7 @@
 package com.continuuity.loom.common.queue;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.Service;
 
 import java.util.Iterator;
 

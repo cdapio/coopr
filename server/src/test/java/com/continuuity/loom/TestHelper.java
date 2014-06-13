@@ -36,8 +36,8 @@ import java.util.Map;
  */
 public class TestHelper {
   private static Gson GSON = new Gson();
-  public static JsonObject takeTask(String loomUrl, String workerId) throws Exception{
-    Map<String, String> properties = ImmutableMap.of("workerId", workerId);
+  public static JsonObject takeTask(String loomUrl, String workerId, String tenantId) throws Exception{
+    Map<String, String> properties = ImmutableMap.of("workerId", workerId, "tenantId", tenantId);
     HttpPost httpPost = new HttpPost(String.format("%s/v1/loom/tasks/take", loomUrl));
     httpPost.setEntity(new StringEntity(GSON.toJson(properties)));
 

@@ -34,7 +34,7 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -65,8 +65,8 @@ import java.util.Set;
  */
 public class SolverSchedulerTest extends BaseTest {
   private static Gson GSON = new JsonSerde().getGson();
-  private static TimeoutTrackingQueue solverQueue;
-  private static TimeoutTrackingQueue clusterQueue;
+  private static QueueGroup solverQueues;
+  private static QueueGroup clusterQueues;
   private static SolverScheduler solverScheduler;
   private static ClusterTemplate reactorTemplate;
   private static Account account = new Account(Constants.ADMIN_USER, "tenant1");
@@ -84,7 +84,8 @@ public class SolverSchedulerTest extends BaseTest {
       new ClusterCreateRequest(cluster.getName(), cluster.getDescription(),
                                reactorTemplate.getName(), 5, null, null, null, null, null, 0L, null, null);
     SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, GSON.toJson(createRequest));
-    solverQueue.add(new Element(cluster.getId(), GSON.toJson(solverRequest)));
+    String queueName = "tenant123";
+    solverQueues.add(queueName, new Element(cluster.getId(), GSON.toJson(solverRequest)));
 
     solverScheduler.run();
 
@@ -110,21 +111,17 @@ public class SolverSchedulerTest extends BaseTest {
     Assert.assertEquals(3, serviceSetCounts.count(ImmutableSet.of("datanode", "regionserver", "nodemanager")));
     Assert.assertEquals(1, serviceSetCounts.count(ImmutableSet.of("reactor", "zookeeper")));
 
-    Element element = clusterQueue.take("0");
+    Element element = clusterQueues.take(queueName, "0");
     Assert.assertEquals(cluster.getId(), element.getId());
 
-    solverQueue.removeAll();
-    clusterQueue.removeAll();
+    solverQueues.removeAll(queueName);
+    clusterQueues.removeAll(queueName);
   }
 
   @BeforeClass
   public static void setupSchedulerTest() throws Exception {
-    solverQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.SOLVER)));
-    solverQueue.start();
-    clusterQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
-    clusterQueue.start();
+    solverQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
+    clusterQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
     solverScheduler = injector.getInstance(SolverScheduler.class);
 
     Set<String> services = ImmutableSet.of("namenode", "datanode", "resourcemanager", "nodemanager",

@@ -21,7 +21,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Constants used by Loom.
@@ -95,7 +94,6 @@ public class Constants {
     public static final String SOLVER = "solver.queue";
     public static final String JOB = "internal.job.queue";
     public static final String CALLBACK = "callback.queue";
-    public static final Set<String> ALL = ImmutableSet.of(PROVISIONER, CLUSTER, SOLVER, JOB, CALLBACK);
   }
 
   public static final String TASK_NAMESPACE = "/tasks";
@@ -105,5 +103,4 @@ public class Constants {
   public static final String TENANT_HEADER = "X-Loom-TenantID";
   public static final String SUPERADMIN_TENANT = "loom";
   public static final String ADMIN_USER = "admin";
-  public static final String SYSTEM_USER = "system";
 }

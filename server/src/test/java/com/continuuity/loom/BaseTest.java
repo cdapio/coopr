@@ -15,17 +15,16 @@
  */
 package com.continuuity.loom;
 
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.guice.LoomModules;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;
 import com.continuuity.loom.store.DBQueryHelper;
-import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.SQLClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
-import com.continuuity.loom.store.tenant.SQLTenantStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.inject.AbstractModule;
@@ -48,7 +47,6 @@ import java.sql.SQLException;
 public class BaseTest {
   private static InMemoryZKServer zkServer;
   private static SQLClusterStoreService sqlClusterStoreService;
-  private static SQLTenantStore sqlTenantStore;
   protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
   protected static ZKClientService zkClientService;
@@ -98,10 +96,9 @@ public class BaseTest {
     entityStoreService.startAndWait();
     sqlClusterStoreService = injector.getInstance(SQLClusterStoreService.class);
     sqlClusterStoreService.startAndWait();
-    sqlTenantStore = injector.getInstance(SQLTenantStore.class);
-    sqlTenantStore.startAndWait();
     clusterStoreService = sqlClusterStoreService;
-    tenantStore = sqlTenantStore;
+    tenantStore = injector.getInstance(TenantStore.class);
+    tenantStore.startAndWait();
     clusterStore = clusterStoreService.getSystemView();
   }
 

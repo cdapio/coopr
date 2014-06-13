@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.runtime;
 
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
@@ -32,9 +31,6 @@ import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import org.apache.twill.common.Services;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.RetryStrategies;
 import org.apache.twill.zookeeper.ZKClientService;
@@ -124,11 +120,6 @@ public final class LoomServerMain extends DaemonMain {
       clusterStoreService.startAndWait();
       entityStoreService = injector.getInstance(EntityStoreService.class);
       entityStoreService.startAndWait();
-
-      for (String queueName : Constants.Queue.ALL) {
-        TimeoutTrackingQueue queue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named(queueName)));
-        queue.start();
-      }
 
       // Register MBean
       LoomStats loomStats = injector.getInstance(LoomStats.class);
