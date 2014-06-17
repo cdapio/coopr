@@ -1,0 +1,33 @@
+{
+    "id": "00001",
+    "workers": 5,
+    "modules": {
+        "automatortype": {
+            "chef-solo": {
+                "cookbooks": [
+                    {
+                        "name": "reactor",
+                        "version": 2
+                    },
+                    {
+                        "name": "hadoop",
+                        "version": 1
+                    }
+                ],
+                "data_bags": [
+                    {
+                        "name": "creds",
+                        "version": 18,
+                        "user_path": "sensu"
+                    }
+                ]
+            }
+        }
+    },
+    "plugins": [
+        {
+            "name": "chef_solo_automator",
+            "version": 2
+        }
+    ]
+}
