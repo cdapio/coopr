@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store;
+package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.store.DBConnectionPool;
+import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.tenant.SQLTenantStore;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 
 import java.sql.SQLException;

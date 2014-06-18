@@ -75,7 +75,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
                                          new Compatibilities(null, null, ImmutableSet.of("zookeeper")),
                                          null, new Administration(new LeaseDuration(10000, 30000, 5000)));
 
-    entityStore.writeClusterTemplate(smallTemplate);
+    entityStoreService.getView(ADMIN_ACCOUNT).writeClusterTemplate(smallTemplate);
   }
 
   @After
@@ -205,11 +205,11 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     Node nodeBC = new Node("nodeBC", "123", ImmutableSet.of(svcB, svcC),
                            ImmutableMap.of(ipProperty, "123.456.0.4",
                                            hostnameProperty, "testcluster-1-1003.local"));
-    Cluster cluster = new Cluster("123", USER1, "testcluster", System.currentTimeMillis(), "description",
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "testcluster", System.currentTimeMillis(), "description",
                                   Entities.ProviderExample.RACKSPACE, smallTemplate,
                                   ImmutableSet.of(nodeA.getId(), nodeAB.getId(), nodeABC.getId(), nodeBC.getId()),
                                   ImmutableSet.of(svcA.getName(), svcB.getName(), svcC.getName()));
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(USER1_ACCOUNT).writeCluster(cluster);
     clusterStore.writeNode(nodeA);
     clusterStore.writeNode(nodeAB);
     clusterStore.writeNode(nodeABC);

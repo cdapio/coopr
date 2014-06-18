@@ -16,24 +16,16 @@
 package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
-import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.http.AddServicesRequest;
-import com.continuuity.loom.layout.ClusterCreateRequest;
-import com.continuuity.loom.layout.Solver;
-import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.task.ClusterJob;
-import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.gson.Gson;
@@ -41,10 +33,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
 
 /**
  * Polls a queue which contains {@link com.continuuity.loom.scheduler.callback.CallbackData} for performing cluster
@@ -61,7 +49,6 @@ public class CallbackScheduler implements Runnable {
   private final ClusterCallback clusterCallback;
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
-
   @Inject
   private CallbackScheduler(@Named("scheduler.id") String id,
                             @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,
@@ -69,14 +56,15 @@ public class CallbackScheduler implements Runnable {
                             @Named("callback.executor.service") ListeningExecutorService executorService,
                             TaskService taskService,
                             ClusterCallback clusterCallback,
-                            Configuration conf, ClusterStore clusterStore) {
+                            Configuration conf,
+                            ClusterStoreService clusterStoreService) {
     this.id = id;
     this.callbackQueue = callbackQueue;
     this.jobQueue = jobQueue;
     this.executorService = executorService;
     this.taskService = taskService;
     this.clusterCallback = clusterCallback;
-    this.clusterCallback.initialize(conf, clusterStore);
+    this.clusterCallback.initialize(conf, clusterStoreService);
   }
 
   @Override

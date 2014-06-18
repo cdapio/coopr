@@ -13,32 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store;
+package com.continuuity.loom.common.zookeeper;
 
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.google.common.base.Throwables;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.ZKClientService;
 import org.junit.AfterClass;
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
  */
-public class SQLClusterStoreTest extends ClusterStoreTest {
+public class IdServiceTest {
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
   private static InMemoryZKServer zkServer;
   private static ZKClientService zkClient;
-  private static SQLClusterStore clusterStore;
 
   @BeforeClass
   public static void beforeClass() throws SQLException, ClassNotFoundException, IOException {
@@ -47,29 +49,47 @@ public class SQLClusterStoreTest extends ClusterStoreTest {
 
     zkClient = ZKClientService.Builder.of(zkServer.getConnectionStr()).build();
     zkClient.startAndWait();
-
-    Configuration sqlConf = Configuration.create();
-    sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
-    sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
-    sqlConf.setLong(Constants.ID_START_NUM, 1);
-    sqlConf.setLong(Constants.ID_INCREMENT_BY, 1);
-    DBConnectionPool dbConnectionPool = new DBConnectionPool(sqlConf);
-    clusterStore = new SQLClusterStore(dbConnectionPool);
-    clusterStore.initialize();
-    clusterStore.initDerbyDB();
-    store = clusterStore;
-    clusterStore.clearData();
-  }
-
-  @Override
-  public void clearState() throws Exception {
-    clusterStore.clearData();
   }
 
   @AfterClass
   public static void afterClass() {
     zkClient.stopAndWait();
     zkServer.stopAndWait();
-    DBQueryHelper.dropDerbyDB();
   }
+
+  @Test
+  public void testIds() throws InterruptedException, SQLException, ClassNotFoundException {
+    final IdService idService = new IdService(zkClient, 3, 10);
+    idService.startAndWait();
+    final int incrementsPerThread = 100;
+    final int numThreads = 20;
+    final CyclicBarrier barrier = new CyclicBarrier(numThreads);
+    final CountDownLatch latch = new CountDownLatch(numThreads);
+
+    ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+    for (int i = 0; i < numThreads; i++) {
+      executor.execute(new Runnable() {
+        @Override
+        public void run() {
+          for (int j = 0; j < incrementsPerThread; j++) {
+            try {
+              barrier.await();
+              idService.getNewClusterId();
+            } catch (Exception e) {
+              Throwables.propagate(e);
+            }
+          }
+          latch.countDown();
+        }
+      });
+    }
+
+    latch.await();
+
+    // counter starts at 3, goes up by 10 each time
+    long expected = 3 + numThreads * incrementsPerThread * 10;
+    long actual = Long.valueOf(idService.getNewClusterId());
+    Assert.assertEquals(expected, actual);
+  }
+
 }

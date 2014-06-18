@@ -17,45 +17,55 @@ package com.continuuity.loom.http;
 
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.store.tenant.TenantStore;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+
+import java.io.IOException;
 
 /**
  * Abstract handler that provides some base methods for authenticating and authorizing requests.
  */
 public abstract class LoomAuthHandler extends AbstractHttpHandler {
+  private final TenantStore tenantStore;
 
-  /**
-   * Gets the user from the request and authenticates the user, returning null and writing an error message to the
-   * responder if there was an error getting or authenticating the user.
-   *
-   * @param request Request containing the user id.
-   * @param responder Responder to use when there is an issue getting or authenticating the user.
-   * @return User id if it exists and authentication passes.
-   */
-  protected String getAndAuthenticateUser(HttpRequest request, HttpResponder responder) {
-    // TODO: proper authentication/authorization
-    String user = request.getHeader(Constants.USER_HEADER);
-    String apiKey = request.getHeader(Constants.API_KEY_HEADER);
-    if (user == null) {
-      responder.sendError(HttpResponseStatus.UNAUTHORIZED, Constants.USER_HEADER + " not found in the request header.");
-      return null;
-    }
-    return user;
+  protected LoomAuthHandler(TenantStore tenantStore) {
+    this.tenantStore = tenantStore;
   }
 
   /**
-   * Returns whether or not the request is a request from the super administrator.
+   * Gets the user and tenant from the request and authenticates, returning null and writing an error message to the
+   * responder if there was an error getting or authenticating the user and tenant.
    *
    * @param request Request containing the user id.
-   * @return true if the request came from the admin and false if not.
+   * @param responder Responder to use when there is an issue getting or authenticating the user.
+   * @return Account id if it exists and authentication passes.
    */
-  protected boolean isAdminRequest(HttpRequest request) {
+  protected Account getAndAuthenticateAccount(HttpRequest request, HttpResponder responder) {
     // TODO: proper authentication/authorization
     String user = request.getHeader(Constants.USER_HEADER);
+    String tenant = request.getHeader(Constants.TENANT_HEADER);
     String apiKey = request.getHeader(Constants.API_KEY_HEADER);
+    if (user == null) {
+      responder.sendError(HttpResponseStatus.UNAUTHORIZED, Constants.USER_HEADER + " not found in request headers.");
+      return null;
+    }
+    if (tenant == null) {
+      responder.sendError(HttpResponseStatus.UNAUTHORIZED, Constants.TENANT_HEADER + " not found in request headers.");
+      return null;
+    }
+    try {
+      if (!tenant.equals(Constants.SUPERADMIN_TENANT) && tenantStore.getTenant(tenant) == null) {
+        responder.sendError(HttpResponseStatus.NOT_FOUND, "Tenant does not exist.");
+        return null;
+      }
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error authenticating tenant");
+      return null;
+    }
 
-    return user != null && user.equals(Constants.ADMIN_USER);
+    return new Account(user, tenant);
   }
 }

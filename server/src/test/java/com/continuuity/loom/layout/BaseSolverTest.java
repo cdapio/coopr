@@ -17,6 +17,7 @@ package com.continuuity.loom.layout;
 
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Administration;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
@@ -31,6 +32,8 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.utils.ImmutablePair;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -56,6 +59,7 @@ public class BaseSolverTest extends BaseTest {
   protected static Service reactor;
   protected static Service mysql;
   protected static Map<String, Service> serviceMap;
+  protected static Account account = new Account(Constants.ADMIN_USER, "tenant1");
 
   @BeforeClass
   public static void setupBaseSolverTests() throws Exception {
@@ -105,6 +109,7 @@ public class BaseSolverTest extends BaseTest {
     reactorTemplate2 =
       new JsonSerde().getGson().fromJson(Entities.ClusterTemplateExample.REACTOR2_STRING, ClusterTemplate.class);
 
+    EntityStoreView entityStore = entityStoreService.getView(account);
     // create providers
     entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
                                            ImmutableMap.<String, String>of()));

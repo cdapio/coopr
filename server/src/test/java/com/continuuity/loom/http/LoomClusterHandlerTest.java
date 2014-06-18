@@ -17,6 +17,7 @@ package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Administration;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
@@ -49,6 +50,8 @@ import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.store.cluster.ClusterStoreView;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.utils.ImmutablePair;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -278,7 +281,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     ClusterJob clusterJob = new ClusterJob(new JobId(clusterId, 1), ClusterAction.CLUSTER_DELETE);
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
     cluster.setLatestJobId(clusterJob.getJobId());
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     clusterStore.writeClusterJob(clusterJob);
 
     Node node1 = new JsonSerde().getGson().fromJson(SchedulerTest.NODE1, Node.class);
@@ -732,21 +735,20 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   @Test
   public void testGetAllClusters() throws Exception {
     // First delete all clusters
-    for (Cluster cluster : clusterStore.getAllClusters()) {
-      clusterStore.deleteCluster(cluster.getId());
+    for (Cluster cluster : clusterStoreService.getView(USER1_ACCOUNT).getAllClusters()) {
+      clusterStoreService.getView(USER1_ACCOUNT).deleteCluster(cluster.getId());
     }
 
-    ClusterCreateRequest clusterCreateRequest = createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
+    ClusterCreateRequest clusterCreateRequest =
+      createClusterRequest("cluster1", "my 1st cluster", reactorTemplate.getName(), 5);
     HttpResponse response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    String cluster1 = getIdFromResponse(response);
 
     solverScheduler.run();
 
     clusterCreateRequest = createClusterRequest("cluster2", "my 2nd cluster", reactorTemplate.getName(), 6);
     response = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    String cluster2 = getIdFromResponse(response);
 
     solverScheduler.run();
 
@@ -770,8 +772,6 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     // cleanup
     clusterQueue.removeAll();
-    clusterStore.deleteCluster(cluster1);
-    clusterStore.deleteCluster(cluster2);
   }
 
   @Test
@@ -823,7 +823,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     ClusterJob clusterJob = new ClusterJob(new JobId(clusterId, 1), ClusterAction.CLUSTER_DELETE);
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
     cluster.setLatestJobId(clusterJob.getJobId());
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     clusterStore.writeClusterJob(clusterJob);
 
     assertResponseStatus(doDelete("/v1/loom/clusters/" + clusterId, ADMIN_HEADERS), HttpResponseStatus.OK);
@@ -886,9 +886,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                  new Service("s2", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of()),
                  new Service("s3", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of())),
                ImmutableMap.<String, String>of()));
-    Cluster cluster = new Cluster("123", USER1, "my-cluster", System.currentTimeMillis(), "my cluster", null, null,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "my-cluster", System.currentTimeMillis(), "my cluster", null, null,
                                   nodes.keySet(), ImmutableSet.of("s1", "s2", "s3"));
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(USER1_ACCOUNT).writeCluster(cluster);
 
     // check services
     HttpResponse response = doGet("/v1/loom/clusters/" + cluster.getId() + "/services", USER1_HEADERS);
@@ -898,7 +898,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals(ImmutableSet.of("s1", "s2", "s3"), services);
 
     // cleanup
-    clusterStore.deleteCluster(cluster.getId());
+    clusterStoreService.getView(USER1_ACCOUNT).deleteCluster(cluster.getId());
   }
 
   @Test
@@ -923,7 +923,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     JsonArray expectedAllPlans = GSON.fromJson(ALL_SAMPLE_PLANS, JsonArray.class);
 
     // Verify plan for job
-    Cluster cluster = clusterStore.getCluster(clusterId);
+    Cluster cluster = clusterStoreService.getView(USER1_ACCOUNT).getCluster(clusterId);
     response = doGet("/v1/loom/clusters/" + clusterId + "/plans/" + cluster.getLatestJobId(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
@@ -972,10 +972,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testClusterTemplateSync() throws Exception {
     ClusterTemplate template = Entities.ClusterTemplateExample.HDFS;
     Cluster cluster =
-      new Cluster("123", USER1, "name", System.currentTimeMillis(), "description", Entities.ProviderExample.RACKSPACE,
+      new Cluster("123", USER1_ACCOUNT, "name", System.currentTimeMillis(), "description", Entities.ProviderExample.RACKSPACE,
                   template, ImmutableSet.<String>of(), ImmutableSet.<String>of());
     cluster.setStatus(Cluster.Status.ACTIVE);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(USER1_ACCOUNT).writeCluster(cluster);
     clusterStore.writeNode(Entities.ClusterExample.NODE1);
     clusterStore.writeNode(Entities.ClusterExample.NODE2);
 
@@ -989,25 +989,26 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     ClusterTemplate updatedTemplate =
       new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
                           newCompatibilities, template.getConstraints(), template.getAdministration());
-    entityStore.writeClusterTemplate(updatedTemplate);
+    entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(updatedTemplate);
 
     // now sync the cluster
     String path = "/v1/loom/clusters/" + cluster.getId() + "/clustertemplate/sync";
     assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.OK);
 
     // now check the cluster's template is as expected
-    cluster = clusterStore.getCluster(cluster.getId(), cluster.getOwnerId());
+    cluster = clusterStoreService.getView(cluster.getAccount()).getCluster(cluster.getId());
     Assert.assertEquals(updatedTemplate, cluster.getClusterTemplate());
   }
 
   @Test
   public void testClusterTemplateSync404Conditions() throws Exception {
     Cluster cluster = Entities.ClusterExample.CLUSTER;
+    Account clusterAccount = cluster.getAccount();
     cluster.setStatus(Cluster.Status.ACTIVE);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(clusterAccount).writeCluster(cluster);
     clusterStore.writeNode(Entities.ClusterExample.NODE1);
     clusterStore.writeNode(Entities.ClusterExample.NODE2);
-    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+    entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(cluster.getClusterTemplate());
     String path = "/v1/loom/clusters/" + cluster.getId() + "/clustertemplate/sync";
 
     // test cluster that does not exist returns 404
@@ -1019,11 +1020,11 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(doPost(path, "", USER2_HEADERS), HttpResponseStatus.NOT_FOUND);
 
     // test missing template returns 404
-    entityStore.deleteClusterTemplate(cluster.getClusterTemplate().getName());
+    entityStoreService.getView(Entities.ADMIN_ACCOUNT).deleteClusterTemplate(cluster.getClusterTemplate().getName());
     assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
 
     // test missing nodes returns 404
-    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+    entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(cluster.getClusterTemplate());
     clusterStore.deleteNode(Entities.ClusterExample.NODE1.getId());
     clusterStore.deleteNode(Entities.ClusterExample.NODE2.getId());
     assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
@@ -1032,16 +1033,17 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   @Test
   public void testClusterTemplateSyncOnlyAllowedOnActiveClusters() throws Exception {
     Cluster cluster = Entities.ClusterExample.CLUSTER;
-    clusterStore.writeCluster(cluster);
-    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+    Account clusterAccount = cluster.getAccount();
+    clusterStoreService.getView(clusterAccount).writeCluster(cluster);
+    entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(cluster.getClusterTemplate());
     String path = "/v1/loom/clusters/" + cluster.getId() + "/clustertemplate/sync";
 
     // test cluster in bad state return 409
-    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+    entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(cluster.getClusterTemplate());
     for (Cluster.Status status : Cluster.Status.values()) {
       if (status != Cluster.Status.ACTIVE) {
         cluster.setStatus(status);
-        clusterStore.writeCluster(cluster);
+        clusterStoreService.getView(clusterAccount).writeCluster(cluster);
         assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.CONFLICT);
       }
     }
@@ -1050,12 +1052,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   @Test
   public void testClusterTemplateSyncDisallowsIncompatibilities() throws Exception {
     Cluster cluster = Entities.ClusterExample.CLUSTER;
+    Account clusterAccount = cluster.getAccount();
     ClusterTemplate template = cluster.getClusterTemplate();
     cluster.setStatus(Cluster.Status.ACTIVE);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(clusterAccount).writeCluster(cluster);
     clusterStore.writeNode(Entities.ClusterExample.NODE1);
     clusterStore.writeNode(Entities.ClusterExample.NODE2);
-    entityStore.writeClusterTemplate(cluster.getClusterTemplate());
+    entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(cluster.getClusterTemplate());
 
     // now edit the template, making centos incompatible with the template
     Set<String> newCompatibleImages = ImmutableSet.of(Entities.ImageTypeExample.UBUNTU_12.getName());
@@ -1066,7 +1069,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     ClusterTemplate updatedTemplate =
       new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
                           newCompatibilities, template.getConstraints(), template.getAdministration());
-    entityStore.writeClusterTemplate(updatedTemplate);
+    entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(updatedTemplate);
 
     // syncing the cluster would make it invalid, should not be allowed
     String path = "/v1/loom/clusters/" + cluster.getId() + "/clustertemplate/sync";
@@ -1086,7 +1089,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     solverScheduler.run();
 
     String clusterId = getIdFromResponse(response);
-    Cluster cluster = clusterStore.getCluster(clusterId);
+    Cluster cluster = clusterStoreService.getView(USER1_ACCOUNT).getCluster(clusterId);
 
     Assert.assertEquals(expectedStatus, cluster.getStatus());
 
@@ -1111,19 +1114,19 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                           Constraints.EMPTY_CONSTRAINTS, Administration.EMPTY_ADMINISTRATION);
 
     long currentTime = 10000;
-    Cluster foreverCluster = new Cluster("1002", "", "prolong-test", currentTime, "", null,
+    Cluster foreverCluster = new Cluster("1002", USER1_ACCOUNT, "prolong-test", currentTime, "", null,
                                   foreverTemplate, ImmutableSet.<String>of(), ImmutableSet.<String>of(),
                                   new JsonObject());
     foreverCluster.setExpireTime(currentTime + 10000);
     foreverCluster.setStatus(Cluster.Status.ACTIVE);
-    clusterStore.writeCluster(foreverCluster);
+    clusterStoreService.getView(USER1_ACCOUNT).writeCluster(foreverCluster);
 
     HttpResponse response = doPost("/v1/loom/clusters/" + foreverCluster.getId(),
                                    "{'expireTime' : 90000}",
                                    ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
-    foreverCluster = clusterStore.getCluster(foreverCluster.getId());
+    foreverCluster = clusterStoreService.getView(USER1_ACCOUNT).getCluster(foreverCluster.getId());
     Assert.assertEquals(90000, foreverCluster.getExpireTime());
   }
 
@@ -1136,12 +1139,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                           Constraints.EMPTY_CONSTRAINTS, new Administration(new LeaseDuration(1000, 12000, 1000)));
 
     long currentTime = 10000;
-    Cluster cluster = new Cluster("1002", "", "prolong-test", currentTime, "", null,
+    Cluster cluster = new Cluster("1002", USER1_ACCOUNT, "prolong-test", currentTime, "", null,
                                          template, ImmutableSet.<String>of(), ImmutableSet.<String>of(),
                                          new JsonObject());
     long expireTime = currentTime + 10000;
     cluster.setExpireTime(expireTime);
     cluster.setStatus(Cluster.Status.ACTIVE);
+    ClusterStoreView clusterStore = clusterStoreService.getView(USER1_ACCOUNT);
     clusterStore.writeCluster(cluster);
 
     cluster = clusterStore.getCluster(cluster.getId());
@@ -1258,9 +1262,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testInvalidGetClusterConfigRequests() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of(), new JsonObject());
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
 
     assertResponseStatus(doGet("/v1/loom/clusters/" + cluster.getId() + "9/config", USER1_HEADERS),
                          HttpResponseStatus.NOT_FOUND);
@@ -1280,9 +1284,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     objVal.addProperty("okey1", "oval1");
     objVal.addProperty("okey2", "oval2");
     config.add("key3", objVal);
-    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of(), config);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     HttpResponse response = doGet("/v1/loom/clusters/" + cluster.getId() + "/config", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
@@ -1292,9 +1296,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testInvalidClusterConfigRequests() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of(), new JsonObject());
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     String requestStr = GSON.toJson(new ClusterConfigureRequest(new JsonObject(), false));
 
     assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", "{}", USER1_HEADERS),
@@ -1306,7 +1310,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                          HttpResponseStatus.NOT_FOUND);
 
     cluster.setStatus(Cluster.Status.INCOMPLETE);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
 
     assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", requestStr, USER1_HEADERS),
                          HttpResponseStatus.CONFLICT);
@@ -1314,10 +1318,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testPutClusterConfigCanRunOnInconsistentClusters() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of(), new JsonObject());
     cluster.setStatus(Cluster.Status.INCONSISTENT);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     String requestStr = GSON.toJson(new ClusterConfigureRequest(new JsonObject(), false));
 
     assertResponseStatus(doPut("/v1/loom/clusters/" + cluster.getId() + "/config", requestStr, USER1_HEADERS),
@@ -1328,10 +1332,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testPutClusterConfig() throws Exception {
     JsonObject originalConfig = new JsonObject();
     originalConfig.addProperty("key1", "val1");
-    Cluster cluster = new Cluster("123", USER1, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "get-config-test", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of(), originalConfig);
     cluster.setStatus(Cluster.Status.ACTIVE);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
 
     HttpResponse response = doGet("/v1/loom/clusters/123/config", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -1354,9 +1358,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testClusterServiceActions() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "service-actions", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "service-actions", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
     cluster.setStatus(Cluster.Status.ACTIVE);
+    ClusterStoreView clusterStore = clusterStoreService.getView(cluster.getAccount());
     clusterStore.writeCluster(cluster);
     Map<String, ClusterAction> actions = Maps.newHashMap();
     actions.put("/stop", ClusterAction.STOP_SERVICES);
@@ -1381,10 +1386,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testServiceActionsOnNonexistantClusterReturn404() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of());
     cluster.setStatus(Cluster.Status.ACTIVE);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     Set<String> actions = ImmutableSet.of(
       "/stop",
       "/start",
@@ -1405,10 +1410,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testServiceActionsOnNonexistantClusterServiceReturn404() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of());
     cluster.setStatus(Cluster.Status.ACTIVE);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     assertResponseStatus(doPost("/v1/loom/clusters/123/services/fake/stop", "", USER1_HEADERS),
                          HttpResponseStatus.NOT_FOUND);
     assertResponseStatus(doPost("/v1/loom/clusters/123/services/fake/start", "", USER1_HEADERS),
@@ -1419,7 +1424,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testServiceActionsCanOnlyRunOnActiveCluster() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
     Set<Cluster.Status> badStatuses = ImmutableSet.of(
       Cluster.Status.INCOMPLETE, Cluster.Status.PENDING, Cluster.Status.TERMINATED, Cluster.Status.INCONSISTENT);
@@ -1433,7 +1438,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     );
     for (Cluster.Status status : badStatuses) {
       cluster.setStatus(status);
-      clusterStore.writeCluster(cluster);
+      clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
       for (String resource : resources) {
         assertResponseStatus(doPost(resource, "", USER1_HEADERS), HttpResponseStatus.CONFLICT);
       }
@@ -1442,10 +1447,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testAddInvalidServicesReturns400() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
     cluster.setStatus(Cluster.Status.ACTIVE);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     // can't add nodemanager without resourcemanager
     AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("nodemanager"));
     assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER1_HEADERS),
@@ -1458,10 +1463,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testAddServicesOnNonexistantClusterReturns404() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
     cluster.setStatus(Cluster.Status.ACTIVE);
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
     assertResponseStatus(doPost("/v1/loom/clusters/1123/services", GSON.toJson(body), USER1_HEADERS),
                          HttpResponseStatus.NOT_FOUND);
@@ -1471,14 +1476,14 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testAddServicesCanOnlyRunOnActiveCluster() throws Exception {
-    Cluster cluster = new Cluster("123", USER1, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
+    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "test-cluster", 0, "", null, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of("namenode", "datanode"));
     Set<Cluster.Status> badStatuses = ImmutableSet.of(
       Cluster.Status.INCOMPLETE, Cluster.Status.PENDING, Cluster.Status.TERMINATED, Cluster.Status.INCONSISTENT);
     AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
     for (Cluster.Status status : badStatuses) {
       cluster.setStatus(status);
-      clusterStore.writeCluster(cluster);
+      clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
       assertResponseStatus(doPost("/v1/loom/clusters/123/services", GSON.toJson(body), USER1_HEADERS),
                            HttpResponseStatus.CONFLICT);
     }
@@ -1575,6 +1580,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                                          new Compatibilities(null, null, ImmutableSet.of("zookeeper")),
                                          null, new Administration(new LeaseDuration(10000, 30000, 5000)));
 
+    EntityStoreView entityStore = entityStoreService.getView(ADMIN_ACCOUNT);
     // create providers
     entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
                                            ImmutableMap.<String, String>of()));

@@ -16,8 +16,7 @@
 package com.continuuity.loom.scheduler.callback;
 
 import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.store.ClusterStore;
-import com.google.inject.Inject;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 
 /**
  * Executes some code before a job starts and after a job completes. Callbacks must be idempotent. There is a
@@ -29,9 +28,9 @@ public interface ClusterCallback {
    * Initialize the cluster callback. Guaranteed to be called exactly once before any other methods are called.
    *
    * @param conf Server configuration.
-   * @param clusterStore Cluster store for looking up cluster information.
+   * @param clusterStoreService Service for accessing the cluster store.
    */
-  void initialize(Configuration conf, ClusterStore clusterStore);
+  void initialize(Configuration conf, ClusterStoreService clusterStoreService);
 
   /**
    * Execute some method before a cluster job starts, returning whether or not the job can proceed or whether it should

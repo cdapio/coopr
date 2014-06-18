@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store;
+package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.store.DBConnectionPool;
+import com.continuuity.loom.store.DBQueryHelper;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -32,7 +34,7 @@ import java.sql.Statement;
 import java.util.List;
 
 /**
- * Implementation of {@link com.continuuity.loom.store.TenantStore} using a SQL database as the persistent store.
+ * Implementation of {@link TenantStore} using a SQL database as the persistent store.
  */
 public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   private static final Logger LOG  = LoggerFactory.getLogger(SQLTenantStore.class);

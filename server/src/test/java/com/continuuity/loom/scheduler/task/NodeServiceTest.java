@@ -19,7 +19,7 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.LoomServiceTestBase;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -33,13 +33,6 @@ import org.junit.Test;
  * Test NodeService
  */
 public class NodeServiceTest extends LoomServiceTestBase {
-
-  static ClusterStore clusterStore;
-
-  @BeforeClass
-  public static void init() throws Exception {
-    clusterStore = injector.getInstance(ClusterStore.class);
-  }
 
   @Test
   public void testCreateHostname() {

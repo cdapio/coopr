@@ -16,19 +16,15 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.layout.InvalidClusterException;
-import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
-import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -36,18 +32,16 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.MissingClusterException;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.scheduler.task.TaskId;
-import com.continuuity.loom.store.ClusterStore;
-import com.continuuity.loom.store.IdService;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.cluster.ClusterStoreView;
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import org.apache.twill.zookeeper.ZKClient;
-import org.apache.twill.zookeeper.ZKClients;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -75,30 +69,23 @@ public class LoomClusterHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomClusterHandler.class);
   private static final Gson GSON = new JsonSerde().getGson();
 
-  private final ClusterStore store;
-  private final TrackingQueue jobQueue;
   private final JsonSerde codec;
-  private final TrackingQueue solverQueue;
-  private final ZKClient zkClient;
-  private ClusterService clusterService;
+  private final ClusterService clusterService;
+  private final ClusterStoreService clusterStoreService;
+  private final ClusterStore clusterStore;
   private final int maxClusterSize;
-  private final LoomStats loomStats;
-  private final IdService idService;
 
   @Inject
-  private LoomClusterHandler(ClusterStore store, @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
-                             @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
-                             ClusterService clusterService, Configuration conf,
-                             LoomStats loomStats, IdService idService) {
-    this.store = store;
-    this.jobQueue = jobQueue;
+  private LoomClusterHandler(TenantStore tenantStore,
+                             ClusterService clusterService,
+                             ClusterStoreService clusterStoreService,
+                             Configuration conf) {
+    super(tenantStore);
     this.codec = new JsonSerde();
-    this.solverQueue = solverQueue;
-    this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.clusterService = clusterService;
+    this.clusterStoreService = clusterStoreService;
+    this.clusterStore = clusterStoreService.getSystemView();
     this.maxClusterSize = conf.getInt(Constants.MAX_CLUSTER_SIZE);
-    this.loomStats = loomStats;
-    this.idService = idService;
   }
 
   /**
@@ -106,21 +93,19 @@ public class LoomClusterHandler extends LoomAuthHandler {
    *
    * @param request Request for clusters.
    * @param responder Responder for sending the response.
-   * @throws Exception
    */
   @GET
-  public void getClusters(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getClusters(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    List<Cluster> clusters;
-    // TODO: revise endpoints so that admin has its own for this
-    if (userId.equals(Constants.ADMIN_USER)) {
-      clusters = store.getAllClusters();
-    } else {
-      clusters = store.getAllClusters(userId);
+    List<Cluster> clusters = null;
+    try {
+      clusters = clusterStoreService.getView(account).getAllClusters();
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting clusters.");
     }
 
     JsonArray jsonArray = new JsonArray();
@@ -134,7 +119,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
                       cluster.getClusterTemplate() == null ? "..." : cluster.getClusterTemplate().getName());
       obj.addProperty("numNodes", cluster.getNodes().size());
       obj.addProperty("status", cluster.getStatus().name());
-      obj.addProperty("ownerId", cluster.getOwnerId());
+      obj.addProperty("ownerId", cluster.getAccount().getUserId());
 
       jsonArray.add(obj);
     }
@@ -148,36 +133,40 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request for a cluster.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster to get.
-   * @throws Exception
    */
   @GET
   @Path("/{cluster-id}")
   public void getCluster(HttpRequest request, HttpResponder responder,
-                         @PathParam("cluster-id") String clusterId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                         @PathParam("cluster-id") String clusterId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    Cluster cluster = clusterService.getUserCluster(clusterId, userId);
-    if (cluster == null) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
-      return;
+    try {
+      ClusterStoreView view = clusterStoreService.getView(account);
+      Cluster cluster = view.getCluster(clusterId);
+      if (cluster == null) {
+        responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
+        return;
+      }
+
+      JsonObject jsonObject = GSON.toJsonTree(cluster).getAsJsonObject();
+
+      // Update cluster Json with node information.
+      Set<Node> clusterNodes = view.getClusterNodes(clusterId);
+      jsonObject.add("nodes", GSON.toJsonTree(clusterNodes));
+
+      // Add last job message if any
+      ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      if (clusterJob.getStatusMessage() != null) {
+        jsonObject.addProperty("message", clusterJob.getStatusMessage());
+      }
+
+      responder.sendJson(HttpResponseStatus.OK, jsonObject);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting cluster " + clusterId);
     }
-
-    JsonObject jsonObject = GSON.toJsonTree(cluster).getAsJsonObject();
-
-    // Update cluster Json with node information.
-    Set<Node> clusterNodes = store.getClusterNodes(clusterId);
-    jsonObject.add("nodes", GSON.toJsonTree(clusterNodes));
-
-    // Add last job message if any
-    ClusterJob clusterJob = store.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-    if (clusterJob.getStatusMessage() != null) {
-      jsonObject.addProperty("message", clusterJob.getStatusMessage());
-    }
-
-    responder.sendJson(HttpResponseStatus.OK, jsonObject);
   }
 
   /**
@@ -186,23 +175,27 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request for config of a cluster.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster containing the config to get.
-   * @throws Exception
    */
   @GET
   @Path("/{cluster-id}/config")
   public void getClusterConfig(HttpRequest request, HttpResponder responder,
-                               @PathParam("cluster-id") String clusterId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                               @PathParam("cluster-id") String clusterId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    Cluster cluster = clusterService.getUserCluster(clusterId, userId);
-    if (cluster == null) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
-      return;
+    try {
+      Cluster cluster = clusterStoreService.getView(account).getCluster(clusterId);
+      if (cluster == null) {
+        responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
+        return;
+      }
+      responder.sendJson(HttpResponseStatus.OK, cluster.getConfig());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting config for cluster " + clusterId);
     }
-    responder.sendJson(HttpResponseStatus.OK, cluster.getConfig());
   }
 
   /**
@@ -211,23 +204,27 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request for services on a cluster.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster containing the services to get.
-   * @throws Exception
    */
   @GET
   @Path("/{cluster-id}/services")
   public void getClusterServices(HttpRequest request, HttpResponder responder,
-                                 @PathParam("cluster-id") String clusterId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                                 @PathParam("cluster-id") String clusterId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    Cluster cluster = clusterService.getUserCluster(clusterId, userId);
-    if (cluster == null) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
-      return;
+    try {
+      Cluster cluster = clusterStoreService.getView(account).getCluster(clusterId);
+      if (cluster == null) {
+        responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
+        return;
+      }
+      responder.sendJson(HttpResponseStatus.OK, cluster.getServices());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting services for cluster " + clusterId);
     }
-    responder.sendJson(HttpResponseStatus.OK, cluster.getServices());
   }
 
   /**
@@ -236,31 +233,35 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request for cluster status.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster whose status to get.
-   * @throws Exception
    */
   @GET
   @Path("/{cluster-id}/status")
   public void getClusterStatus(HttpRequest request, HttpResponder responder,
-                               @PathParam("cluster-id") String clusterId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                               @PathParam("cluster-id") String clusterId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    Cluster cluster = clusterService.getUserCluster(clusterId, userId);
-    if (cluster == null){
-      responder.sendError(HttpResponseStatus.NOT_FOUND, String.format("cluster %s not found", clusterId));
-      return;
-    }
+    try {
+      ClusterStoreView view = clusterStoreService.getView(account);
+      Cluster cluster = view.getCluster(clusterId);
+      if (cluster == null){
+        responder.sendError(HttpResponseStatus.NOT_FOUND, String.format("cluster %s not found", clusterId));
+        return;
+      }
 
-    ClusterJob job = store.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-    if (job == null){
-      responder.sendError(HttpResponseStatus.NOT_FOUND,
-                          String.format("job %s not found for cluster %s", cluster.getLatestJobId(), clusterId));
-      return;
-    }
+      ClusterJob job = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      if (job == null){
+        responder.sendError(HttpResponseStatus.NOT_FOUND,
+                            String.format("job %s not found for cluster %s", cluster.getLatestJobId(), clusterId));
+        return;
+      }
 
-    responder.sendJson(HttpResponseStatus.OK, getClusterResponseJson(cluster, job));
+      responder.sendJson(HttpResponseStatus.OK, getClusterResponseJson(cluster, job));
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting status of cluster " + clusterId);
+    }
   }
 
   protected static JsonObject getClusterResponseJson(Cluster cluster, ClusterJob job) {
@@ -290,15 +291,14 @@ public class LoomClusterHandler extends LoomAuthHandler {
    *
    * @param request Request to add a cluster.
    * @param responder Responder for sending the response.
-   * @throws Exception
    */
   @POST
-  public void createCluster(HttpRequest request, HttpResponder responder) throws Exception {
-    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void createCluster(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
+    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
 
     try {
       ClusterCreateRequest clusterCreateRequest = codec.getGson().fromJson(reader, ClusterCreateRequest.class);
@@ -307,47 +307,18 @@ public class LoomClusterHandler extends LoomAuthHandler {
         responder.sendError(HttpResponseStatus.BAD_REQUEST, "numMachines above max cluster size " + maxClusterSize);
         return;
       }
-
-      String name = clusterCreateRequest.getName();
-      int numMachines = clusterCreateRequest.getNumMachines();
-      String templateName = clusterCreateRequest.getClusterTemplate();
-      LOG.debug(String.format("Received a request to create cluster %s with %d machines from template %s", name,
-                             numMachines, templateName));
-      String clusterId = idService.getNewClusterId();
-      Cluster cluster = new Cluster(clusterId, userId, name, System.currentTimeMillis(),
-                                    clusterCreateRequest.getDescription(), null, null,
-                                    ImmutableSet.<String>of(), ImmutableSet.<String>of(),
-                                    clusterCreateRequest.getConfig());
-      JobId clusterJobId = idService.getNewJobId(clusterId);
-      ClusterJob clusterJob = new ClusterJob(clusterJobId, ClusterAction.SOLVE_LAYOUT);
-      cluster.setLatestJobId(clusterJob.getJobId());
-
-      try {
-        LOG.trace("Writing cluster {} to store", cluster);
-        store.writeCluster(cluster);
-        store.writeClusterJob(clusterJob);
-      } catch (Exception e) {
-        LOG.error("Exception while trying to add cluster {} to cluster store.", cluster.getName(), e);
-        responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error adding cluster.");
-        return;
-      }
-
-      LOG.debug("adding create cluster element to solverQueue");
-      SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER,
-                                                      GSON.toJson(clusterCreateRequest));
-      solverQueue.add(new Element(cluster.getId(), GSON.toJson(solverRequest)));
-
-      loomStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
-
+      String id = clusterService.requestClusterCreate(clusterCreateRequest, account);
       JsonObject response = new JsonObject();
-      response.addProperty("id", cluster.getId());
+      response.addProperty("id", id);
       responder.sendJson(HttpResponseStatus.OK, response);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User not authorized to create cluster.");
     } catch (IllegalArgumentException e) {
       LOG.error("Exception trying to create cluster.", e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
-    } catch (Exception e) {
-      LOG.error("Exception trying to create cluster.", e);
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal error while adding cluster.");
+    } catch (IOException e) {
+      LOG.error("Exception while trying to create cluster.", e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error requesting cluster create operation.");
     } finally {
       try {
         reader.close();
@@ -363,48 +334,45 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to delete cluster.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster to delete.
-   * @throws Exception
    */
   @DELETE
   @Path("/{cluster-id}")
   public void deleteCluster(HttpRequest request, HttpResponder responder,
-                            @PathParam("cluster-id") String clusterId) throws Exception {
+                            @PathParam("cluster-id") String clusterId) {
     LOG.debug("Received a request to delete cluster {}", clusterId);
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
-      return;
-    }
-
-    Cluster cluster = clusterService.getUserCluster(clusterId, userId);
-    if (cluster == null) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
-      return;
-    }
-
-    if (cluster.getStatus() == Cluster.Status.TERMINATED) {
-      responder.sendStatus(HttpResponseStatus.OK);
-      return;
-    }
-
-    ClusterJob clusterJob = store.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-    // If previous job on a cluster is still underway, don't accept new jobs
-    if (cluster.getStatus() == Cluster.Status.PENDING) {
-      String message = String.format("Job %s is still underway for cluster %s",
-                                     clusterJob.getJobId(), clusterId);
-      LOG.error(message);
-      responder.sendError(HttpResponseStatus.CONFLICT, message);
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
     try {
-      clusterService.requestClusterDelete(clusterId, userId);
-    } catch (Throwable e) {
-      LOG.error("Exception while trying to write cluster {} to cluster store.", cluster.getName(), e);
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error deleting cluster.");
-      return;
-    }
+      Cluster cluster = clusterStoreService.getView(account).getCluster(clusterId);
+      if (cluster == null) {
+        responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
+        return;
+      }
 
-    responder.sendStatus(HttpResponseStatus.OK);
+      if (cluster.getStatus() == Cluster.Status.TERMINATED) {
+        responder.sendStatus(HttpResponseStatus.OK);
+        return;
+      }
+
+      ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      // If previous job on a cluster is still underway, don't accept new jobs
+      if (cluster.getStatus() == Cluster.Status.PENDING) {
+        String message = String.format("Job %s is still underway for cluster %s",
+                                       clusterJob.getJobId(), clusterId);
+        LOG.error(message);
+        responder.sendError(HttpResponseStatus.CONFLICT, message);
+        return;
+      }
+      clusterService.requestClusterDelete(clusterId, account);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error deleting cluster.");
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User unauthorized to perform delete.");
+    }
   }
 
   /**
@@ -413,87 +381,27 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to abort the cluster operation.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster to abort.
-   * @throws Exception
    */
   @POST
   @Path("/{cluster-id}/abort")
   public void abortClusterJob(HttpRequest request, HttpResponder responder,
-                              @PathParam("cluster-id") String clusterId) throws Exception {
+                              @PathParam("cluster-id") String clusterId) {
     LOG.debug("Received a request to abort job on cluster {}", clusterId);
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    // First read cluster without locking
-    Cluster cluster = clusterService.getUserCluster(clusterId, userId);
-    if (cluster == null) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
-      return;
-    }
-
-    if (cluster.getStatus() == Cluster.Status.TERMINATED || cluster.getStatus() != Cluster.Status.PENDING) {
-      responder.sendStatus(HttpResponseStatus.OK);
-      return;
-    }
-
-    // Get latest job
-    ClusterJob clusterJob = store.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-
-    // If job not running, nothing to abort
-    if (clusterJob.getJobStatus() == ClusterJob.Status.FAILED ||
-      clusterJob.getJobStatus() == ClusterJob.Status.COMPLETE) {
-      // Reschedule the job.
-      jobQueue.add(new Element(clusterJob.getJobId()));
-      responder.sendStatus(HttpResponseStatus.OK);
-      return;
-    }
-
-    // Job can be aborted only when CLUSTER_CREATE is RUNNING
-    if (!(clusterJob.getClusterAction() == ClusterAction.CLUSTER_CREATE &&
-      clusterJob.getJobStatus() == ClusterJob.Status.RUNNING)) {
-      responder.sendError(HttpResponseStatus.CONFLICT, "Cannot be aborted at this time.");
-      return;
-    }
-
-    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
-    lock.acquire();
     try {
-      cluster = clusterService.getUserCluster(clusterId, userId);
-      if (cluster == null) {
-        responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
-        return;
-      }
-
-      if (cluster.getStatus() == Cluster.Status.TERMINATED || cluster.getStatus() != Cluster.Status.PENDING) {
-        responder.sendStatus(HttpResponseStatus.OK);
-        return;
-      }
-
-      clusterJob = store.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-
-      // If job already done, return.
-      if (clusterJob.getJobStatus() == ClusterJob.Status.COMPLETE ||
-        clusterJob.getJobStatus() == ClusterJob.Status.FAILED) {
-        responder.sendStatus(HttpResponseStatus.OK);
-        return;
-      }
-
-      clusterJob.setJobStatus(ClusterJob.Status.FAILED);
-      clusterJob.setStatusMessage("Aborted by user.");
-      try {
-        store.writeClusterJob(clusterJob);
-        // Reschedule the job.
-        jobQueue.add(new Element(clusterJob.getJobId()));
-      } catch (Exception e) {
-        LOG.error("Exception while trying to write job {} to cluster store.", clusterJob.getJobId(), e);
-        responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error aborting cluster.");
-        return;
-      }
-    } finally {
-      lock.release();
+      clusterService.requestAbortJob(clusterId, account);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (MissingClusterException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT, "Cannot be aborted at this time.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error aborting cluster.");
     }
-    responder.sendStatus(HttpResponseStatus.OK);
   }
 
   /**
@@ -502,18 +410,17 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to change cluster parameter.
    * @param responder Responder to send the response.
    * @param clusterId Id of the cluster to change.
-   * @throws Exception
    */
   @POST
   @Path("/{cluster-id}")
   public void changeClusterParameter(HttpRequest request, HttpResponder responder,
-                                     @PathParam("cluster-id") String clusterId) throws Exception {
-    try {
-      String userId = getAndAuthenticateUser(request, responder);
-      if (userId == null) {
-        return;
-      }
+                                     @PathParam("cluster-id") String clusterId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
 
+    try {
       JsonObject jsonObject = GSON.fromJson(request.getContent().toString(Charsets.UTF_8), JsonObject.class);
       if (jsonObject == null || !jsonObject.has("expireTime")) {
         responder.sendError(HttpResponseStatus.BAD_REQUEST, "expire time not specified");
@@ -522,13 +429,17 @@ public class LoomClusterHandler extends LoomAuthHandler {
 
       long expireTime = jsonObject.get("expireTime").getAsLong();
 
-      clusterService.changeExpireTime(clusterId, userId, expireTime);
+      clusterService.changeExpireTime(clusterId, account, expireTime);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
     } catch (JsonSyntaxException e) {
       LOG.error("Exception while parsing JSON.", e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid JSON");
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User does not have permission to change cluster parameter.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception changing cluster parameter.");
     }
   }
 
@@ -539,26 +450,27 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param responder Responder to send the response.
    * @param clusterId Id of the cluster whose plan we want to get.
    * @param planId Id of the plan for the cluster.
-   * @throws Exception
    */
   @GET
   @Path("/{cluster-id}/plans/{plan-id}")
   public void getPlanForJob(HttpRequest request, HttpResponder responder,
                             @PathParam("cluster-id") String clusterId,
-                            @PathParam("plan-id") String planId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                            @PathParam("plan-id") String planId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
+
     try {
-      Cluster cluster = clusterService.getUserCluster(clusterId, userId);
+      ClusterStoreView view = clusterStoreService.getView(account);
+      Cluster cluster = view.getCluster(clusterId);
       if (cluster == null) {
         responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
         return;
       }
 
       JobId jobId = JobId.fromString(planId);
-      ClusterJob clusterJob = store.getClusterJob(jobId);
+      ClusterJob clusterJob = clusterStore.getClusterJob(jobId);
 
       if (!clusterJob.getClusterId().equals(clusterId)) {
         throw new IllegalArgumentException(String.format("Job %s does not belong to cluster %s", planId, clusterId));
@@ -568,6 +480,8 @@ public class LoomClusterHandler extends LoomAuthHandler {
     } catch (IllegalArgumentException e) {
       LOG.error("Exception get plan {} for cluster {}.", planId, clusterId, e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting plan.");
     }
   }
 
@@ -577,26 +491,26 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request for cluster plans.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster whose plans we have to fetch.
-   * @throws Exception
    */
   @GET
   @Path("/{cluster-id}/plans")
   public void getPlansForCluster(HttpRequest request, HttpResponder responder,
-                                 @PathParam("cluster-id") String clusterId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                                 @PathParam("cluster-id") String clusterId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
+
     try {
 
       JsonArray jobsJson = new JsonArray();
 
-      List<ClusterJob> jobs = clusterService.getClusterJobs(clusterId, userId);
+      List<ClusterJob> jobs = clusterStoreService.getView(account).getClusterJobs(clusterId, -1);
       if (jobs.isEmpty()) {
         responder.sendError(HttpResponseStatus.NOT_FOUND, "Plans for cluster " + clusterId + " not found.");
         return;
       }
-      for (ClusterJob clusterJob : clusterService.getClusterJobs(clusterId, userId)) {
+      for (ClusterJob clusterJob : jobs) {
         jobsJson.add(formatJobPlan(clusterJob));
       }
 
@@ -604,6 +518,8 @@ public class LoomClusterHandler extends LoomAuthHandler {
     } catch (IllegalArgumentException e) {
       LOG.error("Exception getting plans for cluster {}.", clusterId, e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting cluster plans.");
     }
   }
 
@@ -616,14 +532,13 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request for config of a cluster.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster containing the config to get.
-   * @throws Exception
    */
   @PUT
   @Path("/{cluster-id}/config")
   public void putClusterConfig(HttpRequest request, HttpResponder responder,
-                               @PathParam("cluster-id") String clusterId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                               @PathParam("cluster-id") String clusterId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
@@ -637,14 +552,16 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
 
     try {
-      clusterService.requestClusterReconfigure(clusterId, userId,
+      clusterService.requestClusterReconfigure(clusterId, account,
                                                configRequest.getRestart(), configRequest.getConfig());
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (MissingClusterException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, "Cluster is not in a configurable state.");
-    } catch (Exception e) {
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User is not authorized to perform a reconfigure.");
+    } catch (IOException e) {
       LOG.error("Exception requesting reconfigure on cluster {}.", clusterId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Internal error while requesting cluster reconfigure");
@@ -661,14 +578,13 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to add services to a cluster.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster to add services to.
-   * @throws Exception
    */
   @POST
   @Path("/{cluster-id}/services")
   public void addClusterServices(HttpRequest request, HttpResponder responder,
-                                 @PathParam("cluster-id") String clusterId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                                 @PathParam("cluster-id") String clusterId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
@@ -682,7 +598,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
 
     try {
-      clusterService.requestAddServices(clusterId, userId, addServicesRequest);
+      clusterService.requestAddServices(clusterId, account, addServicesRequest);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
@@ -691,7 +607,9 @@ public class LoomClusterHandler extends LoomAuthHandler {
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT,
                           "Cluster is not in a state where service actions can be performed.");
-    } catch (Exception e) {
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User is not authorized to add services.");
+    } catch (IOException e) {
       LOG.error("Exception requesting to add services to cluster {}.", clusterId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Internal error while requesting service action.");
@@ -704,12 +622,11 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to start cluster services.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster whose services should be started.
-   * @throws Exception
    */
   @POST
   @Path("/{cluster-id}/services/start")
   public void startAllClusterServices(HttpRequest request, HttpResponder responder,
-                                      @PathParam("cluster-id") String clusterId) throws Exception {
+                                      @PathParam("cluster-id") String clusterId) {
     requestServiceAction(request, responder, clusterId, null, ClusterAction.START_SERVICES);
   }
 
@@ -719,12 +636,11 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to stop cluster services.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster whose services should be stopped.
-   * @throws Exception
    */
   @POST
   @Path("/{cluster-id}/services/stop")
   public void stopAllClusterServices(HttpRequest request, HttpResponder responder,
-                                     @PathParam("cluster-id") String clusterId) throws Exception {
+                                     @PathParam("cluster-id") String clusterId) {
     requestServiceAction(request, responder, clusterId, null, ClusterAction.STOP_SERVICES);
   }
 
@@ -735,12 +651,11 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to restart cluster services.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster whose services should be restarted.
-   * @throws Exception
    */
   @POST
   @Path("/{cluster-id}/services/restart")
   public void restartAllClusterServices(HttpRequest request, HttpResponder responder,
-                                        @PathParam("cluster-id") String clusterId) throws Exception {
+                                        @PathParam("cluster-id") String clusterId) {
     requestServiceAction(request, responder, clusterId, null, ClusterAction.RESTART_SERVICES);
   }
 
@@ -750,13 +665,12 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to start cluster service.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster whose services should be started.
-   * @throws Exception
    */
   @POST
   @Path("/{cluster-id}/services/{service-id}/start")
   public void startClusterService(HttpRequest request, HttpResponder responder,
                                   @PathParam("cluster-id") String clusterId,
-                                  @PathParam("service-id") String serviceId) throws Exception {
+                                  @PathParam("service-id") String serviceId) {
     requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.START_SERVICES);
   }
 
@@ -767,13 +681,12 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to stop cluster services.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster whose services should be stopped.
-   * @throws Exception
    */
   @POST
   @Path("/{cluster-id}/services/{service-id}/stop")
   public void stopClusterService(HttpRequest request, HttpResponder responder,
                                  @PathParam("cluster-id") String clusterId,
-                                 @PathParam("service-id") String serviceId) throws Exception {
+                                 @PathParam("service-id") String serviceId) {
     requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.STOP_SERVICES);
   }
 
@@ -784,13 +697,12 @@ public class LoomClusterHandler extends LoomAuthHandler {
    * @param request Request to restart cluster service.
    * @param responder Responder for sending the response.
    * @param clusterId Id of the cluster whose service should be restarted.
-   * @throws Exception
    */
   @POST
   @Path("/{cluster-id}/services/{service-id}/restart")
   public void restartClusterService(HttpRequest request, HttpResponder responder,
                                     @PathParam("cluster-id") String clusterId,
-                                    @PathParam("service-id") String serviceId) throws Exception {
+                                    @PathParam("service-id") String serviceId) {
     requestServiceAction(request, responder, clusterId, serviceId, ClusterAction.RESTART_SERVICES);
   }
 
@@ -806,13 +718,13 @@ public class LoomClusterHandler extends LoomAuthHandler {
   @Path("/{cluster-id}/clustertemplate/sync")
   public void syncClusterTemplate(HttpRequest request, HttpResponder responder,
                                   @PathParam("cluster-id") String clusterId) {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
     try {
-      clusterService.syncClusterToCurrentTemplate(clusterId, userId);
+      clusterService.syncClusterToCurrentTemplate(clusterId, account);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, "Cluster is not in a state where the template can by synced");
@@ -820,7 +732,10 @@ public class LoomClusterHandler extends LoomAuthHandler {
       responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     } catch (InvalidClusterException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
-    } catch (Exception e) {
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN,
+                          "User not authorized to perform template sync on cluster " + clusterId);
+    } catch (IOException e) {
       LOG.error("Exception syncing template for cluster {}", clusterId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal error while syncing cluster template");
     }
@@ -828,27 +743,28 @@ public class LoomClusterHandler extends LoomAuthHandler {
 
   private void requestServiceAction(HttpRequest request, HttpResponder responder, String clusterId,
                                     String service, ClusterAction action) {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
     try {
-      clusterService.requestServiceRuntimeAction(clusterId, userId, action, service);
+      clusterService.requestServiceRuntimeAction(clusterId, account, action, service);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (MissingClusterException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT,
                           "Cluster is not in a state where service actions can be performed.");
-    } catch (Exception e) {
-      LOG.error("Exception requesting {} on service {} for cluster {}.", action, service, clusterId, e);
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Internal error while requesting service action.");
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User not authorized to perform service action.");
+    } catch (IOException e) {
+      LOG.error("Exception performing service action for cluster {}", clusterId, e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal error performing service action");
     }
   }
 
-  private JsonObject formatJobPlan(ClusterJob job) throws Exception {
+  private JsonObject formatJobPlan(ClusterJob job) throws IOException {
     JsonObject jobJson = new JsonObject();
     jobJson.addProperty("id", job.getJobId());
     jobJson.addProperty("clusterId", job.getClusterId());
@@ -859,7 +775,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
     for (Set<String> stage : job.getStagedTasks()) {
       JsonArray stageJson = new JsonArray();
       for (String taskId : stage) {
-        ClusterTask task = store.getClusterTask(TaskId.fromString(taskId));
+        ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
 
         JsonObject taskJson = new JsonObject();
         taskJson.addProperty("id", task.getTaskId());

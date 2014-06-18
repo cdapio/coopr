@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store;
+package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.HardwareType;
@@ -26,6 +27,7 @@ import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
+import com.continuuity.loom.conf.Constants;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -43,14 +45,21 @@ import java.util.Map;
  * Tests for getting and setting admin defined entities.  Test classes for different types of stores must set the
  * protected entityStore field before each test and make sure state is wiped out between tests.
  */
-public abstract class EntityStoreTest {
-  protected static EntityStore entityStore;
+public abstract class EntityStoreServiceTest {
+  protected static EntityStoreService entityStoreService;
+  private static final Account tenant1Admin = new Account(Constants.ADMIN_USER, "tenant1");
+  private static final Account tenant2Admin = new Account(Constants.ADMIN_USER, "tenant2");
+
+  public abstract void clearState() throws Exception;
 
   @Before
-  public abstract void clearState() throws Exception;
+  public void setupTest() throws Exception {
+    clearState();
+  }
 
   @Test
   public void testGetStoreDeleteProvider() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Provider provider = Entities.ProviderExample.JOYENT;
     Assert.assertNull(entityStore.getProvider(provider.getName()));
 
@@ -71,6 +80,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetStoreDeleteHardwareType() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     HardwareType hardwareType = Entities.HardwareTypeExample.MEDIUM;
     String hardwareTypeName = hardwareType.getName();
     Assert.assertNull(entityStore.getHardwareType(hardwareTypeName));
@@ -92,6 +102,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetStoreDeleteImageType() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     ImageType imageType = Entities.ImageTypeExample.UBUNTU_12;
     String imageTypeName = imageType.getName();
     Assert.assertNull(entityStore.getImageType(imageTypeName));
@@ -113,6 +124,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetStoreDeleteService() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Service service = Entities.ServiceExample.DATANODE;
     String serviceName = service.getName();
     Assert.assertNull(entityStore.getService(serviceName));
@@ -134,6 +146,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetStoreDeleteClusterTemplate() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     ClusterTemplate clusterTemplate = Entities.ClusterTemplateExample.REACTOR;
     String clusterTemplateName = clusterTemplate.getName();
     Assert.assertNull(entityStore.getClusterTemplate(clusterTemplateName));
@@ -155,6 +168,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetStoreDeleteProviderType() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     ProviderType providerType = Entities.ProviderTypeExample.JOYENT;
     String providerTypeName = providerType.getName();
     Assert.assertNull(entityStore.getProviderType(providerTypeName));
@@ -176,6 +190,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetStoreDeleteAutomatorType() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     AutomatorType automatorType = Entities.AutomatorTypeExample.CHEF;
     String automatorTypeName = automatorType.getName();
     Assert.assertNull(entityStore.getAutomatorType(automatorTypeName));
@@ -197,6 +212,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetAllProviderTypes() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllProviderTypes().size());
 
     ProviderType type1 = Entities.ProviderTypeExample.JOYENT;
@@ -223,6 +239,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetAllAutomatorTypes() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllAutomatorTypes().size());
 
     AutomatorType type1 = Entities.AutomatorTypeExample.SHELL;
@@ -249,6 +266,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetAllProviders() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllProviders().size());
 
     Provider provider1 = createProvider("provider1", "1st provider", Entities.JOYENT, "k1", "v1", "k2", "v2");
@@ -275,6 +293,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetAllHardwareTypes() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllHardwareTypes().size());
 
     HardwareType hw1 = new HardwareType("hw1", "1st hw type", ImmutableMap.<String, Map<String, String>>of(
@@ -313,6 +332,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetAllImageTypes() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllImageTypes().size());
 
     ImageType it1 =
@@ -353,6 +373,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetAllServices() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllServices().size());
 
     Service s1 = new Service("datanode", "hadoop datanode", ImmutableSet.of("namenode"),
@@ -402,6 +423,7 @@ public abstract class EntityStoreTest {
 
   @Test
   public void testGetAllClusterTemplates() throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllClusterTemplates().size());
 
     ClusterTemplate c1 = Entities.ClusterTemplateExample.HDFS;
@@ -425,6 +447,174 @@ public abstract class EntityStoreTest {
                         clusterTemplates.size(), result.size());
     Assert.assertTrue("not all written cluster templates were found in the results",
                       result.containsAll(clusterTemplates));
+  }
+
+  @Test
+  public void testProvidersDoNotOverlapAcrossTenants() throws Exception {
+    Provider provider1 = Entities.ProviderExample.RACKSPACE;
+    Provider provider2 = Entities.ProviderExample.JOYENT;
+    EntityStoreView account1View = entityStoreService.getView(tenant1Admin);
+    EntityStoreView account2View = entityStoreService.getView(tenant2Admin);
+    account1View.writeProvider(provider1);
+
+    Assert.assertNull(account2View.getProvider(provider1.getName()));
+    Assert.assertEquals(provider1, account1View.getProvider(provider1.getName()));
+
+    account1View.deleteProvider(provider1.getName());
+    account2View.writeProvider(provider1);
+
+    Assert.assertNull(account1View.getProvider(provider1.getName()));
+    Assert.assertEquals(provider1, account2View.getProvider(provider1.getName()));
+
+    account2View.writeProvider(provider2);
+
+    Assert.assertTrue(account1View.getAllProviders().isEmpty());
+    Assert.assertEquals(ImmutableSet.<Provider>of(provider1, provider2),
+                        ImmutableSet.copyOf(account2View.getAllProviders()));
+  }
+
+  @Test
+  public void testHardwaretypesDoNotOverlapAcrossTenants() throws Exception {
+    HardwareType entity1 = Entities.HardwareTypeExample.MEDIUM;
+    HardwareType entity2 = Entities.HardwareTypeExample.LARGE;
+    EntityStoreView account1View = entityStoreService.getView(tenant1Admin);
+    EntityStoreView account2View = entityStoreService.getView(tenant2Admin);
+    account1View.writeHardwareType(entity1);
+
+    Assert.assertNull(account2View.getHardwareType(entity1.getName()));
+    Assert.assertEquals(entity1, account1View.getHardwareType(entity1.getName()));
+
+    account1View.deleteHardwareType(entity1.getName());
+    account2View.writeHardwareType(entity1);
+
+    Assert.assertNull(account1View.getHardwareType(entity1.getName()));
+    Assert.assertEquals(entity1, account2View.getHardwareType(entity1.getName()));
+
+    account2View.writeHardwareType(entity2);
+
+    Assert.assertTrue(account1View.getAllHardwareTypes().isEmpty());
+    Assert.assertEquals(ImmutableSet.<HardwareType>of(entity1, entity2),
+                        ImmutableSet.copyOf(account2View.getAllHardwareTypes()));
+  }
+
+  @Test
+  public void testImagetypesDoNotOverlapAcrossTenants() throws Exception {
+    ImageType entity1 = Entities.ImageTypeExample.CENTOS_6;
+    ImageType entity2 = Entities.ImageTypeExample.UBUNTU_12;
+    EntityStoreView account1View = entityStoreService.getView(tenant1Admin);
+    EntityStoreView account2View = entityStoreService.getView(tenant2Admin);
+    account1View.writeImageType(entity1);
+
+    Assert.assertNull(account2View.getImageType(entity1.getName()));
+    Assert.assertEquals(entity1, account1View.getImageType(entity1.getName()));
+
+    account1View.deleteImageType(entity1.getName());
+    account2View.writeImageType(entity1);
+
+    Assert.assertNull(account1View.getImageType(entity1.getName()));
+    Assert.assertEquals(entity1, account2View.getImageType(entity1.getName()));
+
+    account2View.writeImageType(entity2);
+
+    Assert.assertTrue(account1View.getAllImageTypes().isEmpty());
+    Assert.assertEquals(ImmutableSet.<ImageType>of(entity1, entity2),
+                        ImmutableSet.copyOf(account2View.getAllImageTypes()));
+  }
+
+  @Test
+  public void testServicesDoNotOverlapAcrossTenants() throws Exception {
+    Service entity1 = Entities.ServiceExample.DATANODE;
+    Service entity2 = Entities.ServiceExample.NAMENODE;
+    EntityStoreView account1View = entityStoreService.getView(tenant1Admin);
+    EntityStoreView account2View = entityStoreService.getView(tenant2Admin);
+    account1View.writeService(entity1);
+
+    Assert.assertNull(account2View.getService(entity1.getName()));
+    Assert.assertEquals(entity1, account1View.getService(entity1.getName()));
+
+    account1View.deleteService(entity1.getName());
+    account2View.writeService(entity1);
+
+    Assert.assertNull(account1View.getService(entity1.getName()));
+    Assert.assertEquals(entity1, account2View.getService(entity1.getName()));
+
+    account2View.writeService(entity2);
+
+    Assert.assertTrue(account1View.getAllServices().isEmpty());
+    Assert.assertEquals(ImmutableSet.<Service>of(entity1, entity2),
+                        ImmutableSet.copyOf(account2View.getAllServices()));
+  }
+
+  @Test
+  public void testTemplatesDoNotOverlapAcrossTenants() throws Exception {
+    ClusterTemplate entity1 = Entities.ClusterTemplateExample.HDFS;
+    ClusterTemplate entity2 = Entities.ClusterTemplateExample.REACTOR;
+    EntityStoreView account1View = entityStoreService.getView(tenant1Admin);
+    EntityStoreView account2View = entityStoreService.getView(tenant2Admin);
+    account1View.writeClusterTemplate(entity1);
+
+    Assert.assertNull(account2View.getClusterTemplate(entity1.getName()));
+    Assert.assertEquals(entity1, account1View.getClusterTemplate(entity1.getName()));
+
+    account1View.deleteClusterTemplate(entity1.getName());
+    account2View.writeClusterTemplate(entity1);
+
+    Assert.assertNull(account1View.getClusterTemplate(entity1.getName()));
+    Assert.assertEquals(entity1, account2View.getClusterTemplate(entity1.getName()));
+
+    account2View.writeClusterTemplate(entity2);
+
+    Assert.assertTrue(account1View.getAllClusterTemplates().isEmpty());
+    Assert.assertEquals(ImmutableSet.<ClusterTemplate>of(entity1, entity2),
+                        ImmutableSet.copyOf(account2View.getAllClusterTemplates()));
+  }
+
+  @Test
+  public void testProviderTypesDoNotOverlapAcrossTenants() throws Exception {
+    ProviderType entity1 = Entities.ProviderTypeExample.RACKSPACE;
+    ProviderType entity2 = Entities.ProviderTypeExample.JOYENT;
+    EntityStoreView account1View = entityStoreService.getView(tenant1Admin);
+    EntityStoreView account2View = entityStoreService.getView(tenant2Admin);
+    account1View.writeProviderType(entity1);
+
+    Assert.assertNull(account2View.getProviderType(entity1.getName()));
+    Assert.assertEquals(entity1, account1View.getProviderType(entity1.getName()));
+
+    account1View.deleteProviderType(entity1.getName());
+    account2View.writeProviderType(entity1);
+
+    Assert.assertNull(account1View.getProviderType(entity1.getName()));
+    Assert.assertEquals(entity1, account2View.getProviderType(entity1.getName()));
+
+    account2View.writeProviderType(entity2);
+
+    Assert.assertTrue(account1View.getAllProviderTypes().isEmpty());
+    Assert.assertEquals(ImmutableSet.<ProviderType>of(entity1, entity2),
+                        ImmutableSet.copyOf(account2View.getAllProviderTypes()));
+  }
+
+  @Test
+  public void testAutomatorTypesDoNotOverlapAcrossTenants() throws Exception {
+    AutomatorType entity1 = Entities.AutomatorTypeExample.CHEF;
+    AutomatorType entity2 = Entities.AutomatorTypeExample.PUPPET;
+    EntityStoreView account1View = entityStoreService.getView(tenant1Admin);
+    EntityStoreView account2View = entityStoreService.getView(tenant2Admin);
+    account1View.writeAutomatorType(entity1);
+
+    Assert.assertNull(account2View.getAutomatorType(entity1.getName()));
+    Assert.assertEquals(entity1, account1View.getAutomatorType(entity1.getName()));
+
+    account1View.deleteAutomatorType(entity1.getName());
+    account2View.writeAutomatorType(entity1);
+
+    Assert.assertNull(account1View.getAutomatorType(entity1.getName()));
+    Assert.assertEquals(entity1, account2View.getAutomatorType(entity1.getName()));
+
+    account2View.writeAutomatorType(entity2);
+
+    Assert.assertTrue(account1View.getAllAutomatorTypes().isEmpty());
+    Assert.assertEquals(ImmutableSet.<AutomatorType>of(entity1, entity2),
+                        ImmutableSet.copyOf(account2View.getAllAutomatorTypes()));
   }
 
   protected Provider createProvider(String name, String description, String type, String... mapKeyVals) {
