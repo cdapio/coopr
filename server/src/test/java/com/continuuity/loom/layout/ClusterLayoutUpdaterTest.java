@@ -103,7 +103,7 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
                          ImmutableMap.<String, String>of(
                            Node.Properties.HARDWARETYPE.name().toLowerCase(), "large-mem",
                            Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
-    clusterStoreService.writeNode(node);
+    clusterStoreService.getSystemView().writeNode(node);
     nodeIds.add(node.getId());
     nodes.add(node);
     // slave nodes
@@ -112,7 +112,7 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
                       ImmutableMap.<String, String>of(
                         Node.Properties.HARDWARETYPE.name().toLowerCase(), "medium",
                         Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
-      clusterStoreService.writeNode(node);
+      clusterStoreService.getSystemView().writeNode(node);
       nodeIds.add(node.getId());
       nodes.add(node);
     }

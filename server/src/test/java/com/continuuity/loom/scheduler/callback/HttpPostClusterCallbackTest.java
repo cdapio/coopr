@@ -99,8 +99,8 @@ public class HttpPostClusterCallbackTest extends BaseTest {
     host = service.getBindAddress().getHostName();
 
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    clusterStoreService.writeNode(Entities.ClusterExample.NODE1);
-    clusterStoreService.writeNode(Entities.ClusterExample.NODE2);
+    clusterStoreService.getSystemView().writeNode(Entities.ClusterExample.NODE1);
+    clusterStoreService.getSystemView().writeNode(Entities.ClusterExample.NODE2);
   }
 
   @AfterClass

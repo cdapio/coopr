@@ -20,6 +20,7 @@ import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
+import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,7 +38,7 @@ public class TaskQueueService {
   private static final Logger LOG = LoggerFactory.getLogger(TaskQueueService.class);
 
   private final TrackingQueue taskQueue;
-  private final ClusterStoreService clusterStoreService;
+  private final ClusterStore clusterStore;
   private final TrackingQueue jobQueue;
   private final TaskService taskService;
   private final NodeService nodeService;
@@ -46,10 +47,12 @@ public class TaskQueueService {
   @Inject
   private TaskQueueService(@Named(Constants.Queue.PROVISIONER) TrackingQueue taskQueue,
                            @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
-                           ClusterStoreService clusterStoreService, TaskService taskService, NodeService nodeService,
+                           ClusterStoreService clusterStoreService,
+                           TaskService taskService,
+                           NodeService nodeService,
                            LoomStats loomStats) {
     this.taskQueue = taskQueue;
-    this.clusterStoreService = clusterStoreService;
+    this.clusterStore = clusterStoreService.getSystemView();
     this.jobQueue = jobQueue;
     this.taskService = taskService;
     this.nodeService = nodeService;
@@ -77,10 +80,10 @@ public class TaskQueueService {
         break;
       }
 
-      clusterTask = clusterStoreService.getClusterTask(TaskId.fromString(task.getId()));
+      clusterTask = clusterStore.getClusterTask(TaskId.fromString(task.getId()));
       if (clusterTask != null) {
         String jobId = clusterTask.getJobId();
-        ClusterJob clusterJob = clusterStoreService.getClusterJob(JobId.fromString(jobId));
+        ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(jobId));
 
         if (clusterJob == null || clusterJob.getJobStatus() == ClusterJob.Status.FAILED) {
           // we don't want to give out tasks for failed jobs.  Remove from the queue and move on.
@@ -130,7 +133,7 @@ public class TaskQueueService {
     }
 
     // Queue update was successful, now update the task object
-    ClusterTask clusterTask = clusterStoreService.getClusterTask(TaskId.fromString(taskId));
+    ClusterTask clusterTask = clusterStore.getClusterTask(TaskId.fromString(taskId));
 
     if (status == 0) {
       LOG.debug("Successful finish of the task reported. Task {} by worker {}", taskId, workerId);
@@ -152,7 +155,7 @@ public class TaskQueueService {
     // by the task output.
     // Eg. deleting a box during a rollback operation since we reuse nodeIds.
     if (clusterTask.getNodeId() != null) {
-      Node node = clusterStoreService.getNode(clusterTask.getNodeId());
+      Node node = clusterStore.getNode(clusterTask.getNodeId());
       if (node == null) {
         LOG.error("Cannot find node {} for task {} to update the properties",
                   clusterTask.getNodeId(), clusterTask.getTaskId());
@@ -170,7 +173,7 @@ public class TaskQueueService {
     // by the task output.
     // Eg. deleting a box during a rollback operation since we reuse nodeIds.
     if (clusterTask.getNodeId() != null) {
-      Node node = clusterStoreService.getNode(clusterTask.getNodeId());
+      Node node = clusterStore.getNode(clusterTask.getNodeId());
       if (node == null) {
         LOG.error("Cannot find node {} for task {} to update the properties",
                   clusterTask.getNodeId(), clusterTask.getTaskId());

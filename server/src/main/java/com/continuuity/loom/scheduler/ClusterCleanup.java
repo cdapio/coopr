@@ -28,6 +28,7 @@ import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.NodeService;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
+import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -46,9 +47,9 @@ import java.util.concurrent.TimeUnit;
 public class ClusterCleanup implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterCleanup.class);
 
-  private final ClusterStoreService clusterStoreService;
-  private final NodeService nodeService;
   private final ClusterService clusterService;
+  private final ClusterStore clusterStore;
+  private final NodeService nodeService;
   private final TaskService taskService;
   private final TrackingQueue provisionerQueue;
   private final TrackingQueue jobQueue;
@@ -59,14 +60,14 @@ public class ClusterCleanup implements Runnable {
   @Inject
   private ClusterCleanup(ClusterStoreService clusterStoreService,
                          NodeService nodeService,
-                         ClusterService clusterService,
                          TaskService taskService,
+                         ClusterService clusterService,
                          @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
                          @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
                          Configuration conf) {
-    this.clusterStoreService = clusterStoreService;
-    this.nodeService = nodeService;
     this.clusterService = clusterService;
+    this.clusterStore = clusterStoreService.getSystemView();
+    this.nodeService = nodeService;
     this.taskService = taskService;
     this.provisionerQueue = provisionerQueue;
     this.jobQueue = jobQueue;
@@ -78,18 +79,18 @@ public class ClusterCleanup implements Runnable {
   }
 
   // for unit tests
-  ClusterCleanup(ClusterStoreService clusterStoreService,
-                 NodeService nodeService,
+  ClusterCleanup(ClusterStore clusterStore,
                  ClusterService clusterService,
+                 NodeService nodeService,
                  TaskService taskService,
                  TrackingQueue provisionerQueue,
                  TrackingQueue jobQueue,
                  long taskTimeout,
                  long startId,
                  long incrementBy) {
-    this.clusterStoreService = clusterStoreService;
-    this.nodeService = nodeService;
+    this.clusterStore = clusterStore;
     this.clusterService = clusterService;
+    this.nodeService = nodeService;
     this.taskService = taskService;
     this.provisionerQueue = provisionerQueue;
     this.jobQueue = jobQueue;
@@ -129,7 +130,7 @@ public class ClusterCleanup implements Runnable {
         }
 
         String taskId = queuedElement.getElement().getId();
-        ClusterTask task = clusterStoreService.getClusterTask(TaskId.fromString(taskId));
+        ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
 
         if (task == null) {
           LOG.warn("provisioner queue contains task {} which is not in the cluster store, removing it from the queue.",
@@ -147,7 +148,7 @@ public class ClusterCleanup implements Runnable {
           taskService.failTask(task, -1);
 
           // Update node status
-          Node node = clusterStoreService.getNode(task.getNodeId());
+          Node node = clusterStore.getNode(task.getNodeId());
           nodeService.failAction(node, "", statusMessage);
 
           // Schedule the job
@@ -163,7 +164,7 @@ public class ClusterCleanup implements Runnable {
     try {
       LOG.debug("Expiring clusters older than {}", currentTime);
 
-      Set<Cluster> clusters = clusterStoreService.getExpiringClusters(currentTime);
+      Set<Cluster> clusters = clusterStore.getExpiringClusters(currentTime);
 
       if (clusters.isEmpty()) {
         LOG.debug("Got 0 clusters to be expired for time {}", currentTime);

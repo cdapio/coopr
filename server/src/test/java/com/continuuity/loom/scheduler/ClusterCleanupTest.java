@@ -76,8 +76,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
 
   @Test
   public void testCleanup() throws Exception {
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStoreService, nodeService, clusterService, taskService,
-                                                       provisionQueue, jobQueue, 1, 1, 1);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
+                                                       taskService, provisionQueue, jobQueue, 1, 1, 1);
 
     jobQueue.removeAll();
     nodeProvisionTaskQueue.removeAll();
@@ -96,10 +96,10 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     task3.setStatus(ClusterTask.Status.IN_PROGRESS);
     task4.setStatus(ClusterTask.Status.IN_PROGRESS);
 
-    clusterStoreService.writeClusterTask(task1);
-    clusterStoreService.writeClusterTask(task2);
-    clusterStoreService.writeClusterTask(task3);
-    clusterStoreService.writeClusterTask(task4);
+    clusterStore.writeClusterTask(task1);
+    clusterStore.writeClusterTask(task2);
+    clusterStore.writeClusterTask(task3);
+    clusterStore.writeClusterTask(task4);
 
     Node node1 = new Node("node1", "2", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
     nodeService.startAction(node1, task1.getTaskId(), "service", "action");
@@ -146,18 +146,18 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     Assert.assertEquals(2, jobQueue.size());
 
     Assert.assertEquals(ClusterTask.Status.FAILED,
-                        clusterStoreService.getClusterTask(TaskId.fromString(task1.getTaskId())).getStatus());
+                        clusterStore.getClusterTask(TaskId.fromString(task1.getTaskId())).getStatus());
     Assert.assertEquals(ClusterTask.Status.FAILED,
-                        clusterStoreService.getClusterTask(TaskId.fromString(task2.getTaskId())).getStatus());
+                        clusterStore.getClusterTask(TaskId.fromString(task2.getTaskId())).getStatus());
     Assert.assertEquals(ClusterTask.Status.IN_PROGRESS,
-                        clusterStoreService.getClusterTask(TaskId.fromString(task3.getTaskId())).getStatus());
+                        clusterStore.getClusterTask(TaskId.fromString(task3.getTaskId())).getStatus());
     Assert.assertEquals(ClusterTask.Status.IN_PROGRESS,
-                        clusterStoreService.getClusterTask(TaskId.fromString(task4.getTaskId())).getStatus());
+                        clusterStore.getClusterTask(TaskId.fromString(task4.getTaskId())).getStatus());
 
-    Assert.assertEquals(Node.Status.FAILED, clusterStoreService.getNode("node1").getActions().get(0).getStatus());
-    Assert.assertEquals(Node.Status.FAILED, clusterStoreService.getNode("node2").getActions().get(0).getStatus());
-    Assert.assertEquals(Node.Status.IN_PROGRESS, clusterStoreService.getNode("node3").getActions().get(0).getStatus());
-    Assert.assertEquals(Node.Status.IN_PROGRESS, clusterStoreService.getNode("node4").getActions().get(0).getStatus());
+    Assert.assertEquals(Node.Status.FAILED, clusterStore.getNode("node1").getActions().get(0).getStatus());
+    Assert.assertEquals(Node.Status.FAILED, clusterStore.getNode("node2").getActions().get(0).getStatus());
+    Assert.assertEquals(Node.Status.IN_PROGRESS, clusterStore.getNode("node3").getActions().get(0).getStatus());
+    Assert.assertEquals(Node.Status.IN_PROGRESS, clusterStore.getNode("node4").getActions().get(0).getStatus());
 
     jobQueue.removeAll();
     nodeProvisionTaskQueue.removeAll();
@@ -188,8 +188,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
 
     Cluster clusterForever = createCluster("1000", System.currentTimeMillis() - 1000, 0, Cluster.Status.ACTIVE);
 
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStoreService, nodeService, clusterService, taskService,
-                                                       provisionQueue, jobQueue, 1, 1, 1);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
+                                                       taskService, provisionQueue, jobQueue, 1, 1, 1);
 
     clusterQueue.removeAll();
     Assert.assertEquals(0, Iterators.size(clusterQueue.getQueued()));
@@ -205,11 +205,11 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE.name(), e2.getValue());
 
     Cluster actualCluster1 = clusterStoreService.getView(account).getCluster(cluster1.getId());
-    ClusterJob delJob1 = clusterStoreService.getClusterJob(JobId.fromString(actualCluster1.getLatestJobId()));
+    ClusterJob delJob1 = clusterStore.getClusterJob(JobId.fromString(actualCluster1.getLatestJobId()));
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE, delJob1.getClusterAction());
 
     Cluster actualCluster3 = clusterStoreService.getView(account).getCluster(cluster3.getId());
-    ClusterJob delJob2 = clusterStoreService.getClusterJob(JobId.fromString(actualCluster3.getLatestJobId()));
+    ClusterJob delJob2 = clusterStore.getClusterJob(JobId.fromString(actualCluster3.getLatestJobId()));
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE, delJob2.getClusterAction());
 
     clusterQueue.removeAll();
@@ -217,8 +217,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
 
   @Test
   public void testQueuedTaskMissingFromStoreIsRemovedFromQueue() {
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStoreService, nodeService, clusterService, taskService,
-                                                       provisionQueue, jobQueue, -10, 1, 1);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
+                                                       taskService, provisionQueue, jobQueue, -10, 1, 1);
 
     jobQueue.removeAll();
     nodeProvisionTaskQueue.removeAll();
@@ -243,8 +243,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
       createCluster(String.valueOf(i), now - 1000, now - 100, Cluster.Status.ACTIVE);
     }
 
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStoreService, nodeService, clusterService, taskService,
-                                                       provisionQueue, jobQueue, -10, 3, 7);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
+                                                       taskService, provisionQueue, jobQueue, -10, 3, 7);
     clusterQueue.removeAll();
     Assert.assertEquals(0, Iterators.size(clusterQueue.getQueued()));
 

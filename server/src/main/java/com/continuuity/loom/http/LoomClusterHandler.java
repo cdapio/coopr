@@ -32,6 +32,7 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.MissingClusterException;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.scheduler.task.TaskId;
+import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.tenant.TenantStore;
@@ -69,17 +70,21 @@ public class LoomClusterHandler extends LoomAuthHandler {
   private static final Gson GSON = new JsonSerde().getGson();
 
   private final JsonSerde codec;
-  private ClusterService clusterService;
-  private ClusterStoreService clusterStoreService;
+  private final ClusterService clusterService;
+  private final ClusterStoreService clusterStoreService;
+  private final ClusterStore clusterStore;
   private final int maxClusterSize;
 
   @Inject
-  private LoomClusterHandler(TenantStore tenantStore, ClusterService clusterService,
-                             ClusterStoreService clusterStoreService, Configuration conf) {
+  private LoomClusterHandler(TenantStore tenantStore,
+                             ClusterService clusterService,
+                             ClusterStoreService clusterStoreService,
+                             Configuration conf) {
     super(tenantStore);
     this.codec = new JsonSerde();
     this.clusterService = clusterService;
     this.clusterStoreService = clusterStoreService;
+    this.clusterStore = clusterStoreService.getSystemView();
     this.maxClusterSize = conf.getInt(Constants.MAX_CLUSTER_SIZE);
   }
 
@@ -153,7 +158,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
       jsonObject.add("nodes", GSON.toJsonTree(clusterNodes));
 
       // Add last job message if any
-      ClusterJob clusterJob = clusterStoreService.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
       if (clusterJob.getStatusMessage() != null) {
         jsonObject.addProperty("message", clusterJob.getStatusMessage());
       }
@@ -246,7 +251,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
         return;
       }
 
-      ClusterJob job = clusterStoreService.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      ClusterJob job = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
       if (job == null){
         responder.sendError(HttpResponseStatus.NOT_FOUND,
                             String.format("job %s not found for cluster %s", cluster.getLatestJobId(), clusterId));
@@ -352,7 +357,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
         return;
       }
 
-      ClusterJob clusterJob = clusterStoreService.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
       // If previous job on a cluster is still underway, don't accept new jobs
       if (cluster.getStatus() == Cluster.Status.PENDING) {
         String message = String.format("Job %s is still underway for cluster %s",
@@ -465,7 +470,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
       }
 
       JobId jobId = JobId.fromString(planId);
-      ClusterJob clusterJob = clusterStoreService.getClusterJob(jobId);
+      ClusterJob clusterJob = clusterStore.getClusterJob(jobId);
 
       if (!clusterJob.getClusterId().equals(clusterId)) {
         throw new IllegalArgumentException(String.format("Job %s does not belong to cluster %s", planId, clusterId));
@@ -770,7 +775,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
     for (Set<String> stage : job.getStagedTasks()) {
       JsonArray stageJson = new JsonArray();
       for (String taskId : stage) {
-        ClusterTask task = clusterStoreService.getClusterTask(TaskId.fromString(taskId));
+        ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
 
         JsonObject taskJson = new JsonObject();
         taskJson.addProperty("id", task.getTaskId());

@@ -22,6 +22,7 @@ import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;
 import com.continuuity.loom.store.DBQueryHelper;
 import com.continuuity.loom.common.zookeeper.IdService;
+import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.SQLClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.tenant.SQLTenantStore;
@@ -53,6 +54,7 @@ public class BaseTest {
   protected static ZKClientService zkClientService;
   protected static EntityStoreService entityStoreService;
   protected static SQLClusterStoreService clusterStoreService;
+  protected static ClusterStore clusterStore;
   protected static TenantStore tenantStore;
   protected static Configuration conf;
   protected static MockClusterCallback mockClusterCallback;
@@ -100,6 +102,7 @@ public class BaseTest {
     sqlTenantStore.startAndWait();
     clusterStoreService = sqlClusterStoreService;
     tenantStore = sqlTenantStore;
+    clusterStore = clusterStoreService.getSystemView();
   }
 
   @AfterClass

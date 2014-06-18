@@ -28,7 +28,7 @@ public interface ClusterCallback {
    * Initialize the cluster callback. Guaranteed to be called exactly once before any other methods are called.
    *
    * @param conf Server configuration.
-   * @param clusterStoreService Cluster store service for looking up cluster information.
+   * @param clusterStoreService Service for accessing the cluster store.
    */
   void initialize(Configuration conf, ClusterStoreService clusterStoreService);
 

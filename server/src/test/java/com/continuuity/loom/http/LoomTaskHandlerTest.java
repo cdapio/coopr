@@ -53,9 +53,9 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     ClusterTask clusterTask = new ClusterTask(
       ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node_id", "service", ClusterAction.CLUSTER_CREATE,
       new JsonObject());
-    clusterStoreService.writeClusterTask(clusterTask);
+    clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
-    clusterStoreService.writeClusterJob(clusterJob);
+    clusterStore.writeClusterJob(clusterJob);
     nodeProvisionTaskQueue.add(new Element(clusterTask.getTaskId(), GSON.toJson(clusterTask)));
 
     HttpResponse response = doPost("/v1/loom/tasks/take", "{ \"workerId\":\"worker1\" }");
@@ -69,15 +69,15 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
   @Test
   public void testFinishTask() throws Exception {
     Node node = new Node("node_id1", "1", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
-    clusterStoreService.writeNode(node);
+    clusterStore.writeNode(node);
 
     ClusterTask clusterTask = new ClusterTask(
       ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE,
       new JsonObject());
-    clusterStoreService.writeClusterTask(clusterTask);
+    clusterStore.writeClusterTask(clusterTask);
 
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
-    clusterStoreService.writeClusterJob(clusterJob);
+    clusterStore.writeClusterJob(clusterJob);
 
     nodeProvisionTaskQueue.add(new Element(clusterTask.getTaskId(), GSON.toJson(clusterTask)));
 
@@ -97,10 +97,10 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
 
     TestHelper.finishTask(getBaseUrl(), finishResponse);
 
-    ClusterTask actualTask = clusterStoreService.getClusterTask(TaskId.fromString(clusterTask.getTaskId()));
+    ClusterTask actualTask = clusterStore.getClusterTask(TaskId.fromString(clusterTask.getTaskId()));
     Assert.assertEquals(ClusterTask.Status.COMPLETE, actualTask.getStatus());
 
-    Node actualNode = clusterStoreService.getNode(clusterTask.getNodeId());
+    Node actualNode = clusterStore.getNode(clusterTask.getNodeId());
     Assert.assertNotNull(actualNode);
     Node.Action lastAction = actualNode.getActions().get(actualNode.getActions().size() - 1);
     Assert.assertEquals(lastAction.getStatus(), Node.Status.COMPLETE);
@@ -114,7 +114,7 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
   @Test
   public void testFailTask() throws Exception {
     Node node = new Node("node_id2", "1", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
-    clusterStoreService.writeNode(node);
+    clusterStore.writeNode(node);
 
     Cluster cluster = new Cluster("1", USER1_ACCOUNT, "cluster1" , System.currentTimeMillis(), "", null, null,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of());
@@ -123,9 +123,9 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     ClusterTask clusterTask = new ClusterTask(
       ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE,
       new JsonObject());
-    clusterStoreService.writeClusterTask(clusterTask);
+    clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
-    clusterStoreService.writeClusterJob(clusterJob);
+    clusterStore.writeClusterJob(clusterJob);
     nodeProvisionTaskQueue.add(new Element(clusterTask.getTaskId(), GSON.toJson(clusterTask)));
 
     JsonObject responseJson = TestHelper.takeTask(getBaseUrl(), "worker1");
@@ -140,10 +140,10 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
 
     TestHelper.finishTask(getBaseUrl(), finishResponse);
 
-    ClusterTask actualTask = clusterStoreService.getClusterTask(TaskId.fromString(clusterTask.getTaskId()));
+    ClusterTask actualTask = clusterStore.getClusterTask(TaskId.fromString(clusterTask.getTaskId()));
     Assert.assertEquals(ClusterTask.Status.FAILED, actualTask.getStatus());
 
-    Node actualNode = clusterStoreService.getNode(clusterTask.getNodeId());
+    Node actualNode = clusterStore.getNode(clusterTask.getNodeId());
     Assert.assertNotNull(actualNode);
     Node.Action lastAction = actualNode.getActions().get(actualNode.getActions().size() - 1);
     Assert.assertEquals(lastAction.getStatus(), Node.Status.FAILED);

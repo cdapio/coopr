@@ -154,7 +154,8 @@ public class HttpPostClusterCallback implements ClusterCallback {
     HttpPost post = new HttpPost(url);
     Set<Node> nodes;
     try {
-      nodes = clusterStoreService.getView(data.getCluster().getAccount()).getClusterNodes(data.getCluster().getId());
+      nodes = clusterStoreService.getView(data.getCluster().getAccount())
+        .getClusterNodes(data.getCluster().getId());
     } catch (Exception e) {
       LOG.error("Unable to fetch nodes for cluster {}, not sending post request.", data.getCluster().getId());
       return;

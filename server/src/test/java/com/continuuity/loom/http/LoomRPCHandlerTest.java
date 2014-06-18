@@ -210,10 +210,10 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
                                   ImmutableSet.of(nodeA.getId(), nodeAB.getId(), nodeABC.getId(), nodeBC.getId()),
                                   ImmutableSet.of(svcA.getName(), svcB.getName(), svcC.getName()));
     clusterStoreService.getView(USER1_ACCOUNT).writeCluster(cluster);
-    clusterStoreService.writeNode(nodeA);
-    clusterStoreService.writeNode(nodeAB);
-    clusterStoreService.writeNode(nodeABC);
-    clusterStoreService.writeNode(nodeBC);
+    clusterStore.writeNode(nodeA);
+    clusterStore.writeNode(nodeAB);
+    clusterStore.writeNode(nodeABC);
+    clusterStore.writeNode(nodeBC);
 
     // test with nonexistant cluster
     JsonObject requestBody = new JsonObject();

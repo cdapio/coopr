@@ -117,13 +117,13 @@ public class SchedulerTest extends BaseTest {
     job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    clusterStoreService.writeClusterJob(job);
+    clusterStore.writeClusterJob(job);
 
     Node node = GSON.fromJson(NODE1, Node.class);
-    clusterStoreService.writeNode(node);
+    clusterStore.writeNode(node);
 
     node = GSON.fromJson(NODE2, Node.class);
-    clusterStoreService.writeNode(node);
+    clusterStore.writeNode(node);
   }
 
   @Test(timeout = 20000)
@@ -166,11 +166,11 @@ public class SchedulerTest extends BaseTest {
     String consumerId = "testJobScheduler";
     Element jobQueueElement = jobQueue.take(consumerId);
     String jobId = jobQueueElement.getValue();
-    job = clusterStoreService.getClusterJob(JobId.fromString(jobId));
+    job = clusterStore.getClusterJob(JobId.fromString(jobId));
     while (true) {
       Multiset<ActionService> actionServices = HashMultiset.create();
       for (String taskId : job.getCurrentStage()) {
-        ClusterTask task = clusterStoreService.getClusterTask(TaskId.fromString(taskId));
+        ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
         actionServices.add(new ActionService(task.getTaskName().name(), task.getService()));
       }
 

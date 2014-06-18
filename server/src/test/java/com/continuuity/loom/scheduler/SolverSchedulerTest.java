@@ -79,7 +79,7 @@ public class SolverSchedulerTest extends BaseTest {
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    clusterStoreService.writeClusterJob(job);
+    clusterStore.writeClusterJob(job);
     ClusterCreateRequest createRequest =
       new ClusterCreateRequest(cluster.getName(), cluster.getDescription(),
                                reactorTemplate.getName(), 5, null, null, null, null, null, 0L, null, null);
@@ -95,7 +95,7 @@ public class SolverSchedulerTest extends BaseTest {
     // check the node counts are as expected
     Multiset<Set<String>> serviceSetCounts = HashMultiset.create();
     for (String nodeId : solvedCluster.getNodes()) {
-      Node node = clusterStoreService.getNode(nodeId);
+      Node node = clusterStore.getNode(nodeId);
       Set<String> serviceNames = Sets.newHashSet(Iterables.transform(node.getServices(),
                                                                      new Function<Service, String>() {
         @Nullable

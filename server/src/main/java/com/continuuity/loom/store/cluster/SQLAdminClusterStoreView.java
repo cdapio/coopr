@@ -62,23 +62,6 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
   }
 
   @Override
-  protected PreparedStatement getInsertClusterStatement(
-    Connection conn, long id, Cluster cluster, ByteArrayInputStream clusterBytes) throws SQLException {
-    PreparedStatement statement = conn.prepareStatement(
-      "INSERT INTO  clusters (cluster, owner_id, tenant_id, status, expire_time, create_time, name, id) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    statement.setBlob(1, clusterBytes);
-    statement.setString(2, cluster.getAccount().getUserId());
-    statement.setString(3, cluster.getAccount().getTenantId());
-    statement.setString(4, cluster.getStatus().name());
-    statement.setTimestamp(5, DBQueryHelper.getTimestamp(cluster.getExpireTime()));
-    statement.setTimestamp(6, DBQueryHelper.getTimestamp(cluster.getCreateTime()));
-    statement.setString(7, cluster.getName());
-    statement.setLong(8, id);
-    return statement;
-  }
-
-  @Override
   protected PreparedStatement getClusterExistsStatement(Connection conn, long id) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "SELECT id FROM clusters WHERE id=? AND tenant_id=?");

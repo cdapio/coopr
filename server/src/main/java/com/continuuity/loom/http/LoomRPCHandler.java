@@ -21,8 +21,8 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.scheduler.task.ClusterJob;
-import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
@@ -53,14 +53,14 @@ public class LoomRPCHandler extends LoomAuthHandler {
   private static final Gson GSON = new GsonBuilder()
     .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec()).create();
   private final ClusterStoreService clusterStoreService;
-  private ClusterService clusterService;
+  private final ClusterStore clusterStore;
 
   @Inject
-  private LoomRPCHandler(TenantStore tenantStore, ClusterStoreService clusterStoreService,
-                         ClusterService clusterService) {
+  private LoomRPCHandler(TenantStore tenantStore,
+                         ClusterStoreService clusterStoreService) {
     super(tenantStore);
     this.clusterStoreService = clusterStoreService;
-    this.clusterService = clusterService;
+    this.clusterStore = clusterStoreService.getSystemView();
   }
 
   /**
@@ -93,7 +93,7 @@ public class LoomRPCHandler extends LoomAuthHandler {
       clusterMap.put(JobId.fromString(cluster.getLatestJobId()), cluster);
     }
 
-    Map<JobId, ClusterJob> jobs = clusterStoreService.getClusterJobs(clusterMap.keySet(), account.getTenantId());
+    Map<JobId, ClusterJob> jobs = clusterStore.getClusterJobs(clusterMap.keySet(), account.getTenantId());
 
     if (jobs.size() == 0) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, String.format("No jobs found for clusters"));

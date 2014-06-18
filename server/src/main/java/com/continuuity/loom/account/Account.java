@@ -10,9 +10,10 @@ import com.google.gson.annotations.Expose;
 public final class Account {
   private final String userId;
   private final String tenantId;
+  // an internal flag, doesn't need to be serialized since clusters will never be owned by the system.
   @Expose(serialize = false, deserialize = false)
   private final boolean isSystem;
-  public static final Account SYSTEM_ACCOUNT = new Account("", "", true);
+  public static final Account SYSTEM_ACCOUNT = new Account("system", "system", true);
 
   // keep for Gson deserialization
   private Account() {

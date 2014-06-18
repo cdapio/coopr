@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.scheduler;
 
-import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
@@ -31,8 +30,8 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
+import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
-import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -58,8 +57,7 @@ public class ClusterScheduler implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterScheduler.class);
 
   private final String id;
-  private final ClusterStoreService clusterStoreService;
-  private final ClusterStoreView clusterStore;
+  private final ClusterStore clusterStore;
   private final TrackingQueue inputQueue;
   private final TaskService taskService;
   private final IdService idService;
@@ -73,8 +71,7 @@ public class ClusterScheduler implements Runnable {
                            TaskService taskService,
                            IdService idService) {
     this.id = id;
-    this.clusterStoreService = clusterStoreService;
-    this.clusterStore = clusterStoreService.getView(Account.SYSTEM_ACCOUNT);
+    this.clusterStore = clusterStoreService.getSystemView();
     this.inputQueue = inputQueue;
     this.taskService = taskService;
     this.idService = idService;
@@ -90,7 +87,7 @@ public class ClusterScheduler implements Runnable {
         }
 
         Cluster cluster = clusterStore.getCluster(clusterElement.getId());
-        ClusterJob job = clusterStoreService.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+        ClusterJob job = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
         ClusterAction clusterAction = ClusterAction.valueOf(clusterElement.getValue());
         LOG.debug("Got cluster {} with action {}", cluster.getName(), clusterAction);
         try {
@@ -180,7 +177,7 @@ public class ClusterScheduler implements Runnable {
         ClusterTask task = new ClusterTask(ProvisionerAction.valueOf(taskNode.getTaskName()), taskId,
                                            taskNode.getHostId(), taskNode.getService(), clusterAction,
                                            taskConfig);
-        clusterStoreService.writeClusterTask(task);
+        clusterStore.writeClusterTask(task);
         stageTasks.add(task);
       }
       if (!stageTasks.isEmpty()) {

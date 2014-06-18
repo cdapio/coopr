@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- *
+ * Implementation of {@link EntityStoreService} that provides views of the entity store backed by a SQL database.
  */
 public class SQLEntityStoreService extends AbstractIdleService implements EntityStoreService {
   private DBConnectionPool dbConnectionPool;

@@ -33,6 +33,7 @@ import com.continuuity.loom.layout.Solver;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.SolverRequest;
+import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.entity.EntityStoreService;
@@ -58,6 +59,7 @@ public class ClusterService {
   private static final Gson GSON = new JsonSerde().getGson();
 
   private final ClusterStoreService clusterStoreService;
+  private final ClusterStore clusterStore;
   private final EntityStoreService entityStoreService;
   private final TrackingQueue clusterQueue;
   private final TrackingQueue solverQueue;
@@ -78,6 +80,7 @@ public class ClusterService {
                         Solver solver,
                         IdService idService) {
     this.clusterStoreService = clusterStoreService;
+    this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
     this.clusterQueue = clusterQueue;
     this.solverQueue = solverQueue;
@@ -116,7 +119,7 @@ public class ClusterService {
 
     LOG.trace("Writing cluster {} to store", cluster);
     clusterStoreService.getView(account).writeCluster(cluster);
-    clusterStoreService.writeClusterJob(clusterJob);
+    clusterStore.writeClusterJob(clusterJob);
 
     LOG.debug("adding create cluster element to solverQueue");
     SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER,
@@ -150,7 +153,7 @@ public class ClusterService {
 
       LOG.debug("Writing cluster {} to store with delete job {}", clusterId, deleteJobId);
       view.writeCluster(cluster);
-      clusterStoreService.writeClusterJob(deleteJob);
+      clusterStore.writeClusterJob(deleteJob);
 
       loomStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_DELETE);
       clusterQueue.add(new Element(clusterId, ClusterAction.CLUSTER_DELETE.name()));
@@ -198,7 +201,7 @@ public class ClusterService {
       LOG.debug("Writing cluster {} to store with configure job {}", clusterId, configureJobId);
       cluster.setConfig(config);
       view.writeCluster(cluster);
-      clusterStoreService.writeClusterJob(configureJob);
+      clusterStore.writeClusterJob(configureJob);
 
       loomStats.getClusterStats().incrementStat(action);
       clusterQueue.add(new Element(clusterId, action.name()));
@@ -244,7 +247,7 @@ public class ClusterService {
       cluster.setLatestJobId(job.getJobId());
       cluster.setStatus(Cluster.Status.PENDING);
       view.writeCluster(cluster);
-      clusterStoreService.writeClusterJob(job);
+      clusterStore.writeClusterJob(job);
 
       loomStats.getClusterStats().incrementStat(action);
       clusterQueue.add(new Element(clusterId, action.name()));
@@ -266,7 +269,7 @@ public class ClusterService {
     }
 
     // Get latest job
-    ClusterJob clusterJob = clusterStoreService.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+    ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
 
     // If job not running, nothing to abort
     if (clusterJob.getJobStatus() == ClusterJob.Status.FAILED ||
@@ -294,7 +297,7 @@ public class ClusterService {
         return;
       }
 
-      clusterJob = clusterStoreService.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
 
       // If job already done, return.
       if (clusterJob.getJobStatus() == ClusterJob.Status.COMPLETE ||
@@ -304,7 +307,7 @@ public class ClusterService {
 
       clusterJob.setJobStatus(ClusterJob.Status.FAILED);
       clusterJob.setStatusMessage("Aborted by user.");
-      clusterStoreService.writeClusterJob(clusterJob);
+      clusterStore.writeClusterJob(clusterJob);
       // Reschedule the job.
       jobQueue.add(new Element(clusterJob.getJobId()));
     } finally {
@@ -348,7 +351,7 @@ public class ClusterService {
       cluster.setLatestJobId(job.getJobId());
       cluster.setStatus(Cluster.Status.PENDING);
       view.writeCluster(cluster);
-      clusterStoreService.writeClusterJob(job);
+      clusterStore.writeClusterJob(job);
 
       loomStats.getClusterStats().incrementStat(action);
       SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, GSON.toJson(addRequest));

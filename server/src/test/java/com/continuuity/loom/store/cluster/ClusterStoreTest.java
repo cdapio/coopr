@@ -53,7 +53,7 @@ public abstract class ClusterStoreTest {
   private static final Account tenant2_admin = new Account(Constants.ADMIN_USER, "tenant2");
 
   protected static ClusterStoreService clusterStoreService;
-  protected static ClusterStoreView systemView;
+  protected static ClusterStore systemView;
 
   public abstract void clearState() throws Exception;
   public abstract ClusterStoreService getClusterStoreService() throws Exception;
@@ -61,7 +61,7 @@ public abstract class ClusterStoreTest {
   @Before
   public void setupTest() throws Exception {
     clusterStoreService = getClusterStoreService();
-    systemView = clusterStoreService.getView(Account.SYSTEM_ACCOUNT);
+    systemView = clusterStoreService.getSystemView();
     clearState();
   }
 
@@ -151,15 +151,15 @@ public abstract class ClusterStoreTest {
   public void testGetStoreDeleteJob() throws IOException {
     JobId id = new JobId("1", 1);
     ClusterJob job = new ClusterJob(id, ClusterAction.CLUSTER_DELETE);
-    Assert.assertNull(clusterStoreService.getClusterJob(id));
+    Assert.assertNull(systemView.getClusterJob(id));
 
-    clusterStoreService.writeClusterJob(job);
-    Assert.assertEquals(job, clusterStoreService.getClusterJob(id));
-    clusterStoreService.writeClusterJob(job);
-    Assert.assertEquals(job, clusterStoreService.getClusterJob(id));
+    systemView.writeClusterJob(job);
+    Assert.assertEquals(job, systemView.getClusterJob(id));
+    systemView.writeClusterJob(job);
+    Assert.assertEquals(job, systemView.getClusterJob(id));
 
-    clusterStoreService.deleteClusterJob(id);
-    Assert.assertNull(clusterStoreService.getClusterJob(id));
+    systemView.deleteClusterJob(id);
+    Assert.assertNull(systemView.getClusterJob(id));
   }
 
   @Test
@@ -177,12 +177,12 @@ public abstract class ClusterStoreTest {
     for (int i = 0; i < 10; i++) {
       JobId jobId = new JobId(cluster.getId(), i);
       ClusterJob job = new ClusterJob(jobId, ClusterAction.RESTART_SERVICES);
-      clusterStoreService.writeClusterJob(job);
+      systemView.writeClusterJob(job);
       jobs.add(job);
     }
     // this job shouldn't get fetched
     ClusterJob randomJob = new ClusterJob(JobId.fromString("2123-0214"), ClusterAction.CLUSTER_CONFIGURE);
-    clusterStoreService.writeClusterJob(randomJob);
+    systemView.writeClusterJob(randomJob);
 
     // shouldn't be able to get since the cluster isn't owned by this user
     Assert.assertTrue(clusterStoreService.getView(tenant1_user2).getClusterJobs(cluster.getId(), -1).isEmpty());
@@ -205,15 +205,15 @@ public abstract class ClusterStoreTest {
     TaskId id = new TaskId(new JobId("1", 1), 1);
     ClusterTask task = new ClusterTask(ProvisionerAction.CONFIGURE, id,
                                        "node1", "service", ClusterAction.CLUSTER_CREATE, new JsonObject());
-    Assert.assertNull(clusterStoreService.getClusterTask(id));
+    Assert.assertNull(systemView.getClusterTask(id));
 
-    clusterStoreService.writeClusterTask(task);
-    Assert.assertEquals(task, clusterStoreService.getClusterTask(id));
-    clusterStoreService.writeClusterTask(task);
-    Assert.assertEquals(task, clusterStoreService.getClusterTask(id));
+    systemView.writeClusterTask(task);
+    Assert.assertEquals(task, systemView.getClusterTask(id));
+    systemView.writeClusterTask(task);
+    Assert.assertEquals(task, systemView.getClusterTask(id));
 
-    clusterStoreService.deleteClusterTask(id);
-    Assert.assertNull(clusterStoreService.getClusterTask(id));
+    systemView.deleteClusterTask(id);
+    Assert.assertNull(systemView.getClusterTask(id));
   }
 
   @Test
@@ -253,16 +253,16 @@ public abstract class ClusterStoreTest {
   @Test
   public void testGetStoreDeleteNode() throws Exception {
     Node node = GSON.fromJson(SchedulerTest.NODE1, Node.class);
-    Assert.assertNull(clusterStoreService.getNode(node.getId()));
+    Assert.assertNull(systemView.getNode(node.getId()));
 
-    clusterStoreService.writeNode(node);
-    Assert.assertEquals(node, clusterStoreService.getNode(node.getId()));
+    systemView.writeNode(node);
+    Assert.assertEquals(node, systemView.getNode(node.getId()));
     // check overwrite
-    clusterStoreService.writeNode(node);
-    Assert.assertEquals(node, clusterStoreService.getNode(node.getId()));
+    systemView.writeNode(node);
+    Assert.assertEquals(node, systemView.getNode(node.getId()));
 
-    clusterStoreService.deleteNode(node.getId());
-    Assert.assertNull(clusterStoreService.getNode(node.getId()));
+    systemView.deleteNode(node.getId());
+    Assert.assertNull(systemView.getNode(node.getId()));
   }
 
   @Test
@@ -272,10 +272,10 @@ public abstract class ClusterStoreTest {
     store.writeCluster(cluster);
 
     Node node1 = GSON.fromJson(SchedulerTest.NODE1, Node.class);
-    clusterStoreService.writeNode(node1);
+    systemView.writeNode(node1);
 
     Node node2 = GSON.fromJson(SchedulerTest.NODE2, Node.class);
-    clusterStoreService.writeNode(node2);
+    systemView.writeNode(node2);
 
     Set<Node> nodes =  store.getClusterNodes(cluster.getId());
     Assert.assertEquals(ImmutableSet.of(node1, node2), nodes);
@@ -285,11 +285,11 @@ public abstract class ClusterStoreTest {
 
     Assert.assertTrue(clusterStoreService.getView(tenant2_user1).getClusterNodes(cluster.getId()).isEmpty());
 
-    clusterStoreService.deleteNode(node1.getId());
-    Assert.assertNull(clusterStoreService.getNode(node1.getId()));
+    systemView.deleteNode(node1.getId());
+    Assert.assertNull(systemView.getNode(node1.getId()));
 
-    clusterStoreService.deleteNode(node2.getId());
-    Assert.assertNull(clusterStoreService.getNode(node1.getId()));
+    systemView.deleteNode(node2.getId());
+    Assert.assertNull(systemView.getNode(node1.getId()));
 
     store.deleteCluster(cluster.getId());
     Assert.assertNull(store.getCluster(cluster.getId()));
@@ -298,16 +298,16 @@ public abstract class ClusterStoreTest {
   @Test
   public void testGetNodes() throws Exception {
     Node node1 = GSON.fromJson(SchedulerTest.NODE1, Node.class);
-    clusterStoreService.writeNode(node1);
+    systemView.writeNode(node1);
 
     Node node2 = GSON.fromJson(SchedulerTest.NODE2, Node.class);
-    clusterStoreService.writeNode(node2);
+    systemView.writeNode(node2);
 
-    clusterStoreService.deleteNode(node1.getId());
-    Assert.assertNull(clusterStoreService.getNode(node1.getId()));
+    systemView.deleteNode(node1.getId());
+    Assert.assertNull(systemView.getNode(node1.getId()));
 
-    clusterStoreService.deleteNode(node2.getId());
-    Assert.assertNull(clusterStoreService.getNode(node1.getId()));
+    systemView.deleteNode(node2.getId());
+    Assert.assertNull(systemView.getNode(node1.getId()));
   }
 
   @Test
@@ -339,15 +339,15 @@ public abstract class ClusterStoreTest {
     task5.setSubmitTime(currentTime - 1000);
     task5.setStatus(ClusterTask.Status.NOT_SUBMITTED);
 
-    clusterStoreService.writeClusterTask(task1);
-    clusterStoreService.writeClusterTask(task2);
-    clusterStoreService.writeClusterTask(task3);
-    clusterStoreService.writeClusterTask(task4);
-    clusterStoreService.writeClusterTask(task5);
+    systemView.writeClusterTask(task1);
+    systemView.writeClusterTask(task2);
+    systemView.writeClusterTask(task3);
+    systemView.writeClusterTask(task4);
+    systemView.writeClusterTask(task5);
 
-    Assert.assertEquals(ImmutableSet.of(task1, task2), clusterStoreService.getRunningTasks(currentTime - 500));
-    Assert.assertEquals(ImmutableSet.of(task1, task2, task3, task4), clusterStoreService.getRunningTasks(currentTime));
-    Assert.assertTrue(clusterStoreService.getRunningTasks(currentTime - 5000).isEmpty());
+    Assert.assertEquals(ImmutableSet.of(task1, task2), systemView.getRunningTasks(currentTime - 500));
+    Assert.assertEquals(ImmutableSet.of(task1, task2, task3, task4), systemView.getRunningTasks(currentTime));
+    Assert.assertTrue(systemView.getRunningTasks(currentTime - 5000).isEmpty());
   }
 
   @SuppressWarnings("UnusedDeclaration")
@@ -376,9 +376,9 @@ public abstract class ClusterStoreTest {
     Cluster clusterForever = createCluster("1000", System.currentTimeMillis() - 1000, 0, Cluster.Status.ACTIVE);
 
     Assert.assertEquals(ImmutableSet.of(cluster1, cluster3),
-                        clusterStoreService.getExpiringClusters(System.currentTimeMillis()));
+                        systemView.getExpiringClusters(System.currentTimeMillis()));
     Assert.assertEquals(ImmutableSet.of(cluster1, cluster2, cluster3, cluster4),
-                        clusterStoreService.getExpiringClusters(System.currentTimeMillis() + 500000));
+                        systemView.getExpiringClusters(System.currentTimeMillis() + 500000));
   }
 
   private Cluster createCluster(String id, long createTime, long expireTime, Cluster.Status status) throws Exception {

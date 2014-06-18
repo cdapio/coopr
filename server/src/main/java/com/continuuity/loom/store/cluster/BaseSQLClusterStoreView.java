@@ -36,7 +36,7 @@ import java.util.Set;
  */
 public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   private final DBConnectionPool dbConnectionPool;
-  private static final JsonSerde codec = new JsonSerde();
+  private static final JsonSerde CODEC = new JsonSerde();
 
   BaseSQLClusterStoreView(DBConnectionPool dbConnectionPool) {
     this.dbConnectionPool = dbConnectionPool;
@@ -49,9 +49,6 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   abstract boolean allowedToWrite(Cluster cluster);
 
   abstract PreparedStatement getSetClusterStatement(
-    Connection conn, long id, Cluster cluster, ByteArrayInputStream clusterBytes) throws SQLException;
-
-  abstract PreparedStatement getInsertClusterStatement(
     Connection conn, long id, Cluster cluster, ByteArrayInputStream clusterBytes) throws SQLException;
 
   abstract PreparedStatement getClusterExistsStatement(Connection conn, long id) throws SQLException;
@@ -138,7 +135,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement writeStatement;
-        ByteArrayInputStream clusterBytes = new ByteArrayInputStream(codec.serialize(cluster, Cluster.class));
+        ByteArrayInputStream clusterBytes = new ByteArrayInputStream(CODEC.serialize(cluster, Cluster.class));
         if (clusterExists(cluster.getId())) {
           writeStatement = getSetClusterStatement(conn, clusterNum, cluster, clusterBytes);
         } else {
@@ -218,5 +215,21 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
     } catch (SQLException e) {
       throw new IOException("Exception getting nodes for cluster " + clusterId, e);
     }
+  }
+
+  private PreparedStatement getInsertClusterStatement(
+    Connection conn, long id, Cluster cluster, ByteArrayInputStream clusterBytes) throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "INSERT INTO  clusters (cluster, owner_id, tenant_id, status, expire_time, create_time, name, id) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    statement.setBlob(1, clusterBytes);
+    statement.setString(2, cluster.getAccount().getUserId());
+    statement.setString(3, cluster.getAccount().getTenantId());
+    statement.setString(4, cluster.getStatus().name());
+    statement.setTimestamp(5, DBQueryHelper.getTimestamp(cluster.getExpireTime()));
+    statement.setTimestamp(6, DBQueryHelper.getTimestamp(cluster.getCreateTime()));
+    statement.setString(7, cluster.getName());
+    statement.setLong(8, id);
+    return statement;
   }
 }

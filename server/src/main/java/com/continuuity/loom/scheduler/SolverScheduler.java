@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.scheduler;
 
-import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
@@ -30,8 +29,8 @@ import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskService;
+import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
-import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -59,8 +58,7 @@ public class SolverScheduler implements Runnable {
 
   private final String id;
   private final Solver solver;
-  private final ClusterStoreService clusterStoreService;
-  private final ClusterStoreView clusterStore;
+  private final ClusterStore clusterStore;
   private final TrackingQueue solverQueue;
   private final TrackingQueue clusterQueue;
   private final ListeningExecutorService executorService;
@@ -77,8 +75,7 @@ public class SolverScheduler implements Runnable {
                           TaskService taskService, LoomStats loomStats, IdService idService) {
     this.id = id;
     this.solver = solver;
-    this.clusterStoreService = clusterStoreService;
-    this.clusterStore = clusterStoreService.getView(Account.SYSTEM_ACCOUNT);
+    this.clusterStore = clusterStoreService.getSystemView();
     this.solverQueue = solverQueue;
     this.clusterQueue = clusterQueue;
     this.executorService = executorService;
@@ -139,11 +136,11 @@ public class SolverScheduler implements Runnable {
         }
 
         // Get cluster job for solving.
-        solverJob = clusterStoreService.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+        solverJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
         SolverRequest solverRequest = GSON.fromJson(solveElement.getValue(), SolverRequest.class);
         try {
           solverJob.setJobStatus(ClusterJob.Status.RUNNING);
-          clusterStoreService.writeClusterJob(solverJob);
+          clusterStore.writeClusterJob(solverJob);
 
           switch (solverRequest.getType()) {
             case CREATE_CLUSTER:
@@ -201,7 +198,7 @@ public class SolverScheduler implements Runnable {
 
       // Solving succeeded, schedule planning.
       solverJob.setJobStatus(ClusterJob.Status.COMPLETE);
-      clusterStoreService.writeClusterJob(solverJob);
+      clusterStore.writeClusterJob(solverJob);
 
       // TODO: loom status update should happen in TaskService.
       loomStats.getSuccessfulClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
@@ -209,7 +206,7 @@ public class SolverScheduler implements Runnable {
       // TODO: stuff like this should be wrapped in a transaction
       Set<String> changedNodeIds = Sets.newHashSet();
       for (Node node : changedNodes) {
-        clusterStoreService.writeNode(node);
+        clusterStore.writeNode(node);
         changedNodeIds.add(node.getId());
       }
       clusterStore.writeCluster(cluster);
@@ -219,7 +216,7 @@ public class SolverScheduler implements Runnable {
       ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.ADD_SERVICES,
                                             request.getServices(), changedNodeIds);
       cluster.setLatestJobId(createJob.getJobId());
-      clusterStoreService.writeClusterJob(createJob);
+      clusterStore.writeClusterJob(createJob);
 
       clusterStore.writeCluster(cluster);
 
@@ -259,20 +256,20 @@ public class SolverScheduler implements Runnable {
 
       // Solving succeeded, schedule cluster creation.
       solverJob.setJobStatus(ClusterJob.Status.COMPLETE);
-      clusterStoreService.writeClusterJob(solverJob);
+      clusterStore.writeClusterJob(solverJob);
 
       // TODO: loom status update should happen in TaskService.
       loomStats.getSuccessfulClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
 
       for (Node node : clusterNodes.values()) {
-        clusterStoreService.writeNode(node);
+        clusterStore.writeNode(node);
       }
 
       // Create new Job for creating cluster.
       JobId clusterJobId = idService.getNewJobId(cluster.getId());
       ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.CLUSTER_CREATE);
       cluster.setLatestJobId(createJob.getJobId());
-      clusterStoreService.writeClusterJob(createJob);
+      clusterStore.writeClusterJob(createJob);
 
       clusterStore.writeCluster(cluster);
 

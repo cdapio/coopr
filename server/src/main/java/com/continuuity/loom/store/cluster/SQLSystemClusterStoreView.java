@@ -1,10 +1,8 @@
 package com.continuuity.loom.store.cluster;
 
-import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryHelper;
-import com.google.common.base.Preconditions;
 
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
@@ -16,9 +14,8 @@ import java.sql.SQLException;
  */
 public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
 
-  public SQLSystemClusterStoreView(DBConnectionPool dbConnectionPool, Account account) {
+  public SQLSystemClusterStoreView(DBConnectionPool dbConnectionPool) {
     super(dbConnectionPool);
-    Preconditions.checkArgument(account.isSystem(), "Cannot create system view with a non-system user.");
   }
 
   @Override
@@ -52,23 +49,6 @@ public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
     statement.setTimestamp(5, DBQueryHelper.getTimestamp(cluster.getExpireTime()));
     // where clause
     statement.setLong(6, id);
-    return statement;
-  }
-
-  @Override
-  protected PreparedStatement getInsertClusterStatement(
-    Connection conn, long id, Cluster cluster, ByteArrayInputStream clusterBytes) throws SQLException {
-    PreparedStatement statement = conn.prepareStatement(
-      "INSERT INTO  clusters (cluster, owner_id, tenant_id, status, expire_time, create_time, name, id) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    statement.setBlob(1, clusterBytes);
-    statement.setString(2, cluster.getAccount().getUserId());
-    statement.setString(3, cluster.getAccount().getTenantId());
-    statement.setString(4, cluster.getStatus().name());
-    statement.setTimestamp(5, DBQueryHelper.getTimestamp(cluster.getExpireTime()));
-    statement.setTimestamp(6, DBQueryHelper.getTimestamp(cluster.getCreateTime()));
-    statement.setString(7, cluster.getName());
-    statement.setLong(8, id);
     return statement;
   }
 

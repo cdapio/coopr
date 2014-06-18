@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
@@ -29,8 +28,8 @@ import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Actions;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.CallbackData;
+import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
-import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -48,8 +47,7 @@ import java.util.List;
 public class TaskService {
   private static final Logger LOG = LoggerFactory.getLogger(TaskService.class);
   private static final Gson GSON = new JsonSerde().getGson();
-  private final ClusterStoreService clusterStoreService;
-  private final ClusterStoreView clusterStore;
+  private final ClusterStore clusterStore;
   private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
   private final TrackingQueue callbackQueue;
@@ -60,8 +58,7 @@ public class TaskService {
                       LoomStats loomStats,
                       @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,
                       IdService idService) {
-    this.clusterStoreService = clusterStoreService;
-    this.clusterStore = clusterStoreService.getView(Account.SYSTEM_ACCOUNT);
+    this.clusterStore = clusterStoreService.getSystemView();
     this.loomStats = loomStats;
     this.callbackQueue = callbackQueue;
     this.idService = idService;
@@ -161,7 +158,7 @@ public class TaskService {
     if (message != null) {
       job.setStatusMessage(message);
     }
-    clusterStoreService.writeClusterJob(job);
+    clusterStore.writeClusterJob(job);
 
     loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
     callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.FAILURE, cluster, job))));
@@ -201,7 +198,7 @@ public class TaskService {
    */
   public void failJob(ClusterJob job) throws IOException {
     job.setJobStatus(ClusterJob.Status.FAILED);
-    clusterStoreService.writeClusterJob(job);
+    clusterStore.writeClusterJob(job);
   }
 
   /**
@@ -217,7 +214,7 @@ public class TaskService {
     job.setJobStatus(ClusterJob.Status.RUNNING);
     // Note: writing job status as RUNNING, will allow other operations on the job
     // (like cancel, etc.) to happen in parallel.
-    clusterStoreService.writeClusterJob(job);
+    clusterStore.writeClusterJob(job);
     callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.START, cluster, job))));
   }
 
@@ -231,7 +228,7 @@ public class TaskService {
    */
   public void completeJob(ClusterJob job, Cluster cluster) throws IOException, IllegalAccessException {
     job.setJobStatus(ClusterJob.Status.COMPLETE);
-    clusterStoreService.writeClusterJob(job);
+    clusterStore.writeClusterJob(job);
     LOG.debug("Job {} is complete", job.getJobId());
 
     // Update cluster status
@@ -256,7 +253,7 @@ public class TaskService {
   public void startTask(ClusterTask clusterTask) throws IOException {
     clusterTask.setStatus(ClusterTask.Status.IN_PROGRESS);
     clusterTask.setSubmitTime(System.currentTimeMillis());
-    clusterStoreService.writeClusterTask(clusterTask);
+    clusterStore.writeClusterTask(clusterTask);
 
     // Update stats
     loomStats.getProvisionerStats().incrementStat(clusterTask.getTaskName());
@@ -274,7 +271,7 @@ public class TaskService {
   public void dropTask(ClusterTask clusterTask) throws IOException {
     clusterTask.setStatus(ClusterTask.Status.DROPPED);
     clusterTask.setStatusTime(System.currentTimeMillis());
-    clusterStoreService.writeClusterTask(clusterTask);
+    clusterStore.writeClusterTask(clusterTask);
 
     // Update stats
     loomStats.getDroppedProvisionerStats().incrementStat(clusterTask.getTaskName());
@@ -292,7 +289,7 @@ public class TaskService {
     clusterTask.setStatus(ClusterTask.Status.FAILED);
     clusterTask.setStatusCode(status);
     clusterTask.setStatusTime(System.currentTimeMillis());
-    clusterStoreService.writeClusterTask(clusterTask);
+    clusterStore.writeClusterTask(clusterTask);
 
     // Update stats
     loomStats.getFailedProvisionerStats().incrementStat(clusterTask.getTaskName());
@@ -310,7 +307,7 @@ public class TaskService {
     clusterTask.setStatus(ClusterTask.Status.COMPLETE);
     clusterTask.setStatusCode(status);
     clusterTask.setStatusTime(System.currentTimeMillis());
-    clusterStoreService.writeClusterTask(clusterTask);
+    clusterStore.writeClusterTask(clusterTask);
 
     // update stats
     loomStats.getSuccessfulProvisionerStats().incrementStat(clusterTask.getTaskName());

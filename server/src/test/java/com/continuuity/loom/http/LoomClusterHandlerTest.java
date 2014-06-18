@@ -282,12 +282,12 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
     cluster.setLatestJobId(clusterJob.getJobId());
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    clusterStoreService.writeClusterJob(clusterJob);
+    clusterStore.writeClusterJob(clusterJob);
 
     Node node1 = new JsonSerde().getGson().fromJson(SchedulerTest.NODE1, Node.class);
     Node node2 = new JsonSerde().getGson().fromJson(SchedulerTest.NODE2, Node.class);
-    clusterStoreService.writeNode(node1);
-    clusterStoreService.writeNode(node2);
+    clusterStore.writeNode(node1);
+    clusterStore.writeNode(node2);
 
     HttpResponse response = doDelete("/v1/loom/clusters/" + clusterId, USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -333,7 +333,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                           List<String> statuses) throws Exception {
     Assert.assertEquals(actions.size(), statuses.size());
 
-    Node node = clusterStoreService.getNode(nodeId);
+    Node node = clusterStore.getNode(nodeId);
     Assert.assertNotNull(node);
 
     List<Node.Action> nodeActions = node.getActions();
@@ -824,7 +824,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
     cluster.setLatestJobId(clusterJob.getJobId());
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    clusterStoreService.writeClusterJob(clusterJob);
+    clusterStore.writeClusterJob(clusterJob);
 
     assertResponseStatus(doDelete("/v1/loom/clusters/" + clusterId, ADMIN_HEADERS), HttpResponseStatus.OK);
   }
@@ -976,8 +976,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                   template, ImmutableSet.<String>of(), ImmutableSet.<String>of());
     cluster.setStatus(Cluster.Status.ACTIVE);
     clusterStoreService.getView(USER1_ACCOUNT).writeCluster(cluster);
-    clusterStoreService.writeNode(Entities.ClusterExample.NODE1);
-    clusterStoreService.writeNode(Entities.ClusterExample.NODE2);
+    clusterStore.writeNode(Entities.ClusterExample.NODE1);
+    clusterStore.writeNode(Entities.ClusterExample.NODE2);
 
     // now edit the template
     Set<String> newCompatibleServices = Sets.newHashSet(template.getCompatibilities().getServices());
@@ -1006,8 +1006,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Account clusterAccount = cluster.getAccount();
     cluster.setStatus(Cluster.Status.ACTIVE);
     clusterStoreService.getView(clusterAccount).writeCluster(cluster);
-    clusterStoreService.writeNode(Entities.ClusterExample.NODE1);
-    clusterStoreService.writeNode(Entities.ClusterExample.NODE2);
+    clusterStore.writeNode(Entities.ClusterExample.NODE1);
+    clusterStore.writeNode(Entities.ClusterExample.NODE2);
     entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(cluster.getClusterTemplate());
     String path = "/v1/loom/clusters/" + cluster.getId() + "/clustertemplate/sync";
 
@@ -1025,8 +1025,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     // test missing nodes returns 404
     entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(cluster.getClusterTemplate());
-    clusterStoreService.deleteNode(Entities.ClusterExample.NODE1.getId());
-    clusterStoreService.deleteNode(Entities.ClusterExample.NODE2.getId());
+    clusterStore.deleteNode(Entities.ClusterExample.NODE1.getId());
+    clusterStore.deleteNode(Entities.ClusterExample.NODE2.getId());
     assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
   }
 
@@ -1056,8 +1056,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     ClusterTemplate template = cluster.getClusterTemplate();
     cluster.setStatus(Cluster.Status.ACTIVE);
     clusterStoreService.getView(clusterAccount).writeCluster(cluster);
-    clusterStoreService.writeNode(Entities.ClusterExample.NODE1);
-    clusterStoreService.writeNode(Entities.ClusterExample.NODE2);
+    clusterStore.writeNode(Entities.ClusterExample.NODE1);
+    clusterStore.writeNode(Entities.ClusterExample.NODE2);
     entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(cluster.getClusterTemplate());
 
     // now edit the template, making centos incompatible with the template
