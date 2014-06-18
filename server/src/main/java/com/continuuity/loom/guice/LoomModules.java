@@ -35,8 +35,6 @@ import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.cluster.ClusterStore;
-import com.continuuity.loom.store.cluster.SQLClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.SQLClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
