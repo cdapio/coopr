@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.codec.json;
 
-import com.continuuity.loom.http.ClusterConfigureRequest;
+import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -25,8 +25,8 @@ import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.http.ClusterConfigureRequest}, used so some validation is done
- * on required fields.
+ * Codec for deserializing a {@link com.continuuity.loom.http.request.ClusterConfigureRequest},
+ * used so some validation is done on required fields.
  */
 public class ClusterConfigureRequestCodec implements JsonDeserializer<ClusterConfigureRequest> {
 

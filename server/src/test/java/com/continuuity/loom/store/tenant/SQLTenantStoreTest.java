@@ -15,11 +15,10 @@
  */
 package com.continuuity.loom.store.tenant;
 
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryHelper;
-import com.continuuity.loom.store.tenant.SQLTenantStore;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 

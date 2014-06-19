@@ -32,7 +32,7 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.utils.ImmutablePair;
 import com.google.common.collect.ImmutableMap;

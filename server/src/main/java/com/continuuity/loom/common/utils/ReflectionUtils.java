@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.common.utils;
 
-import com.continuuity.loom.conf.Configurable;
-import com.continuuity.loom.conf.Configuration;
+import com.continuuity.loom.common.conf.Configurable;
+import com.continuuity.loom.common.conf.Configuration;
 
 import java.lang.reflect.Constructor;
 import java.util.Map;

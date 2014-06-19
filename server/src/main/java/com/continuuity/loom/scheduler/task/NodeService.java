@@ -16,8 +16,8 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.inject.Inject;
