@@ -400,7 +400,6 @@ public class LoomClusterHandler extends LoomAuthHandler {
       responder.sendError(HttpResponseStatus.CONFLICT, "Cannot be aborted at this time.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error aborting cluster.");
-      return;
     }
   }
 
