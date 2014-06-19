@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.codec.json;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Constraints;
 import com.continuuity.loom.admin.LayoutConstraint;
@@ -54,7 +55,7 @@ public class ClusterCodec implements JsonDeserializer<Cluster> {
     Set<String> nodes = context.deserialize(jsonObj.get("nodes"), new TypeToken<Set<String>>() {}.getType());
     Set<String> services = context.deserialize(jsonObj.get("services"), new TypeToken<Set<String>>() {}.getType());
     String latestJobId = context.deserialize(jsonObj.get("latestJobId"), String.class);
-    String ownerId = context.deserialize(jsonObj.get("ownerId"), String.class);
+    Account account = context.deserialize(jsonObj.get("account"), Account.class);
     Cluster.Status status = context.deserialize(jsonObj.get("status"), Cluster.Status.class);
     JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
 
@@ -66,7 +67,7 @@ public class ClusterCodec implements JsonDeserializer<Cluster> {
       }
     }
 
-    return new Cluster(id, ownerId, name, createTime, expireTime == null ? 0 : expireTime, description,
+    return new Cluster(id, account, name, createTime, expireTime == null ? 0 : expireTime, description,
                        provider, template, nodes, services, config, status, latestJobId);
   }
 }

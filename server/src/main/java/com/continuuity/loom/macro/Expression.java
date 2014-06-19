@@ -178,7 +178,7 @@ public class Expression {
   private String evaluateClusterProperty(Cluster cluster) {
     switch (type) {
       case CLUSTER_OWNER:
-        return cluster.getOwnerId();
+        return cluster.getAccount().getUserId();
       default:
         // shouldn't ever happen
         return type.getRepresentation();

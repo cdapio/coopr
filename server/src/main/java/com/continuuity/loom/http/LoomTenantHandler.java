@@ -16,15 +16,13 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.store.IdService;
-import com.continuuity.loom.store.TenantStore;
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -52,12 +50,11 @@ public class LoomTenantHandler extends LoomAuthHandler {
   private static final Gson GSON = new JsonSerde().getGson();
 
   private final TenantStore store;
-  private final IdService idService;
 
   @Inject
-  private LoomTenantHandler(TenantStore store, IdService idService) {
+  private LoomTenantHandler(TenantStore store) {
+    super(store);
     this.store = store;
-    this.idService = idService;
   }
 
   /**
@@ -68,7 +65,11 @@ public class LoomTenantHandler extends LoomAuthHandler {
    */
   @GET
   public void getAllTenants(HttpRequest request, HttpResponder responder) {
-    if (!isSuperAdmin(request)) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isSuperadmin()) {
       responder.sendStatus(HttpResponseStatus.FORBIDDEN);
       return;
     }
@@ -91,7 +92,11 @@ public class LoomTenantHandler extends LoomAuthHandler {
   @GET
   @Path("/{tenant-id}")
   public void getTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
-    if (!isSuperAdmin(request)) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isSuperadmin()) {
       responder.sendStatus(HttpResponseStatus.FORBIDDEN);
       return;
     }
@@ -117,7 +122,11 @@ public class LoomTenantHandler extends LoomAuthHandler {
    */
   @POST
   public void createTenant(HttpRequest request, HttpResponder responder) {
-    if (!isSuperAdmin(request)) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isSuperadmin()) {
       responder.sendStatus(HttpResponseStatus.FORBIDDEN);
       return;
     }
@@ -165,7 +174,11 @@ public class LoomTenantHandler extends LoomAuthHandler {
   @PUT
   @Path("/{tenant-id}")
   public void writeTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
-    if (!isSuperAdmin(request)) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isSuperadmin()) {
       responder.sendStatus(HttpResponseStatus.FORBIDDEN);
       return;
     }
@@ -214,7 +227,11 @@ public class LoomTenantHandler extends LoomAuthHandler {
   @DELETE
   @Path("/{tenant-id}")
   public void deleteTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
-    if (!isSuperAdmin(request)) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isSuperadmin()) {
       responder.sendStatus(HttpResponseStatus.FORBIDDEN);
       return;
     }
@@ -226,15 +243,5 @@ public class LoomTenantHandler extends LoomAuthHandler {
       LOG.error("Exception while deleting tenant {}", tenantId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while deleting tenant " + tenantId);
     }
-  }
-
-  private boolean isSuperAdmin(HttpRequest request) {
-    String tenant = request.getHeader(Constants.TENANT_HEADER);
-    String user = request.getHeader(Constants.USER_HEADER);
-    // TODO: authenticate
-    String apiKey = request.getHeader(Constants.API_KEY_HEADER);
-
-    return tenant != null && tenant.equals(Constants.SUPERADMIN_TENANT) &&
-      user != null && user.equals(Constants.SUPERADMIN_USER);
   }
 }

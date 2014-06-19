@@ -16,6 +16,7 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.HardwareType;
@@ -24,7 +25,9 @@ import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.store.EntityStore;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.entity.EntityStoreView;
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -71,11 +74,14 @@ public class LoomAdminHandler extends LoomAuthHandler {
   public static final String AUTOMATOR_TYPES = "automatortypes";
   public static final String PROVIDER_TYPES = "providertypes";
 
-  private final EntityStore entityStore;
+  private final EntityStoreService entityStoreService;
+  private final JsonSerde codec;
 
   @Inject
-  private LoomAdminHandler(EntityStore entityStore) {
-    this.entityStore = entityStore;
+  private LoomAdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService) {
+    super(tenantStore);
+    this.entityStoreService = entityStoreService;
+    this.codec = new JsonSerde();
   }
 
   /**
@@ -84,18 +90,21 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request for the provider.
    * @param responder Responder for sending the response.
    * @param providerId Id of the provider to get.
-   * @throws Exception
    */
   @GET
   @Path("/providers/{provider-id}")
-  public void getProvider(HttpRequest request, HttpResponder responder,
-                          @PathParam("provider-id") String providerId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getProvider(HttpRequest request, HttpResponder responder, @PathParam("provider-id") String providerId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    respondToGetEntity(entityStore.getProvider(providerId), "provider", providerId, Provider.class, responder);
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getProvider(providerId), "provider",
+                         providerId, Provider.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting provider " + providerId);
+    }
   }
 
   /**
@@ -104,19 +113,23 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request for the hardware type.
    * @param responder Responder for sending the response.
    * @param hardwaretypeId Id of the hardware type to get.
-   * @throws Exception
    */
   @GET
   @Path("/hardwaretypes/{hardwaretype-id}")
   public void getHardwareType(HttpRequest request, HttpResponder responder,
-                              @PathParam("hardwaretype-id") String hardwaretypeId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                              @PathParam("hardwaretype-id") String hardwaretypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    respondToGetEntity(entityStore.getHardwareType(hardwaretypeId), "hardware type",
-                       hardwaretypeId, HardwareType.class, responder);
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getHardwareType(hardwaretypeId), "hardware type",
+                         hardwaretypeId, HardwareType.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting hardware type " + hardwaretypeId);
+    }
   }
 
   /**
@@ -125,18 +138,22 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request for the image type.
    * @param responder Responder for sending the response.
    * @param imagetypeId Id of the image type to get.
-   * @throws Exception
    */
   @GET
   @Path("/imagetypes/{imagetype-id}")
   public void getImageType(HttpRequest request, HttpResponder responder,
-                           @PathParam("imagetype-id") String imagetypeId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                           @PathParam("imagetype-id") String imagetypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    respondToGetEntity(entityStore.getImageType(imagetypeId), "image type", imagetypeId, ImageType.class, responder);
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getImageType(imagetypeId),
+                         "image type", imagetypeId, ImageType.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting image type " + imagetypeId);
+    }
   }
 
   /**
@@ -145,18 +162,21 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request for the service.
    * @param responder Responder for sending the response.
    * @param serviceId Id of the service to get.
-   * @throws Exception
    */
   @GET
   @Path("/services/{service-id}")
-  public void getService(HttpRequest request, HttpResponder responder,
-                              @PathParam("service-id") String serviceId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getService(HttpRequest request, HttpResponder responder, @PathParam("service-id") String serviceId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    respondToGetEntity(entityStore.getService(serviceId), "service", serviceId, Service.class, responder);
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getService(serviceId), "service",
+                         serviceId, Service.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting service " + serviceId);
+    }
   }
 
   /**
@@ -165,20 +185,23 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request for the cluster template.
    * @param responder Responder for sending the response.
    * @param clustertemplateId Id of the cluster template to get.
-   * @throws Exception
    */
   @GET
   @Path("/clustertemplates/{clustertemplate-id}")
   public void getClusterTemplate(HttpRequest request, HttpResponder responder,
-                                 @PathParam("clustertemplate-id") String clustertemplateId) throws Exception {
-    // TODO: clustertemplates should be associated with a user group
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                                 @PathParam("clustertemplate-id") String clustertemplateId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    respondToGetEntity(entityStore.getClusterTemplate(clustertemplateId), "cluster template",
-                       clustertemplateId, ClusterTemplate.class, responder);
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getClusterTemplate(clustertemplateId), "cluster template",
+                         clustertemplateId, ClusterTemplate.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting cluster template " + clustertemplateId);
+    }
   }
 
   /**
@@ -187,19 +210,23 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request for the provider type.
    * @param responder Responder for sending the response.
    * @param providertypeId Id of the provider type to get.
-   * @throws Exception
    */
   @GET
   @Path("/providertypes/{providertype-id}")
   public void getProviderType(HttpRequest request, HttpResponder responder,
-                              @PathParam("providertype-id") String providertypeId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                              @PathParam("providertype-id") String providertypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    respondToGetEntity(entityStore.getProviderType(providertypeId), "provider type",
-                       providertypeId, ProviderType.class, responder);
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getProviderType(providertypeId), "provider type",
+                         providertypeId, ProviderType.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting provider type " + providertypeId);
+    }
   }
 
   /**
@@ -208,19 +235,23 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request for the automator type.
    * @param responder Responder for sending the response.
    * @param automatortypeId Id of the automator type to get.
-   * @throws Exception
    */
   @GET
   @Path("/automatortypes/{automatortype-id}")
   public void getAutomatorType(HttpRequest request, HttpResponder responder,
-                              @PathParam("automatortype-id") String automatortypeId) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+                              @PathParam("automatortype-id") String automatortypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    respondToGetEntity(entityStore.getAutomatorType(automatortypeId), "automator type",
-                       automatortypeId, AutomatorType.class, responder);
+    try {
+      respondToGetEntity(entityStoreService.getView(account).getAutomatorType(automatortypeId), "automator type",
+                         automatortypeId, AutomatorType.class, responder);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception getting automator type " + automatortypeId);
+    }
   }
 
   /**
@@ -228,17 +259,22 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request The request for providers.
    * @param responder Responder for sending the response.
-   * @throws Exception
    */
   @GET
   @Path("/providers")
-  public void getProviders(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getProviders(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllProviders()));
+    try {
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllProviders(),
+                         new TypeToken<Collection<Provider>>() {}.getType(),
+                         codec.getGson());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting providers");
+    }
   }
 
   /**
@@ -246,17 +282,22 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request The request for hardware types.
    * @param responder Responder for sending the response.
-   * @throws Exception
    */
   @GET
   @Path("/hardwaretypes")
-  public void getHardwareType(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getHardwareType(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllHardwareTypes()));
+    try {
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllHardwareTypes(),
+                         new TypeToken<Collection<HardwareType>>() {}.getType(),
+                         codec.getGson());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting hardware types");
+    }
   }
 
   /**
@@ -264,17 +305,22 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request The request for image types.
    * @param responder Responder for sending the response.
-   * @throws Exception
    */
   @GET
   @Path("/imagetypes")
-  public void getImageType(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getImageType(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllImageTypes()));
+    try {
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllImageTypes(),
+                         new TypeToken<Collection<ImageType>>() {}.getType(),
+                         codec.getGson());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting image types");
+    }
   }
 
   /**
@@ -282,17 +328,22 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request The request for services.
    * @param responder Responder for sending the response.
-   * @throws Exception
    */
   @GET
   @Path("/services")
-  public void getServices(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getServices(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllServices()));
+    try {
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllServices(),
+                         new TypeToken<Collection<Service>>() {}.getType(),
+                         codec.getGson());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting services");
+    }
   }
 
   /**
@@ -300,17 +351,22 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request The request for services.
    * @param responder Responder for sending the response.
-   * @throws Exception
    */
   @GET
   @Path("/providertypes")
-  public void getProviderTypes(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getProviderTypes(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllProviderTypes()));
+    try {
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllProviderTypes(),
+                         new TypeToken<Collection<ProviderType>>() {}.getType(),
+                         codec.getGson());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting provider types");
+    }
   }
 
   /**
@@ -318,17 +374,22 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request The request for services.
    * @param responder Responder for sending the response.
-   * @throws Exception
    */
   @GET
   @Path("/automatortypes")
-  public void getAutomatorTypes(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getAutomatorTypes(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllAutomatorTypes()));
+    try {
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllAutomatorTypes(),
+                         new TypeToken<Collection<AutomatorType>>() {}.getType(),
+                         codec.getGson());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting automator types");
+    }
   }
 
   /**
@@ -336,18 +397,22 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request The request for cluster templates.
    * @param responder Responder for sending the response.
-   * @throws Exception
    */
   @GET
   @Path("/clustertemplates")
-  public void getClusterTemplate(HttpRequest request, HttpResponder responder) throws Exception {
-    // TODO: clustertemplates should be associated with a user group
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+  public void getClusterTemplate(HttpRequest request, HttpResponder responder){
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, GSON.toJsonTree(entityStore.getAllClusterTemplates()));
+    try {
+      responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllClusterTemplates(),
+                         new TypeToken<Collection<ClusterTemplate>>() {}.getType(),
+                         codec.getGson());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting cluster templates");
+    }
   }
 
   /**
@@ -356,18 +421,28 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request to delete a provider.
    * @param responder Responder for sending the response.
    * @param providerId Id of the provider to delete.
-   * @throws Exception
    */
   @DELETE
   @Path("/providers/{provider-id}")
   public void deleteProvider(HttpRequest request, HttpResponder responder,
-                             @PathParam("provider-id") String providerId) throws Exception {
-    if (!isAdminRequest(request)) {
+                             @PathParam("provider-id") String providerId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
-    entityStore.deleteProvider(providerId);
-    responder.sendStatus(HttpResponseStatus.OK);
+
+    try {
+      entityStoreService.getView(account).deleteProvider(providerId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception deleting provider " + providerId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete provider.");
+    }
   }
 
   /**
@@ -376,18 +451,29 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request to delete a hardware type.
    * @param responder Responder for sending the response.
    * @param hardwaretypeId Id of the hardware type to delete.
-   * @throws Exception
    */
   @DELETE
   @Path("/hardwaretypes/{hardwaretype-id}")
   public void deleteHardwareType(HttpRequest request, HttpResponder responder,
-                                 @PathParam("hardwaretype-id") String hardwaretypeId) throws Exception {
-    if (!isAdminRequest(request)) {
+                                 @PathParam("hardwaretype-id") String hardwaretypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
-    entityStore.deleteHardwareType(hardwaretypeId);
-    responder.sendStatus(HttpResponseStatus.OK);
+
+    try {
+      entityStoreService.getView(account).deleteHardwareType(hardwaretypeId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting hardware type " + hardwaretypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete hardware type.");
+    }
   }
 
   /**
@@ -396,18 +482,28 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request to delete a image type.
    * @param responder Responder for sending the response.
    * @param imagetypeId Id of the image type to delete.
-   * @throws Exception
    */
   @DELETE
   @Path("/imagetypes/{imagetype-id}")
   public void deleteImageType(HttpRequest request, HttpResponder responder,
-                              @PathParam("imagetype-id") String imagetypeId) throws Exception {
-    if (!isAdminRequest(request)) {
+                              @PathParam("imagetype-id") String imagetypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
-    entityStore.deleteImageType(imagetypeId);
-    responder.sendStatus(HttpResponseStatus.OK);
+
+    try {
+      entityStoreService.getView(account).deleteImageType(imagetypeId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception deleting image type " + imagetypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete image type.");
+    }
   }
 
   /**
@@ -416,18 +512,27 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request to delete a service.
    * @param responder Responder for sending the response.
    * @param serviceId Id of the service to delete.
-   * @throws Exception
    */
   @DELETE
   @Path("/services/{service-id}")
-  public void deleteService(HttpRequest request, HttpResponder responder,
-                            @PathParam("service-id") String serviceId) throws Exception {
-    if (!isAdminRequest(request)) {
+  public void deleteService(HttpRequest request, HttpResponder responder, @PathParam("service-id") String serviceId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
-    entityStore.deleteService(serviceId);
-    responder.sendStatus(HttpResponseStatus.OK);
+
+    try {
+      entityStoreService.getView(account).deleteService(serviceId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception deleting service " + serviceId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete service.");
+    }
   }
 
   /**
@@ -436,18 +541,29 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request to delete a cluster template.
    * @param responder Responder for sending the response.
    * @param clustertemplateId Id of the cluster template to delete.
-   * @throws Exception
    */
   @DELETE
   @Path("/clustertemplates/{clustertemplate-id}")
   public void deleteClusterTemplate(HttpRequest request, HttpResponder responder,
-                                    @PathParam("clustertemplate-id") String clustertemplateId) throws Exception {
-    if (!isAdminRequest(request)) {
+                                    @PathParam("clustertemplate-id") String clustertemplateId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
-    entityStore.deleteClusterTemplate(clustertemplateId);
-    responder.sendStatus(HttpResponseStatus.OK);
+
+    try {
+      entityStoreService.getView(account).deleteClusterTemplate(clustertemplateId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting cluster template " + clustertemplateId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete cluster template.");
+    }
   }
 
   /**
@@ -456,18 +572,29 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request to delete a provider type.
    * @param responder Responder for sending the response.
    * @param providertypeId Id of the provider type to delete.
-   * @throws Exception
    */
   @DELETE
   @Path("/providertypes/{providertype-id}")
   public void deleteProviderType(HttpRequest request, HttpResponder responder,
-                                 @PathParam("providertype-id") String providertypeId) throws Exception {
-    if (!isAdminRequest(request)) {
+                                 @PathParam("providertype-id") String providertypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
-    entityStore.deleteProviderType(providertypeId);
-    responder.sendStatus(HttpResponseStatus.OK);
+
+    try {
+      entityStoreService.getView(account).deleteProviderType(providertypeId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting provider type " + providertypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete provider type.");
+    }
   }
 
   /**
@@ -476,18 +603,29 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request The request to delete an automator type.
    * @param responder Responder for sending the response.
    * @param automatortypeId Id of the automator type to delete.
-   * @throws Exception
    */
   @DELETE
   @Path("/automatortypes/{automatortype-id}")
   public void deleteAutomatorType(HttpRequest request, HttpResponder responder,
-                                 @PathParam("automatortype-id") String automatortypeId) throws Exception {
-    if (!isAdminRequest(request)) {
+                                 @PathParam("automatortype-id") String automatortypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
-    entityStore.deleteAutomatorType(automatortypeId);
-    responder.sendStatus(HttpResponseStatus.OK);
+
+    try {
+      entityStoreService.getView(account).deleteAutomatorType(automatortypeId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception deleting automator type " + automatortypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete automator type.");
+    }
   }
 
   /**
@@ -497,16 +635,19 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request Request to write provider.
    * @param responder Responder to send response.
    * @param providerId Id of the provider to write.
-   * @throws Exception
    */
   @PUT
   @Path("/providers/{provider-id}")
-  public void putProvider(HttpRequest request, HttpResponder responder,
-                          @PathParam("provider-id") String providerId) throws Exception {
-    if (!isAdminRequest(request)) {
+  public void putProvider(HttpRequest request, HttpResponder responder, @PathParam("provider-id") String providerId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
+
     Provider provider = getEntityFromRequest(request, responder, Provider.class);
     if (provider == null) {
       // getEntityFromRequest writes to the responder if there was an issue.
@@ -516,8 +657,14 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    entityStore.writeProvider(provider);
-    responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      entityStoreService.getView(account).writeProvider(provider);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception writing provider " + providerId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write provider.");
+    }
   }
 
   /**
@@ -527,16 +674,20 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request Request to write hardware type.
    * @param responder Responder to send response.
    * @param hardwaretypeId Id of the hardware type to write.
-   * @throws Exception
    */
   @PUT
   @Path("/hardwaretypes/{hardwaretype-id}")
   public void putHardwareType(HttpRequest request, HttpResponder responder,
-                              @PathParam("hardwaretype-id") String hardwaretypeId) throws Exception {
-    if (!isAdminRequest(request)) {
+                              @PathParam("hardwaretype-id") String hardwaretypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
+
     HardwareType hardwareType = getEntityFromRequest(request, responder, HardwareType.class);
     if (hardwareType == null) {
       // getEntityFromRequest writes to the responder if there was an issue.
@@ -546,8 +697,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    entityStore.writeHardwareType(hardwareType);
-    responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      entityStoreService.getView(account).writeHardwareType(hardwareType);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception writing hardware type " + hardwaretypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write hardware type.");
+    }
   }
 
   /**
@@ -557,16 +715,20 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request Request to write image type.
    * @param responder Responder to send response.
    * @param imagetypeId Id of the image type to write.
-   * @throws Exception
    */
   @PUT
   @Path("/imagetypes/{imagetype-id}")
   public void putImageType(HttpRequest request, HttpResponder responder,
-                           @PathParam("imagetype-id") String imagetypeId) throws Exception {
-    if (!isAdminRequest(request)) {
+                           @PathParam("imagetype-id") String imagetypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
+
     ImageType imageType = getEntityFromRequest(request, responder, ImageType.class);
     if (imageType == null) {
       // getEntityFromRequest writes to the responder if there was an issue.
@@ -576,8 +738,14 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    entityStore.writeImageType(imageType);
-    responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      entityStoreService.getView(account).writeImageType(imageType);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception writing image type " + imagetypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write image type.");
+    }
   }
 
   /**
@@ -587,16 +755,19 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request Request to write service.
    * @param responder Responder to send response.
    * @param serviceId Id of the service to write.
-   * @throws Exception
    */
   @PUT
   @Path("/services/{service-id}")
-  public void putService(HttpRequest request, HttpResponder responder,
-                         @PathParam("service-id") String serviceId) throws Exception {
-    if (!isAdminRequest(request)) {
+  public void putService(HttpRequest request, HttpResponder responder, @PathParam("service-id") String serviceId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
+
     Service service = getEntityFromRequest(request, responder, Service.class);
     if (service == null) {
       // getEntityFromRequest writes to the responder if there was an issue.
@@ -606,8 +777,14 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    entityStore.writeService(service);
-    responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      entityStoreService.getView(account).writeService(service);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception writing service " + serviceId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write service.");
+    }
   }
 
   /**
@@ -617,16 +794,20 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request Request to write cluster template.
    * @param responder Responder to send response.
    * @param clustertemplateId Id of the cluster template to write.
-   * @throws Exception
    */
   @PUT
   @Path("/clustertemplates/{clustertemplate-id}")
   public void putClusterTemplate(HttpRequest request, HttpResponder responder,
-                                 @PathParam("clustertemplate-id") String clustertemplateId) throws Exception {
-    if (!isAdminRequest(request)) {
+                                 @PathParam("clustertemplate-id") String clustertemplateId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
+
     ClusterTemplate clusterTemplate = getEntityFromRequest(request, responder, ClusterTemplate.class);
     if (clusterTemplate == null) {
       // getEntityFromRequest writes to the responder if there was an issue.
@@ -640,8 +821,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    entityStore.writeClusterTemplate(clusterTemplate);
-    responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      entityStoreService.getView(account).writeClusterTemplate(clusterTemplate);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception writing cluster template " + clustertemplateId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write cluster template.");
+    }
   }
 
   /**
@@ -651,16 +839,20 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request Request to write provider type.
    * @param responder Responder to send response.
    * @param providertypeId Id of the provider type to write.
-   * @throws Exception
    */
   @PUT
   @Path("/providertypes/{providertype-id}")
   public void putProviderType(HttpRequest request, HttpResponder responder,
-                              @PathParam("providertype-id") String providertypeId) throws Exception {
-    if (!isAdminRequest(request)) {
+                              @PathParam("providertype-id") String providertypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
+
     ProviderType providerType = getEntityFromRequest(request, responder, ProviderType.class);
     if (providerType == null) {
       // getEntityFromRequest writes to the responder if there was an issue.
@@ -670,8 +862,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    entityStore.writeProviderType(providerType);
-    responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      entityStoreService.getView(account).writeProviderType(providerType);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception writing provider type " + providertypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write provider type.");
+    }
   }
 
   /**
@@ -681,16 +880,20 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param request Request to write provider type.
    * @param responder Responder to send response.
    * @param automatortypeId Id of the provider type to write.
-   * @throws Exception
    */
   @PUT
   @Path("/automatortypes/{automatortype-id}")
   public void putAutomatorType(HttpRequest request, HttpResponder responder,
-                               @PathParam("automatortype-id") String automatortypeId) throws Exception {
-    if (!isAdminRequest(request)) {
+                               @PathParam("automatortype-id") String automatortypeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
+
     AutomatorType automatorType = getEntityFromRequest(request, responder, AutomatorType.class);
     if (automatorType == null) {
       // getEntityFromRequest writes to the responder if there was an issue.
@@ -700,8 +903,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    entityStore.writeAutomatorType(automatorType);
-    responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      entityStoreService.getView(account).writeAutomatorType(automatorType);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Exception writing automator type " + automatortypeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write automator type.");
+    }
   }
 
   /**
@@ -710,12 +920,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request Request to add provider.
    * @param responder Responder for sending response.
-   * @throws Exception
    */
   @POST
   @Path("/providers")
-  public void postProvider(HttpRequest request, HttpResponder responder) throws Exception {
-    if (!isAdminRequest(request)) {
+  public void postProvider(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
@@ -725,12 +938,19 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    if (entityStore.getProvider(provider.getName()) != null) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST,
-                          "provider " + provider.getName() + " already exists");
-    } else {
-      entityStore.writeProvider(provider);
-      responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      EntityStoreView view = entityStoreService.getView(account);
+      if (view.getProvider(provider.getName()) != null) {
+        responder.sendError(HttpResponseStatus.BAD_REQUEST,
+                            "provider " + provider.getName() + " already exists");
+      } else {
+        view.writeProvider(provider);
+        responder.sendStatus(HttpResponseStatus.OK);
+      }
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to add provider.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding provider.");
     }
   }
 
@@ -740,12 +960,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request Request to add hardware type.
    * @param responder Responder for sending response.
-   * @throws Exception
    */
   @POST
   @Path("/hardwaretypes")
-  public void postHardwareType(HttpRequest request, HttpResponder responder) throws Exception {
-    if (!isAdminRequest(request)) {
+  public void postHardwareType(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
@@ -754,12 +977,19 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    if (entityStore.getHardwareType(hardwareType.getName()) != null) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST,
-                          "hardware type " + hardwareType.getName() + " already exists");
-    } else {
-      entityStore.writeHardwareType(hardwareType);
-      responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      EntityStoreView view = entityStoreService.getView(account);
+      if (view.getHardwareType(hardwareType.getName()) != null) {
+        responder.sendError(HttpResponseStatus.BAD_REQUEST,
+                            "hardware type " + hardwareType.getName() + " already exists");
+      } else {
+        view.writeHardwareType(hardwareType);
+        responder.sendStatus(HttpResponseStatus.OK);
+      }
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to add hardware type.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding hardware type.");
     }
   }
 
@@ -769,12 +999,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request Request to add image type.
    * @param responder Responder for sending response.
-   * @throws Exception
    */
   @POST
   @Path("/imagetypes")
-  public void postImageType(HttpRequest request, HttpResponder responder) throws Exception {
-    if (!isAdminRequest(request)) {
+  public void postImageType(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
@@ -783,11 +1016,18 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    if (entityStore.getImageType(imageType.getName()) != null) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "image type " + imageType.getName() + " already exists");
-    } else {
-      entityStore.writeImageType(imageType);
-      responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      EntityStoreView view = entityStoreService.getView(account);
+      if (view.getImageType(imageType.getName()) != null) {
+        responder.sendError(HttpResponseStatus.BAD_REQUEST, "image type " + imageType.getName() + " already exists");
+      } else {
+        view.writeImageType(imageType);
+        responder.sendStatus(HttpResponseStatus.OK);
+      }
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to add image type.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding image type.");
     }
   }
 
@@ -797,12 +1037,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request Request to add service.
    * @param responder Responder for sending response.
-   * @throws Exception
    */
   @POST
   @Path("/services")
-  public void postService(HttpRequest request, HttpResponder responder) throws Exception {
-    if (!isAdminRequest(request)) {
+  public void postService(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
@@ -811,11 +1054,18 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    if (entityStore.getService(service.getName()) != null) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "service " + service.getName() + " already exists");
-    } else {
-      entityStore.writeService(service);
-      responder.sendStatus(HttpResponseStatus.OK);
+    try {
+      EntityStoreView view = entityStoreService.getView(account);
+      if (view.getService(service.getName()) != null) {
+        responder.sendError(HttpResponseStatus.BAD_REQUEST, "service " + service.getName() + " already exists");
+      } else {
+        view.writeService(service);
+        responder.sendStatus(HttpResponseStatus.OK);
+      }
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to add service.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding service.");
     }
   }
 
@@ -825,12 +1075,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request Request to add cluster template.
    * @param responder Responder for sending response.
-   * @throws Exception
    */
   @POST
   @Path("/clustertemplates")
-  public void postClusterTemplate(HttpRequest request, HttpResponder responder) throws Exception {
-    if (!isAdminRequest(request)) {
+  public void postClusterTemplate(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
@@ -839,16 +1092,23 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    if (entityStore.getClusterTemplate(clusterTemplate.getName()) != null) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST,
-                          "cluster template " + clusterTemplate.getName() + " already exists");
-    } else {
-      if (!validateClusterTemplate(clusterTemplate, responder)) {
-        return;
-      }
+    try {
+      EntityStoreView view = entityStoreService.getView(account);
+      if (view.getClusterTemplate(clusterTemplate.getName()) != null) {
+        responder.sendError(HttpResponseStatus.BAD_REQUEST,
+                            "cluster template " + clusterTemplate.getName() + " already exists");
+      } else {
+        if (!validateClusterTemplate(clusterTemplate, responder)) {
+          return;
+        }
 
-      entityStore.writeClusterTemplate(clusterTemplate);
-      responder.sendStatus(HttpResponseStatus.OK);
+        view.writeClusterTemplate(clusterTemplate);
+        responder.sendStatus(HttpResponseStatus.OK);
+      }
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to add cluster template.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding cluster template.");
     }
   }
 
@@ -857,43 +1117,43 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request Request to export admin definable entities.
    * @param responder Responder for sending response.
-   * @throws Exception
    */
   @GET
   @Path("/export")
   public void exportConfig(HttpRequest request, HttpResponder responder) throws Exception {
-    String userId = getAndAuthenticateUser(request, responder);
-    if (userId == null) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
       return;
     }
 
     Map<String, JsonElement> outJson = Maps.newHashMap();
 
-    Collection<Provider> providers = entityStore.getAllProviders();
+    EntityStoreView view = entityStoreService.getView(account);
+    Collection<Provider> providers = view.getAllProviders();
     LOG.debug("Exporting {} providers", providers.size());
     outJson.put(PROVIDERS, GSON.toJsonTree(providers));
 
-    Collection<HardwareType> hardwareTypes = entityStore.getAllHardwareTypes();
+    Collection<HardwareType> hardwareTypes = view.getAllHardwareTypes();
     LOG.debug("Exporting {} hardware types", hardwareTypes.size());
     outJson.put(HARDWARE_TYPES, GSON.toJsonTree(hardwareTypes));
 
-    Collection<ImageType> imageTypes = entityStore.getAllImageTypes();
+    Collection<ImageType> imageTypes = view.getAllImageTypes();
     LOG.debug("Exporting {} image types", imageTypes.size());
     outJson.put(IMAGE_TYPES, GSON.toJsonTree(imageTypes));
 
-    Collection<Service> services = entityStore.getAllServices();
+    Collection<Service> services = view.getAllServices();
     LOG.debug("Exporting {} services", services.size());
     outJson.put(SERVICES, GSON.toJsonTree(services));
 
-    Collection<ClusterTemplate> clusterTemplates = entityStore.getAllClusterTemplates();
+    Collection<ClusterTemplate> clusterTemplates = view.getAllClusterTemplates();
     LOG.debug("Exporting {} cluster templates", clusterTemplates.size());
     outJson.put(CLUSTER_TEMPLATES, GSON.toJsonTree(clusterTemplates));
 
-    Collection<AutomatorType> automatorTypes = entityStore.getAllAutomatorTypes();
+    Collection<AutomatorType> automatorTypes = view.getAllAutomatorTypes();
     LOG.debug("Exporting {} automator types", automatorTypes.size());
     outJson.put(AUTOMATOR_TYPES, GSON.toJsonTree(automatorTypes));
 
-    Collection<ProviderType> providerTypes = entityStore.getAllProviderTypes();
+    Collection<ProviderType> providerTypes = view.getAllProviderTypes();
     LOG.debug("Exporting {} provider types", providerTypes.size());
     outJson.put(PROVIDER_TYPES, GSON.toJsonTree(providerTypes));
 
@@ -908,12 +1168,15 @@ public class LoomAdminHandler extends LoomAuthHandler {
    *
    * @param request Request to import admin definable entities.
    * @param responder Responder for sending response.
-   * @throws Exception
    */
   @POST
   @Path("/import")
-  public void importConfig(HttpRequest request, HttpResponder responder) throws Exception {
-    if (!isAdminRequest(request)) {
+  public void importConfig(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
@@ -971,72 +1234,83 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    // Delete all existing config data
-    for (Provider provider : entityStore.getAllProviders()) {
-      entityStore.deleteProvider(provider.getName());
-    }
+    try {
+      EntityStoreView view = entityStoreService.getView(account);
+      // Delete all existing config data
+      for (Provider provider : view.getAllProviders()) {
+        view.deleteProvider(provider.getName());
+      }
 
-    for (HardwareType hardwareType : entityStore.getAllHardwareTypes()) {
-      entityStore.deleteHardwareType(hardwareType.getName());
-    }
+      for (HardwareType hardwareType : view.getAllHardwareTypes()) {
+        view.deleteHardwareType(hardwareType.getName());
+      }
 
-    for (ImageType imageType : entityStore.getAllImageTypes()) {
-      entityStore.deleteImageType(imageType.getName());
-    }
+      for (ImageType imageType : view.getAllImageTypes()) {
+        view.deleteImageType(imageType.getName());
+      }
 
-    for (Service service : entityStore.getAllServices()) {
-      entityStore.deleteService(service.getName());
-    }
+      for (Service service : view.getAllServices()) {
+        view.deleteService(service.getName());
+      }
 
-    for (ClusterTemplate clusterTemplate : entityStore.getAllClusterTemplates()) {
-      entityStore.deleteClusterTemplate(clusterTemplate.getName());
-    }
+      for (ClusterTemplate clusterTemplate : view.getAllClusterTemplates()) {
+        view.deleteClusterTemplate(clusterTemplate.getName());
+      }
 
-    for (AutomatorType automatorType : entityStore.getAllAutomatorTypes()) {
-      entityStore.deleteAutomatorType(automatorType.getName());
-    }
+      for (AutomatorType automatorType : view.getAllAutomatorTypes()) {
+        view.deleteAutomatorType(automatorType.getName());
+      }
 
-    for (ProviderType providerType : entityStore.getAllProviderTypes()) {
-      entityStore.deleteProviderType(providerType.getName());
-    }
+      for (ProviderType providerType : view.getAllProviderTypes()) {
+        view.deleteProviderType(providerType.getName());
+      }
 
-    // Add new config data
-    LOG.debug("Importing {} providers", newProviders.size());
-    for (Provider provider : newProviders) {
-      entityStore.writeProvider(provider);
-    }
+      // Add new config data
+      LOG.debug("Importing {} providers", newProviders.size());
+      for (Provider provider : newProviders) {
+        view.writeProvider(provider);
+      }
 
-    LOG.debug("Importing {} hardware types", newHardwareTypes.size());
-    for (HardwareType hardwareType : newHardwareTypes) {
-      entityStore.writeHardwareType(hardwareType);
-    }
+      LOG.debug("Importing {} hardware types", newHardwareTypes.size());
+      for (HardwareType hardwareType : newHardwareTypes) {
+        view.writeHardwareType(hardwareType);
+      }
 
-    LOG.debug("Importing {} image types", newImageTypes.size());
-    for (ImageType imageType : newImageTypes) {
-      entityStore.writeImageType(imageType);
-    }
+      LOG.debug("Importing {} image types", newImageTypes.size());
+      for (ImageType imageType : newImageTypes) {
+        view.writeImageType(imageType);
+      }
 
-    LOG.debug("Importing {} services", newServices.size());
-    for (Service service : newServices) {
-      entityStore.writeService(service);
-    }
+      LOG.debug("Importing {} services", newServices.size());
+      for (Service service : newServices) {
+        view.writeService(service);
+      }
 
-    LOG.debug("Importing {} cluster templates", newClusterTemplates.size());
-    for (ClusterTemplate clusterTemplate : newClusterTemplates) {
-      entityStore.writeClusterTemplate(clusterTemplate);
-    }
+      LOG.debug("Importing {} cluster templates", newClusterTemplates.size());
+      for (ClusterTemplate clusterTemplate : newClusterTemplates) {
+        view.writeClusterTemplate(clusterTemplate);
+      }
 
-    LOG.debug("Importing {} automator types", newAutomatorTypes.size());
-    for (AutomatorType automatorType : newAutomatorTypes) {
-      entityStore.writeAutomatorType(automatorType);
-    }
+      LOG.debug("Importing {} automator types", newAutomatorTypes.size());
+      for (AutomatorType automatorType : newAutomatorTypes) {
+        view.writeAutomatorType(automatorType);
+      }
 
-    LOG.debug("Importing {} provider types", newProviderTypes.size());
-    for (ProviderType providerType : newProviderTypes) {
-      entityStore.writeProviderType(providerType);
-    }
+      LOG.debug("Importing {} provider types", newProviderTypes.size());
+      for (ProviderType providerType : newProviderTypes) {
+        view.writeProviderType(providerType);
+      }
 
-    responder.sendStatus(HttpResponseStatus.OK);
+      LOG.debug("Importing {} cluster templates", newClusterTemplates.size());
+      for (ClusterTemplate clusterTemplate : newClusterTemplates) {
+        view.writeClusterTemplate(clusterTemplate);
+      }
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, e.getMessage());
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception importing entities.");
+    }
   }
 
   private <T> T getEntityFromRequest(HttpRequest request, HttpResponder responder, Type tClass) {

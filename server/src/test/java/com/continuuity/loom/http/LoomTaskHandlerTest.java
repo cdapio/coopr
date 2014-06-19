@@ -116,9 +116,9 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     Node node = new Node("node_id2", "1", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
     clusterStore.writeNode(node);
 
-    Cluster cluster = new Cluster("1", "user", "cluster1" , System.currentTimeMillis(), "", null, null,
+    Cluster cluster = new Cluster("1", USER1_ACCOUNT, "cluster1" , System.currentTimeMillis(), "", null, null,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of());
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
 
     ClusterTask clusterTask = new ClusterTask(
       ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE,

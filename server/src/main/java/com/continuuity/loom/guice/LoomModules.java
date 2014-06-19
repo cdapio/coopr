@@ -19,6 +19,7 @@ import com.continuuity.http.HttpHandler;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.common.queue.internal.ZKElementsTracking;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.http.LoomAdminHandler;
@@ -33,14 +34,13 @@ import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
-import com.continuuity.loom.store.ClusterStore;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.EntityStore;
-import com.continuuity.loom.store.IdService;
-import com.continuuity.loom.store.SQLClusterStore;
-import com.continuuity.loom.store.SQLEntityStore;
-import com.continuuity.loom.store.SQLTenantStore;
-import com.continuuity.loom.store.TenantStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.cluster.SQLClusterStoreService;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.entity.SQLEntityStoreService;
+import com.continuuity.loom.store.tenant.SQLTenantStore;
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -148,8 +148,8 @@ public final class LoomModules {
             .annotatedWith(Names.named(Constants.Queue.CALLBACK)).toInstance(callbackQueue);
 
           bind(ClusterCallback.class).to(callbackClass).in(Scopes.SINGLETON);
-          bind(EntityStore.class).to(SQLEntityStore.class).in(Scopes.SINGLETON);
-          bind(ClusterStore.class).to(SQLClusterStore.class).in(Scopes.SINGLETON);
+          bind(EntityStoreService.class).to(SQLEntityStoreService.class).in(Scopes.SINGLETON);
+          bind(ClusterStoreService.class).to(SQLClusterStoreService.class).in(Scopes.SINGLETON);
           bind(TenantStore.class).to(SQLTenantStore.class).in(Scopes.SINGLETON);
           bind(ZKClient.class).toInstance(zkClient);
           bind(String.class)
@@ -177,8 +177,8 @@ public final class LoomModules {
           bind(Scheduler.class).in(Scopes.SINGLETON);
           bind(LoomStats.class).in(Scopes.SINGLETON);
           bind(DBConnectionPool.class).in(Scopes.SINGLETON);
-          bind(SQLClusterStore.class).in(Scopes.SINGLETON);
-          bind(SQLEntityStore.class).in(Scopes.SINGLETON);
+          bind(SQLClusterStoreService.class).in(Scopes.SINGLETON);
+          bind(SQLEntityStoreService.class).in(Scopes.SINGLETON);
           bind(SQLTenantStore.class).in(Scopes.SINGLETON);
           bind(IdService.class).in(Scopes.SINGLETON);
 

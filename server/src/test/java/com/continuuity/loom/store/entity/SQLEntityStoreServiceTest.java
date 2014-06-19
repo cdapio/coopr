@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store;
+package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
-import com.google.common.base.Throwables;
+import com.continuuity.loom.store.DBConnectionPool;
+import com.continuuity.loom.store.DBQueryHelper;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
  *
  */
-public class SQLEntityStoreTest extends EntityStoreTest {
-  private static SQLEntityStore sqlStore;
+public class SQLEntityStoreServiceTest extends EntityStoreServiceTest {
+  private static SQLEntityStoreService sqlStore;
 
   @BeforeClass
   public static void beforeClass() throws SQLException, ClassNotFoundException {
@@ -37,10 +36,9 @@ public class SQLEntityStoreTest extends EntityStoreTest {
     sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
     DBConnectionPool dbConnectionPool = new DBConnectionPool(sqlConf);
-    sqlStore = new SQLEntityStore(dbConnectionPool);
-    sqlStore.initDerbyDB();
-    sqlStore.clearData();
-    entityStore = sqlStore;
+    sqlStore = new SQLEntityStoreService(dbConnectionPool);
+    sqlStore.startAndWait();
+    entityStoreService = sqlStore;
   }
 
   @Override

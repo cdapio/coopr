@@ -16,22 +16,25 @@
 package com.continuuity.loom.runtime;
 
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.conf.Configuration;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.guice.LoomModules;
 import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Scheduler;
-import com.continuuity.loom.store.ClusterStore;
-import com.continuuity.loom.store.IdService;
-import com.continuuity.loom.store.TenantStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import org.apache.twill.common.Services;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.RetryStrategies;
 import org.apache.twill.zookeeper.ZKClientService;
@@ -61,6 +64,8 @@ public final class LoomServerMain extends DaemonMain {
   private Configuration conf;
   private int solverNumThreads;
   private ListeningExecutorService executorService;
+  private ClusterStoreService clusterStoreService;
+  private EntityStoreService entityStoreService;
   private IdService idService;
   private TenantStore tenantStore;
 
@@ -115,8 +120,11 @@ public final class LoomServerMain extends DaemonMain {
       idService.startAndWait();
       tenantStore = injector.getInstance(TenantStore.class);
       tenantStore.startAndWait();
-      ClusterStore clusterStore = injector.getInstance(ClusterStore.class);
-      clusterStore.initialize();
+      clusterStoreService = injector.getInstance(ClusterStoreService.class);
+      clusterStoreService.startAndWait();
+      entityStoreService = injector.getInstance(EntityStoreService.class);
+      entityStoreService.startAndWait();
+
       for (String queueName : Constants.Queue.ALL) {
         TimeoutTrackingQueue queue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named(queueName)));
         queue.start();
@@ -159,16 +167,15 @@ public final class LoomServerMain extends DaemonMain {
       }
     }
 
-    if (loomService != null) {
-      loomService.stopAndWait();
-    }
+    stopAll(loomService, tenantStore, clusterStoreService,
+            entityStoreService, idService, zkClientService, inMemoryZKServer);
+  }
 
-    if (zkClientService != null) {
-      zkClientService.stopAndWait();
-    }
-
-    if (inMemoryZKServer != null) {
-      inMemoryZKServer.stopAndWait();
+  private void stopAll(Service... services) {
+    for (Service service : services) {
+      if (service != null) {
+        service.stopAndWait();
+      }
     }
   }
 

@@ -21,6 +21,7 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.dag.TaskNode;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -29,8 +30,8 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
-import com.continuuity.loom.store.IdService;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -64,13 +65,13 @@ public class ClusterScheduler implements Runnable {
   private final Actions actions = Actions.getInstance();
 
   @Inject
-  private ClusterScheduler(@Named("scheduler.id") String id, ClusterStore clusterStore,
+  private ClusterScheduler(@Named("scheduler.id") String id,
+                           ClusterStoreService clusterStoreService,
                            @Named(Constants.Queue.CLUSTER) TrackingQueue inputQueue,
-                           @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
                            TaskService taskService,
                            IdService idService) {
     this.id = id;
-    this.clusterStore = clusterStore;
+    this.clusterStore = clusterStoreService.getSystemView();
     this.inputQueue = inputQueue;
     this.taskService = taskService;
     this.idService = idService;
