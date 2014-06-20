@@ -17,16 +17,14 @@ package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.LoomServiceTestBase;
-import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**

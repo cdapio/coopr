@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.http;
+package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
@@ -1128,27 +1128,32 @@ public class LoomAdminHandler extends LoomAuthHandler {
     Collection<Provider> providers = view.getAllProviders();
     LOG.debug("Exporting {} providers", providers.size());
     outJson.put(PROVIDERS, codec.getGson().toJsonTree(providers,
-                                                        new TypeToken<Collection<Provider>>() {}.getType()));
+                                                      new TypeToken<Collection<Provider>>() {
+                                                      }.getType()));
 
     Collection<HardwareType> hardwareTypes = view.getAllHardwareTypes();
     LOG.debug("Exporting {} hardware types", hardwareTypes.size());
     outJson.put(HARDWARE_TYPES, codec.getGson().toJsonTree(hardwareTypes,
-                                                            new TypeToken<Collection<HardwareType>>() {}.getType()));
+                                                           new TypeToken<Collection<HardwareType>>() {
+                                                           }.getType()));
 
     Collection<ImageType> imageTypes = view.getAllImageTypes();
     LOG.debug("Exporting {} image types", imageTypes.size());
     outJson.put(IMAGE_TYPES, codec.getGson().toJsonTree(imageTypes,
-                                                        new TypeToken<Collection<ImageType>>() {}.getType()));
+                                                        new TypeToken<Collection<ImageType>>() {
+                                                        }.getType()));
 
     Collection<Service> services = view.getAllServices();
     LOG.debug("Exporting {} services", services.size());
     outJson.put(SERVICES, codec.getGson().toJsonTree(services,
-                                                       new TypeToken<Collection<Service>>() {}.getType()));
+                                                     new TypeToken<Collection<Service>>() {
+                                                     }.getType()));
 
     Collection<ClusterTemplate> clusterTemplates = view.getAllClusterTemplates();
     LOG.debug("Exporting {} cluster templates", clusterTemplates.size());
     outJson.put(CLUSTER_TEMPLATES, codec.getGson().toJsonTree(clusterTemplates,
-                                                               new TypeToken<Collection<Service>>() {}.getType()));
+                                                              new TypeToken<Collection<Service>>() {
+                                                              }.getType()));
 
     LOG.trace("Exporting {}", outJson);
 

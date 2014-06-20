@@ -15,10 +15,10 @@
  */
 package com.continuuity.loom.scheduler;
 
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.zookeeper.ElectionHandler;
 import com.continuuity.loom.common.zookeeper.LeaderElection;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;

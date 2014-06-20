@@ -1,6 +1,6 @@
 package com.continuuity.loom.account;
 
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Constants;
 import com.google.common.base.Objects;
 import com.google.gson.annotations.Expose;
 
