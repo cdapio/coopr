@@ -49,6 +49,7 @@ public class CallbackScheduler implements Runnable {
   private final ClusterCallback clusterCallback;
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
+
   @Inject
   private CallbackScheduler(@Named("scheduler.id") String id,
                             @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,

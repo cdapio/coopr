@@ -263,11 +263,10 @@ public class SchedulerTest extends BaseTest {
     waitForCallback(callbackScheduler);
     Assert.assertEquals(CallbackData.Type.START, mockClusterCallback.getReceivedCallbacks().get(0).getType());
 
-    JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
-    jobScheduler.run();
-
     // wait for fail callback to finish
-    waitForCallback(callbackScheduler);
+    if (mockClusterCallback.getReceivedCallbacks().size() < 2) {
+      waitForCallback(callbackScheduler);
+    }
     Assert.assertEquals(CallbackData.Type.FAILURE, mockClusterCallback.getReceivedCallbacks().get(1).getType());
 
     // there also should not be any jobs in the queue
