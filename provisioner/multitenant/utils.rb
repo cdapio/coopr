@@ -6,12 +6,13 @@ module Loom
       @interruptable = false
       @enqueued     = []
       trap(signal) do
+        print "************ Worker callback received #{signal} signal **********\n"
         if @interruptable
           #log.info 'Gracefully shutting down provisioner...'
-          puts 'Gracefully shutting down provisioner...'
-          exit 0
+         # print "Gracefully shutting down provisioner...\n"
+          exit
         else
-          puts "queueing signal #{signal} until task complete"
+          print "queueing signal #{signal} until task complete\n"
           @enqueued.push(signal)
         end
       end
@@ -33,7 +34,11 @@ module Loom
       @interruptable = true
       # Send the temporarily ignored signals to ourself
       # see http://www.ruby-doc.org/core/classes/Process.html#M001286
-      @enqueued.each { |signal| Process.kill(signal, 0) }
+      #@enqueued.each { |signal| Process.kill(signal, 0) }
+      @enqueued.each do |signal|
+        #print "*** sending queued #{signal} to process #{Process.pid} ***\n"
+        Process.kill(signal, Process.pid)
+      end
     end
   end
 

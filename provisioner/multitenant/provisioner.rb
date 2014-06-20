@@ -7,8 +7,28 @@ module Loom
     attr_accessor :tenantmanagers
 
     def initialize()
-      #@tenantmanagers = Array.new
       @tenantmanagers = {}
+
+      # register signal handler here, and set callback to notify all tenantmanangers
+      Signal.trap('CLD') do
+        puts "********** Provisioner callback Received CLD signal ***********"
+        @tenantmanagers.each do |k, v|
+          v.verify_children
+        end
+      end
+
+      Signal.trap('TERM') do
+        if !@shutting_down
+          @shutting_down = true
+          @tenantmanagers.each do |k, v|
+            v.terminate_all_worker_processes
+          end
+          Process.waitall
+          puts "provisioner shutdown complete"
+          exit
+        end
+      end
+
     end 
 
     def add_tenant(tenantmgr)
@@ -31,12 +51,6 @@ module Loom
         @tenantmanagers[id] = tenantmgr
       end 
  
-      #@tenantmanagers[id] = tenantmgr
-#      @tenantmanagers.push(tenantmgr)
-
-      # start the worker threads
-#      puts "calling spawn"
-#      tenantmgr.spawn
     end
 
     def delete_tenant(id)
