@@ -46,7 +46,7 @@ import java.io.Reader;
  *
  */
 public class LoomTaskHandlerTest extends LoomServiceTestBase {
-  private static final Gson GSON = new JsonSerde().getGson();
+  private final Gson GSON = jsonSerde.getGson();
 
   @Test
   public void testTakeTask() throws Exception {

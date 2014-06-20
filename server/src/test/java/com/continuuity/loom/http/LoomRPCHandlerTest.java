@@ -27,7 +27,6 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.Scheduler;
@@ -53,7 +52,7 @@ import java.util.Set;
  *
  */
 public class LoomRPCHandlerTest extends LoomServiceTestBase {
-  private static Gson GSON = new JsonSerde().getGson();
+  private static Gson GSON = jsonSerde.getGson();
   private static ClusterTemplate smallTemplate;
 
   @BeforeClass

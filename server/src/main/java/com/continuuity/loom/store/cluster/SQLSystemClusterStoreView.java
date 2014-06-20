@@ -1,6 +1,7 @@
 package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryHelper;
 
@@ -14,8 +15,8 @@ import java.sql.SQLException;
  */
 public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
 
-  public SQLSystemClusterStoreView(DBConnectionPool dbConnectionPool) {
-    super(dbConnectionPool);
+  public SQLSystemClusterStoreView(DBConnectionPool dbConnectionPool, JsonSerde serde) {
+    super(dbConnectionPool, serde);
   }
 
   @Override

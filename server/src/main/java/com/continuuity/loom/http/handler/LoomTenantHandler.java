@@ -47,14 +47,15 @@ import java.util.UUID;
 @Path("/v1/tenants")
 public class LoomTenantHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomTenantHandler.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
+  private final Gson gson;
   private final TenantStore store;
 
   @Inject
-  private LoomTenantHandler(TenantStore store) {
+  private LoomTenantHandler(TenantStore store, JsonSerde jsonSerde) {
     super(store);
     this.store = store;
+    this.gson = jsonSerde.getGson();
   }
 
   /**
@@ -134,7 +135,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
     Tenant requestedTenant;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      requestedTenant = GSON.fromJson(reader, Tenant.class);
+      requestedTenant = gson.fromJson(reader, Tenant.class);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
       return;
@@ -186,7 +187,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
     Tenant tenant = null;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      tenant = GSON.fromJson(reader, Tenant.class);
+      tenant = gson.fromJson(reader, Tenant.class);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
       return;

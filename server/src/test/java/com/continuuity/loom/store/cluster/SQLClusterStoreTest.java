@@ -15,10 +15,16 @@
  */
 package com.continuuity.loom.store.cluster;
 
+import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.guice.CodecModule;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.conf.guice.ConfigurationModule;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.guice.StoreModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -37,8 +43,13 @@ public class SQLClusterStoreTest extends ClusterStoreTest {
     sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
     sqlConf.setLong(Constants.ID_START_NUM, 1);
     sqlConf.setLong(Constants.ID_INCREMENT_BY, 1);
-    DBConnectionPool dbConnectionPool = new DBConnectionPool(sqlConf);
-    sqlClusterStoreService = new SQLClusterStoreService(dbConnectionPool);
+    Injector injector = Guice.createInjector(
+      new ConfigurationModule(sqlConf),
+      new StoreModule(),
+      new CodecModule()
+    );
+    DBConnectionPool dbConnectionPool = injector.getInstance(DBConnectionPool.class);
+    sqlClusterStoreService = new SQLClusterStoreService(dbConnectionPool, injector.getInstance(JsonSerde.class));
     sqlClusterStoreService.startAndWait();
   }
 

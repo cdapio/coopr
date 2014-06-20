@@ -31,7 +31,6 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.utils.ImmutablePair;
@@ -107,7 +106,7 @@ public class BaseSolverTest extends BaseTest {
       Administration.EMPTY_ADMINISTRATION
     );
     reactorTemplate2 =
-      new JsonSerde().getGson().fromJson(Entities.ClusterTemplateExample.REACTOR2_STRING, ClusterTemplate.class);
+      jsonSerde.getGson().fromJson(Entities.ClusterTemplateExample.REACTOR2_STRING, ClusterTemplate.class);
 
     EntityStoreView entityStore = entityStoreService.getView(account);
     // create providers

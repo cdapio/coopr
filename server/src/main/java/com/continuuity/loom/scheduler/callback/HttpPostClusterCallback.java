@@ -16,7 +16,7 @@
 package com.continuuity.loom.scheduler.callback;
 
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.current.CurrentJsonSerde;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.scheduler.ClusterAction;
@@ -51,7 +51,7 @@ import java.util.Set;
  */
 public class HttpPostClusterCallback implements ClusterCallback {
   private static final Logger LOG = LoggerFactory.getLogger(HttpPostClusterCallback.class);
-  private static final Gson GSON = new JsonSerde().getGson();
+  private final Gson gson = new CurrentJsonSerde().getGson();
   private String onStartUrl;
   private String onSuccessUrl;
   private String onFailureUrl;
@@ -163,10 +163,10 @@ public class HttpPostClusterCallback implements ClusterCallback {
 
     try {
       JsonObject body = new JsonObject();
-      body.add("cluster", GSON.toJsonTree(data.getCluster()));
-      body.add("job", GSON.toJsonTree(data.getJob()));
-      body.add("nodes", GSON.toJsonTree(nodes));
-      post.setEntity(new StringEntity(GSON.toJson(body)));
+      body.add("cluster", gson.toJsonTree(data.getCluster()));
+      body.add("job", gson.toJsonTree(data.getJob()));
+      body.add("nodes", gson.toJsonTree(nodes));
+      post.setEntity(new StringEntity(gson.toJson(body)));
       httpClient.execute(post);
     } catch (UnsupportedEncodingException e) {
       LOG.warn("Exception setting http post body", e);

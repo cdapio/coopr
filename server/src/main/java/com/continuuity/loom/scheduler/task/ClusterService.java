@@ -56,7 +56,6 @@ import java.util.Set;
  */
 public class ClusterService {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterService.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
@@ -68,6 +67,7 @@ public class ClusterService {
   private final LoomStats loomStats;
   private final Solver solver;
   private final IdService idService;
+  private final Gson gson;
 
   @Inject
   public ClusterService(ClusterStoreService clusterStoreService,
@@ -78,7 +78,8 @@ public class ClusterService {
                         ZKClient zkClient,
                         LoomStats loomStats,
                         Solver solver,
-                        IdService idService) {
+                        IdService idService,
+                        JsonSerde jsonSerde) {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
@@ -89,6 +90,7 @@ public class ClusterService {
     this.loomStats = loomStats;
     this.solver = solver;
     this.idService = idService;
+    this.gson = jsonSerde.getGson();
   }
 
   /**
@@ -123,8 +125,8 @@ public class ClusterService {
 
     LOG.debug("adding create cluster element to solverQueue");
     SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER,
-                                                    GSON.toJson(clusterCreateRequest));
-    solverQueue.add(new Element(cluster.getId(), GSON.toJson(solverRequest)));
+                                                    gson.toJson(clusterCreateRequest));
+    solverQueue.add(new Element(cluster.getId(), gson.toJson(solverRequest)));
 
     loomStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
     return cluster.getId();
@@ -354,8 +356,8 @@ public class ClusterService {
       clusterStore.writeClusterJob(job);
 
       loomStats.getClusterStats().incrementStat(action);
-      SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, GSON.toJson(addRequest));
-      solverQueue.add(new Element(clusterId, GSON.toJson(solverRequest)));
+      SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, gson.toJson(addRequest));
+      solverQueue.add(new Element(clusterId, gson.toJson(solverRequest)));
     } finally {
       lock.release();
     }

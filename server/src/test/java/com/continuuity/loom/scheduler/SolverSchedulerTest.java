@@ -32,7 +32,6 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.common.conf.Constants;
@@ -64,7 +63,7 @@ import java.util.Set;
  *
  */
 public class SolverSchedulerTest extends BaseTest {
-  private static Gson GSON = new JsonSerde().getGson();
+  private static Gson GSON = jsonSerde.getGson();
   private static TimeoutTrackingQueue solverQueue;
   private static TimeoutTrackingQueue clusterQueue;
   private static SolverScheduler solverScheduler;

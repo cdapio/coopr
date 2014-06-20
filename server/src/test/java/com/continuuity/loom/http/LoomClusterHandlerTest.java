@@ -34,7 +34,6 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.conf.Configuration;
@@ -47,7 +46,6 @@ import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.ClusterScheduler;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
-import com.continuuity.loom.scheduler.SchedulerTest;
 import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -92,7 +90,7 @@ import java.util.Set;
  */
 public class LoomClusterHandlerTest extends LoomServiceTestBase {
   private static ClusterTemplate reactorTemplate;
-  private static Gson GSON = new JsonSerde().getGson();
+  private static Gson GSON = jsonSerde.getGson();
   private static ClusterTemplate smallTemplate;
   private static JsonObject defaultClusterConfig;
   private static JobScheduler jobScheduler;
@@ -278,7 +276,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   public void testDeleteCluster() throws Exception {
     //Create cluster
     String clusterId = "2";
-    Cluster cluster = new JsonSerde().getGson().fromJson(SchedulerTest.TEST_CLUSTER, Cluster.class);
+    Cluster cluster = Entities.ClusterExample.createCluster();
     cluster.setStatus(Cluster.Status.ACTIVE);
     ClusterJob clusterJob = new ClusterJob(new JobId(clusterId, 1), ClusterAction.CLUSTER_DELETE);
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
@@ -286,8 +284,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     clusterStore.writeClusterJob(clusterJob);
 
-    Node node1 = new JsonSerde().getGson().fromJson(SchedulerTest.NODE1, Node.class);
-    Node node2 = new JsonSerde().getGson().fromJson(SchedulerTest.NODE2, Node.class);
+    Node node1 = Entities.ClusterExample.NODE1;
+    Node node2 = Entities.ClusterExample.NODE2;
     clusterStore.writeNode(node1);
     clusterStore.writeNode(node2);
 
@@ -820,7 +818,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   @Test
   public void testAdminCanDeleteClustersOwnedByOthers() throws Exception {
     String clusterId = "2";
-    Cluster cluster = new JsonSerde().getGson().fromJson(SchedulerTest.TEST_CLUSTER, Cluster.class);
+    Cluster cluster = Entities.ClusterExample.createCluster();
     cluster.setStatus(Cluster.Status.ACTIVE);
     ClusterJob clusterJob = new ClusterJob(new JobId(clusterId, 1), ClusterAction.CLUSTER_DELETE);
     clusterJob.setJobStatus(ClusterJob.Status.COMPLETE);
@@ -972,10 +970,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testClusterTemplateSync() throws Exception {
-    ClusterTemplate template = Entities.ClusterTemplateExample.HDFS;
-    Cluster cluster =
-      new Cluster("123", USER1_ACCOUNT, "name", System.currentTimeMillis(), "description", Entities.ProviderExample.RACKSPACE,
-                  template, ImmutableSet.<String>of(), ImmutableSet.<String>of());
+    Cluster cluster = Entities.ClusterExample.createCluster();
+    ClusterTemplate template = cluster.getClusterTemplate();
     cluster.setStatus(Cluster.Status.ACTIVE);
     clusterStoreService.getView(USER1_ACCOUNT).writeCluster(cluster);
     clusterStore.writeNode(Entities.ClusterExample.NODE1);
@@ -1004,7 +1000,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testClusterTemplateSync404Conditions() throws Exception {
-    Cluster cluster = Entities.ClusterExample.CLUSTER;
+    Cluster cluster = Entities.ClusterExample.createCluster();
     Account clusterAccount = cluster.getAccount();
     cluster.setStatus(Cluster.Status.ACTIVE);
     clusterStoreService.getView(clusterAccount).writeCluster(cluster);
@@ -1034,7 +1030,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testClusterTemplateSyncOnlyAllowedOnActiveClusters() throws Exception {
-    Cluster cluster = Entities.ClusterExample.CLUSTER;
+    Cluster cluster = Entities.ClusterExample.createCluster();
     Account clusterAccount = cluster.getAccount();
     clusterStoreService.getView(clusterAccount).writeCluster(cluster);
     entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(cluster.getClusterTemplate());
@@ -1053,7 +1049,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testClusterTemplateSyncDisallowsIncompatibilities() throws Exception {
-    Cluster cluster = Entities.ClusterExample.CLUSTER;
+    Cluster cluster = Entities.ClusterExample.createCluster();
     Account clusterAccount = cluster.getAccount();
     ClusterTemplate template = cluster.getClusterTemplate();
     cluster.setStatus(Cluster.Status.ACTIVE);

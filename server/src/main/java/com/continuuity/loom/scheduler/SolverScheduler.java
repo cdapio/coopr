@@ -54,7 +54,6 @@ import java.util.concurrent.Callable;
 public class SolverScheduler implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(SolverScheduler.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
   private final String id;
   private final Solver solver;
@@ -65,6 +64,7 @@ public class SolverScheduler implements Runnable {
   private final TaskService taskService;
   private final LoomStats loomStats;
   private final IdService idService;
+  private final Gson gson;
 
   @Inject
   private SolverScheduler(@Named("scheduler.id") String id, Solver solver,
@@ -72,7 +72,7 @@ public class SolverScheduler implements Runnable {
                           @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
                           @Named(Constants.Queue.CLUSTER) TrackingQueue clusterQueue,
                           @Named("solver.executor.service") ListeningExecutorService executorService,
-                          TaskService taskService, LoomStats loomStats, IdService idService) {
+                          TaskService taskService, LoomStats loomStats, IdService idService, JsonSerde jsonSerde) {
     this.id = id;
     this.solver = solver;
     this.clusterStore = clusterStoreService.getSystemView();
@@ -82,6 +82,7 @@ public class SolverScheduler implements Runnable {
     this.taskService = taskService;
     this.loomStats = loomStats;
     this.idService = idService;
+    this.gson = jsonSerde.getGson();
   }
 
   @Override
@@ -137,17 +138,17 @@ public class SolverScheduler implements Runnable {
 
         // Get cluster job for solving.
         solverJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-        SolverRequest solverRequest = GSON.fromJson(solveElement.getValue(), SolverRequest.class);
+        SolverRequest solverRequest = gson.fromJson(solveElement.getValue(), SolverRequest.class);
         try {
           solverJob.setJobStatus(ClusterJob.Status.RUNNING);
           clusterStore.writeClusterJob(solverJob);
 
           switch (solverRequest.getType()) {
             case CREATE_CLUSTER:
-              return solveClusterCreate(cluster, GSON.fromJson(solverRequest.getJsonRequest(),
+              return solveClusterCreate(cluster, gson.fromJson(solverRequest.getJsonRequest(),
                                                                ClusterCreateRequest.class));
             case ADD_SERVICES:
-              return solveAddServices(cluster, GSON.fromJson(solverRequest.getJsonRequest(), AddServicesRequest.class));
+              return solveAddServices(cluster, gson.fromJson(solverRequest.getJsonRequest(), AddServicesRequest.class));
             default:
               return "unknown solver request type " + solverRequest.getType();
           }

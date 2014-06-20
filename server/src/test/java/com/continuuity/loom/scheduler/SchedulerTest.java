@@ -19,19 +19,17 @@ import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.cluster.Cluster;
-import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.http.handler.LoomService;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
-import com.continuuity.loom.common.zookeeper.IdService;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
@@ -57,8 +55,6 @@ import java.util.concurrent.TimeUnit;
  * Test ClusterScheduler
  */
 public class SchedulerTest extends BaseTest {
-  private static final Gson GSON = new JsonSerde().getGson();
-
   private static TimeoutTrackingQueue inputQueue;
   private static TimeoutTrackingQueue provisionQueue;
   private static TimeoutTrackingQueue callbackQueue;
@@ -67,6 +63,7 @@ public class SchedulerTest extends BaseTest {
   private static TimeoutTrackingQueue jobQueue;
   private static Cluster cluster;
   private static ClusterJob job;
+  private static Gson gson = jsonSerde.getGson();
 
   @BeforeClass
   public static void start() throws Exception {
@@ -113,17 +110,14 @@ public class SchedulerTest extends BaseTest {
     callbackQueue.removeAll();
     mockClusterCallback.clear();
 
-    cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
+    cluster = Entities.ClusterExample.createCluster();
     job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     clusterStore.writeClusterJob(job);
 
-    Node node = GSON.fromJson(NODE1, Node.class);
-    clusterStore.writeNode(node);
-
-    node = GSON.fromJson(NODE2, Node.class);
-    clusterStore.writeNode(node);
+    clusterStore.writeNode(Entities.ClusterExample.NODE1);
+    clusterStore.writeNode(Entities.ClusterExample.NODE2);
   }
 
   @Test(timeout = 20000)
@@ -134,6 +128,9 @@ public class SchedulerTest extends BaseTest {
     inputQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
     clusterScheduler.run();
 
+    String hosts = Entities.ServiceExample.HOSTS.getName();
+    String namenode = Entities.ServiceExample.NAMENODE.getName();
+    String datanode = Entities.ServiceExample.DATANODE.getName();
     // Verify stages and actions
     List<Multiset<ActionService>> expectedStages =
       ImmutableList.<Multiset<ActionService>>of(
@@ -143,20 +140,20 @@ public class SchedulerTest extends BaseTest {
 
         ImmutableMultiset.of(new ActionService("BOOTSTRAP", ""), new ActionService("BOOTSTRAP", "")),
 
-        ImmutableMultiset.of(new ActionService("CONFIGURE", "hosts"), new ActionService("CONFIGURE", "hosts"),
-                             new ActionService("INSTALL", "hadoop-hdfs-datanode"),
-                             new ActionService("INSTALL", "hadoop-hdfs-namenode")),
+        ImmutableMultiset.of(new ActionService("CONFIGURE", hosts), new ActionService("CONFIGURE", hosts),
+                             new ActionService("INSTALL", datanode),
+                             new ActionService("INSTALL", namenode)),
 
-        ImmutableMultiset.of(new ActionService("CONFIGURE", "hadoop-hdfs-namenode"),
-                             new ActionService("CONFIGURE", "hadoop-hdfs-datanode")),
+        ImmutableMultiset.of(new ActionService("CONFIGURE", namenode),
+                             new ActionService("CONFIGURE", datanode)),
 
-        ImmutableMultiset.of(new ActionService("INITIALIZE", "hadoop-hdfs-namenode")),
+        ImmutableMultiset.of(new ActionService("INITIALIZE", namenode)),
 
-        ImmutableMultiset.of(new ActionService("START", "hadoop-hdfs-namenode")),
+        ImmutableMultiset.of(new ActionService("START", namenode)),
 
-        ImmutableMultiset.of(new ActionService("INITIALIZE", "hadoop-hdfs-datanode")),
+        ImmutableMultiset.of(new ActionService("INITIALIZE", datanode)),
 
-        ImmutableMultiset.of(new ActionService("START", "hadoop-hdfs-datanode"))
+        ImmutableMultiset.of(new ActionService("START", datanode))
       );
 
     List<Multiset<ActionService>> actualStages = Lists.newArrayList();
@@ -204,7 +201,7 @@ public class SchedulerTest extends BaseTest {
     returnJson.addProperty("status", 0);
     returnJson.addProperty("workerId", "consumer1");
     returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
-    returnJson.add("result", GSON.toJsonTree(ImmutableMap.of("ipaddress", "123.456.789.123")));
+    returnJson.add("result", gson.toJsonTree(ImmutableMap.of("ipaddress", "123.456.789.123")));
     TestHelper.finishTask(getLoomUrl(), returnJson);
 
     taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1");
@@ -212,7 +209,7 @@ public class SchedulerTest extends BaseTest {
     returnJson.addProperty("status", 0);
     returnJson.addProperty("workerId", "consumer1");
     returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
-    returnJson.add("result", GSON.toJsonTree(ImmutableMap.of("ipaddress", "456.789.123.123")));
+    returnJson.add("result", gson.toJsonTree(ImmutableMap.of("ipaddress", "456.789.123.123")));
     TestHelper.finishTask(getLoomUrl(), returnJson);
 
     TestHelper.takeTask(getLoomUrl(), "consumer1");
@@ -365,167 +362,4 @@ public class SchedulerTest extends BaseTest {
         .toString();
     }
   }
-
-  public static final String TEST_CLUSTER =
-    "{\n" +
-      "   \"id\":\"2\",\n" +
-      "   \"account\":{\n" +
-      "     \"userId\":\"user1\",\n" +
-      "     \"tenantId\":\"tenant1\"\n" +
-      "   },\n" +
-      "   \"name\":\"ashau-dev\",\n" +
-      "   \"description\":\"\",\n" +
-      "   \"status\":\"pending\",\n" +
-      "   \"createTime\":1234567890,\n" +
-      "   \"provider\":{\n" +
-      "      \"name\":\"joyent\",\n" +
-      "      \"description\":\"Joyent Compute Service\",\n" +
-      "      \"providertype\":\"joyent\",\n" +
-      "      \"provisioner\":{\n" +
-      "         \"auth\":{\n" +
-      "            \"joyent_username\":\"EXAMPLE_USERNAME\",\n" +
-      "            \"joyent_keyname\":\"EXAMPLE_KEYNAME\",\n" +
-      "            \"joyent_keyfile\":\"/path/to/example.key\",\n" +
-      "            \"joyent_version\":\"~7.0\"\n" +
-      "         }\n" +
-      "      }\n" +
-      "   },\n" +
-      "  \"clusterTemplate\":" + Entities.ClusterTemplateExample.HDFS_STRING +
-      "   ,\n" +
-      "   \"nodes\":[\n" +
-      "      \"c128b2fd-4cac-4ca1-ae99-b27a49b72e06\",\n" +
-      "      \"091a6330-b87b-4095-90f3-02e39e4b6dba\"\n" +
-      "   ],\n" +
-      "   \"services\":[\n" +
-      "      \"hosts\",\n" +
-      "      \"hadoop-hdfs-datanode\",\n" +
-      "      \"hadoop-hdfs-namenode\"\n" +
-      "   ],\n" +
-      "   \"latestJobId\":\"2-001\"\n" +
-      "}";
-
-  public static final String NODE1 =
-      "       {\n" +
-      "         \"id\":\"c128b2fd-4cac-4ca1-ae99-b27a49b72e06\",\n" +
-      "         \"clusterId\":\"2\",\n" +
-      "         \"services\":[\n" +
-      "            {\n" +
-      "               \"name\":\"hadoop-hdfs-namenode\",\n" +
-      "               \"description\":\"Hadoop HDFS NameNode\",\n" +
-      "               \"dependson\":[\n" +
-      "                  \"hosts\"\n" +
-      "               ],\n" +
-      "               \"provisioner\":{\n" +
-      "                  \"actions\":{\n" +
-      "                     \"install\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[hadoop::hadoop_hdfs_namenode]\"\n" +
-      "                     },\n" +
-      "                     \"initialize\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]\"\n" +
-      "                     },\n" +
-      "                     \"configure\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[hadoop::default]\"\n" +
-      "                     },\n" +
-      "                     \"start\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[loom_service_runner::default]\",\n" +
-      "                        \"data\":\"{\\\"loom\\\": { \\\"node\\\": { \\\"services\\\": [ \\\"hadoop-hdfs-namenode\\\": \\\"start\\\" ] } } }\"\n" +
-      "                     },\n" +
-      "                     \"stop\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[loom_service_runner::default]\",\n" +
-      "                        \"data\":\"{\\\"loom\\\": { \\\"node\\\": { \\\"services\\\": [ \\\"hadoop-hdfs-namenode\\\": \\\"stop\\\" ] } } }\"\n" +
-      "                     }\n" +
-      "                  }\n" +
-      "               }\n" +
-      "            },\n" +
-      "            {\n" +
-      "               \"name\":\"hosts\",\n" +
-      "               \"description\":\"Manages /etc/hosts\",\n" +
-      "               \"dependson\":[\n" +
-      "\n" +
-      "               ],\n" +
-      "               \"provisioner\":{\n" +
-      "                  \"actions\":{\n" +
-      "                     \"configure\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[loom_hosts::default]\"\n" +
-      "                     }\n" +
-      "                  }\n" +
-      "               }\n" +
-      "            }\n" +
-      "         ],\n" +
-      "         \"properties\":{\n" +
-      "            \"flavor\":\"Large 8GB\",\n" +
-      "            \"image\":\"325dbc5e-2b90-11e3-8a3e-bfdcb1582a8d\",\n" +
-      "            \"hostname\":\"node1.net\"\n" +
-      "         },\n" +
-      "         \"actions\":[]\n" +
-      "      }";
-
-  public static final String NODE2 =
-      "       {\n" +
-      "         \"id\":\"091a6330-b87b-4095-90f3-02e39e4b6dba\",\n" +
-      "         \"clusterId\":\"2\",\n" +
-      "         \"services\":[\n" +
-      "            {\n" +
-      "               \"name\":\"hadoop-hdfs-datanode\",\n" +
-      "               \"description\":\"Hadoop HDFS DataNode\",\n" +
-      "               \"dependson\":[\n" +
-      "                  \"hosts\",\n" +
-      "                  \"hadoop-hdfs-namenode\"\n" +
-      "               ],\n" +
-      "               \"provisioner\":{\n" +
-      "                  \"actions\":{\n" +
-      "                     \"install\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[hadoop::hadoop_hdfs_datanode]\"\n" +
-      "                     },\n" +
-        "                     \"initialize\":{\n" +
-        "                        \"type\":\"chef-solo\",\n" +
-        "                        \"script\":\"recipe[hadoop_wrapper::hadoop_hdfs_datanode_init]\"\n" +
-        "                     },\n" +
-      "                     \"configure\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[hadoop::default]\"\n" +
-      "                     },\n" +
-      "                     \"start\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[loom_service_runner::default]\",\n" +
-      "                        \"data\":\"{\\\"loom\\\": { \\\"node\\\": { \\\"services\\\": [ \\\"hadoop-hdfs-datanode\\\": \\\"start\\\" ] } } }\"\n" +
-      "                     },\n" +
-      "                     \"stop\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[loom_service_runner::default]\",\n" +
-      "                        \"data\":\"{\\\"loom\\\": { \\\"node\\\": { \\\"services\\\": [ \\\"hadoop-hdfs-datanode\\\": \\\"stop\\\" ] } } }\"\n" +
-      "                     }\n" +
-      "                  }\n" +
-      "               }\n" +
-      "            },\n" +
-      "            {\n" +
-      "               \"name\":\"hosts\",\n" +
-      "               \"description\":\"Manages /etc/hosts\",\n" +
-      "               \"dependson\":[\n" +
-      "\n" +
-      "               ],\n" +
-      "               \"provisioner\":{\n" +
-      "                  \"actions\":{\n" +
-      "                     \"configure\":{\n" +
-      "                        \"type\":\"chef-solo\",\n" +
-      "                        \"script\":\"recipe[loom_hosts::default]\"\n" +
-      "                     }\n" +
-      "                  }\n" +
-      "               }\n" +
-      "            }\n" +
-      "         ],\n" +
-      "         \"properties\":{\n" +
-      "            \"flavor\":\"Large 8GB\",\n" +
-      "            \"image\":\"325dbc5e-2b90-11e3-8a3e-bfdcb1582a8d\",\n" +
-      "            \"hostname\":\"node2.net\"\n" +
-      "         },\n" +
-      "         \"actions\":[]\n" +
-      "     }\n";
 }

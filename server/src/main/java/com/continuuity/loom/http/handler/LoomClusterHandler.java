@@ -69,25 +69,27 @@ import java.util.Set;
 @Path("/v1/loom/clusters")
 public class LoomClusterHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomClusterHandler.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
   private final JsonSerde codec;
   private final ClusterService clusterService;
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
   private final int maxClusterSize;
+  private final Gson gson;
 
   @Inject
   private LoomClusterHandler(TenantStore tenantStore,
                              ClusterService clusterService,
                              ClusterStoreService clusterStoreService,
-                             Configuration conf) {
+                             Configuration conf,
+                             JsonSerde codec) {
     super(tenantStore);
-    this.codec = new JsonSerde();
     this.clusterService = clusterService;
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.maxClusterSize = conf.getInt(Constants.MAX_CLUSTER_SIZE);
+    this.codec = codec;
+    this.gson = codec.getGson();
   }
 
   /**
@@ -153,11 +155,11 @@ public class LoomClusterHandler extends LoomAuthHandler {
         return;
       }
 
-      JsonObject jsonObject = GSON.toJsonTree(cluster).getAsJsonObject();
+      JsonObject jsonObject = gson.toJsonTree(cluster).getAsJsonObject();
 
       // Update cluster Json with node information.
       Set<Node> clusterNodes = view.getClusterNodes(clusterId);
-      jsonObject.add("nodes", GSON.toJsonTree(clusterNodes));
+      jsonObject.add("nodes", gson.toJsonTree(clusterNodes));
 
       // Add last job message if any
       ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
@@ -423,7 +425,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
 
     try {
-      JsonObject jsonObject = GSON.fromJson(request.getContent().toString(Charsets.UTF_8), JsonObject.class);
+      JsonObject jsonObject = gson.fromJson(request.getContent().toString(Charsets.UTF_8), JsonObject.class);
       if (jsonObject == null || !jsonObject.has("expireTime")) {
         responder.sendError(HttpResponseStatus.BAD_REQUEST, "expire time not specified");
         return;
@@ -547,7 +549,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
     ClusterConfigureRequest configRequest;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      configRequest = GSON.fromJson(reader, ClusterConfigureRequest.class);
+      configRequest = gson.fromJson(reader, ClusterConfigureRequest.class);
     } catch (Exception e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body.");
       return;
@@ -593,7 +595,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
     AddServicesRequest addServicesRequest;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      addServicesRequest = GSON.fromJson(reader, AddServicesRequest.class);
+      addServicesRequest = gson.fromJson(reader, AddServicesRequest.class);
     } catch (Exception e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body.");
       return;

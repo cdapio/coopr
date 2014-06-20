@@ -15,6 +15,8 @@
  */
 package com.continuuity.loom;
 
+import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.guice.CodecModule;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
@@ -64,6 +66,7 @@ public class BaseTest {
   protected static Configuration conf;
   protected static MockClusterCallback mockClusterCallback;
   protected static IdService idService;
+  protected static JsonSerde jsonSerde;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -91,7 +94,8 @@ public class BaseTest {
         new StoreModule(),
         new QueueModule(zkClientService),
         new HttpModule(),
-        new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor())
+        new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor()),
+        new CodecModule()
       ).with(
         new AbstractModule() {
           @Override
@@ -113,6 +117,7 @@ public class BaseTest {
     clusterStoreService = sqlClusterStoreService;
     tenantStore = sqlTenantStore;
     clusterStore = clusterStoreService.getSystemView();
+    jsonSerde = injector.getInstance(JsonSerde.class);
   }
 
   @AfterClass

@@ -38,9 +38,9 @@ import java.util.List;
  */
 public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   private static final Logger LOG  = LoggerFactory.getLogger(SQLTenantStore.class);
-  private static final JsonSerde codec = new JsonSerde();
 
   private final DBConnectionPool dbConnectionPool;
+  private final JsonSerde codec;
 
   // for unit tests only.  Truncate is not supported in derby.
   public void clearData() throws SQLException {
@@ -58,14 +58,15 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   }
 
   @Inject
-  SQLTenantStore(DBConnectionPool dbConnectionPool) throws SQLException, ClassNotFoundException {
+  SQLTenantStore(DBConnectionPool dbConnectionPool, JsonSerde codec) throws SQLException, ClassNotFoundException {
     this.dbConnectionPool = dbConnectionPool;
+    this.codec = codec;
   }
 
   @Override
   protected void startUp() throws Exception {
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
-      DBQueryHelper.createDerbyTable(
+      DBQueryHelper.createDerbyTableIfNotExists(
         "CREATE TABLE tenants ( id VARCHAR(255), name VARCHAR(255), workers INT, tenant BLOB )", dbConnectionPool);
     }
   }
@@ -83,7 +84,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
         PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants WHERE id=?");
         statement.setString(1, id);
         try {
-          return DBQueryHelper.getQueryItem(statement, Tenant.class);
+          return DBQueryHelper.getQueryItem(statement, Tenant.class, codec);
         } finally {
           statement.close();
         }
@@ -103,7 +104,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants");
         try {
-          return DBQueryHelper.getQueryList(statement, Tenant.class);
+          return DBQueryHelper.getQueryList(statement, Tenant.class, codec);
         } finally {
           statement.close();
         }

@@ -15,10 +15,17 @@
  */
 package com.continuuity.loom.store.entity;
 
+import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.guice.CodecModule;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.conf.guice.ConfigurationModule;
+import com.continuuity.loom.scheduler.guice.SchedulerModule;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.guice.StoreModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -35,8 +42,13 @@ public class SQLEntityStoreServiceTest extends EntityStoreServiceTest {
     Configuration sqlConf = Configuration.create();
     sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
-    DBConnectionPool dbConnectionPool = new DBConnectionPool(sqlConf);
-    sqlStore = new SQLEntityStoreService(dbConnectionPool);
+    Injector injector = Guice.createInjector(
+      new ConfigurationModule(sqlConf),
+      new StoreModule(),
+      new CodecModule()
+    );
+    DBConnectionPool dbConnectionPool = injector.getInstance(DBConnectionPool.class);
+    sqlStore = new SQLEntityStoreService(dbConnectionPool, injector.getInstance(JsonSerde.class));
     sqlStore.startAndWait();
     entityStoreService = sqlStore;
   }

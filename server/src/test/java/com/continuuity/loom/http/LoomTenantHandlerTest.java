@@ -38,7 +38,7 @@ import java.util.UUID;
  *
  */
 public class LoomTenantHandlerTest extends LoomServiceTestBase {
-  private static final Gson GSON = new JsonSerde().getGson();
+  private final Gson GSON = jsonSerde.getGson();
 
   @Before
   public void clearData() throws SQLException {

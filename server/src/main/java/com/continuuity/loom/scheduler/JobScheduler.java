@@ -59,7 +59,6 @@ import java.util.Set;
 public class JobScheduler implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(JobScheduler.class);
   private static final String consumerId = "jobscheduler";
-  private static final JsonSerde jsonSerde = new JsonSerde();
 
   private final ClusterStore clusterStore;
   private final TrackingQueue provisionerQueue;
@@ -67,6 +66,7 @@ public class JobScheduler implements Runnable {
   private final ZKClient zkClient;
   private final TaskService taskService;
   private final int maxTaskRetries;
+  private final JsonSerde jsonSerde;
 
   @Inject
   private JobScheduler(ClusterStoreService clusterStoreService,
@@ -74,13 +74,15 @@ public class JobScheduler implements Runnable {
                        @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
                        ZKClient zkClient,
                        TaskService taskService,
-                       Configuration conf) {
+                       Configuration conf,
+                       JsonSerde jsonSerde) {
     this.clusterStore = clusterStoreService.getSystemView();
     this.provisionerQueue = provisionerQueue;
     this.jobQueue = jobQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.taskService = taskService;
     this.maxTaskRetries = conf.getInt(Constants.MAX_ACTION_RETRIES);
+    this.jsonSerde = jsonSerde;
   }
 
   @Override

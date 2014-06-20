@@ -29,17 +29,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * A full view of the cluster store backed by a sql database.
  */
 public class SQLClusterStore implements ClusterStore {
   private static final Logger LOG  = LoggerFactory.getLogger(SQLClusterStore.class);
-  private static final JsonSerde CODEC = new JsonSerde();
+  private final JsonSerde codec;
   private final DBConnectionPool dbConnectionPool;
   private final ClusterStoreView systemView;
 
-  SQLClusterStore(DBConnectionPool dbConnectionPool) {
+  SQLClusterStore(DBConnectionPool dbConnectionPool, JsonSerde codec) {
     this.dbConnectionPool = dbConnectionPool;
-    this.systemView = new SQLSystemClusterStoreView(dbConnectionPool);
+    this.systemView = new SQLSystemClusterStoreView(dbConnectionPool, codec);
+    this.codec = codec;
   }
 
   @Override
@@ -51,7 +52,7 @@ public class SQLClusterStore implements ClusterStore {
         statement.setLong(1, jobId.getJobNum());
         statement.setLong(2, Long.parseLong(jobId.getClusterId()));
         try {
-          return DBQueryHelper.getQueryItem(statement, ClusterJob.class);
+          return DBQueryHelper.getQueryItem(statement, ClusterJob.class, codec);
         } finally {
           statement.close();
         }
@@ -148,7 +149,7 @@ public class SQLClusterStore implements ClusterStore {
               // cluster exists already, perform an update.
               writeStatement =
                 conn.prepareStatement("UPDATE jobs SET job=?, status=? WHERE job_num=? AND cluster_id=?");
-              writeStatement.setBlob(1, new ByteArrayInputStream(CODEC.serialize(clusterJob, ClusterJob.class)));
+              writeStatement.setBlob(1, new ByteArrayInputStream(codec.serialize(clusterJob, ClusterJob.class)));
               writeStatement.setString(2, clusterJob.getJobStatus().name());
               writeStatement.setLong(3, jobId.getJobNum());
               writeStatement.setLong(4, clusterId);
@@ -160,7 +161,7 @@ public class SQLClusterStore implements ClusterStore {
               writeStatement.setLong(2, clusterId);
               writeStatement.setString(3, clusterJob.getJobStatus().name());
               writeStatement.setTimestamp(4, DBQueryHelper.getTimestamp(System.currentTimeMillis()));
-              writeStatement.setBlob(5, new ByteArrayInputStream(CODEC.serialize(clusterJob, ClusterJob.class)));
+              writeStatement.setBlob(5, new ByteArrayInputStream(codec.serialize(clusterJob, ClusterJob.class)));
             }
           } finally {
             rs.close();
@@ -214,7 +215,7 @@ public class SQLClusterStore implements ClusterStore {
         statement.setLong(2, Long.parseLong(taskId.getClusterId()));
         statement.setLong(3, taskId.getJobNum());
         try {
-          return DBQueryHelper.getQueryItem(statement, ClusterTask.class);
+          return DBQueryHelper.getQueryItem(statement, ClusterTask.class, codec);
         } finally {
           statement.close();
         }
@@ -248,7 +249,7 @@ public class SQLClusterStore implements ClusterStore {
               writeStatement = conn.prepareStatement(
                 "UPDATE tasks SET task=?, status=?, submit_time=?, status_time=?" +
                   " WHERE task_num=? AND job_num=? AND cluster_id=?");
-              writeStatement.setBlob(1, new ByteArrayInputStream(CODEC.serialize(clusterTask, ClusterTask.class)));
+              writeStatement.setBlob(1, new ByteArrayInputStream(codec.serialize(clusterTask, ClusterTask.class)));
               writeStatement.setString(2, clusterTask.getStatus().name());
               writeStatement.setTimestamp(3, DBQueryHelper.getTimestamp(clusterTask.getSubmitTime()));
               writeStatement.setTimestamp(4, DBQueryHelper.getTimestamp(clusterTask.getStatusTime()));
@@ -265,7 +266,7 @@ public class SQLClusterStore implements ClusterStore {
               writeStatement.setLong(3, clusterId);
               writeStatement.setString(4, clusterTask.getStatus().name());
               writeStatement.setTimestamp(5, DBQueryHelper.getTimestamp(clusterTask.getSubmitTime()));
-              writeStatement.setBlob(6, new ByteArrayInputStream(CODEC.serialize(clusterTask, ClusterTask.class)));
+              writeStatement.setBlob(6, new ByteArrayInputStream(codec.serialize(clusterTask, ClusterTask.class)));
             }
           } finally {
             rs.close();
@@ -318,7 +319,7 @@ public class SQLClusterStore implements ClusterStore {
         PreparedStatement statement = conn.prepareStatement("SELECT node FROM nodes WHERE id=? ");
         statement.setString(1, nodeId);
         try {
-          return DBQueryHelper.getQueryItem(statement, Node.class);
+          return DBQueryHelper.getQueryItem(statement, Node.class, codec);
         } finally {
           statement.close();
         }
@@ -346,7 +347,7 @@ public class SQLClusterStore implements ClusterStore {
             if (rs.next()) {
               // node exists already, perform an update.
               writeStatement = conn.prepareStatement("UPDATE nodes SET node=? WHERE id=?");
-              writeStatement.setBlob(1, new ByteArrayInputStream(CODEC.serialize(node, Node.class)));
+              writeStatement.setBlob(1, new ByteArrayInputStream(codec.serialize(node, Node.class)));
               writeStatement.setString(2, node.getId());
             } else {
               // node does not exist, perform an insert.
@@ -354,7 +355,7 @@ public class SQLClusterStore implements ClusterStore {
                 "INSERT INTO nodes (id, cluster_id, node) VALUES (?, ?, ?)");
               writeStatement.setString(1, node.getId());
               writeStatement.setLong(2, Long.parseLong(node.getClusterId()));
-              writeStatement.setBlob(3, new ByteArrayInputStream(CODEC.serialize(node, Node.class)));
+              writeStatement.setBlob(3, new ByteArrayInputStream(codec.serialize(node, Node.class)));
             }
           } finally {
             rs.close();
@@ -406,7 +407,7 @@ public class SQLClusterStore implements ClusterStore {
         statement.setString(1, ClusterTask.Status.IN_PROGRESS.name());
         statement.setTimestamp(2, DBQueryHelper.getTimestamp(timestamp));
         try {
-          return DBQueryHelper.getQuerySet(statement, ClusterTask.class);
+          return DBQueryHelper.getQuerySet(statement, ClusterTask.class, codec);
         } finally {
           statement.close();
         }
@@ -429,7 +430,7 @@ public class SQLClusterStore implements ClusterStore {
         statement.setString(2, Cluster.Status.INCOMPLETE.name());
         statement.setTimestamp(3, DBQueryHelper.getTimestamp(timestamp));
         try {
-          return DBQueryHelper.getQuerySet(statement, Cluster.class);
+          return DBQueryHelper.getQuerySet(statement, Cluster.class, codec);
         } finally {
           statement.close();
         }
@@ -445,7 +446,7 @@ public class SQLClusterStore implements ClusterStore {
     Reader reader = new InputStreamReader(blob.getBinaryStream(), Charsets.UTF_8);
     T object;
     try {
-      object = CODEC.deserialize(reader, clazz);
+      object = codec.deserialize(reader, clazz);
     } finally {
       Closeables.closeQuietly(reader);
     }

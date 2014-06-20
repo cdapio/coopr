@@ -33,8 +33,8 @@ import java.util.Collection;
  * Abstract {@link EntityStoreView} that represents entities as json.
  */
 public abstract class BaseEntityStoreView implements EntityStoreView {
-  private static final JsonSerde codec = new JsonSerde();
-  private static final Function<byte[], Provider> PROVIDER_TRANSFORM =
+  private final JsonSerde codec;
+  private final Function<byte[], Provider> providerTransform =
     new Function<byte[], Provider>() {
       @Nullable
       @Override
@@ -42,7 +42,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
         return codec.deserialize(input, Provider.class);
       }
     };
-  private static final Function<byte[], HardwareType> HARDWARE_TYPE_TRANSFORM =
+  private final Function<byte[], HardwareType> hardwareTypeTransform =
     new Function<byte[], HardwareType>() {
       @Nullable
       @Override
@@ -50,7 +50,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
         return codec.deserialize(input, HardwareType.class);
       }
     };
-  private static final Function<byte[], ImageType> IMAGE_TYPE_TRANSFORM =
+  private final Function<byte[], ImageType> imageTypeTransform =
     new Function<byte[], ImageType>() {
       @Nullable
       @Override
@@ -58,7 +58,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
         return codec.deserialize(input, ImageType.class);
       }
   };
-  private static final Function<byte[], Service> SERVICE_TRANSFORM =
+  private final Function<byte[], Service> serviceTransform =
     new Function<byte[], Service>() {
       @Nullable
       @Override
@@ -66,7 +66,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
         return codec.deserialize(input, Service.class);
       }
     };
-  private static final Function<byte[], ClusterTemplate> CLUSTER_TEMPLATE_TRANSFORM =
+  private final Function<byte[], ClusterTemplate> clusterTemplateTransform =
     new Function<byte[], ClusterTemplate>() {
       @Nullable
       @Override
@@ -74,7 +74,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
         return codec.deserialize(input, ClusterTemplate.class);
       }
     };
-  private static final Function<byte[], ProviderType> PROVIDER_TYPE_TRANSFORM =
+  private final Function<byte[], ProviderType> providerTypeTransform =
     new Function<byte[], ProviderType>() {
       @Nullable
       @Override
@@ -82,7 +82,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
         return codec.deserialize(input, ProviderType.class);
       }
     };
-  private static final Function<byte[], AutomatorType> AUTOMATOR_TYPE_TRANSFORM =
+  private final Function<byte[], AutomatorType> automatorTypeTransform =
     new Function<byte[], AutomatorType>() {
       @Nullable
       @Override
@@ -113,14 +113,18 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     }
   }
 
+  protected BaseEntityStoreView(JsonSerde codec) {
+    this.codec = codec;
+  }
+
   @Override
   public Provider getProvider(String providerName) throws IOException {
-    return get(EntityType.PROVIDER, providerName, PROVIDER_TRANSFORM);
+    return get(EntityType.PROVIDER, providerName, providerTransform);
   }
 
   @Override
   public Collection<Provider> getAllProviders() throws IOException {
-    return getAllEntities(EntityType.PROVIDER, PROVIDER_TRANSFORM);
+    return getAllEntities(EntityType.PROVIDER, providerTransform);
   }
 
   @Override
@@ -135,12 +139,12 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public HardwareType getHardwareType(String hardwareTypeName) throws IOException {
-    return get(EntityType.HARDWARE_TYPE, hardwareTypeName, HARDWARE_TYPE_TRANSFORM);
+    return get(EntityType.HARDWARE_TYPE, hardwareTypeName, hardwareTypeTransform);
   }
 
   @Override
   public Collection<HardwareType> getAllHardwareTypes() throws IOException {
-    return getAllEntities(EntityType.HARDWARE_TYPE, HARDWARE_TYPE_TRANSFORM);
+    return getAllEntities(EntityType.HARDWARE_TYPE, hardwareTypeTransform);
   }
 
   @Override
@@ -155,12 +159,12 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public ImageType getImageType(String imageTypeName) throws IOException {
-    return get(EntityType.IMAGE_TYPE, imageTypeName, IMAGE_TYPE_TRANSFORM);
+    return get(EntityType.IMAGE_TYPE, imageTypeName, imageTypeTransform);
   }
 
   @Override
   public Collection<ImageType> getAllImageTypes() throws IOException {
-    return getAllEntities(EntityType.IMAGE_TYPE, IMAGE_TYPE_TRANSFORM);
+    return getAllEntities(EntityType.IMAGE_TYPE, imageTypeTransform);
   }
 
   @Override
@@ -175,12 +179,12 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public Service getService(String serviceName) throws IOException {
-    return get(EntityType.SERVICE, serviceName, SERVICE_TRANSFORM);
+    return get(EntityType.SERVICE, serviceName, serviceTransform);
   }
 
   @Override
   public Collection<Service> getAllServices() throws IOException {
-    return getAllEntities(EntityType.SERVICE, SERVICE_TRANSFORM);
+    return getAllEntities(EntityType.SERVICE, serviceTransform);
   }
 
   @Override
@@ -195,12 +199,12 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public ClusterTemplate getClusterTemplate(String clusterTemplateName) throws IOException {
-    return get(EntityType.CLUSTER_TEMPLATE, clusterTemplateName, CLUSTER_TEMPLATE_TRANSFORM);
+    return get(EntityType.CLUSTER_TEMPLATE, clusterTemplateName, clusterTemplateTransform);
   }
 
   @Override
   public Collection<ClusterTemplate> getAllClusterTemplates() throws IOException {
-    return getAllEntities(EntityType.CLUSTER_TEMPLATE, CLUSTER_TEMPLATE_TRANSFORM);
+    return getAllEntities(EntityType.CLUSTER_TEMPLATE, clusterTemplateTransform);
   }
 
   @Override
@@ -216,12 +220,12 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public ProviderType getProviderType(String providerTypeName) throws IOException {
-    return get(EntityType.PROVIDER_TYPE, providerTypeName, PROVIDER_TYPE_TRANSFORM);
+    return get(EntityType.PROVIDER_TYPE, providerTypeName, providerTypeTransform);
   }
 
   @Override
   public Collection<ProviderType> getAllProviderTypes() throws IOException {
-    return getAllEntities(EntityType.PROVIDER_TYPE, PROVIDER_TYPE_TRANSFORM);
+    return getAllEntities(EntityType.PROVIDER_TYPE, providerTypeTransform);
   }
 
   @Override
@@ -236,12 +240,12 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public AutomatorType getAutomatorType(String automatorTypeName) throws IOException {
-    return get(EntityType.AUTOMATOR_TYPE, automatorTypeName, AUTOMATOR_TYPE_TRANSFORM);
+    return get(EntityType.AUTOMATOR_TYPE, automatorTypeName, automatorTypeTransform);
   }
 
   @Override
   public Collection<AutomatorType> getAllAutomatorTypes() throws IOException {
-    return getAllEntities(EntityType.AUTOMATOR_TYPE, AUTOMATOR_TYPE_TRANSFORM);
+    return getAllEntities(EntityType.AUTOMATOR_TYPE, automatorTypeTransform);
   }
 
   @Override

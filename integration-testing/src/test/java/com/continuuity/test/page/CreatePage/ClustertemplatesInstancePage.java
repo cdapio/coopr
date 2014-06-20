@@ -20,7 +20,7 @@ import com.continuuity.loom.admin.Compatibilities;
 import com.continuuity.loom.admin.Constraints;
 import com.continuuity.loom.admin.LayoutConstraint;
 import com.continuuity.loom.admin.ServiceConstraint;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.current.CurrentJsonSerde;
 import com.continuuity.test.Constants;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -42,7 +42,7 @@ import static com.continuuity.test.drivers.Global.globalDriver;
  */
 public class ClustertemplatesInstancePage extends GenericPage {
   // Constants in Default tab
-  private static final Gson GSON = new JsonSerde().getGson();
+  private static final Gson GSON = new CurrentJsonSerde().getGson();
   private static final By PROVIDER = By.name("inputProvider");
   private static final By HARDWARETYPE = By.name("inputHardwaretype");
   private static final By IMAGETYPE = By.name("inputImagetype");

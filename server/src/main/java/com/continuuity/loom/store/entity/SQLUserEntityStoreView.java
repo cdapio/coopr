@@ -16,6 +16,7 @@
 package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -35,8 +36,8 @@ import java.util.List;
  */
 public class SQLUserEntityStoreView extends BaseSQLEntityStoreView {
 
-  SQLUserEntityStoreView(Account account, DBConnectionPool dbConnectionPool) {
-    super(account, dbConnectionPool);
+  SQLUserEntityStoreView(Account account, DBConnectionPool dbConnectionPool, JsonSerde codec) {
+    super(account, dbConnectionPool, codec);
   }
 
   @Override

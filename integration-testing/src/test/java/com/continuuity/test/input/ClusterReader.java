@@ -15,7 +15,7 @@
  */
 package com.continuuity.test.input;
 
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.current.CurrentJsonSerde;
 import com.continuuity.test.Constants;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
@@ -39,7 +39,7 @@ import java.util.Set;
 public class ClusterReader {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterReader.class);
 
-  private static final Gson GSON = new JsonSerde().getGson();
+  private static final Gson GSON = new CurrentJsonSerde().getGson();
   private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   private static final String URI = "/v1/loom/clusters/00000028";
   private static final List<String> KEYS = ImmutableList.of("00000139", "00000138", "00000135");

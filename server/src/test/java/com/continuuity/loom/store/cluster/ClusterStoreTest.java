@@ -21,9 +21,9 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.guice.CodecModule;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.scheduler.ClusterAction;
-import com.continuuity.loom.scheduler.SchedulerTest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
@@ -32,6 +32,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,12 +47,12 @@ import java.util.Set;
  * protected store field before each test and make sure state is wiped out between tests.
  */
 public abstract class ClusterStoreTest {
-  private static final Gson GSON = new JsonSerde().getGson();
   private static final Account tenant1_user1 = new Account("user1", "tenant1");
   private static final Account tenant1_user2 = new Account("user2", "tenant1");
   private static final Account tenant1_admin = new Account(Constants.ADMIN_USER, "tenant1");
   private static final Account tenant2_user1 = new Account("user1", "tenant2");
   private static final Account tenant2_admin = new Account(Constants.ADMIN_USER, "tenant2");
+  private static Gson GSON;
 
   protected static ClusterStoreService clusterStoreService;
   protected static ClusterStore systemView;
@@ -60,6 +62,10 @@ public abstract class ClusterStoreTest {
 
   @Before
   public void setupTest() throws Exception {
+    Injector injector = Guice.createInjector(
+      new CodecModule()
+    );
+    GSON = injector.getInstance(JsonSerde.class).getGson();
     clusterStoreService = getClusterStoreService();
     systemView = clusterStoreService.getSystemView();
     clearState();
@@ -252,7 +258,7 @@ public abstract class ClusterStoreTest {
 
   @Test
   public void testGetStoreDeleteNode() throws Exception {
-    Node node = GSON.fromJson(SchedulerTest.NODE1, Node.class);
+    Node node = Entities.ClusterExample.NODE1;
     Assert.assertNull(systemView.getNode(node.getId()));
 
     systemView.writeNode(node);
@@ -267,14 +273,14 @@ public abstract class ClusterStoreTest {
 
   @Test
   public void testGetClusterNodes() throws Exception {
-    Cluster cluster = new JsonSerde().getGson().fromJson(SchedulerTest.TEST_CLUSTER, Cluster.class);
+    Cluster cluster = Entities.ClusterExample.createCluster();
     ClusterStoreView store = clusterStoreService.getView(cluster.getAccount());
     store.writeCluster(cluster);
 
-    Node node1 = GSON.fromJson(SchedulerTest.NODE1, Node.class);
+    Node node1 = Entities.ClusterExample.NODE1;
     systemView.writeNode(node1);
 
-    Node node2 = GSON.fromJson(SchedulerTest.NODE2, Node.class);
+    Node node2 = Entities.ClusterExample.NODE2;
     systemView.writeNode(node2);
 
     Set<Node> nodes =  store.getClusterNodes(cluster.getId());
@@ -297,10 +303,10 @@ public abstract class ClusterStoreTest {
 
   @Test
   public void testGetNodes() throws Exception {
-    Node node1 = GSON.fromJson(SchedulerTest.NODE1, Node.class);
+    Node node1 = Entities.ClusterExample.NODE1;
     systemView.writeNode(node1);
 
-    Node node2 = GSON.fromJson(SchedulerTest.NODE2, Node.class);
+    Node node2 = Entities.ClusterExample.NODE2;
     systemView.writeNode(node2);
 
     systemView.deleteNode(node1.getId());

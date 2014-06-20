@@ -21,7 +21,7 @@ import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.NamedEntity;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.current.CurrentJsonSerde;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -38,7 +38,7 @@ import java.util.Map;
  * Read examples files.
  */
 public class ExampleReader {
-  private static final Gson GSON = new JsonSerde().getGson();
+  private static final Gson GSON = new CurrentJsonSerde().getGson();
   private static final Logger LOG = LoggerFactory.getLogger(ExampleReader.class);
 
   public Map<String, ImageType> getImageTypes(String pathName) throws Exception {

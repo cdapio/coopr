@@ -36,10 +36,11 @@ import java.util.Set;
  */
 public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   private final DBConnectionPool dbConnectionPool;
-  private static final JsonSerde CODEC = new JsonSerde();
+  private final JsonSerde codec;
 
-  BaseSQLClusterStoreView(DBConnectionPool dbConnectionPool) {
+  BaseSQLClusterStoreView(DBConnectionPool dbConnectionPool, JsonSerde codec) {
     this.dbConnectionPool = dbConnectionPool;
+    this.codec = codec;
   }
 
   abstract PreparedStatement getSelectAllClustersStatement(Connection conn) throws SQLException;
@@ -66,7 +67,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       try {
         PreparedStatement statement = getSelectAllClustersStatement(conn);
         try {
-          return DBQueryHelper.getQueryList(statement, Cluster.class);
+          return DBQueryHelper.getQueryList(statement, Cluster.class, codec);
         } finally {
           statement.close();
         }
@@ -86,7 +87,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       try {
         PreparedStatement statement = getSelectClusterStatement(conn, clusterNum);
         try {
-          return DBQueryHelper.getQueryItem(statement, Cluster.class);
+          return DBQueryHelper.getQueryItem(statement, Cluster.class, codec);
         } finally {
           statement.close();
         }
@@ -135,7 +136,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement writeStatement;
-        ByteArrayInputStream clusterBytes = new ByteArrayInputStream(CODEC.serialize(cluster, Cluster.class));
+        ByteArrayInputStream clusterBytes = new ByteArrayInputStream(codec.serialize(cluster, Cluster.class));
         if (clusterExists(cluster.getId())) {
           writeStatement = getSetClusterStatement(conn, clusterNum, cluster, clusterBytes);
         } else {
@@ -185,7 +186,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
         PreparedStatement statement = getSelectClusterJobsStatement(conn, clusterNum);
 
         try {
-          return DBQueryHelper.getQueryList(statement, ClusterJob.class, limit);
+          return DBQueryHelper.getQueryList(statement, ClusterJob.class, codec, limit);
         } finally {
           statement.close();
         }
@@ -205,7 +206,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       try {
         PreparedStatement statement = getSelectClusterNodesStatement(conn, clusterNum);
         try {
-          return DBQueryHelper.getQuerySet(statement, Node.class);
+          return DBQueryHelper.getQuerySet(statement, Node.class, codec);
         } finally {
           statement.close();
         }

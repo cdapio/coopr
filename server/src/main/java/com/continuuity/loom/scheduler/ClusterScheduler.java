@@ -19,6 +19,7 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
@@ -36,6 +37,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -61,6 +63,7 @@ public class ClusterScheduler implements Runnable {
   private final TrackingQueue inputQueue;
   private final TaskService taskService;
   private final IdService idService;
+  private final Gson gson;
 
   private final Actions actions = Actions.getInstance();
 
@@ -69,12 +72,14 @@ public class ClusterScheduler implements Runnable {
                            ClusterStoreService clusterStoreService,
                            @Named(Constants.Queue.CLUSTER) TrackingQueue inputQueue,
                            TaskService taskService,
-                           IdService idService) {
+                           IdService idService,
+                           JsonSerde jsonSerde) {
     this.id = id;
     this.clusterStore = clusterStoreService.getSystemView();
     this.inputQueue = inputQueue;
     this.taskService = taskService;
     this.idService = idService;
+    this.gson = jsonSerde.getGson();
   }
 
   @Override
@@ -167,7 +172,7 @@ public class ClusterScheduler implements Runnable {
         Node node = nodeMap.get(taskNode.getHostId());
         Service service = serviceMap.get(taskNode.getService());
         JsonObject taskConfig =
-          TaskConfig.getConfig(cluster, node, service, ProvisionerAction.valueOf(taskNode.getTaskName()));
+          TaskConfig.getConfig(cluster, node, service, ProvisionerAction.valueOf(taskNode.getTaskName()), gson);
         if (taskConfig == null) {
           LOG.debug("Not scheduling {} for job {} since config is null", taskNode, job.getJobId());
           continue;

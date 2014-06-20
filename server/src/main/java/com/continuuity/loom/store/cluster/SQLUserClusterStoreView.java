@@ -2,6 +2,7 @@ package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryHelper;
 
@@ -17,8 +18,8 @@ import java.sql.SQLException;
 public class SQLUserClusterStoreView extends BaseSQLClusterStoreView {
   private final Account account;
 
-  public SQLUserClusterStoreView(DBConnectionPool dbConnectionPool, Account account) {
-    super(dbConnectionPool);
+  public SQLUserClusterStoreView(DBConnectionPool dbConnectionPool, Account account, JsonSerde serde) {
+    super(dbConnectionPool, serde);
     this.account = account;
   }
 

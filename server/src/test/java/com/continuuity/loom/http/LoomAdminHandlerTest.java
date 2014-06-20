@@ -23,7 +23,6 @@ import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.http.handler.LoomAdminHandler;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -48,7 +47,7 @@ import java.util.Set;
  *
  */
 public class LoomAdminHandlerTest extends LoomServiceTestBase {
-  private static final Gson GSON = new JsonSerde().getGson();
+  private final Gson gson = jsonSerde.getGson();
 
   @Test
   public void testProviders() throws Exception {
@@ -107,34 +106,37 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     // Import some config
     Map<String, JsonElement> import1 = Maps.newHashMap();
     import1.put(LoomAdminHandler.PROVIDERS,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ProviderExample.JOYENT),
-                                new TypeToken<List<Provider>>() {}.getType()));
+                gson.toJsonTree(Lists.newArrayList(Entities.ProviderExample.JOYENT),
+                                new TypeToken<List<Provider>>() {
+                                }.getType()));
     import1.put(LoomAdminHandler.HARDWARE_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.LARGE,
+                gson.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.LARGE,
                                                    Entities.HardwareTypeExample.MEDIUM),
-                                new TypeToken<List<HardwareType>>() {}.getType()));
+                                new TypeToken<List<HardwareType>>() {
+                                }.getType()));
     import1.put(LoomAdminHandler.IMAGE_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6,
+                gson.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6,
                                                    Entities.ImageTypeExample.UBUNTU_12),
                                 new TypeToken<List<ImageType>>() {}.getType()));
 
     import1.put(LoomAdminHandler.SERVICES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
+                gson.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
                                                    Entities.ServiceExample.NAMENODE),
-                                new TypeToken<List<Service>>() {}.getType()));
+                                new TypeToken<List<Service>>() {
+                                }.getType()));
 
     import1.put(LoomAdminHandler.CLUSTER_TEMPLATES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
+                gson.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
                                                    Entities.ClusterTemplateExample.REACTOR),
                                 new TypeToken<List<ClusterTemplate>>() {}.getType()));
 
     import1.put(LoomAdminHandler.PROVIDER_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ProviderTypeExample.JOYENT,
+                gson.toJsonTree(Lists.newArrayList(Entities.ProviderTypeExample.JOYENT,
                                                    Entities.ProviderTypeExample.RACKSPACE),
                                 new TypeToken<List<ProviderType>>() {}.getType()));
 
     import1.put(LoomAdminHandler.AUTOMATOR_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.AutomatorTypeExample.CHEF,
+                gson.toJsonTree(Lists.newArrayList(Entities.AutomatorTypeExample.CHEF,
                                                    Entities.AutomatorTypeExample.PUPPET),
                                 new TypeToken<List<AutomatorType>>() {}.getType()));
 
@@ -144,35 +146,37 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     // Import some other config
     Map<String, JsonElement> import2 = Maps.newHashMap();
     import2.put(LoomAdminHandler.PROVIDERS,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ProviderExample.RACKSPACE,
+                gson.toJsonTree(Lists.newArrayList(Entities.ProviderExample.RACKSPACE,
                                                    Entities.ProviderExample.JOYENT),
                                 new TypeToken<List<Provider>>() {}.getType()));
     import2.put(LoomAdminHandler.HARDWARE_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.MEDIUM,
+                gson.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.MEDIUM,
                                                    Entities.HardwareTypeExample.SMALL),
-                                new TypeToken<List<HardwareType>>() {}.getType()));
+                                new TypeToken<List<HardwareType>>() {
+                                }.getType()));
     import2.put(LoomAdminHandler.IMAGE_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6),
+                gson.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6),
                                 new TypeToken<List<ImageType>>() {}.getType()));
 
     import2.put(LoomAdminHandler.SERVICES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
+                gson.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
                                                    Entities.ServiceExample.NAMENODE,
                                                    Entities.ServiceExample.HOSTS),
                                 new TypeToken<List<Service>>() {}.getType()));
 
     import2.put(LoomAdminHandler.CLUSTER_TEMPLATES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
+                gson.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
                                                    Entities.ClusterTemplateExample.REACTOR),
-                                new TypeToken<List<ClusterTemplate>>() {}.getType()));
+                                new TypeToken<List<ClusterTemplate>>() {
+                                }.getType()));
 
     import2.put(LoomAdminHandler.PROVIDER_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ProviderTypeExample.USER_RACKSPACE),
+                gson.toJsonTree(Lists.newArrayList(Entities.ProviderTypeExample.USER_RACKSPACE),
                                 new TypeToken<List<ProviderType>>() {
                                 }.getType()));
 
     import2.put(LoomAdminHandler.AUTOMATOR_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.AutomatorTypeExample.CHEF,
+                gson.toJsonTree(Lists.newArrayList(Entities.AutomatorTypeExample.CHEF,
                                                    Entities.AutomatorTypeExample.SHELL),
                                 new TypeToken<List<AutomatorType>>() {
                                 }.getType()));
@@ -195,7 +199,7 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
   }
 
   private void runImportExportTest(Map<String, JsonElement> importJson) throws Exception {
-    assertResponseStatus(doPost("/v1/loom/import", GSON.toJson(importJson), ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/v1/loom/import", gson.toJson(importJson), ADMIN_HEADERS), HttpResponseStatus.OK);
 
     // verify using export
     HttpResponse response = doGet("/v1/loom/export", ADMIN_HEADERS);
@@ -218,10 +222,12 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
       return;
     }
 
-    Assert.assertEquals(GSON.fromJson(import1.get(key),
-                                      new TypeToken<Set<?>>() {}.getType()),
-                        GSON.fromJson(export1.get(key),
-                                      new TypeToken<Set<?>>() {}.getType()));
+    Assert.assertEquals(gson.fromJson(import1.get(key),
+                                      new TypeToken<Set<?>>() {
+                                      }.getType()),
+                        gson.fromJson(export1.get(key),
+                                      new TypeToken<Set<?>>() {
+                                      }.getType()));
   }
 
   @Test

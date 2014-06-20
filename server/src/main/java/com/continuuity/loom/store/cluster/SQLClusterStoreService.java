@@ -1,6 +1,7 @@
 package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryHelper;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -19,11 +20,13 @@ public class SQLClusterStoreService extends AbstractIdleService implements Clust
   private static final Logger LOG  = LoggerFactory.getLogger(SQLClusterStoreService.class);
   private final DBConnectionPool dbConnectionPool;
   private final ClusterStore clusterStore;
+  private final JsonSerde serde;
 
   @Inject
-  public SQLClusterStoreService(DBConnectionPool dbConnectionPool) {
+  public SQLClusterStoreService(DBConnectionPool dbConnectionPool, JsonSerde serde) {
     this.dbConnectionPool = dbConnectionPool;
-    this.clusterStore = new SQLClusterStore(dbConnectionPool);
+    this.serde = serde;
+    this.clusterStore = new SQLClusterStore(dbConnectionPool, serde);
   }
 
   // for unit tests only
@@ -52,24 +55,62 @@ public class SQLClusterStoreService extends AbstractIdleService implements Clust
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
       LOG.warn("Initializing Derby DB... Tables are not optimized for performance.");
 
-      DBQueryHelper.createDerbyTable("CREATE TABLE clusters ( " +
-                                       "id BIGINT, " +
-                                       "owner_id VARCHAR(255), " +
-                                       "tenant_id VARCHAR(255), " +
-                                       "name VARCHAR(255), " +
-                                       "create_time TIMESTAMP, " +
-                                       "expire_time TIMESTAMP, " +
-                                       "status VARCHAR(32), " +
-                                       "cluster BLOB )",
-                                     dbConnectionPool);
-      DBQueryHelper.createDerbyTable("CREATE TABLE jobs ( cluster_id BIGINT, job_num BIGINT, status VARCHAR(32)," +
-                                       " create_time TIMESTAMP, job BLOB)",
-                                     dbConnectionPool);
-      DBQueryHelper.createDerbyTable("CREATE TABLE tasks ( cluster_id BIGINT, job_num BIGINT, task_num BIGINT," +
-                                       "submit_time TIMESTAMP, status_time TIMESTAMP, status VARCHAR(32), task BLOB )",
-                                     dbConnectionPool);
-      DBQueryHelper.createDerbyTable("CREATE TABLE nodes ( cluster_id BIGINT, id VARCHAR(64), node BLOB )",
-                                     dbConnectionPool);
+      boolean created = DBQueryHelper.createDerbyTableIfNotExists("CREATE TABLE clusters ( " +
+                                                                    "id BIGINT, " +
+                                                                    "owner_id VARCHAR(255), " +
+                                                                    "tenant_id VARCHAR(255), " +
+                                                                    "name VARCHAR(255), " +
+                                                                    "create_time TIMESTAMP, " +
+                                                                    "expire_time TIMESTAMP, " +
+                                                                    "status VARCHAR(32), " +
+                                                                    "cluster BLOB, " +
+                                                                    "PRIMARY KEY (id) )",
+                                                                  dbConnectionPool);
+      if (created) {
+        DBQueryHelper.createDerbyIndex(dbConnectionPool,
+                                       "clusters_account_index", "clusters", "tenant_id", "owner_id", "id");
+        DBQueryHelper.createDerbyIndex(dbConnectionPool, "clusters_ctime_index", "clusters", "create_time");
+        DBQueryHelper.createDerbyIndex(dbConnectionPool, "clusters_status_index", "clusters", "status");
+      }
+
+      created = DBQueryHelper.createDerbyTableIfNotExists("CREATE TABLE jobs ( " +
+                                                            "cluster_id BIGINT, " +
+                                                            "job_num BIGINT, " +
+                                                            "status VARCHAR(32), " +
+                                                            "create_time TIMESTAMP, " +
+                                                            "job BLOB, " +
+                                                            "PRIMARY KEY (job_num, cluster_id) )",
+                                                          dbConnectionPool);
+      if (created) {
+        DBQueryHelper.createDerbyIndex(dbConnectionPool, "jobs_ctime_index", "jobs", "create_time");
+        DBQueryHelper.createDerbyIndex(dbConnectionPool, "jobs_status_index", "jobs", "status");
+      }
+
+      created = DBQueryHelper.createDerbyTableIfNotExists("CREATE TABLE tasks ( " +
+                                                            "cluster_id BIGINT, " +
+                                                            "job_num BIGINT, " +
+                                                            "task_num BIGINT, " +
+                                                            "submit_time TIMESTAMP, " +
+                                                            "status_time TIMESTAMP, " +
+                                                            "status VARCHAR(32), " +
+                                                            "task BLOB, " +
+                                                            "PRIMARY KEY (task_num, job_num, cluster_id) )",
+                                                          dbConnectionPool);
+      if (created) {
+        DBQueryHelper.createDerbyIndex(dbConnectionPool, "tasks_status_time_index", "tasks", "status_time");
+        DBQueryHelper.createDerbyIndex(dbConnectionPool, "tasks_submit_time_index", "tasks", "submit_time");
+        DBQueryHelper.createDerbyIndex(dbConnectionPool, "tasks_status_index", "tasks", "status");
+      }
+
+      created = DBQueryHelper.createDerbyTableIfNotExists("CREATE TABLE nodes ( " +
+                                                            "cluster_id BIGINT, " +
+                                                            "id VARCHAR(64), " +
+                                                            "node BLOB, " +
+                                                            "PRIMARY KEY (id) )",
+                                                          dbConnectionPool);
+      if (created) {
+        DBQueryHelper.createDerbyIndex(dbConnectionPool, "nodes_cluster_index", "nodes", "cluster_id", "id");
+      }
     }
   }
 
@@ -83,9 +124,9 @@ public class SQLClusterStoreService extends AbstractIdleService implements Clust
     if (account.isSystem()) {
       return clusterStore;
     } else if (account.isAdmin()) {
-      return new SQLAdminClusterStoreView(dbConnectionPool, account);
+      return new SQLAdminClusterStoreView(dbConnectionPool, account, serde);
     } else {
-      return new SQLUserClusterStoreView(dbConnectionPool, account);
+      return new SQLUserClusterStoreView(dbConnectionPool, account, serde);
     }
   }
 

@@ -229,7 +229,7 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     SchedulableTask schedulableTask = new SchedulableTask(task);
 
     // add a task to the queue without storing it.
-    nodeProvisionTaskQueue.add(new Element(task.getTaskId(), new JsonSerde().getGson().toJson(schedulableTask)));
+    nodeProvisionTaskQueue.add(new Element(task.getTaskId(), jsonSerde.getGson().toJson(schedulableTask)));
     nodeProvisionTaskQueue.take("0");
 
     clusterCleanup.run();

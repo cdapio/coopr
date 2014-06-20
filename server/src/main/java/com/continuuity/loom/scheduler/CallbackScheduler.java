@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 public class CallbackScheduler implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(CallbackScheduler.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
   private final String id;
   private final TrackingQueue jobQueue;
@@ -49,6 +48,7 @@ public class CallbackScheduler implements Runnable {
   private final ClusterCallback clusterCallback;
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
+  private final Gson gson;
 
   @Inject
   private CallbackScheduler(@Named("scheduler.id") String id,
@@ -58,7 +58,8 @@ public class CallbackScheduler implements Runnable {
                             TaskService taskService,
                             ClusterCallback clusterCallback,
                             Configuration conf,
-                            ClusterStoreService clusterStoreService) {
+                            ClusterStoreService clusterStoreService,
+                            JsonSerde jsonSerde) {
     this.id = id;
     this.callbackQueue = callbackQueue;
     this.jobQueue = jobQueue;
@@ -66,6 +67,7 @@ public class CallbackScheduler implements Runnable {
     this.taskService = taskService;
     this.clusterCallback = clusterCallback;
     this.clusterCallback.initialize(conf, clusterStoreService);
+    this.gson = jsonSerde.getGson();
   }
 
   @Override
@@ -104,7 +106,7 @@ public class CallbackScheduler implements Runnable {
 
     @Override
     public void run() {
-      CallbackData callbackData = GSON.fromJson(element.getValue(), CallbackData.class);
+      CallbackData callbackData = gson.fromJson(element.getValue(), CallbackData.class);
       switch (callbackData.getType()) {
         case START:
           onStart(callbackData);

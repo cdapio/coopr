@@ -16,6 +16,7 @@
 package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -37,7 +38,8 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
   protected final DBConnectionPool dbConnectionPool;
   protected final String accountErrorSnippet;
 
-  BaseSQLEntityStoreView(Account account, DBConnectionPool dbConnectionPool) {
+  BaseSQLEntityStoreView(Account account, DBConnectionPool dbConnectionPool, JsonSerde codec) {
+    super(codec);
     this.account = account;
     this.dbConnectionPool = dbConnectionPool;
     this.accountErrorSnippet = " from tenant " + account.getTenantId();
