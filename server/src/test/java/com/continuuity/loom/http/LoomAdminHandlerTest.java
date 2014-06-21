@@ -16,10 +16,12 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.http.handler.LoomAdminHandler;
@@ -126,6 +128,16 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
                                                    Entities.ClusterTemplateExample.REACTOR),
                                 new TypeToken<List<ClusterTemplate>>() {}.getType()));
 
+    import1.put(LoomAdminHandler.PROVIDER_TYPES,
+                GSON.toJsonTree(Lists.newArrayList(Entities.ProviderTypeExample.JOYENT,
+                                                   Entities.ProviderTypeExample.RACKSPACE),
+                                new TypeToken<List<ProviderType>>() {}.getType()));
+
+    import1.put(LoomAdminHandler.AUTOMATOR_TYPES,
+                GSON.toJsonTree(Lists.newArrayList(Entities.AutomatorTypeExample.CHEF,
+                                                   Entities.AutomatorTypeExample.PUPPET),
+                                new TypeToken<List<AutomatorType>>() {}.getType()));
+
     // Verify import worked by exporting
     runImportExportTest(import1);
 
@@ -154,6 +166,17 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
                                                    Entities.ClusterTemplateExample.REACTOR),
                                 new TypeToken<List<ClusterTemplate>>() {}.getType()));
 
+    import2.put(LoomAdminHandler.PROVIDER_TYPES,
+                GSON.toJsonTree(Lists.newArrayList(Entities.ProviderTypeExample.USER_RACKSPACE),
+                                new TypeToken<List<ProviderType>>() {
+                                }.getType()));
+
+    import2.put(LoomAdminHandler.AUTOMATOR_TYPES,
+                GSON.toJsonTree(Lists.newArrayList(Entities.AutomatorTypeExample.CHEF,
+                                                   Entities.AutomatorTypeExample.SHELL),
+                                new TypeToken<List<AutomatorType>>() {
+                                }.getType()));
+
     // Verify import worked by exporting
     runImportExportTest(import2);
 
@@ -164,6 +187,8 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     import3.put(LoomAdminHandler.IMAGE_TYPES, new JsonArray());
     import3.put(LoomAdminHandler.SERVICES, new JsonArray());
     import3.put(LoomAdminHandler.CLUSTER_TEMPLATES, new JsonArray());
+    import3.put(LoomAdminHandler.AUTOMATOR_TYPES, new JsonArray());
+    import3.put(LoomAdminHandler.PROVIDER_TYPES, new JsonArray());
 
     // Verify import worked by exporting
     runImportExportTest(import3);
@@ -184,6 +209,8 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     assertImport(importJson, exportJson, LoomAdminHandler.IMAGE_TYPES);
     assertImport(importJson, exportJson, LoomAdminHandler.SERVICES);
     assertImport(importJson, exportJson, LoomAdminHandler.CLUSTER_TEMPLATES);
+    assertImport(importJson, exportJson, LoomAdminHandler.AUTOMATOR_TYPES);
+    assertImport(importJson, exportJson, LoomAdminHandler.PROVIDER_TYPES);
   }
 
   private void assertImport(Map<String, JsonElement> import1, Map<String, JsonElement> export1, String key) {
