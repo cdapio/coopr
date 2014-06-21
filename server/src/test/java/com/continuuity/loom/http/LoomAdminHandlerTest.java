@@ -24,6 +24,7 @@ import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.http.handler.LoomAdminHandler;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

@@ -21,7 +21,7 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.SchedulerTest;
 import com.continuuity.loom.scheduler.task.ClusterJob;

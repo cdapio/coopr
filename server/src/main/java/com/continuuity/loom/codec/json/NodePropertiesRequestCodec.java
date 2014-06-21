@@ -1,5 +1,6 @@
-package com.continuuity.loom.http;
+package com.continuuity.loom.codec.json;
 
+import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -11,7 +12,7 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Deserializes {@link NodePropertiesRequest}.
+ * Deserializes {@link com.continuuity.loom.http.request.NodePropertiesRequest}.
  */
 public class NodePropertiesRequestCodec implements JsonDeserializer<NodePropertiesRequest> {
 

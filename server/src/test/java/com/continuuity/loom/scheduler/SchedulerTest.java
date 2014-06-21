@@ -24,8 +24,8 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.http.LoomService;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.http.handler.LoomService;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -263,11 +263,10 @@ public class SchedulerTest extends BaseTest {
     waitForCallback(callbackScheduler);
     Assert.assertEquals(CallbackData.Type.START, mockClusterCallback.getReceivedCallbacks().get(0).getType());
 
-    JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
-    jobScheduler.run();
-
     // wait for fail callback to finish
-    waitForCallback(callbackScheduler);
+    if (mockClusterCallback.getReceivedCallbacks().size() < 2) {
+      waitForCallback(callbackScheduler);
+    }
     Assert.assertEquals(CallbackData.Type.FAILURE, mockClusterCallback.getReceivedCallbacks().get(1).getType());
 
     // there also should not be any jobs in the queue

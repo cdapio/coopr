@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.conf;
+package com.continuuity.loom.common.conf;
 
 import com.continuuity.loom.common.utils.ReflectionUtils;
 import com.continuuity.loom.common.utils.StringUtils;

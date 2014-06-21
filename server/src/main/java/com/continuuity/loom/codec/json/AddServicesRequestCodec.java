@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.codec.json;
 
-import com.continuuity.loom.http.AddServicesRequest;
-import com.continuuity.loom.http.ClusterConfigureRequest;
+import com.continuuity.loom.http.request.AddServicesRequest;
+import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -28,8 +28,8 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.http.AddServicesRequest}, used so some validation is done
- * on required fields.
+ * Codec for deserializing a {@link com.continuuity.loom.http.request.AddServicesRequest},
+ * used so some validation is done on required fields.
  */
 public class AddServicesRequestCodec implements JsonDeserializer<AddServicesRequest> {
 

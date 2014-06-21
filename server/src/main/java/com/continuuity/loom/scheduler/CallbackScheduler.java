@@ -17,10 +17,10 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -49,6 +49,7 @@ public class CallbackScheduler implements Runnable {
   private final ClusterCallback clusterCallback;
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
+
   @Inject
   private CallbackScheduler(@Named("scheduler.id") String id,
                             @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,

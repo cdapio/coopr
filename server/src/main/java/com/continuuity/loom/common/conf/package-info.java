@@ -17,5 +17,5 @@
 /**
  * Configuration constants and defaults.
  */
-package com.continuuity.loom.conf;
+package com.continuuity.loom.common.conf;
 
