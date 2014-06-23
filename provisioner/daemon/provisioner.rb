@@ -39,6 +39,12 @@ OptionParser.new do |opts|
   opts.on('-f', '--file FILE', 'Full path to task json') do |f|
     options[:file] = f
   end
+  opts.on('-t', '--tenant TENANT', 'Tenant ID') do |t|
+    options[:tenant] = t
+  end
+  opts.on('-p', '--provisioner PROVISIONER', 'Provisioner ID') do |p|
+    options[:provisioner] = p
+  end
   options[:register] = false
   opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do
     options[:register] = true
@@ -185,7 +191,7 @@ if options[:file]
 else
   # run in server polling mode
 
-  pid = $PROCESS_ID
+  pid = Process.pid
   host = Socket.gethostname.downcase
   myid = "#{host}.#{pid}"
 
@@ -196,7 +202,7 @@ else
     response = nil
     task = nil
     begin
-      response = RestClient.post "#{loom_uri}/v1/loom/tasks/take", { 'workerId' => myid }.to_json
+      response = RestClient.post "#{loom_uri}/v1/loom/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
     rescue => e
       log.error "Caught exception connecting to loom server #{loom_uri}/v1/loom/tasks/take: #{e}"
       sleep 10
