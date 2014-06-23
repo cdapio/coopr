@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'thin'
+#require 'thin'
 require 'sinatra/base'
 require 'json'
 
