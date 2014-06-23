@@ -6,13 +6,11 @@ module Loom
       @interruptable = false
       @enqueued     = []
       trap(signal) do
-        print "************ Worker callback received #{signal} signal **********\n"
         if @interruptable
           #log.info 'Gracefully shutting down provisioner...'
-         # print "Gracefully shutting down provisioner...\n"
+          #print "Gracefully shutting down provisioner...\n"
           exit
         else
-          print "queueing signal #{signal} until task complete\n"
           @enqueued.push(signal)
         end
       end

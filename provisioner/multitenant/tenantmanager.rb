@@ -5,7 +5,7 @@ require_relative 'worker'
 
 module Loom
   class TenantManager
-    attr_accessor :spec
+    attr_accessor :spec, :provisioner_id
     @workerthreads = []
     @workerpids = []
 
@@ -46,7 +46,7 @@ module Loom
           ret = Process.waitpid(pid, Process::WNOHANG)
           if ret == pid
             # child has died
-            puts "confirmed pid #{pid} dead"
+            #puts "confirmed pid #{pid} dead"
             @workerpids.delete_if {|x| x == pid }
           elsif ret.nil?
             # all good, child is running`
@@ -55,6 +55,7 @@ module Loom
           end
         rescue Errno::ECHILD
           # pid exists but is not my child
+          puts "non-child pid: #{pid}"
         end
       end
     end
@@ -75,7 +76,8 @@ module Loom
       cpid = fork { 
         #worker = Loom::Worker.new(worker_name)
         #worker.work
-        exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} worker.rb #{worker_name}")
+        #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} worker.rb #{worker_name}")
+        exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} ../daemon/provisioner.rb --tenant #{@spec.id} --provisioner #{@provisioner_id} --uri http://localhost:1515")
       }
 
       @workerpids.push(cpid)

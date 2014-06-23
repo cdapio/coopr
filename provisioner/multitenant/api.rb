@@ -13,8 +13,62 @@ module Loom
     attr_accessor :provisioner
 
     def initialize()
+      $stdout.sync = true
       super()
+      setup_signal_traps
       @provisioner = Loom::Provisioner.new
+      spawn_heartbeat_thread
+      spawn_signal_thread
+    end
+
+    def setup_signal_traps
+      $signals = Array.new
+      ['CLD', 'TERM'].each do |signal|
+        Signal.trap(signal) do
+          $signals << signal
+        end
+      end
+    end
+
+    def spawn_signal_thread
+      Thread.new {
+        loop {
+          puts "reaping signals: #{$signals}"
+          signals_processed = {}
+          while !$signals.empty?
+            sig = $signals.shift
+            next if signals_processed.key?(sig)
+            puts "processing signal: #{sig}"
+            case sig
+            when 'CLD'
+              @provisioner.tenantmanagers.each do |k, v|
+                v.verify_children
+              end
+            when 'TERM'
+              if !@shutting_down
+                @shutting_down = true
+                @provisioner.tenantmanagers.each do |k, v|
+                  v.terminate_all_worker_processes
+                end
+                Process.waitall
+                puts "provisioner shutdown complete"
+                exit
+              end
+            end
+            signals_processed[sig] = true
+          end
+        sleep 10
+        }
+      }
+    end
+
+    def spawn_heartbeat_thread
+      Thread.new {
+        loop {
+          puts @provisioner.heartbeat.to_json
+          sleep 10
+        }
+      }
     end
 
     get '/hi' do

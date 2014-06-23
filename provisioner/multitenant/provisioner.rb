@@ -4,31 +4,13 @@ require_relative 'tenantmanager'
 
 module Loom
   class Provisioner
-    attr_accessor :tenantmanagers
+    attr_accessor :tenantmanagers, :provisioner_id
 
     def initialize()
       @tenantmanagers = {}
-
-      # register signal handler here, and set callback to notify all tenantmanangers
-      Signal.trap('CLD') do
-        puts "********** Provisioner callback Received CLD signal ***********"
-        @tenantmanagers.each do |k, v|
-          v.verify_children
-        end
-      end
-
-      Signal.trap('TERM') do
-        if !@shutting_down
-          @shutting_down = true
-          @tenantmanagers.each do |k, v|
-            v.terminate_all_worker_processes
-          end
-          Process.waitall
-          puts "provisioner shutdown complete"
-          exit
-        end
-      end
-
+      pid = Process.pid
+      host = Socket.gethostname.downcase
+      @provisioner_id = "#{host}.#{pid}"
     end 
 
     def add_tenant(tenantmgr)
@@ -39,6 +21,9 @@ module Loom
       id = tenantmgr.id
       puts "Adding/Editing tenant: #{id}"
       raise "cannot add a TenantManager without an id: #{tenantmgr.inspect}" if id.nil?
+
+      # set provisionerId
+      tenantmgr.provisioner_id = @provisioner_id
 
       if @tenantmanagers.key? id
         # edit tenant

@@ -27,7 +27,8 @@ module Loom
 #        log.info("#{@name} iteration")
 
         sleeptime = Random.rand(20)
-        puts "worker #{@name} sleeping #{sleeptime}"
+        # printing to stdout appears to cause contention 
+#        puts "worker #{@name} sleeping #{sleeptime}"
         # While provisioning, don't allow the provisioner to terminate by disabling signal
         @sigterm.dont_interrupt {
           sleep sleeptime
@@ -42,6 +43,11 @@ module Loom
         # this appears to be needed to allow time for the signal handler to pass the signal to the OS before 
         # going into the next iteration of the loop
         #sleep 2
+
+        # meaningless interruptable calculation
+        100.times do
+          foo = "bar"
+        end
 
       }
     end 
