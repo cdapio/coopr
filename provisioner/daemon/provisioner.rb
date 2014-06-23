@@ -235,6 +235,8 @@ else
         result = Hash.new if result.nil? == true
         result['workerId'] = myid
         result['taskId'] = task['taskId']
+        result['provisionerId'] = options[:provisioner]
+        result['tenantId'] = options[:tenant]
 
         log.debug "Task <#{task["taskId"]}> completed, updating results <#{result}>"
         begin
@@ -248,6 +250,8 @@ else
         result['status'] = '1'
         result['workerId'] = myid
         result['taskId'] = task['taskId']
+        result['provisionerId'] = options[:provisioner]
+        result['tenantId'] = options[:tenant]
         if e.class.name == 'CommandExecutionError'
           log.error "#{e.class.name}: #{e.to_json}"
           result['stdout'] = e.stdout
