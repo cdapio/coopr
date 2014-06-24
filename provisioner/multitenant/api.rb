@@ -33,7 +33,7 @@ module Loom
     def spawn_signal_thread
       Thread.new {
         loop {
-          puts "reaping signals: #{$signals}"
+          puts "reaping #{$signals.size} signals: #{$signals}"
           signals_processed = {}
           while !$signals.empty?
             sig = $signals.shift
@@ -55,6 +55,7 @@ module Loom
                 exit
               end
             end
+            puts "done processing signal #{sig}"
             signals_processed[sig] = true
           end
         sleep 10
@@ -135,6 +136,7 @@ module Loom
 
     delete "/v1/tenants/:t_id" do
       @provisioner.delete_tenant(params[:t_id])
+      body "OK"
     end
 
     # replace with start script

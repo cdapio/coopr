@@ -40,7 +40,7 @@ module Loom
 
     def delete_tenant(id)
       @tenantmanagers[id].delete
-      @tenantmanagers.delete(id)
+      #@tenantmanagers.delete(id)
     end
 
     def status

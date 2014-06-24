@@ -41,14 +41,19 @@ module Loom
     end
 
     def verify_children
-      @workerpids.each do |pid|
+      puts "checking: #{@workerpids}"
+      workerpids = @workerpids.dup
+      workerpids.each do |pid|
         begin
+          puts "checking: #{pid}"
           ret = Process.waitpid(pid, Process::WNOHANG)
           if ret == pid
             # child has died
-            #puts "confirmed pid #{pid} dead"
+            puts "confirmed pid #{pid} dead"
             @workerpids.delete_if {|x| x == pid }
+            puts "new workerpids: #{@workerpids}"
           elsif ret.nil?
+            puts "child #{pid} still running"
             # all good, child is running`
           else
             raise "dont know how this can happen"
@@ -56,6 +61,8 @@ module Loom
         rescue Errno::ECHILD
           # pid exists but is not my child
           puts "non-child pid: #{pid}"
+          @workerpids.delete_if {|x| x == pid }
+          puts "new workerpids: #{@workerpids}"
         end
       end
     end
@@ -85,7 +92,6 @@ module Loom
 
     def terminate_worker_process(pid)
       Process.kill(:SIGTERM, pid)
-#      Process.waitpid(pid_to_kill)
 #      while true do
 #        if @workerpids.include? pid_to_kill
 #          puts "waiting for confirmation pid #{pid_to_kill} is dead"
@@ -128,6 +134,7 @@ module Loom
         pids_to_kill.each do |pid|
           #terminate_worker
           terminate_worker_process(pid)
+          #sleep 2
         end
       end
     end
@@ -136,9 +143,9 @@ module Loom
     end
 
     def delete
-      puts "deleting, killing threads"
-      @workerthreads.each do |t|
-        t.terminate
+      workerpids = @workerpids.dup 
+      workerpids.each do |pid|
+        terminate_worker_process(pid)
       end
     end
 
