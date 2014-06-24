@@ -48,7 +48,7 @@ class SignalHandler
     @interuptable = true
     # Send the temporarily ignored signals to ourself
     # see http://www.ruby-doc.org/core/classes/Process.html#M001286
-    @enqueued.each { |signal| Process.kill(signal, 0) }
+    @enqueued.each { |signal| Process.kill(signal, Process.pid) }
   end
 end
 
