@@ -216,13 +216,15 @@ public final class LoomServerMain extends DaemonMain {
 
   private ZKClientService getZKService(String connectString) {
     return ZKClientServices.delegate(
-      ZKClients.reWatchOnExpire(
-        ZKClients.retryOnFailure(
-          ZKClientService.Builder.of(connectString)
-            .setSessionTimeout(conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT_MILLIS))
-            .build(),
-          RetryStrategies.fixDelay(2, TimeUnit.SECONDS)
-        )
+      ZKClients.namespace(
+        ZKClients.reWatchOnExpire(
+          ZKClients.retryOnFailure(
+            ZKClientService.Builder.of(connectString)
+              .setSessionTimeout(conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT_MILLIS))
+              .build(),
+            RetryStrategies.fixDelay(2, TimeUnit.SECONDS)
+          )
+        ), conf.get(Constants.ZOOKEEPER_NAMESPACE)
       )
     );
   }
