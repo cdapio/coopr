@@ -17,7 +17,10 @@ package com.continuuity.loom.http;
 
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.provisioner.Provisioner;
+import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
 import com.continuuity.loom.store.tenant.SQLTenantStore;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -28,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.SQLException;
@@ -37,12 +41,15 @@ import java.util.UUID;
 /**
  *
  */
-public class LoomTenantHandlerTest extends LoomServiceTestBase {
+public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
   private static final Gson GSON = new JsonSerde().getGson();
 
   @Before
-  public void clearData() throws SQLException {
+  public void clearData() throws SQLException, IOException {
     ((SQLTenantStore) tenantStore).clearData();
+    ((SQLProvisionerStore) provisionerStore).clearData();
+    provisionerStore.writeProvisioner(
+      new Provisioner("p1", "host", 12345, 100, ImmutableMap.<String, Integer>of(), ImmutableMap.<String, Integer>of()));
   }
 
   @Test
@@ -73,18 +80,40 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
+  public void testCreateTenantWithTooManyWorkersReturnsConflict() throws Exception {
+    Tenant requestedTenant = new Tenant("companyX", null, 10000, 100, 1000);
+    HttpResponse response = doPost("/v1/tenants", GSON.toJson(requestedTenant), SUPERADMIN_HEADERS);
+
+    // perform create request
+    assertResponseStatus(response, HttpResponseStatus.CONFLICT);
+  }
+
+  @Test
   public void testWriteTenant() throws Exception {
     // write tenant to store
     String id = UUID.randomUUID().toString();
     Tenant actualTenant = new Tenant("companyX", id, 10, 100, 1000);
     tenantStore.writeTenant(actualTenant);
 
-    // perform request to delete tenant
+    // perform request to write tenant
     Tenant updatedTenant = new Tenant("companyX", id, 10, 100, 500);
     HttpResponse response = doPut("/v1/tenants/" + id, GSON.toJson(updatedTenant), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     Assert.assertEquals(updatedTenant, tenantStore.getTenant(updatedTenant.getId()));
+  }
+
+  @Test
+  public void testWriteTenantWithTooManyWorkersReturnsConflict() throws Exception {
+    // write tenant to store
+    String id = UUID.randomUUID().toString();
+    Tenant actualTenant = new Tenant("companyX", id, 10, 100, 1000);
+    tenantStore.writeTenant(actualTenant);
+
+    // perform request to write tenant
+    Tenant updatedTenant = new Tenant("companyX", id, 100000, 100, 500);
+    HttpResponse response = doPut("/v1/tenants/" + id, GSON.toJson(updatedTenant), SUPERADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.CONFLICT);
   }
 
   @Test

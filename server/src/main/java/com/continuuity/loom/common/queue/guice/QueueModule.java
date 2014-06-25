@@ -47,6 +47,10 @@ public class QueueModule extends AbstractModule {
       new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, clusterManagerZKBasePath + "/callback"),
                                queueMsBetweenChecks,
                                queueMsRescheduleTimeout);
+    TimeoutTrackingQueue balancerQueue =
+      new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, clusterManagerZKBasePath + "/balancer"),
+                               queueMsBetweenChecks,
+                               queueMsRescheduleTimeout);
 
     bind(TimeoutTrackingQueue.class)
       .annotatedWith(Names.named(Constants.Queue.PROVISIONER)).toInstance(nodeProvisionTaskQueue);
@@ -68,5 +72,9 @@ public class QueueModule extends AbstractModule {
       .annotatedWith(Names.named(Constants.Queue.CALLBACK)).toInstance(callbackQueue);
     bind(TrackingQueue.class)
       .annotatedWith(Names.named(Constants.Queue.CALLBACK)).toInstance(callbackQueue);
+    bind(TimeoutTrackingQueue.class)
+      .annotatedWith(Names.named(Constants.Queue.WORKER_BALANCE)).toInstance(balancerQueue);
+    bind(TrackingQueue.class)
+      .annotatedWith(Names.named(Constants.Queue.WORKER_BALANCE)).toInstance(balancerQueue);
   }
 }

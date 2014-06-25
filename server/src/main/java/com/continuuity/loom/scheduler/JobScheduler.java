@@ -78,7 +78,7 @@ public class JobScheduler implements Runnable {
     this.clusterStore = clusterStoreService.getSystemView();
     this.provisionerQueue = provisionerQueue;
     this.jobQueue = jobQueue;
-    this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
+    this.zkClient = ZKClients.namespace(zkClient, Constants.TASK_LOCK_NAMESPACE);
     this.taskService = taskService;
     this.maxTaskRetries = conf.getInt(Constants.MAX_ACTION_RETRIES);
   }

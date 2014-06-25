@@ -17,9 +17,7 @@ package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,8 +25,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Implementation of {@link BaseSQLEntityStoreView} from the view of a tenant admin.
@@ -45,7 +41,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
     // sticking with standard sql... this could be done in one step with replace, or with
     // insert ... on duplicate key update with mysql.
     try {
-      Connection conn = dbConnectionPool.getConnection();
+      Connection conn = dbConnectionPool.getConnection(true);
       try {
         // table name doesn't come from the user, ok to insert here
         PreparedStatement checkStatement = getSelectStatement(conn, entityType, entityName);
@@ -84,7 +80,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
   @Override
   protected void deleteEntity(EntityType entityType, String entityName) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection();
+      Connection conn = dbConnectionPool.getConnection(true);
       try {
         PreparedStatement statement = getDeleteStatement(conn, entityType, entityName);
         try {

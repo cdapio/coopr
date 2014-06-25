@@ -21,9 +21,11 @@ import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.handler.LoomService;
+import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.common.zookeeper.IdService;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -77,6 +79,7 @@ public class LoomServiceTestBase extends BaseTest {
   protected static TimeoutTrackingQueue solverQueue;
   protected static TimeoutTrackingQueue jobQueue;
   protected static TimeoutTrackingQueue callbackQueue;
+  protected static TimeoutTrackingQueue balancerQueue;
   protected static Scheduler scheduler;
   protected static JobScheduler jobScheduler;
 
@@ -99,6 +102,9 @@ public class LoomServiceTestBase extends BaseTest {
     callbackQueue = injector.getInstance(
       Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CALLBACK)));
     callbackQueue.start();
+    balancerQueue = injector.getInstance(
+      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.WORKER_BALANCE)));
+    balancerQueue.start();
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
     port = loomService.getBindAddress().getPort();
@@ -129,6 +135,10 @@ public class LoomServiceTestBase extends BaseTest {
     }
 
     return client.execute(get);
+  }
+
+  public static HttpResponse doPut(String resource, String body) throws Exception {
+    return doPut(resource, body, null);
   }
 
   public static HttpResponse doPut(String resource, String body, Header[] headers) throws Exception {

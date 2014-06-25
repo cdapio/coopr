@@ -19,6 +19,7 @@ import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.zookeeper.ElectionHandler;
 import com.continuuity.loom.common.zookeeper.LeaderElection;
+import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -50,6 +51,8 @@ public class Scheduler extends AbstractIdleService {
   private final SolverScheduler solverScheduler;
   private final CallbackScheduler callbackScheduler;
   private final ClusterCleanup clusterCleanup;
+  private final WorkerBalanceScheduler workerBalanceScheduler;
+  private final TenantProvisionerService tenantProvisionerService;
   private final long clusterCleanupRunInterval;
   private final Set<ScheduledFuture<?>> scheduledFutures;
   private final LeaderElection leaderElection;
@@ -60,6 +63,8 @@ public class Scheduler extends AbstractIdleService {
                     ClusterScheduler clusterScheduler,
                     SolverScheduler solverScheduler,
                     CallbackScheduler callbackScheduler,
+                    WorkerBalanceScheduler workerBalanceScheduler,
+                    TenantProvisionerService tenantProvisionerService,
                     ClusterCleanup clusterCleanup,
                     ZKClient zkClient) {
     int schedulerRunInterval = conf.getInt(Constants.SCHEDULER_INTERVAL_SECS);
@@ -74,8 +79,10 @@ public class Scheduler extends AbstractIdleService {
     this.clusterScheduler = clusterScheduler;
     this.solverScheduler = solverScheduler;
     this.callbackScheduler = callbackScheduler;
+    this.workerBalanceScheduler = workerBalanceScheduler;
     this.clusterCleanup = clusterCleanup;
     this.scheduledFutures = Sets.newHashSet();
+    this.tenantProvisionerService = tenantProvisionerService;
 
     this.leaderElection = new LeaderElection(zkClient, "/server-election", new ElectionHandler() {
       private final ExecutorService executor = Executors.newSingleThreadExecutor(
@@ -119,6 +126,8 @@ public class Scheduler extends AbstractIdleService {
   }
 
   private void schedule() {
+    tenantProvisionerService.startAndWait();
+
     LOG.info("Scheduling cluster scheduler every {} secs...", schedulerRunInterval);
     scheduledFutures.add(
       executorService.scheduleAtFixedRate(clusterScheduler, 1, schedulerRunInterval, TimeUnit.SECONDS)
@@ -139,6 +148,11 @@ public class Scheduler extends AbstractIdleService {
       executorService.scheduleAtFixedRate(callbackScheduler, 1, schedulerRunInterval, TimeUnit.SECONDS)
     );
 
+    LOG.info("Scheduling worker balancer every {} secs...", schedulerRunInterval);
+    scheduledFutures.add(
+      executorService.scheduleAtFixedRate(workerBalanceScheduler, 1, schedulerRunInterval, TimeUnit.SECONDS)
+    );
+
     LOG.info("Scheduling cluster cleanup every {} secs...", clusterCleanupRunInterval);
     scheduledFutures.add(
       executorService.scheduleAtFixedRate(clusterCleanup, 10, clusterCleanupRunInterval, TimeUnit.SECONDS)
@@ -154,5 +168,6 @@ public class Scheduler extends AbstractIdleService {
       }
     }
     scheduledFutures.clear();
+    tenantProvisionerService.stopAndWait();
   }
 }

@@ -85,7 +85,7 @@ public class ClusterService {
     this.clusterQueue = clusterQueue;
     this.solverQueue = solverQueue;
     this.jobQueue = jobQueue;
-    this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
+    this.zkClient = ZKClients.namespace(zkClient, Constants.TASK_LOCK_NAMESPACE);
     this.loomStats = loomStats;
     this.solver = solver;
     this.idService = idService;

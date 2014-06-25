@@ -18,7 +18,6 @@ package com.continuuity.loom.store.entity;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
@@ -47,7 +46,7 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
   protected byte[] getEntity(EntityType entityType, String entityName) throws IOException {
     try {
       byte[] entityBytes = null;
-      Connection conn = dbConnectionPool.getConnection();
+      Connection conn = dbConnectionPool.getConnection(true);
       try {
         PreparedStatement statement = getSelectStatement(conn, entityType, entityName);
         try {
@@ -75,7 +74,7 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
   @Override
   protected <T> Collection<T> getAllEntities(EntityType entityType, Function<byte[], T> transform) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection();
+      Connection conn = dbConnectionPool.getConnection(true);
       List<T> entities = Lists.newLinkedList();
       try {
         PreparedStatement statement = getSelectAllStatement(conn, entityType);

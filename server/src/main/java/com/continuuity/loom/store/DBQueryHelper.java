@@ -29,7 +29,7 @@ public final class DBQueryHelper {
   private static final JsonSerde codec = new JsonSerde();
 
   public static void createDerbyTable(String createString, DBConnectionPool connectionPool) throws SQLException {
-    Connection conn = connectionPool.getConnection();
+    Connection conn = connectionPool.getConnection(true);
     try {
       Statement statement = conn.createStatement();
       try {
@@ -139,6 +139,26 @@ public final class DBQueryHelper {
       }
     } finally {
       rs.close();
+    }
+  }
+
+  /**
+   * Queries for a single number, returning the value of the number.
+   *
+   * @param statement PreparedStatement of the query, ready for execution.
+   * @return Result of the query.
+   * @throws SQLException
+   */
+  public static int getNum(PreparedStatement statement) throws SQLException {
+    ResultSet results = statement.executeQuery();
+    try {
+      if (!results.next()) {
+        return 0;
+      } else {
+        return results.getInt(1);
+      }
+    } finally {
+      results.close();
     }
   }
 
