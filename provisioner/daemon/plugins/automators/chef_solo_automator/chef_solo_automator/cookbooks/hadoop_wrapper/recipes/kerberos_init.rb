@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: hadoop_wrapper
-# Recipe:: _kerberos_init
+# Recipe:: kerberos_init
 #
 # Copyright (C) 2013-2014 Continuuity, Inc.
 #
@@ -39,6 +39,7 @@ if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.
     'HTTP' => { 'owner' => 'hdfs', 'group' => 'hadoop', 'mode' => '0640' },
     'hdfs' => { 'owner' => 'hdfs', 'group' => 'hadoop', 'mode' => '0640' },
     'hbase' => { 'owner' => 'hbase', 'group' => 'hadoop', 'mode' => '0640' },
+    'hive' => { 'owner' => 'hive', 'group' => 'hadoop', 'mode' => '0640' },
     'mapred' => { 'owner' => 'mapred', 'group' => 'hadoop', 'mode' => '0640' },
     'yarn' => { 'owner' => 'yarn', 'group' => 'hadoop', 'mode' => '0640' },
     'zookeeper' => { 'owner' => 'zookeeper', 'group' => 'hadoop', 'mode' => '0640' }
