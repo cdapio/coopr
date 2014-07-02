@@ -33,7 +33,7 @@ module Loom
     def spawn_signal_thread
       Thread.new {
         loop {
-          puts "reaping #{$signals.size} signals: #{$signals}"
+          puts "reaping #{$signals.size} signals: #{$signals}" unless $signals.empty?
           signals_processed = {}
           while !$signals.empty?
             sig = $signals.shift
