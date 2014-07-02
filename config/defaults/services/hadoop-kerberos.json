@@ -21,7 +21,7 @@
       "initialize": {
         "type":"chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::_kerberos_init]"
+          "run_list": "recipe[hadoop_wrapper::kerberos_init]"
         }
       }
     }
