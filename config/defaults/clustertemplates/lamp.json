@@ -13,7 +13,7 @@
     "imagetype": "centos6",
     "config": {
       "apache": {
-        "default_site_enabled": "true"
+        "default_site_enabled": "true",
         "default_modules": [
           "status",
           "alias",
