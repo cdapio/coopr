@@ -18,6 +18,7 @@ package com.continuuity.loom.runtime;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
+import com.continuuity.loom.common.daemon.DaemonMain;
 import com.continuuity.loom.common.queue.guice.QueueModule;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.common.zookeeper.IdService;
