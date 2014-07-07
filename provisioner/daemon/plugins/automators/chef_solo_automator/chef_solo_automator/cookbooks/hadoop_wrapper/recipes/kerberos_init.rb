@@ -28,7 +28,7 @@ if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.
   secure_hadoop_enabled = true
 
   # Create users for services not in base Hadoop
-  %w(hbase zookeeper).each do |u|
+  %w(hbase hive zookeeper).each do |u|
     user u do
       action :create
     end
