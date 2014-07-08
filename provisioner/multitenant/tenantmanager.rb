@@ -8,6 +8,7 @@ module Loom
     attr_accessor :spec, :provisioner_id
     @workerthreads = []
     @workerpids = []
+    @terminating_workers = []
 
     def initialize(spec)
       if !spec.instance_of?(TenantSpec)
@@ -16,6 +17,7 @@ module Loom
       @spec = spec
       @workerthreads = []
       @workerpids = []
+      @terminating_workers = []
     end 
 
     def id
@@ -51,6 +53,7 @@ module Loom
             # child has died
             puts "confirmed pid #{pid} dead"
             @workerpids.delete_if {|x| x == pid }
+            @terminating_workers.delete(pid) if @terminating_workers.include?(pid)
             puts "new workerpids: #{@workerpids}"
           elsif ret.nil?
             puts "child #{pid} still running"
@@ -62,6 +65,7 @@ module Loom
           # pid exists but is not my child
           puts "non-child pid: #{pid}"
           @workerpids.delete_if {|x| x == pid }
+          @terminating_workers.delete(pid) if @terminating_workers.include?(pid)
           puts "new workerpids: #{@workerpids}"
         end
       end
@@ -118,9 +122,8 @@ module Loom
 #    end
 
     def update(new_tm)
-      puts "update workers to #{new_tm.spec.workers}"
-      @spec.workers = new_tm.spec.workers
-      difference = @spec.workers - @workerpids.size
+      puts "update workers from #{@spec.workers} to #{new_tm.spec.workers}"
+      difference = new_tm.spec.workers - @spec.workers
       if difference > 0
         puts "adding #{difference} workers"
         difference.times do |i|
@@ -129,14 +132,27 @@ module Loom
         end
       elsif difference < 0
         puts "terminating #{difference.abs} workers"
-        pids_to_kill = @workerpids[difference, difference.abs]
+        # we need to find active workers
+        pids_to_kill = []
+        @workerpids.reverse_each do |pid|
+          break if pids_to_kill.size == difference.abs
+          pids_to_kill.push(pid) unless @terminating_workers.include?(pid)
+        end
+
+        if pids_to_kill.size != difference.abs
+          fail "attempting to kill #{difference.abs} workers but could not find enough running workers to kill"
+        end
+
+        #pids_to_kill = @workerpids[difference, difference.abs]
         puts "pids_to_kill: #{pids_to_kill}"
         pids_to_kill.each do |pid|
           #terminate_worker
+          @terminating_workers.push(pid)
           terminate_worker_process(pid)
           #sleep 2
         end
       end
+      @spec.workers = new_tm.spec.workers
     end
 
     def halt
