@@ -46,7 +46,7 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
   protected byte[] getEntity(EntityType entityType, String entityName) throws IOException {
     try {
       byte[] entityBytes = null;
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = getSelectStatement(conn, entityType, entityName);
         try {
@@ -74,7 +74,7 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
   @Override
   protected <T> Collection<T> getAllEntities(EntityType entityType, Function<byte[], T> transform) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       List<T> entities = Lists.newLinkedList();
       try {
         PreparedStatement statement = getSelectAllStatement(conn, entityType);

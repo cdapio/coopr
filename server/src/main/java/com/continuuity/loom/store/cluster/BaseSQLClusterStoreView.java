@@ -62,7 +62,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   @Override
   public List<Cluster> getAllClusters() throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = getSelectAllClustersStatement(conn);
         try {
@@ -82,7 +82,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   public Cluster getCluster(String clusterId) throws IOException {
     long clusterNum = Long.parseLong(clusterId);
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = getSelectClusterStatement(conn, clusterNum);
         try {
@@ -102,7 +102,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   public boolean clusterExists(String clusterId) throws IOException {
     long clusterNum = Long.parseLong(clusterId);
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = getClusterExistsStatement(conn, clusterNum);
         try {
@@ -132,7 +132,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
     // sticking with standard sql... this could be done in one step with replace, or with
     // insert ... on duplicate key update with mysql.
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement writeStatement;
         ByteArrayInputStream clusterBytes = new ByteArrayInputStream(CODEC.serialize(cluster, Cluster.class));
@@ -160,7 +160,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   public void deleteCluster(String clusterId) throws IOException {
     long clusterNum = Long.parseLong(clusterId);
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = getDeleteClusterStatement(conn, clusterNum);
         try {
@@ -180,7 +180,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   public List<ClusterJob> getClusterJobs(String clusterId, int limit) throws IOException {
     long clusterNum = Long.parseLong(clusterId);
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = getSelectClusterJobsStatement(conn, clusterNum);
 
@@ -200,7 +200,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   @Override
   public Set<Node> getClusterNodes(String clusterId) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       long clusterNum = Long.parseLong(clusterId);
       try {
         PreparedStatement statement = getSelectClusterNodesStatement(conn, clusterNum);

@@ -45,7 +45,7 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public ClusterJob getClusterJob(JobId jobId) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT job FROM jobs WHERE job_num=? AND cluster_id=?");
         statement.setLong(1, jobId.getJobNum());
@@ -79,7 +79,7 @@ public class SQLClusterStore implements ClusterStore {
 
     ClusterJob job;
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
 
         int bufferSize = jobIds.size();
@@ -134,7 +134,7 @@ public class SQLClusterStore implements ClusterStore {
     JobId jobId = JobId.fromString(clusterJob.getJobId());
     long clusterId = Long.parseLong(jobId.getClusterId());
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement checkStatement =
           conn.prepareStatement("SELECT job_num FROM jobs WHERE job_num=? AND cluster_id=?");
@@ -185,7 +185,7 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public void deleteClusterJob(JobId jobId) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("DELETE FROM jobs WHERE job_num=? AND cluster_id=?");
         statement.setLong(1, jobId.getJobNum());
@@ -206,7 +206,7 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public ClusterTask getClusterTask(TaskId taskId) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement =
           conn.prepareStatement("SELECT task FROM tasks WHERE task_num=? AND cluster_id=? AND job_num=?");
@@ -232,7 +232,7 @@ public class SQLClusterStore implements ClusterStore {
     TaskId taskId = TaskId.fromString(clusterTask.getTaskId());
     long clusterId = Long.parseLong(taskId.getClusterId());
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement checkStatement =
           conn.prepareStatement("SELECT task_num FROM tasks WHERE task_num=? AND job_num=? AND cluster_id=?");
@@ -290,7 +290,7 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public void deleteClusterTask(TaskId taskId) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement =
           conn.prepareStatement("DELETE FROM tasks WHERE task_num=? AND cluster_id=? AND job_num=?");
@@ -313,7 +313,7 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public Node getNode(String nodeId) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT node FROM nodes WHERE id=? ");
         statement.setString(1, nodeId);
@@ -335,7 +335,7 @@ public class SQLClusterStore implements ClusterStore {
     // sticking with standard sql... this could be done in one step with replace, or with
     // insert ... on duplicate key update with mysql.
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement checkStatement = conn.prepareStatement("SELECT id FROM nodes WHERE id=?");
         checkStatement.setString(1, node.getId());
@@ -379,7 +379,7 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public void deleteNode(String nodeId) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("DELETE FROM nodes WHERE id=? ");
         try {
@@ -399,7 +399,7 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public Set<ClusterTask> getRunningTasks(long timestamp) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement =
           conn.prepareStatement("SELECT task FROM tasks WHERE status = ? AND submit_time < ?");
@@ -421,7 +421,7 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public Set<Cluster> getExpiringClusters(long timestamp) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement =
           conn.prepareStatement("SELECT cluster FROM clusters WHERE status IN (?, ?) AND expire_time < ?");

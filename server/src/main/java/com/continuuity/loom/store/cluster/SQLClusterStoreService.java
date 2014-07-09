@@ -28,7 +28,7 @@ public class SQLClusterStoreService extends AbstractIdleService implements Clust
 
   // for unit tests only
   public void clearData() throws SQLException {
-    Connection conn = dbConnectionPool.getConnection(true);
+    Connection conn = dbConnectionPool.getConnection();
     try {
       Statement stmt = conn.createStatement();
       try {

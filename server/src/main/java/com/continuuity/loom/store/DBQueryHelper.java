@@ -29,7 +29,7 @@ public final class DBQueryHelper {
   private static final JsonSerde codec = new JsonSerde();
 
   public static void createDerbyTable(String createString, DBConnectionPool connectionPool) throws SQLException {
-    Connection conn = connectionPool.getConnection(true);
+    Connection conn = connectionPool.getConnection();
     try {
       Statement statement = conn.createStatement();
       try {

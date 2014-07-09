@@ -109,6 +109,16 @@ public class DBConnectionPool {
   }
 
   /**
+   * Get a {@link Connection} from the pool with auto commit on.
+   *
+   * @return Connection from the pool with autocommit.
+   * @throws SQLException
+   */
+  public Connection getConnection() throws SQLException {
+    return getConnection(true);
+  }
+
+  /**
    * Get a {@link Connection} from the pool with auto commit set to the given value.
    *
    * @param autoCommit Whether or not autoCommit should be set.

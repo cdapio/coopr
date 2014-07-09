@@ -41,7 +41,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
     // sticking with standard sql... this could be done in one step with replace, or with
     // insert ... on duplicate key update with mysql.
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         // table name doesn't come from the user, ok to insert here
         PreparedStatement checkStatement = getSelectStatement(conn, entityType, entityName);
@@ -80,7 +80,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
   @Override
   protected void deleteEntity(EntityType entityType, String entityName) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = getDeleteStatement(conn, entityType, entityName);
         try {

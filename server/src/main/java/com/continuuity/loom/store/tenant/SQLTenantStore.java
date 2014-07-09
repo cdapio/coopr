@@ -44,7 +44,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
 
   // for unit tests only.  Truncate is not supported in derby.
   public void clearData() throws SQLException {
-    Connection conn = dbConnectionPool.getConnection(true);
+    Connection conn = dbConnectionPool.getConnection();
     try {
       Statement stmt = conn.createStatement();
       try {
@@ -78,7 +78,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   @Override
   public Tenant getTenant(String id) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants WHERE id=?");
         statement.setString(1, id);
@@ -99,7 +99,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   @Override
   public List<Tenant> getAllTenants() throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants");
         try {
@@ -119,7 +119,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   @Override
   public void writeTenant(Tenant tenant) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       String tenantId = tenant.getId();
       try {
         PreparedStatement checkStatement = conn.prepareStatement("SELECT id FROM tenants WHERE id=?");
@@ -167,7 +167,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   @Override
   public void deleteTenant(String id) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("DELETE FROM tenants WHERE id=? ");
         statement.setString(1, id);

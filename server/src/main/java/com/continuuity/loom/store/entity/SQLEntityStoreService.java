@@ -23,7 +23,7 @@ public class SQLEntityStoreService extends AbstractIdleService implements Entity
 
   // for unit tests only
   public void clearData() throws SQLException {
-    Connection conn = dbConnectionPool.getConnection(true);
+    Connection conn = dbConnectionPool.getConnection();
     try {
       for (BaseEntityStoreView.EntityType type : BaseEntityStoreView.EntityType.values()) {
         Statement stmt = conn.createStatement();

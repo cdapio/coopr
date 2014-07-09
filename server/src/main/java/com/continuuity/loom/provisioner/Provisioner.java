@@ -19,12 +19,11 @@ public class Provisioner {
   private final int port;
   private final int capacityTotal;
   private final Map<String, Integer> assignments;
-  private final ProvisionerStatus status;
   private Map<String, Integer> usage;
   private int capacityFree;
 
   public Provisioner(String id, String host, Integer port, Integer capacityTotal, Map<String, Integer> usage,
-                     Map<String, Integer> assignments, ProvisionerStatus status) {
+                     Map<String, Integer> assignments) {
     Preconditions.checkArgument(id != null && !id.isEmpty(), "id must be specified.");
     Preconditions.checkArgument(host != null && !host.isEmpty(), "host must be specified.");
     Preconditions.checkArgument(port != null, "port must be specified.");
@@ -40,14 +39,8 @@ public class Provisioner {
     for (Integer assigned : this.assignments.values()) {
       totalAssigned += assigned;
     }
-    this.status = status;
     this.capacityFree = capacityTotal - totalAssigned;
     Preconditions.checkArgument(this.capacityFree >= 0, "assignments cannot exceed total capacity");
-  }
-
-  public Provisioner(String id, String host, Integer port, Integer capacityTotal,
-                     Map<String, Integer> usage, Map<String, Integer> assignments) {
-    this(id, host, port, capacityTotal, usage, assignments, ProvisionerStatus.LIVE);
   }
 
   /**
@@ -102,15 +95,6 @@ public class Provisioner {
    */
   public Map<String, Integer> getUsage() {
     return usage;
-  }
-
-  /**
-   * Get the status of the provisioner.
-   *
-   * @return Status of the provisioner.
-   */
-  public ProvisionerStatus getStatus() {
-    return status;
   }
 
   /**

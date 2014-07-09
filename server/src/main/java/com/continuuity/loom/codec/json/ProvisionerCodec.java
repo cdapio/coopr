@@ -16,7 +16,6 @@
 package com.continuuity.loom.codec.json;
 
 import com.continuuity.loom.provisioner.Provisioner;
-import com.continuuity.loom.provisioner.ProvisionerStatus;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -45,7 +44,6 @@ public class ProvisionerCodec implements JsonDeserializer<Provisioner> {
       context.deserialize(jsonObj.get("usage"), new TypeToken<Map<String, Integer>>() {}.getType());
     Map<String, Integer> assignments =
       context.deserialize(jsonObj.get("assignments"), new TypeToken<Map<String, Integer>>() {}.getType());
-    ProvisionerStatus status = context.deserialize(jsonObj.get("status"), ProvisionerStatus.class);
 
     return new Provisioner(id, host, port, capacityTotal, usage, assignments);
   }

@@ -106,6 +106,7 @@ public class Constants {
 
   public static final String TASK_NAMESPACE = "/tasks";
   public static final String TASK_LOCK_NAMESPACE = TASK_NAMESPACE + "/lock";
+  public static final String CLUSTER_LOCK_NAMESPACE = "/clusters/lock";
   public static final String TENANT_NAMESPACE = "/tenants";
   public static final String USER_HEADER = "X-Loom-UserID";
   public static final String API_KEY_HEADER = "X-Loom-ApiKey";

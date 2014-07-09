@@ -4,7 +4,6 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryHelper;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.inject.Inject;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,7 +42,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
 
   // for unit tests only
   public void clearData() throws SQLException {
-    Connection conn = dbConnectionPool.getConnection(true);
+    Connection conn = dbConnectionPool.getConnection();
     try {
       Statement stmt = conn.createStatement();
       try {
@@ -76,11 +74,10 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
                                        "last_heartbeat TIMESTAMP, " +
                                        "capacity_total INTEGER, " +
                                        "capacity_free INTEGER, " +
-                                       "status VARCHAR(16), " +
                                        "provisioner BLOB, " +
                                        "PRIMARY KEY (id) )",
                                      dbConnectionPool);
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         Statement stmt = conn.createStatement();
         try {
@@ -96,7 +93,6 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
                                        "tenant_id VARCHAR(255), " +
                                        "num_assigned INTEGER, " +
                                        "num_live INTEGER, " +
-                                       "assign_time TIMESTAMP, " +
                                        "PRIMARY KEY (tenant_id, provisioner_id) )",
                                      dbConnectionPool);
     }
@@ -120,7 +116,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   @Override
   public Collection<Provisioner> getAllProvisioners() throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT provisioner FROM provisioners");
         try {
@@ -139,7 +135,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   @Override
   public Collection<Provisioner> getProvisionersWithFreeCapacity() throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
           "SELECT provisioner FROM provisioners WHERE capacity_free > 0");
@@ -159,7 +155,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   @Override
   public Collection<Provisioner> getIdleProvisioners(long idleTimestamp) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
           "SELECT provisioner FROM provisioners WHERE last_heartbeat < ?");
@@ -180,7 +176,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   @Override
   public Collection<Provisioner> getTenantProvisioners(String tenantId) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
           "SELECT P.provisioner FROM provisioners P, provisionerWorkers W" +
@@ -202,7 +198,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   @Override
   public Provisioner getProvisioner(String id) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT provisioner FROM provisioners WHERE id=?");
         statement.setString(1, id);
@@ -329,7 +325,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   @Override
   public void setHeartbeat(String provisionerId, long ts) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("UPDATE provisioners SET last_heartbeat=? WHERE id=?");
         try {
@@ -350,7 +346,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   @Override
   public int getFreeCapacity() throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT SUM(capacity_free) FROM provisioners");
         try {
@@ -369,7 +365,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   @Override
   public int getNumAssignedWorkers(String tenantID) throws IOException {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
           "SELECT SUM(num_assigned) FROM provisionerWorkers WHERE tenant_id=?");
@@ -390,7 +386,7 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   // cleanup provisionerWorkers table. If assigned and live are both 0, no reason to keep them there.
   private void cleanupWorkers() {
     try {
-      Connection conn = dbConnectionPool.getConnection(true);
+      Connection conn = dbConnectionPool.getConnection();
       try {
         Statement statement = conn.createStatement();
         try {
@@ -432,8 +428,8 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
     PreparedStatement updateStatement = conn.prepareStatement(
       "UPDATE provisionerWorkers SET num_assigned=?, num_live=? WHERE provisioner_id=? AND tenant_id=?");
     PreparedStatement insertStatement = conn.prepareStatement(
-      "INSERT INTO provisionerWorkers (provisioner_id, tenant_id, num_assigned, num_live, assign_time) " +
-        "VALUES (?, ?, ?, ?, ?)");
+      "INSERT INTO provisionerWorkers (provisioner_id, tenant_id, num_assigned, num_live) " +
+        "VALUES (?, ?, ?, ?)");
     try {
       updateStatement.setString(3, provisionerId);
       for (String tenant : tenants) {
@@ -447,7 +443,6 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
           insertStatement.setString(2, tenant);
           insertStatement.setInt(3, assigned);
           insertStatement.setInt(4, live);
-          insertStatement.setTimestamp(5, DBQueryHelper.getTimestamp(System.currentTimeMillis()));
           insertStatement.executeUpdate();
         }
       }
@@ -468,13 +463,12 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   private int updateProvisioner(Connection conn, Provisioner provisioner,
                                 ByteArrayInputStream bytes) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
-      "UPDATE provisioners SET capacity_total=?, capacity_free=?, status=?, provisioner=? WHERE id=?");
+      "UPDATE provisioners SET capacity_total=?, capacity_free=?, provisioner=? WHERE id=?");
     try {
       statement.setInt(1, provisioner.getCapacityTotal());
       statement.setInt(2, provisioner.getCapacityFree());
-      statement.setString(3, provisioner.getStatus().name());
-      statement.setBlob(4, bytes);
-      statement.setString(5, provisioner.getId());
+      statement.setBlob(3, bytes);
+      statement.setString(4, provisioner.getId());
       return statement.executeUpdate();
     } finally {
       statement.close();
@@ -484,15 +478,14 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   private void addProvisioner(Connection conn, Provisioner provisioner,
                               ByteArrayInputStream bytes) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
-      "INSERT INTO provisioners (id, last_heartbeat, capacity_total, capacity_free, status, provisioner) " +
-        "VALUES (?, ?, ?, ?, ?, ?)");
+      "INSERT INTO provisioners (id, last_heartbeat, capacity_total, capacity_free, provisioner) " +
+        "VALUES (?, ?, ?, ?, ?)");
     try {
       statement.setString(1, provisioner.getId());
       statement.setTimestamp(2, DBQueryHelper.getTimestamp(System.currentTimeMillis()));
       statement.setInt(3, provisioner.getCapacityTotal());
       statement.setInt(4, provisioner.getCapacityFree());
-      statement.setString(5, provisioner.getStatus().name());
-      statement.setBlob(6, bytes);
+      statement.setBlob(5, bytes);
       statement.executeUpdate();
     } finally {
       statement.close();
