@@ -146,33 +146,26 @@
     <property>
         <name>server.provisioner.timeout.secs</name>
         <value>120</value>
-        <description>seconds to wait hear from a provisioner before marking it as dead</description>
+        <description>seconds to wait for a provisioner heartbeat before moving its workers and deleting it</description>
     </property>
 
     <property>
         <name>server.provisioner.request.max.retries</name>
         <value>2</value>
-        <description>max number of times to retry a failed request to a provisioner before removing the provisioner
-                     from the list of live provisioners and reassigning its tenant workers</description>
+        <description>max number of times to retry a failed request to a provisioner before reassigning its workers
+                     and deleting it</description>
     </property>
 
     <property>
         <name>server.provisioner.request.ms.between.retries</name>
         <value>500</value>
-        <description>milliseconds to wait between retrying a failed request to a provisioner</description>
-    </property>
-
-    <property>
-        <name>server.provisioner.request.max.connections</name>
-        <value>100</value>
-        <description>maximum number of connections to have open at any given time to provisioners. Should never
-                     have to be higher than the total number of provisioners.</description>
+        <description>milliseconds to wait before retrying a failed request to a provisioner</description>
     </property>
 
     <property>
         <name>server.provisioner.request.socket.timeout.ms</name>
         <value>10000</value>
-        <description>socket timeout in milliseconds to use when opening connections to provisioners</description>
+        <description>socket timeout in milliseconds to use when making requests to provisioners</description>
     </property>
 
 </configuration>

@@ -62,7 +62,6 @@ public class Constants {
   public static final String PROVISIONER_TIMEOUT_SECS = "server.provisioner.timeout.secs";
   public static final String PROVISIONER_REQUEST_MAX_RETRIES = "server.provisioner.request.max.retries";
   public static final String PROVISIONER_REQUEST_MS_BETWEEN_RETRIES = "server.provisioner.request.ms.between.retries";
-  public static final String PROVISIONER_REQUEST_MAX_CONNECTIONS = "server.provisioner.request.max.connections";
   public static final String PROVISIONER_REQUEST_SOCKET_TIMEOUT_MS = "server.provisioner.request.socket.timeout.ms";
 
   /**
