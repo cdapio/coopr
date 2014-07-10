@@ -41,7 +41,11 @@ public class MockProvisionerTenantStore {
   }
 
   public void setAssignedWorkers(String tenantId, int numWorkers) {
-    assignedWorkers.put(tenantId, numWorkers);
+    if (numWorkers == 0) {
+      assignedWorkers.remove(tenantId);
+    } else {
+      assignedWorkers.put(tenantId, numWorkers);
+    }
   }
 
   public void deleteTenant(String tenantId) {
@@ -50,7 +54,11 @@ public class MockProvisionerTenantStore {
   }
 
   public void setLiveTenantWorkers(String tenantId, int numWorkers) {
-    liveWorkers.put(tenantId, numWorkers);
+    if (numWorkers == 0) {
+      liveWorkers.remove(tenantId);
+    } else {
+      liveWorkers.put(tenantId, numWorkers);
+    }
   }
 
   public Map<String, Integer> getUsage() {
