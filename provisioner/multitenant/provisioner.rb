@@ -60,10 +60,9 @@ module Loom
 
     def heartbeat
       hb = {}
-      hb['total'] = 1000
-      hb['used'] = {}
+      hb['usage'] = {}
       @tenantmanagers.each do |id, tm|
-        hb['used'][id] = tm.num_workers
+        hb['usage'][id] = tm.num_workers
       end
       hb
     end

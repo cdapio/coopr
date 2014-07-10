@@ -20,10 +20,6 @@ module Loom
         opts.on('-p', '--provisioner PROVISIONER', 'Provisioner ID') do |p|
           options[:provisioner] = p
         end
-        options[:register] = false
-        opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do
-          options[:register] = true
-        end
         opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
           options[:log_level] = f
         end
@@ -33,19 +29,10 @@ module Loom
         opts.on('-b', '--background', 'runs as a daemon. ensure you specify a logfile also') do 
           options[:daemonize] = true 
         end
-        options[:once] = false
-        opts.on('-o', '--once', 'Only poll and run a single task') do
-          options[:once] = true
-        end
       end.parse!
 
       if !options[:uri] && !options[:file]
         puts 'Either URI for loom server or --file must be specified'
-        exit(1)
-      end
-
-      if(!options[:uri] && options[:register])
-        puts "--register option requires the --uri [server uri] option"
         exit(1)
       end
       options

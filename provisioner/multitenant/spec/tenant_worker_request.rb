@@ -25,7 +25,7 @@ begin
   end
 rescue => e
   puts "Caught exception"
-  e.inspect
-  e.backtrace
+  puts e.inspect
+  puts e.backtrace
 end
 

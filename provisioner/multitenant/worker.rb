@@ -9,13 +9,15 @@ module Loom
   class Worker
     include Logging
 
-      Logging.configure('/Users/derek/git/loom/provisioner/multitenant/workerlog.txt')
-      Logging.level = 0
+      #Logging.configure('/Users/derek/git/loom/provisioner/multitenant/workerlog.txt')
+      #Logging.level = 0
 
     attr_accessor :name
 
     def initialize(name)
       @name = name
+      Logging.configure("/Users/derek/git/loom/provisioner/multitenant/worker-#{@name}.txt")
+      Logging.level = 0
 #      Logging.configure('/Users/derek/git/loom/provisioner/multitenant/workerlog.txt')
 #      Logging.level = 0
 #      @logger = Logger.new('/Users/derek/git/loom/provisioner/multitenant/log-worker.log')

@@ -3,6 +3,7 @@
 require 'thin'
 require 'sinatra/base'
 require 'json'
+require 'rest_client'
 
 require_relative 'tenantmanager'
 require_relative 'provisioner'
@@ -19,32 +20,41 @@ module Loom
 #      @logger = Logger.new('/Users/derek/git/loom/provisioner/multitenant/log-api.log')
       $stdout.sync = true
       super()
-      setup_signal_traps
-      @provisioner = Loom::Provisioner.new
-      spawn_heartbeat_thread
-      spawn_signal_thread
+      puts "initialize called"
+#      $provisioner = Loom::Provisioner.new
+#      spawn_heartbeat_thread
+#      spawn_signal_thread
+      # setup signals here in application scope since we know sinatra has already registered its own
+      self.class.setup_signal_traps
     end
 
     def self.run(options)
       Logging.configure(options[:log_file])
       Logging.level = options[:log_level]
-      Logging.log.info "Loom api starting up" 
+      Logging.log.info "Loom api starting up"
+      @@server_uri = options[:uri]
 
+      setup_process if options[:daemonize]
+#      EM::run do
 #      puts "setup traps"
-#      setup_signal_traps
-#      puts "create provisioner"
-#      @provisioner = Loom::Provisioner.new
-#      puts "spawn hb"
-#      spawn_heartbeat_thread
-#      puts "spawn reap"
-#      spawn_signal_thread
-#      configure(options[:log_file])
-#      level = options[:log_level]
+      setup_signal_traps
+      puts "create provisioner"
+      #$provisioner = Loom::Provisioner.new
+      $provisioner = Loom::Provisioner.new
+      puts "spawn hb"
+      spawn_heartbeat_thread
+      puts "spawn reap"
+      # this may be overriddedn by sinatra initialization, so we call it again in application initialze
+      spawn_signal_thread
+      register_with_server
+      #configure(options[:log_file])
+      #level = options[:log_level]
       #Logging.level = 0
 
 #      EM::run do
         #$stdout.sync = true
-        setup_process if options[:daemonize]
+        #setup_process if options[:daemonize]
+        Logging.log.info "starting up web-server"
         #Thin::Logging.silent = true
         bind_address = '0.0.0.0'
         #Thin::Server.start(bind, '4567', self, :signals => false)
@@ -64,7 +74,7 @@ module Loom
 #      }
     end
 
-    def setup_signal_traps
+    def self.setup_signal_traps
       $signals = Array.new
       ['CLD', 'TERM'].each do |signal|
         Signal.trap(signal) do
@@ -73,32 +83,34 @@ module Loom
       end
     end
 
-    def spawn_signal_thread
+    def self.spawn_signal_thread
       Thread.new {
+        Logging.log.info "started signal processing thread"
         loop {
-          log.info "reaping #{$signals.size} signals: #{$signals}" unless $signals.empty?
+          Logging.log.info "reaping #{$signals.size} signals: #{$signals}" unless $signals.empty?
+          #Logging.log.info "reaping #{$signals.size} signals: #{$signals}"
           signals_processed = {}
           while !$signals.empty?
             sig = $signals.shift
             next if signals_processed.key?(sig)
-            log.info "processing signal: #{sig}"
+            Logging.log.info "processing signal: #{sig}"
             case sig
             when 'CLD'
-              @provisioner.tenantmanagers.each do |k, v|
+              $provisioner.tenantmanagers.each do |k, v|
                 v.verify_children
               end
             when 'TERM'
               if !@shutting_down
                 @shutting_down = true
-                @provisioner.tenantmanagers.each do |k, v|
+                $provisioner.tenantmanagers.each do |k, v|
                   v.terminate_all_worker_processes
                 end
                 Process.waitall
-                log.info "provisioner shutdown complete"
+                Logging.log.info "provisioner shutdown complete"
                 exit
               end
             end
-            log.info "done processing signal #{sig}"
+            Logging.log.info "done processing signal #{sig}"
             signals_processed[sig] = true
           end
         sleep 1 
@@ -106,14 +118,67 @@ module Loom
       }
     end
 
-    def spawn_heartbeat_thread
+    def self.spawn_heartbeat_thread
       Thread.new {
+        Logging.log.info "started heartbeat thread"
         loop {
-          log.info @provisioner.heartbeat.to_json
-          sleep 5
+          Logging.log.info "hbt: #{$provisioner.heartbeat.to_json}"
+          uri = "#{@@server_uri}/v1/provisioners/#{$provisioner.provisioner_id}/heartbeat"
+          begin
+            Logging.log.debug "sending heartbeat to #{uri}"
+            json = $provisioner.heartbeat.to_json
+            resp = RestClient.put("#{uri}/v1/provisioners/#{$provisioner.provisioner_id}/capacity", json, :'X-Loom-UserID' => "admin")
+            if(resp.code == 200)
+              Logging.log.debug "Successfully sent heartbeat"
+            else
+              Logging.log.warn "Response code #{resp.code}, #{resp.to_str} when sending heartbeat to loom server #{uri}"
+            end
+          rescue => e
+            Logging.log.error "Caught exception sending heartbeat to loom server #{uri}: #{e.message}"
+            #log.error e.message
+            #log.error e.backtrace.inspect
+          end
+          sleep 10 
         }
       }
     end
+
+    def self.register_with_server
+      uri = "#{@@server_uri}/v1/provisioners/#{$provisioner.provisioner_id}"
+      Logging.log.info "Registering with server at #{uri}"
+      data = {}
+      data['id'] = $provisioner.provisioner_id
+      data['capacityTotal'] = '100'
+      data['host'] = '127.0.0.1'
+      data['port'] = '4567'
+      
+      Logging.log.info "Registering with server at #{uri}: #{data.to_json}"
+
+      begin
+        resp = RestClient.put("#{uri}", data.to_json, :'X-Loom-UserID' => "admin")
+        if(resp.code == 200)
+          Logging.log.info "Successfully registered"
+        else
+          Logging.log.warn "Response code #{resp.code}, #{resp.to_str} when registering with loom server #{uri}"
+        end
+      rescue => e
+        Logging.log.error "Caught exception when registering with loom server #{uri}: #{e.message}"
+        #log.error e.message
+        #log.error e.backtrace.inspect
+      end
+    end
+
+
+    def heartbeat
+      hb = {}
+      hb['total'] = 1000
+      hb['used'] = {}
+      @tenantmanagers.each do |id, tm|
+        hb['used'][id] = tm.num_workers
+      end
+      hb
+    end
+
 
     get '/hi' do
       "Hello World!"
@@ -126,13 +191,13 @@ module Loom
     end
 
     get '/status' do
-      @provisioner.status
+      $provisioner.status
       body "OK"
     end
 
     get '/heartbeat' do
       log.info "heartbeat called"
-      @provisioner.heartbeat.to_json
+      $provisioner.heartbeat.to_json
     end
 
     post "/v1/tenants" do
@@ -146,7 +211,7 @@ module Loom
       ts = TenantSpec.new(id, workers, modules, plugins)
       tm = TenantManager.new(ts)
 
-      @provisioner.add_tenant(tm)
+      $provisioner.add_tenant(tm)
 
       data['status'] = 0
       body data.to_json
@@ -165,7 +230,7 @@ module Loom
       ts = TenantSpec.new(params[:t_id], workers, modules, plugins)
       tm = TenantManager.new(ts)
 
-      @provisioner.add_tenant(tm)
+      $provisioner.add_tenant(tm)
 #      provisioner = provisioner.getinstance
 #      provisioner.add_tenant(tm)
 
@@ -178,7 +243,7 @@ module Loom
     end
 
     delete "/v1/tenants/:t_id" do
-      @provisioner.delete_tenant(params[:t_id])
+      $provisioner.delete_tenant(params[:t_id])
       body "OK"
     end
 
