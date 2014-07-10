@@ -15,6 +15,7 @@
 
 :doc:`REST Overview </rest/index>` |
 :doc:`Tenants </rest/tenants>` |
+:doc:`Provisioners </rest/provisioners>` |
 :doc:`Providers </rest/provider>` |
 :doc:`Hardware Types </rest/hardware>` |
 :doc:`Image Types </rest/image>` |

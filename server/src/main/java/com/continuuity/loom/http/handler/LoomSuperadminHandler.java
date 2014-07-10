@@ -254,6 +254,13 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     }
   }
 
+  /**
+   * Get the specified provisioner.
+   *
+   * @param request Request to get a provisioner.
+   * @param responder Responder for sending the response.
+   * @param provisionerId Id of the provisioner to get.
+   */
   @GET
   @Path("/provisioners/{provisioner-id}")
   public void getProvisioner(HttpRequest request, HttpResponder responder,
@@ -280,7 +287,12 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     }
   }
 
-
+  /**
+   * Get all provisioners in the system.
+   *
+   * @param request Request to get all provisioners.
+   * @param responder Responder for sending the response.
+   */
   @GET
   @Path("/provisioners")
   public void getProvisioners(HttpRequest request, HttpResponder responder) {
