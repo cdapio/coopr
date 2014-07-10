@@ -42,4 +42,11 @@ public class ProvisionerHeartbeat {
   public int hashCode() {
     return usage.hashCode();
   }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("usage", usage)
+      .toString();
+  }
 }

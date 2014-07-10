@@ -145,7 +145,7 @@
 
     <property>
         <name>server.provisioner.timeout.secs</name>
-        <value>300</value>
+        <value>120</value>
         <description>seconds to wait hear from a provisioner before marking it as dead</description>
     </property>
 

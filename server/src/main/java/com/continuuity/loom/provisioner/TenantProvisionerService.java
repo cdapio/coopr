@@ -102,6 +102,7 @@ public class TenantProvisionerService extends AbstractScheduledService {
       // so client would have to resend the delete when things are ok again.
       // TODO: what happens if we crash here? workaround would be to restart provisioners...
       for (Provisioner provisioner : tenantProvisioners) {
+        LOG.debug("Requesting provisioner {} to delete tenant {}.", provisioner.getId(), tenantId);
         if (!provisionerRequestService.deleteTenant(provisioner, tenantId)) {
           // unable to complete request to delete tenant from this provisioner. Something is wrong with it, delete it
           // and rebalance its workers.
@@ -138,8 +139,11 @@ public class TenantProvisionerService extends AbstractScheduledService {
       if (provisioner == null) {
         throw new MissingEntityException("Provisioner " + provisionerId + " not found.");
       }
-      provisioner.setUsage(heartbeat.getUsage());
-      provisionerStore.writeProvisioner(provisioner);
+      if (!provisioner.getUsage().equals(heartbeat.getUsage())) {
+        provisioner.setUsage(heartbeat.getUsage());
+        provisionerStore.writeProvisioner(provisioner);
+      }
+      provisionerStore.setHeartbeat(provisionerId, System.currentTimeMillis());
     } finally {
       lock.release();
     }
@@ -173,9 +177,12 @@ public class TenantProvisionerService extends AbstractScheduledService {
       int diff = tenant.getWorkers() - provisionerStore.getNumAssignedWorkers(tenantId);
       if (diff < 0) {
         // too many workers assigned, remove some.
-        removeWorkers(tenantId, 0 - diff);
+        int toRemove = 0 - diff;
+        LOG.debug("Removing {} workers from tenant {}", toRemove, tenantId);
+        removeWorkers(tenantId, toRemove);
       } else if (diff > 0) {
         // not enough workers assigned, assign some more.
+        LOG.debug("Adding {} workers to tenant {}", diff, tenantId);
         addWorkers(tenantId, diff);
       }
     } finally {
@@ -191,6 +198,8 @@ public class TenantProvisionerService extends AbstractScheduledService {
       int numRemoved = provisioner.tryRemoveTenantAssignments(tenantId, numToRemove);
       if (numRemoved > 0) {
         provisionerStore.writeProvisioner(provisioner);
+        LOG.debug("Requesting provisioner {} to set workers to {} for tenant {} (removing {})",
+                  provisioner.getId(), provisioner.getAssignedWorkers(tenantId), tenantId, numRemoved);
         if (provisionerRequestService.putTenant(provisioner, tenantId)) {
           numToRemove -= numRemoved;
         } else {
@@ -211,6 +220,8 @@ public class TenantProvisionerService extends AbstractScheduledService {
       int numAdded = provisioner.tryAddTenantAssignments(tenantId, numToAdd);
       if (numAdded > 0) {
         provisionerStore.writeProvisioner(provisioner);
+        LOG.debug("Requesting provisioner {} to set workers to {} for tenant {} (adding {})",
+                  provisioner.getId(), provisioner.getAssignedWorkers(tenantId), tenantId, numAdded);
         if (provisionerRequestService.putTenant(provisioner, tenantId)) {
           numToAdd -= numAdded;
         } else {
@@ -265,7 +276,9 @@ public class TenantProvisionerService extends AbstractScheduledService {
 
   @Override
   protected Scheduler scheduler() {
-    return Scheduler.newFixedRateSchedule(1, 60, TimeUnit.SECONDS);
+    // if the server was down for a while, we don't want to time out provisioners right away but want to
+    // give them a chance to get their heartbeats in.  So wait for a while before starting the timeout logic.
+    return Scheduler.newFixedRateSchedule(provisionerTimeoutSecs, 60, TimeUnit.SECONDS);
   }
 
   private void checkCapacity(int diff) throws IOException, CapacityException {

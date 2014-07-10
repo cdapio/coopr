@@ -89,6 +89,8 @@ public final class LoomProvisionerHandler extends AbstractHttpHandler {
     }
 
     try {
+      LOG.debug("Received request to write provisioner {} with {} capacity.",
+                provisioner.getId(), provisioner.getCapacityTotal());
       tenantProvisionerService.writeProvisioner(provisioner);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
@@ -127,6 +129,7 @@ public final class LoomProvisionerHandler extends AbstractHttpHandler {
     }
 
     try {
+      LOG.trace("Received heartbeat for provisioner {}. heartbeat = {}", provisionerId, heartbeat);
       tenantProvisionerService.handleHeartbeat(provisionerId, heartbeat);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
@@ -149,6 +152,7 @@ public final class LoomProvisionerHandler extends AbstractHttpHandler {
   public void deleteProvisioner(HttpRequest request, HttpResponder responder,
                                 @PathParam("provisioner-id") String provisionerId) {
     try {
+      LOG.debug("Received request to delete provisioner {}.", provisionerId);
       tenantProvisionerService.deleteProvisioner(provisionerId);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
