@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+unless $:.include?(File.dirname(__FILE__) + '/../')
+  $: << File.dirname(__FILE__) + '/../'
+end
+
+require 'api'
+
+options = Loom::CLI.read
+Loom::ProvisionerApi.run(options)

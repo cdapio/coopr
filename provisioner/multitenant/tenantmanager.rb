@@ -2,12 +2,16 @@
 
 require_relative 'tenantspec'
 require_relative 'worker'
+require_relative 'logging'
 
 module Loom
   class TenantManager
+    include Logging
     attr_accessor :spec, :provisioner_id
 
     def initialize(spec)
+#      @logger = Logger.new('/Users/derek/git/loom/provisioner/multitenant/log-tmgr.log')
+#      @logger.info "tenanmgr starting"
       if !spec.instance_of?(TenantSpec)
         raise ArgumentError, "TenantManager needs to be initialized with object of type TenantSpec", caller
       end
@@ -37,14 +41,14 @@ module Loom
       workerpids = @workerpids.dup
       workerpids.each do |pid|
         begin
-          #puts "checking: #{pid}"
+          log.debug "checking: #{pid}"
           ret = Process.waitpid(pid, Process::WNOHANG)
           if ret == pid
             # child has died
-            puts "confirmed pid #{pid} dead"
+            log.debug "confirmed pid #{pid} dead"
             @workerpids.delete_if {|x| x == pid }
             @terminating_workers.delete(pid) if @terminating_workers.include?(pid)
-            #puts "new workerpids: #{@workerpids}"
+            log.debug "new workerpids: #{@workerpids}"
           elsif ret.nil?
             #puts "child #{pid} still running"
             # all good, child is running`
@@ -53,24 +57,27 @@ module Loom
           end
         rescue Errno::ECHILD
           # pid exists but is not my child
-          puts "non-child pid: #{pid}"
+          log.debug "non-child pid: #{pid}"
           @workerpids.delete_if {|x| x == pid }
           @terminating_workers.delete(pid) if @terminating_workers.include?(pid)
-          #puts "new workerpids: #{@workerpids}"
+          log.debug "new workerpids: #{@workerpids}"
         end
       end
     end
 
     def spawn_worker_process
       worker_name = "worker-" + self.id + "-"  + (@workerpids.size + 1).to_s
-      puts "spawning #{worker_name}"
+      log.debug "spawning #{worker_name}"
+#      @logger.info "spawning #{worker_name}"
+#      @logger.info "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} worker.rb #{worker_name}"
       cpid = fork { 
         #worker = Loom::Worker.new(worker_name)
         #worker.work
-        #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} worker.rb #{worker_name}")
-        exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} ../daemon/provisioner.rb --tenant #{@spec.id} --provisioner #{@provisioner_id} --uri http://localhost:55055")
+        exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} /Users/derek/git/loom/provisioner/multitenant/worker.rb #{worker_name}")
+        #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} ../daemon/provisioner.rb --tenant #{@spec.id} --provisioner #{@provisioner_id} --uri http://localhost:55055")
       }
 
+      #@logger.info "spawned #{cpid}"
       @workerpids.push(cpid)
     end
 
@@ -85,15 +92,15 @@ module Loom
 
 
     def update(new_tm)
-      puts "update workers from #{@spec.workers} to #{new_tm.spec.workers}"
+      log.info "update workers from #{@spec.workers} to #{new_tm.spec.workers}"
       difference = new_tm.spec.workers - @spec.workers
       if difference > 0
-        puts "adding #{difference} workers"
+        log.debug "adding #{difference} workers"
         difference.times do |i|
           spawn_worker_process
         end
       elsif difference < 0
-        puts "terminating #{difference.abs} workers"
+        log.debug "terminating #{difference.abs} workers"
         # we need to find active workers
         pids_to_kill = []
         @workerpids.reverse_each do |pid|

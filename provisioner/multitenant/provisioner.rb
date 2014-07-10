@@ -1,16 +1,25 @@
 #!/usr/bin/env ruby
 
 require_relative 'tenantmanager'
+require_relative 'logging'
 
 module Loom
   class Provisioner
+    include Logging
     attr_accessor :tenantmanagers, :provisioner_id
+
+    #Logging.configure(options[:log_file])
+    #Logging.level = options[:log_level]
+    #configure(options[:log_file])
+    #level = options[:log_level]
+
 
     def initialize()
       @tenantmanagers = {}
       pid = Process.pid
       host = Socket.gethostname.downcase
       @provisioner_id = "#{host}.#{pid}"
+      log.info "provisioner #{@provisioner_id} initialized"
     end 
 
     def add_tenant(tenantmgr)
@@ -19,7 +28,7 @@ module Loom
       end
       # validate input
       id = tenantmgr.id
-      puts "Adding/Editing tenant: #{id}"
+      log.info "Adding/Editing tenant: #{id}"
       raise "cannot add a TenantManager without an id: #{tenantmgr.inspect}" if id.nil?
 
       # set provisionerId
@@ -27,11 +36,11 @@ module Loom
 
       if @tenantmanagers.key? id
         # edit tenant
-        puts "Editing tenant: #{id}"
+        log.info "Editing tenant: #{id}"
         @tenantmanagers[id].update(tenantmgr)
       else
         # new tenant
-        puts "Adding new tenant: #{id}"
+        log.info "Adding new tenant: #{id}"
         tenantmgr.spawn
         @tenantmanagers[id] = tenantmgr
       end 
