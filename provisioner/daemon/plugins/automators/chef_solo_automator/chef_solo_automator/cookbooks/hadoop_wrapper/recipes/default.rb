@@ -35,4 +35,4 @@ if node.key?('java') && node['java'].key?('java_home')
 end
 
 include_recipe 'hadoop::default'
-include_recipe 'hadoop_wrapper::_kerberos_init'
+include_recipe 'hadoop_wrapper::kerberos_init'

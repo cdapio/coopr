@@ -17,12 +17,12 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.GroupElement;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.task.ClusterJob;

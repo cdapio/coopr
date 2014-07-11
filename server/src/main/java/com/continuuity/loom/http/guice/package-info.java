@@ -13,16 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.conf;
 
 /**
- * Interface defining the object is configurable.
+ * Guice modules for http classes.
  */
-public interface Configurable {
+package com.continuuity.loom.http.guice;
 
-  /** Set the configuration to be used by this object. */
-  void setConf(Configuration conf);
-
-  /** Return the configuration used by this object. */
-  Configuration getConf();
-}

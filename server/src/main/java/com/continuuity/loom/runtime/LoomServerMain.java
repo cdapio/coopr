@@ -15,15 +15,21 @@
  */
 package com.continuuity.loom.runtime;
 
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.conf.guice.ConfigurationModule;
+import com.continuuity.loom.common.queue.guice.QueueModule;
 import com.continuuity.loom.common.zookeeper.IdService;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.guice.LoomModules;
-import com.continuuity.loom.http.LoomService;
+import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
+import com.continuuity.loom.http.guice.HttpModule;
+import com.continuuity.loom.http.handler.LoomService;
 import com.continuuity.loom.management.LoomStats;
+import com.continuuity.loom.management.guice.ManagementModule;
 import com.continuuity.loom.scheduler.Scheduler;
+import com.continuuity.loom.scheduler.guice.SchedulerModule;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.guice.StoreModule;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -59,7 +65,8 @@ public final class LoomServerMain extends DaemonMain {
   private Scheduler scheduler;
   private Configuration conf;
   private int solverNumThreads;
-  private ListeningExecutorService executorService;
+  private ListeningExecutorService solverExecutorService;
+  private ListeningExecutorService callbackExecutorService;
   private ClusterStoreService clusterStoreService;
   private EntityStoreService entityStoreService;
   private IdService idService;
@@ -100,17 +107,31 @@ public final class LoomServerMain extends DaemonMain {
     }
     zkClientService.startAndWait();
 
-    executorService = MoreExecutors.listeningDecorator(
+    solverExecutorService = MoreExecutors.listeningDecorator(
       Executors.newFixedThreadPool(solverNumThreads,
                                    new ThreadFactoryBuilder()
                                      .setNameFormat("solver-scheduler-%d")
                                      .setDaemon(true)
                                      .build()));
 
+    callbackExecutorService = MoreExecutors.listeningDecorator(
+      Executors.newCachedThreadPool(new ThreadFactoryBuilder()
+                                      .setNameFormat("callback-%d")
+                                      .setDaemon(true)
+                                      .build()));
+
     try {
       // this is here because loom modules does things that need to connect to zookeeper...
       // TODO: move everything that needs zk started out of the module
-      injector = Guice.createInjector(LoomModules.createModule(zkClientService, executorService, conf));
+      injector = Guice.createInjector(
+        new ConfigurationModule(conf),
+        new ZookeeperModule(zkClientService),
+        new StoreModule(),
+        new QueueModule(zkClientService),
+        new SchedulerModule(conf, callbackExecutorService, solverExecutorService),
+        new HttpModule(),
+        new ManagementModule()
+      );
 
       idService = injector.getInstance(IdService.class);
       idService.startAndWait();
@@ -149,10 +170,18 @@ public final class LoomServerMain extends DaemonMain {
     if (scheduler != null) {
       scheduler.stopAndWait();
     }
-    if (executorService != null) {
-      executorService.shutdown();
+    if (solverExecutorService != null) {
+      solverExecutorService.shutdown();
       try {
-        executorService.awaitTermination(100, TimeUnit.SECONDS);
+        solverExecutorService.awaitTermination(100, TimeUnit.SECONDS);
+      } catch (InterruptedException e) {
+        LOG.error("Got Exception: ", e);
+      }
+    }
+    if (callbackExecutorService != null) {
+      callbackExecutorService.shutdown();
+      try {
+        callbackExecutorService.awaitTermination(100, TimeUnit.SECONDS);
       } catch (InterruptedException e) {
         LOG.error("Got Exception: ", e);
       }
@@ -179,13 +208,15 @@ public final class LoomServerMain extends DaemonMain {
 
   private ZKClientService getZKService(String connectString) {
     return ZKClientServices.delegate(
-      ZKClients.reWatchOnExpire(
-        ZKClients.retryOnFailure(
-          ZKClientService.Builder.of(connectString)
-            .setSessionTimeout(conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT_MILLIS))
-            .build(),
-          RetryStrategies.fixDelay(2, TimeUnit.SECONDS)
-        )
+      ZKClients.namespace(
+        ZKClients.reWatchOnExpire(
+          ZKClients.retryOnFailure(
+            ZKClientService.Builder.of(connectString)
+              .setSessionTimeout(conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT_MILLIS))
+              .build(),
+            RetryStrategies.fixDelay(2, TimeUnit.SECONDS)
+          )
+        ), conf.get(Constants.ZOOKEEPER_NAMESPACE)
       )
     );
   }

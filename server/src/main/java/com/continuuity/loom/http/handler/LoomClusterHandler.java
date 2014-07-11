@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.http;
+package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.http.request.AddServicesRequest;
+import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.layout.InvalidClusterException;
 import com.continuuity.loom.scheduler.ClusterAction;

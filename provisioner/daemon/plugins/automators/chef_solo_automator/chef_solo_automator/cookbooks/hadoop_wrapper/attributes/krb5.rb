@@ -74,3 +74,30 @@ if node['hbase'].key?('hbase_site') && node['hbase']['hbase_site'].key?('hbase.s
   default['hbase']['hbase_site']['hbase.bulkload.staging.dir'] = '/tmp/hbase-staging'
 
 end
+
+# Hive MetaStore
+if node['hive'].key?('hive_site') && node['hive']['hive_site'].key?('hive.metastore.sasl.enabled') &&
+  node['hive']['hive_site']['hive.metastore.sasl.enabled'].to_s == 'true'
+
+  include_attribute 'krb5'
+  include_attribute 'krb5_utils'
+
+  # hive-site.xml
+  default['hive']['hive_site']['hive.metastore.kerberos.keytab.file'] = "#{node['krb5_utils']['keytabs_dir']}/hive.service.keytab"
+  default['hive']['hive_site']['hive.metastore.kerberos.principal'] = "hive/_HOST@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
+
+end
+
+# Hive Server2
+if node['hive'].key?('hive_site') && node['hive']['hive_site'].key?('hive.server2.authentication') &&
+  node['hive']['hive_site']['hive.server2.authentication'].upcase == 'KERBEROS'
+
+  include_attribute 'krb5'
+  include_attribute 'krb5_utils'
+
+  # hive-site.xml
+  default['hive']['hive_site']['hive.server2.authentication'] = 'KERBEROS'
+  default['hive']['hive_site']['hive.server2.authentication.kerberos.principal'] = "#{node['krb5_utils']['keytabs_dir']}/hive.service.keytab"
+  default['hive']['hive_site']['hive.server2.authentication.kerberos.keytab'] = "hive/_HOST@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
+
+end

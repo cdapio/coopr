@@ -15,7 +15,7 @@
  */
 
 /**
- * Dependency injection Guice modules.
+ * Guice modules for zookeeper classes.
  */
-package com.continuuity.loom.guice;
+package com.continuuity.loom.common.zookeeper.guice;
 

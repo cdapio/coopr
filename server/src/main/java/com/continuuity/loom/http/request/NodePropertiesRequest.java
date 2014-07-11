@@ -1,4 +1,4 @@
-package com.continuuity.loom.http;
+package com.continuuity.loom.http.request;
 
 import com.google.common.base.Preconditions;
 

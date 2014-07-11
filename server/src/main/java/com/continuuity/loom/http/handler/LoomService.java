@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.http;
+package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpHandler;
 import com.continuuity.http.NettyHttpService;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;

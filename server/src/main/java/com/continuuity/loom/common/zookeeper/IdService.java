@@ -15,9 +15,9 @@
  */
 package com.continuuity.loom.common.zookeeper;
 
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.google.common.primitives.Longs;
