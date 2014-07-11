@@ -104,6 +104,7 @@ module Loom
                   v.terminate_all_worker_processes
                 end
                 Process.waitall
+                unregister_from_server
                 Logging.log.info "provisioner shutdown complete"
                 exit
               end
@@ -147,7 +148,6 @@ module Loom
 
     def self.register_with_server
       uri = "#{@@server_uri}/v1/provisioners/#{$provisioner.provisioner_id}"
-      Logging.log.info "Registering with server at #{uri}"
       data = {}
       data['id'] = $provisioner.provisioner_id
       data['capacityTotal'] = '100'
@@ -165,6 +165,23 @@ module Loom
         end
       rescue => e
         Logging.log.error "Caught exception when registering with loom server #{uri}: #{e.message}"
+        #log.error e.message
+        #log.error e.backtrace.inspect
+      end
+    end
+
+    def self.unregister_from_server
+      uri = "#{@@server_uri}/v1/provisioners/#{$provisioner.provisioner_id}"
+      Logging.log.info "Unregistering with server at #{uri}"
+      begin
+        resp = RestClient.delete("#{uri}", :'X-Loom-UserID' => "admin")
+        if(resp.code == 200)
+          Logging.log.info "Successfully unregistered"
+        else
+          Logging.log.warn "Response code #{resp.code}, #{resp.to_str} when unregistering with loom server #{uri}"
+        end
+      rescue => e
+        Logging.log.error "Caught exception when unregistering with loom server #{uri}: #{e.message}"
         #log.error e.message
         #log.error e.backtrace.inspect
       end
