@@ -96,9 +96,7 @@ module Loom
             Logging.log.info "processing signal: #{sig}"
             case sig
             when 'CLD'
-              $provisioner.tenantmanagers.each do |k, v|
-                v.verify_children
-              end
+              $provisioner.verify_tenants
             when 'TERM'
               if !@shutting_down
                 @shutting_down = true

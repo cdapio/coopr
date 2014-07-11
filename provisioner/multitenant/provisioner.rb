@@ -16,6 +16,7 @@ module Loom
 
     def initialize()
       @tenantmanagers = {}
+      @terminating_tenants = []
       pid = Process.pid
       host = Socket.gethostname.downcase
       @provisioner_id = "#{host}.#{pid}"
@@ -44,12 +45,24 @@ module Loom
         tenantmgr.spawn
         @tenantmanagers[id] = tenantmgr
       end 
- 
+    end
+
+    def verify_tenants
+      @tenantmanagers.each do |k, v|
+        v.verify_workers
+        # has this tenant been deleted?
+        if (@terminating_tenants.include?(k) && v.num_workers == 0)
+          @tenantmanagers.delete(k)
+          @terminating_tenants.delete(k) 
+        end
+      end
     end
 
     def delete_tenant(id)
+      # instruct tenant to send kill signal to its workers
       @tenantmanagers[id].delete
-      #@tenantmanagers.delete(id)
+      # we mark this tenant as deleting.  when its num_workers reaches 0 it can be deleted from @tenantmanagers
+      @terminating_tenants.push(id)
     end
 
     def status

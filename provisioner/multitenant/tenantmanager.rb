@@ -36,7 +36,7 @@ module Loom
     end
 
     # this is called from the provisioner CLD signal handler upon child process termination
-    def verify_children
+    def verify_workers
       #puts "checking: #{@workerpids}"
       workerpids = @workerpids.dup
       workerpids.each do |pid|
