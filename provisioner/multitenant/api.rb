@@ -170,18 +170,7 @@ module Loom
       end
     end
 
-
-#    def heartbeat
-#      hb = {}
-#      hb['total'] = 1000
-#      hb['used'] = {}
-#      @tenantmanagers.each do |id, tm|
-#        hb['used'][id] = tm.num_workers
-#      end
-#      hb
-#    end
-
-
+    # start sinatra endpoint definition
     get '/hi' do
       "Hello World!"
     end
