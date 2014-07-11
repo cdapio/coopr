@@ -1,10 +1,10 @@
 {
   "name": "fog",
   "description": "Multi-cloud fog-based provider (Openstack, Rackspace, Joyent)",
-  "providertypes": [ "openstack" ],
+  "providertypes": [ "rackspace" ],
   "openstack": {
     "name": "openstack",
-    "classname": "FogOpenstackProvider",
+    "classname": "FogProviderOpenstack",
     "parameters": { 
       "admin": {
         "fields": {
@@ -78,7 +78,7 @@
   }
   "rackspace": {
     "name": "rackspace",
-    "classname": "FogRackspaceProvider",
+    "classname": "FogProviderRackspace",
     "parameters": {
       "admin": {
         "fields": {
