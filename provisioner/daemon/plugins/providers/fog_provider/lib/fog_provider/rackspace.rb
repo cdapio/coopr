@@ -82,8 +82,8 @@ class FogProviderRackspace < FogProvider
       log.error("SSH Authentication failure for #{providerid}/#{instance_result['ipaddress']}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{instance_result['ipaddress']}: #{e.inspect}"
     rescue Exception => e
-      log.error('Unexpected Error Occured in RackspaceProvider.confirm:' + e.inspect)
-      @result['stderr'] = "Unexpected Error Occured in RackspaceProvider.confirm: #{e.inspect}"
+      log.error('Unexpected Error Occured in FogProviderRackspace.confirm:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occured in FogProviderRackspace.confirm: #{e.inspect}"
     else
       log.debug "Confirm finished successfully: #{@result}"
     ensure
@@ -94,6 +94,25 @@ class FogProviderRackspace < FogProvider
   def delete(inputmap)
     providerid = inputmap['providerid']
     fields = inputmap['fields']
+    begin
+      # Our fields are fog symbols
+      fields.each do |k,v|
+        k.to_sym = v
+      end
+      # Delete server
+      log.debug 'Invoking server delete'
+      instance = FogProviderRackspaceDelete.new
+      instance_result = instance.run
+      # Return 0
+      @result['status'] = 0
+    rescue Exception => e
+      log.error('Unexpected Error Occured in FogProviderRackspace.delete:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occured in FogProviderRackspace.delete: #{e.inspect}"
+    else
+      log.debug "Delete finished sucessfully: #{@result}"
+    ensure
+      @result['status'] = 1 if @result['status'].nil? || (@result['status'].is_a?(Hash) && @result['status'].empty?)
+    end
   end
 
   # Shared definitions (borrowed from knife-rackspace gem, Apache 2.0 license)
