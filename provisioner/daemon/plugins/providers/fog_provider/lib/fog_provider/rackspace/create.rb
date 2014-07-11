@@ -18,11 +18,13 @@
 
 class FogProviderRackspaceCreate
 
+  include FogProviderRackspace
+
   def run
     $stdout.sync = true
 
-    unless :image
-      log.debug "Missing #{image_id}"
+    unless image
+      log.debug "Missing image value"
       exit 1
     end
 
@@ -34,6 +36,14 @@ class FogProviderRackspaceCreate
       :personality  => files,
       :keypair      => rackspace_ssh_keypair
     )
+
+    server.save
+
+    if (server.password && !server.key_name)
+      return { 'status' => 0, 'providerid' => server.id.to_s, 'rootpassword' => server.password }
+    else
+      return { 'status' => 0, 'providerid' => server.id.to_s }
+    end
 
   end
 end
