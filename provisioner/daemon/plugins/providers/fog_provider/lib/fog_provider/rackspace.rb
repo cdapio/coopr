@@ -35,7 +35,23 @@ class FogProviderRackspace < FogProvider
       # Create the server
       log.debug 'Invoking server create'
       instance = FogProviderRackspaceCreate.new
+      instance_result = instance.run
 
+      # Process results
+      @result['result']['providerid'] = instance_result['providerid']
+      @result['result']['ssh-auth']['user'] = 'root'
+      if instance_result.key?('rootpassword')
+        @result['result']['ssh-auth']['password'] = instance_result['rootpassword']
+      end
+      @result['status'] = instance_result['status']
+
+    rescue Exception => e
+      log.error('Unexpected Error Occured in FogProviderRackspace.create:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occured in FogProviderRackspace.create: #{e.inspect}"
+    else
+      log.debug "Create finished successfully: #{@result}"
+    ensure
+      @result['status'] = 1 if @result['status'].nil? || (@result['status'].is_a?(Hash) && @result['status'].empty?)
     end
   end
 
