@@ -65,6 +65,8 @@ class FogProviderRackspace < FogProvider
     fields = inputmap['fields']
   end
 
+  # Shared definitions (borrowed from knife-rackspace gem, Apache 2.0 license)
+
   def connection
     log.debug "Connection options for Rackspace:"
     log.debug "rackspace_version #{rackspace_version}"
@@ -79,6 +81,28 @@ class FogProviderRackspace < FogProvider
         :version  => 'v2'
       )
     end
+  end
+
+  def ip_address(server, network='public')
+    if network == 'public' && v2_access_ip(server) != ''
+      v2_access_ip(server)
+    else
+      v2_ip_address(server, network)
+    end
+  end
+
+  def v2_ip_address(server, network)
+    network_ips = server.addresses[network]
+    extract_ipv4_address(network_ips) if network_ips
+  end
+
+  def v2_access_ip(server)
+    server.access_ipv4_address == nil ? '' : server.access_ipv4_address
+  end
+
+  def extract_ipv4_address(ip_addresses)
+    address = ip_addresses.select { |ip| ip['version'] == 4 }.first
+    address ? address['addr'] : ''
   end
 
 end
