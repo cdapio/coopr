@@ -83,7 +83,7 @@ class FogProviderRackspace < FogProvider
     end
   end
 
-  def ip_address(server, network='public')
+  def ip_address(server, network = 'public')
     if network == 'public' && v2_access_ip(server) != ''
       v2_access_ip(server)
     else
@@ -97,7 +97,7 @@ class FogProviderRackspace < FogProvider
   end
 
   def v2_access_ip(server)
-    server.access_ipv4_address == nil ? '' : server.access_ipv4_address
+    server.access_ipv4_address.nil? ? '' : server.access_ipv4_address
   end
 
   def extract_ipv4_address(ip_addresses)
