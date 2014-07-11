@@ -17,6 +17,8 @@
 #
 
 require_relative 'rackspace/create'
+require_relative 'rackspace/confirm'
+require_relative 'rackspace/delete'
 
 class FogProviderRackspace < FogProvider
 
