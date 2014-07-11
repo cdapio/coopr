@@ -22,7 +22,7 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Actions;
@@ -50,18 +50,18 @@ public class TaskService {
   private final ClusterStore clusterStore;
   private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
-  private final TrackingQueue callbackQueue;
   private final IdService idService;
+  private final QueueGroup callbackQueues;
 
   @Inject
   private TaskService(ClusterStoreService clusterStoreService,
                       LoomStats loomStats,
-                      @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,
+                      @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
                       IdService idService) {
     this.clusterStore = clusterStoreService.getSystemView();
     this.loomStats = loomStats;
-    this.callbackQueue = callbackQueue;
     this.idService = idService;
+    this.callbackQueues = callbackQueues;
   }
 
   /**
@@ -161,7 +161,8 @@ public class TaskService {
     clusterStore.writeClusterJob(job);
 
     loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
-    callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.FAILURE, cluster, job))));
+    callbackQueues.add(cluster.getAccount().getTenantId(),
+                       new Element(GSON.toJson(new CallbackData(CallbackData.Type.FAILURE, cluster, job))));
   }
 
   /**
@@ -215,7 +216,8 @@ public class TaskService {
     // Note: writing job status as RUNNING, will allow other operations on the job
     // (like cancel, etc.) to happen in parallel.
     clusterStore.writeClusterJob(job);
-    callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.START, cluster, job))));
+    callbackQueues.add(cluster.getAccount().getTenantId(),
+                       new Element(GSON.toJson(new CallbackData(CallbackData.Type.START, cluster, job))));
   }
 
   /**
@@ -240,7 +242,8 @@ public class TaskService {
     clusterStore.writeCluster(cluster);
 
     loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
-    callbackQueue.add(new Element(GSON.toJson(new CallbackData(CallbackData.Type.SUCCESS, cluster, job))));
+    callbackQueues.add(cluster.getAccount().getTenantId(),
+                       new Element(GSON.toJson(new CallbackData(CallbackData.Type.SUCCESS, cluster, job))));
   }
 
   /**

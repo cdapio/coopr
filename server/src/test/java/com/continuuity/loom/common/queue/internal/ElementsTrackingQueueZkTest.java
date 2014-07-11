@@ -19,7 +19,6 @@ import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.ZKClientService;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
@@ -28,13 +27,13 @@ import java.io.IOException;
 /**
  *
  */
-public class TimeoutTrackingQueueZkTest extends TimeoutTrackingQueueTestBase {
+public class ElementsTrackingQueueZkTest extends ElementsTrackingQueueTestBase {
   @Rule
   public TemporaryFolder tmpFolder = new TemporaryFolder();
   private InMemoryZKServer zkServer;
   private ZKClientService zkClient;
 
-  private TimeoutTrackingQueue queue;
+  private ElementsTrackingQueue queue;
 
   @Before
   public void before() throws IOException {
@@ -47,25 +46,15 @@ public class TimeoutTrackingQueueZkTest extends TimeoutTrackingQueueTestBase {
 
   @After
   public void after() {
-    if (queue != null) {
-      queue.stop();
-    }
     zkClient.stopAndWait();
     zkServer.stopAndWait();
   }
 
   @Override
-  protected TimeoutTrackingQueue getQueue(long intervalBetweenChecks, long rescheduleAfterTimeout) throws Exception {
+  protected ElementsTrackingQueue getQueue() throws Exception {
     String queueName = "/tracking-queue";
     System.out.println("queue name: " + queueName);
-    queue = new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, queueName),
-                                     intervalBetweenChecks, rescheduleAfterTimeout);
-    queue.start();
+    queue = new ElementsTrackingQueue(new ZKElementsTracking(zkClient, queueName));
     return queue;
-  }
-
-  @Override
-  protected long getRescheduleInterval() {
-    return 500;
   }
 }

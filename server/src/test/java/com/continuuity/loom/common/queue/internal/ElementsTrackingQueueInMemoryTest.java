@@ -15,30 +15,14 @@
  */
 package com.continuuity.loom.common.queue.internal;
 
-import org.junit.After;
-
 /**
  *
  */
-public class TimeoutTrackingQueueInMemoryTest extends TimeoutTrackingQueueTestBase {
-  private TimeoutTrackingQueue queue;
+public class ElementsTrackingQueueInMemoryTest extends ElementsTrackingQueueTestBase {
+  private ElementsTrackingQueue queue;
 
-  @Override
-  protected TimeoutTrackingQueue getQueue(long intervalBetweenChecks, long rescheduleAfterTimeout) {
-    queue = new TimeoutTrackingQueue(new InMemoryElementsTracking(), intervalBetweenChecks, rescheduleAfterTimeout);
-    queue.start();
+  protected ElementsTrackingQueue getQueue() {
+    queue = new ElementsTrackingQueue(new InMemoryElementsTracking());
     return queue;
-  }
-
-  @Override
-  protected long getRescheduleInterval() {
-    return 200;
-  }
-
-  @After
-  public void after() {
-    if (queue != null) {
-      queue.stop();
-    }
   }
 }
