@@ -16,13 +16,27 @@
 # limitations under the License.
 #
 
-class FogRackspaceProvider < FogProvider
+require_relative 'rackspace/create'
+
+class FogProviderRackspace < FogProvider
 
   def create(inputmap)
     flavor = inputmap['flavor']
     image = inputmap['image']
     hostname = inputmap['hostname']
     fields = inputmap['fields']
+
+    begin
+      # Our fields are fog symbols
+      fields.each do |k,v|
+        k.to_sym = v
+      end
+
+      # Create the server
+      log.debug 'Invoking server create'
+      instance = FogProviderRackspaceCreate.new
+
+    end
   end
 
   def confirm(inputmap)
@@ -33,6 +47,22 @@ class FogRackspaceProvider < FogProvider
   def delete(inputmap)
     providerid = inputmap['providerid']
     fields = inputmap['fields']
+  end
+
+  def connection
+    log.debug "Connection options for Rackspace:"
+    log.debug "rackspace_version #{rackspace_version}"
+    log.debug "rackspace_api_key #{rackspace_api_key}"
+    log.debug "rackspace_username #{rackspace_username}"
+    log.debug "rackspace_region #{rackspace_region}"
+
+    # Create connection
+    @connection ||= begin
+      connection = Fog::Compute.new(
+        :provider => 'Rackspace',
+        :version  => 'v2'
+      )
+    end
   end
 
 end

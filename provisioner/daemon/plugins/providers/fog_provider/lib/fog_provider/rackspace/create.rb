@@ -16,25 +16,24 @@
 # limitations under the License.
 #
 
-gem 'fog', '~> 1.21.0'
+class FogProviderRackspaceCreate
 
-require 'fog'
-require_relative 'lib/fog_provider/openstack'
-require_relative 'lib/fog_provider/rackspace'
+  def run
+    $stdout.sync = true
 
-class FogProvider < Provider
-  # used by ssh validation in confirm stage
-  def set_credentials(sshauth)
-    @credentials = Hash.new
-    @credentials[:paranoid] = false
-    sshauth.each do |k, v|
-      if (k =~ /password/)
-        @credentials[:password] = v
-      elsif (k =~ /identityfile/)
-        @credentials[:keys] = [ v ]
-      end
+    unless :image
+      log.debug "Missing #{image_id}"
+      exit 1
     end
+
+    server = connection.servers.create(
+      :flavor_id    => flavor,
+      :image_id     => image,
+      :name         => hostname,
+      :config_drive => false,
+      :personality  => files,
+      :keypair      => rackspace_ssh_keypair
+    )
+
   end
-
 end
-
