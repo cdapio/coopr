@@ -16,21 +16,38 @@
 package com.continuuity.loom.common.queue;
 
 /**
- * The element to be placed in the {@link com.continuuity.loom.common.queue.TrackingQueue}.
+ * An element taken from a {@link QueueGroup}, indicating which queue the element was taken from as well as the
+ * element itself.
  */
 public class GroupElement {
   private final String queueName;
   private final Element element;
 
+  /**
+   * Create a group element where the given element was taken from the given queue.
+   *
+   * @param queueName Name of the queue the element was taken from.
+   * @param element Element that was taken.
+   */
   public GroupElement(String queueName, Element element) {
     this.queueName = queueName;
     this.element = element;
   }
 
+  /**
+   * Get the name of the queue the element was taken from.
+   *
+   * @return Name of the queue the element was taken from.
+   */
   public String getQueueName() {
     return queueName;
   }
 
+  /**
+   * Get the element that was taken.
+   *
+   * @return Element that was taken.
+   */
   public Element getElement() {
     return element;
   }

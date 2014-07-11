@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Implementation of a {@link QueueGroup} that uses queues built on zookeeper, and which round robins through queues
+ * when an element is taken from the group and not from a specific queue. Whenever a queue name is referenced in a
+ * method, the queue is cached and the physical zookeeper queue is created if it does not already exist.
  */
 public class ZKQueueGroup implements QueueGroup {
   private final ZKClient zkClient;
@@ -27,6 +29,14 @@ public class ZKQueueGroup implements QueueGroup {
   private final Map<String, TrackingQueue> queueMap;
   private int index;
 
+  /**
+   * Create a zookeeper queue group of the given type, using the given zookeeper client. Physical queues in the group
+   * are namespaced by the namespace of the client plus the queue type and queue name. As such, if two queue groups
+   * of the same type should not conflict, the namespace of their clients should not be the same.
+   *
+   * @param zkClient Client to use for zookeeper operations.
+   * @param queueType Type of queues in the group.
+   */
   public ZKQueueGroup(final ZKClient zkClient, final QueueType queueType) {
     this.zkClient = zkClient;
     this.queueType = queueType;
@@ -40,6 +50,13 @@ public class ZKQueueGroup implements QueueGroup {
     return checkAndGetQueue(queueName).add(element);
   }
 
+  /**
+   * Cycles through the queues in the group in a round-robin fashion, returning an element from the first queue that
+   * has one available. If all queues are cycled through once without an element, null is returned.
+   *
+   * @param consumerId Id of the consumer taking the element.
+   * @return An element from a queue in the group, or null if none exists.
+   */
   @Override
   public synchronized GroupElement take(String consumerId) {
     int numQueues = queueList.size();
@@ -50,7 +67,9 @@ public class ZKQueueGroup implements QueueGroup {
     int startIndex = index;
     do {
       ImmutablePair<String, TrackingQueue> queueInfo = queueList.get(index);
+      // if we're at the end, reset to the beginning
       index = index == (numQueues - 1) ? 0 : index + 1;
+
       Element element = queueInfo.getSecond().take(consumerId);
       if (element != null) {
         return new GroupElement(queueInfo.getFirst(), element);
@@ -90,7 +109,7 @@ public class ZKQueueGroup implements QueueGroup {
   }
 
   @Override
-  public synchronized void hideQueue(String queueName) {
+  public synchronized void removeQueue(String queueName) {
     if (queueMap.containsKey(queueName)) {
       TrackingQueue queue = queueMap.get(queueName);
       queueList.remove(ImmutablePair.of(queueName, queue));
@@ -121,6 +140,7 @@ public class ZKQueueGroup implements QueueGroup {
     return checkAndGetQueue(queueName).getQueued();
   }
 
+  // If we already have the queue, return it directly. Otherwise add the queue before returning it.
   private TrackingQueue checkAndGetQueue(String queueName) {
     if (!queueMap.containsKey(queueName)) {
       addQueue(queueName);
@@ -128,6 +148,7 @@ public class ZKQueueGroup implements QueueGroup {
     return queueMap.get(queueName);
   }
 
+  // add the queue.  Queues are namespaced by zk namespace, queue type, and name
   private synchronized void addQueue(String queueName) {
     if (!queueMap.containsKey(queueName)) {
       TrackingQueue queue =

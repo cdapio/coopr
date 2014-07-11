@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
@@ -271,7 +270,7 @@ public abstract class QueueGroupTest {
     Assert.assertEquals("id2-1", taken.getElement().getId());
 
     // hide queue3, should not get elements anymore until its referenced directly
-    queues.hideQueue("tenant3");
+    queues.removeQueue("tenant3");
 
     taken = queues.take("consumer");
     Assert.assertEquals("tenant1", taken.getQueueName());
