@@ -33,7 +33,6 @@ class FogProviderRackspaceCreate
       :image_id     => image,
       :name         => hostname,
       :config_drive => false,
-      :personality  => files,
       :keypair      => rackspace_ssh_keypair
     )
 

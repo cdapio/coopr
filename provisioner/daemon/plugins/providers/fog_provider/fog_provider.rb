@@ -23,6 +23,7 @@ require_relative 'lib/fog_provider/openstack'
 require_relative 'lib/fog_provider/rackspace'
 
 class FogProvider < Provider
+
   # used by ssh validation in confirm stage
   def set_credentials(sshauth)
     @credentials = Hash.new
@@ -36,5 +37,32 @@ class FogProvider < Provider
     end
   end
 
-end
+  # Open a connection to a port
+  def tcp_test_port(hostname, port)
+    tcp_socket = TCPSocket.new(hostname, port)
+    readable = IO.select([tcp_socket], nil, nil, 5)
+    if readable
+      log.debug("sshd accepting connections on #{hostname} port #{port}, banner is #{tcp_socket.gets}")
+      yield
+      true
+    else
+      false
+    end
+  rescue Errno::ETIMEDOUT
+    false
+  rescue Errno::EPERM
+    false
+  rescue Errno::ECONNREFUSED
+    sleep 2
+    false
+  rescue Errno::EHOSTUNREACH, Errno::ENETUNREACH
+    sleep 2
+    false
+  rescue Errno::ENETUNREACH
+    sleep 2
+    false
+  ensure
+    tcp_socket && tcp_socket.close
+  end
 
+end

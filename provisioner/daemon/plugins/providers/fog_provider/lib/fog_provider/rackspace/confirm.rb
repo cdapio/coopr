@@ -34,12 +34,12 @@ class FogProviderRackspaceConfirm
       log.error 'Timeout waiting for the server to be created'
     end
 
-    bootstrap_ip_address = ip_address(server, 'public')
-    if bootstrap_ip_address.nil?
+    bootstrap_ip = ip_address(server, 'public')
+    if bootstrap_ip.nil?
       log.error 'No IP address available for bootstrapping.'
       exit 1
     else
-      log.debug "Bootstrap IP address #{bootstrap_ip_address}"
+      log.debug "Bootstrap IP address #{bootstrap_ip}"
     end
 
   end
