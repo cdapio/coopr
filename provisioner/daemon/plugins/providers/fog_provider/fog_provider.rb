@@ -19,7 +19,7 @@
 gem 'fog', '~> 1.21.0'
 
 require 'fog'
-require_relative 'lib/fog/openstack/openstack'
+require_relative 'lib/fog_provider/openstack'
 
 class FogProvider < Provider
   # used by ssh validation in confirm stage
