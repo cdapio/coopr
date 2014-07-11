@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Administration;
 import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterDefaults;
@@ -38,6 +39,7 @@ import com.continuuity.loom.admin.ServiceDependencies;
 import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.common.conf.Constants;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -54,6 +56,8 @@ public class Entities {
   public static final String JOYENT = "joyent";
   public static final String RACKSPACE = "rackspace";
   public static final String OPENSTACK = "openstack";
+  public static final Account USER_ACCOUNT = new Account("user1", "tenant1");
+  public static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, "tenant1");
 
   public static class ProviderTypeExample {
     public static final ProviderType JOYENT =
@@ -1143,7 +1147,7 @@ public class Entities {
     private static String node1 = "node1";
     private static String node2 = "node2";
     public static Cluster CLUSTER =
-      new Cluster("123", "user1", "name", 1234567890, "description",
+      new Cluster("123", USER_ACCOUNT, "name", 1234567890, "description",
                   ProviderExample.RACKSPACE, ClusterTemplateExample.HDFS,
                   ImmutableSet.of(node1, node2),
                   ImmutableSet.of(ServiceExample.NAMENODE.getName(), ServiceExample.DATANODE.getName()));

@@ -16,13 +16,14 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.BaseTest;
+import com.continuuity.loom.account.Account;
+import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.http.handler.LoomService;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
-import com.continuuity.loom.store.ClusterStore;
-import com.continuuity.loom.store.IdService;
-import com.continuuity.loom.store.TenantStore;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -46,17 +47,29 @@ public class LoomServiceTestBase extends BaseTest {
   protected static final String USER1 = "user1";
   protected static final String USER2 = "user2";
   protected static final String API_KEY = "apikey";
-  protected static final Header[] USER1_HEADERS =
-    { new BasicHeader(Constants.USER_HEADER, USER1), new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
-  protected static final Header[] USER2_HEADERS =
-    { new BasicHeader(Constants.USER_HEADER, USER2), new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
-  protected static final Header[] ADMIN_HEADERS =
-    { new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
-      new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
-  protected static final Header[] SUPERADMIN_HEADERS =
-    { new BasicHeader(Constants.USER_HEADER, Constants.SUPERADMIN_USER),
-      new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
-      new BasicHeader(Constants.TENANT_HEADER, Constants.SUPERADMIN_TENANT) };
+  protected static final String TENANT = "tenant1";
+  protected static final Account USER1_ACCOUNT = new Account(USER1, TENANT);
+  protected static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, TENANT);
+  protected static final Header[] USER1_HEADERS = {
+    new BasicHeader(Constants.USER_HEADER, USER1),
+    new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+    new BasicHeader(Constants.TENANT_HEADER, TENANT)
+  };
+  protected static final Header[] USER2_HEADERS = {
+    new BasicHeader(Constants.USER_HEADER, USER2),
+    new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+    new BasicHeader(Constants.TENANT_HEADER, TENANT)
+  };
+  protected static final Header[] ADMIN_HEADERS = {
+    new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
+    new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+    new BasicHeader(Constants.TENANT_HEADER, TENANT)
+  };
+  protected static final Header[] SUPERADMIN_HEADERS = {
+    new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
+    new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+    new BasicHeader(Constants.TENANT_HEADER, Constants.SUPERADMIN_TENANT)
+  };
   private static int port;
   protected static LoomService loomService;
   protected static TimeoutTrackingQueue nodeProvisionTaskQueue;
@@ -64,8 +77,6 @@ public class LoomServiceTestBase extends BaseTest {
   protected static TimeoutTrackingQueue solverQueue;
   protected static TimeoutTrackingQueue jobQueue;
   protected static TimeoutTrackingQueue callbackQueue;
-  protected static ClusterStore clusterStore;
-  protected static TenantStore tenantStore;
   protected static Scheduler scheduler;
   protected static JobScheduler jobScheduler;
 
@@ -91,13 +102,10 @@ public class LoomServiceTestBase extends BaseTest {
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
     port = loomService.getBindAddress().getPort();
-    clusterStore = injector.getInstance(ClusterStore.class);
-    clusterStore.initialize();
     scheduler = injector.getInstance(Scheduler.class);
     scheduler.startAndWait();
     jobScheduler = injector.getInstance(JobScheduler.class);
-    tenantStore = injector.getInstance(TenantStore.class);
-    tenantStore.startAndWait();
+    tenantStore.writeTenant(new Tenant("name", TENANT, 10, 100, 1000));
   }
 
   @AfterClass

@@ -24,14 +24,14 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.http.LoomService;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.http.handler.LoomService;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
-import com.continuuity.loom.store.IdService;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
@@ -116,7 +116,7 @@ public class SchedulerTest extends BaseTest {
     cluster = new JsonSerde().getGson().fromJson(TEST_CLUSTER, Cluster.class);
     job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     clusterStore.writeClusterJob(job);
 
     Node node = GSON.fromJson(NODE1, Node.class);
@@ -263,11 +263,10 @@ public class SchedulerTest extends BaseTest {
     waitForCallback(callbackScheduler);
     Assert.assertEquals(CallbackData.Type.START, mockClusterCallback.getReceivedCallbacks().get(0).getType());
 
-    JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
-    jobScheduler.run();
-
     // wait for fail callback to finish
-    waitForCallback(callbackScheduler);
+    if (mockClusterCallback.getReceivedCallbacks().size() < 2) {
+      waitForCallback(callbackScheduler);
+    }
     Assert.assertEquals(CallbackData.Type.FAILURE, mockClusterCallback.getReceivedCallbacks().get(1).getType());
 
     // there also should not be any jobs in the queue
@@ -370,7 +369,10 @@ public class SchedulerTest extends BaseTest {
   public static final String TEST_CLUSTER =
     "{\n" +
       "   \"id\":\"2\",\n" +
-      "   \"ownerId\":\"user1\",\n" +
+      "   \"account\":{\n" +
+      "     \"userId\":\"user1\",\n" +
+      "     \"tenantId\":\"tenant1\"\n" +
+      "   },\n" +
       "   \"name\":\"ashau-dev\",\n" +
       "   \"description\":\"\",\n" +
       "   \"status\":\"pending\",\n" +

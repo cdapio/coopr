@@ -15,17 +15,23 @@
  */
 package com.continuuity.loom;
 
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.guice.LoomModules;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.conf.guice.ConfigurationModule;
+import com.continuuity.loom.common.queue.guice.QueueModule;
+import com.continuuity.loom.common.zookeeper.IdService;
+import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
+import com.continuuity.loom.http.guice.HttpModule;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.scheduler.guice.SchedulerModule;
 import com.continuuity.loom.store.DBQueryHelper;
-import com.continuuity.loom.store.EntityStore;
-import com.continuuity.loom.store.IdService;
-import com.continuuity.loom.store.SQLClusterStore;
-import com.continuuity.loom.store.SQLTenantStore;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.SQLClusterStoreService;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.guice.StoreModule;
+import com.continuuity.loom.store.tenant.SQLTenantStore;
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -46,13 +52,15 @@ import java.sql.SQLException;
  */
 public class BaseTest {
   private static InMemoryZKServer zkServer;
-  private static SQLClusterStore sqlClusterStore;
+  private static SQLClusterStoreService sqlClusterStoreService;
   private static SQLTenantStore sqlTenantStore;
   protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
   protected static ZKClientService zkClientService;
-  protected static EntityStore entityStore;
+  protected static EntityStoreService entityStoreService;
+  protected static SQLClusterStoreService clusterStoreService;
   protected static ClusterStore clusterStore;
+  protected static TenantStore tenantStore;
   protected static Configuration conf;
   protected static MockClusterCallback mockClusterCallback;
   protected static IdService idService;
@@ -78,7 +86,12 @@ public class BaseTest {
     mockClusterCallback = new MockClusterCallback();
     injector = Guice.createInjector(
       Modules.override(
-        LoomModules.createModule(zkClientService, MoreExecutors.sameThreadExecutor(), conf)
+        new ConfigurationModule(conf),
+        new ZookeeperModule(zkClientService),
+        new StoreModule(),
+        new QueueModule(zkClientService),
+        new HttpModule(),
+        new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor())
       ).with(
         new AbstractModule() {
           @Override
@@ -91,12 +104,15 @@ public class BaseTest {
 
     idService = injector.getInstance(IdService.class);
     idService.startAndWait();
-    entityStore = injector.getInstance(EntityStore.class);
-    sqlClusterStore = injector.getInstance(SQLClusterStore.class);
-    sqlClusterStore.initialize();
+    entityStoreService = injector.getInstance(EntityStoreService.class);
+    entityStoreService.startAndWait();
+    sqlClusterStoreService = injector.getInstance(SQLClusterStoreService.class);
+    sqlClusterStoreService.startAndWait();
     sqlTenantStore = injector.getInstance(SQLTenantStore.class);
     sqlTenantStore.startAndWait();
-    clusterStore = sqlClusterStore;
+    clusterStoreService = sqlClusterStoreService;
+    tenantStore = sqlTenantStore;
+    clusterStore = clusterStoreService.getSystemView();
   }
 
   @AfterClass
@@ -108,7 +124,6 @@ public class BaseTest {
 
   @Before
   public void setupBaseTest() throws SQLException {
-    sqlClusterStore.clearData();
-    sqlTenantStore.clearData();
+    sqlClusterStoreService.clearData();
   }
 }

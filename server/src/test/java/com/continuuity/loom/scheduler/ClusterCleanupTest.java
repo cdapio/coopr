@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.scheduler;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
@@ -23,7 +24,7 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.LoomServiceTestBase;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
@@ -32,7 +33,6 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.NodeService;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
@@ -49,17 +49,16 @@ import java.util.concurrent.TimeUnit;
  * Test ClusterCleanup.
  */
 public class ClusterCleanupTest extends LoomServiceTestBase {
-  static ClusterStore clusterStore;
   static TrackingQueue provisionQueue;
   static TrackingQueue clusterQueue;
   static TrackingQueue jobQueue;
   static NodeService nodeService;
   static ClusterService clusterService;
   static TaskService taskService;
+  private static final Account account = new Account(USER1, TENANT);
 
   @BeforeClass
   public static void initTest() {
-    clusterStore = injector.getInstance(ClusterStore.class);
     provisionQueue = injector.getInstance(
       Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.PROVISIONER)));
     clusterQueue = injector.getInstance(
@@ -77,8 +76,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
 
   @Test
   public void testCleanup() throws Exception {
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, nodeService, clusterService, taskService,
-                                                       provisionQueue, jobQueue, 1, 1, 1);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
+                                                       taskService, provisionQueue, jobQueue, 1, 1, 1);
 
     jobQueue.removeAll();
     nodeProvisionTaskQueue.removeAll();
@@ -189,8 +188,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
 
     Cluster clusterForever = createCluster("1000", System.currentTimeMillis() - 1000, 0, Cluster.Status.ACTIVE);
 
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, nodeService, clusterService, taskService,
-                                                       provisionQueue, jobQueue, 1, 1, 1);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
+                                                       taskService, provisionQueue, jobQueue, 1, 1, 1);
 
     clusterQueue.removeAll();
     Assert.assertEquals(0, Iterators.size(clusterQueue.getQueued()));
@@ -205,10 +204,12 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE.name(), e1.getValue());
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE.name(), e2.getValue());
 
-    ClusterJob delJob1 = clusterStore.getClusterJob(JobId.fromString(clusterStore.getCluster("1001").getLatestJobId()));
+    Cluster actualCluster1 = clusterStoreService.getView(account).getCluster(cluster1.getId());
+    ClusterJob delJob1 = clusterStore.getClusterJob(JobId.fromString(actualCluster1.getLatestJobId()));
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE, delJob1.getClusterAction());
 
-    ClusterJob delJob2 = clusterStore.getClusterJob(JobId.fromString(clusterStore.getCluster("1003").getLatestJobId()));
+    Cluster actualCluster3 = clusterStoreService.getView(account).getCluster(cluster3.getId());
+    ClusterJob delJob2 = clusterStore.getClusterJob(JobId.fromString(actualCluster3.getLatestJobId()));
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE, delJob2.getClusterAction());
 
     clusterQueue.removeAll();
@@ -216,8 +217,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
 
   @Test
   public void testQueuedTaskMissingFromStoreIsRemovedFromQueue() {
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, nodeService, clusterService, taskService,
-                                                       provisionQueue, jobQueue, -10, 1, 1);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
+                                                       taskService, provisionQueue, jobQueue, -10, 1, 1);
 
     jobQueue.removeAll();
     nodeProvisionTaskQueue.removeAll();
@@ -242,8 +243,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
       createCluster(String.valueOf(i), now - 1000, now - 100, Cluster.Status.ACTIVE);
     }
 
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, nodeService, clusterService, taskService,
-                                                       provisionQueue, jobQueue, -10, 3, 7);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
+                                                       taskService, provisionQueue, jobQueue, -10, 3, 7);
     clusterQueue.removeAll();
     Assert.assertEquals(0, Iterators.size(clusterQueue.getQueued()));
 
@@ -263,12 +264,12 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
   }
 
   private Cluster createCluster(String id, long createTime, long expireTime, Cluster.Status status) throws Exception {
-    Cluster cluster = new Cluster(id, "", "expire" + id, createTime, "", null, null,
+    Cluster cluster = new Cluster(id, account, "expire" + id, createTime, "", null, null,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of(), null);
     cluster.setStatus(status);
     cluster.setExpireTime(expireTime);
 
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(account).writeCluster(cluster);
     return cluster;
   }
 }

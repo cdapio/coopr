@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.store;
 
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.google.inject.Inject;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
@@ -36,7 +36,7 @@ public class DBConnectionPool {
   private final boolean isEmbeddedDerbyDB;
 
   @Inject
-  DBConnectionPool(Configuration conf) throws SQLException, ClassNotFoundException {
+  public DBConnectionPool(Configuration conf) throws SQLException {
     String driverClass = conf.get(Constants.JDBC_DRIVER);
     String connectionString = conf.get(Constants.JDBC_CONNECTION_STRING);
     String dbUser = conf.get(Constants.DB_USER);

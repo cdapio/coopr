@@ -16,11 +16,12 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.management.LoomStats;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -46,10 +47,12 @@ public class TaskQueueService {
   @Inject
   private TaskQueueService(@Named(Constants.Queue.PROVISIONER) TrackingQueue taskQueue,
                            @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
-                           ClusterStore clusterStore, TaskService taskService, NodeService nodeService,
+                           ClusterStoreService clusterStoreService,
+                           TaskService taskService,
+                           NodeService nodeService,
                            LoomStats loomStats) {
     this.taskQueue = taskQueue;
-    this.clusterStore = clusterStore;
+    this.clusterStore = clusterStoreService.getSystemView();
     this.jobQueue = jobQueue;
     this.taskService = taskService;
     this.nodeService = nodeService;

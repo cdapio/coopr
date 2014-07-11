@@ -18,11 +18,11 @@ package com.continuuity.loom.scheduler;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.macro.Expander;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -30,7 +30,8 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -58,22 +59,24 @@ import java.util.Set;
 public class JobScheduler implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(JobScheduler.class);
   private static final String consumerId = "jobscheduler";
+  private static final JsonSerde jsonSerde = new JsonSerde();
 
   private final ClusterStore clusterStore;
   private final TrackingQueue provisionerQueue;
-  private final JsonSerde jsonSerde;
   private final TrackingQueue jobQueue;
   private final ZKClient zkClient;
   private final TaskService taskService;
   private final int maxTaskRetries;
 
   @Inject
-  private JobScheduler(ClusterStore clusterStore, @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
-                       JsonSerde jsonSerde, @Named(Constants.Queue.JOB) TrackingQueue jobQueue, ZKClient zkClient,
-                       TaskService taskService, Configuration conf) {
-    this.clusterStore = clusterStore;
+  private JobScheduler(ClusterStoreService clusterStoreService,
+                       @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
+                       @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
+                       ZKClient zkClient,
+                       TaskService taskService,
+                       Configuration conf) {
+    this.clusterStore = clusterStoreService.getSystemView();
     this.provisionerQueue = provisionerQueue;
-    this.jsonSerde = jsonSerde;
     this.jobQueue = jobQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.taskService = taskService;

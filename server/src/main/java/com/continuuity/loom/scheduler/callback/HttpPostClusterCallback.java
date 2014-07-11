@@ -17,10 +17,10 @@ package com.continuuity.loom.scheduler.callback;
 
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.scheduler.ClusterAction;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
@@ -59,10 +59,10 @@ public class HttpPostClusterCallback implements ClusterCallback {
   private Set<ClusterAction> successTriggerActions;
   private Set<ClusterAction> failureTriggerActions;
   private HttpClient httpClient;
-  private ClusterStore clusterStore;
+  private ClusterStoreService clusterStoreService;
 
-  public void initialize(Configuration conf, ClusterStore clusterStore) {
-    this.clusterStore = clusterStore;
+  public void initialize(Configuration conf, ClusterStoreService clusterStoreService) {
+    this.clusterStoreService = clusterStoreService;
     this.onStartUrl = conf.get(Constants.HttpCallback.START_URL);
     this.onSuccessUrl = conf.get(Constants.HttpCallback.SUCCESS_URL);
     this.onFailureUrl = conf.get(Constants.HttpCallback.FAILURE_URL);
@@ -154,7 +154,8 @@ public class HttpPostClusterCallback implements ClusterCallback {
     HttpPost post = new HttpPost(url);
     Set<Node> nodes;
     try {
-      nodes = clusterStore.getClusterNodes(data.getCluster().getId());
+      nodes = clusterStoreService.getView(data.getCluster().getAccount())
+        .getClusterNodes(data.getCluster().getId());
     } catch (Exception e) {
       LOG.error("Unable to fetch nodes for cluster {}, not sending post request.", data.getCluster().getId());
       return;

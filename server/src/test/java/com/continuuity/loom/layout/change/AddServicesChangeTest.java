@@ -16,6 +16,7 @@
 package com.continuuity.loom.layout.change;
 
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Constraints;
 import com.continuuity.loom.admin.LayoutConstraint;
 import com.continuuity.loom.admin.ServiceConstraint;
@@ -95,7 +96,7 @@ public class AddServicesChangeTest extends BaseSolverTest {
     Multiset<NodeLayout> counts = HashMultiset.create();
     counts.add(masterNodeLayout);
     NodeLayout badNodeLayout = new NodeLayout("large-mem", "ubuntu12", ImmutableSet.of("namenode"));
-    Multiset badCounts = HashMultiset.create();
+    Multiset<NodeLayout> badCounts = HashMultiset.create();
     badCounts.add(badNodeLayout);
     ClusterLayout layout = new ClusterLayout(constraints, counts);
     AddServicesChange change = new AddServicesChange(badCounts, "resourcemanager");
@@ -124,9 +125,9 @@ public class AddServicesChangeTest extends BaseSolverTest {
       nodeIds.add(node.getId());
       nodes.add(node);
     }
-    Cluster cluster = new Cluster("123", "user1", "hadoop", System.currentTimeMillis(), "hadoop cluster",
-                          Entities.ProviderExample.RACKSPACE, reactorTemplate, nodeIds,
-                          ImmutableSet.of(namenode.getName(), datanode.getName()));
+    Cluster cluster = new Cluster("123", new Account("user1", "tenant1"), "hadoop", System.currentTimeMillis(),
+                                  "hadoop cluster",  Entities.ProviderExample.RACKSPACE, reactorTemplate, nodeIds,
+                                  ImmutableSet.of(namenode.getName(), datanode.getName()));
     Constraints constraints = cluster.getClusterTemplate().getConstraints();
 
     // create the change objects
@@ -202,7 +203,7 @@ public class AddServicesChangeTest extends BaseSolverTest {
   }
 
   private Cluster copyOfClusterWith(Cluster cluster, Set<String> services) {
-    return new Cluster(cluster.getId(), cluster.getOwnerId(), cluster.getName(),
+    return new Cluster(cluster.getId(), cluster.getAccount(), cluster.getName(),
                        cluster.getCreateTime(), cluster.getDescription(), cluster.getProvider(),
                        cluster.getClusterTemplate(), cluster.getNodes(), services);
   }

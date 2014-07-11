@@ -38,24 +38,21 @@ public class ExpanderTest {
 
   @Test
   public void testValidation() throws SyntaxException {
-    Expander expander = new Expander();
-    expander.validate("zookeeper.quorum = %join(map(host.service.zk,'$:2181'),',')%");
-    expander.validate("this %% is not a macro, but this is: %host.service.zk%");
+    Expander.validate("zookeeper.quorum = %join(map(host.service.zk,'$:2181'),',')%");
+    Expander.validate("this %% is not a macro, but this is: %host.service.zk%");
   }
 
   @Test
   public void testExpansion() throws SyntaxException, IncompleteClusterException {
-    Expander expander = new Expander();
     Assert.assertEquals(
       "service one: rab:2181,oof:2181,eno:2181",
-      expander.expand("service one: %join(map(host.service.svc1,'$:2181'),',')%", cluster, clusterNodes, node1));
+      Expander.expand("service one: %join(map(host.service.svc1,'$:2181'),',')%", cluster, clusterNodes, node1));
   }
 
   @Test
   public void testJsonExpansion() throws SyntaxException, IncompleteClusterException {
     JsonElement json = new Gson().fromJson(jsonIn, JsonElement.class);
-    JsonElement json1 = new Expander().expand(
-      json, ImmutableList.of("defaults", "config"), cluster, clusterNodes, node2);
+    JsonElement json1 = Expander.expand(json, ImmutableList.of("defaults", "config"), cluster, clusterNodes, node2);
     System.out.println(json1);
     Assert.assertNotSame(json, json1);
     Assert.assertTrue(json1.toString().contains("hdfs://rab,oof,eno"));
@@ -65,7 +62,7 @@ public class ExpanderTest {
     Assert.assertTrue(json1.toString().contains("server.3\":\"eno:2888:3888\""));
     Assert.assertTrue(json1.toString().contains("myid\":\"2\""));
     Assert.assertTrue(json1.toString().contains("quorum.size\":\"3\""));
-    Assert.assertTrue(json1.toString().contains("email\":\"" + cluster.getOwnerId() + "@company.net\""));
+    Assert.assertTrue(json1.toString().contains("email\":\"" + cluster.getAccount().getUserId() + "@company.net\""));
     // should not expand if the self macro is not for the node
     Assert.assertTrue(json1.toString().contains("dummyvar\":\"%instance.self.service.svc2%\""));
   }
@@ -74,7 +71,7 @@ public class ExpanderTest {
   public void testJsonExpansionSkipsUnexpandableMacros() throws SyntaxException, IncompleteClusterException {
     JsonObject input = new Gson().fromJson(jsonIn, JsonObject.class);
     input.addProperty("invalid-cluster-macro", "%host.service.svc4%");
-    JsonElement expanded = new Expander().expand(input, null, cluster, clusterNodes, node1);
+    JsonElement expanded = Expander.expand(input, null, cluster, clusterNodes, node1);
     Assert.assertEquals("%host.service.svc4%", expanded.getAsJsonObject().get("invalid-cluster-macro").getAsString());
   }
 

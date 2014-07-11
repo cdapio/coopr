@@ -173,7 +173,7 @@ public abstract class TimeoutTrackingQueueTestBase {
     Assert.assertNull(queue.take("worker6"));
   }
 
-  @Test(timeout = 20000)
+  @Test(timeout = 30000)
   public void testConcurrentAccess() throws Exception {
     final TimeoutTrackingQueue queue = getQueue(300, 100);
 
@@ -250,7 +250,7 @@ public abstract class TimeoutTrackingQueueTestBase {
         // looking for next to consume)
         if (i % 10 == 9) {
           try {
-            Thread.sleep(50);
+            Thread.sleep(10);
           } catch (InterruptedException e) {
             // DO NOTHING
             System.out.println();
@@ -298,7 +298,7 @@ public abstract class TimeoutTrackingQueueTestBase {
             break;
           }
           try {
-            Thread.sleep(50);
+            Thread.sleep(10);
           } catch (InterruptedException e) {
             // DO NOTHING
           }
@@ -313,15 +313,6 @@ public abstract class TimeoutTrackingQueueTestBase {
           continue;
         }
 
-        // sometimes we process item very slowly which should cause timeout
-        if (cycle % 50 == 15) {
-          try {
-            System.out.println("slow consuming: " + element.getId());
-            Thread.sleep(200);
-          } catch (InterruptedException e) {
-            // DO NOTHING
-          }
-        }
         TrackingQueue.PossessionState state =
           queue.recordProgress(consumerName, element.getId(),
                                TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "result-" + element.getId());

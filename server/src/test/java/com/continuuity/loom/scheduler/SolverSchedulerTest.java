@@ -17,6 +17,7 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
@@ -34,11 +35,11 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.utils.ImmutablePair;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultiset;
@@ -66,19 +67,18 @@ public class SolverSchedulerTest extends BaseTest {
   private static Gson GSON = new JsonSerde().getGson();
   private static TimeoutTrackingQueue solverQueue;
   private static TimeoutTrackingQueue clusterQueue;
-  private static ClusterStore clusterStore;
   private static SolverScheduler solverScheduler;
   private static ClusterTemplate reactorTemplate;
-
+  private static Account account = new Account(Constants.ADMIN_USER, "tenant1");
 
   @Test
   public void testAddCluster() throws Exception {
     String clusterName = "my-cluster";
-    Cluster cluster = new Cluster("1", "user", clusterName, System.currentTimeMillis(),
+    Cluster cluster = new Cluster("1", account, clusterName, System.currentTimeMillis(),
                                   "my cluster", null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of());
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     clusterStore.writeClusterJob(job);
     ClusterCreateRequest createRequest =
       new ClusterCreateRequest(cluster.getName(), cluster.getDescription(),
@@ -88,7 +88,7 @@ public class SolverSchedulerTest extends BaseTest {
 
     solverScheduler.run();
 
-    Cluster solvedCluster = clusterStore.getCluster(cluster.getId());
+    Cluster solvedCluster = clusterStoreService.getView(cluster.getAccount()).getCluster(cluster.getId());
     // check the cluster is as expected
     Assert.assertEquals(clusterName, solvedCluster.getName());
     Assert.assertEquals("my cluster", solvedCluster.getDescription());
@@ -125,8 +125,6 @@ public class SolverSchedulerTest extends BaseTest {
     clusterQueue = injector.getInstance(
       Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
     clusterQueue.start();
-    clusterStore = injector.getInstance(ClusterStore.class);
-    clusterStore.initialize();
     solverScheduler = injector.getInstance(SolverScheduler.class);
 
     Set<String> services = ImmutableSet.of("namenode", "datanode", "resourcemanager", "nodemanager",
@@ -176,6 +174,7 @@ public class SolverSchedulerTest extends BaseTest {
       null
     );
 
+    EntityStoreView entityStore = entityStoreService.getView(account);
     // create providers
     entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
                                            ImmutableMap.<String, String>of()));
