@@ -27,18 +27,15 @@ class FogProviderRackspace < FogProvider
     image = inputmap['image']
     hostname = inputmap['hostname']
     fields = inputmap['fields']
-
     begin
       # Our fields are fog symbols
       fields.each do |k,v|
         k.to_sym = v
       end
-
       # Create the server
       log.debug 'Invoking server create'
       instance = FogProviderRackspaceCreate.new
       instance_result = instance.run
-
       # Process results
       @result['result']['providerid'] = instance_result['providerid']
       @result['result']['ssh-auth']['user'] = 'root'
@@ -46,7 +43,6 @@ class FogProviderRackspace < FogProvider
         @result['result']['ssh-auth']['password'] = instance_result['rootpassword']
       end
       @result['status'] = instance_result['status']
-
     rescue Exception => e
       log.error('Unexpected Error Occured in FogProviderRackspace.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occured in FogProviderRackspace.create: #{e.inspect}"
@@ -60,6 +56,39 @@ class FogProviderRackspace < FogProvider
   def confirm(inputmap)
     providerid = inputmap['providerid']
     fields = inputmap['fields']
+    begin
+      # Our fields are fog symbols
+      fields.each do |k,v|
+        k.to_sym = v
+      end
+      # Confirm server
+      log.debug 'Invoking server confirm'
+      instance = FogProviderRackspaceConfirm.new
+      instance_result = instance.run
+      # Process results
+      @result['result']['ipaddress'] = instance_result['ipaddress']
+      raise "non-zero exit code: #{instance_result['ipaddress']} from FogProviderRackspaceConfirm unless instance_result['status'] == 0
+      # Additional checks
+      log.debug 'Confirming sshd is up'
+      instance.tcp_test_port(instance_result['ipaddress'], 22) { sleep 5 }
+      set_credentials(@task['config']['ssh-auth'])
+      # Validate connectivity
+      Net::SSH.start(instance_result['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+        ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+      end
+      # Return 0
+      @result['status'] = 0
+    rescue Net::SSH::AuthenticationFailed => e
+      log.error("SSH Authentication failure for #{providerid}/#{instance_result['ipaddress']}")
+      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{instance_result['ipaddress']}: #{e.inspect}"
+    rescue Exception => e
+      log.error('Unexpected Error Occured in RackspaceProvider.confirm:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occured in RackspaceProvider.confirm: #{e.inspect}"
+    else
+      log.debug "Confirm finished successfully: #{@result}"
+    ensure
+      @result['status'] = 1 if @result['status'].nil? || (@result['status'].is_a?(Hash) && @result['status'].empty?)
+    end
   end
 
   def delete(inputmap)
