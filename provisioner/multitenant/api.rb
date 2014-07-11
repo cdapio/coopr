@@ -46,7 +46,7 @@ module Loom
       puts "spawn reap"
       # this may be overriddedn by sinatra initialization, so we call it again in application initialze
       spawn_signal_thread
-      register_with_server
+#      register_with_server
       #configure(options[:log_file])
       #level = options[:log_level]
       #Logging.level = 0
@@ -118,7 +118,8 @@ module Loom
 
     def self.spawn_heartbeat_thread
       Thread.new {
-        Logging.log.info "started heartbeat thread"
+        Logging.log.info "starting heartbeat thread"
+        register_with_server
         loop {
           Logging.log.info "hbt: #{$provisioner.heartbeat.to_json}"
           uri = "#{@@server_uri}/v1/provisioners/#{$provisioner.provisioner_id}/heartbeat"
@@ -128,6 +129,9 @@ module Loom
             resp = RestClient.post("#{uri}", json, :'X-Loom-UserID' => "admin")
             if(resp.code == 200)
               Logging.log.debug "Successfully sent heartbeat"
+            elsif(resp.code == 404)
+              Logging.log.warn "Response code #{resp.code} when sending heartbeat, re-registering provisioner"
+              register_with_server
             else
               Logging.log.warn "Response code #{resp.code}, #{resp.to_str} when sending heartbeat to loom server #{uri}"
             end
@@ -167,15 +171,15 @@ module Loom
     end
 
 
-    def heartbeat
-      hb = {}
-      hb['total'] = 1000
-      hb['used'] = {}
-      @tenantmanagers.each do |id, tm|
-        hb['used'][id] = tm.num_workers
-      end
-      hb
-    end
+#    def heartbeat
+#      hb = {}
+#      hb['total'] = 1000
+#      hb['used'] = {}
+#      @tenantmanagers.each do |id, tm|
+#        hb['used'][id] = tm.num_workers
+#      end
+#      hb
+#    end
 
 
     get '/hi' do
