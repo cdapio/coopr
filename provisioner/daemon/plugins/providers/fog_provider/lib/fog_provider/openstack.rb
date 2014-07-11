@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-class FogOpenstackProvider < FogProvider
+class FogProviderOpenstack < FogProvider
 
   def create(inputmap)
     flavor = inputmap['flavor']
