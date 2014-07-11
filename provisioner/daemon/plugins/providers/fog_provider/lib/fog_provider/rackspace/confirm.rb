@@ -42,5 +42,9 @@ class FogProviderRackspaceConfirm
       log.debug "Bootstrap IP address #{bootstrap_ip}"
     end
 
+    wait_for_sshd
+
+    return { 'status' => 0, 'ipaddress' => bootstrap_ip }
+
   end
 end
