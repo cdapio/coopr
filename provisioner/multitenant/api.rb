@@ -52,13 +52,15 @@ module Loom
       #Logging.level = 0
 
 #      EM::run do
-        #$stdout.sync = true
-        #setup_process if options[:daemonize]
-        Logging.log.info "starting up web-server"
-        #Thin::Logging.silent = true
-        bind_address = '0.0.0.0'
-        #Thin::Server.start(bind, '4567', self, :signals => false)
-        Thin::Server.start(bind_address, '4567', self)
+         #$stdout.sync = true
+         #setup_process if options[:daemonize]
+         Logging.log.info "starting up web-server"
+         # thin directly
+         #Thin::Logging.silent = true
+         # bind_address = '0.0.0.0'
+         # Thin::Server.start(bind_address, '4567', self)
+         # sinatra default
+         run!
 #      end
 
       Logging.log.info "after start - does it ever unblock?"
