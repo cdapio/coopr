@@ -76,7 +76,7 @@ module Loom
 
         # Absolute paths needed for daemon mode!
         #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} /Users/derek/git/loom/provisioner/multitenant/worker.rb #{worker_name}")
-        exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} ../daemon/provisioner.rb --tenant #{@spec.id} --provisioner #{@provisioner_id} --uri http://localhost:55055 -l /tmp/worker-#{worker_name}.log -L debug")
+        exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} ../daemon/provisioner.rb --tenant #{@spec.id} --provisioner #{@provisioner_id} --uri http://localhost:55054 -l /tmp/worker-#{worker_name}.log -L debug")
       }
 
       #@logger.info "spawned #{cpid}"

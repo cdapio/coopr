@@ -127,7 +127,7 @@ module Loom
           begin
             Logging.log.debug "sending heartbeat to #{uri}"
             json = $provisioner.heartbeat.to_json
-            resp = RestClient.put("#{uri}/v1/provisioners/#{$provisioner.provisioner_id}/capacity", json, :'X-Loom-UserID' => "admin")
+            resp = RestClient.post("#{uri}", json, :'X-Loom-UserID' => "admin")
             if(resp.code == 200)
               Logging.log.debug "Successfully sent heartbeat"
             else
