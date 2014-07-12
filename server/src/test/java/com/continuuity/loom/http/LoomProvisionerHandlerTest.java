@@ -2,6 +2,7 @@ package com.continuuity.loom.http;
 
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.ProvisionerHeartbeat;
+import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -12,9 +13,11 @@ import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -22,6 +25,11 @@ import java.util.List;
  */
 public class LoomProvisionerHandlerTest extends LoomServiceTestBase {
   private static final Gson GSON = new Gson();
+
+  @Before
+  public void setupProvisionerHandlerTest() throws SQLException {
+    injector.getInstance(SQLProvisionerStore.class).clearData();
+  }
 
   @Test
   public void testPutAndGetProvisioner() throws Exception {
