@@ -121,9 +121,7 @@ public class SQLClusterStoreService extends AbstractIdleService implements Clust
 
   @Override
   public ClusterStoreView getView(Account account) {
-    if (account.isSystem()) {
-      return clusterStore;
-    } else if (account.isAdmin()) {
+    if (account.isAdmin()) {
       return new SQLAdminClusterStoreView(dbConnectionPool, account, serde);
     } else {
       return new SQLUserClusterStoreView(dbConnectionPool, account, serde);

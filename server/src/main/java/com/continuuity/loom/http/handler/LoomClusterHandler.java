@@ -68,9 +68,8 @@ import java.util.Set;
  */
 @Path("/v1/loom/clusters")
 public class LoomClusterHandler extends LoomAuthHandler {
-  private static final Logger LOG  = LoggerFactory.getLogger(LoomClusterHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LoomClusterHandler.class);
 
-  private final JsonSerde codec;
   private final ClusterService clusterService;
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
@@ -88,7 +87,6 @@ public class LoomClusterHandler extends LoomAuthHandler {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.maxClusterSize = conf.getInt(Constants.MAX_CLUSTER_SIZE);
-    this.codec = codec;
     this.gson = codec.getGson();
   }
 
@@ -305,12 +303,13 @@ public class LoomClusterHandler extends LoomAuthHandler {
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
 
     try {
-      ClusterCreateRequest clusterCreateRequest = codec.getGson().fromJson(reader, ClusterCreateRequest.class);
+      ClusterCreateRequest clusterCreateRequest = gson.fromJson(reader, ClusterCreateRequest.class);
 
       if (clusterCreateRequest.getNumMachines() > maxClusterSize) {
         responder.sendError(HttpResponseStatus.BAD_REQUEST, "numMachines above max cluster size " + maxClusterSize);
         return;
       }
+
       String id = clusterService.requestClusterCreate(clusterCreateRequest, account);
       JsonObject response = new JsonObject();
       response.addProperty("id", id);

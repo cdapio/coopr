@@ -20,7 +20,6 @@ import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
 import com.continuuity.loom.common.queue.guice.QueueModule;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
 import com.continuuity.loom.http.guice.HttpModule;
@@ -39,8 +38,6 @@ import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.RetryStrategies;
 import org.apache.twill.zookeeper.ZKClientService;
@@ -147,11 +144,6 @@ public final class LoomServerMain extends DaemonMain {
       entityStoreService = injector.getInstance(EntityStoreService.class);
       entityStoreService.startAndWait();
 
-      for (String queueName : Constants.Queue.ALL) {
-        TimeoutTrackingQueue queue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named(queueName)));
-        queue.start();
-      }
-
       // Register MBean
       LoomStats loomStats = injector.getInstance(LoomStats.class);
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -218,13 +210,15 @@ public final class LoomServerMain extends DaemonMain {
 
   private ZKClientService getZKService(String connectString) {
     return ZKClientServices.delegate(
-      ZKClients.reWatchOnExpire(
-        ZKClients.retryOnFailure(
-          ZKClientService.Builder.of(connectString)
-            .setSessionTimeout(conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT_MILLIS))
-            .build(),
-          RetryStrategies.fixDelay(2, TimeUnit.SECONDS)
-        )
+      ZKClients.namespace(
+        ZKClients.reWatchOnExpire(
+          ZKClients.retryOnFailure(
+            ZKClientService.Builder.of(connectString)
+              .setSessionTimeout(conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT_MILLIS))
+              .build(),
+            RetryStrategies.fixDelay(2, TimeUnit.SECONDS)
+          )
+        ), conf.get(Constants.ZOOKEEPER_NAMESPACE)
       )
     );
   }

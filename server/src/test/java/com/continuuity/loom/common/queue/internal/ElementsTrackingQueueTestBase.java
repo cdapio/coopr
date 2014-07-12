@@ -30,18 +30,13 @@ import java.util.Map;
 /**
  *
  */
-public abstract class TimeoutTrackingQueueTestBase {
-  protected abstract TimeoutTrackingQueue getQueue(long intervalBetweenChecks, long rescheduleAfterTimeout) throws
-    Exception;
-
-  protected abstract long getRescheduleInterval();
+public abstract class ElementsTrackingQueueTestBase {
+  protected abstract ElementsTrackingQueue getQueue() throws Exception;
 
   @Test
   public void testBasics() throws Exception {
-    long rescheduleInterval = getRescheduleInterval();
-    long intervalBetweenChecks = rescheduleInterval;
 
-    TimeoutTrackingQueue queue = getQueue(intervalBetweenChecks, rescheduleInterval);
+    ElementsTrackingQueue queue = getQueue();
     ListenableFuture<String> workResult1 = queue.add(new Element("work1", "data1"));
     // we sleep a bit so that we make sure entries are added at different ts (which is used when prioritizing elements
     // in queue)
@@ -173,9 +168,9 @@ public abstract class TimeoutTrackingQueueTestBase {
     Assert.assertNull(queue.take("worker6"));
   }
 
-  @Test(timeout = 20000)
+  @Test(timeout = 30000)
   public void testConcurrentAccess() throws Exception {
-    final TimeoutTrackingQueue queue = getQueue(300, 100);
+    final ElementsTrackingQueue queue = getQueue();
 
     ProducerThread[] producers = new ProducerThread[3];
     for (int i = 0; i < producers.length; i++) {
@@ -250,7 +245,7 @@ public abstract class TimeoutTrackingQueueTestBase {
         // looking for next to consume)
         if (i % 10 == 9) {
           try {
-            Thread.sleep(50);
+            Thread.sleep(10);
           } catch (InterruptedException e) {
             // DO NOTHING
             System.out.println();
@@ -298,7 +293,7 @@ public abstract class TimeoutTrackingQueueTestBase {
             break;
           }
           try {
-            Thread.sleep(50);
+            Thread.sleep(10);
           } catch (InterruptedException e) {
             // DO NOTHING
           }
@@ -313,15 +308,6 @@ public abstract class TimeoutTrackingQueueTestBase {
           continue;
         }
 
-        // sometimes we process item very slowly which should cause timeout
-        if (cycle % 50 == 15) {
-          try {
-            System.out.println("slow consuming: " + element.getId());
-            Thread.sleep(200);
-          } catch (InterruptedException e) {
-            // DO NOTHING
-          }
-        }
         TrackingQueue.PossessionState state =
           queue.recordProgress(consumerName, element.getId(),
                                TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "result-" + element.getId());

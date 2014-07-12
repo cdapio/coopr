@@ -71,13 +71,14 @@ public final class LoomTaskHandler extends AbstractHttpHandler {
       return;
     }
 
+    // TODO: refactor, body of the request should be a class and leave deserialization up to codec.
     if (!body.has("workerId") || body.get("workerId") == null) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "workerId must be specified.");
       return;
     }
 
     String workerId = body.get("workerId").getAsString();
-    String taskJson = taskQueueService.takeNextClusterTask(workerId);
+    String taskJson = taskQueueService.takeNextClusterTask(workerId, body.get("tenantId").getAsString());
 
     if (taskJson == null) {
       responder.sendError(HttpResponseStatus.NO_CONTENT, "no tasks to take for worker " + workerId);
@@ -127,7 +128,8 @@ public final class LoomTaskHandler extends AbstractHttpHandler {
     String stderr = (body.has("stderr") && body.get("stderr") != null) ? body.get("stderr").getAsString() : null;
 
     try {
-      taskQueueService.finishClusterTask(taskId, workerId, status, result, stdout, stderr);
+      taskQueueService.finishClusterTask(taskId, workerId, status, result,
+                                         stdout, stderr, body.get("tenantId").getAsString());
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.EXPECTATION_FAILED, e.getMessage());
     } catch (IllegalArgumentException e) {
