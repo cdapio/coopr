@@ -67,7 +67,7 @@ class FogProviderRackspace < FogProvider
       instance_result = instance.run
       # Process results
       @result['result']['ipaddress'] = instance_result['ipaddress']
-      raise "non-zero exit code: #{instance_result['ipaddress']} from FogProviderRackspaceConfirm unless instance_result['status'] == 0
+      raise "non-zero exit code: #{instance_result['ipaddress']} from FogProviderRackspaceConfirm" unless instance_result['status'] == 0
       # Additional checks
       log.debug 'Confirming sshd is up'
       instance.tcp_test_port(instance_result['ipaddress'], 22) { sleep 5 }
