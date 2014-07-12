@@ -29,10 +29,17 @@ module Loom
         opts.on('-b', '--background', 'runs as a daemon. ensure you specify a logfile also') do 
           options[:daemonize] = true 
         end
+        opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do
+          options[:register] = true
+        end
       end.parse!
 
       if !options[:uri] && !options[:file]
         puts 'Either URI for loom server or --file must be specified'
+        exit(1)
+      end
+      if(options[:uri].nil? && options[:register])
+        puts "--register option requires the --uri [server uri] option"
         exit(1)
       end
       options

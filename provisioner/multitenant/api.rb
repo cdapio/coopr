@@ -29,10 +29,13 @@ module Loom
     end
 
     def self.run(options)
+
+      @@server_uri = options[:uri]
+      register_plugins if options[:register]
+
       Logging.configure(options[:log_file])
       Logging.level = options[:log_level]
       Logging.log.info "Loom api starting up"
-      @@server_uri = options[:uri]
 
       setup_process if options[:daemonize]
 #      EM::run do
@@ -170,6 +173,11 @@ module Loom
         #log.error e.message
         #log.error e.backtrace.inspect
       end
+    end
+
+    # this is temporary
+    def self.register_plugins
+      exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../daemon/provisioner.rb --uri #{@@server_uri} --register")
     end
 
     def self.unregister_from_server
