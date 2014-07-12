@@ -22,7 +22,7 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.http.request.AddServicesRequest;
@@ -61,20 +61,20 @@ public class ClusterService {
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
   private final EntityStoreService entityStoreService;
-  private final TrackingQueue clusterQueue;
-  private final TrackingQueue solverQueue;
-  private final TrackingQueue jobQueue;
   private final ZKClient zkClient;
   private final LoomStats loomStats;
   private final Solver solver;
   private final IdService idService;
+  private final QueueGroup clusterQueues;
+  private final QueueGroup solverQueues;
+  private final QueueGroup jobQueues;
 
   @Inject
   public ClusterService(ClusterStoreService clusterStoreService,
                         EntityStoreService entityStoreService,
-                        @Named(Constants.Queue.CLUSTER) TrackingQueue clusterQueue,
-                        @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
-                        @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
+                        @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues,
+                        @Named(Constants.Queue.SOLVER) QueueGroup solverQueues,
+                        @Named(Constants.Queue.JOB) QueueGroup jobQueues,
                         ZKClient zkClient,
                         LoomStats loomStats,
                         Solver solver,
@@ -82,13 +82,13 @@ public class ClusterService {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
-    this.clusterQueue = clusterQueue;
-    this.solverQueue = solverQueue;
-    this.jobQueue = jobQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.CLUSTER_LOCK_NAMESPACE);
     this.loomStats = loomStats;
     this.solver = solver;
     this.idService = idService;
+    this.clusterQueues = clusterQueues;
+    this.solverQueues = solverQueues;
+    this.jobQueues = jobQueues;
   }
 
   /**
@@ -124,7 +124,7 @@ public class ClusterService {
     LOG.debug("adding create cluster element to solverQueue");
     SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER,
                                                     GSON.toJson(clusterCreateRequest));
-    solverQueue.add(new Element(cluster.getId(), GSON.toJson(solverRequest)));
+    solverQueues.add(account.getTenantId(), new Element(cluster.getId(), GSON.toJson(solverRequest)));
 
     loomStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
     return cluster.getId();
@@ -156,7 +156,7 @@ public class ClusterService {
       clusterStore.writeClusterJob(deleteJob);
 
       loomStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_DELETE);
-      clusterQueue.add(new Element(clusterId, ClusterAction.CLUSTER_DELETE.name()));
+      clusterQueues.add(account.getTenantId(), new Element(clusterId, ClusterAction.CLUSTER_DELETE.name()));
     } finally {
       lock.release();
     }
@@ -204,7 +204,7 @@ public class ClusterService {
       clusterStore.writeClusterJob(configureJob);
 
       loomStats.getClusterStats().incrementStat(action);
-      clusterQueue.add(new Element(clusterId, action.name()));
+      clusterQueues.add(account.getTenantId(), new Element(clusterId, action.name()));
     } finally {
       lock.release();
     }
@@ -250,7 +250,7 @@ public class ClusterService {
       clusterStore.writeClusterJob(job);
 
       loomStats.getClusterStats().incrementStat(action);
-      clusterQueue.add(new Element(clusterId, action.name()));
+      clusterQueues.add(account.getTenantId(), new Element(clusterId, action.name()));
     } finally {
       lock.release();
     }
@@ -275,7 +275,7 @@ public class ClusterService {
     if (clusterJob.getJobStatus() == ClusterJob.Status.FAILED ||
       clusterJob.getJobStatus() == ClusterJob.Status.COMPLETE) {
       // Reschedule the job.
-      jobQueue.add(new Element(clusterJob.getJobId()));
+      jobQueues.add(account.getTenantId(), new Element(clusterJob.getJobId()));
       return;
     }
 
@@ -309,7 +309,7 @@ public class ClusterService {
       clusterJob.setStatusMessage("Aborted by user.");
       clusterStore.writeClusterJob(clusterJob);
       // Reschedule the job.
-      jobQueue.add(new Element(clusterJob.getJobId()));
+      jobQueues.add(account.getTenantId(), new Element(clusterJob.getJobId()));
     } finally {
       lock.release();
     }
@@ -355,7 +355,7 @@ public class ClusterService {
 
       loomStats.getClusterStats().incrementStat(action);
       SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, GSON.toJson(addRequest));
-      solverQueue.add(new Element(clusterId, GSON.toJson(solverRequest)));
+      clusterQueues.add(account.getTenantId(), new Element(clusterId, GSON.toJson(solverRequest)));
     } finally {
       lock.release();
     }

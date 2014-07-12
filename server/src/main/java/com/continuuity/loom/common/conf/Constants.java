@@ -100,7 +100,6 @@ public class Constants {
     public static final String JOB = "internal.job.queue";
     public static final String CALLBACK = "callback.queue";
     public static final String WORKER_BALANCE = "worker.balance.queue";
-    public static final Set<String> ALL = ImmutableSet.of(PROVISIONER, CLUSTER, SOLVER, JOB, CALLBACK, WORKER_BALANCE);
   }
 
   public static final String TASK_NAMESPACE = "/tasks";

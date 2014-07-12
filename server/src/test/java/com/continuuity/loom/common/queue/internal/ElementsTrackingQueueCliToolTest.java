@@ -19,29 +19,19 @@ import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.BaseZKTest;
 import com.google.common.collect.Iterators;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-public class TimeoutTrackingQueueCliToolTest extends BaseZKTest {
+public class ElementsTrackingQueueCliToolTest extends BaseZKTest {
   private String queueName;
 
-  private TimeoutTrackingQueue queue;
+  private ElementsTrackingQueue queue;
 
   @Before
   public void beforeCliTest() throws Exception {
     queueName = "/tracking-queue";
-    queue = new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, queueName), Long.MAX_VALUE, Long.MAX_VALUE);
-    queue.start();
-  }
-
-  @After
-  public void afterCliTest() {
-    if (queue != null) {
-      queue.stop();
-    }
+    queue = new ElementsTrackingQueue(new ZKElementsTracking(zkClient, queueName));
   }
 
   @Test
@@ -57,28 +47,28 @@ public class TimeoutTrackingQueueCliToolTest extends BaseZKTest {
 
     String qOpts = " --zk-connection " + zkServer.getConnectionStr() + " --queue-name " + queueName;
 
-    TimeoutTrackingQueueCliTool.main(("list" + qOpts).split(" "));
+    ElementsTrackingQueueCliTool.main(("list" + qOpts).split(" "));
 
-    TimeoutTrackingQueueCliTool.main(("remove --element elem1" + qOpts).split(" "));
+    ElementsTrackingQueueCliTool.main(("remove --element elem1" + qOpts).split(" "));
     Assert.assertEquals(2, getQueuedCount(queue));
     Assert.assertEquals(0, Iterators.size(queue.getBeingConsumed()));
 
-    TimeoutTrackingQueueCliTool.main(("list " + qOpts).split(" "));
+    ElementsTrackingQueueCliTool.main(("list " + qOpts).split(" "));
 
     // moving elem3 to top of the queue
     Assert.assertEquals("elem2", queue.getQueued().next().getElement().getId());
-    TimeoutTrackingQueueCliTool.main(("promote --element elem3" + qOpts).split(" "));
+    ElementsTrackingQueueCliTool.main(("promote --element elem3" + qOpts).split(" "));
     Assert.assertEquals("elem3", queue.getQueued().next().getElement().getId());
 
-    TimeoutTrackingQueueCliTool.main(("list " + qOpts).split(" "));
-    TimeoutTrackingQueueCliTool.main(("remove --element elem2" + qOpts).split(" "));
+    ElementsTrackingQueueCliTool.main(("list " + qOpts).split(" "));
+    ElementsTrackingQueueCliTool.main(("remove --element elem2" + qOpts).split(" "));
     Assert.assertEquals(1, getQueuedCount(queue));
     Assert.assertEquals(0, Iterators.size(queue.getBeingConsumed()));
-    TimeoutTrackingQueueCliTool.main(("list " + qOpts).split(" "));
-    TimeoutTrackingQueueCliTool.main(("remove_all" + qOpts).split(" "));
+    ElementsTrackingQueueCliTool.main(("list " + qOpts).split(" "));
+    ElementsTrackingQueueCliTool.main(("remove_all" + qOpts).split(" "));
     Assert.assertEquals(0, getQueuedCount(queue));
     Assert.assertEquals(0, Iterators.size(queue.getBeingConsumed()));
-    TimeoutTrackingQueueCliTool.main(("list " + qOpts).split(" "));
+    ElementsTrackingQueueCliTool.main(("list " + qOpts).split(" "));
   }
 
 

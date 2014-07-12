@@ -1,7 +1,6 @@
 package com.continuuity.loom.provisioner;
 
 import com.continuuity.http.AbstractHttpHandler;
-import com.continuuity.http.HttpHandler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.http.NettyHttpService;
 import com.continuuity.loom.scheduler.callback.DummyService;

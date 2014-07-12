@@ -58,7 +58,6 @@ import java.sql.SQLException;
 public class BaseTest {
   private static InMemoryZKServer zkServer;
   private static SQLClusterStoreService sqlClusterStoreService;
-  private static SQLTenantStore sqlTenantStore;
   private static SQLProvisionerStore sqlProvisionerStore;
   protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
@@ -117,10 +116,9 @@ public class BaseTest {
     entityStoreService.startAndWait();
     sqlClusterStoreService = injector.getInstance(SQLClusterStoreService.class);
     sqlClusterStoreService.startAndWait();
-    sqlTenantStore = injector.getInstance(SQLTenantStore.class);
-    sqlTenantStore.startAndWait();
     clusterStoreService = sqlClusterStoreService;
-    tenantStore = sqlTenantStore;
+    tenantStore = injector.getInstance(TenantStore.class);
+    tenantStore.startAndWait();
     clusterStore = clusterStoreService.getSystemView();
     sqlProvisionerStore = injector.getInstance(SQLProvisionerStore.class);
     provisionerStore = sqlProvisionerStore;

@@ -22,9 +22,6 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.LoomServiceTestBase;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
@@ -37,9 +34,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.gson.JsonObject;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -49,9 +45,6 @@ import java.util.concurrent.TimeUnit;
  * Test ClusterCleanup.
  */
 public class ClusterCleanupTest extends LoomServiceTestBase {
-  static TrackingQueue provisionQueue;
-  static TrackingQueue clusterQueue;
-  static TrackingQueue jobQueue;
   static NodeService nodeService;
   static ClusterService clusterService;
   static TaskService taskService;
@@ -59,12 +52,6 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
 
   @BeforeClass
   public static void initTest() {
-    provisionQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.PROVISIONER)));
-    clusterQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
-    jobQueue = injector.getInstance(
-      Key.get(TrackingQueue.class, Names.named(Constants.Queue.JOB)));
     nodeService = injector.getInstance(NodeService.class);
     clusterService = injector.getInstance(ClusterService.class);
     taskService = injector.getInstance(TaskService.class);
@@ -74,13 +61,18 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     scheduler.stopAndWait();
   }
 
+  @Before
+  public void clearData() {
+    jobQueues.removeAll();
+    provisionerQueues.removeAll();
+  }
+
   @Test
   public void testCleanup() throws Exception {
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
-                                                       taskService, provisionQueue, jobQueue, 1, 1, 1);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService, taskService,
+                                                       jobQueues, provisionerQueues, 1, 1, 1);
 
-    jobQueue.removeAll();
-    nodeProvisionTaskQueue.removeAll();
+    String queueName = account.getTenantId();
 
     ClusterTask task1 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("2-1-1"), "node1", "service",
                                         ClusterAction.CLUSTER_CREATE, new JsonObject());
@@ -117,33 +109,33 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     nodeService.startAction(node4, task4.getTaskId(), "service", "action");
     Assert.assertEquals(Node.Status.IN_PROGRESS, node4.getActions().get(0).getStatus());
 
-    Assert.assertTrue(jobQueue.removeAll());
-    Assert.assertEquals(0, Iterators.size(nodeProvisionTaskQueue.getQueued()));
-    Assert.assertEquals(0, Iterators.size(nodeProvisionTaskQueue.getBeingConsumed()));
+    Assert.assertTrue(jobQueues.removeAll(queueName));
+    Assert.assertEquals(0, Iterators.size(provisionerQueues.getQueued(queueName)));
+    Assert.assertEquals(0, Iterators.size(provisionerQueues.getBeingConsumed(queueName)));
 
-    nodeProvisionTaskQueue.add(new Element(task1.getTaskId(), ""));
-    nodeProvisionTaskQueue.add(new Element(task2.getTaskId(), ""));
-    nodeProvisionTaskQueue.add(new Element(task3.getTaskId(), ""));
-    nodeProvisionTaskQueue.add(new Element(task4.getTaskId(), ""));
+    provisionerQueues.add(queueName, new Element(task1.getTaskId(), ""));
+    provisionerQueues.add(queueName, new Element(task2.getTaskId(), ""));
+    provisionerQueues.add(queueName, new Element(task3.getTaskId(), ""));
+    provisionerQueues.add(queueName, new Element(task4.getTaskId(), ""));
 
-    Assert.assertEquals(4, Iterators.size(nodeProvisionTaskQueue.getQueued()));
+    Assert.assertEquals(4, Iterators.size(provisionerQueues.getQueued(queueName)));
 
-    nodeProvisionTaskQueue.take("consumer1");
-    nodeProvisionTaskQueue.take("consumer2");
-    Assert.assertEquals(2, Iterators.size(nodeProvisionTaskQueue.getBeingConsumed()));
-    Assert.assertEquals(2, Iterators.size(nodeProvisionTaskQueue.getQueued()));
+    provisionerQueues.take("consumer1");
+    provisionerQueues.take("consumer2");
+    Assert.assertEquals(2, Iterators.size(provisionerQueues.getBeingConsumed(queueName)));
+    Assert.assertEquals(2, Iterators.size(provisionerQueues.getQueued(queueName)));
 
     TimeUnit.SECONDS.sleep(1);
 
-    nodeProvisionTaskQueue.take("consumer3");
-    Assert.assertEquals(3, Iterators.size(nodeProvisionTaskQueue.getBeingConsumed()));
-    Assert.assertEquals(1, Iterators.size(nodeProvisionTaskQueue.getQueued()));
+    provisionerQueues.take("consumer3");
+    Assert.assertEquals(3, Iterators.size(provisionerQueues.getBeingConsumed(queueName)));
+    Assert.assertEquals(1, Iterators.size(provisionerQueues.getQueued(queueName)));
 
     clusterCleanup.run();
 
-    Assert.assertEquals(1, Iterators.size(nodeProvisionTaskQueue.getBeingConsumed()));
-    Assert.assertEquals(1, Iterators.size(nodeProvisionTaskQueue.getQueued()));
-    Assert.assertEquals(2, jobQueue.size());
+    Assert.assertEquals(1, Iterators.size(provisionerQueues.getBeingConsumed(queueName)));
+    Assert.assertEquals(1, Iterators.size(provisionerQueues.getQueued(queueName)));
+    Assert.assertEquals(2, jobQueues.size(queueName));
 
     Assert.assertEquals(ClusterTask.Status.FAILED,
                         clusterStore.getClusterTask(TaskId.fromString(task1.getTaskId())).getStatus());
@@ -158,9 +150,6 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     Assert.assertEquals(Node.Status.FAILED, clusterStore.getNode("node2").getActions().get(0).getStatus());
     Assert.assertEquals(Node.Status.IN_PROGRESS, clusterStore.getNode("node3").getActions().get(0).getStatus());
     Assert.assertEquals(Node.Status.IN_PROGRESS, clusterStore.getNode("node4").getActions().get(0).getStatus());
-
-    jobQueue.removeAll();
-    nodeProvisionTaskQueue.removeAll();
   }
 
   @SuppressWarnings("UnusedDeclaration")
@@ -188,18 +177,18 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
 
     Cluster clusterForever = createCluster("1000", System.currentTimeMillis() - 1000, 0, Cluster.Status.ACTIVE);
 
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
-                                                       taskService, provisionQueue, jobQueue, 1, 1, 1);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService, taskService,
+                                                       jobQueues, provisionerQueues, 1, 1, 1);
 
-    clusterQueue.removeAll();
-    Assert.assertEquals(0, Iterators.size(clusterQueue.getQueued()));
+    String queueName = account.getTenantId();
+    Assert.assertEquals(0, Iterators.size(clusterQueues.getQueued(queueName)));
 
     clusterCleanup.run();
 
-    Assert.assertEquals(2, Iterators.size(clusterQueue.getQueued()));
+    Assert.assertEquals(2, Iterators.size(clusterQueues.getQueued(queueName)));
 
-    Element e1 = clusterQueue.take("consumer1");
-    Element e2 = clusterQueue.take("consumer1");
+    Element e1 = clusterQueues.take(queueName, "consumer1");
+    Element e2 = clusterQueues.take(queueName, "consumer1");
     Assert.assertEquals(ImmutableSet.of("1001", "1003"), ImmutableSet.of(e1.getId(), e2.getId()));
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE.name(), e1.getValue());
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE.name(), e2.getValue());
@@ -211,17 +200,14 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     Cluster actualCluster3 = clusterStoreService.getView(account).getCluster(cluster3.getId());
     ClusterJob delJob2 = clusterStore.getClusterJob(JobId.fromString(actualCluster3.getLatestJobId()));
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE, delJob2.getClusterAction());
-
-    clusterQueue.removeAll();
   }
 
   @Test
   public void testQueuedTaskMissingFromStoreIsRemovedFromQueue() {
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
-                                                       taskService, provisionQueue, jobQueue, -10, 1, 1);
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService, taskService,
+                                                       jobQueues, provisionerQueues, -10, 1, 1);
 
-    jobQueue.removeAll();
-    nodeProvisionTaskQueue.removeAll();
+    String queueName = account.getTenantId();
 
     ClusterTask task = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("3-1-1"), "node1", "service",
                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
@@ -229,11 +215,11 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     SchedulableTask schedulableTask = new SchedulableTask(task);
 
     // add a task to the queue without storing it.
-    nodeProvisionTaskQueue.add(new Element(task.getTaskId(), new JsonSerde().getGson().toJson(schedulableTask)));
-    nodeProvisionTaskQueue.take("0");
+    provisionerQueues.add(queueName, new Element(task.getTaskId(), new JsonSerde().getGson().toJson(schedulableTask)));
+    provisionerQueues.take("0");
 
     clusterCleanup.run();
-    Assert.assertEquals(0, Iterators.size(nodeProvisionTaskQueue.getBeingConsumed()));
+    Assert.assertEquals(0, Iterators.size(provisionerQueues.getBeingConsumed(queueName)));
   }
 
   @Test
@@ -243,24 +229,23 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
       createCluster(String.valueOf(i), now - 1000, now - 100, Cluster.Status.ACTIVE);
     }
 
-    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService,
-                                                       taskService, provisionQueue, jobQueue, -10, 3, 7);
-    clusterQueue.removeAll();
-    Assert.assertEquals(0, Iterators.size(clusterQueue.getQueued()));
+    String queueName = account.getTenantId();
+    ClusterCleanup clusterCleanup = new ClusterCleanup(clusterStore, clusterService, nodeService, taskService,
+                                                       jobQueues, provisionerQueues, -10, 3, 7);
+    Assert.assertEquals(0, Iterators.size(clusterQueues.getQueued(queueName)));
 
     clusterCleanup.run();
 
     // clusters 3, 10, and 17 should have been scheduled for deletion
-    Assert.assertEquals(3, Iterators.size(clusterQueue.getQueued()));
+    Assert.assertEquals(3, Iterators.size(clusterQueues.getQueued(queueName)));
 
-    Element e1 = clusterQueue.take("consumer1");
-    Element e2 = clusterQueue.take("consumer1");
-    Element e3 = clusterQueue.take("consumer1");
+    Element e1 = clusterQueues.take(queueName, "consumer1");
+    Element e2 = clusterQueues.take(queueName, "consumer1");
+    Element e3 = clusterQueues.take(queueName, "consumer1");
     Assert.assertEquals(ImmutableSet.of("3", "10", "17"), ImmutableSet.of(e1.getId(), e2.getId(), e3.getId()));
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE.name(), e1.getValue());
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE.name(), e2.getValue());
     Assert.assertEquals(ClusterAction.CLUSTER_DELETE.name(), e3.getValue());
-    clusterQueue.removeAll();
   }
 
   private Cluster createCluster(String id, long createTime, long expireTime, Cluster.Status status) throws Exception {

@@ -21,6 +21,8 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.GroupElement;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.macro.Expander;
@@ -62,35 +64,37 @@ public class JobScheduler implements Runnable {
   private static final JsonSerde jsonSerde = new JsonSerde();
 
   private final ClusterStore clusterStore;
-  private final TrackingQueue provisionerQueue;
-  private final TrackingQueue jobQueue;
   private final ZKClient zkClient;
   private final TaskService taskService;
   private final int maxTaskRetries;
+  private final QueueGroup jobQueues;
+  private final QueueGroup provisionerQueues;
 
   @Inject
   private JobScheduler(ClusterStoreService clusterStoreService,
-                       @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
-                       @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
+                       @Named(Constants.Queue.JOB) QueueGroup jobQueues,
+                       @Named(Constants.Queue.PROVISIONER) QueueGroup provisionerQueues,
                        ZKClient zkClient,
                        TaskService taskService,
                        Configuration conf) {
     this.clusterStore = clusterStoreService.getSystemView();
-    this.provisionerQueue = provisionerQueue;
-    this.jobQueue = jobQueue;
     this.zkClient = ZKClients.namespace(zkClient, Constants.TASK_LOCK_NAMESPACE);
     this.taskService = taskService;
     this.maxTaskRetries = conf.getInt(Constants.MAX_ACTION_RETRIES);
+    this.jobQueues = jobQueues;
+    this.provisionerQueues = provisionerQueues;
   }
 
   @Override
   public void run() {
     try {
       while (true) {
-        Element element = jobQueue.take(consumerId);
-        if (element == null) {
+        GroupElement gElement = jobQueues.take(consumerId);
+        if (gElement == null) {
           return;
         }
+        String queueName = gElement.getQueueName();
+        Element element = gElement.getElement();
         String jobIdStr = element.getValue();
 
         LOG.debug("Got job {} to schedule", jobIdStr);
@@ -148,13 +152,14 @@ public class JobScheduler implements Runnable {
             // Handle retry tasks if any
             if (!retryTasks.isEmpty()) {
               for (ClusterTask task : retryTasks) {
-                notSubmittedTasks.add(scheduleRetry(cluster, job, task, nodeMap.get(task.getNodeId())));
+                notSubmittedTasks.add(
+                  scheduleRetry(cluster, job, task, nodeMap.get(task.getNodeId()), queueName));
               }
             }
 
             // Submit any tasks not yet submitted
             if (!notSubmittedTasks.isEmpty()) {
-              submitTasks(notSubmittedTasks, cluster, nodeMap, clusterNodes, job);
+              submitTasks(notSubmittedTasks, cluster, nodeMap, clusterNodes, job, queueName);
             }
 
             // Note: before moving cluster out of pending state, make sure that all in progress tasks are done.
@@ -163,7 +168,7 @@ public class JobScheduler implements Runnable {
               if (job.hasNextStage()) {
                 LOG.debug("Advancing to next stage {} for job {}", job.getCurrentStageNumber(), job.getJobId());
                 job.advanceStage();
-                jobQueue.add(new Element(jobIdStr));
+                jobQueues.add(queueName, new Element(jobIdStr));
               } else {
                 taskService.completeJob(job, cluster);
               }
@@ -178,7 +183,8 @@ public class JobScheduler implements Runnable {
           }
         } finally {
           lock.release();
-          jobQueue.recordProgress(consumerId, element.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
+          jobQueues.recordProgress(consumerId, queueName, element.getId(),
+                                  TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
         }
       }
     } catch (Throwable e) {
@@ -187,7 +193,7 @@ public class JobScheduler implements Runnable {
   }
 
   private void submitTasks(Set<ClusterTask> notSubmittedTasks, Cluster cluster, Map<String, Node> nodeMap,
-                           Set<Node> clusterNodes, ClusterJob job) throws Exception {
+                           Set<Node> clusterNodes, ClusterJob job, String queueName) throws Exception {
 
     for (final ClusterTask task : notSubmittedTasks) {
       Node taskNode = nodeMap.get(task.getNodeId());
@@ -205,7 +211,7 @@ public class JobScheduler implements Runnable {
           taskService.failTask(task, -1);
           job.setStatusMessage("Exception while expanding macros: " + e.getMessage());
           // no need to schedule more tasks since the job is considered failed even if one task fails.
-          jobQueue.add(new Element(job.getJobId()));
+          jobQueues.add(queueName, new Element(job.getJobId()));
           break;
         }
       }
@@ -217,17 +223,18 @@ public class JobScheduler implements Runnable {
 
       // Submit task
       // Note: the job has to be scheduled for processing when the task is complete.
-      provisionerQueue.add(new Element(task.getTaskId(),
-                                       jsonSerde.getGson().toJson(schedulableTask)));
+      provisionerQueues.add(
+        queueName, new Element(task.getTaskId(), jsonSerde.getGson().toJson(schedulableTask)));
 
       job.setTaskStatus(task.getTaskId(), ClusterTask.Status.IN_PROGRESS);
       taskService.startTask(task);
     }
   }
 
-  ClusterTask scheduleRetry(Cluster cluster, ClusterJob job, ClusterTask task, Node node) throws Exception {
+  ClusterTask scheduleRetry(Cluster cluster, ClusterJob job, ClusterTask task,
+                            Node node, String queueName) throws Exception {
     // Schedule rollback task before retrying
-    scheduleRollbackTask(task);
+    scheduleRollbackTask(task, queueName);
 
     task.addAttempt();
     List<ClusterTask> retryTasks = taskService.getRetryTask(cluster, task, node);
@@ -254,7 +261,7 @@ public class JobScheduler implements Runnable {
     return retryTasks.get(0);
   }
 
-  void scheduleRollbackTask(ClusterTask task) throws Exception {
+  void scheduleRollbackTask(ClusterTask task, String queueName) throws Exception {
     ClusterTask rollbackTask = taskService.getRollbackTask(task);
 
     if (rollbackTask == null) {
@@ -269,8 +276,8 @@ public class JobScheduler implements Runnable {
     LOG.trace("Task = {}. Rollback task = {}", task, rollbackTask);
 
     // No need to retry roll back tasks.
-    provisionerQueue.add(new Element(rollbackTask.getTaskId(),
-                                     jsonSerde.getGson().toJson(schedulableTask)));
+    provisionerQueues.add(
+      queueName, new Element(rollbackTask.getTaskId(), jsonSerde.getGson().toJson(schedulableTask)));
   }
 
   private static final Function<ClusterTask, String> CLUSTER_TASK_STRING_FUNCTION =

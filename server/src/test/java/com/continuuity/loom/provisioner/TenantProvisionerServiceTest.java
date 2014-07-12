@@ -2,11 +2,7 @@ package com.continuuity.loom.provisioner;
 
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.common.conf.Constants;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.google.common.collect.ImmutableMap;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -21,7 +17,6 @@ public class TenantProvisionerServiceTest extends BaseTest {
 
   @BeforeClass
   public static void setupTestClass() {
-    injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.WORKER_BALANCE))).start();
     service = injector.getInstance(TenantProvisionerService.class);
     provisionerRequestService = injector.getInstance(MockProvisionerRequestService.class);
   }

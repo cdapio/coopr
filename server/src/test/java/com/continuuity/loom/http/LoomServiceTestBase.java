@@ -18,14 +18,12 @@ package com.continuuity.loom.http;
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.queue.QueueGroup;
+import com.continuuity.loom.common.queue.internal.ElementsTrackingQueue;
 import com.continuuity.loom.http.handler.LoomService;
-import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
-import com.continuuity.loom.common.zookeeper.IdService;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -74,37 +72,25 @@ public class LoomServiceTestBase extends BaseTest {
   };
   private static int port;
   protected static LoomService loomService;
-  protected static TimeoutTrackingQueue nodeProvisionTaskQueue;
-  protected static TimeoutTrackingQueue clusterQueue;
-  protected static TimeoutTrackingQueue solverQueue;
-  protected static TimeoutTrackingQueue jobQueue;
-  protected static TimeoutTrackingQueue callbackQueue;
-  protected static TimeoutTrackingQueue balancerQueue;
+  protected static ElementsTrackingQueue balancerQueue;
+  protected static QueueGroup provisionerQueues;
+  protected static QueueGroup clusterQueues;
+  protected static QueueGroup solverQueues;
+  protected static QueueGroup jobQueues;
+  protected static QueueGroup callbackQueues;
   protected static Scheduler scheduler;
   protected static JobScheduler jobScheduler;
 
 
   @BeforeClass
   public static void setupServiceBase() throws Exception {
-    injector.getInstance(IdService.class).startAndWait();
-    nodeProvisionTaskQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.PROVISIONER)));
-    nodeProvisionTaskQueue.start();
-    clusterQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
-    clusterQueue.start();
-    solverQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.SOLVER)));
-    solverQueue.start();
-    jobQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.JOB)));
-    jobQueue.start();
-    callbackQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CALLBACK)));
-    callbackQueue.start();
     balancerQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.WORKER_BALANCE)));
-    balancerQueue.start();
+      Key.get(ElementsTrackingQueue.class, Names.named(Constants.Queue.WORKER_BALANCE)));
+    provisionerQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.PROVISIONER)));
+    clusterQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
+    solverQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
+    jobQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.JOB)));
+    callbackQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CALLBACK)));
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
     port = loomService.getBindAddress().getPort();
@@ -117,8 +103,6 @@ public class LoomServiceTestBase extends BaseTest {
   @AfterClass
   public static void cleanupServiceBase() {
     loomService.stopAndWait();
-    clusterQueue.stop();
-    nodeProvisionTaskQueue.stop();
     scheduler.stopAndWait();
   }
 
