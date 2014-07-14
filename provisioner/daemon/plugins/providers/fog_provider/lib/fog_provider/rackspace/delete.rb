@@ -21,10 +21,9 @@ class FogProviderRackspaceDelete
   def run
     $stdout.sync = true
 
-    id = name_args.first
-    server = self.connection.servers.get(id)
-
     begin
+      id = @task['config']['providerid']
+      server = self.connection.servers.get(id)
       server.destroy
     rescue NoMethodError
       log.error "Could not locate server '#{id}'"

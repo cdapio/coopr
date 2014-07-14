@@ -21,7 +21,7 @@ class FogProviderRackspaceConfirm
   def run
     $stdout.sync = true
 
-    id = name_args.first
+    id = @task['config']['providerid']
     log.debug "fetching server for id: #{id}"
     server = self.connection.servers.get(id)
 
