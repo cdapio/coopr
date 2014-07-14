@@ -75,7 +75,7 @@
         ]
       }
     }
-  }
+  },
   "rackspace": {
     "name": "rackspace",
     "classname": "FogProviderRackspace",
