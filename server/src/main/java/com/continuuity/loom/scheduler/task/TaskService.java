@@ -19,7 +19,6 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
@@ -59,11 +58,11 @@ public class TaskService {
                       LoomStats loomStats,
                       @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
                       IdService idService,
-                      JsonSerde jsonSerde) {
+                      Gson gson) {
     this.clusterStore = clusterStoreService.getSystemView();
     this.loomStats = loomStats;
     this.idService = idService;
-    this.gson = jsonSerde.getGson();
+    this.gson = gson;
     this.callbackQueues = callbackQueues;
   }
 

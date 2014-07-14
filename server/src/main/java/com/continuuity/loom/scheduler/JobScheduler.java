@@ -17,7 +17,6 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
@@ -39,6 +38,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.apache.twill.zookeeper.ZKClient;
@@ -66,7 +66,7 @@ public class JobScheduler implements Runnable {
   private final ZKClient zkClient;
   private final TaskService taskService;
   private final int maxTaskRetries;
-  private final JsonSerde jsonSerde;
+  private final Gson gson;
   private final QueueGroup jobQueues;
   private final QueueGroup provisionerQueues;
 
@@ -77,12 +77,12 @@ public class JobScheduler implements Runnable {
                        ZKClient zkClient,
                        TaskService taskService,
                        Configuration conf,
-                       JsonSerde jsonSerde) {
+                       Gson gson) {
     this.clusterStore = clusterStoreService.getSystemView();
     this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
     this.taskService = taskService;
     this.maxTaskRetries = conf.getInt(Constants.MAX_ACTION_RETRIES);
-    this.jsonSerde = jsonSerde;
+    this.gson = gson;
     this.jobQueues = jobQueues;
     this.provisionerQueues = provisionerQueues;
   }
@@ -226,7 +226,7 @@ public class JobScheduler implements Runnable {
       // Submit task
       // Note: the job has to be scheduled for processing when the task is complete.
       provisionerQueues.add(
-        queueName, new Element(task.getTaskId(), jsonSerde.getGson().toJson(schedulableTask)));
+        queueName, new Element(task.getTaskId(), gson.toJson(schedulableTask)));
 
       job.setTaskStatus(task.getTaskId(), ClusterTask.Status.IN_PROGRESS);
       taskService.startTask(task);
@@ -279,7 +279,7 @@ public class JobScheduler implements Runnable {
 
     // No need to retry roll back tasks.
     provisionerQueues.add(
-      queueName, new Element(rollbackTask.getTaskId(), jsonSerde.getGson().toJson(schedulableTask)));
+      queueName, new Element(rollbackTask.getTaskId(), gson.toJson(schedulableTask)));
   }
 
   private static final Function<ClusterTask, String> CLUSTER_TASK_STRING_FUNCTION =

@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.runtime;
 
-import com.continuuity.loom.codec.json.guice.CodecModule;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
@@ -132,7 +132,7 @@ public final class LoomServerMain extends DaemonMain {
         new SchedulerModule(conf, callbackExecutorService, solverExecutorService),
         new HttpModule(),
         new ManagementModule(),
-        new CodecModule()
+        new CodecModules().getModule()
       );
 
       idService = injector.getInstance(IdService.class);

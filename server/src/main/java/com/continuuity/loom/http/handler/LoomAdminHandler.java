@@ -24,7 +24,6 @@ import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.tenant.TenantStore;
@@ -77,10 +76,10 @@ public class LoomAdminHandler extends LoomAuthHandler {
   private final Gson gson;
 
   @Inject
-  private LoomAdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService, JsonSerde codec) {
+  private LoomAdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService, Gson gson) {
     super(tenantStore);
     this.entityStoreService = entityStoreService;
-    this.gson = codec.getGson();
+    this.gson = gson;
   }
 
   /**

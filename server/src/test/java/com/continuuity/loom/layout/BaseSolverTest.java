@@ -105,8 +105,7 @@ public class BaseSolverTest extends BaseTest {
       ),
       Administration.EMPTY_ADMINISTRATION
     );
-    reactorTemplate2 =
-      jsonSerde.getGson().fromJson(Entities.ClusterTemplateExample.REACTOR2_STRING, ClusterTemplate.class);
+    reactorTemplate2 = gson.fromJson(Entities.ClusterTemplateExample.REACTOR2_STRING, ClusterTemplate.class);
 
     EntityStoreView entityStore = entityStoreService.getView(account);
     // create providers

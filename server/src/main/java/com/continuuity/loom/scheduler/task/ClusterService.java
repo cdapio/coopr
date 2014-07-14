@@ -19,7 +19,6 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
@@ -79,7 +78,7 @@ public class ClusterService {
                         LoomStats loomStats,
                         Solver solver,
                         IdService idService,
-                        JsonSerde jsonSerde) {
+                        Gson gson) {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
@@ -87,7 +86,7 @@ public class ClusterService {
     this.loomStats = loomStats;
     this.solver = solver;
     this.idService = idService;
-    this.gson = jsonSerde.getGson();
+    this.gson = gson;
     this.clusterQueues = clusterQueues;
     this.solverQueues = solverQueues;
     this.jobQueues = jobQueues;

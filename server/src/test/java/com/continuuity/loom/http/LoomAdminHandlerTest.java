@@ -47,7 +47,6 @@ import java.util.Set;
  *
  */
 public class LoomAdminHandlerTest extends LoomServiceTestBase {
-  private final Gson gson = jsonSerde.getGson();
 
   @Test
   public void testProviders() throws Exception {

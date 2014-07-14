@@ -1,10 +1,10 @@
 package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 
 import java.sql.Connection;
@@ -16,12 +16,12 @@ import java.sql.Statement;
  */
 public class SQLEntityStoreService extends AbstractIdleService implements EntityStoreService {
   private final DBConnectionPool dbConnectionPool;
-  private final JsonSerde codec;
+  private final Gson gson;
 
   @Inject
-  public SQLEntityStoreService(DBConnectionPool dbConnectionPool, JsonSerde codec) {
+  public SQLEntityStoreService(DBConnectionPool dbConnectionPool, Gson gson) {
     this.dbConnectionPool = dbConnectionPool;
-    this.codec = codec;
+    this.gson = gson;
   }
 
   // for unit tests only
@@ -49,7 +49,7 @@ public class SQLEntityStoreService extends AbstractIdleService implements Entity
         // immune to sql injection since it comes from the enum
         String createString = "CREATE TABLE " + entityName +
           "s ( name VARCHAR(255), tenant_id VARCHAR(255), " + entityName + " BLOB, PRIMARY KEY (tenant_id, name))";
-        DBQueryHelper.createDerbyTableIfNotExists(createString, dbConnectionPool);
+        DBHelper.createDerbyTableIfNotExists(createString, dbConnectionPool);
       }
     }
   }
@@ -62,9 +62,9 @@ public class SQLEntityStoreService extends AbstractIdleService implements Entity
   @Override
   public EntityStoreView getView(Account account) {
     if (account.isAdmin()) {
-      return new SQLAdminEntityStoreView(account, dbConnectionPool, codec);
+      return new SQLAdminEntityStoreView(account, dbConnectionPool, gson);
     } else {
-      return new SQLUserEntityStoreView(account, dbConnectionPool, codec);
+      return new SQLUserEntityStoreView(account, dbConnectionPool, gson);
     }
   }
 }

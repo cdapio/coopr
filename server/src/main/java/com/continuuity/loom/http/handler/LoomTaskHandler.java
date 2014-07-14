@@ -17,7 +17,6 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.scheduler.task.TaskQueueService;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
@@ -45,9 +44,9 @@ public final class LoomTaskHandler extends AbstractHttpHandler {
   private final TaskQueueService taskQueueService;
 
   @Inject
-  private LoomTaskHandler(TaskQueueService taskQueueService, JsonSerde jsonSerde) {
+  private LoomTaskHandler(TaskQueueService taskQueueService, Gson gson) {
     this.taskQueueService = taskQueueService;
-    this.gson = jsonSerde.getGson();
+    this.gson = gson;
   }
 
   /**

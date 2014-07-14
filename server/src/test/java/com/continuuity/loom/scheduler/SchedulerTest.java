@@ -37,7 +37,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -63,7 +62,6 @@ public class SchedulerTest extends BaseTest {
   private static LoomService loomService;
   private static Cluster cluster;
   private static ClusterJob job;
-  private static Gson gson = jsonSerde.getGson();
 
   @BeforeClass
   public static void start() throws Exception {

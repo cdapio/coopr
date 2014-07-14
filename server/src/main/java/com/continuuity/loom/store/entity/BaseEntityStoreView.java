@@ -22,24 +22,26 @@ import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.google.common.base.Charsets;
 import com.google.common.base.Function;
+import com.google.gson.Gson;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Collection;
 
 /**
  * Abstract {@link EntityStoreView} that represents entities as json.
  */
 public abstract class BaseEntityStoreView implements EntityStoreView {
-  private final JsonSerde codec;
+  private final Gson gson;
   private final Function<byte[], Provider> providerTransform =
     new Function<byte[], Provider>() {
       @Nullable
       @Override
       public Provider apply(@Nullable byte[] input) {
-        return codec.deserialize(input, Provider.class);
+        return deserialize(input, Provider.class);
       }
     };
   private final Function<byte[], HardwareType> hardwareTypeTransform =
@@ -47,7 +49,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
       @Nullable
       @Override
       public HardwareType apply(@Nullable byte[] input) {
-        return codec.deserialize(input, HardwareType.class);
+        return deserialize(input, HardwareType.class);
       }
     };
   private final Function<byte[], ImageType> imageTypeTransform =
@@ -55,7 +57,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
       @Nullable
       @Override
       public ImageType apply(@Nullable byte[] input) {
-        return codec.deserialize(input, ImageType.class);
+        return deserialize(input, ImageType.class);
       }
   };
   private final Function<byte[], Service> serviceTransform =
@@ -63,7 +65,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
       @Nullable
       @Override
       public Service apply(@Nullable byte[] input) {
-        return codec.deserialize(input, Service.class);
+        return deserialize(input, Service.class);
       }
     };
   private final Function<byte[], ClusterTemplate> clusterTemplateTransform =
@@ -71,7 +73,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
       @Nullable
       @Override
       public ClusterTemplate apply(@Nullable byte[] input) {
-        return codec.deserialize(input, ClusterTemplate.class);
+        return deserialize(input, ClusterTemplate.class);
       }
     };
   private final Function<byte[], ProviderType> providerTypeTransform =
@@ -79,7 +81,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
       @Nullable
       @Override
       public ProviderType apply(@Nullable byte[] input) {
-        return codec.deserialize(input, ProviderType.class);
+        return deserialize(input, ProviderType.class);
       }
     };
   private final Function<byte[], AutomatorType> automatorTypeTransform =
@@ -87,7 +89,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
       @Nullable
       @Override
       public AutomatorType apply(@Nullable byte[] input) {
-        return codec.deserialize(input, AutomatorType.class);
+        return deserialize(input, AutomatorType.class);
       }
     };
 
@@ -113,8 +115,8 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
     }
   }
 
-  protected BaseEntityStoreView(JsonSerde codec) {
-    this.codec = codec;
+  protected BaseEntityStoreView(Gson gson) {
+    this.gson = gson;
   }
 
   @Override
@@ -129,7 +131,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public void writeProvider(Provider provider) throws IOException, IllegalAccessException {
-    writeEntity(EntityType.PROVIDER, provider.getName(), codec.serialize(provider, Provider.class));
+    writeEntity(EntityType.PROVIDER, provider.getName(), serialize(provider, Provider.class));
   }
 
   @Override
@@ -149,7 +151,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public void writeHardwareType(HardwareType hardwareType) throws IOException, IllegalAccessException {
-    writeEntity(EntityType.HARDWARE_TYPE, hardwareType.getName(), codec.serialize(hardwareType, HardwareType.class));
+    writeEntity(EntityType.HARDWARE_TYPE, hardwareType.getName(), serialize(hardwareType, HardwareType.class));
   }
 
   @Override
@@ -169,7 +171,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public void writeImageType(ImageType imageType) throws IOException, IllegalAccessException {
-    writeEntity(EntityType.IMAGE_TYPE, imageType.getName(), codec.serialize(imageType, ImageType.class));
+    writeEntity(EntityType.IMAGE_TYPE, imageType.getName(), serialize(imageType, ImageType.class));
   }
 
   @Override
@@ -189,7 +191,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public void writeService(Service service) throws IOException, IllegalAccessException {
-    writeEntity(EntityType.SERVICE, service.getName(), codec.serialize(service, Service.class));
+    writeEntity(EntityType.SERVICE, service.getName(), serialize(service, Service.class));
   }
 
   @Override
@@ -210,7 +212,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   @Override
   public void writeClusterTemplate(ClusterTemplate clusterTemplate) throws IOException, IllegalAccessException {
     writeEntity(EntityType.CLUSTER_TEMPLATE, clusterTemplate.getName(),
-                codec.serialize(clusterTemplate, ClusterTemplate.class));
+                serialize(clusterTemplate, ClusterTemplate.class));
   }
 
   @Override
@@ -230,7 +232,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
 
   @Override
   public void writeProviderType(ProviderType providerType) throws IOException, IllegalAccessException {
-    writeEntity(EntityType.PROVIDER_TYPE, providerType.getName(), codec.serialize(providerType, ProviderType.class));
+    writeEntity(EntityType.PROVIDER_TYPE, providerType.getName(), serialize(providerType, ProviderType.class));
   }
 
   @Override
@@ -251,7 +253,7 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   @Override
   public void writeAutomatorType(AutomatorType automatorType) throws IOException, IllegalAccessException {
     writeEntity(EntityType.AUTOMATOR_TYPE, automatorType.getName(),
-                codec.serialize(automatorType, AutomatorType.class));
+                serialize(automatorType, AutomatorType.class));
   }
 
   @Override
@@ -262,6 +264,14 @@ public abstract class BaseEntityStoreView implements EntityStoreView {
   private <T> T get(EntityType entityType, String entityName, Function<byte[], T> transform) throws IOException {
     byte[] data = getEntity(entityType, entityName);
     return (data == null) ? null : transform.apply(data);
+  }
+
+  private <T> byte[] serialize(T object, Type type) {
+    return gson.toJson(object, type).getBytes(Charsets.UTF_8);
+  }
+
+  private <T> T deserialize(byte[] bytes, Type type) {
+    return gson.fromJson(new String(bytes, Charsets.UTF_8), type);
   }
 
   /**

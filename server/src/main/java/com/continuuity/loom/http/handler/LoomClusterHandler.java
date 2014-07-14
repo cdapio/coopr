@@ -19,7 +19,6 @@ import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.request.AddServicesRequest;
@@ -81,13 +80,13 @@ public class LoomClusterHandler extends LoomAuthHandler {
                              ClusterService clusterService,
                              ClusterStoreService clusterStoreService,
                              Configuration conf,
-                             JsonSerde codec) {
+                             Gson gson) {
     super(tenantStore);
     this.clusterService = clusterService;
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.maxClusterSize = conf.getInt(Constants.MAX_CLUSTER_SIZE);
-    this.gson = codec.getGson();
+    this.gson = gson;
   }
 
   /**

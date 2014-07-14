@@ -17,7 +17,6 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.GroupElement;
@@ -74,7 +73,7 @@ public class SolverScheduler implements Runnable {
                           @Named(Constants.Queue.SOLVER) QueueGroup solverQueues,
                           @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues,
                           @Named("solver.executor.service") ListeningExecutorService executorService,
-                          TaskService taskService, LoomStats loomStats, IdService idService, JsonSerde jsonSerde) {
+                          TaskService taskService, LoomStats loomStats, IdService idService, Gson gson) {
     this.id = id;
     this.solver = solver;
     this.clusterStore = clusterStoreService.getSystemView();
@@ -82,7 +81,7 @@ public class SolverScheduler implements Runnable {
     this.taskService = taskService;
     this.loomStats = loomStats;
     this.idService = idService;
-    this.gson = jsonSerde.getGson();
+    this.gson = gson;
     this.solverQueues = solverQueues;
     this.clusterQueues = clusterQueues;
   }

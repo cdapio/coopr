@@ -1,13 +1,11 @@
 package com.continuuity.loom.tools;
 
 import com.continuuity.loom.cluster.Cluster;
-import com.continuuity.loom.codec.json.guice.CodecModule;
-import com.continuuity.loom.codec.json.upgrade.UpgradeJsonSerde;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
-import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.guice.StoreModule;
@@ -32,7 +30,7 @@ public class UpgradeTool {
     Injector injector = Guice.createInjector(
       new ConfigurationModule(conf),
       new StoreModule(),
-      new CodecModule(new UpgradeJsonSerde(NEW_TENANT_ID))
+      new CodecModules().getUpgradeModule(NEW_TENANT_ID)
     );
     ClusterStoreService clusterStoreService = injector.getInstance(ClusterStoreService.class);
     clusterStoreService.startAndWait();
@@ -75,8 +73,8 @@ public class UpgradeTool {
         "ALTER TABLE clusters ADD COLUMN tenant_id VARCHAR(255) NOT NULL WITH DEFAULT '%s'", NEW_TENANT_ID));
 
       System.out.println("adding index on clusters table");
-      DBQueryHelper.createDerbyIndex(dbConnectionPool,
-                                     "clusters_account_index", "clusters", "tenant_id", "owner_id", "id");
+      DBHelper.createDerbyIndex(dbConnectionPool,
+                                "clusters_account_index", "clusters", "tenant_id", "owner_id", "id");
     } finally {
       if (conn != null) {
         conn.close();

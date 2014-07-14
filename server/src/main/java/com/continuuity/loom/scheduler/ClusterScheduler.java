@@ -19,7 +19,6 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.GroupElement;
@@ -74,13 +73,13 @@ public class ClusterScheduler implements Runnable {
                            ClusterStoreService clusterStoreService,
                            TaskService taskService,
                            IdService idService,
-                           JsonSerde jsonSerde,
+                           Gson gson,
                            @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues) {
     this.id = id;
     this.clusterStore = clusterStoreService.getSystemView();
     this.taskService = taskService;
     this.idService = idService;
-    this.gson = jsonSerde.getGson();
+    this.gson = gson;
     this.clusterQueues = clusterQueues;
   }
 

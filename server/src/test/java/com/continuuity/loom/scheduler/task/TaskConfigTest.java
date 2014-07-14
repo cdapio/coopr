@@ -30,8 +30,7 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.codec.json.guice.CodecModule;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.utils.ImmutablePair;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -50,14 +49,14 @@ import java.util.Set;
  * Test TaskConfig.
  */
 public class TaskConfigTest {
-  private static Gson GSON = new Gson();
+  private static Gson GSON;
 
   @BeforeClass
   public static void setupClass() {
     Injector injector = Guice.createInjector(
-      new CodecModule()
+      new CodecModules().getModule()
     );
-    GSON = injector.getInstance(JsonSerde.class).getGson();
+    GSON = injector.getInstance(Gson.class);
   }
 
   @Test

@@ -15,13 +15,11 @@
  */
 package com.continuuity.loom.store.cluster;
 
-import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.codec.json.guice.CodecModule;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
-import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.guice.StoreModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -46,10 +44,9 @@ public class SQLClusterStoreTest extends ClusterStoreTest {
     Injector injector = Guice.createInjector(
       new ConfigurationModule(sqlConf),
       new StoreModule(),
-      new CodecModule()
+      new CodecModules().getModule()
     );
-    DBConnectionPool dbConnectionPool = injector.getInstance(DBConnectionPool.class);
-    sqlClusterStoreService = new SQLClusterStoreService(dbConnectionPool, injector.getInstance(JsonSerde.class));
+    sqlClusterStoreService = injector.getInstance(SQLClusterStoreService.class);
     sqlClusterStoreService.startAndWait();
   }
 
@@ -65,6 +62,6 @@ public class SQLClusterStoreTest extends ClusterStoreTest {
 
   @AfterClass
   public static void afterClass() {
-    DBQueryHelper.dropDerbyDB();
+    DBHelper.dropDerbyDB();
   }
 }

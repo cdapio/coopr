@@ -47,7 +47,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -63,7 +62,6 @@ import java.util.Set;
  *
  */
 public class SolverSchedulerTest extends BaseTest {
-  private static Gson GSON = jsonSerde.getGson();
   private static QueueGroup solverQueues;
   private static QueueGroup clusterQueues;
   private static SolverScheduler solverScheduler;
@@ -82,9 +80,9 @@ public class SolverSchedulerTest extends BaseTest {
     ClusterCreateRequest createRequest =
       new ClusterCreateRequest(cluster.getName(), cluster.getDescription(),
                                reactorTemplate.getName(), 5, null, null, null, null, null, 0L, null, null);
-    SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, GSON.toJson(createRequest));
+    SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, gson.toJson(createRequest));
     String queueName = "tenant123";
-    solverQueues.add(queueName, new Element(cluster.getId(), GSON.toJson(solverRequest)));
+    solverQueues.add(queueName, new Element(cluster.getId(), gson.toJson(solverRequest)));
 
     solverScheduler.run();
 

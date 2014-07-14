@@ -15,8 +15,7 @@
  */
 package com.continuuity.loom;
 
-import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.codec.json.guice.CodecModule;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
@@ -27,13 +26,14 @@ import com.continuuity.loom.http.guice.HttpModule;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;
 import com.continuuity.loom.scheduler.guice.SchedulerModule;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.SQLClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.guice.StoreModule;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -64,7 +64,7 @@ public class BaseTest {
   protected static Configuration conf;
   protected static MockClusterCallback mockClusterCallback;
   protected static IdService idService;
-  protected static JsonSerde jsonSerde;
+  protected static Gson gson;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -93,7 +93,7 @@ public class BaseTest {
         new QueueModule(zkClientService),
         new HttpModule(),
         new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor()),
-        new CodecModule()
+        new CodecModules().getModule()
       ).with(
         new AbstractModule() {
           @Override
@@ -114,14 +114,14 @@ public class BaseTest {
     tenantStore = injector.getInstance(TenantStore.class);
     tenantStore.startAndWait();
     clusterStore = clusterStoreService.getSystemView();
-    jsonSerde = injector.getInstance(JsonSerde.class);
+    gson = injector.getInstance(Gson.class);
   }
 
   @AfterClass
   public static void teardownBase() {
     zkClientService.stopAndWait();
     zkServer.stopAndWait();
-    DBQueryHelper.dropDerbyDB();
+    DBHelper.dropDerbyDB();
   }
 
   @Before

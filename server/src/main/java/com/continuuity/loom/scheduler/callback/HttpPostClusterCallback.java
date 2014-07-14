@@ -16,7 +16,6 @@
 package com.continuuity.loom.scheduler.callback;
 
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.current.CurrentJsonSerde;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.scheduler.ClusterAction;
@@ -51,7 +50,7 @@ import java.util.Set;
  */
 public class HttpPostClusterCallback implements ClusterCallback {
   private static final Logger LOG = LoggerFactory.getLogger(HttpPostClusterCallback.class);
-  private final Gson gson = new CurrentJsonSerde().getGson();
+  private final Gson gson = new Gson();
   private String onStartUrl;
   private String onSuccessUrl;
   private String onFailureUrl;

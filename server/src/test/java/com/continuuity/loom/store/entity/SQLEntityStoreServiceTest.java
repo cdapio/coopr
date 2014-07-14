@@ -15,14 +15,11 @@
  */
 package com.continuuity.loom.store.entity;
 
-import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.codec.json.guice.CodecModule;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
-import com.continuuity.loom.scheduler.guice.SchedulerModule;
-import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.guice.StoreModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -45,10 +42,9 @@ public class SQLEntityStoreServiceTest extends EntityStoreServiceTest {
     Injector injector = Guice.createInjector(
       new ConfigurationModule(sqlConf),
       new StoreModule(),
-      new CodecModule()
+      new CodecModules().getModule()
     );
-    DBConnectionPool dbConnectionPool = injector.getInstance(DBConnectionPool.class);
-    sqlStore = new SQLEntityStoreService(dbConnectionPool, injector.getInstance(JsonSerde.class));
+    sqlStore = injector.getInstance(SQLEntityStoreService.class);
     sqlStore.startAndWait();
     entityStoreService = sqlStore;
   }
@@ -60,6 +56,6 @@ public class SQLEntityStoreServiceTest extends EntityStoreServiceTest {
 
   @AfterClass
   public static void afterClass() {
-    DBQueryHelper.dropDerbyDB();
+    DBHelper.dropDerbyDB();
   }
 }

@@ -70,7 +70,7 @@ more upgrade scripts, and starting back up all Loom services.
   * If you are using MySQL, make sure MySQL is running and update the table schemas
 
   .. parsed-literal::
-   $ mysql -u loom -p loom < /opt/loom/server/config/sql/loom-upgrade-tables-mysql.sql
+   $ mysql -u loom -p loom < /opt/loom/server/config/sql/loom-upgrade-tables-mysql-0.9.8.sql
 
   * If you are using another external database, you will need to perform the table changes, manually
   * If you are using the embedded Derby database, the schema update will be performed in the next step

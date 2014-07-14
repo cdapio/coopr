@@ -33,7 +33,6 @@ import com.continuuity.loom.scheduler.Scheduler;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -52,7 +51,6 @@ import java.util.Set;
  *
  */
 public class LoomRPCHandlerTest extends LoomServiceTestBase {
-  private static Gson GSON = jsonSerde.getGson();
   private static ClusterTemplate smallTemplate;
 
   @BeforeClass
@@ -89,7 +87,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     // create the clusters
     ClusterCreateRequest clusterCreateRequest = LoomClusterHandlerTest.createClusterRequest("cluster1", "my 1st cluster",
                                                                                  smallTemplate.getName(), 5);
-    HttpResponse creationResponse = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
+    HttpResponse creationResponse = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(creationResponse, HttpResponseStatus.OK);
     String cluster1Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
     LoomClusterHandlerTest.assertStatus(cluster1Id, Cluster.Status.PENDING, "NOT_SUBMITTED",
@@ -98,7 +96,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     clusterCreateRequest = LoomClusterHandlerTest.createClusterRequest("cluster2", "my 2nd cluster",
                                                                  smallTemplate.getName(), 6);
 
-    creationResponse = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER1_HEADERS);
+    creationResponse = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(creationResponse, HttpResponseStatus.OK);
     String cluster2Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
     LoomClusterHandlerTest.assertStatus(cluster2Id, Cluster.Status.PENDING, "NOT_SUBMITTED",
@@ -107,7 +105,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     clusterCreateRequest = LoomClusterHandlerTest.createClusterRequest("cluster3", "my 3rd cluster",
                                                                  smallTemplate.getName(), 6);
 
-    creationResponse = doPost("/v1/loom/clusters", GSON.toJson(clusterCreateRequest), USER2_HEADERS);
+    creationResponse = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER2_HEADERS);
     assertResponseStatus(creationResponse, HttpResponseStatus.OK);
     String cluster3Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
 
@@ -118,7 +116,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     HttpResponse statusCheckResponse = doPost("/v1/loom/getClusterStatuses", "", USER1_HEADERS);
     assertResponseStatus(statusCheckResponse, HttpResponseStatus.OK);
     String user1StatusResponseStr = EntityUtils.toString(statusCheckResponse.getEntity());
-    JsonObject[] jsonList = GSON.fromJson(user1StatusResponseStr, JsonObject[].class);
+    JsonObject[] jsonList = gson.fromJson(user1StatusResponseStr, JsonObject[].class);
     Assert.assertEquals(2, jsonList.length);
     for (JsonObject aJsonList : jsonList) {
       LoomClusterHandlerTest.assertStatus(aJsonList, Cluster.Status.PENDING, "NOT_SUBMITTED",
@@ -130,7 +128,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     statusCheckResponse = doPost("/v1/loom/getClusterStatuses", "", USER2_HEADERS);
     assertResponseStatus(statusCheckResponse, HttpResponseStatus.OK);
     String user2StatusResponseStr = EntityUtils.toString(statusCheckResponse.getEntity());
-    jsonList = GSON.fromJson(user2StatusResponseStr, JsonObject[].class);
+    jsonList = gson.fromJson(user2StatusResponseStr, JsonObject[].class);
     Assert.assertEquals(1, jsonList.length);
     for (JsonObject aJsonList : jsonList) {
       LoomClusterHandlerTest.assertStatus(aJsonList, Cluster.Status.PENDING, "NOT_SUBMITTED",
@@ -142,7 +140,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     statusCheckResponse = doPost("/v1/loom/getClusterStatuses", "", ADMIN_HEADERS);
     assertResponseStatus(statusCheckResponse, HttpResponseStatus.OK);
     String adminStatusResponseStr = EntityUtils.toString(statusCheckResponse.getEntity());
-    jsonList = GSON.fromJson(adminStatusResponseStr, JsonObject[].class);
+    jsonList = gson.fromJson(adminStatusResponseStr, JsonObject[].class);
     Assert.assertEquals(3, jsonList.length);
     for (JsonObject aJsonList : jsonList) {
       LoomClusterHandlerTest.assertStatus(aJsonList, Cluster.Status.PENDING, "NOT_SUBMITTED",
@@ -270,6 +268,6 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
 
   private JsonObject getJsonObjectBodyFromResponse(HttpResponse response) throws IOException {
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    return GSON.fromJson(reader, JsonObject.class);
+    return gson.fromJson(reader, JsonObject.class);
   }
 }

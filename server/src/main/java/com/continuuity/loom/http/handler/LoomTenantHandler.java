@@ -18,7 +18,6 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
@@ -52,10 +51,10 @@ public class LoomTenantHandler extends LoomAuthHandler {
   private final TenantStore store;
 
   @Inject
-  private LoomTenantHandler(TenantStore store, JsonSerde jsonSerde) {
+  private LoomTenantHandler(TenantStore store, Gson gson) {
     super(store);
     this.store = store;
-    this.gson = jsonSerde.getGson();
+    this.gson = gson;
   }
 
   /**

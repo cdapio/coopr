@@ -20,8 +20,6 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
-import com.continuuity.loom.codec.json.guice.CodecModule;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -30,10 +28,7 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +47,6 @@ public abstract class ClusterStoreTest {
   private static final Account tenant1_admin = new Account(Constants.ADMIN_USER, "tenant1");
   private static final Account tenant2_user1 = new Account("user1", "tenant2");
   private static final Account tenant2_admin = new Account(Constants.ADMIN_USER, "tenant2");
-  private static Gson GSON;
 
   protected static ClusterStoreService clusterStoreService;
   protected static ClusterStore systemView;
@@ -62,10 +56,6 @@ public abstract class ClusterStoreTest {
 
   @Before
   public void setupTest() throws Exception {
-    Injector injector = Guice.createInjector(
-      new CodecModule()
-    );
-    GSON = injector.getInstance(JsonSerde.class).getGson();
     clusterStoreService = getClusterStoreService();
     systemView = clusterStoreService.getSystemView();
     clearState();

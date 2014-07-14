@@ -303,7 +303,7 @@ public class SolverTest extends BaseSolverTest {
 
   @Test
   public void testServiceConstraintsDontApplyWhenServiceNotOnCluster() throws Exception {
-    ClusterTemplate template = jsonSerde.getGson().fromJson(
+    ClusterTemplate template = gson.fromJson(
       Entities.ClusterTemplateExample.HADOOP_DISTRIBUTED_STRING, ClusterTemplate.class);
     Map<String, String> hwTypeMap = ImmutableMap.of("medium", "medium-flavor");
     Map<String, String> imgTypeMap = ImmutableMap.of("ubuntu12", "ubunut12-image");
