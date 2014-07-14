@@ -31,7 +31,7 @@ class FogProviderRackspace < FogProvider
     begin
       # Our fields are fog symbols
       fields.each do |k,v|
-        k.to_sym = v
+        instance_variable_set('@' + k, v)
       end
       # Create the server
       log.debug 'Invoking server create'
@@ -60,7 +60,7 @@ class FogProviderRackspace < FogProvider
     begin
       # Our fields are fog symbols
       fields.each do |k,v|
-        k.to_sym = v
+        instance_variable_set('@' + k, v)
       end
       # Confirm server
       log.debug 'Invoking server confirm'
@@ -98,7 +98,7 @@ class FogProviderRackspace < FogProvider
     begin
       # Our fields are fog symbols
       fields.each do |k,v|
-        k.to_sym = v
+        instance_variable_set('@' + k, v)
       end
       # Delete server
       log.debug 'Invoking server delete'
@@ -120,16 +120,18 @@ class FogProviderRackspace < FogProvider
 
   def connection
     log.debug "Connection options for Rackspace:"
-    log.debug "rackspace_version #{rackspace_version}"
-    log.debug "rackspace_api_key #{rackspace_api_key}"
-    log.debug "rackspace_username #{rackspace_username}"
-    log.debug "rackspace_region #{rackspace_region}"
+    log.debug "rackspace_api_key #{@rackspace_api_key}"
+    log.debug "rackspace_username #{@rackspace_username}"
+    log.debug "rackspace_region #{@rackspace_region}"
 
     # Create connection
     @connection ||= begin
       connection = Fog::Compute.new(
         :provider => 'Rackspace',
-        :version  => 'v2'
+        :version  => 'v2',
+        :rackspace_username => @rackspace_username,
+        :rackspace_api_key  => @rackspace_api_key,
+        :rackspace_region   => @rackspace_region
       )
     end
   end
