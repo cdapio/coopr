@@ -16,19 +16,19 @@ then
 fi
 
 for d in ${dirs} ; do
-	cd ${MAINDIR}
-	[[ -d ${d} ]] && cd ${d} || continue
-	for f in $(ls -1 *.json) ; do
-		curl --silent --request PUT \
-			--header "Content-Type:application/json" \
-			--header "X-Loom-UserID:${LOOM_API_USER}" \
-			--header "X-Loom-ApiKey:${LOOM_API_KEY}" \
-			--header "X-Loom-TenantID:${LOOM_TENANT}" \
-			--connect-timeout ${TIMEOUT} --data @${f} \
-			${LOOM_SERVER_URI}/v1/loom/${d}/${f/.json/}
-		ret=$?
-		[[ ${ret} -ne 0 ]] && failed="${failed} ${d}/${f}"
-	done
+  cd ${MAINDIR}
+  [[ -d ${d} ]] && cd ${d} || continue
+  for f in $(ls -1 *.json) ; do
+    curl --silent --request PUT \
+      --header "Content-Type:application/json" \
+      --header "X-Loom-UserID:${LOOM_API_USER}" \
+      --header "X-Loom-ApiKey:${LOOM_API_KEY}" \
+      --header "X-Loom-TenantID:${LOOM_TENANT}" \
+      --connect-timeout ${TIMEOUT} --data @${f} \
+      ${LOOM_SERVER_URI}/v1/loom/${d}/${f/.json/}
+    ret=$?
+    [[ ${ret} -ne 0 ]] && failed="${failed} ${d}/${f}"
+  done
 done
 [[ ${failed} ]] && echo "Failed to load: ${failed}" && exit 1
 exit 0
