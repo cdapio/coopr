@@ -16,9 +16,6 @@
 # limitations under the License.
 #
 
-require_relative 'rackspace/create'
-require_relative 'rackspace/confirm'
-require_relative 'rackspace/delete'
 require_relative '../fog_provider'
 
 class FogProviderRackspace < FogProvider
@@ -35,15 +32,21 @@ class FogProviderRackspace < FogProvider
       end
       # Create the server
       log.debug 'Invoking server create'
-      instance = FogProviderRackspaceCreate.new
-      instance_result = instance.run
-      # Process results
-      @result['result']['providerid'] = instance_result['providerid']
-      @result['result']['ssh-auth']['user'] = 'root'
-      if instance_result.key?('rootpassword')
-        @result['result']['ssh-auth']['password'] = instance_result['rootpassword']
+      begin
+        server = connection.servers.create(
+          :flavor_id    => flavor,
+          :image_id     => image,
+          :name         => hostname,
+          :config_drive => false,
+          :keypair      => @rackspace_ssh_keypair if @rackspace_ssh_keypair
+        )
+        server.save
       end
-      @result['status'] = instance_result['status']
+      # Process results
+      @result['result']['providerid'] = server.id.to_s
+      @result['result']['ssh-auth']['user'] = 'root'
+      @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
+      @result['status'] = 0
     rescue Exception => e
       log.error('Unexpected Error Occured in FogProviderRackspace.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occured in FogProviderRackspace.create: #{e.inspect}"
@@ -64,14 +67,30 @@ class FogProviderRackspace < FogProvider
       end
       # Confirm server
       log.debug 'Invoking server confirm'
-      instance = FogProviderRackspaceConfirm.new
-      instance_result = instance.run
+
+      log.debug "fetching server for id: #{providerid}"
+      server = self.connection.servers.get(providerid)
+
+      # Wait until the server is ready
+      begin
+        server.wait_for(600) { ready? }
+      rescue Fog::Errors::TimeoutError
+        log.error 'Timeout waiting for the server to be created'
+      end
+
+      bootstrap_ip = ip_address(server, 'public')
+      if bootstrap_ip.nil?
+        log.error 'No IP address available for bootstrapping.'
+        exit 1
+      else
+        log.debug "Bootstrap IP address #{bootstrap_ip}"
+      end
+
       # Process results
-      @result['result']['ipaddress'] = instance_result['ipaddress']
-      raise "non-zero exit code: #{instance_result['ipaddress']} from FogProviderRackspaceConfirm" unless instance_result['status'] == 0
+      @result['result']['ipaddress'] = bootstrap_ip
       # Additional checks
       log.debug 'Confirming sshd is up'
-      instance.tcp_test_port(instance_result['ipaddress'], 22) { sleep 5 }
+      tcp_test_port(@result['result']['ipaddress'], 22) { sleep 5 }
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
       Net::SSH.start(instance_result['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
@@ -80,8 +99,8 @@ class FogProviderRackspace < FogProvider
       # Return 0
       @result['status'] = 0
     rescue Net::SSH::AuthenticationFailed => e
-      log.error("SSH Authentication failure for #{providerid}/#{instance_result['ipaddress']}")
-      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{instance_result['ipaddress']}: #{e.inspect}"
+      log.error("SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}")
+      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}: #{e.inspect}"
     rescue Exception => e
       log.error('Unexpected Error Occured in FogProviderRackspace.confirm:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occured in FogProviderRackspace.confirm: #{e.inspect}"
@@ -102,8 +121,12 @@ class FogProviderRackspace < FogProvider
       end
       # Delete server
       log.debug 'Invoking server delete'
-      instance = FogProviderRackspaceDelete.new
-      instance_result = instance.run
+      begin
+        server = self.connection.servers.get(providerid)
+        server.destroy
+      rescue NoMethodError
+        log.error "Could not locate server '#{id}'"
+      end
       # Return 0
       @result['status'] = 0
     rescue Exception => e
