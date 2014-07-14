@@ -18,8 +18,6 @@
 
 class FogProviderRackspaceConfirm
 
-  include FogProviderRackspace
-
   def run
     $stdout.sync = true
 
