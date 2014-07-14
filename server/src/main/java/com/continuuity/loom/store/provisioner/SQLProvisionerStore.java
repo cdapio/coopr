@@ -5,9 +5,8 @@ import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryHelper;
 import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.AbstractScheduledService;
+import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
-import org.apache.twill.common.Threads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,16 +19,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the {@link ProvisionerStore} using a SQL database for persistent storage.  Maintains
  * two tables, one for storing provisioner information and another for maintaining an index from tenants to
  * provisioners.
  */
-public class SQLProvisionerStore extends AbstractScheduledService implements ProvisionerStore {
+public class SQLProvisionerStore extends AbstractIdleService implements ProvisionerStore {
   private static final Logger LOG  = LoggerFactory.getLogger(SQLProvisionerStore.class);
   private final DBConnectionPool dbConnectionPool;
   private final JsonSerde codec;
@@ -59,11 +55,6 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
     } finally {
       conn.close();
     }
-  }
-
-  @Override
-  protected void runOneIteration() throws Exception {
-    cleanupWorkers();
   }
 
   @Override
@@ -101,16 +92,6 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
   @Override
   protected void shutDown() throws Exception {
     // No-op
-  }
-
-  @Override
-  protected ScheduledExecutorService executor() {
-    return Executors.newSingleThreadScheduledExecutor(Threads.createDaemonThreadFactory("sql-provisioner-store"));
-  }
-
-  @Override
-  protected Scheduler scheduler() {
-    return Scheduler.newFixedRateSchedule(1, 180, TimeUnit.SECONDS);
   }
 
   @Override
@@ -380,25 +361,6 @@ public class SQLProvisionerStore extends AbstractScheduledService implements Pro
       }
     } catch (SQLException e) {
       throw new IOException("Exception getting number of assigned workers for tenant " + tenantID, e);
-    }
-  }
-
-  // cleanup provisionerWorkers table. If assigned and live are both 0, no reason to keep them there.
-  private void cleanupWorkers() {
-    try {
-      Connection conn = dbConnectionPool.getConnection();
-      try {
-        Statement statement = conn.createStatement();
-        try {
-          statement.executeUpdate("DELETE FROM provisionerWorkers WHERE num_assigned=0 AND num_live=0");
-        } finally {
-          statement.close();
-        }
-      } finally {
-        conn.close();
-      }
-    } catch (SQLException e) {
-      LOG.error("Exception cleaning up provisionerWorkers table");
     }
   }
 

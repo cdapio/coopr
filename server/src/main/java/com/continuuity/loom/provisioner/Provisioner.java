@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Provisioner information, such as the total capacity of the provisioner and how many workers are assigned and live
@@ -34,7 +35,12 @@ public class Provisioner {
     this.port = port;
     this.capacityTotal = capacityTotal;
     this.usage = usage == null ? ImmutableMap.<String, Integer>of() : ImmutableMap.copyOf(usage);
-    this.assignments = assignments == null ? Maps.<String, Integer>newHashMap() : Maps.newHashMap(assignments);
+    this.assignments = Maps.newConcurrentMap();
+    if (assignments != null) {
+      for (Map.Entry<String, Integer> entry : assignments.entrySet()) {
+        this.assignments.put(entry.getKey(), entry.getValue());
+      }
+    }
     int totalAssigned = 0;
     for (Integer assigned : this.assignments.values()) {
       totalAssigned += assigned;

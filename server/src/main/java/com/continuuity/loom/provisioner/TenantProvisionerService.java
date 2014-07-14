@@ -47,6 +47,11 @@ public class TenantProvisionerService extends AbstractScheduledService {
     this.provisionerStore = provisionerStore;
     this.tenantStore = tenantStore;
     this.provisionerRequestService = provisionerRequestService;
+    // a single lock is used across all tenants and provisioners. This is so that a request modifies worker assignments
+    // across multiple provisioners does not conflict with requests that modify worker capacity. For example, if a
+    // tenant is added the same time a tenant is deleted, we don't want to be modifying the same provisioner at the
+    // same time and cause conflicts. Similarly, if we're moving workers from one provisioner to another at the same
+    // time as we're adding a tenant, we don't want to both add workers to the same provisioner at the same time.
     this.lock = new ZKInterProcessReentrantLock(zkClient, Constants.TENANT_NAMESPACE);
     this.provisionerTimeoutSecs = conf.getLong(Constants.PROVISIONER_TIMEOUT_SECS);
     this.balanceQueue = balanceQueue;
@@ -68,22 +73,17 @@ public class TenantProvisionerService extends AbstractScheduledService {
     return provisionerStore.getProvisioner(provisionerId);
   }
 
-  public void addTenant(Tenant tenant) throws IOException, CapacityException {
-    lock.acquire();
-    try {
-      checkCapacity(tenant.getWorkers());
-      balanceQueue.add(new Element(tenant.getId()));
-      tenantStore.writeTenant(tenant);
-    } finally {
-      lock.release();
-    }
-  }
-
-  public void updateTenant(Tenant tenant) throws IOException, CapacityException {
+  public void writeTenant(Tenant tenant) throws IOException, CapacityException {
     lock.acquire();
     try {
       Tenant prevTenant = tenantStore.getTenant(tenant.getId());
-      checkCapacity(tenant.getWorkers() - prevTenant.getWorkers());
+      if (prevTenant == null) {
+        // if we're adding a new tenant
+        checkCapacity(tenant.getWorkers());
+      } else {
+        // we're updating an existing tenant
+        checkCapacity(tenant.getWorkers() - prevTenant.getWorkers());
+      }
       balanceQueue.add(new Element(tenant.getId()));
       tenantStore.writeTenant(tenant);
     } finally {
@@ -91,25 +91,13 @@ public class TenantProvisionerService extends AbstractScheduledService {
     }
   }
 
-  public void deleteTenant(String tenantId) throws IOException {
+  public void deleteTenant(String tenantId) throws IllegalStateException, IOException {
     lock.acquire();
     try {
-      Collection<Provisioner> tenantProvisioners = provisionerStore.getTenantProvisioners(tenantId);
-      provisionerStore.unassignTenantProvisioners(tenantId);
-
-      // send requests to provisioners to delete tenant
-      // if the db dies or something in between, the client making the request will get a 500.  No way to rollback,
-      // so client would have to resend the delete when things are ok again.
-      // TODO: what happens if we crash here? workaround would be to restart provisioners...
-      for (Provisioner provisioner : tenantProvisioners) {
-        LOG.debug("Requesting provisioner {} to delete tenant {}.", provisioner.getId(), tenantId);
-        if (!provisionerRequestService.deleteTenant(provisioner, tenantId)) {
-          // unable to complete request to delete tenant from this provisioner. Something is wrong with it, delete it
-          // and rebalance its workers.
-          LOG.error("Could not delete tenant {} from provisioner {}. The provisioner appears broken, deleting it and " +
-                      "rebalancing its tenant workers", tenantId, provisioner.getId());
-          deleteProvisioner(provisioner);
-        }
+      int numAssignedWorkers = provisionerStore.getNumAssignedWorkers(tenantId);
+      if (numAssignedWorkers > 0) {
+        throw new IllegalStateException("Tenant " + tenantId + " still has " + numAssignedWorkers + " workers. " +
+                                          "Cannot delete it until workers are set to 0.");
       }
       tenantStore.deleteTenant(tenantId);
     } finally {
@@ -152,14 +140,10 @@ public class TenantProvisionerService extends AbstractScheduledService {
   public void writeProvisioner(Provisioner provisioner) throws IOException {
     lock.acquire();
     try {
-      // if a provisioner died earlier leaving us under capacity, and this provisioner adds capacity, we want to
-      // rebalance the workers after writing the provisioner.
-      boolean rebalanceWorkers = provisionerStore.getFreeCapacity() == 0;
       provisionerStore.writeProvisioner(provisioner);
-      if (rebalanceWorkers) {
-        for (Tenant tenant : tenantStore.getAllTenants()) {
-          balanceQueue.add(new Element(tenant.getId()));
-        }
+      // rebalance tenants every time a provisioner registers itself
+      for (Tenant tenant : tenantStore.getAllTenants()) {
+        balanceQueue.add(new Element(tenant.getId()));
       }
     } finally {
       lock.release();
@@ -217,6 +201,9 @@ public class TenantProvisionerService extends AbstractScheduledService {
   // Currently a greedy approach, just add to first available.
   private void addWorkers(String tenantId, int numToAdd) throws CapacityException, IOException {
     for (Provisioner provisioner : provisionerStore.getProvisionersWithFreeCapacity()) {
+      if (numToAdd <= 0) {
+        break;
+      }
       int numAdded = provisioner.tryAddTenantAssignments(tenantId, numToAdd);
       if (numAdded > 0) {
         provisionerStore.writeProvisioner(provisioner);
@@ -225,8 +212,11 @@ public class TenantProvisionerService extends AbstractScheduledService {
         if (provisionerRequestService.putTenant(provisioner, tenantId)) {
           numToAdd -= numAdded;
         } else {
-          // request failed with retries. something is wrong with the provisioner, delete it and rebalance its workers
-          // TODO: what if this fails?
+          // request failed with retries. something is wrong with the provisioner, delete it and rebalance its workers.
+          // Rebalancing will be queued, but will not be triggered until after this method finishes due to the
+          // lock that is held.
+          // TODO: what if this fails due to db failure or something of that sort?
+          // should be ok as long as the tenant balance task is in the queue and retried.
           LOG.error("Could not write tenant {} to provisioner {}. The provisioner appears broken, deleting it and " +
                      "rebalancing its tenant workers", tenantId, provisioner.getId());
           deleteProvisioner(provisioner);

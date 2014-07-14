@@ -41,7 +41,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
- * Handles requests to take and finish tasks from provisioners.
+ * Handles requests from provisioners to register themselves, send heartbeats, and delete themselves.
  */
 @Path("/v1/provisioners")
 public final class LoomProvisionerHandler extends AbstractHttpHandler {

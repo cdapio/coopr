@@ -143,10 +143,10 @@ public final class DBQueryHelper {
   }
 
   /**
-   * Queries for a single number, returning the value of the number.
+   * Queries for a single number, returning the value of the number or 0 if there are no results.
    *
    * @param statement PreparedStatement of the query, ready for execution.
-   * @return Result of the query.
+   * @return Result of the query, or 0 if no results.
    * @throws SQLException
    */
   public static int getNum(PreparedStatement statement) throws SQLException {

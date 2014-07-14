@@ -65,7 +65,7 @@ Example
         http://<loom-server>:<superadmin-port>/<version>/provisioners/p1
  $ {
        "id": "p1",
-       "host": "localhost",
+       "host": "host1",
        "port": 58025,
        "capacityTotal": 10,
        "capacityFree": 2,
@@ -120,7 +120,7 @@ Example
  $ [
        {
            "id": "p1",
-           "host": "localhost",
+           "host": "host1",
            "port": 58025,
            "capacityTotal": 10,
            "capacityFree": 2,
@@ -136,8 +136,8 @@ Example
        },
        {
            "id": "p2",
-           "host": "localhost",
-           "port": 58039,
+           "host": "host2",
+           "port": 58025,
            "capacityTotal": 10,
            "capacityFree": 2,
            "assignments": {

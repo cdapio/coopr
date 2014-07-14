@@ -22,6 +22,7 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
@@ -161,7 +162,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     try {
       Tenant tenant = new Tenant(requestedTenant.getName(), UUID.randomUUID().toString(), requestedTenant.getWorkers(),
                                  requestedTenant.getMaxClusters(), requestedTenant.getMaxNodes());
-      tenantProvisionerService.addTenant(tenant);
+      tenantProvisionerService.writeTenant(tenant);
       responder.sendJson(HttpResponseStatus.OK, ImmutableMap.<String, String>of("id", tenant.getId()));
     } catch (IOException e) {
       LOG.error("Exception adding tenant.", e);
@@ -215,7 +216,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     }
 
     try {
-      tenantProvisionerService.updateTenant(tenant);
+      tenantProvisionerService.writeTenant(tenant);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       LOG.error("Exception while setting workers for tenant {}", tenantId);
@@ -248,6 +249,8 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     try {
       tenantProvisionerService.deleteTenant(tenantId);
       responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT, e.getMessage());
     } catch (IOException e) {
       LOG.error("Exception while deleting tenant {}", tenantId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while deleting tenant " + tenantId);

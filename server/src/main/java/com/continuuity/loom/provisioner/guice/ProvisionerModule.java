@@ -6,7 +6,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 
 /**
- *
+ * Guice module for injection of provisioner related classes.
  */
 public class ProvisionerModule extends AbstractModule {
 
