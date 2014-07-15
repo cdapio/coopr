@@ -73,6 +73,7 @@ class FogProviderRackspace < FogProvider
 
       # Wait until the server is ready
       begin
+        log.debug "waiting for server to come up: #{providerid}"
         server.wait_for(600) { ready? }
       rescue Fog::Errors::TimeoutError
         log.error 'Timeout waiting for the server to be created'
@@ -85,6 +86,8 @@ class FogProviderRackspace < FogProvider
       else
         log.debug "Bootstrap IP address #{bootstrap_ip}"
       end
+
+      wait_for_sshd
 
       # Process results
       @result['result']['ipaddress'] = bootstrap_ip
