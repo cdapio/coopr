@@ -247,6 +247,9 @@ A full list of available configuration settings and their default values are giv
    * - server.provisioner.timeout.secs
      - 120
      - seconds to wait for a provisioner heartbeat before moving its workers and deleting it.
+   * - server.provisioner.timeout.check.interval.secs
+     - 60
+     - seconds between checks for timed out provisioners.
    * - server.provisioner.request.max.retries
      - 2
      - max number of times to retry a failed request to a provisioner before reassigning its workers and deleting it.

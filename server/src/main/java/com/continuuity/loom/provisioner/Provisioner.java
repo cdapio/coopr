@@ -37,9 +37,7 @@ public class Provisioner {
     this.usage = usage == null ? ImmutableMap.<String, Integer>of() : ImmutableMap.copyOf(usage);
     this.assignments = Maps.newConcurrentMap();
     if (assignments != null) {
-      for (Map.Entry<String, Integer> entry : assignments.entrySet()) {
-        this.assignments.put(entry.getKey(), entry.getValue());
-      }
+      this.assignments.putAll(assignments);
     }
     int totalAssigned = 0;
     for (Integer assigned : this.assignments.values()) {

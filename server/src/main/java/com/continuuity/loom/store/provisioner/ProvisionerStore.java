@@ -36,7 +36,7 @@ public interface ProvisionerStore extends Service {
    *         since the given timestamp in milliseconds.
    * @throws IOException
    */
-  Collection<Provisioner> getIdleProvisioners(long idleTimestamp) throws IOException;
+  Collection<Provisioner> getTimedOutProvisioners(long idleTimestamp) throws IOException;
 
   /**
    * Get all provisioners that are assigned workers for the given tenant.
@@ -55,14 +55,6 @@ public interface ProvisionerStore extends Service {
    * @throws IOException
    */
   Provisioner getProvisioner(String id) throws IOException;
-
-  /**
-   * Unassign all workers for the given tenant across all provisioners.
-   *
-   * @param tenantId Id of the tenant whose workers should be unassigned
-   * @throws IOException
-   */
-  void unassignTenantProvisioners(String tenantId) throws IOException;
 
   /**
    * Write the given provisioner.

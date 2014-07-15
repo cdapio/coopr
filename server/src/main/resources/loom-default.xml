@@ -150,6 +150,12 @@
     </property>
 
     <property>
+        <name>server.provisioner.timeout.check.interval.secs</name>
+        <value>60</value>
+        <description>seconds between checks for timed out provisioners</description>
+    </property>
+
+    <property>
         <name>server.provisioner.request.max.retries</name>
         <value>2</value>
         <description>max number of times to retry a failed request to a provisioner before reassigning its workers

@@ -96,10 +96,10 @@ public abstract class ProvisionerStoreTest {
     store.setHeartbeat(provisioner1.getId(), 100L);
     store.setHeartbeat(provisioner2.getId(), 1000L);
 
-    Assert.assertTrue(store.getIdleProvisioners(99L).isEmpty());
-    Assert.assertEquals(ImmutableSet.of(provisioner1), ImmutableSet.copyOf(store.getIdleProvisioners(101L)));
+    Assert.assertTrue(store.getTimedOutProvisioners(99L).isEmpty());
+    Assert.assertEquals(ImmutableSet.of(provisioner1), ImmutableSet.copyOf(store.getTimedOutProvisioners(101L)));
     Assert.assertEquals(ImmutableSet.of(provisioner1, provisioner2),
-                        ImmutableSet.copyOf(store.getIdleProvisioners(1001L)));
+                        ImmutableSet.copyOf(store.getTimedOutProvisioners(1001L)));
   }
 
   @Test
@@ -135,30 +135,6 @@ public abstract class ProvisionerStoreTest {
     store.writeProvisioner(updatedProvisioner1);
     Assert.assertEquals(ImmutableSet.of(updatedProvisioner1, provisioner2),
                         ImmutableSet.copyOf(store.getProvisionersWithFreeCapacity()));
-  }
-
-  @Test
-  public void testUnassignTenantProvisioners() throws IOException {
-    ProvisionerStore store = getProvisionerStore();
-
-    store.writeProvisioner(provisioner1);
-    store.writeProvisioner(provisioner2);
-
-    // tenantA belongs to one provisioner
-    store.unassignTenantProvisioners("tenantA");
-    Assert.assertFalse(store.getProvisioner(provisioner1.getId()).getAssignedTenants().contains("tenantA"));
-    Assert.assertFalse(store.getProvisioner(provisioner2.getId()).getAssignedTenants().contains("tenantA"));
-    Assert.assertTrue(store.getTenantProvisioners("tenantA").isEmpty());
-    Assert.assertEquals(93, store.getFreeCapacity());
-    Assert.assertEquals(0, store.getNumAssignedWorkers("tenantA"));
-
-    // tenantY belongs to both
-    store.unassignTenantProvisioners("tenantY");
-    Assert.assertFalse(store.getProvisioner(provisioner1.getId()).getAssignedTenants().contains("tenantY"));
-    Assert.assertFalse(store.getProvisioner(provisioner2.getId()).getAssignedTenants().contains("tenantY"));
-    Assert.assertTrue(store.getTenantProvisioners("tenantY").isEmpty());
-    Assert.assertEquals(103, store.getFreeCapacity());
-    Assert.assertEquals(0, store.getNumAssignedWorkers("tenantY"));
   }
 
   @Test

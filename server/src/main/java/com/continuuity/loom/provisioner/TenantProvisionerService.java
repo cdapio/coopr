@@ -10,10 +10,8 @@ import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.apache.twill.common.Threads;
 import org.apache.twill.zookeeper.ZKClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +19,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Service for managing provisioners.
  */
-public class TenantProvisionerService extends AbstractScheduledService {
+public class TenantProvisionerService {
   private static final Logger LOG  = LoggerFactory.getLogger(TenantProvisionerService.class);
   private final ProvisionerStore provisionerStore;
   private final TenantStore tenantStore;
@@ -57,22 +53,55 @@ public class TenantProvisionerService extends AbstractScheduledService {
     this.balanceQueue = balanceQueue;
   }
 
+  /**
+   * Get an unmodifiable collection of all tenants.
+   *
+   * @return Unmodifiable collection of all tenants
+   * @throws IOException
+   */
   public Collection<Tenant> getAllTenants() throws IOException {
     return tenantStore.getAllTenants();
   }
 
+  /**
+   * Get a specific tenant.
+   *
+   * @param tenantId Id of the tenant to get
+   * @return Tenant for the given id, or null if none exists
+   * @throws IOException
+   */
   public Tenant getTenant(String tenantId) throws IOException {
     return tenantStore.getTenant(tenantId);
   }
 
+  /**
+   * Get an unmodifiable collection of all provisioners.
+   *
+   * @return Unmodifiable collection of all provisioners
+   * @throws IOException
+   */
   public Collection<Provisioner> getAllProvisioners() throws IOException {
     return provisionerStore.getAllProvisioners();
   }
 
+  /**
+   * Get the provisioner for the given id, or null if none exists.
+   *
+   * @param provisionerId Id of the provisioner to get
+   * @return Provisioner for the given id, or null if none exists
+   * @throws IOException
+   */
   public Provisioner getProvisioner(String provisionerId) throws IOException {
     return provisionerStore.getProvisioner(provisionerId);
   }
 
+  /**
+   * Write the tenant to the store and balance the tenant workers across provisioners.
+   *
+   * @param tenant Tenant to write
+   * @throws IOException if there was an exception persisting the tenant
+   * @throws CapacityException if there is not enough capacity to support all tenant workers
+   */
   public void writeTenant(Tenant tenant) throws IOException, CapacityException {
     lock.acquire();
     try {
@@ -91,6 +120,13 @@ public class TenantProvisionerService extends AbstractScheduledService {
     }
   }
 
+  /**
+   * Delete the given tenant. A tenant must not have any assigned workers in order for deletion to be allowed.
+   *
+   * @param tenantId Id of the tenant to delete
+   * @throws IllegalStateException if the tenant has one or more assigned workers
+   * @throws IOException if there was an exception persisting the deletion
+   */
   public void deleteTenant(String tenantId) throws IllegalStateException, IOException {
     lock.acquire();
     try {
@@ -105,6 +141,12 @@ public class TenantProvisionerService extends AbstractScheduledService {
     }
   }
 
+  /**
+   * Delete the given provisioner, queueing a job to reassign its workers to different provisioners.
+   *
+   * @param provisionerId Id of the provisioner to delete
+   * @throws IOException
+   */
   public void deleteProvisioner(String provisionerId) throws IOException {
     lock.acquire();
     try {
@@ -119,24 +161,37 @@ public class TenantProvisionerService extends AbstractScheduledService {
     }
   }
 
+  /**
+   * Handle the heartbeat of a provisioner, updating the last heartbeat time of the provisioner and updating the number
+   * of live workers running on the provisioner for each tenant it is responsible for.
+   *
+   * @param provisionerId Id of the provisioner that sent the heartbeat
+   * @param heartbeat The heartbeat containing live worker information
+   * @throws IOException if there was an exception persisting the data
+   * @throws MissingEntityException if there is no provisioner for the given id
+   */
   public void handleHeartbeat(String provisionerId, ProvisionerHeartbeat heartbeat)
     throws IOException, MissingEntityException {
-    lock.acquire();
-    try {
-      Provisioner provisioner = provisionerStore.getProvisioner(provisionerId);
-      if (provisioner == null) {
-        throw new MissingEntityException("Provisioner " + provisionerId + " not found.");
-      }
-      if (!provisioner.getUsage().equals(heartbeat.getUsage())) {
-        provisioner.setUsage(heartbeat.getUsage());
-        provisionerStore.writeProvisioner(provisioner);
-      }
-      provisionerStore.setHeartbeat(provisionerId, System.currentTimeMillis());
-    } finally {
-      lock.release();
+    // no lock required here.  Simply getting a provisioner and writing worker usage. Would only expect one provisioner
+    // to be calling this at a time, and even if it is calling it concurrently for some reason, only the usage can
+    // change and for that its ok for one of them to win.
+    Provisioner provisioner = provisionerStore.getProvisioner(provisionerId);
+    if (provisioner == null) {
+      throw new MissingEntityException("Provisioner " + provisionerId + " not found.");
     }
+    if (!provisioner.getUsage().equals(heartbeat.getUsage())) {
+      provisioner.setUsage(heartbeat.getUsage());
+      provisionerStore.writeProvisioner(provisioner);
+    }
+    provisionerStore.setHeartbeat(provisionerId, System.currentTimeMillis());
   }
 
+  /**
+   * Write a provisioner, and queue jobs to rebalance workers for all tenants in the system.
+   *
+   * @param provisioner Provisioner to write
+   * @throws IOException
+   */
   public void writeProvisioner(Provisioner provisioner) throws IOException {
     lock.acquire();
     try {
@@ -150,6 +205,13 @@ public class TenantProvisionerService extends AbstractScheduledService {
     }
   }
 
+  /**
+   * Rebalance workers for the tenant across the provisioners.
+   *
+   * @param tenantId Id of the tenant whose workers need to be rebalanced
+   * @throws CapacityException if there is not enough capacity to rebalance tenant workers
+   * @throws IOException if there was an exception persisting the worker rebalance
+   */
   public void rebalanceTenantWorkers(String tenantId) throws IOException, CapacityException {
     lock.acquire();
     try {
@@ -168,6 +230,32 @@ public class TenantProvisionerService extends AbstractScheduledService {
         // not enough workers assigned, assign some more.
         LOG.debug("Adding {} workers to tenant {}", diff, tenantId);
         addWorkers(tenantId, diff);
+      }
+    } finally {
+      lock.release();
+    }
+  }
+
+  /**
+   * Delete and reassign workers for provisioners that have not sent a heartbeat since the given timestamp in
+   * milliseconds.
+   *
+   * @param timeoutTs Timestamp in milliseconds to use as a cut off for deleting provisioners.
+   * @throws Exception
+   */
+  public void timeoutProvisioners(long timeoutTs) throws IOException {
+    lock.acquire();
+    try {
+      Set <String> affectedTenants = Sets.newHashSet();
+      for (Provisioner provisioner : provisionerStore.getTimedOutProvisioners(timeoutTs)) {
+        String provisionerId = provisioner.getId();
+        LOG.error("provisioner {} has not sent a heartbeat in over {} seconds, deleting it...",
+                  provisionerId, provisionerTimeoutSecs);
+        provisionerStore.deleteProvisioner(provisioner.getId());
+        affectedTenants.addAll(provisioner.getAssignedTenants());
+      }
+      for (String affectedTenant : affectedTenants) {
+        balanceQueue.add(new Element(affectedTenant));
       }
     } finally {
       lock.release();
@@ -234,41 +322,6 @@ public class TenantProvisionerService extends AbstractScheduledService {
       balanceQueue.add(new Element(tenant));
     }
     provisionerStore.deleteProvisioner(provisioner.getId());
-  }
-
-  @Override
-  protected void runOneIteration() throws Exception {
-    lock.acquire();
-    try {
-      // time out provisioners that have not sent a heartbeat in a while
-      long staleTime = System.currentTimeMillis() -
-        TimeUnit.MILLISECONDS.convert(provisionerTimeoutSecs, TimeUnit.SECONDS);
-      Set <String> affectedTenants = Sets.newHashSet();
-      for (Provisioner provisioner : provisionerStore.getIdleProvisioners(staleTime)) {
-        String provisionerId = provisioner.getId();
-        LOG.error("provisioner {} has not sent a heartbeat in over {} seconds, deleting it...",
-                 provisionerId, provisionerTimeoutSecs);
-        provisionerStore.deleteProvisioner(provisioner.getId());
-        affectedTenants.addAll(provisioner.getAssignedTenants());
-      }
-      for (String affectedTenant : affectedTenants) {
-        balanceQueue.add(new Element(affectedTenant));
-      }
-    } finally {
-      lock.release();
-    }
-  }
-
-  @Override
-  protected ScheduledExecutorService executor() {
-    return Executors.newSingleThreadScheduledExecutor(Threads.createDaemonThreadFactory("tenant-provisioner-service"));
-  }
-
-  @Override
-  protected Scheduler scheduler() {
-    // if the server was down for a while, we don't want to time out provisioners right away but want to
-    // give them a chance to get their heartbeats in.  So wait for a while before starting the timeout logic.
-    return Scheduler.newFixedRateSchedule(provisionerTimeoutSecs, 60, TimeUnit.SECONDS);
   }
 
   private void checkCapacity(int diff) throws IOException, CapacityException {

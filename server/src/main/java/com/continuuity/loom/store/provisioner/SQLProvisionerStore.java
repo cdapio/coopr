@@ -134,7 +134,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
   }
 
   @Override
-  public Collection<Provisioner> getIdleProvisioners(long idleTimestamp) throws IOException {
+  public Collection<Provisioner> getTimedOutProvisioners(long idleTimestamp) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -193,46 +193,6 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
       }
     } catch (SQLException e) {
       throw new IOException("Exception getting provisioner " + id, e);
-    }
-  }
-
-  @Override
-  public void unassignTenantProvisioners(String tenantId) throws IOException {
-    Connection conn = null;
-    try {
-      conn = dbConnectionPool.getConnection(false);
-
-      // set num_assigned to 0 for all provisioners that have the tenant
-      int numUnassigned = 0;
-      PreparedStatement statement = conn.prepareStatement(
-        "UPDATE provisionerWorkers SET num_assigned=0 WHERE tenant_id=? AND num_assigned > 0");
-      try {
-        statement.setString(1, tenantId);
-        numUnassigned = statement.executeUpdate();
-      } finally {
-        statement.close();
-      }
-
-      // if we unassigned anything, need to update the provisioners table too
-      if (numUnassigned > 0) {
-        Set <Provisioner> provisioners = getProvisionersForTenant(conn, tenantId);
-        for (Provisioner provisioner : provisioners) {
-          provisioner.removeTenantAssignments(tenantId);
-          updateProvisioner(conn, provisioner, toByteStream(provisioner));
-        }
-      }
-
-      conn.commit();
-    } catch (SQLException e) {
-      LOG.error("Exception deleting provisioners for tenant {}. Attempting rollback.", tenantId, e);
-      if (conn != null) {
-        try {
-          conn.rollback();
-        } catch (SQLException e1) {
-          LOG.error("Exception rolling back failed deletion of provisioners for tenant {}", tenantId);
-        }
-      }
-      throw new IOException("Exception deleting provisioners for tenant " + tenantId, e);
     }
   }
 
@@ -454,35 +414,20 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
     }
   }
 
-  private Set<Provisioner> getProvisionersForTenant(Connection conn, String tenantId) throws SQLException {
-    PreparedStatement statement = conn.prepareStatement(
-      "SELECT P.provisioner FROM provisioners P, provisionerWorkers W WHERE W.tenant_id=? AND W.provisioner_id=P.id");
-    try {
-      statement.setString(1, tenantId);
-      return DBQueryHelper.getQuerySet(statement, Provisioner.class);
-    } finally {
-      statement.close();
-    }
-  }
-
   private Set<String> getTenantsUsedByProvisioner(Connection conn, String provisionerId) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "SELECT tenant_id FROM provisionerWorkers WHERE provisioner_id=?");
     try {
       statement.setString(1, provisionerId);
+      ResultSet rs = statement.executeQuery();
       try {
-        ResultSet rs = statement.executeQuery();
-        try {
-          Set<String> results = Sets.newHashSet();
-          while (rs.next()) {
-            results.add(rs.getString(1));
-          }
-          return results;
-        } finally {
-          rs.close();
+        Set<String> results = Sets.newHashSet();
+        while (rs.next()) {
+          results.add(rs.getString(1));
         }
+        return results;
       } finally {
-        statement.close();
+        rs.close();
       }
     } finally {
       statement.close();
