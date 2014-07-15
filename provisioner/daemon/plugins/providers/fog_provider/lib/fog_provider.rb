@@ -67,7 +67,7 @@ class FogProvider < Provider
     log.debug 'Waiting for sshd'
     i = 0
     begin
-      until tcp_test_port(bootstrap_ip, 22) {
+      until tcp_test_port(@bootstrap_ip, 22) {
         sleep @initial_sleep_delay ||= 10
         i += 1
         if i == 60
@@ -75,7 +75,6 @@ class FogProvider < Provider
         end
       }
       end
-      log.info "Server #{server.name} sshd is up"
     end
   end
 

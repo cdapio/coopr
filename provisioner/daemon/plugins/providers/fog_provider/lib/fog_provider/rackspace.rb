@@ -79,21 +79,22 @@ class FogProviderRackspace < FogProvider
         log.error 'Timeout waiting for the server to be created'
       end
 
-      bootstrap_ip = ip_address(server, 'public')
-      if bootstrap_ip.nil?
+      @bootstrap_ip = ip_address(server, 'public')
+      if @bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
         exit 1
       else
-        log.debug "Bootstrap IP address #{bootstrap_ip}"
+        log.debug "Bootstrap IP address #{@bootstrap_ip}"
       end
 
       wait_for_sshd
+      log.info "Server #{server.name} sshd is up"
 
       # Process results
-      @result['result']['ipaddress'] = bootstrap_ip
+      @result['result']['ipaddress'] = @bootstrap_ip
       # Additional checks
       log.debug 'Confirming sshd is up'
-      tcp_test_port(@result['result']['ipaddress'], 22) { sleep 5 }
+      tcp_test_port(@bootstrap_ip, 22) { sleep 5 }
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
       Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
