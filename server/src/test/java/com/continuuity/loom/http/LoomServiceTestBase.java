@@ -20,6 +20,7 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.QueueGroup;
+import com.continuuity.loom.common.queue.internal.ElementsTrackingQueue;
 import com.continuuity.loom.http.handler.LoomService;
 import com.continuuity.loom.scheduler.JobScheduler;
 import com.continuuity.loom.scheduler.Scheduler;
@@ -71,6 +72,7 @@ public class LoomServiceTestBase extends BaseTest {
   };
   private static int port;
   protected static LoomService loomService;
+  protected static ElementsTrackingQueue balancerQueue;
   protected static QueueGroup provisionerQueues;
   protected static QueueGroup clusterQueues;
   protected static QueueGroup solverQueues;
@@ -82,6 +84,8 @@ public class LoomServiceTestBase extends BaseTest {
 
   @BeforeClass
   public static void setupServiceBase() throws Exception {
+    balancerQueue = injector.getInstance(
+      Key.get(ElementsTrackingQueue.class, Names.named(Constants.Queue.WORKER_BALANCE)));
     provisionerQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.PROVISIONER)));
     clusterQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
     solverQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
@@ -115,6 +119,10 @@ public class LoomServiceTestBase extends BaseTest {
     }
 
     return client.execute(get);
+  }
+
+  public static HttpResponse doPut(String resource, String body) throws Exception {
+    return doPut(resource, body, null);
   }
 
   public static HttpResponse doPut(String resource, String body, Header[] headers) throws Exception {

@@ -1,4 +1,4 @@
-package com.continuuity.loom.codec.json;
+package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.google.common.reflect.TypeToken;

@@ -123,6 +123,26 @@ public final class DBQueryExecutor {
   }
 
   /**
+   * Queries for a single number, returning the value of the number or 0 if there are no results.
+   *
+   * @param statement PreparedStatement of the query, ready for execution.
+   * @return Result of the query, or 0 if no results.
+   * @throws SQLException
+   */
+  public static int getNum(PreparedStatement statement) throws SQLException {
+    ResultSet results = statement.executeQuery();
+    try {
+      if (!results.next()) {
+        return 0;
+      } else {
+        return results.getInt(1);
+      }
+    } finally {
+      results.close();
+    }
+  }
+
+  /**
    * Performs the query and returns whether or not there are results.
    *
    * @param statement PreparedStatement of the query, ready for execution.

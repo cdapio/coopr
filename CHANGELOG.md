@@ -3,6 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- Multi Tenancy ( Issues: #239, #253, #277 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 )
 - Sensu monitoring support ( Issues: #167 )
@@ -10,6 +11,7 @@ Unreleased
 - Ability to sync an active cluster's template to its current version ( Issues: #214 )
 - Cluster owner macro ( Issues: #221 )
 - Loom Firewall updates ( Issues: #226 #227 )
+- Include automator and provider types in export and import ( Issues: #246 )
 - Upgrade script ( Issues: #258 )
 
 v0.9.7 (May 27, 2014)

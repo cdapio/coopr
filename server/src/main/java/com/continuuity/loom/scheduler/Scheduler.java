@@ -45,12 +45,15 @@ public class Scheduler extends AbstractIdleService {
 
   private final ScheduledExecutorService executorService;
   private final int schedulerRunInterval;
+  private final int clusterCleanupRunInterval;
+  private final int provisionerCleanupRunInterval;
   private final JobScheduler jobScheduler;
   private final ClusterScheduler clusterScheduler;
   private final SolverScheduler solverScheduler;
   private final CallbackScheduler callbackScheduler;
   private final ClusterCleanup clusterCleanup;
-  private final long clusterCleanupRunInterval;
+  private final WorkerBalanceScheduler workerBalanceScheduler;
+  private final ProvisionerCleanup provisionerCleanup;
   private final Set<ScheduledFuture<?>> scheduledFutures;
   private final LeaderElection leaderElection;
 
@@ -60,22 +63,25 @@ public class Scheduler extends AbstractIdleService {
                     ClusterScheduler clusterScheduler,
                     SolverScheduler solverScheduler,
                     CallbackScheduler callbackScheduler,
+                    WorkerBalanceScheduler workerBalanceScheduler,
+                    ProvisionerCleanup provisionerCleanup,
                     ClusterCleanup clusterCleanup,
                     ZKClient zkClient) {
-    int schedulerRunInterval = conf.getInt(Constants.SCHEDULER_INTERVAL_SECS);
-    long clusterCleanupRunInterval = conf.getLong(Constants.CLUSTER_CLEANUP_SECS);
+    this.schedulerRunInterval = conf.getInt(Constants.SCHEDULER_INTERVAL_SECS);
+    this.clusterCleanupRunInterval = conf.getInt(Constants.CLUSTER_CLEANUP_SECS);
+    this.provisionerCleanupRunInterval = conf.getInt(Constants.PROVISIONER_TIMEOUT_CHECK_INTERVAL_SECS);
     this.executorService = Executors.newScheduledThreadPool(5,
                                                             new ThreadFactoryBuilder()
                                                               .setNameFormat("scheduler-%d")
                                                               .build());
-    this.schedulerRunInterval = schedulerRunInterval;
-    this.clusterCleanupRunInterval = clusterCleanupRunInterval;
     this.jobScheduler = jobScheduler;
     this.clusterScheduler = clusterScheduler;
     this.solverScheduler = solverScheduler;
     this.callbackScheduler = callbackScheduler;
+    this.workerBalanceScheduler = workerBalanceScheduler;
     this.clusterCleanup = clusterCleanup;
     this.scheduledFutures = Sets.newHashSet();
+    this.provisionerCleanup = provisionerCleanup;
 
     this.leaderElection = new LeaderElection(zkClient, "/server-election", new ElectionHandler() {
       private final ExecutorService executor = Executors.newSingleThreadExecutor(
@@ -119,6 +125,7 @@ public class Scheduler extends AbstractIdleService {
   }
 
   private void schedule() {
+
     LOG.info("Scheduling cluster scheduler every {} secs...", schedulerRunInterval);
     scheduledFutures.add(
       executorService.scheduleAtFixedRate(clusterScheduler, 1, schedulerRunInterval, TimeUnit.SECONDS)
@@ -139,9 +146,22 @@ public class Scheduler extends AbstractIdleService {
       executorService.scheduleAtFixedRate(callbackScheduler, 1, schedulerRunInterval, TimeUnit.SECONDS)
     );
 
+    LOG.info("Scheduling worker balancer every {} secs...", schedulerRunInterval);
+    scheduledFutures.add(
+      executorService.scheduleAtFixedRate(workerBalanceScheduler, 1, schedulerRunInterval, TimeUnit.SECONDS)
+    );
+
     LOG.info("Scheduling cluster cleanup every {} secs...", clusterCleanupRunInterval);
     scheduledFutures.add(
       executorService.scheduleAtFixedRate(clusterCleanup, 10, clusterCleanupRunInterval, TimeUnit.SECONDS)
+    );
+
+    LOG.info("Scheduling provisioner cleanup every {} secs...", provisionerCleanupRunInterval);
+    // if the server was down for a while, we don't want to time out provisioners right away but want to
+    // give them a chance to get their heartbeats in.  So wait for a while before starting the timeout logic.
+    scheduledFutures.add(
+      executorService.scheduleAtFixedRate(provisionerCleanup, provisionerCleanupRunInterval,
+                                          provisionerCleanupRunInterval, TimeUnit.SECONDS)
     );
   }
 

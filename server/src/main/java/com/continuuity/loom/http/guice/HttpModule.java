@@ -3,10 +3,11 @@ package com.continuuity.loom.http.guice;
 import com.continuuity.http.HttpHandler;
 import com.continuuity.loom.http.handler.LoomAdminHandler;
 import com.continuuity.loom.http.handler.LoomClusterHandler;
+import com.continuuity.loom.http.handler.LoomProvisionerHandler;
 import com.continuuity.loom.http.handler.LoomRPCHandler;
 import com.continuuity.loom.http.handler.LoomStatusHandler;
+import com.continuuity.loom.http.handler.LoomSuperadminHandler;
 import com.continuuity.loom.http.handler.LoomTaskHandler;
-import com.continuuity.loom.http.handler.LoomTenantHandler;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 
@@ -24,6 +25,7 @@ public class HttpModule extends AbstractModule {
     handlerBinder.addBinding().to(LoomTaskHandler.class);
     handlerBinder.addBinding().to(LoomStatusHandler.class);
     handlerBinder.addBinding().to(LoomRPCHandler.class);
-    handlerBinder.addBinding().to(LoomTenantHandler.class);
+    handlerBinder.addBinding().to(LoomSuperadminHandler.class);
+    handlerBinder.addBinding().to(LoomProvisionerHandler.class);
   }
 }

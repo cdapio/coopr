@@ -114,3 +114,24 @@ CREATE TABLE IF NOT EXISTS clusterTemplates (
     clusterTemplate MEDIUMBLOB,
     PRIMARY KEY (tenant_id, name)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS provisioners (
+    id VARCHAR(255),
+    last_heartbeat TIMESTAMP,
+    capacity_total INTEGER,
+    capacity_free INTEGER,
+    provisioner MEDIUMBLOB,
+    PRIMARY KEY (id),
+    INDEX heartbeat_index (last_heartbeat),
+    INDEX capacity_index (capacity_free)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS provisionerWorkers (
+    provisioner_id VARCHAR(255),
+    tenant_id VARCHAR(255),
+    num_assigned INTEGER,
+    num_live INTEGER,
+    PRIMARY KEY (provisioner_id, tenant_id),
+    INDEX tenant_index (tenant_id),
+    INDEX assigned_index (num_assigned)
+) ENGINE = InnoDB;

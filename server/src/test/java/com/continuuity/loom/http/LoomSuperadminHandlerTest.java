@@ -16,7 +16,11 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.provisioner.Provisioner;
+import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
 import com.continuuity.loom.store.tenant.SQLTenantStore;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -24,8 +28,10 @@ import org.apache.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.SQLException;
@@ -35,11 +41,21 @@ import java.util.UUID;
 /**
  *
  */
-public class LoomTenantHandlerTest extends LoomServiceTestBase {
+public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
+  private static TenantProvisionerService tenantProvisionerService;
+
+  @BeforeClass
+  public static void setupTestClass() {
+    tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
+  }
 
   @Before
-  public void clearData() throws SQLException {
+  public void clearData() throws SQLException, IOException {
     ((SQLTenantStore) tenantStore).clearData();
+    ((SQLProvisionerStore) provisionerStore).clearData();
+    tenantProvisionerService.writeProvisioner(
+      new Provisioner("p1", "host", 12345, 100, ImmutableMap.<String, Integer>of(), ImmutableMap.<String, Integer>of())
+    );
   }
 
   @Test
@@ -70,13 +86,22 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
+  public void testCreateTenantWithTooManyWorkersReturnsConflict() throws Exception {
+    Tenant requestedTenant = new Tenant("companyX", null, 10000, 100, 1000);
+    HttpResponse response = doPost("/v1/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS);
+
+    // perform create request
+    assertResponseStatus(response, HttpResponseStatus.CONFLICT);
+  }
+
+  @Test
   public void testWriteTenant() throws Exception {
     // write tenant to store
     String id = UUID.randomUUID().toString();
     Tenant actualTenant = new Tenant("companyX", id, 10, 100, 1000);
     tenantStore.writeTenant(actualTenant);
 
-    // perform request to delete tenant
+    // perform request to write tenant
     Tenant updatedTenant = new Tenant("companyX", id, 10, 100, 500);
     HttpResponse response = doPut("/v1/tenants/" + id, gson.toJson(updatedTenant), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -85,17 +110,38 @@ public class LoomTenantHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
-  public void testDeleteTenant() throws Exception {
+  public void testWriteTenantWithTooManyWorkersReturnsConflict() throws Exception {
     // write tenant to store
     String id = UUID.randomUUID().toString();
     Tenant actualTenant = new Tenant("companyX", id, 10, 100, 1000);
     tenantStore.writeTenant(actualTenant);
 
+    // perform request to write tenant
+    Tenant updatedTenant = new Tenant("companyX", id, 100000, 100, 500);
+    HttpResponse response = doPut("/v1/tenants/" + id, gson.toJson(updatedTenant), SUPERADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.CONFLICT);
+  }
+
+  @Test
+  public void testDeleteTenant() throws Exception {
+    String id = UUID.randomUUID().toString();
+    tenantProvisionerService.writeTenant(new Tenant("companyX", id, 0, 100, 1000));
+
     // perform request to delete tenant
     HttpResponse response = doDelete("/v1/tenants/" + id, SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
-    Assert.assertNull(tenantStore.getTenant(actualTenant.getId()));
+    Assert.assertNull(tenantStore.getTenant(id));
+  }
+
+  @Test
+  public void testDeleteTenantWithNonzeroWorkersFails() throws Exception {
+    String id = UUID.randomUUID().toString();
+    tenantProvisionerService.writeTenant(new Tenant("companyX", id, 10, 100, 1000));
+    tenantProvisionerService.rebalanceTenantWorkers(id);
+
+    // perform request to delete tenant
+    assertResponseStatus(doDelete("/v1/tenants/" + id, SUPERADMIN_HEADERS), HttpResponseStatus.CONFLICT);
   }
 
   @Test

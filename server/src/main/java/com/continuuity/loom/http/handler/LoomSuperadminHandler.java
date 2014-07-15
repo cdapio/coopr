@@ -18,6 +18,9 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.provisioner.CapacityException;
+import com.continuuity.loom.provisioner.Provisioner;
+import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
@@ -43,18 +46,18 @@ import java.util.UUID;
 /**
  * Handler for performing tenant operations.
  */
-@Path("/v1/tenants")
-public class LoomTenantHandler extends LoomAuthHandler {
-  private static final Logger LOG  = LoggerFactory.getLogger(LoomTenantHandler.class);
+@Path("/v1")
+public class LoomSuperadminHandler extends LoomAuthHandler {
+  private static final Logger LOG  = LoggerFactory.getLogger(LoomSuperadminHandler.class);
 
   private final Gson gson;
-  private final TenantStore store;
+  private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
-  private LoomTenantHandler(TenantStore store, Gson gson) {
+  private LoomSuperadminHandler(TenantStore store, TenantProvisionerService tenantProvisionerService, Gson gson) {
     super(store);
-    this.store = store;
     this.gson = gson;
+    this.tenantProvisionerService = tenantProvisionerService;
   }
 
   /**
@@ -64,6 +67,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
    * @param responder Responder for sending the response.
    */
   @GET
+  @Path("/tenants")
   public void getAllTenants(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
@@ -75,7 +79,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
     }
 
     try {
-      responder.sendJson(HttpResponseStatus.OK, store.getAllTenants());
+      responder.sendJson(HttpResponseStatus.OK, tenantProvisionerService.getAllTenants());
     } catch (IOException e) {
       LOG.error("Exception while getting all tenants.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting all tenants.");
@@ -90,7 +94,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
    * @param tenantId Id of the tenant to get.
    */
   @GET
-  @Path("/{tenant-id}")
+  @Path("/tenants/{tenant-id}")
   public void getTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
@@ -102,7 +106,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
     }
 
     try {
-      Tenant tenant = store.getTenant(tenantId);
+      Tenant tenant = tenantProvisionerService.getTenant(tenantId);
       if (tenant == null) {
         responder.sendError(HttpResponseStatus.NOT_FOUND, "tenant " + tenantId + " not found");
         return;
@@ -121,6 +125,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
    * @param responder Responder for sending the response.
    */
   @POST
+  @Path("/tenants")
   public void createTenant(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
@@ -156,11 +161,14 @@ public class LoomTenantHandler extends LoomAuthHandler {
     try {
       Tenant tenant = new Tenant(requestedTenant.getName(), UUID.randomUUID().toString(), requestedTenant.getWorkers(),
                                  requestedTenant.getMaxClusters(), requestedTenant.getMaxNodes());
-      store.writeTenant(tenant);
+      tenantProvisionerService.writeTenant(tenant);
       responder.sendJson(HttpResponseStatus.OK, ImmutableMap.<String, String>of("id", tenant.getId()));
     } catch (IOException e) {
       LOG.error("Exception adding tenant.", e);
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding tenant");
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding tenant.");
+    } catch (CapacityException e) {
+      LOG.info("Could not add tenant due to lack of free workers.", e);
+      responder.sendError(HttpResponseStatus.CONFLICT, "Not enough capacity to add tenant.");
     }
   }
 
@@ -172,7 +180,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
    * @param tenantId Id of the tenant to write.
    */
   @PUT
-  @Path("/{tenant-id}")
+  @Path("/tenants/{tenant-id}")
   public void writeTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
@@ -207,13 +215,14 @@ public class LoomTenantHandler extends LoomAuthHandler {
     }
 
     try {
-      // TODO: validate that there is enough overall capacity to accomodate this request
-      store.writeTenant(tenant);
-      // TODO: send requests to add/remove tenant workers from provisioners
+      tenantProvisionerService.writeTenant(tenant);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       LOG.error("Exception while setting workers for tenant {}", tenantId);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception setting tenant workers.");
+    } catch (CapacityException e) {
+      LOG.error("Could not edit tenant {} due to lack of free workers.", tenantId, e);
+      responder.sendError(HttpResponseStatus.CONFLICT, "Not enough capacity to update tenant.");
     }
   }
 
@@ -225,7 +234,7 @@ public class LoomTenantHandler extends LoomAuthHandler {
    * @param tenantId Id of the tenant to delete.
    */
   @DELETE
-  @Path("/{tenant-id}")
+  @Path("/tenants/{tenant-id}")
   public void deleteTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
@@ -237,11 +246,72 @@ public class LoomTenantHandler extends LoomAuthHandler {
     }
 
     try {
-      store.deleteTenant(tenantId);
+      tenantProvisionerService.deleteTenant(tenantId);
       responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT, e.getMessage());
     } catch (IOException e) {
       LOG.error("Exception while deleting tenant {}", tenantId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while deleting tenant " + tenantId);
+    }
+  }
+
+  /**
+   * Get the specified provisioner.
+   *
+   * @param request Request to get a provisioner.
+   * @param responder Responder for sending the response.
+   * @param provisionerId Id of the provisioner to get.
+   */
+  @GET
+  @Path("/provisioners/{provisioner-id}")
+  public void getProvisioner(HttpRequest request, HttpResponder responder,
+                             @PathParam("provisioner-id") String provisionerId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isSuperadmin()) {
+      responder.sendStatus(HttpResponseStatus.FORBIDDEN);
+      return;
+    }
+
+    try {
+      Provisioner provisioner = tenantProvisionerService.getProvisioner(provisionerId);
+      if (provisioner == null) {
+        responder.sendError(HttpResponseStatus.NOT_FOUND, "Provisioner " + provisionerId + " not found.");
+      } else {
+        responder.sendJson(HttpResponseStatus.OK, provisioner);
+      }
+    } catch (IOException e) {
+      LOG.error("Exception while getting provisioners", e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while getting provisioners");
+    }
+  }
+
+  /**
+   * Get all provisioners in the system.
+   *
+   * @param request Request to get all provisioners.
+   * @param responder Responder for sending the response.
+   */
+  @GET
+  @Path("/provisioners")
+  public void getProvisioners(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isSuperadmin()) {
+      responder.sendStatus(HttpResponseStatus.FORBIDDEN);
+      return;
+    }
+
+    try {
+      responder.sendJson(HttpResponseStatus.OK, tenantProvisionerService.getAllProvisioners());
+    } catch (IOException e) {
+      LOG.error("Exception while getting provisioners", e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while getting provisioners");
     }
   }
 }

@@ -82,7 +82,7 @@ public class ClusterService {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
-    this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
+    this.zkClient = ZKClients.namespace(zkClient, Constants.CLUSTER_LOCK_NAMESPACE);
     this.loomStats = loomStats;
     this.solver = solver;
     this.idService = idService;

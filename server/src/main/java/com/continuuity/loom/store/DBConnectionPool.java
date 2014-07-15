@@ -109,12 +109,25 @@ public class DBConnectionPool {
   }
 
   /**
-   * Get a {@link Connection} from the pool.
+   * Get a {@link Connection} from the pool with auto commit on.
    *
-   * @return Connection from the pool.
+   * @return Connection from the pool with autocommit.
    * @throws SQLException
    */
   public Connection getConnection() throws SQLException {
-    return datasource.getConnection();
+    return getConnection(true);
+  }
+
+  /**
+   * Get a {@link Connection} from the pool with auto commit set to the given value.
+   *
+   * @param autoCommit Whether or not autoCommit should be set.
+   * @return Connection from the pool.
+   * @throws SQLException
+   */
+  public Connection getConnection(boolean autoCommit) throws SQLException {
+    Connection conn = datasource.getConnection();
+    conn.setAutoCommit(autoCommit);
+    return conn;
   }
 }
