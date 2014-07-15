@@ -31,6 +31,7 @@ class FogProviderRackspace < FogProvider
         instance_variable_set('@' + k, v)
       end
       # Create the server
+      log.info "Creating #{hostname} on Rackspace using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
       begin
         server = connection.servers.create(
@@ -82,12 +83,11 @@ class FogProviderRackspace < FogProvider
       @bootstrap_ip = ip_address(server, 'public')
       if @bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
-        exit 1
       else
         log.debug "Bootstrap IP address #{@bootstrap_ip}"
       end
 
-      wait_for_sshd
+      wait_for_sshd(@bootstrap_ip, 22)
       log.info "Server #{server.name} sshd is up"
 
       # Process results

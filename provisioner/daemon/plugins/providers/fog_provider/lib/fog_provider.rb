@@ -63,11 +63,11 @@ class FogProvider < Provider
     tcp_socket && tcp_socket.close
   end
 
-  def wait_for_sshd
+  def wait_for_sshd(hostname, port)
     log.debug 'Waiting for sshd'
     i = 0
     begin
-      until tcp_test_port(@bootstrap_ip, 22) {
+      until tcp_test_port(hostname, port) {
         sleep @initial_sleep_delay ||= 10
         i += 1
         if i == 60
