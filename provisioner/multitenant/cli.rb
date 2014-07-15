@@ -32,7 +32,7 @@ module Loom
         opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do
           options[:register] = true
         end
-      end.parse!
+      end.parse!(arguments)
 
       if !options[:uri] && !options[:file]
         puts 'Either URI for loom server or --file must be specified'
