@@ -283,10 +283,10 @@ public abstract class QueueGroupTest {
     Assert.assertNull(queues.take("consumer"));
   }
 
-  @Test(timeout = 20000)
+  @Test(timeout = 30000)
   public void testConcurrentAddAndTake() throws InterruptedException {
     final QueueGroup queues = getQueueGroup(QueueType.PROVISIONER);
-    final int addsPerThread = 20;
+    final int addsPerThread = 10;
     final int numProducerThreads = 20;
     final int expectedNumElements = addsPerThread * numProducerThreads;
     final int numConsumerThreads = 5;
