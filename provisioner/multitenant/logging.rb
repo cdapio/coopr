@@ -44,7 +44,7 @@ module Logging
         #puts "**** creating new logger to #{@out}"
         @logger = ::Logger.new(@out, 'daily')
       else
-        #puts "**** creating new logger to STDOUT"
+       # puts "**** creating new logger to STDOUT"
         @logger = ::Logger.new(STDOUT)
       end
       @logger.level = @level
