@@ -2,8 +2,9 @@ package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 
 import java.sql.Connection;
@@ -14,11 +15,13 @@ import java.sql.Statement;
  * Implementation of {@link EntityStoreService} that provides views of the entity store backed by a SQL database.
  */
 public class SQLEntityStoreService extends AbstractIdleService implements EntityStoreService {
-  private DBConnectionPool dbConnectionPool;
+  private final DBConnectionPool dbConnectionPool;
+  private final Gson gson;
 
   @Inject
-  public SQLEntityStoreService(DBConnectionPool dbConnectionPool) {
+  public SQLEntityStoreService(DBConnectionPool dbConnectionPool, Gson gson) {
     this.dbConnectionPool = dbConnectionPool;
+    this.gson = gson;
   }
 
   // for unit tests only
@@ -45,8 +48,8 @@ public class SQLEntityStoreService extends AbstractIdleService implements Entity
         String entityName = entityType.getId();
         // immune to sql injection since it comes from the enum
         String createString = "CREATE TABLE " + entityName +
-          "s ( name VARCHAR(255), tenant_id VARCHAR(255), " + entityName + " BLOB )";
-        DBQueryHelper.createDerbyTable(createString, dbConnectionPool);
+          "s ( name VARCHAR(255), tenant_id VARCHAR(255), " + entityName + " BLOB, PRIMARY KEY (tenant_id, name))";
+        DBHelper.createDerbyTableIfNotExists(createString, dbConnectionPool);
       }
     }
   }
@@ -59,9 +62,9 @@ public class SQLEntityStoreService extends AbstractIdleService implements Entity
   @Override
   public EntityStoreView getView(Account account) {
     if (account.isAdmin()) {
-      return new SQLAdminEntityStoreView(account, dbConnectionPool);
+      return new SQLAdminEntityStoreView(account, dbConnectionPool, gson);
     } else {
-      return new SQLUserEntityStoreView(account, dbConnectionPool);
+      return new SQLUserEntityStoreView(account, dbConnectionPool, gson);
     }
   }
 }

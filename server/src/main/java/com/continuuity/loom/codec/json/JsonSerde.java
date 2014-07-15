@@ -15,32 +15,7 @@
  */
 package com.continuuity.loom.codec.json;
 
-import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.FieldSchema;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.LeaseDuration;
-import com.continuuity.loom.admin.ParametersSpecification;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
-import com.continuuity.loom.admin.ServiceConstraint;
-import com.continuuity.loom.admin.ServiceDependencies;
-import com.continuuity.loom.admin.ServiceStageDependencies;
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.cluster.Cluster;
-import com.continuuity.loom.http.request.AddServicesRequest;
-import com.continuuity.loom.http.request.ClusterConfigureRequest;
-import com.continuuity.loom.layout.ClusterCreateRequest;
-import com.google.common.base.Charsets;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -48,38 +23,7 @@ import java.lang.reflect.Type;
 /**
  * Class for serializing and deserializing objects to/from json, using gson.
  */
-public class JsonSerde {
-  private final Gson gson;
-
-  public JsonSerde() {
-    gson = new GsonBuilder()
-      .registerTypeAdapter(AddServicesRequest.class, new AddServicesRequestCodec())
-      .registerTypeAdapter(Administration.class, new AdministrationCodec())
-      .registerTypeAdapter(AutomatorType.class, new AutomatorTypeCodec())
-      .registerTypeAdapter(Cluster.class, new ClusterCodec())
-      .registerTypeAdapter(ClusterConfigureRequest.class, new ClusterConfigureRequestCodec())
-      .registerTypeAdapter(ClusterCreateRequest.class, new ClusterCreateRequestCodec())
-      .registerTypeAdapter(ClusterDefaults.class, new ClusterDefaultsCodec())
-      .registerTypeAdapter(ClusterTemplate.class, new ClusterTemplateCodec())
-      .registerTypeAdapter(Constraints.class, new ConstraintsCodec())
-      .registerTypeAdapter(FieldSchema.class, new FieldSchemaCodec())
-      .registerTypeAdapter(HardwareType.class, new HardwareTypeCodec())
-      .registerTypeAdapter(ImageType.class, new ImageTypeCodec())
-      .registerTypeAdapter(LayoutConstraint.class, new LayoutConstraintCodec())
-      .registerTypeAdapter(LeaseDuration.class, new LeaseDurationCodec())
-      .registerTypeAdapter(ParametersSpecification.class, new ParametersSpecificationCodec())
-      .registerTypeAdapter(Provider.class, new ProviderCodec())
-      .registerTypeAdapter(ProviderType.class, new ProviderTypeCodec())
-      .registerTypeAdapter(Service.class, new ServiceCodec())
-      .registerTypeAdapter(ServiceAction.class, new ServiceActionCodec())
-      .registerTypeAdapter(ServiceConstraint.class, new ServiceConstraintCodec())
-      .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
-      .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
-      .registerTypeAdapter(Tenant.class, new TenantCodec())
-      .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
-      .enableComplexMapKeySerialization()
-      .create();
-  }
+public interface JsonSerde {
 
   /**
    * Serialize the object of specified type.
@@ -89,9 +33,7 @@ public class JsonSerde {
    * @param <T> Object class.
    * @return serialized object.
    */
-  public <T> byte[] serialize(T object, Type type) {
-    return gson.toJson(object, type).getBytes(Charsets.UTF_8);
-  }
+  public <T> byte[] serialize(T object, Type type);
 
   /**
    * Deserialize an object given a reader for the object and the type of the object.
@@ -101,10 +43,7 @@ public class JsonSerde {
    * @param <T> Object class.
    * @return deserialized object.
    */
-  public <T> T deserialize(Reader reader, Type type) {
-    return gson.fromJson(reader, type);
-  }
-
+  public <T> T deserialize(Reader reader, Type type);
   /**
    * Deserialize an object given the object as a byte array and the type of the object.
    *
@@ -113,16 +52,12 @@ public class JsonSerde {
    * @param <T> Object class.
    * @return deserialized object.
    */
-  public <T> T deserialize(byte[] bytes, Type type) {
-    return gson.fromJson(new String(bytes, Charsets.UTF_8), type);
-  }
+  public <T> T deserialize(byte[] bytes, Type type);
 
   /**
    * Get the Gson used for serialization and deserialization.
    *
    * @return Gson used for serialization and deserialization.
    */
-  public Gson getGson() {
-    return gson;
-  }
+  public Gson getGson();
 }

@@ -17,26 +17,17 @@ package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Implementation of {@link com.continuuity.loom.store.entity.BaseEntityStoreView} from the view of a tenant user.
  */
 public class SQLUserEntityStoreView extends BaseSQLEntityStoreView {
 
-  SQLUserEntityStoreView(Account account, DBConnectionPool dbConnectionPool) {
-    super(account, dbConnectionPool);
+  SQLUserEntityStoreView(Account account, DBConnectionPool dbConnectionPool, Gson gson) {
+    super(account, dbConnectionPool, gson);
   }
 
   @Override

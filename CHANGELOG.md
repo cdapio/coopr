@@ -10,6 +10,7 @@ Unreleased
 - Ability to sync an active cluster's template to its current version ( Issues: #214 )
 - Cluster owner macro ( Issues: #221 )
 - Loom Firewall updates ( Issues: #226 #227 )
+- Upgrade script ( Issues: #258 )
 
 v0.9.7 (May 27, 2014)
 ---------------------

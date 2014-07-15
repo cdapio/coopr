@@ -2,7 +2,9 @@ package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBQueryExecutor;
+import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
@@ -14,8 +16,8 @@ import java.sql.SQLException;
  */
 public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
 
-  public SQLSystemClusterStoreView(DBConnectionPool dbConnectionPool) {
-    super(dbConnectionPool);
+  public SQLSystemClusterStoreView(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor) {
+    super(dbConnectionPool, dbQueryExecutor);
   }
 
   @Override
@@ -46,7 +48,7 @@ public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
     statement.setString(2, cluster.getAccount().getUserId());
     statement.setString(3, cluster.getAccount().getTenantId());
     statement.setString(4, cluster.getStatus().name());
-    statement.setTimestamp(5, DBQueryHelper.getTimestamp(cluster.getExpireTime()));
+    statement.setTimestamp(5, DBHelper.getTimestamp(cluster.getExpireTime()));
     // where clause
     statement.setLong(6, id);
     return statement;

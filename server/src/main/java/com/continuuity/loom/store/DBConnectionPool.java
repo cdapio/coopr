@@ -36,7 +36,7 @@ public class DBConnectionPool {
   private final boolean isEmbeddedDerbyDB;
 
   @Inject
-  public DBConnectionPool(Configuration conf) throws SQLException {
+  private DBConnectionPool(Configuration conf) throws SQLException {
     String driverClass = conf.get(Constants.JDBC_DRIVER);
     String connectionString = conf.get(Constants.JDBC_CONNECTION_STRING);
     String dbUser = conf.get(Constants.DB_USER);

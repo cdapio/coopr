@@ -17,7 +17,6 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.scheduler.task.TaskQueueService;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
@@ -40,13 +39,14 @@ import java.io.Reader;
 @Path("/v1/loom/tasks")
 public final class LoomTaskHandler extends AbstractHttpHandler {
   private static final Logger LOG = LoggerFactory.getLogger(LoomTaskHandler.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
-  private TaskQueueService taskQueueService;
+  private final Gson gson;
+  private final TaskQueueService taskQueueService;
 
   @Inject
-  private LoomTaskHandler(TaskQueueService taskQueueService) {
+  private LoomTaskHandler(TaskQueueService taskQueueService, Gson gson) {
     this.taskQueueService = taskQueueService;
+    this.gson = gson;
   }
 
   /**
@@ -159,6 +159,6 @@ public final class LoomTaskHandler extends AbstractHttpHandler {
 
   private JsonObject getRequestBody(HttpRequest request) {
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    return GSON.fromJson(reader, JsonObject.class);
+    return gson.fromJson(reader, JsonObject.class);
   }
 }

@@ -18,10 +18,9 @@ package com.continuuity.loom.http;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -30,7 +29,6 @@ import com.continuuity.loom.scheduler.task.TaskId;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
@@ -46,7 +44,6 @@ import java.io.Reader;
  *
  */
 public class LoomTaskHandlerTest extends LoomServiceTestBase {
-  private static final Gson GSON = new JsonSerde().getGson();
 
   @Test
   public void testTakeTask() throws Exception {
@@ -57,7 +54,7 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);
-    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), GSON.toJson(clusterTask)));
+    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(clusterTask)));
 
     HttpResponse response = doPost("/v1/loom/tasks/take",
                                    "{ \"workerId\":\"worker1\", \"tenantId\":\"" + tenantId + "\" }");
@@ -82,7 +79,7 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);
 
-    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), GSON.toJson(clusterTask)));
+    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(clusterTask)));
 
     JsonObject responseJson = TestHelper.takeTask(getBaseUrl(), "worker1", tenantId);
     Assert.assertEquals(clusterTask.getTaskId(), responseJson.get("taskId").getAsString());
@@ -131,7 +128,7 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);
-    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), GSON.toJson(clusterTask)));
+    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(clusterTask)));
 
     JsonObject responseJson = TestHelper.takeTask(getBaseUrl(), "worker1", tenantId);
     Assert.assertEquals(clusterTask.getTaskId(), responseJson.get("taskId").getAsString());
@@ -164,6 +161,6 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
 
   private JsonObject getResponseJson(HttpResponse response) throws IOException {
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    return GSON.fromJson(reader, JsonObject.class);
+    return gson.fromJson(reader, JsonObject.class);
   }
 }

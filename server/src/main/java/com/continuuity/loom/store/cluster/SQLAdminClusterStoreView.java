@@ -3,7 +3,8 @@ package com.continuuity.loom.store.cluster;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.base.Preconditions;
 
 import java.io.ByteArrayInputStream;
@@ -18,8 +19,9 @@ import java.sql.SQLException;
 public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
   private final Account account;
 
-  public SQLAdminClusterStoreView(DBConnectionPool dbConnectionPool, Account account) {
-    super(dbConnectionPool);
+  public SQLAdminClusterStoreView(DBConnectionPool dbConnectionPool,
+                                  Account account, DBQueryExecutor dbQueryExecutor) {
+    super(dbConnectionPool, dbQueryExecutor);
     Preconditions.checkArgument(account.isAdmin(), "Cannot create admin view with a non-admin user.");
     this.account = account;
   }
@@ -54,7 +56,7 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
     statement.setString(2, cluster.getAccount().getUserId());
     statement.setString(3, cluster.getAccount().getTenantId());
     statement.setString(4, cluster.getStatus().name());
-    statement.setTimestamp(5, DBQueryHelper.getTimestamp(cluster.getExpireTime()));
+    statement.setTimestamp(5, DBHelper.getTimestamp(cluster.getExpireTime()));
     // where clause
     statement.setLong(6, id);
     statement.setString(7, account.getTenantId());

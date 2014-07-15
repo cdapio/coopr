@@ -15,13 +15,15 @@
  */
 package com.continuuity.test.input;
 
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.test.Constants;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,15 +41,21 @@ import java.util.Set;
 public class ClusterReader {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterReader.class);
 
-  private static final Gson GSON = new JsonSerde().getGson();
   private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   private static final String URI = "/v1/loom/clusters/00000028";
   private static final List<String> KEYS = ImmutableList.of("00000139", "00000138", "00000135");
   private static final String CLUSTER_ID = "00000139";
 
+  private final Gson gson;
+
+  public ClusterReader() {
+    Injector injector = Guice.createInjector(new CodecModules().getModule());
+    gson = injector.getInstance(Gson.class);
+  }
+
   public JsonObject getCluster() throws Exception {
     try {
-      JsonObject clusterDefinition =  GSON.fromJson(readCluster(Constants.CLUSTERDEF_FILE_NAME), JsonObject.class);
+      JsonObject clusterDefinition =  gson.fromJson(readCluster(Constants.CLUSTERDEF_FILE_NAME), JsonObject.class);
       return clusterDefinition.get(CLUSTER_ID).getAsJsonObject();
     } catch (JsonSyntaxException e) {
       LOG.error("Got exception while parsing JSON: ", e);
@@ -57,7 +65,7 @@ public class ClusterReader {
 
   public JsonObject getCreateCluster() throws  Exception {
     try {
-      JsonObject cluster = GSON.fromJson(readCluster(Constants.CLUSTER_CREATE_FILE_NAME), JsonObject.class);
+      JsonObject cluster = gson.fromJson(readCluster(Constants.CLUSTER_CREATE_FILE_NAME), JsonObject.class);
       return cluster;
     } catch (JsonSyntaxException e) {
       LOG.error("Got exception while parsing JSON: ", e);
@@ -69,7 +77,7 @@ public class ClusterReader {
   public Set<TestCluster> getClusters(String status) throws Exception {
     Set<TestCluster> testClusters = Sets.newHashSet();
     try {
-      JsonObject clusters = GSON.fromJson(readCluster(Constants.CLUSTERS_FILE_NAME), JsonObject.class);
+      JsonObject clusters = gson.fromJson(readCluster(Constants.CLUSTERS_FILE_NAME), JsonObject.class);
       for (String key : KEYS) {
         TestCluster cluster = parseCluster(clusters.get(key).getAsJsonObject(), status);
         if (cluster != null) {

@@ -16,15 +16,14 @@
 package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,9 +37,9 @@ import java.util.List;
  */
 public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   private static final Logger LOG  = LoggerFactory.getLogger(SQLTenantStore.class);
-  private static final JsonSerde codec = new JsonSerde();
 
   private final DBConnectionPool dbConnectionPool;
+  private final DBQueryExecutor dbQueryExecutor;
 
   // for unit tests only.  Truncate is not supported in derby.
   public void clearData() throws SQLException {
@@ -58,14 +57,16 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   }
 
   @Inject
-  SQLTenantStore(DBConnectionPool dbConnectionPool) throws SQLException, ClassNotFoundException {
+  SQLTenantStore(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor)
+    throws SQLException, ClassNotFoundException {
     this.dbConnectionPool = dbConnectionPool;
+    this.dbQueryExecutor = dbQueryExecutor;
   }
 
   @Override
   protected void startUp() throws Exception {
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
-      DBQueryHelper.createDerbyTable(
+      DBHelper.createDerbyTableIfNotExists(
         "CREATE TABLE tenants ( id VARCHAR(255), name VARCHAR(255), workers INT, tenant BLOB )", dbConnectionPool);
     }
   }
@@ -83,7 +84,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
         PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants WHERE id=?");
         statement.setString(1, id);
         try {
-          return DBQueryHelper.getQueryItem(statement, Tenant.class);
+          return dbQueryExecutor.getQueryItem(statement, Tenant.class);
         } finally {
           statement.close();
         }
@@ -103,7 +104,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants");
         try {
-          return DBQueryHelper.getQueryList(statement, Tenant.class);
+          return dbQueryExecutor.getQueryList(statement, Tenant.class);
         } finally {
           statement.close();
         }
@@ -132,7 +133,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
               // cluster exists already, perform an update.
               writeStatement = conn.prepareStatement(
                 "UPDATE tenants SET tenant=?, workers=? WHERE id=?");
-              writeStatement.setBlob(1, new ByteArrayInputStream(codec.serialize(tenant, Tenant.class)));
+              writeStatement.setBlob(1, dbQueryExecutor.toByteStream(tenant, Tenant.class));
               writeStatement.setInt(2, tenant.getWorkers());
               writeStatement.setString(3, tenantId);
             } else {
@@ -141,7 +142,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
                 "INSERT INTO tenants (id, workers, tenant) VALUES (?, ?, ?)");
               writeStatement.setString(1, tenantId);
               writeStatement.setInt(2, tenant.getWorkers());
-              writeStatement.setBlob(3, new ByteArrayInputStream(codec.serialize(tenant, Tenant.class)));
+              writeStatement.setBlob(3, dbQueryExecutor.toByteStream(tenant, Tenant.class));
             }
           } finally {
             rs.close();
