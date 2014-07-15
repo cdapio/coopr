@@ -37,9 +37,9 @@ class FogProviderRackspace < FogProvider
           :flavor_id    => flavor,
           :image_id     => image,
           :name         => hostname,
-          :config_drive => false,
-          :keypair      => @rackspace_ssh_keypair if @rackspace_ssh_keypair
+          :config_drive => false
         )
+        # :keypair      => @rackspace_ssh_keypair if @rackspace_ssh_keypair
         server.save
       end
       # Process results
@@ -93,7 +93,7 @@ class FogProviderRackspace < FogProvider
       tcp_test_port(@result['result']['ipaddress'], 22) { sleep 5 }
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
-      Net::SSH.start(instance_result['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+      Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
       end
       # Return 0
@@ -125,7 +125,7 @@ class FogProviderRackspace < FogProvider
         server = self.connection.servers.get(providerid)
         server.destroy
       rescue NoMethodError
-        log.error "Could not locate server '#{id}'"
+        log.warn "Could not locate server '#{providerid}'... skipping"
       end
       # Return 0
       @result['status'] = 0
