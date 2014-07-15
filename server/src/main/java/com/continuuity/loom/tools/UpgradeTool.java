@@ -37,6 +37,7 @@ public class UpgradeTool {
     DBConnectionPool dbConnectionPool = injector.getInstance(DBConnectionPool.class);
     alterTables(dbConnectionPool);
     migrateClusters(clusterStoreService);
+    clusterStoreService.stopAndWait();
   }
 
   private static void migrateClusters(ClusterStoreService clusterStoreService) throws IOException,
