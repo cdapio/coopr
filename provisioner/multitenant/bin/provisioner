@@ -7,4 +7,4 @@ end
 require 'api'
 
 options = Loom::CLI.read
-Loom::ProvisionerApi.run(options)
+Loom::Provisioner.run(options)

@@ -11,271 +11,70 @@ require_relative 'cli'
 require_relative 'logging'
 
 module Loom
-  class ProvisionerApi < Sinatra::Base
-    include Logging
+  class Provisioner
+    class Api < Sinatra::Base
+      include Logging
+      @@provisioner
 
-    attr_accessor :provisioner
+      def self.run_for_provisioner!(provisioner)
+        @@provisioner = provisioner
+        # sinatra blocks
+        run!
+      end
 
-    def initialize()
-#      @logger = Logger.new('/Users/derek/git/loom/provisioner/multitenant/log-api.log')
-      $stdout.sync = true
-      super()
-      puts "initialize called"
-#      $provisioner = Loom::Provisioner.new
-#      spawn_heartbeat_thread
-#      spawn_signal_thread
-      # setup signals here in application scope since we know sinatra has already registered its own
-      self.class.setup_signal_traps
-    end
+      set :logging, false
 
-    def self.run(options)
+      get '/status' do
+        @@provisioner.status
+        body "OK"
+      end
 
-      @@server_uri = options[:uri]
-      register_plugins if options[:register]
+      get '/heartbeat' do
+        log.info "heartbeat called"
+        @@provisioner.heartbeat.to_json
+      end
 
-      Logging.configure(options[:log_file])
-      Logging.level = options[:log_level]
-      Logging.log.info "Loom api starting up"
+      post "/v1/tenants" do
+        log.info "adding tenant"
+        data = JSON.parse request.body.read
+        id = data['id']
+        workers = data['workers']
+        modules = data['modules'] || nil
+        plugins = data['plugins'] || nil
 
-      setup_process if options[:daemonize]
-#      EM::run do
-#      puts "setup traps"
-      setup_signal_traps
-      puts "create provisioner"
-      #$provisioner = Loom::Provisioner.new
-      $provisioner = Loom::Provisioner.new
-      puts "spawn hb"
-      spawn_heartbeat_thread
-      puts "spawn reap"
-      # this may be overriddedn by sinatra initialization, so we call it again in application initialze
-      spawn_signal_thread
-#      register_with_server
-      #configure(options[:log_file])
-      #level = options[:log_level]
-      #Logging.level = 0
+        ts = TenantSpec.new(id, workers, modules, plugins)
+        tm = TenantManager.new(ts)
 
-#      EM::run do
-         #$stdout.sync = true
-         #setup_process if options[:daemonize]
-         Logging.log.info "starting up web-server"
-         # thin directly
-         #Thin::Logging.silent = true
-         # bind_address = '0.0.0.0'
-         # Thin::Server.start(bind_address, '4567', self)
-         # sinatra default
-         run!
-#      end
+        @@provisioner.add_tenant(tm)
 
-      Logging.log.info "after start - does it ever unblock?"
-    #end
+        data['status'] = 0
+        body data.to_json
+      end
 
-      #self.run!
-#      run!
-#      puts "after run!"
+      put "/v1/tenants/:t_id" do
+        log.info "adding/updating tennant id: #{params[:t_id]}"
+        data = JSON.parse request.body.read
+        workers = data['workers'] || 3 # TO DO: replace default with constant
+        log.debug "requesting workers: #{workers}"
+        modules = data['modules'] || nil
+        log.debug "requesting modules: #{modules}"
+        plugins = data['plugins'] || nil
+        log.debug "requesting plugins: #{plugins}"
 
-#      loop {
-#        puts "looping"
-#        sleep 10
-#      }
-    end
+        ts = TenantSpec.new(params[:t_id], workers, modules, plugins)
+        tm = TenantManager.new(ts)
 
-    def self.setup_signal_traps
-      $signals = Array.new
-      ['CLD', 'TERM'].each do |signal|
-        Signal.trap(signal) do
-          $signals << signal
-        end
+        @@provisioner.add_tenant(tm)
+
+        data['status'] = 0
+        body data.to_json
+      end
+
+      delete "/v1/tenants/:t_id" do
+        @@provisioner.delete_tenant(params[:t_id])
+        body "OK"
       end
     end
-
-    def self.spawn_signal_thread
-      Thread.new {
-        Logging.log.info "started signal processing thread"
-        loop {
-          Logging.log.info "reaping #{$signals.size} signals: #{$signals}" unless $signals.empty?
-          #Logging.log.info "reaping #{$signals.size} signals: #{$signals}"
-          signals_processed = {}
-          while !$signals.empty?
-            sig = $signals.shift
-            next if signals_processed.key?(sig)
-            Logging.log.info "processing signal: #{sig}"
-            case sig
-            when 'CLD'
-              $provisioner.verify_tenants
-            when 'TERM'
-              if !@shutting_down
-                @shutting_down = true
-                $provisioner.tenantmanagers.each do |k, v|
-                  v.terminate_all_worker_processes
-                end
-                Process.waitall
-                unregister_from_server
-                Logging.log.info "provisioner shutdown complete"
-                exit
-              end
-            end
-            Logging.log.info "done processing signal #{sig}"
-            signals_processed[sig] = true
-          end
-        sleep 1 
-        }
-      }
-    end
-
-    def self.spawn_heartbeat_thread
-      Thread.new {
-        Logging.log.info "starting heartbeat thread"
-        register_with_server
-        loop {
-          Logging.log.info "hbt: #{$provisioner.heartbeat.to_json}"
-          uri = "#{@@server_uri}/v1/provisioners/#{$provisioner.provisioner_id}/heartbeat"
-          begin
-            Logging.log.debug "sending heartbeat to #{uri}"
-            json = $provisioner.heartbeat.to_json
-            resp = RestClient.post("#{uri}", json, :'X-Loom-UserID' => "admin")
-            if(resp.code == 200)
-              Logging.log.debug "Successfully sent heartbeat"
-            elsif(resp.code == 404)
-              Logging.log.warn "Response code #{resp.code} when sending heartbeat, re-registering provisioner"
-              register_with_server
-            else
-              Logging.log.warn "Response code #{resp.code}, #{resp.to_str} when sending heartbeat to loom server #{uri}"
-            end
-          rescue => e
-            Logging.log.error "Caught exception sending heartbeat to loom server #{uri}: #{e.message}"
-            #log.error e.message
-            #log.error e.backtrace.inspect
-          end
-          sleep 10 
-        }
-      }
-    end
-
-    def self.register_with_server
-      uri = "#{@@server_uri}/v1/provisioners/#{$provisioner.provisioner_id}"
-      data = {}
-      data['id'] = $provisioner.provisioner_id
-      data['capacityTotal'] = '100'
-      data['host'] = '127.0.0.1'
-      data['port'] = '4567'
-      
-      Logging.log.info "Registering with server at #{uri}: #{data.to_json}"
-
-      begin
-        resp = RestClient.put("#{uri}", data.to_json, :'X-Loom-UserID' => "admin")
-        if(resp.code == 200)
-          Logging.log.info "Successfully registered"
-        else
-          Logging.log.warn "Response code #{resp.code}, #{resp.to_str} when registering with loom server #{uri}"
-        end
-      rescue => e
-        Logging.log.error "Caught exception when registering with loom server #{uri}: #{e.message}"
-        #log.error e.message
-        #log.error e.backtrace.inspect
-      end
-    end
-
-    # this is temporary
-    def self.register_plugins
-      exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../daemon/provisioner.rb --uri #{@@server_uri} --register")
-    end
-
-    def self.unregister_from_server
-      uri = "#{@@server_uri}/v1/provisioners/#{$provisioner.provisioner_id}"
-      Logging.log.info "Unregistering with server at #{uri}"
-      begin
-        resp = RestClient.delete("#{uri}", :'X-Loom-UserID' => "admin")
-        if(resp.code == 200)
-          Logging.log.info "Successfully unregistered"
-        else
-          Logging.log.warn "Response code #{resp.code}, #{resp.to_str} when unregistering with loom server #{uri}"
-        end
-      rescue => e
-        Logging.log.error "Caught exception when unregistering with loom server #{uri}: #{e.message}"
-        #log.error e.message
-        #log.error e.backtrace.inspect
-      end
-    end
-
-    # start sinatra endpoint definition
-    get '/hi' do
-      "Hello World!"
-    end
-
-    get '/hello/:name' do
-      # matches "GET /hello/foo" and "GET /hello/bar"
-      # params[:name] is 'foo' or 'bar'
-      "Hello #{params[:name]}!"
-    end
-
-    get '/status' do
-      $provisioner.status
-      body "OK"
-    end
-
-    get '/heartbeat' do
-      log.info "heartbeat called"
-      $provisioner.heartbeat.to_json
-    end
-
-    post "/v1/tenants" do
-      log.info "adding tenant"
-      data = JSON.parse request.body.read
-      id = data['id']
-      workers = data['workers']
-      modules = data['modules'] || nil
-      plugins = data['plugins'] || nil
-
-      ts = TenantSpec.new(id, workers, modules, plugins)
-      tm = TenantManager.new(ts)
-
-      $provisioner.add_tenant(tm)
-
-      data['status'] = 0
-      body data.to_json
-    end
-
-    put "/v1/tenants/:t_id" do
-      log.info "adding/updating tennant id: #{params[:t_id]}"
-      data = JSON.parse request.body.read 
-      workers = data['workers'] || 3 # TO DO: replace default with constant
-      log.debug "requesting workers: #{workers}"
-      modules = data['modules'] || nil
-      log.debug "requesting modules: #{modules}"
-      plugins = data['plugins'] || nil
-      log.debug "requesting plugins: #{plugins}"
-
-      ts = TenantSpec.new(params[:t_id], workers, modules, plugins)
-      tm = TenantManager.new(ts)
-
-      $provisioner.add_tenant(tm)
-#      provisioner = provisioner.getinstance
-#      provisioner.add_tenant(tm)
-
-#      tm.spawn
-
-      data['status'] = 0
-
-      #data = JSON.parse(params[:data])
-      body data.to_json
-    end
-
-    delete "/v1/tenants/:t_id" do
-      $provisioner.delete_tenant(params[:t_id])
-      body "OK"
-    end
-
-    def self.setup_process
-      Process.daemon
-    #  process = Process.new
-    #  if @options[:daemonize]
-    #    process.daemonize
-    #  end
-    end
-
-
-    # replace with start script
-    run! if app_file == $0
   end
 end
 
