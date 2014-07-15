@@ -20,13 +20,13 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
@@ -107,12 +107,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       try {
         PreparedStatement statement = getClusterExistsStatement(conn, clusterNum);
         try {
-          ResultSet rs = statement.executeQuery();
-          try {
-            return rs.next();
-          } finally {
-            rs.close();
-          }
+          return dbQueryExecutor.hasResults(statement);
         } finally {
           statement.close();
         }
@@ -130,25 +125,12 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       throw new IllegalAccessException("Not allowed to write cluster " + cluster.getId());
     }
     long clusterNum = Long.parseLong(cluster.getId());
-    // sticking with standard sql... this could be done in one step with replace, or with
-    // insert ... on duplicate key update with mysql.
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement writeStatement;
         ByteArrayInputStream clusterBytes = dbQueryExecutor.toByteStream(cluster, Cluster.class);
-        if (clusterExists(cluster.getId())) {
-          writeStatement = getSetClusterStatement(conn, clusterNum, cluster, clusterBytes);
-        } else {
-          writeStatement = getInsertClusterStatement(conn, clusterNum, cluster, clusterBytes);
-        }
-
-        // perform the update or insert
-        try {
-          writeStatement.executeUpdate();
-        } finally {
-          writeStatement.close();
-        }
+        DBPut clusterPut = new ClusterDBPut(clusterNum, cluster, clusterBytes);
+        dbQueryExecutor.executePut(conn, clusterPut);
       } finally {
         conn.close();
       }
@@ -232,5 +214,27 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
     statement.setString(7, cluster.getName());
     statement.setLong(8, id);
     return statement;
+  }
+
+  private class ClusterDBPut implements DBPut {
+    private final long clusterId;
+    private final Cluster cluster;
+    private final ByteArrayInputStream clusterBytes;
+
+    private ClusterDBPut(long clusterId, Cluster cluster, ByteArrayInputStream clusterBytes) {
+      this.clusterId = clusterId;
+      this.cluster = cluster;
+      this.clusterBytes = clusterBytes;
+    }
+
+    @Override
+    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
+      return getSetClusterStatement(conn, clusterId, cluster, clusterBytes);
+    }
+
+    @Override
+    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
+      return getInsertClusterStatement(conn, clusterId, cluster, clusterBytes);
+    }
   }
 }

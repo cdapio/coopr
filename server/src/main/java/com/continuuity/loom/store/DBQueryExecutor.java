@@ -1,9 +1,22 @@
+/*
+ * Copyright 2012-2014, Continuuity, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.continuuity.loom.store;
 
-import com.continuuity.loom.cluster.Cluster;
 import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
+import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -13,18 +26,14 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.sql.Blob;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
@@ -46,7 +55,7 @@ public final class DBQueryExecutor {
    * @param statement PreparedStatement of the query, ready for execution. Will be closed by this method.
    * @param clazz Class of the items being queried.
    * @param <T> Type of the items being queried.
-   * @return
+   * @return Immutable set of items queried for.
    * @throws java.sql.SQLException
    */
   public <T> ImmutableSet<T> getQuerySet(PreparedStatement statement, Class<T> clazz) throws SQLException {
@@ -105,7 +114,7 @@ public final class DBQueryExecutor {
    * @param statement PreparedStatement of the query, ready for execution.
    * @param clazz Class of the item being queried.
    * @param <T> Type of the item being queried.
-   * @return
+   * @return Item queried for, or null if none exists.
    * @throws java.sql.SQLException
    */
   public <T> T getQueryItem(PreparedStatement statement, Class<T> clazz) throws SQLException {
@@ -158,6 +167,39 @@ public final class DBQueryExecutor {
     }
   }
 
+  /**
+   * Perform a write by first trying to update, and if no rows are updated, by performing an insert.
+   *
+   * @param put DBPut which specifies how to create the update and insert statements.
+   * @throws SQLException
+   */
+  public void executePut(Connection conn, DBPut put) throws SQLException {
+    PreparedStatement updateStatement = put.createUpdateStatement(conn);
+    try {
+      int rowsUpdated = updateStatement.executeUpdate();
+      // if no rows are updated, perform the insert
+      if (rowsUpdated == 0) {
+        PreparedStatement insertStatement = put.createInsertStatement(conn);
+        try {
+          insertStatement.executeUpdate();
+        } finally {
+          insertStatement.close();
+        }
+      }
+    } finally {
+      updateStatement.close();
+    }
+  }
+
+  /**
+   * Deserialize a blob into an object. Assumes blob was serialized json.
+   *
+   * @param blob Blob to deserialize.
+   * @param clazz Class of the object to deserialize the blob into.
+   * @param <T> Type of the object to deserialize.
+   * @return Deserialized object.
+   * @throws SQLException
+   */
   public <T> T deserializeBlob(Blob blob, Class<T> clazz) throws SQLException {
     Reader reader = new InputStreamReader(blob.getBinaryStream(), Charsets.UTF_8);
     T object;
@@ -169,6 +211,15 @@ public final class DBQueryExecutor {
     return object;
   }
 
+  /**
+   * Serialize the given object into json, then into bytes of that json, and finally place those bytes
+   * into a byte array stream.
+   *
+   * @param object Object to serialize.
+   * @param type Type of the object to serialize.
+   * @param <T> Type of the object to serialize.
+   * @return Object in a byte array input stream.
+   */
   public <T> ByteArrayInputStream toByteStream(T object, Type type) {
     return new ByteArrayInputStream(gson.toJson(object, type).getBytes(Charsets.UTF_8));
   }

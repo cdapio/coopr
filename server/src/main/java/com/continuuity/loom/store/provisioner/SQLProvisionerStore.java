@@ -3,6 +3,7 @@ package com.continuuity.loom.store.provisioner;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -191,13 +192,10 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
     Connection conn = null;
     try {
       conn = dbConnectionPool.getConnection(false);
-      ByteArrayInputStream bytes = dbQueryExecutor.toByteStream(provisioner, Provisioner.class);
       try {
-        // try updating first, if no rows were updated we need to do an insert
-        if (updateProvisioner(conn, provisioner, bytes) == 0) {
-          addProvisioner(conn, provisioner, bytes);
-        }
-
+        DBPut provisionerPut =
+          new ProvisionerDBPut(provisioner, dbQueryExecutor.toByteStream(provisioner, Provisioner.class));
+        dbQueryExecutor.executePut(conn, provisionerPut);
         writeProvisionerWorkers(conn, provisioner);
         conn.commit();
       } finally {
@@ -372,38 +370,6 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
     }
   }
 
-  private int updateProvisioner(Connection conn, Provisioner provisioner,
-                                ByteArrayInputStream bytes) throws SQLException {
-    PreparedStatement statement = conn.prepareStatement(
-      "UPDATE provisioners SET capacity_total=?, capacity_free=?, provisioner=? WHERE id=?");
-    try {
-      statement.setInt(1, provisioner.getCapacityTotal());
-      statement.setInt(2, provisioner.getCapacityFree());
-      statement.setBlob(3, bytes);
-      statement.setString(4, provisioner.getId());
-      return statement.executeUpdate();
-    } finally {
-      statement.close();
-    }
-  }
-
-  private void addProvisioner(Connection conn, Provisioner provisioner,
-                              ByteArrayInputStream bytes) throws SQLException {
-    PreparedStatement statement = conn.prepareStatement(
-      "INSERT INTO provisioners (id, last_heartbeat, capacity_total, capacity_free, provisioner) " +
-        "VALUES (?, ?, ?, ?, ?)");
-    try {
-      statement.setString(1, provisioner.getId());
-      statement.setTimestamp(2, DBHelper.getTimestamp(System.currentTimeMillis()));
-      statement.setInt(3, provisioner.getCapacityTotal());
-      statement.setInt(4, provisioner.getCapacityFree());
-      statement.setBlob(5, bytes);
-      statement.executeUpdate();
-    } finally {
-      statement.close();
-    }
-  }
-
   private Set<String> getTenantsUsedByProvisioner(Connection conn, String provisionerId) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "SELECT tenant_id FROM provisionerWorkers WHERE provisioner_id=?");
@@ -421,6 +387,40 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
       }
     } finally {
       statement.close();
+    }
+  }
+
+  private class ProvisionerDBPut implements DBPut {
+    private final Provisioner provisioner;
+    private final ByteArrayInputStream provisionerBytes;
+
+    private ProvisionerDBPut(Provisioner provisioner, ByteArrayInputStream provisionerBytes) {
+      this.provisioner = provisioner;
+      this.provisionerBytes = provisionerBytes;
+    }
+
+    @Override
+    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
+      PreparedStatement statement = conn.prepareStatement(
+        "UPDATE provisioners SET capacity_total=?, capacity_free=?, provisioner=? WHERE id=?");
+      statement.setInt(1, provisioner.getCapacityTotal());
+      statement.setInt(2, provisioner.getCapacityFree());
+      statement.setBlob(3, provisionerBytes);
+      statement.setString(4, provisioner.getId());
+      return statement;
+    }
+
+    @Override
+    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
+      PreparedStatement statement = conn.prepareStatement(
+        "INSERT INTO provisioners (id, last_heartbeat, capacity_total, capacity_free, provisioner) " +
+          "VALUES (?, ?, ?, ?, ?)");
+      statement.setString(1, provisioner.getId());
+      statement.setTimestamp(2, DBHelper.getTimestamp(System.currentTimeMillis()));
+      statement.setInt(3, provisioner.getCapacityTotal());
+      statement.setInt(4, provisioner.getCapacityFree());
+      statement.setBlob(5, provisionerBytes);
+      return statement;
     }
   }
 }
