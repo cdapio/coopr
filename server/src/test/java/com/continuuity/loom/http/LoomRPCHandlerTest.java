@@ -81,8 +81,8 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
   @After
   public void testCleanup() {
     // cleanup
-    solverQueue.removeAll();
-    clusterQueue.removeAll();
+    solverQueues.removeAll();
+    clusterQueues.removeAll();
   }
 
   @Test

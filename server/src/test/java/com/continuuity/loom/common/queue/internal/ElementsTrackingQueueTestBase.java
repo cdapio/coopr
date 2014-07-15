@@ -30,18 +30,13 @@ import java.util.Map;
 /**
  *
  */
-public abstract class TimeoutTrackingQueueTestBase {
-  protected abstract TimeoutTrackingQueue getQueue(long intervalBetweenChecks, long rescheduleAfterTimeout) throws
-    Exception;
-
-  protected abstract long getRescheduleInterval();
+public abstract class ElementsTrackingQueueTestBase {
+  protected abstract ElementsTrackingQueue getQueue() throws Exception;
 
   @Test
   public void testBasics() throws Exception {
-    long rescheduleInterval = getRescheduleInterval();
-    long intervalBetweenChecks = rescheduleInterval;
 
-    TimeoutTrackingQueue queue = getQueue(intervalBetweenChecks, rescheduleInterval);
+    ElementsTrackingQueue queue = getQueue();
     ListenableFuture<String> workResult1 = queue.add(new Element("work1", "data1"));
     // we sleep a bit so that we make sure entries are added at different ts (which is used when prioritizing elements
     // in queue)
@@ -175,7 +170,7 @@ public abstract class TimeoutTrackingQueueTestBase {
 
   @Test(timeout = 30000)
   public void testConcurrentAccess() throws Exception {
-    final TimeoutTrackingQueue queue = getQueue(300, 100);
+    final ElementsTrackingQueue queue = getQueue();
 
     ProducerThread[] producers = new ProducerThread[3];
     for (int i = 0; i < producers.length; i++) {

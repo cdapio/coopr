@@ -36,9 +36,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Command-line tool for manipulating TimeoutTrackingQueue.
+ * Command-line tool for manipulating ElementsTrackingQueue.
  */
-public class TimeoutTrackingQueueCliTool {
+public class ElementsTrackingQueueCliTool {
   public static final String CMD_LIST = "list";
   public static final String CMD_REMOVE = "remove";
   public static final String CMD_REMOVE_ALL = "remove_all";
@@ -58,9 +58,9 @@ public class TimeoutTrackingQueueCliTool {
   private String queueName = null;
 
   public static void main(String[] args) throws Exception {
-    TimeoutTrackingQueueCliTool client = null;
+    ElementsTrackingQueueCliTool client = null;
     try {
-      client = new TimeoutTrackingQueueCliTool();
+      client = new ElementsTrackingQueueCliTool();
       client.configure(args);
     } catch (ParseException e) {
       printHelp();
@@ -133,7 +133,7 @@ public class TimeoutTrackingQueueCliTool {
     PrintStream out = System.out;
 
     out.println("Usage: ");
-    String command = "TimeoutTrackingQueueCliTool";
+    String command = "ElementsTrackingQueueCliTool";
     out.println("  " + command + " list [queue options]");
     out.println("  " + command + " promote --element <element_id> [queue options]");
     out.println("  " + command + " remove --element <element_id> [queue options]");
@@ -160,12 +160,8 @@ public class TimeoutTrackingQueueCliTool {
 
     zkClientService.start();
     try {
-      TimeoutTrackingQueue queue = new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, queueName),
-                                                            // to make sure we don't do tracking
-                                                            Long.MAX_VALUE, Long.MAX_VALUE);
+      ElementsTrackingQueue queue = new ElementsTrackingQueue(new ZKElementsTracking(zkClient, queueName));
       try {
-        queue.start();
-
         if (CMD_LIST.equals(command)) {
           printQueueElements(queue);
         }
@@ -193,15 +189,13 @@ public class TimeoutTrackingQueueCliTool {
       } catch (Exception e) {
         System.out.println(String.format("Caught Exception while running %s ", command));
         System.out.println(String.format("Error: %s", e.getMessage()));
-      } finally {
-        queue.stop();
       }
     } finally {
       zkClientService.stop();
     }
   }
 
-  private void printQueueElements(TimeoutTrackingQueue queue) {
+  private void printQueueElements(ElementsTrackingQueue queue) {
     System.out.println("Queued: ");
     int count = Iterators.size(queue.getQueued());
     System.out.println("# of queued: " + count);

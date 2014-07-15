@@ -20,6 +20,8 @@ import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.GroupElement;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
@@ -44,46 +46,47 @@ public class CallbackScheduler implements Runnable {
   private static final Gson GSON = new JsonSerde().getGson();
 
   private final String id;
-  private final TrackingQueue jobQueue;
-  private final TrackingQueue callbackQueue;
   private final ClusterCallback clusterCallback;
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
+  private final QueueGroup callbackQueues;
+  private final QueueGroup jobQueues;
 
   @Inject
   private CallbackScheduler(@Named("scheduler.id") String id,
-                            @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,
-                            @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
                             @Named("callback.executor.service") ListeningExecutorService executorService,
                             TaskService taskService,
                             ClusterCallback clusterCallback,
                             Configuration conf,
-                            ClusterStoreService clusterStoreService) {
+                            ClusterStoreService clusterStoreService,
+                            @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
+                            @Named(Constants.Queue.JOB) QueueGroup jobQueues) {
     this.id = id;
-    this.callbackQueue = callbackQueue;
-    this.jobQueue = jobQueue;
     this.executorService = executorService;
     this.taskService = taskService;
     this.clusterCallback = clusterCallback;
     this.clusterCallback.initialize(conf, clusterStoreService);
+    this.callbackQueues = callbackQueues;
+    this.jobQueues = jobQueues;
   }
 
   @Override
   public void run() {
     try {
       while (true) {
-        final Element element = callbackQueue.take(id);
-        if (element == null) {
+        final GroupElement gElement = callbackQueues.take(id);
+        if (gElement == null) {
           return;
         }
 
-        final ListenableFuture future = executorService.submit(new CallbackRunner(element));
+        final Element element = gElement.getElement();
+        final ListenableFuture future = executorService.submit(new CallbackRunner(gElement));
         future.addListener(new Runnable() {
           @Override
           public void run() {
             try {
-              callbackQueue.recordProgress(id, element.getId(),
-                                           TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "Executed");
+              callbackQueues.recordProgress(id, gElement.getQueueName(), element.getId(),
+                                            TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "Executed");
             } catch (Exception e) {
               LOG.error("Exception processing callback", e);
             }
@@ -96,15 +99,15 @@ public class CallbackScheduler implements Runnable {
   }
 
   private class CallbackRunner implements Runnable {
-    private final Element element;
+    private final GroupElement gElement;
 
-    private CallbackRunner(Element element) {
-      this.element = element;
+    private CallbackRunner(GroupElement gElement) {
+      this.gElement = gElement;
     }
 
     @Override
     public void run() {
-      CallbackData callbackData = GSON.fromJson(element.getValue(), CallbackData.class);
+      CallbackData callbackData = GSON.fromJson(gElement.getElement().getValue(), CallbackData.class);
       switch (callbackData.getType()) {
         case START:
           onStart(callbackData);
@@ -126,7 +129,7 @@ public class CallbackScheduler implements Runnable {
       try {
         if (clusterCallback.onStart(callbackData)) {
           String jobId = callbackData.getJob().getJobId();
-          jobQueue.add(new Element(jobId));
+          jobQueues.add(gElement.getQueueName(), new Element(jobId));
           LOG.debug("added job {} to job queue", jobId);
         } else {
           switch (job.getClusterAction()) {
