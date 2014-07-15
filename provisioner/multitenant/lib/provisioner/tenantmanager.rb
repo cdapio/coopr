@@ -8,10 +8,10 @@ module Loom
   class TenantManager
     include Logging
     attr_accessor :spec, :provisioner_id
+    # command used to launch a worker.  args are separate
+    @worker_name
 
     def initialize(spec)
-#      @logger = Logger.new('/Users/derek/git/loom/provisioner/multitenant/log-tmgr.log')
-#      @logger.info "tenanmgr starting"
       if !spec.instance_of?(TenantSpec)
         raise ArgumentError, "TenantManager needs to be initialized with object of type TenantSpec", caller
       end
@@ -19,6 +19,8 @@ module Loom
       @provisioner_id = 'default'
       @workerpids = []
       @terminating_workers = []
+      # command to launch a worker.  encapsulated into proc so that it can be changed for testing
+      @worker_cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/worker.rb #{@spec.id}"
     end 
 
     def id
@@ -66,16 +68,16 @@ module Loom
     end
 
     def spawn_worker_process
-      worker_name = "worker-" + self.id + "-"  + (@workerpids.size + 1).to_s
-      log.debug "spawning #{worker_name}"
-#      @logger.info "spawning #{worker_name}"
-#      @logger.info "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} worker.rb #{worker_name}"
+      #worker_name = "worker-" + self.id + "-"  + (@workerpids.size + 1).to_s
+      #log.debug "spawning #{worker_name}"
+      #cmd = @worker_cmd.call
+      log.debug "spawning #{@worker_cmd}"
       cpid = fork { 
         #worker = Loom::Worker.new(worker_name)
         #worker.work
-        # Absolute paths needed for daemon mode!
-        exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/worker.rb #{worker_name}")
+        #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/worker.rb #{worker_name}")
         #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../daemon/provisioner.rb --tenant #{@spec.id} --provisioner #{@provisioner_id} --uri http://localhost:55054 -l /tmp/worker-#{worker_name}.log -L debug")
+        exec(@worker_cmd)
       }
 
       #@logger.info "spawned #{cpid}"
@@ -91,7 +93,6 @@ module Loom
         Process.kill(:SIGTERM, pid)
       end
     end 
-
 
     def update(new_tm)
       log.info "update workers from #{@spec.workers} to #{new_tm.spec.workers}"

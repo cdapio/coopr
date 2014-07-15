@@ -11,8 +11,9 @@ module Loom
 
     attr_accessor :name
 
-    def initialize(name)
-      @name = name
+    def initialize(tenant)
+      pid = Process.pid
+      @name = "worker.#{tenant}.#{pid}"
       Logging.configure("#{File.dirname(__FILE__)}/#{@name}.log")
       Logging.level = 0
       log.info "* worker #{name} starting"
@@ -36,8 +37,8 @@ module Loom
 end
 
 if __FILE__ == $0
-  name = ARGV[0] || "worker-default"
-  worker = Loom::Worker.new(name)
+  tenant = ARGV[0] || "loom"
+  worker = Loom::Worker.new(tenant)
   worker.work
 end
 
