@@ -36,6 +36,9 @@ module Loom
       @enqueued.each do |signal|
         #print "*** sending queued #{signal} to process #{Process.pid} ***\n"
         Process.kill(signal, Process.pid)
+        # there is a race condition here if the calling process immediately enters dont_interrupt again
+        # allow time for signal handler to process, since this is only used for terminating signals
+        sleep 1
       end
     end
   end
