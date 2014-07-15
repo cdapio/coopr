@@ -38,6 +38,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -62,6 +63,7 @@ public class ClusterScheduler implements Runnable {
   private final ClusterStore clusterStore;
   private final TaskService taskService;
   private final IdService idService;
+  private final Gson gson;
   private final QueueGroup clusterQueues;
 
   private final Actions actions = Actions.getInstance();
@@ -71,11 +73,13 @@ public class ClusterScheduler implements Runnable {
                            ClusterStoreService clusterStoreService,
                            TaskService taskService,
                            IdService idService,
+                           Gson gson,
                            @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues) {
     this.id = id;
     this.clusterStore = clusterStoreService.getSystemView();
     this.taskService = taskService;
     this.idService = idService;
+    this.gson = gson;
     this.clusterQueues = clusterQueues;
   }
 
@@ -171,7 +175,7 @@ public class ClusterScheduler implements Runnable {
         Node node = nodeMap.get(taskNode.getHostId());
         Service service = serviceMap.get(taskNode.getService());
         JsonObject taskConfig =
-          TaskConfig.getConfig(cluster, node, service, ProvisionerAction.valueOf(taskNode.getTaskName()));
+          TaskConfig.getConfig(cluster, node, service, ProvisionerAction.valueOf(taskNode.getTaskName()), gson);
         if (taskConfig == null) {
           LOG.debug("Not scheduling {} for job {} since config is null", taskNode, job.getJobId());
           continue;

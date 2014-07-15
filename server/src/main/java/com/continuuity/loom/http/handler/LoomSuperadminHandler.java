@@ -18,11 +18,9 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
-import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
@@ -51,13 +49,14 @@ import java.util.UUID;
 @Path("/v1")
 public class LoomSuperadminHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomSuperadminHandler.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
+  private final Gson gson;
   private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
-  private LoomSuperadminHandler(TenantStore store, TenantProvisionerService tenantProvisionerService) {
+  private LoomSuperadminHandler(TenantStore store, TenantProvisionerService tenantProvisionerService, Gson gson) {
     super(store);
+    this.gson = gson;
     this.tenantProvisionerService = tenantProvisionerService;
   }
 
@@ -140,7 +139,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     Tenant requestedTenant;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      requestedTenant = GSON.fromJson(reader, Tenant.class);
+      requestedTenant = gson.fromJson(reader, Tenant.class);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
       return;
@@ -195,7 +194,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     Tenant tenant = null;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      tenant = GSON.fromJson(reader, Tenant.class);
+      tenant = gson.fromJson(reader, Tenant.class);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
       return;

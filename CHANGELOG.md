@@ -12,6 +12,7 @@ Unreleased
 - Cluster owner macro ( Issues: #221 )
 - Loom Firewall updates ( Issues: #226 #227 )
 - Include automator and provider types in export and import ( Issues: #246 )
+- Upgrade script ( Issues: #258 )
 
 v0.9.7 (May 27, 2014)
 ---------------------

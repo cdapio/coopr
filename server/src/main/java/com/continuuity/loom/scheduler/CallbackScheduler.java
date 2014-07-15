@@ -16,7 +16,6 @@
 package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
@@ -43,12 +42,12 @@ import org.slf4j.LoggerFactory;
 public class CallbackScheduler implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(CallbackScheduler.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
   private final String id;
   private final ClusterCallback clusterCallback;
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
+  private final Gson gson;
   private final QueueGroup callbackQueues;
   private final QueueGroup jobQueues;
 
@@ -59,6 +58,7 @@ public class CallbackScheduler implements Runnable {
                             ClusterCallback clusterCallback,
                             Configuration conf,
                             ClusterStoreService clusterStoreService,
+                            Gson gson,
                             @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
                             @Named(Constants.Queue.JOB) QueueGroup jobQueues) {
     this.id = id;
@@ -66,6 +66,7 @@ public class CallbackScheduler implements Runnable {
     this.taskService = taskService;
     this.clusterCallback = clusterCallback;
     this.clusterCallback.initialize(conf, clusterStoreService);
+    this.gson = gson;
     this.callbackQueues = callbackQueues;
     this.jobQueues = jobQueues;
   }
@@ -107,7 +108,7 @@ public class CallbackScheduler implements Runnable {
 
     @Override
     public void run() {
-      CallbackData callbackData = GSON.fromJson(gElement.getElement().getValue(), CallbackData.class);
+      CallbackData callbackData = gson.fromJson(gElement.getElement().getValue(), CallbackData.class);
       switch (callbackData.getType()) {
         case START:
           onStart(callbackData);

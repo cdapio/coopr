@@ -16,14 +16,12 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
 import com.continuuity.loom.store.tenant.SQLTenantStore;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.HttpResponse;
@@ -44,7 +42,6 @@ import java.util.UUID;
  *
  */
 public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
-  private static final Gson GSON = new JsonSerde().getGson();
   private static TenantProvisionerService tenantProvisionerService;
 
   @BeforeClass
@@ -72,12 +69,12 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
   @Test
   public void testCreateTenant() throws Exception {
     Tenant requestedTenant = new Tenant("companyX", null, 10, 100, 1000);
-    HttpResponse response = doPost("/v1/tenants", GSON.toJson(requestedTenant), SUPERADMIN_HEADERS);
+    HttpResponse response = doPost("/v1/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
-    JsonObject responseObj = GSON.fromJson(reader, JsonObject.class);
+    JsonObject responseObj = gson.fromJson(reader, JsonObject.class);
     String id = responseObj.get("id").getAsString();
 
     // make sure tenant was actually written
@@ -91,7 +88,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
   @Test
   public void testCreateTenantWithTooManyWorkersReturnsConflict() throws Exception {
     Tenant requestedTenant = new Tenant("companyX", null, 10000, 100, 1000);
-    HttpResponse response = doPost("/v1/tenants", GSON.toJson(requestedTenant), SUPERADMIN_HEADERS);
+    HttpResponse response = doPost("/v1/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
@@ -106,7 +103,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
 
     // perform request to write tenant
     Tenant updatedTenant = new Tenant("companyX", id, 10, 100, 500);
-    HttpResponse response = doPut("/v1/tenants/" + id, GSON.toJson(updatedTenant), SUPERADMIN_HEADERS);
+    HttpResponse response = doPut("/v1/tenants/" + id, gson.toJson(updatedTenant), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     Assert.assertEquals(updatedTenant, tenantStore.getTenant(updatedTenant.getId()));
@@ -121,7 +118,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
 
     // perform request to write tenant
     Tenant updatedTenant = new Tenant("companyX", id, 100000, 100, 500);
-    HttpResponse response = doPut("/v1/tenants/" + id, GSON.toJson(updatedTenant), SUPERADMIN_HEADERS);
+    HttpResponse response = doPut("/v1/tenants/" + id, gson.toJson(updatedTenant), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
   }
 
@@ -158,7 +155,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     HttpResponse response = doGet("/v1/tenants/" + id, SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
-    Assert.assertEquals(actualTenant, GSON.fromJson(reader, Tenant.class));
+    Assert.assertEquals(actualTenant, gson.fromJson(reader, Tenant.class));
   }
 
   @Test
@@ -175,7 +172,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     HttpResponse response = doGet("/v1/tenants", SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
-    Set<Tenant> actualTenants = GSON.fromJson(reader, new TypeToken<Set<Tenant>>() {}.getType());
+    Set<Tenant> actualTenants = gson.fromJson(reader, new TypeToken<Set<Tenant>>() {}.getType());
     Assert.assertEquals(ImmutableSet.of(expectedTenant1, expectedTenant2), actualTenants);
   }
 
@@ -187,12 +184,12 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
 
     // id in object does not match id in path
     Tenant tenant = new Tenant("name", "id123", 10, 10, 10);
-    assertResponseStatus(doPut("/v1/tenants/10", GSON.toJson(tenant), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPut("/v1/tenants/10", gson.toJson(tenant), SUPERADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // missing id in object
     tenant = new Tenant("name", null, 10, 10, 10);
-    assertResponseStatus(doPut("/v1/tenants/10", GSON.toJson(tenant), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPut("/v1/tenants/10", gson.toJson(tenant), SUPERADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 

@@ -19,6 +19,7 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -36,7 +37,8 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
   protected final DBConnectionPool dbConnectionPool;
   protected final String accountErrorSnippet;
 
-  BaseSQLEntityStoreView(Account account, DBConnectionPool dbConnectionPool) {
+  BaseSQLEntityStoreView(Account account, DBConnectionPool dbConnectionPool, Gson gson) {
+    super(gson);
     this.account = account;
     this.dbConnectionPool = dbConnectionPool;
     this.accountErrorSnippet = " from tenant " + account.getTenantId();

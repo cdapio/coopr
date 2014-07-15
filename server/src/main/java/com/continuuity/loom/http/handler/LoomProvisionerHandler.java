@@ -17,7 +17,6 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.ProvisionerHeartbeat;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
@@ -47,11 +46,12 @@ import java.io.Reader;
 public final class LoomProvisionerHandler extends AbstractHttpHandler {
   private static final Logger LOG = LoggerFactory.getLogger(LoomProvisionerHandler.class);
 
+  private final Gson gson;
   private final TenantProvisionerService tenantProvisionerService;
-  private final Gson gson = new JsonSerde().getGson();
 
   @Inject
-  private LoomProvisionerHandler(TenantProvisionerService tenantProvisionerService) {
+  private LoomProvisionerHandler(TenantProvisionerService tenantProvisionerService, Gson gson) {
+    this.gson = gson;
     this.tenantProvisionerService = tenantProvisionerService;
   }
 

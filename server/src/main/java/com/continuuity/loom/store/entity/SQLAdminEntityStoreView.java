@@ -18,6 +18,7 @@ package com.continuuity.loom.store.entity;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.google.common.base.Preconditions;
+import com.google.gson.Gson;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,8 +32,8 @@ import java.sql.SQLException;
  */
 public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
 
-  SQLAdminEntityStoreView(Account account, DBConnectionPool dbConnectionPool) {
-    super(account, dbConnectionPool);
+  SQLAdminEntityStoreView(Account account, DBConnectionPool dbConnectionPool, Gson gson) {
+    super(account, dbConnectionPool, gson);
     Preconditions.checkArgument(account.isAdmin(), "Entity store only viewable by admins");
   }
 

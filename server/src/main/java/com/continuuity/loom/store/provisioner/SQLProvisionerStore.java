@@ -1,9 +1,9 @@
 package com.continuuity.loom.store.provisioner;
 
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
@@ -28,12 +28,12 @@ import java.util.Set;
 public class SQLProvisionerStore extends AbstractIdleService implements ProvisionerStore {
   private static final Logger LOG  = LoggerFactory.getLogger(SQLProvisionerStore.class);
   private final DBConnectionPool dbConnectionPool;
-  private final JsonSerde codec;
+  private final DBQueryExecutor dbQueryExecutor;
 
   @Inject
-  public SQLProvisionerStore(DBConnectionPool dbConnectionPool, JsonSerde codec) {
+  private SQLProvisionerStore(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor) {
     this.dbConnectionPool = dbConnectionPool;
-    this.codec = codec;
+    this.dbQueryExecutor = dbQueryExecutor;
   }
 
   // for unit tests only
@@ -60,32 +60,22 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
   @Override
   protected void startUp() throws Exception {
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
-      DBQueryHelper.createDerbyTable("CREATE TABLE provisioners (" +
-                                       "id VARCHAR(255), " +
-                                       "last_heartbeat TIMESTAMP, " +
-                                       "capacity_total INTEGER, " +
-                                       "capacity_free INTEGER, " +
-                                       "provisioner BLOB, " +
-                                       "PRIMARY KEY (id) )",
-                                     dbConnectionPool);
-      Connection conn = dbConnectionPool.getConnection();
-      try {
-        Statement stmt = conn.createStatement();
-        try {
-          stmt.execute("CREATE INDEX provisioners_heartbeat_index ON provisioners (last_heartbeat)");
-        } finally {
-          stmt.close();
-        }
-      } finally {
-        conn.close();
-      }
-      DBQueryHelper.createDerbyTable("CREATE TABLE provisionerWorkers (" +
-                                       "provisioner_id VARCHAR(255), " +
-                                       "tenant_id VARCHAR(255), " +
-                                       "num_assigned INTEGER, " +
-                                       "num_live INTEGER, " +
-                                       "PRIMARY KEY (tenant_id, provisioner_id) )",
-                                     dbConnectionPool);
+      DBHelper.createDerbyTableIfNotExists("CREATE TABLE provisioners (" +
+                                             "id VARCHAR(255), " +
+                                             "last_heartbeat TIMESTAMP, " +
+                                             "capacity_total INTEGER, " +
+                                             "capacity_free INTEGER, " +
+                                             "provisioner BLOB, " +
+                                             "PRIMARY KEY (id) )",
+                                           dbConnectionPool);
+      DBHelper.createDerbyIndex(dbConnectionPool, "provisioners_heartbeat_index", "provisioners", "last_heartbeat");
+      DBHelper.createDerbyTableIfNotExists("CREATE TABLE provisionerWorkers (" +
+                                             "provisioner_id VARCHAR(255), " +
+                                             "tenant_id VARCHAR(255), " +
+                                             "num_assigned INTEGER, " +
+                                             "num_live INTEGER, " +
+                                             "PRIMARY KEY (tenant_id, provisioner_id) )",
+                                           dbConnectionPool);
     }
   }
 
@@ -101,7 +91,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT provisioner FROM provisioners");
         try {
-          return DBQueryHelper.getQueryList(statement, Provisioner.class);
+          return dbQueryExecutor.getQueryList(statement, Provisioner.class);
         } finally {
           statement.close();
         }
@@ -121,7 +111,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
         PreparedStatement statement = conn.prepareStatement(
           "SELECT provisioner FROM provisioners WHERE capacity_free > 0");
         try {
-          return DBQueryHelper.getQueryList(statement, Provisioner.class);
+          return dbQueryExecutor.getQueryList(statement, Provisioner.class);
         } finally {
           statement.close();
         }
@@ -141,8 +131,8 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
         PreparedStatement statement = conn.prepareStatement(
           "SELECT provisioner FROM provisioners WHERE last_heartbeat < ?");
         try {
-          statement.setTimestamp(1, DBQueryHelper.getTimestamp(idleTimestamp));
-          return DBQueryHelper.getQueryList(statement, Provisioner.class);
+          statement.setTimestamp(1, DBHelper.getTimestamp(idleTimestamp));
+          return dbQueryExecutor.getQueryList(statement, Provisioner.class);
         } finally {
           statement.close();
         }
@@ -164,7 +154,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
             " WHERE W.tenant_id=? AND P.id=W.provisioner_id AND W.num_assigned > 0");
         try {
           statement.setString(1, tenantId);
-          return DBQueryHelper.getQueryList(statement, Provisioner.class);
+          return dbQueryExecutor.getQueryList(statement, Provisioner.class);
         } finally {
           statement.close();
         }
@@ -184,7 +174,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
         PreparedStatement statement = conn.prepareStatement("SELECT provisioner FROM provisioners WHERE id=?");
         statement.setString(1, id);
         try {
-          return DBQueryHelper.getQueryItem(statement, Provisioner.class);
+          return dbQueryExecutor.getQueryItem(statement, Provisioner.class);
         } finally {
           statement.close();
         }
@@ -201,7 +191,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
     Connection conn = null;
     try {
       conn = dbConnectionPool.getConnection(false);
-      ByteArrayInputStream bytes = toByteStream(provisioner);
+      ByteArrayInputStream bytes = dbQueryExecutor.toByteStream(provisioner, Provisioner.class);
       try {
         // try updating first, if no rows were updated we need to do an insert
         if (updateProvisioner(conn, provisioner, bytes) == 0) {
@@ -270,7 +260,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
       try {
         PreparedStatement statement = conn.prepareStatement("UPDATE provisioners SET last_heartbeat=? WHERE id=?");
         try {
-          statement.setTimestamp(1, DBQueryHelper.getTimestamp(ts));
+          statement.setTimestamp(1, DBHelper.getTimestamp(ts));
           statement.setString(2, provisionerId);
           statement.executeUpdate();
         } finally {
@@ -291,7 +281,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT SUM(capacity_free) FROM provisioners");
         try {
-          return DBQueryHelper.getNum(statement);
+          return dbQueryExecutor.getNum(statement);
         } finally {
           statement.close();
         }
@@ -312,7 +302,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
           "SELECT SUM(num_assigned) FROM provisionerWorkers WHERE tenant_id=?");
         try {
           statement.setString(1, tenantID);
-          return DBQueryHelper.getNum(statement);
+          return dbQueryExecutor.getNum(statement);
         } finally {
           statement.close();
         }
@@ -404,7 +394,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
         "VALUES (?, ?, ?, ?, ?)");
     try {
       statement.setString(1, provisioner.getId());
-      statement.setTimestamp(2, DBQueryHelper.getTimestamp(System.currentTimeMillis()));
+      statement.setTimestamp(2, DBHelper.getTimestamp(System.currentTimeMillis()));
       statement.setInt(3, provisioner.getCapacityTotal());
       statement.setInt(4, provisioner.getCapacityFree());
       statement.setBlob(5, bytes);
@@ -432,9 +422,5 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
     } finally {
       statement.close();
     }
-  }
-
-  private ByteArrayInputStream toByteStream(Provisioner provisioner) {
-    return new ByteArrayInputStream(codec.serialize(provisioner, Provisioner.class));
   }
 }
