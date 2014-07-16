@@ -35,9 +35,11 @@ class FogProviderOpenstack < FogProvider
       log.debug 'Invoking server create'
       begin
         server = connection.servers.create(
-          :flavor_ref => flavor,
-          :image_ref  => image,
-          :name       => hostname
+          :flavor_ref      => flavor,
+          :image_ref       => image,
+          :name            => hostname,
+          :security_groups => @security_groups,
+          :key_name        => @openstack_ssh_key_id
         )
         server.save
       end
