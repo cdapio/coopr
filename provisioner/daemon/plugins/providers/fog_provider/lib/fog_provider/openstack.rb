@@ -41,7 +41,6 @@ class FogProviderOpenstack < FogProvider
           :security_groups => @security_groups,
           :key_name        => @openstack_ssh_key_id
         )
-        server.save
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
