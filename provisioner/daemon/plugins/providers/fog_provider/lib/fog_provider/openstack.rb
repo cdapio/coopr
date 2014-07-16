@@ -159,7 +159,7 @@ class FogProviderOpenstack < FogProvider
         :openstack_auth_url => @openstack_auth_url,
         :openstack_username => @openstack_username,
         :openstack_tenant   => @openstack_tenant,
-        :openstack_api_key  => @openstack_password
+        :openstack_api_key  => @openstack_password,
         :connection_options => {
           :ssl_verify_peer => @ssl_verify_peer
         }
