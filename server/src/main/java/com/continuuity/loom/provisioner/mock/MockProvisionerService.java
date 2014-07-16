@@ -42,7 +42,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Netty Loom service.
+ * Mock provisioner that will register itself, periodically heartbeat, and deregister itself on shutdown. Also starts
+ * up services for handling http requests for editing tenants and a mock service for managing tenant workers.
  */
 public class MockProvisionerService extends AbstractScheduledService {
   private static final Logger LOG = LoggerFactory.getLogger(MockProvisionerService.class);

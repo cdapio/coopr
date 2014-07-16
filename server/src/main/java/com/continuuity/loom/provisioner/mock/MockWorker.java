@@ -21,7 +21,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * Mock worker that periodically takes a task and finishes it without performing any actual work.
  */
 public class MockWorker extends AbstractScheduledService {
   private static final Gson GSON = new Gson();
@@ -52,10 +52,20 @@ public class MockWorker extends AbstractScheduledService {
     this.httpContext = HttpClientContext.create();
   }
 
+  /**
+   * Get the id of the worker.
+   *
+   * @return Id of the worker
+   */
   public String getWorkerId() {
     return workerId;
   }
 
+  /**
+   * Get the tenant the worker is for.
+   *
+   * @return Tenant the worker is for
+   */
   public String getTenantId() {
     return tenantId;
   }

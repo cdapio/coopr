@@ -22,7 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * Mock service that will spin up and shut down mock workers for tenants.
  */
 public class MockProvisionerWorkerService extends AbstractScheduledService {
   private static final Logger LOG = LoggerFactory.getLogger(MockProvisionerWorkerService.class);
@@ -36,6 +36,17 @@ public class MockProvisionerWorkerService extends AbstractScheduledService {
   private final CloseableHttpClient httpClient;
   private int counter;
 
+  /**
+   * Create a worker service for the given provisioner id that talks to the given server url for tasks and has the
+   * given capacity. Each worker created will wait for the given amount of time between taking tasks and will finish
+   * a taken task after the given amount of time.
+   *
+   * @param provisionerId Id of the provisioner
+   * @param serverUrl URL of the server workers will communicate with
+   * @param capacity Maximum number of workers that can be running at any given time
+   * @param taskMs Time that workers should wait before finishing a task
+   * @param msBetweenTasks Time workers should wait between finishing a task and taking another task
+   */
   public MockProvisionerWorkerService(String provisionerId, String serverUrl,
                                       int capacity, long taskMs, long msBetweenTasks) {
     this.provisionerId = provisionerId;
