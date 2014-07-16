@@ -16,6 +16,7 @@
 package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -103,11 +104,24 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
   }
 
   protected PreparedStatement getSelectStatement(Connection conn, EntityType entityType,
-                                               String entityName) throws SQLException {
+                                                 String entityName) throws SQLException {
     String entityTypeId = entityType.getId();
-    // immune to sql injection since it comes from the enum.
-    String queryStr = "SELECT " + entityTypeId + " FROM " + entityTypeId + "s WHERE name=? AND tenant_id=?";
-    PreparedStatement statement = conn.prepareStatement(queryStr);
+    // immune to sql injection since everything is an enum or constant
+    StringBuilder queryStr = new StringBuilder();
+    queryStr.append("SELECT ");
+    queryStr.append(entityTypeId);
+    queryStr.append(" FROM ");
+    queryStr.append(entityTypeId);
+    queryStr.append("s WHERE name=? AND ");
+    // TODO: remove once types are defined through server instead of through provisioner
+    if (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) {
+      queryStr.append("( tenant_id=? OR tenant_id='");
+      queryStr.append(Constants.SUPERADMIN_TENANT);
+      queryStr.append("' )");
+    } else {
+      queryStr.append(" tenant_id=?");
+    }
+    PreparedStatement statement = conn.prepareStatement(queryStr.toString());
     statement.setString(1, entityName);
     statement.setString(2, account.getTenantId());
     return statement;
@@ -115,9 +129,21 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
 
   private PreparedStatement getSelectAllStatement(Connection conn, EntityType entityType) throws SQLException {
     String entityTypeId = entityType.getId();
-    // immune to sql injection since it comes from the enum.
-    String queryStr = "SELECT " + entityTypeId + " FROM " + entityTypeId + "s WHERE tenant_id=?";
-    PreparedStatement statement = conn.prepareStatement(queryStr);
+    // immune to sql injection since everything is an enum or constant
+    StringBuilder queryStr = new StringBuilder();
+    queryStr.append("SELECT ");
+    queryStr.append(entityTypeId);
+    queryStr.append(" FROM ");
+    queryStr.append(entityTypeId);
+    queryStr.append("s WHERE tenant_id=? ");
+    // TODO: remove once types are defined through server instead of through provisioner
+    if (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) {
+      queryStr.append(" OR tenant_id='");
+      queryStr.append(Constants.SUPERADMIN_TENANT);
+      queryStr.append("'");
+    }
+
+    PreparedStatement statement = conn.prepareStatement(queryStr.toString());
     statement.setString(1, account.getTenantId());
     return statement;
   }

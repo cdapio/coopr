@@ -572,8 +572,8 @@ public class LoomAdminHandler extends LoomAuthHandler {
     if (account == null) {
       return;
     }
-    if (!account.isAdmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+    if (!account.isSuperadmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
       return;
     }
 
@@ -603,8 +603,8 @@ public class LoomAdminHandler extends LoomAuthHandler {
     if (account == null) {
       return;
     }
-    if (!account.isAdmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+    if (!account.isSuperadmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
       return;
     }
 
@@ -839,8 +839,8 @@ public class LoomAdminHandler extends LoomAuthHandler {
     if (account == null) {
       return;
     }
-    if (!account.isAdmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+    if (!account.isSuperadmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
       return;
     }
 
@@ -880,8 +880,8 @@ public class LoomAdminHandler extends LoomAuthHandler {
     if (account == null) {
       return;
     }
-    if (!account.isAdmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+    if (!account.isSuperadmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
       return;
     }
 
