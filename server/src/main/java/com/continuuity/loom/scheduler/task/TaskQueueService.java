@@ -80,8 +80,9 @@ public class TaskQueueService {
   public String takeNextClusterTask(TakeTaskRequest takeRequest) throws IOException, MissingEntityException {
     //loomStats.setQueueLength(taskQueues.size(queueName));
     String queueName = takeRequest.getTenantId();
-    String workerId = takeRequest.getWorkerId();
     String provisionerId = takeRequest.getProvisionerId();
+    String workerId = takeRequest.getWorkerId();
+    String consumerId = provisionerId + "." + workerId;
 
     if (tenantProvisionerService.getProvisioner(provisionerId) == null) {
       throw new MissingEntityException("provisioner " + provisionerId + " not found.");
@@ -91,7 +92,7 @@ public class TaskQueueService {
     String taskJson = null;
 
     while (clusterTask == null) {
-      Element task = taskQueues.take(queueName, workerId);
+      Element task = taskQueues.take(queueName, consumerId);
       if (task == null) {
         break;
       }
@@ -103,7 +104,7 @@ public class TaskQueueService {
 
         if (clusterJob == null || clusterJob.getJobStatus() == ClusterJob.Status.FAILED) {
           // we don't want to give out tasks for failed jobs.  Remove from the queue and move on.
-          taskQueues.recordProgress(workerId, queueName, clusterTask.getTaskId(),
+          taskQueues.recordProgress(consumerId, queueName, clusterTask.getTaskId(),
                                     TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
                                     "Skipped due to job failure.");
           taskService.dropTask(clusterTask);
@@ -115,7 +116,7 @@ public class TaskQueueService {
         }
       } else {
         LOG.error("Got empty task JSON for {}, skipping it.", task.getId());
-        taskQueues.recordProgress(workerId, queueName, task.getId(),
+        taskQueues.recordProgress(consumerId, queueName, task.getId(),
                                   TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
                                   "Skipped due to empty task JSON.");
       }
@@ -142,13 +143,14 @@ public class TaskQueueService {
     String queueName = finishRequest.getTenantId();
     String taskId = finishRequest.getTaskId();
     String provisionerId = finishRequest.getProvisionerId();
+    String consumerId = provisionerId + "." + workerId;
 
     if (tenantProvisionerService.getProvisioner(provisionerId) == null) {
       throw new MissingEntityException("provisioner " + provisionerId + " not found.");
     }
 
     TrackingQueue.PossessionState state =
-      taskQueues.recordProgress(workerId, queueName, taskId, TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
+      taskQueues.recordProgress(consumerId, queueName, taskId, TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "");
 
     if (state != TrackingQueue.PossessionState.POSSESSES) {
       LOG.warn("Worker {} is not owner of task {}", workerId, taskId);
