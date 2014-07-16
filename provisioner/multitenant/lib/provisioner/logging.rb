@@ -5,6 +5,7 @@ require 'logger'
 module Loom
 module Logging
   attr_accessor :level
+  @level = ::Logger::INFO
   @out = nil
   def log
     #puts "log called"
@@ -38,20 +39,20 @@ module Logging
   end
 
   def self.log
-    #puts "self.log called"
+    # puts "self.log called"
     unless @logger
       if @out
-        #puts "**** creating new logger to #{@out}"
+        # puts "**** creating new logger to #{@out}"
         @logger = ::Logger.new(@out, 'daily')
       else
-       # puts "**** creating new logger to STDOUT"
+        # puts "**** creating new logger to STDOUT"
         @logger = ::Logger.new(STDOUT)
       end
       @logger.level = @level
       @logger.formatter = proc do |severity, datetime, progname, msg|
         "#{datetime} #{severity}: #{msg}\n"
       end
-      #puts @logger.inspect
+      # puts @logger.inspect
     end
     @logger
   end
