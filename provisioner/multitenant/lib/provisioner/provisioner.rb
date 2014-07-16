@@ -243,10 +243,15 @@ module Loom
     end
 
     def delete_tenant(id)
-      # instruct tenant to send kill signal to its workers
-      @tenantmanagers[id].delete
-      # we mark this tenant as deleting.  when its num_workers reaches 0 it can be deleted from @tenantmanagers
-      @terminating_tenants.push(id)
+      # if no workers running, just delete
+      if @tenantmanagers[id].num_workers == 0
+        @tenantmanagers.delete(id)
+      else
+        # instruct tenant to send kill signal to its workers
+        @tenantmanagers[id].delete
+        # we mark this tenant as deleting.  when its num_workers reaches 0 it can be deleted from @tenantmanagers
+        @terminating_tenants.push(id)
+      end
     end
 
     def status
