@@ -16,6 +16,11 @@ module Loom
       include Logging
       @@provisioner
 
+      # used for testing
+      def self::provisioner= (value)
+        @@provisioner = value
+      end
+
       def self.run_for_provisioner!(provisioner)
         @@provisioner = provisioner
         # sinatra blocks
@@ -25,7 +30,6 @@ module Loom
       set :logging, false
 
       get '/status' do
-        @@provisioner.status
         body "OK"
       end
 
