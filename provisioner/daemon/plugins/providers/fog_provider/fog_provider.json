@@ -1,7 +1,7 @@
 {
   "name": "fog",
   "description": "Multi-cloud fog-based provider (Openstack, Rackspace, Joyent)",
-  "providertypes": [ "rackspace" ],
+  "providertypes": [ "openstack", "rackspace" ],
   "openstack": {
     "name": "openstack",
     "classname": "FogProviderOpenstack",
@@ -29,15 +29,20 @@
             "default": "http://EXAMPLE.DOMAIN.COM:5000/v2.0/tokens",
             "tip": "Your Openstack Keystone API URL"
           },
-          "openstack_ssh_key_id" : {
+          "openstack_ssh_key_id": {
             "label": "Key name",
             "type": "text",
             "tip": "Your Openstack SSH public key name"
           },
-          "identity_file" : {
+          "identity_file": {
             "label": "Key file",
             "type": "text",
             "tip": "Path to your Openstack SSH private key file"
+          },
+          "ssl_verify_peer": {
+            "label": "Verify SSL peers",
+            "type": "checkbox",
+            "tip": "Verify peer SSL certificates"
           }
         },
         "required": [
