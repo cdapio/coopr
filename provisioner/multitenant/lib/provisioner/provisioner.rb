@@ -74,7 +74,7 @@ module Loom
     end
 
     def spawn_sinatra_thread
-      @sinatra_thread = Thread.new { Api.run_for_provisioner!(self) }
+      @sinatra_thread = Thread.new { Api.set_provisioner_and_run!(self) }
       # surface any exceptions immediately
       @sinatra_thread.abort_on_exception=true
 

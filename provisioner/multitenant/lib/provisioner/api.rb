@@ -21,7 +21,7 @@ module Loom
         @@provisioner = value
       end
 
-      def self.run_for_provisioner!(provisioner)
+      def self.set_provisioner_and_run!(provisioner)
         @@provisioner = provisioner
         # sinatra blocks
         run!
