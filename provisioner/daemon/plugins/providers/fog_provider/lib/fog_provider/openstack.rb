@@ -73,12 +73,8 @@ class FogProviderOpenstack < FogProvider
       server = self.connection.servers.get(providerid)
 
       # Wait until the server is ready
-      begin
-        log.debug "waiting for server to come up: #{providerid}"
-        server.wait_for(600) { ready? }
-      rescue Fog::Errors::TimeoutError
-        log.error 'Timeout waiting for the server to be created'
-      end
+      log.debug "waiting for server to come up: #{providerid}"
+      server.wait_for(600) { ready? }
 
       @bootstrap_ip = ip_address(server, 'public')
       if @bootstrap_ip.nil?
@@ -102,6 +98,8 @@ class FogProviderOpenstack < FogProvider
       end
       # Return 0
       @result['status'] = 0
+    rescue Fog::Errors::TimeoutError
+      log.error 'Timeout waiting for the server to be created'
     rescue Net::SSH::AuthenticationFailed => e
       log.error("SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}: #{e.inspect}"
