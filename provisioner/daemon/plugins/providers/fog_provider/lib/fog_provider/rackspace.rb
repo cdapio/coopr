@@ -92,7 +92,6 @@ class FogProviderRackspace < FogProvider
       # Process results
       @result['result']['ipaddress'] = @bootstrap_ip
       # Additional checks
-      tcp_test_port(@bootstrap_ip, 22) { sleep 5 }
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
       Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
