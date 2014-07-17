@@ -14,20 +14,8 @@ module Loom
   class Provisioner
     class Api < Sinatra::Base
       include Logging
-      @@provisioner
 
-      # used for testing
-      def self::provisioner= (value)
-        @@provisioner = value
-      end
-
-      def self.set_provisioner_and_run!(provisioner)
-        @@provisioner = provisioner
-        # sinatra blocks
-        run!
-      end
-
-      set :logging, false
+      set :environment, :production
 
       get '/status' do
         body "OK"
@@ -35,7 +23,7 @@ module Loom
 
       get '/heartbeat' do
         log.info "heartbeat called"
-        @@provisioner.heartbeat.to_json
+        settings.provisioner.heartbeat.to_json
       end
 
       post "/v1/tenants" do
@@ -49,7 +37,7 @@ module Loom
         ts = TenantSpec.new(id, workers, modules, plugins)
         tm = TenantManager.new(ts)
 
-        @@provisioner.add_tenant(tm)
+        settings.provisioner.add_tenant(tm)
 
         data['status'] = 0
         body data.to_json
@@ -68,15 +56,15 @@ module Loom
         ts = TenantSpec.new(params[:t_id], workers, modules, plugins)
         tm = TenantManager.new(ts)
 
-        @@provisioner.add_tenant(tm)
+        settings.provisioner.add_tenant(tm)
 
         data['status'] = 0
         body data.to_json
       end
 
       delete "/v1/tenants/:t_id" do
-        if @@provisioner.tenantmanagers.key?(params[:t_id])
-          @@provisioner.delete_tenant(params[:t_id])
+        if settings.provisioner.tenantmanagers.key?(params[:t_id])
+          settings.provisioner.delete_tenant(params[:t_id])
           body "OK"
         else
           halt 404
