@@ -15,15 +15,22 @@
  */
 package com.continuuity.loom.http;
 
+import com.continuuity.loom.Entities;
+import com.continuuity.loom.admin.AutomatorType;
+import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
 import com.continuuity.loom.store.tenant.SQLTenantStore;
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
@@ -201,5 +208,87 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
   @Test
   public void testAddTenantWithDefaults() {
     // TODO: implement once bootstrapping with defaults is implemented
+  }
+
+  @Test
+  public void testProviderTypes() throws Exception {
+    testNonPostRestAPIs("providertypes", Entities.ProviderTypeExample.JOYENT_JSON,
+                        Entities.ProviderTypeExample.RACKSPACE_JSON, SUPERADMIN_HEADERS);
+  }
+
+  @Test
+  public void testAutomatorTypes() throws Exception {
+    testNonPostRestAPIs("automatortypes", Entities.AutomatorTypeExample.CHEF_JSON,
+                        Entities.AutomatorTypeExample.SHELL_JSON, SUPERADMIN_HEADERS);
+  }
+
+  @Test
+  public void testEditProviderTypesMustBeSuperadmin() throws Exception {
+    tenantStore.writeTenant(new Tenant("tenant", ADMIN_ACCOUNT.getTenantId(), 500, 1000, 10000));
+    ProviderType type = Entities.ProviderTypeExample.RACKSPACE;
+    assertResponseStatus(doPut("/v1/loom/providertypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
+                         HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doDelete("/v1/loom/providertypes/" + type.getName(), ADMIN_HEADERS),
+                         HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void testEditAutomatorTypesMustBeSuperadmin() throws Exception {
+    tenantStore.writeTenant(new Tenant("tenant", ADMIN_ACCOUNT.getTenantId(), 500, 1000, 10000));
+    AutomatorType type = Entities.AutomatorTypeExample.CHEF;
+    assertResponseStatus(doPut("/v1/loom/automatortypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
+                         HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doDelete("/v1/loom/automatortypes/" + type.getName(), ADMIN_HEADERS),
+                         HttpResponseStatus.FORBIDDEN);
+  }
+
+  private void testNonPostRestAPIs(String entityType, JsonObject entity1, JsonObject entity2,
+                                   Header[] headers) throws Exception {
+    String base = "/v1/loom/" + entityType;
+    String entity1Path = base + "/" + entity1.get("name").getAsString();
+    String entity2Path = base + "/" + entity2.get("name").getAsString();
+    // should start off with no entities
+    assertResponseStatus(doGet(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
+
+    // add entity through PUT
+    assertResponseStatus(doPut(entity1Path, entity1.toString(), headers), HttpResponseStatus.OK);
+    // check we can get it
+    HttpResponse response = doGet(entity1Path, headers);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+    Assert.assertEquals(entity1, result);
+
+    // add second entity through PUT
+    assertResponseStatus(doPut(entity2Path, entity2.toString(), headers), HttpResponseStatus.OK);
+    // check we can get it
+    response = doGet(entity2Path, headers);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    result = new Gson().fromJson(reader, JsonObject.class);
+    Assert.assertEquals(entity2, result);
+
+    // get both entities
+    response = doGet(base, headers);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    JsonArray results = new Gson().fromJson(reader, JsonArray.class);
+
+    Assert.assertEquals(2, results.size());
+    JsonObject first = results.get(0).getAsJsonObject();
+    JsonObject second = results.get(1).getAsJsonObject();
+    if (first.get("name").getAsString().equals(entity1.get("name").getAsString())) {
+      Assert.assertEquals(entity1, first);
+      Assert.assertEquals(entity2, second);
+    } else {
+      Assert.assertEquals(entity2, first);
+      Assert.assertEquals(entity1, second);
+    }
+
+    assertResponseStatus(doDelete(entity1Path, headers), HttpResponseStatus.OK);
+    assertResponseStatus(doDelete(entity2Path, headers), HttpResponseStatus.OK);
+    // check both were deleted
+    assertResponseStatus(doGet(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGet(entity2Path, headers), HttpResponseStatus.NOT_FOUND);
   }
 }
