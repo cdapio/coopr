@@ -17,6 +17,8 @@ package com.continuuity.loom.store.entity;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.store.DBConnectionPool;
+import com.continuuity.loom.store.DBPut;
+import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 
@@ -24,51 +26,28 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
  * Implementation of {@link BaseSQLEntityStoreView} from the view of a tenant admin.
  */
 public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
+  private final DBQueryExecutor dbQueryExecutor;
 
-  SQLAdminEntityStoreView(Account account, DBConnectionPool dbConnectionPool, Gson gson) {
+  SQLAdminEntityStoreView(Account account, DBConnectionPool dbConnectionPool,
+                          DBQueryExecutor dbQueryExecutor, Gson gson) {
     super(account, dbConnectionPool, gson);
+    this.dbQueryExecutor = dbQueryExecutor;
     Preconditions.checkArgument(account.isAdmin(), "Entity store only writeable by admins");
   }
 
   @Override
   protected void writeEntity(EntityType entityType, String entityName, byte[] data) throws IOException {
-    // sticking with standard sql... this could be done in one step with replace, or with
-    // insert ... on duplicate key update with mysql.
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        // table name doesn't come from the user, ok to insert here
-        PreparedStatement checkStatement = getSelectStatement(conn, entityType, entityName);
-        PreparedStatement writeStatement;
-        try {
-          ResultSet rs = checkStatement.executeQuery();
-          try {
-            if (rs.next()) {
-              // entity exists already, perform an update.
-              writeStatement = getUpdateStatement(conn, entityType, entityName, data);
-            } else {
-              // entity does not exist, perform an insert.
-              writeStatement = getInsertStatement(conn, entityType, entityName, data);
-            }
-          } finally {
-            rs.close();
-          }
-          // perform the update or insert
-          try {
-            writeStatement.executeUpdate();
-          } finally {
-            writeStatement.close();
-          }
-        } finally {
-          checkStatement.close();
-        }
+        DBPut entityPut = new EntityDBPut(entityType, entityName, data);
+        entityPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -98,30 +77,6 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
     }
   }
 
-  private PreparedStatement getInsertStatement(Connection conn, EntityType entityType,
-                                               String entityName, byte[] data) throws SQLException {
-    String entityTypeId = entityType.getId();
-    // immune to sql injection since it comes from the enum.
-    String queryStr = "INSERT INTO " + entityTypeId + "s (name, tenant_id, " + entityTypeId + ") VALUES (?, ?, ?)";
-    PreparedStatement statement = conn.prepareStatement(queryStr);
-    statement.setString(1, entityName);
-    statement.setString(2, account.getTenantId());
-    statement.setBlob(3, new ByteArrayInputStream(data));
-    return statement;
-  }
-
-  private PreparedStatement getUpdateStatement(Connection conn, EntityType entityType,
-                                               String entityName, byte[] data) throws SQLException {
-    String entityTypeId = entityType.getId();
-    // immune to sql injection since it comes from the enum.
-    String queryStr = "UPDATE " + entityTypeId + "s SET " + entityTypeId + "=? WHERE name=? AND tenant_id=?";
-    PreparedStatement statement = conn.prepareStatement(queryStr);
-    statement.setBlob(1, new ByteArrayInputStream(data));
-    statement.setString(2, entityName);
-    statement.setString(3, account.getTenantId());
-    return statement;
-  }
-
   private PreparedStatement getDeleteStatement(Connection conn, EntityType entityType,
                                                String entityName) throws SQLException {
     String entityTypeId = entityType.getId();
@@ -131,5 +86,41 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
     statement.setString(1, entityName);
     statement.setString(2, account.getTenantId());
     return statement;
+  }
+
+  private class EntityDBPut extends DBPut {
+    private final EntityType entityType;
+    private final String entityName;
+    private final byte[] data;
+
+    private EntityDBPut(EntityType entityType, String entityName, byte[] data) {
+      this.entityType = entityType;
+      this.entityName = entityName;
+      this.data = data;
+    }
+
+    @Override
+    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
+      String entityTypeId = entityType.getId();
+      // immune to sql injection since it comes from the enum.
+      String queryStr = "UPDATE " + entityTypeId + "s SET " + entityTypeId + "=? WHERE name=? AND tenant_id=?";
+      PreparedStatement statement = conn.prepareStatement(queryStr);
+      statement.setBlob(1, new ByteArrayInputStream(data));
+      statement.setString(2, entityName);
+      statement.setString(3, account.getTenantId());
+      return statement;
+    }
+
+    @Override
+    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
+      String entityTypeId = entityType.getId();
+      // immune to sql injection since it comes from the enum.
+      String queryStr = "INSERT INTO " + entityTypeId + "s (name, tenant_id, " + entityTypeId + ") VALUES (?, ?, ?)";
+      PreparedStatement statement = conn.prepareStatement(queryStr);
+      statement.setString(1, entityName);
+      statement.setString(2, account.getTenantId());
+      statement.setBlob(3, new ByteArrayInputStream(data));
+      return statement;
+    }
   }
 }

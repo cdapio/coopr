@@ -18,16 +18,17 @@ package com.continuuity.loom.store.tenant;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -121,41 +122,9 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   public void writeTenant(Tenant tenant) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
-      String tenantId = tenant.getId();
       try {
-        PreparedStatement checkStatement = conn.prepareStatement("SELECT id FROM tenants WHERE id=?");
-        checkStatement.setString(1, tenantId);
-        PreparedStatement writeStatement;
-        try {
-          ResultSet rs = checkStatement.executeQuery();
-          try {
-            if (rs.next()) {
-              // cluster exists already, perform an update.
-              writeStatement = conn.prepareStatement(
-                "UPDATE tenants SET tenant=?, workers=? WHERE id=?");
-              writeStatement.setBlob(1, dbQueryExecutor.toByteStream(tenant, Tenant.class));
-              writeStatement.setInt(2, tenant.getWorkers());
-              writeStatement.setString(3, tenantId);
-            } else {
-              // cluster does not exist, perform an insert.
-              writeStatement = conn.prepareStatement(
-                "INSERT INTO tenants (id, workers, tenant) VALUES (?, ?, ?)");
-              writeStatement.setString(1, tenantId);
-              writeStatement.setInt(2, tenant.getWorkers());
-              writeStatement.setBlob(3, dbQueryExecutor.toByteStream(tenant, Tenant.class));
-            }
-          } finally {
-            rs.close();
-          }
-          // perform the update or insert
-          try {
-            writeStatement.executeUpdate();
-          } finally {
-            writeStatement.close();
-          }
-        } finally {
-          checkStatement.close();
-        }
+        DBPut tenantPut = new TenantDBPut(tenant, dbQueryExecutor.toByteStream(tenant, Tenant.class));
+        tenantPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -183,6 +152,36 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     } catch (SQLException e) {
       LOG.error("Exception deleting tenant {}", id);
       throw new IOException(e);
+    }
+  }
+
+  private class TenantDBPut extends DBPut {
+    private final Tenant tenant;
+    private final ByteArrayInputStream tenantBytes;
+
+    private TenantDBPut(Tenant tenant, ByteArrayInputStream tenantBytes) {
+      this.tenant = tenant;
+      this.tenantBytes = tenantBytes;
+    }
+
+    @Override
+    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
+      PreparedStatement statement = conn.prepareStatement(
+        "UPDATE tenants SET tenant=?, workers=? WHERE id=?");
+      statement.setBlob(1, tenantBytes);
+      statement.setInt(2, tenant.getWorkers());
+      statement.setString(3, tenant.getId());
+      return statement;
+    }
+
+    @Override
+    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
+      PreparedStatement statement = conn.prepareStatement(
+        "INSERT INTO tenants (id, workers, tenant) VALUES (?, ?, ?)");
+      statement.setString(1, tenant.getId());
+      statement.setInt(2, tenant.getWorkers());
+      statement.setBlob(3, tenantBytes);
+      return statement;
     }
   }
 }

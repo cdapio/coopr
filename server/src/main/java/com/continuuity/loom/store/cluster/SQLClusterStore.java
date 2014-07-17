@@ -8,11 +8,13 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -44,9 +46,9 @@ public class SQLClusterStore implements ClusterStore {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("SELECT job FROM jobs WHERE job_num=? AND cluster_id=?");
-        statement.setLong(1, jobId.getJobNum());
-        statement.setLong(2, Long.parseLong(jobId.getClusterId()));
         try {
+          statement.setLong(1, jobId.getJobNum());
+          statement.setLong(2, Long.parseLong(jobId.getClusterId()));
           return dbQueryExecutor.getQueryItem(statement, ClusterJob.class);
         } finally {
           statement.close();
@@ -132,44 +134,9 @@ public class SQLClusterStore implements ClusterStore {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement checkStatement =
-          conn.prepareStatement("SELECT job_num FROM jobs WHERE job_num=? AND cluster_id=?");
-        checkStatement.setLong(1, jobId.getJobNum());
-        checkStatement.setLong(2, Long.parseLong(jobId.getClusterId()));
-        PreparedStatement writeStatement;
-        try {
-          ResultSet rs = checkStatement.executeQuery();
-          try {
-            if (rs.next()) {
-              // cluster exists already, perform an update.
-              writeStatement =
-                conn.prepareStatement("UPDATE jobs SET job=?, status=? WHERE job_num=? AND cluster_id=?");
-              writeStatement.setBlob(1, dbQueryExecutor.toByteStream(clusterJob, ClusterJob.class));
-              writeStatement.setString(2, clusterJob.getJobStatus().name());
-              writeStatement.setLong(3, jobId.getJobNum());
-              writeStatement.setLong(4, clusterId);
-            } else {
-              // cluster does not exist, perform an insert.
-              writeStatement = conn.prepareStatement(
-                "INSERT INTO jobs (job_num, cluster_id, status, create_time, job) VALUES (?, ?, ?, ?, ?)");
-              writeStatement.setLong(1, jobId.getJobNum());
-              writeStatement.setLong(2, clusterId);
-              writeStatement.setString(3, clusterJob.getJobStatus().name());
-              writeStatement.setTimestamp(4, DBHelper.getTimestamp(System.currentTimeMillis()));
-              writeStatement.setBlob(5, dbQueryExecutor.toByteStream(clusterJob, ClusterJob.class));
-            }
-          } finally {
-            rs.close();
-          }
-          // perform the update or insert
-          try {
-            writeStatement.executeUpdate();
-          } finally {
-            writeStatement.close();
-          }
-        } finally {
-          checkStatement.close();
-        }
+        ByteArrayInputStream jobBytes = dbQueryExecutor.toByteStream(clusterJob, ClusterJob.class);
+        DBPut jobPut = new ClusterJobDBPut(clusterJob, jobBytes, jobId, clusterId);
+        jobPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -184,9 +151,9 @@ public class SQLClusterStore implements ClusterStore {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement("DELETE FROM jobs WHERE job_num=? AND cluster_id=?");
-        statement.setLong(1, jobId.getJobNum());
-        statement.setLong(2, Long.parseLong(jobId.getClusterId()));
         try {
+          statement.setLong(1, jobId.getJobNum());
+          statement.setLong(2, Long.parseLong(jobId.getClusterId()));
           statement.executeUpdate();
         } finally {
           statement.close();
@@ -206,10 +173,10 @@ public class SQLClusterStore implements ClusterStore {
       try {
         PreparedStatement statement =
           conn.prepareStatement("SELECT task FROM tasks WHERE task_num=? AND cluster_id=? AND job_num=?");
-        statement.setLong(1, taskId.getTaskNum());
-        statement.setLong(2, Long.parseLong(taskId.getClusterId()));
-        statement.setLong(3, taskId.getJobNum());
         try {
+          statement.setLong(1, taskId.getTaskNum());
+          statement.setLong(2, Long.parseLong(taskId.getClusterId()));
+          statement.setLong(3, taskId.getJobNum());
           return dbQueryExecutor.getQueryItem(statement, ClusterTask.class);
         } finally {
           statement.close();
@@ -230,51 +197,9 @@ public class SQLClusterStore implements ClusterStore {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement checkStatement =
-          conn.prepareStatement("SELECT task_num FROM tasks WHERE task_num=? AND job_num=? AND cluster_id=?");
-        checkStatement.setLong(1, taskId.getTaskNum());
-        checkStatement.setLong(2, taskId.getJobNum());
-        checkStatement.setLong(3, clusterId);
-        PreparedStatement writeStatement;
-        try {
-          ResultSet rs = checkStatement.executeQuery();
-          try {
-            if (rs.next()) {
-              // task exists already, perform an update.
-              writeStatement = conn.prepareStatement(
-                "UPDATE tasks SET task=?, status=?, submit_time=?, status_time=?" +
-                  " WHERE task_num=? AND job_num=? AND cluster_id=?");
-              writeStatement.setBlob(1, dbQueryExecutor.toByteStream(clusterTask, ClusterTask.class));
-              writeStatement.setString(2, clusterTask.getStatus().name());
-              writeStatement.setTimestamp(3, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
-              writeStatement.setTimestamp(4, DBHelper.getTimestamp(clusterTask.getStatusTime()));
-              writeStatement.setLong(5, taskId.getTaskNum());
-              writeStatement.setLong(6, taskId.getJobNum());
-              writeStatement.setLong(7, clusterId);
-            } else {
-              // task does not exist, perform an insert.
-              writeStatement = conn.prepareStatement(
-                "INSERT INTO tasks (task_num, job_num, cluster_id, status, submit_time, task)" +
-                  " VALUES (?, ?, ?, ?, ?, ?)");
-              writeStatement.setLong(1, taskId.getTaskNum());
-              writeStatement.setLong(2, taskId.getJobNum());
-              writeStatement.setLong(3, clusterId);
-              writeStatement.setString(4, clusterTask.getStatus().name());
-              writeStatement.setTimestamp(5, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
-              writeStatement.setBlob(6, dbQueryExecutor.toByteStream(clusterTask, ClusterTask.class));
-            }
-          } finally {
-            rs.close();
-          }
-          // perform the update or insert
-          try {
-            writeStatement.executeUpdate();
-          } finally {
-            writeStatement.close();
-          }
-        } finally {
-          checkStatement.close();
-        }
+        ByteArrayInputStream taskBytes = dbQueryExecutor.toByteStream(clusterTask, ClusterTask.class);
+        DBPut taskPut = new ClusterTaskDBPut(clusterTask, taskBytes, taskId, clusterId);
+        taskPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -328,42 +253,12 @@ public class SQLClusterStore implements ClusterStore {
 
   @Override
   public void writeNode(Node node) throws IOException {
-    // sticking with standard sql... this could be done in one step with replace, or with
-    // insert ... on duplicate key update with mysql.
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement checkStatement = conn.prepareStatement("SELECT id FROM nodes WHERE id=?");
-        checkStatement.setString(1, node.getId());
-        PreparedStatement writeStatement;
-        try {
-          ResultSet rs = checkStatement.executeQuery();
-          try {
-            if (rs.next()) {
-              // node exists already, perform an update.
-              writeStatement = conn.prepareStatement("UPDATE nodes SET node=? WHERE id=?");
-              writeStatement.setBlob(1, dbQueryExecutor.toByteStream(node, Node.class));
-              writeStatement.setString(2, node.getId());
-            } else {
-              // node does not exist, perform an insert.
-              writeStatement = conn.prepareStatement(
-                "INSERT INTO nodes (id, cluster_id, node) VALUES (?, ?, ?)");
-              writeStatement.setString(1, node.getId());
-              writeStatement.setLong(2, Long.parseLong(node.getClusterId()));
-              writeStatement.setBlob(3, dbQueryExecutor.toByteStream(node, Node.class));
-            }
-          } finally {
-            rs.close();
-          }
-          // perform the update or insert
-          try {
-            writeStatement.executeUpdate();
-          } finally {
-            writeStatement.close();
-          }
-        } finally {
-          checkStatement.close();
-        }
+        ByteArrayInputStream nodeBytes = dbQueryExecutor.toByteStream(node, Node.class);
+        DBPut nodePut = new NodeDBPut(node, nodeBytes);
+        nodePut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -470,5 +365,113 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public Set<Node> getClusterNodes(String clusterId) throws IOException {
     return systemView.getClusterNodes(clusterId);
+  }
+
+  private class ClusterJobDBPut extends DBPut {
+    private final ClusterJob clusterJob;
+    private final ByteArrayInputStream jobBytes;
+    private final JobId jobId;
+    private final long clusterId;
+
+    private ClusterJobDBPut(ClusterJob clusterJob, ByteArrayInputStream jobBytes, JobId jobId, long clusterId) {
+      this.clusterJob = clusterJob;
+      this.jobBytes = jobBytes;
+      this.jobId = jobId;
+      this.clusterId = clusterId;
+    }
+
+    @Override
+    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
+      PreparedStatement updateStatement =
+        conn.prepareStatement("UPDATE jobs SET job=?, status=? WHERE job_num=? AND cluster_id=?");
+      updateStatement.setBlob(1, jobBytes);
+      updateStatement.setString(2, clusterJob.getJobStatus().name());
+      updateStatement.setLong(3, jobId.getJobNum());
+      updateStatement.setLong(4, clusterId);
+      return updateStatement;
+    }
+
+    @Override
+    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
+      PreparedStatement statement = conn.prepareStatement(
+        "INSERT INTO jobs (job_num, cluster_id, status, create_time, job) VALUES (?, ?, ?, ?, ?)");
+      statement.setLong(1, jobId.getJobNum());
+      statement.setLong(2, clusterId);
+      statement.setString(3, clusterJob.getJobStatus().name());
+      statement.setTimestamp(4, DBHelper.getTimestamp(System.currentTimeMillis()));
+      statement.setBlob(5, jobBytes);
+      return statement;
+    }
+  }
+
+  private class ClusterTaskDBPut extends DBPut {
+    private final ClusterTask clusterTask;
+    private final ByteArrayInputStream taskBytes;
+    private final TaskId taskId;
+    private final long clusterId;
+
+    private ClusterTaskDBPut(ClusterTask clusterTask, ByteArrayInputStream taskBytes, TaskId taskId, long clusterId) {
+      this.clusterTask = clusterTask;
+      this.taskBytes = taskBytes;
+      this.taskId = taskId;
+      this.clusterId = clusterId;
+    }
+
+    @Override
+    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
+      PreparedStatement statement = conn.prepareStatement(
+        "UPDATE tasks SET task=?, status=?, submit_time=?, status_time=?" +
+          " WHERE task_num=? AND job_num=? AND cluster_id=?");
+      statement.setBlob(1, dbQueryExecutor.toByteStream(clusterTask, ClusterTask.class));
+      statement.setString(2, clusterTask.getStatus().name());
+      statement.setTimestamp(3, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
+      statement.setTimestamp(4, DBHelper.getTimestamp(clusterTask.getStatusTime()));
+      statement.setLong(5, taskId.getTaskNum());
+      statement.setLong(6, taskId.getJobNum());
+      statement.setLong(7, clusterId);
+      return statement;
+    }
+
+    @Override
+    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
+      PreparedStatement statement = conn.prepareStatement(
+        "INSERT INTO tasks (task_num, job_num, cluster_id, status, submit_time, task)" +
+          " VALUES (?, ?, ?, ?, ?, ?)");
+      statement.setLong(1, taskId.getTaskNum());
+      statement.setLong(2, taskId.getJobNum());
+      statement.setLong(3, clusterId);
+      statement.setString(4, clusterTask.getStatus().name());
+      statement.setTimestamp(5, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
+      statement.setBlob(6, taskBytes);
+      return statement;
+    }
+  }
+
+  private class NodeDBPut extends DBPut {
+    private final Node node;
+    private final ByteArrayInputStream nodeBytes;
+
+    private NodeDBPut(Node node, ByteArrayInputStream nodeBytes) {
+      this.node = node;
+      this.nodeBytes = nodeBytes;
+    }
+
+    @Override
+    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
+      PreparedStatement statement = conn.prepareStatement("UPDATE nodes SET node=? WHERE id=?");
+      statement.setBlob(1, nodeBytes);
+      statement.setString(2, node.getId());
+      return statement;
+    }
+
+    @Override
+    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
+      PreparedStatement statement = conn.prepareStatement(
+        "INSERT INTO nodes (id, cluster_id, node) VALUES (?, ?, ?)");
+      statement.setString(1, node.getId());
+      statement.setLong(2, Long.parseLong(node.getClusterId()));
+      statement.setBlob(3, nodeBytes);
+      return statement;
+    }
   }
 }
