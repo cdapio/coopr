@@ -40,7 +40,6 @@ class FogProviderRackspace < FogProvider
           :name         => hostname,
           :config_drive => false
         )
-        # :keypair      => @rackspace_ssh_keypair if @rackspace_ssh_keypair
         server.persisted? || server.save
       end
       # Process results
@@ -68,18 +67,11 @@ class FogProviderRackspace < FogProvider
       end
       # Confirm server
       log.debug 'Invoking server confirm'
-
       log.debug "fetching server for id: #{providerid}"
       server = self.connection.servers.get(providerid)
-
       # Wait until the server is ready
-      begin
-        log.debug "waiting for server to come up: #{providerid}"
-        server.wait_for(600) { ready? }
-      rescue Fog::Errors::TimeoutError
-        log.error 'Timeout waiting for the server to be created'
-      end
-
+      log.debug "waiting for server to come up: #{providerid}"
+      server.wait_for(600) { ready? }
       @bootstrap_ip = ip_address(server, 'public')
       if @bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
@@ -93,7 +85,6 @@ class FogProviderRackspace < FogProvider
       # Process results
       @result['result']['ipaddress'] = @bootstrap_ip
       # Additional checks
-      log.debug 'Confirming sshd is up'
       tcp_test_port(@bootstrap_ip, 22) { sleep 5 }
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
@@ -102,6 +93,8 @@ class FogProviderRackspace < FogProvider
       end
       # Return 0
       @result['status'] = 0
+    rescue Fog::Errors::TimeoutError
+      log.error 'Timeout waiting for the server to be created'
     rescue Net::SSH::AuthenticationFailed => e
       log.error("SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}: #{e.inspect}"
