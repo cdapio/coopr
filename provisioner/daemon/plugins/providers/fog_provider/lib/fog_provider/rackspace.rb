@@ -71,7 +71,13 @@ class FogProviderRackspace < FogProvider
       server = self.connection.servers.get(providerid)
       # Wait until the server is ready
       log.debug "waiting for server to come up: #{providerid}"
-      server.wait_for(600) { ready? }
+      server.wait_for(600) {
+        if @rackconnect_wait
+          ready? and metadata.all['rackconnect_automation_status'] == 'DEPLOYED'
+        else
+          ready?
+        end
+      }
       @bootstrap_ip = ip_address(server, 'public')
       if @bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'

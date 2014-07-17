@@ -109,6 +109,18 @@
         "required": [
           [ "rackspace_username", "rackspace_api_key", "rackspace_region" ]
         ]
+      },
+      "user": {
+        "fields": {
+          "rackconnect_wait": {
+            "label": "RackConnect Wait",
+            "type": "checkbox",
+            "tip": "Wait for RackConnect"
+          }
+        },
+        "required": [
+          [ ]
+        ]
       }
     }
   }
