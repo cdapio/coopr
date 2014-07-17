@@ -195,7 +195,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
       try {
         DBPut provisionerPut =
           new ProvisionerDBPut(provisioner, dbQueryExecutor.toByteStream(provisioner, Provisioner.class));
-        dbQueryExecutor.executePut(conn, provisionerPut);
+        provisionerPut.executePut(conn);
         writeProvisionerWorkers(conn, provisioner);
         conn.commit();
       } finally {
@@ -390,7 +390,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
     }
   }
 
-  private class ProvisionerDBPut implements DBPut {
+  private class ProvisionerDBPut extends DBPut {
     private final Provisioner provisioner;
     private final ByteArrayInputStream provisionerBytes;
 

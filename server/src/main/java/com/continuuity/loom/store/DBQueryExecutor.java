@@ -16,7 +16,6 @@
 package com.continuuity.loom.store;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -30,7 +29,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.sql.Blob;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,7 +48,7 @@ public final class DBQueryExecutor {
 
   /**
    * Queries the store for a set of items, deserializing the items and returning an immutable set of them. If no items
-   * exist, the set will be empty.
+   * exist, the set will be empty. Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution. Will be closed by this method.
    * @param clazz Class of the items being queried.
@@ -59,30 +57,36 @@ public final class DBQueryExecutor {
    * @throws java.sql.SQLException
    */
   public <T> ImmutableSet<T> getQuerySet(PreparedStatement statement, Class<T> clazz) throws SQLException {
+    ResultSet rs = statement.executeQuery();
     try {
-      ResultSet rs = statement.executeQuery();
-      try {
-        Set<T> results = Sets.newHashSet();
-        while (rs.next()) {
-          Blob blob = rs.getBlob(1);
-          results.add(deserializeBlob(blob, clazz));
-        }
-        return ImmutableSet.copyOf(results);
-      } finally {
-        rs.close();
+      Set<T> results = Sets.newHashSet();
+      while (rs.next()) {
+        Blob blob = rs.getBlob(1);
+        results.add(deserializeBlob(blob, clazz));
       }
+      return ImmutableSet.copyOf(results);
     } finally {
-      statement.close();
+      rs.close();
     }
   }
 
+  /**
+   * Queries the store for a list of items, deserializing the items and returning an immutable list of them. If no items
+   * exist, the list will be empty. Statement passed in must be closed by the caller.
+   *
+   * @param statement PreparedStatement of the query, ready for execution.
+   * @param clazz Class of the items being queried.
+   * @param <T> Type of the items being queried.
+   * @return Immutable list of objects that were queried for.
+   * @throws java.sql.SQLException
+   */
   public <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
     return getQueryList(statement, clazz, Integer.MAX_VALUE);
   }
 
   /**
-   * Queries the store for a list of items, deserializing the items and returning an immutable list of them. If no items
-   * exist, the list will be empty.
+   * Queries the store for a list of at most limit items, deserializing the items and returning an immutable
+   * list of them. If no items exist, the list will be empty. Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution.
    * @param clazz Class of the items being queried.
@@ -110,6 +114,7 @@ public final class DBQueryExecutor {
 
   /**
    * Queries the store for a single item, deserializing the item and returning it or null if the item does not exist.
+   * Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution.
    * @param clazz Class of the item being queried.
@@ -133,6 +138,7 @@ public final class DBQueryExecutor {
 
   /**
    * Queries for a single number, returning the value of the number or 0 if there are no results.
+   * Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution.
    * @return Result of the query, or 0 if no results.
@@ -152,7 +158,7 @@ public final class DBQueryExecutor {
   }
 
   /**
-   * Performs the query and returns whether or not there are results.
+   * Performs the query and returns whether or not there are results. Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution.
    * @return True if the query has results, false if not.
@@ -164,30 +170,6 @@ public final class DBQueryExecutor {
       return rs.next();
     } finally {
       rs.close();
-    }
-  }
-
-  /**
-   * Perform a write by first trying to update, and if no rows are updated, by performing an insert.
-   *
-   * @param put DBPut which specifies how to create the update and insert statements.
-   * @throws SQLException
-   */
-  public void executePut(Connection conn, DBPut put) throws SQLException {
-    PreparedStatement updateStatement = put.createUpdateStatement(conn);
-    try {
-      int rowsUpdated = updateStatement.executeUpdate();
-      // if no rows are updated, perform the insert
-      if (rowsUpdated == 0) {
-        PreparedStatement insertStatement = put.createInsertStatement(conn);
-        try {
-          insertStatement.executeUpdate();
-        } finally {
-          insertStatement.close();
-        }
-      }
-    } finally {
-      updateStatement.close();
     }
   }
 

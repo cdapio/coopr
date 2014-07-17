@@ -136,7 +136,7 @@ public class SQLClusterStore implements ClusterStore {
       try {
         ByteArrayInputStream jobBytes = dbQueryExecutor.toByteStream(clusterJob, ClusterJob.class);
         DBPut jobPut = new ClusterJobDBPut(clusterJob, jobBytes, jobId, clusterId);
-        dbQueryExecutor.executePut(conn, jobPut);
+        jobPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -199,7 +199,7 @@ public class SQLClusterStore implements ClusterStore {
       try {
         ByteArrayInputStream taskBytes = dbQueryExecutor.toByteStream(clusterTask, ClusterTask.class);
         DBPut taskPut = new ClusterTaskDBPut(clusterTask, taskBytes, taskId, clusterId);
-        dbQueryExecutor.executePut(conn, taskPut);
+        taskPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -258,7 +258,7 @@ public class SQLClusterStore implements ClusterStore {
       try {
         ByteArrayInputStream nodeBytes = dbQueryExecutor.toByteStream(node, Node.class);
         DBPut nodePut = new NodeDBPut(node, nodeBytes);
-        dbQueryExecutor.executePut(conn, nodePut);
+        nodePut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -367,7 +367,7 @@ public class SQLClusterStore implements ClusterStore {
     return systemView.getClusterNodes(clusterId);
   }
 
-  private class ClusterJobDBPut implements DBPut {
+  private class ClusterJobDBPut extends DBPut {
     private final ClusterJob clusterJob;
     private final ByteArrayInputStream jobBytes;
     private final JobId jobId;
@@ -404,7 +404,7 @@ public class SQLClusterStore implements ClusterStore {
     }
   }
 
-  private class ClusterTaskDBPut implements DBPut {
+  private class ClusterTaskDBPut extends DBPut {
     private final ClusterTask clusterTask;
     private final ByteArrayInputStream taskBytes;
     private final TaskId taskId;
@@ -447,7 +447,7 @@ public class SQLClusterStore implements ClusterStore {
     }
   }
 
-  private class NodeDBPut implements DBPut {
+  private class NodeDBPut extends DBPut {
     private final Node node;
     private final ByteArrayInputStream nodeBytes;
 

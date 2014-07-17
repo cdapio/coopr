@@ -47,7 +47,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
       Connection conn = dbConnectionPool.getConnection();
       try {
         DBPut entityPut = new EntityDBPut(entityType, entityName, data);
-        dbQueryExecutor.executePut(conn, entityPut);
+        entityPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -88,7 +88,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
     return statement;
   }
 
-  private class EntityDBPut implements DBPut {
+  private class EntityDBPut extends DBPut {
     private final EntityType entityType;
     private final String entityName;
     private final byte[] data;

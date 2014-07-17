@@ -23,9 +23,33 @@ import java.sql.SQLException;
  * Interface used to put an object into a database by first trying to perform an update, and then performing an
  * insert if the update did not affect any rows.
  */
-public interface DBPut {
+public abstract class DBPut {
 
-  PreparedStatement createUpdateStatement(Connection conn) throws SQLException;
+  /**
+   * Execute the put using the given connection.
+   *
+   * @param conn Connection to use to execute the put
+   * @throws SQLException
+   */
+  public void executePut(Connection conn) throws SQLException {
+    PreparedStatement updateStatement = createUpdateStatement(conn);
+    try {
+      int rowsUpdated = updateStatement.executeUpdate();
+      // if no rows are updated, perform the insert
+      if (rowsUpdated == 0) {
+        PreparedStatement insertStatement = createInsertStatement(conn);
+        try {
+          insertStatement.executeUpdate();
+        } finally {
+          insertStatement.close();
+        }
+      }
+    } finally {
+      updateStatement.close();
+    }
+  }
 
-  PreparedStatement createInsertStatement(Connection conn) throws SQLException;
+  abstract protected PreparedStatement createUpdateStatement(Connection conn) throws SQLException;
+
+  abstract protected PreparedStatement createInsertStatement(Connection conn) throws SQLException;
 }

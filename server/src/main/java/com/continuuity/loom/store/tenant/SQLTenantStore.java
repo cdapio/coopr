@@ -124,7 +124,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
       Connection conn = dbConnectionPool.getConnection();
       try {
         DBPut tenantPut = new TenantDBPut(tenant, dbQueryExecutor.toByteStream(tenant, Tenant.class));
-        dbQueryExecutor.executePut(conn, tenantPut);
+        tenantPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -155,7 +155,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     }
   }
 
-  private class TenantDBPut implements DBPut {
+  private class TenantDBPut extends DBPut {
     private final Tenant tenant;
     private final ByteArrayInputStream tenantBytes;
 
@@ -168,7 +168,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
         "UPDATE tenants SET tenant=?, workers=? WHERE id=?");
-      statement.setBlob(1, dbQueryExecutor.toByteStream(tenant, Tenant.class));
+      statement.setBlob(1, tenantBytes);
       statement.setInt(2, tenant.getWorkers());
       statement.setString(3, tenant.getId());
       return statement;
@@ -180,7 +180,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
         "INSERT INTO tenants (id, workers, tenant) VALUES (?, ?, ?)");
       statement.setString(1, tenant.getId());
       statement.setInt(2, tenant.getWorkers());
-      statement.setBlob(3, dbQueryExecutor.toByteStream(tenant, Tenant.class));
+      statement.setBlob(3, tenantBytes);
       return statement;
     }
   }

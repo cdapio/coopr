@@ -130,7 +130,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       try {
         ByteArrayInputStream clusterBytes = dbQueryExecutor.toByteStream(cluster, Cluster.class);
         DBPut clusterPut = new ClusterDBPut(clusterNum, cluster, clusterBytes);
-        dbQueryExecutor.executePut(conn, clusterPut);
+        clusterPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -216,7 +216,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
     return statement;
   }
 
-  private class ClusterDBPut implements DBPut {
+  private class ClusterDBPut extends DBPut {
     private final long clusterId;
     private final Cluster cluster;
     private final ByteArrayInputStream clusterBytes;
