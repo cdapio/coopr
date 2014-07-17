@@ -75,8 +75,12 @@ module Loom
       end
 
       delete "/v1/tenants/:t_id" do
-        @@provisioner.delete_tenant(params[:t_id])
-        body "OK"
+        if @@provisioner.tenantmanagers.key?(params[:t_id])
+          @@provisioner.delete_tenant(params[:t_id])
+          body "OK"
+        else
+          halt 404
+        end
       end
     end
   end
