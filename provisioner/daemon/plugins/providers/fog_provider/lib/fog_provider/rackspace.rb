@@ -147,9 +147,10 @@ class FogProviderRackspace < FogProvider
 
   def connection
     log.debug "Connection options for Rackspace:"
-    log.debug "rackspace_api_key #{@rackspace_api_key}"
-    log.debug "rackspace_username #{@rackspace_username}"
-    log.debug "rackspace_region #{@rackspace_region}"
+    log.debug "- rackspace_api_key #{@rackspace_api_key}"
+    log.debug "- rackspace_username #{@rackspace_username}"
+    log.debug "- rackspace_region #{@rackspace_region}"
+    log.debug "- rackspace_auth_url #{auth_endpoint}"
 
     # Create connection
     @connection ||= begin
@@ -158,9 +159,16 @@ class FogProviderRackspace < FogProvider
         :version  => 'v2',
         :rackspace_username => @rackspace_username,
         :rackspace_api_key  => @rackspace_api_key,
-        :rackspace_region   => @rackspace_region
+        :rackspace_region   => @rackspace_region,
+        :rackspace_auth_url => auth_endpoint
       )
     end
+  end
+
+  def auth_endpoint
+    url = @rackspace_auth_url if @rackspace_auth_url
+    return url if url
+    (@rackspace_region == 'lon') ? ::Fog::Rackspace::UK_AUTH_ENDPOINT : ::Fog::Rackspace::US_AUTH_ENDPOINT
   end
 
   def ip_address(server, network = 'public')
