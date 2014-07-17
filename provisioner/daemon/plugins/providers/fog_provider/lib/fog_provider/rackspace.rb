@@ -42,7 +42,7 @@ class FogProviderRackspace < FogProvider
           :metadata     => @rackspace_metadata || nil,
           :disk_config  => @rackspace_disk_config || 'AUTO',
           :personality  => files,
-          :keypair      => @rackspace_ssh_keypair || nil
+          :key_name      => @rackspace_ssh_keypair || nil
         )
         server.persisted? || server.save
       end

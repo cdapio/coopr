@@ -116,6 +116,11 @@
             "label": "RackConnect Wait",
             "type": "checkbox",
             "tip": "Wait for RackConnect"
+          },
+          "rackspace_ssh_keypair": {
+            "label": "Rackspace SSH Keypair",
+            "type": "text",
+            "tip": "Your Rackspace SSH key name"
           }
         },
         "required": [
