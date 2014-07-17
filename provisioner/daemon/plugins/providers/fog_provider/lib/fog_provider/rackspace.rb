@@ -38,7 +38,11 @@ class FogProviderRackspace < FogProvider
           :flavor_id    => flavor,
           :image_id     => image,
           :name         => hostname,
-          :config_drive => false
+          :config_drive => @rackspace_config_drive || false,
+          :metadata     => @rackspace_metadata || nil,
+          :disk_config  => @rackspace_disk_config || 'AUTO',
+          :personality  => files,
+          :keypair      => @rackspace_ssh_keypair || nil
         )
         server.persisted? || server.save
       end
@@ -162,6 +166,41 @@ class FogProviderRackspace < FogProvider
         :rackspace_auth_url => auth_endpoint
       )
     end
+  end
+
+  def parse_file_argument(arg)
+    dest, src = arg.split('=')
+    unless dest && src
+      log.error "Unable to process file arguments #{arg}. The remote destination and local source using DESTINATION-PATH=SOURCE-PATH are needed"
+      raise "Failed processing file arguments #{arg}"
+    end
+    [dest, src]
+  end
+
+  def encode_file(file)
+    begin
+      filename = File.expand_path(file)
+      content = File.read(filename)
+    rescue Errno::ENOENT => e
+      log.error "Unable to read source file - #{filename}"
+      raise "Failed encoding file #{filename}"
+    end
+    Base64.encode64(content)
+  end
+
+  def files
+    return {} unless @rackspace_files
+
+    files = []
+    @rackspace_files.each do |arg|
+      dest, src = parse_file_argument(arg)
+      Chef::Log.debug("Inject file #{src} into #{dest}")
+      files << {
+        :path => dest,
+        :contents => encode_file(src)
+      }
+    end
+    files
   end
 
   def auth_endpoint
