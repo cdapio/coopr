@@ -168,27 +168,30 @@ public class SolverSchedulerTest extends BaseTest {
       null
     );
 
-    EntityStoreView entityStore = entityStoreService.getView(account);
+    EntityStoreView superadminView =
+      entityStoreService.getView(new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT));
+    superadminView.writeProviderType(Entities.ProviderTypeExample.JOYENT);
+
+    EntityStoreView adminView = entityStoreService.getView(account);
     // create providers
-    entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
+    adminView.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
                                            ImmutableMap.<String, String>of()));
-    entityStore.writeProviderType(Entities.ProviderTypeExample.JOYENT);
     // create hardware types
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "medium",
         "medium hardware",
         ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Medium 4GB"))
       )
     );
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "large-mem",
         "hardware with a lot of memory",
         ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Large 32GB"))
       )
     );
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "large-cpu",
         "hardware with a lot of cpu",
@@ -196,18 +199,19 @@ public class SolverSchedulerTest extends BaseTest {
       )
     );
     // create image types
-    entityStore.writeImageType(
+    adminView.writeImageType(
       new ImageType(
         "centos6",
         "CentOs 6.4 image",
-        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("image", "joyent-hash-of-centos6.4"))
+        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("image",
+                                                                                               "joyent-hash-of-centos6.4"))
       )
     );
     // create services
     for (String serviceName : services) {
-      entityStore.writeService(new Service(serviceName, serviceName + " description", ImmutableSet.<String>of(),
+      adminView.writeService(new Service(serviceName, serviceName + " description", ImmutableSet.<String>of(),
                                            ImmutableMap.<ProvisionerAction, ServiceAction>of()));
     }
-    entityStore.writeClusterTemplate(reactorTemplate);
+    adminView.writeClusterTemplate(reactorTemplate);
   }
 }

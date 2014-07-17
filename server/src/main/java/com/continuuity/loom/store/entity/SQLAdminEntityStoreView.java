@@ -34,7 +34,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
 
   SQLAdminEntityStoreView(Account account, DBConnectionPool dbConnectionPool, Gson gson) {
     super(account, dbConnectionPool, gson);
-    Preconditions.checkArgument(account.isAdmin(), "Entity store only viewable by admins");
+    Preconditions.checkArgument(account.isAdmin(), "Entity store only writeable by admins");
   }
 
   @Override

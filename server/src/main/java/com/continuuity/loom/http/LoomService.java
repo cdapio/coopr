@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.http.handler;
+package com.continuuity.loom.http;
 
 import com.continuuity.http.HttpHandler;
 import com.continuuity.http.NettyHttpService;
