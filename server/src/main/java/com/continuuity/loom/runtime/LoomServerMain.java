@@ -24,7 +24,7 @@ import com.continuuity.loom.common.queue.guice.QueueModule;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
 import com.continuuity.loom.http.guice.HttpModule;
-import com.continuuity.loom.http.handler.LoomService;
+import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.management.guice.ManagementModule;
 import com.continuuity.loom.provisioner.guice.ProvisionerModule;

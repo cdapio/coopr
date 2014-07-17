@@ -76,18 +76,6 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
-  public void testProviderTypes() throws Exception {
-    testNonPostRestAPIs("providertypes", Entities.ProviderTypeExample.JOYENT_JSON,
-                        Entities.ProviderTypeExample.RACKSPACE_JSON, SUPERADMIN_HEADERS);
-  }
-
-  @Test
-  public void testAutomatorTypes() throws Exception {
-    testNonPostRestAPIs("automatortypes", Entities.AutomatorTypeExample.CHEF_JSON,
-                        Entities.AutomatorTypeExample.SHELL_JSON, SUPERADMIN_HEADERS);
-  }
-
-  @Test
   public void testNonAdminUserGetsForbiddenStatus() throws Exception {
     String base = "/v1/loom/";
     String[] resources = { "providers", "hardwaretypes", "imagetypes", "services", "clustertemplates" };
@@ -130,15 +118,6 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
                                                    Entities.ClusterTemplateExample.REACTOR),
                                 new TypeToken<List<ClusterTemplate>>() {}.getType()));
 
-    import1.put(LoomAdminHandler.PROVIDER_TYPES,
-                gson.toJsonTree(Lists.newArrayList(Entities.ProviderTypeExample.JOYENT,
-                                                   Entities.ProviderTypeExample.RACKSPACE),
-                                new TypeToken<List<ProviderType>>() {}.getType()));
-
-    import1.put(LoomAdminHandler.AUTOMATOR_TYPES,
-                gson.toJsonTree(Lists.newArrayList(Entities.AutomatorTypeExample.CHEF,
-                                                   Entities.AutomatorTypeExample.PUPPET),
-                                new TypeToken<List<AutomatorType>>() {}.getType()));
 
     // Verify import worked by exporting
     runImportExportTest(import1);
@@ -170,17 +149,6 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
                                 new TypeToken<List<ClusterTemplate>>() {
                                 }.getType()));
 
-    import2.put(LoomAdminHandler.PROVIDER_TYPES,
-                gson.toJsonTree(Lists.newArrayList(Entities.ProviderTypeExample.USER_RACKSPACE),
-                                new TypeToken<List<ProviderType>>() {
-                                }.getType()));
-
-    import2.put(LoomAdminHandler.AUTOMATOR_TYPES,
-                gson.toJsonTree(Lists.newArrayList(Entities.AutomatorTypeExample.CHEF,
-                                                   Entities.AutomatorTypeExample.SHELL),
-                                new TypeToken<List<AutomatorType>>() {
-                                }.getType()));
-
     // Verify import worked by exporting
     runImportExportTest(import2);
 
@@ -191,9 +159,6 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     import3.put(LoomAdminHandler.IMAGE_TYPES, new JsonArray());
     import3.put(LoomAdminHandler.SERVICES, new JsonArray());
     import3.put(LoomAdminHandler.CLUSTER_TEMPLATES, new JsonArray());
-    import3.put(LoomAdminHandler.AUTOMATOR_TYPES, new JsonArray());
-    import3.put(LoomAdminHandler.PROVIDER_TYPES, new JsonArray());
-
     // Verify import worked by exporting
     runImportExportTest(import3);
   }
@@ -213,8 +178,6 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     assertImport(importJson, exportJson, LoomAdminHandler.IMAGE_TYPES);
     assertImport(importJson, exportJson, LoomAdminHandler.SERVICES);
     assertImport(importJson, exportJson, LoomAdminHandler.CLUSTER_TEMPLATES);
-    assertImport(importJson, exportJson, LoomAdminHandler.AUTOMATOR_TYPES);
-    assertImport(importJson, exportJson, LoomAdminHandler.PROVIDER_TYPES);
   }
 
   private void assertImport(Map<String, JsonElement> import1, Map<String, JsonElement> export1, String key) {
@@ -244,56 +207,6 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     provider.addProperty("name", "?");
     assertResponseStatus(doPost("/v1/loom/providers", provider.toString(), ADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
-  }
-
-  private void testNonPostRestAPIs(String entityType, JsonObject entity1, JsonObject entity2,
-                                   Header[] headers) throws Exception {
-    String base = "/v1/loom/" + entityType;
-    String entity1Path = base + "/" + entity1.get("name").getAsString();
-    String entity2Path = base + "/" + entity2.get("name").getAsString();
-    // should start off with no entities
-    assertResponseStatus(doGet(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
-
-    // add entity through PUT
-    assertResponseStatus(doPut(entity1Path, entity1.toString(), headers), HttpResponseStatus.OK);
-    // check we can get it
-    HttpResponse response = doGet(entity1Path, headers);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-    Assert.assertEquals(entity1, result);
-
-    // add second entity through PUT
-    assertResponseStatus(doPut(entity2Path, entity2.toString(), headers), HttpResponseStatus.OK);
-    // check we can get it
-    response = doGet(entity2Path, headers);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    result = new Gson().fromJson(reader, JsonObject.class);
-    Assert.assertEquals(entity2, result);
-
-    // get both entities
-    response = doGet(base, headers);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonArray results = new Gson().fromJson(reader, JsonArray.class);
-
-    Assert.assertEquals(2, results.size());
-    JsonObject first = results.get(0).getAsJsonObject();
-    JsonObject second = results.get(1).getAsJsonObject();
-    if (first.get("name").getAsString().equals(entity1.get("name").getAsString())) {
-      Assert.assertEquals(entity1, first);
-      Assert.assertEquals(entity2, second);
-    } else {
-      Assert.assertEquals(entity2, first);
-      Assert.assertEquals(entity1, second);
-    }
-
-    assertResponseStatus(doDelete(entity1Path, headers), HttpResponseStatus.OK);
-    assertResponseStatus(doDelete(entity2Path, headers), HttpResponseStatus.OK);
-    // check both were deleted
-    assertResponseStatus(doGet(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doGet(entity2Path, headers), HttpResponseStatus.NOT_FOUND);
   }
 
   private void testRestAPIs(String entityType, JsonObject entity1, JsonObject entity2) throws Exception {

@@ -112,18 +112,14 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
     queryStr.append(entityTypeId);
     queryStr.append(" FROM ");
     queryStr.append(entityTypeId);
-    queryStr.append("s WHERE name=? AND ");
+    queryStr.append("s WHERE name=? AND tenant_id=?");
     // TODO: remove once types are defined through server instead of through provisioner
-    if (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) {
-      queryStr.append("( tenant_id=? OR tenant_id='");
-      queryStr.append(Constants.SUPERADMIN_TENANT);
-      queryStr.append("' )");
-    } else {
-      queryStr.append(" tenant_id=?");
-    }
+    // automator and provider types are constant across tenants and defined only in the superadmin tenant.
+    String tenantId = (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) ?
+      Constants.SUPERADMIN_TENANT : account.getTenantId();
     PreparedStatement statement = conn.prepareStatement(queryStr.toString());
     statement.setString(1, entityName);
-    statement.setString(2, account.getTenantId());
+    statement.setString(2, tenantId);
     return statement;
   }
 
@@ -137,14 +133,12 @@ public abstract class BaseSQLEntityStoreView extends BaseEntityStoreView {
     queryStr.append(entityTypeId);
     queryStr.append("s WHERE tenant_id=? ");
     // TODO: remove once types are defined through server instead of through provisioner
-    if (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) {
-      queryStr.append(" OR tenant_id='");
-      queryStr.append(Constants.SUPERADMIN_TENANT);
-      queryStr.append("'");
-    }
+    // automator and provider types are constant across tenants and defined only in the superadmin tenant.
+    String tenantId = (entityType == EntityType.AUTOMATOR_TYPE || entityType == EntityType.PROVIDER_TYPE) ?
+      Constants.SUPERADMIN_TENANT : account.getTenantId();
 
     PreparedStatement statement = conn.prepareStatement(queryStr.toString());
-    statement.setString(1, account.getTenantId());
+    statement.setString(1, tenantId);
     return statement;
   }
 }

@@ -558,68 +558,6 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Delete a specific {@link ProviderType}. User must be admin or a 403 is returned.
-   *
-   * @param request The request to delete a provider type.
-   * @param responder Responder for sending the response.
-   * @param providertypeId Id of the provider type to delete.
-   */
-  @DELETE
-  @Path("/providertypes/{providertype-id}")
-  public void deleteProviderType(HttpRequest request, HttpResponder responder,
-                                 @PathParam("providertype-id") String providertypeId) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isSuperadmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
-      return;
-    }
-
-    try {
-      entityStoreService.getView(account).deleteProviderType(providertypeId);
-      responder.sendStatus(HttpResponseStatus.OK);
-    } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception deleting provider type " + providertypeId);
-    } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete provider type.");
-    }
-  }
-
-  /**
-   * Delete a specific {@link AutomatorType}. User must be admin or a 403 is returned.
-   *
-   * @param request The request to delete an automator type.
-   * @param responder Responder for sending the response.
-   * @param automatortypeId Id of the automator type to delete.
-   */
-  @DELETE
-  @Path("/automatortypes/{automatortype-id}")
-  public void deleteAutomatorType(HttpRequest request, HttpResponder responder,
-                                 @PathParam("automatortype-id") String automatortypeId) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isSuperadmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
-      return;
-    }
-
-    try {
-      entityStoreService.getView(account).deleteAutomatorType(automatortypeId);
-      responder.sendStatus(HttpResponseStatus.OK);
-    } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception deleting automator type " + automatortypeId);
-    } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to delete automator type.");
-    }
-  }
-
-  /**
    * Writes a {@link Provider}. User must be admin or a 403 is returned. If the name in the path does not match the
    * name in the put body, a 400 is returned.
    *
@@ -820,88 +758,6 @@ public class LoomAdminHandler extends LoomAuthHandler {
                           "Exception writing cluster template " + clustertemplateId);
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write cluster template.");
-    }
-  }
-
-  /**
-   * Writes a {@link ProviderType}. User must be admin or a 403 is returned.
-   * If the name in the path does not match the name in the put body, a 400 is returned.
-   *
-   * @param request Request to write provider type.
-   * @param responder Responder to send response.
-   * @param providertypeId Id of the provider type to write.
-   */
-  @PUT
-  @Path("/providertypes/{providertype-id}")
-  public void putProviderType(HttpRequest request, HttpResponder responder,
-                              @PathParam("providertype-id") String providertypeId) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isSuperadmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
-      return;
-    }
-
-    ProviderType providerType = getEntityFromRequest(request, responder, ProviderType.class);
-    if (providerType == null) {
-      // getEntityFromRequest writes to the responder if there was an issue.
-      return;
-    } else if (!providerType.getName().equals(providertypeId)) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "mismatch between provider type name and name in path.");
-      return;
-    }
-
-    try {
-      entityStoreService.getView(account).writeProviderType(providerType);
-      responder.sendStatus(HttpResponseStatus.OK);
-    } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception writing provider type " + providertypeId);
-    } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write provider type.");
-    }
-  }
-
-  /**
-   * Writes a {@link AutomatorType}. User must be admin or a 403 is returned.
-   * If the name in the path does not match the name in the put body, a 400 is returned.
-   *
-   * @param request Request to write provider type.
-   * @param responder Responder to send response.
-   * @param automatortypeId Id of the provider type to write.
-   */
-  @PUT
-  @Path("/automatortypes/{automatortype-id}")
-  public void putAutomatorType(HttpRequest request, HttpResponder responder,
-                               @PathParam("automatortype-id") String automatortypeId) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isSuperadmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be superadmin.");
-      return;
-    }
-
-    AutomatorType automatorType = getEntityFromRequest(request, responder, AutomatorType.class);
-    if (automatorType == null) {
-      // getEntityFromRequest writes to the responder if there was an issue.
-      return;
-    } else if (!automatorType.getName().equals(automatortypeId)) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "mismatch between automator type name and name in path.");
-      return;
-    }
-
-    try {
-      entityStoreService.getView(account).writeAutomatorType(automatorType);
-      responder.sendStatus(HttpResponseStatus.OK);
-    } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                          "Exception writing automator type " + automatortypeId);
-    } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write automator type.");
     }
   }
 
@@ -1140,14 +996,6 @@ public class LoomAdminHandler extends LoomAuthHandler {
     LOG.debug("Exporting {} cluster templates", clusterTemplates.size());
     outJson.put(CLUSTER_TEMPLATES, gson.toJsonTree(clusterTemplates));
 
-    Collection<AutomatorType> automatorTypes = view.getAllAutomatorTypes();
-    LOG.debug("Exporting {} automator types", automatorTypes.size());
-    outJson.put(AUTOMATOR_TYPES, gson.toJsonTree(automatorTypes));
-
-    Collection<ProviderType> providerTypes = view.getAllProviderTypes();
-    LOG.debug("Exporting {} provider types", providerTypes.size());
-    outJson.put(PROVIDER_TYPES, gson.toJsonTree(providerTypes));
-
     LOG.trace("Exporting {}", outJson);
 
     responder.sendJson(HttpResponseStatus.OK, outJson);
@@ -1208,16 +1056,6 @@ public class LoomAdminHandler extends LoomAuthHandler {
         gson.<List<ClusterTemplate>>fromJson(inJson.get(CLUSTER_TEMPLATES),
                                                         new TypeToken<List<ClusterTemplate>>() {}.getType());
 
-      newAutomatorTypes = !inJson.containsKey(AUTOMATOR_TYPES) ?
-        ImmutableList.<AutomatorType>of() :
-        gson.<List<AutomatorType>>fromJson(inJson.get(AUTOMATOR_TYPES),
-                                           new TypeToken<List<AutomatorType>>() {}.getType());
-
-      newProviderTypes = !inJson.containsKey(PROVIDER_TYPES) ?
-        ImmutableList.<ProviderType>of() :
-        gson.<List<ProviderType>>fromJson(inJson.get(PROVIDER_TYPES),
-                                          new TypeToken<List<ProviderType>>() {}.getType());
-
 
     } catch (JsonSyntaxException e) {
       LOG.error("Got exception while importing config", e);
@@ -1248,14 +1086,6 @@ public class LoomAdminHandler extends LoomAuthHandler {
         view.deleteClusterTemplate(clusterTemplate.getName());
       }
 
-      for (AutomatorType automatorType : view.getAllAutomatorTypes()) {
-        view.deleteAutomatorType(automatorType.getName());
-      }
-
-      for (ProviderType providerType : view.getAllProviderTypes()) {
-        view.deleteProviderType(providerType.getName());
-      }
-
       // Add new config data
       LOG.debug("Importing {} providers", newProviders.size());
       for (Provider provider : newProviders) {
@@ -1280,16 +1110,6 @@ public class LoomAdminHandler extends LoomAuthHandler {
       LOG.debug("Importing {} cluster templates", newClusterTemplates.size());
       for (ClusterTemplate clusterTemplate : newClusterTemplates) {
         view.writeClusterTemplate(clusterTemplate);
-      }
-
-      LOG.debug("Importing {} automator types", newAutomatorTypes.size());
-      for (AutomatorType automatorType : newAutomatorTypes) {
-        view.writeAutomatorType(automatorType);
-      }
-
-      LOG.debug("Importing {} provider types", newProviderTypes.size());
-      for (ProviderType providerType : newProviderTypes) {
-        view.writeProviderType(providerType);
       }
 
       LOG.debug("Importing {} cluster templates", newClusterTemplates.size());
