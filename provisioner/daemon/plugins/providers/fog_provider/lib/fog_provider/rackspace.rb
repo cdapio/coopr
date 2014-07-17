@@ -70,6 +70,7 @@ class FogProviderRackspace < FogProvider
       log.debug "fetching server for id: #{providerid}"
       server = self.connection.servers.get(providerid)
       # Wait until the server is ready
+      raise 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) {
         if @rackconnect_wait
@@ -86,7 +87,7 @@ class FogProviderRackspace < FogProvider
       end
 
       wait_for_sshd(@bootstrap_ip, 22)
-      log.info "Server #{server.name} sshd is up"
+      log.debug "Server #{server.name} sshd is up"
 
       # Process results
       @result['result']['ipaddress'] = @bootstrap_ip
