@@ -8,7 +8,7 @@ import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
-import com.continuuity.loom.store.guice.StoreModule;
+import com.continuuity.loom.store.guice.StoreModules;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -29,7 +29,7 @@ public class UpgradeTool {
     Configuration conf = Configuration.create();
     Injector injector = Guice.createInjector(
       new ConfigurationModule(conf),
-      new StoreModule(),
+      new StoreModules(conf).getDefaultModule(),
       new CodecModules().getUpgradeModule(NEW_TENANT_ID)
     );
     ClusterStoreService clusterStoreService = injector.getInstance(ClusterStoreService.class);

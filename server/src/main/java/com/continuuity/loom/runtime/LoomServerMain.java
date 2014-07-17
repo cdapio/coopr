@@ -27,12 +27,13 @@ import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.http.guice.HttpModule;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.management.guice.ManagementModule;
+import com.continuuity.loom.provisioner.PluginResourceService;
 import com.continuuity.loom.provisioner.guice.ProvisionerModule;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.guice.SchedulerModule;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
-import com.continuuity.loom.store.guice.StoreModule;
+import com.continuuity.loom.store.guice.StoreModules;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -73,6 +74,7 @@ public final class LoomServerMain extends DaemonMain {
   private ListeningExecutorService callbackExecutorService;
   private ClusterStoreService clusterStoreService;
   private EntityStoreService entityStoreService;
+  private PluginResourceService pluginResourceService;
   private ProvisionerStore provisionerStore;
   private IdService idService;
   private TenantStore tenantStore;
@@ -131,7 +133,7 @@ public final class LoomServerMain extends DaemonMain {
       injector = Guice.createInjector(
         new ConfigurationModule(conf),
         new ZookeeperModule(zkClientService),
-        new StoreModule(),
+        new StoreModules(conf).getDefaultModule(),
         new QueueModule(zkClientService),
         new SchedulerModule(conf, callbackExecutorService, solverExecutorService),
         new HttpModule(),
@@ -150,6 +152,8 @@ public final class LoomServerMain extends DaemonMain {
       entityStoreService.startAndWait();
       provisionerStore = injector.getInstance(ProvisionerStore.class);
       provisionerStore.startAndWait();
+      pluginResourceService = injector.getInstance(PluginResourceService.class);
+      pluginResourceService.startAndWait();
 
       // Register MBean
       LoomStats loomStats = injector.getInstance(LoomStats.class);
@@ -196,7 +200,7 @@ public final class LoomServerMain extends DaemonMain {
       }
     }
 
-    stopAll(loomService, provisionerStore, tenantStore, clusterStoreService,
+    stopAll(loomService, pluginResourceService, provisionerStore, tenantStore, clusterStoreService,
             entityStoreService, idService, zkClientService, inMemoryZKServer);
   }
 

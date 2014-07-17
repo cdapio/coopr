@@ -59,6 +59,8 @@ public class Constants {
 
   public static final String CALLBACK_CLASS = "server.callback.class";
 
+  public static final String PLUGIN_STORE_CLASS = "server.plugin.store.class";
+
   public static final String PROVISIONER_TIMEOUT_SECS = "server.provisioner.timeout.secs";
   public static final String PROVISIONER_TIMEOUT_CHECK_INTERVAL_SECS = "server.provisioner.timeout.check.interval.secs";
   public static final String PROVISIONER_REQUEST_MAX_RETRIES = "server.provisioner.request.max.retries";
@@ -91,6 +93,10 @@ public class Constants {
     public static final int DEFAULT_MAX_CONNECTIONS = 100;
   }
 
+  public static final class LocalFilePluginStore {
+    public static final String DATA_DIR = "server.plugin.store.localfilestore.data.dir";
+  }
+
   /**
    * Queue related constants.
    */
@@ -103,9 +109,11 @@ public class Constants {
     public static final String WORKER_BALANCE = "worker.balance.queue";
   }
 
+  public static final int PLUGIN_RESOURCE_CHUNK_SIZE = 1024 * 64;
   public static final String TASK_NAMESPACE = "/tasks";
   public static final String TASK_LOCK_NAMESPACE = TASK_NAMESPACE + "/lock";
   public static final String CLUSTER_LOCK_NAMESPACE = "/clusters/lock";
+  public static final String PLUGIN_LOCK_NAMESPACE = "/plugins/lock";
   public static final String TENANT_NAMESPACE = "/tenants";
   public static final String USER_HEADER = "X-Loom-UserID";
   public static final String API_KEY_HEADER = "X-Loom-ApiKey";

@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.macro;
 
-import com.continuuity.utils.ImmutablePair;
+import com.continuuity.loom.common.utils.ImmutablePair;
 
 /**
  * Parses a macro expression. Syntax:
@@ -172,7 +172,7 @@ public class Parser {
     if (pos1 >= input.length() || input.charAt(pos1) != quote) {
       throw new SyntaxException("Expected " + quote + " at position " + pos);
     }
-    return new ImmutablePair<String, Integer>(input.substring(pos + 1, pos1), pos1 + 1);
+    return ImmutablePair.of(input.substring(pos + 1, pos1), pos1 + 1);
   }
 
   /**

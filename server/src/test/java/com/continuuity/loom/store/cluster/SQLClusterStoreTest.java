@@ -20,13 +20,11 @@ import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
 import com.continuuity.loom.store.DBHelper;
-import com.continuuity.loom.store.guice.StoreModule;
+import com.continuuity.loom.store.guice.StoreModules;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-
-import java.sql.SQLException;
 
 /**
  *
@@ -35,7 +33,7 @@ public class SQLClusterStoreTest extends ClusterStoreTest {
   private static SQLClusterStoreService sqlClusterStoreService;
 
   @BeforeClass
-  public static void setupSQLClusterStoreTest() throws SQLException {
+  public static void setupSQLClusterStoreTest() throws Exception {
     Configuration sqlConf = Configuration.create();
     sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
@@ -43,7 +41,7 @@ public class SQLClusterStoreTest extends ClusterStoreTest {
     sqlConf.setLong(Constants.ID_INCREMENT_BY, 1);
     Injector injector = Guice.createInjector(
       new ConfigurationModule(sqlConf),
-      new StoreModule(),
+      new StoreModules(sqlConf).getTestModule(),
       new CodecModules().getModule()
     );
     sqlClusterStoreService = injector.getInstance(SQLClusterStoreService.class);

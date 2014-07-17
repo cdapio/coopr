@@ -24,6 +24,7 @@ import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
 import com.continuuity.loom.http.guice.HttpModule;
 import com.continuuity.loom.provisioner.MockProvisionerRequestService;
+import com.continuuity.loom.provisioner.PluginResourceService;
 import com.continuuity.loom.provisioner.ProvisionerRequestService;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;
@@ -32,8 +33,10 @@ import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.SQLClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
-import com.continuuity.loom.store.guice.StoreModule;
+import com.continuuity.loom.store.guice.StoreModules;
+import com.continuuity.loom.store.provisioner.PluginResourceMetaStoreService;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
+import com.continuuity.loom.store.provisioner.SQLPluginResourceMetaStoreService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -60,11 +63,14 @@ public class BaseTest {
   private static InMemoryZKServer zkServer;
   private static SQLClusterStoreService sqlClusterStoreService;
   private static SQLProvisionerStore sqlProvisionerStore;
+  private static SQLPluginResourceMetaStoreService sqlMetaStoreService;
   protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
   protected static ZKClientService zkClientService;
   protected static EntityStoreService entityStoreService;
   protected static SQLClusterStoreService clusterStoreService;
+  protected static PluginResourceMetaStoreService metaStoreService;
+  protected static PluginResourceService pluginResourceService;
   protected static ClusterStore clusterStore;
   protected static TenantStore tenantStore;
   protected static ProvisionerStore provisionerStore;
@@ -96,7 +102,7 @@ public class BaseTest {
       Modules.override(
         new ConfigurationModule(conf),
         new ZookeeperModule(zkClientService),
-        new StoreModule(),
+        new StoreModules(conf).getTestModule(),
         new QueueModule(zkClientService),
         new HttpModule(),
         new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor()),
@@ -126,6 +132,10 @@ public class BaseTest {
     sqlProvisionerStore = injector.getInstance(SQLProvisionerStore.class);
     provisionerStore = sqlProvisionerStore;
     provisionerStore.startAndWait();
+    sqlMetaStoreService = injector.getInstance(SQLPluginResourceMetaStoreService.class);
+    metaStoreService = sqlMetaStoreService;
+    pluginResourceService = injector.getInstance(PluginResourceService.class);
+    pluginResourceService.startAndWait();
     gson = injector.getInstance(Gson.class);
   }
 
@@ -140,5 +150,6 @@ public class BaseTest {
   public void setupBaseTest() throws SQLException {
     sqlClusterStoreService.clearData();
     sqlProvisionerStore.clearData();
+    sqlMetaStoreService.clearData();
   }
 }

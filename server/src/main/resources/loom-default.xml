@@ -144,6 +144,18 @@
     </property>
 
     <property>
+        <name>server.plugin.store.class</name>
+        <value>com.continuuity.loom.store.provisioner.LocalFilePluginStore</value>
+        <description>class to use to store plugin modules</description>
+    </property>
+
+    <property>
+        <name>server.plugin.store.localfilestore.data.dir</name>
+        <value>/var/loom/data/plugin-modules</value>
+        <description>data directory to store plugin modules when using the file plugin store</description>
+    </property>
+
+    <property>
         <name>server.provisioner.timeout.secs</name>
         <value>120</value>
         <description>seconds to wait for a provisioner heartbeat before moving its workers and deleting it</description>

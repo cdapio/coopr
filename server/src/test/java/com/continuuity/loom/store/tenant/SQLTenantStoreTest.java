@@ -20,7 +20,7 @@ import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
 import com.continuuity.loom.store.DBHelper;
-import com.continuuity.loom.store.guice.StoreModule;
+import com.continuuity.loom.store.guice.StoreModules;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.AfterClass;
@@ -42,7 +42,7 @@ public class SQLTenantStoreTest extends TenantStoreTest {
     sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
     Injector injector = Guice.createInjector(
       new ConfigurationModule(sqlConf),
-      new StoreModule(),
+      new StoreModules(sqlConf).getTestModule(),
       new CodecModules().getModule()
     );
     sqlStore = injector.getInstance(SQLTenantStore.class);
