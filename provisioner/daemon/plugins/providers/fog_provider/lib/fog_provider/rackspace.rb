@@ -41,7 +41,7 @@ class FogProviderRackspace < FogProvider
           :config_drive => false
         )
         # :keypair      => @rackspace_ssh_keypair if @rackspace_ssh_keypair
-        server.save
+        server.persisted? || server.save
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
