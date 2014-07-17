@@ -49,7 +49,7 @@ public abstract class DBPut {
     }
   }
 
-  abstract protected PreparedStatement createUpdateStatement(Connection conn) throws SQLException;
+  protected abstract PreparedStatement createUpdateStatement(Connection conn) throws SQLException;
 
-  abstract protected PreparedStatement createInsertStatement(Connection conn) throws SQLException;
+  protected abstract PreparedStatement createInsertStatement(Connection conn) throws SQLException;
 }

@@ -25,14 +25,14 @@ import java.io.Reader;
 public class MockProvisionerHandler extends AbstractHttpHandler {
   private static final Logger LOG = LoggerFactory.getLogger(MockProvisionerHandler.class);
   private final MockProvisionerTenantStore provisionerTenantStore = MockProvisionerTenantStore.getInstance();
-  private final Gson GSON = new Gson();
+  private final Gson gson = new Gson();
 
   @PUT
   @Path("/{tenant-id}")
   public void writeTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
     LOG.debug("Received request to put tenant {}", tenantId);
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    JsonObject body = GSON.fromJson(reader, JsonObject.class);
+    JsonObject body = gson.fromJson(reader, JsonObject.class);
     Integer numWorkers = body.get("workers").getAsInt();
     LOG.debug("Request to set num workers for tenant {} to {}", tenantId, numWorkers);
     if (numWorkers != provisionerTenantStore.getAssignedWorkers(tenantId)) {
