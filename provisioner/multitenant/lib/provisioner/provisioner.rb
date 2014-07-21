@@ -86,7 +86,8 @@ module Loom
 
     def setup_signal_traps
       @signals = Array.new
-      ['CLD', 'TERM', 'INT'].each do |signal|
+      #['CLD', 'TERM', 'INT'].each do |signal|
+      %w(CLD TERM INT).each do |signal|
         Signal.trap(signal) do
           @signals << signal
         end
@@ -100,7 +101,7 @@ module Loom
           log.info "reaping #{@signals.size} signals: #{@signals}" unless @signals.empty?
           #Logging.log.info "reaping #{@signals.size} signals: #{@signals}"
           signals_processed = {}
-          while !@signals.empty?
+          unless @signals.empty?
             sig = @signals.shift
             next if signals_processed.key?(sig)
             log.info "processing signal: #{sig}"
@@ -108,7 +109,7 @@ module Loom
             when 'CLD'
               verify_tenants
             when 'TERM', 'INT'
-              if !@shutting_down
+              unless @shutting_down
                 @shutting_down = true
                 tenantmanagers.each do |k, v|
                   v.terminate_all_worker_processes
@@ -123,7 +124,7 @@ module Loom
             log.info "done processing signal #{sig}"
             signals_processed[sig] = true
           end
-        sleep 1
+          sleep 1
         }
       }
     end
@@ -212,7 +213,7 @@ module Loom
     end
 
     def add_tenant(tenantmgr)
-      if !tenantmgr.instance_of?(TenantManager)
+      unless tenantmgr.instance_of?(TenantManager)
         raise ArgumentError, "only instances of TenantManager can be added to provisioner", caller
       end
       # validate input

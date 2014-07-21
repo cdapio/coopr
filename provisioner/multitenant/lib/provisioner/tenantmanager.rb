@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 
 require_relative 'tenantspec'
 require_relative 'worker'
@@ -9,10 +10,10 @@ module Loom
     include Logging
     attr_accessor :spec, :provisioner_id
     # command used to launch a worker.  args are separate
-    @worker_name
+    #@worker_name
 
     def initialize(spec)
-      if !spec.instance_of?(TenantSpec)
+      unless spec.instance_of?(TenantSpec)
         raise ArgumentError, "TenantManager needs to be initialized with object of type TenantSpec", caller
       end
       @spec = spec

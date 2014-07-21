@@ -1,8 +1,9 @@
+# encoding: UTF-8
 require 'optparse'
 
 module Loom
   class CLI
-    def self.read(arguments=ARGV)
+    def self.read(arguments = ARGV)
 
       # Parse command line options.
       options = {}
