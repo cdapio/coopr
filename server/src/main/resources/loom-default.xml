@@ -146,13 +146,13 @@
     <property>
         <name>server.plugin.store.class</name>
         <value>com.continuuity.loom.store.provisioner.LocalFilePluginStore</value>
-        <description>class to use to store plugin modules</description>
+        <description>class to use to store plugin resources</description>
     </property>
 
     <property>
         <name>server.plugin.store.localfilestore.data.dir</name>
-        <value>/var/loom/data/plugin-modules</value>
-        <description>data directory to store plugin modules when using the file plugin store</description>
+        <value>/var/loom/data/plugins/resources</value>
+        <description>data directory to store plugin resources when using the local file plugin store</description>
     </property>
 
     <property>

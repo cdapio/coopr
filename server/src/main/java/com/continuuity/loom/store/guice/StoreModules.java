@@ -19,7 +19,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 
 /**
- * Guice module for binding store related classes.
+ * Creates guice modules for binding store related classes.
  */
 public class StoreModules {
   private final Class pluginStoreClass;
@@ -28,6 +28,11 @@ public class StoreModules {
     this.pluginStoreClass = Class.forName(conf.get(Constants.PLUGIN_STORE_CLASS));
   }
 
+  /**
+   * Get the default module, which binds store classes to their default sql backed implementation.
+   *
+   * @return module that binds classes to SQL backed implementations.
+   */
   public AbstractModule getDefaultModule() {
     return new AbstractModule() {
       @Override
@@ -48,6 +53,12 @@ public class StoreModules {
     };
   }
 
+  /**
+   * Get the test module, which binds store classes to their default sql backed implementations where applicable, and
+   * memory backed implementations where not.
+   *
+   * @return module that binds some classes to memory backed implementations
+   */
   public AbstractModule getTestModule() {
     return new AbstractModule() {
       @Override

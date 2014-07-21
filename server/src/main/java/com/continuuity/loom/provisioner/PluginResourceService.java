@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012-2014, Continuuity, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.continuuity.loom.provisioner;
 
 import com.continuuity.http.BodyConsumer;
@@ -101,16 +116,19 @@ public class PluginResourceService extends AbstractIdleService {
     };
   }
 
+  /**
+   * Get an input stream for reading the plugin resource, or null if the resource does not exist.
+   *
+   * @param account Account the resource belongs to
+   * @param resourceType Type of resource
+   * @param resourceMeta Metadata of the resource
+   * @return Input stream for reading the given plugin resource
+   * @throws IOException if there was an error getting the input stream for the resource
+   */
   public InputStream getResourceInputStream(final Account account, PluginResourceType resourceType,
                                             PluginResourceMeta resourceMeta) throws IOException {
-    // TODO: implement read, write locks
-    final ZKInterProcessReentrantLock lock = getLock(account, resourceType, resourceMeta.getName());
-    lock.acquire();
-    try {
-      return pluginStore.getResourceInputStream(account, resourceType, resourceMeta);
-    } finally {
-      lock.release();
-    }
+    // TODO: implement read locks. For now this may fail if a write/delete occurs concurrently.
+    return pluginStore.getResourceInputStream(account, resourceType, resourceMeta);
   }
 
   /**

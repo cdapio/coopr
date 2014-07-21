@@ -400,8 +400,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
 
     try {
       responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllClusterTemplates(),
-                         new TypeToken<Collection<ClusterTemplate>>() {
-                         }.getType(), gson);
+                         new TypeToken<Collection<ClusterTemplate>>() {}.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting cluster templates");
     }
