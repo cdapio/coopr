@@ -21,8 +21,8 @@ import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.internal.ElementsTrackingQueue;
-import com.continuuity.loom.http.LoomService;
-import com.continuuity.loom.scheduler.JobScheduler;
+import com.continuuity.loom.provisioner.Provisioner;
+import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -38,6 +38,7 @@ import org.apache.http.message.BasicHeader;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 /**
@@ -47,6 +48,8 @@ public class LoomServiceTestBase extends BaseTest {
   protected static final String USER1 = "user1";
   protected static final String USER2 = "user2";
   protected static final String API_KEY = "apikey";
+  protected static final String TENANT_ID = "tenant1";
+  protected static final String PROVISIONER_ID = "provisioner1";
   protected static final String TENANT = "tenant1";
   protected static final Account USER1_ACCOUNT = new Account(USER1, TENANT);
   protected static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, TENANT);
@@ -54,17 +57,17 @@ public class LoomServiceTestBase extends BaseTest {
   protected static final Header[] USER1_HEADERS = {
     new BasicHeader(Constants.USER_HEADER, USER1),
     new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
-    new BasicHeader(Constants.TENANT_HEADER, TENANT)
+    new BasicHeader(Constants.TENANT_HEADER, TENANT_ID)
   };
   protected static final Header[] USER2_HEADERS = {
     new BasicHeader(Constants.USER_HEADER, USER2),
     new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
-    new BasicHeader(Constants.TENANT_HEADER, TENANT)
+    new BasicHeader(Constants.TENANT_HEADER, TENANT_ID)
   };
   protected static final Header[] ADMIN_HEADERS = {
     new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
     new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
-    new BasicHeader(Constants.TENANT_HEADER, TENANT)
+    new BasicHeader(Constants.TENANT_HEADER, TENANT_ID)
   };
   protected static final Header[] SUPERADMIN_HEADERS = {
     new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
@@ -80,7 +83,7 @@ public class LoomServiceTestBase extends BaseTest {
   protected static QueueGroup jobQueues;
   protected static QueueGroup callbackQueues;
   protected static Scheduler scheduler;
-  protected static JobScheduler jobScheduler;
+  protected static TenantProvisionerService tenantProvisionerService;
 
 
   @BeforeClass
@@ -97,8 +100,14 @@ public class LoomServiceTestBase extends BaseTest {
     port = loomService.getBindAddress().getPort();
     scheduler = injector.getInstance(Scheduler.class);
     scheduler.startAndWait();
-    jobScheduler = injector.getInstance(JobScheduler.class);
-    tenantStore.writeTenant(new Tenant("name", TENANT, 10, 100, 1000));
+    tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
+    tenantStore.writeTenant(new Tenant("name", TENANT_ID, 10, 100, 1000));
+  }
+
+  @Before
+  public void setupServiceTest() throws Exception {
+    tenantProvisionerService.writeProvisioner(new Provisioner(PROVISIONER_ID, "host1", 12345, 100, null, null));
+    tenantProvisionerService.writeTenant(new Tenant("name", TENANT_ID, 10, 100, 1000));
   }
 
   @AfterClass

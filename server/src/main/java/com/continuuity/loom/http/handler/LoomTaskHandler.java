@@ -17,12 +17,13 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.http.HttpHelper;
+import com.continuuity.loom.http.request.FinishTaskRequest;
+import com.continuuity.loom.http.request.TakeTaskRequest;
+import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.scheduler.task.TaskQueueService;
-import com.google.common.base.Charsets;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
@@ -30,8 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.IOException;
 
 /**
  * Handles requests to take and finish tasks from provisioners.
@@ -56,35 +56,26 @@ public final class LoomTaskHandler extends AbstractHttpHandler {
    *
    * @param request The request to take a task.
    * @param responder Responder to send the response.
-   * @throws Exception
    */
   @POST
   @Path("/take")
-  public void handleTakeTask(HttpRequest request, HttpResponder responder) throws Exception {
-    JsonObject body;
+  public void handleTakeTask(HttpRequest request, HttpResponder responder) {
+    TakeTaskRequest takeRequest = HttpHelper.decodeRequestBody(request, responder, TakeTaskRequest.class, gson);
 
     try {
-      body = getRequestBody(request);
-    } catch (Exception e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid request.");
-      return;
+      String taskJson = taskQueueService.takeNextClusterTask(takeRequest);
+      if (taskJson == null) {
+        responder.sendError(HttpResponseStatus.NO_CONTENT, "no tasks to take for worker " + takeRequest.getWorkerId());
+        return;
+      }
+      responder.sendString(HttpResponseStatus.OK, taskJson);
+    } catch (IOException e) {
+      LOG.error("Exception while taking task.", e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error taking task.");
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "Provisioner " + takeRequest.getProvisionerId()
+        + " is not registered.");
     }
-
-    // TODO: refactor, body of the request should be a class and leave deserialization up to codec.
-    if (!body.has("workerId") || body.get("workerId") == null) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "workerId must be specified.");
-      return;
-    }
-
-    String workerId = body.get("workerId").getAsString();
-    String taskJson = taskQueueService.takeNextClusterTask(workerId, body.get("tenantId").getAsString());
-
-    if (taskJson == null) {
-      responder.sendError(HttpResponseStatus.NO_CONTENT, "no tasks to take for worker " + workerId);
-      return;
-    }
-
-    responder.sendString(HttpResponseStatus.OK, taskJson);
   }
 
   /**
@@ -98,67 +89,31 @@ public final class LoomTaskHandler extends AbstractHttpHandler {
    *
    * @param request The request to take a task.
    * @param responder Responder to send the response.
-   * @throws Exception
    */
   @POST
   @Path("/finish")
-  public void handleFinishTask(HttpRequest request, HttpResponder responder) throws Exception {
-    JsonObject body;
-    try {
-      body = getRequestBody(request);
-    } catch (Exception e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid request.");
+  public void handleFinishTask(HttpRequest request, HttpResponder responder) {
+    FinishTaskRequest finishRequest = HttpHelper.decodeRequestBody(request, responder, FinishTaskRequest.class, gson);
+    if (finishRequest == null) {
       return;
     }
 
-    if (!validateFinishBody(body, responder)) {
-      // validateFinishBody sends error response.
-      return;
-    }
-
-    LOG.trace("Got response {}", body);
-
-    String workerId = body.get("workerId").getAsString();
-    String taskId = body.get("taskId").getAsString();
-    int status = body.get("status").getAsInt();
-    JsonObject result = (body.has("result") && body.get("result") != null) ?
-      body.get("result").getAsJsonObject() : new JsonObject();
-    String stdout = (body.has("stdout") && body.get("stdout") != null) ? body.get("stdout").getAsString() : null;
-    String stderr = (body.has("stderr") && body.get("stderr") != null) ? body.get("stderr").getAsString() : null;
+    LOG.trace("Got task finish {}", finishRequest);
 
     try {
-      taskQueueService.finishClusterTask(taskId, workerId, status, result,
-                                         stdout, stderr, body.get("tenantId").getAsString());
+      taskQueueService.finishClusterTask(finishRequest);
+      responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.EXPECTATION_FAILED, e.getMessage());
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    } catch (IOException e) {
+      LOG.error("Exception finishing task {}.", finishRequest.getTaskId(), e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                          "Error finishing task " + finishRequest.getTaskId());
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "Provisioner " + finishRequest.getProvisionerId()
+        + " is not registered.");
     }
-
-    responder.sendStatus(HttpResponseStatus.OK);
-  }
-
-  private boolean validateFinishBody(JsonObject body, HttpResponder responder) {
-    if (!body.has("workerId") || body.get("workerId") == null) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "workerId must be specified.");
-      return false;
-    }
-
-    if (!body.has("taskId") || body.get("taskId") == null) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "taskId must be specified.");
-      return false;
-    }
-
-    if (!body.has("status") || body.get("status") == null) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "status must be specified.");
-      return false;
-    }
-
-    return true;
-  }
-
-  private JsonObject getRequestBody(HttpRequest request) {
-    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    return gson.fromJson(reader, JsonObject.class);
   }
 }
