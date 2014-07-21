@@ -17,15 +17,13 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.http.HttpHelper;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.scheduler.task.TaskQueueService;
-import com.google.common.base.Charsets;
-import com.google.common.io.Closeables;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
@@ -34,8 +32,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
 /**
  * Handles requests to take and finish tasks from provisioners.
@@ -64,19 +60,7 @@ public final class LoomTaskHandler extends AbstractHttpHandler {
   @POST
   @Path("/take")
   public void handleTakeTask(HttpRequest request, HttpResponder responder) {
-    TakeTaskRequest takeRequest = null;
-    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    try {
-      takeRequest = gson.fromJson(reader, TakeTaskRequest.class);
-    } catch (IllegalArgumentException e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
-      return;
-    } catch (Exception e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid request.");
-      return;
-    } finally {
-      Closeables.closeQuietly(reader);
-    }
+    TakeTaskRequest takeRequest = HttpHelper.decodeRequestBody(request, responder, TakeTaskRequest.class, gson);
 
     try {
       String taskJson = taskQueueService.takeNextClusterTask(takeRequest);
@@ -109,18 +93,9 @@ public final class LoomTaskHandler extends AbstractHttpHandler {
   @POST
   @Path("/finish")
   public void handleFinishTask(HttpRequest request, HttpResponder responder) {
-    FinishTaskRequest finishRequest = null;
-    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    try {
-      finishRequest = gson.fromJson(reader, FinishTaskRequest.class);
-    } catch (IllegalArgumentException e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    FinishTaskRequest finishRequest = HttpHelper.decodeRequestBody(request, responder, FinishTaskRequest.class, gson);
+    if (finishRequest == null) {
       return;
-    } catch (Exception e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid request.");
-      return;
-    } finally {
-      Closeables.closeQuietly(reader);
     }
 
     LOG.trace("Got task finish {}", finishRequest);
