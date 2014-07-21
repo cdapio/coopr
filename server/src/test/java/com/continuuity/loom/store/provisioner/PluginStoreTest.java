@@ -20,14 +20,15 @@ import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.PluginResourceMeta;
 import com.continuuity.loom.provisioner.PluginResourceType;
 import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 
 /**
  *
@@ -49,7 +50,7 @@ public abstract class PluginStoreTest {
   public void testBasicInputOutputStreams() throws Exception {
     PluginStore store = getInitializedStore();
 
-    String contents = "this is the cookbook";
+    String contents = "this is the cookbook\nthis is the second line";
     PluginResourceType resourceType = new PluginResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
     PluginResourceMeta resourceMeta = new PluginResourceMeta("hadoop", "1", true);
 
@@ -184,15 +185,10 @@ public abstract class PluginStoreTest {
 
   private String readFromStore(PluginStore store, Account account, PluginResourceType resourceType,
                                PluginResourceMeta resourceMeta) throws IOException {
-    BufferedReader reader = new BufferedReader(
-      new InputStreamReader(store.getResourceInputStream(account, resourceType, resourceMeta), Charsets.UTF_8));
+    Reader reader = new InputStreamReader(
+      store.getResourceInputStream(account, resourceType, resourceMeta), Charsets.UTF_8);
     try {
-      StringBuilder sb = new StringBuilder();
-      String line;
-      while ((line = reader.readLine()) != null) {
-        sb.append(line);
-      }
-      return sb.toString();
+      return CharStreams.toString(reader);
     } finally {
       reader.close();
     }

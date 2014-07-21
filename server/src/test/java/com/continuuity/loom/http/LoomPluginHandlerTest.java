@@ -19,8 +19,10 @@ import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.PluginResourceMeta;
 import com.continuuity.loom.provisioner.PluginResourceType;
 import com.continuuity.loom.store.provisioner.PluginType;
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+import com.google.common.io.CharStreams;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpResponse;
@@ -28,7 +30,6 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -41,18 +42,19 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testNonAdminGetsForbidden() throws Exception {
-
-  }
-
-  private void assertSendContents(String contents, PluginType type, String pluginName, String resourceType,
-                                  String resourceName, String version) throws Exception {
-    assertSendContents(contents, new PluginResourceType(type, pluginName, resourceType),
-                       new PluginResourceMeta(resourceName, version));
-  }
-
-  private void assertSendContents(String contents, PluginResourceType type, PluginResourceMeta meta) throws Exception {
-    String path = getVersionedPath(type, meta);
-    assertResponseStatus(doPut(path, contents, ADMIN_HEADERS), HttpResponseStatus.OK);
+    PluginResourceType type1 = new PluginResourceType(PluginType.PROVIDER, "openstack", "keys");
+    PluginResourceType type2 = new PluginResourceType(PluginType.AUTOMATOR, "shell", "script");
+    PluginResourceMeta meta = new PluginResourceMeta("name", "1", false);
+    assertResponseStatus(doPut(getVersionedPath(type1, meta), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doPut(getVersionedPath(type2, meta), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doDelete(getVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doDelete(getVersionedPath(type2, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGet(getVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGet(getVersionedPath(type2, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGet(getUnVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGet(getUnVersionedPath(type2, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGet(getPath(type1), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGet(getPath(type2), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
@@ -83,6 +85,17 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   @Test
   public void testGetAndDeleteProviderTypeResources() throws Exception {
     testGetAndDelete(new PluginResourceType(PluginType.PROVIDER, "openstack", "keys"));
+  }
+
+  private void assertSendContents(String contents, PluginType type, String pluginName, String resourceType,
+                                  String resourceName, String version) throws Exception {
+    assertSendContents(contents, new PluginResourceType(type, pluginName, resourceType),
+                       new PluginResourceMeta(resourceName, version));
+  }
+
+  private void assertSendContents(String contents, PluginResourceType type, PluginResourceMeta meta) throws Exception {
+    String path = getVersionedPath(type, meta);
+    assertResponseStatus(doPut(path, contents, ADMIN_HEADERS), HttpResponseStatus.OK);
   }
 
   private void testPutAndGet(PluginType type, String pluginName, String resourceType) throws Exception {
@@ -193,14 +206,12 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   }
 
   private String bodyToString(HttpResponse response) throws IOException {
-    BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-    StringBuilder sb = new StringBuilder();
-    String line = reader.readLine();
-    while (line != null) {
-      sb.append(line);
-      line = reader.readLine();
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    try {
+      return CharStreams.toString(reader);
+    } finally {
+      reader.close();
     }
-    return sb.toString();
   }
 
   private String getPath(PluginResourceType type) {

@@ -190,6 +190,10 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
     if (account == null) {
       return;
     }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User must be admin.");
+      return;
+    }
 
     PluginResourceType resourceTypeObj = new PluginResourceType(PluginType.AUTOMATOR, automatortypeId, resourceType);
     PluginResourceMeta resourceMeta = new PluginResourceMeta(resourceName, version);
@@ -205,6 +209,10 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
                                               @PathParam("version") String version) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User must be admin.");
       return;
     }
 
