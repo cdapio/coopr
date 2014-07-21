@@ -1,4 +1,4 @@
-package com.continuuity.loom.runtime;
+package com.continuuity.loom.common.daemon;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

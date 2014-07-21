@@ -21,7 +21,6 @@ import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.internal.ElementsTrackingQueue;
-import com.continuuity.loom.http.handler.LoomService;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.scheduler.Scheduler;
@@ -51,8 +50,10 @@ public class LoomServiceTestBase extends BaseTest {
   protected static final String API_KEY = "apikey";
   protected static final String TENANT_ID = "tenant1";
   protected static final String PROVISIONER_ID = "provisioner1";
-  protected static final Account USER1_ACCOUNT = new Account(USER1, TENANT_ID);
-  protected static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, TENANT_ID);
+  protected static final String TENANT = "tenant1";
+  protected static final Account USER1_ACCOUNT = new Account(USER1, TENANT);
+  protected static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, TENANT);
+  protected static final Account SUPERADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT);
   protected static final Header[] USER1_HEADERS = {
     new BasicHeader(Constants.USER_HEADER, USER1),
     new BasicHeader(Constants.API_KEY_HEADER, API_KEY),

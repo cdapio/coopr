@@ -1,9 +1,21 @@
+/*
+ * Copyright 2012-2014, Continuuity, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.continuuity.loom.store;
 
-import com.continuuity.loom.cluster.Cluster;
 import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -13,18 +25,13 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.sql.Blob;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
@@ -41,39 +48,45 @@ public final class DBQueryExecutor {
 
   /**
    * Queries the store for a set of items, deserializing the items and returning an immutable set of them. If no items
-   * exist, the set will be empty.
+   * exist, the set will be empty. Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution. Will be closed by this method.
    * @param clazz Class of the items being queried.
    * @param <T> Type of the items being queried.
-   * @return
+   * @return Immutable set of items queried for.
    * @throws java.sql.SQLException
    */
   public <T> ImmutableSet<T> getQuerySet(PreparedStatement statement, Class<T> clazz) throws SQLException {
+    ResultSet rs = statement.executeQuery();
     try {
-      ResultSet rs = statement.executeQuery();
-      try {
-        Set<T> results = Sets.newHashSet();
-        while (rs.next()) {
-          Blob blob = rs.getBlob(1);
-          results.add(deserializeBlob(blob, clazz));
-        }
-        return ImmutableSet.copyOf(results);
-      } finally {
-        rs.close();
+      Set<T> results = Sets.newHashSet();
+      while (rs.next()) {
+        Blob blob = rs.getBlob(1);
+        results.add(deserializeBlob(blob, clazz));
       }
+      return ImmutableSet.copyOf(results);
     } finally {
-      statement.close();
+      rs.close();
     }
   }
 
+  /**
+   * Queries the store for a list of items, deserializing the items and returning an immutable list of them. If no items
+   * exist, the list will be empty. Statement passed in must be closed by the caller.
+   *
+   * @param statement PreparedStatement of the query, ready for execution.
+   * @param clazz Class of the items being queried.
+   * @param <T> Type of the items being queried.
+   * @return Immutable list of objects that were queried for.
+   * @throws java.sql.SQLException
+   */
   public <T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<T> clazz) throws SQLException {
     return getQueryList(statement, clazz, Integer.MAX_VALUE);
   }
 
   /**
-   * Queries the store for a list of items, deserializing the items and returning an immutable list of them. If no items
-   * exist, the list will be empty.
+   * Queries the store for a list of at most limit items, deserializing the items and returning an immutable
+   * list of them. If no items exist, the list will be empty. Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution.
    * @param clazz Class of the items being queried.
@@ -101,11 +114,12 @@ public final class DBQueryExecutor {
 
   /**
    * Queries the store for a single item, deserializing the item and returning it or null if the item does not exist.
+   * Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution.
    * @param clazz Class of the item being queried.
    * @param <T> Type of the item being queried.
-   * @return
+   * @return Item queried for, or null if none exists.
    * @throws java.sql.SQLException
    */
   public <T> T getQueryItem(PreparedStatement statement, Class<T> clazz) throws SQLException {
@@ -124,6 +138,7 @@ public final class DBQueryExecutor {
 
   /**
    * Queries for a single number, returning the value of the number or 0 if there are no results.
+   * Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution.
    * @return Result of the query, or 0 if no results.
@@ -143,7 +158,7 @@ public final class DBQueryExecutor {
   }
 
   /**
-   * Performs the query and returns whether or not there are results.
+   * Performs the query and returns whether or not there are results. Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution.
    * @return True if the query has results, false if not.
@@ -158,6 +173,15 @@ public final class DBQueryExecutor {
     }
   }
 
+  /**
+   * Deserialize a blob into an object. Assumes blob was serialized json.
+   *
+   * @param blob Blob to deserialize.
+   * @param clazz Class of the object to deserialize the blob into.
+   * @param <T> Type of the object to deserialize.
+   * @return Deserialized object.
+   * @throws SQLException
+   */
   public <T> T deserializeBlob(Blob blob, Class<T> clazz) throws SQLException {
     Reader reader = new InputStreamReader(blob.getBinaryStream(), Charsets.UTF_8);
     T object;
@@ -169,6 +193,15 @@ public final class DBQueryExecutor {
     return object;
   }
 
+  /**
+   * Serialize the given object into json, then into bytes of that json, and finally place those bytes
+   * into a byte array stream.
+   *
+   * @param object Object to serialize.
+   * @param type Type of the object to serialize.
+   * @param <T> Type of the object to serialize.
+   * @return Object in a byte array input stream.
+   */
   public <T> ByteArrayInputStream toByteStream(T object, Type type) {
     return new ByteArrayInputStream(gson.toJson(object, type).getBytes(Charsets.UTF_8));
   }

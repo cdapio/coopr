@@ -107,33 +107,33 @@ public class BaseSolverTest extends BaseTest {
     );
     reactorTemplate2 = gson.fromJson(Entities.ClusterTemplateExample.REACTOR2_STRING, ClusterTemplate.class);
 
-    EntityStoreView entityStore = entityStoreService.getView(account);
+    EntityStoreView adminView = entityStoreService.getView(account);
     // create providers
-    entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
+    adminView.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
                                            ImmutableMap.<String, String>of()));
     // create hardware types
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "small",
         "small hardware",
         ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Small 2GB"))
       )
     );
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "medium",
         "medium hardware",
         ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Medium 4GB"))
       )
     );
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "large-mem",
         "hardware with a lot of memory",
         ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Large 32GB"))
       )
     );
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "large-cpu",
         "hardware with a lot of cpu",
@@ -141,7 +141,7 @@ public class BaseSolverTest extends BaseTest {
       )
     );
     // create image types
-    entityStore.writeImageType(
+    adminView.writeImageType(
       new ImageType(
         "centos6",
         "CentOS 6.4 image",
@@ -149,7 +149,7 @@ public class BaseSolverTest extends BaseTest {
           "joyent", ImmutableMap.<String, String>of("image", "joyent-hash-of-centos6.4"))
       )
     );
-    entityStore.writeImageType(
+    adminView.writeImageType(
       new ImageType(
         "ubuntu12",
         "Ubuntu 12 image",
@@ -186,18 +186,20 @@ public class BaseSolverTest extends BaseTest {
     serviceMap.put(reactor.getName(), reactor);
     serviceMap.put(mysql.getName(), mysql);
 
-    entityStore.writeService(namenode);
-    entityStore.writeService(datanode);
-    entityStore.writeService(resourcemanager);
-    entityStore.writeService(nodemanager);
-    entityStore.writeService(hbasemaster);
-    entityStore.writeService(regionserver);
-    entityStore.writeService(zookeeper);
-    entityStore.writeService(reactor);
-    entityStore.writeService(mysql);
-    entityStore.writeClusterTemplate(reactorTemplate);
+    adminView.writeService(namenode);
+    adminView.writeService(datanode);
+    adminView.writeService(resourcemanager);
+    adminView.writeService(nodemanager);
+    adminView.writeService(hbasemaster);
+    adminView.writeService(regionserver);
+    adminView.writeService(zookeeper);
+    adminView.writeService(reactor);
+    adminView.writeService(mysql);
+    adminView.writeClusterTemplate(reactorTemplate);
 
-    entityStore.writeProviderType(Entities.ProviderTypeExample.JOYENT);
-    entityStore.writeProviderType(Entities.ProviderTypeExample.RACKSPACE);
+    EntityStoreView superadminView =
+      entityStoreService.getView(new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT));
+    superadminView.writeProviderType(Entities.ProviderTypeExample.JOYENT);
+    superadminView.writeProviderType(Entities.ProviderTypeExample.RACKSPACE);
   }
 }

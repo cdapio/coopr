@@ -3,6 +3,7 @@ package com.continuuity.loom.store.entity;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -16,11 +17,13 @@ import java.sql.Statement;
  */
 public class SQLEntityStoreService extends AbstractIdleService implements EntityStoreService {
   private final DBConnectionPool dbConnectionPool;
+  private final DBQueryExecutor dbQueryExecutor;
   private final Gson gson;
 
   @Inject
-  public SQLEntityStoreService(DBConnectionPool dbConnectionPool, Gson gson) {
+  private SQLEntityStoreService(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor, Gson gson) {
     this.dbConnectionPool = dbConnectionPool;
+    this.dbQueryExecutor = dbQueryExecutor;
     this.gson = gson;
   }
 
@@ -62,7 +65,7 @@ public class SQLEntityStoreService extends AbstractIdleService implements Entity
   @Override
   public EntityStoreView getView(Account account) {
     if (account.isAdmin()) {
-      return new SQLAdminEntityStoreView(account, dbConnectionPool, gson);
+      return new SQLAdminEntityStoreView(account, dbConnectionPool, dbQueryExecutor, gson);
     } else {
       return new SQLUserEntityStoreView(account, dbConnectionPool, gson);
     }
