@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 
 require 'thin'
 require 'sinatra/base'
@@ -16,9 +17,9 @@ module Loom
     include Logging
 
     attr_accessor :tenantmanagers, :provisioner_id, :server_uri
-    @sinatra_thread
-    @signal_thread
-    @heartbeat_thread
+    #@sinatra_thread
+    #@signal_thread
+    #@heartbeat_thread
 
     def initialize()
       @tenantmanagers = {}
@@ -84,10 +85,10 @@ module Loom
     end
 
     def setup_signal_traps
-      $signals = Array.new
+      @signals = Array.new
       ['CLD', 'TERM', 'INT'].each do |signal|
         Signal.trap(signal) do
-          $signals << signal
+          @signals << signal
         end
       end
     end
@@ -96,11 +97,11 @@ module Loom
       @signal_thread = Thread.new {
         log.info "started signal processing thread"
         loop {
-          log.info "reaping #{$signals.size} signals: #{$signals}" unless $signals.empty?
-          #Logging.log.info "reaping #{$signals.size} signals: #{$signals}"
+          log.info "reaping #{@signals.size} signals: #{@signals}" unless @signals.empty?
+          #Logging.log.info "reaping #{@signals.size} signals: #{@signals}"
           signals_processed = {}
-          while !$signals.empty?
-            sig = $signals.shift
+          while !@signals.empty?
+            sig = @signals.shift
             next if signals_processed.key?(sig)
             log.info "processing signal: #{sig}"
             case sig
