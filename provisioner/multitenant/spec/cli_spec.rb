@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require File.expand_path '../spec_helper.rb', __FILE__
 require File.dirname(__FILE__) + '/../lib/provisioner/cli.rb'
 

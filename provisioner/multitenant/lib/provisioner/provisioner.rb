@@ -17,14 +17,12 @@ module Loom
     include Logging
 
     attr_accessor :tenantmanagers, :provisioner_id, :server_uri
-    #@sinatra_thread
-    #@signal_thread
-    #@heartbeat_thread
 
     def initialize(options)
       @options = options
       @tenantmanagers = {}
       @terminating_tenants = []
+      @server_uri = options[:uri]
       pid = Process.pid
       host = Socket.gethostname.downcase
       @provisioner_id = "#{host}.#{pid}"
@@ -33,27 +31,14 @@ module Loom
 
     # invoked from bin/provisioner
     def self.run(options)
-      @server_uri = options[:uri]
 
-      #initialize logging
-
-      #log_file = nil
-      #if options[:log_directory]
-      #  log_file = [ options[:log_directory], @provisioner_id ].join('/') + '.log'
-      #Logging.configure(log_file)
-
-      #Logging.configure(options[:log_directory] ? [ options[:log_directory], 'provisioner' ].join('/') + '.log' : nil)
+      # initialize logging
       Logging.configure(options[:log_directory] ? "#{options[:log_directory]}/provisioner.log" : nil)
-      #Logging.configure(options[:log_directory] ? '/tmp/foo.log' : nil)
-
-
-      #Logging.configure(options[:log_file])
       Logging.level = options[:log_level]
       Logging.log.info "Loom api starting up"
 
-      #register_plugins if options[:register]
-
-      setup_process if options[:daemonize]
+      # daemonize
+      daemonize if options[:daemonize]
 
       pg = Loom::Provisioner.new(options)
       if options[:register]
@@ -78,12 +63,12 @@ module Loom
 
       # wait for signal_handler to exit in response to signals
       @signal_thread.join
-      # kill the others
+      # kill the other threads
       @heartbeat_thread.kill
       @sinatra_thread.kill
       @heartbeat_thread.join
       @sinatra_thread.join
-      log.info "provisioner shut down"
+      log.info "provisioner gracefully shut down"
       exit
     end
 
@@ -99,7 +84,6 @@ module Loom
 
     def setup_signal_traps
       @signals = Array.new
-      #['CLD', 'TERM', 'INT'].each do |signal|
       %w(CLD TERM INT).each do |signal|
         Signal.trap(signal) do
           @signals << signal
@@ -112,29 +96,28 @@ module Loom
         log.info "started signal processing thread"
         loop {
           log.info "reaping #{@signals.size} signals: #{@signals}" unless @signals.empty?
-          #Logging.log.info "reaping #{@signals.size} signals: #{@signals}"
           signals_processed = {}
           unless @signals.empty?
             sig = @signals.shift
             next if signals_processed.key?(sig)
-            log.info "processing signal: #{sig}"
+            log.debug "processing signal: #{sig}"
             case sig
             when 'CLD'
               verify_tenants
             when 'TERM', 'INT'
               unless @shutting_down
+                # begin shutdown procedure
                 @shutting_down = true
                 tenantmanagers.each do |k, v|
-                  v.terminate_all_worker_processes
+                  v.delete
                 end
+                # wait for all workers to shut down
                 Process.waitall
-                log.info "workers shutdown"
                 unregister_from_server
+                # exit thread
                 Thread.current.kill
-                #exit
               end
             end
-            log.info "done processing signal #{sig}"
             signals_processed[sig] = true
           end
           sleep 1
@@ -147,7 +130,6 @@ module Loom
         log.info "starting heartbeat thread"
         register_with_server
         loop {
-          #Logging.log.info "hbt: #{$provisioner.heartbeat.to_json}"
           uri = "#{@server_uri}/v1/provisioners/#{provisioner_id}/heartbeat"
           begin
             log.debug "sending heartbeat to #{uri}"
@@ -163,8 +145,6 @@ module Loom
             end
           rescue => e
             log.error "Caught exception sending heartbeat to loom server #{uri}: #{e.message}"
-            #log.error e.message
-            #log.error e.backtrace.inspect
           end
           sleep 10
         }
@@ -190,14 +170,13 @@ module Loom
         end
       rescue => e
         Logging.log.error "Caught exception when registering with loom server #{uri}: #{e.message}"
-        #log.error e.message
-        #log.error e.backtrace.inspect
       end
     end
 
-    # this is temporary
+    # this is temporary until provisioner process manages worker data
     def register_plugins
-      exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../daemon/provisioner.rb --uri #{@server_uri} --register")
+      # launch a single worker with register flag
+      exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../../../daemon/provisioner.rb --uri #{@server_uri} --register")
     end
 
     def unregister_from_server
@@ -212,27 +191,22 @@ module Loom
         end
       rescue => e
         Logging.log.error "Caught exception when unregistering with loom server #{uri}: #{e.message}"
-        #log.error e.message
-        #log.error e.backtrace.inspect
       end
     end
 
-    def self.setup_process
+    def self.daemonize
       Process.daemon
-    #  process = Process.new
-    #  if @options[:daemonize]
-    #    process.daemonize
-    #  end
     end
 
+    # api method to add or edit tenant
     def add_tenant(tenantmgr)
       unless tenantmgr.instance_of?(TenantManager)
         raise ArgumentError, "only instances of TenantManager can be added to provisioner", caller
       end
       # validate input
       id = tenantmgr.id
-      log.info "Adding/Editing tenant: #{id}"
-      raise "cannot add a TenantManager without an id: #{tenantmgr.inspect}" if id.nil?
+      log.debug "Adding/Editing tenant: #{id}"
+      fail "cannot add a TenantManager without an id: #{tenantmgr.inspect}" if id.nil?
 
       # set provisionerId
       tenantmgr.provisioner_id = @provisioner_id
@@ -242,29 +216,19 @@ module Loom
 
       if @tenantmanagers.key? id
         # edit tenant
-        log.info "Editing tenant: #{id}"
+        log.debug "Editing tenant: #{id}"
         @tenantmanagers[id].update(tenantmgr)
       else
         # new tenant
-        log.info "Adding new tenant: #{id}"
+        log.debug "Adding new tenant: #{id}"
         tenantmgr.spawn
         @tenantmanagers[id] = tenantmgr
       end
     end
 
-    def verify_tenants
-      @tenantmanagers.each do |k, v|
-        v.verify_workers
-        # has this tenant been deleted?
-        if (@terminating_tenants.include?(k) && v.num_workers == 0)
-          @tenantmanagers.delete(k)
-          @terminating_tenants.delete(k)
-        end
-      end
-    end
-
+    # api method to delete tenant for given id
     def delete_tenant(id)
-      # if no workers running, just delete
+      # if no workers currently running, just delete
       if @tenantmanagers[id].num_workers == 0
         @tenantmanagers.delete(id)
       else
@@ -275,12 +239,20 @@ module Loom
       end
     end
 
-    def status
-      @tenantmanagers.each do |id, tm|
-        tm.check_threads
+    # check running tenants and their workers, called after a CLD signal processed
+    def verify_tenants
+      @tenantmanagers.each do |k, v|
+        # update worker counts
+        v.verify_workers
+        # has this tenant been deleted?
+        if (@terminating_tenants.include?(k) && v.num_workers == 0)
+          @tenantmanagers.delete(k)
+          @terminating_tenants.delete(k)
+        end
       end
     end
 
+    # get current heartbeat data
     def heartbeat
       hb = {}
       hb['usage'] = {}

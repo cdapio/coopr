@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require File.expand_path '../spec_helper.rb', __FILE__
 require File.expand_path '../../lib/provisioner/api.rb', __FILE__
 require File.expand_path '../../lib/provisioner/provisioner.rb', __FILE__
@@ -32,9 +34,9 @@ describe 'Sinatra API' do
   end
 
   it 'can delete a tenant with no workers' do
-    post 'v1/tenants', {:id => "test_tenant", :workers => 0}.to_json, "CONTENT_TYPE" => "application/json"
+    post 'v1/tenants', {:id => "test_tenant2", :workers => 0}.to_json, "CONTENT_TYPE" => "application/json"
     expect(last_response).to be_ok
-    delete 'v1/tenants/test_tenant', "CONTENT_TYPE" => "application/json"
+    delete 'v1/tenants/test_tenant2', "CONTENT_TYPE" => "application/json"
     expect(last_response).to be_ok
   end
 

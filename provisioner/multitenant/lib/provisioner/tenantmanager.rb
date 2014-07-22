@@ -9,8 +9,6 @@ module Loom
   class TenantManager
     include Logging
     attr_accessor :spec, :provisioner_id, :options
-    # command used to launch a worker.  args are separate
-    #@worker_name
 
     def initialize(spec)
       unless spec.instance_of?(TenantSpec)
@@ -20,13 +18,6 @@ module Loom
       @provisioner_id = 'default'
       @workerpids = []
       @terminating_workers = []
-      # command to launch a worker.  encapsulated into proc so that it can be changed for testing
-      #@worker_cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/worker.rb #{@spec.id}"
-      #@worker_cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} "\
-      #              "#{File.dirname(__FILE__)}/../daemon/provisioner.rb --tenant #{@spec.id} "\
-      #              "--provisioner #{@provisioner_id} --uri http://localhost:55054 "\
-      #              "-l #{@options[:log_dir]} -L debug"
-
     end 
 
     def id
@@ -37,15 +28,15 @@ module Loom
       @workerpids.size
     end
 
+    # launch the specified number of worker processes
     def spawn
       @spec.workers.times do |i|
         spawn_worker_process
       end
     end
 
-    # this is called from the provisioner CLD signal handler upon child process termination
+    # check worker processes, called after CLD signal processed (child process termination)
     def verify_workers
-      #puts "checking: #{@workerpids}"
       workerpids = @workerpids.dup
       workerpids.each do |pid|
         begin
@@ -54,29 +45,30 @@ module Loom
           if ret == pid
             # child has died
             log.debug "confirmed pid #{pid} dead"
-            @workerpids.delete_if {|x| x == pid }
-            @terminating_workers.delete(pid) if @terminating_workers.include?(pid)
-            log.debug "new workerpids: #{@workerpids}"
+            forget_dead_worker(pid)
           elsif ret.nil?
-            #puts "child #{pid} still running"
-            # all good, child is running`
+            # all good, child is running
           else
-            raise "dont know how this can happen"
+            # this should never happen
+            fail "Process.waitpid returned something other than nil or expected pid: #{ret.inspect}"
           end
         rescue Errno::ECHILD
           # pid exists but is not my child
           log.debug "non-child pid: #{pid}"
-          @workerpids.delete_if {|x| x == pid }
-          @terminating_workers.delete(pid) if @terminating_workers.include?(pid)
-          log.debug "new workerpids: #{@workerpids}"
+          forget_dead_worker(pid)
         end
       end
     end
 
+    # un-register a child pid
+    def forget_dead_worker(pid)
+      @workerpids.delete_if {|x| x == pid }
+      @terminating_workers.delete(pid) if @terminating_workers.include?(pid)
+      log.debug "new workerpids: #{@workerpids}"
+    end
+
+    # spawn a new child worker process
     def spawn_worker_process
-      #worker_name = "worker-" + self.id + "-"  + (@workerpids.size + 1).to_s
-      #log.debug "spawning #{worker_name}"
-      #cmd = @worker_cmd.call
       worker_launcher = WorkerLauncher.new(@options)
       worker_launcher.provisioner = @provisioner_id
       worker_launcher.tenant = id
@@ -84,29 +76,19 @@ module Loom
       worker_cmd = worker_launcher.cmd
       log.debug "spawning #{worker_cmd}"
       cpid = fork { 
-        #worker = Loom::Worker.new(worker_name)
-        #worker.work
-        #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/worker.rb #{worker_name}")
-        #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../daemon/provisioner.rb --tenant #{@spec.id} --provisioner #{@provisioner_id} --uri http://localhost:55054 -l /tmp/worker-#{worker_name}.log -L debug")
         exec(worker_cmd)
       }
-
-      #@logger.info "spawned #{cpid}"
       @workerpids.push(cpid)
     end
 
     def terminate_worker_process(pid)
+      @terminating_workers.push(pid)
       Process.kill(:SIGTERM, pid)
     end
 
-    def terminate_all_worker_processes
-      @workerpids.each do |pid|
-        Process.kill(:SIGTERM, pid)
-      end
-    end 
-
+    # process new specifications for this tenant
     def update(new_tm)
-      log.info "update workers from #{@spec.workers} to #{new_tm.spec.workers}"
+      log.debug "update workers from #{@spec.workers} to #{new_tm.spec.workers}"
       difference = new_tm.spec.workers - @spec.workers
       if difference > 0
         log.debug "adding #{difference} workers"
@@ -115,7 +97,7 @@ module Loom
         end
       elsif difference < 0
         log.debug "terminating #{difference.abs} workers"
-        # we need to find active workers
+        # we need to find active workers not already terminating
         pids_to_kill = []
         @workerpids.reverse_each do |pid|
           break if pids_to_kill.size == difference.abs
@@ -127,17 +109,14 @@ module Loom
         end
 
         pids_to_kill.each do |pid|
-          #terminate_worker
-          @terminating_workers.push(pid)
           terminate_worker_process(pid)
         end
       end
+      # update our "expected" spec
       @spec.workers = new_tm.spec.workers
     end
 
-    def halt
-    end
-
+    # delete sends kill to all workers
     def delete
       workerpids = @workerpids.dup 
       workerpids.each do |pid|
@@ -146,17 +125,4 @@ module Loom
     end
 
   end
-end
-
-
-if __FILE__ == $0
-  ts = Loom::TenantSpec.new('test', 3)
-  tm = Loom::TenantManager.new(ts)
-  tm.spawn
-  sleep 5
-  loop {
-    puts "workers running: #{tm.num_workers}"
-    sleep 5
-  }
-
 end

@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
+# simple specification for a tenant
 module Loom
   class TenantSpec
     attr_accessor :id, :workers, :modules, :plugins

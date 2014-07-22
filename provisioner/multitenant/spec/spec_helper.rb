@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'rspec'
 require 'rack/test'
 

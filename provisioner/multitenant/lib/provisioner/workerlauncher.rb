@@ -7,7 +7,7 @@ module Loom
     attr_accessor :tenant, :provisioner, :name, :options
 
     def initialize(options)
-      @options = options
+      @options = options || {}
     end
 
     def cmd
