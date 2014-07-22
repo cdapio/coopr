@@ -28,13 +28,19 @@ module Loom
         opts.on('-u', '--uri URI', 'Loom web server uri') do |u|
           options[:uri] = u
         end
+        opts.on('-b', '--bind IP', 'IP to listen on, default 0.0.0.0') do |b|
+          options[:bind_ip] = b
+        end
+        opts.on('-p', '--port PORT', 'Port to listen on, default 55056') do |p|
+          options[:bind_port] = p
+        end
         opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
           options[:log_level] = f
         end
         opts.on('-l', '--log-directory DIR', 'Path to log directory for provisioner and workers') do |d|
           options[:log_directory] = d
         end
-        opts.on('-b', '--background', 'runs as a daemon. ensure you specify a logfile also') do 
+        opts.on('-d', '--daemon', 'runs as a daemon. ensure you specify a log directory also') do
           options[:daemonize] = true 
         end
         opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do

@@ -24,18 +24,18 @@ describe 'Provisioner::CLI' do
   it 'can parse command line arguments' do
     options = Loom::CLI.read([
         '-u', 'http://test',
-        '-t', 'test_tenant',
-        '-p', 'test_provisioner',
         '-L', 'debug',
         '-l', '/tmp/test.log',
-        '-b'
+        '-b', '127.0.0.1',
+        '-p', '55058',
+        '-d'
                              ])
     expected = {
         :uri => 'http://test',
-        :tenant => 'test_tenant',
-        :provisioner => 'test_provisioner',
         :log_level => 'debug',
         :log_directory => '/tmp/test.log',
+        :bind_ip => '127.0.0.1',
+        :bind_port => '55058',
         :daemonize => true
     }
     expect(options).to eq(expected)

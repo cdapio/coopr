@@ -90,7 +90,14 @@ module Loom
 
     def spawn_sinatra_thread
       @sinatra_thread = Thread.new {
+        # set reference to provisioner
         Api.set :provisioner, self
+        # set bind settings
+        bind_ip = @options[:bind_ip] || '0.0.0.0'
+        bind_port = @options[:bind_port] || '55056'
+        Api.set :bind, bind_ip
+        Api.set :port, bind_port
+        # let sinatra take over from here
         Api.run!
       }
       # surface any exceptions immediately

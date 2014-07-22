@@ -34,6 +34,9 @@ module Loom
 
       set :environment, :production
 
+      set :port, 55056
+      set :bind, '0.0.0.0'
+
       get '/status' do
         body "OK"
       end
