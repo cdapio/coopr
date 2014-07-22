@@ -45,6 +45,9 @@ OptionParser.new do |opts|
   opts.on('-p', '--provisioner PROVISIONER', 'Provisioner ID') do |p|
     options[:provisioner] = p
   end
+  opts.on('-n', '--name NAME', 'Worker name') do |n|
+    options[:name] = n
+  end
   options[:register] = false
   opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do
     options[:register] = true
@@ -52,8 +55,8 @@ OptionParser.new do |opts|
   opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
     options[:log_level] = f
   end
-  opts.on('-l', '--log-file FILE', 'Path to logfile') do |f|
-    options[:log_file] = f
+  opts.on('-l', '--log-directory DIRECTORY', 'Path to log directory') do |f|
+    options[:log_directory] = f
   end
   options[:once] = false
   opts.on('-o', '--once', 'Only poll and run a single task') do
@@ -73,7 +76,13 @@ if(loom_uri.nil? && options[:register])
 end
 
 include Logging
-Logging.configure(options[:log_file])
+log_file = nil
+if options[:log_directory] && options[:name]
+  log_file = [ options[:log_directory], options[:name] ].join('/') + '.log'
+elsif options[:log_directory]
+  log_file = "#{options[:log_directory]}/worker-default.log"
+end
+Logging.configure(log_file)
 Logging.level = options[:log_level]
 
 # load plugins
