@@ -28,15 +28,6 @@ module Loom
         opts.on('-u', '--uri URI', 'Loom web server uri') do |u|
           options[:uri] = u
         end
-        opts.on('-f', '--file FILE', 'Full path to task json') do |f|
-          options[:file] = f
-        end
-        opts.on('-t', '--tenant TENANT', 'Tenant ID') do |t|
-          options[:tenant] = t
-        end
-        opts.on('-p', '--provisioner PROVISIONER', 'Provisioner ID') do |p|
-          options[:provisioner] = p
-        end
         opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
           options[:log_level] = f
         end
