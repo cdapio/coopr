@@ -23,8 +23,10 @@ import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +35,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * SQL database backed implementation of {@link PluginResourceMetaStoreView}. Stores all metadata in a single
@@ -116,16 +119,20 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public List<PluginResourceMeta> getAll() throws IOException {
+  public Map<String, Set<PluginResourceMeta>> getAll(boolean activeOnly) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement statement = conn.prepareStatement(
+        String queryStr =
           "SELECT name, version, active FROM pluginMeta " +
-            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=?");
+            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=?";
+        if (activeOnly) {
+          queryStr += " AND active=true";
+        }
+        PreparedStatement statement = conn.prepareStatement(queryStr);
         try {
           setConstantFields(statement);
-          return getResourceMetaList(statement);
+          return getResourceMetaMap(statement);
         } finally {
           statement.close();
         }
@@ -139,36 +146,17 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public List<PluginResourceMeta> getAllActive() throws IOException {
+  public Set<PluginResourceMeta> getAll(String resourceName, boolean activeOnly) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement statement = conn.prepareStatement(
+        String queryStr =
           "SELECT name, version, active FROM pluginMeta " +
-            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND active=true");
-        try {
-          setConstantFields(statement);
-          return getResourceMetaList(statement);
-        } finally {
-          statement.close();
+            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?";
+        if (activeOnly) {
+          queryStr += " AND active=true";
         }
-      } finally {
-        conn.close();
-      }
-    } catch (SQLException e) {
-      LOG.error("Exception getting resources.", e);
-      throw new IOException(e);
-    }
-  }
-
-  @Override
-  public List<PluginResourceMeta> getAll(String resourceName) throws IOException {
-    try {
-      Connection conn = dbConnectionPool.getConnection();
-      try {
-        PreparedStatement statement = conn.prepareStatement(
-          "SELECT name, version, active FROM pluginMeta " +
-            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?");
+        PreparedStatement statement = conn.prepareStatement(queryStr);
         try {
           setConstantFields(statement);
           statement.setString(5, resourceName);
@@ -181,30 +169,6 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
       }
     } catch (SQLException e) {
       LOG.error("Exception getting all metadata for resource {}.", resourceName, e);
-      throw new IOException(e);
-    }
-  }
-
-  @Override
-  public PluginResourceMeta getActive(String resourceName) throws IOException {
-    try {
-      Connection conn = dbConnectionPool.getConnection();
-      try {
-        PreparedStatement statement = conn.prepareStatement(
-          "SELECT name, version, active FROM pluginMeta " +
-            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND active=true");
-        try {
-          setConstantFields(statement);
-          statement.setString(5, resourceName);
-          return getResourceMeta(statement);
-        } finally {
-          statement.close();
-        }
-      } finally {
-        conn.close();
-      }
-    } catch (SQLException e) {
-      LOG.error("Exception getting active version of resource {}.", resourceName, e);
       throw new IOException(e);
     }
   }
@@ -293,6 +257,22 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     }
   }
 
+  private Set<PluginResourceMeta> getResourceMetaList(PreparedStatement statement) throws SQLException {
+    ResultSet results = statement.executeQuery();
+    try {
+      Set<PluginResourceMeta> output = Sets.newHashSet();
+      while (results.next()) {
+        String name = results.getString(1);
+        String version = results.getString(2);
+        boolean isActive = results.getBoolean(3);
+        output.add(new PluginResourceMeta(name, version, isActive));
+      }
+      return ImmutableSet.copyOf(output);
+    } finally {
+      results.close();
+    }
+  }
+
   private PluginResourceMeta getResourceMeta(PreparedStatement statement) throws SQLException {
     ResultSet results = statement.executeQuery();
     try {
@@ -308,17 +288,22 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     }
   }
 
-  private List<PluginResourceMeta> getResourceMetaList(PreparedStatement statement) throws SQLException {
+  private Map<String, Set<PluginResourceMeta>> getResourceMetaMap(PreparedStatement statement) throws SQLException {
     ResultSet results = statement.executeQuery();
     try {
-      List<PluginResourceMeta> output = Lists.newArrayList();
+      Map<String, Set<PluginResourceMeta>> output = Maps.newHashMap();
       while (results.next()) {
         String name = results.getString(1);
         String version = results.getString(2);
         boolean isActive = results.getBoolean(3);
-        output.add(new PluginResourceMeta(name, version, isActive));
+        PluginResourceMeta meta = new PluginResourceMeta(name, version, isActive);
+        if (output.containsKey(name)) {
+          output.get(name).add(meta);
+        } else {
+          output.put(name, Sets.newHashSet(meta));
+        }
       }
-      return ImmutableList.copyOf(output);
+      return ImmutableMap.copyOf(output);
     } finally {
       results.close();
     }

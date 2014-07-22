@@ -19,8 +19,8 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.PluginResourceMeta;
 import com.continuuity.loom.provisioner.PluginResourceType;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -131,10 +131,20 @@ public abstract class PluginResourceMetaStoreTest {
     for (PluginResourceMeta meta : all) {
       view.write(meta);
     }
-    Assert.assertEquals(all, ImmutableSet.copyOf(view.getAll()));
-    Assert.assertEquals(hadoops, ImmutableSet.copyOf(view.getAll("hadoop")));
-    Assert.assertEquals(mysqls, ImmutableSet.copyOf(view.getAll("mysql")));
-    Assert.assertEquals(allActive, ImmutableSet.copyOf(view.getAllActive()));
+    Assert.assertEquals(
+      ImmutableMap.<String, Set<PluginResourceMeta>>of(
+        "hadoop", ImmutableSet.<PluginResourceMeta>of(hadoop1, hadoop2, hadoop3),
+        "mysql", ImmutableSet.<PluginResourceMeta>of(mysql1, mysql2)),
+      ImmutableMap.copyOf(view.getAll(false))
+    );
+    Assert.assertEquals(hadoops, ImmutableSet.copyOf(view.getAll("hadoop", false)));
+    Assert.assertEquals(mysqls, ImmutableSet.copyOf(view.getAll("mysql", false)));
+    Assert.assertEquals(
+      ImmutableMap.<String, Set<PluginResourceMeta>>of(
+        "hadoop", ImmutableSet.<PluginResourceMeta>of(hadoop3),
+        "mysql", ImmutableSet.<PluginResourceMeta>of(mysql2)),
+      ImmutableMap.copyOf(view.getAll(true))
+    );
   }
 
   @Test
@@ -146,17 +156,17 @@ public abstract class PluginResourceMetaStoreTest {
 
     view.write(hadoop2);
     view.write(hadoop3);
-    Assert.assertTrue(view.getAllActive().isEmpty());
+    Assert.assertTrue(view.getAll(true).isEmpty());
 
     view.activate("hadoop", "2");
     hadoop2 = new PluginResourceMeta("hadoop", "2", true);
-    Assert.assertEquals(1, view.getAllActive().size());
-    Assert.assertEquals(hadoop2, view.getAllActive().get(0));
+    Assert.assertEquals(1, view.getAll(true).size());
+    Assert.assertEquals(hadoop2, view.getAll(true).get("hadoop").iterator().next());
 
     view.activate("hadoop", "3");
     hadoop3 = new PluginResourceMeta("hadoop", "3", true);
-    Assert.assertEquals(1, view.getAllActive().size());
-    Assert.assertEquals(hadoop3, view.getAllActive().get(0));
+    Assert.assertEquals(1, view.getAll(true).size());
+    Assert.assertEquals(hadoop3, view.getAll(true).get("hadoop").iterator().next());
   }
 
   @Test
@@ -172,13 +182,13 @@ public abstract class PluginResourceMetaStoreTest {
     view.write(hadoop3);
     view.write(mysql1);
     view.write(mysql2);
-    Assert.assertEquals(2, view.getAllActive().size());
+    Assert.assertEquals(2, view.getAll(true).size());
 
     view.deactivate("hadoop");
-    Assert.assertEquals(1, view.getAllActive().size());
-    Assert.assertEquals(mysql2, view.getAllActive().get(0));
+    Assert.assertEquals(1, view.getAll(true).size());
+    Assert.assertEquals(mysql2, view.getAll(true).get("mysql").iterator().next());
 
     view.deactivate("mysql");
-    Assert.assertTrue(view.getAllActive().isEmpty());
+    Assert.assertTrue(view.getAll(true).isEmpty());
   }
 }

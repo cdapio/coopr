@@ -21,6 +21,8 @@ import com.continuuity.loom.provisioner.PluginResourceType;
 import com.continuuity.loom.store.provisioner.PluginType;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.gson.reflect.TypeToken;
@@ -33,6 +35,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -106,7 +109,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     // get metadata
     HttpResponse response = doGet(getUnVersionedPath(pluginResourceType, meta), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(Sets.newHashSet(meta), bodyToMetaSet(response));
+    Assert.assertEquals(ImmutableSet.of(meta), bodyToMetaSet(response));
     // get actual contents
     response = doGet(getVersionedPath(pluginResourceType, meta), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -131,11 +134,14 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     // check get active versions of the resources
     response = doGet(getPath(pluginResourceType) + "?active=true", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(Sets.newHashSet(meta2), bodyToMetaSet(response));
+    Assert.assertEquals(
+      ImmutableMap.<String, Set<PluginResourceMeta>>of("name", ImmutableSet.<PluginResourceMeta>of(meta2)),
+      bodyToMetaMap(response)
+    );
     // check get active version of the specific resource
     response = doGet(getUnVersionedPath(pluginResourceType, meta2) + "?active=true", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(meta2, bodyToMeta(response));
+    Assert.assertEquals(Sets.newHashSet(meta2), bodyToMetaSet(response));
 
     // activate version1
     meta1 = new PluginResourceMeta("name", "1", true);
@@ -149,11 +155,14 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     // check get active versions of the resources
     response = doGet(getPath(pluginResourceType) + "?active=true", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(Sets.newHashSet(meta1), bodyToMetaSet(response));
+    Assert.assertEquals(
+      ImmutableMap.<String, Set<PluginResourceMeta>>of("name", ImmutableSet.<PluginResourceMeta>of(meta1)),
+      bodyToMetaMap(response)
+    );
     // check get active version of the specific resource
     response = doGet(getUnVersionedPath(pluginResourceType, meta1) + "?active=true", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(meta1, bodyToMeta(response));
+    Assert.assertEquals(Sets.newHashSet(meta1), bodyToMetaSet(response));
 
     // deactivate
     meta1 = new PluginResourceMeta("name", "1", false);
@@ -163,14 +172,15 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     // should still see both versions when getting all versions of the resource name
     response = doGet(getUnVersionedPath(pluginResourceType, meta1), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(Sets.newHashSet(meta1, meta2), bodyToMetaSet(response));
-    // active flag should return an empty list
+    Assert.assertEquals(ImmutableSet.<PluginResourceMeta>of(meta1, meta2), bodyToMetaSet(response));
+    // active flag should return an empty map
     response = doGet(getPath(pluginResourceType) + "?active=true", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertTrue(bodyToMetaSet(response).isEmpty());
+    Assert.assertTrue(bodyToMetaMap(response).isEmpty());
     // no active versions
-    assertResponseStatus(doGet(getUnVersionedPath(pluginResourceType, meta1) + "?active=true", ADMIN_HEADERS),
-                         HttpResponseStatus.NOT_FOUND);
+    response = doGet(getUnVersionedPath(pluginResourceType, meta1) + "?active=true", ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Assert.assertTrue(bodyToMetaSet(response).isEmpty());
   }
 
   private void testGetAndDelete(PluginResourceType type) throws Exception {
@@ -186,23 +196,34 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
     HttpResponse response = doGet(getPath(type), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(Sets.newHashSet(meta1, meta2, meta3, meta4), bodyToMetaSet(response));
+    Assert.assertEquals(
+      ImmutableMap.<String, Set<PluginResourceMeta>>of(
+        "name1", ImmutableSet.<PluginResourceMeta>of(meta1, meta2),
+        "name2", ImmutableSet.<PluginResourceMeta>of(meta3),
+        "name3", ImmutableSet.<PluginResourceMeta>of(meta4)),
+      bodyToMetaMap(response)
+    );
 
     // delete one
     assertResponseStatus(doDelete(getVersionedPath(type, meta3), ADMIN_HEADERS), HttpResponseStatus.OK);
     response = doGet(getPath(type), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Assert.assertEquals(Sets.newHashSet(meta1, meta2, meta4), bodyToMetaSet(response));
+    Assert.assertEquals(
+      ImmutableMap.<String, Set<PluginResourceMeta>>of(
+        "name1", ImmutableSet.<PluginResourceMeta>of(meta1, meta2),
+        "name3", ImmutableSet.<PluginResourceMeta>of(meta4)),
+      bodyToMetaMap(response)
+    );
+  }
+
+  private Map<String, Set<PluginResourceMeta>> bodyToMetaMap(HttpResponse response) throws IOException {
+    Reader reader = new InputStreamReader(response.getEntity().getContent());
+    return gson.fromJson(reader, new TypeToken<Map<String, Set<PluginResourceMeta>>>() {}.getType());
   }
 
   private Set<PluginResourceMeta> bodyToMetaSet(HttpResponse response) throws IOException {
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     return gson.fromJson(reader, new TypeToken<Set<PluginResourceMeta>>() {}.getType());
-  }
-
-  private PluginResourceMeta bodyToMeta(HttpResponse response) throws IOException {
-    Reader reader = new InputStreamReader(response.getEntity().getContent());
-    return gson.fromJson(reader, PluginResourceMeta.class);
   }
 
   private String bodyToString(HttpResponse response) throws IOException {

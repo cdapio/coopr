@@ -18,7 +18,8 @@ package com.continuuity.loom.store.provisioner;
 import com.continuuity.loom.provisioner.PluginResourceMeta;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A view of the plugin resource metadata store. Each account and resource type pair will see a different view of
@@ -53,38 +54,23 @@ public interface PluginResourceMetaStoreView {
   public void delete(PluginResourceMeta meta) throws IOException;
 
   /**
-   * Get an immutable list of all resource metadata.
+   * Get an immutable map of resource name to all metadata.
    *
-   * @return Immutable list of all resource metadata
+   * @param activeOnly Whether or not to filter out inactive resources
+   * @return Immutable map of resource name to resource metadata
    * @throws IOException
    */
-  public List<PluginResourceMeta> getAll() throws IOException;
+  public Map<String, Set<PluginResourceMeta>> getAll(boolean activeOnly) throws IOException;
 
   /**
-   * Get an immutable list of all active resource metadata.
-   *
-   * @return Immutable list of all active resource metadata
-   * @throws IOException
-   */
-  public List<PluginResourceMeta> getAllActive() throws IOException;
-
-  /**
-   * Get an immutable list of all resource metadata for the given resource name.
+   * Get an immutable set of all resource metadata for the given resource name.
    *
    * @param resourceName Name of resource to get metadata for
-   * @return Immutable list of all resource metadata for the given resource name
+   * @param activeOnly Whether or not to filter out inactive resources
+   * @return Immutable set of all resource metadata for the given resource name
    * @throws IOException
    */
-  public List<PluginResourceMeta> getAll(String resourceName) throws IOException;
-
-  /**
-   * Get the metadata for the active version of the given resource name, or null if none exists.
-   *
-   * @param resourceName Name of resource to get metadata for
-   * @return Metadata for the active version of the given resource name, or null if none exists
-   * @throws IOException
-   */
-  public PluginResourceMeta getActive(String resourceName) throws IOException;
+  public Set<PluginResourceMeta> getAll(String resourceName, boolean activeOnly) throws IOException;
 
   /**
    * Atomically activate a specific resource version and deactivate the previous active version.

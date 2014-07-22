@@ -37,7 +37,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Service for managing plugin modules.
@@ -170,7 +171,7 @@ public class PluginResourceService extends AbstractIdleService {
     lock.acquire();
     try {
       PluginResourceMetaStoreView view = metaStoreService.getView(account, resourceType);
-      if (view.getAll(resourceName).isEmpty()) {
+      if (view.getAll(resourceName, true).isEmpty()) {
         throw new MissingEntityException("Modules do not exist.");
       }
       view.deactivate(resourceName);
@@ -185,17 +186,13 @@ public class PluginResourceService extends AbstractIdleService {
    *
    * @param account Account containing the resources
    * @param resourceType Type of resource to get
-   * @param activeOnly Whether or not to return only active module versions
+   * @param activeOnly Whether or not to filter out inactive resources
    * @return Immutable list of metadata for resource of the given type, owned by the given account
    * @throws IOException if there was an error getting the resources
    */
-  public List<PluginResourceMeta> getAll(Account account, PluginResourceType resourceType, boolean activeOnly)
-    throws IOException {
-    if (activeOnly) {
-      return metaStoreService.getView(account, resourceType).getAllActive();
-    } else {
-      return metaStoreService.getView(account, resourceType).getAll();
-    }
+  public Map<String, Set<PluginResourceMeta>> getAll(Account account, PluginResourceType resourceType,
+                                                      boolean activeOnly) throws IOException {
+    return metaStoreService.getView(account, resourceType).getAll(activeOnly);
   }
 
   /**
@@ -204,26 +201,13 @@ public class PluginResourceService extends AbstractIdleService {
    * @param account Account containing the resource
    * @param resourceType Type of resource to get
    * @param resourceName Name of the resource to get
-   * @return Immutable list of metadata for versions of the given module
+   * @param activeOnly Whether or not to filter out inactive resources
+   * @return Immutable set of metadata for versions of the given module
    * @throws IOException if there was an error getting the module versions
    */
-  public List<PluginResourceMeta> getVersions(Account account, PluginResourceType resourceType,
-                                              String resourceName) throws IOException {
-    return metaStoreService.getView(account, resourceType).getAll(resourceName);
-  }
-
-  /**
-   * Get the metadata for the active version of the given resource, or null if none exists.
-   *
-   * @param account Account containing the resource
-   * @param resourceType Type of resource to get
-   * @param resourceName Name of the resource to get
-   * @return Metadata for the active version of the given module, or null if none exists
-   * @throws IOException if there was an error getting the module versions
-   */
-  public PluginResourceMeta getActiveVersion(Account account, PluginResourceType resourceType,
-                                             String resourceName) throws IOException {
-    return metaStoreService.getView(account, resourceType).getActive(resourceName);
+  public Set<PluginResourceMeta> getVersions(Account account, PluginResourceType resourceType,
+                                              String resourceName, boolean activeOnly) throws IOException {
+    return metaStoreService.getView(account, resourceType).getAll(resourceName, activeOnly);
   }
 
   /**

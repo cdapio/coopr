@@ -18,8 +18,8 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.provisioner.PluginResourceService;
 import com.continuuity.loom.provisioner.PluginResourceMeta;
+import com.continuuity.loom.provisioner.PluginResourceService;
 import com.continuuity.loom.provisioner.PluginResourceType;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.provisioner.PluginType;
@@ -339,18 +339,9 @@ public class LoomPluginHandler extends LoomAuthHandler {
                             PluginType pluginType, String pluginName, String resourceType, String resourceName) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
     try {
-      if (isActiveParamSet(request)) {
-        PluginResourceMeta activeVersion =
-          pluginResourceService.getActiveVersion(account, pluginResourceType, resourceName);
-        if (activeVersion != null) {
-          responder.sendJson(HttpResponseStatus.OK, activeVersion);
-        } else {
-          responder.sendError(HttpResponseStatus.NOT_FOUND, "Active version of the resource not found.");
-        }
-      } else {
-        responder.sendJson(HttpResponseStatus.OK,
-                           pluginResourceService.getVersions(account, pluginResourceType, resourceName));
-      }
+      boolean activeOnly = isActiveParamSet(request);
+      responder.sendJson(HttpResponseStatus.OK,
+                         pluginResourceService.getVersions(account, pluginResourceType, resourceName, activeOnly));
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting modules.");
     }
