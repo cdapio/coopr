@@ -17,7 +17,7 @@ describe 'Provisioner::CLI' do
         :tenant => 'test_tenant',
         :provisioner => 'test_provisioner',
         :log_level => 'debug',
-        :log_file => '/tmp/test.log',
+        :log_directory => '/tmp/test.log',
         :daemonize => true
     }
     expect(options).to eq(expected)
