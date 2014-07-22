@@ -2,7 +2,6 @@
 # encoding: UTF-8
 
 require_relative 'tenantspec'
-require_relative 'worker'
 require_relative 'logging'
 require_relative 'workerlauncher'
 
