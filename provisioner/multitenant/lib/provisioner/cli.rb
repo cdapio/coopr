@@ -24,8 +24,8 @@ module Loom
         opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
           options[:log_level] = f
         end
-        opts.on('-l', '--log-file FILE', 'Path to logfile') do |f|
-          options[:log_file] = f
+        opts.on('-l', '--log-directory DIR', 'Path to log directory for provisioner and workers') do |d|
+          options[:log_directory] = d
         end
         opts.on('-b', '--background', 'runs as a daemon. ensure you specify a logfile also') do 
           options[:daemonize] = true 

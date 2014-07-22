@@ -21,7 +21,8 @@ module Loom
     #@signal_thread
     #@heartbeat_thread
 
-    def initialize()
+    def initialize(options)
+      @options = options
       @tenantmanagers = {}
       @terminating_tenants = []
       pid = Process.pid
@@ -34,7 +35,19 @@ module Loom
     def self.run(options)
       @server_uri = options[:uri]
 
-      Logging.configure(options[:log_file])
+      #initialize logging
+
+      #log_file = nil
+      #if options[:log_directory]
+      #  log_file = [ options[:log_directory], @provisioner_id ].join('/') + '.log'
+      #Logging.configure(log_file)
+
+      #Logging.configure(options[:log_directory] ? [ options[:log_directory], 'provisioner' ].join('/') + '.log' : nil)
+      Logging.configure(options[:log_directory] ? "#{options[:log_directory]}/provisioner.log" : nil)
+      #Logging.configure(options[:log_directory] ? '/tmp/foo.log' : nil)
+
+
+      #Logging.configure(options[:log_file])
       Logging.level = options[:log_level]
       Logging.log.info "Loom api starting up"
 
@@ -42,7 +55,7 @@ module Loom
 
       setup_process if options[:daemonize]
 
-      pg = Loom::Provisioner.new
+      pg = Loom::Provisioner.new(options)
       if options[:register]
         pg.register_plugins
       else
@@ -223,6 +236,9 @@ module Loom
 
       # set provisionerId
       tenantmgr.provisioner_id = @provisioner_id
+
+      # set options
+      tenantmgr.options = @options
 
       if @tenantmanagers.key? id
         # edit tenant

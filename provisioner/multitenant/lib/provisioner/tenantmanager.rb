@@ -4,11 +4,12 @@
 require_relative 'tenantspec'
 require_relative 'worker'
 require_relative 'logging'
+require_relative 'workerlauncher'
 
 module Loom
   class TenantManager
     include Logging
-    attr_accessor :spec, :provisioner_id
+    attr_accessor :spec, :provisioner_id, :options
     # command used to launch a worker.  args are separate
     #@worker_name
 
@@ -21,7 +22,12 @@ module Loom
       @workerpids = []
       @terminating_workers = []
       # command to launch a worker.  encapsulated into proc so that it can be changed for testing
-      @worker_cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/worker.rb #{@spec.id}"
+      #@worker_cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/worker.rb #{@spec.id}"
+      #@worker_cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} "\
+      #              "#{File.dirname(__FILE__)}/../daemon/provisioner.rb --tenant #{@spec.id} "\
+      #              "--provisioner #{@provisioner_id} --uri http://localhost:55054 "\
+      #              "-l #{@options[:log_dir]} -L debug"
+
     end 
 
     def id
@@ -72,13 +78,18 @@ module Loom
       #worker_name = "worker-" + self.id + "-"  + (@workerpids.size + 1).to_s
       #log.debug "spawning #{worker_name}"
       #cmd = @worker_cmd.call
-      log.debug "spawning #{@worker_cmd}"
+      worker_launcher = WorkerLauncher.new(@options)
+      worker_launcher.provisioner = @provisioner_id
+      worker_launcher.tenant = id
+      worker_launcher.name = "worker-" + id + "-"  + (@workerpids.size + 1).to_s
+      worker_cmd = worker_launcher.cmd
+      log.debug "spawning #{worker_cmd}"
       cpid = fork { 
         #worker = Loom::Worker.new(worker_name)
         #worker.work
         #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/worker.rb #{worker_name}")
         #exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../daemon/provisioner.rb --tenant #{@spec.id} --provisioner #{@provisioner_id} --uri http://localhost:55054 -l /tmp/worker-#{worker_name}.log -L debug")
-        exec(@worker_cmd)
+        exec(worker_cmd)
       }
 
       #@logger.info "spawned #{cpid}"
