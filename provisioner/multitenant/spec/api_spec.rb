@@ -27,7 +27,14 @@ describe 'Sinatra API' do
     expect(last_response).to be_ok
     put 'v1/tenants/test_tenant', {:id => "test_tenant", :workers => 1}.to_json, "CONTENT_TYPE" => "application/json"
     expect(last_response).to be_ok
-    delete 'v1/tenants/test_tenant', {:id => "test_tenant"}.to_json, "CONTENT_TYPE" => "application/json"
+    delete 'v1/tenants/test_tenant', "CONTENT_TYPE" => "application/json"
+    expect(last_response).to be_ok
+  end
+
+  it 'can delete a tenant with no workers' do
+    post 'v1/tenants', {:id => "test_tenant", :workers => 0}.to_json, "CONTENT_TYPE" => "application/json"
+    expect(last_response).to be_ok
+    delete 'v1/tenants/test_tenant', "CONTENT_TYPE" => "application/json"
     expect(last_response).to be_ok
   end
 
