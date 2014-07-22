@@ -25,7 +25,7 @@ module Loom
     def test_cmd
       cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])}"
       cmd += " #{File.dirname(__FILE__)}/../../spec/worker.rb"
-      cmd += @name unless @name.nil?
+      cmd += " #{@name}" unless @name.nil?
       cmd
     end
   end
