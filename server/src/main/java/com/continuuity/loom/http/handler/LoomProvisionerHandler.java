@@ -18,7 +18,6 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
-import com.continuuity.loom.provisioner.PluginResourceMeta;
 import com.continuuity.loom.provisioner.PluginResourceService;
 import com.continuuity.loom.provisioner.PluginResourceType;
 import com.continuuity.loom.provisioner.Provisioner;
@@ -181,11 +180,11 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
 
   @GET
   @Path("/loom/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}")
-  public void deleteAutomatorTypeModuleVersion(HttpRequest request, HttpResponder responder,
-                                               @PathParam("automatortype-id") String automatortypeId,
-                                               @PathParam("resource-type") String resourceType,
-                                               @PathParam("resource-name") String resourceName,
-                                               @PathParam("version") String version) {
+  public void getAutomatorResource(HttpRequest request, HttpResponder responder,
+                                   @PathParam("automatortype-id") String automatortypeId,
+                                   @PathParam("resource-type") String resourceType,
+                                   @PathParam("resource-name") String resourceName,
+                                   @PathParam("version") String version) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -196,8 +195,7 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
     }
 
     PluginResourceType resourceTypeObj = new PluginResourceType(PluginType.AUTOMATOR, automatortypeId, resourceType);
-    PluginResourceMeta resourceMeta = new PluginResourceMeta(resourceName, version);
-    sendResourceInChunks(responder, account, resourceTypeObj, resourceMeta);
+    sendResourceInChunks(responder, account, resourceTypeObj, resourceName, version);
   }
 
   @GET
@@ -217,16 +215,18 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
     }
 
     PluginResourceType resourceTypeObj = new PluginResourceType(PluginType.PROVIDER, providertypeId, resourceType);
-    PluginResourceMeta resourceMeta = new PluginResourceMeta(resourceName, version);
-    sendResourceInChunks(responder, account, resourceTypeObj, resourceMeta);
+    sendResourceInChunks(responder, account, resourceTypeObj, resourceName, version);
   }
 
   private void sendResourceInChunks(HttpResponder responder, Account account,
-                                    PluginResourceType resourceType, PluginResourceMeta resourceMeta) {
+                                    PluginResourceType resourceType, String resourceName, String resourceVersion) {
     try {
-      InputStream inputStream = pluginResourceService.getResourceInputStream(account, resourceType, resourceMeta);
+      InputStream inputStream =
+        pluginResourceService.getResourceInputStream(account, resourceType, resourceName, resourceVersion);
       if (inputStream == null) {
-        responder.sendError(HttpResponseStatus.NOT_FOUND, "Resource not found.");
+        LOG.error("No input stream available, but metadata exists for version {} of resource {} for tenant {}.",
+                  resourceVersion, resourceName, account.getTenantId());
+        responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting resource.");
       }
       try {
         responder.sendChunkStart(HttpResponseStatus.OK, ImmutableMultimap.<String, String>of());
@@ -244,6 +244,8 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
       }
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting resource.");
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "Resource not found.");
     }
   }
 }

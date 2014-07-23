@@ -20,10 +20,18 @@ import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.provisioner.PluginResourceMeta;
 import com.continuuity.loom.provisioner.PluginResourceService;
+import com.continuuity.loom.provisioner.PluginResourceStatus;
 import com.continuuity.loom.provisioner.PluginResourceType;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.provisioner.PluginType;
 import com.continuuity.loom.store.tenant.TenantStore;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -36,14 +44,18 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
- *
+ * Handler for plugin resource related operations, such as uploading resources, staging, and unstaging resources,
+ * and syncing resources.
  */
 @Path("/v1/loom")
 public class LoomPluginHandler extends LoomAuthHandler {
+  private static final Gson gson = getGson();
   private final PluginResourceService pluginResourceService;
 
   @Inject
@@ -67,7 +79,6 @@ public class LoomPluginHandler extends LoomAuthHandler {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return null;
     }
-
 
     return uploadResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName,
                           version);
@@ -93,12 +104,12 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   @POST
-  @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}/activate")
-  public void activateAutomatorTypeModule(HttpRequest request, HttpResponder responder,
-                                          @PathParam("automatortype-id") String automatortypeId,
-                                          @PathParam("resource-type") String resourceType,
-                                          @PathParam("resource-name") String resourceName,
-                                          @PathParam("version") String version) {
+  @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}/stage")
+  public void stageAutomatorTypeModule(HttpRequest request, HttpResponder responder,
+                                       @PathParam("automatortype-id") String automatortypeId,
+                                       @PathParam("resource-type") String resourceType,
+                                       @PathParam("resource-name") String resourceName,
+                                       @PathParam("version") String version) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -109,14 +120,34 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
 
 
-    activateResource(responder, account, PluginType.AUTOMATOR,
-                     automatortypeId, resourceType, resourceName, version);
+    stageResource(responder, account, PluginType.AUTOMATOR,
+                  automatortypeId, resourceType, resourceName, version);
   }
 
   @POST
-  @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}/activate")
-  public void activateProviderTypeModule(HttpRequest request, HttpResponder responder,
-                                         @PathParam("providertype-id") String providertypeId,
+  @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}/stage")
+  public void stageProviderTypeModule(HttpRequest request, HttpResponder responder,
+                                      @PathParam("providertype-id") String providertypeId,
+                                      @PathParam("resource-type") String resourceType,
+                                      @PathParam("resource-name") String resourceName,
+                                      @PathParam("version") String version) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    stageResource(responder, account, PluginType.PROVIDER,
+                  providertypeId, resourceType, resourceName, version);
+  }
+
+  @POST
+  @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}/unstage")
+  public void unstageAutomatorTypeModule(HttpRequest request, HttpResponder responder,
+                                         @PathParam("automatortype-id") String automatortypeId,
                                          @PathParam("resource-type") String resourceType,
                                          @PathParam("resource-name") String resourceName,
                                          @PathParam("version") String version) {
@@ -129,16 +160,16 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    activateResource(responder, account, PluginType.PROVIDER,
-                     providertypeId, resourceType, resourceName, version);
+    unstageResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
   }
 
   @POST
-  @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/deactivate")
-  public void deactivateAutomatorTypeModule(HttpRequest request, HttpResponder responder,
-                                            @PathParam("automatortype-id") String automatortypeId,
-                                            @PathParam("resource-type") String resourceType,
-                                            @PathParam("resource-name") String resourceName) {
+  @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}/unstage")
+  public void unstageProviderTypeModule(HttpRequest request, HttpResponder responder,
+                                        @PathParam("providertype-id") String providertypeId,
+                                        @PathParam("resource-type") String resourceType,
+                                        @PathParam("resource-name") String resourceName,
+                                        @PathParam("version") String version) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -148,25 +179,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    deactivateResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName);
-  }
-
-  @POST
-  @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/deactivate")
-  public void deactivateProviderTypeModule(HttpRequest request, HttpResponder responder,
-                                           @PathParam("providertype-id") String providertypeId,
-                                           @PathParam("resource-type") String resourceType,
-                                           @PathParam("resource-name") String resourceName) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isAdmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
-      return;
-    }
-
-    deactivateResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName);
+    unstageResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName, version);
   }
 
   @GET
@@ -206,9 +219,9 @@ public class LoomPluginHandler extends LoomAuthHandler {
   @GET
   @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}")
   public void getAllAutomatorTypeResourceVersions(HttpRequest request, HttpResponder responder,
-                                                @PathParam("automatortype-id") String automatortypeId,
-                                                @PathParam("resource-type") String resourceType,
-                                                @PathParam("resource-name") String resourceName) {
+                                                  @PathParam("automatortype-id") String automatortypeId,
+                                                  @PathParam("resource-type") String resourceType,
+                                                  @PathParam("resource-name") String resourceName) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -224,9 +237,9 @@ public class LoomPluginHandler extends LoomAuthHandler {
   @GET
   @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}")
   public void getAllProviderTypeResourceVersions(HttpRequest request, HttpResponder responder,
-                                               @PathParam("providertype-id") String providertypeId,
-                                               @PathParam("resource-type") String resourceType,
-                                               @PathParam("resource-name") String resourceName) {
+                                                 @PathParam("providertype-id") String providertypeId,
+                                                 @PathParam("resource-type") String resourceType,
+                                                 @PathParam("resource-name") String resourceName) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -240,12 +253,48 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   @DELETE
+  @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}")
+  public void deleteAutomatorTypeResource(HttpRequest request, HttpResponder responder,
+                                          @PathParam("automatortype-id") String automatortypeId,
+                                          @PathParam("resource-type") String resourceType,
+                                          @PathParam("resource-name") String resourceName) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    deleteResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName);
+  }
+
+  @DELETE
+  @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}")
+  public void deleteProviderTypeResource(HttpRequest request, HttpResponder responder,
+                                         @PathParam("providertype-id") String providertypeId,
+                                         @PathParam("resource-type") String resourceType,
+                                         @PathParam("resource-name") String resourceName) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    deleteResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName);
+  }
+
+  @DELETE
   @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}")
   public void deleteAutomatorTypeResourceVersion(HttpRequest request, HttpResponder responder,
-                                               @PathParam("automatortype-id") String automatortypeId,
-                                               @PathParam("resource-type") String resourceType,
-                                               @PathParam("resource-name") String resourceName,
-                                               @PathParam("version") String version) {
+                                                 @PathParam("automatortype-id") String automatortypeId,
+                                                 @PathParam("resource-type") String resourceType,
+                                                 @PathParam("resource-name") String resourceName,
+                                                 @PathParam("version") String version) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -261,10 +310,10 @@ public class LoomPluginHandler extends LoomAuthHandler {
   @DELETE
   @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}")
   public void deleteProviderTypeResourceVersion(HttpRequest request, HttpResponder responder,
-                                              @PathParam("providertype-id") String providertypeId,
-                                              @PathParam("resource-type") String resourceType,
-                                              @PathParam("resource-name") String resourceName,
-                                              @PathParam("version") String version) {
+                                                @PathParam("providertype-id") String providertypeId,
+                                                @PathParam("resource-type") String resourceType,
+                                                @PathParam("resource-name") String resourceName,
+                                                @PathParam("version") String version) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -288,21 +337,20 @@ public class LoomPluginHandler extends LoomAuthHandler {
                                       String pluginName, String resourceType,
                                       String resourceName, String version) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
-    PluginResourceMeta resourceMeta = new PluginResourceMeta(resourceName, version);
     try {
-      return pluginResourceService.createResourceBodyConsumer(account, pluginResourceType, resourceMeta, responder);
+      return pluginResourceService.createResourceBodyConsumer(
+        account, pluginResourceType, resourceName, version, responder);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error uploading module");
       return null;
     }
   }
 
-  private void activateResource(HttpResponder responder, Account account, PluginType pluginType,
-                                String pluginName, String resourceType, String resourceName, String version) {
+  private void stageResource(HttpResponder responder, Account account, PluginType pluginType,
+                             String pluginName, String resourceType, String resourceName, String version) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
-    PluginResourceMeta resourceMeta = new PluginResourceMeta(resourceName, version, true);
     try {
-      pluginResourceService.activate(account, pluginResourceType, resourceMeta);
+      pluginResourceService.stage(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
@@ -311,11 +359,11 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private void deactivateResource(HttpResponder responder, Account account, PluginType pluginType,
-                                  String pluginName, String resourceType, String resourceName) {
+  private void unstageResource(HttpResponder responder, Account account, PluginType pluginType,
+                               String pluginName, String resourceType, String resourceName, String version) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
     try {
-      pluginResourceService.deactivate(account, pluginResourceType, resourceName);
+      pluginResourceService.unstage(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
@@ -326,10 +374,15 @@ public class LoomPluginHandler extends LoomAuthHandler {
 
   private void getResources(HttpRequest request, HttpResponder responder, Account account,
                             PluginType pluginType, String pluginName, String resourceType) {
-    boolean activeOnly = isActiveParamSet(request);
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
     try {
-      responder.sendJson(HttpResponseStatus.OK, pluginResourceService.getAll(account, pluginResourceType, activeOnly));
+      PluginResourceStatus statusFilter = getStatusParam(request);
+      responder.sendJson(HttpResponseStatus.OK,
+                         pluginResourceService.getAll(account, pluginResourceType, statusFilter),
+                         new TypeToken<Map<String, Set<PluginResourceStatus>>>() {}.getType(),
+                         gson);
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting modules.");
     }
@@ -339,9 +392,13 @@ public class LoomPluginHandler extends LoomAuthHandler {
                             PluginType pluginType, String pluginName, String resourceType, String resourceName) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
     try {
-      boolean activeOnly = isActiveParamSet(request);
+      PluginResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
-                         pluginResourceService.getVersions(account, pluginResourceType, resourceName, activeOnly));
+                         pluginResourceService.getAll(account, pluginResourceType, resourceName, statusFilter),
+                         new TypeToken<Set<PluginResourceStatus>>() {}.getType(),
+                         gson);
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting modules.");
     }
@@ -350,17 +407,48 @@ public class LoomPluginHandler extends LoomAuthHandler {
   private void deleteResource(HttpResponder responder, Account account, PluginType pluginType,
                               String pluginName, String resourceType, String resourceName, String version) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
-    PluginResourceMeta resourceMeta = new PluginResourceMeta(resourceName, version);
     try {
-      pluginResourceService.delete(account, pluginResourceType, resourceMeta);
+      pluginResourceService.delete(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT, "Resource not in a deletable state.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
     }
   }
 
-  private boolean isActiveParamSet(HttpRequest request) {
+  private void deleteResource(HttpResponder responder, Account account, PluginType pluginType,
+                              String pluginName, String resourceType, String resourceName) {
+    PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
+    try {
+      pluginResourceService.delete(account, pluginResourceType, resourceName);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IllegalStateException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT, "Resource not in a deletable state.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
+    }
+  }
+
+  private PluginResourceStatus getStatusParam(HttpRequest request) throws IllegalArgumentException {
     Map<String, List<String>> queryParams = new QueryStringDecoder(request.getUri()).getParameters();
-    return  queryParams.containsKey("active") ? Boolean.parseBoolean(queryParams.get("active").get(0)) : false;
+    return queryParams.containsKey("status") ?
+      PluginResourceStatus.valueOf(queryParams.get("status").get(0).toUpperCase()) : null;
+  }
+
+  // don't want to expose internal ids in the get calls
+  private static Gson getGson() {
+    return new GsonBuilder()
+      .registerTypeAdapter(PluginResourceMeta.class, new JsonSerializer<PluginResourceMeta>() {
+        @Override
+        public JsonElement serialize(PluginResourceMeta src, Type typeOfSrc, JsonSerializationContext context) {
+          JsonObject jsonObj = new JsonObject();
+          jsonObj.addProperty("name", src.getName());
+          jsonObj.addProperty("version", src.getVersion());
+          jsonObj.addProperty("status", src.getStatus().name().toLowerCase());
+          return jsonObj;
+        }
+      })
+      .create();
   }
 }

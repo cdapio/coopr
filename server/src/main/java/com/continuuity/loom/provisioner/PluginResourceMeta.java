@@ -18,21 +18,54 @@ package com.continuuity.loom.provisioner;
 import com.continuuity.loom.admin.NamedEntity;
 import com.google.common.base.Objects;
 
+import java.util.UUID;
+
 /**
- * Metadata about a plugin resource, such as the name, version, and whether or not it is the active version.
+ * Metadata about a plugin resource, including a unique id, a name, a version, and status.
  */
 public class PluginResourceMeta extends NamedEntity {
+  private final String resourceId;
   private final String version;
-  private final boolean active;
+  private final PluginResourceStatus status;
 
-  public PluginResourceMeta(String name, String version) {
-    this(name, version, false);
+  private PluginResourceMeta(String resourceId, String name, String version, PluginResourceStatus status) {
+    super(name);
+    this.resourceId = resourceId;
+    this.version = version;
+    this.status = status;
   }
 
-  public PluginResourceMeta(String name, String version, boolean active) {
-    super(name);
-    this.version = version;
-    this.active = active;
+  /**
+   * Create metadata for a new plugin resource, with a unique id.
+   *
+   * @param name Name of the resource
+   * @param version Version of the resource
+   * @return Metadata for a new plugin resource, with a unique id
+   */
+  public static PluginResourceMeta createNew(String name, String version) {
+    return new PluginResourceMeta(UUID.randomUUID().toString(), name, version, PluginResourceStatus.INACTIVE);
+  }
+
+  /**
+   * Create metadata for an existing resource, with a pre-existing id.
+   *
+   * @param id Id of the resource
+   * @param name Name of the resource
+   * @param version Version of the resource
+   * @param status Status of the resource
+   * @return metadata for an existing resource, with a pre-existing id
+   */
+  public static PluginResourceMeta fromExisting(String id, String name, String version, PluginResourceStatus status) {
+    return new PluginResourceMeta(id, name, version, status);
+  }
+
+  /**
+   * Get the id.
+   *
+   * @return Id
+   */
+  public String getResourceId() {
+    return resourceId;
   }
 
   /**
@@ -45,12 +78,12 @@ public class PluginResourceMeta extends NamedEntity {
   }
 
   /**
-   * Get whether or not the resource is active.
+   * Get the status.
    *
-   * @return Whether or not the resource is active
+   * @return Status
    */
-  public boolean isActive() {
-    return active;
+  public PluginResourceStatus getStatus() {
+    return status;
   }
 
   @Override
@@ -64,22 +97,24 @@ public class PluginResourceMeta extends NamedEntity {
 
     PluginResourceMeta that = (PluginResourceMeta) o;
 
-    return Objects.equal(name, that.name) &&
+    return Objects.equal(resourceId, that.resourceId) &&
+      Objects.equal(name, that.name) &&
       Objects.equal(version, that.version) &&
-      Objects.equal(active, that.active);
+      Objects.equal(status, that.status);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, version, active);
+    return Objects.hashCode(resourceId, name, version, status);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
+      .add("resourceId", resourceId)
       .add("name", name)
       .add("version", version)
-      .add("active", active)
+      .add("status", status)
       .toString();
   }
 }

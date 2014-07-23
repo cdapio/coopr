@@ -18,6 +18,7 @@ package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.provisioner.PluginResourceMeta;
+import com.continuuity.loom.provisioner.PluginResourceStatus;
 import com.continuuity.loom.provisioner.PluginResourceType;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBPut;
@@ -63,16 +64,51 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public boolean exists(PluginResourceMeta meta) throws IOException {
+  public boolean exists(String resourceName) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        return exists(conn, meta);
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT name FROM pluginMeta WHERE " +
+            "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?");
+        try {
+          setConstantFields(statement);
+          statement.setString(5, resourceName);
+          return dbQueryExecutor.hasResults(statement);
+        } finally {
+          statement.close();
+        }
       } finally {
         conn.close();
       }
     } catch (SQLException e) {
-      LOG.error("Exception checking existance of {} for tenant {}.", meta, tenant);
+      LOG.error("Exception checking existance of resource {} for tenant {}.", resourceName, tenant);
+      throw new IOException(e);
+    }
+  }
+
+  @Override
+  public boolean exists(String resourceName, String resourceVersion) throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT name FROM pluginMeta WHERE " +
+            "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
+        try {
+          setConstantFields(statement);
+          statement.setString(5, resourceName);
+          statement.setString(6, resourceVersion);
+          return dbQueryExecutor.hasResults(statement);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception checking existance of version {} of resource {} for tenant {}.",
+                resourceVersion, resourceName, tenant);
       throw new IOException(e);
     }
   }
@@ -82,19 +118,36 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        DBPut metaPut = new PluginResourceMetaDBPut(meta);
+        DBPut metaPut = new MetaDBPut(meta);
         metaPut.executePut(conn);
       } finally {
         conn.close();
       }
     } catch (SQLException e) {
-      LOG.error("Exception writing resource metadata {}.", meta, e);
+      LOG.error("Exception adding version {} of resource {} for tenant {}.",
+                meta.getVersion(), meta.getName(), tenant, e);
       throw new IOException(e);
     }
   }
 
   @Override
-  public void delete(PluginResourceMeta meta) throws IOException {
+  public PluginResourceMeta get(String resourceName, String resourceVersion) throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        return getMeta(conn, resourceName, resourceVersion);
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting metadata of version {} of resource {} for tenant {}.",
+                resourceVersion, resourceName, tenant, e);
+      throw new IOException(e);
+    }
+  }
+
+  @Override
+  public void delete(String resourceName, String resourceVersion) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -103,8 +156,8 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
             "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
         try {
           setConstantFields(statement);
-          statement.setString(5, meta.getName());
-          statement.setString(6, meta.getVersion());
+          statement.setString(5, resourceName);
+          statement.setString(6, resourceVersion);
           statement.executeUpdate();
         } finally {
           statement.close();
@@ -113,23 +166,20 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
         conn.close();
       }
     } catch (SQLException e) {
-      LOG.error("Exception deleting resource metadata {}.", meta, e);
+      LOG.error("Exception deleting version {} of resource {} for tenant {}.",
+                resourceVersion, resourceName, tenant);
       throw new IOException(e);
     }
   }
 
   @Override
-  public Map<String, Set<PluginResourceMeta>> getAll(boolean activeOnly) throws IOException {
+  public Map<String, Set<PluginResourceMeta>> getAll() throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        String queryStr =
-          "SELECT name, version, active FROM pluginMeta " +
-            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=?";
-        if (activeOnly) {
-          queryStr += " AND active=true";
-        }
-        PreparedStatement statement = conn.prepareStatement(queryStr);
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT resource_id, name, version, status FROM pluginMeta " +
+            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=?");
         try {
           setConstantFields(statement);
           return getResourceMetaMap(statement);
@@ -146,17 +196,37 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public Set<PluginResourceMeta> getAll(String resourceName, boolean activeOnly) throws IOException {
+  public Map<String, Set<PluginResourceMeta>> getAll(PluginResourceStatus status) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        String queryStr =
-          "SELECT name, version, active FROM pluginMeta " +
-            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?";
-        if (activeOnly) {
-          queryStr += " AND active=true";
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT resource_id, name, version, status FROM pluginMeta " +
+            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND status=?");
+        try {
+          setConstantFields(statement);
+          statement.setString(5, status.name());
+          return getResourceMetaMap(statement);
+        } finally {
+          statement.close();
         }
-        PreparedStatement statement = conn.prepareStatement(queryStr);
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting resources.", e);
+      throw new IOException(e);
+    }
+  }
+
+  @Override
+  public Set<PluginResourceMeta> getAll(String resourceName) throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT resource_id, name, version, status FROM pluginMeta " +
+            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?");
         try {
           setConstantFields(statement);
           statement.setString(5, resourceName);
@@ -174,20 +244,56 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public void activate(String resourceName, String version) throws IOException {
+  public Set<PluginResourceMeta> getAll(String resourceName, PluginResourceStatus status) throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT resource_id, name, version, status FROM pluginMeta " +
+            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND status=?");
+        try {
+          setConstantFields(statement);
+          statement.setString(5, resourceName);
+          statement.setString(6, status.name());
+          return getResourceMetaList(statement);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting all metadata for resource {}.", resourceName, e);
+      throw new IOException(e);
+    }
+  }
+
+  @Override
+  public void stage(String resourceName, String resourceVersion) throws IOException {
     Connection conn = null;
     try {
       conn = dbConnectionPool.getConnection(false);
       try {
-        deactivateActiveVersion(conn, resourceName);
-        activateVersion(conn, resourceName, version);
+        PluginResourceMeta meta = getMeta(conn, resourceName, resourceVersion);
+        if (meta == null) {
+          return;
+        }
+        PluginResourceStatus status = meta.getStatus();
+        if (status == PluginResourceStatus.INACTIVE) {
+          // deactivate current staged version if there is one
+          deactivateVersionsWithStatus(conn, resourceName, PluginResourceStatus.STAGED);
+          // set status of this version to staged
+          setStatus(conn, resourceName, resourceVersion, PluginResourceStatus.STAGED);
+        } else if (status == PluginResourceStatus.UNSTAGED) {
+          setStatus(conn, resourceName, resourceVersion, PluginResourceStatus.ACTIVE);
+        }
         conn.commit();
       } finally {
         conn.close();
       }
     } catch (SQLException e) {
       if (conn != null) {
-        LOG.error("Exception activating version {} of {}. Rolling back...", version, resourceName, e);
+        LOG.error("Exception activating version {} of {}. Rolling back...", resourceVersion, resourceName, e);
         try {
           conn.rollback();
         } catch (SQLException se) {
@@ -199,11 +305,17 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public void deactivate(String resourceName) throws IOException {
+  public void unstage(String resourceName, String resourceVersion) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        deactivateActiveVersion(conn, resourceName);
+        PluginResourceMeta meta = getMeta(conn, resourceName, resourceVersion);
+        PluginResourceStatus status = meta.getStatus();
+        if (status == PluginResourceStatus.STAGED) {
+          setStatus(conn, resourceName, resourceVersion, PluginResourceStatus.INACTIVE);
+        } else if (status == PluginResourceStatus.ACTIVE) {
+          setStatus(conn, resourceName, resourceVersion, PluginResourceStatus.UNSTAGED);
+        }
       } finally {
         conn.close();
       }
@@ -213,47 +325,80 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     }
   }
 
-  private void deactivateActiveVersion(Connection conn, String resourceName) throws SQLException {
-    PreparedStatement statement = conn.prepareStatement(
-      "UPDATE pluginMeta SET active=false WHERE " +
-        "active=true AND tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?");
+  @Override
+  public void activate(String resourceName) throws IOException {
+    Connection conn = null;
     try {
-      setConstantFields(statement);
-      statement.setString(5, resourceName);
+      conn = dbConnectionPool.getConnection(false);
+      try {
+        PluginResourceMeta meta = getStagedMeta(conn, resourceName);
+        // if there is no staged version, don't do anything
+        if (meta == null) {
+          return;
+        }
+        // deactivate current active version
+        deactivateVersionsWithStatus(conn, resourceName, PluginResourceStatus.ACTIVE);
+        // activate staged version
+        setStatus(conn, resourceName, meta.getVersion(), PluginResourceStatus.ACTIVE);
+        conn.commit();
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception activating plugin resource {}.", resourceName, e);
+      if (conn != null) {
+        LOG.error("Rolling back changes...");
+        try {
+          conn.rollback();
+        } catch (SQLException se) {
+          LOG.error("Exception rolling back.", se);
+        }
+      }
+      throw new IOException(e);
+    }
+  }
+
+  private void deactivateVersionsWithStatus(Connection conn, String resourceName, PluginResourceStatus status)
+    throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "UPDATE pluginMeta SET status=? WHERE " +
+        "status=? AND tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?");
+    try {
+      statement.setString(1, PluginResourceStatus.INACTIVE.name());
+      statement.setString(2, status.name());
+      setConstantFields(statement, 3);
+      statement.setString(7, resourceName);
       statement.executeUpdate();
     } finally {
       statement.close();
     }
   }
 
-  private void activateVersion(Connection conn, String resourceName, String version) throws SQLException {
+  private void setStatus(Connection conn, String resourceName, String resourceVersion, PluginResourceStatus status)
+    throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
-      "UPDATE pluginMeta SET active=true WHERE " +
+      "UPDATE pluginMeta SET status=? WHERE " +
         "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
     try {
-      setConstantFields(statement);
-      statement.setString(5, resourceName);
-      statement.setString(6, version);
+      statement.setString(1, status.name());
+      setConstantFields(statement, 2);
+      statement.setString(6, resourceName);
+      statement.setString(7, resourceVersion);
       statement.executeUpdate();
     } finally {
       statement.close();
     }
   }
 
-  private boolean exists(Connection conn, PluginResourceMeta meta) throws SQLException {
-    PreparedStatement statement = conn.prepareStatement(
-      "SELECT name FROM pluginMeta WHERE " +
-        "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
+  private PluginResourceMeta getResourceMeta(PreparedStatement statement) throws SQLException {
+    ResultSet results = statement.executeQuery();
     try {
-      statement.setString(1, tenant);
-      statement.setString(2, pluginType);
-      statement.setString(3, pluginName);
-      statement.setString(4, resourceType);
-      statement.setString(5, meta.getName());
-      statement.setString(6, meta.getVersion());
-      return dbQueryExecutor.hasResults(statement);
+      if (results.next()) {
+        return metaFromResult(results);
+      }
+      return null;
     } finally {
-      statement.close();
+      results.close();
     }
   }
 
@@ -262,27 +407,9 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     try {
       Set<PluginResourceMeta> output = Sets.newHashSet();
       while (results.next()) {
-        String name = results.getString(1);
-        String version = results.getString(2);
-        boolean isActive = results.getBoolean(3);
-        output.add(new PluginResourceMeta(name, version, isActive));
+        output.add(metaFromResult(results));
       }
       return ImmutableSet.copyOf(output);
-    } finally {
-      results.close();
-    }
-  }
-
-  private PluginResourceMeta getResourceMeta(PreparedStatement statement) throws SQLException {
-    ResultSet results = statement.executeQuery();
-    try {
-      if (results.next()) {
-        String name = results.getString(1);
-        String version = results.getString(2);
-        boolean isActive = results.getBoolean(3);
-        return new PluginResourceMeta(name, version, isActive);
-      }
-      return null;
     } finally {
       results.close();
     }
@@ -293,10 +420,8 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     try {
       Map<String, Set<PluginResourceMeta>> output = Maps.newHashMap();
       while (results.next()) {
-        String name = results.getString(1);
-        String version = results.getString(2);
-        boolean isActive = results.getBoolean(3);
-        PluginResourceMeta meta = new PluginResourceMeta(name, version, isActive);
+        PluginResourceMeta meta = metaFromResult(results);
+        String name = meta.getName();
         if (output.containsKey(name)) {
           output.get(name).add(meta);
         } else {
@@ -309,47 +434,84 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     }
   }
 
-  private void setConstantFields(PreparedStatement statement) throws SQLException {
-    statement.setString(1, tenant);
-    statement.setString(2, pluginType);
-    statement.setString(3, pluginName);
-    statement.setString(4, resourceType);
+  private PluginResourceMeta getStagedMeta(Connection conn, String resourceName) throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "SELECT resource_id, name, version, status FROM pluginMeta " +
+        "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND status=?");
+    try {
+      setConstantFields(statement);
+      statement.setString(5, resourceName);
+      statement.setString(6, PluginResourceStatus.STAGED.name());
+      return getResourceMeta(statement);
+    } finally {
+      statement.close();
+    }
   }
 
-  private class PluginResourceMetaDBPut extends DBPut {
+  private PluginResourceMeta getMeta(Connection conn, String resourceName, String resourceVersion) throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "SELECT resource_id, name, version, status FROM pluginMeta " +
+        "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
+    try {
+      setConstantFields(statement);
+      statement.setString(5, resourceName);
+      statement.setString(6, resourceVersion);
+      return getResourceMeta(statement);
+    } finally {
+      statement.close();
+    }
+  }
+
+  private PluginResourceMeta metaFromResult(ResultSet results) throws SQLException {
+    String id = results.getString(1);
+    String name = results.getString(2);
+    String version = results.getString(3);
+    PluginResourceStatus status = PluginResourceStatus.valueOf(results.getString(4));
+    return PluginResourceMeta.fromExisting(id, name, version, status);
+  }
+
+  private void setConstantFields(PreparedStatement statement) throws SQLException {
+    setConstantFields(statement, 1);
+  }
+
+  private void setConstantFields(PreparedStatement statement, int startIndex) throws SQLException {
+    statement.setString(startIndex, tenant);
+    statement.setString(startIndex + 1, pluginType);
+    statement.setString(startIndex + 2, pluginName);
+    statement.setString(startIndex + 3, resourceType);
+  }
+
+  private class MetaDBPut extends DBPut {
     private final PluginResourceMeta meta;
 
-    private PluginResourceMetaDBPut(PluginResourceMeta meta) {
+    private MetaDBPut(PluginResourceMeta meta) {
       this.meta = meta;
     }
 
     @Override
     protected PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
-        "UPDATE pluginMeta SET active=? WHERE " +
+        "UPDATE pluginMeta SET resource_id=?, status=? WHERE " +
           "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
-      statement.setBoolean(1, meta.isActive());
-      statement.setString(2, tenant);
-      statement.setString(3, pluginType);
-      statement.setString(4, pluginName);
-      statement.setString(5, resourceType);
-      statement.setString(6, meta.getName());
-      statement.setString(7, meta.getVersion());
+      statement.setString(1, meta.getResourceId());
+      statement.setString(2, meta.getStatus().name());
+      setConstantFields(statement, 3);
+      statement.setString(7, meta.getName());
+      statement.setString(8, meta.getVersion());
       return statement;
     }
 
     @Override
     protected PreparedStatement createInsertStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
-        "INSERT INTO pluginMeta (tenant_id, plugin_type, plugin_name, resource_type, name, version, active) " +
-          "VALUES (?, ?, ?, ?, ?, ?, ?)");
-      statement.setString(1, tenant);
-      statement.setString(2, pluginType);
-      statement.setString(3, pluginName);
-      statement.setString(4, resourceType);
-      statement.setString(5, meta.getName());
-      statement.setString(6, meta.getVersion());
-      statement.setBoolean(7, meta.isActive());
+        "INSERT INTO pluginMeta " +
+          "(tenant_id, plugin_type, plugin_name, resource_type, resource_id, name, version, status) " +
+          "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+      setConstantFields(statement);
+      statement.setString(5, meta.getResourceId());
+      statement.setString(6, meta.getName());
+      statement.setString(7, meta.getVersion());
+      statement.setString(8, meta.getStatus().name());
       return statement;
     }
   }

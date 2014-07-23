@@ -66,11 +66,12 @@ public class SQLPluginResourceMetaStoreService extends AbstractIdleService imple
                                              "resource_type VARCHAR(255), " +
                                              "name VARCHAR(255), " +
                                              "version VARCHAR(255), " +
-                                             "active BOOLEAN )",
+                                             "resource_id VARCHAR(64), " +
+                                             "status VARCHAR(32) )",
                                            dbConnectionPool);
       DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_index", "pluginMeta",
                                 "tenant_id", "plugin_type", "plugin_name", "resource_type", "name", "version");
-      DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_active_index", "pluginMeta", "active");
+      DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_status_index", "pluginMeta", "status");
     }
   }
 

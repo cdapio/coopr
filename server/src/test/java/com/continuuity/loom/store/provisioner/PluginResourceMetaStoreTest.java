@@ -18,14 +18,17 @@ package com.continuuity.loom.store.provisioner;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.PluginResourceMeta;
+import com.continuuity.loom.provisioner.PluginResourceStatus;
 import com.continuuity.loom.provisioner.PluginResourceType;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Set;
+import java.util.UUID;
 
 /**
  *
@@ -46,16 +49,20 @@ public abstract class PluginResourceMetaStoreTest {
   }
 
   @Test
-  public void testWriteDeleteExistsWithinAccount() throws Exception {
+  public void testWriteDeleteExistsGetWithinAccount() throws Exception {
     PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceMetaStoreView view = service.getView(account1, type1);
-    PluginResourceMeta meta = new PluginResourceMeta("name", "version", false);
+    String name = "name";
+    String version = "version";
+    PluginResourceMeta meta = PluginResourceMeta.createNew(name, version);
 
     view.write(meta);
-    Assert.assertTrue(view.exists(meta));
+    Assert.assertTrue(view.exists(name, version));
+    Assert.assertEquals(meta, view.get(name, version));
 
-    view.delete(meta);
-    Assert.assertFalse(view.exists(meta));
+    view.delete(name, version);
+    Assert.assertFalse(view.exists(name, version));
+    Assert.assertNull(view.get(name, version));
   }
 
   @Test
@@ -63,23 +70,33 @@ public abstract class PluginResourceMetaStoreTest {
     PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceMetaStoreView view1 = service.getView(account1, type1);
     PluginResourceMetaStoreView view2 = service.getView(account2, type1);
-    PluginResourceMeta meta = new PluginResourceMeta("name", "version", false);
+    String name = "name";
+    String version = "version";
+    PluginResourceMeta meta = PluginResourceMeta.createNew(name, version);
 
     view1.write(meta);
-    Assert.assertTrue(view1.exists(meta));
-    Assert.assertFalse(view2.exists(meta));
+    Assert.assertTrue(view1.exists(name, version));
+    Assert.assertFalse(view2.exists(name, version));
+    Assert.assertEquals(meta, view1.get(name, version));
+    Assert.assertNull(view2.get(name, version));
 
     view2.write(meta);
-    Assert.assertTrue(view1.exists(meta));
-    Assert.assertTrue(view2.exists(meta));
+    Assert.assertTrue(view1.exists(name, version));
+    Assert.assertTrue(view2.exists(name, version));
+    Assert.assertEquals(meta, view1.get(name, version));
+    Assert.assertEquals(meta, view2.get(name, version));
 
-    view1.delete(meta);
-    Assert.assertFalse(view1.exists(meta));
-    Assert.assertTrue(view2.exists(meta));
+    view1.delete(name, version);
+    Assert.assertFalse(view1.exists(name, version));
+    Assert.assertTrue(view2.exists(name, version));
+    Assert.assertNull(view1.get(name, version));
+    Assert.assertEquals(meta, view2.get(name, version));
 
-    view2.delete(meta);
-    Assert.assertFalse(view1.exists(meta));
-    Assert.assertFalse(view2.exists(meta));
+    view2.delete(name, version);
+    Assert.assertFalse(view1.exists(name, version));
+    Assert.assertFalse(view2.exists(name, version));
+    Assert.assertNull(view1.get(name, version));
+    Assert.assertNull(view2.get(name, version));
   }
 
   @Test
@@ -87,23 +104,33 @@ public abstract class PluginResourceMetaStoreTest {
     PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceMetaStoreView view1 = service.getView(account1, type1);
     PluginResourceMetaStoreView view2 = service.getView(account1, type2);
-    PluginResourceMeta meta = new PluginResourceMeta("name", "version", false);
+    String name = "name";
+    String version = "version";
+    PluginResourceMeta meta = PluginResourceMeta.createNew(name, version);
 
     view1.write(meta);
-    Assert.assertTrue(view1.exists(meta));
-    Assert.assertFalse(view2.exists(meta));
+    Assert.assertTrue(view1.exists(name, version));
+    Assert.assertFalse(view2.exists(name, version));
+    Assert.assertEquals(meta, view1.get(name, version));
+    Assert.assertNull(view2.get(name, version));
 
     view2.write(meta);
-    Assert.assertTrue(view1.exists(meta));
-    Assert.assertTrue(view2.exists(meta));
+    Assert.assertTrue(view1.exists(name, version));
+    Assert.assertTrue(view2.exists(name, version));
+    Assert.assertEquals(meta, view1.get(name, version));
+    Assert.assertEquals(meta, view2.get(name, version));
 
-    view1.delete(meta);
-    Assert.assertFalse(view1.exists(meta));
-    Assert.assertTrue(view2.exists(meta));
+    view1.delete(name, version);
+    Assert.assertFalse(view1.exists(name, version));
+    Assert.assertTrue(view2.exists(name, version));
+    Assert.assertNull(view1.get(name, version));
+    Assert.assertEquals(meta, view2.get(name, version));
 
-    view2.delete(meta);
-    Assert.assertFalse(view1.exists(meta));
-    Assert.assertFalse(view2.exists(meta));
+    view2.delete(name, version);
+    Assert.assertFalse(view1.exists(name, version));
+    Assert.assertFalse(view2.exists(name, version));
+    Assert.assertNull(view1.get(name, version));
+    Assert.assertNull(view2.get(name, version));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -117,16 +144,23 @@ public abstract class PluginResourceMetaStoreTest {
   public void testGetAll() throws Exception {
     PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceMetaStoreView view = service.getView(account1, type1);
-    PluginResourceMeta hadoop1 = new PluginResourceMeta("hadoop", "1", false);
-    PluginResourceMeta hadoop2 = new PluginResourceMeta("hadoop", "2", false);
-    PluginResourceMeta hadoop3 = new PluginResourceMeta("hadoop", "3", true);
-    PluginResourceMeta mysql1 = new PluginResourceMeta("mysql", "1", false);
-    PluginResourceMeta mysql2 = new PluginResourceMeta("mysql", "2", true);
+    PluginResourceMeta hadoop1 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta hadoop2 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "2", PluginResourceStatus.STAGED);
+    PluginResourceMeta hadoop3 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "3", PluginResourceStatus.ACTIVE);
+    PluginResourceMeta mysql1 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "1", PluginResourceStatus.STAGED);
+    PluginResourceMeta mysql2 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "2", PluginResourceStatus.ACTIVE);
+    PluginResourceMeta apache =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "apache", "1", PluginResourceStatus.UNSTAGED);
 
-    Set<PluginResourceMeta> all = ImmutableSet.of(hadoop1, hadoop2, hadoop3, mysql1, mysql2);
+    Set<PluginResourceMeta> all = ImmutableSet.of(hadoop1, hadoop2, hadoop3, mysql1, mysql2, apache);
     Set<PluginResourceMeta> hadoops = ImmutableSet.of(hadoop1, hadoop2, hadoop3);
     Set<PluginResourceMeta> mysqls = ImmutableSet.of(mysql1, mysql2);
-    Set<PluginResourceMeta> allActive = ImmutableSet.of(hadoop3, mysql2);
+    Set<PluginResourceMeta> apaches = ImmutableSet.of(apache);
 
     for (PluginResourceMeta meta : all) {
       view.write(meta);
@@ -134,61 +168,195 @@ public abstract class PluginResourceMetaStoreTest {
     Assert.assertEquals(
       ImmutableMap.<String, Set<PluginResourceMeta>>of(
         "hadoop", ImmutableSet.<PluginResourceMeta>of(hadoop1, hadoop2, hadoop3),
-        "mysql", ImmutableSet.<PluginResourceMeta>of(mysql1, mysql2)),
-      ImmutableMap.copyOf(view.getAll(false))
+        "mysql", ImmutableSet.<PluginResourceMeta>of(mysql1, mysql2),
+        "apache", ImmutableSet.<PluginResourceMeta>of(apache)),
+      ImmutableMap.copyOf(view.getAll())
     );
-    Assert.assertEquals(hadoops, ImmutableSet.copyOf(view.getAll("hadoop", false)));
-    Assert.assertEquals(mysqls, ImmutableSet.copyOf(view.getAll("mysql", false)));
+    Assert.assertEquals(hadoops, ImmutableSet.copyOf(view.getAll("hadoop")));
+    Assert.assertEquals(mysqls, ImmutableSet.copyOf(view.getAll("mysql")));
+    Assert.assertEquals(apaches, ImmutableSet.copyOf(view.getAll("apache")));
+
+    // test get active
     Assert.assertEquals(
       ImmutableMap.<String, Set<PluginResourceMeta>>of(
         "hadoop", ImmutableSet.<PluginResourceMeta>of(hadoop3),
         "mysql", ImmutableSet.<PluginResourceMeta>of(mysql2)),
-      ImmutableMap.copyOf(view.getAll(true))
+      ImmutableMap.copyOf(view.getAll(PluginResourceStatus.ACTIVE))
     );
+    Assert.assertEquals(Sets.newHashSet(hadoop3), view.getAll("hadoop", PluginResourceStatus.ACTIVE));
+    Assert.assertEquals(Sets.newHashSet(mysql2), view.getAll("mysql", PluginResourceStatus.ACTIVE));
+    Assert.assertTrue(view.getAll("apache", PluginResourceStatus.ACTIVE).isEmpty());
+
+    // test get staged
+    Assert.assertEquals(
+      ImmutableMap.<String, Set<PluginResourceMeta>>of(
+        "hadoop", ImmutableSet.<PluginResourceMeta>of(hadoop2),
+        "mysql", ImmutableSet.<PluginResourceMeta>of(mysql1)),
+      ImmutableMap.copyOf(view.getAll(PluginResourceStatus.STAGED))
+    );
+    Assert.assertEquals(Sets.newHashSet(hadoop2), view.getAll("hadoop", PluginResourceStatus.STAGED));
+    Assert.assertEquals(Sets.newHashSet(mysql1), view.getAll("mysql", PluginResourceStatus.STAGED));
+    Assert.assertTrue(view.getAll("apache", PluginResourceStatus.STAGED).isEmpty());
+
+    // test get unstaged
+    Assert.assertEquals(
+      ImmutableMap.<String, Set<PluginResourceMeta>>of(
+        "apache", ImmutableSet.<PluginResourceMeta>of(apache)),
+      ImmutableMap.copyOf(view.getAll(PluginResourceStatus.UNSTAGED))
+    );
+    Assert.assertTrue(view.getAll("hadoop", PluginResourceStatus.UNSTAGED).isEmpty());
+    Assert.assertTrue(view.getAll("mysql", PluginResourceStatus.UNSTAGED).isEmpty());
+    Assert.assertEquals(Sets.newHashSet(apache), view.getAll("apache", PluginResourceStatus.UNSTAGED));
+
+    // test get inactive
+    Assert.assertEquals(
+      ImmutableMap.<String, Set<PluginResourceMeta>>of(
+        "hadoop", ImmutableSet.<PluginResourceMeta>of(hadoop1)),
+      ImmutableMap.copyOf(view.getAll(PluginResourceStatus.INACTIVE))
+    );
+    Assert.assertEquals(Sets.newHashSet(hadoop1), view.getAll("hadoop", PluginResourceStatus.INACTIVE));
+    Assert.assertTrue(view.getAll("mysql", PluginResourceStatus.INACTIVE).isEmpty());
+    Assert.assertTrue(view.getAll("apache", PluginResourceStatus.INACTIVE).isEmpty());
+  }
+
+  @Test
+  public void testStage() throws Exception {
+    PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
+    PluginResourceMetaStoreView view = service.getView(account1, type1);
+    PluginResourceMeta hadoop1 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta hadoop2 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "2", PluginResourceStatus.UNSTAGED);
+    PluginResourceMeta hadoop3 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "3", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta mysql1 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "1", PluginResourceStatus.STAGED);
+    PluginResourceMeta mysql2 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "2", PluginResourceStatus.ACTIVE);
+
+    view.write(hadoop1);
+    view.write(hadoop2);
+    view.write(hadoop3);
+    view.write(mysql1);
+    view.write(mysql2);
+
+    // check no-ops
+    view.stage(mysql1.getName(), mysql1.getVersion());
+    Assert.assertEquals(PluginResourceStatus.STAGED, view.get(mysql1.getName(), mysql1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.ACTIVE, view.get(mysql2.getName(), mysql2.getVersion()).getStatus());
+
+    view.stage(mysql2.getName(), mysql2.getVersion());
+    Assert.assertEquals(PluginResourceStatus.STAGED, view.get(mysql1.getName(), mysql1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.ACTIVE, view.get(mysql2.getName(), mysql2.getVersion()).getStatus());
+
+    // check staging an unstaged makes it active
+    view.stage(hadoop2.getName(), hadoop2.getVersion());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.ACTIVE, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
+
+    // check staging from inactive
+    view.stage(hadoop1.getName(), hadoop1.getVersion());
+    Assert.assertEquals(PluginResourceStatus.STAGED, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.ACTIVE, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
+
+    // check staging deactivates previous staged version
+    view.stage(hadoop3.getName(), hadoop3.getVersion());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.ACTIVE, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.STAGED, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
+  }
+
+  @Test
+  public void testUnstage() throws Exception {
+    PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
+    PluginResourceMetaStoreView view = service.getView(account1, type1);
+    PluginResourceMeta hadoop1 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta hadoop2 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "2", PluginResourceStatus.UNSTAGED);
+    PluginResourceMeta hadoop3 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "3", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta mysql1 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "1", PluginResourceStatus.STAGED);
+    PluginResourceMeta mysql2 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "2", PluginResourceStatus.ACTIVE);
+
+    view.write(hadoop1);
+    view.write(hadoop2);
+    view.write(hadoop3);
+    view.write(mysql1);
+    view.write(mysql2);
+
+    // check no-ops
+    view.unstage(hadoop1.getName(), hadoop1.getVersion());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.UNSTAGED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
+
+    view.unstage(hadoop2.getName(), hadoop2.getVersion());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.UNSTAGED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
+
+    view.unstage(hadoop3.getName(), hadoop3.getVersion());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.UNSTAGED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
+
+    // check unstaging a staged resource deactivates it
+    view.unstage(mysql1.getName(), mysql1.getVersion());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(mysql1.getName(), mysql1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.ACTIVE, view.get(mysql2.getName(), mysql2.getVersion()).getStatus());
+
+    // check unstaging an active moves it to unstaged
+    view.unstage(mysql2.getName(), mysql2.getVersion());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(mysql1.getName(), mysql1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.UNSTAGED, view.get(mysql2.getName(), mysql2.getVersion()).getStatus());
   }
 
   @Test
   public void testActivate() throws Exception {
     PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceMetaStoreView view = service.getView(account1, type1);
-    PluginResourceMeta hadoop2 = new PluginResourceMeta("hadoop", "2", false);
-    PluginResourceMeta hadoop3 = new PluginResourceMeta("hadoop", "3", false);
+    PluginResourceMeta hadoop1 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta hadoop2 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "2", PluginResourceStatus.STAGED);
+    PluginResourceMeta hadoop3 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "3", PluginResourceStatus.ACTIVE);
+    PluginResourceMeta mysql1 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta mysql2 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "2", PluginResourceStatus.STAGED);
+    PluginResourceMeta apache1 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "apache", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta apache2 =
+      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "apache", "2", PluginResourceStatus.UNSTAGED);
 
-    view.write(hadoop2);
-    view.write(hadoop3);
-    Assert.assertTrue(view.getAll(true).isEmpty());
-
-    view.activate("hadoop", "2");
-    hadoop2 = new PluginResourceMeta("hadoop", "2", true);
-    Assert.assertEquals(1, view.getAll(true).size());
-    Assert.assertEquals(hadoop2, view.getAll(true).get("hadoop").iterator().next());
-
-    view.activate("hadoop", "3");
-    hadoop3 = new PluginResourceMeta("hadoop", "3", true);
-    Assert.assertEquals(1, view.getAll(true).size());
-    Assert.assertEquals(hadoop3, view.getAll(true).get("hadoop").iterator().next());
-  }
-
-  @Test
-  public void testDeactivate() throws Exception {
-    PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
-    PluginResourceMetaStoreView view = service.getView(account1, type1);
-    PluginResourceMeta hadoop2 = new PluginResourceMeta("hadoop", "2", false);
-    PluginResourceMeta hadoop3 = new PluginResourceMeta("hadoop", "3", true);
-    PluginResourceMeta mysql1 = new PluginResourceMeta("mysql", "1", false);
-    PluginResourceMeta mysql2 = new PluginResourceMeta("mysql", "2", true);
-
+    view.write(hadoop1);
     view.write(hadoop2);
     view.write(hadoop3);
     view.write(mysql1);
     view.write(mysql2);
-    Assert.assertEquals(2, view.getAll(true).size());
+    view.write(apache1);
+    view.write(apache2);
 
-    view.deactivate("hadoop");
-    Assert.assertEquals(1, view.getAll(true).size());
-    Assert.assertEquals(mysql2, view.getAll(true).get("mysql").iterator().next());
+    // check staged becomes active and active becomes inactive
+    view.activate(hadoop1.getName());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.ACTIVE, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
 
-    view.deactivate("mysql");
-    Assert.assertTrue(view.getAll(true).isEmpty());
+    // check staged becomes active
+    view.activate(mysql1.getName());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(mysql1.getName(), mysql1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.ACTIVE, view.get(mysql2.getName(), mysql2.getVersion()).getStatus());
+
+    // check no-op
+    view.activate(apache1.getName());
+    Assert.assertEquals(PluginResourceStatus.INACTIVE, view.get(apache1.getName(), apache1.getVersion()).getStatus());
+    Assert.assertEquals(PluginResourceStatus.UNSTAGED, view.get(apache2.getName(), apache2.getVersion()).getStatus());
   }
 }
