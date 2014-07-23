@@ -34,6 +34,9 @@ module Loom
         opts.on('-p', '--port PORT', 'Port to listen on, default 55056') do |p|
           options[:bind_port] = p
         end
+        opts.on('-c', '--capacity CAPACITY', 'Max number of running workers for this provisioner, default 10') do |c|
+          options[:capacity] = c
+        end
         opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
           options[:log_level] = f
         end

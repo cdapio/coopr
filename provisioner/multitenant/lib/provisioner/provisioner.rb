@@ -21,6 +21,8 @@ require 'thin'
 require 'sinatra/base'
 require 'json'
 require 'rest_client'
+require 'socket'
+require 'resolv'
 
 require_relative 'api'
 require_relative 'tenantmanager'
@@ -178,21 +180,21 @@ module Loom
       uri = "#{@server_uri}/v1/provisioners/#{@provisioner_id}"
       data = {}
       data['id'] = @provisioner_id
-      data['capacityTotal'] = '100'
-      data['host'] = '127.0.0.1'
-      data['port'] = '4567'
+      data['capacityTotal'] = @options[:capacity] || '10'
+      data['host'] = local_ip
+      data['port'] = @options[:bind_port]
 
-      Logging.log.info "Registering with server at #{uri}: #{data.to_json}"
+      log.info "Registering with server at #{uri}: #{data.to_json}"
 
       begin
         resp = RestClient.put("#{uri}", data.to_json, :'X-Loom-UserID' => "admin")
         if(resp.code == 200)
-          Logging.log.info "Successfully registered"
+          log.info "Successfully registered"
         else
-          Logging.log.warn "Response code #{resp.code}, #{resp.to_str} when registering with loom server #{uri}"
+          log.warn "Response code #{resp.code}, #{resp.to_str} when registering with loom server #{uri}"
         end
       rescue => e
-        Logging.log.error "Caught exception when registering with loom server #{uri}: #{e.message}"
+        log.error "Caught exception when registering with loom server #{uri}: #{e.message}"
       end
     end
 
@@ -204,16 +206,16 @@ module Loom
 
     def unregister_from_server
       uri = "#{@server_uri}/v1/provisioners/#{@provisioner_id}"
-      Logging.log.info "Unregistering with server at #{uri}"
+      log.info "Unregistering with server at #{uri}"
       begin
         resp = RestClient.delete("#{uri}", :'X-Loom-UserID' => "admin")
         if(resp.code == 200)
-          Logging.log.info "Successfully unregistered"
+          log.info "Successfully unregistered"
         else
-          Logging.log.warn "Response code #{resp.code}, #{resp.to_str} when unregistering with loom server #{uri}"
+          log.warn "Response code #{resp.code}, #{resp.to_str} when unregistering with loom server #{uri}"
         end
       rescue => e
-        Logging.log.error "Caught exception when unregistering with loom server #{uri}: #{e.message}"
+        log.error "Caught exception when unregistering with loom server #{uri}: #{e.message}"
       end
     end
 
@@ -283,6 +285,19 @@ module Loom
         hb['usage'][id] = tm.num_workers
       end
       hb
+    end
+
+    # determine ip to register with server from routing info
+    # http://coderrr.wordpress.com/2008/05/28/get-your-local-ip-address/
+    def local_ip
+      server_ip = Resolv.getaddress( @server_uri.sub(%r{^https?://}, '').split(':').first ) rescue '127.0.0.1'
+      orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true # turn off reverse DNS resolution temporarily
+      UDPSocket.open do |s|
+        s.connect server_ip, 1
+        s.addr.last
+      end
+      ensure
+        Socket.do_not_reverse_lookup = orig
     end
 
   end
