@@ -20,7 +20,7 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
@@ -34,7 +34,6 @@ import java.util.Set;
  */
 public class TaskConfig {
   private static final Logger LOG = LoggerFactory.getLogger(TaskConfig.class);
-  private static final JsonSerde JSON_SERDE = new JsonSerde();
 
   /**
    * Create a configuration json object to use for a given cluster, node, service, and action.
@@ -45,7 +44,7 @@ public class TaskConfig {
    * @param action Action that will be performed that needs the configuration.
    * @return Configuration json object to use for a given cluster, node, service, and action.
    */
-  public static JsonObject getConfig(Cluster cluster, Node node, Service service, ProvisionerAction action) {
+  public static JsonObject getConfig(Cluster cluster, Node node, Service service, ProvisionerAction action, Gson gson) {
     JsonObject jsonObject = new JsonObject();
 
     // cluster config
@@ -69,7 +68,7 @@ public class TaskConfig {
         return null;
       }
 
-      serviceObject.add("action", JSON_SERDE.getGson().toJsonTree(serviceAction));
+      serviceObject.add("action", gson.toJsonTree(serviceAction));
       jsonObject.add("service", serviceObject);
     }
 
@@ -79,7 +78,7 @@ public class TaskConfig {
     }
 
     // provider config
-    jsonObject.add("provider", JSON_SERDE.getGson().toJsonTree(cluster.getProvider()));
+    jsonObject.add("provider", gson.toJsonTree(cluster.getProvider()));
 
     return jsonObject;
   }

@@ -20,7 +20,6 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.http.LoomServiceTestBase;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -48,7 +47,7 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
   static NodeService nodeService;
   static ClusterService clusterService;
   static TaskService taskService;
-  private static final Account account = new Account(USER1, TENANT);
+  private static final Account account = new Account(USER1, TENANT_ID);
 
   @BeforeClass
   public static void initTest() {
@@ -214,8 +213,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     task.setStatus(ClusterTask.Status.IN_PROGRESS);
     SchedulableTask schedulableTask = new SchedulableTask(task);
 
-    // add a task to the queue without storing it.
-    provisionerQueues.add(queueName, new Element(task.getTaskId(), new JsonSerde().getGson().toJson(schedulableTask)));
+    // add a task to the queue without storing it.x
+    provisionerQueues.add(queueName, new Element(task.getTaskId(), gson.toJson(schedulableTask)));
     provisionerQueues.take("0");
 
     clusterCleanup.run();

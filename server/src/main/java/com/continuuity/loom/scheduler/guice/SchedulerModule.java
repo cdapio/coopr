@@ -2,10 +2,13 @@ package com.continuuity.loom.scheduler.guice;
 
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.scheduler.ClusterCleanup;
 import com.continuuity.loom.scheduler.ClusterScheduler;
 import com.continuuity.loom.scheduler.JobScheduler;
+import com.continuuity.loom.scheduler.ProvisionerCleanup;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.SolverScheduler;
+import com.continuuity.loom.scheduler.WorkerBalanceScheduler;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.inject.AbstractModule;
@@ -46,5 +49,8 @@ public class SchedulerModule extends AbstractModule {
     bind(ClusterScheduler.class).in(Scopes.SINGLETON);
     bind(SolverScheduler.class).in(Scopes.SINGLETON);
     bind(Scheduler.class).in(Scopes.SINGLETON);
+    bind(WorkerBalanceScheduler.class).in(Scopes.SINGLETON);
+    bind(ClusterCleanup.class).in(Scopes.SINGLETON);
+    bind(ProvisionerCleanup.class).in(Scopes.SINGLETON);
   }
 }

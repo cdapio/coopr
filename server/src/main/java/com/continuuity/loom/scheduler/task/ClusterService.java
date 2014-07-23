@@ -19,7 +19,6 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
@@ -56,7 +55,6 @@ import java.util.Set;
  */
 public class ClusterService {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterService.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
@@ -65,6 +63,7 @@ public class ClusterService {
   private final LoomStats loomStats;
   private final Solver solver;
   private final IdService idService;
+  private final Gson gson;
   private final QueueGroup clusterQueues;
   private final QueueGroup solverQueues;
   private final QueueGroup jobQueues;
@@ -78,14 +77,16 @@ public class ClusterService {
                         ZKClient zkClient,
                         LoomStats loomStats,
                         Solver solver,
-                        IdService idService) {
+                        IdService idService,
+                        Gson gson) {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
-    this.zkClient = ZKClients.namespace(zkClient, Constants.LOCK_NAMESPACE);
+    this.zkClient = ZKClients.namespace(zkClient, Constants.CLUSTER_LOCK_NAMESPACE);
     this.loomStats = loomStats;
     this.solver = solver;
     this.idService = idService;
+    this.gson = gson;
     this.clusterQueues = clusterQueues;
     this.solverQueues = solverQueues;
     this.jobQueues = jobQueues;
@@ -123,8 +124,8 @@ public class ClusterService {
 
     LOG.debug("adding create cluster element to solverQueue");
     SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER,
-                                                    GSON.toJson(clusterCreateRequest));
-    solverQueues.add(account.getTenantId(), new Element(cluster.getId(), GSON.toJson(solverRequest)));
+                                                    gson.toJson(clusterCreateRequest));
+    solverQueues.add(account.getTenantId(), new Element(cluster.getId(), gson.toJson(solverRequest)));
 
     loomStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
     return cluster.getId();
@@ -354,8 +355,8 @@ public class ClusterService {
       clusterStore.writeClusterJob(job);
 
       loomStats.getClusterStats().incrementStat(action);
-      SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, GSON.toJson(addRequest));
-      clusterQueues.add(account.getTenantId(), new Element(clusterId, GSON.toJson(solverRequest)));
+      SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, gson.toJson(addRequest));
+      clusterQueues.add(account.getTenantId(), new Element(clusterId, gson.toJson(solverRequest)));
     } finally {
       lock.release();
     }

@@ -18,7 +18,7 @@ import org.junit.Test;
  *
  */
 public class HttpPostClusterCallbackTest extends BaseTest {
-  private static Cluster cluster = Entities.ClusterExample.CLUSTER;
+  private static Cluster cluster = Entities.ClusterExample.createCluster();
   private static DummyService service;
   private static DummyHandler handler;
   private static String host;

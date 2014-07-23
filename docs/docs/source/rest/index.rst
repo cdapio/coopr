@@ -57,6 +57,11 @@ Tenants
   * :ref:`Update a Tenant <tenants-modify>`
   * :ref:`Delete a Tenant <tenants-delete>`
 
+Provisioners
+------------
+  * :ref:`Get a Provisioner <provisioners-retrieve>`
+  * :ref:`Get all Provisioners <provisioners-all-list>`
+
 
 Administration APIs
 ====================

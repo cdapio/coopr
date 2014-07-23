@@ -17,16 +17,16 @@ package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBPut;
+import com.continuuity.loom.store.DBQueryExecutor;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
@@ -36,10 +36,11 @@ import java.util.Set;
  */
 public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   private final DBConnectionPool dbConnectionPool;
-  private static final JsonSerde CODEC = new JsonSerde();
+  private final DBQueryExecutor dbQueryExecutor;
 
-  BaseSQLClusterStoreView(DBConnectionPool dbConnectionPool) {
+  BaseSQLClusterStoreView(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor) {
     this.dbConnectionPool = dbConnectionPool;
+    this.dbQueryExecutor = dbQueryExecutor;
   }
 
   abstract PreparedStatement getSelectAllClustersStatement(Connection conn) throws SQLException;
@@ -66,7 +67,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       try {
         PreparedStatement statement = getSelectAllClustersStatement(conn);
         try {
-          return DBQueryHelper.getQueryList(statement, Cluster.class);
+          return dbQueryExecutor.getQueryList(statement, Cluster.class);
         } finally {
           statement.close();
         }
@@ -86,7 +87,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       try {
         PreparedStatement statement = getSelectClusterStatement(conn, clusterNum);
         try {
-          return DBQueryHelper.getQueryItem(statement, Cluster.class);
+          return dbQueryExecutor.getQueryItem(statement, Cluster.class);
         } finally {
           statement.close();
         }
@@ -106,12 +107,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       try {
         PreparedStatement statement = getClusterExistsStatement(conn, clusterNum);
         try {
-          ResultSet rs = statement.executeQuery();
-          try {
-            return rs.next();
-          } finally {
-            rs.close();
-          }
+          return dbQueryExecutor.hasResults(statement);
         } finally {
           statement.close();
         }
@@ -129,25 +125,12 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       throw new IllegalAccessException("Not allowed to write cluster " + cluster.getId());
     }
     long clusterNum = Long.parseLong(cluster.getId());
-    // sticking with standard sql... this could be done in one step with replace, or with
-    // insert ... on duplicate key update with mysql.
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement writeStatement;
-        ByteArrayInputStream clusterBytes = new ByteArrayInputStream(CODEC.serialize(cluster, Cluster.class));
-        if (clusterExists(cluster.getId())) {
-          writeStatement = getSetClusterStatement(conn, clusterNum, cluster, clusterBytes);
-        } else {
-          writeStatement = getInsertClusterStatement(conn, clusterNum, cluster, clusterBytes);
-        }
-
-        // perform the update or insert
-        try {
-          writeStatement.executeUpdate();
-        } finally {
-          writeStatement.close();
-        }
+        ByteArrayInputStream clusterBytes = dbQueryExecutor.toByteStream(cluster, Cluster.class);
+        DBPut clusterPut = new ClusterDBPut(clusterNum, cluster, clusterBytes);
+        clusterPut.executePut(conn);
       } finally {
         conn.close();
       }
@@ -185,7 +168,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
         PreparedStatement statement = getSelectClusterJobsStatement(conn, clusterNum);
 
         try {
-          return DBQueryHelper.getQueryList(statement, ClusterJob.class, limit);
+          return dbQueryExecutor.getQueryList(statement, ClusterJob.class, limit);
         } finally {
           statement.close();
         }
@@ -205,7 +188,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       try {
         PreparedStatement statement = getSelectClusterNodesStatement(conn, clusterNum);
         try {
-          return DBQueryHelper.getQuerySet(statement, Node.class);
+          return dbQueryExecutor.getQuerySet(statement, Node.class);
         } finally {
           statement.close();
         }
@@ -226,10 +209,32 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
     statement.setString(2, cluster.getAccount().getUserId());
     statement.setString(3, cluster.getAccount().getTenantId());
     statement.setString(4, cluster.getStatus().name());
-    statement.setTimestamp(5, DBQueryHelper.getTimestamp(cluster.getExpireTime()));
-    statement.setTimestamp(6, DBQueryHelper.getTimestamp(cluster.getCreateTime()));
+    statement.setTimestamp(5, DBHelper.getTimestamp(cluster.getExpireTime()));
+    statement.setTimestamp(6, DBHelper.getTimestamp(cluster.getCreateTime()));
     statement.setString(7, cluster.getName());
     statement.setLong(8, id);
     return statement;
+  }
+
+  private class ClusterDBPut extends DBPut {
+    private final long clusterId;
+    private final Cluster cluster;
+    private final ByteArrayInputStream clusterBytes;
+
+    private ClusterDBPut(long clusterId, Cluster cluster, ByteArrayInputStream clusterBytes) {
+      this.clusterId = clusterId;
+      this.cluster = cluster;
+      this.clusterBytes = clusterBytes;
+    }
+
+    @Override
+    public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
+      return getSetClusterStatement(conn, clusterId, cluster, clusterBytes);
+    }
+
+    @Override
+    public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
+      return getInsertClusterStatement(conn, clusterId, cluster, clusterBytes);
+    }
   }
 }

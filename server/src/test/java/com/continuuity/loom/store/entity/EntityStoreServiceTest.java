@@ -49,6 +49,7 @@ public abstract class EntityStoreServiceTest {
   protected static EntityStoreService entityStoreService;
   private static final Account tenant1Admin = new Account(Constants.ADMIN_USER, "tenant1");
   private static final Account tenant2Admin = new Account(Constants.ADMIN_USER, "tenant2");
+  private static final Account superadmin = new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT);
 
   public abstract void clearState() throws Exception;
 
@@ -168,7 +169,7 @@ public abstract class EntityStoreServiceTest {
 
   @Test
   public void testGetStoreDeleteProviderType() throws Exception {
-    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
+    EntityStoreView entityStore = entityStoreService.getView(superadmin);
     ProviderType providerType = Entities.ProviderTypeExample.JOYENT;
     String providerTypeName = providerType.getName();
     Assert.assertNull(entityStore.getProviderType(providerTypeName));
@@ -190,7 +191,7 @@ public abstract class EntityStoreServiceTest {
 
   @Test
   public void testGetStoreDeleteAutomatorType() throws Exception {
-    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
+    EntityStoreView entityStore = entityStoreService.getView(superadmin);
     AutomatorType automatorType = Entities.AutomatorTypeExample.CHEF;
     String automatorTypeName = automatorType.getName();
     Assert.assertNull(entityStore.getAutomatorType(automatorTypeName));
@@ -212,7 +213,7 @@ public abstract class EntityStoreServiceTest {
 
   @Test
   public void testGetAllProviderTypes() throws Exception {
-    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
+    EntityStoreView entityStore = entityStoreService.getView(superadmin);
     Assert.assertEquals(0, entityStore.getAllProviderTypes().size());
 
     ProviderType type1 = Entities.ProviderTypeExample.JOYENT;
@@ -239,8 +240,10 @@ public abstract class EntityStoreServiceTest {
 
   @Test
   public void testGetAllAutomatorTypes() throws Exception {
-    EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
-    Assert.assertEquals(0, entityStore.getAllAutomatorTypes().size());
+    EntityStoreView superadminView = entityStoreService.getView(superadmin);
+    EntityStoreView adminView = entityStoreService.getView(tenant1Admin);
+    Assert.assertEquals(0, superadminView.getAllAutomatorTypes().size());
+    Assert.assertEquals(0, adminView.getAllAutomatorTypes().size());
 
     AutomatorType type1 = Entities.AutomatorTypeExample.SHELL;
     AutomatorType type2 = Entities.AutomatorTypeExample.CHEF;
@@ -248,17 +251,25 @@ public abstract class EntityStoreServiceTest {
     List<AutomatorType> types = ImmutableList.of(type1, type2, type3);
 
     for (AutomatorType type : types) {
-      entityStore.writeAutomatorType(type);
+      superadminView.writeAutomatorType(type);
     }
-    Collection<AutomatorType> result = entityStore.getAllAutomatorTypes();
+    Collection<AutomatorType> result = superadminView.getAllAutomatorTypes();
+    Assert.assertEquals("automator types written and fetched are not equal in size",
+                        types.size(), result.size());
+    Assert.assertTrue("not all automator types written were found in the results", result.containsAll(result));
+    result = adminView.getAllAutomatorTypes();
     Assert.assertEquals("automator types written and fetched are not equal in size",
                         types.size(), result.size());
     Assert.assertTrue("not all automator types written were found in the results", result.containsAll(result));
 
     // check we get all the providers after one of them is deleted
-    entityStore.deleteAutomatorType(type1.getName());
+    superadminView.deleteAutomatorType(type1.getName());
     types = ImmutableList.of(type2, type3);
-    result = entityStore.getAllAutomatorTypes();
+    result = superadminView.getAllAutomatorTypes();
+    Assert.assertEquals("automator types written and fetched are not equal in size",
+                        types.size(), result.size());
+    Assert.assertTrue("not all automator types written were found in the results", result.containsAll(result));
+    result = adminView.getAllAutomatorTypes();
     Assert.assertEquals("automator types written and fetched are not equal in size",
                         types.size(), result.size());
     Assert.assertTrue("not all automator types written were found in the results", result.containsAll(result));
@@ -567,54 +578,6 @@ public abstract class EntityStoreServiceTest {
     Assert.assertTrue(account1View.getAllClusterTemplates().isEmpty());
     Assert.assertEquals(ImmutableSet.<ClusterTemplate>of(entity1, entity2),
                         ImmutableSet.copyOf(account2View.getAllClusterTemplates()));
-  }
-
-  @Test
-  public void testProviderTypesDoNotOverlapAcrossTenants() throws Exception {
-    ProviderType entity1 = Entities.ProviderTypeExample.RACKSPACE;
-    ProviderType entity2 = Entities.ProviderTypeExample.JOYENT;
-    EntityStoreView account1View = entityStoreService.getView(tenant1Admin);
-    EntityStoreView account2View = entityStoreService.getView(tenant2Admin);
-    account1View.writeProviderType(entity1);
-
-    Assert.assertNull(account2View.getProviderType(entity1.getName()));
-    Assert.assertEquals(entity1, account1View.getProviderType(entity1.getName()));
-
-    account1View.deleteProviderType(entity1.getName());
-    account2View.writeProviderType(entity1);
-
-    Assert.assertNull(account1View.getProviderType(entity1.getName()));
-    Assert.assertEquals(entity1, account2View.getProviderType(entity1.getName()));
-
-    account2View.writeProviderType(entity2);
-
-    Assert.assertTrue(account1View.getAllProviderTypes().isEmpty());
-    Assert.assertEquals(ImmutableSet.<ProviderType>of(entity1, entity2),
-                        ImmutableSet.copyOf(account2View.getAllProviderTypes()));
-  }
-
-  @Test
-  public void testAutomatorTypesDoNotOverlapAcrossTenants() throws Exception {
-    AutomatorType entity1 = Entities.AutomatorTypeExample.CHEF;
-    AutomatorType entity2 = Entities.AutomatorTypeExample.PUPPET;
-    EntityStoreView account1View = entityStoreService.getView(tenant1Admin);
-    EntityStoreView account2View = entityStoreService.getView(tenant2Admin);
-    account1View.writeAutomatorType(entity1);
-
-    Assert.assertNull(account2View.getAutomatorType(entity1.getName()));
-    Assert.assertEquals(entity1, account1View.getAutomatorType(entity1.getName()));
-
-    account1View.deleteAutomatorType(entity1.getName());
-    account2View.writeAutomatorType(entity1);
-
-    Assert.assertNull(account1View.getAutomatorType(entity1.getName()));
-    Assert.assertEquals(entity1, account2View.getAutomatorType(entity1.getName()));
-
-    account2View.writeAutomatorType(entity2);
-
-    Assert.assertTrue(account1View.getAllAutomatorTypes().isEmpty());
-    Assert.assertEquals(ImmutableSet.<AutomatorType>of(entity1, entity2),
-                        ImmutableSet.copyOf(account2View.getAllAutomatorTypes()));
   }
 
   protected Provider createProvider(String name, String description, String type, String... mapKeyVals) {

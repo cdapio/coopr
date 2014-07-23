@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom;
 
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
@@ -22,19 +23,26 @@ import com.continuuity.loom.common.queue.guice.QueueModule;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
 import com.continuuity.loom.http.guice.HttpModule;
+import com.continuuity.loom.provisioner.MockProvisionerRequestService;
+import com.continuuity.loom.provisioner.ProvisionerRequestService;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;
 import com.continuuity.loom.scheduler.guice.SchedulerModule;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.SQLClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.guice.StoreModule;
+import com.continuuity.loom.store.provisioner.ProvisionerStore;
+import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
+import com.continuuity.loom.store.tenant.SQLTenantStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Scopes;
 import com.google.inject.util.Modules;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.ZKClientService;
@@ -52,6 +60,8 @@ import java.sql.SQLException;
 public class BaseTest {
   private static InMemoryZKServer zkServer;
   private static SQLClusterStoreService sqlClusterStoreService;
+  private static SQLProvisionerStore sqlProvisionerStore;
+  private static SQLTenantStore sqlTenantStore;
   protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
   protected static ZKClientService zkClientService;
@@ -59,9 +69,11 @@ public class BaseTest {
   protected static SQLClusterStoreService clusterStoreService;
   protected static ClusterStore clusterStore;
   protected static TenantStore tenantStore;
+  protected static ProvisionerStore provisionerStore;
   protected static Configuration conf;
   protected static MockClusterCallback mockClusterCallback;
   protected static IdService idService;
+  protected static Gson gson;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -89,12 +101,15 @@ public class BaseTest {
         new StoreModule(),
         new QueueModule(zkClientService),
         new HttpModule(),
-        new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor())
+        new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor()),
+        new CodecModules().getModule()
       ).with(
         new AbstractModule() {
           @Override
           protected void configure() {
             bind(ClusterCallback.class).toInstance(mockClusterCallback);
+            bind(ProvisionerRequestService.class).to(MockProvisionerRequestService.class).in(Scopes.SINGLETON);
+            bind(MockProvisionerRequestService.class).in(Scopes.SINGLETON);
           }
         }
       )
@@ -110,17 +125,25 @@ public class BaseTest {
     tenantStore = injector.getInstance(TenantStore.class);
     tenantStore.startAndWait();
     clusterStore = clusterStoreService.getSystemView();
+    sqlProvisionerStore = injector.getInstance(SQLProvisionerStore.class);
+    provisionerStore = sqlProvisionerStore;
+    provisionerStore.startAndWait();
+    sqlTenantStore = injector.getInstance(SQLTenantStore.class);
+    tenantStore = sqlTenantStore;
+    gson = injector.getInstance(Gson.class);
   }
 
   @AfterClass
   public static void teardownBase() {
     zkClientService.stopAndWait();
     zkServer.stopAndWait();
-    DBQueryHelper.dropDerbyDB();
+    DBHelper.dropDerbyDB();
   }
 
   @Before
   public void setupBaseTest() throws SQLException {
     sqlClusterStoreService.clearData();
+    sqlProvisionerStore.clearData();
+    sqlTenantStore.clearData();
   }
 }

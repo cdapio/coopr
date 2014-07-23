@@ -20,11 +20,19 @@ package com.continuuity.loom.common.queue;
  * Types of Queues.
  */
 public enum QueueType {
+  // solver queues hold jobids for solving cluster layouts
   SOLVER("/clustermanager/solver"),
+  // cluster queues hold cluster ids for creating the plan for performing a cluster operation and kicking off the job
   CLUSTER("/clustermanager/clustercreate"),
+  // job queues hold job ids and coordinate task progress and moving to the next stage of a job
   JOB("/clustermanager/jobscheduler"),
+  // callback queues hold cluster and job objects for an operation and
+  // are read to perform callbacks before/after cluster operations
   CALLBACK("/clustermanager/callback"),
-  PROVISIONER("/clustermanager/nodeprovision");
+  // provisioner queues hold tasks for provisioners to complete
+  PROVISIONER("/clustermanager/nodeprovision"),
+  // balancer queue holds tenants to rebalance workers for
+  BALANCER("/clustermanager/balancer");
   private final String path;
 
   private QueueType(String path) {

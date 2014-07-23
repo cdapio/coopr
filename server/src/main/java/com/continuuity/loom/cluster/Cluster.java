@@ -250,17 +250,6 @@ public final class Cluster extends NamedEntity {
   }
 
   /**
-   * Set the account of the owner of the cluster. Only sets the account in this Java object. A separate call must
-   * be made to persistently store changes.
-   *
-   * @param account Account of the owner of the cluster.
-   */
-  public void setAccount(Account account) {
-    Preconditions.checkArgument(account != null, "account must not be null");
-    this.account = account;
-  }
-
-  /**
    * Set the provider to use for creating and deleting machines. Only sets the provider in this Java object.
    * A separate call must be made to persistently store changes in provider.
    *

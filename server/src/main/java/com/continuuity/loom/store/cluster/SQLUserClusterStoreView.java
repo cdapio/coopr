@@ -3,7 +3,8 @@ package com.continuuity.loom.store.cluster;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.store.DBConnectionPool;
-import com.continuuity.loom.store.DBQueryHelper;
+import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.DBQueryExecutor;
 
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
@@ -17,8 +18,9 @@ import java.sql.SQLException;
 public class SQLUserClusterStoreView extends BaseSQLClusterStoreView {
   private final Account account;
 
-  public SQLUserClusterStoreView(DBConnectionPool dbConnectionPool, Account account) {
-    super(dbConnectionPool);
+  public SQLUserClusterStoreView(DBConnectionPool dbConnectionPool,
+                                 Account account, DBQueryExecutor dbQueryExecutor) {
+    super(dbConnectionPool, dbQueryExecutor);
     this.account = account;
   }
 
@@ -56,7 +58,7 @@ public class SQLUserClusterStoreView extends BaseSQLClusterStoreView {
     statement.setString(2, cluster.getAccount().getUserId());
     statement.setString(3, cluster.getAccount().getTenantId());
     statement.setString(4, cluster.getStatus().name());
-    statement.setTimestamp(5, DBQueryHelper.getTimestamp(cluster.getExpireTime()));
+    statement.setTimestamp(5, DBHelper.getTimestamp(cluster.getExpireTime()));
     // where clause
     statement.setLong(6, id);
     statement.setString(7, account.getTenantId());

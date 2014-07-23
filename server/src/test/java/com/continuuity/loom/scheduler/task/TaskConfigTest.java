@@ -30,12 +30,16 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.utils.ImmutablePair;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Map;
@@ -45,7 +49,15 @@ import java.util.Set;
  * Test TaskConfig.
  */
 public class TaskConfigTest {
-  private static final Gson GSON = new Gson();
+  private static Gson GSON;
+
+  @BeforeClass
+  public static void setupClass() {
+    Injector injector = Guice.createInjector(
+      new CodecModules().getModule()
+    );
+    GSON = injector.getInstance(Gson.class);
+  }
 
   @Test
   public void testConfig() throws Exception {
@@ -136,7 +148,7 @@ public class TaskConfigTest {
                                          ImmutableSet.of(s1.getName(), s2.getName(), s3.getName()));
 
     JsonObject actualDefaultConfig = TaskConfig.getConfig(defaultCluster, nodeMap.get("node1"), s1,
-                                                          ProvisionerAction.INSTALL);
+                                                          ProvisionerAction.INSTALL, GSON);
 
     Assert.assertEquals(GSON.fromJson(DEFAULT_CONFIG, JsonObject.class), actualDefaultConfig);
 
@@ -149,7 +161,7 @@ public class TaskConfigTest {
                                       ImmutableSet.of(s1.getName(), s2.getName(), s3.getName()), userConf);
 
     JsonObject actualUserConfig = TaskConfig.getConfig(userCluster, nodeMap.get("node1"), s1,
-                                                       ProvisionerAction.INSTALL);
+                                                       ProvisionerAction.INSTALL, GSON);
 
 
     Assert.assertEquals(GSON.fromJson(USER_CONFIG, JsonObject.class), actualUserConfig);

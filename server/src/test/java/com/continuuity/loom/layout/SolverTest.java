@@ -16,7 +16,6 @@
 package com.continuuity.loom.layout;
 
 import com.continuuity.loom.Entities;
-import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Administration;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
@@ -29,7 +28,6 @@ import com.continuuity.loom.admin.ServiceDependencies;
 import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;
@@ -305,7 +303,7 @@ public class SolverTest extends BaseSolverTest {
 
   @Test
   public void testServiceConstraintsDontApplyWhenServiceNotOnCluster() throws Exception {
-    ClusterTemplate template = new JsonSerde().getGson().fromJson(
+    ClusterTemplate template = gson.fromJson(
       Entities.ClusterTemplateExample.HADOOP_DISTRIBUTED_STRING, ClusterTemplate.class);
     Map<String, String> hwTypeMap = ImmutableMap.of("medium", "medium-flavor");
     Map<String, String> imgTypeMap = ImmutableMap.of("ubuntu12", "ubunut12-image");
