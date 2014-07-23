@@ -34,7 +34,7 @@ data['workers'] = num_workers.to_i
 
 begin
   json = JSON.generate(data)
-  resp = RestClient.put("http://localhost:4567/v1/tenants/#{id}", json)
+  resp = RestClient.put("http://localhost:55056/v1/tenants/#{id}", json)
   if(resp.code == 200)
     puts "success: 200"
   else
