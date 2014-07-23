@@ -39,52 +39,68 @@ module Loom
       end
 
       get '/heartbeat' do
-        log.info "heartbeat called"
-        settings.provisioner.heartbeat.to_json
+        begin
+          log.info "heartbeat called"
+          settings.provisioner.heartbeat.to_json
+        rescue
+          halt 503
+        end
       end
 
       post "/v1/tenants" do
-        log.info "adding tenant"
-        data = JSON.parse request.body.read
-        id = data['id']
-        workers = data['workers']
-        modules = data['modules'] || nil
-        plugins = data['plugins'] || nil
+        begin
+          log.info "adding tenant"
+          data = JSON.parse request.body.read
+          id = data['id']
+          workers = data['workers']
+          modules = data['modules'] || nil
+          plugins = data['plugins'] || nil
 
-        ts = TenantSpec.new(id, workers, modules, plugins)
-        tm = TenantManager.new(ts)
+          ts = TenantSpec.new(id, workers, modules, plugins)
+          tm = TenantManager.new(ts)
 
-        settings.provisioner.add_tenant(tm)
+          settings.provisioner.add_tenant(tm)
 
-        data['status'] = 0
-        body data.to_json
+          data['status'] = 0
+          body data.to_json
+        rescue
+          halt 503
+        end
       end
 
       put "/v1/tenants/:t_id" do
-        log.info "adding/updating tennant id: #{params[:t_id]}"
-        data = JSON.parse request.body.read
-        workers = data['workers'] || 3 # TO DO: replace default with constant
-        log.debug "requesting workers: #{workers}"
-        modules = data['modules'] || nil
-        log.debug "requesting modules: #{modules}"
-        plugins = data['plugins'] || nil
-        log.debug "requesting plugins: #{plugins}"
+        begin
+          log.info "adding/updating tennant id: #{params[:t_id]}"
+          data = JSON.parse request.body.read
+          workers = data['workers'] || 3 # TO DO: replace default with constant
+          log.debug "requesting workers: #{workers}"
+          modules = data['modules'] || nil
+          log.debug "requesting modules: #{modules}"
+          plugins = data['plugins'] || nil
+          log.debug "requesting plugins: #{plugins}"
 
-        ts = TenantSpec.new(params[:t_id], workers, modules, plugins)
-        tm = TenantManager.new(ts)
+          ts = TenantSpec.new(params[:t_id], workers, modules, plugins)
+          tm = TenantManager.new(ts)
 
-        settings.provisioner.add_tenant(tm)
+          settings.provisioner.add_tenant(tm)
 
-        data['status'] = 0
-        body data.to_json
+          data['status'] = 0
+          body data.to_json
+        rescue
+          halt 503
+        end
       end
 
       delete "/v1/tenants/:t_id" do
-        if settings.provisioner.tenantmanagers.key?(params[:t_id])
-          settings.provisioner.delete_tenant(params[:t_id])
-          body "OK"
-        else
-          halt 404
+        begin
+          if settings.provisioner.tenantmanagers.key?(params[:t_id])
+            settings.provisioner.delete_tenant(params[:t_id])
+            body "OK"
+          else
+            halt 404
+          end
+        rescue
+          halt 503
         end
       end
     end
