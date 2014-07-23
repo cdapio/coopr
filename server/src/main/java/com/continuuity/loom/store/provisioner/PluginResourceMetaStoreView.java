@@ -25,13 +25,7 @@ import java.util.Set;
 /**
  * A view of the plugin resource metadata store. Each account and resource type pair will see a different view of
  * the store. Resource metadata essentially serves as a record of what resources have been uploaded, what resources
- * are staged, and what resources are active. Every resource has a user defined name and version, as well as an id.
- * The id is used internally for communication between the server and provisioner, with the assumption that a unique
- * id is assigned to a resource if it is written multiple times. For example, the first time a resource named
- * "hadoop" with version "2.2.0" is written, it may get assigned "id123", and the second time the resource named
- * "hadoop" with version "2.2.0" is written, it will get a new id.
- * This is because the id is used in communication between the server and provisioner, and the provisioner needs
- * to be able to tell if it needs to update its resource, or whether the resource it has is up to date.
+ * are staged, and what resources are in what state.
  */
 public interface PluginResourceMetaStoreView {
 

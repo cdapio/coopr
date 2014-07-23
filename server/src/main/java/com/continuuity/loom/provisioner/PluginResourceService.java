@@ -75,7 +75,7 @@ public class PluginResourceService extends AbstractIdleService {
                                                  final String resourceName,
                                                  final String resourceVersion,
                                                  final HttpResponder responder) throws IOException {
-    final PluginResourceMeta resourceMeta = PluginResourceMeta.createNew(resourceName, resourceVersion);
+    final PluginResourceMeta resourceMeta = new PluginResourceMeta(resourceName, resourceVersion);
     final OutputStream os = pluginStore.getResourceOutputStream(account, resourceType, resourceMeta);
     final ZKInterProcessReentrantLock lock = getLock(account, resourceType, resourceName);
     lock.acquire();

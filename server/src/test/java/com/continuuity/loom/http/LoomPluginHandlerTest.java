@@ -48,7 +48,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   public void testNonAdminGetsForbidden() throws Exception {
     PluginResourceType type1 = new PluginResourceType(PluginType.PROVIDER, "openstack", "keys");
     PluginResourceType type2 = new PluginResourceType(PluginType.AUTOMATOR, "shell", "script");
-    PluginResourceMeta meta = PluginResourceMeta.createNew("name", "1");
+    PluginResourceMeta meta = new PluginResourceMeta("name", "1");
     assertResponseStatus(doPut(getVersionedPath(type1, meta), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doPut(getVersionedPath(type2, meta), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doDelete(getVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
@@ -94,7 +94,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   private void assertSendContents(String contents, PluginType type, String pluginName, String resourceType,
                                   String resourceName, String version) throws Exception {
     assertSendContents(contents, new PluginResourceType(type, pluginName, resourceType),
-                       PluginResourceMeta.createNew(resourceName, version));
+                       new PluginResourceMeta(resourceName, version));
   }
 
   private void assertSendContents(String contents, PluginResourceType type, PluginResourceMeta meta) throws Exception {
@@ -105,7 +105,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   private void testPutAndGet(PluginType type, String pluginName, String resourceType) throws Exception {
     String contents = RandomStringUtils.randomAlphanumeric(8 * Constants.PLUGIN_RESOURCE_CHUNK_SIZE);
     PluginResourceType pluginResourceType = new PluginResourceType(type, pluginName, resourceType);
-    PluginResourceMeta meta = PluginResourceMeta.fromExisting(null, "hello", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta meta = new PluginResourceMeta("hello", "1", PluginResourceStatus.INACTIVE);
     assertSendContents(contents, type, pluginName, resourceType, "hello", "1");
     // get metadata
     HttpResponse response = doGet(getUnVersionedPath(pluginResourceType, meta), ADMIN_HEADERS);
@@ -120,14 +120,13 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   private void testVersions(PluginType type, String pluginName, String resourceType) throws Exception{
     String contents = "some contents";
     PluginResourceType pluginResourceType = new PluginResourceType(type, pluginName, resourceType);
-    PluginResourceMeta meta1 = PluginResourceMeta.fromExisting(null, "name", "1", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta meta2 = PluginResourceMeta.fromExisting(null, "name", "2", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta meta1 = new PluginResourceMeta("name", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta meta2 = new PluginResourceMeta("name", "2", PluginResourceStatus.INACTIVE);
     assertSendContents(contents, pluginResourceType, meta1);
     assertSendContents(contents, pluginResourceType, meta2);
 
     // stage version2
-    meta2 = PluginResourceMeta.fromExisting(
-      meta2.getResourceId(), meta2.getName(), meta2.getVersion(), PluginResourceStatus.STAGED);
+    meta2 = new PluginResourceMeta(meta2.getName(), meta2.getVersion(), PluginResourceStatus.STAGED);
     assertResponseStatus(doPost(getVersionedPath(pluginResourceType, meta2) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
@@ -147,10 +146,8 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals(Sets.newHashSet(meta2), bodyToMetaSet(response));
 
     // stage version1
-    meta1 = PluginResourceMeta.fromExisting(
-      meta1.getResourceId(), meta1.getName(), meta1.getVersion(), PluginResourceStatus.STAGED);
-    meta2 = PluginResourceMeta.fromExisting(
-      meta2.getResourceId(), meta2.getName(), meta2.getVersion(), PluginResourceStatus.INACTIVE);
+    meta1 = new PluginResourceMeta(meta1.getName(), meta1.getVersion(), PluginResourceStatus.STAGED);
+    meta2 = new PluginResourceMeta(meta2.getName(), meta2.getVersion(), PluginResourceStatus.INACTIVE);
     assertResponseStatus(doPost(getVersionedPath(pluginResourceType, meta1) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
@@ -170,8 +167,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals(Sets.newHashSet(meta1), bodyToMetaSet(response));
 
     // unstage
-    meta1 = PluginResourceMeta.fromExisting(
-      meta1.getResourceId(), meta1.getName(), meta1.getVersion(), PluginResourceStatus.INACTIVE);
+    meta1 = new PluginResourceMeta(meta1.getName(), meta1.getVersion(), PluginResourceStatus.INACTIVE);
     assertResponseStatus(doPost(getVersionedPath(pluginResourceType, meta1) + "/unstage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
@@ -190,10 +186,10 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   private void testGetAndDelete(PluginResourceType type) throws Exception {
     String contents = "some contents";
-    PluginResourceMeta meta1 = PluginResourceMeta.fromExisting(null, "name1", "1", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta meta2 = PluginResourceMeta.fromExisting(null, "name1", "2", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta meta3 = PluginResourceMeta.fromExisting(null, "name2", "1", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta meta4 = PluginResourceMeta.fromExisting(null, "name3", "2", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta meta1 = new PluginResourceMeta("name1", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta meta2 = new PluginResourceMeta("name1", "2", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta meta3 = new PluginResourceMeta("name2", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta meta4 = new PluginResourceMeta("name3", "2", PluginResourceStatus.INACTIVE);
     assertSendContents(contents, type, meta1);
     assertSendContents(contents, type, meta2);
     assertSendContents(contents, type, meta3);

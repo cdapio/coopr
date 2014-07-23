@@ -178,7 +178,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
-          "SELECT resource_id, name, version, status FROM pluginMeta " +
+          "SELECT name, version, status FROM pluginMeta " +
             "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=?");
         try {
           setConstantFields(statement);
@@ -201,7 +201,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
-          "SELECT resource_id, name, version, status FROM pluginMeta " +
+          "SELECT name, version, status FROM pluginMeta " +
             "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND status=?");
         try {
           setConstantFields(statement);
@@ -225,7 +225,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
-          "SELECT resource_id, name, version, status FROM pluginMeta " +
+          "SELECT name, version, status FROM pluginMeta " +
             "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?");
         try {
           setConstantFields(statement);
@@ -249,7 +249,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
-          "SELECT resource_id, name, version, status FROM pluginMeta " +
+          "SELECT name, version, status FROM pluginMeta " +
             "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND status=?");
         try {
           setConstantFields(statement);
@@ -436,7 +436,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
 
   private PluginResourceMeta getStagedMeta(Connection conn, String resourceName) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
-      "SELECT resource_id, name, version, status FROM pluginMeta " +
+      "SELECT name, version, status FROM pluginMeta " +
         "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND status=?");
     try {
       setConstantFields(statement);
@@ -450,7 +450,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
 
   private PluginResourceMeta getMeta(Connection conn, String resourceName, String resourceVersion) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
-      "SELECT resource_id, name, version, status FROM pluginMeta " +
+      "SELECT name, version, status FROM pluginMeta " +
         "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
     try {
       setConstantFields(statement);
@@ -463,11 +463,10 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   private PluginResourceMeta metaFromResult(ResultSet results) throws SQLException {
-    String id = results.getString(1);
-    String name = results.getString(2);
-    String version = results.getString(3);
-    PluginResourceStatus status = PluginResourceStatus.valueOf(results.getString(4));
-    return PluginResourceMeta.fromExisting(id, name, version, status);
+    String name = results.getString(1);
+    String version = results.getString(2);
+    PluginResourceStatus status = PluginResourceStatus.valueOf(results.getString(3));
+    return new PluginResourceMeta(name, version, status);
   }
 
   private void setConstantFields(PreparedStatement statement) throws SQLException {
@@ -491,13 +490,12 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     @Override
     protected PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
-        "UPDATE pluginMeta SET resource_id=?, status=? WHERE " +
+        "UPDATE pluginMeta SET status=? WHERE " +
           "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
-      statement.setString(1, meta.getResourceId());
-      statement.setString(2, meta.getStatus().name());
-      setConstantFields(statement, 3);
-      statement.setString(7, meta.getName());
-      statement.setString(8, meta.getVersion());
+      statement.setString(1, meta.getStatus().name());
+      setConstantFields(statement, 2);
+      statement.setString(6, meta.getName());
+      statement.setString(7, meta.getVersion());
       return statement;
     }
 
@@ -505,13 +503,12 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     protected PreparedStatement createInsertStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
         "INSERT INTO pluginMeta " +
-          "(tenant_id, plugin_type, plugin_name, resource_type, resource_id, name, version, status) " +
-          "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+          "(tenant_id, plugin_type, plugin_name, resource_type, name, version, status) " +
+          "VALUES (?, ?, ?, ?, ?, ?, ?)");
       setConstantFields(statement);
-      statement.setString(5, meta.getResourceId());
-      statement.setString(6, meta.getName());
-      statement.setString(7, meta.getVersion());
-      statement.setString(8, meta.getStatus().name());
+      statement.setString(5, meta.getName());
+      statement.setString(6, meta.getVersion());
+      statement.setString(7, meta.getStatus().name());
       return statement;
     }
   }

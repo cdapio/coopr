@@ -52,7 +52,7 @@ public abstract class PluginStoreTest {
 
     String contents = "this is the cookbook\nthis is the second line";
     PluginResourceType resourceType = new PluginResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
-    PluginResourceMeta resourceMeta = PluginResourceMeta.createNew("hadoop", "1");
+    PluginResourceMeta resourceMeta = new PluginResourceMeta("hadoop", "1");
 
     writeToStore(store, account1, resourceType, resourceMeta, contents);
 
@@ -65,7 +65,7 @@ public abstract class PluginStoreTest {
 
     String contents = "these are the first contents";
     PluginResourceType resourceType = new PluginResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
-    PluginResourceMeta resourceMeta = PluginResourceMeta.createNew("hadoop", "1");
+    PluginResourceMeta resourceMeta = new PluginResourceMeta("hadoop", "1");
 
     // write once
     writeToStore(store, account1, resourceType, resourceMeta, contents);
@@ -83,8 +83,8 @@ public abstract class PluginStoreTest {
     String contents1 = "v1 contents";
     String contents2 = "v2 contents";
     PluginResourceType resourceType = new PluginResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
-    PluginResourceMeta resourceMeta1 = PluginResourceMeta.createNew("hadoop", "1");
-    PluginResourceMeta resourceMeta2 = PluginResourceMeta.createNew("hadoop", "1");
+    PluginResourceMeta resourceMeta1 = new PluginResourceMeta("hadoop", "1");
+    PluginResourceMeta resourceMeta2 = new PluginResourceMeta("hadoop", "2");
 
     // write different versions of the same module
     writeToStore(store, account1, resourceType, resourceMeta1, contents1);
@@ -102,7 +102,7 @@ public abstract class PluginStoreTest {
     String contents1 = "tenant1 contents";
     String contents2 = "tenant2 contents";
     PluginResourceType resourceType = new PluginResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
-    PluginResourceMeta resourceMeta = PluginResourceMeta.createNew("hadoop", "1");
+    PluginResourceMeta resourceMeta = new PluginResourceMeta("hadoop", "1");
 
     // write the same module and version but to 2 different tenants
     writeToStore(store, account1, resourceType, resourceMeta, contents1);
@@ -120,8 +120,8 @@ public abstract class PluginStoreTest {
     String contents1 = "hadoop cookbook";
     String contents2 = "mysql cookbook";
     PluginResourceType resourceType = new PluginResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
-    PluginResourceMeta resourceMeta1 = PluginResourceMeta.createNew("hadoop", "1");
-    PluginResourceMeta resourceMeta2 = PluginResourceMeta.createNew("mysql", "1");
+    PluginResourceMeta resourceMeta1 = new PluginResourceMeta("hadoop", "1");
+    PluginResourceMeta resourceMeta2 = new PluginResourceMeta("mysql", "1");
 
     // write different versions of the same module
     writeToStore(store, account1, resourceType, resourceMeta1, contents1);
@@ -138,7 +138,7 @@ public abstract class PluginStoreTest {
 
     String contents = "hadoop cookbook";
     PluginResourceType resourceType = new PluginResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
-    PluginResourceMeta resourceMeta = PluginResourceMeta.createNew("hadoop", "1");
+    PluginResourceMeta resourceMeta = new PluginResourceMeta("hadoop", "1");
 
     // write different versions of the same module
     writeToStore(store, account1, resourceType, resourceMeta, contents);
@@ -157,7 +157,7 @@ public abstract class PluginStoreTest {
 
     String contents = "hadoop cookbook";
     PluginResourceType resourceType = new PluginResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
-    PluginResourceMeta resourceMeta = PluginResourceMeta.createNew("hadoop", "1");
+    PluginResourceMeta resourceMeta = new PluginResourceMeta("hadoop", "1");
 
     // write different versions of the same module
     writeToStore(store, account1, resourceType, resourceMeta, contents);

@@ -26,11 +26,6 @@ import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.provisioner.PluginType;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -44,7 +39,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,13 +49,14 @@ import java.util.Set;
  */
 @Path("/v1/loom")
 public class LoomPluginHandler extends LoomAuthHandler {
-  private static final Gson gson = getGson();
+  private final Gson gson;
   private final PluginResourceService pluginResourceService;
 
   @Inject
-  private LoomPluginHandler(TenantStore tenantStore, PluginResourceService pluginResourceService) {
+  private LoomPluginHandler(TenantStore tenantStore, PluginResourceService pluginResourceService, Gson gson) {
     super(tenantStore);
     this.pluginResourceService = pluginResourceService;
+    this.gson = gson;
   }
 
   @PUT
@@ -379,7 +374,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       PluginResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
                          pluginResourceService.getAll(account, pluginResourceType, statusFilter),
-                         new TypeToken<Map<String, Set<PluginResourceStatus>>>() {}.getType(),
+                         new TypeToken<Map<String, Set<PluginResourceMeta>>>() {}.getType(),
                          gson);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
@@ -395,7 +390,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       PluginResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
                          pluginResourceService.getAll(account, pluginResourceType, resourceName, statusFilter),
-                         new TypeToken<Set<PluginResourceStatus>>() {}.getType(),
+                         new TypeToken<Set<PluginResourceMeta>>() {}.getType(),
                          gson);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
@@ -434,21 +429,5 @@ public class LoomPluginHandler extends LoomAuthHandler {
     Map<String, List<String>> queryParams = new QueryStringDecoder(request.getUri()).getParameters();
     return queryParams.containsKey("status") ?
       PluginResourceStatus.valueOf(queryParams.get("status").get(0).toUpperCase()) : null;
-  }
-
-  // don't want to expose internal ids in the get calls
-  private static Gson getGson() {
-    return new GsonBuilder()
-      .registerTypeAdapter(PluginResourceMeta.class, new JsonSerializer<PluginResourceMeta>() {
-        @Override
-        public JsonElement serialize(PluginResourceMeta src, Type typeOfSrc, JsonSerializationContext context) {
-          JsonObject jsonObj = new JsonObject();
-          jsonObj.addProperty("name", src.getName());
-          jsonObj.addProperty("version", src.getVersion());
-          jsonObj.addProperty("status", src.getStatus().name().toLowerCase());
-          return jsonObj;
-        }
-      })
-      .create();
   }
 }

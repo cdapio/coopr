@@ -28,7 +28,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Set;
-import java.util.UUID;
 
 /**
  *
@@ -54,7 +53,7 @@ public abstract class PluginResourceMetaStoreTest {
     PluginResourceMetaStoreView view = service.getView(account1, type1);
     String name = "name";
     String version = "version";
-    PluginResourceMeta meta = PluginResourceMeta.createNew(name, version);
+    PluginResourceMeta meta = new PluginResourceMeta(name, version);
 
     view.write(meta);
     Assert.assertTrue(view.exists(name, version));
@@ -72,7 +71,7 @@ public abstract class PluginResourceMetaStoreTest {
     PluginResourceMetaStoreView view2 = service.getView(account2, type1);
     String name = "name";
     String version = "version";
-    PluginResourceMeta meta = PluginResourceMeta.createNew(name, version);
+    PluginResourceMeta meta = new PluginResourceMeta(name, version);
 
     view1.write(meta);
     Assert.assertTrue(view1.exists(name, version));
@@ -106,7 +105,7 @@ public abstract class PluginResourceMetaStoreTest {
     PluginResourceMetaStoreView view2 = service.getView(account1, type2);
     String name = "name";
     String version = "version";
-    PluginResourceMeta meta = PluginResourceMeta.createNew(name, version);
+    PluginResourceMeta meta = new PluginResourceMeta(name, version);
 
     view1.write(meta);
     Assert.assertTrue(view1.exists(name, version));
@@ -144,18 +143,12 @@ public abstract class PluginResourceMetaStoreTest {
   public void testGetAll() throws Exception {
     PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceMetaStoreView view = service.getView(account1, type1);
-    PluginResourceMeta hadoop1 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "1", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta hadoop2 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "2", PluginResourceStatus.STAGED);
-    PluginResourceMeta hadoop3 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "3", PluginResourceStatus.ACTIVE);
-    PluginResourceMeta mysql1 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "1", PluginResourceStatus.STAGED);
-    PluginResourceMeta mysql2 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "2", PluginResourceStatus.ACTIVE);
-    PluginResourceMeta apache =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "apache", "1", PluginResourceStatus.UNSTAGED);
+    PluginResourceMeta hadoop1 = new PluginResourceMeta("hadoop", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta hadoop2 = new PluginResourceMeta("hadoop", "2", PluginResourceStatus.STAGED);
+    PluginResourceMeta hadoop3 = new PluginResourceMeta("hadoop", "3", PluginResourceStatus.ACTIVE);
+    PluginResourceMeta mysql1 = new PluginResourceMeta("mysql", "1", PluginResourceStatus.STAGED);
+    PluginResourceMeta mysql2 = new PluginResourceMeta("mysql", "2", PluginResourceStatus.ACTIVE);
+    PluginResourceMeta apache = new PluginResourceMeta("apache", "1", PluginResourceStatus.UNSTAGED);
 
     Set<PluginResourceMeta> all = ImmutableSet.of(hadoop1, hadoop2, hadoop3, mysql1, mysql2, apache);
     Set<PluginResourceMeta> hadoops = ImmutableSet.of(hadoop1, hadoop2, hadoop3);
@@ -223,16 +216,11 @@ public abstract class PluginResourceMetaStoreTest {
   public void testStage() throws Exception {
     PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceMetaStoreView view = service.getView(account1, type1);
-    PluginResourceMeta hadoop1 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "1", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta hadoop2 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "2", PluginResourceStatus.UNSTAGED);
-    PluginResourceMeta hadoop3 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "3", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta mysql1 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "1", PluginResourceStatus.STAGED);
-    PluginResourceMeta mysql2 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "2", PluginResourceStatus.ACTIVE);
+    PluginResourceMeta hadoop1 = new PluginResourceMeta("hadoop", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta hadoop2 = new PluginResourceMeta("hadoop", "2", PluginResourceStatus.UNSTAGED);
+    PluginResourceMeta hadoop3 = new PluginResourceMeta("hadoop", "3", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta mysql1 = new PluginResourceMeta("mysql", "1", PluginResourceStatus.STAGED);
+    PluginResourceMeta mysql2 = new PluginResourceMeta("mysql", "2", PluginResourceStatus.ACTIVE);
 
     view.write(hadoop1);
     view.write(hadoop2);
@@ -272,16 +260,11 @@ public abstract class PluginResourceMetaStoreTest {
   public void testUnstage() throws Exception {
     PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceMetaStoreView view = service.getView(account1, type1);
-    PluginResourceMeta hadoop1 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "1", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta hadoop2 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "2", PluginResourceStatus.UNSTAGED);
-    PluginResourceMeta hadoop3 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "3", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta mysql1 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "1", PluginResourceStatus.STAGED);
-    PluginResourceMeta mysql2 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "2", PluginResourceStatus.ACTIVE);
+    PluginResourceMeta hadoop1 = new PluginResourceMeta("hadoop", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta hadoop2 = new PluginResourceMeta("hadoop", "2", PluginResourceStatus.UNSTAGED);
+    PluginResourceMeta hadoop3 = new PluginResourceMeta("hadoop", "3", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta mysql1 = new PluginResourceMeta("mysql", "1", PluginResourceStatus.STAGED);
+    PluginResourceMeta mysql2 = new PluginResourceMeta("mysql", "2", PluginResourceStatus.ACTIVE);
 
     view.write(hadoop1);
     view.write(hadoop2);
@@ -320,20 +303,13 @@ public abstract class PluginResourceMetaStoreTest {
   public void testActivate() throws Exception {
     PluginResourceMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceMetaStoreView view = service.getView(account1, type1);
-    PluginResourceMeta hadoop1 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "1", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta hadoop2 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "2", PluginResourceStatus.STAGED);
-    PluginResourceMeta hadoop3 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "hadoop", "3", PluginResourceStatus.ACTIVE);
-    PluginResourceMeta mysql1 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "1", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta mysql2 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "mysql", "2", PluginResourceStatus.STAGED);
-    PluginResourceMeta apache1 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "apache", "1", PluginResourceStatus.INACTIVE);
-    PluginResourceMeta apache2 =
-      PluginResourceMeta.fromExisting(UUID.randomUUID().toString(), "apache", "2", PluginResourceStatus.UNSTAGED);
+    PluginResourceMeta hadoop1 = new PluginResourceMeta("hadoop", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta hadoop2 = new PluginResourceMeta("hadoop", "2", PluginResourceStatus.STAGED);
+    PluginResourceMeta hadoop3 = new PluginResourceMeta("hadoop", "3", PluginResourceStatus.ACTIVE);
+    PluginResourceMeta mysql1 = new PluginResourceMeta("mysql", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta mysql2 = new PluginResourceMeta("mysql", "2", PluginResourceStatus.STAGED);
+    PluginResourceMeta apache1 = new PluginResourceMeta("apache", "1", PluginResourceStatus.INACTIVE);
+    PluginResourceMeta apache2 = new PluginResourceMeta("apache", "2", PluginResourceStatus.UNSTAGED);
 
     view.write(hadoop1);
     view.write(hadoop2);

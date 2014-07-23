@@ -37,6 +37,7 @@ import com.continuuity.loom.codec.json.current.LayoutConstraintCodec;
 import com.continuuity.loom.codec.json.current.LeaseDurationCodec;
 import com.continuuity.loom.codec.json.current.NodePropertiesRequestCodec;
 import com.continuuity.loom.codec.json.current.ParametersSpecificationCodec;
+import com.continuuity.loom.codec.json.current.PluginResourceMetaCodec;
 import com.continuuity.loom.codec.json.current.ProviderCodec;
 import com.continuuity.loom.codec.json.current.ProviderTypeCodec;
 import com.continuuity.loom.codec.json.current.ProvisionerCodec;
@@ -53,6 +54,7 @@ import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.provisioner.PluginResourceMeta;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -117,6 +119,7 @@ public class CodecModules {
       .registerTypeAdapter(LeaseDuration.class, new LeaseDurationCodec())
       .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec())
       .registerTypeAdapter(ParametersSpecification.class, new ParametersSpecificationCodec())
+      .registerTypeAdapter(PluginResourceMeta.class, new PluginResourceMetaCodec())
       .registerTypeAdapter(Provider.class, new ProviderCodec())
       .registerTypeAdapter(ProviderType.class, new ProviderTypeCodec())
       .registerTypeAdapter(Provisioner.class, new ProvisionerCodec())

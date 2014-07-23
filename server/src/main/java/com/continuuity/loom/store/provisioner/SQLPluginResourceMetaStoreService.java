@@ -59,19 +59,20 @@ public class SQLPluginResourceMetaStoreService extends AbstractIdleService imple
   @Override
   protected void startUp() throws Exception {
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
-      DBHelper.createDerbyTableIfNotExists("CREATE TABLE pluginMeta (" +
-                                             "tenant_id VARCHAR(255), " +
-                                             "plugin_type VARCHAR(255), " +
-                                             "plugin_name VARCHAR(255), " +
-                                             "resource_type VARCHAR(255), " +
-                                             "name VARCHAR(255), " +
-                                             "version VARCHAR(255), " +
-                                             "resource_id VARCHAR(64), " +
-                                             "status VARCHAR(32) )",
-                                           dbConnectionPool);
-      DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_index", "pluginMeta",
-                                "tenant_id", "plugin_type", "plugin_name", "resource_type", "name", "version");
-      DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_status_index", "pluginMeta", "status");
+      boolean created = DBHelper.createDerbyTableIfNotExists("CREATE TABLE pluginMeta (" +
+                                                               "tenant_id VARCHAR(255), " +
+                                                               "plugin_type VARCHAR(255), " +
+                                                               "plugin_name VARCHAR(255), " +
+                                                               "resource_type VARCHAR(255), " +
+                                                               "name VARCHAR(255), " +
+                                                               "version VARCHAR(255), " +
+                                                               "status VARCHAR(32))",
+                                                             dbConnectionPool);
+      if (created) {
+        DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_index", "pluginMeta",
+                                  "tenant_id", "plugin_type", "plugin_name", "resource_type", "name", "version");
+        DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_status_index", "pluginMeta", "status");
+      }
     }
   }
 

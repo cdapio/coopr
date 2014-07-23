@@ -105,8 +105,6 @@ public class LocalFilePluginStore implements PluginStore {
       .append(meta.getName())
       .append(File.separator)
       .append(meta.getVersion())
-      .append(File.separator)
-      .append(meta.getResourceId())
       .toString();
     return new File(path);
   }
