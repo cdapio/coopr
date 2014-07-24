@@ -25,7 +25,7 @@ module Loom
       options = {}
       OptionParser.new do |opts|
         opts.banner = 'Usage: '
-        opts.on('-u', '--uri URI', 'Loom web server uri') do |u|
+        opts.on('-u', '--uri URI', 'Loom web server URI') do |u|
           options[:uri] = u
         end
         opts.on('-b', '--bind IP', 'IP to listen on, default 0.0.0.0') do |b|
@@ -43,7 +43,7 @@ module Loom
         opts.on('-l', '--log-directory DIR', 'Path to log directory for provisioner and workers') do |d|
           options[:log_directory] = d
         end
-        opts.on('-d', '--daemon', 'runs as a daemon. ensure you specify a log directory also') do
+        opts.on('-d', '--daemon', 'Runs as a daemon. Ensure you also specify a log directory') do
           options[:daemonize] = true 
         end
         opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do

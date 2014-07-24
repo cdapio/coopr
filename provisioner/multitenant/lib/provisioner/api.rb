@@ -70,9 +70,9 @@ module Loom
 
       put "/v1/tenants/:t_id" do
         begin
-          log.info "adding/updating tennant id: #{params[:t_id]}"
+          log.info "adding/updating tenant id: #{params[:t_id]}"
           data = JSON.parse request.body.read
-          workers = data['workers'] || 3 # TO DO: replace default with constant
+          workers = data['workers'] || 3 # TODO: replace default with constant
           log.debug "requesting workers: #{workers}"
           modules = data['modules'] || nil
           log.debug "requesting modules: #{modules}"

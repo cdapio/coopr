@@ -120,7 +120,7 @@ module Loom
       @signal_thread = Thread.new {
         log.info "started signal processing thread"
         loop {
-          log.info "reaping #{@signals.size} signals: #{@signals}" unless @signals.empty?
+          log.debug "reaping #{@signals.size} signals: #{@signals}" unless @signals.empty?
           signals_processed = {}
           unless @signals.empty?
             sig = @signals.shift
@@ -296,8 +296,8 @@ module Loom
         s.connect server_ip, 1
         s.addr.last
       end
-      ensure
-        Socket.do_not_reverse_lookup = orig
+    ensure
+      Socket.do_not_reverse_lookup = orig
     end
 
   end
