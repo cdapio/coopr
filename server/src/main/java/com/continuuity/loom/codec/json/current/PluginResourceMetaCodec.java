@@ -17,8 +17,8 @@
 package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.codec.json.AbstractCodec;
-import com.continuuity.loom.provisioner.PluginResourceMeta;
-import com.continuuity.loom.provisioner.PluginResourceStatus;
+import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
+import com.continuuity.loom.provisioner.plugin.PluginResourceStatus;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -28,7 +28,7 @@ import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 
 /**
- * Codec for serializing/deserializing {@link com.continuuity.loom.provisioner.PluginResourceMeta} objects. Used so
+ * Codec for serializing/deserializing {@link com.continuuity.loom.provisioner.plugin.PluginResourceMeta} objects. Used so
  * that enums are handled correctly.
  */
 public class PluginResourceMetaCodec extends AbstractCodec<PluginResourceMeta> {
@@ -50,7 +50,7 @@ public class PluginResourceMetaCodec extends AbstractCodec<PluginResourceMeta> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
-    String version = context.deserialize(jsonObj.get("version"), String.class);
+    Integer version = context.deserialize(jsonObj.get("version"), Integer.class);
     PluginResourceStatus status = context.deserialize(jsonObj.get("status"), PluginResourceStatus.class);
 
     return new PluginResourceMeta(name, version, status);

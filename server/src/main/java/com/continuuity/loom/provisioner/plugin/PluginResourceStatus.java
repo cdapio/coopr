@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.provisioner;
+package com.continuuity.loom.provisioner.plugin;
 
 /**
  * Status of a plugin resource. If a resource is inactive, it has been uploaded to the plugin store, but has not been
@@ -27,4 +27,24 @@ public enum PluginResourceStatus {
   ACTIVE,
   STAGED,
   UNSTAGED;
+
+  public boolean isLive() {
+    return this == ACTIVE || this == UNSTAGED;
+  }
+
+  public boolean isSlatedToBeLive() {
+    return this == STAGED || this == ACTIVE;
+  }
+
+  public static PluginResourceStatus fromLiveFlags(boolean live, boolean slated) {
+    if (live && slated) {
+      return ACTIVE;
+    } else if (live && !slated) {
+      return UNSTAGED;
+    } else if (!live && slated) {
+      return STAGED;
+    } else {
+      return INACTIVE;
+    }
+  }
 }

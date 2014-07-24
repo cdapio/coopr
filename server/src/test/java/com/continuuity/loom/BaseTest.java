@@ -24,7 +24,7 @@ import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
 import com.continuuity.loom.http.guice.HttpModule;
 import com.continuuity.loom.provisioner.MockProvisionerRequestService;
-import com.continuuity.loom.provisioner.PluginResourceService;
+import com.continuuity.loom.provisioner.plugin.PluginResourceService;
 import com.continuuity.loom.provisioner.ProvisionerRequestService;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;

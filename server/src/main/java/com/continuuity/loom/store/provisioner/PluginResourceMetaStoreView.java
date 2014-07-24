@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.store.provisioner;
 
-import com.continuuity.loom.provisioner.PluginResourceMeta;
-import com.continuuity.loom.provisioner.PluginResourceStatus;
+import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
+import com.continuuity.loom.provisioner.plugin.PluginResourceStatus;
 
 import java.io.IOException;
 import java.util.Map;
@@ -32,48 +32,57 @@ public interface PluginResourceMetaStoreView {
   /**
    * Checks whether or not any version of the given resource exists.
    *
-   * @param resourceName Name of the resource to check for
+   * @param name Name of the resource to check for
    * @return True if the module version exists, false if not
    * @throws IOException
    */
-  public boolean exists(String resourceName) throws IOException;
+  public boolean exists(String name) throws IOException;
 
   /**
    * Checks whether or not a specific version of the given resource exists.
    *
-   * @param resourceName Name of the resource to check for
-   * @param resourceVersion Version of the resource to check for
+   * @param name Name of the resource to check for
+   * @param version Version of the resource to check for
    * @return True if the module version exists, false if not
    * @throws IOException
    */
-  public boolean exists(String resourceName, String resourceVersion) throws IOException;
+  public boolean exists(String name, int version) throws IOException;
 
   /**
-   * Write the resource metadata to the store.
+   * Add the resource metadata to the store. The version given must be unique for the given resource name.
    *
-   * @param meta Metadata to write
+   * @param meta Metadata to add
    * @throws IOException
    */
-  public void write(PluginResourceMeta meta) throws IOException;
+  public void add(PluginResourceMeta meta) throws IOException;
+
+  /**
+   * Get the highest version of given resource, or 0 if the resource does not exist.
+   *
+   * @param name Name of the resource to get the highest version of
+   * @return Highest version of given resource, or 0 if the resource does not exist.
+   * @throws IOException
+   */
+  public int getHighestVersion(String name) throws IOException;
 
   /**
    * Get the metadata for the given resource name and version.
    *
-   * @param resourceName Name of the resource to get
-   * @param resourceVersion Version of the resource to get
+   * @param name Name of the resource to get
+   * @param version Version of the resource to get
    * @return Metadata of the given resource
    * @throws IOException
    */
-  public PluginResourceMeta get(String resourceName, String resourceVersion) throws IOException;
+  public PluginResourceMeta get(String name, int version) throws IOException;
 
   /**
    * Delete the given version of the given resource from the store.
    *
-   * @param resourceName Name of the resource to delete
-   * @param resourceVersion Version of the resource to delete
+   * @param name Name of the resource to delete
+   * @param version Version of the resource to delete
    * @throws IOException
    */
-  public void delete(String resourceName, String resourceVersion) throws IOException;
+  public void delete(String name, int version) throws IOException;
 
   /**
    * Get an immutable map of resource name to all metadata with that name.
@@ -95,50 +104,49 @@ public interface PluginResourceMetaStoreView {
   /**
    * Get an immutable set of all resource metadata for the given resource name.
    *
-   * @param resourceName Name of resource to get metadata for
+   * @param name Name of resource to get metadata for
    * @return Immutable set of all resource metadata for the given resource name
    * @throws IOException
    */
-  public Set<PluginResourceMeta> getAll(String resourceName) throws IOException;
+  public Set<PluginResourceMeta> getAll(String name) throws IOException;
 
   /**
    * Get an immutable set of all resource metadata for the given resource name with the given status.
    *
-   * @param resourceName Name of resources to get
+   * @param name Name of resources to get
    * @param status Status of the resources to get
    * @return Immutable set of all resource metadata for the given resource name with the given status
    * @throws IOException
    */
-  public Set<PluginResourceMeta> getAll(String resourceName, PluginResourceStatus status) throws IOException;
+  public Set<PluginResourceMeta> getAll(String name, PluginResourceStatus status) throws IOException;
 
   /**
    * Atomically stage an inactive resource version and deactivate the current staged version if there is one.
    * Staging an unstage resource puts it back in an active state. This is a no-op if the given resource is already
    * staged or active.
    *
-   * @param resourceName Name of resource to stage
-   * @param resourceVersion Version of resource to stage
-   * @return True if the resource was staged, false if there was no resource to stage
+   * @param name Name of resource to stage
+   * @param version Version of resource to stage
    * @throws IOException
    */
-  public void stage(String resourceName, String resourceVersion) throws IOException;
+  public void stage(String name, int version) throws IOException;
 
   /**
    * Unstage the given resource, moving a resource in the staged state into the inactive state, or moving a resource
    * in the active state into the unstaged state. This a no-op if the given resource is already unstaged or inactive.
    *
-   * @param resourceName Name of resource to unstage
-   * @param resourceVersion Version of resource to unstage
+   * @param name Name of resource to unstage
+   * @param version Version of resource to unstage
    * @throws IOException
    */
-  public void unstage(String resourceName, String resourceVersion) throws IOException;
+  public void unstage(String name, int version) throws IOException;
 
   /**
-   * Atomically promote the staged version of the resource into the active state and the active version of the resource
-   * into the inactive state.
+   * Atomically promote the staged version of the resource into the active state and the unstaged version of
+   * the resource into the inactive state.
    *
-   * @param resourceName Name of the resource to activate
+   * @param name Name of the resource to sync
    * @throws IOException
    */
-  public void activate(String resourceName) throws IOException;
+  public void syncStatus(String name) throws IOException;
 }

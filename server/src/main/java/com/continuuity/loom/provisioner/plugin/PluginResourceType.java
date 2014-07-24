@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.provisioner;
+package com.continuuity.loom.provisioner.plugin;
 
-import com.continuuity.loom.store.provisioner.PluginType;
 import com.google.common.base.Objects;
 
 /**

@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.provisioner;
+package com.continuuity.loom.provisioner.plugin;
 
 import com.continuuity.loom.admin.NamedEntity;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Metadata about a plugin resource, including a unique id, a name, a version, and status.
  */
 public class PluginResourceMeta extends NamedEntity {
-  private final String version;
+  private final int version;
   private final PluginResourceStatus status;
 
-  public PluginResourceMeta(String name, String version) {
+  public PluginResourceMeta(String name, int version) {
     this(name, version, PluginResourceStatus.INACTIVE);
   }
 
-  public PluginResourceMeta(String name, String version, PluginResourceStatus status) {
+  public PluginResourceMeta(String name, Integer version, PluginResourceStatus status) {
     super(name);
+    Preconditions.checkArgument(version != null && version >= 0, "Version must be non-null and positive.");
     this.version = version;
     this.status = status;
   }
@@ -40,7 +42,7 @@ public class PluginResourceMeta extends NamedEntity {
    *
    * @return Version
    */
-  public String getVersion() {
+  public int getVersion() {
     return version;
   }
 
@@ -65,7 +67,7 @@ public class PluginResourceMeta extends NamedEntity {
     PluginResourceMeta that = (PluginResourceMeta) o;
 
     return Objects.equal(name, that.name) &&
-      Objects.equal(version, that.version) &&
+      version == that.version &&
       Objects.equal(status, that.status);
   }
 

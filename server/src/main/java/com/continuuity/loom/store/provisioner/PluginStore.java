@@ -17,8 +17,8 @@ package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Configuration;
-import com.continuuity.loom.provisioner.PluginResourceMeta;
-import com.continuuity.loom.provisioner.PluginResourceType;
+import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
+import com.continuuity.loom.provisioner.plugin.PluginResourceType;
 
 import java.io.IOException;
 import java.io.InputStream;

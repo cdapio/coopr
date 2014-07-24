@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.provisioner;
+package com.continuuity.loom.provisioner.plugin;
 
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
@@ -65,7 +65,6 @@ public class PluginResourceService extends AbstractIdleService {
    * @param account Account that is uploading the resource
    * @param resourceType Type of resource to upload
    * @param resourceName Name of resource to upload
-   * @param resourceVersion Version of resource to upload
    * @param responder Responder for responding to the upload request
    * @return BodyConsumer for consuming the resource contents and streaming them to the persistent store
    * @throws IOException if there was an error getting the output stream for writing to the persistent store
@@ -73,51 +72,54 @@ public class PluginResourceService extends AbstractIdleService {
   public BodyConsumer createResourceBodyConsumer(final Account account,
                                                  final PluginResourceType resourceType,
                                                  final String resourceName,
-                                                 final String resourceVersion,
                                                  final HttpResponder responder) throws IOException {
-    final PluginResourceMeta resourceMeta = new PluginResourceMeta(resourceName, resourceVersion);
-    final OutputStream os = pluginStore.getResourceOutputStream(account, resourceType, resourceMeta);
     final ZKInterProcessReentrantLock lock = getLock(account, resourceType, resourceName);
     lock.acquire();
-    return new BodyConsumer() {
-      @Override
-      public void chunk(ChannelBuffer request, HttpResponder responder) {
-        try {
-          request.readBytes(os, request.readableBytes());
-        } catch (IOException e) {
-          LOG.error("Error during upload of version {} of resource {} for account {}.",
-                    resourceVersion, resourceName, account, e);
-          responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-      }
+    try {
+      PluginResourceMetaStoreView view = metaStoreService.getView(account, resourceType);
+      // ok to do versioning this way since we have a lock
+      final int resourceVersion = view.getHighestVersion(resourceName) + 1;
+      final PluginResourceMeta resourceMeta = new PluginResourceMeta(resourceName, resourceVersion);
+      final OutputStream os = pluginStore.getResourceOutputStream(account, resourceType, resourceMeta);
 
-      @Override
-      public void finished(HttpResponder responder) {
-        try {
-          os.close();
-          metaStoreService.getView(account, resourceType).write(resourceMeta);
-          responder.sendString(HttpResponseStatus.OK, "Upload Complete");
-        } catch (Exception e) {
-          LOG.error("Error finishing upload of resource {} of type {} for account {}.",
-                    resourceMeta, resourceType, account, e);
-          responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        } finally {
-          lock.release();
+      return new BodyConsumer() {
+        @Override
+        public void chunk(ChannelBuffer request, HttpResponder responder) {
+          try {
+            request.readBytes(os, request.readableBytes());
+          } catch (IOException e) {
+            LOG.error("Error during upload of version {} of resource {} for account {}.",
+                      resourceVersion, resourceName, account, e);
+            responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+          }
         }
-      }
 
-      @Override
-      public void handleError(Throwable t) {
-        try {
-          os.close();
-          responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
-        } catch (IOException e) {
-          LOG.error("Error uploading resource {} of type {} for account {}.", resourceMeta, resourceType, account, e);
-        } finally {
-          lock.release();
+        @Override
+        public void finished(HttpResponder responder) {
+          try {
+            os.close();
+            metaStoreService.getView(account, resourceType).add(resourceMeta);
+            responder.sendString(HttpResponseStatus.OK, "Upload Complete");
+          } catch (Exception e) {
+            LOG.error("Error finishing upload of resource {} of type {} for account {}.",
+                      resourceMeta, resourceType, account, e);
+            responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+          }
         }
-      }
-    };
+
+        @Override
+        public void handleError(Throwable t) {
+          try {
+            os.close();
+            responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
+          } catch (IOException e) {
+            LOG.error("Error uploading resource {} of type {} for account {}.", resourceMeta, resourceType, account, e);
+          }
+        }
+      };
+    } finally {
+      lock.release();
+    }
   }
 
   /**
@@ -132,7 +134,7 @@ public class PluginResourceService extends AbstractIdleService {
    * @throws IOException if there was an error getting the input stream for the resource
    */
   public InputStream getResourceInputStream(
-    final Account account, PluginResourceType resourceType, String resourceName, String resourceVersion)
+    final Account account, PluginResourceType resourceType, String resourceName, int resourceVersion)
     throws MissingEntityException, IOException {
     // no lock needed since each resource uploaded gets its own id.
     PluginResourceMeta meta = metaStoreService.getView(account, resourceType).get(resourceName, resourceVersion);
@@ -153,7 +155,7 @@ public class PluginResourceService extends AbstractIdleService {
    * @throws MissingEntityException if there is no such resource version
    * @throws IOException if there was an error stsaging the resource
    */
-  public void stage(Account account, PluginResourceType resourceType, String resourceName, String resourceVersion)
+  public void stage(Account account, PluginResourceType resourceType, String resourceName, int resourceVersion)
     throws MissingEntityException, IOException {
     ZKInterProcessReentrantLock lock = getLock(account, resourceType, resourceName);
     lock.acquire();
@@ -178,7 +180,7 @@ public class PluginResourceService extends AbstractIdleService {
    * @throws MissingEntityException if there is no such module
    * @throws IOException if there was an error deactivating all versions of the module
    */
-  public void unstage(Account account, PluginResourceType resourceType, String resourceName, String resourceVersion)
+  public void unstage(Account account, PluginResourceType resourceType, String resourceName, int resourceVersion)
     throws MissingEntityException, IOException {
     ZKInterProcessReentrantLock lock = getLock(account, resourceType, resourceName);
     lock.acquire();
@@ -207,7 +209,7 @@ public class PluginResourceService extends AbstractIdleService {
     lock.acquire();
     try {
       PluginResourceMetaStoreView view = metaStoreService.getView(account, resourceType);
-      view.activate(resourceName);
+      view.syncStatus(resourceName);
     } finally {
       lock.release();
     }
@@ -259,7 +261,7 @@ public class PluginResourceService extends AbstractIdleService {
    * @throws IOException if there was an error deleting the module version
    */
   public void delete(Account account, PluginResourceType resourceType,
-                     String resourceName, String resourceVersion) throws IllegalStateException, IOException {
+                     String resourceName, int resourceVersion) throws IllegalStateException, IOException {
     ZKInterProcessReentrantLock lock = getLock(account, resourceType, resourceName);
     lock.acquire();
     try {

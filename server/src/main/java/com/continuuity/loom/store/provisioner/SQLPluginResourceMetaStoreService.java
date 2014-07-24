@@ -16,7 +16,7 @@
 package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.provisioner.PluginResourceType;
+import com.continuuity.loom.provisioner.plugin.PluginResourceType;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBQueryExecutor;
@@ -61,17 +61,20 @@ public class SQLPluginResourceMetaStoreService extends AbstractIdleService imple
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
       boolean created = DBHelper.createDerbyTableIfNotExists("CREATE TABLE pluginMeta (" +
                                                                "tenant_id VARCHAR(255), " +
-                                                               "plugin_type VARCHAR(255), " +
+                                                               "plugin_type VARCHAR(16), " +
                                                                "plugin_name VARCHAR(255), " +
                                                                "resource_type VARCHAR(255), " +
                                                                "name VARCHAR(255), " +
-                                                               "version VARCHAR(255), " +
-                                                               "status VARCHAR(32))",
+                                                               "version INTEGER, " +
+                                                               "live BOOLEAN, " +
+                                                               "slated BOOLEAN, " +
+                                                               "create_time TIMESTAMP )",
                                                              dbConnectionPool);
       if (created) {
         DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_index", "pluginMeta",
                                   "tenant_id", "plugin_type", "plugin_name", "resource_type", "name", "version");
-        DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_status_index", "pluginMeta", "status");
+        DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_slated_index", "pluginMeta", "slated");
+        DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_live_index", "pluginMeta", "live");
       }
     }
   }

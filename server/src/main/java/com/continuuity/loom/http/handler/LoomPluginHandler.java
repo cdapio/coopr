@@ -18,12 +18,12 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.provisioner.PluginResourceMeta;
-import com.continuuity.loom.provisioner.PluginResourceService;
-import com.continuuity.loom.provisioner.PluginResourceStatus;
-import com.continuuity.loom.provisioner.PluginResourceType;
+import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
+import com.continuuity.loom.provisioner.plugin.PluginResourceService;
+import com.continuuity.loom.provisioner.plugin.PluginResourceStatus;
+import com.continuuity.loom.provisioner.plugin.PluginResourceType;
+import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
-import com.continuuity.loom.store.provisioner.PluginType;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -35,7 +35,6 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import java.io.IOException;
@@ -59,13 +58,12 @@ public class LoomPluginHandler extends LoomAuthHandler {
     this.gson = gson;
   }
 
-  @PUT
-  @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}")
+  @POST
+  @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}")
   public BodyConsumer uploadAutomatorTypeModule(HttpRequest request, HttpResponder responder,
                                                 @PathParam("automatortype-id") String automatortypeId,
                                                 @PathParam("resource-type") String resourceType,
-                                                @PathParam("resource-name") String resourceName,
-                                                @PathParam("version") String version) {
+                                                @PathParam("resource-name") String resourceName) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return null;
@@ -75,17 +73,15 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return null;
     }
 
-    return uploadResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName,
-                          version);
+    return uploadResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
-  @PUT
-  @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}")
+  @POST
+  @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}")
   public BodyConsumer uploadProviderTypeModule(HttpRequest request, HttpResponder responder,
                                                @PathParam("providertype-id") String providertypeId,
                                                @PathParam("resource-type") String resourceType,
-                                               @PathParam("resource-name") String resourceName,
-                                               @PathParam("version") String version) {
+                                               @PathParam("resource-name") String resourceName) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return null;
@@ -95,7 +91,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return null;
     }
 
-    return uploadResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName, version);
+    return uploadResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
   @POST
@@ -330,11 +326,10 @@ public class LoomPluginHandler extends LoomAuthHandler {
 
   private BodyConsumer uploadResource(HttpResponder responder, Account account, PluginType pluginType,
                                       String pluginName, String resourceType,
-                                      String resourceName, String version) {
+                                      String resourceName) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
     try {
-      return pluginResourceService.createResourceBodyConsumer(
-        account, pluginResourceType, resourceName, version, responder);
+      return pluginResourceService.createResourceBodyConsumer(account, pluginResourceType, resourceName, responder);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error uploading module");
       return null;
@@ -342,11 +337,14 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   private void stageResource(HttpResponder responder, Account account, PluginType pluginType,
-                             String pluginName, String resourceType, String resourceName, String version) {
+                             String pluginName, String resourceType, String resourceName, String versionStr) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
     try {
+      int version = Integer.parseInt(versionStr);
       pluginResourceService.stage(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
+    } catch (NumberFormatException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
     } catch (MissingEntityException e) {
@@ -355,11 +353,14 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   private void unstageResource(HttpResponder responder, Account account, PluginType pluginType,
-                               String pluginName, String resourceType, String resourceName, String version) {
+                               String pluginName, String resourceType, String resourceName, String versionStr) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
     try {
+      int version = Integer.parseInt(versionStr);
       pluginResourceService.unstage(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
+    } catch (NumberFormatException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
     } catch (MissingEntityException e) {
@@ -400,11 +401,14 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   private void deleteResource(HttpResponder responder, Account account, PluginType pluginType,
-                              String pluginName, String resourceType, String resourceName, String version) {
+                              String pluginName, String resourceType, String resourceName, String versionStr) {
     PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
     try {
+      int version = Integer.parseInt(versionStr);
       pluginResourceService.delete(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
+    } catch (NumberFormatException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, "Resource not in a deletable state.");
     } catch (IOException e) {

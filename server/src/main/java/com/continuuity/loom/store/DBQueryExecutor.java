@@ -144,7 +144,7 @@ public final class DBQueryExecutor {
    * @return Result of the query, or 0 if no results.
    * @throws SQLException
    */
-  public static int getNum(PreparedStatement statement) throws SQLException {
+  public int getNum(PreparedStatement statement) throws SQLException {
     ResultSet results = statement.executeQuery();
     try {
       if (!results.next()) {

@@ -27,7 +27,7 @@ import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.http.guice.HttpModule;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.management.guice.ManagementModule;
-import com.continuuity.loom.provisioner.PluginResourceService;
+import com.continuuity.loom.provisioner.plugin.PluginResourceService;
 import com.continuuity.loom.provisioner.guice.ProvisionerModule;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.guice.SchedulerModule;

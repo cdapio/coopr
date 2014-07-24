@@ -54,7 +54,7 @@ import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
-import com.continuuity.loom.provisioner.PluginResourceMeta;
+import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
