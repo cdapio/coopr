@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
-gem 'sinatra'
-gem 'thin'
-gem 'rest_client'
-gem 'rspec'
-gem 'rack-test'
+gem 'sinatra', "~> 1.4"
+gem 'thin', "~> 1.6"
+gem 'rest_client', "~> 1.7"
+gem 'rspec', "~> 3.0"
+gem 'rack-test', "~> 0.6"
