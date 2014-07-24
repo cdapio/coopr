@@ -19,7 +19,6 @@ import com.continuuity.loom.Entities;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,10 +32,7 @@ import java.util.Set;
  */
 public abstract class NodeStoreTest {
   private static final Account tenant1_user1 = new Account("user1", "tenant1");
-  //  private static final Account tenant1_user2 = new Account("user2", "tenant1");
   private static final Account tenant1_admin = new Account(Constants.ADMIN_USER, "tenant1");
-  //  private static final Account tenant2_user1 = new Account("user1", "tenant2");
-  //  private static final Account tenant2_admin = new Account(Constants.ADMIN_USER, "tenant2");
   protected static NodeStoreService nodeStoreService;
   protected static NodeStore systemView;
 
@@ -130,7 +126,7 @@ public abstract class NodeStoreTest {
   }
 
   private void assertNodeSetAgainstNodeSet(Set<Node> leftNodes, Set<Node> rightNodes) {
-    Assert.assertArrayEquals(leftNodes.toArray(), rightNodes.toArray());
+    Assert.assertEquals(leftNodes, rightNodes);
   }
 
   private void assertGetStoreGetNode(NodeStoreView view) throws IOException, IllegalAccessException {

@@ -15,6 +15,6 @@
  */
 
 /**
- * Persistent store for clusters, jobs, tasks, and nodes.
+ * Persistent store for nodes.
  */
 package com.continuuity.loom.store.node;

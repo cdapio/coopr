@@ -23,7 +23,6 @@ import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.guice.StoreModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -37,9 +36,20 @@ public class SQLNodeStoreTest extends NodeStoreTest {
 
   @BeforeClass
   public static void setupSQLNodeStoreTest() throws SQLException {
-    Configuration sqlConf = Configuration.create(); sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver"); sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
-    sqlConf.setLong(Constants.ID_START_NUM, 1); sqlConf.setLong(Constants.ID_INCREMENT_BY, 1); Injector injector = Guice.createInjector(new ConfigurationModule(sqlConf), new StoreModule(), new CodecModules().getModule());
-    sqlNodeStoreService = injector.getInstance(SQLNodeStoreService.class); sqlNodeStoreService.startAndWait();
+    Configuration sqlConf = Configuration.create();
+    sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
+    sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+    sqlConf.setLong(Constants.ID_START_NUM, 1);
+    sqlConf.setLong(Constants.ID_INCREMENT_BY, 1);
+    Injector injector = Guice.createInjector(new ConfigurationModule(sqlConf),
+                                             new StoreModule(),
+                                             new CodecModules().getModule());
+    sqlNodeStoreService = injector.getInstance(SQLNodeStoreService.class);
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    DBHelper.dropDerbyDB();
   }
 
   @Override
@@ -50,10 +60,5 @@ public class SQLNodeStoreTest extends NodeStoreTest {
   @Override
   public NodeStoreService getNodeStoreService() throws Exception {
     return sqlNodeStoreService;
-  }
-
-  @AfterClass
-  public static void afterClass() {
-    DBHelper.dropDerbyDB();
   }
 }

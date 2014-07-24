@@ -4,9 +4,6 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryExecutor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,8 +13,6 @@ import java.sql.SQLException;
  * The node store as viewed by the system. The system can do anything to any object.
  */
 public class SQLSystemNodeStoreView extends BaseSQLNodeStoreView {
-  private static final Logger LOG = LoggerFactory.getLogger(SQLSystemNodeStoreView.class);
-
   public SQLSystemNodeStoreView(final DBConnectionPool dbConnectionPool, final DBQueryExecutor dbQueryExecutor) {
     super(dbConnectionPool, dbQueryExecutor);
   }
@@ -49,7 +44,8 @@ public class SQLSystemNodeStoreView extends BaseSQLNodeStoreView {
   }
 
   @Override
-  PreparedStatement getSetNodeStatement(final Connection conn, final Node node, final ByteArrayInputStream nodeBytes) throws SQLException {
+  PreparedStatement getSetNodeStatement(final Connection conn, final Node node, final ByteArrayInputStream nodeBytes)
+  throws SQLException {
     PreparedStatement statement = conn.prepareStatement("UPDATE nodes SET node=? WHERE id=?");
     statement.setBlob(1, nodeBytes);
     statement.setString(2, node.getId());
@@ -57,7 +53,8 @@ public class SQLSystemNodeStoreView extends BaseSQLNodeStoreView {
   }
 
   @Override
-  PreparedStatement getInsertNodeStatement(final Connection conn, final Node node, final ByteArrayInputStream nodeBytes) throws SQLException {
+  PreparedStatement getInsertNodeStatement(final Connection conn, final Node node, final ByteArrayInputStream nodeBytes)
+  throws SQLException {
     PreparedStatement statement = conn.prepareStatement("INSERT INTO nodes (id, cluster_id, node) VALUES (?, ?, ?)");
     statement.setString(1, node.getId());
     statement.setLong(2, Long.parseLong(node.getClusterId()));

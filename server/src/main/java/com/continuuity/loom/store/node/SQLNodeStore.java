@@ -1,11 +1,23 @@
+/*
+ * Copyright 2012-2014, Continuuity, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.continuuity.loom.store.node;
 
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryExecutor;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Set;
@@ -14,20 +26,10 @@ import java.util.Set;
  * A full view of the node store backed by a sql database.
  */
 public class SQLNodeStore implements NodeStore {
-  private static final Logger LOG = LoggerFactory.getLogger(SQLNodeStore.class);
-  private final DBQueryExecutor dbQueryExecutor;
-  private final DBConnectionPool dbConnectionPool;
   private final NodeStoreView systemView;
 
   public SQLNodeStore(final DBConnectionPool dbConnectionPool, final DBQueryExecutor dbQueryExecutor) {
-    this.dbConnectionPool = dbConnectionPool;
-    this.dbQueryExecutor = dbQueryExecutor;
     this.systemView = new SQLSystemNodeStoreView(dbConnectionPool, dbQueryExecutor);
-  }
-
-  @Override
-  public Set<Node> getClusterNodes(final String clusterId) throws IOException {
-    return null;
   }
 
   @Override
