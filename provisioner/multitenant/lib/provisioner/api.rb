@@ -53,10 +53,10 @@ module Loom
           data = JSON.parse request.body.read
           id = data['id']
           workers = data['workers']
-          modules = data['modules'] || nil
+          resources = data['resources'] || nil
           plugins = data['plugins'] || nil
 
-          ts = TenantSpec.new(id, workers, modules, plugins)
+          ts = TenantSpec.new(id, workers, resources, plugins)
           tm = TenantManager.new(ts)
 
           settings.provisioner.add_tenant(tm)
@@ -74,12 +74,12 @@ module Loom
           data = JSON.parse request.body.read
           workers = data['workers'] || 3 # TODO: replace default with constant
           log.debug "requesting workers: #{workers}"
-          modules = data['modules'] || nil
-          log.debug "requesting modules: #{modules}"
+          resources = data['resources'] || nil
+          log.debug "requesting resources: #{resources}"
           plugins = data['plugins'] || nil
           log.debug "requesting plugins: #{plugins}"
 
-          ts = TenantSpec.new(params[:t_id], workers, modules, plugins)
+          ts = TenantSpec.new(params[:t_id], workers, resources, plugins)
           tm = TenantManager.new(ts)
 
           settings.provisioner.add_tenant(tm)
