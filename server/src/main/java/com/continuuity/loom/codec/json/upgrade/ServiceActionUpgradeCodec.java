@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.codec.json.current;
+
+package com.continuuity.loom.codec.json.upgrade;
 
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.codec.json.AbstractCodec;
@@ -31,7 +32,7 @@ import java.util.Map;
 /**
  * Codec for serializing/deserializing a {@link com.continuuity.loom.admin.ServiceAction}.
  */
-public class ServiceActionCodec extends AbstractCodec<ServiceAction> {
+public class ServiceActionUpgradeCodec extends AbstractCodec<ServiceAction> {
 
   @Override
   public JsonElement serialize(ServiceAction action, Type type, JsonSerializationContext context) {
@@ -51,6 +52,19 @@ public class ServiceActionCodec extends AbstractCodec<ServiceAction> {
     String actionType = context.deserialize(jsonObj.get("type"), String.class);
     Map<String, String> fields =
       context.deserialize(jsonObj.get("fields"), new TypeToken<Map<String, String>>() {}.getType());
+    // For backwards compatibility.
+    if (jsonObj.has("script")) {
+      if (fields == null) {
+        fields = Maps.newHashMap();
+      }
+      fields.put("script", jsonObj.get("script").getAsString());
+    }
+    if (jsonObj.has("data")) {
+      if (fields == null) {
+        fields = Maps.newHashMap();
+      }
+      fields.put("data", jsonObj.get("data").getAsString());
+    }
 
     return new ServiceAction(actionType, fields);
   }

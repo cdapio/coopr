@@ -59,8 +59,6 @@ public class ServiceCodec extends AbstractCodec<Service> {
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
-    Set<String> dependsOn = context.deserialize(jsonObj.get("dependson"),
-                                                new TypeToken<Set<String>>() {}.getType());
     ServiceDependencies dependencies = context.deserialize(jsonObj.get("dependencies"), ServiceDependencies.class);
 
     JsonObject provisioner = context.deserialize(jsonObj.get("provisioner"), JsonObject.class);
