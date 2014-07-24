@@ -18,11 +18,11 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
-import com.continuuity.loom.provisioner.plugin.PluginResourceService;
-import com.continuuity.loom.provisioner.plugin.PluginResourceStatus;
-import com.continuuity.loom.provisioner.plugin.PluginResourceType;
-import com.continuuity.loom.provisioner.plugin.PluginType;
+import com.continuuity.loom.provisioner.plugin.ResourceMeta;
+import com.continuuity.loom.provisioner.plugin.ResourceService;
+import com.continuuity.loom.provisioner.plugin.ResourceStatus;
+import com.continuuity.loom.provisioner.plugin.ResourceType;
+import com.continuuity.loom.provisioner.plugin.Type;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.gson.Gson;
@@ -49,12 +49,12 @@ import java.util.Set;
 @Path("/v1/loom")
 public class LoomPluginHandler extends LoomAuthHandler {
   private final Gson gson;
-  private final PluginResourceService pluginResourceService;
+  private final ResourceService resourceService;
 
   @Inject
-  private LoomPluginHandler(TenantStore tenantStore, PluginResourceService pluginResourceService, Gson gson) {
+  private LoomPluginHandler(TenantStore tenantStore, ResourceService resourceService, Gson gson) {
     super(tenantStore);
-    this.pluginResourceService = pluginResourceService;
+    this.resourceService = resourceService;
     this.gson = gson;
   }
 
@@ -73,7 +73,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return null;
     }
 
-    return uploadResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName);
+    return uploadResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
   @POST
@@ -91,7 +91,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return null;
     }
 
-    return uploadResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName);
+    return uploadResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
   @POST
@@ -111,7 +111,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
 
 
-    stageResource(responder, account, PluginType.AUTOMATOR,
+    stageResource(responder, account, Type.AUTOMATOR,
                   automatortypeId, resourceType, resourceName, version);
   }
 
@@ -131,7 +131,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    stageResource(responder, account, PluginType.PROVIDER,
+    stageResource(responder, account, Type.PROVIDER,
                   providertypeId, resourceType, resourceName, version);
   }
 
@@ -151,7 +151,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    unstageResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
+    unstageResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
   }
 
   @POST
@@ -170,7 +170,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    unstageResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName, version);
+    unstageResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName, version);
   }
 
   @GET
@@ -187,7 +187,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    getResources(request, responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType);
+    getResources(request, responder, account, Type.AUTOMATOR, automatortypeId, resourceType);
   }
 
   @GET
@@ -204,7 +204,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    getResources(request, responder, account, PluginType.PROVIDER, providertypeId, resourceType);
+    getResources(request, responder, account, Type.PROVIDER, providertypeId, resourceType);
   }
 
   @GET
@@ -222,7 +222,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    getResources(request, responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName);
+    getResources(request, responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
   @GET
@@ -240,7 +240,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    getResources(request, responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName);
+    getResources(request, responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
   @DELETE
@@ -258,7 +258,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    deleteResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName);
+    deleteResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
   @DELETE
@@ -276,7 +276,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    deleteResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName);
+    deleteResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
   @DELETE
@@ -295,7 +295,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    deleteResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
+    deleteResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
   }
 
   @DELETE
@@ -314,7 +314,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    deleteResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName, version);
+    deleteResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName, version);
   }
 
   @POST
@@ -324,24 +324,24 @@ public class LoomPluginHandler extends LoomAuthHandler {
     responder.sendError(HttpResponseStatus.NOT_IMPLEMENTED, "not implemented yet");
   }
 
-  private BodyConsumer uploadResource(HttpResponder responder, Account account, PluginType pluginType,
+  private BodyConsumer uploadResource(HttpResponder responder, Account account, Type type,
                                       String pluginName, String resourceType,
                                       String resourceName) {
-    PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
+    ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
-      return pluginResourceService.createResourceBodyConsumer(account, pluginResourceType, resourceName, responder);
+      return resourceService.createResourceBodyConsumer(account, pluginResourceType, resourceName, responder);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error uploading module");
       return null;
     }
   }
 
-  private void stageResource(HttpResponder responder, Account account, PluginType pluginType,
+  private void stageResource(HttpResponder responder, Account account, Type type,
                              String pluginName, String resourceType, String resourceName, String versionStr) {
-    PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
+    ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
       int version = Integer.parseInt(versionStr);
-      pluginResourceService.stage(account, pluginResourceType, resourceName, version);
+      resourceService.stage(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (NumberFormatException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
@@ -352,12 +352,12 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private void unstageResource(HttpResponder responder, Account account, PluginType pluginType,
+  private void unstageResource(HttpResponder responder, Account account, Type type,
                                String pluginName, String resourceType, String resourceName, String versionStr) {
-    PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
+    ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
       int version = Integer.parseInt(versionStr);
-      pluginResourceService.unstage(account, pluginResourceType, resourceName, version);
+      resourceService.unstage(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (NumberFormatException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
@@ -369,13 +369,13 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   private void getResources(HttpRequest request, HttpResponder responder, Account account,
-                            PluginType pluginType, String pluginName, String resourceType) {
-    PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
+                            Type type, String pluginName, String resourceType) {
+    ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
-      PluginResourceStatus statusFilter = getStatusParam(request);
+      ResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
-                         pluginResourceService.getAll(account, pluginResourceType, statusFilter),
-                         new TypeToken<Map<String, Set<PluginResourceMeta>>>() {}.getType(),
+                         resourceService.getAll(account, pluginResourceType, statusFilter),
+                         new TypeToken<Map<String, Set<ResourceMeta>>>() {}.getType(),
                          gson);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
@@ -385,13 +385,13 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   private void getResources(HttpRequest request, HttpResponder responder, Account account,
-                            PluginType pluginType, String pluginName, String resourceType, String resourceName) {
-    PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
+                            Type type, String pluginName, String resourceType, String resourceName) {
+    ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
-      PluginResourceStatus statusFilter = getStatusParam(request);
+      ResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
-                         pluginResourceService.getAll(account, pluginResourceType, resourceName, statusFilter),
-                         new TypeToken<Set<PluginResourceMeta>>() {}.getType(),
+                         resourceService.getAll(account, pluginResourceType, resourceName, statusFilter),
+                         new TypeToken<Set<ResourceMeta>>() {}.getType(),
                          gson);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
@@ -400,12 +400,12 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private void deleteResource(HttpResponder responder, Account account, PluginType pluginType,
+  private void deleteResource(HttpResponder responder, Account account, Type type,
                               String pluginName, String resourceType, String resourceName, String versionStr) {
-    PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
+    ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
       int version = Integer.parseInt(versionStr);
-      pluginResourceService.delete(account, pluginResourceType, resourceName, version);
+      resourceService.delete(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (NumberFormatException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
@@ -416,11 +416,11 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private void deleteResource(HttpResponder responder, Account account, PluginType pluginType,
+  private void deleteResource(HttpResponder responder, Account account, Type type,
                               String pluginName, String resourceType, String resourceName) {
-    PluginResourceType pluginResourceType = new PluginResourceType(pluginType, pluginName, resourceType);
+    ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
-      pluginResourceService.delete(account, pluginResourceType, resourceName);
+      resourceService.delete(account, pluginResourceType, resourceName);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, "Resource not in a deletable state.");
@@ -429,9 +429,9 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private PluginResourceStatus getStatusParam(HttpRequest request) throws IllegalArgumentException {
+  private ResourceStatus getStatusParam(HttpRequest request) throws IllegalArgumentException {
     Map<String, List<String>> queryParams = new QueryStringDecoder(request.getUri()).getParameters();
     return queryParams.containsKey("status") ?
-      PluginResourceStatus.valueOf(queryParams.get("status").get(0).toUpperCase()) : null;
+      ResourceStatus.valueOf(queryParams.get("status").get(0).toUpperCase()) : null;
   }
 }

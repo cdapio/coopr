@@ -17,9 +17,9 @@
 package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
-import com.continuuity.loom.provisioner.plugin.PluginResourceStatus;
-import com.continuuity.loom.provisioner.plugin.PluginResourceType;
+import com.continuuity.loom.provisioner.plugin.ResourceMeta;
+import com.continuuity.loom.provisioner.plugin.ResourceStatus;
+import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBQueryExecutor;
@@ -40,11 +40,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * SQL database backed implementation of {@link PluginResourceMetaStoreView}. Stores all metadata in a single
+ * SQL database backed implementation of {@link PluginMetaStoreView}. Stores all metadata in a single
  * database table.
  */
-public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreView {
-  private static final Logger LOG  = LoggerFactory.getLogger(SQLPluginResourceMetaStoreView.class);
+public class SQLPluginMetaStoreView implements PluginMetaStoreView {
+  private static final Logger LOG  = LoggerFactory.getLogger(SQLPluginMetaStoreView.class);
   private final DBConnectionPool dbConnectionPool;
   private final DBQueryExecutor dbQueryExecutor;
   private final String tenant;
@@ -52,15 +52,15 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   private final String pluginName;
   private final String resourceType;
 
-  SQLPluginResourceMetaStoreView(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor,
-                                 Account account, PluginResourceType pluginResourceType) {
+  SQLPluginMetaStoreView(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor,
+                         Account account, ResourceType resourceType) {
     Preconditions.checkArgument(account.isAdmin(), "Must be admin to write to plugin meta store.");
     this.tenant = account.getTenantId();
     this.dbConnectionPool = dbConnectionPool;
     this.dbQueryExecutor = dbQueryExecutor;
-    this.pluginType = pluginResourceType.getPluginType().name();
-    this.pluginName = pluginResourceType.getPluginName();
-    this.resourceType = pluginResourceType.getResourceType();
+    this.pluginType = resourceType.getType().name();
+    this.pluginName = resourceType.getPluginName();
+    this.resourceType = resourceType.getResourceType();
   }
 
   @Override
@@ -114,7 +114,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public void add(PluginResourceMeta meta) throws IOException {
+  public void add(ResourceMeta meta) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -123,7 +123,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
             "(tenant_id, plugin_type, plugin_name, resource_type, name, version, slated, live, create_time) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         try {
-          PluginResourceStatus status = meta.getStatus();
+          ResourceStatus status = meta.getStatus();
           setConstantFields(statement);
           statement.setString(5, meta.getName());
           statement.setInt(6, meta.getVersion());
@@ -169,7 +169,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public PluginResourceMeta get(String name, int version) throws IOException {
+  public ResourceMeta get(String name, int version) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -211,7 +211,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public Map<String, Set<PluginResourceMeta>> getAll() throws IOException {
+  public Map<String, Set<ResourceMeta>> getAll() throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -234,7 +234,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public Map<String, Set<PluginResourceMeta>> getAll(PluginResourceStatus status) throws IOException {
+  public Map<String, Set<ResourceMeta>> getAll(ResourceStatus status) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -259,7 +259,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public Set<PluginResourceMeta> getAll(String name) throws IOException {
+  public Set<ResourceMeta> getAll(String name) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -283,7 +283,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
   }
 
   @Override
-  public Set<PluginResourceMeta> getAll(String name, PluginResourceStatus status) throws IOException {
+  public Set<ResourceMeta> getAll(String name, ResourceStatus status) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
@@ -446,7 +446,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     }
   }
 
-  private PluginResourceMeta getResourceMeta(PreparedStatement statement) throws SQLException {
+  private ResourceMeta getResourceMeta(PreparedStatement statement) throws SQLException {
     ResultSet results = statement.executeQuery();
     try {
       if (results.next()) {
@@ -458,10 +458,10 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     }
   }
 
-  private Set<PluginResourceMeta> getResourceMetaList(PreparedStatement statement) throws SQLException {
+  private Set<ResourceMeta> getResourceMetaList(PreparedStatement statement) throws SQLException {
     ResultSet results = statement.executeQuery();
     try {
-      Set<PluginResourceMeta> output = Sets.newHashSet();
+      Set<ResourceMeta> output = Sets.newHashSet();
       while (results.next()) {
         output.add(metaFromResult(results));
       }
@@ -471,12 +471,12 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     }
   }
 
-  private Map<String, Set<PluginResourceMeta>> getResourceMetaMap(PreparedStatement statement) throws SQLException {
+  private Map<String, Set<ResourceMeta>> getResourceMetaMap(PreparedStatement statement) throws SQLException {
     ResultSet results = statement.executeQuery();
     try {
-      Map<String, Set<PluginResourceMeta>> output = Maps.newHashMap();
+      Map<String, Set<ResourceMeta>> output = Maps.newHashMap();
       while (results.next()) {
-        PluginResourceMeta meta = metaFromResult(results);
+        ResourceMeta meta = metaFromResult(results);
         String name = meta.getName();
         if (output.containsKey(name)) {
           output.get(name).add(meta);
@@ -490,7 +490,7 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     }
   }
 
-  private PluginResourceMeta getMeta(Connection conn, String name, int version) throws SQLException {
+  private ResourceMeta getMeta(Connection conn, String name, int version) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "SELECT name, version, slated, live FROM pluginMeta " +
         "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
@@ -504,12 +504,12 @@ public class SQLPluginResourceMetaStoreView implements PluginResourceMetaStoreVi
     }
   }
 
-  private PluginResourceMeta metaFromResult(ResultSet results) throws SQLException {
+  private ResourceMeta metaFromResult(ResultSet results) throws SQLException {
     String name = results.getString(1);
     int version = results.getInt(2);
     boolean slated = results.getBoolean(3);
     boolean live = results.getBoolean(4);
-    return new PluginResourceMeta(name, version, PluginResourceStatus.fromLiveFlags(live, slated));
+    return new ResourceMeta(name, version, ResourceStatus.fromLiveFlags(live, slated));
   }
 
   private void setConstantFields(PreparedStatement statement) throws SQLException {

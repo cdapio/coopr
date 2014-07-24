@@ -18,7 +18,7 @@ package com.continuuity.loom.provisioner.plugin;
 /**
  * Type of plugin.
  */
-public enum PluginType {
+public enum Type {
   AUTOMATOR,
   PROVIDER;
 }

@@ -22,7 +22,7 @@ package com.continuuity.loom.provisioner.plugin;
  * pushed. If a resource is unstaged, it has been marked to be removed from provisioners on the next sync, but is still
  * being used on the provisioners.
  */
-public enum PluginResourceStatus {
+public enum ResourceStatus {
   INACTIVE,
   ACTIVE,
   STAGED,
@@ -36,7 +36,7 @@ public enum PluginResourceStatus {
     return this == STAGED || this == ACTIVE;
   }
 
-  public static PluginResourceStatus fromLiveFlags(boolean live, boolean slated) {
+  public static ResourceStatus fromLiveFlags(boolean live, boolean slated) {
     if (live && slated) {
       return ACTIVE;
     } else if (live && !slated) {

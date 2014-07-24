@@ -16,7 +16,7 @@
 package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.provisioner.plugin.PluginResourceType;
+import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBQueryExecutor;
@@ -29,14 +29,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * SQL database backed implementation of {@link PluginResourceMetaStoreService}.
+ * SQL database backed implementation of {@link PluginMetaStoreService}.
  */
-public class SQLPluginResourceMetaStoreService extends AbstractIdleService implements PluginResourceMetaStoreService {
+public class SQLPluginMetaStoreService extends AbstractIdleService implements PluginMetaStoreService {
   private final DBConnectionPool dbConnectionPool;
   private final DBQueryExecutor dbQueryExecutor;
 
   @Inject
-  private SQLPluginResourceMetaStoreService(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor) {
+  private SQLPluginMetaStoreService(DBConnectionPool dbConnectionPool, DBQueryExecutor dbQueryExecutor) {
     this.dbConnectionPool = dbConnectionPool;
     this.dbQueryExecutor = dbQueryExecutor;
   }
@@ -85,8 +85,8 @@ public class SQLPluginResourceMetaStoreService extends AbstractIdleService imple
   }
 
   @Override
-  public PluginResourceMetaStoreView getView(Account account, PluginResourceType type) {
+  public PluginMetaStoreView getView(Account account, ResourceType type) {
     Preconditions.checkArgument(account.isAdmin(), "Only an admin is allowed to access plugin information.");
-    return new SQLPluginResourceMetaStoreView(dbConnectionPool, dbQueryExecutor, account, type);
+    return new SQLPluginMetaStoreView(dbConnectionPool, dbQueryExecutor, account, type);
   }
 }

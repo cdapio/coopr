@@ -17,8 +17,8 @@
 package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.codec.json.AbstractCodec;
-import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
-import com.continuuity.loom.provisioner.plugin.PluginResourceStatus;
+import com.continuuity.loom.provisioner.plugin.ResourceMeta;
+import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -28,13 +28,13 @@ import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 
 /**
- * Codec for serializing/deserializing {@link com.continuuity.loom.provisioner.plugin.PluginResourceMeta} objects. Used so
+ * Codec for serializing/deserializing {@link com.continuuity.loom.provisioner.plugin.ResourceMeta} objects. Used so
  * that enums are handled correctly.
  */
-public class PluginResourceMetaCodec extends AbstractCodec<PluginResourceMeta> {
+public class PluginResourceMetaCodec extends AbstractCodec<ResourceMeta> {
 
   @Override
-  public JsonElement serialize(PluginResourceMeta meta, Type type, JsonSerializationContext context) {
+  public JsonElement serialize(ResourceMeta meta, Type type, JsonSerializationContext context) {
     JsonObject jsonObj = new JsonObject();
 
     jsonObj.add("name", context.serialize(meta.getName()));
@@ -45,14 +45,14 @@ public class PluginResourceMetaCodec extends AbstractCodec<PluginResourceMeta> {
   }
 
   @Override
-  public PluginResourceMeta deserialize(JsonElement json, Type type, JsonDeserializationContext context)
+  public ResourceMeta deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
     Integer version = context.deserialize(jsonObj.get("version"), Integer.class);
-    PluginResourceStatus status = context.deserialize(jsonObj.get("status"), PluginResourceStatus.class);
+    ResourceStatus status = context.deserialize(jsonObj.get("status"), ResourceStatus.class);
 
-    return new PluginResourceMeta(name, version, status);
+    return new ResourceMeta(name, version, status);
   }
 }

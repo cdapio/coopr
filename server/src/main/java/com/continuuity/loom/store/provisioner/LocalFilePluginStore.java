@@ -18,8 +18,7 @@ package com.continuuity.loom.store.provisioner;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
-import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
-import com.continuuity.loom.provisioner.plugin.PluginResourceType;
+import com.continuuity.loom.provisioner.plugin.ResourceType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,8 +28,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Plugin store that writes modules to the local file system. Modules are namespaced by the data directory given
- * in the configuration, plugin type, plugin type id, module type, module name, and module version.
+ * Plugin store that writes resources to the local file system. Modules are namespaced by the data directory given
+ * in the configuration, plugin type, plugin type id, resource type, name, and version.
  */
 public class LocalFilePluginStore implements PluginStore {
   private String baseDir;
@@ -51,14 +50,15 @@ public class LocalFilePluginStore implements PluginStore {
    *
    * @param account Account that owns the plugin resource
    * @param type Type of resource
-   * @param meta Metadata of the resource
+   * @param name Name of the resource being written
+   * @param version Version of the resource being written
    * @return Output stream for the file
    * @throws IOException if there was an error creating the file
    */
   @Override
-  public OutputStream getResourceOutputStream(Account account, PluginResourceType type,
-                                              PluginResourceMeta meta) throws IOException {
-    File file = getFile(account, type, meta);
+  public OutputStream getResourceOutputStream(Account account, ResourceType type, String name, int version)
+    throws IOException {
+    File file = getFile(account, type, name, version);
     File parent = file.getParentFile();
     if (!parent.exists()) {
       if (!parent.mkdirs()) {
@@ -74,9 +74,9 @@ public class LocalFilePluginStore implements PluginStore {
   }
 
   @Override
-  public InputStream getResourceInputStream(Account account, PluginResourceType type,
-                                            PluginResourceMeta meta) throws IOException {
-    File file = getFile(account, type, meta);
+  public InputStream getResourceInputStream(Account account, ResourceType type, String name, int version)
+    throws IOException {
+    File file = getFile(account, type, name, version);
     if (!file.exists()) {
       return null;
     }
@@ -84,27 +84,27 @@ public class LocalFilePluginStore implements PluginStore {
   }
 
   @Override
-  public void deleteResource(Account account, PluginResourceType type, PluginResourceMeta meta) throws IOException {
-    File file = getFile(account, type, meta);
+  public void deleteResource(Account account, ResourceType type, String name, int version) throws IOException {
+    File file = getFile(account, type, name, version);
     if (file.exists()) {
       file.delete();
     }
   }
 
-  private File getFile(Account account, PluginResourceType type, PluginResourceMeta meta) {
+  private File getFile(Account account, ResourceType type,  String name, int version) {
     String path = new StringBuilder()
       .append(baseDir)
       .append(account.getTenantId())
       .append(File.separator)
-      .append(type.getPluginType().name().toLowerCase())
+      .append(type.getType().name().toLowerCase())
       .append(File.separator)
       .append(type.getPluginName())
       .append(File.separator)
       .append(type.getResourceType())
       .append(File.separator)
-      .append(meta.getName())
+      .append(name)
       .append(File.separator)
-      .append(meta.getVersion())
+      .append(version)
       .toString();
     return new File(path);
   }

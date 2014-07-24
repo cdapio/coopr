@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.store.provisioner;
 
-import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
-import com.continuuity.loom.provisioner.plugin.PluginResourceStatus;
+import com.continuuity.loom.provisioner.plugin.ResourceMeta;
+import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 
 import java.io.IOException;
 import java.util.Map;
@@ -27,7 +27,7 @@ import java.util.Set;
  * the store. Resource metadata essentially serves as a record of what resources have been uploaded, what resources
  * are staged, and what resources are in what state.
  */
-public interface PluginResourceMetaStoreView {
+public interface PluginMetaStoreView {
 
   /**
    * Checks whether or not any version of the given resource exists.
@@ -54,7 +54,7 @@ public interface PluginResourceMetaStoreView {
    * @param meta Metadata to add
    * @throws IOException
    */
-  public void add(PluginResourceMeta meta) throws IOException;
+  public void add(ResourceMeta meta) throws IOException;
 
   /**
    * Get the highest version of given resource, or 0 if the resource does not exist.
@@ -73,7 +73,7 @@ public interface PluginResourceMetaStoreView {
    * @return Metadata of the given resource
    * @throws IOException
    */
-  public PluginResourceMeta get(String name, int version) throws IOException;
+  public ResourceMeta get(String name, int version) throws IOException;
 
   /**
    * Delete the given version of the given resource from the store.
@@ -90,7 +90,7 @@ public interface PluginResourceMetaStoreView {
    * @return Immutable map of resource name to resource metadata
    * @throws IOException
    */
-  public Map<String, Set<PluginResourceMeta>> getAll() throws IOException;
+  public Map<String, Set<ResourceMeta>> getAll() throws IOException;
 
   /**
    * Get an immutable map of resource name to all metadata with that name with the given status.
@@ -99,7 +99,7 @@ public interface PluginResourceMetaStoreView {
    * @return Immutable map of resource name to resource metadata
    * @throws IOException
    */
-  public Map<String, Set<PluginResourceMeta>> getAll(PluginResourceStatus status) throws IOException;
+  public Map<String, Set<ResourceMeta>> getAll(ResourceStatus status) throws IOException;
 
   /**
    * Get an immutable set of all resource metadata for the given resource name.
@@ -108,7 +108,7 @@ public interface PluginResourceMetaStoreView {
    * @return Immutable set of all resource metadata for the given resource name
    * @throws IOException
    */
-  public Set<PluginResourceMeta> getAll(String name) throws IOException;
+  public Set<ResourceMeta> getAll(String name) throws IOException;
 
   /**
    * Get an immutable set of all resource metadata for the given resource name with the given status.
@@ -118,7 +118,7 @@ public interface PluginResourceMetaStoreView {
    * @return Immutable set of all resource metadata for the given resource name with the given status
    * @throws IOException
    */
-  public Set<PluginResourceMeta> getAll(String name, PluginResourceStatus status) throws IOException;
+  public Set<ResourceMeta> getAll(String name, ResourceStatus status) throws IOException;
 
   /**
    * Atomically stage an inactive resource version and deactivate the current staged version if there is one.

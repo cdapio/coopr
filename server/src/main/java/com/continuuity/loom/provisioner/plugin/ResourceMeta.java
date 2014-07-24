@@ -22,15 +22,15 @@ import com.google.common.base.Preconditions;
 /**
  * Metadata about a plugin resource, including a unique id, a name, a version, and status.
  */
-public class PluginResourceMeta extends NamedEntity {
+public class ResourceMeta extends NamedEntity {
   private final int version;
-  private final PluginResourceStatus status;
+  private final ResourceStatus status;
 
-  public PluginResourceMeta(String name, int version) {
-    this(name, version, PluginResourceStatus.INACTIVE);
+  public ResourceMeta(String name, int version) {
+    this(name, version, ResourceStatus.INACTIVE);
   }
 
-  public PluginResourceMeta(String name, Integer version, PluginResourceStatus status) {
+  public ResourceMeta(String name, Integer version, ResourceStatus status) {
     super(name);
     Preconditions.checkArgument(version != null && version >= 0, "Version must be non-null and positive.");
     this.version = version;
@@ -51,7 +51,7 @@ public class PluginResourceMeta extends NamedEntity {
    *
    * @return Status
    */
-  public PluginResourceStatus getStatus() {
+  public ResourceStatus getStatus() {
     return status;
   }
 
@@ -60,11 +60,11 @@ public class PluginResourceMeta extends NamedEntity {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof PluginResourceMeta)) {
+    if (!(o instanceof ResourceMeta)) {
       return false;
     }
 
-    PluginResourceMeta that = (PluginResourceMeta) o;
+    ResourceMeta that = (ResourceMeta) o;
 
     return Objects.equal(name, that.name) &&
       version == that.version &&

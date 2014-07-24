@@ -18,13 +18,13 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
-import com.continuuity.loom.provisioner.plugin.PluginResourceService;
-import com.continuuity.loom.provisioner.plugin.PluginResourceType;
+import com.continuuity.loom.provisioner.plugin.ResourceService;
+import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.ProvisionerHeartbeat;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.provisioner.plugin.Type;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
-import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMultimap;
@@ -57,17 +57,17 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
   private static final Logger LOG = LoggerFactory.getLogger(LoomProvisionerHandler.class);
 
   private final Gson gson;
-  private final PluginResourceService pluginResourceService;
+  private final ResourceService resourceService;
   private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
   private LoomProvisionerHandler(TenantStore tenantStore,
                                  TenantProvisionerService tenantProvisionerService,
-                                 PluginResourceService pluginResourceService,
+                                 ResourceService resourceService,
                                  Gson gson) {
     super(tenantStore);
     this.gson = gson;
-    this.pluginResourceService = pluginResourceService;
+    this.resourceService = resourceService;
     this.tenantProvisionerService = tenantProvisionerService;
   }
 
@@ -194,7 +194,7 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
       return;
     }
 
-    PluginResourceType resourceTypeObj = new PluginResourceType(PluginType.AUTOMATOR, automatortypeId, resourceType);
+    ResourceType resourceTypeObj = new ResourceType(Type.AUTOMATOR, automatortypeId, resourceType);
     sendResourceInChunks(responder, account, resourceTypeObj, name, version);
   }
 
@@ -214,16 +214,16 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
       return;
     }
 
-    PluginResourceType resourceTypeObj = new PluginResourceType(PluginType.PROVIDER, providertypeId, resourceType);
+    ResourceType resourceTypeObj = new ResourceType(Type.PROVIDER, providertypeId, resourceType);
     sendResourceInChunks(responder, account, resourceTypeObj, name, version);
   }
 
   private void sendResourceInChunks(HttpResponder responder, Account account,
-                                    PluginResourceType resourceType, String name, String versionStr) {
+                                    ResourceType resourceType, String name, String versionStr) {
     try {
       int version = Integer.parseInt(versionStr);
       InputStream inputStream =
-        pluginResourceService.getResourceInputStream(account, resourceType, name, version);
+        resourceService.getResourceInputStream(account, resourceType, name, version);
       if (inputStream == null) {
         LOG.error("No input stream available, but metadata exists for version {} of resource {} for tenant {}.",
                   version, name, account.getTenantId());

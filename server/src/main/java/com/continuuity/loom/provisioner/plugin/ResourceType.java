@@ -21,13 +21,13 @@ import com.google.common.base.Objects;
  * Type of plugin resource. Includes the plugin type (ex: automator or provider), plugin name (ex: chef-solo or shell),
  * and resource type (ex: cookbook, script).
  */
-public class PluginResourceType {
-  private final PluginType pluginType;
+public class ResourceType {
+  private final Type type;
   private final String pluginName;
   private final String resourceType;
 
-  public PluginResourceType(PluginType pluginType, String pluginName, String resourceType) {
-    this.pluginType = pluginType;
+  public ResourceType(Type type, String pluginName, String resourceType) {
+    this.type = type;
     this.pluginName = pluginName;
     this.resourceType = resourceType;
   }
@@ -37,8 +37,8 @@ public class PluginResourceType {
    *
    * @return Plugin type
    */
-  public PluginType getPluginType() {
-    return pluginType;
+  public Type getType() {
+    return type;
   }
 
   /**
@@ -64,26 +64,26 @@ public class PluginResourceType {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof PluginResourceType)) {
+    if (!(o instanceof ResourceType)) {
       return false;
     }
 
-    PluginResourceType that = (PluginResourceType) o;
+    ResourceType that = (ResourceType) o;
 
-    return Objects.equal(pluginType, that.pluginType) &&
+    return Objects.equal(type, that.type) &&
       Objects.equal(pluginName, that.pluginName) &&
       Objects.equal(resourceType, that.resourceType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(pluginType, pluginName, resourceType);
+    return Objects.hashCode(type, pluginName, resourceType);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("pluginType", pluginType)
+      .add("type", type)
       .add("pluginTypeId", pluginName)
       .add("resourceType", resourceType)
       .toString();

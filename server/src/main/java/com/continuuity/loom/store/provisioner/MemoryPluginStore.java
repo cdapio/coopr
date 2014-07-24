@@ -17,8 +17,7 @@ package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Configuration;
-import com.continuuity.loom.provisioner.plugin.PluginResourceMeta;
-import com.continuuity.loom.provisioner.plugin.PluginResourceType;
+import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 
@@ -50,17 +49,17 @@ public class MemoryPluginStore implements PluginStore {
   }
 
   @Override
-  public OutputStream getResourceOutputStream(Account account, PluginResourceType type,
-                                              PluginResourceMeta meta) throws IOException {
+  public OutputStream getResourceOutputStream(Account account, ResourceType type, String name, int version)
+    throws IOException {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    store.put(new Key(account, type, meta), outputStream);
+    store.put(new Key(account, type, name, version), outputStream);
     return outputStream;
   }
 
   @Override
-  public InputStream getResourceInputStream(Account account, PluginResourceType type,
-                                            PluginResourceMeta meta) throws IOException {
-    Key key = new Key(account, type, meta);
+  public InputStream getResourceInputStream(Account account, ResourceType type, String name, int version)
+    throws IOException {
+    Key key = new Key(account, type, name, version);
     if (!store.containsKey(key)) {
       return null;
     }
@@ -68,19 +67,21 @@ public class MemoryPluginStore implements PluginStore {
   }
 
   @Override
-  public void deleteResource(Account account, PluginResourceType type, PluginResourceMeta meta) throws IOException {
-    store.remove(new Key(account, type, meta));
+  public void deleteResource(Account account, ResourceType type,  String name, int version) throws IOException {
+    store.remove(new Key(account, type, name, version));
   }
 
   private class Key {
     private final Account account;
-    private final PluginResourceType type;
-    private final PluginResourceMeta meta;
+    private final ResourceType type;
+    private final String name;
+    private final int version;
 
-    private Key(Account account, PluginResourceType type, PluginResourceMeta meta) {
+    private Key(Account account, ResourceType type, String name, int version) {
       this.account = account;
       this.type = type;
-      this.meta = meta;
+      this.name = name;
+      this.version = version;
     }
 
     @Override
@@ -96,12 +97,13 @@ public class MemoryPluginStore implements PluginStore {
 
       return Objects.equal(account, that.account) &&
         Objects.equal(type, that.type) &&
-        Objects.equal(meta, that.meta);
+        Objects.equal(name, that.name) &&
+        Objects.equal(version, that.version);
     }
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(account, type, meta);
+      return Objects.hashCode(account, type, name, version);
     }
   }
 }

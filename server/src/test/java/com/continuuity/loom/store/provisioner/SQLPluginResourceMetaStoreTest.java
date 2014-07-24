@@ -27,7 +27,7 @@ import org.junit.BeforeClass;
  *
  */
 public class SQLPluginResourceMetaStoreTest extends PluginResourceMetaStoreTest {
-  private static SQLPluginResourceMetaStoreService service;
+  private static SQLPluginMetaStoreService service;
 
   @BeforeClass
   public static void setupTestClass() throws Exception {
@@ -38,12 +38,12 @@ public class SQLPluginResourceMetaStoreTest extends PluginResourceMetaStoreTest 
       new ConfigurationModule(conf),
       new StoreModules(conf).getTestModule()
     );
-    service = injector.getInstance(SQLPluginResourceMetaStoreService.class);
+    service = injector.getInstance(SQLPluginMetaStoreService.class);
     service.startAndWait();
   }
 
   @Override
-  PluginResourceMetaStoreService getPluginResourceMetaStoreService() throws Exception {
+  PluginMetaStoreService getPluginResourceMetaStoreService() throws Exception {
     return service;
   }
 
