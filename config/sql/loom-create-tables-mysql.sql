@@ -145,8 +145,8 @@ CREATE TABLE IF NOT EXISTS pluginMeta (
     version INTEGER,
     live BOOLEAN,
     slated BOOLEAN,
+    deleted BOOLEAN,
     create_time TIMESTAMP,
-    PRIMARY KEY (tenant_id, plugin_type, plugin_name, resource_type, name, version),
-    INDEX live_index (live),
-    INDEX slated_index (slated)
+    delete_time TIMESTAMP,
+    PRIMARY KEY (tenant_id, plugin_type, plugin_name, resource_type, name, version)
 ) ENGINE = InnoDB;

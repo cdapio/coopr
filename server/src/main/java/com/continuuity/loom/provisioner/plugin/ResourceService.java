@@ -22,8 +22,8 @@ import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
-import com.continuuity.loom.store.provisioner.PluginMetaStoreView;
 import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
+import com.continuuity.loom.store.provisioner.PluginMetaStoreView;
 import com.continuuity.loom.store.provisioner.PluginStore;
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -68,7 +68,8 @@ public class ResourceService extends AbstractIdleService {
    * @param name Name of resource to upload
    * @param responder Responder for responding to the upload request
    * @return BodyConsumer for consuming the resource contents and streaming them to the persistent store
-   * @throws IOException if there was an error getting the output stream for writing to the persistent store
+   * @throws IOException if there was an error getting the output stream for writing to the persistent store or writing
+   *                     the plugin metadata
    */
   public BodyConsumer createResourceBodyConsumer(final Account account,
                                                  final ResourceType resourceType,
@@ -81,7 +82,10 @@ public class ResourceService extends AbstractIdleService {
       // ok to do versioning this way since we have a lock
       final int version = view.getHighestVersion(name) + 1;
       final ResourceMeta resourceMeta = new ResourceMeta(name, version);
+      LOG.debug("getting output stream for version {} of resource {} of type {} for account {}",
+                version, name, resourceType, account);
       final OutputStream os = pluginStore.getResourceOutputStream(account, resourceType, name, version);
+      metaStoreService.getView(account, resourceType).add(resourceMeta);
 
       return new BodyConsumer() {
         @Override
@@ -99,8 +103,8 @@ public class ResourceService extends AbstractIdleService {
         public void finished(HttpResponder responder) {
           try {
             os.close();
-            metaStoreService.getView(account, resourceType).add(resourceMeta);
             responder.sendString(HttpResponseStatus.OK, "Upload Complete");
+            LOG.debug("finished uploading resource.");
           } catch (Exception e) {
             LOG.error("Error finishing upload of resource {} of type {} for account {}.",
                       resourceMeta, resourceType, account, e);
@@ -110,8 +114,11 @@ public class ResourceService extends AbstractIdleService {
 
         @Override
         public void handleError(Throwable t) {
+          LOG.error("Error uploading version {} of resource {} of type {} for account {}.",
+                    version, name, resourceType, account, t);
           try {
             os.close();
+            metaStoreService.getView(account, resourceType).delete(name, version);
             responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
           } catch (IOException e) {
             LOG.error("Error uploading resource {} of type {} for account {}.", resourceMeta, resourceType, account, e);
@@ -134,14 +141,15 @@ public class ResourceService extends AbstractIdleService {
    * @throws MissingEntityException if there is no such resource version
    * @throws IOException if there was an error getting the input stream for the resource
    */
-  public InputStream getResourceInputStream(
-    final Account account, ResourceType resourceType, String name, int version)
+  public InputStream getResourceInputStream(final Account account, ResourceType resourceType, String name, int version)
     throws MissingEntityException, IOException {
     // no lock needed since each resource uploaded gets its own id.
     ResourceMeta meta = metaStoreService.getView(account, resourceType).get(name, version);
     if (meta == null) {
       throw new MissingEntityException("Resource not found.");
     }
+    LOG.debug("getting input stream for version {} of resource {} of type {} for account {}.",
+              version, name, resourceType, account);
     return pluginStore.getResourceInputStream(account, resourceType, meta.getName(), meta.getVersion());
   }
 
@@ -158,6 +166,8 @@ public class ResourceService extends AbstractIdleService {
    */
   public void stage(Account account, ResourceType resourceType, String name, int version)
     throws MissingEntityException, IOException {
+    LOG.debug("staging version {} of resource {} of type {} for account {}.",
+              version, name, resourceType, account);
     ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
     lock.acquire();
     try {
@@ -183,6 +193,8 @@ public class ResourceService extends AbstractIdleService {
    */
   public void unstage(Account account, ResourceType resourceType, String name, int version)
     throws MissingEntityException, IOException {
+    LOG.debug("unstaging version {} of resource {} of type {} for account {}.",
+              version, name, resourceType, account);
     ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
     lock.acquire();
     try {
@@ -207,6 +219,7 @@ public class ResourceService extends AbstractIdleService {
    */
   public void syncStatus(Account account, ResourceType resourceType, String name) throws IOException {
     ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
+    LOG.debug("syncing status of resource {} of type {} for account {}.", name, resourceType, account);
     lock.acquire();
     try {
       PluginMetaStoreView view = metaStoreService.getView(account, resourceType);
@@ -263,6 +276,7 @@ public class ResourceService extends AbstractIdleService {
    */
   public void delete(Account account, ResourceType resourceType,
                      String name, int version) throws IllegalStateException, IOException {
+    LOG.debug("deleting version {} of resource {} of type {} for account {}.", version, name, resourceType, account);
     ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
     lock.acquire();
     try {
@@ -272,7 +286,11 @@ public class ResourceService extends AbstractIdleService {
         throw new IllegalStateException("Resource must be inactive before it can be deleted.");
       }
       view.delete(name, version);
+      LOG.debug("deleted version {} of resource {} of type {} for account {} from meta store.",
+                version, name, resourceType, account);
       pluginStore.deleteResource(account, resourceType, meta.getName(), meta.getVersion());
+      LOG.debug("deleted version {} of resource {} of type {} for account {} from plugin store.",
+                version, name, resourceType, account);
     } finally {
       lock.release();
     }
@@ -289,6 +307,7 @@ public class ResourceService extends AbstractIdleService {
    */
   public void delete(Account account, ResourceType resourceType,
                      String name) throws IllegalStateException, IOException {
+    LOG.debug("deleting all versions of resource {} of type {} for account {}.", name, resourceType, account);
     ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
     lock.acquire();
     try {
@@ -302,6 +321,8 @@ public class ResourceService extends AbstractIdleService {
       for (ResourceMeta meta : metas) {
         view.delete(name, meta.getVersion());
         pluginStore.deleteResource(account, resourceType, meta.getName(), meta.getVersion());
+        LOG.debug("deleted version {} of resource {} of type {} for account {}.",
+                  meta.getVersion(), name, resourceType, account);
       }
     } finally {
       lock.release();

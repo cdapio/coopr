@@ -68,13 +68,13 @@ public class SQLPluginMetaStoreService extends AbstractIdleService implements Pl
                                                                "version INTEGER, " +
                                                                "live BOOLEAN, " +
                                                                "slated BOOLEAN, " +
-                                                               "create_time TIMESTAMP )",
+                                                               "deleted BOOLEAN, " +
+                                                               "create_time TIMESTAMP," +
+                                                               "delete_time TIMESTAMP )",
                                                              dbConnectionPool);
       if (created) {
         DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_index", "pluginMeta",
                                   "tenant_id", "plugin_type", "plugin_name", "resource_type", "name", "version");
-        DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_slated_index", "pluginMeta", "slated");
-        DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_live_index", "pluginMeta", "live");
       }
     }
   }

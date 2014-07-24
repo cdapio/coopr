@@ -70,7 +70,7 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
       try {
         PreparedStatement statement = conn.prepareStatement(
           "SELECT name FROM pluginMeta WHERE " +
-            "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?");
+            "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND deleted=false");
         try {
           setConstantFields(statement);
           statement.setString(5, name);
@@ -93,8 +93,8 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
-          "SELECT name FROM pluginMeta WHERE " +
-            "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
+          "SELECT name FROM pluginMeta WHERE tenant_id=? AND plugin_type=? AND plugin_name=? " +
+            "AND resource_type=? AND name=? AND version=? AND deleted=false");
         try {
           setConstantFields(statement);
           statement.setString(5, name);
@@ -120,8 +120,9 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
       try {
         PreparedStatement statement = conn.prepareStatement(
           "INSERT INTO pluginMeta " +
-            "(tenant_id, plugin_type, plugin_name, resource_type, name, version, slated, live, create_time) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            "(tenant_id, plugin_type, plugin_name, resource_type, name," +
+            " version, slated, live, deleted, create_time, delete_time) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         try {
           ResourceStatus status = meta.getStatus();
           setConstantFields(statement);
@@ -129,7 +130,9 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
           statement.setInt(6, meta.getVersion());
           statement.setBoolean(7, status.isSlatedToBeLive());
           statement.setBoolean(8, status.isLive());
-          statement.setTimestamp(9, DBHelper.getTimestamp(System.currentTimeMillis()));
+          statement.setBoolean(9, false);
+          statement.setTimestamp(10, DBHelper.getTimestamp(System.currentTimeMillis()));
+          statement.setTimestamp(11, null);
           statement.executeUpdate();
         } finally {
           statement.close();
@@ -190,12 +193,13 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
-          "DELETE FROM pluginMeta WHERE " +
+          "UPDATE pluginMeta SET deleted=true, delete_time=? WHERE " +
             "tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
         try {
-          setConstantFields(statement);
-          statement.setString(5, name);
-          statement.setInt(6, version);
+          statement.setTimestamp(1, DBHelper.getTimestamp(System.currentTimeMillis()));
+          setConstantFields(statement, 2);
+          statement.setString(6, name);
+          statement.setInt(7, version);
           statement.executeUpdate();
         } finally {
           statement.close();
@@ -217,7 +221,7 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
       try {
         PreparedStatement statement = conn.prepareStatement(
           "SELECT name, version, slated, live FROM pluginMeta " +
-            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=?");
+            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND deleted=false");
         try {
           setConstantFields(statement);
           return getResourceMetaMap(statement);
@@ -239,8 +243,8 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = conn.prepareStatement(
-          "SELECT name, version, slated, live FROM pluginMeta " +
-            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND slated=? AND live=?");
+          "SELECT name, version, slated, live FROM pluginMeta WHERE tenant_id=? AND plugin_type=? " +
+            "AND plugin_name=? AND resource_type=? AND slated=? AND live=? AND deleted=false");
         try {
           setConstantFields(statement);
           statement.setBoolean(5, status.isSlatedToBeLive());
@@ -265,7 +269,7 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
       try {
         PreparedStatement statement = conn.prepareStatement(
           "SELECT name, version, slated, live FROM pluginMeta " +
-            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=?");
+            "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND deleted=false");
         try {
           setConstantFields(statement);
           statement.setString(5, name);
@@ -290,7 +294,7 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
         PreparedStatement statement = conn.prepareStatement(
           "SELECT name, version, slated, live FROM pluginMeta " +
             "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND " +
-            "resource_type=? AND name=? AND slated=? AND live=?");
+            "resource_type=? AND name=? AND slated=? AND live=? AND deleted=false");
         try {
           setConstantFields(statement);
           statement.setString(5, name);
