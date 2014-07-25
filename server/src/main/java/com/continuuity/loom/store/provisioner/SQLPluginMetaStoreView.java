@@ -496,8 +496,8 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
 
   private ResourceMeta getMeta(Connection conn, String name, int version) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
-      "SELECT name, version, slated, live FROM pluginMeta " +
-        "WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=?");
+      "SELECT name, version, slated, live FROM pluginMeta WHERE tenant_id=? " +
+        "AND plugin_type=? AND plugin_name=? AND resource_type=? AND name=? AND version=? AND deleted=false");
     try {
       setConstantFields(statement);
       statement.setString(5, name);
