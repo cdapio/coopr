@@ -16,14 +16,12 @@
 # limitations under the License.
 #
 
+require 'fog'
+require 'ipaddr'
+
 gem 'fog', '~> 1.21.0'
 
 class FogProvider < Provider
-
-  deps do
-    require 'fog'
-    require 'ipaddr'
-  end
 
   # used by ssh validation in confirm stage
   def set_credentials(sshauth)
