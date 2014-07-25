@@ -20,12 +20,12 @@
 # simple specification for a tenant
 module Loom
   class TenantSpec
-    attr_accessor :id, :workers, :modules, :plugins
+    attr_accessor :id, :workers, :resources, :plugins
 
-    def initialize(id, workers, modules = nil, plugins = nil)
+    def initialize(id, workers, resources = nil, plugins = nil)
       @id = id
       @workers = workers
-      # @modules = modules ||= Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
+      # @resources = resources ||= Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
       # @plugins = plugins ||= Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
     end
   end
