@@ -22,8 +22,6 @@ require 'fog'
 
 class FogProvider < Provider
 
-  @plugin_data_dir = '/tmp/loom/fog_provider/' + Process.pid.to_s unless @plugin_data_dir
-
   # used by ssh validation in confirm stage
   def set_credentials(sshauth)
     @credentials = Hash.new
