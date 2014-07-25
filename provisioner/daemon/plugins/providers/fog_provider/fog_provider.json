@@ -105,7 +105,7 @@
             "openstack_tenant",
             "openstack_auth_url",
             "openstack_ssh_keypair",
-            "identity_file"
+            "openstack_identity_file"
           ]
         ]
       },
@@ -174,7 +174,12 @@
             "label": "Rackspace SSH Keypair",
             "type": "text",
             "tip": "Your Rackspace SSH key name"
-          }
+          },
+          "rackspace_identity_file": {
+            "label": "Key file",
+            "type": "text",
+            "tip": "Path to your Rackspace SSH private key file"
+          },
         },
         "required": [
           [ ]

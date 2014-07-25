@@ -50,6 +50,7 @@ class FogProviderRackspace < FogProvider
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = 'root'
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
+      @result['result']['ssh-auth']['identityfile'] = @rackspace_identity_file if @rackspace_identity_file
       @result['status'] = 0
     rescue Exception => e
       log.error('Unexpected Error Occured in FogProviderRackspace.create:' + e.inspect)

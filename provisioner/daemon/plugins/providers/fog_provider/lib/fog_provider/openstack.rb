@@ -45,7 +45,7 @@ class FogProviderOpenstack < FogProvider
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = 'root'
-      @result['result']['ssh-auth']['password'] = server.password if server.password
+      @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
       @result['result']['ssh-auth']['identityfile'] = @openstack_identity_file if @openstack_identity_file
       @result['status'] = 0
     rescue Exception => e
