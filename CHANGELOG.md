@@ -3,6 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- Provisioner Multi Tenancy ( Issues: #290 )
 - Multi Tenancy ( Issues: #239, #253, #277, #284 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 )
