@@ -68,10 +68,8 @@ class FogProviderOpenstack < FogProvider
       end
       # Confirm server
       log.debug 'Invoking server confirm'
-
       log.debug "fetching server for id: #{providerid}"
       server = self.connection.servers.get(providerid)
-
       # Wait until the server is ready
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
@@ -145,11 +143,11 @@ class FogProviderOpenstack < FogProvider
 
   def connection
     log.debug "Connection options for Openstack:"
-    log.debug "openstack_username #{@openstack_username}"
-    log.debug "openstack_password #{@openstack_password}"
-    log.debug "openstack_tenant #{@openstack_tenant}"
-    log.debug "openstack_auth_url #{@openstack_auth_url}"
-    log.debug "openstack_ssl_verify_peer #{@openstack_ssl_verify_peer}"
+    log.debug "- openstack_username #{@openstack_username}"
+    log.debug "- openstack_password #{@openstack_password}"
+    log.debug "- openstack_tenant #{@openstack_tenant}"
+    log.debug "- openstack_auth_url #{@openstack_auth_url}"
+    log.debug "- openstack_ssl_verify_peer #{@openstack_ssl_verify_peer}"
 
     # Create connection
     @connection ||= begin
