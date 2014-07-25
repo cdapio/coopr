@@ -157,16 +157,15 @@ module Loom
         loop {
           uri = "#{@server_uri}/v1/provisioners/#{provisioner_id}/heartbeat"
           begin
-            log.debug "sending heartbeat to #{uri}"
             json = heartbeat.to_json
             resp = RestClient.post("#{uri}", json, :'X-Loom-UserID' => "admin")
-            if(resp.code == 200)
-              log.debug "Successfully sent heartbeat"
-            elsif(resp.code == 404)
-              log.warn "Response code #{resp.code} when sending heartbeat, re-registering provisioner"
-              register_with_server
-            else
-              log.warn "Response code #{resp.code}, #{resp.to_str} when sending heartbeat to loom server #{uri}"
+            unless resp.code == 200
+              if(resp.code == 404)
+                log.warn "Response code #{resp.code} when sending heartbeat, re-registering provisioner"
+                register_with_server
+              else
+                log.warn "Response code #{resp.code}, #{resp.to_str} when sending heartbeat to loom server #{uri}"
+              end
             end
           rescue => e
             log.error "Caught exception sending heartbeat to loom server #{uri}: #{e.message}"
