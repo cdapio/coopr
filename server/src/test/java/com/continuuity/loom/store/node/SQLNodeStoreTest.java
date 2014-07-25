@@ -45,6 +45,7 @@ public class SQLNodeStoreTest extends NodeStoreTest {
                                              new StoreModule(),
                                              new CodecModules().getModule());
     sqlNodeStoreService = injector.getInstance(SQLNodeStoreService.class);
+    sqlNodeStoreService.startAndWait();
   }
 
   @AfterClass

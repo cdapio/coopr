@@ -64,7 +64,6 @@ public class SQLNodeStoreService extends AbstractIdleService implements NodeStor
     try {
       Statement stmt = conn.createStatement();
       try {
-        stmt = conn.createStatement();
         stmt.execute("DELETE FROM nodes");
       } finally {
         stmt.close();
