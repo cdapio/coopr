@@ -73,7 +73,7 @@ class FogProviderJoyent < FogProvider
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
-      @bootstrap_ip = ip_address(server, 'public')
+      @bootstrap_ip = ip_address(server)
       if @bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
       else
@@ -162,14 +162,13 @@ class FogProviderJoyent < FogProvider
     end
   end
 
-  def ip_address(server, network = 'public')
-    network_ips = server.addresses[network]
-    extract_ipv4_address(network_ips) if network_ips
-  end
-
-  def extract_ipv4_address(ip_addresses)
-    address = ip_addresses.select { |ip| ip['version'] == 4 }.first
-    address ? address['addr'] : ''
+  def ip_address(server)
+    server_ips = server.ips.select{ |ip| ip && not(is_loopback(ip) || is_linklocal(ip)) }
+    if server_ips.count === 1
+      server_ips.first
+    else
+      server_ips.find{ |ip| not is_private(ip) }
+    end
   end
 
 end
