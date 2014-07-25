@@ -89,7 +89,7 @@ class FogProvider < Provider
   def is_private(ip)
     block_a = IPAddr.new '10.0.0.0/8'
     block_b = IPAddr.new '172.16.0.0/12'
-    block_b = IPAddr.new '192.168.0.0/16'
+    block_c = IPAddr.new '192.168.0.0/16'
     return (block_a.include?(ip) || block_b.include?(ip) || block_c.include?(ip))
   end
 
