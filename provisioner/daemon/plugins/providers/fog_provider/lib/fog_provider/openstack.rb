@@ -46,7 +46,7 @@ class FogProviderOpenstack < FogProvider
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = 'root'
       @result['result']['ssh-auth']['password'] = server.password if server.password
-      @result['result']['ssh-auth']['identityfile'] = @identity_file if @identity_file
+      @result['result']['ssh-auth']['identityfile'] = @openstack_identity_file if @openstack_identity_file
       @result['status'] = 0
     rescue Exception => e
       log.error('Unexpected Error Occured in FogProviderOpenstack.create:' + e.inspect)
@@ -149,7 +149,7 @@ class FogProviderOpenstack < FogProvider
     log.debug "openstack_password #{@openstack_password}"
     log.debug "openstack_tenant #{@openstack_tenant}"
     log.debug "openstack_auth_url #{@openstack_auth_url}"
-    log.debug "ssl_verify_peer #{@ssl_verify_peer}"
+    log.debug "openstack_ssl_verify_peer #{@openstack_ssl_verify_peer}"
 
     # Create connection
     @connection ||= begin
@@ -160,7 +160,7 @@ class FogProviderOpenstack < FogProvider
         :openstack_tenant   => @openstack_tenant,
         :openstack_api_key  => @openstack_password,
         :connection_options => {
-          :ssl_verify_peer => @ssl_verify_peer
+          :ssl_verify_peer => @openstack_ssl_verify_peer
         }
       )
     end

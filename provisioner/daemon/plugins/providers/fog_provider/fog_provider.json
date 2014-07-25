@@ -87,12 +87,12 @@
             "type": "text",
             "tip": "Your Openstack SSH public key name"
           },
-          "identity_file": {
+          "openstack_identity_file": {
             "label": "Key file",
             "type": "text",
             "tip": "Path to your Openstack SSH private key file"
           },
-          "ssl_verify_peer": {
+          "openstack_ssl_verify_peer": {
             "label": "Verify SSL peers",
             "type": "checkbox",
             "tip": "Verify peer SSL certificates"
