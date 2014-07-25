@@ -70,6 +70,7 @@ class FogProviderJoyent < FogProvider
       log.debug "fetching server for id: #{providerid}"
       server = self.connection.servers.get(providerid)
       # Wait until the server is ready
+      raise 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
