@@ -18,9 +18,12 @@
 
 gem 'fog', '~> 1.21.0'
 
-require 'fog'
-
 class FogProvider < Provider
+
+  deps do
+    require 'fog'
+    require 'ipaddr'
+  end
 
   # used by ssh validation in confirm stage
   def set_credentials(sshauth)
@@ -76,6 +79,23 @@ class FogProvider < Provider
       }
       end
     end
+  end
+
+  def is_linklocal(ip)
+    linklocal = IPAddr.new '169.254.0.0/16'
+    return linklocal.include?(ip)
+  end
+
+  def is_loopback(ip)
+    loopback = IPAddr.new '127.0.0.0/8'
+    return loopback.include?(ip)
+  end
+
+  def is_private(ip)
+    block_a = IPAddr.new '10.0.0.0/8'
+    block_b = IPAddr.new '172.16.0.0/12'
+    block_b = IPAddr.new '192.168.0.0/16'
+    return (block_a.include?(ip) || block_b.include?(ip) || block_c.include?(ip))
   end
 
 end
