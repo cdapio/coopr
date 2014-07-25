@@ -16,5 +16,6 @@
 # limitations under the License.
 #
 
+require_relative 'lib/fog_provider/joyent'
 require_relative 'lib/fog_provider/openstack'
 require_relative 'lib/fog_provider/rackspace'

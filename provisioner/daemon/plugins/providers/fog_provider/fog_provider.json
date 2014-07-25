@@ -1,7 +1,7 @@
 {
   "name": "fog",
   "description": "Multi-cloud fog-based provider (Openstack, Rackspace, Joyent)",
-  "providertypes": [ "openstack", "rackspace" ],
+  "providertypes": [ "joyent", "openstack", "rackspace" ],
   "joyent": {
     "name": "joyent",
     "classname": "FogProviderJoyent",
@@ -179,7 +179,7 @@
             "label": "Key file",
             "type": "text",
             "tip": "Path to your Rackspace SSH private key file"
-          },
+          }
         },
         "required": [
           [ ]
