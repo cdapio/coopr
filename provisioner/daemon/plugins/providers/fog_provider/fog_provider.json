@@ -82,7 +82,7 @@
             "default": "http://EXAMPLE.DOMAIN.COM:5000/v2.0/tokens",
             "tip": "Your Openstack Keystone API URL"
           },
-          "openstack_ssh_key_id": {
+          "openstack_ssh_keypair": {
             "label": "Key name",
             "type": "text",
             "tip": "Your Openstack SSH public key name"
@@ -104,7 +104,7 @@
             "openstack_password",
             "openstack_tenant",
             "openstack_auth_url",
-            "openstack_ssh_key_id",
+            "openstack_ssh_keypair",
             "identity_file"
           ]
         ]

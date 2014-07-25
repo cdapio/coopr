@@ -39,7 +39,7 @@ class FogProviderOpenstack < FogProvider
           :image_ref       => image,
           :name            => hostname,
           :security_groups => @security_groups,
-          :key_name        => @openstack_ssh_key_id
+          :key_name        => @openstack_ssh_keypair
         )
       end
       # Process results
