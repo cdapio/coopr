@@ -31,6 +31,7 @@ import com.continuuity.loom.codec.json.current.ClusterDefaultsCodec;
 import com.continuuity.loom.codec.json.current.ClusterTemplateCodec;
 import com.continuuity.loom.codec.json.current.ConstraintsCodec;
 import com.continuuity.loom.codec.json.current.FieldSchemaCodec;
+import com.continuuity.loom.codec.json.current.FinishTaskRequestCodec;
 import com.continuuity.loom.codec.json.current.HardwareTypeCodec;
 import com.continuuity.loom.codec.json.current.ImageTypeCodec;
 import com.continuuity.loom.codec.json.current.LayoutConstraintCodec;
@@ -46,13 +47,17 @@ import com.continuuity.loom.codec.json.current.ServiceCodec;
 import com.continuuity.loom.codec.json.current.ServiceConstraintCodec;
 import com.continuuity.loom.codec.json.current.ServiceDependenciesCodec;
 import com.continuuity.loom.codec.json.current.ServiceStageDependenciesCodec;
+import com.continuuity.loom.codec.json.current.TakeTaskRequestCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
 import com.continuuity.loom.codec.json.upgrade.ClusterUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
+import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceUpgradeCodec;
 import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
+import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
+import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
@@ -94,6 +99,7 @@ public class CodecModules {
             .registerTypeAdapter(Cluster.class, new ClusterUpgradeCodec(tenantId))
             .registerTypeAdapter(Provider.class, new ProviderUpgradeCodec())
             .registerTypeAdapter(Service.class, new ServiceUpgradeCodec())
+            .registerTypeAdapter(ServiceAction.class, new ServiceActionUpgradeCodec())
             .create()
         );
       }
@@ -113,6 +119,7 @@ public class CodecModules {
       .registerTypeAdapter(ClusterTemplate.class, new ClusterTemplateCodec())
       .registerTypeAdapter(Constraints.class, new ConstraintsCodec())
       .registerTypeAdapter(FieldSchema.class, new FieldSchemaCodec())
+      .registerTypeAdapter(FinishTaskRequest.class, new FinishTaskRequestCodec())
       .registerTypeAdapter(HardwareType.class, new HardwareTypeCodec())
       .registerTypeAdapter(ImageType.class, new ImageTypeCodec())
       .registerTypeAdapter(LayoutConstraint.class, new LayoutConstraintCodec())
@@ -128,6 +135,7 @@ public class CodecModules {
       .registerTypeAdapter(ServiceConstraint.class, new ServiceConstraintCodec())
       .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
       .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
+      .registerTypeAdapter(TakeTaskRequest.class, new TakeTaskRequestCodec())
       .registerTypeAdapter(Tenant.class, new TenantCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
       .enableComplexMapKeySerialization();

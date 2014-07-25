@@ -24,6 +24,7 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -50,9 +51,9 @@ public class NodeService {
    * @param taskId Id of the task associated with the action.
    * @param service Service the action is for or empty if its not a service action.
    * @param action Action to execute on the node.
-   * @throws Exception
+   * @throws IOException
    */
-  public void startAction(Node node, String taskId, String service, String action) throws Exception {
+  public void startAction(Node node, String taskId, String service, String action) throws IOException {
     if (node.getActions().size() >= maxActions) {
       Node.Action removed = node.removeFirstAction();
       LOG.debug("Removing action {} from node {} since num actions is more than {}",
@@ -66,9 +67,9 @@ public class NodeService {
    * Complete an action on a node. Updates the node in the persistent store.
    *
    * @param node Node the completed action took place on.
-   * @throws Exception
+   * @throws IOException
    */
-  public void completeAction(Node node) throws Exception {
+  public void completeAction(Node node) throws IOException {
     Node.Action action = validateAndGetAction(node);
     action.setStatus(Node.Status.COMPLETE);
     action.setStatusTime(System.currentTimeMillis());
@@ -81,9 +82,9 @@ public class NodeService {
    * @param node Node the action failed on.
    * @param stdout Stdout of failed action.
    * @param stderr Stderr of failed action.
-   * @throws Exception
+   * @throws IOException
    */
-  public void failAction(Node node, String stdout, String stderr) throws Exception {
+  public void failAction(Node node, String stdout, String stderr) throws IOException {
     Node.Action action = validateAndGetAction(node);
     action.setStatus(Node.Status.FAILED);
     action.setStatusTime(System.currentTimeMillis());

@@ -15,6 +15,8 @@
  */
 package com.continuuity.loom;
 
+import com.continuuity.loom.http.request.FinishTaskRequest;
+import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -22,10 +24,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 
@@ -36,27 +39,35 @@ import java.util.Map;
  */
 public class TestHelper {
   private static Gson GSON = new Gson();
-  public static JsonObject takeTask(String loomUrl, String workerId, String tenantId) throws Exception{
-    Map<String, String> properties = ImmutableMap.of("workerId", workerId, "tenantId", tenantId);
-    HttpPost httpPost = new HttpPost(String.format("%s/v1/loom/tasks/take", loomUrl));
-    httpPost.setEntity(new StringEntity(GSON.toJson(properties)));
 
-    DefaultHttpClient httpClient = new DefaultHttpClient();
-    HttpResponse response = httpClient.execute(httpPost);
-    Assert.assertEquals(2, response.getStatusLine().getStatusCode() / 100);
-    if (response.getEntity() == null) {
-      return new JsonObject();
+  public static JsonObject takeTask(String loomUrl, TakeTaskRequest request) throws Exception {
+    HttpPost httpPost = new HttpPost(String.format("%s/v1/loom/tasks/take", loomUrl));
+    httpPost.setEntity(new StringEntity(GSON.toJson(request)));
+
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    CloseableHttpResponse response = httpClient.execute(httpPost);
+    try {
+      Assert.assertEquals(2, response.getStatusLine().getStatusCode() / 100);
+      if (response.getEntity() == null) {
+        return new JsonObject();
+      }
+      return GSON.fromJson(EntityUtils.toString(response.getEntity()), JsonElement.class).getAsJsonObject();
+    } finally {
+      response.close();
     }
-    return GSON.fromJson(EntityUtils.toString(response.getEntity()), JsonElement.class).getAsJsonObject();
   }
 
-  public static void finishTask(String loomUrl, JsonObject jsonObject) throws Exception {
+  public static void finishTask(String loomUrl, FinishTaskRequest finishRequest) throws Exception {
     HttpPost httpPost = new HttpPost(String.format("%s/v1/loom/tasks/finish", loomUrl));
-    httpPost.setEntity(new StringEntity(GSON.toJson(jsonObject)));
+    httpPost.setEntity(new StringEntity(GSON.toJson(finishRequest)));
 
-    DefaultHttpClient httpClient = new DefaultHttpClient();
-    HttpResponse response = httpClient.execute(httpPost);
-    Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    CloseableHttpResponse response = httpClient.execute(httpPost);
+    try {
+      Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+    } finally {
+      response.close();
+    }
   }
 
   public static JsonArray jsonArrayOf(String... values) {

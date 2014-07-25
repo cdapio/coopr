@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.scheduler;
 
-import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.cluster.Cluster;
@@ -25,6 +24,9 @@ import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.http.LoomService;
+import com.continuuity.loom.http.LoomServiceTestBase;
+import com.continuuity.loom.http.request.FinishTaskRequest;
+import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -33,14 +35,12 @@ import com.continuuity.loom.scheduler.task.TaskId;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.gson.JsonObject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Test ClusterScheduler
  */
-public class SchedulerTest extends BaseTest {
+public class SchedulerTest extends LoomServiceTestBase {
   private static QueueGroup clusterQueues;
   private static QueueGroup provisionerQueues;
   private static QueueGroup callbackQueues;
@@ -75,11 +75,6 @@ public class SchedulerTest extends BaseTest {
 
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
-  }
-
-  @AfterClass
-  public static void stop() throws Exception {
-    loomService.stopAndWait();
   }
 
   @Before
@@ -177,26 +172,24 @@ public class SchedulerTest extends BaseTest {
     Assert.assertEquals(0, jobQueues.size(tenantId));
 
     // Two tasks should have been submitted for provisioning.
-    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
+    TakeTaskRequest takeRequest = new TakeTaskRequest("consumer1", PROVISIONER_ID, tenantId);
+    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
 
-    JsonObject returnJson = new JsonObject();
-    returnJson.addProperty("status", 0);
-    returnJson.addProperty("workerId", "consumer1");
-    returnJson.addProperty("tenantId", tenantId);
-    returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
-    returnJson.add("result", gson.toJsonTree(ImmutableMap.of("ipaddress", "123.456.789.123")));
-    TestHelper.finishTask(getLoomUrl(), returnJson);
+    JsonObject result = new JsonObject();
+    result.addProperty("ipaddress", "123.456.789.123");
+    FinishTaskRequest finishRequest =
+      new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId, taskJson.get("taskId").getAsString(),
+                            null, null, 0, result);
+    TestHelper.finishTask(getLoomUrl(), finishRequest);
 
-    taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
-    returnJson = new JsonObject();
-    returnJson.addProperty("status", 0);
-    returnJson.addProperty("workerId", "consumer1");
-    returnJson.addProperty("tenantId", tenantId);
-    returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
-    returnJson.add("result", gson.toJsonTree(ImmutableMap.of("ipaddress", "456.789.123.123")));
-    TestHelper.finishTask(getLoomUrl(), returnJson);
+    taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
+    result = new JsonObject();
+    result.addProperty("ipaddress", "456.789.123.123");
+    finishRequest = new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
+                                          taskJson.get("taskId").getAsString(), null, null, 0, result);
+    TestHelper.finishTask(getLoomUrl(), finishRequest);
 
-    TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
+    TestHelper.takeTask(getLoomUrl(), takeRequest);
 
     Assert.assertEquals(2, jobQueues.size(tenantId));
 
@@ -206,13 +199,10 @@ public class SchedulerTest extends BaseTest {
     jobScheduler.run();
 
     for (int i = 0; i < 5; i++) {
-      taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
-      returnJson = new JsonObject();
-      returnJson.addProperty("status", 0);
-      returnJson.addProperty("workerId", "consumer1");
-      returnJson.addProperty("tenantId", tenantId);
-      returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
-      TestHelper.finishTask(getLoomUrl(), returnJson);
+      taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
+      finishRequest = new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
+                                            taskJson.get("taskId").getAsString(), null, null, 0, null);
+      TestHelper.finishTask(getLoomUrl(), finishRequest);
       jobScheduler.run();
       jobScheduler.run();
     }
@@ -284,17 +274,16 @@ public class SchedulerTest extends BaseTest {
     jobScheduler.run();
 
     // take tasks until there are no more
-    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
+    TakeTaskRequest takeRequest = new TakeTaskRequest("consumer1", PROVISIONER_ID, tenantId);
+    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
     while (taskJson.entrySet().size() > 0) {
-      JsonObject returnJson = new JsonObject();
-      returnJson.addProperty("status", failJob ? 1 : 0);
-      returnJson.addProperty("workerId", "consumer1");
-      returnJson.addProperty("tenantId", tenantId);
-      returnJson.addProperty("taskId", taskJson.get("taskId").getAsString());
-      TestHelper.finishTask(getLoomUrl(), returnJson);
+      FinishTaskRequest finishRequest =
+        new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
+                              taskJson.get("taskId").getAsString(), null, null, failJob ? 1 : 0, null);
+      TestHelper.finishTask(getLoomUrl(), finishRequest);
       jobScheduler.run();
       jobScheduler.run();
-      taskJson = TestHelper.takeTask(getLoomUrl(), "consumer1", tenantId);
+      taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
     }
     jobScheduler.run();
     waitForCallback(callbackScheduler);

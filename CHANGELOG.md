@@ -3,7 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
-- Multi Tenancy ( Issues: #239, #253, #277 )
+- Multi Tenancy ( Issues: #239, #253, #277, #284 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 )
 - Sensu monitoring support ( Issues: #167 )

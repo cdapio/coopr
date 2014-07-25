@@ -38,6 +38,7 @@ import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.provisioner.SQLPluginMetaStoreService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
+import com.continuuity.loom.store.tenant.SQLTenantStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.gson.Gson;
@@ -64,6 +65,7 @@ public class BaseTest {
   private static SQLClusterStoreService sqlClusterStoreService;
   private static SQLProvisionerStore sqlProvisionerStore;
   private static SQLPluginMetaStoreService sqlMetaStoreService;
+  private static SQLTenantStore sqlTenantStore;
   protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
   protected static ZKClientService zkClientService;
@@ -136,6 +138,8 @@ public class BaseTest {
     metaStoreService = sqlMetaStoreService;
     resourceService = injector.getInstance(ResourceService.class);
     resourceService.startAndWait();
+    sqlTenantStore = injector.getInstance(SQLTenantStore.class);
+    tenantStore = sqlTenantStore;
     gson = injector.getInstance(Gson.class);
   }
 
@@ -151,5 +155,6 @@ public class BaseTest {
     sqlClusterStoreService.clearData();
     sqlProvisionerStore.clearData();
     sqlMetaStoreService.clearData();
+    sqlTenantStore.clearData();
   }
 }

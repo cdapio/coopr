@@ -47,7 +47,7 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
   static NodeService nodeService;
   static ClusterService clusterService;
   static TaskService taskService;
-  private static final Account account = new Account(USER1, TENANT);
+  private static final Account account = new Account(USER1, TENANT_ID);
 
   @BeforeClass
   public static void initTest() {
