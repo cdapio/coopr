@@ -82,13 +82,11 @@ class FogProviderOpenstack < FogProvider
       end
 
       wait_for_sshd(@bootstrap_ip, 22)
-      log.info "Server #{server.name} sshd is up"
+      log.debug "Server #{server.name} sshd is up"
 
       # Process results
       @result['result']['ipaddress'] = @bootstrap_ip
       # Additional checks
-      log.debug 'Confirming sshd is up'
-      tcp_test_port(@bootstrap_ip, 22) { sleep 5 }
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
       Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
