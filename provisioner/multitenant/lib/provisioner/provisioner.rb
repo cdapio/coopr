@@ -193,7 +193,7 @@ module Loom
           log.warn "Response code #{resp.code}, #{resp.to_str} when registering with loom server #{uri}"
         end
       rescue => e
-        log.error "Caught exception when registering with loom server #{uri}: #{e.message}"
+        log.error "Caught exception when registering with server #{uri}: #{e.message}"
       end
     end
 
