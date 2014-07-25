@@ -82,12 +82,12 @@
             "default": "http://EXAMPLE.DOMAIN.COM:5000/v2.0/tokens",
             "tip": "Your Openstack Keystone API URL"
           },
-          "openstack_ssh_keypair": {
+          "openstack_keyname": {
             "label": "Key name",
             "type": "text",
             "tip": "Your Openstack SSH public key name"
           },
-          "openstack_identity_file": {
+          "openstack_keyfile": {
             "label": "Key file",
             "type": "text",
             "tip": "Path to your Openstack SSH private key file"
@@ -104,8 +104,8 @@
             "openstack_password",
             "openstack_tenant",
             "openstack_auth_url",
-            "openstack_ssh_keypair",
-            "openstack_identity_file"
+            "openstack_keyname",
+            "openstack_keyfile"
           ]
         ]
       },
@@ -170,12 +170,12 @@
             "type": "checkbox",
             "tip": "Wait for RackConnect"
           },
-          "rackspace_ssh_keypair": {
+          "rackspace_keyname": {
             "label": "Rackspace SSH Keypair",
             "type": "text",
             "tip": "Your Rackspace SSH key name"
           },
-          "rackspace_identity_file": {
+          "rackspace_keyfile": {
             "label": "Key file",
             "type": "text",
             "tip": "Path to your Rackspace SSH private key file"

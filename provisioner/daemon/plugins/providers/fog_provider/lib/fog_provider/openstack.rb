@@ -39,14 +39,14 @@ class FogProviderOpenstack < FogProvider
           :image_ref       => image,
           :name            => hostname,
           :security_groups => @security_groups,
-          :key_name        => @openstack_ssh_keypair
+          :key_name        => @openstack_keyname
         )
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = 'root'
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
-      @result['result']['ssh-auth']['identityfile'] = @openstack_identity_file if @openstack_identity_file
+      @result['result']['ssh-auth']['identityfile'] = @openstack_keyfile unless @openstack_keyfile.nil?
       @result['status'] = 0
     rescue Exception => e
       log.error('Unexpected Error Occured in FogProviderOpenstack.create:' + e.inspect)
