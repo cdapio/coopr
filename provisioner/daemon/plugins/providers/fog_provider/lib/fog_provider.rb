@@ -49,17 +49,14 @@ class FogProvider < Provider
     else
       false
     end
-  rescue Errno::ETIMEDOUT
-    false
-  rescue Errno::EPERM
-    false
-  rescue Errno::ECONNREFUSED
-    sleep 2
-    false
-  rescue Errno::EHOSTUNREACH, Errno::ENETUNREACH
-    sleep 2
-    false
-  rescue Errno::ENETUNREACH
+  rescue SocketError,
+         IOError,
+         Errno::ETIMEDOUT,
+         Errno::EPERM,
+         Errno::ECONNREFUSED,
+         Errno::ECONNRESET,
+         Errno::EHOSTUNREACH,
+         Errno::ENETUNREACH
     sleep 2
     false
   ensure
