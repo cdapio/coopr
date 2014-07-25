@@ -99,7 +99,7 @@ public final class IdService extends AbstractIdleService {
    * @return Unique id that can be used for a new cluster.
    */
   public String getNewClusterId() {
-    return String.format("%08d", generateId(Type.CLUSTER.path));
+    return String.format("%08d", generateId(Type.CLUSTER));
   }
 
   /**
@@ -109,7 +109,7 @@ public final class IdService extends AbstractIdleService {
    * @return Unique job id.
    */
   public JobId getNewJobId(String clusterId) {
-    return new JobId(clusterId, generateId(Type.JOB.path));
+    return new JobId(clusterId, generateId(Type.JOB));
   }
 
   /**
@@ -119,17 +119,17 @@ public final class IdService extends AbstractIdleService {
    * @return Unique task id.
    */
   public TaskId getNewTaskId(JobId jobId) {
-    return new TaskId(jobId, generateId(Type.TASK.path));
+    return new TaskId(jobId, generateId(Type.TASK));
   }
 
   // This generally should not be a noticeable amount of time compared to the time it takes to perform tasks
   // TODO: try optimistic locking before actual locking to improve performance.
-  private long generateId(String path) {
+  private long generateId(Type type) {
     idLock.get().acquire();
     try {
-      NodeData nodeData = Futures.getUnchecked(zkClient.getData(path));
+      NodeData nodeData = Futures.getUnchecked(zkClient.getData(type.path));
       long counterVal = Longs.fromByteArray(nodeData.getData());
-      Futures.getUnchecked(zkClient.setData(path, Longs.toByteArray(counterVal + incrementBy)));
+      Futures.getUnchecked(zkClient.setData(type.path, Longs.toByteArray(counterVal + incrementBy)));
       return counterVal;
     } finally {
       idLock.get().release();

@@ -28,14 +28,33 @@ public enum ResourceStatus {
   STAGED,
   UNSTAGED;
 
+  /**
+   * Whether or not the resource is live, meaning it is the version of the resource being used on the provisioners.
+   *
+   * @return Whether or not the resource is live
+   */
   public boolean isLive() {
     return this == ACTIVE || this == UNSTAGED;
   }
 
+
+  /**
+   * Whether or not the resource is slated to be live, meaning it is the version of the resource that will be
+   * used on the provisioners after the next sync call. A resource that is live can also be slated to be live.
+   *
+   * @return Whether or not the resource is slated to be live
+   */
   public boolean isSlatedToBeLive() {
     return this == STAGED || this == ACTIVE;
   }
 
+  /**
+   * Return the status that corresponds to the given values of being live and slated to be live.
+   *
+   * @param live Whether or not the resource is live
+   * @param slated Whether or not the resource is slated to be live
+   * @return Status corresponding to the given flags
+   */
   public static ResourceStatus fromLiveFlags(boolean live, boolean slated) {
     if (live && slated) {
       return ACTIVE;

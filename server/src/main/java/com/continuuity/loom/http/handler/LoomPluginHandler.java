@@ -44,7 +44,7 @@ import java.util.Set;
 
 /**
  * Handler for plugin resource related operations, such as uploading resources, staging, and unstaging resources,
- * and syncing resources.
+ * and syncing resources. Only a tenant admin can access these APIs.
  */
 @Path("/v1/loom")
 public class LoomPluginHandler extends LoomAuthHandler {
@@ -58,6 +58,17 @@ public class LoomPluginHandler extends LoomAuthHandler {
     this.gson = gson;
   }
 
+  /**
+   * Add an automator type resource. For example, uploading a resource named "hadoop" of resource type "cookbook"
+   * for the automator type "chef-solo".
+   *
+   * @param request Request containing the resource contents
+   * @param responder Responder for responding to the request
+   * @param automatortypeId Id of the automator type that is having a resource uploaded
+   * @param resourceType Type of resource that is being uploaded for the specified automator type
+   * @param resourceName Name of the resource being uploaded
+   * @return Body consumer for streaming the contents of the resource to the plugin store
+   */
   @POST
   @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}")
   public BodyConsumer uploadAutomatorTypeModule(HttpRequest request, HttpResponder responder,
@@ -76,6 +87,17 @@ public class LoomPluginHandler extends LoomAuthHandler {
     return uploadResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
+  /**
+   * Add a provider type resource. For example, uploading a resource named "dev" of resource type "keys"
+   * for the provider type "openstack".
+   *
+   * @param request Request containing the resource contents
+   * @param responder Responder for responding to the request
+   * @param providertypeId Id of the provider type that is having a resource uploaded
+   * @param resourceType Type of resource that is being uploaded for the specified provider type
+   * @param resourceName Name of the resource being uploaded
+   * @return Body consumer for streaming the contents of the resource to the plugin store
+   */
   @POST
   @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}")
   public BodyConsumer uploadProviderTypeModule(HttpRequest request, HttpResponder responder,
@@ -94,6 +116,17 @@ public class LoomPluginHandler extends LoomAuthHandler {
     return uploadResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
+  /**
+   * Stage a particular resource version, which means that version of the resource will get pushed to provisioners
+   * on the next sync call. Staging one version unstages other versions of the resource.
+   *
+   * @param request Request to stage a resource
+   * @param responder Responder for responding to the request
+   * @param automatortypeId Id of the automator type that has the resource
+   * @param resourceType Type of resource to stage
+   * @param resourceName Name of the resource to stage
+   * @param version Version of the resource to stage
+   */
   @POST
   @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}/stage")
   public void stageAutomatorTypeModule(HttpRequest request, HttpResponder responder,
@@ -115,6 +148,17 @@ public class LoomPluginHandler extends LoomAuthHandler {
                   automatortypeId, resourceType, resourceName, version);
   }
 
+  /**
+   * Stage a particular resource version, which means that version of the resource will get pushed to provisioners
+   * on the next sync call. Staging one version unstages other versions of the resource.
+   *
+   * @param request Request to stage a resource
+   * @param responder Responder for responding to the request
+   * @param providertypeId Id of the provider type that has the resource
+   * @param resourceType Type of resource to stage
+   * @param resourceName Name of the resource to stage
+   * @param version Version of the resource to stage
+   */
   @POST
   @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}/stage")
   public void stageProviderTypeModule(HttpRequest request, HttpResponder responder,
@@ -135,6 +179,17 @@ public class LoomPluginHandler extends LoomAuthHandler {
                   providertypeId, resourceType, resourceName, version);
   }
 
+  /**
+   * Unstage a particular resource version, which means that version of the resource will get removed from provisioners
+   * on the next sync call.
+   *
+   * @param request Request to unstage a resource
+   * @param responder Responder for responding to the request
+   * @param automatortypeId Id of the automator type that has the resource
+   * @param resourceType Type of resource to unstage
+   * @param resourceName Name of the resource to unstage
+   * @param version Version of the resource to unstage
+   */
   @POST
   @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}/unstage")
   public void unstageAutomatorTypeModule(HttpRequest request, HttpResponder responder,
@@ -154,6 +209,18 @@ public class LoomPluginHandler extends LoomAuthHandler {
     unstageResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
   }
 
+
+  /**
+   * Unstage a particular resource version, which means that version of the resource will get removed from provisioners
+   * on the next sync call.
+   *
+   * @param request Request to unstage a resource
+   * @param responder Responder for responding to the request
+   * @param providertypeId Id of the provider type that has the resource
+   * @param resourceType Type of resource to unstage
+   * @param resourceName Name of the resource to unstage
+   * @param version Version of the resource to unstage
+   */
   @POST
   @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}/unstage")
   public void unstageProviderTypeModule(HttpRequest request, HttpResponder responder,
@@ -173,6 +240,16 @@ public class LoomPluginHandler extends LoomAuthHandler {
     unstageResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName, version);
   }
 
+  /**
+   * Get a mapping of all resources of the given type for the given automator type. Request can optionally contain
+   * a 'status' http param whose value is one of 'active', 'inactive', 'staged', or 'unstaged' to filter the results
+   * to only contain resource that have the given status.
+   *
+   * @param request Request to get resources of the given type
+   * @param responder Responder for responding to the request
+   * @param automatortypeId Id of the automator type that has the resources
+   * @param resourceType Type of resources to get
+   */
   @GET
   @Path("/automatortypes/{automatortype-id}/{resource-type}")
   public void getAllAutomatorTypeModules(HttpRequest request, HttpResponder responder,
@@ -190,6 +267,16 @@ public class LoomPluginHandler extends LoomAuthHandler {
     getResources(request, responder, account, Type.AUTOMATOR, automatortypeId, resourceType);
   }
 
+  /**
+   * Get a mapping of all resources of the given type for the given provider type. Request can optionally contain
+   * a 'status' http param whose value is one of 'active', 'inactive', 'staged', or 'unstaged' to filter the results
+   * to only contain resource that have the given status.
+   *
+   * @param request Request to get resources of the given type
+   * @param responder Responder for responding to the request
+   * @param providertypeId Id of the provider type that has the resources
+   * @param resourceType Type of resources to get
+   */
   @GET
   @Path("/providertypes/{providertype-id}/{resource-type}")
   public void getAllProviderTypeModules(HttpRequest request, HttpResponder responder,
@@ -207,6 +294,17 @@ public class LoomPluginHandler extends LoomAuthHandler {
     getResources(request, responder, account, Type.PROVIDER, providertypeId, resourceType);
   }
 
+  /**
+   * Get a list of all versions of the given resource of the given type for the given automator type.
+   * Request can optionally contain a 'status' http param whose value is one of 'active', 'inactive', 'staged',
+   * or 'unstaged' to filter the results to only contain resource that have the given status.
+   *
+   * @param request Request to get resources of the given type
+   * @param responder Responder for responding to the request
+   * @param automatortypeId Id of the automator type that has the resources
+   * @param resourceType Type of resources to get
+   * @param resourceName Name of the resources to get
+   */
   @GET
   @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}")
   public void getAllAutomatorTypeResourceVersions(HttpRequest request, HttpResponder responder,
@@ -225,6 +323,17 @@ public class LoomPluginHandler extends LoomAuthHandler {
     getResources(request, responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
+  /**
+   * Get a list of all versions of the given resource of the given type for the given provider type.
+   * Request can optionally contain a 'status' http param whose value is one of 'active', 'inactive', 'staged',
+   * or 'unstaged' to filter the results to only contain resource that have the given status.
+   *
+   * @param request Request to get resources of the given type
+   * @param responder Responder for responding to the request
+   * @param providertypeId Id of the provider type that has the resources
+   * @param resourceType Type of resources to get
+   * @param resourceName Name of the resources to get
+   */
   @GET
   @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}")
   public void getAllProviderTypeResourceVersions(HttpRequest request, HttpResponder responder,
@@ -243,6 +352,15 @@ public class LoomPluginHandler extends LoomAuthHandler {
     getResources(request, responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
+  /**
+   * Delete all versions of the given resource.
+   *
+   * @param request Request to delete resources
+   * @param responder Responder for responding to the request
+   * @param automatortypeId Id of the automator type whose resources should be deleted
+   * @param resourceType Type of resources to delete
+   * @param resourceName Name of resources to delete
+   */
   @DELETE
   @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}")
   public void deleteAutomatorTypeResource(HttpRequest request, HttpResponder responder,
@@ -261,6 +379,15 @@ public class LoomPluginHandler extends LoomAuthHandler {
     deleteResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
+  /**
+   * Delete all versions of the given resource.
+   *
+   * @param request Request to delete resources
+   * @param responder Responder for responding to the request
+   * @param providertypeId Id of the provider type whose resources should be deleted
+   * @param resourceType Type of resources to delete
+   * @param resourceName Name of resources to delete
+   */
   @DELETE
   @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}")
   public void deleteProviderTypeResource(HttpRequest request, HttpResponder responder,
@@ -279,6 +406,16 @@ public class LoomPluginHandler extends LoomAuthHandler {
     deleteResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
+  /**
+   * Delete a specific version of the given resource.
+   *
+   * @param request Request to delete resource
+   * @param responder Responder for responding to the request
+   * @param automatortypeId Id of the automator type whose resource should be deleted
+   * @param resourceType Type of resource to delete
+   * @param resourceName Name of resource to delete
+   * @param version Version of resource to delete
+   */
   @DELETE
   @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}")
   public void deleteAutomatorTypeResourceVersion(HttpRequest request, HttpResponder responder,
@@ -298,6 +435,16 @@ public class LoomPluginHandler extends LoomAuthHandler {
     deleteResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
   }
 
+  /**
+   * Delete a specific version of the given resource.
+   *
+   * @param request Request to delete resource
+   * @param responder Responder for responding to the request
+   * @param providertypeId Id of the provider type whose resource should be deleted
+   * @param resourceType Type of resource to delete
+   * @param resourceName Name of resource to delete
+   * @param version Version of resource to delete
+   */
   @DELETE
   @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}")
   public void deleteProviderTypeResourceVersion(HttpRequest request, HttpResponder responder,
@@ -317,6 +464,12 @@ public class LoomPluginHandler extends LoomAuthHandler {
     deleteResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName, version);
   }
 
+  /**
+   * Push staged resources to the provisioners, and remove unstaged resources from the provisioners.
+   *
+   * @param request Request to sync resources to the provisioners
+   * @param responder Responder for responding to the request
+   */
   @POST
   @Path("/sync")
   public void syncPlugins(HttpRequest request, HttpResponder responder) {

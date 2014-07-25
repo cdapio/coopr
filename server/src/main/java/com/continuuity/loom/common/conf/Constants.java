@@ -93,6 +93,9 @@ public class Constants {
     public static final int DEFAULT_MAX_CONNECTIONS = 100;
   }
 
+  /**
+   * Constants for the local file store implementation for plugin resources.
+   */
   public static final class LocalFilePluginStore {
     public static final String DATA_DIR = "server.plugin.store.localfilestore.data.dir";
   }

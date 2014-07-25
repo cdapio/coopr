@@ -18,11 +18,11 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
-import com.continuuity.loom.provisioner.plugin.ResourceService;
-import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.ProvisionerHeartbeat;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.provisioner.plugin.ResourceService;
+import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.continuuity.loom.provisioner.plugin.Type;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.tenant.TenantStore;
@@ -178,6 +178,16 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
     }
   }
 
+  /**
+   * Get the contents of a specific resource.
+   *
+   * @param request Request to get an automator type resource
+   * @param responder Responder for responding to the request
+   * @param automatortypeId Id of the automator type that owns the resource
+   * @param resourceType Type of resource to get
+   * @param name Name of the resource to get
+   * @param version Version of the resource to get
+   */
   @GET
   @Path("/loom/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}")
   public void getAutomatorResource(HttpRequest request, HttpResponder responder,
@@ -198,6 +208,16 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
     sendResourceInChunks(responder, account, resourceTypeObj, name, version);
   }
 
+  /**
+   * Get the contents of a specific resource.
+   *
+   * @param request Request to get an provider type resource
+   * @param responder Responder for responding to the request
+   * @param providertypeId Id of the provider type that owns the resource
+   * @param resourceType Type of resource to get
+   * @param name Name of the resource to get
+   * @param version Version of the resource to get
+   */
   @GET
   @Path("/loom/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}")
   public void deleteProviderTypeModuleVersion(HttpRequest request, HttpResponder responder,
