@@ -5,7 +5,7 @@ end
 
 require 'rspec/autorun'
 
-require_relative '../daemon/automator'
-require_relative '../daemon/pluginmanager'
-require_relative '../daemon/provider'
-require_relative '../daemon/utils'
+require_relative '../automator'
+require_relative '../pluginmanager'
+require_relative '../provider'
+require_relative '../utils'
