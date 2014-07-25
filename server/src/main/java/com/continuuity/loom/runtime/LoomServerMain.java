@@ -15,22 +15,25 @@
  */
 package com.continuuity.loom.runtime;
 
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
+import com.continuuity.loom.common.daemon.DaemonMain;
 import com.continuuity.loom.common.queue.guice.QueueModule;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
+import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.http.guice.HttpModule;
-import com.continuuity.loom.http.handler.LoomService;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.management.guice.ManagementModule;
+import com.continuuity.loom.provisioner.guice.ProvisionerModule;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.guice.SchedulerModule;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.guice.StoreModule;
+import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -38,8 +41,6 @@ import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.RetryStrategies;
 import org.apache.twill.zookeeper.ZKClientService;
@@ -72,6 +73,7 @@ public final class LoomServerMain extends DaemonMain {
   private ListeningExecutorService callbackExecutorService;
   private ClusterStoreService clusterStoreService;
   private EntityStoreService entityStoreService;
+  private ProvisionerStore provisionerStore;
   private IdService idService;
   private TenantStore tenantStore;
 
@@ -133,7 +135,9 @@ public final class LoomServerMain extends DaemonMain {
         new QueueModule(zkClientService),
         new SchedulerModule(conf, callbackExecutorService, solverExecutorService),
         new HttpModule(),
-        new ManagementModule()
+        new ManagementModule(),
+        new ProvisionerModule(),
+        new CodecModules().getModule()
       );
 
       idService = injector.getInstance(IdService.class);
@@ -144,11 +148,8 @@ public final class LoomServerMain extends DaemonMain {
       clusterStoreService.startAndWait();
       entityStoreService = injector.getInstance(EntityStoreService.class);
       entityStoreService.startAndWait();
-
-      for (String queueName : Constants.Queue.ALL) {
-        TimeoutTrackingQueue queue = injector.getInstance(Key.get(TimeoutTrackingQueue.class, Names.named(queueName)));
-        queue.start();
-      }
+      provisionerStore = injector.getInstance(ProvisionerStore.class);
+      provisionerStore.startAndWait();
 
       // Register MBean
       LoomStats loomStats = injector.getInstance(LoomStats.class);
@@ -195,7 +196,7 @@ public final class LoomServerMain extends DaemonMain {
       }
     }
 
-    stopAll(loomService, tenantStore, clusterStoreService,
+    stopAll(loomService, provisionerStore, tenantStore, clusterStoreService,
             entityStoreService, idService, zkClientService, inMemoryZKServer);
   }
 

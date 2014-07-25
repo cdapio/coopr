@@ -1,21 +1,20 @@
 package com.continuuity.loom.common.queue.guice;
 
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.queue.QueueGroup;
+import com.continuuity.loom.common.queue.QueueType;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
+import com.continuuity.loom.common.queue.internal.ElementsTrackingQueue;
 import com.continuuity.loom.common.queue.internal.ZKElementsTracking;
+import com.continuuity.loom.common.queue.internal.ZKQueueGroup;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import org.apache.twill.zookeeper.ZKClient;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Guice module for binding queue related classes and instances.
  */
 public class QueueModule extends AbstractModule {
-  private static final String clusterManagerZKBasePath = "/clustermanager";
-  // TODO: should not be required to be started
   private final ZKClient zkClient;
 
   public QueueModule(ZKClient zkClient) {
@@ -24,49 +23,23 @@ public class QueueModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    long queueMsBetweenChecks = TimeUnit.SECONDS.toMillis(100);
-    long queueMsRescheduleTimeout = TimeUnit.SECONDS.toMillis(6000);
+    ElementsTrackingQueue balancerQueue =
+      new ElementsTrackingQueue(new ZKElementsTracking(zkClient, QueueType.BALANCER.getPath()));
 
-    TimeoutTrackingQueue clusterCreationQueue =
-      new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, clusterManagerZKBasePath + "/clustercreate"),
-                               queueMsBetweenChecks,
-                               queueMsRescheduleTimeout);
-    TimeoutTrackingQueue solverQueue =
-      new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, clusterManagerZKBasePath + "/solver"),
-                               queueMsBetweenChecks,
-                               queueMsRescheduleTimeout);
-    TimeoutTrackingQueue nodeProvisionTaskQueue =
-      new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, clusterManagerZKBasePath + "/nodeprovision"),
-                               queueMsBetweenChecks,
-                               queueMsRescheduleTimeout);
-    TimeoutTrackingQueue jobSchedulerQueue =
-      new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, clusterManagerZKBasePath + "/jobscheduler"),
-                               queueMsBetweenChecks,
-                               queueMsRescheduleTimeout);
-    TimeoutTrackingQueue callbackQueue =
-      new TimeoutTrackingQueue(new ZKElementsTracking(zkClient, clusterManagerZKBasePath + "/callback"),
-                               queueMsBetweenChecks,
-                               queueMsRescheduleTimeout);
+    bind(ElementsTrackingQueue.class)
+      .annotatedWith(Names.named(Constants.Queue.WORKER_BALANCE)).toInstance(balancerQueue);
+    bind(TrackingQueue.class)
+      .annotatedWith(Names.named(Constants.Queue.WORKER_BALANCE)).toInstance(balancerQueue);
 
-    bind(TimeoutTrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.PROVISIONER)).toInstance(nodeProvisionTaskQueue);
-    bind(TrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.PROVISIONER)).toInstance(nodeProvisionTaskQueue);
-    bind(TimeoutTrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.CLUSTER)).toInstance(clusterCreationQueue);
-    bind(TrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.CLUSTER)).toInstance(clusterCreationQueue);
-    bind(TimeoutTrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.SOLVER)).toInstance(solverQueue);
-    bind(TrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.SOLVER)).toInstance(solverQueue);
-    bind(TimeoutTrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.JOB)).toInstance(jobSchedulerQueue);
-    bind(TrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.JOB)).toInstance(jobSchedulerQueue);
-    bind(TimeoutTrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.CALLBACK)).toInstance(callbackQueue);
-    bind(TrackingQueue.class)
-      .annotatedWith(Names.named(Constants.Queue.CALLBACK)).toInstance(callbackQueue);
+    bind(QueueGroup.class).annotatedWith(Names.named(Constants.Queue.CALLBACK))
+      .toInstance(new ZKQueueGroup(zkClient, QueueType.CALLBACK));
+    bind(QueueGroup.class).annotatedWith(Names.named(Constants.Queue.CLUSTER))
+      .toInstance(new ZKQueueGroup(zkClient, QueueType.CLUSTER));
+    bind(QueueGroup.class).annotatedWith(Names.named(Constants.Queue.JOB))
+      .toInstance(new ZKQueueGroup(zkClient, QueueType.JOB));
+    bind(QueueGroup.class).annotatedWith(Names.named(Constants.Queue.PROVISIONER))
+      .toInstance(new ZKQueueGroup(zkClient, QueueType.PROVISIONER));
+    bind(QueueGroup.class).annotatedWith(Names.named(Constants.Queue.SOLVER))
+      .toInstance(new ZKQueueGroup(zkClient, QueueType.SOLVER));
   }
 }

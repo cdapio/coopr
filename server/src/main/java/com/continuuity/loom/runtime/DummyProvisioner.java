@@ -54,6 +54,7 @@ public final class DummyProvisioner {
   private static String host;
   private static int port;
   private static int numTasks;
+  private static String tenant;
   private static ExecutorService pool;
 
   public static void main(final String[] args) throws Exception {
@@ -63,9 +64,10 @@ public final class DummyProvisioner {
     options.addOption("c", "concurrency", true, "default concurrent threads");
     options.addOption("f", "failurePercent", true, "% of the time a provisioner should fail its task");
     options.addOption("o", "once", false, "whether or not only one task should be taken before exiting");
-    options.addOption("t", "taskMs", true, "number of milliseconds it should take to finish a task");
+    options.addOption("d", "taskDuration", true, "number of milliseconds it should take to finish a task");
     options.addOption("s", "sleepMs", true, "number of milliseconds a thread will sleep before taking another task");
     options.addOption("n", "numTasks", true, "number of tasks to try and take from the queue.  Default is infinite.");
+    options.addOption("t", "tenant", true, "tenant id to use.");
 
     try {
       CommandLineParser parser = new BasicParser();
@@ -75,9 +77,10 @@ public final class DummyProvisioner {
       concurrency = cmd.hasOption('c') ? Integer.valueOf(cmd.getOptionValue('c')) : 5;
       failurePercent = cmd.hasOption('f') ? Integer.valueOf(cmd.getOptionValue('f')) : 0;
       runOnce = cmd.hasOption('o');
-      taskMs = cmd.hasOption('t') ? Long.valueOf(cmd.getOptionValue('t')) : 1000;
+      taskMs = cmd.hasOption('d') ? Long.valueOf(cmd.getOptionValue('d')) : 1000;
       sleepMs = cmd.hasOption('s') ? Long.valueOf(cmd.getOptionValue('s')) : 1000;
       numTasks = cmd.hasOption('n') ? Integer.valueOf(cmd.getOptionValue('n')) : -1;
+      tenant = cmd.hasOption('t') ? cmd.getOptionValue('t') : "loom";
     } catch (ParseException e) {
       LOG.error("exception parsing input arguments.", e);
       return;
@@ -88,19 +91,21 @@ public final class DummyProvisioner {
     }
 
     if (runOnce) {
-      new Provisioner("dummy-0", host, port, failurePercent, taskMs, sleepMs, 1).runOnce();
+      new Provisioner("dummy-0", tenant, host, port, failurePercent, taskMs, sleepMs, 1).runOnce();
     } else {
-      LOG.info("running with " + concurrency + " threads, connecting to " + host + ":" + port + " with a failure % of "
-                 + failurePercent + ", task time of " + taskMs + " ms, and sleep time of " + sleepMs + " ms.");
+      LOG.info(String.format("running with %d threads, connecting to %s:%d using tenant %s, with a failure rate of" +
+                               "%d percent, task time of %d ms, and sleep time of %d ms between fetches",
+                             concurrency, host, port, tenant, failurePercent, taskMs, sleepMs));
       pool = Executors.newFixedThreadPool(concurrency);
 
       try {
         int tasksPerProvisioner = numTasks >= 0 ? numTasks / concurrency : -1;
         int extra = numTasks < 0 ? 0 : numTasks % concurrency;
         pool.execute(
-          new Provisioner("dummy-0", host, port, failurePercent, taskMs, sleepMs, tasksPerProvisioner + extra));
+          new Provisioner("dummy-0", tenant, host, port, failurePercent, taskMs, sleepMs, tasksPerProvisioner + extra));
         for (int i = 1; i < concurrency; i++) {
-          pool.execute(new Provisioner("dummy-" + i, host, port, failurePercent, taskMs, sleepMs, tasksPerProvisioner));
+          pool.execute(new Provisioner("dummy-" + i, tenant, host, port,
+                                       failurePercent, taskMs, sleepMs, tasksPerProvisioner));
         }
       } catch (Exception e) {
         LOG.error("Caught exception, shutting down now.", e);
@@ -115,6 +120,7 @@ public final class DummyProvisioner {
    */
   public static class Provisioner implements Runnable {
     private final String id;
+    private final String tenant;
     private final String host;
     private final int port;
     private final int failureRate;
@@ -123,8 +129,10 @@ public final class DummyProvisioner {
     private final long sleepMs;
     private int tasksTaken;
 
-    public Provisioner(String id, String host, int port, int failureRate, long taskMs, long sleepMs, int numTasks) {
+    public Provisioner(String id, String tenant, String host, int port, int failureRate,
+                       long taskMs, long sleepMs, int numTasks) {
       this.id = id;
+      this.tenant = tenant;
       this.host = host;
       this.port = port;
       this.failureRate = failureRate;
@@ -160,7 +168,10 @@ public final class DummyProvisioner {
     private String takeTask() throws IOException {
       DefaultHttpClient client = new DefaultHttpClient();
       HttpPost post = new HttpPost(String.format("http://%s:%d/v1/loom/tasks/take", host, port));
-      post.setEntity(new StringEntity("{ \"workerId\":\"" + id + "\" }"));
+      JsonObject requestBody = new JsonObject();
+      requestBody.addProperty("workerId", id);
+      requestBody.addProperty("tenantId", tenant);
+      post.setEntity(new StringEntity(requestBody.toString()));
       HttpResponse response = client.execute(post);
       if (response.getStatusLine().getStatusCode() != 200) {
         return null;
@@ -175,6 +186,7 @@ public final class DummyProvisioner {
       DefaultHttpClient client = new DefaultHttpClient();
       JsonObject finishResponse = new JsonObject();
       finishResponse.addProperty("workerId", id);
+      finishResponse.addProperty("tenantId", tenant);
       finishResponse.addProperty("taskId", taskId);
 
       int randInt = random.nextInt(100);

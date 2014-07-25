@@ -143,7 +143,7 @@ To delete a tenant, make a DELETE HTTP request to URI:
 
  /tenants/{id}
 
-This resource request represents an individual tenant for deletion.
+A tenant can only be deleted if its workers have been set to 0.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -156,8 +156,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - If delete was successful
-   * - 404 (NOT FOUND)
-     - If the resource requested is not found.
+   * - 409 (CONFLICT)
+     - If the tenant is not in a deletable state.
 
 Example
 ^^^^^^^^

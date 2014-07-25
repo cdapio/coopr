@@ -20,12 +20,14 @@ import com.continuuity.loom.admin.Compatibilities;
 import com.continuuity.loom.admin.Constraints;
 import com.continuuity.loom.admin.LayoutConstraint;
 import com.continuuity.loom.admin.ServiceConstraint;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.test.Constants;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.json.JSONException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -42,7 +44,6 @@ import static com.continuuity.test.drivers.Global.globalDriver;
  */
 public class ClustertemplatesInstancePage extends GenericPage {
   // Constants in Default tab
-  private static final Gson GSON = new JsonSerde().getGson();
   private static final By PROVIDER = By.name("inputProvider");
   private static final By HARDWARETYPE = By.name("inputHardwaretype");
   private static final By IMAGETYPE = By.name("inputImagetype");
@@ -68,6 +69,13 @@ public class ClustertemplatesInstancePage extends GenericPage {
   private static final By MUST_COEXIST_GROUP = By.cssSelector(".must-coexist-group");
   private static final By MUST_COEXIST_ENTRY = By.cssSelector(".must-coexist-entry");
 
+  private final Gson gson;
+
+  public ClustertemplatesInstancePage() {
+    Injector injector = Guice.createInjector(new CodecModules().getModule());
+    gson = injector.getInstance(Gson.class);
+  }
+
   public ClusterDefaults getClusterDefaults() throws JSONException {
     Select select = new Select(globalDriver.findElement(PROVIDER));
     String provider = select.getFirstSelectedOption().getAttribute(Constants.TEXT);
@@ -81,7 +89,7 @@ public class ClustertemplatesInstancePage extends GenericPage {
     String dnsSuffix = globalDriver.findElement(DNS_SUFFIX).getAttribute(Constants.VALUE);
 
     String config = globalDriver.findElement(CONFIG).getAttribute(Constants.VALUE);
-    JsonObject configJson = GSON.fromJson(config, JsonObject.class);
+    JsonObject configJson = gson.fromJson(config, JsonObject.class);
 
     Set<String> services = Sets.newHashSet();
     for (WebElement element : globalDriver.findElement(DEFAULT_SERVICE).findElements(DEFAULT_SERVIE_ENTRY)) {
