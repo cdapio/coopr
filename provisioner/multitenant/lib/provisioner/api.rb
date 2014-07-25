@@ -43,7 +43,7 @@ module Loom
           log.info "heartbeat called"
           settings.provisioner.heartbeat.to_json
         rescue
-          halt 503
+          halt 500
         end
       end
 
@@ -64,7 +64,7 @@ module Loom
           data['status'] = 0
           body data.to_json
         rescue
-          halt 503
+          halt 500
         end
       end
 
@@ -87,7 +87,7 @@ module Loom
           data['status'] = 0
           body data.to_json
         rescue
-          halt 503
+          halt 500
         end
       end
 
@@ -100,7 +100,7 @@ module Loom
             halt 404
           end
         rescue
-          halt 503
+          halt 500
         end
       end
     end
