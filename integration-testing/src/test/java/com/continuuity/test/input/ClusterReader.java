@@ -93,12 +93,11 @@ public class ClusterReader {
 
   private TestCluster parseCluster(JsonObject json, String status) {
     if (status.equalsIgnoreCase(json.get("status").getAsString())) {
-      // Convert GMT to PST
-      long tsPST = Long.parseLong(json.get("createTime").getAsString()) / 1000 + 8 * 60 * 60;
-      String expectedDate = DATE_FORMAT.format(new Date(tsPST * 1000));
+      // Convert GMT to PST. Lop off milliseconds.
+      long ts = 1000 * (json.get("createTime").getAsLong() / 1000);
 
       return new TestCluster(json.get("name").getAsString(), json.get("id").getAsString(),
-                                       expectedDate, json.get("clusterTemplate").getAsString(),
+                                       ts, json.get("clusterTemplate").getAsString(),
                                        Integer.parseInt(json.get("numNodes").getAsString()));
     }
     return null;
