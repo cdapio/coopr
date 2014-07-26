@@ -82,7 +82,6 @@ public class LoomServiceTestBase extends BaseTest {
   protected static QueueGroup solverQueues;
   protected static QueueGroup jobQueues;
   protected static QueueGroup callbackQueues;
-  protected static Scheduler scheduler;
   protected static TenantProvisionerService tenantProvisionerService;
 
 
@@ -98,8 +97,6 @@ public class LoomServiceTestBase extends BaseTest {
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
     port = loomService.getBindAddress().getPort();
-    scheduler = injector.getInstance(Scheduler.class);
-    scheduler.startAndWait();
     tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
     tenantStore.writeTenant(new Tenant("name", TENANT_ID, 10, 100, 1000));
   }
@@ -113,7 +110,6 @@ public class LoomServiceTestBase extends BaseTest {
   @AfterClass
   public static void cleanupServiceBase() {
     loomService.stopAndWait();
-    scheduler.stopAndWait();
   }
 
   public static HttpResponse doGet(String resource) throws Exception {
