@@ -1,0 +1,35 @@
+{
+  "name": "base",
+  "description": "Base system",
+  "defaults": {
+    "services": [
+      "base"
+    ],
+    "provider": "rackspace",
+    "hardwaretype": "small",
+    "imagetype": "ubuntu12",
+    "config": {
+    }
+  },
+  "compatibility": {
+    "hardwaretypes": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "imagetypes": [
+      "centos6",
+      "ubuntu12"
+    ],
+    "services": [
+      "base"
+    ]
+  },
+  "administration": {
+    "leaseduration": {
+      "initial":0,
+      "max":0,
+      "step":0
+    }
+  }
+}
