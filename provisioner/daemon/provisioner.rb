@@ -39,6 +39,15 @@ OptionParser.new do |opts|
   opts.on('-f', '--file FILE', 'Full path to task json') do |f|
     options[:file] = f
   end
+  opts.on('-t', '--tenant TENANT', 'Tenant ID') do |t|
+    options[:tenant] = t
+  end
+  opts.on('-p', '--provisioner PROVISIONER', 'Provisioner ID') do |p|
+    options[:provisioner] = p
+  end
+  opts.on('-n', '--name NAME', 'Worker name') do |n|
+    options[:name] = n
+  end
   options[:register] = false
   opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do
     options[:register] = true
@@ -46,8 +55,8 @@ OptionParser.new do |opts|
   opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
     options[:log_level] = f
   end
-  opts.on('-l', '--log-file FILE', 'Path to logfile') do |f|
-    options[:log_file] = f
+  opts.on('-l', '--log-directory DIRECTORY', 'Path to log directory') do |f|
+    options[:log_directory] = f
   end
   options[:once] = false
   opts.on('-o', '--once', 'Only poll and run a single task') do
@@ -67,7 +76,13 @@ if(loom_uri.nil? && options[:register])
 end
 
 include Logging
-Logging.configure(options[:log_file])
+log_file = nil
+if options[:log_directory] && options[:name]
+  log_file = [ options[:log_directory], options[:name] ].join('/') + '.log'
+elsif options[:log_directory]
+  log_file = "#{options[:log_directory]}/worker-default.log"
+end
+Logging.configure(log_file)
 Logging.level = options[:log_level]
 
 # load plugins
@@ -185,7 +200,7 @@ if options[:file]
 else
   # run in server polling mode
 
-  pid = $PROCESS_ID
+  pid = Process.pid
   host = Socket.gethostname.downcase
   myid = "#{host}.#{pid}"
 
@@ -196,7 +211,7 @@ else
     response = nil
     task = nil
     begin
-      response = RestClient.post "#{loom_uri}/v1/loom/tasks/take", { 'workerId' => myid }.to_json
+      response = RestClient.post "#{loom_uri}/v1/loom/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
     rescue => e
       log.error "Caught exception connecting to loom server #{loom_uri}/v1/loom/tasks/take: #{e}"
       sleep 10
@@ -229,6 +244,8 @@ else
         result = Hash.new if result.nil? == true
         result['workerId'] = myid
         result['taskId'] = task['taskId']
+        result['provisionerId'] = options[:provisioner]
+        result['tenantId'] = options[:tenant]
 
         log.debug "Task <#{task["taskId"]}> completed, updating results <#{result}>"
         begin
@@ -242,6 +259,8 @@ else
         result['status'] = '1'
         result['workerId'] = myid
         result['taskId'] = task['taskId']
+        result['provisionerId'] = options[:provisioner]
+        result['tenantId'] = options[:tenant]
         if e.class.name == 'CommandExecutionError'
           log.error "#{e.class.name}: #{e.to_json}"
           result['stdout'] = e.stdout
