@@ -54,10 +54,6 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     nodeService = injector.getInstance(NodeService.class);
     clusterService = injector.getInstance(ClusterService.class);
     taskService = injector.getInstance(TaskService.class);
-
-    // Stop scheduler
-    Scheduler scheduler = injector.getInstance(Scheduler.class);
-    scheduler.stopAndWait();
   }
 
   @Before
