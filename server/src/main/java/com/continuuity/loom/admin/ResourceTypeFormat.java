@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.continuuity.loom.admin;
 
-import java.util.Map;
-
 /**
- * A Provider type defines what parameters admins and users need to provide to a {@link Provider} in order for it
- * to provide machines properly.
+ * Format of a resource type.
  */
-public class ProviderType extends PluginType {
-
-  public ProviderType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
-                      Map<String, ResourceTypeSpecification> resourceTypes) {
-    super(name, description, parameters, resourceTypes);
-  }
+public enum ResourceTypeFormat {
+  FILE,
+  ARCHIVE;
 }
