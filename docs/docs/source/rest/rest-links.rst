@@ -22,4 +22,5 @@
 :doc:`Services </rest/services>` |
 :doc:`Cluster Template </rest/templates>` |
 :doc:`Importing & Exporting </rest/entities>` |
-:doc:`Clusters </rest/clusters>` 
+:doc:`Clusters </rest/clusters>` |
+:doc:`Metrics </rest/metrics>` 

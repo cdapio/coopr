@@ -111,6 +111,10 @@ Import/Export
   * :ref:`Export Template Metadata <entity-export>`
   * :ref:`Import Template Metadata <entity-import>`
 
+Metrics
+-------
+  * :ref:`Queue Metrics <metrics-queues>`
+
 User APIs
 =========
 The User Web service provides methods that can be used to create, delete and manage clusters. 

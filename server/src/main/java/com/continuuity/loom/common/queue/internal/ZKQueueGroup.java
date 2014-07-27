@@ -43,7 +43,7 @@ public class ZKQueueGroup implements QueueGroup {
     this.queueType = queueType;
     this.queueList = Lists.newArrayList();
     this.index = 0;
-    this.queueMap = Maps.newHashMap();
+    this.queueMap = Maps.newConcurrentMap();
   }
 
   @Override
