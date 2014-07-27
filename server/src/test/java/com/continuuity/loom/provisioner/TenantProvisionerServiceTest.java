@@ -1,9 +1,13 @@
 package com.continuuity.loom.provisioner;
 
 import com.continuuity.loom.BaseTest;
+import com.continuuity.loom.Entities;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -25,6 +29,38 @@ public class TenantProvisionerServiceTest extends BaseTest {
   @Before
   public void setupTest() {
     provisionerRequestService.reset();
+  }
+
+  @Test(expected = QuotaException.class)
+  public void testExceptionWhenQuotaExceeded() throws Exception {
+    // 2 cluster quota, 5 node quota
+    Tenant tenant = new Tenant("tenantX", "id123", 50, 2, 5);
+    Provisioner provisioner = new Provisioner("p1", "host", 12345, 100, null, null);
+    service.writeProvisioner(provisioner);
+    service.writeTenant(tenant);
+
+    // write a cluster with 2 nodes, quotas should be fine
+    Account account = new Account("user1", tenant.getId());
+    Cluster cluster = new Cluster(
+      "104", account, "example-hdfs-delete", System.currentTimeMillis(), "hdfs cluster",
+      Entities.ProviderExample.RACKSPACE,
+      Entities.ClusterTemplateExample.HDFS,
+      ImmutableSet.of("node1", "node2"),
+      ImmutableSet.of("s1", "s2")
+    );
+    clusterStoreService.getView(account).writeCluster(cluster);
+
+    // quotas should be fine with 1 more cluster
+    Assert.assertTrue(service.satisfiesTenantQuotas(tenant, 1, 0));
+    // quotas should not be fine with 2 more clusters
+    Assert.assertFalse(service.satisfiesTenantQuotas(tenant, 2, 0));
+    // quotas should be fine with 3 more nodes
+    Assert.assertTrue(service.satisfiesTenantQuotas(tenant, 0, 3));
+    // quotas should not be fine with 4 more nodes
+    Assert.assertFalse(service.satisfiesTenantQuotas(tenant, 0, 4));
+
+    // lowering the quotas should throw the exception
+    service.writeTenant(new Tenant(tenant.getName(), tenant.getId(), tenant.getWorkers(), 1, 1));
   }
 
   @Test

@@ -41,7 +41,8 @@ To create a new tenant, make a HTTP POST request to URI:
 
 The POST body is a JSON Object that must contain ``name`` and ``workers`` as keys specifying 
 the name of the tenant and the number of workers assigned to the tenant. Other key-value pairs
-can be added to specify other tenant specific settings. 
+can be added to specify other tenant specific settings, such as quotas on the maximum number
+of clusters and nodes allowed within the tenant. 
 
 POST Parameters
 ^^^^^^^^^^^^^^^^
@@ -181,7 +182,8 @@ To update a tenant, make a PUT HTTP request to URI:
 
 The resource specified above respresents an individual tenant that is being updated.
 Currently, the update of a tenant resource requires the complete tenant object to in
-the request body. 
+the request body. Trying to lower the max clusters or max nodes belong the number
+currently in use is not allowed. 
 
 PUT Parameters
 ^^^^^^^^^^^^^^^^
@@ -220,6 +222,8 @@ HTTP Responses
      - If the resource in the request is invalid
    * - 404 (NOT FOUND)
      - If the resource requested is not found
+   * - 409 (CONFLICT)
+     - If writing the tenant resource would cause quota violations
 
 Example
 ^^^^^^^^

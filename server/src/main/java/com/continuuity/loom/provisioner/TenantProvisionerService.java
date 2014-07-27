@@ -1,12 +1,16 @@
 package com.continuuity.loom.provisioner;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.collect.Sets;
@@ -18,8 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Service for managing provisioners.
@@ -32,17 +36,20 @@ public class TenantProvisionerService {
   private final long provisionerTimeoutSecs;
   private final TrackingQueue balanceQueue;
   private final ProvisionerRequestService provisionerRequestService;
+  private final ClusterStoreService clusterStoreService;
 
   @Inject
   private TenantProvisionerService(ProvisionerStore provisionerStore,
                                    TenantStore tenantStore,
                                    ZKClient zkClient,
                                    @Named(Constants.Queue.WORKER_BALANCE) TrackingQueue balanceQueue,
+                                   ClusterStoreService clusterStoreService,
                                    ProvisionerRequestService provisionerRequestService,
                                    Configuration conf) {
     this.provisionerStore = provisionerStore;
     this.tenantStore = tenantStore;
     this.provisionerRequestService = provisionerRequestService;
+    this.clusterStoreService = clusterStoreService;
     // a single lock is used across all tenants and provisioners. This is so that a request modifies worker assignments
     // across multiple provisioners does not conflict with requests that modify worker capacity. For example, if a
     // tenant is added the same time a tenant is deleted, we don't want to be modifying the same provisioner at the
@@ -101,10 +108,16 @@ public class TenantProvisionerService {
    * @param tenant Tenant to write
    * @throws IOException if there was an exception persisting the tenant
    * @throws CapacityException if there is not enough capacity to support all tenant workers
+   * @throws QuotaException if a tenant quota would be violated by the change
    */
-  public void writeTenant(Tenant tenant) throws IOException, CapacityException {
+  public void writeTenant(Tenant tenant) throws IOException, CapacityException, QuotaException {
     lock.acquire();
     try {
+      // check if changing the tenant would cause the cluster or node quotas to be exceeded.
+      if (!satisfiesTenantQuotas(tenant, 0, 0)) {
+        throw new QuotaException("Writing tenant would cause cluster or node quotas to be violated.");
+      }
+
       Tenant prevTenant = tenantStore.getTenant(tenant.getId());
       if (prevTenant == null) {
         // if we're adding a new tenant
@@ -118,6 +131,33 @@ public class TenantProvisionerService {
     } finally {
       lock.release();
     }
+  }
+
+  /**
+   * Verify that tenant cluster and node quotas would not be exceeded if the given number of additional clusters and
+   * nodes would be added.
+   *
+   * @param tenant Tenant to verify quotas for
+   * @returns True if the tenantQuotas would be satisfied, false if they would be exceeded.
+   */
+  public boolean satisfiesTenantQuotas(Tenant tenant, int additionalClusters, int additionalNodes) throws IOException {
+    ClusterStoreView view = clusterStoreService.getView(new Account(Constants.ADMIN_USER, tenant.getId()));
+    List<Cluster> nonTerminatedClusters = view.getNonTerminatedClusters();
+
+    int numClusters = additionalClusters + nonTerminatedClusters.size();
+    if (numClusters > tenant.getMaxClusters()) {
+      return false;
+    }
+
+    int numNodes = additionalNodes;
+    for (Cluster cluster : nonTerminatedClusters) {
+      numNodes += cluster.getNodes().size();
+    }
+    if (numNodes > tenant.getMaxNodes()) {
+      return false;
+    }
+
+    return true;
   }
 
   /**

@@ -36,7 +36,7 @@ To create a new cluster, make a HTTP POST request to URI:
 
  /clusters
 
-The request body must contain name, numMachines, and clusterTemplate.  Optionally, it can contain imagetype, hardwaretype, provider, providerFields, services, initialLeaseDuration, dnsSuffix, and config.  If the user specifies any optional value, it will override the corresponding default value in the cluster template.
+The request body must contain name, numMachines, and clusterTemplate.  Optionally, it can contain imagetype, hardwaretype, provider, providerFields, services, initialLeaseDuration, dnsSuffix, and config.  If the user specifies any optional value, it will override the corresponding default value in the cluster template. Trying to create a cluster that would violate the tenant quotas will result in a failure.
 
 POST Parameters
 ^^^^^^^^^^^^^^^^
@@ -91,6 +91,8 @@ The server will respond with the id of the cluster added.
      - Bad request.  Missing name, clusterTemplate, or numMachines in the request body.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
+   * - 409 (CONFLICT)
+     - If the creation of the cluster would cause tenant quotas to be violated.
 
 Example
 ^^^^^^^^

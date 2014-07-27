@@ -31,7 +31,7 @@ public final class Tenant extends NamedEntity {
     this.id = id;
     this.workers = workers == null ? 0 : workers;
     this.maxClusters = maxClusters == null ? Integer.MAX_VALUE : maxClusters;
-    this.maxNodes = maxNodes == null ? Integer.MAX_VALUE : maxClusters;
+    this.maxNodes = maxNodes == null ? Integer.MAX_VALUE : maxNodes;
   }
 
   public String getId() {
