@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of a {@link QueueGroup} that uses queues built on zookeeper, and which round robins through queues
@@ -121,12 +122,21 @@ public class ZKQueueGroup implements QueueGroup {
   }
 
   @Override
+  public int size() {
+    int size = 0;
+    for (TrackingQueue queue : queueMap.values()) {
+      size += queue.size();
+    }
+    return size;
+  }
+
+  @Override
   public int size(String queueName) {
     return checkAndGetQueue(queueName).size();
   }
 
   @Override
-  public Collection<String> getQueueNames() {
+  public Set<String> getQueueNames() {
     return queueMap.keySet();
   }
 

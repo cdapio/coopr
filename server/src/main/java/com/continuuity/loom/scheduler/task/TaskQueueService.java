@@ -19,6 +19,7 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
+import com.continuuity.loom.common.queue.QueueMetrics;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
@@ -26,6 +27,8 @@ import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -34,7 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages handing out tasks from task queue, and recording status after the task is done.
@@ -68,6 +73,30 @@ public class TaskQueueService {
   }
 
   /**
+   * Get a snapshot of the number of queued and in progress elements for all queues in the task queues.
+   *
+   * @return Snapshot of the number of queued and in progress elements in the task queues
+   */
+  public Map<String, QueueMetrics> getTaskQueueMetricsSnapshot() {
+    return getTaskQueueMetricsSnapshot(taskQueues.getQueueNames());
+  }
+
+  /**
+   * Get a snapshot of the number of queued and in progress elements in the task queues.
+   *
+   * @return Snapshot of the number of queued and in progress elements in the task queues
+   */
+  public Map<String, QueueMetrics> getTaskQueueMetricsSnapshot(Set<String> queues) {
+    Map<String, QueueMetrics> snapshot = Maps.newHashMap();
+    for (String queueName : queues) {
+      int numQueued = Iterators.size(taskQueues.getQueued(queueName));
+      int numInProgress = Iterators.size(taskQueues.getBeingConsumed(queueName));
+      snapshot.put(queueName, new QueueMetrics(numQueued, numInProgress));
+    }
+    return snapshot;
+  }
+
+  /**
    * Returns the next task from task queue that can be handed out for provisioning.
    * When it goes through the task queue, if it gets a task whose job is already marked as FAILED then
    * the task gets marked as DROPPED, and is skipped.
@@ -78,7 +107,7 @@ public class TaskQueueService {
    * @throws IOException if there was an error persisting task information.
    */
   public String takeNextClusterTask(TakeTaskRequest takeRequest) throws IOException, MissingEntityException {
-    //loomStats.setQueueLength(taskQueues.size(queueName));
+    loomStats.setQueueLength(taskQueues.size());
     String queueName = takeRequest.getTenantId();
     String provisionerId = takeRequest.getProvisionerId();
     String workerId = takeRequest.getWorkerId();
@@ -136,8 +165,7 @@ public class TaskQueueService {
    * @throws IOException if there was an error persisting task information.
    */
   public void finishClusterTask(FinishTaskRequest finishRequest) throws MissingEntityException, IOException {
-    // TODO: implement per tenant queue statistics
-    //loomStats.setQueueLength(taskQueue.size());
+    loomStats.setQueueLength(taskQueues.size());
 
     String workerId = finishRequest.getWorkerId();
     String queueName = finishRequest.getTenantId();

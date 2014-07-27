@@ -23,10 +23,16 @@ import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.QueueMetrics;
 import com.continuuity.loom.http.handler.LoomAdminHandler;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -34,6 +40,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.message.BasicHeader;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
 import org.junit.Test;
@@ -87,6 +94,50 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     }
     assertResponseStatus(doGet(base + "export", USER1_HEADERS), HttpResponseStatus.OK);
     assertResponseStatus(doPost(base + "import", "{}", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void testForbiddenIfNonadminGetsQueueMetrics() throws Exception {
+    tenantStore.writeTenant(new Tenant(USER1_ACCOUNT.getTenantId(), USER1_ACCOUNT.getTenantId(), 10, 10, 100));
+    assertResponseStatus(doGet("/v1/loom/metrics/queues", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void testGetQueueMetrics() throws Exception {
+    try {
+      tenantStore.writeTenant(new Tenant("tenantA", "tenantA", 10, 10, 100));
+      tenantStore.writeTenant(new Tenant("tenantB", "tenantB", 10, 10, 100));
+      tenantStore.writeTenant(new Tenant("tenantC", "tenantC", 10, 10, 100));
+      tenantStore.writeTenant(new Tenant("tenantD", "tenantD", 10, 10, 100));
+      provisionerQueues.add("tenantA", new Element("task1"));
+      provisionerQueues.add("tenantA", new Element("task2"));
+      provisionerQueues.add("tenantA", new Element("task3"));
+      provisionerQueues.take("tenantA", "consumer");
+      provisionerQueues.add("tenantB", new Element("task4"));
+      provisionerQueues.add("tenantC", new Element("task5"));
+      provisionerQueues.take("tenantC", "consumer");
+      provisionerQueues.add("tenantD", new Element("task6"));
+      provisionerQueues.add("tenantD", new Element("task7"));
+      provisionerQueues.take("tenantD", "consumer");
+
+      Map<String, QueueMetrics> expected = Maps.newHashMap();
+      expected.put("tenantA", new QueueMetrics(2, 1));
+      expected.put("tenantB", new QueueMetrics(1, 0));
+      expected.put("tenantC", new QueueMetrics(0, 1));
+      expected.put("tenantD", new QueueMetrics(1, 1));
+
+      assertQueueMetrics(Constants.SUPERADMIN_TENANT, expected);
+      assertQueueMetrics("tenantA", ImmutableMap.of("tenantA", new QueueMetrics(2, 1)));
+      assertQueueMetrics("tenantB", ImmutableMap.of("tenantB", new QueueMetrics(1, 0)));
+      assertQueueMetrics("tenantC", ImmutableMap.of("tenantC", new QueueMetrics(0, 1)));
+      assertQueueMetrics("tenantD", ImmutableMap.of("tenantD", new QueueMetrics(1, 1)));
+    } finally {
+      provisionerQueues.removeAll();
+      tenantStore.deleteTenant("tenantA");
+      tenantStore.deleteTenant("tenantB");
+      tenantStore.deleteTenant("tenantC");
+      tenantStore.deleteTenant("tenantD");
+    }
   }
 
   @Test
@@ -263,5 +314,18 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
 
     assertResponseStatus(doDelete(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
     assertResponseStatus(doDelete(entity2Path, ADMIN_HEADERS), HttpResponseStatus.OK);
+  }
+
+  private void assertQueueMetrics(String tenant, Map<String, QueueMetrics> expected) throws Exception {
+    Header[] headers = {
+      new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
+      new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+      new BasicHeader(Constants.TENANT_HEADER, tenant)
+    };
+    HttpResponse response = doGet("/v1/loom/metrics/queues", headers);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    Map<String, QueueMetrics> result = gson.fromJson(reader, new TypeToken<Map<String, QueueMetrics>>() {}.getType());
+    Assert.assertEquals(expected, result);
   }
 }
