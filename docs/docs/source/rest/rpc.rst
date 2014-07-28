@@ -24,8 +24,67 @@ RPC
 
 .. include:: /rest/rest-links.rst
 
-In addition to the standard REST endpoints, a few RPC functions are available to obtain
-cluster information.
+In addition to the standard REST endpoints, a few RPC functions are available.
+
+.. _rpc-bootstrap:
+
+Bootstrap Tenant
+================
+Bootstrapping a tenant will copy all providers, hardware types, image types, services, 
+cluster templates, and plugin resources from the superadmin to the tenant making the request.
+The user making the request must be the tenant admin. This is a copy, meaning if the 
+superadmin updates the entities, the changes will not be reflected in the tenant.
+
+To bootstrap a tenant, making a POST HTTP request to URI:
+::
+
+ /bootstrap
+
+The body is a JSON Object containing one optional key ``overwrite`` which indicates whether or 
+not data from the superadmin should overwrite existing data. By default it is false, meaning an entity
+from the superadmin will not skipped if it already exists in the tenant account, even if the entities 
+themselves have different values. 
+
+POST Parameters
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Parameter
+     - Description
+   * - overwrite
+     - Boolean indicating whether or not data from the superadmin should overwrite existing data. Defaults to false.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - If update was successful
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the resource requested is not found.
+
+Example
+^^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Loom-TenantID:<tenantid>'
+        -X POST
+        -d '{ 
+                "overwrite": "true"
+            }'
+        http://<loom-server>:<loom-port>/<version>/loom/bootstrap
 
 .. _rpc-statuses:
 

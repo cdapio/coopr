@@ -17,15 +17,22 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.admin.ClusterTemplate;
+import com.continuuity.loom.admin.HardwareType;
+import com.continuuity.loom.admin.ImageType;
+import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.current.NodePropertiesRequestCodec;
+import com.continuuity.loom.http.request.BootstrapRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
@@ -54,15 +61,95 @@ import java.util.Set;
 public class LoomRPCHandler extends LoomAuthHandler {
   private static final Gson GSON = new GsonBuilder()
     .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec()).create();
+  private final EntityStoreService entityStoreService;
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
 
   @Inject
   private LoomRPCHandler(TenantStore tenantStore,
+                         EntityStoreService entityStoreService,
                          ClusterStoreService clusterStoreService) {
     super(tenantStore);
+    this.entityStoreService = entityStoreService;
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
+  }
+
+  /**
+   * Bootstraps a tenant by copying all entities and plugin resources from the superadmin into the tenant. Will not
+   * overwrite existing content unless the body contains overwrite=true.
+   *
+   * @param request Request to bootstrap the tenant
+   * @param responder Responder for responding to the request
+   * @throws Exception
+   */
+  @POST
+  @Path("/bootstrap")
+  public void bootstrapTenant(HttpRequest request, HttpResponder responder) throws Exception {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (account.isSuperadmin()) {
+      responder.sendString(HttpResponseStatus.OK, "Nothing to bootstrap for superadmin.");
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User is not allowed to bootstrap.");
+      return;
+    }
+
+    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
+    BootstrapRequest bootstrapRequest = null;
+    try {
+      bootstrapRequest = GSON.fromJson(reader, BootstrapRequest.class);
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+      return;
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body. Must be a valid JSON Object.");
+      return;
+    }
+
+    boolean shouldOverwrite = bootstrapRequest == null ? false : bootstrapRequest.shouldOverwrite();
+    EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
+    EntityStoreView tenantView = entityStoreService.getView(account);
+
+    // copy entities
+    for (HardwareType hardwareType : superadminView.getAllHardwareTypes()) {
+      if (!shouldOverwrite && tenantView.getHardwareType(hardwareType.getName()) != null) {
+        continue;
+      }
+      tenantView.writeHardwareType(hardwareType);
+    }
+    for (ImageType imageType : superadminView.getAllImageTypes()) {
+      if (!shouldOverwrite && tenantView.getImageType(imageType.getName()) != null) {
+        continue;
+      }
+      tenantView.writeImageType(imageType);
+    }
+    for (Service service : superadminView.getAllServices()) {
+      if (!shouldOverwrite && tenantView.getService(service.getName()) != null) {
+        continue;
+      }
+      tenantView.writeService(service);
+    }
+    for (ClusterTemplate template : superadminView.getAllClusterTemplates()) {
+      if (!shouldOverwrite && tenantView.getClusterTemplate(template.getName()) != null) {
+        continue;
+      }
+      tenantView.writeClusterTemplate(template);
+    }
+    for (Provider provider : superadminView.getAllProviders()) {
+      if (!shouldOverwrite && tenantView.getProvider(provider.getName()) != null) {
+        continue;
+      }
+      tenantView.writeProvider(provider);
+    }
+
+    // TODO: bootstrap plugin resources
+
+    responder.sendStatus(HttpResponseStatus.OK);
   }
 
   /**

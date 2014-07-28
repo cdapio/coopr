@@ -17,19 +17,25 @@ package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Administration;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
+import com.continuuity.loom.admin.HardwareType;
+import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.LeaseDuration;
+import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.http.request.BootstrapRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.ClusterAction;
-import com.continuuity.loom.scheduler.Scheduler;
+import com.continuuity.loom.store.entity.EntityStoreView;
+import com.continuuity.loom.store.entity.SQLEntityStoreService;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -39,6 +45,7 @@ import org.apache.http.util.EntityUtils;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -64,15 +71,101 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
                                                              null, defaultClusterConfig),
                                          new Compatibilities(null, null, ImmutableSet.of("zookeeper")),
                                          null, new Administration(new LeaseDuration(10000, 30000, 5000)));
+  }
 
+  @Before
+  public void setupTest() throws Exception {
     entityStoreService.getView(ADMIN_ACCOUNT).writeClusterTemplate(smallTemplate);
   }
 
   @After
-  public void testCleanup() {
+  public void testCleanup() throws Exception {
     // cleanup
     solverQueues.removeAll();
     clusterQueues.removeAll();
+    ((SQLEntityStoreService) entityStoreService).clearData();
+  }
+
+  @Test
+  public void testNonAdminCantBootstrap() throws Exception {
+    assertResponseStatus(doPost("/v1/loom/bootstrap", "", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void testBootstrapTenant() throws Exception {
+    EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
+    Set<Provider> providers = ImmutableSet.of(Entities.ProviderExample.JOYENT, Entities.ProviderExample.RACKSPACE);
+    Set<Service> services = ImmutableSet.of(Entities.ServiceExample.NAMENODE, Entities.ServiceExample.DATANODE);
+    Set<HardwareType> hardwareTypes =
+      ImmutableSet.of(Entities.HardwareTypeExample.SMALL, Entities.HardwareTypeExample.MEDIUM);
+    Set<ImageType> imageTypes =
+      ImmutableSet.of(Entities.ImageTypeExample.UBUNTU_12, Entities.ImageTypeExample.CENTOS_6);
+    Set<ClusterTemplate> clusterTemplates =
+      ImmutableSet.of(Entities.ClusterTemplateExample.HDFS, smallTemplate);
+    for (Provider provider : providers) {
+      superadminView.writeProvider(provider);
+    }
+    for (Service service : services) {
+      superadminView.writeService(service);
+    }
+    for (HardwareType hardwareType : hardwareTypes) {
+      superadminView.writeHardwareType(hardwareType);
+    }
+    for (ImageType imageType : imageTypes) {
+      superadminView.writeImageType(imageType);
+    }
+    for (ClusterTemplate template : clusterTemplates) {
+      superadminView.writeClusterTemplate(template);
+    }
+
+    // make sure tenant account is empty
+    EntityStoreView tenantView = entityStoreService.getView(ADMIN_ACCOUNT);
+    Assert.assertTrue(tenantView.getAllProviders().isEmpty());
+    Assert.assertTrue(tenantView.getAllServices().isEmpty());
+    Assert.assertTrue(tenantView.getAllHardwareTypes().isEmpty());
+    Assert.assertTrue(tenantView.getAllImageTypes().isEmpty());
+    // one pre-existing template
+    Assert.assertEquals(ImmutableSet.of(smallTemplate), ImmutableSet.copyOf(tenantView.getAllClusterTemplates()));
+
+    // bootstrap
+    assertResponseStatus(doPost("/v1/loom/bootstrap", "", ADMIN_HEADERS), HttpResponseStatus.OK);
+
+    // make sure tenant account has copied superadmin data
+    Assert.assertEquals(providers, ImmutableSet.copyOf(tenantView.getAllProviders()));
+    Assert.assertEquals(services, ImmutableSet.copyOf(tenantView.getAllServices()));
+    Assert.assertEquals(hardwareTypes, ImmutableSet.copyOf(tenantView.getAllHardwareTypes()));
+    Assert.assertEquals(imageTypes, ImmutableSet.copyOf(tenantView.getAllImageTypes()));
+    Assert.assertEquals(clusterTemplates, ImmutableSet.copyOf(tenantView.getAllClusterTemplates()));
+  }
+
+  @Test
+  public void testBootstrapTenantOverwrite() throws Exception {
+    // superadmin has a slightly different version than tenant
+    String name = "template";
+    ClusterTemplate template1 = new ClusterTemplate(
+      name, "description1",
+      new ClusterDefaults(ImmutableSet.of("zookeeper"), "rackspace", null, null, null, null),
+      null, null, null);
+    ClusterTemplate template2 = new ClusterTemplate(
+      name, "description2",
+      new ClusterDefaults(ImmutableSet.of("zookeeper"), "rackspace", null, null, null, null),
+      null, null, null);
+
+    EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
+    EntityStoreView tenantView = entityStoreService.getView(ADMIN_ACCOUNT);
+
+    superadminView.writeClusterTemplate(template1);
+    tenantView.writeClusterTemplate(template2);
+
+    // check that with overwrite false, the template is not overwritten
+    BootstrapRequest body = new BootstrapRequest(false);
+    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), ADMIN_HEADERS), HttpResponseStatus.OK);
+    Assert.assertEquals(template2, tenantView.getClusterTemplate(name));
+
+    // check that with overwrite true, the template is overwritten
+    body = new BootstrapRequest(true);
+    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), ADMIN_HEADERS), HttpResponseStatus.OK);
+    Assert.assertEquals(template1, tenantView.getClusterTemplate(name));
   }
 
   @Test
