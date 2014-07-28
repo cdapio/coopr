@@ -68,8 +68,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - If update was successful
-   * - 401 (UNAUTHORIZED)
-     - If the user is unauthorized to make this request.
+   * - 403 (FORBIDDEN)
+     - If the user is not allowed to make this request.
    * - 404 (NOT FOUND)
      - If the resource requested is not found.
 
