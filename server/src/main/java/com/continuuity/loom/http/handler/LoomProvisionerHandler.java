@@ -17,6 +17,7 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.ProvisionerHeartbeat;
@@ -64,8 +65,9 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
   private LoomProvisionerHandler(TenantStore tenantStore,
                                  TenantProvisionerService tenantProvisionerService,
                                  ResourceService resourceService,
+                                 Configuration conf,
                                  Gson gson) {
-    super(tenantStore);
+    super(tenantStore, conf);
     this.gson = gson;
     this.resourceService = resourceService;
     this.tenantProvisionerService = tenantProvisionerService;

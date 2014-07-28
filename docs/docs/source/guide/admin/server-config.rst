@@ -244,6 +244,9 @@ A full list of available configuration settings and their default values are giv
    * - server.callback.http.max.connections
      - 100
      - max number of concurrent http connections for callbacks. If the max is reached, the next callback to try and send a request blocks until an open connection frees up.
+   * - server.multitenancy.enabled
+     - true
+     - whether or not multi-tenancy is enabled.
    * - server.provisioner.timeout.secs
      - 120
      - seconds to wait for a provisioner heartbeat before moving its workers and deleting it.

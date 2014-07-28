@@ -29,6 +29,11 @@ Each tenant consists of a unique id, a name, some number of workers, and optiona
 settings, such as max clusters allowed in the tenant or max nodes allowed in the tenant.
 Only the superadmin is allowed to access the tenant APIs.
 
+These APIs are disabled when multi tenancy is disabled, except for the API to update a tenant.
+That API is still required in order to edit settings such as the maximum number of clusters and
+nodes allowed, and the number of provisioner workers to use to execute tasks. If multi tenancy
+is disabled, the admin should use 'superadmin' as his tenant id for editing tenant settings.
+
 .. _tenants-create:
 
 Create a Tenant

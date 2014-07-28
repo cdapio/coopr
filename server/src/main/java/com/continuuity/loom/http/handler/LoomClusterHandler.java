@@ -83,7 +83,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
                              ClusterStoreService clusterStoreService,
                              Configuration conf,
                              Gson gson) {
-    super(tenantStore);
+    super(tenantStore, conf);
     this.clusterService = clusterService;
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();

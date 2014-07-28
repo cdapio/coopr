@@ -156,6 +156,12 @@
     </property>
 
     <property>
+        <name>server.multitenancy.enabled</name>
+        <value>true</value>
+        <description>whether or not multi-tenancy is enabled</description>
+    </property>
+
+    <property>
         <name>server.provisioner.timeout.secs</name>
         <value>120</value>
         <description>seconds to wait for a provisioner heartbeat before moving its workers and deleting it</description>

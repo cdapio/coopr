@@ -19,6 +19,7 @@ import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.tenant.TenantStore;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -31,9 +32,11 @@ import java.io.IOException;
  */
 public abstract class LoomAuthHandler extends AbstractHttpHandler {
   private final TenantStore tenantStore;
+  protected final boolean multiTenancyEnabled;
 
-  protected LoomAuthHandler(TenantStore tenantStore) {
+  protected LoomAuthHandler(TenantStore tenantStore, Configuration conf) {
     this.tenantStore = tenantStore;
+    this.multiTenancyEnabled = conf.getBoolean(Constants.MULTITENANCY_ENABLED);
   }
 
   /**
@@ -47,7 +50,8 @@ public abstract class LoomAuthHandler extends AbstractHttpHandler {
   protected Account getAndAuthenticateAccount(HttpRequest request, HttpResponder responder) {
     // TODO: proper authentication/authorization
     String user = request.getHeader(Constants.USER_HEADER);
-    String tenantName = request.getHeader(Constants.TENANT_HEADER);
+    // if multi-tenancy is disabled, everything happens within the superadmin tenant.
+    String tenantName = multiTenancyEnabled ? request.getHeader(Constants.TENANT_HEADER) : Constants.SUPERADMIN_TENANT;
     String apiKey = request.getHeader(Constants.API_KEY_HEADER);
     if (user == null) {
       responder.sendError(HttpResponseStatus.UNAUTHORIZED, Constants.USER_HEADER + " not found in request headers.");

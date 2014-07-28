@@ -39,15 +39,21 @@ All URLs referenced in the documentation have the following base:
 
  http://<loom-server>:<loom-port>/v1/loom
 
-In addition, three headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
+In addition, two headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
 the id of the user making the request. The second is ``X-Loom-ApiKey`` and is used to specify the api key used to
-communicate with the server. The third is ``X-Loom-TenantID`` and is used to specify the id of the tenant that the
-user belongs to.
+communicate with the server. If multi tenancy is enabled (it is enabled by default), a third header is required. 
+The ``X-Loom-TenantID`` header is used to specify the id of the tenant that the user belongs to.
+
+Examples in the following pages include all three headers. Disregard the tenant header if you have multi-tenancy disabled.
 
 .. note:: The Loom REST API is served over HTTP. In the near future, the Loom APIs will be served on HTTPS to ensure data privacy, and unencrypted HTTP will not be supported.
 
 Super admin APIs
 ================
+
+The super admin APIs are used to manage tenants and get information about provisioners and queues. These APIs are disabled
+when multi tenancy is disabled, except for the API to update a tenant. That API is still required in order to edit settings
+such as the maximum number of clusters and nodes allowed, and the number of provisioner workers to use to execute tasks.
 
 Tenants
 -------

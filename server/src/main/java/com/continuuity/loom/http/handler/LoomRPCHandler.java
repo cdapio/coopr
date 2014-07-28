@@ -21,6 +21,7 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.current.NodePropertiesRequestCodec;
+import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
@@ -59,8 +60,9 @@ public class LoomRPCHandler extends LoomAuthHandler {
 
   @Inject
   private LoomRPCHandler(TenantStore tenantStore,
-                         ClusterStoreService clusterStoreService) {
-    super(tenantStore);
+                         ClusterStoreService clusterStoreService,
+                         Configuration conf) {
+    super(tenantStore, conf);
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
   }
