@@ -19,6 +19,7 @@ import com.continuuity.loom.Entities;
 import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
@@ -57,7 +58,8 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
   }
 
   @Before
-  public void clearData() throws SQLException, IOException {
+  public void setupSuperadminHandlerTest() throws SQLException, IOException {
+    // base tests will write some tenants that we don't want.
     ((SQLTenantStore) tenantStore).clearData();
     ((SQLProvisionerStore) provisionerStore).clearData();
     tenantProvisionerService.writeProvisioner(
@@ -180,7 +182,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     Set<Tenant> actualTenants = gson.fromJson(reader, new TypeToken<Set<Tenant>>() {}.getType());
-    Assert.assertEquals(ImmutableSet.of(expectedTenant1, expectedTenant2), actualTenants);
+    Assert.assertEquals(ImmutableSet.of(Tenant.DEFAULT_SUPERADMIN, expectedTenant1, expectedTenant2), actualTenants);
   }
 
   @Test

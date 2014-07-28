@@ -15,12 +15,15 @@
  */
 package com.continuuity.loom.admin;
 
+import com.continuuity.loom.common.conf.Constants;
 import com.google.common.base.Objects;
 
 /**
  * A tenant contains the id, name, and settings for a tenant.
  */
 public final class Tenant extends NamedEntity {
+  public static final Tenant DEFAULT_SUPERADMIN =
+    new Tenant(Constants.SUPERADMIN_TENANT, Constants.SUPERADMIN_TENANT, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
   private final String id;
   private final int workers;
   private final int maxClusters;

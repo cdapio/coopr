@@ -16,6 +16,7 @@
 package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBPut;
@@ -46,9 +47,10 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   public void clearData() throws SQLException {
     Connection conn = dbConnectionPool.getConnection();
     try {
-      Statement stmt = conn.createStatement();
+      PreparedStatement stmt = conn.prepareStatement("DELETE FROM tenants WHERE id<>?");
       try {
-        stmt.execute("DELETE FROM tenants");
+        stmt.setString(1, Constants.SUPERADMIN_TENANT);
+        stmt.executeUpdate();
       } finally {
         stmt.close();
       }
@@ -69,6 +71,11 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
       DBHelper.createDerbyTableIfNotExists(
         "CREATE TABLE tenants ( id VARCHAR(255), name VARCHAR(255), workers INT, tenant BLOB )", dbConnectionPool);
+    }
+    // add superadmin if it doesn't exist
+    Tenant superadminTenant = getTenant(Constants.SUPERADMIN_TENANT);
+    if (superadminTenant == null) {
+      writeTenant(Tenant.DEFAULT_SUPERADMIN);
     }
   }
 

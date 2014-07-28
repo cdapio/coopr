@@ -98,7 +98,6 @@ public class LoomServiceTestBase extends BaseTest {
     loomService.startAndWait();
     port = loomService.getBindAddress().getPort();
     tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
-    tenantStore.writeTenant(new Tenant("name", TENANT_ID, 10, 100, 1000));
   }
 
   @Before

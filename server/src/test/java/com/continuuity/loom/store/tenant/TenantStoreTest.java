@@ -16,6 +16,7 @@
 package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.tenant.TenantStore;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +34,11 @@ public abstract class TenantStoreTest {
 
   @Before
   public abstract void clearState() throws Exception;
+
+  @Test
+  public void testSuperadminExistsOnStart() throws IOException {
+    Assert.assertEquals(Tenant.DEFAULT_SUPERADMIN, store.getTenant(Constants.SUPERADMIN_TENANT));
+  }
 
   @Test
   public void testGetNonExistantTenantReturnsNull() throws IOException {
