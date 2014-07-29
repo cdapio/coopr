@@ -42,7 +42,7 @@ To bootstrap a tenant, making a POST HTTP request to URI:
 
 The body is a JSON Object containing one optional key ``overwrite`` which indicates whether or 
 not data from the superadmin should overwrite existing data. By default it is false, meaning an entity
-from the superadmin will not skipped if it already exists in the tenant account, even if the entities 
+from the superadmin will be skipped if it already exists in the tenant account, even if the entities 
 themselves have different values. 
 
 POST Parameters
