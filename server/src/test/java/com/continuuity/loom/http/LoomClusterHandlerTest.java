@@ -103,10 +103,6 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     clusterScheduler = injector.getInstance(ClusterScheduler.class);
     solverScheduler = injector.getInstance(SolverScheduler.class);
     callbackScheduler = injector.getInstance(CallbackScheduler.class);
-
-    // We don't need scheduler to run for these test cases, we'll run them manually due to timing issues.
-    Scheduler scheduler = injector.getInstance(Scheduler.class);
-    scheduler.stopAndWait();
   }
 
   @After

@@ -50,6 +50,7 @@ import com.continuuity.loom.codec.json.current.TakeTaskRequestCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
 import com.continuuity.loom.codec.json.upgrade.ClusterUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
+import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceUpgradeCodec;
 import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
@@ -96,6 +97,7 @@ public class CodecModules {
             .registerTypeAdapter(Cluster.class, new ClusterUpgradeCodec(tenantId))
             .registerTypeAdapter(Provider.class, new ProviderUpgradeCodec())
             .registerTypeAdapter(Service.class, new ServiceUpgradeCodec())
+            .registerTypeAdapter(ServiceAction.class, new ServiceActionUpgradeCodec())
             .create()
         );
       }
