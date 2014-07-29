@@ -164,11 +164,11 @@ class FogProviderJoyent < FogProvider
   end
 
   def ip_address(server)
-    server_ips = server.ips.select{ |ip| ip && not(is_loopback(ip) || is_linklocal(ip)) }
+    server_ips = server.ips.select{ |ip| ip && !(is_loopback(ip) || is_linklocal(ip)) }
     if server_ips.count === 1
       server_ips.first
     else
-      server_ips.find{ |ip| not is_private(ip) }
+      server_ips.find{ |ip| !is_private(ip) }
     end
   end
 
