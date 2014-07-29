@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import static com.continuuity.test.drivers.Global.globalDriver;
 import static org.junit.Assert.assertEquals;
@@ -61,6 +62,7 @@ public class ClustersInstanceTest extends GenericTest {
 
   @BeforeClass
   public static void runInitial() throws Exception {
+    DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
     cluster= new ClusterReader().getCluster();
     globalDriver.get(Constants.CLUSTERS_INSTANCE_URL);
     table = globalDriver.findElement(TABLE);
@@ -174,7 +176,6 @@ public class ClustersInstanceTest extends GenericTest {
       ProvisionerAction action = ProvisionerAction.valueOf(tableCells.get(0).getAttribute(Constants.INNER_HTML));
       String service = tableCells.get(1).getAttribute(Constants.INNER_HTML);
       long submitTime = DATE_FORMAT.parse(tableCells.get(2).getAttribute(Constants.INNER_HTML)).getTime() / 1000;
-      submitTime -= 8 * 60 * 60;
       long duration = getDuration(tableCells.get(3).getAttribute(Constants.INNER_HTML));
       String status = tableCells.get(4).getAttribute(Constants.INNER_HTML);
       results.add(new TestNode.Action(action, service, submitTime, duration, status));

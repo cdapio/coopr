@@ -52,7 +52,7 @@ class OpenstackProvider < Provider
       if kniferesult.has_key? 'rootpassword'
         @result['result']['ssh-auth']['password'] = kniferesult['rootpassword']
       else
-        @result['result']['ssh-auth']['identityfile'] = Chef::Config[:knife][:identity_file] || "/opt/loom/provisioner/daemon/plugins/providers/openstack_provider/id_rsa"
+        @result['result']['ssh-auth']['identityfile'] = Chef::Config[:knife][:identity_file] || "/opt/loom/provisioner/worker/plugins/providers/openstack_provider/id_rsa"
       end
       @result['status'] = kniferesult['status']
     rescue Exception => e
