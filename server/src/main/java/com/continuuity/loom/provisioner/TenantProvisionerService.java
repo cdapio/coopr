@@ -1,7 +1,7 @@
 package com.continuuity.loom.provisioner;
 
-import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
