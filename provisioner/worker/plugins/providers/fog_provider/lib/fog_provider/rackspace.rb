@@ -183,8 +183,8 @@ class FogProviderRackspace < FogProvider
       filename = File.expand_path(file)
       content = File.read(filename)
     rescue Errno::ENOENT => e
-      log.error "Unable to read source file - #{filename}"
-      raise "Failed encoding file #{filename}"
+      log.error("Unable to read source file - #{filename}" + e.inspect)
+      raise "Failed encoding file #{filename} - #{e.inspect}"
     end
     Base64.encode64(content)
   end
