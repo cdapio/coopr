@@ -61,7 +61,7 @@ class FogProvider < Provider
     tcp_socket && tcp_socket.close
   end
 
-  def wait_for_sshd(host, port=22)
+  def wait_for_sshd(host, port = 22)
     ssh_test_max = 10*60
     ssh_test = 0
     log.debug 'Waiting for sshd'
