@@ -29,9 +29,9 @@ class FogProvider < Provider
     @credentials[:paranoid] = false
     sshauth.each do |k, v|
       if (k =~ /identityfile/)
-	@credentials[:keys] = [ v ]
+        @credentials[:keys] = [ v ]
       elsif (k =~ /password/)
-	@credentials[:password] = v
+        @credentials[:password] = v
       end
     end
   end
