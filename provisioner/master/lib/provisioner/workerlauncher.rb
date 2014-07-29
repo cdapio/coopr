@@ -28,7 +28,7 @@ module Loom
 
     def cmd
       cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])}"
-      cmd += " #{File.dirname(__FILE__)}/../../../daemon/provisioner.rb"
+      cmd += " #{File.dirname(__FILE__)}/../../../worker/provisioner.rb"
       cmd += " --uri #{@options[:uri]}" if @options[:uri]
       cmd += " --log-directory #{@options[:log_directory]}" if @options[:log_directory]
       cmd += " --log-level #{@options[:log_level]}" if @options[:log_level]
