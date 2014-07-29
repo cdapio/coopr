@@ -31,6 +31,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -60,32 +61,72 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testAddNodeAsUser() throws Exception {
-    postNode(USER1_HEADERS);
+    postNodes(1, USER1_HEADERS);
+    List<JsonObject> nodes = getNodes(USER1_HEADERS);
+    Assert.assertEquals(1, nodes.size());
   }
 
   @Test
   public void testGetAllNodesAsUser() throws Exception {
-    Node postedNode = postNode(USER1_HEADERS);
-    HttpResponse response = doGet("/v1/loom/nodes", USER1_HEADERS);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    List<JsonObject> jsonObject = getJsonListFromResponse(response);
-    Assert.assertEquals(1, jsonObject.size());
-    String nodeId = jsonObject.get(0).get("id").getAsString();
-    String clusterId = jsonObject.get(0).get("clusterId").getAsString();
+    Node postedNode = postNodes(1, USER1_HEADERS).get(0);
+    List<JsonObject> nodes = getNodes(USER1_HEADERS);
+    Assert.assertEquals(1, nodes.size());
+    String nodeId = nodes.get(0).get("id").getAsString();
+    String clusterId = nodes.get(0).get("clusterId").getAsString();
     Assert.assertEquals(nodeId, postedNode.getId());
     Assert.assertEquals(clusterId, postedNode.getClusterId());
   }
 
-  private Node postNode(Header[] headers) throws Exception {
-    Node node = createNode();
-    String nodeJsonString = gson.toJson(node);
-    HttpResponse response = doPost("/v1/loom/nodes", nodeJsonString, headers);
-    assertResponseStatus(response, HttpResponseStatus.CREATED);
-    return node;
+  @Test
+  public void testDeleteNodeAsUser() throws Exception {
+    Node node = postNodes(1, USER1_HEADERS).get(0);
+    HttpResponse response = doDelete("/v1/loom/nodes/" + node.getId(), USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.NO_CONTENT);
+    List<JsonObject> nodes = getNodes(USER1_HEADERS);
+    Assert.assertEquals(0, nodes.size());
   }
 
-  private Node createNode() {
+  @Test
+  public void testUpdateNodeAsUser() throws Exception {
+    Node node = postNodes(2, USER1_HEADERS).get(0);
+    String nodeJsonString = getNodeAsJsonString(node);
+    HttpResponse response = doPut("/v1/loom/nodes", nodeJsonString, USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.NO_CONTENT);
+    // test to see that it has been updated
+  }
 
-    return new Node("id", "1234", new HashSet<Service>() {}, new HashMap<String, String>());
+  private List<JsonObject> getNodes(final Header[] headers) throws Exception {
+    HttpResponse response = doGet("/v1/loom/nodes", headers);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    return getJsonListFromResponse(response);
+  }
+
+  private List<Node> postNodes(int numberOfNodes, Header[] headers) throws Exception {
+    List<Node> nodes = createNodes(numberOfNodes);
+    String nodesToPost = getNodeListAsJsonString(nodes);
+    HttpResponse response = doPost("/v1/loom/nodes", nodesToPost, headers);
+    assertResponseStatus(response, HttpResponseStatus.CREATED);
+    return nodes;
+  }
+
+  private String getNodeListAsJsonString(final List<Node> nodes) {
+    return gson.toJson(nodes);
+  }
+
+  private String getNodeAsJsonString(final Node node) {
+    return gson.toJson(node);
+  }
+
+  private List<Node> createNodes(int numberOfNodesToCreate) {
+    List<Node> createdNodes = new ArrayList<Node>();
+    for (int i = 0; i < numberOfNodesToCreate; i++) {
+      createdNodes.add(createNode(Integer.toString(i)));
+    }
+
+    return createdNodes;
+  }
+
+  private Node createNode(String id) {
+    return new Node(id, "1234", new HashSet<Service>() {}, new HashMap<String, String>());
   }
 }
