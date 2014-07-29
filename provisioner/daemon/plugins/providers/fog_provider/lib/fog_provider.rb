@@ -42,7 +42,7 @@ class FogProvider < Provider
     readable = IO.select([tcp_socket], nil, nil, 5)
     if readable
       log.debug("sshd accepting connections on #{hostname} port #{port}, banner is #{tcp_socket.gets}")
-      yield
+      sleep @initial_sleep_delay ||= 10
       true
     else
       false
@@ -61,17 +61,18 @@ class FogProvider < Provider
     tcp_socket && tcp_socket.close
   end
 
-  def wait_for_sshd(hostname, port)
+  def wait_for_sshd(hostname, port=22)
+    ssh_test_max = 10*60
+    ssh_test = 0
     log.debug 'Waiting for sshd'
-    i = 0
     begin
-      until tcp_test_port(hostname, port) {
-        sleep @initial_sleep_delay ||= 10
-        i += 1
-        if i == 60
+      until tcp_test_port(hostname, port)
+        if ssh_test < ssh_test_max
+          ssh_test += 1
+          log.debug "Status of ssh_test = #{ssh_test}"
+        else
           break
         end
-      }
       end
     end
   end
