@@ -16,38 +16,28 @@
 package com.continuuity.loom.admin;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
- * A tenant contains the id, name, and settings for a tenant.
+ * A tenant contains the id, plus fields.
  */
-public final class Tenant extends NamedEntity {
+public final class Tenant {
   private final String id;
-  private final int workers;
-  private final int maxClusters;
-  private final int maxNodes;
+  private final TenantSpecification specification;
 
-  public Tenant(String name, String id, Integer workers, Integer maxClusters, Integer maxNodes) {
-    super(name);
+  public Tenant(String id, TenantSpecification specification) {
+    Preconditions.checkArgument(id != null, "Id must be specified.");
+    Preconditions.checkArgument(specification != null, "Fields must be specified");
     this.id = id;
-    this.workers = workers == null ? 0 : workers;
-    this.maxClusters = maxClusters == null ? Integer.MAX_VALUE : maxClusters;
-    this.maxNodes = maxNodes == null ? Integer.MAX_VALUE : maxClusters;
+    this.specification = specification;
   }
 
   public String getId() {
     return id;
   }
 
-  public int getWorkers() {
-    return workers;
-  }
-
-  public int getMaxClusters() {
-    return maxClusters;
-  }
-
-  public int getMaxNodes() {
-    return maxNodes;
+  public TenantSpecification getSpecification() {
+    return specification;
   }
 
   @Override
@@ -56,26 +46,20 @@ public final class Tenant extends NamedEntity {
       return false;
     }
     Tenant other = (Tenant) o;
-    return Objects.equal(name, other.name) &&
-      Objects.equal(id, other.id) &&
-      Objects.equal(workers, other.workers) &&
-      Objects.equal(maxClusters, other.maxClusters) &&
-      Objects.equal(maxNodes, other.maxNodes);
+    return Objects.equal(id, other.id) &&
+      Objects.equal(specification, other.specification);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, id, workers, maxClusters, maxNodes);
+    return Objects.hashCode(id, specification);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("name", name)
       .add("id", id)
-      .add("workers", workers)
-      .add("maxClusters", maxClusters)
-      .add("maxNodes", maxNodes)
+      .add("fields", specification)
       .toString();
   }
 }

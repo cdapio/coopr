@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.admin.TenantSpecification;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -26,17 +26,20 @@ import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.admin.Tenant}. Used so field validation is done.
+ * Codec for deserializing a {@link com.continuuity.loom.admin.TenantSpecification}. Used so field validation is done.
  */
-public class TenantCodec implements JsonDeserializer<Tenant> {
+public class TenantSpecificationCodec implements JsonDeserializer<TenantSpecification> {
 
   @Override
-  public Tenant deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+  public TenantSpecification deserialize(JsonElement json, Type type, JsonDeserializationContext context)
+    throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    String id = context.deserialize(jsonObj.get("id"), String.class);
-    TenantSpecification specification = context.deserialize(jsonObj.get("specification"), TenantSpecification.class);
+    String name = context.deserialize(jsonObj.get("name"), String.class);
+    Integer workers = context.deserialize(jsonObj.get("workers"), Integer.class);
+    Integer maxClusters = context.deserialize(jsonObj.get("maxClusters"), Integer.class);
+    Integer maxNodes = context.deserialize(jsonObj.get("maxNodes"), Integer.class);
 
-    return new Tenant(id, specification);
+    return new TenantSpecification(name, workers, maxClusters, maxNodes);
   }
 }

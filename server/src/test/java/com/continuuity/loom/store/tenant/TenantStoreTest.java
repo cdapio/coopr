@@ -16,7 +16,7 @@
 package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.store.tenant.TenantStore;
+import com.continuuity.loom.admin.TenantSpecification;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,26 +36,28 @@ public abstract class TenantStoreTest {
 
   @Test
   public void testGetNonExistantTenantReturnsNull() throws IOException {
-    Assert.assertNull(store.getTenant(UUID.randomUUID().toString()));
+    Assert.assertNull(store.getTenantByID(UUID.randomUUID().toString()));
   }
 
   @Test
   public void testAddWriteDelete() throws IOException {
-    Tenant tenant = new Tenant("name", UUID.randomUUID().toString(), 10, 100, 1000);
+    Tenant tenant = new Tenant(UUID.randomUUID().toString(), new TenantSpecification("name", 10, 100, 1000));
     store.writeTenant(tenant);
 
-    Assert.assertEquals(tenant, store.getTenant(tenant.getId()));
+    Assert.assertEquals(tenant, store.getTenantByID(tenant.getId()));
+    Assert.assertEquals(tenant, store.getTenantByName(tenant.getSpecification().getName()));
 
-    store.deleteTenant(tenant.getId());
-    Assert.assertNull(store.getTenant(tenant.getId()));
+    store.deleteTenantByName(tenant.getSpecification().getName());
+    Assert.assertNull(store.getTenantByID(tenant.getId()));
+    Assert.assertNull(store.getTenantByName(tenant.getSpecification().getName()));
   }
 
   @Test
   public void testOverwrite() throws IOException {
-    Tenant tenant = new Tenant("name", UUID.randomUUID().toString(), 10, 100, 1000);
+    Tenant tenant = new Tenant(UUID.randomUUID().toString(), new TenantSpecification("name", 10, 100, 1000));
     store.writeTenant(tenant);
-    tenant = new Tenant("name", tenant.getId(), 10, 100, 500);
+    tenant = new Tenant(tenant.getId(), new TenantSpecification("name", 10, 100, 500));
     store.writeTenant(tenant);
-    Assert.assertEquals(tenant, store.getTenant(tenant.getId()));
+    Assert.assertEquals(tenant, store.getTenantByID(tenant.getId()));
   }
 }
