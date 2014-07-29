@@ -28,9 +28,14 @@ if (id.nil? || num_workers.nil?)
   exit 1
 end
 
-data = {}
+data = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
 data['id'] = id
 data['workers'] = num_workers.to_i
+data['resources']['automatortype']['chef-solo']['cookbooks']['format'] = 'archive'
+data['resources']['automatortype']['chef-solo']['cookbooks']['active'] = [
+      {"name" => "reactor", "version" => '2'},
+      {"name" => "hadoop", "version" => '52'}
+    ]
 
 begin
   json = JSON.generate(data)
