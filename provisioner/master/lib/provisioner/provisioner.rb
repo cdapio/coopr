@@ -200,7 +200,7 @@ module Loom
     # this is temporary until provisioner process manages worker data
     def register_plugins
       # launch a single worker with register flag
-      exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../../../daemon/provisioner.rb --uri #{@server_uri} --register")
+      exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../../../worker/provisioner.rb --uri #{@server_uri} --register")
     end
 
     def unregister_from_server

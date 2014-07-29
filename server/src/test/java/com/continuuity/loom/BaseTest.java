@@ -48,7 +48,10 @@ import com.google.inject.Injector;
 import com.google.inject.Scopes;
 import com.google.inject.util.Modules;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
+import org.apache.twill.zookeeper.RetryStrategies;
 import org.apache.twill.zookeeper.ZKClientService;
+import org.apache.twill.zookeeper.ZKClientServices;
+import org.apache.twill.zookeeper.ZKClients;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -56,6 +59,7 @@ import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Base class with utilities for loading admin entities into a entityStore and starting zookeeper up.
@@ -89,15 +93,24 @@ public class BaseTest {
     zkServer = InMemoryZKServer.builder().setDataDir(tmpFolder.newFolder()).setTickTime(5000).build();
     zkServer.startAndWait();
 
-    zkClientService = ZKClientService.Builder.of(zkServer.getConnectionStr()).build();
-    zkClientService.startAndWait();
-
     conf = Configuration.create();
     conf.set(Constants.PORT, "0");
     conf.set(Constants.HOST, HOSTNAME);
     conf.set(Constants.SCHEDULER_INTERVAL_SECS, "1");
     conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+
+    zkClientService = ZKClientServices.delegate(
+      ZKClients.reWatchOnExpire(
+        ZKClients.retryOnFailure(
+          ZKClientService.Builder.of(zkServer.getConnectionStr())
+            .setSessionTimeout(conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT_MILLIS))
+            .build(),
+          RetryStrategies.fixDelay(2, TimeUnit.SECONDS)
+        )
+      )
+    );
+    zkClientService.startAndWait();
 
     mockClusterCallback = new MockClusterCallback();
     injector = Guice.createInjector(

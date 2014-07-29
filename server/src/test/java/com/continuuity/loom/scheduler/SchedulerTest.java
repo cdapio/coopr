@@ -41,6 +41,7 @@ import com.google.common.collect.Multiset;
 import com.google.gson.JsonObject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -54,38 +55,11 @@ import java.util.concurrent.TimeUnit;
  * Test ClusterScheduler
  */
 public class SchedulerTest extends LoomServiceTestBase {
-  private static QueueGroup clusterQueues;
-  private static QueueGroup provisionerQueues;
-  private static QueueGroup callbackQueues;
-  private static QueueGroup solverQueues;
-  private static QueueGroup jobQueues;
-  private static LoomService loomService;
   private static Cluster cluster;
   private static ClusterJob job;
 
-  @BeforeClass
-  public static void start() throws Exception {
-    injector.getInstance(IdService.class).startAndWait();
-
-    clusterQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
-    provisionerQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.PROVISIONER)));
-    solverQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
-    jobQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.JOB)));
-    callbackQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CALLBACK)));
-
-    loomService = injector.getInstance(LoomService.class);
-    loomService.startAndWait();
-  }
-
   @Before
   public void beforeTest() throws Exception {
-    jobQueues.removeAll();
-    clusterQueues.removeAll();
-    solverQueues.removeAll();
-    provisionerQueues.removeAll();
-    callbackQueues.removeAll();
-    mockClusterCallback.clear();
-
     cluster = Entities.ClusterExample.createCluster();
     job = new ClusterJob(new JobId(cluster.getId(), 0), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
@@ -94,6 +68,16 @@ public class SchedulerTest extends LoomServiceTestBase {
 
     clusterStore.writeNode(Entities.ClusterExample.NODE1);
     clusterStore.writeNode(Entities.ClusterExample.NODE2);
+  }
+
+  @After
+  public void cleanupTest() throws Exception {
+    jobQueues.removeAll();
+    clusterQueues.removeAll();
+    solverQueues.removeAll();
+    provisionerQueues.removeAll();
+    callbackQueues.removeAll();
+    mockClusterCallback.clear();
   }
 
   @Test(timeout = 20000)

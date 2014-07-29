@@ -54,13 +54,6 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
   private static ClusterTemplate smallTemplate;
 
   @BeforeClass
-  public static void init() throws Exception {
-    // We don't need scheduler to run for these test cases, we'll run them manually due to timing issues.
-    Scheduler scheduler = injector.getInstance(Scheduler.class);
-    scheduler.stopAndWait();
-  }
-
-  @BeforeClass
   public static void initData() throws Exception {
     JsonObject defaultClusterConfig = new JsonObject();
     defaultClusterConfig.addProperty("defaultconfig", "value1");
