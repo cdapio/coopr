@@ -50,8 +50,8 @@ class FogProviderJoyent
       @result['result']['ssh-auth']['identityfile'] = @joyent_keyfile unless @joyent_keyfile.nil?
       @result['status'] = 0
     rescue Exception => e
-      log.error('Unexpected Error Occured in FogProviderJoyent.create:' + e.inspect)
-      @result['stderr'] = "Unexpected Error Occured in FogProviderJoyent.create: #{e.inspect}"
+      log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.create: #{e.inspect}"
     else
       log.debug "Create finished successfully: #{@result}"
     ensure
@@ -103,8 +103,8 @@ class FogProviderJoyent
       log.error("SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}: #{e.inspect}"
     rescue Exception => e
-      log.error('Unexpected Error Occured in FogProviderJoyent.confirm:' + e.inspect)
-      @result['stderr'] = "Unexpected Error Occured in FogProviderJoyent.confirm: #{e.inspect}"
+      log.error('Unexpected Error Occurred in FogProviderJoyent.confirm:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.confirm: #{e.inspect}"
     else
       log.debug "Confirm finished successfully: #{@result}"
     ensure
@@ -131,8 +131,8 @@ class FogProviderJoyent
       # Return 0
       @result['status'] = 0
     rescue => e
-      log.error('Unexpected Error Occured in FogProviderJoyent.delete:' + e.inspect)
-      @result['stderr'] = "Unexpected Error Occured in FogProviderJoyent.delete: #{e.inspect}"
+      log.error('Unexpected Error Occurred in FogProviderJoyent.delete:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.delete: #{e.inspect}"
     else
       log.debug "Delete finished sucessfully: #{@result}"
     ensure

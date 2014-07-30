@@ -51,8 +51,8 @@ class FogProviderOpenstack
       @result['result']['ssh-auth']['identityfile'] = @openstack_keyfile unless @openstack_keyfile.nil?
       @result['status'] = 0
     rescue Exception => e
-      log.error('Unexpected Error Occured in FogProviderOpenstack.create:' + e.inspect)
-      @result['stderr'] = "Unexpected Error Occured in FogProviderOpenstack.create: #{e.inspect}"
+      log.error('Unexpected Error Occurred in FogProviderOpenstack.create:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.create: #{e.inspect}"
     else
       log.debug "Create finished successfully: #{@result}"
     ensure
@@ -103,8 +103,8 @@ class FogProviderOpenstack
       log.error("SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}: #{e.inspect}"
     rescue Exception => e
-      log.error('Unexpected Error Occured in FogProviderOpenstack.confirm:' + e.inspect)
-      @result['stderr'] = "Unexpected Error Occured in FogProviderOpenstack.confirm: #{e.inspect}"
+      log.error('Unexpected Error Occurred in FogProviderOpenstack.confirm:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.confirm: #{e.inspect}"
     else
       log.debug "Confirm finished successfully: #{@result}"
     ensure
@@ -131,8 +131,8 @@ class FogProviderOpenstack
       # Return 0
       @result['status'] = 0
     rescue => e
-      log.error('Unexpected Error Occured in FogProviderOpenstack.delete:' + e.inspect)
-      @result['stderr'] = "Unexpected Error Occured in FogProviderOpenstack.delete: #{e.inspect}"
+      log.error('Unexpected Error Occurred in FogProviderOpenstack.delete:' + e.inspect)
+      @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.delete: #{e.inspect}"
     else
       log.debug "Delete finished sucessfully: #{@result}"
     ensure
