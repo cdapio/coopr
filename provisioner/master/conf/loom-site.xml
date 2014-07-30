@@ -16,7 +16,7 @@
   </property>
   <property>
     <name>provisioner.register.ip</name>
-    <value></value>
+    <value>127.0.0.1</value>
     <description>Routable IP for the server to call back to this provisioner</description>
   </property>
   <property>

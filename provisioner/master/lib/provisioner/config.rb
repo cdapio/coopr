@@ -21,7 +21,6 @@ require_relative 'logging'
 
 module Loom
   class Config
-    include Logging
 
     attr_reader :config, :file, :properties
 
@@ -42,7 +41,6 @@ module Loom
     end
 
     def load_file(file = @file)
-      log.debug("loading config file: #{file}")
       if File.file?(file) && File.readable?(file)
         begin
 
@@ -75,7 +73,7 @@ module Loom
 
           end
         rescue => e
-          log.error "Exception during parsing of config file: #{file}: #{e.message}, #{e.backtrace}"
+          puts "Exception during parsing of config file: #{file}: #{e.message}, #{e.backtrace}"
         end
       end
     end

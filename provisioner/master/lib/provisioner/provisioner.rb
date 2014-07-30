@@ -42,7 +42,7 @@ module Loom
       @config = config
       @tenantmanagers = {}
       @terminating_tenants = []
-      @server_uri = options[:uri]
+      @server_uri = config.get_value('server.uri')
       pid = Process.pid
       host = Socket.gethostname.downcase
       @provisioner_id = "#{host}.#{pid}"
@@ -56,7 +56,7 @@ module Loom
       config.load_default
 
       # initialize logging
-      Logging.configure(options[:log_directory] ? "#{options[:log_directory]}/provisioner.log" : nil)
+      Logging.configure(config.get_value('log.directory') ? "#{config.get_value('log.directory')}/provisioner.log" : nil)
       Logging.level = options[:log_level]
       Logging.log.info "Loom api starting up"
 
@@ -100,8 +100,8 @@ module Loom
         # set reference to provisioner
         Api.set :provisioner, self
         # set bind settings
-        bind_ip = @options[:bind_ip] || '0.0.0.0'
-        bind_port = @options[:bind_port] || '55056'
+        bind_ip = @config.get_value('bind.ip')
+        bind_port = @config.get_value('bind.port')
         Api.set :bind, bind_ip
         Api.set :port, bind_port
         # let sinatra take over from here
@@ -184,9 +184,9 @@ module Loom
       uri = "#{@server_uri}/v1/provisioners/#{@provisioner_id}"
       data = {}
       data['id'] = @provisioner_id
-      data['capacityTotal'] = @options[:capacity] || '10'
-      data['host'] = local_ip
-      data['port'] = @options[:bind_port]
+      data['capacityTotal'] = @config.get_value('default.capacity')
+      data['host'] = @config.get_value('register.ip') || local_ip
+      data['port'] = @config.get_value('bind.port')
 
       log.info "Registering with server at #{uri}: #{data.to_json}"
 
@@ -240,8 +240,8 @@ module Loom
       # set provisionerId
       tenantmgr.provisioner_id = @provisioner_id
 
-      # set options
-      tenantmgr.options = @options
+      # set configuration
+      tenantmgr.config = @config
 
       if @tenantmanagers.key? id
         # edit tenant
