@@ -37,11 +37,9 @@ module Loom
 
     attr_accessor :tenantmanagers, :provisioner_id, :server_uri
 
-    def initialize(options)
+    def initialize(options, config)
       @options = options
-      # load config from file
-      config = Config.new(options)
-      config.load_default
+      @config = config
       @tenantmanagers = {}
       @terminating_tenants = []
       @server_uri = options[:uri]
@@ -54,6 +52,9 @@ module Loom
     # invoked from bin/provisioner
     def self.run(options)
 
+      config = Config.new(options)
+      config.load_default
+
       # initialize logging
       Logging.configure(options[:log_directory] ? "#{options[:log_directory]}/provisioner.log" : nil)
       Logging.level = options[:log_level]
@@ -62,7 +63,7 @@ module Loom
       # daemonize
       daemonize if options[:daemonize]
 
-      pg = Loom::Provisioner.new(options)
+      pg = Loom::Provisioner.new(options, config)
       if options[:register]
         pg.register_plugins
       else
