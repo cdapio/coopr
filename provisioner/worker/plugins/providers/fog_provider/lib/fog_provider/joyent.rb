@@ -75,18 +75,18 @@ class FogProviderJoyent
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
-      @bootstrap_ip = ip_address(server)
-      if @bootstrap_ip.nil?
+      bootstrap_ip = ip_address(server)
+      if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
       else
-        log.debug "Bootstrap IP address #{@bootstrap_ip}"
+        log.debug "Bootstrap IP address #{bootstrap_ip}"
       end
 
-      wait_for_sshd(@bootstrap_ip, 22)
+      wait_for_sshd(bootstrap_ip, 22)
       log.debug "Server #{server.name} sshd is up"
 
       # Process results
-      @result['result']['ipaddress'] = @bootstrap_ip
+      @result['result']['ipaddress'] = bootstrap_ip
       # Additional checks
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
