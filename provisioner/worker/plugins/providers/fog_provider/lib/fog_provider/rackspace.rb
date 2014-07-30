@@ -16,7 +16,11 @@
 # limitations under the License.
 #
 
+require_relative 'utils'
+
 class FogProviderRackspace < FogProvider
+
+  include FogProvider
 
   def create(inputmap)
     flavor = inputmap['flavor']
