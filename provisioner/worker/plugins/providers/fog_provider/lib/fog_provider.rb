@@ -16,9 +16,9 @@
 # limitations under the License.
 #
 
-require_relative 'lib/fog_provider/joyent'
-require_relative 'lib/fog_provider/openstack'
-require_relative 'lib/fog_provider/rackspace'
+require_relative 'fog_provider/joyent'
+require_relative 'fog_provider/openstack'
+require_relative 'fog_provider/rackspace'
 
 require 'fog'
 require 'ipaddr'
