@@ -17,8 +17,6 @@
 
 require 'rexml/document'
 
-require_relative 'logging'
-
 module Loom
   class Config
 
@@ -74,6 +72,7 @@ module Loom
           end
         rescue => e
           puts "Exception during parsing of config file: #{file}: #{e.message}, #{e.backtrace}"
+          exit(1)
         end
       end
     end

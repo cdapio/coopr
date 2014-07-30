@@ -58,7 +58,7 @@ module Loom
 
       # initialize logging
       Logging.configure(config.get_value('log.directory') ? "#{config.get_value('log.directory')}/provisioner.log" : nil)
-      Logging.level = options[:log_level]
+      Logging.level = config.get_value('log.level')
       Logging.log.info "Loom api starting up"
 
       # daemonize
