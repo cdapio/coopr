@@ -1,0 +1,98 @@
+<configuration>
+  <property>
+    <name>server.zookeeper.quorum</name>
+    <value>localhost:2181</value>
+    <description>Specifies the zookeeper host:port</description>
+  </property>
+  <property>
+    <name>server.host</name>
+    <value>162.242.148.244</value>
+    <description>Specifies the loom host to bind to</description>
+  </property>
+  <property>
+    <name>server.jdbc.driver</name>
+    <value>com.mysql.jdbc.Driver</value>
+    <description>specifies db driver</description>
+  </property>
+  <property>
+    <name>server.jdbc.connection.string</name>
+    <value>jdbc:mysql://127.0.0.1:3306/loom?useLegacyDatetimeCode=false</value>
+    <description>specifies how to connect to mysql</description>
+  </property>
+  <property>
+    <name>server.db.user</name>
+    <value>loom</value>
+    <description>mysql user</description>
+  </property>
+  <property>
+    <name>server.db.password</name>
+    <value>loomers</value>
+    <description>mysql user password</description>
+  </property>
+  <property>
+    <name>server.jdbc.validation.query</name>
+    <value>SELECT 1</value>
+    <description>query used with connection pools to validate a jdbc connection taken from a pool</description>
+  </property>
+  <property>
+    <name>server.ids.start.num</name>
+    <value>600</value>
+  </property>
+  <!-- provisioner settings -->
+  <property>
+    <name>provisioner.server.uri</name>
+    <value>http://localhost:55054</value>
+    <description>URI of server to connect to</description>
+  </property>
+  <property>
+    <name>provisioner.bind.ip</name>
+    <value>0.0.0.0</value>
+    <description>Local IP provisioner should listen on</description>
+  </property>
+  <property>
+    <name>provisioner.bind.port</name>
+    <value>55056</value>
+    <description>Local Port provisioner should listen on</description>
+  </property>
+  <property>
+    <name>provisioner.register.ip</name>
+    <value></value>
+    <description>Routable IP for the server to call back to this provisioner</description>
+  </property>
+  <property>
+    <name>provisioner.data.dir</name>
+    <value>/tmp/loom/data</value>
+    <description>Provisioner storage directory for plugin data resources</description>
+  </property>
+  <property>
+    <name>provisioner.work.dir</name>
+    <value>/tmp/loom/work</value>
+    <description>Provisioner working directory</description>
+  </property>
+  <property>
+    <name>provisioner.default.capacity</name>
+    <value>10</value>
+    <description>Max number of running workers for this provisioner</description>
+  </property>
+  <property>
+    <name>provisioner.heartbeat.interval</name>
+    <value>10</value>
+    <description>interval in seconds to send heartbeat to server</description>
+  </property>
+  <property>
+    <name>provisioner.log.directory</name>
+    <value></value>
+    <description>Provisioner log directory</description>
+  </property>
+  <property>
+    <name>provisioner.log.rotation.shift.age</name>
+    <value>10</value>
+    <description>number of old log files to keep, or frequency of rotation (daily, weekly, or monthly)</description>
+  </property>
+  <property>
+    <name>provisioner.log.rotation.shift.size</name>
+    <value>10485760</value>
+    <description>maximum logfile size. only applies when shift.age is a number</description>
+  </property>
+</configuration>
+
