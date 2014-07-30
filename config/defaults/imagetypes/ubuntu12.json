@@ -3,7 +3,7 @@
   "description": "Ubuntu 12.04 LTS",
   "providermap": {
     "joyent": {
-      "image": "d2ba0f30-bbe8-11e2-a9a2-6bc116856d85"
+      "image": "f21af273-353f-4020-8ae1-3ac34481c7b4"
     },
     "rackspace": {
       "image": "ffa476b1-9b14-46bd-99a8-862d1d94eb7a"
