@@ -29,6 +29,7 @@ require_relative 'tenantmanager'
 require_relative 'provisioner'
 require_relative 'cli'
 require_relative 'logging'
+require_relative 'config'
 
 module Loom
   class Provisioner
@@ -38,6 +39,9 @@ module Loom
 
     def initialize(options)
       @options = options
+      # load config from file
+      config = Config.new(options)
+      config.load_default
       @tenantmanagers = {}
       @terminating_tenants = []
       @server_uri = options[:uri]
