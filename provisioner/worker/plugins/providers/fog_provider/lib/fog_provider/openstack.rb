@@ -130,7 +130,7 @@ class FogProviderOpenstack
       end
       # Return 0
       @result['status'] = 0
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occured in FogProviderOpenstack.delete:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occured in FogProviderOpenstack.delete: #{e.inspect}"
     else

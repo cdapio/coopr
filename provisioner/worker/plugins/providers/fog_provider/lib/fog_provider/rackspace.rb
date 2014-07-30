@@ -139,7 +139,7 @@ class FogProviderRackspace < FogProvider
       end
       # Return 0
       @result['status'] = 0
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occured in FogProviderRackspace.delete:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occured in FogProviderRackspace.delete: #{e.inspect}"
     else
