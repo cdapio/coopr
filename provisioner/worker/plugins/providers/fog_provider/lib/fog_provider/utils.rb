@@ -37,7 +37,6 @@ module FogProvider
     readable = IO.select([tcp_socket], nil, nil, 5)
     if readable
       log.debug("Accepting connections on #{host} port #{port}, banner: #{tcp_socket.gets}")
-      sleep @initial_sleep_delay ||= 10
       true
     else
       false
@@ -68,6 +67,7 @@ module FogProvider
 	  break
 	end
       end
+      sleep 10
     end
   end
 
