@@ -1,45 +1,5 @@
 <configuration>
   <property>
-    <name>server.zookeeper.quorum</name>
-    <value>localhost:2181</value>
-    <description>Specifies the zookeeper host:port</description>
-  </property>
-  <property>
-    <name>server.host</name>
-    <value>162.242.148.244</value>
-    <description>Specifies the loom host to bind to</description>
-  </property>
-  <property>
-    <name>server.jdbc.driver</name>
-    <value>com.mysql.jdbc.Driver</value>
-    <description>specifies db driver</description>
-  </property>
-  <property>
-    <name>server.jdbc.connection.string</name>
-    <value>jdbc:mysql://127.0.0.1:3306/loom?useLegacyDatetimeCode=false</value>
-    <description>specifies how to connect to mysql</description>
-  </property>
-  <property>
-    <name>server.db.user</name>
-    <value>loom</value>
-    <description>mysql user</description>
-  </property>
-  <property>
-    <name>server.db.password</name>
-    <value>loomers</value>
-    <description>mysql user password</description>
-  </property>
-  <property>
-    <name>server.jdbc.validation.query</name>
-    <value>SELECT 1</value>
-    <description>query used with connection pools to validate a jdbc connection taken from a pool</description>
-  </property>
-  <property>
-    <name>server.ids.start.num</name>
-    <value>600</value>
-  </property>
-  <!-- provisioner settings -->
-  <property>
     <name>provisioner.server.uri</name>
     <value>http://localhost:55054</value>
     <description>URI of server to connect to</description>
