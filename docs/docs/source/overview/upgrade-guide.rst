@@ -23,10 +23,71 @@ Upgrade Guide
 =============
 .. _upgrade-guide:
 
-This guide describes how to upgrade Continuuity Loom from 0.9.6 to the |release| Release.
+This guide describes how to upgrade Continuuity Loom. Upgrades follow the general process 
+of stopping Loom services, taking a backup of all state in the database, running one or 
+more upgrade scripts, and starting back up all Loom services. 
 
-Checklist
-=========
+0.9.6/0.9.7 to 0.9.8
+^^^^^^^^^^^^^^^^^^^^
+
+* 1 - Stop Loom services
+
+  .. parsed-literal::
+   $ sudo /etc/init.d/loom-provisioner stop
+   $ sudo /etc/init.d/loom-ui stop
+   $ sudo /etc/init.d/loom-server stop
+
+* 2 - Stop Database and take a backup
+
+  * The embedded Derby database is stopped when Loom Server is stopped
+  * If you are using the embedded Derby database, perform the following
+     * Replace ``/var/loom/data`` below with the location from ``loom.local.data.dir`` in ``/etc/loom/conf/loom-site.xml`` if you have modified it from default
+
+  .. parsed-literal::
+   $ sudo cp -R /var/loom/data /var/loom/data.backup
+
+  * If you are using another database, such as MySQL, follow your standard procedures for backing up the Loom database
+
+* 3 - Verify configuration path
+
+  * Double check that ``/etc/loom/conf.loom`` is the active configuration
+
+  .. parsed-literal::
+   $ update-alternatives --display loom-conf
+
+  * If not, run the following to update it
+
+  .. parsed-literal::
+   $ update-alternatives --install /etc/loom/conf loom-conf /etc/loom/conf.loom 20
+
+* 4 - Upgrade Loom packages
+
+  * If upgrading from file, follow the instructions at :doc:`Installing from File </guide/installation/index>`
+  * If upgrading from repository, follow the instructions at :doc:`Installing from Repository </guide/installation/index>` and replace the ``install`` on each command with ``upgrade``
+
+* 5 - Upgrade database table schemas
+
+  * If you are using MySQL, make sure MySQL is running and update the table schemas
+
+  .. parsed-literal::
+   $ mysql -u loom -p loom < /opt/loom/server/config/sql/loom-upgrade-tables-mysql-0.9.8.sql
+
+  * If you are using another external database, you will need to perform the table changes, manually
+  * If you are using the embedded Derby database, the schema update will be performed in the next step
+
+* 6 - Upgrade internal data
+
+  * Run /opt/loom/server/bin/upgrade-0.9.8.sh to migrate data in the database.
+
+* 7 - Start Loom services
+
+  .. parsed-literal::
+   $ sudo /etc/init.d/loom-server start
+   $ sudo /etc/init.d/loom-ui start
+   $ sudo /etc/init.d/loom-provisioner start
+
+0.9.6 to 0.9.7
+^^^^^^^^^^^^^^
 
 * 1 - Login to the Loom UI as admin and click "Export" to export a JSON file containing:
 

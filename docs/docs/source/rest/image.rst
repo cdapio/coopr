@@ -167,7 +167,7 @@ To update an image type, make a PUT HTTP request to URI:
 
 Resource specified above respresents an individual image type request for an update operation.
 Currently, the update of image type resource requires complete image type object to be 
-returned back rather than individual fields.
+in the request body.
 
 PUT Parameters
 ^^^^^^^^^^^^^^^^

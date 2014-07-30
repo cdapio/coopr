@@ -27,7 +27,8 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.layout.change.ClusterLayoutChange;
 import com.continuuity.loom.layout.change.ClusterLayoutTracker;
 import com.continuuity.loom.scheduler.task.NodeService;
-import com.continuuity.loom.store.EntityStore;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -36,6 +37,7 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,12 +53,12 @@ import java.util.UUID;
  */
 public class Solver {
   private static final Logger LOG  = LoggerFactory.getLogger(Solver.class);
-  private final EntityStore entityStore;
+  private final EntityStoreService entityStoreService;
   private final ClusterLayoutUpdater updater;
 
   @Inject
-  private Solver(EntityStore entityStore, ClusterLayoutUpdater updater) {
-    this.entityStore = entityStore;
+  private Solver(EntityStoreService entityStoreService, ClusterLayoutUpdater updater) {
+    this.entityStoreService = entityStoreService;
     this.updater = updater;
   }
 
@@ -72,7 +74,8 @@ public class Solver {
    */
   public Set<Node> addServicesToCluster(Cluster cluster, Set<Node> clusterNodes,
                                         Set<String> servicesToAdd) throws Exception {
-    Map<String, Service> serviceMap = getServiceMap(Sets.union(cluster.getServices(), servicesToAdd));
+    EntityStoreView entityStore = entityStoreService.getView(cluster.getAccount());
+    Map<String, Service> serviceMap = getServiceMap(Sets.union(cluster.getServices(), servicesToAdd), entityStore);
     validateServiceCompatibilities(cluster.getClusterTemplate().getCompatibilities(), servicesToAdd);
     validateServiceDependencies(serviceMap);
 
@@ -93,15 +96,16 @@ public class Solver {
    *
    * @param cluster Cluster to check addition of services to.
    * @param servicesToAdd Services to add to the cluster
-   * @throws Exception
+   * @throws IOException
    */
-  public void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd) throws Exception {
-    Map<String, Service> serviceMap = getServiceMap(Sets.union(cluster.getServices(), servicesToAdd));
+  public void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd) throws IOException {
+    EntityStoreView entityStore = entityStoreService.getView(cluster.getAccount());
+    Map<String, Service> serviceMap = getServiceMap(Sets.union(cluster.getServices(), servicesToAdd), entityStore);
     validateServicesToAdd(cluster, servicesToAdd, serviceMap);
   }
 
   private void validateServicesToAdd(Cluster cluster, Set<String> servicesToAdd, Map<String, Service> serviceMap)
-    throws Exception {
+     {
     validateServiceCompatibilities(cluster.getClusterTemplate().getCompatibilities(), servicesToAdd);
     validateServiceDependencies(serviceMap);
   }
@@ -117,6 +121,7 @@ public class Solver {
    * @throws Exception
    */
   public Map<String, Node> solveClusterNodes(Cluster cluster, ClusterCreateRequest request) throws Exception {
+    EntityStoreView entityStore = entityStoreService.getView(cluster.getAccount());
     // make sure the template exists
     String clusterTemplateName = request.getClusterTemplate();
     ClusterTemplate template = entityStore.getClusterTemplate(clusterTemplateName);
@@ -154,7 +159,8 @@ public class Solver {
     if (requiredHardwareType != null && requiredHardwareType.isEmpty()) {
       requiredHardwareType = null;
     }
-    Map<String, String> hardwareTypeFlavors = getHardwareTypeMap(providerName, template, requiredHardwareType);
+    Map<String, String> hardwareTypeFlavors =
+      getHardwareTypeMap(providerName, template, requiredHardwareType, entityStore);
     if (hardwareTypeFlavors.isEmpty()) {
       throw new IllegalArgumentException("no hardware types are available to use with template "
                                            + template.getName() + " and provider " + providerName);
@@ -169,7 +175,7 @@ public class Solver {
     if (requiredImageType != null && requiredImageType.isEmpty()) {
       requiredImageType = null;
     }
-    Map<String, String> imageTypeMap = getImageTypeMap(providerName, template, requiredImageType);
+    Map<String, String> imageTypeMap = getImageTypeMap(providerName, template, requiredImageType, entityStore);
     if (imageTypeMap.isEmpty()) {
       throw new IllegalArgumentException("no image types are available to use with template "
                                            + template.getName() + " and provider " + providerName);
@@ -203,7 +209,7 @@ public class Solver {
     }
     validateServiceCompatibilities(template.getCompatibilities(), serviceNames);
 
-    Map<String, Service> serviceMap = getServiceMap(serviceNames);
+    Map<String, Service> serviceMap = getServiceMap(serviceNames, entityStore);
     validateServiceDependencies(serviceMap);
     cluster.setServices(serviceNames);
 
@@ -226,7 +232,7 @@ public class Solver {
 
   // get a mapping of service name to service object for fast lookup later. Also check that each service actually
   // exists.
-  private Map<String, Service> getServiceMap(Set<String> serviceNames) throws Exception {
+  private Map<String, Service> getServiceMap(Set<String> serviceNames, EntityStoreView entityStore) throws IOException {
     Map<String, Service> map = Maps.newHashMap();
     for (String serviceName : serviceNames) {
       Service service = entityStore.getService(serviceName);
@@ -240,7 +246,8 @@ public class Solver {
 
   // get a mapping of hardware type name to flavor that can be used with the given provider and cluster template.
   private Map<String, String> getHardwareTypeMap(String providerName, ClusterTemplate template,
-                                                 String requiredHardwareType) throws Exception {
+                                                 String requiredHardwareType, EntityStoreView entityStore)
+    throws Exception {
     Map<String, String> flavorMap = Maps.newHashMap();
 
     Compatibilities compatibilities = template.getCompatibilities();
@@ -277,7 +284,7 @@ public class Solver {
 
   // get a mapping of image type name to image that can be used with the given provider
   private Map<String, String> getImageTypeMap(String providerName, ClusterTemplate template,
-                                              String requiredImageType) throws Exception {
+                                              String requiredImageType, EntityStoreView entityStore) throws Exception {
     Map<String, String> imageMap = Maps.newHashMap();
 
     Compatibilities compatibilities = template.getCompatibilities();
@@ -324,9 +331,8 @@ public class Solver {
    * are not.
    *
    * @param serviceMap Map of service name to {@link Service} to check all dependency requirements for.
-   * @throws Exception
    */
-  private void validateServiceDependencies(Map<String, Service> serviceMap) throws Exception {
+  private void validateServiceDependencies(Map<String, Service> serviceMap) {
     // gather all services that will be provided on the cluster. This is every service plus any service they provide.
     Set<String> providedServices = Sets.newHashSet();
     for (Service service : serviceMap.values()) {
@@ -385,7 +391,7 @@ public class Solver {
                                             Map<String, String> imageTypeMap,
                                             Set<String> serviceNames,
                                             Map<String, Service> serviceMap,
-                                            String dnsSuffix) throws Exception {
+                                            String dnsSuffix) {
     NodeLayoutGenerator nodeLayoutGenerator =
       new NodeLayoutGenerator(clusterTemplate, serviceNames, hardwareTypeMap.keySet(), imageTypeMap.keySet());
 

@@ -28,8 +28,8 @@ public abstract class NamedEntity {
   protected final String name;
 
   public NamedEntity(String name) {
-    Preconditions.checkArgument(whitelist.matcher(name).matches(),
-                                "invalid name.  Name must consist of only [a-zA-Z0-9_.-]");
+    Preconditions.checkArgument(name != null && name.length() > 0 && whitelist.matcher(name).matches(),
+                                "invalid name. Name must exist and consist of only [a-zA-Z0-9_.-]");
     this.name = name;
   }
 

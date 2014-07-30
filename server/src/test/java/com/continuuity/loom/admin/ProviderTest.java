@@ -60,7 +60,6 @@ public class ProviderTest extends BaseTest {
     );
     provider.addUserFields(userFields, Entities.ProviderTypeExample.USER_RACKSPACE);
 
-
     Map<String, String> expected = Maps.newHashMap();
     for (Map.Entry<String, String> entry : fields.entrySet()) {
       expected.put(entry.getKey(), entry.getValue());
@@ -70,11 +69,5 @@ public class ProviderTest extends BaseTest {
     }
     expected.remove("boguskey");
     Assert.assertEquals(expected, provider.getProvisionerFields());
-  }
-
-  @BeforeClass
-  public static void setupProviderTest() throws Exception {
-    entityStore.writeProviderType(Entities.ProviderTypeExample.USER_RACKSPACE);
-    entityStore.writeProvider(Entities.ProviderExample.JOYENT);
   }
 }

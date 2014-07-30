@@ -31,8 +31,12 @@ import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import static com.continuuity.test.drivers.Global.globalDriver;
 import static org.junit.Assert.assertEquals;
@@ -93,7 +97,7 @@ public class ClustersTest extends GenericTest {
                  TEST_UTIL.getTopListUri(globalDriver));
   }
 
-  private Set<TestCluster> getActualClusters(WebElement table) {
+  private Set<TestCluster> getActualClusters(WebElement table) throws ParseException {
     Set<TestCluster> clusters = Sets.newHashSet();
     List<WebElement> tableRows = TEST_UTIL.getRows(table);
     for (int i = 0; i < tableRows.size(); i++) {
@@ -103,9 +107,13 @@ public class ClustersTest extends GenericTest {
       String name = tds.get(0).getText();
       String clusterId = tds.get(2).getText();
       String date = tds.get(3).getText();
+      SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      f.setTimeZone(TimeZone.getTimeZone("GMT"));
+      Date d = f.parse(date);
+      long timestamp = d.getTime();
       String template = tds.get(4).getText();
       int nodeNumber = Integer.parseInt(tds.get(5).getText());
-      clusters.add(new TestCluster(name, clusterId, date, template, nodeNumber));
+      clusters.add(new TestCluster(name, clusterId, timestamp, template, nodeNumber));
     }
     return clusters;
   }

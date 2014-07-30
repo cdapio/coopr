@@ -171,7 +171,7 @@ To update a provider type, make a PUT HTTP request to URI:
 
 Resource specified above respresents an individual provider that is being updated.
 Currently, the update of provider resource requires complete provider object to be 
-returned back rather than individual fields.
+in the request body.
 
 PUT Parameters
 ^^^^^^^^^^^^^^^^
