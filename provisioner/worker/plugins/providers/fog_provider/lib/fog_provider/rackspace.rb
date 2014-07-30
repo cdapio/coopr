@@ -18,7 +18,7 @@
 
 require_relative 'utils'
 
-class FogProviderRackspace < FogProvider
+class FogProviderRackspace < Provider
 
   include FogProvider
 

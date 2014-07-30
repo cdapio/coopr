@@ -18,7 +18,7 @@
 
 require_relative 'utils'
 
-class FogProviderOpenstack
+class FogProviderOpenstack < Provider
 
   include FogProvider
 

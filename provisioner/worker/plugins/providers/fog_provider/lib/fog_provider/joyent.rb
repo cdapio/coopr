@@ -18,7 +18,7 @@
 
 require_relative 'utils'
 
-class FogProviderJoyent
+class FogProviderJoyent < Provider
 
   include FogProvider
 
