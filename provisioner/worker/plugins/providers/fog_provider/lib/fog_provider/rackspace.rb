@@ -73,8 +73,7 @@ class FogProviderRackspace < FogProvider
         instance_variable_set('@' + k, v)
       end
       # Confirm server
-      log.debug 'Invoking server confirm'
-      log.debug "fetching server for id: #{providerid}"
+      log.debug "Invoking server confirm for id: #{providerid}"
       server = self.connection.servers.get(providerid)
       # Wait until the server is ready
       raise 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
