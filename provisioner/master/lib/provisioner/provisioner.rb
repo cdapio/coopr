@@ -52,6 +52,7 @@ module Loom
     # invoked from bin/provisioner
     def self.run(options)
 
+      # read configuration
       config = Config.new(options)
       config.load_default
 
@@ -178,6 +179,8 @@ module Loom
           sleep 10
         }
       }
+      # abort on any uncaught exception during registration, etc
+      @heartbeat_thread.abort_on_exception=true
     end
 
     def register_with_server
