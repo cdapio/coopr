@@ -1,6 +1,6 @@
 {
   "name": "php-modules",
-  "description": "Installs PHP PEAR modules",
+  "description": "Installs/configures PHP PEAR modules",
   "dependencies": {
     "conflicts": [],
     "install": {
@@ -9,7 +9,7 @@
     },
     "provides": [],
     "runtime": {
-      "requires": [ "php" ],
+      "requires": [],
       "uses": []
     }
   },
