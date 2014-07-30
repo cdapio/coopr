@@ -16,8 +16,6 @@
 # limitations under the License.
 #
 
-require_relative '../fog_provider'
-
 class FogProviderRackspace < FogProvider
 
   def create(inputmap)
