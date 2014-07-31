@@ -40,10 +40,13 @@ To bootstrap a tenant, making a POST HTTP request to URI:
 
  /bootstrap
 
-The body is a JSON Object containing one optional key ``overwrite`` which indicates whether or 
-not data from the superadmin should overwrite existing data. By default it is false, meaning an entity
-from the superadmin will be skipped if it already exists in the tenant account, even if the entities 
-themselves have different values. 
+Normally, a bootstrap is only allowed if the tenant is in an completely clean state, meaning
+there are no providers, hardware types, image types, services, cluster templates, or 
+plugin resources. The tenant admin can force a potentially destructive bootstrap by setting
+a variable in the request body.
+The body is a JSON Object containing one optional key ``force`` which indicates whether or 
+not superadmin data should be copied regardless of the state of the tenant. This will overwrite
+any existing data.
 
 POST Parameters
 ^^^^^^^^^^^^^^^^
@@ -54,8 +57,8 @@ POST Parameters
 
    * - Parameter
      - Description
-   * - overwrite
-     - Boolean indicating whether or not data from the superadmin should overwrite existing data. Defaults to false.
+   * - force 
+     - Boolean indicating whether or not to force a bootstrap regardless of the tenant state. Defaults to false.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -70,8 +73,8 @@ HTTP Responses
      - If update was successful
    * - 403 (FORBIDDEN)
      - If the user is not allowed to make this request.
-   * - 404 (NOT FOUND)
-     - If the resource requested is not found.
+   * - 409 (CONFLICT)
+     - If the tenant is not in a clean slate and cannot be bootstrapped.
 
 Example
 ^^^^^^^^

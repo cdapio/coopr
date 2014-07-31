@@ -48,6 +48,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
@@ -111,37 +112,42 @@ public class LoomRPCHandler extends LoomAuthHandler {
       return;
     }
 
-    boolean shouldOverwrite = bootstrapRequest == null ? false : bootstrapRequest.shouldOverwrite();
+    boolean forced = bootstrapRequest == null ? false : bootstrapRequest.isForced();
     EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
     EntityStoreView tenantView = entityStoreService.getView(account);
 
+    if (!forced && !canBootstrap(tenantView)) {
+      responder.sendError(HttpResponseStatus.CONFLICT, "Cannot bootstrap unless the tenant is empty.");
+      return;
+    }
+
     // copy entities
     for (HardwareType hardwareType : superadminView.getAllHardwareTypes()) {
-      if (!shouldOverwrite && tenantView.getHardwareType(hardwareType.getName()) != null) {
+      if (!forced && tenantView.getHardwareType(hardwareType.getName()) != null) {
         continue;
       }
       tenantView.writeHardwareType(hardwareType);
     }
     for (ImageType imageType : superadminView.getAllImageTypes()) {
-      if (!shouldOverwrite && tenantView.getImageType(imageType.getName()) != null) {
+      if (!forced && tenantView.getImageType(imageType.getName()) != null) {
         continue;
       }
       tenantView.writeImageType(imageType);
     }
     for (Service service : superadminView.getAllServices()) {
-      if (!shouldOverwrite && tenantView.getService(service.getName()) != null) {
+      if (!forced && tenantView.getService(service.getName()) != null) {
         continue;
       }
       tenantView.writeService(service);
     }
     for (ClusterTemplate template : superadminView.getAllClusterTemplates()) {
-      if (!shouldOverwrite && tenantView.getClusterTemplate(template.getName()) != null) {
+      if (!forced && tenantView.getClusterTemplate(template.getName()) != null) {
         continue;
       }
       tenantView.writeClusterTemplate(template);
     }
     for (Provider provider : superadminView.getAllProviders()) {
-      if (!shouldOverwrite && tenantView.getProvider(provider.getName()) != null) {
+      if (!forced && tenantView.getProvider(provider.getName()) != null) {
         continue;
       }
       tenantView.writeProvider(provider);
@@ -150,6 +156,14 @@ public class LoomRPCHandler extends LoomAuthHandler {
     // TODO: bootstrap plugin resources
 
     responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  private boolean canBootstrap(EntityStoreView tenantView) throws IOException {
+    return tenantView.getAllProviders().isEmpty() &&
+      tenantView.getAllHardwareTypes().isEmpty() &&
+      tenantView.getAllImageTypes().isEmpty() &&
+      tenantView.getAllServices().isEmpty() &&
+      tenantView.getAllClusterTemplates().isEmpty();
   }
 
   /**

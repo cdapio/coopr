@@ -20,13 +20,13 @@ package com.continuuity.loom.http.request;
  * Request for bootstrapping a tenant.
  */
 public class BootstrapRequest {
-  private final boolean overwrite;
+  private final boolean force;
 
-  public BootstrapRequest(Boolean overwrite) {
-    this.overwrite = overwrite == null ? false : overwrite;
+  public BootstrapRequest(Boolean force) {
+    this.force = force == null ? false : force;
   }
 
-  public boolean shouldOverwrite() {
-    return overwrite;
+  public boolean isForced() {
+    return force;
   }
 }

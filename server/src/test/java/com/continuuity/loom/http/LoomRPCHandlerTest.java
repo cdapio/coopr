@@ -29,8 +29,10 @@ import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
+import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.request.BootstrapRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.ClusterAction;
@@ -40,7 +42,9 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.After;
@@ -118,17 +122,17 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
       superadminView.writeClusterTemplate(template);
     }
 
-    // make sure tenant account is empty
-    EntityStoreView tenantView = entityStoreService.getView(ADMIN_ACCOUNT);
-    Assert.assertTrue(tenantView.getAllProviders().isEmpty());
-    Assert.assertTrue(tenantView.getAllServices().isEmpty());
-    Assert.assertTrue(tenantView.getAllHardwareTypes().isEmpty());
-    Assert.assertTrue(tenantView.getAllImageTypes().isEmpty());
-    // one pre-existing template
-    Assert.assertEquals(ImmutableSet.of(smallTemplate), ImmutableSet.copyOf(tenantView.getAllClusterTemplates()));
+    Account account = new Account(Constants.ADMIN_USER, "tenantX");
+    tenantStore.writeTenant(new Tenant("tenantX", "tenantX", 0, 10, 100));
+    EntityStoreView tenantView = entityStoreService.getView(account);
 
     // bootstrap
-    assertResponseStatus(doPost("/v1/loom/bootstrap", "", ADMIN_HEADERS), HttpResponseStatus.OK);
+    Header[] headers = {
+      new BasicHeader(Constants.USER_HEADER, account.getUserId()),
+      new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+      new BasicHeader(Constants.TENANT_HEADER, account.getTenantId())
+    };
+    assertResponseStatus(doPost("/v1/loom/bootstrap", "", headers), HttpResponseStatus.OK);
 
     // make sure tenant account has copied superadmin data
     Assert.assertEquals(providers, ImmutableSet.copyOf(tenantView.getAllProviders()));
@@ -139,7 +143,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
-  public void testBootstrapTenantOverwrite() throws Exception {
+  public void testForceBootstrap() throws Exception {
     // superadmin has a slightly different version than tenant
     String name = "template";
     ClusterTemplate template1 = new ClusterTemplate(
@@ -154,15 +158,23 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
     EntityStoreView tenantView = entityStoreService.getView(ADMIN_ACCOUNT);
 
+    Account account = new Account(Constants.ADMIN_USER, "tenantX");
+    tenantStore.writeTenant(new Tenant("tenantX", "tenantX", 0, 10, 100));
+
     superadminView.writeClusterTemplate(template1);
     tenantView.writeClusterTemplate(template2);
 
-    // check that with overwrite false, the template is not overwritten
+    // check that with force false, bootstrap is not allowed
+    Header[] headers = {
+      new BasicHeader(Constants.USER_HEADER, account.getUserId()),
+      new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+      new BasicHeader(Constants.TENANT_HEADER, account.getTenantId())
+    };
     BootstrapRequest body = new BootstrapRequest(false);
-    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), ADMIN_HEADERS), HttpResponseStatus.CONFLICT);
     Assert.assertEquals(template2, tenantView.getClusterTemplate(name));
 
-    // check that with overwrite true, the template is overwritten
+    // check that with force true, the template is overwritten
     body = new BootstrapRequest(true);
     assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), ADMIN_HEADERS), HttpResponseStatus.OK);
     Assert.assertEquals(template1, tenantView.getClusterTemplate(name));
