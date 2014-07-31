@@ -23,30 +23,14 @@ describe 'Provisioner::CLI' do
 
   it 'can parse command line arguments' do
     options = Loom::CLI.read([
-      '-u', 'http://test',
-      '-L', 'debug',
-      '-l', '/tmp/test.log',
-      '-b', '127.0.0.1',
-      '-p', '55058',
-      '-d'
+      '-c', '/tmp/config.xml',
+      '-r'
     ])
     expected = {
-      :uri => 'http://test',
-      :log_level => 'debug',
-      :log_directory => '/tmp/test.log',
-      :bind_ip => '127.0.0.1',
-      :bind_port => '55058',
-      :daemonize => true
+      :configfile => '/tmp/config.xml',
+      :register => true
     }
     expect(options).to eq(expected)
-  end
-
-  it 'needs either file or uri arguments' do
-    expect { Loom::CLI.read(['-L' 'debug']) }.to raise_error SystemExit
-  end
-
-  it 'cannot register without an uri argument' do
-    expect { Loom::CLI.read(['-r']) }.to raise_error SystemExit
   end
 
 end
