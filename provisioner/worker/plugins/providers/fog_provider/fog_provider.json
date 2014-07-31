@@ -17,6 +17,11 @@
             "type": "password",
             "tip": "AWS Secret Access Key"
           },
+          "aws_credential_file": {
+            "label": "AWS Credential file",
+            "type": "text",
+            "tip": "Full path and file name to AWS credential file as used by AWS command line tools",
+          },
           "aws_keyname": {
             "label": "Key name",
             "type": "text",
@@ -50,6 +55,12 @@
           [
             "aws_access_key_id",
             "aws_secret_access_key",
+            "aws_keyname",
+            "aws_keyfile",
+            "aws_region"
+          ],
+          [
+            "aws_credential_file",
             "aws_keyname",
             "aws_keyfile",
             "aws_region"
