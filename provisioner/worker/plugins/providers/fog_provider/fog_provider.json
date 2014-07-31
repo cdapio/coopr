@@ -76,13 +76,13 @@
             "tip": "AWS security group (non-VPC)"
           },
           "security_group_ids": {
-            "label": "Security Group IDs",
+            "label": "Security Group IDs (VPC only)",
             "type": "text",
             "default": "default",
             "tip": "AWS security group IDs (required for VPC)"
           },
           "subnet_id": {
-            "label": "Subnet ID",
+            "label": "Subnet ID (VPC only)",
             "type": "text",
             "tip": "Enable VPC and use this subnet ID"
           },
