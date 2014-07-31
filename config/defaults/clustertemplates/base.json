@@ -1,6 +1,6 @@
 {
   "name": "base",
-  "description": "Base system",
+  "description": "Base-only system, runs only base service",
   "defaults": {
     "services": [
       "base"
