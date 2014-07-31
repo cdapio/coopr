@@ -42,7 +42,7 @@ module Loom
       @config = config
       @tenantmanagers = {}
       @terminating_tenants = []
-      @server_uri = config.get('server.uri')
+      @server_uri = config.get('provisioner.server.uri')
       pid = Process.pid
       host = Socket.gethostname.downcase
       @provisioner_id = "#{host}.#{pid}"
@@ -57,17 +57,17 @@ module Loom
       config.load
 
       # initialize logging
-      Logging.configure(config.get('log.directory') ? "#{config.get('log.directory')}/provisioner.log" : nil)
-      Logging.level = config.get('log.level')
-      Logging.shift_age = config.get('log.rotation.shift.age')
-      Logging.shift_size = config.get('log.rotation.shift.size')
+      Logging.configure(config.get('provisioner.log.directory') ? "#{config.get('provisioner.log.directory')}/provisioner.log" : nil)
+      Logging.level = config.get('provisioner.log.level')
+      Logging.shift_age = config.get('provisioner.log.rotation.shift.age')
+      Logging.shift_size = config.get('provisioner.log.rotation.shift.size')
       Logging.log.debug "Provisioner starting up"
       config.properties.each do |k, v|
         Logging.log.debug "  #{k}: #{v}"
       end
 
       # daemonize
-      daemonize if config.get('daemonize')
+      daemonize if config.get('provisioner.daemonize')
 
       pg = Loom::Provisioner.new(options, config)
       if options[:register]
@@ -106,8 +106,8 @@ module Loom
         # set reference to provisioner
         Api.set :provisioner, self
         # set bind settings
-        bind_ip = @config.get('bind.ip')
-        bind_port = @config.get('bind.port')
+        bind_ip = @config.get('provisioner.bind.ip')
+        bind_port = @config.get('provisioner.bind.port')
         Api.set :bind, bind_ip
         Api.set :port, bind_port
         # let sinatra take over from here
@@ -193,8 +193,8 @@ module Loom
       data = {}
       data['id'] = @provisioner_id
       data['capacityTotal'] = @config.get('provisioner.capacity')
-      data['host'] = @config.get('register.ip') || local_ip
-      data['port'] = @config.get('bind.port')
+      data['host'] = @config.get('provisioner.register.ip') || local_ip
+      data['port'] = @config.get('provisioner.bind.port')
 
       log.info "Registering with server at #{uri}: #{data.to_json}"
 

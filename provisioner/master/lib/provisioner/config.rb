@@ -30,7 +30,7 @@ module Loom
     end
 
     def get(val)
-      val = 'provisioner.' + val.downcase unless val.downcase =~ /^provisioner\./i
+      val = val.downcase
       # handle boolean
       if @properties[val] =~ /^false$/i
         false
