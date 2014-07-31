@@ -16,9 +16,7 @@
 package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.admin.FieldSchema;
-import com.continuuity.loom.admin.ParameterType;
 import com.continuuity.loom.admin.ParametersSpecification;
-import com.continuuity.loom.admin.ProviderType;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

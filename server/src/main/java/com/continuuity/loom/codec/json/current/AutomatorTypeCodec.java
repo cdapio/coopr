@@ -18,7 +18,7 @@ package com.continuuity.loom.codec.json.current;
 import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ParameterType;
 import com.continuuity.loom.admin.ParametersSpecification;
-import com.continuuity.loom.admin.ProviderType;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -44,7 +44,9 @@ public class AutomatorTypeCodec implements JsonDeserializer<AutomatorType> {
     String description = context.deserialize(jsonObj.get("description"), String.class);
     Map<ParameterType, ParametersSpecification> parameters = context.deserialize(
       jsonObj.get("parameters"), new TypeToken<Map<ParameterType, ParametersSpecification>>() {}.getType());
+    Map<String, ResourceTypeSpecification> resourceTypes = context.deserialize(
+      jsonObj.get("resourceTypes"), new TypeToken<Map<String, ResourceTypeSpecification>>() {}.getType());
 
-    return new AutomatorType(name, description, parameters);
+    return new AutomatorType(name, description, parameters, resourceTypes);
   }
 }

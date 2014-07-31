@@ -181,7 +181,7 @@ module Loom
       data['id'] = @provisioner_id
       data['capacityTotal'] = @options[:capacity] || '10'
       data['host'] = local_ip
-      data['port'] = @options[:bind_port]
+      data['port'] = @options[:bind_port] || '55056'
 
       log.info "Registering with server at #{uri}: #{data.to_json}"
 
