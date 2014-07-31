@@ -90,13 +90,6 @@ module Loom
       end
     end
 
-    def merge_options(options)
-    end
-
-    def apply_defaults
-      # @properties['provisioner.bind.ip'] = '0.0.0.0' unless @properties['provisioner.bind.ip']
-    end
-
     def validate
       # %w(server.uri register.ip data.dir work.dir default.capacity )
     end
