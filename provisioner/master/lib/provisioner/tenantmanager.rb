@@ -25,6 +25,7 @@ module Loom
   class TenantManager
     include Logging
     attr_accessor :spec, :provisioner_id, :config
+    attr_reader :status
 
     def initialize(spec)
       unless spec.instance_of?(TenantSpec)
@@ -49,6 +50,15 @@ module Loom
       @spec.workers.times do |i|
         spawn_worker_process
       end
+    end
+
+    def resource_sync_needed
+      @status = 'STALE'
+      terminate_all_worker_processes
+    end
+
+    def resource_sync_needed?
+      'STALE' == @status
     end
 
     # check worker processes, called after CLD signal processed (child process termination)
@@ -132,12 +142,18 @@ module Loom
       @spec.workers = new_tm.spec.workers
     end
 
-    # delete sends kill to all workers
-    def delete
-      workerpids = @workerpids.dup 
+    # send kill to all workers
+    def terminate_all_worker_processes
+      workerpids = @workerpids.dup
       workerpids.each do |pid|
         terminate_worker_process(pid)
       end
+    end
+
+    # delete sends kill to all workers
+    def delete
+      @status = 'DELETING'
+      terminate_all_worker_processes
     end
 
   end

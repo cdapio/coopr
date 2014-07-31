@@ -258,7 +258,8 @@ module Loom
       else
         # new tenant
         log.debug "Adding new tenant: #{id}"
-        tenantmgr.spawn
+        #tenantmgr.spawn
+        tenantmgr.resource_sync_needed
         @tenantmanagers[id] = tenantmgr
       end
     end
