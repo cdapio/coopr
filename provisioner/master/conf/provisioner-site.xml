@@ -4,5 +4,10 @@
     <value>127.0.0.1</value>
     <description>Routable IP for the server to call back to this provisioner</description>
   </property>
+  <property>
+    <name>provisioner.log.directory</name>
+    <value>/tmp/log</value>
+    <description>Provisioner log directory</description>
+  </property>
 </configuration>
 

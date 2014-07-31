@@ -18,7 +18,7 @@
     <name>provisioner.register.ip</name>
     <!-- default: no value, provisioner will attempt to auto-detect -->
     <value></value>
-    <description>Routable IP for the server to call back to this provisioner</description>
+    <description>Routable IP for the server to call back to this provisioner's API</description>
   </property>
   <property>
     <name>provisioner.data.dir</name>
@@ -42,12 +42,13 @@
   </property>
   <property>
     <name>provisioner.log.directory</name>
+    <!-- default: no value, logs to STDOUT -->
     <value></value>
     <description>Provisioner log directory</description>
   </property>
   <property>
     <name>provisioner.log.rotation.shift.age</name>
-    <value>10</value>
+    <value>7</value>
     <description>number of old log files to keep, or frequency of rotation (daily, weekly, or monthly)</description>
   </property>
   <property>

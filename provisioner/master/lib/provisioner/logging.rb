@@ -23,6 +23,8 @@ module Loom
   module Logging
     attr_accessor :level
     @level = ::Logger::INFO
+    @shift_age = 7
+    @shift_size = 10485760 # 10Mb
     @out = nil
     def log
       Loom::Logging.log
@@ -51,10 +53,18 @@ module Loom
       end
     end
 
+    def self.shift_age=(shift_age)
+      @shift_age = shift_age
+    end
+
+    def self.shift_size=(shift_size)
+      @shift_size = shift_size
+    end
+
     def self.log
       unless @logger
         if @out
-          @logger = ::Logger.new(@out, 'daily')
+          @logger = ::Logger.new(@out, @shift_age.to_i, @shift_size.to_i)
         else
           @logger = ::Logger.new(STDOUT)
         end

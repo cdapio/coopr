@@ -59,6 +59,8 @@ module Loom
       # initialize logging
       Logging.configure(config.get_value('log.directory') ? "#{config.get_value('log.directory')}/provisioner.log" : nil)
       Logging.level = config.get_value('log.level')
+      Logging.shift_age = config.get_value('log.rotation.shift.age')
+      Logging.shift_size = config.get_value('log.rotation.shift.size')
       Logging.log.debug "Provisioner starting up"
       config.config.each do |k, v|
         Logging.log.debug "  #{k}: #{v}"
