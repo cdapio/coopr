@@ -21,6 +21,11 @@
     <description>Routable IP for the server to call back to this provisioner's API</description>
   </property>
   <property>
+    <name>provisioner.daemonize</name>
+    <value>false</value>
+    <description>Run provisioner as a daemon. Ensure you also specify a log directory</description>
+  </property>
+  <property>
     <name>provisioner.data.dir</name>
     <value>/tmp/loom/data</value>
     <description>Provisioner storage directory for plugin data resources</description>

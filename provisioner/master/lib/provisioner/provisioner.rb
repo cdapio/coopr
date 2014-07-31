@@ -67,7 +67,7 @@ module Loom
       end
 
       # daemonize
-      daemonize if options[:daemonize]
+      daemonize if config.get_value('daemonize')
 
       pg = Loom::Provisioner.new(options, config)
       if options[:register]
