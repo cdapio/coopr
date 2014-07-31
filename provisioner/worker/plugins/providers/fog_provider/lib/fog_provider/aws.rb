@@ -45,8 +45,7 @@ class FogProviderAWS < Provider
       server = connection.servers.create(create_server_def)
       # Process results
       @result['result']['providerid'] = server.id.to_s
-      @result['result']['ssh-auth']['user'] = 'root'
-      @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
+      @result['result']['ssh-auth']['user'] = @task['config']['ssh-auth']['user'] || 'root'
       @result['result']['ssh-auth']['identityfile'] = @aws_keyfile unless @aws_keyfile.nil?
       @result['status'] = 0
     rescue Exception => e
