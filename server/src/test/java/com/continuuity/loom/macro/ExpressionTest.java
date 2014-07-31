@@ -21,7 +21,7 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.utils.ImmutablePair;
+import com.continuuity.loom.common.utils.ImmutablePair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;

@@ -1,0 +1,12 @@
+{
+  "name": "xlarge",
+  "description": "4+ vCPU, 15+ GB RAM, 240+ GB Disk",
+  "providermap": {
+    "joyent": {
+      "flavor": "Large 16GB"
+    },
+    "rackspace": {
+      "flavor": "performance2-15"
+    }
+  }
+}

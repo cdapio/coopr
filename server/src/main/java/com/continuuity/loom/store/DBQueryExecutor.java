@@ -16,6 +16,7 @@
 package com.continuuity.loom.store;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -113,6 +114,56 @@ public final class DBQueryExecutor {
   }
 
   /**
+   * Queries the store for a list of at most limit items, deserializing the items and performing a transform before
+   * before placing the transformed object into the output, finally returning an immutable list of transformed items.
+   * If no items exist, the list will be empty. Statement passed in must be closed by the caller.
+   *
+   * @param statement PreparedStatement of the query, ready for execution.
+   * @param clazz Class of the items being queried in the statement.
+   * @param transform Transform to perform to change the deserialized object in the table to the object in the output.
+   * @param <F> Type of item being queried
+   * @param <T> Type of item to return
+   * @return Immutable list of transformed objects that were queried for.
+   * @throws SQLException
+   */
+  public <F, T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<F> clazz,
+                                              Function<F, T> transform) throws SQLException {
+    return getQueryList(statement, clazz, transform, Integer.MAX_VALUE);
+  }
+
+  /**
+   * Queries the store for a list of at most limit items, deserializing the items and performing a transform before
+   * before placing the transformed object into the output, finally returning an immutable list of transformed items.
+   * If no items exist, the list will be empty. Statement passed in must be closed by the caller.
+   *
+   * @param statement PreparedStatement of the query, ready for execution.
+   * @param clazz Class of the items being queried in the statement.
+   * @param transform Transform to perform to change the deserialized object in the table to the object in the output.
+   * @param limit Max number of items to get.
+   * @param <F> Type of item being queried
+   * @param <T> Type of item to return
+   * @return Immutable list of transformed objects that were queried for.
+   * @throws SQLException
+   */
+  public <F, T> ImmutableList<T> getQueryList(PreparedStatement statement, Class<F> clazz,
+                                              Function<F, T> transform, int limit) throws SQLException {
+    ResultSet rs = statement.executeQuery();
+    try {
+      List<T> results = Lists.newArrayList();
+      int numResults = 0;
+      int actualLimit = limit < 0 ? Integer.MAX_VALUE : limit;
+      while (rs.next() && numResults < actualLimit) {
+        Blob blob = rs.getBlob(1);
+        results.add(transform.apply(deserializeBlob(blob, clazz)));
+        numResults++;
+      }
+      return ImmutableList.copyOf(results);
+    } finally {
+      rs.close();
+    }
+  }
+
+  /**
    * Queries the store for a single item, deserializing the item and returning it or null if the item does not exist.
    * Statement passed in must be closed by the caller.
    *
@@ -144,13 +195,34 @@ public final class DBQueryExecutor {
    * @return Result of the query, or 0 if no results.
    * @throws SQLException
    */
-  public static int getNum(PreparedStatement statement) throws SQLException {
+  public int getNum(PreparedStatement statement) throws SQLException {
     ResultSet results = statement.executeQuery();
     try {
       if (!results.next()) {
         return 0;
       } else {
         return results.getInt(1);
+      }
+    } finally {
+      results.close();
+    }
+  }
+
+  /**
+   * Queries for a single string, returning the value of the string or null if there are no results.
+   * Statement passed in must be closed by the caller.
+   *
+   * @param statement PreparedStatement of the query, ready for execution.
+   * @return Result of the query, or null if no results.
+   * @throws SQLException
+   */
+  public String getString(PreparedStatement statement) throws SQLException {
+    ResultSet results = statement.executeQuery();
+    try {
+      if (!results.next()) {
+        return null;
+      } else {
+        return results.getString(1);
       }
     } finally {
       results.close();

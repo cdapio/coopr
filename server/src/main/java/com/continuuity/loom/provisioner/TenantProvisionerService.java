@@ -1,6 +1,7 @@
 package com.continuuity.loom.provisioner;
 
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
@@ -9,6 +10,8 @@ import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -18,8 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 
 /**
  * Service for managing provisioners.
@@ -35,7 +40,7 @@ public class TenantProvisionerService {
 
   @Inject
   private TenantProvisionerService(ProvisionerStore provisionerStore,
-                                   TenantStore tenantStore,
+                                   final TenantStore tenantStore,
                                    ZKClient zkClient,
                                    @Named(Constants.Queue.WORKER_BALANCE) TrackingQueue balanceQueue,
                                    ProvisionerRequestService provisionerRequestService,
@@ -54,67 +59,77 @@ public class TenantProvisionerService {
   }
 
   /**
-   * Get an unmodifiable collection of all tenants.
+   * Get an unmodifiable collection of all tenant specifications.
    *
-   * @return Unmodifiable collection of all tenants
+   * @return Unmodifiable collection of all tenant specifications
    * @throws IOException
    */
-  public Collection<Tenant> getAllTenants() throws IOException {
-    return tenantStore.getAllTenants();
+  public Collection<TenantSpecification> getAllTenantSpecifications() throws IOException {
+    return tenantStore.getAllTenantSpecifications();
   }
 
   /**
-   * Get a specific tenant.
+   * Get a tenant specification by tenant name.
    *
-   * @param tenantId Id of the tenant to get
-   * @return Tenant for the given id, or null if none exists
+   * @param name Name of the tenant to get
+   * @return Tenant for the given name, or null if none exists
    * @throws IOException
    */
-  public Tenant getTenant(String tenantId) throws IOException {
-    return tenantStore.getTenant(tenantId);
+  public TenantSpecification getTenantSpecification(String name) throws IOException {
+    Tenant tenant = tenantStore.getTenantByName(name);
+    return tenant == null ? null : tenant.getSpecification();
   }
 
   /**
-   * Get an unmodifiable collection of all provisioners.
+   * Get an immutable collection of all provisioners for external display, with tenant ids mapped to tenant names.
    *
-   * @return Unmodifiable collection of all provisioners
+   * @return Immutable collection of all provisioners for external display, with tenant ids mapped to tenant names
    * @throws IOException
    */
   public Collection<Provisioner> getAllProvisioners() throws IOException {
-    return provisionerStore.getAllProvisioners();
+    Collection<Provisioner> provisioners = provisionerStore.getAllProvisioners();
+    List<Provisioner> externalProvisioners = Lists.newArrayListWithCapacity(provisioners.size());
+    for (Provisioner provisioner : provisioners) {
+      externalProvisioners.add(createExternalProvisioner(provisioner, tenantStore));
+    }
+    return externalProvisioners;
   }
 
   /**
-   * Get the provisioner for the given id, or null if none exists.
+   * Get the provisioner for the given id for external display, with tenant ids mapped to tenant names,
+   * or null if none exists.
    *
    * @param provisionerId Id of the provisioner to get
-   * @return Provisioner for the given id, or null if none exists
+   * @return Provisioner for the given id with tenant ids mapped to tenant names, or null if none exists
    * @throws IOException
    */
   public Provisioner getProvisioner(String provisionerId) throws IOException {
-    return provisionerStore.getProvisioner(provisionerId);
+    return createExternalProvisioner(provisionerStore.getProvisioner(provisionerId), tenantStore);
   }
 
   /**
    * Write the tenant to the store and balance the tenant workers across provisioners.
    *
-   * @param tenant Tenant to write
+   * @param tenantSpecification Tenant to write
    * @throws IOException if there was an exception persisting the tenant
    * @throws CapacityException if there is not enough capacity to support all tenant workers
    */
-  public void writeTenant(Tenant tenant) throws IOException, CapacityException {
+  public void writeTenantSpecification(TenantSpecification tenantSpecification) throws IOException, CapacityException {
     lock.acquire();
     try {
-      Tenant prevTenant = tenantStore.getTenant(tenant.getId());
+      Tenant prevTenant = tenantStore.getTenantByName(tenantSpecification.getName());
+      String id;
       if (prevTenant == null) {
         // if we're adding a new tenant
-        checkCapacity(tenant.getWorkers());
+        id = UUID.randomUUID().toString();
+        checkCapacity(tenantSpecification.getWorkers());
       } else {
         // we're updating an existing tenant
-        checkCapacity(tenant.getWorkers() - prevTenant.getWorkers());
+        id = prevTenant.getId();
+        checkCapacity(tenantSpecification.getWorkers() - prevTenant.getSpecification().getWorkers());
       }
-      balanceQueue.add(new Element(tenant.getId()));
-      tenantStore.writeTenant(tenant);
+      balanceQueue.add(new Element(id));
+      tenantStore.writeTenant(new Tenant(id, tenantSpecification));
     } finally {
       lock.release();
     }
@@ -123,19 +138,23 @@ public class TenantProvisionerService {
   /**
    * Delete the given tenant. A tenant must not have any assigned workers in order for deletion to be allowed.
    *
-   * @param tenantId Id of the tenant to delete
+   * @param name Name of the tenant to delete
    * @throws IllegalStateException if the tenant has one or more assigned workers
    * @throws IOException if there was an exception persisting the deletion
    */
-  public void deleteTenant(String tenantId) throws IllegalStateException, IOException {
+  public void deleteTenantByName(String name) throws IllegalStateException, IOException {
     lock.acquire();
     try {
-      int numAssignedWorkers = provisionerStore.getNumAssignedWorkers(tenantId);
+      Tenant tenant = tenantStore.getTenantByName(name);
+      if (tenant == null) {
+        return;
+      }
+      int numAssignedWorkers = provisionerStore.getNumAssignedWorkers(tenant.getId());
       if (numAssignedWorkers > 0) {
-        throw new IllegalStateException("Tenant " + tenantId + " still has " + numAssignedWorkers + " workers. " +
+        throw new IllegalStateException("Tenant " + name + " still has " + numAssignedWorkers + " workers. " +
                                           "Cannot delete it until workers are set to 0.");
       }
-      tenantStore.deleteTenant(tenantId);
+      tenantStore.deleteTenantByName(name);
     } finally {
       lock.release();
     }
@@ -215,12 +234,12 @@ public class TenantProvisionerService {
   public void rebalanceTenantWorkers(String tenantId) throws IOException, CapacityException {
     lock.acquire();
     try {
-      Tenant tenant = tenantStore.getTenant(tenantId);
+      Tenant tenant = tenantStore.getTenantByID(tenantId);
       if (tenant == null) {
         return;
       }
 
-      int diff = tenant.getWorkers() - provisionerStore.getNumAssignedWorkers(tenantId);
+      int diff = tenant.getSpecification().getWorkers() - provisionerStore.getNumAssignedWorkers(tenantId);
       if (diff < 0) {
         // too many workers assigned, remove some.
         int toRemove = 0 - diff;
@@ -241,7 +260,7 @@ public class TenantProvisionerService {
    * milliseconds.
    *
    * @param timeoutTs Timestamp in milliseconds to use as a cut off for deleting provisioners.
-   * @throws Exception
+   * @throws IOException
    */
   public void timeoutProvisioners(long timeoutTs) throws IOException {
     lock.acquire();
@@ -315,6 +334,41 @@ public class TenantProvisionerService {
       throw new CapacityException("Unable to add all " + numToAdd + " workers to tenant "
                                     + tenantId + " without exceeding worker capacity.");
     }
+  }
+
+  /**
+   * Create a new Provisioner object where the tenant ids have been replaced with tenant names for external
+   * consumption.
+   *
+   * @param provisioner Internal provisioner that uses tenant ids
+   * @param tenantStore Tenant store for mapping ids to names
+   * @return New Provisioner where the tenant ids have been replaced with tenant names
+   * @throws IOException
+   */
+  private Provisioner createExternalProvisioner(Provisioner provisioner, TenantStore tenantStore) throws IOException {
+    if (provisioner == null) {
+      return null;
+    }
+    Map<String, Integer> nameUsage = Maps.newHashMap();
+    for (Map.Entry<String, Integer> entry : provisioner.getUsage().entrySet()) {
+      nameUsage.put(tenantIdToName(entry.getKey()), entry.getValue());
+    }
+    Map<String, Integer> nameAssignments = Maps.newHashMap();
+    for (String tenantId : provisioner.getAssignedTenants()) {
+      nameAssignments.put(tenantIdToName(tenantId), provisioner.getAssignedWorkers(tenantId));
+    }
+    return new Provisioner(provisioner.getId(), provisioner.getHost(), provisioner.getPort(),
+                           provisioner.getCapacityTotal(), nameUsage, nameAssignments);
+  }
+
+  // id to name mapping is cached, so this mapping should not be expensive
+  private String tenantIdToName(String id) throws IOException {
+    String tenantName = tenantStore.getNameForId(id);
+    if (tenantName == null) {
+      LOG.warn("Could not map tenant id {} to a name, will use the id.");
+      tenantName = id;
+    }
+    return tenantName;
   }
 
   private void deleteProvisioner(Provisioner provisioner) throws IOException {
