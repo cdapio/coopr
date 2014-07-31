@@ -48,15 +48,7 @@ class FogProviderAWS < Provider
       # Create the server
       log.info "Creating #{hostname} on AWS using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
-      begin
-        server = connection.servers.create(
-          :flavor_id       => flavor,
-          :image_id        => image,
-          :name            => hostname,
-          :security_groups => @security_groups,
-          :key_name        => @aws_keyname
-        )
-      end
+      server = connection.servers.create(create_server_def)
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = 'root'
@@ -227,6 +219,23 @@ class FogProviderAWS < Provider
       raise 'Tags should be entered in a key=value pair'
     end
     tags
+  end
+
+  def create_server_def
+    server_def = {
+      :flavor_id                 => @flavor,
+      :image_id                  => @image,
+      :groups                    => @security_groups,
+      :security_group_ids        => @security_group_ids,
+      :key_name                  => @aws_keyname,
+      :availability_zone         => @availability_zone,
+      :placement_group           => @placement_group,
+      :iam_instance_profile_name => @iam_instance_profile
+    }
+    server_def[:subnet_id] = @subnet_id if vpc_mode?
+    server_def[:tenancy] = 'dedicated' if vpc_mode? && @dedicated_instance
+    server_def[:associate_public_ip] = @associate_public_ip if vpc_mode? && @associate_public_ip
+    server_def
   end
 
 end
