@@ -2,6 +2,80 @@
   "name": "fog",
   "description": "Multi-cloud fog-based provider (Openstack, Rackspace, Joyent)",
   "providertypes": [ "joyent", "openstack", "rackspace" ],
+  "aws" : {
+    "classname": "FogProviderAWS",
+    "parameters": {
+      "admin": {
+        "fields": {
+          "aws_access_key": {
+            "label": "Access Key ID",
+            "type": "text",
+            "tip": "AWS Access Key ID"
+          },
+          "aws_secret_key": {
+            "label": "Secret Access Key",
+            "type": "password",
+            "tip": "AWS Secret Access Key"
+          },
+          "aws_keyname": {
+            "label": "Key name",
+            "type": "text",
+            "override": true,
+            "tip": "Your AWS SSH public key name"
+          },
+          "aws_keyfile": {
+            "label": "Key file",
+            "type": "text",
+            "tip": "Full path and file name to your AWS SSH private key"
+          },
+          "aws_region": {
+            "label": "AWS Region",
+            "type": "select",
+            "options": [
+              "ap-northeast-1",
+              "ap-southeast-1",
+              "ap-southeast-2",
+              "eu-west-1",
+              "sa-east-1",
+              "us-east-1",
+              "us-west-1",
+              "us-west-2"
+            ],
+            "default": "us-east-1",
+            "override": true,
+            "tip": "AWS Region"
+          }
+        },
+        "required": [
+          [
+            "aws_access_key_id",
+            "aws_secret_access_key",
+            "aws_keyname",
+            "aws_keyfile",
+            "aws_region"
+          ]
+        ]
+      },
+      "user": {
+        "fields": {
+          "security_groups": {
+            "label": "Security Group",
+            "type": "text",
+            "default": "default",
+            "tip": "AWS security group"
+          },
+          "availability_zone": {
+            "label": "Availability Zone",
+            "type": "text",
+            "tip": "AWS Availability Zone"
+          }
+        },
+        "required": [
+          []
+        ]
+      }
+    }
+  },
   "joyent": {
     "name": "joyent",
     "classname": "FogProviderJoyent",
@@ -160,7 +234,11 @@
           }
         },
         "required": [
-          [ "rackspace_username", "rackspace_api_key", "rackspace_region" ]
+          [
+            "rackspace_username",
+            "rackspace_api_key",
+            "rackspace_region"
+          ]
         ]
       },
       "user": {
@@ -182,7 +260,7 @@
           }
         },
         "required": [
-          [ ]
+          []
         ]
       }
     }
