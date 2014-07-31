@@ -30,6 +30,7 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
@@ -123,7 +124,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     }
 
     Account account = new Account(Constants.ADMIN_USER, "tenantX");
-    tenantStore.writeTenant(new Tenant("tenantX", "tenantX", 0, 10, 100));
+    tenantStore.writeTenant(new Tenant("tenant-id123", new TenantSpecification("tenantX", 0, 10, 100)));
     EntityStoreView tenantView = entityStoreService.getView(account);
 
     // bootstrap
@@ -155,11 +156,11 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
       new ClusterDefaults(ImmutableSet.of("zookeeper"), "rackspace", null, null, null, null),
       null, null, null);
 
-    EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
-    EntityStoreView tenantView = entityStoreService.getView(ADMIN_ACCOUNT);
-
     Account account = new Account(Constants.ADMIN_USER, "tenantX");
-    tenantStore.writeTenant(new Tenant("tenantX", "tenantX", 0, 10, 100));
+    tenantStore.writeTenant(new Tenant("tenant-id123", new TenantSpecification("tenantX", 0, 10, 100)));
+
+    EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
+    EntityStoreView tenantView = entityStoreService.getView(account);
 
     superadminView.writeClusterTemplate(template1);
     tenantView.writeClusterTemplate(template2);
@@ -171,12 +172,12 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
       new BasicHeader(Constants.TENANT_HEADER, account.getTenantId())
     };
     BootstrapRequest body = new BootstrapRequest(false);
-    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), ADMIN_HEADERS), HttpResponseStatus.CONFLICT);
+    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), headers), HttpResponseStatus.CONFLICT);
     Assert.assertEquals(template2, tenantView.getClusterTemplate(name));
 
     // check that with force true, the template is overwritten
     body = new BootstrapRequest(true);
-    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), headers), HttpResponseStatus.OK);
     Assert.assertEquals(template1, tenantView.getClusterTemplate(name));
   }
 
