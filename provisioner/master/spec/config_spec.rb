@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # encoding: UTF-8
 #
 # Copyright 2012-2014, Continuuity, Inc.
@@ -17,16 +16,19 @@
 #
 
 
-# simple specification for a tenant
-module Loom
-  class TenantSpec
-    attr_accessor :id, :workers, :resources, :plugins
+require File.expand_path '../spec_helper.rb', __FILE__
+require File.dirname(__FILE__) + '/../lib/provisioner/config.rb'
+require File.dirname(__FILE__) + '/../lib/provisioner/constants.rb'
 
-    def initialize(id, workers, resources = nil, plugins = nil)
-      @id = id
-      @workers = workers
-      @resources = resources ||= Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
-      # @plugins = plugins ||= Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
-    end
+describe 'Loom::Config' do
+
+  before do
+    @config = Loom::Config.new({})
   end
+
+  it 'can parse the included config file' do
+    @config.load_file("#{File.dirname(__FILE__)}/provisioner-default.xml")
+    expect(@config.get(Loom::PROVISIONER_BIND_IP)).to eq('0.0.0.0')
+  end
+
 end

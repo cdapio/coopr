@@ -26,7 +26,7 @@ describe 'Sinatra API' do
     Loom::Provisioner::Api
   end
 
-  Loom::Provisioner::Api.set :provisioner, Loom::Provisioner.new({})
+  Loom::Provisioner::Api.set :provisioner, Loom::Provisioner.new({}, Loom::Config.new({}))
 
   it 'should serve status endpoint' do
     get '/status'

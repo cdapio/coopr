@@ -25,40 +25,13 @@ module Loom
       options = {}
       OptionParser.new do |opts|
         opts.banner = 'Usage: '
-        opts.on('-u', '--uri URI', 'Loom web server URI') do |u|
-          options[:uri] = u
+        opts.on('-c', '--config-file FILE', 'Site-specific config file to use') do |c|
+          options[:configfile] = c
         end
-        opts.on('-b', '--bind IP', 'IP to listen on, default 0.0.0.0') do |b|
-          options[:bind_ip] = b
-        end
-        opts.on('-p', '--port PORT', 'Port to listen on, default 55056') do |p|
-          options[:bind_port] = p
-        end
-        opts.on('-c', '--capacity CAPACITY', 'Max number of running workers for this provisioner, default 10') do |c|
-          options[:capacity] = c
-        end
-        opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
-          options[:log_level] = f
-        end
-        opts.on('-l', '--log-directory DIR', 'Path to log directory for provisioner and workers') do |d|
-          options[:log_directory] = d
-        end
-        opts.on('-d', '--daemon', 'Runs as a daemon. Ensure you also specify a log directory') do
-          options[:daemonize] = true 
-        end
-        opts.on('-r', '--register', 'Register installed plugins with the server.  Requires --uri') do
+        opts.on('-r', '--register', 'Register installed plugins with the server.') do
           options[:register] = true
         end
       end.parse!(arguments)
-
-      if !options[:uri] && !options[:file]
-        puts 'Either URI for loom server or --file must be specified'
-        exit(1)
-      end
-      if(options[:uri].nil? && options[:register])
-        puts "--register option requires the --uri [server uri] option"
-        exit(1)
-      end
       options
     end
   end
