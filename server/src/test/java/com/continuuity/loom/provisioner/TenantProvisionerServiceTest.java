@@ -2,6 +2,7 @@ package com.continuuity.loom.provisioner;
 
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
@@ -29,38 +30,41 @@ public class TenantProvisionerServiceTest extends BaseTest {
 
   @Test
   public void testAddWorkersToProvisioner() throws Exception {
-    Tenant tenant = new Tenant("tenantX", "id123", 50, 10, 100);
+    Tenant tenant = new Tenant("id123", new TenantSpecification("tenantX", 50, 10, 100));
     Provisioner provisioner = new Provisioner("p1", "host", 12345, 100, null, null);
     service.writeProvisioner(provisioner);
-    service.writeTenant(tenant);
+    tenantStore.writeTenant(tenant);
 
     service.rebalanceTenantWorkers(tenant.getId());
-    Assert.assertEquals(tenant.getWorkers(),
-                        service.getProvisioner(provisioner.getId()).getAssignedWorkers(tenant.getId()));
+    Provisioner actual = service.getProvisioner(provisioner.getId());
+    Assert.assertEquals(tenant.getSpecification().getWorkers(),
+                        actual.getAssignedWorkers(tenant.getSpecification().getName()));
   }
 
   @Test
   public void testRemoveWorkersFromProvisioner() throws Exception {
-    Tenant tenant = new Tenant("tenantX", "id123", 10, 10, 100);
+    Tenant tenant = new Tenant("id123", new TenantSpecification("tenantX", 10, 10, 100));
     Provisioner provisioner =
       new Provisioner("p1", "host", 12345, 100, null,
-                      ImmutableMap.<String, Integer>of(tenant.getId(), tenant.getWorkers()));
+                      ImmutableMap.<String, Integer>of(tenant.getId(), tenant.getSpecification().getWorkers()));
     service.writeProvisioner(provisioner);
-    service.writeTenant(tenant);
+    tenantStore.writeTenant(tenant);
 
     service.rebalanceTenantWorkers(tenant.getId());
-    Assert.assertEquals(tenant.getWorkers(),
-                        service.getProvisioner(provisioner.getId()).getAssignedWorkers(tenant.getId()));
+    Provisioner actual = service.getProvisioner(provisioner.getId());
+    Assert.assertEquals(tenant.getSpecification().getWorkers(),
+                        // tenant ids get replaced with names
+                        actual.getAssignedWorkers(tenant.getSpecification().getName()));
   }
 
   @Test
   public void testDeadProvisionerGetsDeletedDuringAddWorkers() throws Exception {
-    Tenant tenant = new Tenant("tenantX", "id123", 110, 10, 100);
+    Tenant tenant = new Tenant("id123", new TenantSpecification("tenantX", 110, 10, 100));
     Provisioner provisioner1 = new Provisioner("p1", "host1", 12345, 100, null, null);
     Provisioner provisioner2 = new Provisioner("p2", "host2", 12345, 100, null, null);
     service.writeProvisioner(provisioner1);
     service.writeProvisioner(provisioner2);
-    service.writeTenant(tenant);
+    tenantStore.writeTenant(tenant);
 
     provisionerRequestService.addDeadProvisioner(provisioner1.getId());
 
@@ -75,13 +79,13 @@ public class TenantProvisionerServiceTest extends BaseTest {
 
   @Test
   public void testDeadProvisionerGetsDeletedDuringRemoveWorkers() throws Exception {
-    Tenant tenant = new Tenant("tenantX", "id123", 40, 10, 100);
+    Tenant tenant = new Tenant("id123", new TenantSpecification("tenantX", 40, 10, 100));
     Provisioner provisioner1 = new Provisioner("p1", "host1", 12345, 100, null,
                                                ImmutableMap.<String, Integer>of(tenant.getId(), 50));
     Provisioner provisioner2 = new Provisioner("p2", "host2", 12345, 100, null, null);
     service.writeProvisioner(provisioner1);
     service.writeProvisioner(provisioner2);
-    service.writeTenant(tenant);
+    tenantStore.writeTenant(tenant);
 
     provisionerRequestService.addDeadProvisioner(provisioner1.getId());
 
@@ -97,13 +101,15 @@ public class TenantProvisionerServiceTest extends BaseTest {
     service.rebalanceTenantWorkers(tenant.getId());
     // workers should have been transferred to provisioner2
     Provisioner p2 = service.getProvisioner(provisioner2.getId());
-    Assert.assertEquals(tenant.getWorkers(), p2.getAssignedWorkers(tenant.getId()));
+    Assert.assertEquals(tenant.getSpecification().getWorkers(),
+                        // tenant ids should have been replaced with names
+                        p2.getAssignedWorkers(tenant.getSpecification().getName()));
   }
 
   @Test
   public void testDeleteTenant() throws Exception {
-    Tenant tenant1 = new Tenant("tenant1", "tenant1", 0, 10, 100);
-    Tenant tenant2 = new Tenant("tenant2", "tenant2", 10, 10, 100);
+    Tenant tenant1 = new Tenant("tenant1", new TenantSpecification("tenant1", 0, 10, 100));
+    Tenant tenant2 = new Tenant("tenant2", new TenantSpecification("tenant2", 10, 10, 100));
     Provisioner provisioner1 =
       new Provisioner("p1", "host1", 12345, 100, null,
                       ImmutableMap.<String, Integer>of(
@@ -114,10 +120,10 @@ public class TenantProvisionerServiceTest extends BaseTest {
                         tenant2.getId(), 5));
     service.writeProvisioner(provisioner1);
     service.writeProvisioner(provisioner2);
-    service.writeTenant(tenant1);
-    service.writeTenant(tenant2);
+    tenantStore.writeTenant(tenant1);
+    tenantStore.writeTenant(tenant2);
 
-    service.deleteTenant(tenant1.getId());
+    service.deleteTenantByName(tenant1.getId());
     Provisioner actualProvisioner1 = service.getProvisioner(provisioner1.getId());
     Provisioner actualProvisioner2 = service.getProvisioner(provisioner2.getId());
     Assert.assertTrue(!actualProvisioner1.getAssignedTenants().contains(tenant1.getId()));
@@ -126,25 +132,25 @@ public class TenantProvisionerServiceTest extends BaseTest {
 
   @Test(expected = IllegalStateException.class)
   public void testDeleteTenantWithAssignedWorkersThrowsException() throws Exception {
-    Tenant tenant1 = new Tenant("tenant1", "tenant1", 10, 10, 100);
+    Tenant tenant1 = new Tenant("tenant1", new TenantSpecification("tenant1", 10, 10, 100));
     Provisioner provisioner1 =
       new Provisioner("p1", "host1", 12345, 100, null,
                       ImmutableMap.<String, Integer>of(
                         tenant1.getId(), 10));
     service.writeProvisioner(provisioner1);
-    service.writeTenant(tenant1);
-    service.deleteTenant(tenant1.getId());
+    tenantStore.writeTenant(tenant1);
+    service.deleteTenantByName(tenant1.getId());
   }
 
   @Test
   public void testHeartbeatChanges() throws Exception {
-    Tenant tenant = new Tenant("tenant1", "tenant1", 10, 10, 100);
+    Tenant tenant = new Tenant("tenant1", new TenantSpecification("tenant1", 10, 10, 100));
     Provisioner provisioner =
       new Provisioner("p1", "host1", 12345, 100,
                       ImmutableMap.<String, Integer>of(tenant.getId(), 5),
                       ImmutableMap.<String, Integer>of(tenant.getId(), 10));
     service.writeProvisioner(provisioner);
-    service.writeTenant(tenant);
+    tenantStore.writeTenant(tenant);
 
     ProvisionerHeartbeat heartbeat1 = new ProvisionerHeartbeat(ImmutableMap.<String, Integer>of(tenant.getId(), 5));
     ProvisionerHeartbeat heartbeat2 = new ProvisionerHeartbeat(ImmutableMap.<String, Integer>of(tenant.getId(), 10));
@@ -166,13 +172,13 @@ public class TenantProvisionerServiceTest extends BaseTest {
 
   @Test
   public void testHeartbeatAfterDeleteTenant() throws Exception {
-    Tenant tenant = new Tenant("tenant1", "tenant1", 0, 10, 100);
+    Tenant tenant = new Tenant("tenant1", new TenantSpecification("tenant1", 0, 10, 100));
     Provisioner provisioner =
       new Provisioner("p1", "host1", 12345, 100, ImmutableMap.<String, Integer>of(tenant.getId(), 5), null);
     service.writeProvisioner(provisioner);
-    service.writeTenant(tenant);
+    tenantStore.writeTenant(tenant);
 
-    service.deleteTenant(tenant.getId());
+    service.deleteTenantByName(tenant.getId());
     service.handleHeartbeat(provisioner.getId(), new ProvisionerHeartbeat(ImmutableMap.<String, Integer>of()));
     Provisioner actualProvisioner = service.getProvisioner(provisioner.getId());
     Assert.assertTrue(actualProvisioner.getAssignedTenants().isEmpty());
