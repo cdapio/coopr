@@ -300,15 +300,20 @@ module Loom
     # determine ip to register with server from routing info
     # http://coderrr.wordpress.com/2008/05/28/get-your-local-ip-address/
     def local_ip
-      server_ip = Resolv.getaddress( @server_uri.sub(%r{^https?://}, '').split(':').first ) rescue '127.0.0.1'
-      orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true # turn off reverse DNS resolution temporarily
-      UDPSocket.open do |s|
-        s.connect server_ip, 1
-        s.addr.last
+      begin
+        server_ip = Resolv.getaddress( @server_uri.sub(%r{^https?://}, '').split(':').first ) rescue '127.0.0.1'
+        orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true # turn off reverse DNS resolution temporarily
+        UDPSocket.open do |s|
+          s.connect server_ip, 1
+          s.addr.last
+        end
+      rescue => e
+        log.error "Unable to determine provisioner.register.ip, defaulting to 127.0.0.1. Please set it explicitly. "\
+          "Server may not be able to connect to this provisioner: #{e.inspect}"
+        '127.0.0.1'
+      ensure
+        Socket.do_not_reverse_lookup = orig
       end
-    ensure
-      Socket.do_not_reverse_lookup = orig
     end
-
   end
 end
