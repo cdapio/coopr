@@ -26,7 +26,7 @@ module Loom
   PROVISIONER_WORK_DIR = 'provisioner.work.dir'
   PROVISIONER_CAPACITY = 'provisioner.capacity'
   PROVISIONER_HEARTBEAT_INTERVAL = 'provisioner.heartbeat.interval'
-  PROVISIONER_LOG_DIRECTORY = 'provisioner.log.directory'
+  PROVISIONER_LOG_DIR = 'provisioner.log.dir'
   PROVISIONER_LOG_ROTATION_SHIFT_AGE = 'provisioner.log.rotation.shift.age'
   PROVISIONER_LOG_ROTATION_SHIFT_SIZE = 'provisioner.log.rotation.shift.size'
   PROVISIONER_LOG_LEVEL = 'provisioner.log.level'

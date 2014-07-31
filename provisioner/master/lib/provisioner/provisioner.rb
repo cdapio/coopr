@@ -58,7 +58,7 @@ module Loom
       config.load
 
       # initialize logging
-      Logging.configure(config.get(PROVISIONER_LOG_DIRECTORY) ? "#{config.get(PROVISIONER_LOG_DIRECTORY)}/provisioner.log" : nil)
+      Logging.configure(config.get(PROVISIONER_LOG_DIR) ? "#{config.get(PROVISIONER_LOG_DIR)}/provisioner.log" : nil)
       Logging.level = config.get(PROVISIONER_LOG_LEVEL)
       Logging.shift_age = config.get(PROVISIONER_LOG_ROTATION_SHIFT_AGE)
       Logging.shift_size = config.get(PROVISIONER_LOG_ROTATION_SHIFT_SIZE)
