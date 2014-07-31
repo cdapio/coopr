@@ -31,7 +31,12 @@ module Loom
 
     def get_value(val)
       val = 'provisioner.' + val.downcase unless val.downcase =~ /^provisioner\./i
-      @config[val]
+      # handle boolean
+      if @config[val] =~ /^false$/i
+        false
+      else
+        @config[val]
+      end
     end
 
     def load
