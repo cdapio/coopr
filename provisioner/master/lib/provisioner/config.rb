@@ -20,13 +20,13 @@ require 'rexml/document'
 module Loom
   class Config
 
-    attr_reader :config, :file, :properties
+    attr_reader :config, :default_file, :properties
 
     def initialize(options)
       @config = {} # name => value
       @properties = {} # name => description
-      # @file = options[:configfile] || '/etc/loom/conf/loom-site.xml'
-      @file = options[:configfile] || "#{File.dirname(__FILE__)}/../../conf/loom-site.xml"
+      @default_file = "#{File.dirname(__FILE__)}/../../conf/provisioner-default.xml"
+      @site_file = options[:configfile]
     end
 
     def get_value(val)
@@ -34,11 +34,16 @@ module Loom
       @config[val]
     end
 
+    def load
+      load_default
+      load_file(@site_file) if @site_file
+    end
+
     def load_default
       load_file
     end
 
-    def load_file(file = @file)
+    def load_file(file = @default_file)
       if File.file?(file) && File.readable?(file)
         begin
 
@@ -74,6 +79,9 @@ module Loom
           puts "Exception during parsing of config file: #{file}: #{e.message}, #{e.backtrace}"
           exit(1)
         end
+      else
+        puts "Could not read configuration file #{file}. Aborting."
+        exit(1)
       end
     end
 

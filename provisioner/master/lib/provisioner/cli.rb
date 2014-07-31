@@ -37,7 +37,7 @@ module Loom
         opts.on('-c', '--capacity CAPACITY', 'Max number of running workers for this provisioner, default 10') do |c|
           options[:capacity] = c
         end
-        opts.on('-C', '--config-file FILE', 'Alternate config file to use, default /etc/loom/conf/loom-site.xml') do |c|
+        opts.on('-C', '--config-file FILE', 'Alternate config file to use, default /etc/loom/conf/provisioner-default.xml') do |c|
           options[:configfile] = c
         end
         opts.on('-L', '--log-level LEVEL', 'Log level') do |f|

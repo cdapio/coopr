@@ -26,7 +26,7 @@ describe 'Loom::Config' do
   end
 
   it 'can parse the included config file' do
-    @config.load_file("#{File.dirname(__FILE__)}/loom-site.xml")
+    @config.load_file("#{File.dirname(__FILE__)}/provisioner-default.xml")
     expect(@config.get_value('provisioner.bind.ip')).to eq('0.0.0.0')
     expect(@config.get_value('bind.ip')).to eq('0.0.0.0')
   end

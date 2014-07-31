@@ -16,7 +16,8 @@
   </property>
   <property>
     <name>provisioner.register.ip</name>
-    <value>127.0.0.1</value>
+    <!-- default: no value, provisioner will attempt to auto-detect -->
+    <value></value>
     <description>Routable IP for the server to call back to this provisioner</description>
   </property>
   <property>
@@ -56,7 +57,7 @@
   </property>
   <property>
     <name>provisioner.log.level</name>
-    <value>conf</value>
+    <value>debug</value>
     <description>log level, one of debug, info, warn, error, fatal</description>
   </property>
 </configuration>

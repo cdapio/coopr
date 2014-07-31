@@ -1,0 +1,8 @@
+<configuration>
+  <property>
+    <name>provisioner.register.ip</name>
+    <value>127.0.0.1</value>
+    <description>Routable IP for the server to call back to this provisioner</description>
+  </property>
+</configuration>
+

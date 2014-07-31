@@ -54,12 +54,15 @@ module Loom
 
       # read configuration
       config = Config.new(options)
-      config.load_default
+      config.load
 
       # initialize logging
       Logging.configure(config.get_value('log.directory') ? "#{config.get_value('log.directory')}/provisioner.log" : nil)
       Logging.level = config.get_value('log.level')
-      Logging.log.info "Loom api starting up"
+      Logging.log.debug "Provisioner starting up"
+      config.config.each do |k, v|
+        Logging.log.debug "  #{k}: #{v}"
+      end
 
       # daemonize
       daemonize if options[:daemonize]
