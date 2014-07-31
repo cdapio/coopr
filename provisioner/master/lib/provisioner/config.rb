@@ -91,7 +91,7 @@ module Loom
     end
 
     def validate
-      # %w(server.uri register.ip data.dir work.dir default.capacity )
+      # %w(server.uri register.ip data.dir work.dir capacity )
     end
 
   end

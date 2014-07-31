@@ -192,7 +192,7 @@ module Loom
       uri = "#{@server_uri}/v1/provisioners/#{@provisioner_id}"
       data = {}
       data['id'] = @provisioner_id
-      data['capacityTotal'] = @config.get('default.capacity')
+      data['capacityTotal'] = @config.get('provisioner.capacity')
       data['host'] = @config.get('register.ip') || local_ip
       data['port'] = @config.get('bind.port')
 
