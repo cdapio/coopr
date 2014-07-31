@@ -18,6 +18,7 @@
 
 require File.expand_path '../spec_helper.rb', __FILE__
 require File.dirname(__FILE__) + '/../lib/provisioner/config.rb'
+require File.dirname(__FILE__) + '/../lib/provisioner/constants.rb'
 
 describe 'Loom::Config' do
 
@@ -27,7 +28,7 @@ describe 'Loom::Config' do
 
   it 'can parse the included config file' do
     @config.load_file("#{File.dirname(__FILE__)}/provisioner-default.xml")
-    expect(@config.get('provisioner.bind.ip')).to eq('0.0.0.0')
+    expect(@config.get(Loom::PROVISIONER_BIND_IP)).to eq('0.0.0.0')
   end
 
 end
