@@ -18,13 +18,21 @@ package com.continuuity.loom.provisioner.plugin;
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.admin.AutomatorType;
+import com.continuuity.loom.admin.ProviderType;
+import com.continuuity.loom.admin.ResourceTypeFormat;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
-import com.continuuity.loom.store.provisioner.PluginMetaStoreView;
+import com.continuuity.loom.store.provisioner.PluginResourceTypeView;
 import com.continuuity.loom.store.provisioner.PluginStore;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -45,14 +53,17 @@ public class ResourceService extends AbstractIdleService {
   private static final Logger LOG  = LoggerFactory.getLogger(ResourceService.class);
   private final Configuration conf;
   private final PluginStore pluginStore;
+  private final EntityStoreService entityStoreService;
   private final PluginMetaStoreService metaStoreService;
   private final LockService lockService;
 
   @Inject
-  private ResourceService(PluginStore pluginStore, PluginMetaStoreService metaStoreService,
+  private ResourceService(PluginStore pluginStore, EntityStoreService entityStoreService,
+                          PluginMetaStoreService metaStoreService,
                           LockService lockService, Configuration conf) {
     this.conf = conf;
     this.pluginStore = pluginStore;
+    this.entityStoreService = entityStoreService;
     this.metaStoreService = metaStoreService;
     this.lockService = lockService;
   }
@@ -72,10 +83,10 @@ public class ResourceService extends AbstractIdleService {
                                                  final ResourceType resourceType,
                                                  final String name,
                                                  final HttpResponder responder) throws IOException {
-    final ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
+    final ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
     lock.acquire();
     try {
-      PluginMetaStoreView view = metaStoreService.getView(account, resourceType);
+      PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       // ok to do versioning this way since we have a lock
       final int version = view.getHighestVersion(name) + 1;
       final ResourceMeta resourceMeta = new ResourceMeta(name, version);
@@ -86,7 +97,7 @@ public class ResourceService extends AbstractIdleService {
       // we write metadata here before the data completes streaming because we are guaranteed the
       // version will never be used again, and because we need to increment the highest version in case another
       // upload of the same name is started while this one is still going. It is deleted if the upload fails.
-      metaStoreService.getView(account, resourceType).add(resourceMeta);
+      metaStoreService.getResourceTypeView(account, resourceType).add(resourceMeta);
 
       return new BodyConsumer() {
         @Override
@@ -120,7 +131,7 @@ public class ResourceService extends AbstractIdleService {
           try {
             os.close();
             // deletion flags the entry in the database as deleted
-            metaStoreService.getView(account, resourceType).delete(name, version);
+            metaStoreService.getResourceTypeView(account, resourceType).delete(name, version);
             responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
           } catch (IOException e) {
             LOG.error("Error uploading resource {} of type {} for account {}.", resourceMeta, resourceType, account, e);
@@ -146,7 +157,7 @@ public class ResourceService extends AbstractIdleService {
   public InputStream getResourceInputStream(final Account account, ResourceType resourceType, String name, int version)
     throws MissingEntityException, IOException {
     // no lock needed since each resource uploaded gets its own id.
-    ResourceMeta meta = metaStoreService.getView(account, resourceType).get(name, version);
+    ResourceMeta meta = metaStoreService.getResourceTypeView(account, resourceType).get(name, version);
     if (meta == null) {
       throw new MissingEntityException("Resource not found.");
     }
@@ -170,10 +181,10 @@ public class ResourceService extends AbstractIdleService {
     throws MissingEntityException, IOException {
     LOG.debug("staging version {} of resource {} of type {} for account {}.",
               version, name, resourceType, account);
-    ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
+    ZKInterProcessReentrantLock lock = lockService.getResourceSyncLock(account.getTenantId());
     lock.acquire();
     try {
-      PluginMetaStoreView view = metaStoreService.getView(account, resourceType);
+      PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       if (!view.exists(name)) {
         throw new MissingEntityException("Module does not exist.");
       }
@@ -197,35 +208,14 @@ public class ResourceService extends AbstractIdleService {
     throws MissingEntityException, IOException {
     LOG.debug("unstaging version {} of resource {} of type {} for account {}.",
               version, name, resourceType, account);
-    ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
+    ZKInterProcessReentrantLock lock = lockService.getResourceSyncLock(account.getTenantId());
     lock.acquire();
     try {
-      PluginMetaStoreView view = metaStoreService.getView(account, resourceType);
+      PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       if (!view.exists(name)) {
         throw new MissingEntityException("Resource " + name + " does not exist.");
       }
       view.unstage(name, version);
-    } finally {
-      lock.release();
-    }
-  }
-
-  /**
-   * Atomically promote the staged version of the resource into the active state and the unstaged version
-   * of the resource into the inactive state.
-   *
-   * @param account Account that contains the resource
-   * @param resourceType Type of resource to activate
-   * @param name Name of the resource to activate
-   * @throws IOException if there was an error activating the resource
-   */
-  public void syncStatus(Account account, ResourceType resourceType, String name) throws IOException {
-    ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
-    LOG.debug("syncing status of resource {} of type {} for account {}.", name, resourceType, account);
-    lock.acquire();
-    try {
-      PluginMetaStoreView view = metaStoreService.getView(account, resourceType);
-      view.syncStatus(name);
     } finally {
       lock.release();
     }
@@ -241,11 +231,11 @@ public class ResourceService extends AbstractIdleService {
    * @throws IOException if there was an error getting the resources
    */
   public Map<String, Set<ResourceMeta>> getAll(Account account, ResourceType resourceType,
-                                                     ResourceStatus status) throws IOException {
+                                               ResourceStatus status) throws IOException {
     if (status == null) {
-      return metaStoreService.getView(account, resourceType).getAll();
+      return metaStoreService.getResourceTypeView(account, resourceType).getAll();
     }
-    return metaStoreService.getView(account, resourceType).getAll(status);
+    return metaStoreService.getResourceTypeView(account, resourceType).getAll(status);
   }
 
   /**
@@ -259,11 +249,11 @@ public class ResourceService extends AbstractIdleService {
    * @throws IOException if there was an error getting the module versions
    */
   public Set<ResourceMeta> getAll(Account account, ResourceType resourceType,
-                                        String name, ResourceStatus status) throws IOException {
+                                  String name, ResourceStatus status) throws IOException {
     if (status == null) {
-      return metaStoreService.getView(account, resourceType).getAll(name);
+      return metaStoreService.getResourceTypeView(account, resourceType).getAll(name);
     }
-    return metaStoreService.getView(account, resourceType).getAll(name, status);
+    return metaStoreService.getResourceTypeView(account, resourceType).getAll(name, status);
   }
 
   /**
@@ -279,10 +269,10 @@ public class ResourceService extends AbstractIdleService {
   public void delete(Account account, ResourceType resourceType,
                      String name, int version) throws IllegalStateException, IOException {
     LOG.debug("deleting version {} of resource {} of type {} for account {}.", version, name, resourceType, account);
-    ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
+    ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
     lock.acquire();
     try {
-      PluginMetaStoreView view = metaStoreService.getView(account, resourceType);
+      PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       ResourceMeta meta = view.get(name, version);
       if (meta.getStatus() != ResourceStatus.INACTIVE) {
         throw new IllegalStateException("Resource must be inactive before it can be deleted.");
@@ -310,10 +300,10 @@ public class ResourceService extends AbstractIdleService {
   public void delete(Account account, ResourceType resourceType,
                      String name) throws IllegalStateException, IOException {
     LOG.debug("deleting all versions of resource {} of type {} for account {}.", name, resourceType, account);
-    ZKInterProcessReentrantLock lock = getLock(account, resourceType, name);
+    ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
     lock.acquire();
     try {
-      PluginMetaStoreView view = metaStoreService.getView(account, resourceType);
+      PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
       Set<ResourceMeta> metas = view.getAll(name);
       for (ResourceMeta meta : metas) {
         if (meta.getStatus() != ResourceStatus.INACTIVE) {
@@ -331,6 +321,81 @@ public class ResourceService extends AbstractIdleService {
     }
   }
 
+  /**
+   * Get the active resources for a given account.
+   *
+   * @param account Account to get active resources for
+   * @return Active resources for the given account
+   */
+  public ResourceCollection getLiveResources(Account account) throws IOException {
+    ResourceCollection resourceCollection = new ResourceCollection();
+    for (ImmutablePair<ResourceType, ResourceTypeFormat> typeFormat : getTypesAndFormats(account)) {
+      ResourceType resourceType = typeFormat.getFirst();
+      ResourceTypeFormat format = typeFormat.getSecond();
+      Set<ResourceMeta> resources = metaStoreService.getResourceTypeView(account, resourceType).getLiveResources();
+      resourceCollection.addResources(resourceType, format, resources);
+    }
+    return resourceCollection;
+  }
+
+  /**
+   * Get the resources that should be synced for a given account.
+   *
+   * @param account Account for which to get resources to sync
+   * @return Resources that should be synced for the given account
+   */
+  public ResourceCollection getResourcesToSync(Account account) throws IOException {
+
+    ResourceCollection resourceCollection = new ResourceCollection();
+
+    Set<ImmutablePair<ResourceType, ResourceTypeFormat>> typeFormats = getTypesAndFormats(account);
+    for (ImmutablePair<ResourceType, ResourceTypeFormat> typeFormat : typeFormats) {
+      ResourceType resourceType = typeFormat.getFirst();
+      ResourceTypeFormat format = typeFormat.getSecond();
+      Set<ResourceMeta> resources = metaStoreService.getResourceTypeView(account, resourceType).getResourcesToSync();
+      resourceCollection.addResources(resourceType, format, resources);
+    }
+
+    return resourceCollection;
+  }
+
+  /**
+   * Update the metadata store, syncing the resources in the given collection for the given account.
+   *
+   * @param account Account containing resources to sync
+   * @param resourceCollection Collection of resources to sync
+   * @throws IOException
+   */
+  public void syncResourceMeta(Account account, ResourceCollection resourceCollection) throws IOException {
+    metaStoreService.getAccountView(account).syncResourceTypes(resourceCollection.getResourceTypes());
+  }
+
+  // Helper function for getting all the resource types and formats for plugins belonging to an account.
+  private Set<ImmutablePair<ResourceType, ResourceTypeFormat>> getTypesAndFormats(Account account) throws IOException {
+    Set<ImmutablePair<ResourceType, ResourceTypeFormat>> typesAndFormats = Sets.newHashSet();
+    EntityStoreView entityStoreView = entityStoreService.getView(account);
+
+    for (AutomatorType plugin : entityStoreView.getAllAutomatorTypes()) {
+      String pluginName = plugin.getName();
+      for (Map.Entry<String, ResourceTypeSpecification> entry : plugin.getResourceTypes().entrySet()) {
+        ResourceType resourceType = new ResourceType(PluginType.AUTOMATOR, pluginName, entry.getKey());
+        ResourceTypeFormat format = entry.getValue().getFormat();
+        typesAndFormats.add(ImmutablePair.of(resourceType, format));
+      }
+    }
+
+    for (ProviderType plugin : entityStoreView.getAllProviderTypes()) {
+      String pluginName = plugin.getName();
+      for (Map.Entry<String, ResourceTypeSpecification> entry : plugin.getResourceTypes().entrySet()) {
+        ResourceType resourceType = new ResourceType(PluginType.PROVIDER, pluginName, entry.getKey());
+        ResourceTypeFormat format = entry.getValue().getFormat();
+        typesAndFormats.add(ImmutablePair.of(resourceType, format));
+      }
+    }
+
+    return typesAndFormats;
+  }
+
   @Override
   protected void startUp() throws Exception {
     pluginStore.initialize(conf);
@@ -344,7 +409,7 @@ public class ResourceService extends AbstractIdleService {
 
   // locks are namespaced by tenant and resource type and name. for example,
   // /tenant1/automator/chef-solo/cookbooks/reactor
-  private ZKInterProcessReentrantLock getLock(Account account, ResourceType type, String name) {
+  private ZKInterProcessReentrantLock getResourceLock(Account account, ResourceType type, String name) {
     return lockService.getResourceLock(account.getTenantId(), type.getPluginType().name().toLowerCase(),
                                        type.getPluginName(), type.getTypeName(), name);
   }

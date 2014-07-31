@@ -1,19 +1,16 @@
 package com.continuuity.loom.provisioner;
 
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
+import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 
 /**
  * Tenant information to send to a specific provisioner.
  */
 public class ProvisionerTenant {
   private final int workers;
-  // TODO: placeholder right now, fill in with correct objects.
-  private final Map<String, String> modules;
+  private final ResourceCollection resources;
 
-  public ProvisionerTenant(int workers) {
+  public ProvisionerTenant(int workers, ResourceCollection resources) {
     this.workers = workers;
-    this.modules = ImmutableMap.of();
+    this.resources = resources;
   }
 }

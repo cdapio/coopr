@@ -26,6 +26,8 @@ public class StubProvisioner extends AbstractIdleService {
   private static final Logger LOG  = LoggerFactory.getLogger(DummyService.class);
   private final NettyHttpService httpService;
   private Multiset<String> tenantPutCounts;
+  private Multiset<String> tenantWorkerPutCounts;
+  private Multiset<String> tenantResourcePutCounts;
   private Multiset<String> tenantDeleteCounts;
 
   public StubProvisioner() {
@@ -42,6 +44,8 @@ public class StubProvisioner extends AbstractIdleService {
 
     this.httpService = builder.build();
     this.tenantPutCounts = HashMultiset.create();
+    this.tenantResourcePutCounts = HashMultiset.create();
+    this.tenantWorkerPutCounts = HashMultiset.create();
     this.tenantDeleteCounts = HashMultiset.create();
   }
 
@@ -60,12 +64,22 @@ public class StubProvisioner extends AbstractIdleService {
     return tenantPutCounts.count(tenantId);
   }
 
+  public int getPutWorkersCount(String tenantId) {
+    return tenantWorkerPutCounts.count(tenantId);
+  }
+
+  public int getPutResourcesCount(String tenantId) {
+    return tenantResourcePutCounts.count(tenantId);
+  }
+
   public int getDeleteCount(String tenantId) {
     return tenantDeleteCounts.count(tenantId);
   }
 
   public void reset() {
     tenantPutCounts.clear();
+    tenantWorkerPutCounts.clear();
+    tenantResourcePutCounts.clear();
     tenantDeleteCounts.clear();
   }
 
@@ -84,6 +98,22 @@ public class StubProvisioner extends AbstractIdleService {
     @Path("/v1/tenants/{tenant-id}")
     public void putTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
       tenantPutCounts.add(tenantId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    }
+
+    @PUT
+    @Path("/v1/tenants/{tenant-id}/workers")
+    public void putTenantWorkers(HttpRequest request, HttpResponder responder,
+                                 @PathParam("tenant-id") String tenantId) {
+      tenantWorkerPutCounts.add(tenantId);
+      responder.sendStatus(HttpResponseStatus.OK);
+    }
+
+    @PUT
+    @Path("/v1/tenants/{tenant-id}/resources")
+    public void putTenantResources(HttpRequest request, HttpResponder responder,
+                                   @PathParam("tenant-id") String tenantId) {
+      tenantResourcePutCounts.add(tenantId);
       responder.sendStatus(HttpResponseStatus.OK);
     }
 

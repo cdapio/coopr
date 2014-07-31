@@ -34,7 +34,7 @@ public class MockProvisionerHandler extends AbstractHttpHandler {
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     JsonObject body = gson.fromJson(reader, JsonObject.class);
     Integer numWorkers = body.get("workers").getAsInt();
-    LOG.debug("Request to set num workers for tenant {} to {}", tenantId, numWorkers);
+    LOG.debug("Request body = {}", body);
     if (numWorkers != provisionerTenantStore.getAssignedWorkers(tenantId)) {
       provisionerTenantStore.setAssignedWorkers(tenantId, numWorkers);
     }
