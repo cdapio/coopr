@@ -3,6 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- MongoDB support for clusters ( Issues: #43 #130 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 )
 - Sensu monitoring support ( Issues: #167 )
