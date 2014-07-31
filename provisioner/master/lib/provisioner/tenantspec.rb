@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+require_relative 'resourcespec'
 
 # simple specification for a tenant
 module Loom
@@ -25,7 +26,7 @@ module Loom
     def initialize(id, workers, resources = nil, plugins = nil)
       @id = id
       @workers = workers
-      @resources = resources ||= Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
+      @resources = ResourceSpec.new(resources)
       # @plugins = plugins ||= Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
     end
   end
