@@ -36,13 +36,6 @@ class FogProviderAWS < Provider
       # Update some variables
       @security_groups = @security_groups.split(',') if @security_groups
       @security_group_ids = @security_group_ids.split(',') if @security_group_ids
-      # Handle tags
-      hashed_tags = {}
-      @tags.map{ |t| key,val=t.split('='); hashed_tags[key]=val} unless @tags.nil?
-      # Always set the Name tag, so we display correctly in AWS console UI
-      unless hashed_tags.keys.include?('Name')
-        hashed_tags['Name'] = hostname
-      end
       # Run EC2 credential validation
       validate!
       # Create the server
@@ -84,6 +77,15 @@ class FogProviderAWS < Provider
       server.wait_for(600) { ready? }
 
       bootstrap_ip = ip_address(server, 'public')
+      # Handle tags
+      hashed_tags = {}
+      @tags.map{ |t| key,val=t.split('='); hashed_tags[key]=val} unless @tags.nil?
+      # Always set the Name tag, so we display correctly in AWS console UI
+      unless hashed_tags.keys.include?('Name')
+        hashed_tags['Name'] = hostname
+      end
+      create_tags(hashed_tags, providerid) unless hashed_tags.empty?
+
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
       else
@@ -236,6 +238,12 @@ class FogProviderAWS < Provider
     server_def[:tenancy] = 'dedicated' if vpc_mode? && @dedicated_instance
     server_def[:associate_public_ip] = @associate_public_ip if vpc_mode? && @associate_public_ip
     server_def
+  end
+
+  def create_tags(hashed_tags, providerid)
+    hashed_tags.each_pair do |key,val|
+      connection.tags.create :key => key, :value => val, :resource_id => providerid
+    end
   end
 
 end
