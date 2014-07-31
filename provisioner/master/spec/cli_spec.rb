@@ -23,7 +23,7 @@ describe 'Provisioner::CLI' do
 
   it 'can parse command line arguments' do
     options = Loom::CLI.read([
-      '-C', '/tmp/config.xml',
+      '-c', '/tmp/config.xml',
       '-r'
     ])
     expected = {
