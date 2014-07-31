@@ -19,13 +19,14 @@
 CREATE TABLE IF NOT EXISTS clusters (
     id BIGINT,
     owner_id VARCHAR(255),
+    tenant_id VARCHAR(255),
     name VARCHAR(255),
     create_time TIMESTAMP DEFAULT '0000-00-00 00:00:00',
     expire_time TIMESTAMP NULL,
     status VARCHAR(32),
     cluster MEDIUMBLOB,
     PRIMARY KEY (id),
-    INDEX cluster_user_index (owner_id, id),
+    INDEX cluster_account_index (tenant_id, owner_id, id),
     INDEX ctime_index (create_time),
     INDEX status_index (status)
 ) ENGINE = InnoDB;
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     status VARCHAR(32),
     create_time TIMESTAMP DEFAULT '0000-00-00 00:00:00',
     job MEDIUMBLOB,
-    PRIMARY KEY (job_num, cluster_id),
+    PRIMARY KEY (cluster_id, job_num),
     FOREIGN KEY (cluster_id) REFERENCES clusters(id),
     INDEX ctime_index (create_time),
     INDEX status_index (status)
@@ -50,7 +51,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     status_time TIMESTAMP DEFAULT '0000-00-00 00:00:00',
     status VARCHAR(32),
     task MEDIUMBLOB,
-    PRIMARY KEY (task_num, job_num, cluster_id),
+    PRIMARY KEY (cluster_id, job_num, task_num),
     FOREIGN KEY (job_num, cluster_id) REFERENCES jobs(job_num, cluster_id),
     INDEX status_time_index (status_time),
     INDEX submit_time_index (submit_time),
@@ -67,42 +68,70 @@ CREATE TABLE IF NOT EXISTS nodes (
 
 CREATE TABLE IF NOT EXISTS providerTypes (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     providerType MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (tenant_id, name)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS automatorTypes (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     automatorType MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (tenant_id, name)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS providers (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     provider MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (tenant_id, name)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS hardwareTypes (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     hardwareType MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (tenant_id, name)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS imageTypes (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     imageType MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (tenant_id, name)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS services (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     service MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (tenant_id, name)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS clusterTemplates (
     name VARCHAR(255),
+    tenant_id VARCHAR(255),
     clusterTemplate MEDIUMBLOB,
-    PRIMARY KEY (name)
+    PRIMARY KEY (tenant_id, name)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS provisioners (
+    id VARCHAR(255),
+    last_heartbeat TIMESTAMP,
+    capacity_total INTEGER,
+    capacity_free INTEGER,
+    provisioner MEDIUMBLOB,
+    PRIMARY KEY (id),
+    INDEX heartbeat_index (last_heartbeat),
+    INDEX capacity_index (capacity_free)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS provisionerWorkers (
+    provisioner_id VARCHAR(255),
+    tenant_id VARCHAR(255),
+    num_assigned INTEGER,
+    num_live INTEGER,
+    PRIMARY KEY (provisioner_id, tenant_id),
+    INDEX tenant_index (tenant_id),
+    INDEX assigned_index (num_assigned)
 ) ENGINE = InnoDB;

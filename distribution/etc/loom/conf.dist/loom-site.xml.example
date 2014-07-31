@@ -19,32 +19,32 @@
 -->
 <configuration>
   <property>
-    <name>zookeeper.quorum</name>
+    <name>server.zookeeper.quorum</name>
     <value>host1:2181,host2:2181,host3:2181</value>
     <description>Specifies the zookeeper host:port</description>
   </property>
   <property>
-    <name>loom.host</name>
+    <name>server.host</name>
     <value>123.456.0.1</value>
     <description>Specifies the loom host to bind to</description>
   </property>
   <property>
-    <name>loom.jdbc.driver</name>
+    <name>server.jdbc.driver</name>
     <value>com.mysql.jdbc.Driver</value>
     <description>specifies db driver</description>
   </property>
   <property>
-    <name>loom.jdbc.connection.string</name>
+    <name>server.jdbc.connection.string</name>
     <value>jdbc:mysql://127.0.0.1:3306/loom?useLegacyDatetimeCode=false</value>
     <description>specifies how to connect to mysql</description>
   </property>
   <property>
-    <name>loom.db.user</name>
+    <name>server.db.user</name>
     <value>loom</value>
     <description>mysql user</description>
   </property>
   <property>
-    <name>loom.db.password</name>
+    <name>server.db.password</name>
     <value>loomers</value>
     <description>mysql user password</description>
   </property>

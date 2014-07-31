@@ -16,11 +16,14 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.BaseTest;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.scheduler.JobScheduler;
+import com.continuuity.loom.account.Account;
+import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.queue.QueueGroup;
+import com.continuuity.loom.common.queue.internal.ElementsTrackingQueue;
+import com.continuuity.loom.provisioner.Provisioner;
+import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.scheduler.Scheduler;
-import com.continuuity.loom.store.ClusterStore;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -35,6 +38,7 @@ import org.apache.http.message.BasicHeader;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 /**
@@ -43,59 +47,68 @@ import org.junit.BeforeClass;
 public class LoomServiceTestBase extends BaseTest {
   protected static final String USER1 = "user1";
   protected static final String USER2 = "user2";
-  protected static final String ADMIN_USERID = "admin";
   protected static final String API_KEY = "apikey";
-  protected static final Header[] USER1_HEADERS =
-    { new BasicHeader(Constants.USER_HEADER, USER1), new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
-  protected static final Header[] USER2_HEADERS =
-    { new BasicHeader(Constants.USER_HEADER, USER2), new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
-  protected static final Header[] ADMIN_HEADERS =
-    { new BasicHeader(Constants.USER_HEADER, ADMIN_USERID), new BasicHeader(Constants.API_KEY_HEADER, API_KEY) };
+  protected static final String TENANT_ID = "tenant1";
+  protected static final String PROVISIONER_ID = "provisioner1";
+  protected static final String TENANT = "tenant1";
+  protected static final Account USER1_ACCOUNT = new Account(USER1, TENANT);
+  protected static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, TENANT);
+  protected static final Account SUPERADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT);
+  protected static final Header[] USER1_HEADERS = {
+    new BasicHeader(Constants.USER_HEADER, USER1),
+    new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+    new BasicHeader(Constants.TENANT_HEADER, TENANT_ID)
+  };
+  protected static final Header[] USER2_HEADERS = {
+    new BasicHeader(Constants.USER_HEADER, USER2),
+    new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+    new BasicHeader(Constants.TENANT_HEADER, TENANT_ID)
+  };
+  protected static final Header[] ADMIN_HEADERS = {
+    new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
+    new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+    new BasicHeader(Constants.TENANT_HEADER, TENANT_ID)
+  };
+  protected static final Header[] SUPERADMIN_HEADERS = {
+    new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
+    new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+    new BasicHeader(Constants.TENANT_HEADER, Constants.SUPERADMIN_TENANT)
+  };
   private static int port;
   protected static LoomService loomService;
-  protected static TimeoutTrackingQueue nodeProvisionTaskQueue;
-  protected static TimeoutTrackingQueue clusterQueue;
-  protected static TimeoutTrackingQueue solverQueue;
-  protected static TimeoutTrackingQueue jobQueue;
-  protected static TimeoutTrackingQueue callbackQueue;
-  protected static ClusterStore clusterStore;
-  protected static Scheduler scheduler;
-  protected static JobScheduler jobScheduler;
+  protected static ElementsTrackingQueue balancerQueue;
+  protected static QueueGroup provisionerQueues;
+  protected static QueueGroup clusterQueues;
+  protected static QueueGroup solverQueues;
+  protected static QueueGroup jobQueues;
+  protected static QueueGroup callbackQueues;
+  protected static TenantProvisionerService tenantProvisionerService;
 
 
   @BeforeClass
   public static void setupServiceBase() throws Exception {
-    nodeProvisionTaskQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.PROVISIONER)));
-    nodeProvisionTaskQueue.start();
-    clusterQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
-    clusterQueue.start();
-    solverQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.SOLVER)));
-    solverQueue.start();
-    jobQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.JOB)));
-    jobQueue.start();
-    callbackQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CALLBACK)));
-    callbackQueue.start();
+    balancerQueue = injector.getInstance(
+      Key.get(ElementsTrackingQueue.class, Names.named(Constants.Queue.WORKER_BALANCE)));
+    provisionerQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.PROVISIONER)));
+    clusterQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
+    solverQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
+    jobQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.JOB)));
+    callbackQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CALLBACK)));
     loomService = injector.getInstance(LoomService.class);
     loomService.startAndWait();
     port = loomService.getBindAddress().getPort();
-    clusterStore = injector.getInstance(ClusterStore.class);
-    clusterStore.initialize();
-    scheduler = injector.getInstance(Scheduler.class);
-    scheduler.startAndWait();
-    jobScheduler = injector.getInstance(JobScheduler.class);
+    tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
+  }
+
+  @Before
+  public void setupServiceTest() throws Exception {
+    tenantProvisionerService.writeProvisioner(new Provisioner(PROVISIONER_ID, "host1", 12345, 100, null, null));
+    tenantProvisionerService.writeTenant(new Tenant("name", TENANT_ID, 10, 100, 1000));
   }
 
   @AfterClass
   public static void cleanupServiceBase() {
     loomService.stopAndWait();
-    clusterQueue.stop();
-    nodeProvisionTaskQueue.stop();
-    scheduler.stopAndWait();
   }
 
   public static HttpResponse doGet(String resource) throws Exception {
@@ -111,6 +124,10 @@ public class LoomServiceTestBase extends BaseTest {
     }
 
     return client.execute(get);
+  }
+
+  public static HttpResponse doPut(String resource, String body) throws Exception {
+    return doPut(resource, body, null);
   }
 
   public static HttpResponse doPut(String resource, String body, Header[] headers) throws Exception {

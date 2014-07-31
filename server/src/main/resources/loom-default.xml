@@ -143,4 +143,35 @@
         <description>class to use to handle cluster callbacks</description>
     </property>
 
+    <property>
+        <name>server.provisioner.timeout.secs</name>
+        <value>120</value>
+        <description>seconds to wait for a provisioner heartbeat before moving its workers and deleting it</description>
+    </property>
+
+    <property>
+        <name>server.provisioner.timeout.check.interval.secs</name>
+        <value>60</value>
+        <description>seconds between checks for timed out provisioners</description>
+    </property>
+
+    <property>
+        <name>server.provisioner.request.max.retries</name>
+        <value>2</value>
+        <description>max number of times to retry a failed request to a provisioner before reassigning its workers
+                     and deleting it</description>
+    </property>
+
+    <property>
+        <name>server.provisioner.request.ms.between.retries</name>
+        <value>500</value>
+        <description>milliseconds to wait before retrying a failed request to a provisioner</description>
+    </property>
+
+    <property>
+        <name>server.provisioner.request.socket.timeout.ms</name>
+        <value>10000</value>
+        <description>socket timeout in milliseconds to use when making requests to provisioners</description>
+    </property>
+
 </configuration>

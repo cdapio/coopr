@@ -35,6 +35,8 @@ var PORT = argv.port || 8100;
 var CLIENT_ADDR = argv.loomhost || 'http://127.0.0.1:55054';
 var BOX_ADDR = CLIENT_ADDR + '/v1/loom';
 var CLIENT_DIR = env === 'production' ? 'client-built' : 'client';
+// temporary 
+var TENANT = argv.tenant || 'loom';
 console.info('Environment:', env, BOX_ADDR, CLIENT_DIR);
 
 /**
@@ -192,6 +194,7 @@ site.getEntity = function (path, user) {
       method: 'GET',
       headers: {
         'X-Loom-UserID': user,
+        'X-Loom-TenantID': TENANT,
         'X-Loom-ApiKey': DEFAULT_API_KEY
       }
     };
@@ -224,6 +227,7 @@ site.getEntity = function (path, user) {
 site.sendRequestAndHandleResponse = function (options, user, res) {
   options['headers'] = {
     'X-Loom-UserID': user,
+    'X-Loom-TenantID': TENANT,
     'X-Loom-ApiKey': DEFAULT_API_KEY
   };
   request(options, this.getGenericResponseHandler(res, options.method));
@@ -423,6 +427,7 @@ site.app.post('/import', function (req, res) {
             method: 'POST',
             headers: {
               'X-Loom-UserID': user,
+              'X-Loom-TenantID': TENANT,
               'X-Loom-ApiKey': DEFAULT_API_KEY
             },
             json: config
@@ -451,6 +456,7 @@ site.app.get('/export', function (req, res) {
     method: 'GET',
     headers: {
       'X-Loom-UserID': user,
+      'X-Loom-TenantID': TENANT,
       'X-Loom-ApiKey': DEFAULT_API_KEY
     }
   };
@@ -1284,6 +1290,7 @@ site.app.post('/login', function (req, res) {
     method: 'GET',
     headers: {
       'X-Loom-UserID': user,
+      'X-Loom-TenantID': TENANT,
       'X-Loom-ApiKey': DEFAULT_API_KEY
     }
   };

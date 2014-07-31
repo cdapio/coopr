@@ -16,24 +16,17 @@
 package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
-import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.GroupElement;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.http.AddServicesRequest;
-import com.continuuity.loom.layout.ClusterCreateRequest;
-import com.continuuity.loom.layout.Solver;
-import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.task.ClusterJob;
-import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.gson.Gson;
@@ -42,10 +35,6 @@ import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-
 /**
  * Polls a queue which contains {@link com.continuuity.loom.scheduler.callback.CallbackData} for performing cluster
  * operation callbacks before starting an operation and upon success or failure of an operation.
@@ -53,48 +42,52 @@ import java.util.concurrent.Callable;
 public class CallbackScheduler implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(CallbackScheduler.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
   private final String id;
-  private final TrackingQueue jobQueue;
-  private final TrackingQueue callbackQueue;
   private final ClusterCallback clusterCallback;
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
+  private final Gson gson;
+  private final QueueGroup callbackQueues;
+  private final QueueGroup jobQueues;
 
   @Inject
   private CallbackScheduler(@Named("scheduler.id") String id,
-                            @Named(Constants.Queue.CALLBACK) TrackingQueue callbackQueue,
-                            @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
                             @Named("callback.executor.service") ListeningExecutorService executorService,
                             TaskService taskService,
                             ClusterCallback clusterCallback,
-                            Configuration conf, ClusterStore clusterStore) {
+                            Configuration conf,
+                            ClusterStoreService clusterStoreService,
+                            Gson gson,
+                            @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
+                            @Named(Constants.Queue.JOB) QueueGroup jobQueues) {
     this.id = id;
-    this.callbackQueue = callbackQueue;
-    this.jobQueue = jobQueue;
     this.executorService = executorService;
     this.taskService = taskService;
     this.clusterCallback = clusterCallback;
-    this.clusterCallback.initialize(conf, clusterStore);
+    this.clusterCallback.initialize(conf, clusterStoreService);
+    this.gson = gson;
+    this.callbackQueues = callbackQueues;
+    this.jobQueues = jobQueues;
   }
 
   @Override
   public void run() {
     try {
       while (true) {
-        final Element element = callbackQueue.take(id);
-        if (element == null) {
+        final GroupElement gElement = callbackQueues.take(id);
+        if (gElement == null) {
           return;
         }
 
-        final ListenableFuture future = executorService.submit(new CallbackRunner(element));
+        final Element element = gElement.getElement();
+        final ListenableFuture future = executorService.submit(new CallbackRunner(gElement));
         future.addListener(new Runnable() {
           @Override
           public void run() {
             try {
-              callbackQueue.recordProgress(id, element.getId(),
-                                           TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "Executed");
+              callbackQueues.recordProgress(id, gElement.getQueueName(), element.getId(),
+                                            TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "Executed");
             } catch (Exception e) {
               LOG.error("Exception processing callback", e);
             }
@@ -107,15 +100,15 @@ public class CallbackScheduler implements Runnable {
   }
 
   private class CallbackRunner implements Runnable {
-    private final Element element;
+    private final GroupElement gElement;
 
-    private CallbackRunner(Element element) {
-      this.element = element;
+    private CallbackRunner(GroupElement gElement) {
+      this.gElement = gElement;
     }
 
     @Override
     public void run() {
-      CallbackData callbackData = GSON.fromJson(element.getValue(), CallbackData.class);
+      CallbackData callbackData = gson.fromJson(gElement.getElement().getValue(), CallbackData.class);
       switch (callbackData.getType()) {
         case START:
           onStart(callbackData);
@@ -137,7 +130,7 @@ public class CallbackScheduler implements Runnable {
       try {
         if (clusterCallback.onStart(callbackData)) {
           String jobId = callbackData.getJob().getJobId();
-          jobQueue.add(new Element(jobId));
+          jobQueues.add(gElement.getQueueName(), new Element(jobId));
           LOG.debug("added job {} to job queue", jobId);
         } else {
           switch (job.getClusterAction()) {
