@@ -18,6 +18,7 @@
 
 require_relative 'utils'
 require 'readline'
+require 'resolv'
 
 class FogProviderAWS < Provider
 
@@ -76,7 +77,6 @@ class FogProviderAWS < Provider
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
-      bootstrap_ip = ip_address(server, 'public')
       # Handle tags
       hashed_tags = {}
       @tags.map{ |t| key,val=t.split('='); hashed_tags[key]=val} unless @tags.nil?
@@ -86,6 +86,7 @@ class FogProviderAWS < Provider
       end
       create_tags(hashed_tags, providerid) unless hashed_tags.empty?
 
+      bootstrap_ip = Resolv.getaddress(server.dns_name)
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
       else
