@@ -49,6 +49,7 @@ import org.apache.twill.zookeeper.RetryStrategies;
 import org.apache.twill.zookeeper.ZKClientService;
 import org.apache.twill.zookeeper.ZKClientServices;
 import org.apache.twill.zookeeper.ZKClients;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -153,10 +154,10 @@ public class BaseTest {
     DBHelper.dropDerbyDB();
   }
 
-  @Before
-  public void setupBaseTest() throws SQLException {
+  @After
+  public void cleanupBaseTest() throws SQLException {
+    sqlTenantStore.clearData();
     sqlClusterStoreService.clearData();
     sqlProvisionerStore.clearData();
-    sqlTenantStore.clearData();
   }
 }

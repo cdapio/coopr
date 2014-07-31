@@ -235,7 +235,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get a specific {@link ProviderType} if readable by the user.
+   * Get a specific {@link com.continuuity.loom.admin.ProviderType} if readable by the user.
    *
    * @param request The request for the provider type.
    * @param responder Responder for sending the response.
@@ -260,7 +260,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get a specific {@link AutomatorType} if readable by the user.
+   * Get a specific {@link com.continuuity.loom.admin.AutomatorType} if readable by the user.
    *
    * @param request The request for the automator type.
    * @param responder Responder for sending the response.
@@ -373,7 +373,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get all {@link ProviderType}s readable by the user.
+   * Get all {@link com.continuuity.loom.admin.ProviderType}s readable by the user.
    *
    * @param request The request for services.
    * @param responder Responder for sending the response.
@@ -395,7 +395,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get all {@link AutomatorType}s readable by the user.
+   * Get all {@link com.continuuity.loom.admin.AutomatorType}s readable by the user.
    *
    * @param request The request for services.
    * @param responder Responder for sending the response.

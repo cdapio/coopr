@@ -32,6 +32,8 @@ import com.continuuity.loom.admin.ParametersSpecification;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.admin.ResourceTypeFormat;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
@@ -45,6 +47,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -76,12 +79,14 @@ public class Entities {
           )
         ),
         ParameterType.USER,
-        ParametersSpecification.EMPTY_SPECIFICATION
-      ));
+        ParametersSpecification.EMPTY_SPECIFICATION),
+      ImmutableMap.<String, ResourceTypeSpecification>of()
+    );
     public static final String JOYENT_STRING =
       "{\n" +
         "    \"name\": \"joyent\",\n" +
         "    \"description\": \"joyent provider type\",\n" +
+        "    \"resourceTypes\": { },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -133,11 +138,14 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
           )
-        )));
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of()
+      );
     public static final String RACKSPACE_STRING =
       "{\n" +
         "    \"name\": \"rackspace\",\n" +
         "    \"description\": \"rackspace provider type\",\n" +
+        "    \"resourceTypes\": { },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -175,12 +183,14 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
           )
-        )
-      ));
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of()
+      );
     public static final String USER_RACKSPACE_STRING =
       "{\n" +
         "    \"name\": \"user-rackspace\",\n" +
         "    \"description\": \"description\",\n" +
+        "    \"resourceTypes\": { },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -223,12 +233,24 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("script")
           )
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of(
+          "scripts", new ResourceTypeSpecification(ResourceTypeFormat.FILE),
+          "data", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE)
         )
-      ));
+      );
     public static final String SHELL_STRING =
       "{\n" +
         "    \"name\": \"shell\",\n" +
         "    \"description\": \"shell automator\",\n" +
+        "    \"resourceTypes\": {\n" +
+        "        \"scripts\": {\n" +
+        "            \"format\": \"file\"\n" +
+        "        },\n" +
+        "        \"data\": {\n" +
+        "            \"format\": \"archive\"\n" +
+        "        }\n" +
+        "    },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -266,12 +288,28 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("recipe")
           )
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of(
+          "cookbooks", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
+          "data_bags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
+          "roles", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE)
         )
-      ));
+      );
     public static final String CHEF_STRING =
       "{\n" +
         "    \"name\": \"chef-solo\",\n" +
         "    \"description\": \"chef automator\",\n" +
+        "    \"resourceTypes\": {\n" +
+        "        \"cookbooks\": {\n" +
+        "            \"format\": \"archive\"\n" +
+        "        },\n" +
+        "        \"data_bags\": {\n" +
+        "            \"format\": \"archive\"\n" +
+        "        },\n" +
+        "        \"roles\": {\n" +
+        "            \"format\": \"archive\"\n" +
+        "        }\n" +
+        "    },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -309,8 +347,12 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("manifest")
           )
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of(
+          "modules", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
+          "manifests", new ResourceTypeSpecification(ResourceTypeFormat.FILE)
         )
-      ));
+      );
   }
 
   public static class ProviderExample {
@@ -1181,6 +1223,49 @@ public class Entities {
                  Node.Properties.HARDWARETYPE.name().toLowerCase(), HardwareTypeExample.LARGE.getName(),
                  Node.Properties.IMAGETYPE.name().toLowerCase(), ImageTypeExample.CENTOS_6.getName()
                ));
+  }
+
+  public static class NodeExample {
+    private static String node1 = "node1";
+    private static String node2 = "node2";
+    private static String clusterId = "2";
+    private static final String baseMockHostName = ".test.chi.intsm.net";
+    public static Node NODE1 = createNode(node1, clusterId);
+    public static Node NODE2 = createNode(node2, clusterId);
+    public static Node NODE1_UPDATED = createNode(node1,
+                                                  clusterId,
+                                                  ImmutableSet.of(ServiceExample.DATANODE, ServiceExample.HOSTS),
+                                                  ImmutableMap.of(Node.Properties.HARDWARETYPE.name().toLowerCase(),
+                                                                  HardwareTypeExample.MEDIUM.getName(),
+                                                                  Node.Properties.IMAGETYPE.name().toLowerCase(),
+                                                                  ImageTypeExample.UBUNTU_12.getName())
+                                                 );
+    public static Set<Node> NODES = createMockNodes(2);
+
+    private static Set<Node> createMockNodes(int numberOfNodes) {
+      Set<Node> mockNodes = new HashSet<Node>();
+      for (int i = 0; i < numberOfNodes; i++) {
+        Node mockNode = createNode(i + baseMockHostName, Integer.toString(i));
+        mockNodes.add(mockNode);
+      }
+
+      return mockNodes;
+    }
+
+    public static Node createNode(String id, String clusterId) {
+      return createNode(id,
+                        clusterId,
+                        ImmutableSet.of(ServiceExample.DATANODE, ServiceExample.HOSTS),
+                        ImmutableMap.of(Node.Properties.HARDWARETYPE.name().toLowerCase(),
+                                        HardwareTypeExample.LARGE.getName(),
+                                        Node.Properties.IMAGETYPE.name().toLowerCase(),
+                                        ImageTypeExample.CENTOS_6.getName())
+                       );
+    }
+
+    public static Node createNode(String id, String clusterId, Set<Service> services, Map<String, String> properties) {
+      return new Node(id, clusterId, services, properties);
+    }
   }
 
   protected static JsonObject json(String key, JsonObject val) {

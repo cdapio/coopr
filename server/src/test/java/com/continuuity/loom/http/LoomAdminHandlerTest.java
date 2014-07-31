@@ -16,12 +16,10 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
-import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.common.conf.Constants;
@@ -38,7 +36,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicHeader;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
