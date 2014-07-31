@@ -1,44 +1,44 @@
 {
-    "description": "",
-    "name": "rackspace",
-    "parameters": {
-        "admin": {
-            "fields": {
-                "rackspace_api_key": {
-                    "label": "API key",
-                    "override": false,
-                    "tip": "Your Rackspace API key",
-                    "type": "password"
-                },
-                "rackspace_region": {
-                    "default": "dfw",
-                    "label": "Region",
-                    "options": [
-                        "dfw",
-                        "ord",
-                        "iad",
-                        "lon",
-                        "syd",
-                        "hkg"
-                    ],
-                    "override": true,
-                    "tip": "Rackspace region",
-                    "type": "select"
-                },
-                "rackspace_username": {
-                    "label": "User",
-                    "override": false,
-                    "tip": "Your Rackspace user name",
-                    "type": "text"
-                }
-            },
-            "required": [
-                [
-                    "rackspace_username",
-                    "rackspace_api_key",
-                    "rackspace_region"
-                ]
-            ]
+  "description": "",
+  "name": "rackspace",
+  "parameters": {
+    "admin": {
+      "fields": {
+        "rackspace_api_key": {
+          "label": "API key",
+          "override": false,
+          "tip": "Your Rackspace API key",
+          "type": "password"
+        },
+        "rackspace_region": {
+          "default": "dfw",
+          "label": "Region",
+          "options": [
+            "dfw",
+            "ord",
+            "iad",
+            "lon",
+            "syd",
+            "hkg"
+          ],
+          "override": true,
+          "tip": "Rackspace region",
+          "type": "select"
+        },
+        "rackspace_username": {
+          "label": "User",
+          "override": false,
+          "tip": "Your Rackspace user name",
+          "type": "text"
         }
+      },
+      "required": [
+        [
+          "rackspace_username",
+          "rackspace_api_key",
+          "rackspace_region"
+        ]
+      ]
     }
+  }
 }

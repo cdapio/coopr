@@ -16,6 +16,7 @@
 package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.google.common.util.concurrent.Service;
 
 import java.io.IOException;
@@ -33,15 +34,32 @@ public interface TenantStore extends Service {
    * @return Tenant for the given id or null if no such tenant exists.
    * @throws IOException
    */
-  Tenant getTenant(String id) throws IOException;
+  Tenant getTenantByID(String id) throws IOException;
 
   /**
-   * Get all {@link com.continuuity.loom.admin.Tenant}s.
+   * Get the {@link com.continuuity.loom.admin.Tenant} associated with the given name or null if none exists.
+   *
+   * @param name Name of the tenant.
+   * @return Tenant for the given name or null if no such tenant exists.
+   * @throws IOException
+   */
+  Tenant getTenantByName(String name) throws IOException;
+
+  /**
+   * Get an immutable list of all {@link com.continuuity.loom.admin.Tenant tenants}.
    *
    * @return Collection of all tenants.
    * @throws IOException
    */
   List<Tenant> getAllTenants() throws IOException;
+
+  /**
+   * Get an immutable list of all {@link com.continuuity.loom.admin.TenantSpecification}.
+   *
+   * @return Collection of all tenant specifications.
+   * @throws IOException
+   */
+  List<TenantSpecification> getAllTenantSpecifications() throws IOException;
 
   /**
    * Write the given {@link com.continuuity.loom.admin.Tenant} to the store. Will overwrite the existing
@@ -53,10 +71,19 @@ public interface TenantStore extends Service {
   void writeTenant(Tenant tenant) throws IOException;
 
   /**
-   * Delete the {@link com.continuuity.loom.admin.Tenant} associated with the given id.
+   * Delete the {@link com.continuuity.loom.admin.Tenant} associated with the given name.
    *
-   * @param id Id of the tenant to delete.
-   * @throws Exception
+   * @param name Name of the tenant to delete.
+   * @throws IOException
    */
-  void deleteTenant(String id) throws IOException;
+  void deleteTenantByName(String name) throws IOException;
+
+  /**
+   * Get the name of the tenant that has the given id, or null if the tenant does not exist
+   *
+   * @param id Id of the tenant to get the name for
+   * @return Name of the tenant with the given id, or null if the tenant does not exist
+   * @throws IOException
+   */
+  String getNameForId(String id) throws IOException;
 }

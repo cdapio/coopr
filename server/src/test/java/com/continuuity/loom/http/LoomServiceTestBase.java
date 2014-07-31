@@ -18,12 +18,12 @@ package com.continuuity.loom.http;
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.internal.ElementsTrackingQueue;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
-import com.continuuity.loom.scheduler.Scheduler;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -103,7 +103,7 @@ public class LoomServiceTestBase extends BaseTest {
   @Before
   public void setupServiceTest() throws Exception {
     tenantProvisionerService.writeProvisioner(new Provisioner(PROVISIONER_ID, "host1", 12345, 100, null, null));
-    tenantProvisionerService.writeTenant(new Tenant("name", TENANT_ID, 10, 100, 1000));
+    tenantProvisionerService.writeTenantSpecification(new TenantSpecification(TENANT, 10, 100, 1000));
   }
 
   @AfterClass
