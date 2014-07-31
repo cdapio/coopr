@@ -70,19 +70,36 @@
       "user": {
         "fields": {
           "security_groups": {
-            "label": "Security Group",
+            "label": "Security Groups",
             "type": "text",
             "default": "default",
-            "tip": "AWS security group"
+            "tip": "AWS security group (non-VPC)"
+          },
+          "security_group_ids": {
+            "label": "Security Group IDs",
+            "type": "text",
+            "default": "default",
+            "tip": "AWS security group IDs (required for VPC)"
+          },
+          "subnet_id": {
+            "label": "Subnet ID",
+            "type": "text",
+            "tip": "Enable VPC and use this subnet ID"
           },
           "availability_zone": {
             "label": "Availability Zone",
             "type": "text",
             "tip": "AWS Availability Zone"
+          },
+          "iam_instance_profile": {
+            "label": "IAM instance profile",
+            "type": "text",
+            "tip": "IAM instance profile to apply to cluster"
           }
         },
         "required": [
-          []
+          [ "security_groups" ],
+          [ "security_group_ids", "subnet_id" ]
         ]
       }
     }
