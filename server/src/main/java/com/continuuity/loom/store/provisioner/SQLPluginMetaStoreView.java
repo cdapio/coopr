@@ -58,9 +58,9 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
     this.tenant = account.getTenantId();
     this.dbConnectionPool = dbConnectionPool;
     this.dbQueryExecutor = dbQueryExecutor;
-    this.pluginType = resourceType.getType().name();
+    this.pluginType = resourceType.getPluginType().name();
     this.pluginName = resourceType.getPluginName();
-    this.resourceType = resourceType.getResourceType();
+    this.resourceType = resourceType.getTypeName();
   }
 
   @Override
@@ -128,7 +128,7 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
           setConstantFields(statement);
           statement.setString(5, meta.getName());
           statement.setInt(6, meta.getVersion());
-          statement.setBoolean(7, status.isSlatedToBeLive());
+          statement.setBoolean(7, status.isLiveAfterSync());
           statement.setBoolean(8, status.isLive());
           statement.setBoolean(9, false);
           statement.setTimestamp(10, DBHelper.getTimestamp(System.currentTimeMillis()));
@@ -247,7 +247,7 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
             "AND plugin_name=? AND resource_type=? AND slated=? AND live=? AND deleted=false");
         try {
           setConstantFields(statement);
-          statement.setBoolean(5, status.isSlatedToBeLive());
+          statement.setBoolean(5, status.isLiveAfterSync());
           statement.setBoolean(6, status.isLive());
           return getResourceMetaMap(statement);
         } finally {
@@ -298,7 +298,7 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
         try {
           setConstantFields(statement);
           statement.setString(5, name);
-          statement.setBoolean(6, status.isSlatedToBeLive());
+          statement.setBoolean(6, status.isLiveAfterSync());
           statement.setBoolean(7, status.isLive());
           return getResourceMetaList(statement);
         } finally {

@@ -87,6 +87,7 @@ public class LocalFilePluginStore implements PluginStore {
   public void deleteResource(Account account, ResourceType type, String name, int version) throws IOException {
     File file = getFile(account, type, name, version);
     if (file.exists()) {
+      // TODO: delete directory structure if empty
       file.delete();
     }
   }
@@ -96,11 +97,11 @@ public class LocalFilePluginStore implements PluginStore {
       .append(baseDir)
       .append(account.getTenantId())
       .append(File.separator)
-      .append(type.getType().name().toLowerCase())
+      .append(type.getPluginType().name().toLowerCase())
       .append(File.separator)
       .append(type.getPluginName())
       .append(File.separator)
-      .append(type.getResourceType())
+      .append(type.getTypeName())
       .append(File.separator)
       .append(name)
       .append(File.separator)

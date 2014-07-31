@@ -23,9 +23,13 @@ package com.continuuity.loom.provisioner.plugin;
  * being used on the provisioners.
  */
 public enum ResourceStatus {
+  // inactive means it is not in use and will not be in use after a sync
   INACTIVE,
+  // active means it is in use and will stay in use after a sync
   ACTIVE,
+  // staged means it is not in use but will be in use after a sync
   STAGED,
+  // unstaged means it is in use but will not be in use after a sync
   UNSTAGED;
 
   /**
@@ -44,7 +48,7 @@ public enum ResourceStatus {
    *
    * @return Whether or not the resource is slated to be live
    */
-  public boolean isSlatedToBeLive() {
+  public boolean isLiveAfterSync() {
     return this == STAGED || this == ACTIVE;
   }
 

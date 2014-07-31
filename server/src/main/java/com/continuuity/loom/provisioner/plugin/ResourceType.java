@@ -19,17 +19,17 @@ import com.google.common.base.Objects;
 
 /**
  * Type of plugin resource. Includes the plugin type (ex: automator or provider), plugin name (ex: chef-solo or shell),
- * and resource type (ex: cookbook, script).
+ * and type name (ex: cookbook, script). A resource type and a {@link ResourceMeta} uniquely identify a resource.
  */
 public class ResourceType {
-  private final Type type;
+  private final PluginType pluginType;
   private final String pluginName;
-  private final String resourceType;
+  private final String typeName;
 
-  public ResourceType(Type type, String pluginName, String resourceType) {
-    this.type = type;
+  public ResourceType(PluginType pluginType, String pluginName, String typeName) {
+    this.pluginType = pluginType;
     this.pluginName = pluginName;
-    this.resourceType = resourceType;
+    this.typeName = typeName;
   }
 
   /**
@@ -37,8 +37,8 @@ public class ResourceType {
    *
    * @return Plugin type
    */
-  public Type getType() {
-    return type;
+  public PluginType getPluginType() {
+    return pluginType;
   }
 
   /**
@@ -51,12 +51,12 @@ public class ResourceType {
   }
 
   /**
-   * Get the resource type.
+   * Get the name of the resource type.
    *
-   * @return Resource type
+   * @return Name of the resource type
    */
-  public String getResourceType() {
-    return resourceType;
+  public String getTypeName() {
+    return typeName;
   }
 
   @Override
@@ -70,22 +70,22 @@ public class ResourceType {
 
     ResourceType that = (ResourceType) o;
 
-    return Objects.equal(type, that.type) &&
+    return Objects.equal(pluginType, that.pluginType) &&
       Objects.equal(pluginName, that.pluginName) &&
-      Objects.equal(resourceType, that.resourceType);
+      Objects.equal(typeName, that.typeName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(type, pluginName, resourceType);
+    return Objects.hashCode(pluginType, pluginName, typeName);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("type", type)
+      .add("type", pluginType)
       .add("pluginTypeId", pluginName)
-      .add("resourceType", resourceType)
+      .add("typeName", typeName)
       .toString();
   }
 }

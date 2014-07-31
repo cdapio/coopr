@@ -21,9 +21,9 @@ import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.ProvisionerHeartbeat;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
-import com.continuuity.loom.provisioner.plugin.Type;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
@@ -204,7 +204,7 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
       return;
     }
 
-    ResourceType resourceTypeObj = new ResourceType(Type.AUTOMATOR, automatortypeId, resourceType);
+    ResourceType resourceTypeObj = new ResourceType(PluginType.AUTOMATOR, automatortypeId, resourceType);
     sendResourceInChunks(responder, account, resourceTypeObj, name, version);
   }
 
@@ -234,7 +234,7 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
       return;
     }
 
-    ResourceType resourceTypeObj = new ResourceType(Type.PROVIDER, providertypeId, resourceType);
+    ResourceType resourceTypeObj = new ResourceType(PluginType.PROVIDER, providertypeId, resourceType);
     sendResourceInChunks(responder, account, resourceTypeObj, name, version);
   }
 

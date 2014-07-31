@@ -24,8 +24,8 @@ import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
 import com.continuuity.loom.http.guice.HttpModule;
 import com.continuuity.loom.provisioner.MockProvisionerRequestService;
-import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.provisioner.ProvisionerRequestService;
+import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;
 import com.continuuity.loom.scheduler.guice.SchedulerModule;
@@ -33,7 +33,7 @@ import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.SQLClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
-import com.continuuity.loom.store.guice.StoreModules;
+import com.continuuity.loom.store.guice.TestStoreModule;
 import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.provisioner.SQLPluginMetaStoreService;
@@ -54,7 +54,6 @@ import org.apache.twill.zookeeper.ZKClientServices;
 import org.apache.twill.zookeeper.ZKClients;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
@@ -118,7 +117,7 @@ public class BaseTest {
       Modules.override(
         new ConfigurationModule(conf),
         new ZookeeperModule(zkClientService),
-        new StoreModules(conf).getTestModule(),
+        new TestStoreModule(),
         new QueueModule(zkClientService),
         new HttpModule(),
         new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor()),

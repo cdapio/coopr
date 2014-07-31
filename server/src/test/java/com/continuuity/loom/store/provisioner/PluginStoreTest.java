@@ -17,8 +17,8 @@ package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
-import com.continuuity.loom.provisioner.plugin.Type;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import org.junit.After;
@@ -50,7 +50,7 @@ public abstract class PluginStoreTest {
   public void testBasicInputOutputStreams() throws Exception {
     PluginStore store = getInitializedStore();
     String contents = "this is the cookbook\nthis is the second line";
-    ResourceType resourceType = new ResourceType(Type.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType resourceType = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
     String name = "hadoop";
     int version = 1;
 
@@ -63,7 +63,7 @@ public abstract class PluginStoreTest {
   public void testMultipleWrites() throws Exception {
     PluginStore store = getInitializedStore();
     String contents = "these are the first contents";
-    ResourceType resourceType = new ResourceType(Type.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType resourceType = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
     String name = "hadoop";
     int version = 1;
 
@@ -81,7 +81,7 @@ public abstract class PluginStoreTest {
     PluginStore store = getInitializedStore();
     String contents1 = "v1 contents";
     String contents2 = "v2 contents";
-    ResourceType resourceType = new ResourceType(Type.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType resourceType = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
     String name = "hadoop";
     int version1 = 1;
     int version2 = 2;
@@ -100,7 +100,7 @@ public abstract class PluginStoreTest {
     PluginStore store = getInitializedStore();
     String contents1 = "tenant1 contents";
     String contents2 = "tenant2 contents";
-    ResourceType resourceType = new ResourceType(Type.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType resourceType = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
     String name = "hadoop";
     int version = 1;
 
@@ -118,7 +118,7 @@ public abstract class PluginStoreTest {
     PluginStore store = getInitializedStore();
     String contents1 = "hadoop cookbook";
     String contents2 = "mysql cookbook";
-    ResourceType resourceType = new ResourceType(Type.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType resourceType = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
     String name1 = "hadoop";
     String name2 = "mysql";
     int version = 1;
@@ -136,7 +136,7 @@ public abstract class PluginStoreTest {
   public void testDeleteWithinTenant() throws Exception {
     PluginStore store = getInitializedStore();
     String contents = "hadoop cookbook";
-    ResourceType resourceType = new ResourceType(Type.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType resourceType = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
     String name = "hadoop";
     int version = 1;
 
@@ -155,7 +155,7 @@ public abstract class PluginStoreTest {
   public void testDeleteOnlyAffectsTenant() throws Exception {
     PluginStore store = getInitializedStore();
     String contents = "hadoop cookbook";
-    ResourceType resourceType = new ResourceType(Type.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType resourceType = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
     String name = "hadoop";
     int version = 1;
 

@@ -33,7 +33,7 @@ import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.guice.SchedulerModule;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
-import com.continuuity.loom.store.guice.StoreModules;
+import com.continuuity.loom.store.guice.StoreModule;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -133,7 +133,7 @@ public final class LoomServerMain extends DaemonMain {
       injector = Guice.createInjector(
         new ConfigurationModule(conf),
         new ZookeeperModule(zkClientService),
-        new StoreModules(conf).getDefaultModule(),
+        new StoreModule(conf),
         new QueueModule(zkClientService),
         new SchedulerModule(conf, callbackExecutorService, solverExecutorService),
         new HttpModule(),

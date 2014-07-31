@@ -18,11 +18,11 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
-import com.continuuity.loom.provisioner.plugin.Type;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.gson.Gson;
@@ -84,7 +84,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return null;
     }
 
-    return uploadResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName);
+    return uploadResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
   /**
@@ -113,7 +113,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return null;
     }
 
-    return uploadResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName);
+    return uploadResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
   /**
@@ -144,7 +144,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
 
 
-    stageResource(responder, account, Type.AUTOMATOR,
+    stageResource(responder, account, PluginType.AUTOMATOR,
                   automatortypeId, resourceType, resourceName, version);
   }
 
@@ -175,7 +175,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    stageResource(responder, account, Type.PROVIDER,
+    stageResource(responder, account, PluginType.PROVIDER,
                   providertypeId, resourceType, resourceName, version);
   }
 
@@ -206,7 +206,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    unstageResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
+    unstageResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
   }
 
 
@@ -237,7 +237,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    unstageResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName, version);
+    unstageResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName, version);
   }
 
   /**
@@ -264,7 +264,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    getResources(request, responder, account, Type.AUTOMATOR, automatortypeId, resourceType);
+    getResources(request, responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType);
   }
 
   /**
@@ -291,7 +291,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    getResources(request, responder, account, Type.PROVIDER, providertypeId, resourceType);
+    getResources(request, responder, account, PluginType.PROVIDER, providertypeId, resourceType);
   }
 
   /**
@@ -320,7 +320,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    getResources(request, responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName);
+    getResources(request, responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
   /**
@@ -349,7 +349,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    getResources(request, responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName);
+    getResources(request, responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
   /**
@@ -376,7 +376,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    deleteResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName);
+    deleteResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName);
   }
 
   /**
@@ -403,7 +403,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    deleteResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName);
+    deleteResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName);
   }
 
   /**
@@ -432,7 +432,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    deleteResource(responder, account, Type.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
+    deleteResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
   }
 
   /**
@@ -461,7 +461,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    deleteResource(responder, account, Type.PROVIDER, providertypeId, resourceType, resourceName, version);
+    deleteResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName, version);
   }
 
   /**
@@ -477,7 +477,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
     responder.sendError(HttpResponseStatus.NOT_IMPLEMENTED, "not implemented yet");
   }
 
-  private BodyConsumer uploadResource(HttpResponder responder, Account account, Type type,
+  private BodyConsumer uploadResource(HttpResponder responder, Account account, PluginType type,
                                       String pluginName, String resourceType,
                                       String resourceName) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
@@ -489,7 +489,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private void stageResource(HttpResponder responder, Account account, Type type,
+  private void stageResource(HttpResponder responder, Account account, PluginType type,
                              String pluginName, String resourceType, String resourceName, String versionStr) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
@@ -505,7 +505,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private void unstageResource(HttpResponder responder, Account account, Type type,
+  private void unstageResource(HttpResponder responder, Account account, PluginType type,
                                String pluginName, String resourceType, String resourceName, String versionStr) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
@@ -522,7 +522,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   private void getResources(HttpRequest request, HttpResponder responder, Account account,
-                            Type type, String pluginName, String resourceType) {
+                            PluginType type, String pluginName, String resourceType) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
       ResourceStatus statusFilter = getStatusParam(request);
@@ -538,7 +538,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   private void getResources(HttpRequest request, HttpResponder responder, Account account,
-                            Type type, String pluginName, String resourceType, String resourceName) {
+                            PluginType type, String pluginName, String resourceType, String resourceName) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
       ResourceStatus statusFilter = getStatusParam(request);
@@ -553,7 +553,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private void deleteResource(HttpResponder responder, Account account, Type type,
+  private void deleteResource(HttpResponder responder, Account account, PluginType type,
                               String pluginName, String resourceType, String resourceName, String versionStr) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
@@ -569,7 +569,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private void deleteResource(HttpResponder responder, Account account, Type type,
+  private void deleteResource(HttpResponder responder, Account account, PluginType type,
                               String pluginName, String resourceType, String resourceName) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {

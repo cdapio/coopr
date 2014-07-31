@@ -59,19 +59,21 @@ public class SQLPluginMetaStoreService extends AbstractIdleService implements Pl
   @Override
   protected void startUp() throws Exception {
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
-      boolean created = DBHelper.createDerbyTableIfNotExists("CREATE TABLE pluginMeta (" +
-                                                               "tenant_id VARCHAR(255), " +
-                                                               "plugin_type VARCHAR(16), " +
-                                                               "plugin_name VARCHAR(255), " +
-                                                               "resource_type VARCHAR(255), " +
-                                                               "name VARCHAR(255), " +
-                                                               "version INTEGER, " +
-                                                               "live BOOLEAN, " +
-                                                               "slated BOOLEAN, " +
-                                                               "deleted BOOLEAN, " +
-                                                               "create_time TIMESTAMP," +
-                                                               "delete_time TIMESTAMP )",
-                                                             dbConnectionPool);
+      boolean created = DBHelper.createDerbyTableIfNotExists(
+        "CREATE TABLE pluginMeta (" +
+          "tenant_id VARCHAR(255), " +
+          "plugin_type VARCHAR(16), " +
+          "plugin_name VARCHAR(255), " +
+          "resource_type VARCHAR(255), " +
+          "name VARCHAR(255), " +
+          "version INTEGER, " +
+          "live BOOLEAN, " +
+          "slated BOOLEAN, " +
+          "deleted BOOLEAN, " +
+          "create_time TIMESTAMP," +
+          "delete_time TIMESTAMP," +
+          "PRIMARY KEY(tenant_id, plugin_type, plugin_name, resource_type, name, version) )",
+        dbConnectionPool);
       if (created) {
         DBHelper.createDerbyIndex(dbConnectionPool, "plugin_meta_index", "pluginMeta",
                                   "tenant_id", "plugin_type", "plugin_name", "resource_type", "name", "version");

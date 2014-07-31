@@ -20,7 +20,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 /**
- * Metadata about a plugin resource, including a unique id, a name, a version, and status.
+ * Metadata about a plugin resource, including a name, version, and status.
  */
 public class ResourceMeta extends NamedEntity {
   private final int version;

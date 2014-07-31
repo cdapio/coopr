@@ -18,7 +18,7 @@ package com.continuuity.loom.store.provisioner;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
-import com.continuuity.loom.store.guice.StoreModules;
+import com.continuuity.loom.store.guice.TestStoreModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.BeforeClass;
@@ -36,7 +36,7 @@ public class SQLPluginResourceMetaStoreTest extends PluginResourceMetaStoreTest 
     conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
     Injector injector = Guice.createInjector(
       new ConfigurationModule(conf),
-      new StoreModules(conf).getTestModule()
+      new TestStoreModule()
     );
     service = injector.getInstance(SQLPluginMetaStoreService.class);
     service.startAndWait();

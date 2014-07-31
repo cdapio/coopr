@@ -17,7 +17,7 @@ package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
-import com.continuuity.loom.store.guice.StoreModules;
+import com.continuuity.loom.store.guice.TestStoreModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.BeforeClass;
@@ -34,7 +34,7 @@ public class MemoryPluginStoreTest extends PluginStoreTest {
     conf = Configuration.create();
     Injector injector = Guice.createInjector(
       new ConfigurationModule(conf),
-      new StoreModules(conf).getTestModule()
+      new TestStoreModule()
     );
     store = injector.getInstance(MemoryPluginStore.class);
   }

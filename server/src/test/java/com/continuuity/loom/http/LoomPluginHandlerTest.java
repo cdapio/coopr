@@ -16,10 +16,10 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
-import com.continuuity.loom.provisioner.plugin.Type;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
@@ -46,8 +46,8 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testNonAdminGetsForbidden() throws Exception {
-    ResourceType type1 = new ResourceType(Type.PROVIDER, "openstack", "keys");
-    ResourceType type2 = new ResourceType(Type.AUTOMATOR, "shell", "script");
+    ResourceType type1 = new ResourceType(PluginType.PROVIDER, "openstack", "keys");
+    ResourceType type2 = new ResourceType(PluginType.AUTOMATOR, "shell", "script");
     ResourceMeta meta = new ResourceMeta("name", 1);
     assertResponseStatus(doPost(getNamePath(type1, "name"), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doPost(getNamePath(type2, "name"), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
@@ -63,35 +63,35 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testPutAndGetAutomatorTypeModule() throws Exception {
-    testPutAndGet(Type.AUTOMATOR, "shell", "scripts");
+    testPutAndGet(PluginType.AUTOMATOR, "shell", "scripts");
   }
 
   @Test
   public void testPutAndGetProviderTypeModule() throws Exception {
-    testPutAndGet(Type.PROVIDER, "openstack", "cookbooks");
+    testPutAndGet(PluginType.PROVIDER, "openstack", "cookbooks");
   }
 
   @Test
   public void testActivateDeactivateAutomatorTypeModule() throws Exception {
-    testVersions(Type.AUTOMATOR, "shell", "scripts");
+    testVersions(PluginType.AUTOMATOR, "shell", "scripts");
   }
 
   @Test
   public void testActivateDeactivateProviderTypeModule() throws Exception {
-    testVersions(Type.PROVIDER, "openstack", "keys");
+    testVersions(PluginType.PROVIDER, "openstack", "keys");
   }
 
   @Test
   public void testGetAndDeleteAutomatorTypeResources() throws Exception {
-    testGetAndDelete(new ResourceType(Type.AUTOMATOR, "shell", "scripts"));
+    testGetAndDelete(new ResourceType(PluginType.AUTOMATOR, "shell", "scripts"));
   }
 
   @Test
   public void testGetAndDeleteProviderTypeResources() throws Exception {
-    testGetAndDelete(new ResourceType(Type.PROVIDER, "openstack", "keys"));
+    testGetAndDelete(new ResourceType(PluginType.PROVIDER, "openstack", "keys"));
   }
 
-  private void assertSendContents(String contents, Type type, String pluginName, String resourceType,
+  private void assertSendContents(String contents, PluginType type, String pluginName, String resourceType,
                                   String resourceName) throws Exception {
     assertSendContents(contents, new ResourceType(type, pluginName, resourceType), resourceName);
   }
@@ -101,7 +101,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(doPost(path, contents, ADMIN_HEADERS), HttpResponseStatus.OK);
   }
 
-  private void testPutAndGet(Type type, String pluginName, String resourceType) throws Exception {
+  private void testPutAndGet(PluginType type, String pluginName, String resourceType) throws Exception {
     String contents = RandomStringUtils.randomAlphanumeric(8 * Constants.PLUGIN_RESOURCE_CHUNK_SIZE);
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     ResourceMeta meta = new ResourceMeta("hello", 1, ResourceStatus.INACTIVE);
@@ -116,7 +116,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals(contents, bodyToString(response));
   }
 
-  private void testVersions(Type type, String pluginName, String resourceType) throws Exception{
+  private void testVersions(PluginType type, String pluginName, String resourceType) throws Exception{
     String contents = "some contents";
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     ResourceMeta meta1 = new ResourceMeta("name", 1, ResourceStatus.INACTIVE);
@@ -236,8 +236,8 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   }
 
   private String getTypePath(ResourceType type) {
-    return Joiner.on("/").join("/v1/loom", type.getType().name().toLowerCase() + "types",
-                               type.getPluginName(), type.getResourceType());
+    return Joiner.on("/").join("/v1/loom", type.getPluginType().name().toLowerCase() + "types",
+                               type.getPluginName(), type.getTypeName());
   }
 
   private String getNamePath(ResourceType type, String name) {

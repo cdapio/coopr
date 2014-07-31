@@ -17,10 +17,10 @@ package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
-import com.continuuity.loom.provisioner.plugin.Type;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -34,8 +34,8 @@ import java.util.Set;
  *
  */
 public abstract class PluginResourceMetaStoreTest {
-  ResourceType type1 = new ResourceType(Type.AUTOMATOR, "chef-solo", "cookbooks");
-  ResourceType type2 = new ResourceType(Type.PROVIDER, "openstack", "keys");
+  ResourceType type1 = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
+  ResourceType type2 = new ResourceType(PluginType.PROVIDER, "openstack", "keys");
   Account account1 = new Account(Constants.ADMIN_USER, "tenant1");
   Account account2 = new Account(Constants.ADMIN_USER, "tenant2");
 
@@ -137,7 +137,7 @@ public abstract class PluginResourceMetaStoreTest {
   public void testOnlyAdminsHaveAccess() throws Exception {
     PluginMetaStoreService service = getPluginResourceMetaStoreService();
     service.getView(new Account("notadmin", "tenant"),
-                    new ResourceType(Type.AUTOMATOR, "chef-solo", "cookbooks"));
+                    new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks"));
   }
 
   @Test

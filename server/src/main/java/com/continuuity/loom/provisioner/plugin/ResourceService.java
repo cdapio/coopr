@@ -84,7 +84,11 @@ public class ResourceService extends AbstractIdleService {
       final ResourceMeta resourceMeta = new ResourceMeta(name, version);
       LOG.debug("getting output stream for version {} of resource {} of type {} for account {}",
                 version, name, resourceType, account);
+      // output stream is used to stream resource contents to the plugin store
       final OutputStream os = pluginStore.getResourceOutputStream(account, resourceType, name, version);
+      // we write metadata here before the data completes streaming because we are guaranteed the
+      // version will never be used again, and because we need to increment the highest version in case another
+      // upload of the same name is started while this one is still going. It is deleted if the upload fails.
       metaStoreService.getView(account, resourceType).add(resourceMeta);
 
       return new BodyConsumer() {
@@ -118,6 +122,7 @@ public class ResourceService extends AbstractIdleService {
                     version, name, resourceType, account, t);
           try {
             os.close();
+            // deletion flags the entry in the database as deleted
             metaStoreService.getView(account, resourceType).delete(name, version);
             responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
           } catch (IOException e) {
@@ -345,9 +350,9 @@ public class ResourceService extends AbstractIdleService {
   private ZKInterProcessReentrantLock getLock(Account account, ResourceType type, String name) {
     String path = Joiner.on('/')
       .join(account.getTenantId(),
-            type.getType().name().toLowerCase(),
+            type.getPluginType().name().toLowerCase(),
             type.getPluginName(),
-            type.getResourceType(),
+            type.getTypeName(),
             name);
     return new ZKInterProcessReentrantLock(zkClient, path);
   }

@@ -4,7 +4,7 @@ import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
-import com.continuuity.loom.store.guice.StoreModules;
+import com.continuuity.loom.store.guice.TestStoreModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.BeforeClass;
@@ -22,7 +22,7 @@ public class SQLProvisionerStoreTest extends ProvisionerStoreTest {
     sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
     Injector injector = Guice.createInjector(
       new ConfigurationModule(sqlConf),
-      new StoreModules(sqlConf).getTestModule(),
+      new TestStoreModule(),
       new CodecModules().getModule()
     );
     store = injector.getInstance(SQLProvisionerStore.class);
