@@ -27,11 +27,15 @@ module Loom
     end
 
     def cmd
+      prod_cmd
+    end
+
+    def prod_cmd
       cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])}"
       cmd += " #{File.dirname(__FILE__)}/../../../worker/provisioner.rb"
-      cmd += " --uri #{@config.get_value('server.uri')}" if @config.get_value('server.uri')
-      cmd += " --log-directory #{@config.get_value('log.directory')}" if @config.get_value('log.directory')
-      cmd += " --log-level #{@config.get_value('log.level')}" if @config.get_value('log.level')
+      cmd += " --uri #{@config.get('server.uri')}" if @config.get('server.uri')
+      cmd += " --log-directory #{@config.get('log.directory')}" if @config.get('log.directory')
+      cmd += " --log-level #{@config.get('log.level')}" if @config.get('log.level')
       cmd += " --provisioner #{@provisioner}" unless @provisioner.nil?
       cmd += " --tenant #{@tenant}" unless @tenant.nil?
       cmd += " --name #{@name}" unless @name.nil?
