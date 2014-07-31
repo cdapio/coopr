@@ -12,6 +12,7 @@ Unreleased
 - Ability to sync an active cluster's template to its current version ( Issues: #214 )
 - Cluster owner macro ( Issues: #221 )
 - Loom Firewall updates ( Issues: #226 #227 )
+- Memcached support for clusters ( Issues: #237 )
 - Include automator and provider types in export and import ( Issues: #246 )
 - Upgrade script ( Issues: #258 )
 
