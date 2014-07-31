@@ -211,4 +211,22 @@ class FogProviderAWS < Provider
     end
   end
 
+  def vpc_mode?
+    # Amazon Virtual Private Cloud requires a subnet_id
+    !!@subnet_id
+  end
+
+  def ami
+    @ami ||= connection.images.get(@image)
+  end
+
+  def tags
+    tags = @tags
+    if !tags.nil? && tags.length != tags.to_s.count('=')
+      log.error 'Tags should be entered in a key=value pair'
+      raise 'Tags should be entered in a key=value pair'
+    end
+    tags
+  end
+
 end
