@@ -20,22 +20,22 @@ require 'rexml/document'
 module Loom
   class Config
 
-    attr_reader :config, :default_file, :properties
+    attr_reader :properties, :default_file, :descriptions
 
     def initialize(options)
-      @config = {} # name => value
-      @properties = {} # name => description
+      @properties = {} # name => value
+      @descriptions = {} # name => description
       @default_file = "#{File.dirname(__FILE__)}/../../conf/provisioner-default.xml"
       @site_file = options[:configfile]
     end
 
-    def get_value(val)
+    def get(val)
       val = 'provisioner.' + val.downcase unless val.downcase =~ /^provisioner\./i
       # handle boolean
-      if @config[val] =~ /^false$/i
+      if @properties[val] =~ /^false$/i
         false
       else
-        @config[val]
+        @properties[val]
       end
     end
 
@@ -76,8 +76,8 @@ module Loom
             next if (p_name.nil? || p_value.nil?)
             # only consider 'provisioner.*' entries
             next unless p_name.downcase =~ /^provisioner\./i
-            @config[p_name.downcase] = p_value
-            @properties[p_name.downcase] = p_description
+            @properties[p_name.downcase] = p_value
+            @descriptions[p_name.downcase] = p_description
 
           end
         rescue => e
@@ -94,7 +94,7 @@ module Loom
     end
 
     def apply_defaults
-      # @config['provisioner.bind.ip'] = '0.0.0.0' unless @config['provisioner.bind.ip']
+      # @properties['provisioner.bind.ip'] = '0.0.0.0' unless @properties['provisioner.bind.ip']
     end
 
     def validate
