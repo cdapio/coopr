@@ -13,37 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.FieldSchema;
-import com.continuuity.loom.admin.ParametersSpecification;
-import com.google.common.reflect.TypeToken;
+import com.continuuity.loom.admin.ResourceTypeFormat;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
+import com.continuuity.loom.codec.json.AbstractCodec;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Set;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.admin.ParametersSpecification}. Used so that the constructor
- * is called to avoid null values where they do not make sense.
+ * Codec for serializing/deserializing a {@link ResourceTypeSpecification}. Used to handle enums.
  */
-public class ParametersSpecificationCodec implements JsonDeserializer<ParametersSpecification> {
+public class ResourceTypeSpecificationCodec extends AbstractCodec<ResourceTypeSpecification> {
 
   @Override
-  public ParametersSpecification deserialize(JsonElement json, Type type, JsonDeserializationContext context)
+  public JsonElement serialize(ResourceTypeSpecification spec, Type type, JsonSerializationContext context) {
+    JsonObject jsonObj = new JsonObject();
+
+    jsonObj.add("format", context.serialize(spec.getFormat()));
+
+    return jsonObj;
+  }
+
+  @Override
+  public ResourceTypeSpecification deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    Map<String, FieldSchema> fields =
-      context.deserialize(jsonObj.get("fields"), new TypeToken<Map<String, FieldSchema>>() {}.getType());
-    Set<Set<String>> required =
-      context.deserialize(jsonObj.get("required"), new TypeToken<Set<Set<String>>>() {}.getType());
+    ResourceTypeFormat format = context.deserialize(jsonObj.get("format"), ResourceTypeFormat.class);
 
-    return new ParametersSpecification(fields, required);
+    return new ResourceTypeSpecification(format);
   }
 }

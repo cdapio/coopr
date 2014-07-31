@@ -15,17 +15,16 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.ParameterType;
 import com.continuuity.loom.admin.ParametersSpecification;
 import com.continuuity.loom.admin.ProviderType;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -45,7 +44,9 @@ public class ProviderTypeCodec implements JsonDeserializer<ProviderType> {
     String description = context.deserialize(jsonObj.get("description"), String.class);
     Map<ParameterType, ParametersSpecification> parameters = context.deserialize(
       jsonObj.get("parameters"), new TypeToken<Map<ParameterType, ParametersSpecification>>() {}.getType());
+    Map<String, ResourceTypeSpecification> resourceTypes = context.deserialize(
+      jsonObj.get("resourceTypes"), new TypeToken<Map<String, ResourceTypeSpecification>>() {}.getType());
 
-    return new ProviderType(name, description, parameters);
+    return new ProviderType(name, description, parameters, resourceTypes);
   }
 }

@@ -119,6 +119,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/status
  $ {
@@ -132,6 +133,7 @@ Example
 
  $ curl -X POST
         -H 'X-Loom-UserID:<userid>'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/getClusterStatuses
  $ [
@@ -212,6 +214,7 @@ Example
 
  $ curl -X POST
         -H 'X-Loom-UserID:<userid>'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{ 
                 "clusterId":"00000051",

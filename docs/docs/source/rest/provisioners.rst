@@ -70,13 +70,13 @@ Example
        "capacityTotal": 10,
        "capacityFree": 2,
        "assignments": {
-           "6397a0c0-c6a7-43de-8fe0-2091ac0e6017": 5,
-           "99ac47e3-17b7-4ceb-bfc7-53498c57ca26": 2,
-           "abead0c1-53bd-4482-b503-0a4de8dd18d0": 1
+           "tenantX": 5,
+           "tenantY": 2,
+           "tenantZ": 1
        },
        "usage": {
-           "99ac47e3-17b7-4ceb-bfc7-53498c57ca26": 2,
-           "abead0c1-53bd-4482-b503-0a4de8dd18d0": 1
+           "tenantY": 2,
+           "tenantZ": 1
        }
    }
 
@@ -125,13 +125,13 @@ Example
            "capacityTotal": 10,
            "capacityFree": 2,
            "assignments": {
-               "6397a0c0-c6a7-43de-8fe0-2091ac0e6017": 5,
-               "99ac47e3-17b7-4ceb-bfc7-53498c57ca26": 2,
-               "abead0c1-53bd-4482-b503-0a4de8dd18d0": 1
+               "tenantX": 5,
+               "tenantY": 2,
+               "tenantZ": 1
            },
            "usage": {
-               "99ac47e3-17b7-4ceb-bfc7-53498c57ca26": 2,
-               "abead0c1-53bd-4482-b503-0a4de8dd18d0": 1
+               "tenantY": 2,
+               "tenantZ": 1
            }
        },
        {
@@ -141,12 +141,12 @@ Example
            "capacityTotal": 10,
            "capacityFree": 2,
            "assignments": {
-               "2ce4f26d-3190-4698-96fa-db4c8ee84a4b": 5,
-               "99ac47e3-17b7-4ceb-bfc7-53498c57ca26": 3
+               "tenantX": 5,
+               "tenantY": 3
            },
            "usage": {
-               "2ce4f26d-3190-4698-96fa-db4c8ee84a4b": 5,
-               "99ac47e3-17b7-4ceb-bfc7-53498c57ca26": 3,
+               "tenantX": 5,
+               "tenantY": 3,
            }
        }
     ]

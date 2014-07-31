@@ -13,12 +13,14 @@ import com.continuuity.loom.admin.LeaseDuration;
 import com.continuuity.loom.admin.ParametersSpecification;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.admin.ServiceDependencies;
 import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.codec.json.LowercaseEnumTypeAdapterFactory;
 import com.continuuity.loom.codec.json.current.AddServicesRequestCodec;
@@ -41,6 +43,7 @@ import com.continuuity.loom.codec.json.current.ParametersSpecificationCodec;
 import com.continuuity.loom.codec.json.current.ProviderCodec;
 import com.continuuity.loom.codec.json.current.ProviderTypeCodec;
 import com.continuuity.loom.codec.json.current.ProvisionerCodec;
+import com.continuuity.loom.codec.json.current.ResourceTypeSpecificationCodec;
 import com.continuuity.loom.codec.json.current.ServiceActionCodec;
 import com.continuuity.loom.codec.json.current.ServiceCodec;
 import com.continuuity.loom.codec.json.current.ServiceConstraintCodec;
@@ -48,6 +51,7 @@ import com.continuuity.loom.codec.json.current.ServiceDependenciesCodec;
 import com.continuuity.loom.codec.json.current.ServiceStageDependenciesCodec;
 import com.continuuity.loom.codec.json.current.TakeTaskRequestCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
+import com.continuuity.loom.codec.json.current.TenantSpecificationCodec;
 import com.continuuity.loom.codec.json.upgrade.ClusterUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
@@ -127,6 +131,7 @@ public class CodecModules {
       .registerTypeAdapter(Provider.class, new ProviderCodec())
       .registerTypeAdapter(ProviderType.class, new ProviderTypeCodec())
       .registerTypeAdapter(Provisioner.class, new ProvisionerCodec())
+      .registerTypeAdapter(ResourceTypeSpecification.class, new ResourceTypeSpecificationCodec())
       .registerTypeAdapter(Service.class, new ServiceCodec())
       .registerTypeAdapter(ServiceAction.class, new ServiceActionCodec())
       .registerTypeAdapter(ServiceConstraint.class, new ServiceConstraintCodec())
@@ -134,6 +139,7 @@ public class CodecModules {
       .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
       .registerTypeAdapter(TakeTaskRequest.class, new TakeTaskRequestCodec())
       .registerTypeAdapter(Tenant.class, new TenantCodec())
+      .registerTypeAdapter(TenantSpecification.class, new TenantSpecificationCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
       .enableComplexMapKeySerialization();
   }
