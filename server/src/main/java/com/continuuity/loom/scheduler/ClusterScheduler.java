@@ -19,9 +19,12 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.GroupElement;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.scheduler.dag.TaskNode;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -29,11 +32,13 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -56,33 +61,38 @@ public class ClusterScheduler implements Runnable {
 
   private final String id;
   private final ClusterStore clusterStore;
-  private final TrackingQueue inputQueue;
-  private final TrackingQueue jobQueue;
   private final TaskService taskService;
+  private final IdService idService;
+  private final Gson gson;
+  private final QueueGroup clusterQueues;
 
   private final Actions actions = Actions.getInstance();
 
   @Inject
-  private ClusterScheduler(@Named("scheduler.id") String id, ClusterStore clusterStore,
-                           @Named(Constants.Queue.CLUSTER) TrackingQueue inputQueue,
-                           @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
-                           TaskService taskService) {
+  private ClusterScheduler(@Named("scheduler.id") String id,
+                           ClusterStoreService clusterStoreService,
+                           TaskService taskService,
+                           IdService idService,
+                           Gson gson,
+                           @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues) {
     this.id = id;
-    this.clusterStore = clusterStore;
-    this.inputQueue = inputQueue;
-    this.jobQueue = jobQueue;
+    this.clusterStore = clusterStoreService.getSystemView();
     this.taskService = taskService;
+    this.idService = idService;
+    this.gson = gson;
+    this.clusterQueues = clusterQueues;
   }
 
   @Override
   public void run() {
     try {
       while (true) {
-        Element clusterElement = inputQueue.take(id);
-        if (clusterElement == null) {
+        GroupElement gElement = clusterQueues.take(id);
+        if (gElement == null) {
           return;
         }
 
+        Element clusterElement = gElement.getElement();
         Cluster cluster = clusterStore.getCluster(clusterElement.getId());
         ClusterJob job = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
         ClusterAction clusterAction = ClusterAction.valueOf(clusterElement.getValue());
@@ -92,16 +102,16 @@ public class ClusterScheduler implements Runnable {
           List<ProvisionerAction> actionOrder = actions.getActionOrder().get(clusterAction);
           if (actionOrder == null) {
             LOG.error("Cluster action {} does not have any provisioner actions defined", clusterAction);
-            inputQueue.recordProgress(id, clusterElement.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
-                                      "No actions defined");
+            clusterQueues.recordProgress(id, gElement.getQueueName(), clusterElement.getId(),
+                                        TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "No actions defined");
             continue;
           }
 
           Set<Node> clusterNodes = clusterStore.getClusterNodes(cluster.getId());
           if (clusterNodes == null || clusterNodes.isEmpty()) {
             LOG.error("Cluster {} has no nodes defined", cluster.getId());
-            inputQueue.recordProgress(id, clusterElement.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
-                                      "No nodes defined");
+            clusterQueues.recordProgress(id, gElement.getQueueName(), clusterElement.getId(),
+                                        TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "No nodes defined");
             continue;
           }
 
@@ -122,8 +132,8 @@ public class ClusterScheduler implements Runnable {
           }
           taskService.startJob(job, cluster);
 
-          inputQueue.recordProgress(id, clusterElement.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
-                                    "Scheduled");
+          clusterQueues.recordProgress(id, gElement.getQueueName(), clusterElement.getId(),
+                                      TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, "Scheduled");
         } catch (Throwable e) {
           LOG.error("Got exception while scheduling. Failing the job: ", e);
 
@@ -142,8 +152,9 @@ public class ClusterScheduler implements Runnable {
               break;
           }
 
-          inputQueue.recordProgress(id, clusterElement.getId(), TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
-                                    "Exception during scheduling");
+          clusterQueues.recordProgress(id, gElement.getQueueName(), clusterElement.getId(),
+                                      TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
+                                      "Exception during scheduling");
         }
       }
     } catch (Throwable e) {
@@ -164,13 +175,13 @@ public class ClusterScheduler implements Runnable {
         Node node = nodeMap.get(taskNode.getHostId());
         Service service = serviceMap.get(taskNode.getService());
         JsonObject taskConfig =
-          TaskConfig.getConfig(cluster, node, service, ProvisionerAction.valueOf(taskNode.getTaskName()));
+          TaskConfig.getConfig(cluster, node, service, ProvisionerAction.valueOf(taskNode.getTaskName()), gson);
         if (taskConfig == null) {
           LOG.debug("Not scheduling {} for job {} since config is null", taskNode, job.getJobId());
           continue;
         }
 
-        TaskId taskId = clusterStore.getNewTaskId(JobId.fromString(job.getJobId()));
+        TaskId taskId = idService.getNewTaskId(JobId.fromString(job.getJobId()));
         ClusterTask task = new ClusterTask(ProvisionerAction.valueOf(taskNode.getTaskName()), taskId,
                                            taskNode.getHostId(), taskNode.getService(), clusterAction,
                                            taskConfig);

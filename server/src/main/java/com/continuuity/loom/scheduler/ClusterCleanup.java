@@ -17,17 +17,18 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.QueuedElement;
-import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
 import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.NodeService;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
@@ -45,52 +46,48 @@ import java.util.concurrent.TimeUnit;
 public class ClusterCleanup implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterCleanup.class);
 
+  private final ClusterService clusterService;
   private final ClusterStore clusterStore;
   private final NodeService nodeService;
-  private final ClusterService clusterService;
   private final TaskService taskService;
-  private final TrackingQueue provisionerQueue;
-  private final TrackingQueue jobQueue;
+  private final QueueGroup jobQueues;
+  private final QueueGroup provisionerQueues;
   private final long taskTimeout;
   private final long myMod;
   private final long incrementBy;
 
   @Inject
-  private ClusterCleanup(ClusterStore clusterStore, NodeService nodeService, ClusterService clusterService,
+  private ClusterCleanup(ClusterStoreService clusterStoreService,
+                         ClusterService clusterService,
+                         NodeService nodeService,
                          TaskService taskService,
-                         @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
-                         @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
+                         @Named(Constants.Queue.JOB) QueueGroup jobQueues,
+                         @Named(Constants.Queue.PROVISIONER) QueueGroup provisionerQueues,
                          Configuration conf) {
-    this.clusterStore = clusterStore;
-    this.nodeService = nodeService;
-    this.clusterService = clusterService;
-    this.taskService = taskService;
-    this.provisionerQueue = provisionerQueue;
-    this.jobQueue = jobQueue;
-    this.taskTimeout = conf.getLong(Constants.TASK_TIMEOUT_SECS);
-    this.incrementBy = conf.getLong(Constants.ID_INCREMENT_BY);
-    this.myMod = conf.getLong(Constants.ID_START_NUM) % this.incrementBy;
-
-    LOG.info("Task timeout in seconds = {}", this.taskTimeout);
+    this(clusterStoreService.getSystemView(), clusterService, nodeService, taskService, jobQueues, provisionerQueues,
+         conf.getLong(Constants.TASK_TIMEOUT_SECS),
+         conf.getLong(Constants.ID_START_NUM),
+         conf.getLong(Constants.ID_INCREMENT_BY));
   }
 
   // for unit tests
-  ClusterCleanup(ClusterStore clusterStore, NodeService nodeService, ClusterService clusterService,
-                        TaskService taskService,
-                        @Named(Constants.Queue.PROVISIONER) TrackingQueue provisionerQueue,
-                        @Named(Constants.Queue.JOB) TrackingQueue jobQueue,
-                        @Named(Constants.TASK_TIMEOUT_SECS) long taskTimeout,
-                        @Named(Constants.ID_START_NUM) long startId,
-                        @Named(Constants.ID_INCREMENT_BY) long incrementBy) {
+  ClusterCleanup(ClusterStore clusterStore,
+                 ClusterService clusterService,
+                 NodeService nodeService,
+                 TaskService taskService,
+                 QueueGroup jobQueues,
+                 QueueGroup provisionerQueues,
+                 long taskTimeout, long startId, long incrementBy) {
     this.clusterStore = clusterStore;
-    this.nodeService = nodeService;
     this.clusterService = clusterService;
+    this.nodeService = nodeService;
     this.taskService = taskService;
-    this.provisionerQueue = provisionerQueue;
-    this.jobQueue = jobQueue;
+    this.jobQueues = jobQueues;
+    this.provisionerQueues = provisionerQueues;
     this.taskTimeout = taskTimeout;
     this.incrementBy = incrementBy;
     this.myMod = startId % incrementBy;
+    LOG.info("Task timeout in seconds = {}", this.taskTimeout);
   }
 
   @Override
@@ -98,7 +95,9 @@ public class ClusterCleanup implements Runnable {
     try {
       long currentTime = System.currentTimeMillis();
 
-      timeoutTasks(currentTime);
+      for (String queueName : provisionerQueues.getQueueNames()) {
+        timeoutTasks(queueName, currentTime);
+      }
 
       expireClusters(currentTime);
 
@@ -107,12 +106,12 @@ public class ClusterCleanup implements Runnable {
     }
   }
 
-  private void timeoutTasks(long currentTime) {
+  private void timeoutTasks(String queueName, long currentTime) {
     try {
       long taskFailTime = currentTime - TimeUnit.MILLISECONDS.convert(taskTimeout, TimeUnit.SECONDS);
       LOG.debug("Task fail time = {}", taskFailTime);
 
-      Iterator<QueuedElement> beingConsumed = provisionerQueue.getBeingConsumed();
+      Iterator<QueuedElement> beingConsumed = provisionerQueues.getBeingConsumed(queueName);
 
       while (beingConsumed.hasNext()) {
         QueuedElement queuedElement = beingConsumed.next();
@@ -129,15 +128,15 @@ public class ClusterCleanup implements Runnable {
         if (task == null) {
           LOG.warn("provisioner queue contains task {} which is not in the cluster store, removing it from the queue.",
                    taskId);
-          provisionerQueue.remove(taskId);
+          provisionerQueues.remove(queueName, taskId);
           continue;
         }
 
-        if (provisionerQueue.remove(task.getTaskId())) {
+        if (provisionerQueues.remove(queueName, task.getTaskId())) {
           LOG.debug("Timing out task {} whose queue time is {}", task.getTaskId(), queuedElement.getStatusTime());
 
           // Fail the task
-          String statusMessage = String.format("Timed out by %s after %d secs", Constants.SYSTEM_USER, taskTimeout);
+          String statusMessage = String.format("Timed out by after %d secs", taskTimeout);
           task.setStatusMessage(statusMessage);
           taskService.failTask(task, -1);
 
@@ -146,7 +145,7 @@ public class ClusterCleanup implements Runnable {
           nodeService.failAction(node, "", statusMessage);
 
           // Schedule the job
-          jobQueue.add(new Element(task.getJobId()));
+          jobQueues.add(queueName, new Element(task.getJobId()));
         }
       }
     } catch (Throwable e) {
@@ -171,7 +170,7 @@ public class ClusterCleanup implements Runnable {
         // mod check done here instead of db to avoid full table scan.
         if (Long.valueOf(cluster.getId()) % incrementBy == myMod) {
           LOG.debug("Deleting cluster {} with expire time {}", cluster.getId(), cluster.getExpireTime());
-          clusterService.requestClusterDelete(cluster.getId(), Constants.SYSTEM_USER);
+          clusterService.requestClusterDelete(cluster.getId(), cluster.getAccount());
         }
       }
     } catch (Throwable e) {

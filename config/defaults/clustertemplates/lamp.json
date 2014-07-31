@@ -1,6 +1,6 @@
 {
   "name": "lamp",
-  "description": "LAMP stack (Linux, Apache, MySQL, PHP) with HAproxy support",
+  "description": "LAMP stack (Linux, Apache, MySQL, Perl/PHP/Python) with SSL and HAproxy support",
   "defaults": {
     "services": [
       "base",
@@ -13,7 +13,29 @@
     "imagetype": "centos6",
     "config": {
       "apache": {
-        "default_site_enabled": "true"
+        "default_site_enabled": "true",
+        "default_modules": [
+          "status",
+          "alias",
+          "auth_basic",
+          "authn_file",
+          "authz_default",
+          "authz_groupfile",
+          "authz_host",
+          "authz_user",
+          "autoindex",
+          "dir",
+          "env",
+          "mime",
+          "negotiation",
+          "setenvif",
+          "log_config",
+          "logio",
+          "perl",
+          "php5",
+          "python",
+          "ssl"
+        ]
       },
       "mysql": {
         "server_debian_password": "somedefaultpassword",

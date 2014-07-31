@@ -17,19 +17,21 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.GroupElement;
+import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.http.AddServicesRequest;
+import com.continuuity.loom.common.zookeeper.IdService;
+import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.layout.Solver;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -53,49 +55,54 @@ import java.util.concurrent.Callable;
 public class SolverScheduler implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(SolverScheduler.class);
-  private static final Gson GSON = new JsonSerde().getGson();
 
   private final String id;
   private final Solver solver;
   private final ClusterStore clusterStore;
-  private final TrackingQueue solverQueue;
-  private final TrackingQueue clusterQueue;
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
   private final LoomStats loomStats;
+  private final IdService idService;
+  private final Gson gson;
+  private final QueueGroup solverQueues;
+  private final QueueGroup clusterQueues;
 
   @Inject
-  private SolverScheduler(@Named("scheduler.id") String id, Solver solver, ClusterStore clusterStore,
-                          @Named(Constants.Queue.SOLVER) TrackingQueue solverQueue,
-                          @Named(Constants.Queue.CLUSTER) TrackingQueue clusterQueue,
+  private SolverScheduler(@Named("scheduler.id") String id, Solver solver,
+                          ClusterStoreService clusterStoreService,
+                          @Named(Constants.Queue.SOLVER) QueueGroup solverQueues,
+                          @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues,
                           @Named("solver.executor.service") ListeningExecutorService executorService,
-                          TaskService taskService, LoomStats loomStats) {
+                          TaskService taskService, LoomStats loomStats, IdService idService, Gson gson) {
     this.id = id;
     this.solver = solver;
-    this.clusterStore = clusterStore;
-    this.solverQueue = solverQueue;
-    this.clusterQueue = clusterQueue;
+    this.clusterStore = clusterStoreService.getSystemView();
     this.executorService = executorService;
     this.taskService = taskService;
     this.loomStats = loomStats;
+    this.idService = idService;
+    this.gson = gson;
+    this.solverQueues = solverQueues;
+    this.clusterQueues = clusterQueues;
   }
 
   @Override
   public void run() {
     try {
       while (true) {
-        final Element solveElement = solverQueue.take(id);
-        if (solveElement == null) {
+        final GroupElement gElement = solverQueues.take(id);
+        if (gElement == null) {
           return;
         }
+        final Element solveElement = gElement.getElement();
 
-        final ListenableFuture<String> future = executorService.submit(new SolverRunner(solveElement));
+        final ListenableFuture<String> future = executorService.submit(new SolverRunner(gElement));
         future.addListener(new Runnable() {
           @Override
           public void run() {
             try {
-              solverQueue.recordProgress(id, solveElement.getId(),
-                                         TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, future.get());
+              solverQueues.recordProgress(id, gElement.getQueueName(), solveElement.getId(),
+                                          TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY, future.get());
             } catch (Exception e) {
               LOG.error("Unable to record progress for cluster {}", solveElement.getId());
             }
@@ -110,11 +117,13 @@ public class SolverScheduler implements Runnable {
   private class SolverRunner implements Callable<String> {
     private final Element solveElement;
     private final String clusterId;
+    private final String queueName;
     private ClusterJob solverJob;
     private ClusterJob plannerJob;
 
-    private SolverRunner(Element solveElement) {
-      this.solveElement = solveElement;
+    private SolverRunner(GroupElement gElement) {
+      this.solveElement = gElement.getElement();
+      this.queueName = gElement.getQueueName();
       this.clusterId = solveElement.getId();
       this.solverJob = null;
       this.plannerJob = null;
@@ -133,17 +142,17 @@ public class SolverScheduler implements Runnable {
 
         // Get cluster job for solving.
         solverJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-        SolverRequest solverRequest = GSON.fromJson(solveElement.getValue(), SolverRequest.class);
+        SolverRequest solverRequest = gson.fromJson(solveElement.getValue(), SolverRequest.class);
         try {
           solverJob.setJobStatus(ClusterJob.Status.RUNNING);
           clusterStore.writeClusterJob(solverJob);
 
           switch (solverRequest.getType()) {
             case CREATE_CLUSTER:
-              return solveClusterCreate(cluster, GSON.fromJson(solverRequest.getJsonRequest(),
+              return solveClusterCreate(cluster, gson.fromJson(solverRequest.getJsonRequest(),
                                                                ClusterCreateRequest.class));
             case ADD_SERVICES:
-              return solveAddServices(cluster, GSON.fromJson(solverRequest.getJsonRequest(), AddServicesRequest.class));
+              return solveAddServices(cluster, gson.fromJson(solverRequest.getJsonRequest(), AddServicesRequest.class));
             default:
               return "unknown solver request type " + solverRequest.getType();
           }
@@ -208,7 +217,7 @@ public class SolverScheduler implements Runnable {
       clusterStore.writeCluster(cluster);
 
       // Create new Job for creating cluster.
-      JobId clusterJobId = clusterStore.getNewJobId(cluster.getId());
+      JobId clusterJobId = idService.getNewJobId(cluster.getId());
       ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.ADD_SERVICES,
                                             request.getServices(), changedNodeIds);
       cluster.setLatestJobId(createJob.getJobId());
@@ -220,7 +229,7 @@ public class SolverScheduler implements Runnable {
       loomStats.getClusterStats().incrementStat(ClusterAction.ADD_SERVICES);
 
       LOG.debug("added a cluster add services request to the queue");
-      clusterQueue.add(new Element(cluster.getId(), ClusterAction.ADD_SERVICES.name()));
+      clusterQueues.add(queueName, new Element(cluster.getId(), ClusterAction.ADD_SERVICES.name()));
       return "Solved";
     }
 
@@ -262,7 +271,7 @@ public class SolverScheduler implements Runnable {
       }
 
       // Create new Job for creating cluster.
-      JobId clusterJobId = clusterStore.getNewJobId(cluster.getId());
+      JobId clusterJobId = idService.getNewJobId(cluster.getId());
       ClusterJob createJob = new ClusterJob(clusterJobId, ClusterAction.CLUSTER_CREATE);
       cluster.setLatestJobId(createJob.getJobId());
       clusterStore.writeClusterJob(createJob);
@@ -273,7 +282,7 @@ public class SolverScheduler implements Runnable {
       loomStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_CREATE);
 
       LOG.debug("added a cluster create request to the queue");
-      clusterQueue.add(new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
+      clusterQueues.add(queueName, new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
 
       return "Solved";
     }

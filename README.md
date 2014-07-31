@@ -4,8 +4,8 @@ Continuuity Loom is cluster management software that manages clusters on public,
 
 ## Releases
 
-   * [Theme: Extensibility, 0.9.7](https://github.com/continuuity/loom/releases/tag/0.9.7)
-   * [Theme: Open Source, 0.9.6](https://github.com/continuuity/loom/releases/tag/0.9.6)
+   * [Codename: Vela, Theme: Extensibility, 0.9.7](http://www.continuuity.com/docs/loom/0.9.7/en/overview/release-notes.html)
+   * [Codename: Crux, Theme: Open Source, 0.9.6](http://www.continuuity.com/docs/loom/0.9.6/en/overview/release-notes.html)
 
 ## Documentation
 

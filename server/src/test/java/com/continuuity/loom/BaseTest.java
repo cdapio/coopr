@@ -15,44 +15,70 @@
  */
 package com.continuuity.loom;
 
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.guice.LoomModules;
+import com.continuuity.loom.codec.json.guice.CodecModules;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.conf.guice.ConfigurationModule;
+import com.continuuity.loom.common.queue.guice.QueueModule;
+import com.continuuity.loom.common.zookeeper.IdService;
+import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
+import com.continuuity.loom.http.guice.HttpModule;
+import com.continuuity.loom.provisioner.MockProvisionerRequestService;
+import com.continuuity.loom.provisioner.ProvisionerRequestService;
 import com.continuuity.loom.scheduler.callback.ClusterCallback;
 import com.continuuity.loom.scheduler.callback.MockClusterCallback;
-import com.continuuity.loom.store.ClusterStore;
-import com.continuuity.loom.store.EntityStore;
-import com.continuuity.loom.store.SQLClusterStore;
-import com.google.common.base.Throwables;
+import com.continuuity.loom.scheduler.guice.SchedulerModule;
+import com.continuuity.loom.store.DBHelper;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.SQLClusterStoreService;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.guice.StoreModule;
+import com.continuuity.loom.store.provisioner.ProvisionerStore;
+import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
+import com.continuuity.loom.store.tenant.SQLTenantStore;
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Scopes;
 import com.google.inject.util.Modules;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
+import org.apache.twill.zookeeper.RetryStrategies;
 import org.apache.twill.zookeeper.ZKClientService;
+import org.apache.twill.zookeeper.ZKClientServices;
+import org.apache.twill.zookeeper.ZKClients;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Base class with utilities for loading admin entities into a entityStore and starting zookeeper up.
  */
 public class BaseTest {
   private static InMemoryZKServer zkServer;
-  private static SQLClusterStore sqlClusterStore;
+  private static SQLClusterStoreService sqlClusterStoreService;
+  private static SQLProvisionerStore sqlProvisionerStore;
+  private static SQLTenantStore sqlTenantStore;
   protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
   protected static ZKClientService zkClientService;
-  protected static EntityStore entityStore;
+  protected static EntityStoreService entityStoreService;
+  protected static SQLClusterStoreService clusterStoreService;
   protected static ClusterStore clusterStore;
+  protected static TenantStore tenantStore;
+  protected static ProvisionerStore provisionerStore;
   protected static Configuration conf;
   protected static MockClusterCallback mockClusterCallback;
+  protected static IdService idService;
+  protected static Gson gson;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -62,9 +88,6 @@ public class BaseTest {
     zkServer = InMemoryZKServer.builder().setDataDir(tmpFolder.newFolder()).setTickTime(5000).build();
     zkServer.startAndWait();
 
-    zkClientService = ZKClientService.Builder.of(zkServer.getConnectionStr()).build();
-    zkClientService.startAndWait();
-
     conf = Configuration.create();
     conf.set(Constants.PORT, "0");
     conf.set(Constants.HOST, HOSTNAME);
@@ -72,43 +95,69 @@ public class BaseTest {
     conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
     conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
 
+    zkClientService = ZKClientServices.delegate(
+      ZKClients.reWatchOnExpire(
+        ZKClients.retryOnFailure(
+          ZKClientService.Builder.of(zkServer.getConnectionStr())
+            .setSessionTimeout(conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT_MILLIS))
+            .build(),
+          RetryStrategies.fixDelay(2, TimeUnit.SECONDS)
+        )
+      )
+    );
+    zkClientService.startAndWait();
+
     mockClusterCallback = new MockClusterCallback();
     injector = Guice.createInjector(
       Modules.override(
-        LoomModules.createModule(zkClientService, MoreExecutors.sameThreadExecutor(), conf)
+        new ConfigurationModule(conf),
+        new ZookeeperModule(zkClientService),
+        new StoreModule(),
+        new QueueModule(zkClientService),
+        new HttpModule(),
+        new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor()),
+        new CodecModules().getModule()
       ).with(
         new AbstractModule() {
           @Override
           protected void configure() {
             bind(ClusterCallback.class).toInstance(mockClusterCallback);
+            bind(ProvisionerRequestService.class).to(MockProvisionerRequestService.class).in(Scopes.SINGLETON);
+            bind(MockProvisionerRequestService.class).in(Scopes.SINGLETON);
           }
         }
       )
     );
 
-    entityStore = injector.getInstance(EntityStore.class);
-    sqlClusterStore = injector.getInstance(SQLClusterStore.class);
-    sqlClusterStore.initialize();
-    sqlClusterStore.initDerbyDB();
-    clusterStore = sqlClusterStore;
+    idService = injector.getInstance(IdService.class);
+    idService.startAndWait();
+    entityStoreService = injector.getInstance(EntityStoreService.class);
+    entityStoreService.startAndWait();
+    sqlClusterStoreService = injector.getInstance(SQLClusterStoreService.class);
+    sqlClusterStoreService.startAndWait();
+    clusterStoreService = sqlClusterStoreService;
+    tenantStore = injector.getInstance(TenantStore.class);
+    tenantStore.startAndWait();
+    clusterStore = clusterStoreService.getSystemView();
+    sqlProvisionerStore = injector.getInstance(SQLProvisionerStore.class);
+    provisionerStore = sqlProvisionerStore;
+    provisionerStore.startAndWait();
+    sqlTenantStore = injector.getInstance(SQLTenantStore.class);
+    tenantStore = sqlTenantStore;
+    gson = injector.getInstance(Gson.class);
   }
 
   @AfterClass
   public static void teardownBase() {
     zkClientService.stopAndWait();
     zkServer.stopAndWait();
-    try {
-      DriverManager.getConnection("jdbc:derby:memory:loom;drop=true");
-    } catch (SQLException e) {
-      // this is normal when a drop happens
-      if (!e.getSQLState().equals("08006") ) {
-        Throwables.propagate(e);
-      }
-    }
+    DBHelper.dropDerbyDB();
   }
 
-  @Before
-  public void setupBaseTest() throws SQLException {
-    sqlClusterStore.clearData();
+  @After
+  public void cleanupBaseTest() throws SQLException {
+    sqlTenantStore.clearData();
+    sqlClusterStoreService.clearData();
+    sqlProvisionerStore.clearData();
   }
 }
