@@ -9,5 +9,10 @@
     <value>/tmp/log</value>
     <description>Provisioner log directory</description>
   </property>
+  <property>
+    <name>provisioner.log.level</name>
+    <value>debug</value>
+    <description>log level, one of debug, info, warn, error, fatal</description>
+  </property>
 </configuration>
 

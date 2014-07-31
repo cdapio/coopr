@@ -18,8 +18,8 @@
 require 'rexml/document'
 
 module Loom
+  # class which reads and stores configuration settings from a property file
   class Config
-
     attr_reader :properties, :default_file, :descriptions
 
     def initialize(options)
@@ -73,7 +73,7 @@ module Loom
             end
 
             # ignore anything without a name and value
-            next if (p_name.nil? || p_value.nil?)
+            next if p_name.nil? || p_value.nil?
             # only consider 'provisioner.*' entries
             next unless p_name.downcase =~ /^provisioner\./i
             @properties[p_name.downcase] = p_value
