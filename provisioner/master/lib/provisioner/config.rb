@@ -74,8 +74,6 @@ module Loom
 
             # ignore anything without a name and value
             next if p_name.nil? || p_value.nil?
-            # only consider 'provisioner.*' entries
-            next unless p_name.downcase =~ /^provisioner\./i
             @properties[p_name.downcase] = p_value
             @descriptions[p_name.downcase] = p_description
 
