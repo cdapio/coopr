@@ -21,7 +21,7 @@ import java.util.Map;
  * A Provider type defines what parameters admins and users need to provide to a {@link Provider} in order for it
  * to provide machines properly.
  */
-public class ProviderType extends PluginType {
+public class ProviderType extends AbstractPluginSpecification {
 
   public ProviderType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
                       Map<String, ResourceTypeSpecification> resourceTypes) {

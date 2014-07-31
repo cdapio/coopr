@@ -21,7 +21,7 @@ import java.util.Map;
  * An Automator type defines what parameters admins need to provide to a {@link ServiceAction} in order for the
  * provisioner automator plugin to do its job.
  */
-public class AutomatorType extends PluginType {
+public class AutomatorType extends AbstractPluginSpecification {
 
   public AutomatorType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
                        Map<String, ResourceTypeSpecification> resourceTypes) {

@@ -5,7 +5,7 @@
         "cookbooks": {
             "format": "archive"
         },
-        "databags": {
+        "data_bags": {
             "format": "archive"
         },
         "roles": {

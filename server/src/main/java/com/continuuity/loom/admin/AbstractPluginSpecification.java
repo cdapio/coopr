@@ -22,15 +22,16 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 /**
- * Plugin type
+ * Plugin specification.
  */
-public abstract class PluginType extends NamedEntity {
+public abstract class AbstractPluginSpecification extends NamedEntity {
   private final String description;
   private final Map<ParameterType, ParametersSpecification> parameters;
   private final Map<String, ResourceTypeSpecification> resourceTypes;
 
-  public PluginType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
-                    Map<String, ResourceTypeSpecification> resourceTypes) {
+  public AbstractPluginSpecification(String name, String description,
+                                     Map<ParameterType, ParametersSpecification> parameters,
+                                     Map<String, ResourceTypeSpecification> resourceTypes) {
     super(name);
     this.description = description == null ? "" : description;
     this.parameters = parameters == null ? ImmutableMap.<ParameterType, ParametersSpecification>of() : parameters;
@@ -38,9 +39,9 @@ public abstract class PluginType extends NamedEntity {
   }
 
   /**
-   * Get the description of the automator type.
+   * Get the description of the plugin.
    *
-   * @return Description of the automator type.
+   * @return Description of the plugin.
    */
   public String getDescription() {
     return description;
@@ -70,11 +71,11 @@ public abstract class PluginType extends NamedEntity {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof PluginType)) {
+    if (!(o instanceof AbstractPluginSpecification)) {
       return false;
     }
 
-    PluginType that = (PluginType) o;
+    AbstractPluginSpecification that = (AbstractPluginSpecification) o;
 
     return Objects.equal(description, that.description) &&
       Objects.equal(parameters, that.parameters) &&

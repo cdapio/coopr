@@ -290,7 +290,7 @@ public class Entities {
         )),
         ImmutableMap.<String, ResourceTypeSpecification>of(
           "cookbooks", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
-          "databags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
+          "data_bags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
           "roles", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE)
         )
       );
@@ -302,7 +302,7 @@ public class Entities {
         "        \"cookbooks\": {\n" +
         "            \"format\": \"archive\"\n" +
         "        },\n" +
-        "        \"databags\": {\n" +
+        "        \"data_bags\": {\n" +
         "            \"format\": \"archive\"\n" +
         "        },\n" +
         "        \"roles\": {\n" +
