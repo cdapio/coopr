@@ -13,49 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.store.entity;
+package com.continuuity.loom.store.provisioner;
 
-import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
-import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.guice.TestStoreModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
-
-import java.sql.SQLException;
 
 /**
  *
  */
-public class SQLEntityStoreServiceTest extends EntityStoreServiceTest {
-  private static SQLEntityStoreService sqlStore;
+public class SQLPluginResourceMetaStoreTest extends PluginResourceMetaStoreTest {
+  private static SQLPluginMetaStoreService service;
 
   @BeforeClass
-  public static void beforeClass() throws SQLException, ClassNotFoundException {
-    Configuration sqlConf = Configuration.create();
-    sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
-    sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+  public static void setupTestClass() throws Exception {
+    Configuration conf = Configuration.create();
+    conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
+    conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
     Injector injector = Guice.createInjector(
-      new ConfigurationModule(sqlConf),
-      new TestStoreModule(),
-      new CodecModules().getModule()
+      new ConfigurationModule(conf),
+      new TestStoreModule()
     );
-    sqlStore = injector.getInstance(SQLEntityStoreService.class);
-    sqlStore.startAndWait();
-    entityStoreService = sqlStore;
+    service = injector.getInstance(SQLPluginMetaStoreService.class);
+    service.startAndWait();
   }
 
   @Override
-  public void clearState() throws Exception {
-    sqlStore.clearData();
+  PluginMetaStoreService getPluginResourceMetaStoreService() throws Exception {
+    return service;
   }
 
-  @AfterClass
-  public static void afterClass() {
-    DBHelper.dropDerbyDB();
+  @Override
+  void clearData() throws Exception {
+    service.clearData();
   }
 }

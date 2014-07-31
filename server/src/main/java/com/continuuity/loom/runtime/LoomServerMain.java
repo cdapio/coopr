@@ -28,6 +28,7 @@ import com.continuuity.loom.http.guice.HttpModule;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.management.guice.ManagementModule;
 import com.continuuity.loom.provisioner.guice.ProvisionerModule;
+import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.guice.SchedulerModule;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
@@ -73,6 +74,7 @@ public final class LoomServerMain extends DaemonMain {
   private ListeningExecutorService callbackExecutorService;
   private ClusterStoreService clusterStoreService;
   private EntityStoreService entityStoreService;
+  private ResourceService resourceService;
   private ProvisionerStore provisionerStore;
   private IdService idService;
   private TenantStore tenantStore;
@@ -131,7 +133,7 @@ public final class LoomServerMain extends DaemonMain {
       injector = Guice.createInjector(
         new ConfigurationModule(conf),
         new ZookeeperModule(zkClientService),
-        new StoreModule(),
+        new StoreModule(conf),
         new QueueModule(zkClientService),
         new SchedulerModule(conf, callbackExecutorService, solverExecutorService),
         new HttpModule(),
@@ -150,6 +152,8 @@ public final class LoomServerMain extends DaemonMain {
       entityStoreService.startAndWait();
       provisionerStore = injector.getInstance(ProvisionerStore.class);
       provisionerStore.startAndWait();
+      resourceService = injector.getInstance(ResourceService.class);
+      resourceService.startAndWait();
 
       // Register MBean
       LoomStats loomStats = injector.getInstance(LoomStats.class);
@@ -196,7 +200,7 @@ public final class LoomServerMain extends DaemonMain {
       }
     }
 
-    stopAll(loomService, provisionerStore, tenantStore, clusterStoreService,
+    stopAll(loomService, resourceService, provisionerStore, tenantStore, clusterStoreService,
             entityStoreService, idService, zkClientService, inMemoryZKServer);
   }
 
