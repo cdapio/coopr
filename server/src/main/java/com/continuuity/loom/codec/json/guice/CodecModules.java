@@ -19,6 +19,7 @@ import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.admin.ServiceDependencies;
 import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.codec.json.LowercaseEnumTypeAdapterFactory;
 import com.continuuity.loom.codec.json.current.AddServicesRequestCodec;
@@ -48,6 +49,7 @@ import com.continuuity.loom.codec.json.current.ServiceDependenciesCodec;
 import com.continuuity.loom.codec.json.current.ServiceStageDependenciesCodec;
 import com.continuuity.loom.codec.json.current.TakeTaskRequestCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
+import com.continuuity.loom.codec.json.current.TenantSpecificationCodec;
 import com.continuuity.loom.codec.json.upgrade.ClusterUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
@@ -134,6 +136,7 @@ public class CodecModules {
       .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
       .registerTypeAdapter(TakeTaskRequest.class, new TakeTaskRequestCodec())
       .registerTypeAdapter(Tenant.class, new TenantCodec())
+      .registerTypeAdapter(TenantSpecification.class, new TenantSpecificationCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
       .enableComplexMapKeySerialization();
   }

@@ -57,7 +57,7 @@ public abstract class LoomAuthHandler extends AbstractHttpHandler {
       return null;
     }
     try {
-      if (tenantStore.getTenant(tenant) == null) {
+      if (tenantStore.getTenantByName(tenant) == null) {
         responder.sendError(HttpResponseStatus.NOT_FOUND, "Tenant does not exist.");
         return null;
       }

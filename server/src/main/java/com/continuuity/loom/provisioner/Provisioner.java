@@ -1,14 +1,18 @@
 package com.continuuity.loom.provisioner;
 
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Provisioner information, such as the total capacity of the provisioner and how many workers are assigned and live
