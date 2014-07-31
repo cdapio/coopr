@@ -57,7 +57,7 @@ public abstract class LoomAuthHandler extends AbstractHttpHandler {
       return null;
     }
     try {
-      if (!tenant.equals(Constants.SUPERADMIN_TENANT) && tenantStore.getTenantByName(tenant) == null) {
+      if (tenantStore.getTenantByName(tenant) == null) {
         responder.sendError(HttpResponseStatus.NOT_FOUND, "Tenant does not exist.");
         return null;
       }

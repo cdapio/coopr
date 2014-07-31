@@ -17,6 +17,7 @@ package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBPut;
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 /**
@@ -48,9 +48,10 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   public void clearData() throws SQLException {
     Connection conn = dbConnectionPool.getConnection();
     try {
-      Statement stmt = conn.createStatement();
+      PreparedStatement stmt = conn.prepareStatement("DELETE FROM tenants WHERE id<>?");
       try {
-        stmt.execute("DELETE FROM tenants");
+        stmt.setString(1, Constants.SUPERADMIN_TENANT);
+        stmt.executeUpdate();
       } finally {
         stmt.close();
       }
@@ -78,6 +79,11 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
           "create_time TIMESTAMP, " +
           "delete_time TIMESTAMP, " +
           "tenant BLOB )", dbConnectionPool);
+    }
+    // add superadmin if it doesn't exist
+    Tenant superadminTenant = getTenantByName(Constants.SUPERADMIN_TENANT);
+    if (superadminTenant == null) {
+      writeTenant(Tenant.DEFAULT_SUPERADMIN);
     }
   }
 

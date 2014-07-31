@@ -58,7 +58,8 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
   }
 
   @Before
-  public void clearData() throws SQLException, IOException {
+  public void setupSuperadminHandlerTest() throws SQLException, IOException {
+    // base tests will write some tenants that we don't want.
     ((SQLTenantStore) tenantStore).clearData();
     ((SQLProvisionerStore) provisionerStore).clearData();
     tenantProvisionerService.writeProvisioner(
@@ -191,7 +192,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     Set<Tenant> actualTenants = gson.fromJson(reader, new TypeToken<Set<TenantSpecification>>() {}.getType());
-    Assert.assertEquals(ImmutableSet.of(spec1, spec2), actualTenants);
+    Assert.assertEquals(ImmutableSet.of(Tenant.DEFAULT_SUPERADMIN.getSpecification(), spec1, spec2), actualTenants);
   }
 
   @Test

@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.admin;
 
+import com.continuuity.loom.common.conf.Constants;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -22,6 +23,9 @@ import com.google.common.base.Preconditions;
  * A tenant contains the id, plus fields.
  */
 public final class Tenant {
+  public static final Tenant DEFAULT_SUPERADMIN =
+    new Tenant(Constants.SUPERADMIN_TENANT,
+               new TenantSpecification(Constants.SUPERADMIN_TENANT, 0, Integer.MAX_VALUE, Integer.MAX_VALUE));
   private final String id;
   private final TenantSpecification specification;
 
