@@ -1,6 +1,14 @@
 {
     "description": "",
     "name": "shell",
+    "resourceTypes": {
+        "scripts": {
+            "format": "file"
+        },
+        "archives": {
+            "format": "archive"
+        }
+    }
     "parameters": {
         "admin": {
             "fields": {

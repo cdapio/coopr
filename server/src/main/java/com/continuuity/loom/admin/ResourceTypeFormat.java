@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.continuuity.loom.admin;
 
-import java.util.Map;
-
 /**
- * An Automator type defines what parameters admins need to provide to a {@link ServiceAction} in order for the
- * provisioner automator plugin to do its job.
+ * Format of a resource type.
  */
-public class AutomatorType extends AbstractPluginSpecification {
-
-  public AutomatorType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
-                       Map<String, ResourceTypeSpecification> resourceTypes) {
-    super(name, description, parameters, resourceTypes);
-  }
+public enum ResourceTypeFormat {
+  FILE,
+  ARCHIVE;
 }

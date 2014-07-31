@@ -13,6 +13,7 @@ import com.continuuity.loom.admin.LeaseDuration;
 import com.continuuity.loom.admin.ParametersSpecification;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
@@ -42,6 +43,7 @@ import com.continuuity.loom.codec.json.current.ParametersSpecificationCodec;
 import com.continuuity.loom.codec.json.current.ProviderCodec;
 import com.continuuity.loom.codec.json.current.ProviderTypeCodec;
 import com.continuuity.loom.codec.json.current.ProvisionerCodec;
+import com.continuuity.loom.codec.json.current.ResourceTypeSpecificationCodec;
 import com.continuuity.loom.codec.json.current.ServiceActionCodec;
 import com.continuuity.loom.codec.json.current.ServiceCodec;
 import com.continuuity.loom.codec.json.current.ServiceConstraintCodec;
@@ -129,6 +131,7 @@ public class CodecModules {
       .registerTypeAdapter(Provider.class, new ProviderCodec())
       .registerTypeAdapter(ProviderType.class, new ProviderTypeCodec())
       .registerTypeAdapter(Provisioner.class, new ProvisionerCodec())
+      .registerTypeAdapter(ResourceTypeSpecification.class, new ResourceTypeSpecificationCodec())
       .registerTypeAdapter(Service.class, new ServiceCodec())
       .registerTypeAdapter(ServiceAction.class, new ServiceActionCodec())
       .registerTypeAdapter(ServiceConstraint.class, new ServiceConstraintCodec())

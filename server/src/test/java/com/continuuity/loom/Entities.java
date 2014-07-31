@@ -32,6 +32,8 @@ import com.continuuity.loom.admin.ParametersSpecification;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.admin.ResourceTypeFormat;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
@@ -76,12 +78,14 @@ public class Entities {
           )
         ),
         ParameterType.USER,
-        ParametersSpecification.EMPTY_SPECIFICATION
-      ));
+        ParametersSpecification.EMPTY_SPECIFICATION),
+      ImmutableMap.<String, ResourceTypeSpecification>of()
+    );
     public static final String JOYENT_STRING =
       "{\n" +
         "    \"name\": \"joyent\",\n" +
         "    \"description\": \"joyent provider type\",\n" +
+        "    \"resourceTypes\": { },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -133,11 +137,14 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
           )
-        )));
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of()
+      );
     public static final String RACKSPACE_STRING =
       "{\n" +
         "    \"name\": \"rackspace\",\n" +
         "    \"description\": \"rackspace provider type\",\n" +
+        "    \"resourceTypes\": { },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -175,12 +182,14 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
           )
-        )
-      ));
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of()
+      );
     public static final String USER_RACKSPACE_STRING =
       "{\n" +
         "    \"name\": \"user-rackspace\",\n" +
         "    \"description\": \"description\",\n" +
+        "    \"resourceTypes\": { },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -223,12 +232,24 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("script")
           )
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of(
+          "scripts", new ResourceTypeSpecification(ResourceTypeFormat.FILE),
+          "data", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE)
         )
-      ));
+      );
     public static final String SHELL_STRING =
       "{\n" +
         "    \"name\": \"shell\",\n" +
         "    \"description\": \"shell automator\",\n" +
+        "    \"resourceTypes\": {\n" +
+        "        \"scripts\": {\n" +
+        "            \"format\": \"file\"\n" +
+        "        },\n" +
+        "        \"data\": {\n" +
+        "            \"format\": \"archive\"\n" +
+        "        }\n" +
+        "    },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -266,12 +287,28 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("recipe")
           )
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of(
+          "cookbooks", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
+          "data_bags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
+          "roles", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE)
         )
-      ));
+      );
     public static final String CHEF_STRING =
       "{\n" +
         "    \"name\": \"chef-solo\",\n" +
         "    \"description\": \"chef automator\",\n" +
+        "    \"resourceTypes\": {\n" +
+        "        \"cookbooks\": {\n" +
+        "            \"format\": \"archive\"\n" +
+        "        },\n" +
+        "        \"data_bags\": {\n" +
+        "            \"format\": \"archive\"\n" +
+        "        },\n" +
+        "        \"roles\": {\n" +
+        "            \"format\": \"archive\"\n" +
+        "        }\n" +
+        "    },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +
@@ -309,8 +346,12 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("manifest")
           )
+        )),
+        ImmutableMap.<String, ResourceTypeSpecification>of(
+          "modules", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
+          "manifests", new ResourceTypeSpecification(ResourceTypeFormat.FILE)
         )
-      ));
+      );
   }
 
   public static class ProviderExample {

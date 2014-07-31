@@ -15,68 +15,16 @@
  */
 package com.continuuity.loom.admin;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Map;
 
 /**
  * A Provider type defines what parameters admins and users need to provide to a {@link Provider} in order for it
  * to provide machines properly.
  */
-public class ProviderType extends NamedEntity {
-  private final String description;
-  private final Map<ParameterType, ParametersSpecification> parameters;
+public class ProviderType extends AbstractPluginSpecification {
 
-  public ProviderType(String name, String description, Map<ParameterType, ParametersSpecification> parameters) {
-    super(name);
-    this.description = description == null ? "" : description;
-    this.parameters = parameters == null ? ImmutableMap.<ParameterType, ParametersSpecification>of() : parameters;
-  }
-
-  /**
-   * Get the description of the provider type.
-   *
-   * @return Description of the provider type.
-   */
-  public String getDescription() {
-    return description;
-  }
-
-  /**
-   * Get the mapping of {@link ParameterType} to {@link ParametersSpecification} for that type.
-   *
-   * @return Mapping of {@link ParameterType} to {@link ParametersSpecification} for that type.
-   */
-  public Map<ParameterType, ParametersSpecification> getParameters() {
-    return parameters;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ProviderType)) {
-      return false;
-    }
-
-    ProviderType that = (ProviderType) o;
-
-    return Objects.equal(description, that.description) &&
-      Objects.equal(parameters, that.parameters);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(description, parameters);
-  }
-
-  @Override
-  public String toString() {
-    return Objects.toStringHelper(this)
-      .add("description", description)
-      .add("parameters", parameters)
-      .toString();
+  public ProviderType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
+                      Map<String, ResourceTypeSpecification> resourceTypes) {
+    super(name, description, parameters, resourceTypes);
   }
 }
