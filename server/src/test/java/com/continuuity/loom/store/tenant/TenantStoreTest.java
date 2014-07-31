@@ -36,6 +36,17 @@ public abstract class TenantStoreTest {
   public abstract void clearState() throws Exception;
 
   @Test
+  public void testGetNameForId() throws IOException {
+    Tenant tenant1 = new Tenant(UUID.randomUUID().toString(), new TenantSpecification("name1", 10, 100, 1000));
+    Tenant tenant2 = new Tenant(UUID.randomUUID().toString(), new TenantSpecification("name2", 10, 100, 1000));
+    store.writeTenant(tenant1);
+    store.writeTenant(tenant2);
+
+    Assert.assertEquals(tenant1.getSpecification().getName(), store.getNameForId(tenant1.getId()));
+    Assert.assertEquals(tenant2.getSpecification().getName(), store.getNameForId(tenant2.getId()));
+  }
+
+  @Test
   public void testSuperadminExistsOnStart() throws IOException {
     Assert.assertEquals(Tenant.DEFAULT_SUPERADMIN, store.getTenantByName(Constants.SUPERADMIN_TENANT));
   }

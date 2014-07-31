@@ -209,6 +209,27 @@ public final class DBQueryExecutor {
   }
 
   /**
+   * Queries for a single string, returning the value of the string or null if there are no results.
+   * Statement passed in must be closed by the caller.
+   *
+   * @param statement PreparedStatement of the query, ready for execution.
+   * @return Result of the query, or null if no results.
+   * @throws SQLException
+   */
+  public String getString(PreparedStatement statement) throws SQLException {
+    ResultSet results = statement.executeQuery();
+    try {
+      if (!results.next()) {
+        return null;
+      } else {
+        return results.getString(1);
+      }
+    } finally {
+      results.close();
+    }
+  }
+
+  /**
    * Performs the query and returns whether or not there are results. Statement passed in must be closed by the caller.
    *
    * @param statement PreparedStatement of the query, ready for execution.

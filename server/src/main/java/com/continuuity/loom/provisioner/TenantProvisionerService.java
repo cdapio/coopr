@@ -10,10 +10,8 @@ import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -24,9 +22,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Service for managing provisioners.
@@ -39,7 +37,6 @@ public class TenantProvisionerService {
   private final long provisionerTimeoutSecs;
   private final TrackingQueue balanceQueue;
   private final ProvisionerRequestService provisionerRequestService;
-  private final LoadingCache<String, String> tenantIdNameMap;
 
   @Inject
   private TenantProvisionerService(ProvisionerStore provisionerStore,
@@ -59,17 +56,6 @@ public class TenantProvisionerService {
     this.lock = new ZKInterProcessReentrantLock(zkClient, Constants.TENANT_NAMESPACE);
     this.provisionerTimeoutSecs = conf.getLong(Constants.PROVISIONER_TIMEOUT_SECS);
     this.balanceQueue = balanceQueue;
-    tenantIdNameMap = CacheBuilder.newBuilder().build(new CacheLoader<String, String>() {
-      @Override
-      public String load(String key) throws Exception {
-        Tenant tenant = tenantStore.getTenantByID(key);
-        if (tenant == null) {
-          LOG.warn("Unable to find the name for tenant with id {}, it may have been deleted.", key);
-          return key;
-        }
-        return tenant.getSpecification().getName();
-      }
-    });
   }
 
   /**
@@ -103,15 +89,10 @@ public class TenantProvisionerService {
   public Collection<Provisioner> getAllProvisioners() throws IOException {
     Collection<Provisioner> provisioners = provisionerStore.getAllProvisioners();
     List<Provisioner> externalProvisioners = Lists.newArrayListWithCapacity(provisioners.size());
-    try {
-      for (Provisioner provisioner : provisioners) {
-        externalProvisioners.add(Provisioner.swapIdsForNames(provisioner, tenantIdNameMap));
-      }
-      return externalProvisioners;
-    } catch (ExecutionException e) {
-      LOG.error("Exception mapping tenant ids to names.", e);
-      throw new IOException(e);
+    for (Provisioner provisioner : provisioners) {
+      externalProvisioners.add(createExternalProvisioner(provisioner, tenantStore));
     }
+    return externalProvisioners;
   }
 
   /**
@@ -123,12 +104,7 @@ public class TenantProvisionerService {
    * @throws IOException
    */
   public Provisioner getProvisioner(String provisionerId) throws IOException {
-    try {
-      return Provisioner.swapIdsForNames(provisionerStore.getProvisioner(provisionerId), tenantIdNameMap);
-    } catch (ExecutionException e) {
-      LOG.error("Exception mapping tenant ids to names.", e);
-      throw new IOException(e);
-    }
+    return createExternalProvisioner(provisionerStore.getProvisioner(provisionerId), tenantStore);
   }
 
   /**
@@ -358,6 +334,41 @@ public class TenantProvisionerService {
       throw new CapacityException("Unable to add all " + numToAdd + " workers to tenant "
                                     + tenantId + " without exceeding worker capacity.");
     }
+  }
+
+  /**
+   * Create a new Provisioner object where the tenant ids have been replaced with tenant names for external
+   * consumption.
+   *
+   * @param provisioner Internal provisioner that uses tenant ids
+   * @param tenantStore Tenant store for mapping ids to names
+   * @return New Provisioner where the tenant ids have been replaced with tenant names
+   * @throws IOException
+   */
+  private Provisioner createExternalProvisioner(Provisioner provisioner, TenantStore tenantStore) throws IOException {
+    if (provisioner == null) {
+      return null;
+    }
+    Map<String, Integer> nameUsage = Maps.newHashMap();
+    for (Map.Entry<String, Integer> entry : provisioner.getUsage().entrySet()) {
+      nameUsage.put(tenantIdToName(entry.getKey()), entry.getValue());
+    }
+    Map<String, Integer> nameAssignments = Maps.newHashMap();
+    for (String tenantId : provisioner.getAssignedTenants()) {
+      nameAssignments.put(tenantIdToName(tenantId), provisioner.getAssignedWorkers(tenantId));
+    }
+    return new Provisioner(provisioner.getId(), provisioner.getHost(), provisioner.getPort(),
+                           provisioner.getCapacityTotal(), nameUsage, nameAssignments);
+  }
+
+  // id to name mapping is cached, so this mapping should not be expensive
+  private String tenantIdToName(String id) throws IOException {
+    String tenantName = tenantStore.getNameForId(id);
+    if (tenantName == null) {
+      LOG.warn("Could not map tenant id {} to a name, will use the id.");
+      tenantName = id;
+    }
+    return tenantName;
   }
 
   private void deleteProvisioner(Provisioner provisioner) throws IOException {

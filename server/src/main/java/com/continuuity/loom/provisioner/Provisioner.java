@@ -1,11 +1,13 @@
 package com.continuuity.loom.provisioner;
 
+import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -47,23 +49,6 @@ public class Provisioner {
     }
     this.capacityFree = capacityTotal - totalAssigned;
     Preconditions.checkArgument(this.capacityFree >= 0, "assignments cannot exceed total capacity");
-  }
-
-  public static Provisioner swapIdsForNames(Provisioner provisioner, LoadingCache<String, String> idNameMap)
-    throws ExecutionException {
-    if (provisioner == null) {
-      return null;
-    }
-    Map<String, Integer> nameUsage = Maps.newHashMap();
-    for (Map.Entry<String, Integer> entry : provisioner.usage.entrySet()) {
-      nameUsage.put(idNameMap.get(entry.getKey()), entry.getValue());
-    }
-    Map<String, Integer> nameAssignments = Maps.newHashMap();
-    for (Map.Entry<String, Integer> entry : provisioner.assignments.entrySet()) {
-      nameAssignments.put(idNameMap.get(entry.getKey()), entry.getValue());
-    }
-    return new Provisioner(provisioner.getId(), provisioner.getHost(), provisioner.getPort(),
-                           provisioner.getCapacityTotal(), nameUsage, nameAssignments);
   }
 
   /**

@@ -23,6 +23,7 @@ import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Implementation of {@link TenantStore} using a SQL database as the persistent store.
@@ -43,6 +45,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
 
   private final DBConnectionPool dbConnectionPool;
   private final DBQueryExecutor dbQueryExecutor;
+  private final ConcurrentMap<String, String> idToNameMap;
 
   // for unit tests only.  Truncate is not supported in derby.
   public void clearData() throws SQLException {
@@ -65,6 +68,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     throws SQLException, ClassNotFoundException {
     this.dbConnectionPool = dbConnectionPool;
     this.dbQueryExecutor = dbQueryExecutor;
+    this.idToNameMap = Maps.newConcurrentMap();
   }
 
   @Override
@@ -217,6 +221,49 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
       }
     } catch (SQLException e) {
       LOG.error("Exception deleting tenant {}", name);
+      throw new IOException(e);
+    }
+  }
+
+  /**
+   * Get the name of the tenant with the given id. Id to name mapping is cached, so this will not involve an io
+   * operation except for the first time it is called.
+   *
+   * @param id Id of the tenant to get the name for
+   * @return Name of the tenant with the given id, or null if the tenant does not exist
+   * @throws IOException
+   */
+  @Override
+  public String getNameForId(String id) throws IOException {
+    if (idToNameMap.containsKey(id)) {
+      return idToNameMap.get(id);
+    }
+    String name = getNameFromDB(id);
+    // if there is no tenant, return null
+    if (name == null) {
+      return null;
+    }
+    // cache the result since id to name will never change
+    idToNameMap.put(id, name);
+    return name;
+  }
+
+  private String getNameFromDB(String id) throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement("SELECT name FROM tenants WHERE id=? AND deleted=false ");
+        try {
+          statement.setString(1, id);
+          return dbQueryExecutor.getString(statement);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting name of tenant {}", id);
       throw new IOException(e);
     }
   }
