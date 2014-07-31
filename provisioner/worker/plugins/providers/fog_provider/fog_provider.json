@@ -86,6 +86,16 @@
             "type": "text",
             "tip": "Enable VPC and use this subnet ID"
           },
+          "dedicated_instance": {
+            "label": "Use Dedicated instances (VPC only)",
+            "type": "checkbox",
+            "tip": "Launch as dedicated instances (VPC only)"
+          },
+          "associate_public_ip": {
+            "label": "Associate public IP (VPC only)",
+            "type": "checkbox",
+            "tip": "Associate public IP (VPC only)"
+          },
           "availability_zone": {
             "label": "Availability Zone",
             "type": "text",
@@ -95,6 +105,11 @@
             "label": "IAM instance profile",
             "type": "text",
             "tip": "IAM instance profile to apply to cluster"
+          },
+          "placement_group": {
+            "label": "Placement group",
+            "type": "text",
+            "tip": "Placement group to place cluster instances"
           }
         },
         "required": [
