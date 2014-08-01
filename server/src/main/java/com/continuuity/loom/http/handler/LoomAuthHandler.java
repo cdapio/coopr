@@ -18,6 +18,7 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.tenant.TenantStore;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -46,26 +47,26 @@ public abstract class LoomAuthHandler extends AbstractHttpHandler {
   protected Account getAndAuthenticateAccount(HttpRequest request, HttpResponder responder) {
     // TODO: proper authentication/authorization
     String user = request.getHeader(Constants.USER_HEADER);
-    String tenant = request.getHeader(Constants.TENANT_HEADER);
+    String tenantName = request.getHeader(Constants.TENANT_HEADER);
     String apiKey = request.getHeader(Constants.API_KEY_HEADER);
     if (user == null) {
       responder.sendError(HttpResponseStatus.UNAUTHORIZED, Constants.USER_HEADER + " not found in request headers.");
       return null;
     }
-    if (tenant == null) {
+    if (tenantName == null) {
       responder.sendError(HttpResponseStatus.UNAUTHORIZED, Constants.TENANT_HEADER + " not found in request headers.");
       return null;
     }
     try {
-      if (tenantStore.getTenantByName(tenant) == null) {
+      Tenant tenant = tenantStore.getTenantByName(tenantName);
+      if (tenant == null) {
         responder.sendError(HttpResponseStatus.NOT_FOUND, "Tenant does not exist.");
         return null;
       }
+      return new Account(user, tenant.getId());
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error authenticating tenant");
       return null;
     }
-
-    return new Account(user, tenant);
   }
 }

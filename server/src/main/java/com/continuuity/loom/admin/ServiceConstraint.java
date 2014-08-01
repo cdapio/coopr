@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.admin;
 
-import com.continuuity.utils.ImmutablePair;
+import com.continuuity.loom.common.utils.ImmutablePair;
 import com.google.common.base.Objects;
 
 import java.util.Set;

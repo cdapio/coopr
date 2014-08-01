@@ -144,6 +144,18 @@
     </property>
 
     <property>
+        <name>server.plugin.store.class</name>
+        <value>com.continuuity.loom.store.provisioner.LocalFilePluginStore</value>
+        <description>class to use to store plugin resources</description>
+    </property>
+
+    <property>
+        <name>server.plugin.store.localfilestore.data.dir</name>
+        <value>/var/loom/data/plugins/resources</value>
+        <description>data directory to store plugin resources when using the local file plugin store</description>
+    </property>
+
+    <property>
         <name>server.provisioner.timeout.secs</name>
         <value>120</value>
         <description>seconds to wait for a provisioner heartbeat before moving its workers and deleting it</description>
@@ -174,4 +186,10 @@
         <description>socket timeout in milliseconds to use when making requests to provisioners</description>
     </property>
 
+    <property>
+        <name>server.metrics.queue.cache.seconds</name>
+        <value>10</value>
+        <description>Seconds to cache queue metrics in memory before recalculating. Queue metrics require
+                     walking through the queue and are therefore expensive to compute.</description>
+    </property>
 </configuration>
