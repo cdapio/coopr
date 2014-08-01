@@ -139,6 +139,7 @@ class ChefSoloAutomator < Automator
         ssh_exec!(ssh, "type chef-solo", "Chef install validation")
 
         ssh_exec!(ssh, "#{sudo} mkdir -p #{@remote_cache_dir}", "Create remote cache dir")
+
         ssh_exec!(ssh, "#{sudo} mkdir -p #{@remote_chef_dir}", "Create remote Chef dir")
 
         ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@remote_cache_dir}", "Changing cache dir owner to #{sshauth['user']}")
