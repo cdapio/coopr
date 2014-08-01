@@ -39,11 +39,33 @@ All URLs referenced in the documentation have the following base:
 
  http://<loom-server>:<loom-port>/v1/loom
 
-In addition, two headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
-the id of the user making the request.  The second is ``X-Loom-ApiKey`` and is used to specify the api key used to
-communicate with the server.
+In addition, three headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
+the id of the user making the request. The second is ``X-Loom-ApiKey`` and is used to specify the api key used to
+communicate with the server. The third is ``X-Loom-TenantID`` and is used to specify the id of the tenant that the
+user belongs to.
 
 .. note:: The Loom REST API is served over HTTP. In the near future, the Loom APIs will be served on HTTPS to ensure data privacy, and unencrypted HTTP will not be supported.
+
+Super admin APIs
+================
+
+Tenants
+-------
+  * :ref:`Create a Tenant <tenants-create>`
+  * :ref:`View a Tenant <tenants-retrieve>`
+  * :ref:`View all Tenants <tenants-all-list>`
+  * :ref:`Update a Tenant <tenants-modify>`
+  * :ref:`Delete a Tenant <tenants-delete>`
+
+Provisioners
+------------
+  * :ref:`Get a Provisioner <provisioners-retrieve>`
+  * :ref:`Get all Provisioners <provisioners-all-list>`
+
+Metrics
+-------
+  * :ref:`Queue Metrics <metrics-queues>`
+
 
 Administration APIs
 ====================
@@ -88,10 +110,27 @@ Cluster Templates
   * :ref:`Update a Cluster template <template-modify>`
   * :ref:`Retrieve all configured Cluster templates <template-all-list>`
 
+Provisioner Plugins
+-------------------
+  * :ref:`Retrieve all plugin specifications <plugin-spec-all-list>`
+  * :ref:`Retrieve a plugin specification <plugin-spec-retrieve>`
+  * :ref:`Add a plugin resource <plugin-resource-create>`
+  * :ref:`Retrieve all metadata for resources of a specific type <plugin-resourcetype-all-list>`
+  * :ref:`Retrieve all metadata for resource of a specific type and name <plugin-resource-all-list>`
+  * :ref:`Delete all versions of a resource <plugin-resource-delete>`
+  * :ref:`Delete a specific version of a resource <plugin-resource-delete-version>`
+  * :ref:`Stage a specific version of a resource <plugin-resource-stage>` 
+  * :ref:`Unstage a specific version of a resource <plugin-resource-unstage>` 
+  * :ref:`Sync plugins <plugin-sync>`
+
 Import/Export
 -----------------
   * :ref:`Export Template Metadata <entity-export>`
   * :ref:`Import Template Metadata <entity-import>`
+
+Metrics
+-------
+  * :ref:`Queue Metrics <metrics-queues>`
 
 User APIs
 =========

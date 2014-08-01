@@ -18,7 +18,7 @@ package com.continuuity.loom.macro;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.utils.ImmutablePair;
+import com.continuuity.loom.common.utils.ImmutablePair;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -106,7 +106,7 @@ public class Expression {
     for (Type type : Type.values()) {
       String prefix = type.getRepresentation();
       if (type.isClusterType() && macroName.equals(type.getRepresentation())) {
-        return new ImmutablePair<Type, String>(type, null);
+        return ImmutablePair.of(type, null);
       }
       if (!macroName.startsWith(prefix)) {
         continue;
@@ -114,7 +114,7 @@ public class Expression {
       if (macroName.length() < prefix.length() + 1) {
         continue; // the prefix must be followed at least one character
       }
-      return new ImmutablePair<Type, String>(type, macroName.substring(prefix.length()));
+      return ImmutablePair.of(type, macroName.substring(prefix.length()));
     }
     throw new SyntaxException("'" + macroName + "' is not a valid macro name");
   }
@@ -178,7 +178,7 @@ public class Expression {
   private String evaluateClusterProperty(Cluster cluster) {
     switch (type) {
       case CLUSTER_OWNER:
-        return cluster.getOwnerId();
+        return cluster.getAccount().getUserId();
       default:
         // shouldn't ever happen
         return type.getRepresentation();

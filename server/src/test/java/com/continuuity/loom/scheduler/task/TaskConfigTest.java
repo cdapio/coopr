@@ -17,6 +17,7 @@ package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
@@ -29,12 +30,16 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.utils.ImmutablePair;
+import com.continuuity.loom.codec.json.guice.CodecModules;
+import com.continuuity.loom.common.utils.ImmutablePair;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Map;
@@ -44,7 +49,15 @@ import java.util.Set;
  * Test TaskConfig.
  */
 public class TaskConfigTest {
-  private static final Gson GSON = new Gson();
+  private static Gson GSON;
+
+  @BeforeClass
+  public static void setupClass() {
+    Injector injector = Guice.createInjector(
+      new CodecModules().getModule()
+    );
+    GSON = injector.getInstance(Gson.class);
+  }
 
   @Test
   public void testConfig() throws Exception {
@@ -74,7 +87,7 @@ public class TaskConfigTest {
           "datanode",
           new ServiceConstraint(
             ImmutableSet.of("hardware2"),
-            ImmutableSet.of("imageA"), 1, 5, 1, new ImmutablePair<Integer, Integer>(1, 1))
+            ImmutableSet.of("imageA"), 1, 5, 1, ImmutablePair.of(1, 1))
         ),
         new LayoutConstraint(
           ImmutableSet.<Set<String>>of(
@@ -129,26 +142,26 @@ public class TaskConfigTest {
                                                "bootstrap_keypair", "iad-root",
                                                "image", "f70ed7c7-b42e-4d77-83d8-40fa29825b85")));
 
-    Cluster defaultCluster = new Cluster("1", "user", "cluster1", System.currentTimeMillis(),
+    Cluster defaultCluster = new Cluster("1", new Account("user", "tenant"), "cluster1", System.currentTimeMillis(),
                                          "Test cluster", provider,
                                          c1, nodeMap.keySet(),
                                          ImmutableSet.of(s1.getName(), s2.getName(), s3.getName()));
 
     JsonObject actualDefaultConfig = TaskConfig.getConfig(defaultCluster, nodeMap.get("node1"), s1,
-                                                          ProvisionerAction.INSTALL);
+                                                          ProvisionerAction.INSTALL, GSON);
 
     Assert.assertEquals(GSON.fromJson(DEFAULT_CONFIG, JsonObject.class), actualDefaultConfig);
 
     // Test user config
     JsonObject userConf = new JsonObject();
     userConf.add("hadoop", conf.get("hadoop"));
-    Cluster userCluster = new Cluster("1", "user", "cluster1", System.currentTimeMillis(),
+    Cluster userCluster = new Cluster("1", new Account("user", "tenant"), "cluster1", System.currentTimeMillis(),
                                       "Test cluster", provider,
                                       c1, nodeMap.keySet(),
                                       ImmutableSet.of(s1.getName(), s2.getName(), s3.getName()), userConf);
 
     JsonObject actualUserConfig = TaskConfig.getConfig(userCluster, nodeMap.get("node1"), s1,
-                                                       ProvisionerAction.INSTALL);
+                                                       ProvisionerAction.INSTALL, GSON);
 
 
     Assert.assertEquals(GSON.fromJson(USER_CONFIG, JsonObject.class), actualUserConfig);

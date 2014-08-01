@@ -16,13 +16,15 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.conf.Configuration;
-import com.continuuity.loom.conf.Constants;
-import com.continuuity.loom.store.ClusterStore;
+import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.store.cluster.ClusterStore;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -36,8 +38,8 @@ public class NodeService {
   private final int maxLogLength;
 
   @Inject
-  private NodeService(ClusterStore clusterStore, Configuration conf) {
-    this.clusterStore = clusterStore;
+  private NodeService(ClusterStoreService clusterStoreService, Configuration conf) {
+    this.clusterStore = clusterStoreService.getSystemView();
     this.maxActions = conf.getInt(Constants.MAX_PER_NODE_NUM_ACTIONS);
     this.maxLogLength = conf.getInt(Constants.MAX_PER_NODE_LOG_LENGTH);
   }
@@ -49,9 +51,9 @@ public class NodeService {
    * @param taskId Id of the task associated with the action.
    * @param service Service the action is for or empty if its not a service action.
    * @param action Action to execute on the node.
-   * @throws Exception
+   * @throws IOException
    */
-  public void startAction(Node node, String taskId, String service, String action) throws Exception {
+  public void startAction(Node node, String taskId, String service, String action) throws IOException {
     if (node.getActions().size() >= maxActions) {
       Node.Action removed = node.removeFirstAction();
       LOG.debug("Removing action {} from node {} since num actions is more than {}",
@@ -65,9 +67,9 @@ public class NodeService {
    * Complete an action on a node. Updates the node in the persistent store.
    *
    * @param node Node the completed action took place on.
-   * @throws Exception
+   * @throws IOException
    */
-  public void completeAction(Node node) throws Exception {
+  public void completeAction(Node node) throws IOException {
     Node.Action action = validateAndGetAction(node);
     action.setStatus(Node.Status.COMPLETE);
     action.setStatusTime(System.currentTimeMillis());
@@ -80,9 +82,9 @@ public class NodeService {
    * @param node Node the action failed on.
    * @param stdout Stdout of failed action.
    * @param stderr Stderr of failed action.
-   * @throws Exception
+   * @throws IOException
    */
-  public void failAction(Node node, String stdout, String stderr) throws Exception {
+  public void failAction(Node node, String stdout, String stderr) throws IOException {
     Node.Action action = validateAndGetAction(node);
     action.setStatus(Node.Status.FAILED);
     action.setStatusTime(System.currentTimeMillis());

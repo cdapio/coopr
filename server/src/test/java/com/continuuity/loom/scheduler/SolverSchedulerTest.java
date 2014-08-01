@@ -17,6 +17,7 @@ package com.continuuity.loom.scheduler;
 
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ClusterDefaults;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.Compatibilities;
@@ -31,15 +32,14 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.queue.internal.TimeoutTrackingQueue;
-import com.continuuity.loom.conf.Constants;
+import com.continuuity.loom.common.queue.QueueGroup;
+import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
-import com.continuuity.loom.store.ClusterStore;
-import com.continuuity.utils.ImmutablePair;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;
@@ -47,7 +47,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -63,32 +62,31 @@ import java.util.Set;
  *
  */
 public class SolverSchedulerTest extends BaseTest {
-  private static Gson GSON = new JsonSerde().getGson();
-  private static TimeoutTrackingQueue solverQueue;
-  private static TimeoutTrackingQueue clusterQueue;
-  private static ClusterStore clusterStore;
+  private static QueueGroup solverQueues;
+  private static QueueGroup clusterQueues;
   private static SolverScheduler solverScheduler;
   private static ClusterTemplate reactorTemplate;
-
+  private static Account account = new Account(Constants.ADMIN_USER, "tenant1");
 
   @Test
   public void testAddCluster() throws Exception {
     String clusterName = "my-cluster";
-    Cluster cluster = new Cluster("1", "user", clusterName, System.currentTimeMillis(),
+    Cluster cluster = new Cluster("1", account, clusterName, System.currentTimeMillis(),
                                   "my cluster", null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of());
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
-    clusterStore.writeCluster(cluster);
+    clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     clusterStore.writeClusterJob(job);
     ClusterCreateRequest createRequest =
       new ClusterCreateRequest(cluster.getName(), cluster.getDescription(),
                                reactorTemplate.getName(), 5, null, null, null, null, null, 0L, null, null);
-    SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, GSON.toJson(createRequest));
-    solverQueue.add(new Element(cluster.getId(), GSON.toJson(solverRequest)));
+    SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, gson.toJson(createRequest));
+    String queueName = "tenant123";
+    solverQueues.add(queueName, new Element(cluster.getId(), gson.toJson(solverRequest)));
 
     solverScheduler.run();
 
-    Cluster solvedCluster = clusterStore.getCluster(cluster.getId());
+    Cluster solvedCluster = clusterStoreService.getView(cluster.getAccount()).getCluster(cluster.getId());
     // check the cluster is as expected
     Assert.assertEquals(clusterName, solvedCluster.getName());
     Assert.assertEquals("my cluster", solvedCluster.getDescription());
@@ -110,23 +108,17 @@ public class SolverSchedulerTest extends BaseTest {
     Assert.assertEquals(3, serviceSetCounts.count(ImmutableSet.of("datanode", "regionserver", "nodemanager")));
     Assert.assertEquals(1, serviceSetCounts.count(ImmutableSet.of("reactor", "zookeeper")));
 
-    Element element = clusterQueue.take("0");
+    Element element = clusterQueues.take(queueName, "0");
     Assert.assertEquals(cluster.getId(), element.getId());
 
-    solverQueue.removeAll();
-    clusterQueue.removeAll();
+    solverQueues.removeAll(queueName);
+    clusterQueues.removeAll(queueName);
   }
 
   @BeforeClass
   public static void setupSchedulerTest() throws Exception {
-    solverQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.SOLVER)));
-    solverQueue.start();
-    clusterQueue = injector.getInstance(
-      Key.get(TimeoutTrackingQueue.class, Names.named(Constants.Queue.CLUSTER)));
-    clusterQueue.start();
-    clusterStore = injector.getInstance(ClusterStore.class);
-    clusterStore.initialize();
+    solverQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
+    clusterQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
     solverScheduler = injector.getInstance(SolverScheduler.class);
 
     Set<String> services = ImmutableSet.of("namenode", "datanode", "resourcemanager", "nodemanager",
@@ -176,26 +168,30 @@ public class SolverSchedulerTest extends BaseTest {
       null
     );
 
+    EntityStoreView superadminView =
+      entityStoreService.getView(new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT));
+    superadminView.writeProviderType(Entities.ProviderTypeExample.JOYENT);
+
+    EntityStoreView adminView = entityStoreService.getView(account);
     // create providers
-    entityStore.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
+    adminView.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
                                            ImmutableMap.<String, String>of()));
-    entityStore.writeProviderType(Entities.ProviderTypeExample.JOYENT);
     // create hardware types
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "medium",
         "medium hardware",
         ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Medium 4GB"))
       )
     );
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "large-mem",
         "hardware with a lot of memory",
         ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Large 32GB"))
       )
     );
-    entityStore.writeHardwareType(
+    adminView.writeHardwareType(
       new HardwareType(
         "large-cpu",
         "hardware with a lot of cpu",
@@ -203,18 +199,19 @@ public class SolverSchedulerTest extends BaseTest {
       )
     );
     // create image types
-    entityStore.writeImageType(
+    adminView.writeImageType(
       new ImageType(
         "centos6",
         "CentOs 6.4 image",
-        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("image", "joyent-hash-of-centos6.4"))
+        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("image",
+                                                                                               "joyent-hash-of-centos6.4"))
       )
     );
     // create services
     for (String serviceName : services) {
-      entityStore.writeService(new Service(serviceName, serviceName + " description", ImmutableSet.<String>of(),
+      adminView.writeService(new Service(serviceName, serviceName + " description", ImmutableSet.<String>of(),
                                            ImmutableMap.<ProvisionerAction, ServiceAction>of()));
     }
-    entityStore.writeClusterTemplate(reactorTemplate);
+    adminView.writeClusterTemplate(reactorTemplate);
   }
 }

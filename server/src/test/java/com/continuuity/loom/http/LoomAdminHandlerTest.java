@@ -21,8 +21,14 @@ import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.codec.json.JsonSerde;
+import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.QueueMetrics;
+import com.continuuity.loom.http.handler.LoomAdminHandler;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -30,7 +36,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.message.BasicHeader;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,12 +48,12 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  *
  */
 public class LoomAdminHandlerTest extends LoomServiceTestBase {
-  private static final Gson GSON = new JsonSerde().getGson();
 
   @Test
   public void testProviders() throws Exception {
@@ -74,18 +82,6 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
-  public void testProviderTypes() throws Exception {
-    testNonPostRestAPIs("providertypes", Entities.ProviderTypeExample.JOYENT_JSON,
-                        Entities.ProviderTypeExample.RACKSPACE_JSON);
-  }
-
-  @Test
-  public void testAutomatorTypes() throws Exception {
-    testNonPostRestAPIs("automatortypes", Entities.AutomatorTypeExample.CHEF_JSON,
-                        Entities.AutomatorTypeExample.SHELL_JSON);
-  }
-
-  @Test
   public void testNonAdminUserGetsForbiddenStatus() throws Exception {
     String base = "/v1/loom/";
     String[] resources = { "providers", "hardwaretypes", "imagetypes", "services", "clustertemplates" };
@@ -100,30 +96,81 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
+  public void testForbiddenIfNonadminGetsQueueMetrics() throws Exception {
+    tenantStore.writeTenant(
+      new Tenant(UUID.randomUUID().toString(), new TenantSpecification(USER1_ACCOUNT.getTenantId(), 10, 10, 100)));
+    assertResponseStatus(doGet("/v1/loom/metrics/queues", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void testGetQueueMetrics() throws Exception {
+    try {
+      tenantStore.writeTenant(new Tenant("idA", new TenantSpecification("tenantA", 10, 10, 100)));
+      tenantStore.writeTenant(new Tenant("idB", new TenantSpecification("tenantB", 10, 10, 100)));
+      tenantStore.writeTenant(new Tenant("idC", new TenantSpecification("tenantC", 10, 10, 100)));
+      tenantStore.writeTenant(new Tenant("idD", new TenantSpecification("tenantD", 10, 10, 100)));
+      provisionerQueues.add("idA", new Element("task1"));
+      provisionerQueues.add("idA", new Element("task2"));
+      provisionerQueues.add("idA", new Element("task3"));
+      provisionerQueues.take("idA", "consumer");
+      provisionerQueues.add("idB", new Element("task4"));
+      provisionerQueues.add("idC", new Element("task5"));
+      provisionerQueues.take("idC", "consumer");
+      provisionerQueues.add("idD", new Element("task6"));
+      provisionerQueues.add("idD", new Element("task7"));
+      provisionerQueues.take("idD", "consumer");
+
+      Map<String, QueueMetrics> expected = Maps.newHashMap();
+      expected.put("tenantA", new QueueMetrics(2, 1));
+      expected.put("tenantB", new QueueMetrics(1, 0));
+      expected.put("tenantC", new QueueMetrics(0, 1));
+      expected.put("tenantD", new QueueMetrics(1, 1));
+      expected.put(TENANT, new QueueMetrics(0, 0));
+      expected.put(Constants.SUPERADMIN_TENANT, new QueueMetrics(0, 0));
+
+      assertQueueMetrics(Constants.SUPERADMIN_TENANT, expected);
+      assertQueueMetrics("tenantA", ImmutableMap.of("tenantA", new QueueMetrics(2, 1)));
+      assertQueueMetrics("tenantB", ImmutableMap.of("tenantB", new QueueMetrics(1, 0)));
+      assertQueueMetrics("tenantC", ImmutableMap.of("tenantC", new QueueMetrics(0, 1)));
+      assertQueueMetrics("tenantD", ImmutableMap.of("tenantD", new QueueMetrics(1, 1)));
+    } finally {
+      provisionerQueues.removeAll();
+      tenantStore.deleteTenantByName("tenantA");
+      tenantStore.deleteTenantByName("tenantB");
+      tenantStore.deleteTenantByName("tenantC");
+      tenantStore.deleteTenantByName("tenantD");
+    }
+  }
+
+  @Test
   public void testExportImport() throws Exception {
     // Import some config
     Map<String, JsonElement> import1 = Maps.newHashMap();
     import1.put(LoomAdminHandler.PROVIDERS,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ProviderExample.JOYENT),
-                                new TypeToken<List<Provider>>() {}.getType()));
+                gson.toJsonTree(Lists.newArrayList(Entities.ProviderExample.JOYENT),
+                                new TypeToken<List<Provider>>() {
+                                }.getType()));
     import1.put(LoomAdminHandler.HARDWARE_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.LARGE,
+                gson.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.LARGE,
                                                    Entities.HardwareTypeExample.MEDIUM),
-                                new TypeToken<List<HardwareType>>() {}.getType()));
+                                new TypeToken<List<HardwareType>>() {
+                                }.getType()));
     import1.put(LoomAdminHandler.IMAGE_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6,
+                gson.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6,
                                                    Entities.ImageTypeExample.UBUNTU_12),
                                 new TypeToken<List<ImageType>>() {}.getType()));
 
     import1.put(LoomAdminHandler.SERVICES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
+                gson.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
                                                    Entities.ServiceExample.NAMENODE),
-                                new TypeToken<List<Service>>() {}.getType()));
+                                new TypeToken<List<Service>>() {
+                                }.getType()));
 
     import1.put(LoomAdminHandler.CLUSTER_TEMPLATES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
+                gson.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
                                                    Entities.ClusterTemplateExample.REACTOR),
                                 new TypeToken<List<ClusterTemplate>>() {}.getType()));
+
 
     // Verify import worked by exporting
     runImportExportTest(import1);
@@ -131,27 +178,29 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     // Import some other config
     Map<String, JsonElement> import2 = Maps.newHashMap();
     import2.put(LoomAdminHandler.PROVIDERS,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ProviderExample.RACKSPACE,
+                gson.toJsonTree(Lists.newArrayList(Entities.ProviderExample.RACKSPACE,
                                                    Entities.ProviderExample.JOYENT),
                                 new TypeToken<List<Provider>>() {}.getType()));
     import2.put(LoomAdminHandler.HARDWARE_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.MEDIUM,
+                gson.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.MEDIUM,
                                                    Entities.HardwareTypeExample.SMALL),
-                                new TypeToken<List<HardwareType>>() {}.getType()));
+                                new TypeToken<List<HardwareType>>() {
+                                }.getType()));
     import2.put(LoomAdminHandler.IMAGE_TYPES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6),
+                gson.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6),
                                 new TypeToken<List<ImageType>>() {}.getType()));
 
     import2.put(LoomAdminHandler.SERVICES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
+                gson.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
                                                    Entities.ServiceExample.NAMENODE,
                                                    Entities.ServiceExample.HOSTS),
                                 new TypeToken<List<Service>>() {}.getType()));
 
     import2.put(LoomAdminHandler.CLUSTER_TEMPLATES,
-                GSON.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
+                gson.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
                                                    Entities.ClusterTemplateExample.REACTOR),
-                                new TypeToken<List<ClusterTemplate>>() {}.getType()));
+                                new TypeToken<List<ClusterTemplate>>() {
+                                }.getType()));
 
     // Verify import worked by exporting
     runImportExportTest(import2);
@@ -163,13 +212,12 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     import3.put(LoomAdminHandler.IMAGE_TYPES, new JsonArray());
     import3.put(LoomAdminHandler.SERVICES, new JsonArray());
     import3.put(LoomAdminHandler.CLUSTER_TEMPLATES, new JsonArray());
-
     // Verify import worked by exporting
     runImportExportTest(import3);
   }
 
   private void runImportExportTest(Map<String, JsonElement> importJson) throws Exception {
-    assertResponseStatus(doPost("/v1/loom/import", GSON.toJson(importJson), ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/v1/loom/import", gson.toJson(importJson), ADMIN_HEADERS), HttpResponseStatus.OK);
 
     // verify using export
     HttpResponse response = doGet("/v1/loom/export", ADMIN_HEADERS);
@@ -190,10 +238,12 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
       return;
     }
 
-    Assert.assertEquals(GSON.fromJson(import1.get(key),
-                                      new TypeToken<Set<?>>() {}.getType()),
-                        GSON.fromJson(export1.get(key),
-                                      new TypeToken<Set<?>>() {}.getType()));
+    Assert.assertEquals(gson.fromJson(import1.get(key),
+                                      new TypeToken<Set<?>>() {
+                                      }.getType()),
+                        gson.fromJson(export1.get(key),
+                                      new TypeToken<Set<?>>() {
+                                      }.getType()));
   }
 
   @Test
@@ -210,55 +260,6 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     provider.addProperty("name", "?");
     assertResponseStatus(doPost("/v1/loom/providers", provider.toString(), ADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
-  }
-
-  private void testNonPostRestAPIs(String entityType, JsonObject entity1, JsonObject entity2) throws Exception {
-    String base = "/v1/loom/" + entityType;
-    String entity1Path = base + "/" + entity1.get("name").getAsString();
-    String entity2Path = base + "/" + entity2.get("name").getAsString();
-    // should start off with no entities
-    assertResponseStatus(doGet(entity1Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
-
-    // add entity through PUT
-    assertResponseStatus(doPut(entity1Path, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.OK);
-    // check we can get it
-    HttpResponse response = doGet(entity1Path, ADMIN_HEADERS);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-    Assert.assertEquals(entity1, result);
-
-    // add second entity through PUT
-    assertResponseStatus(doPut(entity2Path, entity2.toString(), ADMIN_HEADERS), HttpResponseStatus.OK);
-    // check we can get it
-    response = doGet(entity2Path, ADMIN_HEADERS);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    result = new Gson().fromJson(reader, JsonObject.class);
-    Assert.assertEquals(entity2, result);
-
-    // get both entities
-    response = doGet(base, ADMIN_HEADERS);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonArray results = new Gson().fromJson(reader, JsonArray.class);
-
-    Assert.assertEquals(2, results.size());
-    JsonObject first = results.get(0).getAsJsonObject();
-    JsonObject second = results.get(1).getAsJsonObject();
-    if (first.get("name").getAsString().equals(entity1.get("name").getAsString())) {
-      Assert.assertEquals(entity1, first);
-      Assert.assertEquals(entity2, second);
-    } else {
-      Assert.assertEquals(entity2, first);
-      Assert.assertEquals(entity1, second);
-    }
-
-    assertResponseStatus(doDelete(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
-    assertResponseStatus(doDelete(entity2Path, ADMIN_HEADERS), HttpResponseStatus.OK);
-    // check both were deleted
-    assertResponseStatus(doGet(entity1Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doGet(entity2Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
   }
 
   private void testRestAPIs(String entityType, JsonObject entity1, JsonObject entity2) throws Exception {
@@ -315,5 +316,18 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
 
     assertResponseStatus(doDelete(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
     assertResponseStatus(doDelete(entity2Path, ADMIN_HEADERS), HttpResponseStatus.OK);
+  }
+
+  private void assertQueueMetrics(String tenant, Map<String, QueueMetrics> expected) throws Exception {
+    Header[] headers = {
+      new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
+      new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+      new BasicHeader(Constants.TENANT_HEADER, tenant)
+    };
+    HttpResponse response = doGet("/v1/loom/metrics/queues", headers);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    Map<String, QueueMetrics> result = gson.fromJson(reader, new TypeToken<Map<String, QueueMetrics>>() {}.getType());
+    Assert.assertEquals(expected, result);
   }
 }

@@ -28,8 +28,9 @@ public abstract class NamedEntity {
   protected final String name;
 
   public NamedEntity(String name) {
-    Preconditions.checkArgument(whitelist.matcher(name).matches(),
-                                "invalid name.  Name must consist of only [a-zA-Z0-9_.-]");
+    Preconditions.checkArgument(name != null && name.length() > 0 && whitelist.matcher(name).matches(),
+                                "invalid name. Name must be specified and consist of only [a-zA-Z0-9_.-].");
+    Preconditions.checkArgument(name.length() < 256, "name must not exceed 255 characters.");
     this.name = name;
   }
 

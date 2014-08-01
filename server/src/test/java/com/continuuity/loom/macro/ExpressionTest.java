@@ -15,12 +15,13 @@
  */
 package com.continuuity.loom.macro;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.continuuity.utils.ImmutablePair;
+import com.continuuity.loom.common.utils.ImmutablePair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -61,8 +62,8 @@ public class ExpressionTest {
                         ImmutableMap.of("hostname", "owt", "nodenum", "9"));
     Node thr = new Node("thr", "1", ImmutableSet.of(svc3),
                         ImmutableMap.of("ipaddress", "9.6.8.8", "nodenum", "10"));
-    cluster = new Cluster("1", "user", "cluster", System.currentTimeMillis(), "testy cluster", null, null,
-                          ImmutableSet.of(foo.getId(), bar.getId(), one.getId(), two.getId(), thr.getId()),
+    cluster = new Cluster("1", new Account("user", "tenant"), "cluster", System.currentTimeMillis(), "testy cluster",
+                          null, null, ImmutableSet.of(foo.getId(), bar.getId(), one.getId(), two.getId(), thr.getId()),
                           ImmutableSet.of(svc1.getName(), svc2.getName(), svc3.getName()));
     clusterNodes = Sets.newTreeSet(Sets.newHashSet(foo, bar, one, two, thr));
     node1 = foo;
@@ -93,7 +94,7 @@ public class ExpressionTest {
   @Test
   public void testClusterOwner() throws Exception {
     Assert.assertEquals(
-      cluster.getOwnerId(),
+      cluster.getAccount().getUserId(),
       new Expression(Expression.Type.CLUSTER_OWNER, null, null, null, null).evaluate(cluster, clusterNodes, node1));
   }
 
@@ -203,7 +204,7 @@ public class ExpressionTest {
   public void testParseMacroName() throws SyntaxException {
     Assert.assertEquals(ImmutablePair.of(HOST_OF_SERVICE, "abc"), Expression.typeAndNameOf("host.service.abc"));
     Assert.assertEquals(ImmutablePair.of(IP_OF_SERVICE, "abc"), Expression.typeAndNameOf("ip.service.abc"));
-    Assert.assertEquals(ImmutablePair.of(CLUSTER_OWNER, null), Expression.typeAndNameOf("cluster.owner"));
+    Assert.assertEquals(ImmutablePair.of(CLUSTER_OWNER, (String) null), Expression.typeAndNameOf("cluster.owner"));
     for (String macro : ImmutableList.of("", "host.service.", "IP_OF_SERVICE.abc", "SERVICE_BULLSHIT_abc")) {
       try {
         Expression.typeAndNameOf(macro);

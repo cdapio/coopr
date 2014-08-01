@@ -8,6 +8,6 @@
     "openstack_tenant": "EXAMPLE_TENANT",
     "openstack_auth_url": "http://EXAMPLE.DOMAIN.COM:5000/v2.0/tokens",
     "openstack_ssh_key_id": "EXAMPLE_TENANT_KEY",
-    "identity_file": "/opt/loom/provisioner/daemon/plugins/providers/openstack_provider/EXAMPLE_TENANT_KEY.pem"
+    "identity_file": "/opt/loom/provisioner/worker/plugins/providers/openstack_provider/EXAMPLE_TENANT_KEY.pem"
   }
 }

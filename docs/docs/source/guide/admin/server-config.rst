@@ -244,3 +244,21 @@ A full list of available configuration settings and their default values are giv
    * - server.callback.http.max.connections
      - 100
      - max number of concurrent http connections for callbacks. If the max is reached, the next callback to try and send a request blocks until an open connection frees up.
+   * - server.provisioner.timeout.secs
+     - 120
+     - seconds to wait for a provisioner heartbeat before moving its workers and deleting it.
+   * - server.provisioner.timeout.check.interval.secs
+     - 60
+     - seconds between checks for timed out provisioners.
+   * - server.provisioner.request.max.retries
+     - 2
+     - max number of times to retry a failed request to a provisioner before reassigning its workers and deleting it.
+   * - server.provisioner.request.ms.between.retries
+     - 500
+     - milliseconds to wait before retrying a failed request to a provisioner.
+   * - server.provisioner.request.socket.timeout.ms
+     - 10000
+     - socket timeout in milliseconds to use when making requests to provisioners.
+   * - server.metrics.queue.cache.seconds
+     - 10
+     - Seconds to cache queue metrics in memory before recalculating. Queue metrics require walking through the queue and are therefore expensive to compute.
