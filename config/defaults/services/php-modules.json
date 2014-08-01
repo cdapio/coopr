@@ -1,16 +1,16 @@
 {
-  "name": "php",
-  "description": "PHP language support",
+  "name": "php-modules",
+  "description": "Installs/configures PHP PEAR modules",
   "dependencies": {
     "conflicts": [],
     "install": {
-      "requires": [ "base" ],
+      "requires": [ "php" ],
       "uses": []
     },
     "provides": [],
     "runtime": {
-      "requires": [ "apache-httpd" ],
-      "uses": [ "php-modules" ]
+      "requires": [],
+      "uses": []
     }
   },
   "provisioner": {
@@ -18,13 +18,13 @@
       "install": {
         "type":"chef-solo",
         "fields": {
-          "run_list": "recipe[php::default]"
+          "run_list": "recipe[php_modules::default]"
         }
       },
       "configure": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[php::default]"
+          "run_list": "recipe[php_modules::default]"
         }
       }
     }

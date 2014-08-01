@@ -6,6 +6,7 @@
       "base",
       "apache-httpd",
       "php",
+      "php-modules",
       "mysql-server"
     ],
     "provider": "rackspace",
@@ -46,7 +47,10 @@
       "php": {
         "directives": {
           "mysql.default_host": "%host.service.mysql-server%"
-        }
+        },
+        "modules": [
+          "mysql"
+        ]
       }
     }
   },
@@ -65,13 +69,14 @@
       "haproxy",
       "apache-httpd",
       "php",
+      "php-modules",
       "mysql-server"
     ]
   },
   "constraints": {
     "layout": {
       "mustcoexist": [
-        [ "apache-httpd", "php" ]
+        [ "apache-httpd", "php", "php-modules" ]
       ]
     },
     "services": {
