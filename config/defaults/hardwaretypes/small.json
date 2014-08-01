@@ -2,6 +2,15 @@
   "name": "small",
   "description": "1 vCPU, 1 GB RAM, 30+ GB Disk",
   "providermap": {
+    "aws-us-east-1": {
+      "flavor": "m1.small"
+    },
+    "aws-us-west-1": {
+      "flavor": "m1.small"
+    },
+    "aws-us-west-2": {
+      "flavor": "m1.small"
+    },
     "joyent": {
       "flavor": "Small 1GB"
     },
