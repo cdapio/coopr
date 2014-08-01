@@ -20,11 +20,12 @@
 require_relative 'tenantspec'
 require_relative 'logging'
 require_relative 'workerlauncher'
+require_relative 'resourcemanager'
 
 module Loom
   class TenantManager
     include Logging
-    attr_accessor :spec, :provisioner_id, :config
+    attr_accessor :spec, :provisioner_id, :config, :resourcemanager
     attr_reader :status
 
     def initialize(spec)
@@ -35,6 +36,8 @@ module Loom
       @provisioner_id = 'default'
       @workerpids = []
       @terminating_workers = []
+      @resourcemanager = ResourceManager.new(spec.resourcespec)
+
     end 
 
     def id
@@ -60,6 +63,18 @@ module Loom
     def resource_sync_needed?
       'STALE' == @status
     end
+
+    def sync
+      puts "TM: calling RM sync"
+      @resourcemanager.sync
+    end
+
+    def resume
+      puts "TM: resuming after RM sync"
+      @status = 'ACTIVE'
+      spawn
+    end
+
 
     # check worker processes, called after CLD signal processed (child process termination)
     def verify_workers
@@ -114,6 +129,14 @@ module Loom
 
     # process new specifications for this tenant
     def update(new_tm)
+      # first check for new resource requirements
+      if @spec.resourcespec == new_tm.spec.resourcespec
+        puts "******** Determined NO new resources needed"
+      else
+        resource_sync_needed
+        @spec = new_tm.spec
+        return
+      end
       log.debug "update workers from #{@spec.workers} to #{new_tm.spec.workers}"
       difference = new_tm.spec.workers - @spec.workers
       if difference > 0
@@ -146,6 +169,7 @@ module Loom
     def terminate_all_worker_processes
       workerpids = @workerpids.dup
       workerpids.each do |pid|
+        puts "KILLING PID: #{pid}"
         terminate_worker_process(pid)
       end
     end

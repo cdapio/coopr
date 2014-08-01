@@ -89,14 +89,18 @@ module Loom
       spawn_heartbeat_thread
       # spawn the signal handler thread
       spawn_signal_thread
+      # spawn the thread to sync data resources
+      spawn_resource_thread
 
       # wait for signal_handler to exit in response to signals
       @signal_thread.join
       # kill the other threads
       @heartbeat_thread.kill
       @sinatra_thread.kill
+      @resource_thread.kill
       @heartbeat_thread.join
       @sinatra_thread.join
+      @resource_thread.join
       log.info "provisioner gracefully shut down"
       exit
     end
@@ -186,6 +190,26 @@ module Loom
       }
       # abort on any uncaught exception during registration, etc
       @heartbeat_thread.abort_on_exception=true
+    end
+
+    def spawn_resource_thread
+      @resource_thread = Thread.new {
+        log.info "starting resource thread"
+        loop {
+          @tenantmanagers.each do |id, tmgr|
+            puts "checking tmgr #{id} #{tmgr.id}: #{tmgr.resource_sync_needed?} #{tmgr.num_workers}"
+            if tmgr.resource_sync_needed? && tmgr.num_workers == 0
+              puts "syncing!!"
+              tmgr.sync
+              puts "done syncing!!"
+              tmgr.resume
+            end
+          end
+          sleep 5
+        }
+      }
+      # abort on any uncaught exception
+      @resource_thread.abort_on_exception=true
     end
 
     def register_with_server

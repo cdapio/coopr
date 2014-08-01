@@ -50,5 +50,10 @@ module Loom
         end
       end
     end
+
+    # define two ResourceSpecs as equal if @resources hash has same contents
+    def ==(other)
+      @resources == other.resources
+    end
   end
 end
