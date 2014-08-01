@@ -46,7 +46,6 @@ class FogProviderJoyent < Provider
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = 'root'
-      @result['result']['ssh-auth']['password'] = @joyent_password unless @joyent_password.nil?
       @result['result']['ssh-auth']['identityfile'] = @joyent_keyfile unless @joyent_keyfile.nil?
       @result['status'] = 0
     rescue Exception => e

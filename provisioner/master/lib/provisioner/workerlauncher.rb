@@ -20,18 +20,22 @@
 # simple class to construct the ruby command used to launch a worker process
 module Loom
   class WorkerLauncher
-    attr_accessor :tenant, :provisioner, :name, :options
+    attr_accessor :tenant, :provisioner, :name, :config
 
-    def initialize(options)
-      @options = options || {}
+    def initialize(config)
+      @config = config || {}
     end
 
     def cmd
+      prod_cmd
+    end
+
+    def prod_cmd
       cmd = "#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])}"
       cmd += " #{File.dirname(__FILE__)}/../../../worker/provisioner.rb"
-      cmd += " --uri #{@options[:uri]}" if @options[:uri]
-      cmd += " --log-directory #{@options[:log_directory]}" if @options[:log_directory]
-      cmd += " --log-level #{@options[:log_level]}" if @options[:log_level]
+      cmd += " --uri #{@config.get(PROVISIONER_SERVER_URI)}" if @config.get(PROVISIONER_SERVER_URI)
+      cmd += " --log-directory #{@config.get(PROVISIONER_LOG_DIR)}" if @config.get(PROVISIONER_LOG_DIR)
+      cmd += " --log-level #{@config.get(PROVISIONER_LOG_LEVEL)}" if @config.get(PROVISIONER_LOG_LEVEL)
       cmd += " --provisioner #{@provisioner}" unless @provisioner.nil?
       cmd += " --tenant #{@tenant}" unless @tenant.nil?
       cmd += " --name #{@name}" unless @name.nil?

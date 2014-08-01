@@ -29,7 +29,7 @@ public class UpgradeTool {
     Configuration conf = Configuration.create();
     Injector injector = Guice.createInjector(
       new ConfigurationModule(conf),
-      new StoreModule(),
+      new StoreModule(conf),
       new CodecModules().getUpgradeModule(NEW_TENANT_ID)
     );
     ClusterStoreService clusterStoreService = injector.getInstance(ClusterStoreService.class);

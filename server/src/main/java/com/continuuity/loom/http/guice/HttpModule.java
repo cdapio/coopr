@@ -3,6 +3,7 @@ package com.continuuity.loom.http.guice;
 import com.continuuity.http.HttpHandler;
 import com.continuuity.loom.http.handler.LoomAdminHandler;
 import com.continuuity.loom.http.handler.LoomClusterHandler;
+import com.continuuity.loom.http.handler.LoomPluginHandler;
 import com.continuuity.loom.http.handler.LoomProvisionerHandler;
 import com.continuuity.loom.http.handler.LoomRPCHandler;
 import com.continuuity.loom.http.handler.LoomStatusHandler;
@@ -27,5 +28,6 @@ public class HttpModule extends AbstractModule {
     handlerBinder.addBinding().to(LoomRPCHandler.class);
     handlerBinder.addBinding().to(LoomSuperadminHandler.class);
     handlerBinder.addBinding().to(LoomProvisionerHandler.class);
+    handlerBinder.addBinding().to(LoomPluginHandler.class);
   }
 }
