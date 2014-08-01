@@ -21,6 +21,7 @@
           "aws_credential_file": {
             "label": "AWS Credential file",
             "type": "text",
+            "override": true,
             "tip": "Full path and file name to AWS credential file as used by AWS command line tools"
           },
           "aws_keyname": {
@@ -32,6 +33,7 @@
           "aws_keyfile": {
             "label": "Key file",
             "type": "text",
+            "override": true,
             "tip": "Full path and file name to your AWS SSH private key"
           },
           "aws_region": {
