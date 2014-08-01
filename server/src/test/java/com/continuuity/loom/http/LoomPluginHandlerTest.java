@@ -53,8 +53,6 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(doPost(getNamePath(type2, "name"), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doDelete(getVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doDelete(getVersionedPath(type2, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doGet(getVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doGet(getVersionedPath(type2, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doGet(getNamePath(type1, "name"), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doGet(getNamePath(type2, "name"), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doGet(getTypePath(type1), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
@@ -110,8 +108,20 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     HttpResponse response = doGet(getNamePath(pluginResourceType, meta.getName()), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(ImmutableSet.of(meta), bodyToMetaSet(response));
+
     // get actual contents
-    response = doGet(getVersionedPath(pluginResourceType, meta), ADMIN_HEADERS);
+    String typeStr = type.name().toLowerCase() + "types";
+    String path = Joiner.on('/').join(
+      "/v1/tenants",
+      ADMIN_ACCOUNT.getTenantId(),
+      typeStr,
+      pluginName,
+      resourceType,
+      meta.getName(),
+      "versions",
+      meta.getVersion()
+    );
+    response = doGet(path);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(contents, bodyToString(response));
   }
