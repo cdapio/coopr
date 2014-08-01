@@ -118,7 +118,7 @@ class ChefSoloAutomator < Automator
       generate_chef_primitive_tar(chef_primitive)
     end
 
-    log.debug "Attempting ssh into ip: #{@task["config"]["ipaddress"]}, user: #{ssh-auth['user']}"
+    log.debug "Attempting ssh into ip: #{@task["config"]["ipaddress"]}, user: #{sshauth['user']}"
 
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
