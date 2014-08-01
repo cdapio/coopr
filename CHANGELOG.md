@@ -5,7 +5,7 @@ Unreleased
 ----------
 - MongoDB support for clusters ( Issues: #43 #130 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
-- Nginx support for clusters ( Issues: #131 )
+- Nginx support for clusters ( Issues: #131 #323 )
 - Sensu monitoring support ( Issues: #167 )
 - Configuration settings renamed ( Issues: #213 )
 - Ability to sync an active cluster's template to its current version ( Issues: #214 )

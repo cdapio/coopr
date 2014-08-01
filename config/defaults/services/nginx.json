@@ -1,6 +1,6 @@
 {
-  "name": "apache-httpd",
-  "description": "Apache HTTP Server",
+  "name": "nginx",
+  "description": "Nginx HTTP Server",
   "dependencies": {
     "conflicts": [],
     "install": {
@@ -18,27 +18,27 @@
       "install": {
         "type":"chef-solo",
         "fields": {
-          "run_list": "recipe[apache2::default]"
+          "run_list": "recipe[nginx::default]"
         }
       },
       "configure": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[apache2::default]"
+          "run_list": "recipe[nginx::default]"
         }
       },
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }" 
+          "run_list": "recipe[nginx::default],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"nginx\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }" 
+          "run_list": "recipe[nginx::default],recipe[loom_service_runner::default]",
+          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"nginx\": \"stop\" } } } }" 
         }
       }
     }
