@@ -6,7 +6,7 @@ Unreleased
 - Settable max for clusters and nodes in a tenant ( Issues: #302 )
 - Queue Metrics ( Issues: #301 )
 - Provisioner Multi Tenancy ( Issues: #290, #296 )
-- Multi Tenancy ( Issues: #239, #253, #277, #284, #292 )
+- Multi Tenancy ( Issues: #239, #253, #277, #284, #292, #325, #326 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 )
 - Sensu monitoring support ( Issues: #167 )
