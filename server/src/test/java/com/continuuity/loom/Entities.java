@@ -80,13 +80,19 @@ public class Entities {
         ),
         ParameterType.USER,
         ParametersSpecification.EMPTY_SPECIFICATION),
-      ImmutableMap.<String, ResourceTypeSpecification>of()
+      ImmutableMap.<String, ResourceTypeSpecification>of(
+        "keys", new ResourceTypeSpecification(ResourceTypeFormat.FILE)
+      )
     );
     public static final String JOYENT_STRING =
       "{\n" +
         "    \"name\": \"joyent\",\n" +
         "    \"description\": \"joyent provider type\",\n" +
-        "    \"resourceTypes\": { },\n" +
+        "    \"resourceTypes\": {\n" +
+        "        \"keys\": {\n" +
+        "            \"format\": \"file\"\n" +
+        "        }\n" +
+        "    },\n" +
         "    \"parameters\": {\n" +
         "        \"admin\": {\n" +
         "            \"fields\": {\n" +

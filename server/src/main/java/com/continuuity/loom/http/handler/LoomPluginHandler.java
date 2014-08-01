@@ -18,12 +18,14 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.admin.AbstractPluginSpecification;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
+import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -50,11 +52,16 @@ import java.util.Set;
 public class LoomPluginHandler extends LoomAuthHandler {
   private final Gson gson;
   private final ResourceService resourceService;
+  private final EntityStoreService entityStoreService;
 
   @Inject
-  private LoomPluginHandler(TenantStore tenantStore, ResourceService resourceService, Gson gson) {
+  private LoomPluginHandler(TenantStore tenantStore,
+                            ResourceService resourceService,
+                            EntityStoreService entityStoreService,
+                            Gson gson) {
     super(tenantStore);
     this.resourceService = resourceService;
+    this.entityStoreService = entityStoreService;
     this.gson = gson;
   }
 
@@ -477,14 +484,42 @@ public class LoomPluginHandler extends LoomAuthHandler {
     responder.sendError(HttpResponseStatus.NOT_IMPLEMENTED, "not implemented yet");
   }
 
+  private void validateTypeExists(Account account, ResourceType resourceType)
+    throws MissingEntityException, IOException {
+    PluginType pluginType = resourceType.getPluginType();
+    String pluginName = resourceType.getPluginName();
+    String resourceTypeName = resourceType.getTypeName();
+    AbstractPluginSpecification plugin;
+    if (pluginType == PluginType.AUTOMATOR) {
+      plugin = entityStoreService.getView(account).getAutomatorType(pluginName);
+    } else if (pluginType == PluginType.PROVIDER) {
+      plugin = entityStoreService.getView(account).getProviderType(pluginName);
+    } else {
+      throw new MissingEntityException("Unknown plugin type " + pluginType);
+    }
+
+    if (plugin == null) {
+      throw new MissingEntityException(pluginType.name().toLowerCase() + " plugin " + pluginName + " not found.");
+    }
+
+    if (!plugin.getResourceTypes().containsKey(resourceTypeName)) {
+      throw new MissingEntityException(resourceTypeName + " for " + pluginType.name().toLowerCase() +
+                                         " plugin " + pluginName + " not found.");
+    }
+  }
+
   private BodyConsumer uploadResource(HttpResponder responder, Account account, PluginType type,
                                       String pluginName, String resourceType,
                                       String resourceName) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
+      validateTypeExists(account, pluginResourceType);
       return resourceService.createResourceBodyConsumer(account, pluginResourceType, resourceName, responder);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error uploading module");
+      return null;
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
       return null;
     }
   }
@@ -494,14 +529,15 @@ public class LoomPluginHandler extends LoomAuthHandler {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
       int version = Integer.parseInt(versionStr);
+      validateTypeExists(account, pluginResourceType);
       resourceService.stage(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (NumberFormatException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
     } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating resource version.");
     } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "Provider type module not found.");
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "Provider type resource not found.");
     }
   }
 
@@ -510,14 +546,15 @@ public class LoomPluginHandler extends LoomAuthHandler {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
       int version = Integer.parseInt(versionStr);
+      validateTypeExists(account, pluginResourceType);
       resourceService.unstage(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (NumberFormatException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
     } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating resource version.");
     } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "Provider type module not found.");
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "Provider type resource not found.");
     }
   }
 
@@ -525,6 +562,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
                             PluginType type, String pluginName, String resourceType) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
+      validateTypeExists(account, pluginResourceType);
       ResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
                          resourceService.getAll(account, pluginResourceType, statusFilter),
@@ -534,6 +572,8 @@ public class LoomPluginHandler extends LoomAuthHandler {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting modules.");
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
   }
 
@@ -541,6 +581,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
                             PluginType type, String pluginName, String resourceType, String resourceName) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
+      validateTypeExists(account, pluginResourceType);
       ResourceStatus statusFilter = getStatusParam(request);
       responder.sendJson(HttpResponseStatus.OK,
                          resourceService.getAll(account, pluginResourceType, resourceName, statusFilter),
@@ -550,6 +591,8 @@ public class LoomPluginHandler extends LoomAuthHandler {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting modules.");
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
   }
 
@@ -557,6 +600,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
                               String pluginName, String resourceType, String resourceName, String versionStr) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
+      validateTypeExists(account, pluginResourceType);
       int version = Integer.parseInt(versionStr);
       resourceService.delete(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
@@ -566,6 +610,8 @@ public class LoomPluginHandler extends LoomAuthHandler {
       responder.sendError(HttpResponseStatus.CONFLICT, "Resource not in a deletable state.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
   }
 
@@ -573,12 +619,15 @@ public class LoomPluginHandler extends LoomAuthHandler {
                               String pluginName, String resourceType, String resourceName) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
+      validateTypeExists(account, pluginResourceType);
       resourceService.delete(account, pluginResourceType, resourceName);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, "Resource not in a deletable state.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
   }
 
