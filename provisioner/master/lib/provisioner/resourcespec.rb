@@ -31,19 +31,21 @@ module Loom
       # resource_formats is a hash of '/'-delimited resource types and their formats
       #   ex: "automatortype/chef-solo/cookbooks" => "archive"
       @resource_formats = {}
-      resource_jsonobj.each do |type, h|
-        h.each do |id, h|
-          h.each do |resource_type, h|
-            if h.key?('format')
-              formatkey = %W( #{type} #{id} #{resource_type} ).join('/')
-              @resource_formats[formatkey] = h['format'] # Albert: Validate here?
-            end
-            if h.key?('active')
-              h['active'].each do |nv|
-                name = nv['name']
-                version = nv['version']
-                resource_name = %W( #{type} #{id} #{resource_type} #{name}).join('/')
-                @resources[resource_name] = version
+      unless resource_jsonobj.nil?
+        resource_jsonobj.each do |type, h|
+          h.each do |id, h|
+            h.each do |resource_type, h|
+              if h.key?('format')
+                formatkey = %W( #{type} #{id} #{resource_type} ).join('/')
+                @resource_formats[formatkey] = h['format'] # Albert: Validate here?
+              end
+              if h.key?('active')
+                h['active'].each do |nv|
+                  name = nv['name']
+                  version = nv['version']
+                  resource_name = %W( #{type} #{id} #{resource_type} #{name}).join('/')
+                  @resources[resource_name] = version
+                end
               end
             end
           end
