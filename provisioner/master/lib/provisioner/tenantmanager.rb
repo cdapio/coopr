@@ -25,18 +25,19 @@ require_relative 'resourcemanager'
 module Loom
   class TenantManager
     include Logging
-    attr_accessor :spec, :provisioner_id, :config, :resourcemanager
-    attr_reader :status
+    attr_accessor :spec, :resourcemanager
+    attr_reader :status, :config, :provisioner_id
 
-    def initialize(spec)
+    def initialize(spec, config, provisioner_id)
       unless spec.instance_of?(TenantSpec)
         raise ArgumentError, "TenantManager needs to be initialized with object of type TenantSpec", caller
       end
       @spec = spec
-      @provisioner_id = 'default'
+      @config = config
+      @provisioner_id = provisioner_id
       @workerpids = []
       @terminating_workers = []
-      @resourcemanager = ResourceManager.new(spec.resourcespec)
+      @resourcemanager = ResourceManager.new(spec.resourcespec, config)
 
     end 
 

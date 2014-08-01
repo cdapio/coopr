@@ -260,20 +260,16 @@ module Loom
     end
 
     # api method to add or edit tenant
-    def add_tenant(tenantmgr)
-      unless tenantmgr.instance_of?(TenantManager)
-        raise ArgumentError, "only instances of TenantManager can be added to provisioner", caller
+    def add_tenant(tenantspec)
+      unless tenantspec.instance_of?(TenantSpec)
+        raise ArgumentError, "only instances of TenantSpec can be added to provisioner", caller
       end
       # validate input
-      id = tenantmgr.id
+      id = tenantspec.id
       log.debug "Adding/Editing tenant: #{id}"
       fail "cannot add a TenantManager without an id: #{tenantmgr.inspect}" if id.nil?
 
-      # set provisionerId
-      tenantmgr.provisioner_id = @provisioner_id
-
-      # set configuration
-      tenantmgr.config = @config
+      tenantmgr = TenantManager.new(tenantspec, @config, @provisioner_id)
 
       if @tenantmanagers.key? id
         # edit tenant
