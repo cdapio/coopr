@@ -59,9 +59,8 @@ public class HttpProvisionerRequestService implements ProvisionerRequestService 
   public boolean putTenant(Provisioner provisioner, String tenantId, ResourceCollection resourceCollection) {
     HttpPut put = new HttpPut(getTenantURL(provisioner, tenantId));
     int workers = provisioner.getAssignedWorkers(tenantId);
-    Map<String, ProvisionerTenant> body = ImmutableMap.of("tenant", new ProvisionerTenant(workers, resourceCollection));
     try {
-      put.setEntity(new StringEntity(gson.toJson(body)));
+      put.setEntity(new StringEntity(gson.toJson(new ProvisionerTenant(workers, resourceCollection))));
     } catch (UnsupportedEncodingException e) {
       // should never happen
       LOG.error("Unsupported encoding when writing tenant {} to provisioner {}",

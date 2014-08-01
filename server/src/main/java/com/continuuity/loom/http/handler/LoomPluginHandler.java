@@ -32,6 +32,8 @@ import com.google.inject.Inject;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -49,6 +51,7 @@ import java.util.Set;
  */
 @Path("/v1/loom")
 public class LoomPluginHandler extends LoomAuthHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(LoomProvisionerHandler.class);
   private final Gson gson;
   private final ResourceService resourceService;
   private final TenantProvisionerService tenantProvisionerService;
@@ -485,6 +488,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
       return;
     }
+    LOG.debug("Plugin sync called for tenant {}.", account.getTenantId());
 
     try {
       tenantProvisionerService.syncResources(account);

@@ -4,6 +4,7 @@ import com.continuuity.loom.admin.ResourceTypeFormat;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.annotations.Expose;
 
 import java.util.Collection;
 import java.util.Map;
@@ -22,6 +23,8 @@ public class ResourceCollection {
   // }
   private final Map<String, Map<String, ActiveResourceList>> automatortypes;
   private final Map<String, Map<String, ActiveResourceList>> providertypes;
+  // purely for internal convenience purposes, dont want it sent to provisioners in put call.
+  @Expose(serialize = false)
   private final Set<ResourceType> resourceTypes;
 
   public ResourceCollection() {
