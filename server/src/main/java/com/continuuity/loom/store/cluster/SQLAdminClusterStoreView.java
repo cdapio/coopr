@@ -35,6 +35,16 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
   }
 
   @Override
+  protected PreparedStatement getSelectNonTerminatedClusters(Connection conn)
+    throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "SELECT cluster FROM clusters WHERE tenant_id=? AND status<>? ORDER BY create_time DESC");
+    statement.setString(1, account.getTenantId());
+    statement.setString(2, Cluster.Status.TERMINATED.name());
+    return statement;
+  }
+
+  @Override
   protected PreparedStatement getSelectClusterStatement(Connection conn, long id) throws SQLException {
     PreparedStatement statement = conn.prepareStatement("SELECT cluster FROM clusters WHERE id=? AND tenant_id=?");
     statement.setLong(1, id);
