@@ -62,6 +62,10 @@ Provisioners
   * :ref:`Get a Provisioner <provisioners-retrieve>`
   * :ref:`Get all Provisioners <provisioners-all-list>`
 
+Metrics
+-------
+  * :ref:`Queue Metrics <metrics-queues>`
+
 
 Administration APIs
 ====================
@@ -106,10 +110,27 @@ Cluster Templates
   * :ref:`Update a Cluster template <template-modify>`
   * :ref:`Retrieve all configured Cluster templates <template-all-list>`
 
+Provisioner Plugins
+-------------------
+  * :ref:`Retrieve all plugin specifications <plugin-spec-all-list>`
+  * :ref:`Retrieve a plugin specification <plugin-spec-retrieve>`
+  * :ref:`Add a plugin resource <plugin-resource-create>`
+  * :ref:`Retrieve all metadata for resources of a specific type <plugin-resourcetype-all-list>`
+  * :ref:`Retrieve all metadata for resource of a specific type and name <plugin-resource-all-list>`
+  * :ref:`Delete all versions of a resource <plugin-resource-delete>`
+  * :ref:`Delete a specific version of a resource <plugin-resource-delete-version>`
+  * :ref:`Stage a specific version of a resource <plugin-resource-stage>` 
+  * :ref:`Unstage a specific version of a resource <plugin-resource-unstage>` 
+  * :ref:`Sync plugins <plugin-sync>`
+
 Import/Export
 -----------------
   * :ref:`Export Template Metadata <entity-export>`
   * :ref:`Import Template Metadata <entity-import>`
+
+Metrics
+-------
+  * :ref:`Queue Metrics <metrics-queues>`
 
 User APIs
 =========

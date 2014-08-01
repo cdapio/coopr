@@ -100,6 +100,7 @@ Example
 
  $ curl -X POST 
         -H 'X-Loom-UserID:<userid>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{ "name":"hadoop-dev", "description":"my hadoop dev cluster", "numMachines":"5", "clusterTemplate":"hadoop.example" }'
         http://<loom-server>:<loom-port>/<version>/loom/clusters
@@ -147,6 +148,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<userid>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079
  $ {
@@ -231,6 +233,7 @@ Example
 
  $ curl -X DELETE
         -H 'X-Loom-UserID:<userid>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079
 
@@ -302,6 +305,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/plans/00000079-001
  $ {
@@ -372,6 +376,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/plans
 
@@ -404,6 +409,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
  $ {
@@ -477,6 +483,7 @@ Example
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
         -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Loom-TenantID:<tenantid>'
         -X PUT
         -d '{
                 "config": {
@@ -539,6 +546,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services
  [
@@ -588,6 +596,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         -d '{ "services": [ "zookeeper-server", "hbase-master", "hbase-regionserver" ] }'
@@ -630,6 +639,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/stop
@@ -672,6 +682,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/stop
@@ -713,6 +724,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/start
@@ -755,6 +767,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/start
@@ -798,6 +811,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/restart
@@ -843,6 +857,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/restart
@@ -895,6 +910,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:<user-id>' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/clustertemplate/sync

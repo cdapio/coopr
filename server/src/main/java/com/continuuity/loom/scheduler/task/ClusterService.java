@@ -117,8 +117,8 @@ public class ClusterService {
     ZKInterProcessReentrantLock lock = getCreateLock(account);
     lock.acquire();
     try {
-      Tenant tenant = tenantProvisionerService.getTenant(account.getTenantId());
-      if (!tenantProvisionerService.satisfiesTenantQuotas(tenant, 1, clusterCreateRequest.getNumMachines())) {
+      if (!tenantProvisionerService.satisfiesTenantQuotas(
+        account.getTenantId(), 1, clusterCreateRequest.getNumMachines())) {
         throw new QuotaException("Creating the cluster would cause cluster or node quotas to be violated.");
       }
 

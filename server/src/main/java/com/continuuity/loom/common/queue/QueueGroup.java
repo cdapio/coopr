@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A group of {@link TrackingQueue TrackingQueues} that usually serve a similar purpose. Elements must be added to
@@ -105,6 +106,13 @@ public interface QueueGroup {
   void removeQueue(String queueName);
 
   /**
+   * Get the size (both queued and being consumed) of all queues.
+   *
+   * @return Size of all queues.
+   */
+  int size();
+
+  /**
    * Get the size (both queued and being consumed) of a specific queue.
    *
    * @param queueName Name of the queue to get the size of.
@@ -117,7 +125,7 @@ public interface QueueGroup {
    *
    * @return Name of all queues in the group.
    */
-  Collection<String> getQueueNames();
+  Set<String> getQueueNames();
 
   /**
    * Get all elements being consumed from a specific queue.

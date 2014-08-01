@@ -72,7 +72,7 @@ module Loom
         begin
           log.info "adding/updating tenant id: #{params[:t_id]}"
           data = JSON.parse request.body.read
-          workers = data['workers'] || 3 # TODO: replace default with constant
+          workers = data['workers'] || 0
           log.debug "requesting workers: #{workers}"
           resources = data['resources'] || nil
           log.debug "requesting resources: #{resources}"

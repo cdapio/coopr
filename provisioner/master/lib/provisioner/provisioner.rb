@@ -29,6 +29,8 @@ require_relative 'tenantmanager'
 require_relative 'provisioner'
 require_relative 'cli'
 require_relative 'logging'
+require_relative 'config'
+require_relative 'constants'
 
 module Loom
   class Provisioner
@@ -36,11 +38,12 @@ module Loom
 
     attr_accessor :tenantmanagers, :provisioner_id, :server_uri
 
-    def initialize(options)
+    def initialize(options, config)
       @options = options
+      @config = config
       @tenantmanagers = {}
       @terminating_tenants = []
-      @server_uri = options[:uri]
+      @server_uri = config.get('provisioner.server.uri')
       pid = Process.pid
       host = Socket.gethostname.downcase
       @provisioner_id = "#{host}.#{pid}"
@@ -50,15 +53,24 @@ module Loom
     # invoked from bin/provisioner
     def self.run(options)
 
+      # read configuration
+      config = Config.new(options)
+      config.load
+
       # initialize logging
-      Logging.configure(options[:log_directory] ? "#{options[:log_directory]}/provisioner.log" : nil)
-      Logging.level = options[:log_level]
-      Logging.log.info "Loom api starting up"
+      Logging.configure(config.get(PROVISIONER_LOG_DIR) ? "#{config.get(PROVISIONER_LOG_DIR)}/provisioner.log" : nil)
+      Logging.level = config.get(PROVISIONER_LOG_LEVEL)
+      Logging.shift_age = config.get(PROVISIONER_LOG_ROTATION_SHIFT_AGE)
+      Logging.shift_size = config.get(PROVISIONER_LOG_ROTATION_SHIFT_SIZE)
+      Logging.log.debug "Provisioner starting up"
+      config.properties.each do |k, v|
+        Logging.log.debug "  #{k}: #{v}"
+      end
 
       # daemonize
-      daemonize if options[:daemonize]
+      daemonize if config.get(PROVISIONER_DAEMONIZE)
 
-      pg = Loom::Provisioner.new(options)
+      pg = Loom::Provisioner.new(options, config)
       if options[:register]
         pg.register_plugins
       else
@@ -95,8 +107,8 @@ module Loom
         # set reference to provisioner
         Api.set :provisioner, self
         # set bind settings
-        bind_ip = @options[:bind_ip] || '0.0.0.0'
-        bind_port = @options[:bind_port] || '55056'
+        bind_ip = @config.get(PROVISIONER_BIND_IP)
+        bind_port = @config.get(PROVISIONER_BIND_PORT)
         Api.set :bind, bind_ip
         Api.set :port, bind_port
         # let sinatra take over from here
@@ -173,15 +185,17 @@ module Loom
           sleep 10
         }
       }
+      # abort on any uncaught exception during registration, etc
+      @heartbeat_thread.abort_on_exception=true
     end
 
     def register_with_server
       uri = "#{@server_uri}/v1/provisioners/#{@provisioner_id}"
       data = {}
       data['id'] = @provisioner_id
-      data['capacityTotal'] = @options[:capacity] || '10'
-      data['host'] = local_ip
-      data['port'] = @options[:bind_port]
+      data['capacityTotal'] = @config.get(PROVISIONER_CAPACITY)
+      data['host'] = @config.get(PROVISIONER_REGISTER_IP) || local_ip
+      data['port'] = @config.get(PROVISIONER_BIND_PORT)
 
       log.info "Registering with server at #{uri}: #{data.to_json}"
 
@@ -235,8 +249,8 @@ module Loom
       # set provisionerId
       tenantmgr.provisioner_id = @provisioner_id
 
-      # set options
-      tenantmgr.options = @options
+      # set configuration
+      tenantmgr.config = @config
 
       if @tenantmanagers.key? id
         # edit tenant
@@ -289,15 +303,20 @@ module Loom
     # determine ip to register with server from routing info
     # http://coderrr.wordpress.com/2008/05/28/get-your-local-ip-address/
     def local_ip
-      server_ip = Resolv.getaddress( @server_uri.sub(%r{^https?://}, '').split(':').first ) rescue '127.0.0.1'
-      orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true # turn off reverse DNS resolution temporarily
-      UDPSocket.open do |s|
-        s.connect server_ip, 1
-        s.addr.last
+      begin
+        server_ip = Resolv.getaddress( @server_uri.sub(%r{^https?://}, '').split(':').first ) rescue '127.0.0.1'
+        orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true # turn off reverse DNS resolution temporarily
+        UDPSocket.open do |s|
+          s.connect server_ip, 1
+          s.addr.last
+        end
+      rescue => e
+        log.error "Unable to determine provisioner.register.ip, defaulting to 127.0.0.1. Please set it explicitly. "\
+          "Server may not be able to connect to this provisioner: #{e.inspect}"
+        '127.0.0.1'
+      ensure
+        Socket.do_not_reverse_lookup = orig
       end
-    ensure
-      Socket.do_not_reverse_lookup = orig
     end
-
   end
 end

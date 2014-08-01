@@ -31,7 +31,7 @@ import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.guice.CodecModules;
-import com.continuuity.utils.ImmutablePair;
+import com.continuuity.loom.common.utils.ImmutablePair;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -87,7 +87,7 @@ public class TaskConfigTest {
           "datanode",
           new ServiceConstraint(
             ImmutableSet.of("hardware2"),
-            ImmutableSet.of("imageA"), 1, 5, 1, new ImmutablePair<Integer, Integer>(1, 1))
+            ImmutableSet.of("imageA"), 1, 5, 1, ImmutablePair.of(1, 1))
         ),
         new LayoutConstraint(
           ImmutableSet.<Set<String>>of(

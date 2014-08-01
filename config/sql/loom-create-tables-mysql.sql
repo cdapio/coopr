@@ -135,3 +135,18 @@ CREATE TABLE IF NOT EXISTS provisionerWorkers (
     INDEX tenant_index (tenant_id),
     INDEX assigned_index (num_assigned)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS pluginMeta (
+    tenant_id VARCHAR(255),
+    plugin_type VARCHAR(16),
+    plugin_name VARCHAR(255),
+    resource_type VARCHAR(255),
+    name VARCHAR(255),
+    version INTEGER,
+    live BOOLEAN,
+    slated BOOLEAN,
+    deleted BOOLEAN,
+    create_time TIMESTAMP,
+    delete_time TIMESTAMP,
+    PRIMARY KEY (tenant_id, plugin_type, plugin_name, resource_type, name, version)
+) ENGINE = InnoDB;
