@@ -83,7 +83,7 @@ class ShellAutomator < Automator
       # scp task.json to remote
       log.debug "Copying json attributes to remote"
       begin
-        Net::SCP.upload!(ipaddress, inputmap['sshauth']['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
+        Net::SCP.upload!(ipaddress, sshauth['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
           @credentials)
       rescue Net::SSH::AuthenticationFailed
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -97,7 +97,7 @@ class ShellAutomator < Automator
 
     # execute the defined shell script
     begin
-      Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
+      Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 
                   "cd #{@remote_scripts_dir}; export PATH=$PATH:#{@remote_scripts_dir}; #{@wrapper_script} #{@remote_cache_dir}/#{@task['taskId']}.json #{shellscript} #{shellargs}",
                   "Running shell command #{shellscript} #{shellargs}")
@@ -120,7 +120,7 @@ class ShellAutomator < Automator
 
     # check to ensure scp is installed and attempt to install it
     begin
-      Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
+      Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
         log.debug "Checking for scp installation"
         begin
           ssh_exec!(ssh, "which scp", "Checking for scp")
@@ -142,8 +142,8 @@ class ShellAutomator < Automator
     end
 
     begin
-      Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, "mkdir -p #{@remote_cache_dir}", "Creating remote cache dir")
+      Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
       end
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -153,7 +153,7 @@ class ShellAutomator < Automator
 
     # scp tarball to target machine
     begin
-      Net::SCP.upload!(ipaddress, sshauth["user"], "#{@scripts_tar}", "#{@remote_cache_dir}/scripts.tar.gz", :ssh =>
+      Net::SCP.upload!(ipaddress, sshauth['user'], "#{@scripts_tar}", "#{@remote_cache_dir}/scripts.tar.gz", :ssh =>
           @credentials, :verbose => true)
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -161,7 +161,7 @@ class ShellAutomator < Automator
 
     # extract scripts tarball on remote machine
     begin
-      Net::SSH.start(ipaddress, inputmap['sshauth']['user'], @credentials) do |ssh|
+      Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
         ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/scripts.tar.gz -C #{@remote_cache_dir}", "Extract remote #{@remote_cache_dir}/scripts.tar.gz")
       end
     rescue Net::SSH::AuthenticationFailed
