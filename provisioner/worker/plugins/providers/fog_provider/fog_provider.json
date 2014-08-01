@@ -1,7 +1,7 @@
 {
   "name": "fog",
   "description": "Multi-cloud fog-based provider (Openstack, Rackspace, Joyent)",
-  "providertypes": [ "joyent", "openstack", "rackspace" ],
+  "providertypes": [ "aws", "joyent", "openstack", "rackspace" ],
   "aws" : {
     "name": "aws",
     "classname": "FogProviderAWS",
