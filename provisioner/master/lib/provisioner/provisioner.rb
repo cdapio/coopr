@@ -90,14 +90,18 @@ module Loom
       spawn_heartbeat_thread
       # spawn the signal handler thread
       spawn_signal_thread
+      # spawn the thread to sync data resources
+      spawn_resource_thread
 
       # wait for signal_handler to exit in response to signals
       @signal_thread.join
       # kill the other threads
       @heartbeat_thread.kill
       @sinatra_thread.kill
+      @resource_thread.kill
       @heartbeat_thread.join
       @sinatra_thread.join
+      @resource_thread.join
       log.info "provisioner gracefully shut down"
       exit
     end
@@ -189,6 +193,26 @@ module Loom
       @heartbeat_thread.abort_on_exception=true
     end
 
+    def spawn_resource_thread
+      @resource_thread = Thread.new {
+        log.info "starting resource thread"
+        loop {
+          @tenantmanagers.each do |id, tmgr|
+            puts "checking tmgr #{id} #{tmgr.id}: #{tmgr.resource_sync_needed?} #{tmgr.num_workers}"
+            if tmgr.resource_sync_needed? && tmgr.num_workers == 0
+              puts "syncing!!"
+              tmgr.sync
+              puts "done syncing!!"
+              tmgr.resume
+            end
+          end
+          sleep 1
+        }
+      }
+      # abort on any uncaught exception
+      @resource_thread.abort_on_exception=true
+    end
+
     def register_with_server
       uri = "#{@server_uri}/v1/provisioners/#{@provisioner_id}"
       data = {}
@@ -237,20 +261,16 @@ module Loom
     end
 
     # api method to add or edit tenant
-    def add_tenant(tenantmgr)
-      unless tenantmgr.instance_of?(TenantManager)
-        raise ArgumentError, "only instances of TenantManager can be added to provisioner", caller
+    def add_tenant(tenantspec)
+      unless tenantspec.instance_of?(TenantSpec)
+        raise ArgumentError, "only instances of TenantSpec can be added to provisioner", caller
       end
       # validate input
-      id = tenantmgr.id
+      id = tenantspec.id
       log.debug "Adding/Editing tenant: #{id}"
       fail "cannot add a TenantManager without an id: #{tenantmgr.inspect}" if id.nil?
 
-      # set provisionerId
-      tenantmgr.provisioner_id = @provisioner_id
-
-      # set configuration
-      tenantmgr.config = @config
+      tenantmgr = TenantManager.new(tenantspec, @config, @provisioner_id)
 
       if @tenantmanagers.key? id
         # edit tenant
@@ -259,7 +279,8 @@ module Loom
       else
         # new tenant
         log.debug "Adding new tenant: #{id}"
-        tenantmgr.spawn
+        #tenantmgr.spawn
+        tenantmgr.resource_sync_needed
         @tenantmanagers[id] = tenantmgr
       end
     end

@@ -34,7 +34,8 @@ data['workers'] = num_workers.to_i
 data['resources']['automatortype']['chef-solo']['cookbooks']['format'] = 'archive'
 data['resources']['automatortype']['chef-solo']['cookbooks']['active'] = [
       {"name" => "reactor", "version" => '2'},
-      {"name" => "hadoop", "version" => '52'}
+      {"name" => "reactor_wrapper", "version" => '3'},
+      {"name" => "hadoop", "version" => '53'}
     ]
 
 begin

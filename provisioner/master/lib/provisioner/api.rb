@@ -22,7 +22,7 @@ require 'sinatra/base'
 require 'json'
 require 'rest_client'
 
-require_relative 'tenantmanager'
+require_relative 'tenantspec'
 require_relative 'provisioner'
 require_relative 'cli'
 require_relative 'logging'
@@ -57,9 +57,8 @@ module Loom
           plugins = data['plugins'] || nil
 
           ts = TenantSpec.new(id, workers, resources, plugins)
-          tm = TenantManager.new(ts)
 
-          settings.provisioner.add_tenant(tm)
+          settings.provisioner.add_tenant(ts)
 
           data['status'] = 0
           body data.to_json
@@ -80,9 +79,8 @@ module Loom
           log.debug "requesting plugins: #{plugins}"
 
           ts = TenantSpec.new(params[:t_id], workers, resources, plugins)
-          tm = TenantManager.new(ts)
 
-          settings.provisioner.add_tenant(tm)
+          settings.provisioner.add_tenant(ts)
 
           data['status'] = 0
           body data.to_json

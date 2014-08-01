@@ -5,8 +5,8 @@
     <description>Routable IP for the server to call back to this provisioner</description>
   </property>
   <property>
-    <name>provisioner.log.dir</name>
-    <value>/tmp/log</value>
+    <name>provisioner.log.directory</name>
+<!--    <value>/tmp/log</value> -->
     <description>Provisioner log directory</description>
   </property>
   <property>

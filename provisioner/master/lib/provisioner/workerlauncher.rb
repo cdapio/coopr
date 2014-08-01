@@ -27,7 +27,7 @@ module Loom
     end
 
     def cmd
-      prod_cmd
+      test_cmd
     end
 
     def prod_cmd
