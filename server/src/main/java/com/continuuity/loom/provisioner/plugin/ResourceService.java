@@ -26,6 +26,7 @@ import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
 import com.continuuity.loom.store.provisioner.PluginMetaStoreView;
 import com.continuuity.loom.store.provisioner.PluginStore;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -47,14 +48,16 @@ public class ResourceService extends AbstractIdleService {
   private final PluginStore pluginStore;
   private final PluginMetaStoreService metaStoreService;
   private final LockService lockService;
+  private final Gson gson;
 
   @Inject
   private ResourceService(PluginStore pluginStore, PluginMetaStoreService metaStoreService,
-                          LockService lockService, Configuration conf) {
+                          LockService lockService, Configuration conf, Gson gson) {
     this.conf = conf;
     this.pluginStore = pluginStore;
     this.metaStoreService = metaStoreService;
     this.lockService = lockService;
+    this.gson = gson;
   }
 
   /**
@@ -104,7 +107,7 @@ public class ResourceService extends AbstractIdleService {
         public void finished(HttpResponder responder) {
           try {
             os.close();
-            responder.sendString(HttpResponseStatus.OK, "Upload Complete");
+            responder.sendString(HttpResponseStatus.OK, gson.toJson(resourceMeta));
             LOG.debug("finished uploading resource.");
           } catch (Exception e) {
             LOG.error("Error finishing upload of resource {} of type {} for account {}.",
@@ -121,6 +124,8 @@ public class ResourceService extends AbstractIdleService {
             os.close();
             // deletion flags the entry in the database as deleted
             metaStoreService.getView(account, resourceType).delete(name, version);
+            // dont need the file in the plugin store if there was an error so delete it
+            pluginStore.deleteResource(account, resourceType, name, version);
             responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
           } catch (IOException e) {
             LOG.error("Error uploading resource {} of type {} for account {}.", resourceMeta, resourceType, account, e);
