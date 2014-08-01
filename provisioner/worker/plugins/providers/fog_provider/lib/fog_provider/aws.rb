@@ -85,7 +85,12 @@ class FogProviderAWS < Provider
       end
       create_tags(hashed_tags, providerid) unless hashed_tags.empty?
 
-      bootstrap_ip = Resolv.getaddress(server.dns_name)
+      bootstrap_ip =
+        if server.public_ip_address
+          server.public_ip_address
+        else
+          Resolv.getaddress(server.dns_name)
+        end
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
       else
