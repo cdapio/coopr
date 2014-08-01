@@ -65,12 +65,10 @@ module Loom
     end
 
     def sync
-      puts "TM: calling RM sync"
       @resourcemanager.sync
     end
 
     def resume
-      puts "TM: resuming after RM sync"
       @status = 'ACTIVE'
       spawn
     end
@@ -130,9 +128,7 @@ module Loom
     # process new specifications for this tenant
     def update(new_tm)
       # first check for new resource requirements
-      if @spec.resourcespec == new_tm.spec.resourcespec
-        puts "******** Determined NO new resources needed"
-      else
+      unless @spec.resourcespec == new_tm.spec.resourcespec
         resource_sync_needed
         @spec = new_tm.spec
         return
@@ -169,7 +165,6 @@ module Loom
     def terminate_all_worker_processes
       workerpids = @workerpids.dup
       workerpids.each do |pid|
-        puts "KILLING PID: #{pid}"
         terminate_worker_process(pid)
       end
     end
