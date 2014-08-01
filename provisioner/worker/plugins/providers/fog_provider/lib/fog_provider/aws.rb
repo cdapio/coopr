@@ -25,9 +25,9 @@ class FogProviderAWS < Provider
   include FogProvider
 
   def create(inputmap)
-    flavor = inputmap['flavor']
-    image = inputmap['image']
-    hostname = inputmap['hostname']
+    @flavor = inputmap['flavor']
+    @image = inputmap['image']
+    @hostname = inputmap['hostname']
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
