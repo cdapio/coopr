@@ -107,6 +107,7 @@ class FogProviderAWS < Provider
       # Validate connectivity
       Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+        ssh_exec!(ssh, "hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
       end
       # Return 0
       @result['status'] = 0
