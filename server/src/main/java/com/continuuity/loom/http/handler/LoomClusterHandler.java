@@ -25,6 +25,8 @@ import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.layout.InvalidClusterException;
+import com.continuuity.loom.provisioner.CapacityException;
+import com.continuuity.loom.provisioner.QuotaException;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
@@ -321,6 +323,8 @@ public class LoomClusterHandler extends LoomAuthHandler {
     } catch (IOException e) {
       LOG.error("Exception while trying to create cluster.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error requesting cluster create operation.");
+    } catch (QuotaException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT, e.getMessage());
     } finally {
       try {
         reader.close();

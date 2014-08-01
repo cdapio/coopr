@@ -1,13 +1,17 @@
 package com.continuuity.loom.provisioner;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.collect.Lists;
@@ -37,17 +41,20 @@ public class TenantProvisionerService {
   private final long provisionerTimeoutSecs;
   private final TrackingQueue balanceQueue;
   private final ProvisionerRequestService provisionerRequestService;
+  private final ClusterStoreService clusterStoreService;
 
   @Inject
   private TenantProvisionerService(ProvisionerStore provisionerStore,
                                    final TenantStore tenantStore,
                                    ZKClient zkClient,
                                    @Named(Constants.Queue.WORKER_BALANCE) TrackingQueue balanceQueue,
+                                   ClusterStoreService clusterStoreService,
                                    ProvisionerRequestService provisionerRequestService,
                                    Configuration conf) {
     this.provisionerStore = provisionerStore;
     this.tenantStore = tenantStore;
     this.provisionerRequestService = provisionerRequestService;
+    this.clusterStoreService = clusterStoreService;
     // a single lock is used across all tenants and provisioners. This is so that a request modifies worker assignments
     // across multiple provisioners does not conflict with requests that modify worker capacity. For example, if a
     // tenant is added the same time a tenant is deleted, we don't want to be modifying the same provisioner at the
@@ -113,8 +120,10 @@ public class TenantProvisionerService {
    * @param tenantSpecification Tenant to write
    * @throws IOException if there was an exception persisting the tenant
    * @throws CapacityException if there is not enough capacity to support all tenant workers
+   * @throws QuotaException if a tenant quota would be violated by the change
    */
-  public void writeTenantSpecification(TenantSpecification tenantSpecification) throws IOException, CapacityException {
+  public void writeTenantSpecification(TenantSpecification tenantSpecification)
+    throws IOException, CapacityException, QuotaException {
     lock.acquire();
     try {
       Tenant prevTenant = tenantStore.getTenantByName(tenantSpecification.getName());
@@ -128,11 +137,65 @@ public class TenantProvisionerService {
         id = prevTenant.getId();
         checkCapacity(tenantSpecification.getWorkers() - prevTenant.getSpecification().getWorkers());
       }
+      Tenant updatedTenant = new Tenant(id, tenantSpecification);
+      // check if changing the tenant would cause the cluster or node quotas to be exceeded.
+      if (!satisfiesTenantQuotas(updatedTenant, 0, 0)) {
+        throw new QuotaException("Writing tenant would cause cluster or node quotas to be violated.");
+      }
+
       balanceQueue.add(new Element(id));
-      tenantStore.writeTenant(new Tenant(id, tenantSpecification));
+      tenantStore.writeTenant(updatedTenant);
     } finally {
       lock.release();
     }
+  }
+
+  /**
+   * Verify that tenant cluster and node quotas would not be exceeded if the given number of additional clusters and
+   * nodes would be added.
+   *
+   * @param tenantId Id of the tenant to verify quotas for
+   * @param additionalClusters Number of clusters that would be added
+   * @param additionalNodes Number of nodes that would be added
+   * @returns True if the tenantQuotas would be satisfied, false if they would be exceeded.
+   */
+  public boolean satisfiesTenantQuotas(String tenantId, int additionalClusters,
+                                       int additionalNodes) throws IOException {
+    Tenant tenant = tenantStore.getTenantByID(tenantId);
+    // if there is no tenant there are no quotas to voilate
+    if (tenant == null) {
+      return true;
+    }
+    return satisfiesTenantQuotas(tenant, additionalClusters, additionalNodes);
+  }
+
+  /**
+   * Verify that tenant cluster and node quotas would not be exceeded if the given number of additional clusters and
+   * nodes would be added.
+   *
+   * @param tenant Tenant to verify quotas for
+   * @param additionalClusters Number of clusters that would be added
+   * @param additionalNodes Number of nodes that would be added
+   * @returns True if the tenantQuotas would be satisfied, false if they would be exceeded.
+   */
+  public boolean satisfiesTenantQuotas(Tenant tenant, int additionalClusters, int additionalNodes) throws IOException {
+    ClusterStoreView view = clusterStoreService.getView(new Account(Constants.ADMIN_USER, tenant.getId()));
+    List<Cluster> nonTerminatedClusters = view.getNonTerminatedClusters();
+
+    int numClusters = additionalClusters + nonTerminatedClusters.size();
+    if (numClusters > tenant.getSpecification().getMaxClusters()) {
+      return false;
+    }
+
+    int numNodes = additionalNodes;
+    for (Cluster cluster : nonTerminatedClusters) {
+      numNodes += cluster.getNodes().size();
+    }
+    if (numNodes > tenant.getSpecification().getMaxNodes()) {
+      return false;
+    }
+
+    return true;
   }
 
   /**

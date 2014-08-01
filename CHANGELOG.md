@@ -3,6 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- Settable max for clusters and nodes in a tenant ( Issues: #302 )
 - Queue Metrics ( Issues: #301 )
 - Provisioner Multi Tenancy ( Issues: #290, #296 )
 - Multi Tenancy ( Issues: #239, #253, #277, #284, #292 )

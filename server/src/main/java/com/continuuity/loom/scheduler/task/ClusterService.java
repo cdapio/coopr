@@ -17,6 +17,7 @@ package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ClusterTemplate;
+import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
@@ -30,12 +31,15 @@ import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.InvalidClusterException;
 import com.continuuity.loom.layout.Solver;
 import com.continuuity.loom.management.LoomStats;
+import com.continuuity.loom.provisioner.QuotaException;
+import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.entity.EntityStoreService;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
@@ -59,6 +63,7 @@ public class ClusterService {
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
   private final EntityStoreService entityStoreService;
+  private final TenantProvisionerService tenantProvisionerService;
   private final ZKClient zkClient;
   private final LoomStats loomStats;
   private final Solver solver;
@@ -71,6 +76,7 @@ public class ClusterService {
   @Inject
   public ClusterService(ClusterStoreService clusterStoreService,
                         EntityStoreService entityStoreService,
+                        TenantProvisionerService tenantProvisionerService,
                         @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues,
                         @Named(Constants.Queue.SOLVER) QueueGroup solverQueues,
                         @Named(Constants.Queue.JOB) QueueGroup jobQueues,
@@ -82,6 +88,7 @@ public class ClusterService {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
+    this.tenantProvisionerService = tenantProvisionerService;
     this.zkClient = ZKClients.namespace(zkClient, Constants.CLUSTER_LOCK_NAMESPACE);
     this.loomStats = loomStats;
     this.solver = solver;
@@ -101,34 +108,48 @@ public class ClusterService {
    * @return Id of the cluster that will be created.
    * @throws IOException if there was some error writing to stores.
    * @throws IllegalAccessException if the operation is not allowed for the given account.
+   * @throws QuotaException if the operation would cause the tenant quotas to be exceeded.
    */
   public String requestClusterCreate(ClusterCreateRequest clusterCreateRequest, Account account)
-    throws IOException, IllegalAccessException {
-    String name = clusterCreateRequest.getName();
-    int numMachines = clusterCreateRequest.getNumMachines();
-    String templateName = clusterCreateRequest.getClusterTemplate();
-    LOG.debug(String.format("Received a request to create cluster %s with %d machines from template %s", name,
-                            numMachines, templateName));
-    String clusterId = idService.getNewClusterId();
-    Cluster cluster = new Cluster(clusterId, account, name, System.currentTimeMillis(),
-                                  clusterCreateRequest.getDescription(), null, null,
-                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(),
-                                  clusterCreateRequest.getConfig());
-    JobId clusterJobId = idService.getNewJobId(clusterId);
-    ClusterJob clusterJob = new ClusterJob(clusterJobId, ClusterAction.SOLVE_LAYOUT);
-    cluster.setLatestJobId(clusterJob.getJobId());
+    throws IOException, IllegalAccessException, QuotaException {
+    // the create lock is shared across an entire tenant and is needed so that concurrent create requests
+    // cannot cause the quota to be exceeded if they both read the old value and both add clusters and nodes
+    ZKInterProcessReentrantLock lock = getCreateLock(account);
+    lock.acquire();
+    try {
+      if (!tenantProvisionerService.satisfiesTenantQuotas(
+        account.getTenantId(), 1, clusterCreateRequest.getNumMachines())) {
+        throw new QuotaException("Creating the cluster would cause cluster or node quotas to be violated.");
+      }
 
-    LOG.trace("Writing cluster {} to store", cluster);
-    clusterStoreService.getView(account).writeCluster(cluster);
-    clusterStore.writeClusterJob(clusterJob);
+      String name = clusterCreateRequest.getName();
+      int numMachines = clusterCreateRequest.getNumMachines();
+      String templateName = clusterCreateRequest.getClusterTemplate();
+      LOG.debug(String.format("Received a request to create cluster %s with %d machines from template %s", name,
+                              numMachines, templateName));
+      String clusterId = idService.getNewClusterId();
+      Cluster cluster = new Cluster(clusterId, account, name, System.currentTimeMillis(),
+                                    clusterCreateRequest.getDescription(), null, null,
+                                    ImmutableSet.<String>of(), ImmutableSet.<String>of(),
+                                    clusterCreateRequest.getConfig());
+      JobId clusterJobId = idService.getNewJobId(clusterId);
+      ClusterJob clusterJob = new ClusterJob(clusterJobId, ClusterAction.SOLVE_LAYOUT);
+      cluster.setLatestJobId(clusterJob.getJobId());
 
-    LOG.debug("adding create cluster element to solverQueue");
-    SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER,
-                                                    gson.toJson(clusterCreateRequest));
-    solverQueues.add(account.getTenantId(), new Element(cluster.getId(), gson.toJson(solverRequest)));
+      LOG.trace("Writing cluster {} to store", cluster);
+      clusterStoreService.getView(account).writeCluster(cluster);
+      clusterStore.writeClusterJob(clusterJob);
 
-    loomStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
-    return cluster.getId();
+      LOG.debug("adding create cluster element to solverQueue");
+      SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER,
+                                                      gson.toJson(clusterCreateRequest));
+      solverQueues.add(account.getTenantId(), new Element(cluster.getId(), gson.toJson(solverRequest)));
+
+      loomStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
+      return cluster.getId();
+    } finally {
+      lock.release();
+    }
   }
 
   /**
@@ -141,7 +162,7 @@ public class ClusterService {
    */
   public void requestClusterDelete(String clusterId, Account account)
     throws IOException, IllegalAccessException {
-    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    ZKInterProcessReentrantLock lock = getClusterLock(account, clusterId);
     lock.acquire();
     try {
       ClusterStoreView view = clusterStoreService.getView(account);
@@ -178,7 +199,7 @@ public class ClusterService {
    */
   public void requestClusterReconfigure(String clusterId, Account account, boolean restartServices, JsonObject config)
     throws IOException, MissingClusterException, IllegalAccessException {
-    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    ZKInterProcessReentrantLock lock = getClusterLock(account, clusterId);
     lock.acquire();
     try {
       ClusterStoreView view = clusterStoreService.getView(account);
@@ -228,7 +249,7 @@ public class ClusterService {
     throws IOException, MissingClusterException, IllegalAccessException {
     Preconditions.checkArgument(ClusterAction.SERVICE_RUNTIME_ACTIONS.contains(action),
                                 action + " is not a service runtime action.");
-    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    ZKInterProcessReentrantLock lock = getClusterLock(account, clusterId);
     lock.acquire();
     try {
       ClusterStoreView view = clusterStoreService.getView(account);
@@ -286,7 +307,7 @@ public class ClusterService {
       throw new IllegalStateException("Cannot be aborted at this time.");
     }
 
-    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    ZKInterProcessReentrantLock lock = getClusterLock(account, clusterId);
     lock.acquire();
     try {
       cluster = view.getCluster(clusterId);
@@ -330,7 +351,7 @@ public class ClusterService {
    */
   public void requestAddServices(String clusterId, Account account, AddServicesRequest addRequest)
     throws IOException, MissingClusterException, IllegalAccessException {
-    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    ZKInterProcessReentrantLock lock = getClusterLock(account, clusterId);
     lock.acquire();
     try {
       ClusterStoreView view = clusterStoreService.getView(account);
@@ -377,7 +398,7 @@ public class ClusterService {
    */
   public void syncClusterToCurrentTemplate(String clusterId, Account account)
     throws IOException, MissingEntityException, InvalidClusterException, IllegalAccessException {
-    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    ZKInterProcessReentrantLock lock = getClusterLock(account, clusterId);
     lock.acquire();
     try {
       ClusterStoreView view = clusterStoreService.getView(account);
@@ -428,7 +449,7 @@ public class ClusterService {
    */
   public void changeExpireTime(String clusterId, Account account, long expireTime) throws IOException,
     IllegalAccessException {
-    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + clusterId);
+    ZKInterProcessReentrantLock lock = getClusterLock(account, clusterId);
     lock.acquire();
     try {
       Cluster cluster = clusterStoreService.getView(account).getCluster(clusterId);
@@ -463,5 +484,13 @@ public class ClusterService {
     } finally {
       lock.release();
     }
+  }
+
+  private ZKInterProcessReentrantLock getCreateLock(Account account) {
+    return new ZKInterProcessReentrantLock(zkClient, Joiner.on('/').join("/tenants", account.getTenantId(), "create"));
+  }
+
+  private ZKInterProcessReentrantLock getClusterLock(Account account, String clusterId) {
+    return new ZKInterProcessReentrantLock(zkClient, Joiner.on('/').join("/tenants", account.getTenantId(), clusterId));
   }
 }
