@@ -27,13 +27,12 @@ module Loom
 
     attr_accessor :resourcespec, :datadir, :workdir, :tenant, :active, :config
 
-    def initialize(resourcespec, config)
+    def initialize(resourcespec, tenant, config)
       @resourcespec = resourcespec
       @config = config
-      #puts `pwd`
-      @datadir = 'tmp'
-      @workdir = Pathname.new('../../../var/work')
-      @tenant = 'tenant1'
+      @datadir = config.get(PROVISIONER_DATA_DIR)
+      @workdir = Pathname.new(config.get(PROVISIONER_WORK_DIR))
+      @tenant = tenant
       @active = {}
     end
 

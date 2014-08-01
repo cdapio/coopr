@@ -37,7 +37,7 @@ module Loom
       @provisioner_id = provisioner_id
       @workerpids = []
       @terminating_workers = []
-      @resourcemanager = ResourceManager.new(spec.resourcespec, config)
+      @resourcemanager = ResourceManager.new(spec.resourcespec, spec.id, config)
 
     end 
 
