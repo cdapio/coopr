@@ -24,7 +24,7 @@ require_relative 'workerlauncher'
 module Loom
   class TenantManager
     include Logging
-    attr_accessor :spec, :provisioner_id, :options
+    attr_accessor :spec, :provisioner_id, :config
 
     def initialize(spec)
       unless spec.instance_of?(TenantSpec)
@@ -85,7 +85,7 @@ module Loom
 
     # spawn a new child worker process
     def spawn_worker_process
-      worker_launcher = WorkerLauncher.new(@options)
+      worker_launcher = WorkerLauncher.new(@config)
       worker_launcher.provisioner = @provisioner_id
       worker_launcher.tenant = id
       worker_launcher.name = "worker-" + id + "-"  + (@workerpids.size + 1).to_s

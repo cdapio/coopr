@@ -1,0 +1,18 @@
+<configuration>
+  <property>
+    <name>provisioner.register.ip</name>
+    <value>127.0.0.1</value>
+    <description>Routable IP for the server to call back to this provisioner</description>
+  </property>
+  <property>
+    <name>provisioner.log.dir</name>
+    <value>/tmp/log</value>
+    <description>Provisioner log directory</description>
+  </property>
+  <property>
+    <name>provisioner.log.level</name>
+    <value>debug</value>
+    <description>log level, one of debug, info, warn, error, fatal</description>
+  </property>
+</configuration>
+

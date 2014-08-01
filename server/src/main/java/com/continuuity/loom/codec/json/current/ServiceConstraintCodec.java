@@ -17,7 +17,7 @@ package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.codec.json.AbstractCodec;
-import com.continuuity.utils.ImmutablePair;
+import com.continuuity.loom.common.utils.ImmutablePair;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -78,7 +78,7 @@ public class ServiceConstraintCodec extends AbstractCodec<ServiceConstraint> {
       return null;
     }
     int index = ratioStr.indexOf(":");
-    return new ImmutablePair<Integer, Integer>(
+    return ImmutablePair.of(
       Integer.valueOf(ratioStr.substring(0, index)), Integer.valueOf(ratioStr.substring(index + 1))
     );
   }

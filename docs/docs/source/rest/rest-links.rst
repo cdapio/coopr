@@ -23,4 +23,5 @@
 :doc:`Cluster Template </rest/templates>` |
 :doc:`Importing & Exporting </rest/entities>` |
 :doc:`Clusters </rest/clusters>` |
+:doc:`Plugins </rest/plugins>` |
 :doc:`Metrics </rest/metrics>` 

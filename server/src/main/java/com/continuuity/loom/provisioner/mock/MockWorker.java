@@ -1,6 +1,7 @@
 package com.continuuity.loom.provisioner.mock;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -13,7 +14,6 @@ import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -165,15 +165,9 @@ public class MockWorker extends AbstractScheduledService {
   }
 
   private String getResponseString(CloseableHttpResponse response) throws IOException {
-    BufferedReader reader =
-      new BufferedReader(new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8));
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     try {
-      String line;
-      StringBuilder output = new StringBuilder();
-      while ((line = reader.readLine()) != null) {
-        output.append(line);
-      }
-      return output.toString();
+      return CharStreams.toString(reader);
     } finally {
       reader.close();
     }
