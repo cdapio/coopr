@@ -48,7 +48,7 @@
               "us-west-2"
             ],
             "default": "us-east-1",
-            "override": true,
+            "override": false,
             "tip": "AWS Region"
           }
         },
