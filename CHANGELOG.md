@@ -18,6 +18,7 @@ Unreleased
 - Updated provider plugin using fog ( Issues: #288 #310 )
 - Queue Metrics ( Issues: #301 )
 - Settable max for clusters and nodes in a tenant ( Issues: #302 )
+- Allow non-root users for SSH ( Issues: #314 #320 )
 - PHP module support ( Issues: #317 )
 
 v0.9.7 (May 27, 2014)
