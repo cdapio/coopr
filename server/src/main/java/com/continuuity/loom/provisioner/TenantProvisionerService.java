@@ -8,6 +8,7 @@ import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
@@ -19,7 +20,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.apache.twill.zookeeper.ZKClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class TenantProvisionerService {
   @Inject
   private TenantProvisionerService(ProvisionerStore provisionerStore,
                                    final TenantStore tenantStore,
-                                   ZKClient zkClient,
+                                   LockService lockService,
                                    @Named(Constants.Queue.WORKER_BALANCE) TrackingQueue balanceQueue,
                                    ClusterStoreService clusterStoreService,
                                    ProvisionerRequestService provisionerRequestService,
@@ -60,7 +60,7 @@ public class TenantProvisionerService {
     // tenant is added the same time a tenant is deleted, we don't want to be modifying the same provisioner at the
     // same time and cause conflicts. Similarly, if we're moving workers from one provisioner to another at the same
     // time as we're adding a tenant, we don't want to both add workers to the same provisioner at the same time.
-    this.lock = new ZKInterProcessReentrantLock(zkClient, Constants.TENANT_NAMESPACE);
+    this.lock = lockService.getTenantProvisionerLock();
     this.provisionerTimeoutSecs = conf.getLong(Constants.PROVISIONER_TIMEOUT_SECS);
     this.balanceQueue = balanceQueue;
   }

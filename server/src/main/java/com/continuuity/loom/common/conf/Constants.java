@@ -119,12 +119,17 @@ public class Constants {
     public static final String WORKER_BALANCE = "worker.balance.queue";
   }
 
+  /**
+   * Lock related constants.
+   */
+  public static final class Lock {
+    public static final String CLUSTER_NAMESPACE = "/locks/clusters";
+    public static final String PLUGIN_NAMESPACE = "/locks/plugins";
+    public static final String TENANT_NAMESPACE = "/locks/tenants";
+    public static final String TASK_NAMESPACE = "/locks/tasks";
+  }
+
   public static final int PLUGIN_RESOURCE_CHUNK_SIZE = 1024 * 64;
-  public static final String TASK_NAMESPACE = "/tasks";
-  public static final String TASK_LOCK_NAMESPACE = TASK_NAMESPACE + "/lock";
-  public static final String CLUSTER_LOCK_NAMESPACE = "/clusters/lock";
-  public static final String PLUGIN_LOCK_NAMESPACE = "/plugins/lock";
-  public static final String TENANT_NAMESPACE = "/tenants";
   public static final String USER_HEADER = "X-Loom-UserID";
   public static final String API_KEY_HEADER = "X-Loom-ApiKey";
   public static final String TENANT_HEADER = "X-Loom-TenantID";
