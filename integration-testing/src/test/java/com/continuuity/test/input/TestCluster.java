@@ -23,14 +23,14 @@ import com.google.common.base.Objects;
 public class TestCluster {
   private final String name;
   private final String clusterId;
-  private final String date;
+  private final long timestamp;
   private final String template;
   private final int nodeNumber;
 
-  public TestCluster(String name, String clusterId, String date, String template, int nodeNumber) {
+  public TestCluster(String name, String clusterId, long timestamp, String template, int nodeNumber) {
     this.name = name;
     this.clusterId = clusterId;
-    this.date = date;
+    this.timestamp = timestamp;
     this.template = template;
     this.nodeNumber = nodeNumber;
   }
@@ -44,14 +44,14 @@ public class TestCluster {
 
     return Objects.equal(name, other.name) &&
       Objects.equal(clusterId, other.clusterId) &&
-      Objects.equal(date, other.date) &&
+      Objects.equal(timestamp, other.timestamp) &&
       Objects.equal(template, other.template) &&
       Objects.equal(nodeNumber, other.nodeNumber);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, clusterId, date, template, nodeNumber);
+    return Objects.hashCode(name, clusterId, timestamp, template, nodeNumber);
   }
 
   @Override
@@ -59,7 +59,7 @@ public class TestCluster {
     return Objects.toStringHelper(this)
       .add("name", name)
       .add("clusterId", clusterId)
-      .add("date", date)
+      .add("timestamp", timestamp)
       .add("template", template)
       .add("nodeNumber", nodeNumber)
       .toString();

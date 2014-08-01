@@ -28,6 +28,7 @@ public class LoomProvisionerHandlerTest extends LoomServiceTestBase {
 
   @Before
   public void setupProvisionerHandlerTest() throws SQLException {
+    // base tests write a provisioner, need to clear it.
     injector.getInstance(SQLProvisionerStore.class).clearData();
   }
 

@@ -47,7 +47,8 @@ public final class IdService extends AbstractIdleService {
   public enum Type {
     JOB(IDS_BASEPATH + "/jobs"),
     TASK(IDS_BASEPATH + "/tasks"),
-    CLUSTER(IDS_BASEPATH + "/clusters");
+    CLUSTER(IDS_BASEPATH + "/clusters"),
+    PLUGIN_RESOURCE(IDS_BASEPATH + "/plugins");
     private final String path;
 
     private Type(String path) {

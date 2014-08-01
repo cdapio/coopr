@@ -67,8 +67,6 @@ Required Parameters
 HTTP Responses
 ^^^^^^^^^^^^^^
 
-The response is a JSON Object with ``id`` as a key and value containing the id of the newly created tenant.
-
 .. list-table:: 
    :widths: 15 10 
    :header-rows: 1
@@ -79,6 +77,8 @@ The response is a JSON Object with ``id`` as a key and value containing the id o
      - Successfully created
    * - 400 (BAD_REQUEST)
      - Bad request, server is unable to process the request because it is ill-formed. 
+   * - 409 (CONFLICT)
+     - A tenant with the requested name already exists.
 
 Example
 ^^^^^^^^
@@ -90,7 +90,6 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"my-company", "workers":10}' 
         http://<loom-server>:<superadmin-port>/<version>/tenants
- $ { "id": "f78dae92-a27b-4e3b-8c6a-cfc19f844259" }
 
 .. _tenants-retrieve:
 
@@ -107,8 +106,8 @@ This resource request represents an individual tenant for viewing.
 HTTP Responses
 ^^^^^^^^^^^^^^
 
-The response is a JSON Object representing the tenant. It contains ``id``,
-``name``, ``workers``, and any additional tenant specific settings.
+The response is a JSON Object representing the tenant. It contains 
+``name``, ``workers``, ``maxClusters``, and ``maxNodes``.
 
 .. list-table::
    :widths: 15 10
@@ -130,7 +129,7 @@ Example
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
- $ { "id":"f78dae92-a27b-4e3b-8c6a-cfc19f844259", "name":"my-company", "workers":10 }
+ $ { "name":"my-company", "workers":10, "maxClusters":20, "maxNodes":100 }
 
 
 .. _tenants-delete:
@@ -167,7 +166,7 @@ Example
         -H 'X-Loom-UserID:superadmin' 
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
+        http://<loom-server>:<superadmin-port>/<version>/tenants/my-company
 
 .. _tenants-modify:
 
@@ -229,14 +228,14 @@ Example
         -H 'X-Loom-UserID:superadmin' 
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
-        -d '{ "id":"f78dae92-a27b-4e3b-8c6a-cfc19f844259", "name":"my-company", "workers":20 }'  
-        http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
+        -d '{ "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }'  
+        http://<loom-server>:<superadmin-port>/<version>/tenants/my-company
  $ curl -X GET 
         -H 'X-Loom-UserID:superadmin' 
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
- $ { "id":"f78dae92-a27b-4e3b-8c6a-cfc19f844259", "name":"my-company", "workers":20 }
+        http://<loom-server>:<superadmin-port>/<version>/tenants/my-company
+ $ { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }
 
 .. _tenants-all-list:
 
@@ -275,6 +274,6 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<superadmin-port>/<version>/tenants
  $ [
-     { "id":"f78dae92-a27b-4e3b-8c6a-cfc19f844259", "name":"my-company", "workers":10 },
-     { "id":"e94ndl34-b38d-3n7a-0c1e-dpl84q438920", "name":"companyX", "workers":100 }
+     { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 },
+     { "name":"companyX", "workers":100, "maxClusters":100, "maxNodes":1000 }
    ]

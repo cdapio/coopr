@@ -30,7 +30,7 @@ module Loom
     end
 
     def get(val)
-      val = 'provisioner.' + val.downcase unless val.downcase =~ /^provisioner\./i
+      val = val.downcase
       # handle boolean
       if @properties[val] =~ /^false$/i
         false
@@ -74,8 +74,6 @@ module Loom
 
             # ignore anything without a name and value
             next if p_name.nil? || p_value.nil?
-            # only consider 'provisioner.*' entries
-            next unless p_name.downcase =~ /^provisioner\./i
             @properties[p_name.downcase] = p_value
             @descriptions[p_name.downcase] = p_description
 
@@ -91,7 +89,7 @@ module Loom
     end
 
     def validate
-      # %w(server.uri register.ip data.dir work.dir default.capacity )
+      # %w(server.uri register.ip data.dir work.dir capacity )
     end
 
   end

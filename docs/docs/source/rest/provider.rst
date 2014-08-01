@@ -84,6 +84,7 @@ Example
 
  $ curl -X POST 
         -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"example", "providertype":"openstack", "description": "Example"}' 
         http://<loom-server>:<loom-port>/<version>/loom/providers
@@ -119,6 +120,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/providers/example
  $ {"name":"example","description":"Example","providertype":"openstack","provisioner":{}}
@@ -156,6 +158,7 @@ Example
 
  $ curl -X DELETE
         -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/providers/example
 
@@ -213,13 +216,12 @@ Example
 
  $ curl -X PUT
         -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name": "example", "description": "Updated example", "providertype":"openstack"}'  
         http://<loom-server>:<loom-port>/<version>/loom/providers/example
  $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/providers/example
- $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/providers/example
  $ {"name":"example","description":"Updated example","providertype":"openstack","provisioner":{}}
@@ -257,6 +259,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/providers
 

@@ -16,6 +16,7 @@
 package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -33,12 +34,9 @@ public class TenantCodec implements JsonDeserializer<Tenant> {
   public Tenant deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    String name = context.deserialize(jsonObj.get("name"), String.class);
     String id = context.deserialize(jsonObj.get("id"), String.class);
-    Integer workers = context.deserialize(jsonObj.get("workers"), Integer.class);
-    Integer maxClusters = context.deserialize(jsonObj.get("maxClusters"), Integer.class);
-    Integer maxNodes = context.deserialize(jsonObj.get("maxNodes"), Integer.class);
+    TenantSpecification specification = context.deserialize(jsonObj.get("specification"), TenantSpecification.class);
 
-    return new Tenant(name, id, workers, maxClusters, maxNodes);
+    return new Tenant(id, specification);
   }
 }

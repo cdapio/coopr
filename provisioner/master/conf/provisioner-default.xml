@@ -36,7 +36,7 @@
     <description>Provisioner working directory</description>
   </property>
   <property>
-    <name>provisioner.default.capacity</name>
+    <name>provisioner.capacity</name>
     <value>10</value>
     <description>Max number of running workers for this provisioner</description>
   </property>
@@ -46,7 +46,7 @@
     <description>interval in seconds to send heartbeat to server</description>
   </property>
   <property>
-    <name>provisioner.log.directory</name>
+    <name>provisioner.log.dir</name>
     <!-- default: no value, logs to STDOUT -->
     <value></value>
     <description>Provisioner log directory</description>

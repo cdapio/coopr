@@ -263,6 +263,7 @@ Example
 
  $ curl -X POST 
         -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{
                 "name": "hadoop.example",
@@ -383,6 +384,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clustertemplates/hadoop.example
  $ {
@@ -504,6 +506,7 @@ Example
 
  $ curl -X DELETE
         -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clustertemplates/hadoop.example
 
@@ -565,6 +568,7 @@ Example
 
  $ curl -X PUT 
         -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d 
   '{
@@ -681,6 +685,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clustertemplates
 

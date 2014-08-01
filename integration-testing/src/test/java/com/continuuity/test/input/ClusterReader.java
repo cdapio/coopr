@@ -31,7 +31,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +40,6 @@ import java.util.Set;
 public class ClusterReader {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterReader.class);
 
-  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   private static final String URI = "/v1/loom/clusters/00000028";
   private static final List<String> KEYS = ImmutableList.of("00000139", "00000138", "00000135");
   private static final String CLUSTER_ID = "00000139";
@@ -93,12 +91,11 @@ public class ClusterReader {
 
   private TestCluster parseCluster(JsonObject json, String status) {
     if (status.equalsIgnoreCase(json.get("status").getAsString())) {
-      // Convert GMT to PST
-      long tsPST = Long.parseLong(json.get("createTime").getAsString()) / 1000 + 8 * 60 * 60;
-      String expectedDate = DATE_FORMAT.format(new Date(tsPST * 1000));
+      // Lop off milliseconds.
+      long ts = 1000 * (json.get("createTime").getAsLong() / 1000);
 
       return new TestCluster(json.get("name").getAsString(), json.get("id").getAsString(),
-                                       expectedDate, json.get("clusterTemplate").getAsString(),
+                                       ts, json.get("clusterTemplate").getAsString(),
                                        Integer.parseInt(json.get("numNodes").getAsString()));
     }
     return null;

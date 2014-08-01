@@ -25,7 +25,7 @@ module Loom
       options = {}
       OptionParser.new do |opts|
         opts.banner = 'Usage: '
-        opts.on('-C', '--config-file FILE', 'Site-specific config file to use') do |c|
+        opts.on('-c', '--config-file FILE', 'Site-specific config file to use') do |c|
           options[:configfile] = c
         end
         opts.on('-r', '--register', 'Register installed plugins with the server.') do
