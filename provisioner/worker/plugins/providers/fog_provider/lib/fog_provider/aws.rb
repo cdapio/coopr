@@ -241,7 +241,7 @@ class FogProviderAWS < Provider
     }
     server_def[:subnet_id] = @subnet_id if vpc_mode?
     server_def[:tenancy] = 'dedicated' if vpc_mode? && @dedicated_instance
-    server_def[:associate_public_ip] = @associate_public_ip if vpc_mode? && @associate_public_ip
+    server_def[:associate_public_ip] = !!@associate_public_ip if vpc_mode? && @associate_public_ip
     server_def
   end
 
