@@ -97,6 +97,7 @@ class FogProviderAWS < Provider
         log.debug "Bootstrap IP address #{bootstrap_ip}"
       end
 
+      sleep 30
       wait_for_sshd(bootstrap_ip, 22)
       log.debug "Server #{server.id} sshd is up"
 
