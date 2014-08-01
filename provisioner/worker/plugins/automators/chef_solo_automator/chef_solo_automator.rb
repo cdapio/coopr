@@ -109,6 +109,9 @@ class ChefSoloAutomator < Automator
     hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
 
+    # do we need sudo bash?
+    sudo = 'sudo' unless sshauth['user'] == 'root'
+
     set_credentials(sshauth)
 
     %w[cookbooks data_bags roles].each do |chef_primitive|
@@ -123,21 +126,23 @@ class ChefSoloAutomator < Automator
         ssh_exec!(ssh, "hostname", "Validating connectivity to #{hostname}")
 
         # determine if curl is installed, else default to wget
-        chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | bash"
+        chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | #{sudo} bash"
         begin
           ssh_exec!(ssh, "which curl", "Checking for curl")
         rescue CommandExecutionError
           log.debug "curl not found, defaulting to wget"
-          chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | bash"
+          chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | #{sudo} bash"
         end
 
         ssh_exec!(ssh, chef_install_cmd, "Installing chef")
 
         ssh_exec!(ssh, "type chef-solo", "Chef install validation")
 
-        ssh_exec!(ssh, "mkdir -p #{@remote_cache_dir}", "Create remote cache dir")
+        ssh_exec!(ssh, "#{sudo} mkdir -p #{@remote_cache_dir}", "Create remote cache dir")
+        ssh_exec!(ssh, "#{sudo} mkdir -p #{@remote_chef_dir}", "Create remote Chef dir")
 
-        ssh_exec!(ssh, "mkdir -p #{@remote_chef_dir}", "Create remote Chef dir")
+        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@remote_cache_dir}", "Changing cache dir owner to #{sshauth['user']}")
+        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@remote_chef_dir}", "Changing Chef dir owner to #{sshauth['user']}")
       end
     rescue Net::SSH::AuthenticationFailed => e
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -152,11 +157,11 @@ class ChefSoloAutomator < Automator
           ssh_exec!(ssh, "which scp")
         rescue CommandExecutionError
           log.warn "scp not found, attempting to install openssh-client"
-          scp_install_cmd = "yum -qy install openssh-clients"
+          scp_install_cmd = "#{sudo} yum -qy install openssh-clients"
           begin
             ssh_exec!(ssh, "which yum")
           rescue CommandExecutionError
-            scp_install_cmd = "apt-get -qy install openssh-client"
+            scp_install_cmd = "#{sudo} apt-get -qy install openssh-client"
           end
           ssh_exec!(ssh, scp_install_cmd, "installing openssh-client via #{scp_install_cmd}")
         else
@@ -213,8 +218,10 @@ class ChefSoloAutomator < Automator
     # merge together json_attributes, cluster config, loom node data
     jsondata = generate_chef_json_attributes(json_attributes)
 
-    set_credentials(sshauth)
+    # do we need sudo bash?
+    sudo = 'sudo' unless sshauth['user'] == 'root'
 
+    set_credentials(sshauth)
 
     begin
       # write json attributes to a local tmp file
@@ -240,7 +247,7 @@ class ChefSoloAutomator < Automator
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
 
-        ssh_exec!(ssh, "chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'", "Running Chef-solo")
+        ssh_exec!(ssh, "#{sudo} chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'", "Running Chef-solo")
       end
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
