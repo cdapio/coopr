@@ -17,12 +17,13 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.BaseTest;
+import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.QueueMetrics;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.junit.After;
@@ -30,6 +31,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -51,30 +53,34 @@ public class TaskQueueServiceTest extends BaseTest {
   }
 
   @Test
-  public void testGetQueueMetrics() {
-    provisionerQueues.add("tenant1", new Element("task1"));
-    provisionerQueues.add("tenant1", new Element("task2"));
-    provisionerQueues.add("tenant1", new Element("task3"));
-    provisionerQueues.take("tenant1", "consumer");
-    provisionerQueues.add("tenant2", new Element("task4"));
-    provisionerQueues.add("tenant3", new Element("task5"));
-    provisionerQueues.take("tenant3", "consumer");
-    provisionerQueues.add("tenant4", new Element("task6"));
-    provisionerQueues.add("tenant4", new Element("task7"));
-    provisionerQueues.take("tenant4", "consumer");
+  public void testGetQueueMetrics() throws IOException {
+    tenantStore.writeTenant(new Tenant("id1", new TenantSpecification("tenant1", 0, 10, 100)));
+    tenantStore.writeTenant(new Tenant("id2", new TenantSpecification("tenant2", 0, 10, 100)));
+    tenantStore.writeTenant(new Tenant("id3", new TenantSpecification("tenant3", 0, 10, 100)));
+    tenantStore.writeTenant(new Tenant("id4", new TenantSpecification("tenant4", 0, 10, 100)));
+    provisionerQueues.add("id1", new Element("task1"));
+    provisionerQueues.add("id1", new Element("task2"));
+    provisionerQueues.add("id1", new Element("task3"));
+    provisionerQueues.take("id1", "consumer");
+    provisionerQueues.add("id2", new Element("task4"));
+    provisionerQueues.add("id3", new Element("task5"));
+    provisionerQueues.take("id3", "consumer");
+    provisionerQueues.add("id4", new Element("task6"));
+    provisionerQueues.add("id4", new Element("task7"));
+    provisionerQueues.take("id4", "consumer");
 
     Map<String, QueueMetrics> expected = Maps.newHashMap();
     expected.put("tenant1", new QueueMetrics(2, 1));
-    Assert.assertEquals(expected, service.getTaskQueueMetricsSnapshot(Sets.newHashSet("tenant1")));
-
     expected.put("tenant2", new QueueMetrics(1, 0));
-    Assert.assertEquals(expected, service.getTaskQueueMetricsSnapshot(Sets.newHashSet("tenant1", "tenant2")));
-
     expected.put("tenant3", new QueueMetrics(0, 1));
-    Assert.assertEquals(expected,
-                        service.getTaskQueueMetricsSnapshot(Sets.newHashSet("tenant1", "tenant2", "tenant3")));
-
     expected.put("tenant4", new QueueMetrics(1, 1));
+    expected.put(Constants.SUPERADMIN_TENANT, new QueueMetrics(0, 0));
+
+    Assert.assertEquals(expected.get("tenant1"), service.getTaskQueueMetricsSnapshot("id1"));
+    Assert.assertEquals(expected.get("tenant2"), service.getTaskQueueMetricsSnapshot("id2"));
+    Assert.assertEquals(expected.get("tenant3"), service.getTaskQueueMetricsSnapshot("id3"));
+    Assert.assertEquals(expected.get("tenant4"), service.getTaskQueueMetricsSnapshot("id4"));
+    Assert.assertEquals(new QueueMetrics(0, 0), service.getTaskQueueMetricsSnapshot("non-id"));
     Assert.assertEquals(expected, service.getTaskQueueMetricsSnapshot());
   }
 }

@@ -15,7 +15,9 @@
  */
 package com.continuuity.loom.scheduler.task;
 
+import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
@@ -27,8 +29,14 @@ import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.tenant.TenantStore;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -38,8 +46,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Manages handing out tasks from task queue, and recording status after the task is done.
@@ -48,20 +58,24 @@ public class TaskQueueService {
   private static final Logger LOG = LoggerFactory.getLogger(TaskQueueService.class);
 
   private final ClusterStore clusterStore;
+  private final TenantStore tenantStore;
   private final TaskService taskService;
   private final NodeService nodeService;
   private final TenantProvisionerService tenantProvisionerService;
   private final LoomStats loomStats;
   private final QueueGroup taskQueues;
   private final QueueGroup jobQueues;
+  private final LoadingCache<String, QueueMetrics> queueMetricsCache;
 
   @Inject
-  private TaskQueueService(@Named(Constants.Queue.PROVISIONER) QueueGroup taskQueues,
+  private TaskQueueService(final @Named(Constants.Queue.PROVISIONER) QueueGroup taskQueues,
                            @Named(Constants.Queue.JOB) QueueGroup jobQueues,
                            ClusterStoreService clusterStoreService,
                            TenantProvisionerService tenantProvisionerService,
                            TaskService taskService,
                            NodeService nodeService,
+                           TenantStore tenantStore,
+                           Configuration conf,
                            LoomStats loomStats) {
     this.clusterStore = clusterStoreService.getSystemView();
     this.taskService = taskService;
@@ -70,6 +84,19 @@ public class TaskQueueService {
     this.loomStats = loomStats;
     this.taskQueues = taskQueues;
     this.jobQueues = jobQueues;
+    this.tenantStore = tenantStore;
+    final int queueCacheSeconds = conf.getInt(Constants.Metrics.QUEUE_CACHE_SECONDS);
+    // queue metrics can be expensive to fetch
+    this.queueMetricsCache = CacheBuilder.newBuilder()
+      .expireAfterWrite(queueCacheSeconds, TimeUnit.SECONDS)
+      .build(new CacheLoader<String, QueueMetrics>() {
+        @Override
+        public QueueMetrics load(String tenantId) {
+          int numQueued = Iterators.size(taskQueues.getQueued(tenantId));
+          int numInProgress = Iterators.size(taskQueues.getBeingConsumed(tenantId));
+          return new QueueMetrics(numQueued, numInProgress);
+        }
+      });
   }
 
   /**
@@ -77,23 +104,25 @@ public class TaskQueueService {
    *
    * @return Snapshot of the number of queued and in progress elements in the task queues
    */
-  public Map<String, QueueMetrics> getTaskQueueMetricsSnapshot() {
-    return getTaskQueueMetricsSnapshot(taskQueues.getQueueNames());
+  public Map<String, QueueMetrics> getTaskQueueMetricsSnapshot() throws IOException {
+    // get tenant list from the tenant store instead of from the queue group because queues are loaded lazily
+    // in the queue group and not derived from zookeeper, so we might not get all the queues.
+    Map<String, QueueMetrics> queueMetrics = Maps.newHashMap();
+    for (Tenant tenant : tenantStore.getAllTenants()) {
+      queueMetrics.put(tenant.getSpecification().getName(), queueMetricsCache.getUnchecked(tenant.getId()));
+    }
+    return queueMetrics;
   }
 
   /**
-   * Get a snapshot of the number of queued and in progress elements in the task queues.
+   * Get the queue metrics for the given tenant.
    *
-   * @return Snapshot of the number of queued and in progress elements in the task queues
+   * @param tenantId Id of the tenant to get queue metrics for
+   * @return Queue metrics for the tenants
+   * @throws IOException
    */
-  public Map<String, QueueMetrics> getTaskQueueMetricsSnapshot(Set<String> queues) {
-    Map<String, QueueMetrics> snapshot = Maps.newHashMap();
-    for (String queueName : queues) {
-      int numQueued = Iterators.size(taskQueues.getQueued(queueName));
-      int numInProgress = Iterators.size(taskQueues.getBeingConsumed(queueName));
-      snapshot.put(queueName, new QueueMetrics(numQueued, numInProgress));
-    }
-    return snapshot;
+  public QueueMetrics getTaskQueueMetricsSnapshot(String tenantId) throws IOException {
+    return queueMetricsCache.getUnchecked(tenantId);
   }
 
   /**

@@ -24,6 +24,8 @@ import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.queue.QueueMetrics;
 import com.continuuity.loom.scheduler.task.TaskQueueService;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.entity.EntityStoreView;
@@ -31,6 +33,7 @@ import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -103,14 +106,20 @@ public class LoomAdminHandler extends LoomAuthHandler {
       return;
     }
 
-    if (account.isSuperadmin()) {
-      responder.sendJson(HttpResponseStatus.OK,
-                         taskQueueService.getTaskQueueMetricsSnapshot());
-    } else if (account.isAdmin()) {
-      responder.sendJson(HttpResponseStatus.OK,
-                         taskQueueService.getTaskQueueMetricsSnapshot(Sets.newHashSet(account.getTenantId())));
-    } else {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "Forbidden to get queue metrics.");
+    try {
+      if (account.isSuperadmin()) {
+        responder.sendJson(HttpResponseStatus.OK,
+                           taskQueueService.getTaskQueueMetricsSnapshot());
+      } else if (account.isAdmin()) {
+        String tenantName = request.getHeader(Constants.TENANT_HEADER);
+        Map<String, QueueMetrics> responseBody =
+          ImmutableMap.of(tenantName, taskQueueService.getTaskQueueMetricsSnapshot(account.getTenantId()));
+        responder.sendJson(HttpResponseStatus.OK, responseBody);
+      } else {
+        responder.sendError(HttpResponseStatus.FORBIDDEN, "Forbidden to get queue metrics.");
+      }
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal error getting queue metrics.");
     }
   }
 

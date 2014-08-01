@@ -62,6 +62,10 @@ Provisioners
   * :ref:`Get a Provisioner <provisioners-retrieve>`
   * :ref:`Get all Provisioners <provisioners-all-list>`
 
+Metrics
+-------
+  * :ref:`Queue Metrics <metrics-queues>`
+
 
 Administration APIs
 ====================

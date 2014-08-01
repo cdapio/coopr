@@ -43,7 +43,7 @@ HTTP Responses
 
 The response will be a JSON Object with tenants as the keys, and the queue metrics as the values.
 Queue metrics include the number of tasks in progress, the number queued but not in progress, and
-the total queued and in progress.
+the total queued and in progress. 
 
 .. list-table::
    :widths: 15 10
@@ -62,9 +62,14 @@ Example
 
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-ApiKey:<apikey>'
-        -H 'X-Loom-TenantID:loom'
+        -H 'X-Loom-TenantID:superadmin'
         http://<loom-server>:<loom-port>/<version>/loom/metrics/queues
  $ {
+       "superadmin": {
+           "inProgress": 0,
+           "queued": 0,
+           "total": 0
+       },
        "tenant1": {
            "inProgress": 8,
            "queued": 34,

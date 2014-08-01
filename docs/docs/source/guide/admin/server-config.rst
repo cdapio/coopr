@@ -259,3 +259,6 @@ A full list of available configuration settings and their default values are giv
    * - server.provisioner.request.socket.timeout.ms
      - 10000
      - socket timeout in milliseconds to use when making requests to provisioners.
+   * - server.metrics.queue.cache.seconds
+     - 10
+     - Seconds to cache queue metrics in memory before recalculating. Queue metrics require walking through the queue and are therefore expensive to compute.
