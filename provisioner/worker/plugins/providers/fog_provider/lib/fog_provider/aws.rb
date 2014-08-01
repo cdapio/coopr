@@ -81,7 +81,7 @@ class FogProviderAWS < Provider
       @tags.map{ |t| key,val=t.split('='); hashed_tags[key]=val} unless @tags.nil?
       # Always set the Name tag, so we display correctly in AWS console UI
       unless hashed_tags.keys.include?('Name')
-        hashed_tags['Name'] = hostname
+        hashed_tags['Name'] = @task['config']['hostname']
       end
       create_tags(hashed_tags, providerid) unless hashed_tags.empty?
 
