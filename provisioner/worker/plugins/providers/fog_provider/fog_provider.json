@@ -3,6 +3,7 @@
   "description": "Multi-cloud fog-based provider (Openstack, Rackspace, Joyent)",
   "providertypes": [ "joyent", "openstack", "rackspace" ],
   "aws" : {
+    "name": "aws",
     "classname": "FogProviderAWS",
     "parameters": {
       "admin": {
@@ -78,7 +79,6 @@
           "security_group_ids": {
             "label": "Security Group IDs (VPC only)",
             "type": "text",
-            "default": "default",
             "tip": "AWS security group IDs (required for VPC)"
           },
           "subnet_id": {
