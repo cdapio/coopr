@@ -24,13 +24,18 @@ import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.queue.QueueMetrics;
+import com.continuuity.loom.scheduler.task.TaskQueueService;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
@@ -73,13 +78,49 @@ public class LoomAdminHandler extends LoomAuthHandler {
   public static final String PROVIDER_TYPES = "providertypes";
 
   private final EntityStoreService entityStoreService;
+  private final TaskQueueService taskQueueService;
   private final Gson gson;
 
   @Inject
-  private LoomAdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService, Gson gson) {
+  private LoomAdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService,
+                           TaskQueueService taskQueueService, Gson gson) {
     super(tenantStore);
+    this.taskQueueService = taskQueueService;
     this.entityStoreService = entityStoreService;
     this.gson = gson;
+  }
+
+  /**
+   * Get a mapping of tenant to provisioner queue metrics for that tenant. User requesting the metrics must be a
+   * tenant, with tenant admins getting back only the queue metrics for their own tenant and with superadmins getting
+   * the metrics across all tenants.
+   *
+   * @param request Request for queue metrics.
+   * @param responder Responder for sending the response.
+   */
+  @GET
+  @Path("/metrics/queues")
+  public void getQueueMetrics(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    try {
+      if (account.isSuperadmin()) {
+        responder.sendJson(HttpResponseStatus.OK,
+                           taskQueueService.getTaskQueueMetricsSnapshot());
+      } else if (account.isAdmin()) {
+        String tenantName = request.getHeader(Constants.TENANT_HEADER);
+        Map<String, QueueMetrics> responseBody =
+          ImmutableMap.of(tenantName, taskQueueService.getTaskQueueMetricsSnapshot(account.getTenantId()));
+        responder.sendJson(HttpResponseStatus.OK, responseBody);
+      } else {
+        responder.sendError(HttpResponseStatus.FORBIDDEN, "Forbidden to get queue metrics.");
+      }
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal error getting queue metrics.");
+    }
   }
 
   /**

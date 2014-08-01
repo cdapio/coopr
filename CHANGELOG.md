@@ -3,6 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- Queue Metrics ( Issues: #301 )
 - Provisioner Multi Tenancy ( Issues: #290, #296 )
 - Multi Tenancy ( Issues: #239, #253, #277, #284, #292 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )

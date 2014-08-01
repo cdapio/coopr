@@ -68,6 +68,13 @@ public class Constants {
   public static final String PROVISIONER_REQUEST_SOCKET_TIMEOUT_MS = "server.provisioner.request.socket.timeout.ms";
 
   /**
+   * Metric config settings.
+   */
+  public static final class Metrics {
+    public static final String QUEUE_CACHE_SECONDS = "server.metrics.queue.cache.seconds";
+  }
+
+  /**
    * {@link HttpPostClusterCallback} config settings.
    */
   public static final class HttpCallback {
