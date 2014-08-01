@@ -182,7 +182,7 @@ To update a tenant, make a PUT HTTP request to URI:
 
 The resource specified above respresents an individual tenant that is being updated.
 Currently, the update of a tenant resource requires the complete tenant object to in
-the request body. Trying to lower the max clusters or max nodes belong the number
+the request body. Trying to lower the max clusters or max nodes below the number
 currently in use is not allowed. 
 
 PUT Parameters
