@@ -49,10 +49,10 @@ class ChefSoloAutomator < Automator
     @credentials = Hash.new
     @credentials[:paranoid] = false
     sshauth.each do |k, v|
-      if (k =~ /password/)
-        @credentials[:password] = v
-      elsif (k =~ /identityfile/)
+      if (k =~ /identityfile/)
         @credentials[:keys] = [ v ]
+      elsif (k =~ /password/)
+        @credentials[:password] = v
       end
     end
   end
