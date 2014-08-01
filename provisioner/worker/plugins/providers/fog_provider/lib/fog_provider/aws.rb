@@ -72,7 +72,7 @@ class FogProviderAWS < Provider
       log.debug "Invoking server confirm for id: #{providerid}"
       server = self.connection.servers.get(providerid)
       # Wait until the server is ready
-      raise 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
+      raise 'Server #{server.id} is in ERROR state' if server.state == 'ERROR'
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
@@ -93,7 +93,7 @@ class FogProviderAWS < Provider
       end
 
       wait_for_sshd(bootstrap_ip, 22)
-      log.debug "Server #{server.name} sshd is up"
+      log.debug "Server #{server.id} sshd is up"
 
       # Process results
       @result['result']['ipaddress'] = bootstrap_ip
