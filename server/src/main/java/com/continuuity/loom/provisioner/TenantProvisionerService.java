@@ -428,7 +428,8 @@ public class TenantProvisionerService {
 
   // TODO: abstract out to support different types of balancing policies
   // Currently a greedy approach, just add to first available.
-  private void addWorkers(String tenantId, int numToAdd, ResourceCollection resources) throws CapacityException, IOException {
+  private void addWorkers(String tenantId, int numToAdd, ResourceCollection resources)
+    throws CapacityException, IOException {
     for (Provisioner provisioner : provisionerStore.getProvisionersWithFreeCapacity()) {
       if (numToAdd <= 0) {
         break;
