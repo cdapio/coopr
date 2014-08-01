@@ -205,7 +205,7 @@ module Loom
               tmgr.resume
             end
           end
-          sleep 5
+          sleep 1
         }
       }
       # abort on any uncaught exception
