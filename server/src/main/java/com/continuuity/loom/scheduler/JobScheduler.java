@@ -23,6 +23,7 @@ import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.GroupElement;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.macro.Expander;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -41,8 +42,6 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.apache.twill.zookeeper.ZKClient;
-import org.apache.twill.zookeeper.ZKClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +62,7 @@ public class JobScheduler implements Runnable {
   private static final String consumerId = "jobscheduler";
 
   private final ClusterStore clusterStore;
-  private final ZKClient zkClient;
+  private final LockService lockService;
   private final TaskService taskService;
   private final int maxTaskRetries;
   private final Gson gson;
@@ -74,12 +73,12 @@ public class JobScheduler implements Runnable {
   private JobScheduler(ClusterStoreService clusterStoreService,
                        @Named(Constants.Queue.JOB) QueueGroup jobQueues,
                        @Named(Constants.Queue.PROVISIONER) QueueGroup provisionerQueues,
-                       ZKClient zkClient,
+                       LockService lockService,
                        TaskService taskService,
                        Configuration conf,
                        Gson gson) {
     this.clusterStore = clusterStoreService.getSystemView();
-    this.zkClient = ZKClients.namespace(zkClient, Constants.TASK_LOCK_NAMESPACE);
+    this.lockService = lockService;
     this.taskService = taskService;
     this.maxTaskRetries = conf.getInt(Constants.MAX_ACTION_RETRIES);
     this.gson = gson;
@@ -101,7 +100,7 @@ public class JobScheduler implements Runnable {
 
         LOG.debug("Got job {} to schedule", jobIdStr);
         JobId jobId = JobId.fromString(jobIdStr);
-        ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/" + jobId.getClusterId());
+        ZKInterProcessReentrantLock lock = lockService.getJobLock(queueName, jobId.getClusterId());
         try {
           lock.acquire();
           ClusterJob job = clusterStore.getClusterJob(jobId);

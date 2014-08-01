@@ -244,6 +244,62 @@ public abstract class ClusterStoreTest {
     // Clusters should be sorted in reverse order
     Assert.assertEquals(cluster2, clusters.get(0));
     Assert.assertEquals(cluster1, clusters.get(1));
+
+    // set status to terminated
+    cluster1.setStatus(Cluster.Status.TERMINATED);
+    store.writeCluster(cluster1);
+
+    // get all should still return the terminated cluster
+    Assert.assertEquals(2, store.getAllClusters().size());
+    // get nonterminated should not return the cluster
+    clusters = store.getNonTerminatedClusters();
+    Assert.assertEquals(1, clusters.size());
+    Assert.assertEquals(cluster2, clusters.get(0));
+  }
+
+  @Test
+  public void testAdminGetAllClusters() throws Exception {
+    Assert.assertEquals(0, systemView.getAllClusters().size());
+
+    String clusterId1 = "123";
+    Cluster cluster1 = new Cluster(
+      clusterId1, tenant1_user1, "example-hdfs", System.currentTimeMillis(), "hdfs cluster",
+      Entities.ProviderExample.RACKSPACE,
+      Entities.ClusterTemplateExample.HDFS,
+      ImmutableSet.of("node1", "node2"),
+      ImmutableSet.of("s1", "s2")
+    );
+
+    // Make sure new cluster is at least 1ms older than the previous one.
+    Cluster cluster2 = new Cluster(
+      "1234", tenant1_user2, "example-hdfs2", System.currentTimeMillis() + 1, "hdfs cluster",
+      Entities.ProviderExample.RACKSPACE,
+      Entities.ClusterTemplateExample.HDFS,
+      ImmutableSet.of("node3", "node4"),
+      ImmutableSet.of("s1", "s4")
+    );
+
+    ClusterStoreView store = clusterStoreService.getView(tenant1_admin);
+    store.writeCluster(cluster1);
+    store.writeCluster(cluster2);
+
+    List<Cluster> clusters = store.getAllClusters();
+    Assert.assertEquals(2, clusters.size());
+
+    // Clusters should be sorted in reverse order
+    Assert.assertEquals(cluster2, clusters.get(0));
+    Assert.assertEquals(cluster1, clusters.get(1));
+
+    // set status to terminated
+    cluster1.setStatus(Cluster.Status.TERMINATED);
+    store.writeCluster(cluster1);
+
+    // get all should still return the terminated cluster
+    Assert.assertEquals(2, store.getAllClusters().size());
+    // get nonterminated should not return the cluster
+    clusters = store.getNonTerminatedClusters();
+    Assert.assertEquals(1, clusters.size());
+    Assert.assertEquals(cluster2, clusters.get(0));
   }
 
   @Test
