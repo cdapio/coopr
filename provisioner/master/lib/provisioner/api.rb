@@ -40,7 +40,6 @@ module Loom
 
       get '/heartbeat' do
         begin
-          log.info "heartbeat called"
           settings.provisioner.heartbeat.to_json
         rescue
           halt 500
