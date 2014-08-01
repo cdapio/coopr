@@ -30,13 +30,11 @@ import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.tenant.TenantStore;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -45,10 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -68,7 +63,7 @@ public class TaskQueueService {
   private final LoadingCache<String, QueueMetrics> queueMetricsCache;
 
   @Inject
-  private TaskQueueService(final @Named(Constants.Queue.PROVISIONER) QueueGroup taskQueues,
+  private TaskQueueService(@Named(Constants.Queue.PROVISIONER) final QueueGroup taskQueues,
                            @Named(Constants.Queue.JOB) QueueGroup jobQueues,
                            ClusterStoreService clusterStoreService,
                            TenantProvisionerService tenantProvisionerService,
