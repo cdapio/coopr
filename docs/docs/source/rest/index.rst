@@ -62,6 +62,10 @@ Provisioners
   * :ref:`Get a Provisioner <provisioners-retrieve>`
   * :ref:`Get all Provisioners <provisioners-all-list>`
 
+Metrics
+-------
+  * :ref:`Queue Metrics <metrics-queues>`
+
 
 Administration APIs
 ====================
@@ -123,6 +127,10 @@ Import/Export
 -----------------
   * :ref:`Export Template Metadata <entity-export>`
   * :ref:`Import Template Metadata <entity-import>`
+
+Metrics
+-------
+  * :ref:`Queue Metrics <metrics-queues>`
 
 User APIs
 =========

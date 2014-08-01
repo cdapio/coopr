@@ -16,6 +16,8 @@ Unreleased
 - Upgrade script ( Issues: #258 )
 - Provisioner Multi Tenancy ( Issues: #290 #296 )
 - Updated provider plugin using fog ( Issues: #288 #310 )
+- Queue Metrics ( Issues: #301 )
+- Settable max for clusters and nodes in a tenant ( Issues: #302 )
 
 v0.9.7 (May 27, 2014)
 ---------------------

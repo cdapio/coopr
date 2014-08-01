@@ -43,7 +43,7 @@ public class ZKQueueGroup implements QueueGroup {
     this.queueType = queueType;
     this.queueList = Lists.newArrayList();
     this.index = 0;
-    this.queueMap = Maps.newHashMap();
+    this.queueMap = Maps.newConcurrentMap();
   }
 
   @Override
@@ -119,6 +119,15 @@ public class ZKQueueGroup implements QueueGroup {
       }
       queueMap.remove(queue);
     }
+  }
+
+  @Override
+  public int size() {
+    int size = 0;
+    for (TrackingQueue queue : queueMap.values()) {
+      size += queue.size();
+    }
+    return size;
   }
 
   @Override

@@ -338,6 +338,11 @@ public class SQLClusterStore implements ClusterStore {
   }
 
   @Override
+  public List<Cluster> getNonTerminatedClusters() throws IOException {
+    return systemView.getNonTerminatedClusters();
+  }
+
+  @Override
   public Cluster getCluster(String clusterId) throws IOException {
     return systemView.getCluster(clusterId);
   }

@@ -79,7 +79,7 @@ public interface TenantStore extends Service {
   void deleteTenantByName(String name) throws IOException;
 
   /**
-   * Get the name of the tenant that has the given id, or null if the tenant does not exist
+   * Get the name of the tenant that has the given id, or null if the tenant does not exist.
    *
    * @param id Id of the tenant to get the name for
    * @return Name of the tenant with the given id, or null if the tenant does not exist
