@@ -112,6 +112,18 @@ CREATE TABLE IF NOT EXISTS clusterTemplates (
     PRIMARY KEY (tenant_id, name)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS tenants (
+    id VARCHAR(64),
+    name VARCHAR(255),
+    workers INT,
+    deleted BOOLEAN,
+    create_time TIMESTAMP,
+    delete_time TIMESTAMP,
+    tenant BLOB,
+    PRIMARY KEY (id),
+    INDEX name_index (name)
+) ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS provisioners (
     id VARCHAR(255),
     last_heartbeat TIMESTAMP,
