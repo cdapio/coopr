@@ -3,9 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
-- Queue Metrics ( Issues: #301 )
-- Provisioner Multi Tenancy ( Issues: #290, #296 )
-- Multi Tenancy ( Issues: #239, #253, #277, #284, #292 )
+- AWS provider support ( Issues: #22 #322 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 )
 - Sensu monitoring support ( Issues: #167 )
@@ -18,6 +16,7 @@ Unreleased
 - Upgrade script ( Issues: #258 )
 - Provisioner Multi Tenancy ( Issues: #290 #296 )
 - Updated provider plugin using fog ( Issues: #288 #310 )
+- Queue Metrics ( Issues: #301 )
 
 v0.9.7 (May 27, 2014)
 ---------------------
