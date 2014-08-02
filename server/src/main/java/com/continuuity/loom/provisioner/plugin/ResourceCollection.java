@@ -23,14 +23,20 @@ public class ResourceCollection {
   // }
   private final Map<String, Map<String, ActiveResourceList>> automatortypes;
   private final Map<String, Map<String, ActiveResourceList>> providertypes;
-  // purely for internal convenience purposes, dont want it sent to provisioners in put call.
-  @Expose(serialize = false)
   private final Set<ResourceType> resourceTypes;
 
   public ResourceCollection() {
     this.automatortypes = Maps.newHashMap();
     this.providertypes = Maps.newHashMap();
     this.resourceTypes = Sets.newHashSet();
+  }
+
+  public Map<String, Map<String, ActiveResourceList>> getAutomatortypes() {
+    return automatortypes;
+  }
+
+  public Map<String, Map<String, ActiveResourceList>> getProvidertypes() {
+    return providertypes;
   }
 
   /**
