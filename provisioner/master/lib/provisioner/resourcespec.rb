@@ -33,8 +33,11 @@ module Loom
       @resource_formats = {}
       unless resource_jsonobj.nil?
         resource_jsonobj.each do |type, h|
+          next if h.nil?
           h.each do |id, h|
+            next if h.nil?
             h.each do |resource_type, h|
+              next if h.nil?
               format = nil
               if h.key?('format')
                 format = h['format']
