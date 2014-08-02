@@ -11,7 +11,7 @@
     ],
     "provider": "rackspace",
     "hardwaretype": "medium",
-    "imagetype": "centos6",
+    "imagetype": "ubuntu12",
     "config": {
       "apache": {
         "default_site_enabled": "true",
@@ -49,6 +49,7 @@
           "mysql.default_host": "%host.service.mysql-server%"
         },
         "modules": [
+          "memcache",
           "mysql"
         ]
       }
@@ -68,6 +69,7 @@
       "base",
       "haproxy",
       "apache-httpd",
+      "memcached",
       "php",
       "php-modules",
       "mysql-server"
