@@ -11,7 +11,7 @@
     ],
     "provider": "rackspace",
     "hardwaretype": "medium",
-    "imagetype": "centos6",
+    "imagetype": "ubuntu12",
     "config": {
       "apache": {
         "default_site_enabled": "true",
