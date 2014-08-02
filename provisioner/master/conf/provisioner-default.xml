@@ -27,12 +27,12 @@
   </property>
   <property>
     <name>provisioner.data.dir</name>
-    <value>/tmp/loom/data</value>
+    <value>/var/loom/data/provisioner/data</value>
     <description>Provisioner storage directory for plugin data resources</description>
   </property>
   <property>
     <name>provisioner.work.dir</name>
-    <value>/tmp/loom/work</value>
+    <value>/var/loom/data/provisioner/work</value>
     <description>Provisioner working directory</description>
   </property>
   <property>

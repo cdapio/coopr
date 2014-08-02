@@ -28,16 +28,16 @@ module Loom
       # resources is a hash of '/'-delimited resource paths and their versions
       #   ex: "automatortype/chef-solo/cookbooks/hadoop" => 2
       @resources = {}
-      # resource_formats is a hash of '/'-delimited resource types and their formats
-      #   ex: "automatortype/chef-solo/cookbooks" => "archive"
+      # resource_formats is a hash of '/'-delimited resource paths and their formats
+      #   ex: "automatortype/chef-solo/cookbooks/hadoop" => "archive"
       @resource_formats = {}
       unless resource_jsonobj.nil?
         resource_jsonobj.each do |type, h|
           h.each do |id, h|
             h.each do |resource_type, h|
+              format = nil
               if h.key?('format')
-                formatkey = %W( #{type} #{id} #{resource_type} ).join('/')
-                @resource_formats[formatkey] = h['format'] # Albert: Validate here?
+                format = h['format']
               end
               if h.key?('active')
                 h['active'].each do |nv|
@@ -45,6 +45,7 @@ module Loom
                   version = nv['version']
                   resource_name = %W( #{type} #{id} #{resource_type} #{name}).join('/')
                   @resources[resource_name] = version
+                  @resource_formats[resource_name] = format
                 end
               end
             end
@@ -55,7 +56,7 @@ module Loom
 
     # define two ResourceSpecs as equal if @resources hash has same contents
     def ==(other)
-      @resources == other.resources
+      @resources == other.resources && @resource_formats == other.resource_formats
     end
   end
 end

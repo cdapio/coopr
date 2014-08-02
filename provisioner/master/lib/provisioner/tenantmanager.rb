@@ -131,7 +131,10 @@ module Loom
       # first check for new resource requirements
       unless @spec.resourcespec == new_tm.spec.resourcespec
         resource_sync_needed
+        log.debug "current expected resources: #{@spec.resourcespec.resources}"
         @spec = new_tm.spec
+        log.debug "new expected resources: #{@spec.resourcespec.resources}"
+        @resourcemanager.resourcespec = @spec.resourcespec
         return
       end
       log.debug "update workers from #{@spec.workers} to #{new_tm.spec.workers}"
