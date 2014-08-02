@@ -39,11 +39,11 @@ module Loom
       @workdir = %W( #{config.get(PROVISIONER_WORK_DIR)} #{tenant} ).join('/')
       @active = {}
       # temporary
-      @tenantnames = {}
-      @tenantnames['e7fd030d-59f8-435b-ad5b-ce76de25d11e'] = 'tenant1'
-      @tenantnames['4e987276-e87b-44eb-9b56-92413fecb40f'] = 'tenant2'
-      @tenantnames['5fee6bea-9c21-4bd4-aea9-c5271451abe7'] = 'tenant3'
-      @tenantnames['9ba44dcc-922f-4d58-9188-5870b60a1dda'] = 'loom'
+#      @tenantnames = {}
+#      @tenantnames['e7fd030d-59f8-435b-ad5b-ce76de25d11e'] = 'tenant1'
+#      @tenantnames['4e987276-e87b-44eb-9b56-92413fecb40f'] = 'tenant2'
+#      @tenantnames['5fee6bea-9c21-4bd4-aea9-c5271451abe7'] = 'tenant3'
+#      @tenantnames['9ba44dcc-922f-4d58-9188-5870b60a1dda'] = 'loom'
     end
 
     # syncs and activates all resources, first determining which ones need to be fetched locally
@@ -51,6 +51,11 @@ module Loom
       log.debug "tenant #{@tenant} syncing resources: #{@resourcespec.resources}"
       load_active_from_disk
       log.debug "currently active: #{@active}"
+
+      # first deactivate everything to handle the case of resource removal
+      @active.each do |resource, version|
+        deactivate_resource(resource)
+      end
 
       # check and sync resources
       @resourcespec.resources.each do |resource, version|
@@ -141,12 +146,12 @@ module Loom
     # fetches a resource from the server to a tmp directory, yields the file location to a block
     def fetch_resource(resource, version)
       begin
-        uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v1/loom #{resource} versions #{version} ).join('/')
-        log.debug "fetching resource at #{uri} with tenantID #{@tenantnames[@tenant]}"
+        uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v1/tenants/#{@tenant} #{resource} versions #{version} ).join('/')
+        log.debug "fetching resource at #{uri} with tenantID #{@tenant}"
         begin
           #response = RestClient.get(uri, {'X-Loom-UserID' => 'admin', 'X-Loom-TenantID' => @tenant})
           # temporary
-          response = RestClient.get(uri, {'X-Loom-UserID' => 'admin', 'X-Loom-TenantID' => @tenantnames[@tenant]})
+          response = RestClient.get(uri, {'X-Loom-UserID' => 'admin', 'X-Loom-TenantID' => @tenant})
         rescue => e
           log.error "unable to fetch resource: #{e.inspect}"
           return
