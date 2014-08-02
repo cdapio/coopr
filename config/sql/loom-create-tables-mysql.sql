@@ -117,16 +117,16 @@ CREATE TABLE IF NOT EXISTS tenants (
     name VARCHAR(255),
     workers INT,
     deleted BOOLEAN,
-    create_time TIMESTAMP,
-    delete_time TIMESTAMP,
-    tenant BLOB,
+    create_time TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+    delete_time TIMESTAMP NULL,
+    tenant MEDIUMBLOB,
     PRIMARY KEY (id),
     INDEX name_index (name)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS provisioners (
     id VARCHAR(255),
-    last_heartbeat TIMESTAMP,
+    last_heartbeat TIMESTAMP NULL,
     capacity_total INTEGER,
     capacity_free INTEGER,
     provisioner MEDIUMBLOB,
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS pluginMeta (
     live BOOLEAN,
     slated BOOLEAN,
     deleted BOOLEAN,
-    create_time TIMESTAMP,
-    delete_time TIMESTAMP,
+    create_time TIMESTAMP DEFAULT '0000-00-00 00:00:00',
+    delete_time TIMESTAMP NULL,
     PRIMARY KEY (tenant_id, plugin_type, plugin_name, resource_type, name, version)
 ) ENGINE = InnoDB;
