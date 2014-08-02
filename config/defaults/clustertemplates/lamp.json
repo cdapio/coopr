@@ -49,6 +49,7 @@
           "mysql.default_host": "%host.service.mysql-server%"
         },
         "modules": [
+          "memcache",
           "mysql"
         ]
       }
