@@ -59,11 +59,20 @@ public class Constants {
 
   public static final String CALLBACK_CLASS = "server.callback.class";
 
+  public static final String PLUGIN_STORE_CLASS = "server.plugin.store.class";
+
   public static final String PROVISIONER_TIMEOUT_SECS = "server.provisioner.timeout.secs";
   public static final String PROVISIONER_TIMEOUT_CHECK_INTERVAL_SECS = "server.provisioner.timeout.check.interval.secs";
   public static final String PROVISIONER_REQUEST_MAX_RETRIES = "server.provisioner.request.max.retries";
   public static final String PROVISIONER_REQUEST_MS_BETWEEN_RETRIES = "server.provisioner.request.ms.between.retries";
   public static final String PROVISIONER_REQUEST_SOCKET_TIMEOUT_MS = "server.provisioner.request.socket.timeout.ms";
+
+  /**
+   * Metric config settings.
+   */
+  public static final class Metrics {
+    public static final String QUEUE_CACHE_SECONDS = "server.metrics.queue.cache.seconds";
+  }
 
   /**
    * {@link HttpPostClusterCallback} config settings.
@@ -92,6 +101,13 @@ public class Constants {
   }
 
   /**
+   * Constants for the local file store implementation for plugin resources.
+   */
+  public static final class LocalFilePluginStore {
+    public static final String DATA_DIR = "server.plugin.store.localfilestore.data.dir";
+  }
+
+  /**
    * Queue related constants.
    */
   public static final class Queue {
@@ -103,10 +119,17 @@ public class Constants {
     public static final String WORKER_BALANCE = "worker.balance.queue";
   }
 
-  public static final String TASK_NAMESPACE = "/tasks";
-  public static final String TASK_LOCK_NAMESPACE = TASK_NAMESPACE + "/lock";
-  public static final String CLUSTER_LOCK_NAMESPACE = "/clusters/lock";
-  public static final String TENANT_NAMESPACE = "/tenants";
+  /**
+   * Lock related constants.
+   */
+  public static final class Lock {
+    public static final String CLUSTER_NAMESPACE = "/locks/clusters";
+    public static final String PLUGIN_NAMESPACE = "/locks/plugins";
+    public static final String TENANT_NAMESPACE = "/locks/tenants";
+    public static final String TASK_NAMESPACE = "/locks/tasks";
+  }
+
+  public static final int PLUGIN_RESOURCE_CHUNK_SIZE = 1024 * 64;
   public static final String USER_HEADER = "X-Loom-UserID";
   public static final String API_KEY_HEADER = "X-Loom-ApiKey";
   public static final String TENANT_HEADER = "X-Loom-TenantID";

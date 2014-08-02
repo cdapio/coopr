@@ -106,6 +106,13 @@ public interface QueueGroup {
   void removeQueue(String queueName);
 
   /**
+   * Get the size (both queued and being consumed) of all queues.
+   *
+   * @return Size of all queues.
+   */
+  int size();
+
+  /**
    * Get the size (both queued and being consumed) of a specific queue.
    *
    * @param queueName Name of the queue to get the size of.

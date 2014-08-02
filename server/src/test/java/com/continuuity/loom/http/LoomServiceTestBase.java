@@ -103,7 +103,7 @@ public class LoomServiceTestBase extends BaseTest {
   @Before
   public void setupServiceTest() throws Exception {
     tenantProvisionerService.writeProvisioner(new Provisioner(PROVISIONER_ID, "host1", 12345, 100, null, null));
-    tenantProvisionerService.writeTenantSpecification(new TenantSpecification(TENANT, 10, 100, 1000));
+    tenantStore.writeTenant(new Tenant(TENANT_ID, new TenantSpecification(TENANT, 10, 100, 1000)));
   }
 
   @AfterClass

@@ -3,8 +3,9 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- MongoDB support for clusters ( Issues: #43 #130 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
-- Nginx support for clusters ( Issues: #131 )
+- Nginx support for clusters ( Issues: #131 #323 )
 - Sensu monitoring support ( Issues: #167 )
 - Configuration settings renamed ( Issues: #213 )
 - Ability to sync an active cluster's template to its current version ( Issues: #214 )
@@ -16,6 +17,10 @@ Unreleased
 - Upgrade script ( Issues: #258 )
 - Provisioner Multi Tenancy ( Issues: #290 #296 )
 - Updated provider plugin using fog ( Issues: #288 #310 )
+- Queue Metrics ( Issues: #301 )
+- Settable max for clusters and nodes in a tenant ( Issues: #302 )
+- Allow non-root users for SSH ( Issues: #314 #320 )
+- PHP module support ( Issues: #317 )
 
 v0.9.7 (May 27, 2014)
 ---------------------

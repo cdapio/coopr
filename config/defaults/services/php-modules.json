@@ -1,0 +1,32 @@
+{
+  "name": "php-modules",
+  "description": "Installs/configures PHP PEAR modules",
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [ "php" ],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [],
+      "uses": []
+    }
+  },
+  "provisioner": {
+    "actions": {
+      "install": {
+        "type":"chef-solo",
+        "fields": {
+          "run_list": "recipe[php_modules::default]"
+        }
+      },
+      "configure": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[php_modules::default]"
+        }
+      }
+    }
+  }
+}
