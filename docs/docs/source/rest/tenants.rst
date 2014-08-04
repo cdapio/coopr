@@ -143,7 +143,8 @@ To delete a tenant, make a DELETE HTTP request to URI:
 
  /tenants/{id}
 
-A tenant can only be deleted if its workers have been set to 0.
+A tenant can only be deleted if its workers have been set to 0. The superadmin tenant
+cannot be deleted.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -156,6 +157,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - If delete was successful
+   * - 403 (FORBIDDEN)
+     - If the user is not allowed to delete the tenant.
    * - 409 (CONFLICT)
      - If the tenant is not in a deletable state.
 
