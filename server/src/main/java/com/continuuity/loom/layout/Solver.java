@@ -166,6 +166,7 @@ public class Solver {
                                            + template.getName() + " and provider " + providerName);
     }
 
+    // TODO: horribly ugly... just get the ImageType object instead of treating flavor/image specially
     // make sure there are image types that can be used
     String requiredImageType = request.getImageType();
     if (requiredImageType == null || requiredImageType.isEmpty()) {
@@ -175,7 +176,8 @@ public class Solver {
     if (requiredImageType != null && requiredImageType.isEmpty()) {
       requiredImageType = null;
     }
-    Map<String, String> imageTypeMap = getImageTypeMap(providerName, template, requiredImageType, entityStore);
+    Map<String, Map<String, String>> imageTypeMap =
+      getImageTypeMap(providerName, template, requiredImageType, entityStore);
     if (imageTypeMap.isEmpty()) {
       throw new IllegalArgumentException("no image types are available to use with template "
                                            + template.getName() + " and provider " + providerName);
@@ -282,10 +284,10 @@ public class Solver {
     }
   }
 
-  // get a mapping of image type name to image that can be used with the given provider
-  private Map<String, String> getImageTypeMap(String providerName, ClusterTemplate template,
+  // get a mapping of image type name to provider properties for that image type
+  private Map<String, Map<String, String>> getImageTypeMap(String providerName, ClusterTemplate template,
                                               String requiredImageType, EntityStoreView entityStore) throws Exception {
-    Map<String, String> imageMap = Maps.newHashMap();
+    Map<String, Map<String, String>> imageMap = Maps.newHashMap();
 
     Compatibilities compatibilities = template.getCompatibilities();
     if (requiredImageType != null) {
@@ -300,16 +302,17 @@ public class Solver {
     return imageMap;
   }
 
-  private void addProviderImage(Map<String, String> map, String providerName,
+  private void addProviderImage(Map<String, Map<String, String>> map, String providerName,
                                 Compatibilities compatibilities, ImageType imageType) {
     if (imageType != null) {
       Map<String, Map<String, String>> providerMap = imageType.getProviderMap();
       String name = imageType.getName();
       // empty allowed types means all types are allowed
       if (compatibilities.compatibleWithImageType(name) && providerMap.containsKey(providerName)) {
-        String image = providerMap.get(providerName).get("image");
+        Map<String, String> providerProperties = providerMap.get(providerName);
+        String image = providerProperties.get("image");
         if (image != null) {
-          map.put(name, image);
+          map.put(name, providerProperties);
         }
       }
     }
@@ -388,7 +391,7 @@ public class Solver {
   static Map<String, Node> solveConstraints(String clusterId, ClusterTemplate clusterTemplate, String clusterName,
                                             int numMachines,
                                             Map<String, String> hardwareTypeMap,
-                                            Map<String, String> imageTypeMap,
+                                            Map<String, Map<String, String>> imageTypeMap,
                                             Set<String> serviceNames,
                                             Map<String, Service> serviceMap,
                                             String dnsSuffix) {
@@ -422,17 +425,21 @@ public class Solver {
         }
         String hardwaretype = nodeLayout.getHardwareTypeName();
         String imagetype = nodeLayout.getImageTypeName();
+        String imageId = imageTypeMap.get(imagetype).get("image");
+        String sshUser = imageTypeMap.get(imagetype).get("ssh-user");
         Map<String, String> nodeProperties = Maps.newHashMap();
         // TODO: these should be proper fields and logic for populating node properties should not be in the solver.
         nodeProperties.put(Node.Properties.HARDWARETYPE.name().toLowerCase(), hardwaretype);
         nodeProperties.put(Node.Properties.IMAGETYPE.name().toLowerCase(), imagetype);
         nodeProperties.put(Node.Properties.FLAVOR.name().toLowerCase(), hardwareTypeMap.get(hardwaretype));
-        nodeProperties.put(Node.Properties.IMAGE.name().toLowerCase(), imageTypeMap.get(imagetype));
+        nodeProperties.put(Node.Properties.IMAGE.name().toLowerCase(), imageId);
         // used for macro expansion and when expanding service numbers.  For every new node added to the cluster,
         // the nodenum should be greater than any other nodenum in the cluster.
         nodeProperties.put(Node.Properties.NODENUM.name().toLowerCase(), String.valueOf(nodeNum));
         nodeProperties.put(Node.Properties.HOSTNAME.name().toLowerCase(),
                            NodeService.createHostname(clusterName, clusterId, nodeNum, dnsSuffix));
+        // TODO: temporary workaround, need to refactor the task json
+        nodeProperties.put("ssh-user", sshUser);
         nodeNum++;
         clusterNodes.put(nodeId, new Node(nodeId, clusterId, nodeServices, nodeProperties));
       }
