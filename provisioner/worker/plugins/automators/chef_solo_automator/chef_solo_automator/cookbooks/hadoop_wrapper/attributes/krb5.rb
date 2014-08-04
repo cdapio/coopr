@@ -101,3 +101,20 @@ if node['hive'].key?('hive_site') && node['hive']['hive_site'].key?('hive.server
   default['hive']['hive_site']['hive.server2.authentication.kerberos.keytab'] = "hive/_HOST@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
 
 end
+
+# ZooKeeper Server
+if node['zookeeper'].key?('zoocfg') && node['zookeeper']['zoocfg'].key?('authProvider.1') &&
+  node['zookeeper']['zoocfg']['authProvider.1'] == 'org.apache.zookeeper.server.auth.SASLAuthenticationProvider'
+
+  # jaas.conf
+  default['zookeeper']['jaas']['keyTab'] = "zookeeper/_HOST@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
+  default['zookeeper']['jaas']['useKeyTab'] = 'true'
+  default['zookeeper']['jaas']['principal'] = "#{node['krb5_utils']['keytabs_dir']}/zookeeper.service.keytab"
+
+  # zoo.cfg
+  default['zookeeper']['zoocfg']['jaasLoginRenew'] = '3600000' unless node['zookeeper']['zoocfg']['jaasLoginRenew']
+
+  # zookeeper-env.sh
+  default['zookeeper']['zookeeper_env']['jvmflags'] = "-Djava.security.auth.login.config=#{node['zookeeper']['conf_dir']}/jaas.conf"
+
+end

@@ -20,7 +20,6 @@ import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -47,10 +46,10 @@ public abstract class BaseSQLNodeStoreView implements NodeStoreView {
 
   abstract PreparedStatement getNodeExistsStatement(Connection conn, String id) throws SQLException;
 
-  abstract PreparedStatement getSetNodeStatement(Connection conn, Node node, ByteArrayInputStream nodeBytes)
+  abstract PreparedStatement getSetNodeStatement(Connection conn, Node node, byte[] nodeBytes)
   throws SQLException;
 
-  abstract PreparedStatement getInsertNodeStatement(Connection conn, Node node, ByteArrayInputStream nodeBytes)
+  abstract PreparedStatement getInsertNodeStatement(Connection conn, Node node, byte[] nodeBytes)
   throws SQLException;
 
   abstract boolean allowedToWrite(Node node);
@@ -122,7 +121,7 @@ public abstract class BaseSQLNodeStoreView implements NodeStoreView {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        ByteArrayInputStream nodeBytes = dbQueryExecutor.toByteStream(node, Node.class);
+        byte[] nodeBytes = dbQueryExecutor.toBytes(node, Node.class);
         DBPut nodePut = new NodeDBPut(node, nodeBytes);
         nodePut.executePut(conn);
       } finally {
@@ -162,9 +161,9 @@ public abstract class BaseSQLNodeStoreView implements NodeStoreView {
 
   private class NodeDBPut extends DBPut {
     private final Node node;
-    private final ByteArrayInputStream nodeBytes;
+    private final byte[] nodeBytes;
 
-    private NodeDBPut(Node node, ByteArrayInputStream nodeBytes) {
+    private NodeDBPut(Node node, byte[] nodeBytes) {
       this.node = node;
       this.nodeBytes = nodeBytes;
     }

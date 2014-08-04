@@ -20,7 +20,6 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryExecutor;
 
-import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -65,21 +64,21 @@ public class SQLUserNodeStoreView extends BaseSQLNodeStoreView {
   }
 
   @Override
-  PreparedStatement getSetNodeStatement(final Connection conn, final Node node, final ByteArrayInputStream nodeBytes)
+  PreparedStatement getSetNodeStatement(final Connection conn, final Node node, final byte[] nodeBytes)
   throws SQLException {
     PreparedStatement statement = conn.prepareStatement("UPDATE nodes SET node=? WHERE id=?");
-    statement.setBlob(1, nodeBytes);
+    statement.setBytes(1, nodeBytes);
     statement.setString(2, node.getId());
     return statement;
   }
 
   @Override
-  PreparedStatement getInsertNodeStatement(final Connection conn, final Node node, final ByteArrayInputStream nodeBytes)
+  PreparedStatement getInsertNodeStatement(final Connection conn, final Node node, final byte[] nodeBytes)
   throws SQLException {
     PreparedStatement statement = conn.prepareStatement("INSERT INTO nodes (id, cluster_id, node) VALUES (?, ?, ?)");
     statement.setString(1, node.getId());
     statement.setLong(2, Long.parseLong(node.getClusterId()));
-    statement.setBlob(3, nodeBytes);
+    statement.setBytes(3, nodeBytes);
     return statement;
   }
 

@@ -10,7 +10,7 @@
     "provides": [],
     "runtime": {
       "requires": [ "apache-httpd" ],
-      "uses": []
+      "uses": [ "php-modules" ]
     }
   },
   "provisioner": {
