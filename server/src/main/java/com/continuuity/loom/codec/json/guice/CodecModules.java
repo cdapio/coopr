@@ -44,7 +44,6 @@ import com.continuuity.loom.codec.json.current.PluginResourceMetaCodec;
 import com.continuuity.loom.codec.json.current.ProviderCodec;
 import com.continuuity.loom.codec.json.current.ProviderTypeCodec;
 import com.continuuity.loom.codec.json.current.ProvisionerCodec;
-import com.continuuity.loom.codec.json.current.ResourceCollectionCodec;
 import com.continuuity.loom.codec.json.current.ResourceTypeSpecificationCodec;
 import com.continuuity.loom.codec.json.current.ServiceActionCodec;
 import com.continuuity.loom.codec.json.current.ServiceCodec;
@@ -132,7 +131,6 @@ public class CodecModules {
       .registerTypeAdapter(LeaseDuration.class, new LeaseDurationCodec())
       .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec())
       .registerTypeAdapter(ParametersSpecification.class, new ParametersSpecificationCodec())
-      .registerTypeAdapter(ResourceCollection.class, new ResourceCollectionCodec())
       .registerTypeAdapter(ResourceMeta.class, new PluginResourceMetaCodec())
       .registerTypeAdapter(Provider.class, new ProviderCodec())
       .registerTypeAdapter(ProviderType.class, new ProviderTypeCodec())

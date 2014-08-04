@@ -12,6 +12,7 @@ import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
+import com.continuuity.loom.provisioner.plugin.ResourceSync;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
@@ -104,7 +105,7 @@ public class TenantProvisionerService {
     Collection<Provisioner> provisioners = provisionerStore.getAllProvisioners();
     List<Provisioner> externalProvisioners = Lists.newArrayListWithCapacity(provisioners.size());
     for (Provisioner provisioner : provisioners) {
-      externalProvisioners.add(createExternalProvisioner(provisioner, tenantStore));
+      externalProvisioners.add(createExternalProvisioner(provisioner));
     }
     return externalProvisioners;
   }
@@ -118,7 +119,7 @@ public class TenantProvisionerService {
    * @throws IOException
    */
   public Provisioner getProvisioner(String provisionerId) throws IOException {
-    return createExternalProvisioner(provisionerStore.getProvisioner(provisionerId), tenantStore);
+    return createExternalProvisioner(provisionerStore.getProvisioner(provisionerId));
   }
 
   /**
@@ -302,7 +303,15 @@ public class TenantProvisionerService {
    * @throws IOException if there was an exception persisting the worker rebalance
    */
   public void rebalanceTenantWorkers(String tenantId) throws IOException, CapacityException {
+    // lock across all tenants to protect against conflicts in setting worker counts for different tenants across
+    // different provisioners
     tenantLock.acquire();
+    // don't want to rebalance while a sync is going on. This is to prevent the scenario where a tenant is moved from
+    // one provisioner to another in the middle of a sync, causing the sync to be called on the wrong provisioners,
+    // as well as the scenario where the rebalance reads the resources that are live, a sync is called to make a new
+    // set of resources live, and then the rebalance puts the old live resource set, undoing the results of the sync.
+    ZKInterProcessReentrantLock syncLock = lockService.getResourceSyncLock(tenantId);
+    syncLock.acquire();
     try {
       Tenant tenant = tenantStore.getTenantByID(tenantId);
       if (tenant == null) {
@@ -325,6 +334,7 @@ public class TenantProvisionerService {
         addWorkers(tenantId, diff, liveResources);
       }
     } finally {
+      syncLock.release();
       tenantLock.release();
     }
   }
@@ -341,7 +351,7 @@ public class TenantProvisionerService {
     // sync lock makes sure we dont do this while some resource is being staged/unstaged for the account.
     syncLock.acquire();
     try {
-      ResourceCollection resourceCollection = resourceService.getResourcesToSync(account);
+      ResourceSync sync = resourceService.getResourcesToSync(account);
 
       // TODO: failures will cause inconsistencies between metadata state and provisioner state.
       // We can add an ability to block tasks for a given tenant from going out here, then make the calls to the
@@ -350,10 +360,10 @@ public class TenantProvisionerService {
       // to the queue group interface.
 
       // update tenant provisioners
-      syncProvisionerResources(account.getTenantId(), resourceCollection);
+      syncProvisionerResources(account.getTenantId(), sync.getResourceCollection());
 
       // update metadata store
-      resourceService.syncResourceMeta(account, resourceCollection);
+      resourceService.syncResourceMeta(account, sync);
 
     } finally {
       syncLock.release();
@@ -465,11 +475,10 @@ public class TenantProvisionerService {
    * consumption.
    *
    * @param provisioner Internal provisioner that uses tenant ids
-   * @param tenantStore Tenant store for mapping ids to names
    * @return New Provisioner where the tenant ids have been replaced with tenant names
    * @throws IOException
    */
-  private Provisioner createExternalProvisioner(Provisioner provisioner, TenantStore tenantStore) throws IOException {
+  private Provisioner createExternalProvisioner(Provisioner provisioner) throws IOException {
     if (provisioner == null) {
       return null;
     }

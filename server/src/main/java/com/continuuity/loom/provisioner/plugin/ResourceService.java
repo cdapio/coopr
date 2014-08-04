@@ -344,30 +344,31 @@ public class ResourceService extends AbstractIdleService {
    * @param account Account for which to get resources to sync
    * @return Resources that should be synced for the given account
    */
-  public ResourceCollection getResourcesToSync(Account account) throws IOException {
-
+  public ResourceSync getResourcesToSync(Account account) throws IOException {
     ResourceCollection resourceCollection = new ResourceCollection();
 
     Set<ImmutablePair<ResourceType, ResourceTypeFormat>> typeFormats = getTypesAndFormats(account);
+    Set<ResourceType> resourceTypes = Sets.newHashSet();
     for (ImmutablePair<ResourceType, ResourceTypeFormat> typeFormat : typeFormats) {
       ResourceType resourceType = typeFormat.getFirst();
       ResourceTypeFormat format = typeFormat.getSecond();
       Set<ResourceMeta> resources = metaStoreService.getResourceTypeView(account, resourceType).getResourcesToSync();
       resourceCollection.addResources(resourceType, format, resources);
+      resourceTypes.add(resourceType);
     }
 
-    return resourceCollection;
+    return new ResourceSync(resourceCollection, resourceTypes);
   }
 
   /**
    * Update the metadata store, syncing the resources in the given collection for the given account.
    *
    * @param account Account containing resources to sync
-   * @param resourceCollection Collection of resources to sync
+   * @param resourceSync Resource sync object containing information around what was synced
    * @throws IOException
    */
-  public void syncResourceMeta(Account account, ResourceCollection resourceCollection) throws IOException {
-    metaStoreService.getAccountView(account).syncResourceTypes(resourceCollection.getResourceTypes());
+  public void syncResourceMeta(Account account, ResourceSync resourceSync) throws IOException {
+    metaStoreService.getAccountView(account).syncResourceTypes(resourceSync.getResourceTypes());
   }
 
   // Helper function for getting all the resource types and formats for plugins belonging to an account.

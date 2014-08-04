@@ -23,12 +23,10 @@ public class ResourceCollection {
   // }
   private final Map<String, Map<String, ActiveResourceList>> automatortypes;
   private final Map<String, Map<String, ActiveResourceList>> providertypes;
-  private final Set<ResourceType> resourceTypes;
 
   public ResourceCollection() {
     this.automatortypes = Maps.newHashMap();
     this.providertypes = Maps.newHashMap();
-    this.resourceTypes = Sets.newHashSet();
   }
 
   public Map<String, Map<String, ActiveResourceList>> getAutomatortypes() {
@@ -49,17 +47,7 @@ public class ResourceCollection {
   public void addResources(ResourceType type, ResourceTypeFormat format, Collection<ResourceMeta> metas) {
     for (ResourceMeta meta : metas) {
       addResource(type, format, meta);
-      resourceTypes.add(type);
     }
-  }
-
-  /**
-   * Get an immutable set of all resource types in the collection.
-   *
-   * @return Immutable set of all resource types in the collection
-   */
-  public Set<ResourceType> getResourceTypes() {
-    return ImmutableSet.copyOf(resourceTypes);
   }
 
   private void addResource(ResourceType type, ResourceTypeFormat format, ResourceMeta meta) {
