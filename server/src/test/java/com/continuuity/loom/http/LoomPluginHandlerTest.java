@@ -74,11 +74,11 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   public void testCallNonexistentResourceReturns404() throws Exception {
     List<String> getPaths = ImmutableList.of(
       // test nonexistent plugin
-      "/v1/loom/providertypes/nonexistent/keys",
-      "/v1/loom/automatortypes/nonexistent/cookbooks",
+      "/plugins/providertypes/nonexistent/keys",
+      "/plugins/automatortypes/nonexistent/cookbooks",
       // test nonexistent plugin resource type
-      "/v1/loom/providertypes/joyent/cookbooks",
-      "/v1/loom/automatortypes/chef-solo/keys"
+      "/plugins/providertypes/joyent/cookbooks",
+      "/plugins/automatortypes/chef-solo/keys"
     );
     for (String getPath : getPaths) {
       assertResponseStatus(doGet(getPath, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
@@ -171,7 +171,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
                          HttpResponseStatus.OK);
 
     // sync
-    assertResponseStatus(doPost("/v1/loom/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/plugins/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
 
     // check cookbooks
     HttpResponse response = doGet(getTypePath(cookbooks), ADMIN_HEADERS);
@@ -203,7 +203,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     actual = bodyToMetaMap(response);
 
     // sync
-    assertResponseStatus(doPost("/v1/loom/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/plugins/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
 
     // check cookbooks
     response = doGet(getTypePath(cookbooks), ADMIN_HEADERS);
@@ -247,7 +247,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     // get actual contents
     String typeStr = type.name().toLowerCase() + "types";
     String path = Joiner.on('/').join(
-      "/v1/tenants",
+      "/tenants",
       ADMIN_ACCOUNT.getTenantId(),
       typeStr,
       pluginName,
@@ -381,7 +381,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   }
 
   private String getTypePath(ResourceType type) {
-    return Joiner.on("/").join("/v1/loom", type.getPluginType().name().toLowerCase() + "types",
+    return Joiner.on("/").join("/plugins", type.getPluginType().name().toLowerCase() + "types",
                                type.getPluginName(), type.getTypeName());
   }
 

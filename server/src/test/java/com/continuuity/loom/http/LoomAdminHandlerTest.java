@@ -87,23 +87,22 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testNonAdminUserGetsForbiddenStatus() throws Exception {
-    String base = "/v1/loom/";
-    String[] resources = { "providers", "hardwaretypes", "imagetypes", "services", "clustertemplates" };
+    String[] resources = { "/providers", "/hardwaretypes", "/imagetypes", "/services", "/clustertemplates" };
     for (String resource : resources) {
-      assertResponseStatus(doGet(base + resource, USER1_HEADERS), HttpResponseStatus.OK);
-      assertResponseStatus(doGet(base + resource + "/id", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
-      assertResponseStatus(doPut(base + resource + "/id", "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-      assertResponseStatus(doPost(base + resource, "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+      assertResponseStatus(doGet(resource, USER1_HEADERS), HttpResponseStatus.OK);
+      assertResponseStatus(doGet(resource + "/id", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
+      assertResponseStatus(doPut(resource + "/id", "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+      assertResponseStatus(doPost(resource, "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     }
-    assertResponseStatus(doGet(base + "export", USER1_HEADERS), HttpResponseStatus.OK);
-    assertResponseStatus(doPost(base + "import", "{}", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGet("/export", USER1_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/import", "{}", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
   public void testForbiddenIfNonadminGetsQueueMetrics() throws Exception {
     tenantStore.writeTenant(
       new Tenant(UUID.randomUUID().toString(), new TenantSpecification(USER1_ACCOUNT.getTenantId(), 10, 10, 100)));
-    assertResponseStatus(doGet("/v1/loom/metrics/queues", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGet("/metrics/queues", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
@@ -221,10 +220,10 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
   }
 
   private void runImportExportTest(Map<String, JsonElement> importJson) throws Exception {
-    assertResponseStatus(doPost("/v1/loom/import", gson.toJson(importJson), ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/import", gson.toJson(importJson), ADMIN_HEADERS), HttpResponseStatus.OK);
 
     // verify using export
-    HttpResponse response = doGet("/v1/loom/export", ADMIN_HEADERS);
+    HttpResponse response = doGet("/export", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     Map<String, JsonElement> exportJson = new Gson().fromJson(reader,
@@ -254,20 +253,20 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
   public void testInvalidProviderReturns400() throws Exception {
     // test an empty object
     JsonObject provider = new JsonObject();
-    assertResponseStatus(doPost("/v1/loom/providers", provider.toString(), ADMIN_HEADERS),
+    assertResponseStatus(doPost("/providers", provider.toString(), ADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // test invalid json
-    assertResponseStatus(doPost("/v1/loom/providers", "[dsfmqo", ADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPost("/providers", "[dsfmqo", ADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
 
     // test an invalid name
     provider.addProperty("name", "?");
-    assertResponseStatus(doPost("/v1/loom/providers", provider.toString(), ADMIN_HEADERS),
+    assertResponseStatus(doPost("/providers", provider.toString(), ADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 
   private void testRestAPIs(String entityType, JsonObject entity1, JsonObject entity2) throws Exception {
-    String base = "/v1/loom/" + entityType;
+    String base = "/" + entityType;
     String entity1Path = base + "/" + entity1.get("name").getAsString();
     String entity2Path = base + "/" + entity2.get("name").getAsString();
     // should start off with no entities
@@ -329,7 +328,7 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
       new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
       new BasicHeader(Constants.TENANT_HEADER, tenant)
     };
-    HttpResponse response = doGet("/v1/loom/metrics/queues", headers);
+    HttpResponse response = doGet("/metrics/queues", headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     Map<String, QueueMetrics> result = gson.fromJson(reader, new TypeToken<Map<String, QueueMetrics>>() {}.getType());

@@ -24,7 +24,7 @@ REST API: Provisioner Plugins
 
 .. include:: /rest/rest-links.rst
 
-Using the Loom admin REST API, you can upload and manage plugin resources.
+Using the admin REST API, you can upload and manage plugin resources.
 Each tenant admin can upload resources that plugins can use, such as chef cookbooks
 or shell scripts. There are two types of plugins: automator and provider. Automator 
 plugins are responsible for performing service operations, such as installing or
@@ -42,7 +42,7 @@ Retrieve a plugin specification
 To retrieve the specification for a specific plugin, make a HTTP GET request to URI:
 ::
 
- /{plugin-type}/{plugin-name}
+ /plugins/{plugin-type}/{plugin-name}
 
 Plugin type is either automatortypes or providertypes. The plugin name and specification
 is defined by the plugin author. For example, one of the automator plugins that comes
@@ -84,9 +84,9 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:tenant'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo
+        http://<server>:<port>/<version>/plugins/automatortypes/chef-solo
  $ {
        "name": "chef-solo",
        "description": "",
@@ -134,7 +134,7 @@ Retrieve all plugin specifications
 To retrieve all specifications of a given plugin type, make a GET HTTP request to URI:
 ::
 
- /{plugin-type}
+ /plugins/{plugin-type}
 
 Plugin type is either automatortypes or providertypes.
 
@@ -159,9 +159,9 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes
+        http://<server>:<port>/<version>/plugins/automatortypes
  $ [
        {
            "name": "chef-solo",
@@ -186,7 +186,7 @@ Add a plugin resource
 To add a plugin resource, make a HTTP POST request to URI:
 ::
 
- /{plugin-type}/{plugin-name}/{resource-type}/{resource-name}
+ /plugins/{plugin-type}/{plugin-name}/{resource-type}/{resource-name}
 
 Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type 
 is one of the resource types defined in the plugin specification. The resource name is the name of 
@@ -219,10 +219,10 @@ Example
 
  $ curl -X POST
         -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         --data-binary @<hadoop-cookbook-file>
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/cookbooks/hadoop
+        http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/cookbooks/hadoop
  $ { 
        "name": "hadoop",
        "version": 1,
@@ -238,7 +238,7 @@ Tenant admins can fetch a map of the metadata of all resources of a specific typ
 HTTP GET request to URI:
 ::
 
- /{plugin-type}/{plugin-name}/{resource-type}
+ /plugins/{plugin-type}/{plugin-name}/{resource-type}
 
 Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type 
 is one of the resource types defined in the plugin specification. Results can also be filtered to only
@@ -278,9 +278,9 @@ Example
 
  $ curl -X GET 
         -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/cookbooks
+        http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/cookbooks
  $ {
        "reactor": [
            {
@@ -316,7 +316,7 @@ Tenant admins can fetch a list of the metadata for all versions of a specific re
 by making a HTTP GET request to URI:
 ::
 
- /{plugin-type}/{plugin-name}/{resource-type}/{resource-name}
+ /plugins/{plugin-type}/{plugin-name}/{resource-type}/{resource-name}
 
 Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type 
 is one of the resource types defined in the plugin specification. Resource name is the name of the resource. 
@@ -358,9 +358,9 @@ Example
 
  $ curl -X GET 
         -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/reactor
+        http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor
  $ [
        {
            "name": "reactor",
@@ -392,7 +392,7 @@ Delete all versions of a resource
 Tenant admins can delete all versions of a resource by making a HTTP DELETE request to URI:
 ::
 
- /{plugin-type}/{plugin-name}/{resource-type}/{resource-name}
+ /plugins/{plugin-type}/{plugin-name}/{resource-type}/{resource-name}
 
 Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type 
 is one of the resource types defined in the plugin specification. Resource name is the name of the resource. 
@@ -420,9 +420,9 @@ Example
 
  $ curl -X DELETE 
         -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/reactor
+        http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor
 
 .. _plugin-resource-delete-version:
 
@@ -432,7 +432,7 @@ Delete a specific version of a resource
 Tenant admins can delete a specific version of a resource by making a HTTP DELETE request to URI:
 ::
 
- /{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}
+ /plugins/{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}
 
 Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type 
 is one of the resource types defined in the plugin specification. Resource name is the name of the resource
@@ -460,9 +460,9 @@ Example
 
  $ curl -X DELETE 
         -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/reactor/versions/1
+        http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor/versions/1
 
 .. _plugin-resource-stage:
 
@@ -472,7 +472,7 @@ Stage a specific version of a resource
 Tenant admins can stage a specific version of a resource by making a HTTP POST request to URI:
 ::
 
- /{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}/stage
+ /plugins/{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}/stage
 
 Staging a resource will make it so that the next sync call will push the resource version to the provisioners.
 Staging an active or staged resource will not do anything. Staging a recalled resource will put it back in the active
@@ -502,9 +502,9 @@ Example
 
  $ curl -X POST 
         -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/reactor/versions/4/stage
+        http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor/versions/4/stage
 
 .. _plugin-resource-recall:
 
@@ -514,7 +514,7 @@ Recall a specific version of a resource
 Tenant admins can recall a specific version of a resource by making a HTTP POST request to URI:
 ::
 
- /{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}/recall
+ /plugins/{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}/recall
 
 Recalling a resource will make it so that the next sync call will remove that resource version from use.
 Recalling an inactive or recalled resource version will have no effect. Recalling a staged resource puts it
@@ -544,9 +544,9 @@ Example
 
  $ curl -X POST 
         -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/reactor/versions/4/recall
+        http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor/versions/4/recall
 
 
 .. _plugin-sync:
@@ -557,7 +557,7 @@ Sync plugins
 Tenant admins can sync plugin resources to provisioners by making a HTTP POST request to URI:
 ::
 
- /sync
+ /plugins/sync
 
 Syncing will push all staged resources to the provisioners, making them available for use. Syncing will
 also remove all recalled resources from use, making them unavailable for use.
@@ -582,6 +582,6 @@ Example
 
  $ curl -X POST 
         -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/sync
+        http://<server>:<port>/<version>/plugins/sync

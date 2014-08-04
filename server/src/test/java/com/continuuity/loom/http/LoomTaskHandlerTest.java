@@ -78,7 +78,7 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(schedulableTask)));
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, TENANT_ID);
-    HttpResponse response = doPost("/v1/loom/tasks/take", gson.toJson(takeRequest));
+    HttpResponse response = doPost("/tasks/take", gson.toJson(takeRequest));
     assertResponseStatus(response, HttpResponseStatus.OK);
     JsonObject responseJson = getResponseJson(response);
     Assert.assertEquals(clusterTask.getTaskId(), responseJson.get("taskId").getAsString());
@@ -87,14 +87,14 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
   @Test
   public void testTakeTaskForDeadProvisionerErrors() throws Exception {
     TakeTaskRequest takeRequest = new TakeTaskRequest("workerX", "nonexistant-provider", "tenantY");
-    assertResponseStatus(doPost("/v1/loom/tasks/take", gson.toJson(takeRequest)), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doPost("/tasks/take", gson.toJson(takeRequest)), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
   public void testFinishTaskForDeadProvisionerErrors() throws Exception {
     FinishTaskRequest finishRequest = new FinishTaskRequest("workerX", "nonexistant-provider", "tenantY", "taskId",
                                                             "stdout", "stderr", 0, null, null);
-    assertResponseStatus(doPost("/v1/loom/tasks/finish", gson.toJson(finishRequest)), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doPost("/tasks/finish", gson.toJson(finishRequest)), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test

@@ -72,9 +72,9 @@ public class MockProvisionerService extends AbstractScheduledService {
     this.httpService = builder.build();
 
     this.httpClient = HttpClients.createDefault();
-    this.heartbeatRequest = new HttpPost(serverUrl + "/v1/provisioners/" + id + "/heartbeat");
-    this.registerRequest = new HttpPut(serverUrl + "/v1/provisioners/" + id);
-    this.deregisterRequest = new HttpDelete(serverUrl + "/v1/provisioners/" + id);
+    this.heartbeatRequest = new HttpPost(serverUrl + "/provisioners/" + id + "/heartbeat");
+    this.registerRequest = new HttpPut(serverUrl + "/provisioners/" + id);
+    this.deregisterRequest = new HttpDelete(serverUrl + "/provisioners/" + id);
     this.workerService = new MockProvisionerWorkerService(id, serverUrl, totalCapacity, taskMs, msBetweenTasks);
   }
 

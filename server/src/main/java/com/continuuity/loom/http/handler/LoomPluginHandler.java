@@ -18,6 +18,7 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
@@ -51,7 +52,7 @@ import java.util.Set;
  * Handler for plugin resource related operations, such as uploading resources, staging, and recalling resources,
  * and syncing resources. Only a tenant admin can access these APIs.
  */
-@Path("/v1/loom")
+@Path(Constants.API_BASE + "/plugins")
 public class LoomPluginHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomPluginHandler.class);
   private final Gson gson;

@@ -24,8 +24,8 @@ Web Services
 
 REST by far is the most efficient and seamless way for disparate and distributed systems to exchange or communicate information. Most 
 interactions are characterized as request-response-action-based exchange. And invariably, there is a client (requesting an action or resource)
-and the server (providing the response or resource) to complete an exchange between two endpoints over HTTP protocol. In that manner, the Loom REST API, then, allows you to interact
-with the Continuuity Loom system from an administrative and user perspective. You can pretty much do everything that a UI can do using these
+and the server (providing the response or resource) to complete an exchange between two endpoints over HTTP protocol. In that manner, the REST API, then, allows you to interact
+with the system from an administrative and user perspective. You can pretty much do everything that a UI can do using these
 REST interfaces. 
 
 Since the API is based on REST principles, it's very easy to write and test applications. You can use your browser to access URLs, 
@@ -37,14 +37,16 @@ Base URL
 All URLs referenced in the documentation have the following base:
 ::
 
- http://<loom-server>:<loom-port>/v1/loom
+ http://<server>:<port>|api_base|
 
+The default server port is 55054 but can be reconfigured as described in :doc:`Configuring the server </guide/admin/server-config>`. 
 In addition, three headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
 the id of the user making the request. The second is ``X-Loom-ApiKey`` and is used to specify the api key used to
 communicate with the server. The third is ``X-Loom-TenantID`` and is used to specify the id of the tenant that the
 user belongs to.
 
-.. note:: The Loom REST API is served over HTTP. In the near future, the Loom APIs will be served on HTTPS to ensure data privacy, and unencrypted HTTP will not be supported.
+
+.. note:: The REST API is served over HTTP. In the near future, the APIs will be served on HTTPS to ensure data privacy, and unencrypted HTTP will not be supported.
 
 Super admin APIs
 ================
@@ -165,7 +167,7 @@ RPC
 About REST (REpresentational State Transfer)
 ===============================================
 
-We designed the Loom API in a very RESTful way, so that your consumption of it is simple and straightforward. 
+We designed the API in a very RESTful way, so that your consumption of it is simple and straightforward. 
 
 From Wikipedia:
 

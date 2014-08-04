@@ -24,14 +24,14 @@ REST API: Importing & Exporting Cluster Templates
 
 .. include:: /rest/rest-links.rst
 
-Loom REST APIs allow you to export all Providers, Hardware Types, Image Types, Services, and Cluster Templates created in a Loom server into a JSON Object that can then be imported into another Loom server.  
+The REST APIs allow you to export all Providers, Hardware Types, Image Types, Services, and Cluster Templates created into a JSON Object that can then be imported into another Loom server.  
 
 .. _entity-export:
 
 Export Template Metadata
 ========================
 
-To export all entities from a Loom server, make a HTTP GET request to URI:
+To export all entities, make a HTTP GET request to URI:
 ::
 
  /export
@@ -59,7 +59,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/export
+        http://<server>:<port>/<version>/export
    {
      "providers":[ ... ],
      "hardwaretypes":[ ... ],
@@ -73,14 +73,14 @@ Example
 Import Template Metadata
 ========================
 
-To import entities into a Loom server, make a POST HTTP request to URI:
+To import entities, make a POST HTTP request to URI:
 ::
 
  /import
 
 The post body must be a JSON object of the same format as the export result.  It has a key for providers, hardwaretypes, imagetypes, services, and clustertemplates.  The value for each key is a JSON array, with each element in the array as a JSON object representation of the corresponding entity.  
 
-.. note:: Imports will wipe out all existing entities from a Loom server, replacing everything with the entities given in the post body. 
+.. note:: Imports will wipe out all existing entities, replacing everything with the entities given in the post body. 
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -110,5 +110,5 @@ Example
               "hardwaretypes":[...],
               "services":[...],
               "clustertemplates":[...]
-            }' http://<loom-server>:<loom-port>/<version>/loom/import
+            }' http://<server>:<port>/<version>/import
 

@@ -18,6 +18,7 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.scheduler.task.NodeService;
 import com.continuuity.loom.store.node.NodeStore;
 import com.continuuity.loom.store.node.NodeStoreService;
@@ -47,7 +48,7 @@ import java.util.Set;
 /**
  * Handler for performing node operations.
  */
-@Path("/v1/loom/nodes")
+@Path(Constants.API_BASE + "/nodes")
 public class LoomNodeHandler extends LoomAuthHandler {
   private static final Logger LOG = LoggerFactory.getLogger(LoomNodeHandler.class);
   private final NodeStoreService nodeStoreService;
