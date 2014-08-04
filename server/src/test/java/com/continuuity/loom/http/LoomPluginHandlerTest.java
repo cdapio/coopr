@@ -98,7 +98,12 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   private void assertSendContents(String contents, ResourceType type, String name) throws Exception {
     String path = getNamePath(type, name);
-    assertResponseStatus(doPost(path, contents, ADMIN_HEADERS), HttpResponseStatus.OK);
+    HttpResponse response = doPost(path, contents, ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent());
+    ResourceMeta responseMeta = gson.fromJson(reader, ResourceMeta.class);
+    Assert.assertEquals(name, responseMeta.getName());
+    Assert.assertEquals(ResourceStatus.INACTIVE, responseMeta.getStatus());
   }
 
   private void testPutAndGet(PluginType type, String pluginName, String resourceType) throws Exception {
