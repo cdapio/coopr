@@ -5,7 +5,7 @@ LOOM_SERVER_HOME=${LOOM_SERVER_HOME:-/opt/loom/server}
 LOOM_SERVER_URI=${LOOM_SERVER_URI:-http://localhost:55054}
 LOOM_API_USER=${LOOM_API_USER:-admin}
 LOOM_API_KEY=${LOOM_API_KEY:-1234567890abcdef}
-LOOM_TENANT=${LOOM_TENANT:-loom}
+LOOM_TENANT=${LOOM_TENANT:-superadmin}
 MAINDIR=${LOOM_SERVER_HOME}/config/defaults
 
 dirs="clustertemplates hardwaretypes imagetypes providers services"
