@@ -51,7 +51,7 @@ import java.util.Set;
  */
 @Path("/v1/loom")
 public class LoomPluginHandler extends LoomAuthHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(LoomProvisionerHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LoomPluginHandler.class);
   private final Gson gson;
   private final ResourceService resourceService;
   private final TenantProvisionerService tenantProvisionerService;

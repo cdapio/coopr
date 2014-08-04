@@ -60,7 +60,8 @@ public class HttpProvisionerRequestService implements ProvisionerRequestService 
     HttpPut put = new HttpPut(getTenantURL(provisioner, tenantId));
     int workers = provisioner.getAssignedWorkers(tenantId);
     try {
-      put.setEntity(new StringEntity(gson.toJson(new ProvisionerTenant(workers, resourceCollection))));
+      String body = gson.toJson(new ProvisionerTenant(workers, resourceCollection));
+      put.setEntity(new StringEntity(body));
     } catch (UnsupportedEncodingException e) {
       // should never happen
       LOG.error("Unsupported encoding when writing tenant {} to provisioner {}",

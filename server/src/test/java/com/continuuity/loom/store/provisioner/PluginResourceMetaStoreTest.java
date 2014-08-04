@@ -16,8 +16,10 @@
 package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.admin.ResourceTypeFormat;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.plugin.PluginType;
+import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
@@ -344,7 +346,10 @@ public abstract class PluginResourceMetaStoreTest {
     view2.add(sally1);
     view2.add(sue1);
 
-    service.getAccountView(account1).syncResourceTypes(ImmutableSet.of(type1, type2));
+    ResourceCollection syncedResources = new ResourceCollection();
+    syncedResources.addResources(type1, ResourceTypeFormat.ARCHIVE, ImmutableSet.of(hadoop2, mysql2));
+    syncedResources.addResources(type2, ResourceTypeFormat.FILE, ImmutableSet.of(bob2, sally1));
+    service.getAccountView(account1).syncResources(syncedResources);
 
     // inactive should stay inactive
     Assert.assertEquals(ResourceStatus.INACTIVE, view1.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());

@@ -16,6 +16,10 @@
 package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.admin.ResourceTypeFormat;
+import com.continuuity.loom.common.utils.ImmutablePair;
+import com.continuuity.loom.provisioner.plugin.ResourceCollection;
+import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryExecutor;
@@ -26,7 +30,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * View of the plugin metadata persistent store for a given account, backed by a SQL database.
@@ -51,18 +55,40 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
   }
 
   @Override
-  public void syncResourceTypes(Set<ResourceType> types) throws IOException {
+  public void syncResources(ResourceCollection resources) throws IOException {
+    // set live to false for everything
     Connection conn = null;
     try {
       conn = dbConnectionPool.getConnection(false);
       try {
-        syncResourceTypes(conn, types);
+        // set everything to not live
+        unsetLiveFlag(conn);
+        // go through resources in the collection and set each one to live
+        PreparedStatement statement = conn.prepareStatement(
+          "UPDATE pluginMeta SET live=true WHERE tenant_id=? AND plugin_type=? AND plugin_name=? AND " +
+            "resource_type=? AND name=? AND version=?");
+        try {
+          statement.setString(1, tenantId);
+          for (Map.Entry<ImmutablePair<ResourceType, ResourceTypeFormat>, ResourceMeta> entry :
+            resources.getResources().entries()) {
+            ResourceType type = entry.getKey().getFirst();
+            ResourceMeta meta = entry.getValue();
+            statement.setString(2, type.getPluginType().name());
+            statement.setString(3, type.getPluginName());
+            statement.setString(4, type.getTypeName());
+            statement.setString(5, meta.getName());
+            statement.setInt(6, meta.getVersion());
+            statement.executeUpdate();
+          }
+        } finally {
+          statement.close();
+        }
         conn.commit();
       } finally {
         conn.close();
       }
     } catch (SQLException e) {
-      LOG.error("Exception syncing resources of types {} for tenant {}.", types, tenantId);
+      LOG.error("Exception syncing resources for tenant {}.", tenantId);
       if (conn != null) {
         try {
           LOG.info("Rolling back uncommitted changes during sync.");
@@ -75,29 +101,14 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
     }
   }
 
-  private void syncResourceTypes(Connection conn, Set<ResourceType> types) throws SQLException {
-    // first set live to false for everything
-    PreparedStatement deactivateStatement = conn.prepareStatement(
-      "UPDATE pluginMeta SET live=false WHERE tenant_id=? AND plugin_type=? AND plugin_name=? " +
-        "AND resource_type=? AND deleted=false AND slated=false AND live=true");
-    deactivateStatement.setString(1, tenantId);
-
-    // then set live to true for everything that is slated to be live
-    PreparedStatement activateStatement = conn.prepareStatement(
-      "UPDATE pluginMeta SET live=true WHERE tenant_id=? AND plugin_type=? AND plugin_name=? " +
-        "AND resource_type=? AND deleted=false AND slated=true");
-    activateStatement.setString(1, tenantId);
-
-    for (ResourceType type : types) {
-      deactivateStatement.setString(2, type.getPluginType().name());
-      deactivateStatement.setString(3, type.getPluginName());
-      deactivateStatement.setString(4, type.getTypeName());
-      deactivateStatement.executeUpdate();
-
-      activateStatement.setString(2, type.getPluginType().name());
-      activateStatement.setString(3, type.getPluginName());
-      activateStatement.setString(4, type.getTypeName());
-      activateStatement.executeUpdate();
+  private void unsetLiveFlag(Connection conn) throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "UPDATE pluginMeta SET live=false WHERE tenant_id=? AND live=true");
+    try {
+      statement.setString(1, tenantId);
+      statement.executeUpdate();
+    } finally {
+      statement.close();
     }
   }
 }

@@ -12,7 +12,6 @@ import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
-import com.continuuity.loom.provisioner.plugin.ResourceSync;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
@@ -306,12 +305,6 @@ public class TenantProvisionerService {
     // lock across all tenants to protect against conflicts in setting worker counts for different tenants across
     // different provisioners
     tenantLock.acquire();
-    // don't want to rebalance while a sync is going on. This is to prevent the scenario where a tenant is moved from
-    // one provisioner to another in the middle of a sync, causing the sync to be called on the wrong provisioners,
-    // as well as the scenario where the rebalance reads the resources that are live, a sync is called to make a new
-    // set of resources live, and then the rebalance puts the old live resource set, undoing the results of the sync.
-    ZKInterProcessReentrantLock syncLock = lockService.getResourceSyncLock(tenantId);
-    syncLock.acquire();
     try {
       Tenant tenant = tenantStore.getTenantByID(tenantId);
       if (tenant == null) {
@@ -334,7 +327,6 @@ public class TenantProvisionerService {
         addWorkers(tenantId, diff, liveResources);
       }
     } finally {
-      syncLock.release();
       tenantLock.release();
     }
   }
@@ -347,11 +339,14 @@ public class TenantProvisionerService {
    * @throws IOException
    */
   public void syncResources(Account account) throws IOException {
-    ZKInterProcessReentrantLock syncLock = lockService.getResourceSyncLock(account.getTenantId());
-    // sync lock makes sure we dont do this while some resource is being staged/unstaged for the account.
-    syncLock.acquire();
+    // this will mean that a sync from one tenant will block a sync from another, but we need this because when
+    // workers are being re-balanced, the live resource collection is sent to the provisioners. We don't want a
+    // scenario where the live collection is read for rebalancing, a sync is called, and the sync and rebalance
+    // fight over what resource versions should be live on the provisioners, resulting in inconsistent state.
+    // Since syncs are uncommon, this should be ok...
+    tenantLock.acquire();
     try {
-      ResourceSync sync = resourceService.getResourcesToSync(account);
+      ResourceCollection resources = resourceService.getResourcesToSync(account);
 
       // TODO: failures will cause inconsistencies between metadata state and provisioner state.
       // We can add an ability to block tasks for a given tenant from going out here, then make the calls to the
@@ -360,29 +355,24 @@ public class TenantProvisionerService {
       // to the queue group interface.
 
       // update tenant provisioners
-      syncProvisionerResources(account.getTenantId(), sync.getResourceCollection());
+      syncProvisionerResources(account.getTenantId(), resources);
 
       // update metadata store
-      resourceService.syncResourceMeta(account, sync);
+      resourceService.syncResourceMeta(account, resources);
 
     } finally {
-      syncLock.release();
+      tenantLock.release();
     }
   }
 
   private void syncProvisionerResources(String tenantId, ResourceCollection resourceCollection) throws IOException {
-    tenantLock.acquire();
-    try {
-      for (Provisioner provisioner : provisionerStore.getTenantProvisioners(tenantId)) {
-        if (!provisionerRequestService.putTenant(provisioner, tenantId, resourceCollection)) {
-          LOG.error("Could not write resource metadata for tenant {} to provisioner {}. " +
-                      "The provisioner appears broken, deleting it and rebalancing its tenant workers",
-                    tenantId, provisioner.getId());
-          deleteProvisioner(provisioner);
-        }
+    for (Provisioner provisioner : provisionerStore.getTenantProvisioners(tenantId)) {
+      if (!provisionerRequestService.putTenant(provisioner, tenantId, resourceCollection)) {
+        LOG.error("Could not write resource metadata for tenant {} to provisioner {}. " +
+                    "The provisioner appears broken, deleting it and rebalancing its tenant workers",
+                  tenantId, provisioner.getId());
+        deleteProvisioner(provisioner);
       }
-    } finally {
-      tenantLock.release();
     }
   }
 

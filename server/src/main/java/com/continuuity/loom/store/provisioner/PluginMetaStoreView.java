@@ -1,9 +1,24 @@
+/*
+ * Copyright 2012-2014, Continuuity, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.continuuity.loom.store.provisioner;
 
+import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
 
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * View of the plugin metadata persistent store for some account.
@@ -19,12 +34,11 @@ public interface PluginMetaStoreView {
   PluginResourceTypeView getResourceTypeView(ResourceType type);
 
   /**
-   * Atomically sync all resources in the account of the given resource types. Sync means that any resource that should
-   * be live after a sync (STAGED or ACTIVE state) is made live (ACTIVE state), and any resource that should not be
-   * live after a sync (UNSTAGED or INACTIVE state) is made not live (INACTIVE state).
+   * Atomically sync all resources in the given collection to be live, and any other resource not given to
+   * not be live.
    *
-   * @param types Resource types to sync
+   * @param resources Resources to set to the live state
    * @throws IOException
    */
-  void syncResourceTypes(Set<ResourceType> types) throws IOException;
+  void syncResources(ResourceCollection resources) throws IOException;
 }

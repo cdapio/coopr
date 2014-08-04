@@ -181,7 +181,7 @@ public class ResourceService extends AbstractIdleService {
     throws MissingEntityException, IOException {
     LOG.debug("staging version {} of resource {} of type {} for account {}.",
               version, name, resourceType, account);
-    ZKInterProcessReentrantLock lock = lockService.getResourceSyncLock(account.getTenantId());
+    ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
     lock.acquire();
     try {
       PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
@@ -208,7 +208,7 @@ public class ResourceService extends AbstractIdleService {
     throws MissingEntityException, IOException {
     LOG.debug("unstaging version {} of resource {} of type {} for account {}.",
               version, name, resourceType, account);
-    ZKInterProcessReentrantLock lock = lockService.getResourceSyncLock(account.getTenantId());
+    ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
     lock.acquire();
     try {
       PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
@@ -344,7 +344,7 @@ public class ResourceService extends AbstractIdleService {
    * @param account Account for which to get resources to sync
    * @return Resources that should be synced for the given account
    */
-  public ResourceSync getResourcesToSync(Account account) throws IOException {
+  public ResourceCollection getResourcesToSync(Account account) throws IOException {
     ResourceCollection resourceCollection = new ResourceCollection();
 
     Set<ImmutablePair<ResourceType, ResourceTypeFormat>> typeFormats = getTypesAndFormats(account);
@@ -357,18 +357,18 @@ public class ResourceService extends AbstractIdleService {
       resourceTypes.add(resourceType);
     }
 
-    return new ResourceSync(resourceCollection, resourceTypes);
+    return resourceCollection;
   }
 
   /**
    * Update the metadata store, syncing the resources in the given collection for the given account.
    *
    * @param account Account containing resources to sync
-   * @param resourceSync Resource sync object containing information around what was synced
+   * @param resourceCollection Collection of synced resources
    * @throws IOException
    */
-  public void syncResourceMeta(Account account, ResourceSync resourceSync) throws IOException {
-    metaStoreService.getAccountView(account).syncResourceTypes(resourceSync.getResourceTypes());
+  public void syncResourceMeta(Account account, ResourceCollection resourceCollection) throws IOException {
+    metaStoreService.getAccountView(account).syncResources(resourceCollection);
   }
 
   // Helper function for getting all the resource types and formats for plugins belonging to an account.
