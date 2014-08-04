@@ -45,6 +45,8 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
 
   abstract PreparedStatement getSelectAllClustersStatement(Connection conn) throws SQLException;
 
+  abstract PreparedStatement getSelectNonTerminatedClusters(Connection conn) throws SQLException;
+
   abstract PreparedStatement getSelectClusterStatement(Connection conn, long id) throws SQLException;
 
   abstract boolean allowedToWrite(Cluster cluster);
@@ -66,6 +68,25 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = getSelectAllClustersStatement(conn);
+        try {
+          return dbQueryExecutor.getQueryList(statement, Cluster.class);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      throw new IOException("Exception getting all clusters");
+    }
+  }
+
+  @Override
+  public List<Cluster> getNonTerminatedClusters() throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = getSelectNonTerminatedClusters(conn);
         try {
           return dbQueryExecutor.getQueryList(statement, Cluster.class);
         } finally {

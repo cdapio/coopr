@@ -306,7 +306,8 @@ public class SolverTest extends BaseSolverTest {
     ClusterTemplate template = gson.fromJson(
       Entities.ClusterTemplateExample.HADOOP_DISTRIBUTED_STRING, ClusterTemplate.class);
     Map<String, String> hwTypeMap = ImmutableMap.of("medium", "medium-flavor");
-    Map<String, String> imgTypeMap = ImmutableMap.of("ubuntu12", "ubunut12-image");
+    Map<String, Map<String, String>> imgTypeMap =
+      ImmutableMap.<String, Map<String, String>>of("ubuntu12", ImmutableMap.of("image", "ubunut12-image"));
     Set<String> services =
       ImmutableSet.of("firewall", "hosts", "namenode", "datanode", "nodemanager", "resourcemanager");
     Map<String, Service> serviceMap = Maps.newHashMap();
@@ -342,9 +343,9 @@ public class SolverTest extends BaseSolverTest {
       "medium", "flavor2",
       "large", "flavor3"
     );
-    Map<String, String> imgmap = ImmutableMap.of(
-      "centos6", "img1",
-      "ubuntu12", "img2"
+    Map<String, Map<String, String>> imgmap = ImmutableMap.<String, Map<String, String>>of(
+      "centos6", ImmutableMap.<String, String>of("image", "img1"),
+      "ubuntu12", ImmutableMap.<String, String>of("image", "img2")
     );
     Set<String> services = reactorTemplate2.getClusterDefaults().getServices();
     Map<String, Service> serviceMap = Maps.newHashMap();

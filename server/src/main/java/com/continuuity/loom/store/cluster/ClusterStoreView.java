@@ -20,6 +20,13 @@ public interface ClusterStoreView {
   List<Cluster> getAllClusters() throws IOException;
 
   /**
+   * Get an immutable list of all clusters in the store that are not in the terminated state.
+   * @return All clusters in the store.
+   * @throws IOException if there was a problem getting the clusters.
+   */
+  List<Cluster> getNonTerminatedClusters() throws IOException;
+
+  /**
    * Get a specific cluster by id.
    * @param clusterId Id of the cluster to find.
    * @return The cluster matching the id, or null if no cluster exists.

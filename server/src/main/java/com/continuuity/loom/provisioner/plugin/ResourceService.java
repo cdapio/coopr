@@ -19,17 +19,15 @@ import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Configuration;
-import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
 import com.continuuity.loom.store.provisioner.PluginMetaStoreView;
 import com.continuuity.loom.store.provisioner.PluginStore;
-import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
-import org.apache.twill.zookeeper.ZKClient;
-import org.apache.twill.zookeeper.ZKClients;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
@@ -49,15 +47,17 @@ public class ResourceService extends AbstractIdleService {
   private final Configuration conf;
   private final PluginStore pluginStore;
   private final PluginMetaStoreService metaStoreService;
-  private final ZKClient zkClient;
+  private final LockService lockService;
+  private final Gson gson;
 
   @Inject
   private ResourceService(PluginStore pluginStore, PluginMetaStoreService metaStoreService,
-                          ZKClient zkClient, Configuration conf) {
+                          LockService lockService, Configuration conf, Gson gson) {
     this.conf = conf;
     this.pluginStore = pluginStore;
     this.metaStoreService = metaStoreService;
-    this.zkClient = ZKClients.namespace(zkClient, Constants.PLUGIN_LOCK_NAMESPACE);
+    this.lockService = lockService;
+    this.gson = gson;
   }
 
   /**
@@ -107,7 +107,7 @@ public class ResourceService extends AbstractIdleService {
         public void finished(HttpResponder responder) {
           try {
             os.close();
-            responder.sendString(HttpResponseStatus.OK, "Upload Complete");
+            responder.sendString(HttpResponseStatus.OK, gson.toJson(resourceMeta));
             LOG.debug("finished uploading resource.");
           } catch (Exception e) {
             LOG.error("Error finishing upload of resource {} of type {} for account {}.",
@@ -124,6 +124,8 @@ public class ResourceService extends AbstractIdleService {
             os.close();
             // deletion flags the entry in the database as deleted
             metaStoreService.getView(account, resourceType).delete(name, version);
+            // dont need the file in the plugin store if there was an error so delete it
+            pluginStore.deleteResource(account, resourceType, name, version);
             responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
           } catch (IOException e) {
             LOG.error("Error uploading resource {} of type {} for account {}.", resourceMeta, resourceType, account, e);
@@ -348,12 +350,7 @@ public class ResourceService extends AbstractIdleService {
   // locks are namespaced by tenant and resource type and name. for example,
   // /tenant1/automator/chef-solo/cookbooks/reactor
   private ZKInterProcessReentrantLock getLock(Account account, ResourceType type, String name) {
-    String path = Joiner.on('/')
-      .join(account.getTenantId(),
-            type.getPluginType().name().toLowerCase(),
-            type.getPluginName(),
-            type.getTypeName(),
-            name);
-    return new ZKInterProcessReentrantLock(zkClient, path);
+    return lockService.getResourceLock(account.getTenantId(), type.getPluginType().name().toLowerCase(),
+                                       type.getPluginName(), type.getTypeName(), name);
   }
 }
