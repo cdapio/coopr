@@ -539,16 +539,10 @@ public class LoomPluginHandler extends LoomAuthHandler {
     } catch (NumberFormatException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
     } catch (IOException e) {
-<<<<<<< HEAD
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating resource version.");
-    } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "Provider type resource not found.");
-=======
       LOG.error("Exception staging resource.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error staging resource version.");
     } catch (MissingEntityException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, type.name().toLowerCase() + " resource not found.");
->>>>>>> origin/develop
     }
   }
 
@@ -563,16 +557,10 @@ public class LoomPluginHandler extends LoomAuthHandler {
     } catch (NumberFormatException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
     } catch (IOException e) {
-<<<<<<< HEAD
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating resource version.");
-    } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "Provider type resource not found.");
-=======
       LOG.error("Exception unstaging resource.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error unstaging resource version.");
     } catch (MissingEntityException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, type.name().toLowerCase() + " resource not found.");
->>>>>>> origin/develop
     }
   }
 
@@ -589,14 +577,10 @@ public class LoomPluginHandler extends LoomAuthHandler {
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
     } catch (IOException e) {
-<<<<<<< HEAD
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting modules.");
-    } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
-=======
       LOG.error("Exception getting resources.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting resources.");
->>>>>>> origin/develop
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
   }
 
@@ -613,14 +597,10 @@ public class LoomPluginHandler extends LoomAuthHandler {
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid status filter.");
     } catch (IOException e) {
-<<<<<<< HEAD
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting modules.");
-    } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
-=======
       LOG.error("Exception getting resources.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting resources.");
->>>>>>> origin/develop
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
   }
 
@@ -637,14 +617,10 @@ public class LoomPluginHandler extends LoomAuthHandler {
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, "Resource not in a deletable state.");
     } catch (IOException e) {
-<<<<<<< HEAD
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
-    } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
-=======
       LOG.error("Exception deleting resource version.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error deleting resource version.");
->>>>>>> origin/develop
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
   }
 
@@ -658,14 +634,10 @@ public class LoomPluginHandler extends LoomAuthHandler {
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, "Resource not in a deletable state.");
     } catch (IOException e) {
-<<<<<<< HEAD
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error activating module version.");
-    } catch (MissingEntityException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
-=======
       LOG.error("Exception deleting all versions of resource.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error deleting all versions of resource.");
->>>>>>> origin/develop
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
   }
 
