@@ -260,6 +260,17 @@ public abstract class PluginResourceMetaStoreTest {
   }
 
   @Test
+  public void testStageOnNothingIsNoOp() throws Exception {
+    PluginMetaStoreService service = getPluginResourceMetaStoreService();
+    PluginResourceTypeView view = service.getResourceTypeView(account1, type1);
+    ResourceMeta hadoop = new ResourceMeta("hadoop", 1, ResourceStatus.STAGED);
+    view.add(hadoop);
+    // if we stage a non-existent version, the current staged version should not be affected
+    view.stage(hadoop.getName(), hadoop.getVersion() + 1);
+    Assert.assertEquals(ResourceStatus.STAGED, view.get(hadoop.getName(), hadoop.getVersion()).getStatus());
+  }
+
+  @Test
   public void testUnstage() throws Exception {
     PluginMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceTypeView view = service.getResourceTypeView(account1, type1);

@@ -365,10 +365,12 @@ public class SQLPluginResourceTypeView implements PluginResourceTypeView {
     try {
       conn = dbConnectionPool.getConnection(false);
       try {
-        // set slated to false for whatever has it set to true
-        unslateResource(conn, name);
         // set the slated flag for this version to true
-        slateVersion(conn, name, version);
+        // if it returns 0, no rows were updated, which means the resource does not exist
+        if (slateVersion(conn, name, version) > 0) {
+          // set slated to false for any other version except this one
+          unslateResource(conn, name, version);
+        }
         conn.commit();
       } finally {
         conn.close();
@@ -411,22 +413,24 @@ public class SQLPluginResourceTypeView implements PluginResourceTypeView {
     }
   }
 
-  // set the slated flag to false wherever its true
-  private void unslateResource(Connection conn, String name) throws SQLException {
+  // set the slated flag to false wherever its true, except for the given version,
+  // returning the number of rows that were updated (should be 0 or 1)
+  private int unslateResource(Connection conn, String name, int exceptVersion) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "UPDATE pluginMeta SET slated=false WHERE tenant_id=? AND plugin_type=? " +
-        "AND plugin_name=? AND resource_type=? AND name=? AND slated=true");
+        "AND plugin_name=? AND resource_type=? AND name=? AND slated=true AND version<>?");
     try {
       setConstantFields(statement);
       statement.setString(5, name);
-      statement.executeUpdate();
+      statement.setInt(6, exceptVersion);
+      return statement.executeUpdate();
     } finally {
       statement.close();
     }
   }
 
-  // slate the given version
-  private void slateVersion(Connection conn, String name, int version) throws SQLException {
+  // slate the given version, returning how many rows were updated (should be 0 or 1)
+  private int slateVersion(Connection conn, String name, int version) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "UPDATE pluginMeta SET slated=true WHERE tenant_id=? AND plugin_type=? " +
         "AND plugin_name=? AND resource_type=? AND name=? AND version=?");
@@ -434,7 +438,7 @@ public class SQLPluginResourceTypeView implements PluginResourceTypeView {
       setConstantFields(statement);
       statement.setString(5, name);
       statement.setInt(6, version);
-      statement.executeUpdate();
+      return statement.executeUpdate();
     } finally {
       statement.close();
     }

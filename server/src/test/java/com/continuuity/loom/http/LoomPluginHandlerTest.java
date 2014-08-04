@@ -24,6 +24,7 @@ import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.continuuity.loom.store.provisioner.PluginResourceTypeView;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -39,6 +40,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,6 +100,25 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   @Test
   public void testGetAndDeleteProviderTypeResources() throws Exception {
     testGetAndDelete(new ResourceType(PluginType.PROVIDER, "joyent", "keys"));
+  }
+
+  @Test
+  public void testStageUnstageOnNonexistentReturns404() throws Exception {
+    ResourceType cookbooks = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType keys = new ResourceType(PluginType.PROVIDER, "joyent", "keys");
+
+    assertSendContents("hadoop contents 1", cookbooks, "hadoop");
+    assertSendContents("dev keys 1", keys, "dev");
+
+    List<String> paths = ImmutableList.of(
+      getVersionedPath(cookbooks, "hadoop", 2) + "/stage",
+      getVersionedPath(cookbooks, "hadoop", 2) + "/unstage",
+      getVersionedPath(keys, "dev", 2) + "/stage",
+      getVersionedPath(keys, "dev", 2) + "/unstage"
+    );
+    for (String path : paths) {
+      assertResponseStatus(doPost(path, "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    }
   }
 
   @Test

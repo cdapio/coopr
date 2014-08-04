@@ -185,8 +185,8 @@ public class ResourceService extends AbstractIdleService {
     lock.acquire();
     try {
       PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
-      if (!view.exists(name)) {
-        throw new MissingEntityException("Module does not exist.");
+      if (!view.exists(name, version)) {
+        throw new MissingEntityException("Resource does not exist.");
       }
       view.stage(name, version);
     } finally {
@@ -212,7 +212,7 @@ public class ResourceService extends AbstractIdleService {
     lock.acquire();
     try {
       PluginResourceTypeView view = metaStoreService.getResourceTypeView(account, resourceType);
-      if (!view.exists(name)) {
+      if (!view.exists(name, version)) {
         throw new MissingEntityException("Resource " + name + " does not exist.");
       }
       view.unstage(name, version);
