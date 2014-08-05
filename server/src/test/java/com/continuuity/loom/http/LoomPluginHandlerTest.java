@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.http;
 
+import com.continuuity.loom.Entities;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
@@ -22,8 +23,10 @@ import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.gson.reflect.TypeToken;
@@ -31,11 +34,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,9 +49,16 @@ import java.util.Set;
  */
 public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
+  @Before
+  public void setupPluginHandlerTest() throws Exception {
+    entityStoreService.getView(SUPERADMIN_ACCOUNT).writeAutomatorType(Entities.AutomatorTypeExample.SHELL);
+    entityStoreService.getView(SUPERADMIN_ACCOUNT).writeAutomatorType(Entities.AutomatorTypeExample.CHEF);
+    entityStoreService.getView(SUPERADMIN_ACCOUNT).writeProviderType(Entities.ProviderTypeExample.JOYENT);
+  }
+
   @Test
   public void testNonAdminGetsForbidden() throws Exception {
-    ResourceType type1 = new ResourceType(PluginType.PROVIDER, "openstack", "keys");
+    ResourceType type1 = new ResourceType(PluginType.PROVIDER, "joyent", "keys");
     ResourceType type2 = new ResourceType(PluginType.AUTOMATOR, "shell", "script");
     ResourceMeta meta = new ResourceMeta("name", 1);
     assertResponseStatus(doPost(getNamePath(type1, "name"), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
@@ -60,13 +72,28 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
+  public void testCallNonexistentResourceReturns404() throws Exception {
+    List<String> getPaths = ImmutableList.of(
+      // test nonexistent plugin
+      "/v1/loom/providertypes/nonexistent/keys",
+      "/v1/loom/automatortypes/nonexistent/cookbooks",
+      // test nonexistent plugin resource type
+      "/v1/loom/providertypes/joyent/cookbooks",
+      "/v1/loom/automatortypes/chef-solo/keys"
+    );
+    for (String getPath : getPaths) {
+      assertResponseStatus(doGet(getPath, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    }
+  }
+
+  @Test
   public void testPutAndGetAutomatorTypeModule() throws Exception {
     testPutAndGet(PluginType.AUTOMATOR, "shell", "scripts");
   }
 
   @Test
   public void testPutAndGetProviderTypeModule() throws Exception {
-    testPutAndGet(PluginType.PROVIDER, "openstack", "cookbooks");
+    testPutAndGet(PluginType.PROVIDER, "joyent", "keys");
   }
 
   @Test
@@ -76,7 +103,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testActivateDeactivateProviderTypeModule() throws Exception {
-    testVersions(PluginType.PROVIDER, "openstack", "keys");
+    testVersions(PluginType.PROVIDER, "joyent", "keys");
   }
 
   @Test
@@ -86,7 +113,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testGetAndDeleteProviderTypeResources() throws Exception {
-    testGetAndDelete(new ResourceType(PluginType.PROVIDER, "openstack", "keys"));
+    testGetAndDelete(new ResourceType(PluginType.PROVIDER, "joyent", "keys"));
   }
 
   private void assertSendContents(String contents, PluginType type, String pluginName, String resourceType,

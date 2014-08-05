@@ -12,7 +12,7 @@ Unreleased
 - Cluster owner macro ( Issues: #221 )
 - Loom Firewall updates ( Issues: #226 #227 )
 - Memcached support for clusters ( Issues: #237 )
-- Multi Tenancy ( Issues: #239 #253 #277 #284 )
+- Multi Tenancy ( Issues: #239, #253, #277, #284, #292, #325, #326 )
 - Include automator and provider types in export and import ( Issues: #246 )
 - Upgrade script ( Issues: #258 )
 - Provisioner Multi Tenancy ( Issues: #290 #296 )
