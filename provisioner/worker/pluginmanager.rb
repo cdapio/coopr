@@ -115,7 +115,7 @@ class PluginManager
     begin
       log.debug "registering provider/automator type: #{name}"
       json = JSON.generate(json_obj)
-      resp = RestClient.put("#{uri}", json, :'X-Loom-UserID' => "admin", :'X-Loom-TenantID' => "loom")
+      resp = RestClient.put("#{uri}", json, :'X-Loom-UserID' => "admin", :'X-Loom-TenantID' => "superadmin")
       if(resp.code == 200)
         log.info "Successfully registered #{name}"
       else

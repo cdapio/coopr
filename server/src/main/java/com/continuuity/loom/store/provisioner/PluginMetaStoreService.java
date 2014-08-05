@@ -19,17 +19,27 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.google.common.util.concurrent.Service;
 
+import java.util.Set;
+
 /**
  * Service that provides views for reading and writing to and from the plugin resource metadata store.
  */
 public interface PluginMetaStoreService extends Service {
 
   /**
+   * Get a view of the metadata store for the given account.
+   *
+   * @param account Account that will be accessing the store
+   * @return View of the metadata store for the given account
+   */
+  PluginMetaStoreView getAccountView(Account account);
+
+  /**
    * Get a view of the metadata store for the given account and resource type.
    *
    * @param account Account that will be accessing the store
-   * @param type Type of plugin resource that will be accessed
+   * @param type Type of resource that will be accessed
    * @return View of the metadata store for the given account and resource type
    */
-  PluginMetaStoreView getView(Account account, ResourceType type);
+  PluginResourceTypeView getResourceTypeView(Account account, ResourceType type);
 }

@@ -1,6 +1,7 @@
 package com.continuuity.loom.common.zookeeper.guice;
 
 import com.continuuity.loom.common.zookeeper.IdService;
+import com.continuuity.loom.common.zookeeper.LockService;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import org.apache.twill.zookeeper.ZKClient;
@@ -20,5 +21,6 @@ public class ZookeeperModule extends AbstractModule {
   protected void configure() {
     bind(ZKClient.class).toInstance(zkClient);
     bind(IdService.class).in(Scopes.SINGLETON);
+    bind(LockService.class).in(Scopes.SINGLETON);
   }
 }

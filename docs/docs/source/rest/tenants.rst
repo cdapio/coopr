@@ -41,7 +41,8 @@ To create a new tenant, make a HTTP POST request to URI:
 
 The POST body is a JSON Object that must contain ``name`` and ``workers`` as keys specifying 
 the name of the tenant and the number of workers assigned to the tenant. Other key-value pairs
-can be added to specify other tenant specific settings. 
+can be added to specify other tenant specific settings, such as quotas on the maximum number
+of clusters and nodes allowed within the tenant. 
 
 POST Parameters
 ^^^^^^^^^^^^^^^^
@@ -85,11 +86,11 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:superadmin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-UserID:admin'
+        -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"my-company", "workers":10}' 
-        http://<loom-server>:<superadmin-port>/<version>/tenants
+        http://<loom-server>:<loom-port>/<version>/tenants
 
 .. _tenants-retrieve:
 
@@ -125,10 +126,10 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:superadmin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-UserID:admin'
+        -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
+        http://<loom-server>:<loom-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
  $ { "name":"my-company", "workers":10, "maxClusters":20, "maxNodes":100 }
 
 
@@ -142,7 +143,8 @@ To delete a tenant, make a DELETE HTTP request to URI:
 
  /tenants/{id}
 
-A tenant can only be deleted if its workers have been set to 0.
+A tenant can only be deleted if its workers have been set to 0. The superadmin tenant
+cannot be deleted.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -155,6 +157,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - If delete was successful
+   * - 403 (FORBIDDEN)
+     - If the user is not allowed to delete the tenant.
    * - 409 (CONFLICT)
      - If the tenant is not in a deletable state.
 
@@ -163,10 +167,10 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Loom-UserID:superadmin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-UserID:admin'
+        -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/tenants/my-company
+        http://<loom-server>:<loom-port>/<version>/tenants/my-company
 
 .. _tenants-modify:
 
@@ -180,7 +184,8 @@ To update a tenant, make a PUT HTTP request to URI:
 
 The resource specified above respresents an individual tenant that is being updated.
 Currently, the update of a tenant resource requires the complete tenant object to in
-the request body. 
+the request body. Trying to lower the max clusters or max nodes below the number
+currently in use is not allowed. 
 
 PUT Parameters
 ^^^^^^^^^^^^^^^^
@@ -219,22 +224,24 @@ HTTP Responses
      - If the resource in the request is invalid
    * - 404 (NOT FOUND)
      - If the resource requested is not found
+   * - 409 (CONFLICT)
+     - If writing the tenant resource would cause quota violations
 
 Example
 ^^^^^^^^
 .. code-block:: bash
 
  $ curl -X PUT
-        -H 'X-Loom-UserID:superadmin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-UserID:admin'
+        -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{ "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }'  
-        http://<loom-server>:<superadmin-port>/<version>/tenants/my-company
+        http://<loom-server>:<loom-port>/<version>/tenants/my-company
  $ curl -X GET 
-        -H 'X-Loom-UserID:superadmin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-UserID:admin'
+        -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/tenants/my-company
+        http://<loom-server>:<loom-port>/<version>/tenants/my-company
  $ { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }
 
 .. _tenants-all-list:
@@ -269,10 +276,10 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:superadmin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-UserID:admin'
+        -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/tenants
+        http://<loom-server>:<loom-port>/<version>/tenants
  $ [
      { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 },
      { "name":"companyX", "workers":100, "maxClusters":100, "maxNodes":1000 }

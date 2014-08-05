@@ -266,15 +266,14 @@ public final class DBQueryExecutor {
   }
 
   /**
-   * Serialize the given object into json, then into bytes of that json, and finally place those bytes
-   * into a byte array stream.
+   * Serialize the given object into json, then into bytes of that json.
    *
    * @param object Object to serialize.
    * @param type Type of the object to serialize.
    * @param <T> Type of the object to serialize.
-   * @return Object in a byte array input stream.
+   * @return Object as bytes.
    */
-  public <T> ByteArrayInputStream toByteStream(T object, Type type) {
-    return new ByteArrayInputStream(gson.toJson(object, type).getBytes(Charsets.UTF_8));
+  public <T> byte[] toBytes(T object, Type type) {
+    return gson.toJson(object, type).getBytes(Charsets.UTF_8);
   }
 }

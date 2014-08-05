@@ -28,6 +28,15 @@ public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
   }
 
   @Override
+  protected PreparedStatement getSelectNonTerminatedClusters(Connection conn)
+    throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "SELECT cluster FROM clusters WHERE status<>? ORDER BY create_time DESC");
+    statement.setString(1, Cluster.Status.TERMINATED.name());
+    return statement;
+  }
+
+  @Override
   protected PreparedStatement getSelectClusterStatement(Connection conn, long id) throws SQLException {
     PreparedStatement statement = conn.prepareStatement("SELECT cluster FROM clusters WHERE id=?");
     statement.setLong(1, id);
@@ -41,10 +50,10 @@ public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
 
   @Override
   protected PreparedStatement getSetClusterStatement(
-    Connection conn, long id, Cluster cluster, ByteArrayInputStream clusterBytes) throws SQLException {
+    Connection conn, long id, Cluster cluster, byte[] clusterBytes) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "UPDATE clusters SET cluster=?, owner_id=?, tenant_id=?, status=?, expire_time=? WHERE id=?");
-    statement.setBlob(1, clusterBytes);
+    statement.setBytes(1, clusterBytes);
     statement.setString(2, cluster.getAccount().getUserId());
     statement.setString(3, cluster.getAccount().getTenantId());
     statement.setString(4, cluster.getStatus().name());

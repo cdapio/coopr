@@ -3,6 +3,7 @@ package com.continuuity.loom.tools;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
@@ -23,7 +24,7 @@ import java.util.Set;
  * Tool for upgrading data from older versions of the system to the current version.
  */
 public class UpgradeTool {
-  private static final String NEW_TENANT_ID = "loom";
+  private static final String NEW_TENANT_ID = Constants.SUPERADMIN_TENANT;
 
   public static void main(String[] args) throws Exception {
     Configuration conf = Configuration.create();
