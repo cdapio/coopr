@@ -33,6 +33,7 @@ import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
 import com.continuuity.loom.store.provisioner.PluginResourceTypeView;
 import com.continuuity.loom.store.provisioner.PluginStore;
 import com.google.common.collect.Sets;
+import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -147,6 +148,76 @@ public class ResourceService extends AbstractIdleService {
         }
       };
     } finally {
+      lock.release();
+    }
+  }
+
+  /**
+   * Get the number of all versions of all resources in the account. Resources can be in any state.
+   *
+   * @param account Account to get the number of resources for
+   * @return Number of resources in the account
+   * @throws IOException
+   */
+  public int numResources(Account account) throws IOException {
+    return metaStoreService.getAccountView(account).numResources();
+  }
+
+  /**
+   * Bootstrap an account's resources by copying what the superadmin has into the account.
+   *
+   * @param account Account to bootstrap
+   */
+  public void bootstrapResources(Account account) throws IOException {
+    for (ImmutablePair<ResourceType, ResourceTypeFormat> typePair : getTypesAndFormats(Account.SUPERADMIN)) {
+      ResourceType type = typePair.getFirst();
+      Map<String, Set<ResourceMeta>> resources =
+        metaStoreService.getResourceTypeView(Account.SUPERADMIN, type).getAll();
+      for (Set<ResourceMeta> metas : resources.values()) {
+        for (ResourceMeta meta : metas) {
+          LOG.debug("copying version {} of resource {} of type {} from superadmin account to account {}",
+                    meta.getVersion(), meta.getName(), type, account);
+          copySuperadminResource(account, type, meta);
+        }
+      }
+    }
+  }
+
+  private void copySuperadminResource(Account account, ResourceType type, ResourceMeta meta) throws IOException {
+    String name = meta.getName();
+    int version = meta.getVersion();
+    ZKInterProcessReentrantLock lock = getResourceLock(account, type, name);
+    lock.acquire();
+    InputStream inStream = null;
+    OutputStream outStream = null;
+    try {
+      inStream = pluginStore.getResourceInputStream(Account.SUPERADMIN, type, name, version);
+      outStream = pluginStore.getResourceOutputStream(account, type, name, version);
+      if (inStream == null) {
+        LOG.error("Could not get input stream for version {} of resource {} of type {} for account {}.",
+                  version, name, type, account);
+        throw new IOException("Unable to get plugin data.");
+      }
+      ByteStreams.copy(inStream, outStream);
+      PluginResourceTypeView metaView = metaStoreService.getResourceTypeView(account, type);
+      if (!metaView.exists(name, version)) {
+        metaView.add(meta);
+      }
+    } finally {
+      if (outStream != null) {
+        try {
+          outStream.close();
+        } catch (IOException e) {
+          LOG.error("Exception closing output stream while copying superadmin resource.", e);
+        }
+      }
+      if (inStream != null) {
+        try {
+          inStream.close();
+        } catch (IOException e) {
+          LOG.error("Exception closing input stream while copying superadmin resource.", e);
+        }
+      }
       lock.release();
     }
   }
