@@ -37,7 +37,6 @@ import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.sun.tools.javac.resources.version;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
