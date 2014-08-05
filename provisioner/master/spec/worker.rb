@@ -53,7 +53,7 @@ module Loom
 end
 
 if __FILE__ == $0
-  tenant = ARGV[0] || "loom"
+  tenant = ARGV[0] || "superadmin"
   worker = Loom::Worker.new(tenant)
   worker.work
 end

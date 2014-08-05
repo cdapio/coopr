@@ -17,41 +17,41 @@
 # mysql -u $user -p -h $hostname $dbname < loom-upgrade-tables-mysql.sql
 
 ALTER TABLE clusters
-    ADD COLUMN tenant_id VARCHAR(255),
+    ADD COLUMN tenant_id VARCHAR(64),
     DROP INDEX cluster_user_index,
     ADD INDEX cluster_account_index (tenant_id, owner_id, id);
 
 ALTER TABLE providerTypes
-    ADD COLUMN tenant_id VARCHAR(255),
+    ADD COLUMN tenant_id VARCHAR(64),
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (tenant_id, name);
 
 ALTER TABLE automatorTypes
-    ADD COLUMN tenant_id VARCHAR(255),
+    ADD COLUMN tenant_id VARCHAR(64),
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (tenant_id, name);
 
 ALTER TABLE providers
-    ADD COLUMN tenant_id VARCHAR(255),
+    ADD COLUMN tenant_id VARCHAR(64),
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (tenant_id, name);
 
 ALTER TABLE hardwareTypes
-    ADD COLUMN tenant_id VARCHAR(255),
+    ADD COLUMN tenant_id VARCHAR(64),
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (tenant_id, name);
 
 ALTER TABLE imageTypes
-    ADD COLUMN tenant_id VARCHAR(255),
+    ADD COLUMN tenant_id VARCHAR(64),
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (tenant_id, name);
 
 ALTER TABLE services
-    ADD COLUMN tenant_id VARCHAR(255),
+    ADD COLUMN tenant_id VARCHAR(64),
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (tenant_id, name);
 
 ALTER TABLE clusterTemplates
-    ADD COLUMN tenant_id VARCHAR(255),
+    ADD COLUMN tenant_id VARCHAR(64),
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (tenant_id, name);

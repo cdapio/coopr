@@ -29,7 +29,6 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -191,7 +190,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        DBPut tenantPut = new TenantDBPut(tenant, dbQueryExecutor.toByteStream(tenant, Tenant.class));
+        DBPut tenantPut = new TenantDBPut(tenant, dbQueryExecutor.toBytes(tenant, Tenant.class));
         tenantPut.executePut(conn);
       } finally {
         conn.close();
@@ -270,9 +269,9 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
 
   private class TenantDBPut extends DBPut {
     private final Tenant tenant;
-    private final ByteArrayInputStream tenantBytes;
+    private final byte[] tenantBytes;
 
-    private TenantDBPut(Tenant tenant, ByteArrayInputStream tenantBytes) {
+    private TenantDBPut(Tenant tenant, byte[] tenantBytes) {
       this.tenant = tenant;
       this.tenantBytes = tenantBytes;
     }
@@ -281,7 +280,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
         "UPDATE tenants SET tenant=?, workers=? WHERE id=?");
-      statement.setBlob(1, tenantBytes);
+      statement.setBytes(1, tenantBytes);
       statement.setInt(2, tenant.getSpecification().getWorkers());
       statement.setString(3, tenant.getId());
       return statement;
@@ -295,7 +294,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
       statement.setString(1, tenant.getId());
       statement.setString(2, tenant.getSpecification().getName());
       statement.setInt(3, tenant.getSpecification().getWorkers());
-      statement.setBlob(4, tenantBytes);
+      statement.setBytes(4, tenantBytes);
       statement.setTimestamp(5, DBHelper.getTimestamp(System.currentTimeMillis()));
       return statement;
     }

@@ -21,7 +21,6 @@ import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
-import com.continuuity.loom.store.provisioner.PluginResourceTypeView;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -50,9 +49,10 @@ import java.util.Set;
 public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   @Before
-  public void setupPluginHandlerTest() throws IOException, IllegalAccessException {
-    entityStoreService.getView(SUPERADMIN_ACCOUNT).writeProviderType(Entities.ProviderTypeExample.JOYENT);
+  public void setupPluginHandlerTest() throws Exception {
+    entityStoreService.getView(SUPERADMIN_ACCOUNT).writeAutomatorType(Entities.AutomatorTypeExample.SHELL);
     entityStoreService.getView(SUPERADMIN_ACCOUNT).writeAutomatorType(Entities.AutomatorTypeExample.CHEF);
+    entityStoreService.getView(SUPERADMIN_ACCOUNT).writeProviderType(Entities.ProviderTypeExample.JOYENT);
   }
 
   @Test
@@ -64,12 +64,25 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(doPost(getNamePath(type2, "name"), "contents", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doDelete(getVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doDelete(getVersionedPath(type2, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doGet(getVersionedPath(type1, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doGet(getVersionedPath(type2, meta), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doGet(getNamePath(type1, "name"), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doGet(getNamePath(type2, "name"), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doGet(getTypePath(type1), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doGet(getTypePath(type2), USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void testCallNonexistentResourceReturns404() throws Exception {
+    List<String> getPaths = ImmutableList.of(
+      // test nonexistent plugin
+      "/v1/loom/providertypes/nonexistent/keys",
+      "/v1/loom/automatortypes/nonexistent/cookbooks",
+      // test nonexistent plugin resource type
+      "/v1/loom/providertypes/joyent/cookbooks",
+      "/v1/loom/automatortypes/chef-solo/keys"
+    );
+    for (String getPath : getPaths) {
+      assertResponseStatus(doGet(getPath, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    }
   }
 
   @Test
@@ -79,7 +92,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testPutAndGetProviderTypeModule() throws Exception {
-    testPutAndGet(PluginType.PROVIDER, "joyent", "cookbooks");
+    testPutAndGet(PluginType.PROVIDER, "joyent", "keys");
   }
 
   @Test
@@ -213,7 +226,12 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
   private void assertSendContents(String contents, ResourceType type, String name) throws Exception {
     String path = getNamePath(type, name);
-    assertResponseStatus(doPost(path, contents, ADMIN_HEADERS), HttpResponseStatus.OK);
+    HttpResponse response = doPost(path, contents, ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent());
+    ResourceMeta responseMeta = gson.fromJson(reader, ResourceMeta.class);
+    Assert.assertEquals(name, responseMeta.getName());
+    Assert.assertEquals(ResourceStatus.INACTIVE, responseMeta.getStatus());
   }
 
   private void testPutAndGet(PluginType type, String pluginName, String resourceType) throws Exception {
@@ -225,8 +243,20 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     HttpResponse response = doGet(getNamePath(pluginResourceType, meta.getName()), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(ImmutableSet.of(meta), bodyToMetaSet(response));
+
     // get actual contents
-    response = doGet(getVersionedPath(pluginResourceType, meta), ADMIN_HEADERS);
+    String typeStr = type.name().toLowerCase() + "types";
+    String path = Joiner.on('/').join(
+      "/v1/tenants",
+      ADMIN_ACCOUNT.getTenantId(),
+      typeStr,
+      pluginName,
+      resourceType,
+      meta.getName(),
+      "versions",
+      meta.getVersion()
+    );
+    response = doGet(path);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(contents, bodyToString(response));
   }

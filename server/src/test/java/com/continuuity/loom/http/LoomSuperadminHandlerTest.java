@@ -20,6 +20,7 @@ import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
@@ -65,6 +66,12 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     tenantProvisionerService.writeProvisioner(
       new Provisioner("p1", "host", 12345, 100, ImmutableMap.<String, Integer>of(), ImmutableMap.<String, Integer>of())
     );
+  }
+
+  @Test
+  public void testDeleteSuperadminForbidden() throws Exception {
+    assertResponseStatus(doDelete("/v1/tenants/" + Constants.SUPERADMIN_TENANT, SUPERADMIN_HEADERS),
+                         HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
