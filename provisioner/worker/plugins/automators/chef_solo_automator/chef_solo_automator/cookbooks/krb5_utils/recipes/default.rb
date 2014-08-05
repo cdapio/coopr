@@ -50,14 +50,16 @@ keytab_dir = node['krb5_utils']['keytabs_dir']
       http_principal = "HTTP/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
       principal = "#{name}/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
       keytab_file = "#{name}.service.keytab"
+      randkey = '-randkey'
     when 'krb5_user_keytabs'
       http_principal = ''
       principal = "#{name}@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
       keytab_file = "#{name}.keytab"
+      randkey = '-norandkey'
     end
 
     execute "krb5-addprinc-#{principal}" do
-      command "kadmin -w #{node['krb5_utils']['admin_password']} -q 'addprinc -randkey #{principal}'"
+      command "kadmin -w #{node['krb5_utils']['admin_password']} -q 'addprinc #{randkey} #{principal}'"
       action :run
       not_if "kadmin -w #{node['krb5_utils']['admin_password']} -q 'list_principals' | grep -v Auth | grep '^#{principal}'"
     end
