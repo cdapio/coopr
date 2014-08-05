@@ -2,6 +2,7 @@ package com.continuuity.loom.provisioner;
 
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
+import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.AfterClass;
@@ -9,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 
 /**
  *
@@ -47,10 +47,14 @@ public class HttpProvisionerRequestServiceTest {
   public void testPutTenant() {
     Provisioner provisioner = new Provisioner("id", host, port, 100, null, null);
     for (int i = 0; i < 10; i++) {
-      provisionerRequestService.putTenant(provisioner, "tenant" + i % 5);
+      provisionerRequestService.putTenantWorkers(provisioner, "tenant" + i % 5);
+      provisionerRequestService.putTenant(provisioner, "tenant" + i % 5, new ResourceCollection());
+      provisionerRequestService.putTenantResources(provisioner, "tenant" + i % 5, new ResourceCollection());
     }
     for (int i = 0; i < 5; i++) {
       Assert.assertEquals(2, stubProvisioner.getPutCount("tenant" + i));
+      Assert.assertEquals(2, stubProvisioner.getPutResourcesCount("tenant" + i));
+      Assert.assertEquals(2, stubProvisioner.getPutWorkersCount("tenant" + i));
     }
   }
 

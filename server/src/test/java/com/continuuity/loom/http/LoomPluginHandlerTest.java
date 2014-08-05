@@ -26,7 +26,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.gson.reflect.TypeToken;
@@ -114,6 +113,110 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   @Test
   public void testGetAndDeleteProviderTypeResources() throws Exception {
     testGetAndDelete(new ResourceType(PluginType.PROVIDER, "joyent", "keys"));
+  }
+
+  @Test
+  public void testStageUnstageOnNonexistentReturns404() throws Exception {
+    ResourceType cookbooks = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType keys = new ResourceType(PluginType.PROVIDER, "joyent", "keys");
+
+    assertSendContents("hadoop contents 1", cookbooks, "hadoop");
+    assertSendContents("dev keys 1", keys, "dev");
+
+    List<String> paths = ImmutableList.of(
+      getVersionedPath(cookbooks, "hadoop", 2) + "/stage",
+      getVersionedPath(cookbooks, "hadoop", 2) + "/unstage",
+      getVersionedPath(keys, "dev", 2) + "/stage",
+      getVersionedPath(keys, "dev", 2) + "/unstage"
+    );
+    for (String path : paths) {
+      assertResponseStatus(doPost(path, "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    }
+  }
+
+  @Test
+  public void testSync() throws Exception {
+    ResourceType cookbooks = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceType keys = new ResourceType(PluginType.PROVIDER, "joyent", "keys");
+    ResourceMeta hadoop1 = new ResourceMeta("hadoop", 1, ResourceStatus.INACTIVE);
+    ResourceMeta hadoop2 = new ResourceMeta("hadoop", 2, ResourceStatus.ACTIVE);
+    ResourceMeta hadoop3 = new ResourceMeta("hadoop", 3, ResourceStatus.INACTIVE);
+    ResourceMeta mysql1 = new ResourceMeta("mysql", 1, ResourceStatus.ACTIVE);
+    ResourceMeta mysql2 = new ResourceMeta("mysql", 2, ResourceStatus.INACTIVE);
+    ResourceMeta dev1 = new ResourceMeta("dev", 1, ResourceStatus.INACTIVE);
+    ResourceMeta dev2 = new ResourceMeta("dev", 2, ResourceStatus.ACTIVE);
+    ResourceMeta research1 = new ResourceMeta("research", 1, ResourceStatus.INACTIVE);
+
+    // upload 3 versions of hadoop cookbook
+    assertSendContents("hadoop contents 1", cookbooks, "hadoop");
+    assertSendContents("hadoop contents 2", cookbooks, "hadoop");
+    assertSendContents("hadoop contents 3", cookbooks, "hadoop");
+    // upload 2 versions of mysql cookbook
+    assertSendContents("mysql contents 1", cookbooks, "mysql");
+    assertSendContents("mysql contents 2", cookbooks, "mysql");
+    // upload 2 versions of dev keys
+    assertSendContents("dev keys 1", keys, "dev");
+    assertSendContents("dev keys 2", keys, "dev");
+    // upload 1 version of research keys
+    assertSendContents("research keys 1", keys, "research");
+
+    // stage version 2 of hadoop
+    assertResponseStatus(doPost(getVersionedPath(cookbooks, "hadoop", 2) + "/stage", "", ADMIN_HEADERS),
+                         HttpResponseStatus.OK);
+    // stage version 1 of mysql
+    assertResponseStatus(doPost(getVersionedPath(cookbooks, "mysql", 1) + "/stage", "", ADMIN_HEADERS),
+                         HttpResponseStatus.OK);
+    // stage version 2 of dev
+    assertResponseStatus(doPost(getVersionedPath(keys, "dev", 2) + "/stage", "", ADMIN_HEADERS),
+                         HttpResponseStatus.OK);
+
+    // sync
+    assertResponseStatus(doPost("/v1/loom/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
+
+    // check cookbooks
+    HttpResponse response = doGet(getTypePath(cookbooks), ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Map<String, Set<ResourceMeta>> actual = bodyToMetaMap(response);
+    Map<String, Set<ResourceMeta>> expected = ImmutableMap.<String, Set<ResourceMeta>>of(
+      "hadoop", ImmutableSet.<ResourceMeta>of(hadoop1, hadoop2, hadoop3),
+      "mysql", ImmutableSet.<ResourceMeta>of(mysql1, mysql2)
+    );
+    Assert.assertEquals(expected, actual);
+    // check keys
+    response = doGet(getTypePath(keys), ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    actual = bodyToMetaMap(response);
+    expected = ImmutableMap.<String, Set<ResourceMeta>>of(
+      "dev", ImmutableSet.<ResourceMeta>of(dev1, dev2),
+      "research", ImmutableSet.<ResourceMeta>of(research1)
+    );
+    Assert.assertEquals(expected, actual);
+
+    // stage version3 of hadoop
+    assertResponseStatus(doPost(getVersionedPath(cookbooks, "hadoop", 3) + "/stage", "", ADMIN_HEADERS),
+                         HttpResponseStatus.OK);
+    // unstage version1 of mysql
+    assertResponseStatus(doPost(getVersionedPath(cookbooks, "mysql", 1) + "/unstage", "", ADMIN_HEADERS),
+                         HttpResponseStatus.OK);
+    response = doGet(getTypePath(cookbooks), ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    actual = bodyToMetaMap(response);
+
+    // sync
+    assertResponseStatus(doPost("/v1/loom/sync", "", ADMIN_HEADERS), HttpResponseStatus.OK);
+
+    // check cookbooks
+    response = doGet(getTypePath(cookbooks), ADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    actual = bodyToMetaMap(response);
+    hadoop2 = new ResourceMeta("hadoop", 2, ResourceStatus.INACTIVE);
+    hadoop3 = new ResourceMeta("hadoop", 3, ResourceStatus.ACTIVE);
+    mysql1 = new ResourceMeta("mysql", 1, ResourceStatus.INACTIVE);
+    expected = ImmutableMap.<String, Set<ResourceMeta>>of(
+      "hadoop", ImmutableSet.<ResourceMeta>of(hadoop1, hadoop2, hadoop3),
+      "mysql", ImmutableSet.<ResourceMeta>of(mysql1, mysql2)
+    );
+    Assert.assertEquals(expected, actual);
   }
 
   private void assertSendContents(String contents, PluginType type, String pluginName, String resourceType,
@@ -286,8 +389,12 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     return Joiner.on("/").join(getTypePath(type), name);
   }
 
+  private String getVersionedPath(ResourceType type, String name, int version) {
+    return Joiner.on("/").join(getTypePath(type), name, "versions", version);
+  }
+
   private String getVersionedPath(ResourceType type, ResourceMeta meta) {
-    return Joiner.on("/").join(getTypePath(type), meta.getName(), "versions", meta.getVersion());
+    return getVersionedPath(type, meta.getName(), meta.getVersion());
   }
 
 }

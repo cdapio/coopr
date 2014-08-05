@@ -87,8 +87,13 @@ public class SQLPluginMetaStoreService extends AbstractIdleService implements Pl
   }
 
   @Override
-  public PluginMetaStoreView getView(Account account, ResourceType type) {
+  public PluginMetaStoreView getAccountView(Account account) {
     Preconditions.checkArgument(account.isAdmin(), "Only an admin is allowed to access plugin information.");
-    return new SQLPluginMetaStoreView(dbConnectionPool, dbQueryExecutor, account, type);
+    return new SQLPluginMetaStoreView(dbConnectionPool, dbQueryExecutor, account);
+  }
+
+  @Override
+  public PluginResourceTypeView getResourceTypeView(Account account, ResourceType type) {
+    return getAccountView(account).getResourceTypeView(type);
   }
 }

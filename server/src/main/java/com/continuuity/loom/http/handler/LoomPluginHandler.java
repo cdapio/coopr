@@ -19,6 +19,7 @@ import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.AbstractPluginSpecification;
+import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
@@ -56,15 +57,18 @@ public class LoomPluginHandler extends LoomAuthHandler {
   private final Gson gson;
   private final ResourceService resourceService;
   private final EntityStoreService entityStoreService;
+  private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
   private LoomPluginHandler(TenantStore tenantStore,
                             ResourceService resourceService,
                             EntityStoreService entityStoreService,
+                            TenantProvisionerService tenantProvisionerService,
                             Gson gson) {
     super(tenantStore);
     this.resourceService = resourceService;
     this.entityStoreService = entityStoreService;
+    this.tenantProvisionerService = tenantProvisionerService;
     this.gson = gson;
   }
 
@@ -483,8 +487,22 @@ public class LoomPluginHandler extends LoomAuthHandler {
   @POST
   @Path("/sync")
   public void syncPlugins(HttpRequest request, HttpResponder responder) {
-    // TODO: implement
-    responder.sendError(HttpResponseStatus.NOT_IMPLEMENTED, "not implemented yet");
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+    LOG.debug("Plugin sync called for tenant {}.", account.getTenantId());
+
+    try {
+      tenantProvisionerService.syncResources(account);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error syncing plugin resources");
+    }
   }
 
   private void validateTypeExists(Account account, ResourceType resourceType)
