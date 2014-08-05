@@ -101,6 +101,28 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
     }
   }
 
+  @Override
+  public int numResources() throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT COUNT(*) FROM pluginMeta WHERE tenant_id=? AND deleted=false");
+        try {
+          statement.setString(1, tenantId);
+          return dbQueryExecutor.getNum(statement);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting number of resources in the metadata store.", e);
+      throw new IOException(e);
+    }
+  }
+
   private void unsetLiveFlag(Connection conn) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "UPDATE pluginMeta SET live=false WHERE tenant_id=? AND live=true");

@@ -12,5 +12,6 @@ public class TestStoreModule extends AbstractStoreModule {
   @Override
   void bindPluginStore() {
     bind(PluginStore.class).to(MemoryPluginStore.class).in(Scopes.SINGLETON);
+    bind(MemoryPluginStore.class).in(Scopes.SINGLETON);
   }
 }

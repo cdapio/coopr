@@ -51,6 +51,24 @@ public abstract class PluginResourceMetaStoreTest {
   }
 
   @Test
+  public void testGetNumResources() throws Exception {
+    PluginMetaStoreService service = getPluginResourceMetaStoreService();
+    // for account1 write 6 resources (7 but one is deleted) in all different states
+    service.getResourceTypeView(account1, type1).add(new ResourceMeta("r1", 1, ResourceStatus.ACTIVE));
+    service.getResourceTypeView(account1, type1).add(new ResourceMeta("r1", 2, ResourceStatus.INACTIVE));
+    service.getResourceTypeView(account1, type1).add(new ResourceMeta("r2", 1, ResourceStatus.INACTIVE));
+    service.getResourceTypeView(account1, type1).add(new ResourceMeta("r2", 2, ResourceStatus.STAGED));
+    service.getResourceTypeView(account1, type2).add(new ResourceMeta("r3", 1, ResourceStatus.UNSTAGED));
+    service.getResourceTypeView(account1, type2).add(new ResourceMeta("r3", 2, ResourceStatus.STAGED));
+    service.getResourceTypeView(account1, type2).add(new ResourceMeta("r3", 3, ResourceStatus.STAGED));
+    service.getResourceTypeView(account1, type2).delete("r3", 3);
+
+    Assert.assertEquals(6, service.getAccountView(account1).numResources());
+    // account 2 should have nothing
+    Assert.assertEquals(0, service.getAccountView(account2).numResources());
+  }
+
+  @Test
   public void testWriteDeleteExistsGetWithinAccount() throws Exception {
     PluginMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceTypeView view = service.getResourceTypeView(account1, type1);

@@ -39,7 +39,7 @@ public class MemoryPluginStore implements PluginStore {
   }
 
   // for unit tests
-  void clearData() {
+  public void clearData() {
     store.clear();
   }
 
