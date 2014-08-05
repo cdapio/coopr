@@ -41,4 +41,12 @@ public interface PluginMetaStoreView {
    * @throws IOException
    */
   void syncResources(ResourceCollection resources) throws IOException;
+
+  /**
+   * Get the number of resources in the metadata store, including all versions of all resources in any state.
+   *
+   * @return The number of resources in the metadata store, including all versions of all resources in any state
+   * @throws IOException
+   */
+  int numResources() throws IOException;
 }

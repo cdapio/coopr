@@ -27,6 +27,8 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.current.NodePropertiesRequestCodec;
 import com.continuuity.loom.http.request.BootstrapRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
+import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.store.cluster.ClusterStore;
@@ -45,6 +47,8 @@ import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -60,20 +64,27 @@ import java.util.Set;
  */
 @Path("/v1/loom")
 public class LoomRPCHandler extends LoomAuthHandler {
+  private static final Logger LOG  = LoggerFactory.getLogger(LoomRPCHandler.class);
   private static final Gson GSON = new GsonBuilder()
     .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec()).create();
   private final EntityStoreService entityStoreService;
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
+  private final ResourceService resourceService;
+  private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
   private LoomRPCHandler(TenantStore tenantStore,
                          EntityStoreService entityStoreService,
-                         ClusterStoreService clusterStoreService) {
+                         ClusterStoreService clusterStoreService,
+                         ResourceService resourceService,
+                         TenantProvisionerService tenantProvisionerService) {
     super(tenantStore);
     this.entityStoreService = entityStoreService;
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
+    this.resourceService = resourceService;
+    this.tenantProvisionerService = tenantProvisionerService;
   }
 
   /**
@@ -86,7 +97,7 @@ public class LoomRPCHandler extends LoomAuthHandler {
    */
   @POST
   @Path("/bootstrap")
-  public void bootstrapTenant(HttpRequest request, HttpResponder responder) throws Exception {
+  public void bootstrapTenant(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -116,54 +127,69 @@ public class LoomRPCHandler extends LoomAuthHandler {
     EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
     EntityStoreView tenantView = entityStoreService.getView(account);
 
-    if (!forced && !canBootstrap(tenantView)) {
-      responder.sendError(HttpResponseStatus.CONFLICT, "Cannot bootstrap unless the tenant is empty.");
-      return;
-    }
+    try {
+      if (!forced && !canBootstrap(account)) {
+        responder.sendError(HttpResponseStatus.CONFLICT, "Cannot bootstrap unless the tenant is empty.");
+        return;
+      }
 
-    // copy entities
-    for (HardwareType hardwareType : superadminView.getAllHardwareTypes()) {
-      if (!forced && tenantView.getHardwareType(hardwareType.getName()) != null) {
-        continue;
+      // copy entities
+      LOG.debug("Bootstrapping entities");
+      for (HardwareType hardwareType : superadminView.getAllHardwareTypes()) {
+        if (!forced && tenantView.getHardwareType(hardwareType.getName()) != null) {
+          continue;
+        }
+        tenantView.writeHardwareType(hardwareType);
       }
-      tenantView.writeHardwareType(hardwareType);
-    }
-    for (ImageType imageType : superadminView.getAllImageTypes()) {
-      if (!forced && tenantView.getImageType(imageType.getName()) != null) {
-        continue;
+      for (ImageType imageType : superadminView.getAllImageTypes()) {
+        if (!forced && tenantView.getImageType(imageType.getName()) != null) {
+          continue;
+        }
+        tenantView.writeImageType(imageType);
       }
-      tenantView.writeImageType(imageType);
-    }
-    for (Service service : superadminView.getAllServices()) {
-      if (!forced && tenantView.getService(service.getName()) != null) {
-        continue;
+      for (Service service : superadminView.getAllServices()) {
+        if (!forced && tenantView.getService(service.getName()) != null) {
+          continue;
+        }
+        tenantView.writeService(service);
       }
-      tenantView.writeService(service);
-    }
-    for (ClusterTemplate template : superadminView.getAllClusterTemplates()) {
-      if (!forced && tenantView.getClusterTemplate(template.getName()) != null) {
-        continue;
+      for (ClusterTemplate template : superadminView.getAllClusterTemplates()) {
+        if (!forced && tenantView.getClusterTemplate(template.getName()) != null) {
+          continue;
+        }
+        tenantView.writeClusterTemplate(template);
       }
-      tenantView.writeClusterTemplate(template);
-    }
-    for (Provider provider : superadminView.getAllProviders()) {
-      if (!forced && tenantView.getProvider(provider.getName()) != null) {
-        continue;
+      for (Provider provider : superadminView.getAllProviders()) {
+        if (!forced && tenantView.getProvider(provider.getName()) != null) {
+          continue;
+        }
+        tenantView.writeProvider(provider);
       }
-      tenantView.writeProvider(provider);
-    }
 
-    // TODO: bootstrap plugin resources
+      // bootstrap plugin resources
+      LOG.debug("Bootstrapping plugin resources");
+      resourceService.bootstrapResources(account);
+      LOG.debug("Syncing plugin resources");
+      tenantProvisionerService.syncResources(account);
 
-    responder.sendStatus(HttpResponseStatus.OK);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      LOG.error("Exception bootstrapping account {}", account);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error boostrapping account.");
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User not allowed to write entities.");
+    }
   }
 
-  private boolean canBootstrap(EntityStoreView tenantView) throws IOException {
+  // can bootstrap if there is nothing in the account
+  private boolean canBootstrap(Account account) throws IOException {
+    EntityStoreView tenantView = entityStoreService.getView(account);
     return tenantView.getAllProviders().isEmpty() &&
       tenantView.getAllHardwareTypes().isEmpty() &&
       tenantView.getAllImageTypes().isEmpty() &&
       tenantView.getAllServices().isEmpty() &&
-      tenantView.getAllClusterTemplates().isEmpty();
+      tenantView.getAllClusterTemplates().isEmpty() &&
+      resourceService.numResources(account) == 0;
   }
 
   /**
