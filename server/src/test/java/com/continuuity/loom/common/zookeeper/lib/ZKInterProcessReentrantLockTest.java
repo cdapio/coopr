@@ -16,6 +16,7 @@
 package com.continuuity.loom.common.zookeeper.lib;
 
 import com.continuuity.loom.common.zookeeper.BaseZKTest;
+import com.continuuity.loom.common.zookeeper.IdService;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.SettableFuture;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
@@ -28,6 +29,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,86 +39,8 @@ import java.util.concurrent.TimeUnit;
 public class ZKInterProcessReentrantLockTest extends BaseZKTest {
 
   @Test(timeout = 10000)
-  public void test() throws ExecutionException, InterruptedException {
-    final String path = "/foo/lock";
-    ExecutorService executorService = Executors.newFixedThreadPool(3);
-    final SettableFuture<Object> unblockFirst = SettableFuture.create();
-    final SettableFuture<Object> unblockSecond = SettableFuture.create();
-    final SettableFuture<Object> unblockThird = SettableFuture.create();
-
-    final int[] lockOwner = new int[1];
-    // 1st thread acquires the lock and waits for a signal before releases it.
-    // 2nd & 3rd thread waits to acquire the lock
-    // 2nd acquires after 1st releases it.
-    // 3nd acquires after 2nd releases it.
-    // Then 1st tries to acquire lock again, but has to wait before 3rd one releases it.
-
-    executorService.submit(new NonSafeRunnable() {
-      @Override
-      public void notSafeRun() throws Exception {
-        ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, path);
-        lock.acquire();
-        lockOwner[0] = 1;
-        // waiting for command to start the whole thing
-        unblockFirst.get();
-        lock.release();
-        TimeUnit.MILLISECONDS.sleep(300);
-        lock.acquire();
-        lockOwner[0] = 1;
-        lock.release();
-      }
-    });
-
-    // waiting for first to acquire the lock
-    TimeUnit.MILLISECONDS.sleep(100);
-
-    executorService.submit(new NonSafeRunnable() {
-      @Override
-      public void notSafeRun() throws Exception {
-        ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, path);
-        lock.acquire();
-        lockOwner[0] = 2;
-        // waiting for command to start the whole thing
-        unblockSecond.get();
-        lock.release();
-      }
-    });
-
-    TimeUnit.MILLISECONDS.sleep(100);
-
-    executorService.submit(new NonSafeRunnable() {
-      @Override
-      public void notSafeRun() throws Exception {
-        ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, path);
-        lock.acquire();
-        lockOwner[0] = 3;
-        // waiting for command to start the whole thing
-        unblockSecond.get();
-        lock.release();
-      }
-    });
-
-    Assert.assertEquals(1, lockOwner[0]);
-
-    unblockFirst.set(new Object());
-    // waiting for next to acquire the lock
-    TimeUnit.MILLISECONDS.sleep(100);
-    Assert.assertEquals(2, lockOwner[0]);
-
-    unblockSecond.set(new Object());
-    // waiting for next to acquire the lock
-    TimeUnit.MILLISECONDS.sleep(200);
-    Assert.assertEquals(3, lockOwner[0]);
-
-    unblockSecond.set(new Object());
-    // waiting for next to acquire the lock
-    TimeUnit.MILLISECONDS.sleep(300);
-    Assert.assertEquals(1, lockOwner[0]);
-
-    // checking that current thread can now acquire the lock
-    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, path);
-    lock.acquire();
-    // checking that we can acquire the same lock multiple times
+  public void testLockIsReentrant() {
+    ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, "/foo/lock");
     lock.acquire();
     lock.acquire();
     lock.release();
@@ -123,16 +48,56 @@ public class ZKInterProcessReentrantLockTest extends BaseZKTest {
     lock.release();
   }
 
-  private static abstract class NonSafeRunnable implements Runnable {
-    @Override
-    public void run() {
-      try {
-        notSafeRun();
-      } catch (Exception e) {
-        throw Throwables.propagate(e);
-      }
+  @Test(timeout = 10000)
+  public void testLock() throws InterruptedException {
+    final int incrementsPerThread = 50;
+    final int numThreads = 10;
+    final CyclicBarrier barrier = new CyclicBarrier(numThreads);
+    final CountDownLatch latch = new CountDownLatch(numThreads);
+    final Counter counter = new Counter();
+    final String lockPath = "/bar/lock";
+
+    ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+    for (int i = 0; i < numThreads; i++) {
+      executor.execute(new Runnable() {
+        @Override
+        public void run() {
+          // wait for all threads to get here
+          try {
+            barrier.await();
+          } catch (Exception e) {
+            Throwables.propagate(e);
+          }
+          // perform increments when holding the lock
+          for (int j = 0; j < incrementsPerThread; j++) {
+            ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, lockPath);
+            lock.acquire();
+            try {
+              counter.setCount(counter.getCount() + 1);
+            } finally {
+              lock.release();
+            }
+          }
+          // hit the latch when you're done
+          latch.countDown();
+        }
+      });
     }
 
-    public abstract void notSafeRun() throws Exception;
+    latch.await();
+
+    Assert.assertEquals(numThreads * incrementsPerThread, counter.getCount());
+  }
+
+  private class Counter {
+    private int count = 0;
+
+    private int getCount() {
+      return count;
+    }
+
+    private void setCount(int count) {
+      this.count = count;
+    }
   }
 }
