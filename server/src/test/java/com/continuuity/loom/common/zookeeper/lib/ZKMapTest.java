@@ -103,6 +103,9 @@ public class ZKMapTest extends BaseZKTest {
     for (int i = 0; i < keyvals.length; i += 2) {
       String key = keyvals[i];
       String val = keyvals[i+1];
+      if (!map.containsKey(key)) {
+        return false;
+      }
       if (!map.get(key).equals(val)) {
         return false;
       }
