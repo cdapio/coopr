@@ -72,8 +72,11 @@ public class ZKInterProcessReentrantLockTest extends BaseZKTest {
           for (int j = 0; j < incrementsPerThread; j++) {
             ZKInterProcessReentrantLock lock = new ZKInterProcessReentrantLock(zkClient, lockPath);
             lock.acquire();
-            counter.setCount(counter.getCount() + 1);
-            lock.release();
+            try {
+              counter.setCount(counter.getCount() + 1);
+            } finally {
+              lock.release();
+            }
           }
           // hit the latch when you're done
           latch.countDown();
