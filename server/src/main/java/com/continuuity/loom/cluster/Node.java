@@ -32,7 +32,7 @@ import java.util.Set;
  * Represents a machine in a cluster.
  */
 public final class Node implements Comparable<Node> {
-
+  private static final String IPADDRESS_KEY = "ipaddress";
   private final String id;
   private final String clusterId;
   private final Set<Service> services;
@@ -60,7 +60,7 @@ public final class Node implements Comparable<Node> {
     this.services = Sets.newHashSet(services);
     this.properties = properties;
     this.actions = actions;
-    this.provisionerResults = provisionerResults;
+    this.provisionerResults = provisionerResults == null ? new JsonObject() : provisionerResults;
   }
 
   /**
@@ -155,7 +155,13 @@ public final class Node implements Comparable<Node> {
    */
   public void addResults(JsonObject results) {
     for (Map.Entry<String, JsonElement> entry : results.entrySet()) {
-      this.provisionerResults.add(entry.getKey(), entry.getValue());
+      // special cased for now
+      // TODO: make ip a required field for confirm tasks
+      if ("ipaddress".equals(entry.getKey())) {
+        this.properties.setIpaddress(entry.getValue().getAsString());
+      } else {
+        this.provisionerResults.add(entry.getKey(), entry.getValue());
+      }
     }
   }
 

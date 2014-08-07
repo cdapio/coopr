@@ -15,7 +15,9 @@
  */
 package com.continuuity.loom.provisioner.mock;
 
+import com.continuuity.loom.admin.ProvisionerAction;
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.gson.Gson;
@@ -103,11 +105,13 @@ public class MockWorker extends AbstractScheduledService {
 
   @Override
   protected void runOneIteration() throws Exception {
-    String taskId = takeTask();
-    if (taskId != null) {
+    JsonObject task = takeTask();
+    if (task != null) {
+      String taskId = task.get("taskId").getAsString();
+      ProvisionerAction action = ProvisionerAction.valueOf(task.get("taskName").getAsString());
       LOG.info("got task {}", taskId);
       TimeUnit.MILLISECONDS.sleep(taskMs);
-      finishTask(taskId);
+      finishTask(taskId, action);
     }
   }
 
@@ -116,7 +120,7 @@ public class MockWorker extends AbstractScheduledService {
     return Scheduler.newFixedRateSchedule(0, msBetweenTasks, TimeUnit.MILLISECONDS);
   }
 
-  private String takeTask() {
+  private JsonObject takeTask() {
     try {
       JsonObject body = new JsonObject();
       body.addProperty("provisionerId", provisionerId);
@@ -138,7 +142,7 @@ public class MockWorker extends AbstractScheduledService {
         reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
         JsonObject task = GSON.fromJson(reader, JsonObject.class);
         LOG.debug("task details: {}", task.toString());
-        return task.get("taskId").getAsString();
+        return task;
       } finally {
         if (reader != null) {
           reader.close();
@@ -153,7 +157,8 @@ public class MockWorker extends AbstractScheduledService {
     }
   }
 
-  private void finishTask(String taskId) throws IOException {
+  private void finishTask(String taskId, ProvisionerAction action) throws IOException {
+    LOG.debug("finishing task {}, which is a {} action.", taskId, action);
     try {
       JsonObject body = new JsonObject();
       body.addProperty("provisionerId", provisionerId);
@@ -161,9 +166,18 @@ public class MockWorker extends AbstractScheduledService {
       body.addProperty("taskId", taskId);
       body.addProperty("tenantId", tenantId);
       body.addProperty("status", "0");
-      // include some random fields in the result
+      // include some random field in the result
       JsonObject result = new JsonObject();
       result.addProperty(RandomStringUtils.randomAlphanumeric(4), RandomStringUtils.randomAlphanumeric(8));
+      if (action == ProvisionerAction.CONFIRM) {
+        String ip = Joiner.on('.').join(
+          RandomStringUtils.randomNumeric(3),
+          RandomStringUtils.randomNumeric(3),
+          RandomStringUtils.randomNumeric(3),
+          RandomStringUtils.randomNumeric(3));
+        result.addProperty("ipaddress", ip);
+        LOG.debug("adding ip {}.", ip);
+      }
       body.add("result", result);
 
       finishRequest.setEntity(new StringEntity(GSON.toJson(body)));

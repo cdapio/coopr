@@ -27,8 +27,8 @@ import java.util.Set;
  * Properties of a node.
  */
 public class NodeProperties {
+  private String ipaddress;
   private final String hostname;
-  private final String ipaddress;
   private final int nodenum;
   // this is the name of the hardware type
   private final String hardwaretype;
@@ -175,6 +175,15 @@ public class NodeProperties {
    */
   public Set<String> getServices() {
     return services;
+  }
+
+  /**
+   * Set the IP address of the node.
+   *
+   * @param ipaddress IP address to set.
+   */
+  public void setIpaddress(String ipaddress) {
+    this.ipaddress = ipaddress;
   }
 
   @Override
