@@ -96,6 +96,7 @@ class FogProviderAWS < Provider
       else
         log.debug "Bootstrap IP address #{bootstrap_ip}"
       end
+      bind_ip = server.private_ip_address
 
       sleep 30
       wait_for_sshd(bootstrap_ip, 22)
@@ -103,6 +104,10 @@ class FogProviderAWS < Provider
 
       # Process results
       @result['result']['ipaddress'] = bootstrap_ip
+      @result['result']['ipaddresses'] = {
+        'access_v4' => bootstrap_ip,
+        'bind_v4' => bind_ip
+      }
       # Additional checks
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
