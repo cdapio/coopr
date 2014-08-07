@@ -153,13 +153,26 @@ function load_defaults () {
 
         # register the default plugins with the server
         provisioner register
-
-        echo
-        echo "Go to http://localhost:8100. Have fun creating clusters!"
     fi
-    
     return 0;
 }
+
+function request_superadmin_workers () {
+
+    wait_for_provisioner
+
+    echo "Requesting 5 workers for default tenant..."
+    # set the initial number of workers for the superadmin tenant
+    #--header "X-Loom-UserID:${LOOM_API_USER}" \
+    #--header "X-Loom-TenantID:${LOOM_TENANT}" \
+    curl --silent --request PUT \
+      --header "Content-Type:application/json" \
+      --header "X-Loom-UserID:admin" \
+      --header "X-Loom-TenantID:superadmin" \
+      --connect-timeout 5 --data '{"workers":5, "name":"superadmin"}' \
+      http://localhost:55054/v1/tenants/superadmin
+}
+
 
 function wait_for_server () {
     RETRIES=0
@@ -171,6 +184,18 @@ function wait_for_server () {
     if [ $RETRIES -gt 60 ]; then
         die "ERROR: Server did not successfully start" 
     fi 
+}
+
+function wait_for_provisioner () {
+    RETRIES=0
+    until [[ $(curl http://localhost:55056/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
+        sleep 2
+        RETRIES=$[$RETRIES + 1]
+    done
+
+    if [ $RETRIES -gt 60 ]; then
+        die "ERROR: Provisioner did not successfully start"
+    fi
 }
 
 function provisioner () {
@@ -187,12 +212,19 @@ function provisioner () {
     fi
 }
 
+function greeting () {
+    echo
+    echo "Go to http://localhost:8100. Have fun creating clusters!"
+}
+
 case "$1" in
   start)
     $LOOM_HOME/bin/loom-server.sh start && \
     $LOOM_HOME/bin/loom-ui.sh start && \
+    load_defaults && \
     provisioner start && \
-    load_defaults 
+    request_superadmin_workers && \
+    greeting
   ;;
 
   stop)
