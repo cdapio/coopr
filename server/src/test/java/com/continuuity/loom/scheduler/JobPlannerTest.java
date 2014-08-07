@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -101,8 +100,8 @@ public class JobPlannerTest {
                                 ProvisionerAction.CONFIGURE, CHEF_ACTION,
                                 ProvisionerAction.INITIALIZE, CHEF_ACTION,
                                 ProvisionerAction.START, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host1", "ip1"));
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host2", "ip2"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
 
@@ -178,8 +177,8 @@ public class JobPlannerTest {
                                 ProvisionerAction.CONFIGURE, CHEF_ACTION,
                                 ProvisionerAction.INITIALIZE, CHEF_ACTION,
                                 ProvisionerAction.START, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host1", "ip1"));
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host2", "ip2"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
 
@@ -271,8 +270,8 @@ public class JobPlannerTest {
                                 ProvisionerAction.INITIALIZE, CHEF_ACTION,
                                 ProvisionerAction.START, CHEF_ACTION,
                                 ProvisionerAction.STOP, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host1", "ip1"));
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host2", "ip2"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
 
@@ -305,7 +304,7 @@ public class JobPlannerTest {
     Assert.assertEquals(expected, planner.createTaskDag());
 
     // add services s2 and s3 to node2
-    node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host2", "ip2"));
     clusterNodes = ImmutableSet.of(node1, node2);
     job = new ClusterJob(JobId.fromString("123-002"), ClusterAction.ADD_SERVICES,
                          ImmutableSet.<String>of(s2.getName(), s3.getName()), ImmutableSet.<String>of(node2.getId()));
@@ -409,7 +408,7 @@ public class JobPlannerTest {
                                 ProvisionerAction.INITIALIZE, CHEF_ACTION,
                                 ProvisionerAction.START, CHEF_ACTION,
                                 ProvisionerAction.STOP, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host1", "ip1"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1);
 
@@ -492,7 +491,7 @@ public class JobPlannerTest {
                                 ProvisionerAction.INITIALIZE, CHEF_ACTION,
                                 ProvisionerAction.START, CHEF_ACTION,
                                 ProvisionerAction.STOP, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host1", "ip1"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1);
 
@@ -573,8 +572,8 @@ public class JobPlannerTest {
     Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                 ProvisionerAction.CONFIGURE, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host1", "ip1"));
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host2", "ip2"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
 
@@ -610,8 +609,8 @@ public class JobPlannerTest {
                                 ProvisionerAction.CONFIGURE, CHEF_ACTION,
                                 ProvisionerAction.START, CHEF_ACTION,
                                 ProvisionerAction.STOP, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host1", "ip1"));
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host2", "ip2"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
 
@@ -679,8 +678,8 @@ public class JobPlannerTest {
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                 ProvisionerAction.START, CHEF_ACTION,
                                 ProvisionerAction.STOP, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host1", "ip1"));
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host2", "ip2"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
 
@@ -740,8 +739,8 @@ public class JobPlannerTest {
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                 ProvisionerAction.START, CHEF_ACTION,
                                 ProvisionerAction.STOP, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host1", "ip1"));
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host2", "ip2"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
 
@@ -803,8 +802,8 @@ public class JobPlannerTest {
                               ImmutableMap.<ProvisionerAction, ServiceAction>of(
                                 ProvisionerAction.START, CHEF_ACTION,
                                 ProvisionerAction.STOP, CHEF_ACTION));
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host1", "ip1"));
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3), TestHelper.nodePropertiesOf("host2", "ip2"));
 
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
 
@@ -864,8 +863,8 @@ public class JobPlannerTest {
   @Test
   public void testNoEdgeNodesInDag() {
     Service s1 = new Service("s1", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
-    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host1", "ip1"));
+    Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1), TestHelper.nodePropertiesOf("host2", "ip2"));
     Set<Node> clusterNodes = ImmutableSet.of(node1, node2);
 
     TaskDag expected = new TaskDag();
@@ -889,8 +888,7 @@ public class JobPlannerTest {
 
   private ClusterTask createClusterTask(String name, String taskId, String hostId) {
     return new ClusterTask(
-      ProvisionerAction.valueOf(name), TaskId.fromString(taskId), hostId, "service", ClusterAction.CLUSTER_CREATE,
-      new JsonObject());
+      ProvisionerAction.valueOf(name), TaskId.fromString(taskId), hostId, "service", ClusterAction.CLUSTER_CREATE);
   }
 
   private Set<ClusterTask> createSortedSet(ClusterTask... t) {

@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom;
 
+import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.google.common.collect.ImmutableMap;
@@ -39,6 +40,8 @@ import java.util.Map;
  */
 public class TestHelper {
   private static Gson GSON = new Gson();
+  public static final NodeProperties EMPTY_NODE_PROPERTIES =
+    new NodeProperties(null, null, 0, null, null, null, null, null, null, null);
 
   public static JsonObject takeTask(String loomUrl, TakeTaskRequest request) throws Exception {
     HttpPost httpPost = new HttpPost(String.format("%s/v1/loom/tasks/take", loomUrl));
@@ -87,5 +90,9 @@ public class TestHelper {
       out.put("data", data);
     }
     return out;
+  }
+
+  public static NodeProperties nodePropertiesOf(String hostname, String ip) {
+    return new NodeProperties(hostname, ip, 1, null, null, null, null, null, null, null);
   }
 }

@@ -33,6 +33,7 @@ import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.request.BootstrapRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
@@ -43,7 +44,6 @@ import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.entity.SQLEntityStoreService;
-import com.continuuity.loom.store.provisioner.PluginStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -311,20 +311,15 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
       new Service("svcB", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
     Service svcC =
       new Service("svcC", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    String hostnameProperty = Node.Properties.HOSTNAME.name().toLowerCase();
-    String ipProperty = Node.Properties.IPADDRESS.name().toLowerCase();
+
     Node nodeA = new Node("nodeA", "123", ImmutableSet.of(svcA),
-                          ImmutableMap.of(ipProperty, "123.456.0.1",
-                                          hostnameProperty, "testcluster-1-1000.local"));
+                          TestHelper.nodePropertiesOf("testcluster-1-1000.local", "123.456.0.1"));
     Node nodeAB = new Node("nodeAB", "123", ImmutableSet.of(svcA, svcB),
-                           ImmutableMap.of(ipProperty, "123.456.0.2",
-                                           hostnameProperty, "testcluster-1-1001.local"));
+                           TestHelper.nodePropertiesOf("testcluster-1-1001.local", "123.456.0.2"));
     Node nodeABC = new Node("nodeABC", "123", ImmutableSet.of(svcA, svcB, svcC),
-                            ImmutableMap.of(ipProperty, "123.456.0.3",
-                                            hostnameProperty, "testcluster-1-1002.local"));
+                            TestHelper.nodePropertiesOf("testcluster-1-1002.local", "123.456.0.3"));
     Node nodeBC = new Node("nodeBC", "123", ImmutableSet.of(svcB, svcC),
-                           ImmutableMap.of(ipProperty, "123.456.0.4",
-                                           hostnameProperty, "testcluster-1-1003.local"));
+                           TestHelper.nodePropertiesOf("testcluster-1-1003.local", "123.456.0.4"));
     Cluster cluster = new Cluster("123", USER1_ACCOUNT, "testcluster", System.currentTimeMillis(), "description",
                                   Entities.ProviderExample.RACKSPACE, smallTemplate,
                                   ImmutableSet.of(nodeA.getId(), nodeAB.getId(), nodeABC.getId(), nodeBC.getId()),
@@ -355,10 +350,10 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
     JsonObject expected = new JsonObject();
-    expected.add(nodeA.getId(), nodeA.getProperties());
-    expected.add(nodeAB.getId(), nodeAB.getProperties());
-    expected.add(nodeABC.getId(), nodeABC.getProperties());
-    expected.add(nodeBC.getId(), nodeBC.getProperties());
+    expected.add(nodeA.getId(), gson.toJsonTree(nodeA.getProperties()));
+    expected.add(nodeAB.getId(), gson.toJsonTree(nodeAB.getProperties()));
+    expected.add(nodeABC.getId(), gson.toJsonTree(nodeABC.getProperties()));
+    expected.add(nodeBC.getId(), gson.toJsonTree(nodeBC.getProperties()));
     Assert.assertEquals(expected, responseBody);
 
     // test with filter on service A
@@ -369,12 +364,12 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     expected = new JsonObject();
     Set<Node> expectedNodes = ImmutableSet.of(nodeA, nodeAB, nodeABC);
     for (Node expectedNode : expectedNodes) {
-      expected.add(expectedNode.getId(), expectedNode.getProperties());
+      expected.add(expectedNode.getId(), gson.toJsonTree(expectedNode.getProperties()));
     }
     Assert.assertEquals(expected, responseBody);
 
     // test with filter on service A and property list
-    requestBody.add("properties", TestHelper.jsonArrayOf(hostnameProperty, ipProperty));
+    requestBody.add("properties", TestHelper.jsonArrayOf("hostname", "ipaddress"));
     response = doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
@@ -382,8 +377,8 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     expectedNodes = ImmutableSet.of(nodeA, nodeAB, nodeABC);
     for (Node expectedNode : expectedNodes) {
       JsonObject value = new JsonObject();
-      value.addProperty(hostnameProperty, expectedNode.getProperties().get(hostnameProperty).getAsString());
-      value.addProperty(ipProperty, expectedNode.getProperties().get(ipProperty).getAsString());
+      value.addProperty("hostname", expectedNode.getProperties().getHostname());
+      value.addProperty("ipaddress", expectedNode.getProperties().getIpaddress());
       expected.add(expectedNode.getId(), value);
     }
     Assert.assertEquals(expected, responseBody);

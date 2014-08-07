@@ -5,6 +5,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -145,6 +146,10 @@ public class MockWorker extends AbstractScheduledService {
       body.addProperty("taskId", taskId);
       body.addProperty("tenantId", tenantId);
       body.addProperty("status", "0");
+      // include some random fields in the result
+      JsonObject result = new JsonObject();
+      result.addProperty(RandomStringUtils.randomAlphanumeric(4), RandomStringUtils.randomAlphanumeric(8));
+      body.add("result", result);
 
       finishRequest.setEntity(new StringEntity(GSON.toJson(body)));
       CloseableHttpResponse response = httpClient.execute(finishRequest, httpContext);

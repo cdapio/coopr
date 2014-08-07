@@ -21,6 +21,7 @@ import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.utils.ImmutablePair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -53,15 +54,15 @@ public class ExpressionTest {
     Service svc3 = new Service("svc3", "service 3", ImmutableSet.<String>of(),
                                ImmutableMap.<ProvisionerAction, ServiceAction>of());
     Node foo = new Node("foo", "1", ImmutableSet.of(svc1, svc2),
-                        ImmutableMap.of("hostname", "oof", "ipaddress", "9.7.8.4", "nodenum", "0"));
+                        new NodeProperties("oof", "9.7.8.4", 0, null, null, null, null, null, null, null));
     Node bar = new Node("bar", "1", ImmutableSet.of(svc1),
-                        ImmutableMap.of("hostname", "rab", "ipaddress", "9.6.8.1", "nodenum", "5"));
+                        new NodeProperties("rab", "9.6.8.1", 5, null, null, null, null, null, null, null));
     Node one = new Node("one", "1", ImmutableSet.of(svc1),
-                        ImmutableMap.of("hostname", "eno", "ipaddress", "9.1.3.4", "nodenum", "8"));
+                        new NodeProperties("eno", "9.1.3.4", 8, null, null, null, null, null, null, null));
     Node two = new Node("two", "1", ImmutableSet.of(svc2),
-                        ImmutableMap.of("hostname", "owt", "nodenum", "9"));
+                        new NodeProperties("owt", null, 9, null, null, null, null, null, null, null));
     Node thr = new Node("thr", "1", ImmutableSet.of(svc3),
-                        ImmutableMap.of("ipaddress", "9.6.8.8", "nodenum", "10"));
+                        new NodeProperties(null, "9.6.8.8", 10, null, null, null, null, null, null, null));
     cluster = new Cluster("1", new Account("user", "tenant"), "cluster", System.currentTimeMillis(), "testy cluster",
                           null, null, ImmutableSet.of(foo.getId(), bar.getId(), one.getId(), two.getId(), thr.getId()),
                           ImmutableSet.of(svc1.getName(), svc2.getName(), svc3.getName()));
@@ -120,11 +121,11 @@ public class ExpressionTest {
   @Test
   public void testSelfServiceHost() throws Exception {
     Assert.assertEquals(
-      node1.getProperties().get(Node.Properties.HOSTNAME.name().toLowerCase()).getAsString(),
+      node1.getProperties().getHostname(),
       new Expression(Expression.Type.SELF_HOST_OF_SERVICE, "svc1", null, null, null)
         .evaluate(cluster, clusterNodes, node1));
     Assert.assertEquals(
-      node2.getProperties().get(Node.Properties.HOSTNAME.name().toLowerCase()).getAsString(),
+      node2.getProperties().getHostname(),
       new Expression(Expression.Type.SELF_HOST_OF_SERVICE, "svc1", null, null, null)
         .evaluate(cluster, clusterNodes, node2));
   }
@@ -132,21 +133,21 @@ public class ExpressionTest {
   @Test
   public void testServiceInstanceHost() throws Exception {
     Assert.assertEquals(
-      node1.getProperties().get(Node.Properties.HOSTNAME.name().toLowerCase()).getAsString(),
+      node1.getProperties().getHostname(),
       new Expression(Expression.Type.HOST_OF_SERVICE, "svc1", null, null, 0).evaluate(cluster, clusterNodes, node1));
     Assert.assertEquals(
-      node2.getProperties().get(Node.Properties.HOSTNAME.name().toLowerCase()).getAsString(),
+      node2.getProperties().getHostname(),
       new Expression(Expression.Type.HOST_OF_SERVICE, "svc1", null, null, 1).evaluate(cluster, clusterNodes, node1));
   }
 
   @Test
   public void testSelfServiceIp() throws Exception {
     Assert.assertEquals(
-      node1.getProperties().get(Node.Properties.IPADDRESS.name().toLowerCase()).getAsString(),
+      node1.getProperties().getIpaddress(),
       new Expression(Expression.Type.SELF_IP_OF_SERVICE, "svc1", null, null, null)
         .evaluate(cluster, clusterNodes, node1));
     Assert.assertEquals(
-      node2.getProperties().get(Node.Properties.IPADDRESS.name().toLowerCase()).getAsString(),
+      node2.getProperties().getIpaddress(),
       new Expression(Expression.Type.SELF_IP_OF_SERVICE, "svc1", null, null, null)
         .evaluate(cluster, clusterNodes, node2));
   }
@@ -154,10 +155,10 @@ public class ExpressionTest {
   @Test
   public void testServiceIpInstance() throws Exception {
     Assert.assertEquals(
-      node1.getProperties().get(Node.Properties.IPADDRESS.name().toLowerCase()).getAsString(),
+      node1.getProperties().getIpaddress(),
       new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, 0).evaluate(cluster, clusterNodes, node1));
     Assert.assertEquals(
-      node2.getProperties().get(Node.Properties.IPADDRESS.name().toLowerCase()).getAsString(),
+      node2.getProperties().getIpaddress(),
       new Expression(Expression.Type.IP_OF_SERVICE, "svc1", null, null, 1).evaluate(cluster, clusterNodes, node1));
   }
 

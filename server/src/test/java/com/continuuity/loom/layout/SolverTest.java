@@ -259,7 +259,7 @@ public class SolverTest extends BaseSolverTest {
       request);
     Assert.assertEquals(5, nodes.size());
     for (Node node : nodes.values()) {
-      Assert.assertEquals("medium", node.getProperties().get("hardwaretype").getAsString());
+      Assert.assertEquals("medium", node.getProperties().getHardwaretype());
     }
 
     request = new ClusterCreateRequest("abc", "desc", "simple", 5, "joyent",
@@ -270,7 +270,7 @@ public class SolverTest extends BaseSolverTest {
       request);
     Assert.assertEquals(5, nodes.size());
     for (Node node : nodes.values()) {
-      Assert.assertEquals("large-mem", node.getProperties().get("hardwaretype").getAsString());
+      Assert.assertEquals("large-mem", node.getProperties().getHardwaretype());
     }
 
     // check required image types
@@ -282,7 +282,7 @@ public class SolverTest extends BaseSolverTest {
       request);
     Assert.assertEquals(5, nodes.size());
     for (Node node : nodes.values()) {
-      Assert.assertEquals("joyent-hash-of-ubuntu12", node.getProperties().get("image").getAsString());
+      Assert.assertEquals("joyent-hash-of-ubuntu12", node.getProperties().getImage());
     }
 
     // test both
@@ -294,8 +294,8 @@ public class SolverTest extends BaseSolverTest {
       request);
     Assert.assertEquals(5, nodes.size());
     for (Node node : nodes.values()) {
-      Assert.assertEquals("small", node.getProperties().get("hardwaretype").getAsString());
-      Assert.assertEquals("joyent-hash-of-centos6.4", node.getProperties().get("image").getAsString());
+      Assert.assertEquals("small", node.getProperties().getHardwaretype());
+      Assert.assertEquals("joyent-hash-of-centos6.4", node.getProperties().getImage());
     }
 
     entityStoreService.getView(account).deleteClusterTemplate(simpleTemplate.getName());

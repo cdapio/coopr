@@ -67,6 +67,7 @@ import com.continuuity.loom.codec.json.current.ServiceConstraintCodec;
 import com.continuuity.loom.codec.json.current.ServiceDependenciesCodec;
 import com.continuuity.loom.codec.json.current.ServiceStageDependenciesCodec;
 import com.continuuity.loom.codec.json.current.TakeTaskRequestCodec;
+import com.continuuity.loom.codec.json.current.TaskConfigCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
 import com.continuuity.loom.codec.json.current.TenantSpecificationCodec;
 import com.continuuity.loom.codec.json.upgrade.ClusterUpgradeCodec;
@@ -82,6 +83,7 @@ import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
+import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.AbstractModule;
@@ -159,6 +161,7 @@ public class CodecModules {
       .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
       .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
       .registerTypeAdapter(TakeTaskRequest.class, new TakeTaskRequestCodec())
+      .registerTypeAdapter(TaskConfig.class, new TaskConfigCodec())
       .registerTypeAdapter(Tenant.class, new TenantCodec())
       .registerTypeAdapter(TenantSpecification.class, new TenantSpecificationCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())

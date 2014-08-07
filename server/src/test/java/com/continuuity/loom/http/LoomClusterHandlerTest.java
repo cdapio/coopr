@@ -885,13 +885,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                ImmutableSet.<Service>of(
                  new Service("s1", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of()),
                  new Service("s2", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of())),
-               ImmutableMap.<String, String>of()),
+               TestHelper.nodePropertiesOf("node1-host", "node1-ip")),
       "node2",
       new Node("node2", "123",
                ImmutableSet.<Service>of(
                  new Service("s2", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of()),
                  new Service("s3", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of())),
-               ImmutableMap.<String, String>of()));
+               TestHelper.nodePropertiesOf("node2-host", "node2-ip")));
     Cluster cluster = new Cluster("123", USER1_ACCOUNT, "my-cluster", System.currentTimeMillis(),
                                   "my cluster", null, null, nodes.keySet(), ImmutableSet.of("s1", "s2", "s3"));
     clusterStoreService.getView(USER1_ACCOUNT).writeCluster(cluster);
