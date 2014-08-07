@@ -19,7 +19,8 @@
 
 node['loom']['cluster']['nodes'].each do |n, v|
   short_host = v.hostname.split('.').first
-  hostsfile_entry v.ipaddress do
+  next unless v.key?('ipaddresses') && v['ipaddresses'].key?('bind_v4')
+  hostsfile_entry v['ipaddresses']['bind_v4'] do
     hostname v.hostname
     aliases [ short_host ]
     unique true
