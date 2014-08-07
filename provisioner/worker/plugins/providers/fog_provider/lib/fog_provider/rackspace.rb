@@ -96,7 +96,11 @@ class FogProviderRackspace < Provider
       log.debug "Server #{server.name} sshd is up"
 
       # Process results
-      @result['result']['ipaddress'] = bootstrap_ip
+      @result['result']['ipaddress'] = bootstrap_ip # TODO: remove this
+      @result['result']['ipaddresses'] = {
+        'access_v4' => bootstrap_ip,
+        'bind_v4' => bootstrap_ip
+      }
       # Additional checks
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
