@@ -23,17 +23,13 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Methods for getting config to attach to a cluster task.
+ * The config section of a cluster task sent to provisioners. Part of a {@link SchedulableTask}.
  */
 public class TaskConfig {
   private final NodeProperties nodeProperties;
@@ -46,6 +42,18 @@ public class TaskConfig {
   private final JsonObject clusterConfig;
   private final JsonObject provisionerResults;
 
+  /**
+   * Create a task config from the given input.
+   *
+   * @param cluster Cluster the task is operating on.
+   * @param node Node the task should take place on.
+   * @param service Service the task is operating on.
+   *                May be null for tasks that are on the node itself but not on a service.
+   * @param clusterConfig Cluster config with expanded macros.
+   * @param action Action to perform.
+   * @param clusterNodes Collection of all nodes in the cluster.
+   * @return Task config created from the given input.
+   */
   public static TaskConfig from(Cluster cluster, Node node, Service service, JsonObject clusterConfig,
                                 ProvisionerAction action, Collection<Node> clusterNodes) {
     Provider provider = cluster.getProvider();
@@ -73,26 +81,56 @@ public class TaskConfig {
     this.provisionerResults = provisionerResults;
   }
 
+  /**
+   * Get the provider to use to perform node operations.
+   *
+   * @return Provider to use to perform node operations.
+   */
   public Provider getProvider() {
     return provider;
   }
 
+  /**
+   * Get the mapping of node id to node properties for all nodes in the cluster.
+   *
+   * @return Mapping of node id to node properties for all nodes in the cluster.
+   */
   public Map<String, NodeProperties> getNodes() {
     return nodes;
   }
 
+  /**
+   * Get the condensed service object containing just the relevant action to perform.
+   *
+   * @return Condensed service object containing just the relevant action to perform.
+   */
   public TaskServiceAction getTaskServiceAction() {
     return taskServiceAction;
   }
 
+  /**
+   * Get the cluster config with macros expanded.
+   *
+   * @return Cluster config with macros expanded.
+   */
   public JsonObject getClusterConfig() {
     return clusterConfig;
   }
 
+  /**
+   * Get the properties of the node the task should be performed on.
+   *
+   * @return Properties of the node the task should be performed on.
+   */
   public NodeProperties getNodeProperties() {
     return nodeProperties;
   }
 
+  /**
+   * Get the payload returned by provisioners that should be passed on to current and future tasks.
+   *
+   * @return Payload returned by provisioners that should be passed on to current and future tasks.
+   */
   public JsonObject getProvisionerResults() {
     return provisionerResults;
   }
@@ -118,6 +156,18 @@ public class TaskConfig {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(nodeProperties, provider, taskServiceAction, provisionerResults,clusterConfig, nodes);
+    return Objects.hashCode(nodeProperties, provider, taskServiceAction, provisionerResults, clusterConfig, nodes);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("nodeProperties", nodeProperties)
+      .add("provider", provider)
+      .add("taskServiceAction", taskServiceAction)
+      .add("provisionerResults", provisionerResults)
+      .add("clusterConfig", clusterConfig)
+      .add("nodes", nodes)
+      .toString();
   }
 }
