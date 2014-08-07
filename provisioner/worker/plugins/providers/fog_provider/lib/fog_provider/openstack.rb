@@ -88,7 +88,7 @@ class FogProviderOpenstack < Provider
 
       # Process results
       @result['result']['ipaddress'] = bootstrap_ip # TODO: remove this
-      @result['result']['ipaddresses'] = {
+      @result['ipaddresses'] = {
         'access_v4' => bootstrap_ip,
         'bind_v4' => bootstrap_ip
       }
