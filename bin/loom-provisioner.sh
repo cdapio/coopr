@@ -16,7 +16,6 @@
 #
 
 LOOM_SERVER_URI=${LOOM_SERVER_URI:-http://localhost:55054}
-LOOM_NUM_WORKERS=${LOOM_NUM_WORKERS:-5}
 LOOM_LOG_DIR=${LOOM_LOG_DIR:-/var/log/loom}
 LOOM_LOG_LEVEL=${LOOM_LOG_LEVEL:-info}
 LOOM_HOME=${LOOM_HOME:-/opt/loom} ; export LOOM_HOME
@@ -28,7 +27,7 @@ die ( ) {
   exit 1
 }
 
-PROVISIONER_PATH="${LOOM_HOME}/provisioner/daemon"
+PROVISIONER_PATH="${LOOM_HOME}/provisioner/master"
 
 APP_NAME="loom-provisioner"
 LOOM_RUBY=${LOOM_RUBY:-"${LOOM_HOME}/embedded/bin/ruby"}
@@ -39,15 +38,13 @@ check_before_start() {
   if [ ! -d "${PID_DIR}" ] ; then
     mkdir -p "${PID_DIR}"
   fi
-  for p in `seq 1 ${LOOM_NUM_WORKERS}` ; do
-    pid="${PID_DIR}/${APP_NAME}${p}.pid"
-    if [ -f "${pid}" ] ; then
-      if kill -0 `cat $pid` > /dev/null 2>&1; then
-        echo "$0 running as process `cat $pid`. Stop it first or use the restart function."
-        exit 0
-      fi
+  pid="${PID_DIR}/${APP_NAME}.pid"
+  if [ -f "${pid}" ] ; then
+    if kill -0 `cat $pid` > /dev/null 2>&1; then
+      echo "$0 running as process `cat $pid`. Stop it first or use the restart function."
+      exit 0
     fi
-  done
+  fi
 }
 
 start ( ) {
@@ -55,89 +52,68 @@ start ( ) {
   check_before_start
 
   # multi-provisioner
-  echo "Starting Loom Provisioners ..."
-  for p in `seq 1 ${LOOM_NUM_WORKERS}` ; do
-    echo "  Starting provisioner ${p} ..."
-    nohup nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/provisioner.rb --uri ${LOOM_SERVER_URI} \
-      -L ${LOOM_LOG_LEVEL} >> ${LOOM_LOG_DIR}/${APP_NAME}${p}.log 2>&1 &
-    pid="${PID_DIR}/${APP_NAME}${p}.pid"
-    echo $! > $pid
-  done
+  echo "Starting Loom Provisioner ..."
+  nohup nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner --config ${PROVISIONER_PATH}/conf/provisioner-site.xml \
+    >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 &
+  pid="${PID_DIR}/${APP_NAME}${p}.pid"
+  echo $! > $pid
 }
 
 register ( ) {
-  echo "Registering provisioner plugins with server ${LOOM_SERVER_URI}"
-  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/provisioner.rb --uri ${LOOM_SERVER_URI} \
-      -L ${LOOM_LOG_LEVEL} --register 
+  echo "Registering provisioner plugins with configured server"
+  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/provisioner.rb --config ${PROVISIONER_PATH}/conf/provisioner-site.xml --register
 }
-
 
 stop ( ) {
   local failed=0
-  echo "Stopping Loom Provisioners ..."
-  for p in `seq 1 ${LOOM_NUM_WORKERS}` ; do
-    pid="${PID_DIR}/${APP_NAME}${p}.pid"
-    if [ -f "${pid}" ] ; then
-      echo -n "  Stopping provisioner ${p} ..."
-      pidToKill=`cat $pid`
-      # kill -0 == see if the PID exists
-      if kill -0 $pidToKill > /dev/null 2>&1; then
-        kill $pidToKill > /dev/null 2>&1
-        local cnt=0
-        while kill -0 $pidToKill > /dev/null 2>&1 ; do
-          echo -n .
-          sleep 1
-          ((cnt++))
-          if [ ${cnt} -ge 30 ]; then
-            echo "  Provisioner ${p} (pid: $pidToKill) still running a task..."
-            break
-          fi
-        done
-        rm -f "${pid}"
-        ret=0
-      else
-        ret=$?
-      fi
-      echo
-      if [ ${ret} -eq 0 ] ; then
-        echo "Stopped successfully ..."
-      else
-        echo "ERROR: Failed stopping!"
-        failed=1
-      fi
+  echo -n "Stopping Loom Provisioner ..."
+  pid="${PID_DIR}/${APP_NAME}.pid"
+  if [ -f "${pid}" ] ; then
+    pidToKill=`cat $pid`
+    # kill -0 == see if the PID exists
+    if kill -0 $pidToKill > /dev/null 2>&1; then
+      kill $pidToKill > /dev/null 2>&1
+      local cnt=0
+      while kill -0 $pidToKill > /dev/null 2>&1 ; do
+        echo -n .
+        sleep 1
+        ((cnt++))
+        if [ ${cnt} -ge 30 ]; then
+          echo "  Provisioner (pid: $pidToKill) waiting for a worker task to complete..."
+          break
+        fi
+      done
+      rm -f "${pid}"
+      ret=0
+    else
+      ret=$?
     fi
-  done
+    echo
+    if [ ${ret} -eq 0 ] ; then
+      echo "Stopped successfully ..."
+    else
+      echo "ERROR: Failed stopping!"
+      failed=1
+    fi
+  fi
   return "${failed}"
 }
 
 status() {
-  local failed=0
-  for p in `seq 1 ${LOOM_NUM_WORKERS}` ; do
-    pid="${PID_DIR}/${APP_NAME}${p}.pid"
-    if [ -f $pid ]; then
-      pidToCheck=`cat $pid`
-      # kill -0 == see if the PID exists
-      if kill -0 $pidToCheck > /dev/null 2>&1; then
-        echo "${APP_NAME} ${p} running as process $pidToCheck"
-        ret=0
-      else
-        echo "${APP_NAME} ${p} pidfile exists, but process does not appear to be running"
-        ret=3
-      fi
+  pid="${PID_DIR}/${APP_NAME}.pid"
+  if [ -f $pid ]; then
+    pidToCheck=`cat $pid`
+    if kill -0 $pidToCheck > /dev/null 2>&1; then
+      echo "${APP_NAME} running as process $pidToCheck"
+      ret=0
     else
-      echo "${APP_NAME} ${p} is not running"
-      ret=2
+      echo "${APP_NAME} pidfile exists, but process does not appear to be running"
+      ret=3
     fi
-    if [ ${ret} -ne 0 ] ; then
-      failed=1
-    fi
-  done
-  if [ ${failed} -eq 0 ] ; then
-    echo "Loom Provisioner up and running"
-  elif [ ${failed} -eq 3 ] ; then
-    echo "At least one provisioner failed"
+  else
+    echo "${APP_NAME} is not running"
+    ret=2
   fi
-  return "${failed}"
 }
 
 restart() {
