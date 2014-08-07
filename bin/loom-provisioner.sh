@@ -61,7 +61,7 @@ start ( ) {
 
 register ( ) {
   echo "Registering provisioner plugins with configured server"
-  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/provisioner.rb --config ${PROVISIONER_PATH}/conf/provisioner-site.xml --register
+  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner --config ${PROVISIONER_PATH}/conf/provisioner-site.xml --register
 }
 
 stop ( ) {
