@@ -61,7 +61,8 @@ start ( ) {
 
 register ( ) {
   echo "Registering provisioner plugins with configured server"
-  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner --config ${PROVISIONER_PATH}/conf/provisioner-site.xml --register
+  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner --config ${PROVISIONER_PATH}/conf/provisioner-site.xml --register \
+    >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 &
 }
 
 stop ( ) {
