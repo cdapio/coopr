@@ -52,6 +52,7 @@ import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.scheduler.task.SchedulableTask;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.base.Charsets;
@@ -188,10 +189,10 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
 
-    JsonObject object = TestHelper.takeTask(getBaseUrl(), new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId));
+    SchedulableTask task = TestHelper.takeTask(getBaseUrl(), new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId));
 
     // Only user config should be present, not default cluster config.
-    Assert.assertEquals(userConfig, object.get("config").getAsJsonObject().get("cluster").getAsJsonObject());
+    Assert.assertEquals(userConfig, task.getConfig().getClusterConfig());
   }
 
   @Test
@@ -230,22 +231,22 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
       assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, i);
 
-      JsonObject object = TestHelper.takeTask(getBaseUrl(), takeRequest);
+      SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
       Assert.assertEquals(defaultClusterConfig,
-                          object.get("config").getAsJsonObject().get("cluster").getAsJsonObject());
+                          task.getConfig().getClusterConfig());
       if (i > 0) {
         Assert.assertEquals("111.222.333." + (i - 1),
-                            object.getAsJsonObject("config").get("ipaddress").getAsString());
+                            task.getConfig().getNodeProperties().getIpaddress());
       }
 
-      actions.add(object.get("taskName").getAsString());
+      actions.add(task.getTaskName());
       statuses.add(Node.Status.IN_PROGRESS.name());
-      verifyNode(object.get("nodeId").getAsString(), actions, statuses);
+      verifyNode(task.getNodeId(), actions, statuses);
 
       JsonObject result = new JsonObject();
       result.addProperty("ipaddress", "111.222.333." + i);
       FinishTaskRequest finishRequest =
-        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, object.get("taskId").getAsString(),
+        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, task.getTaskId(),
                               null, null, 0, result);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
@@ -253,7 +254,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
       statuses.remove(statuses.size() - 1);
       statuses.add(Node.Status.COMPLETE.name());
-      verifyNode(object.get("nodeId").getAsString(), actions, statuses);
+      verifyNode(task.getNodeId(), actions, statuses);
     }
 
     jobScheduler.run();
@@ -304,18 +305,17 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       jobScheduler.run();  // run scheduler put in queue
       jobScheduler.run();  // run scheduler take from queue
 
-      JsonObject object = TestHelper.takeTask(getBaseUrl(), takeRequest);
-      verifyNode(object.get("nodeId").getAsString(), ImmutableList.of("DELETE"),
+      SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+      verifyNode(task.getNodeId(), ImmutableList.of("DELETE"),
                  ImmutableList.of(Node.Status.IN_PROGRESS.name()));
 
       FinishTaskRequest finishRequest =
-        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, object.get("taskId").getAsString(),
-                              null, null, 0, null);
+        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, task.getTaskId(), null, null, 0, null);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);
 
-      verifyNode(object.get("nodeId").getAsString(), ImmutableList.of("DELETE"),
+      verifyNode(task.getNodeId(), ImmutableList.of("DELETE"),
                  ImmutableList.of(Node.Status.COMPLETE.name()));
     }
 
@@ -372,12 +372,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       jobScheduler.run();
       jobScheduler.run();
 
-      JsonObject object = TestHelper.takeTask(getBaseUrl(), new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId));
+      SchedulableTask task =
+        TestHelper.takeTask(getBaseUrl(), new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId));
 
       JsonObject result = new JsonObject();
       result.addProperty("ipaddress", "111.222.333." + i);
       FinishTaskRequest finishRequest =
-        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, object.get("taskId").getAsString(),
+        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, task.getTaskId(),
                               null, null, 1, result);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
@@ -413,13 +414,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       jobScheduler.run();
       jobScheduler.run();
 
-      JsonObject object = TestHelper.takeTask(getBaseUrl(), takeRequest);
-      Assert.assertEquals("CREATE", object.get("taskName").getAsString());
+      SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+      Assert.assertEquals("CREATE", task.getTaskName());
 
       JsonObject result = new JsonObject();
       result.addProperty("ipaddress", "111.222.333." + i);
       FinishTaskRequest finishRequest =
-        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, object.get("taskId").getAsString(),
+        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, task.getTaskId(),
                               null, null, 0, result);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
@@ -432,11 +433,11 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3 + i, 1 + i);
 
       //Fail confirm.
-      object = TestHelper.takeTask(getBaseUrl(), takeRequest);
-      Assert.assertEquals("CONFIRM", object.get("taskName").getAsString());
+      task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+      Assert.assertEquals("CONFIRM", task.getTaskName());
 
       finishRequest = new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId,
-                                            object.get("taskId").getAsString(), null, null, 1, result);
+                                            task.getTaskId(), null, null, 1, result);
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);
 
@@ -445,13 +446,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
       if (i < 2) {
         // Should get DELETE task now
-        object = TestHelper.takeTask(getBaseUrl(), takeRequest);
-        Assert.assertEquals("DELETE", object.get("taskName").getAsString());
+        task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+        Assert.assertEquals("DELETE", task.getTaskName());
 
         result = new JsonObject();
         result.addProperty("ipaddress", "111.222.333." + i);
         finishRequest = new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId,
-                                              object.get("taskId").getAsString(), null, null, 0, result);
+                                              task.getTaskId(), null, null, 0, result);
 
         TestHelper.finishTask(getBaseUrl(), finishRequest);
         assertResponseStatus(response, HttpResponseStatus.OK);
@@ -533,12 +534,12 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
       assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 6, i);
 
-      JsonObject object = TestHelper.takeTask(getBaseUrl(), takeRequest);
+      SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
       JsonObject result = new JsonObject();
       result.addProperty("ipaddress", "111.222.333." + i);
       FinishTaskRequest finishRequest =
         new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId,
-                              object.get("taskId").getAsString(), null, null, 0, result);
+                              task.getTaskId(), null, null, 0, result);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);
@@ -555,8 +556,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "FAILED", ClusterAction.CLUSTER_CREATE, 6, 3);
 
     // We should be not be able to take any more tasks once the job has been failed.
-    JsonObject object = TestHelper.takeTask(getBaseUrl(), takeRequest);
-    Assert.assertTrue(object.entrySet().isEmpty());
+    SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+    Assert.assertNull(task);
     jobScheduler.run();
 
     assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, "FAILED", ClusterAction.CLUSTER_CREATE, 6, 3);
@@ -604,8 +605,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     jobScheduler.run();
 
     // We should not be able to take any tasks after the job has been failed.
-    JsonObject object = TestHelper.takeTask(getBaseUrl(), new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId));
-    Assert.assertTrue(object.entrySet().isEmpty());
+    SchedulableTask task = TestHelper.takeTask(getBaseUrl(), new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId));
+    Assert.assertNull(task);
     jobScheduler.run();
 
     assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, "FAILED", ClusterAction.CLUSTER_CREATE, 3, 0);

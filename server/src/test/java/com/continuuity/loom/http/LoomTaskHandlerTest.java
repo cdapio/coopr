@@ -28,6 +28,7 @@ import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.scheduler.task.SchedulableTask;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
@@ -99,8 +100,8 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(clusterTask)));
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, tenantId);
-    JsonObject responseJson = TestHelper.takeTask(getBaseUrl(), takeRequest);
-    Assert.assertEquals(clusterTask.getTaskId(), responseJson.get("taskId").getAsString());
+    SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+    Assert.assertEquals(clusterTask.getTaskId(), task.getTaskId());
 
     JsonObject provisionerResult = new JsonObject();
     provisionerResult.addProperty("ip", "127.0.0.1");
@@ -142,8 +143,8 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(clusterTask)));
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, tenantId);
-    JsonObject responseJson = TestHelper.takeTask(getBaseUrl(), takeRequest);
-    Assert.assertEquals(clusterTask.getTaskId(), responseJson.get("taskId").getAsString());
+    SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+    Assert.assertEquals(clusterTask.getTaskId(), task.getTaskId());
 
     FinishTaskRequest finishRequest =
       new FinishTaskRequest("worker1", PROVISIONER_ID, tenantId, clusterTask.getTaskId(),
