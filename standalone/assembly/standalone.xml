@@ -47,6 +47,10 @@
     </fileSets>
         <files>
             <file>
+                <source>${project.basedir}/../standalone/provisioner/master/conf/provisioner-site.xml</source>
+                <outputDirectory>/provisioner/master/conf</outputDirectory>
+            </file>
+            <file>
                 <source>${project.basedir}/../standalone/README.md</source>
                 <outputDirectory>/</outputDirectory>
             </file>
