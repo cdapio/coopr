@@ -157,7 +157,7 @@ public final class Node implements Comparable<Node> {
     for (Map.Entry<String, JsonElement> entry : results.entrySet()) {
       // special cased for now
       // TODO: make ip a required field for confirm tasks
-      if ("ipaddress".equals(entry.getKey())) {
+      if (IPADDRESS_KEY.equals(entry.getKey())) {
         this.properties.setIpaddress(entry.getValue().getAsString());
       } else {
         this.provisionerResults.add(entry.getKey(), entry.getValue());
