@@ -20,6 +20,7 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
@@ -84,7 +85,8 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
   @Test
   public void testFinishTask() throws Exception {
     String tenantId = USER1_ACCOUNT.getTenantId();
-    Node node = new Node("node_id1", "1", ImmutableSet.<Service>of(), TestHelper.nodePropertiesOf("host", null));
+    Node node = new Node("node_id1", "1", ImmutableSet.<Service>of(),
+                         NodeProperties.builder().setHostname("host").build());
     clusterStore.writeNode(node);
 
     ClusterTask clusterTask = new ClusterTask(
@@ -124,7 +126,8 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
   @Test
   public void testFailTask() throws Exception {
     String tenantId = USER1_ACCOUNT.getTenantId();
-    Node node = new Node("node_id2", "1", ImmutableSet.<Service>of(), TestHelper.nodePropertiesOf("host", null));
+    Node node = new Node("node_id2", "1", ImmutableSet.<Service>of(),
+                         NodeProperties.builder().setHostname("host").build());
     clusterStore.writeNode(node);
 
     Cluster cluster = new Cluster("1", USER1_ACCOUNT, "cluster1" , System.currentTimeMillis(), "", null, null,

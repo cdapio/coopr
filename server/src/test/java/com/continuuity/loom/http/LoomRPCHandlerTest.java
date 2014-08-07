@@ -313,13 +313,21 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
       new Service("svcC", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
 
     Node nodeA = new Node("nodeA", "123", ImmutableSet.of(svcA),
-                          TestHelper.nodePropertiesOf("testcluster-1-1000.local", "123.456.0.1"));
+                          NodeProperties.builder()
+                            .setHostname("testcluster-1-1000.local")
+                            .setIpaddress("123.456.0.1").build());
     Node nodeAB = new Node("nodeAB", "123", ImmutableSet.of(svcA, svcB),
-                           TestHelper.nodePropertiesOf("testcluster-1-1001.local", "123.456.0.2"));
+                           NodeProperties.builder()
+                             .setHostname("testcluster-1-1001.local")
+                             .setIpaddress("123.456.0.2").build());
     Node nodeABC = new Node("nodeABC", "123", ImmutableSet.of(svcA, svcB, svcC),
-                            TestHelper.nodePropertiesOf("testcluster-1-1002.local", "123.456.0.3"));
+                            NodeProperties.builder()
+                              .setHostname("testcluster-1-1002.local")
+                              .setIpaddress("123.456.0.3").build());
     Node nodeBC = new Node("nodeBC", "123", ImmutableSet.of(svcB, svcC),
-                           TestHelper.nodePropertiesOf("testcluster-1-1003.local", "123.456.0.4"));
+                           NodeProperties.builder()
+                             .setHostname("testcluster-1-1003.local")
+                             .setIpaddress("123.456.0.4").build());
     Cluster cluster = new Cluster("123", USER1_ACCOUNT, "testcluster", System.currentTimeMillis(), "description",
                                   Entities.ProviderExample.RACKSPACE, smallTemplate,
                                   ImmutableSet.of(nodeA.getId(), nodeAB.getId(), nodeABC.getId(), nodeBC.getId()),

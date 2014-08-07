@@ -1218,14 +1218,16 @@ public class Entities {
       new Node(node1,
                clusterId,
                ImmutableSet.of(ServiceExample.NAMENODE, ServiceExample.HOSTS),
-               new NodeProperties("host1", "ip1", 1, HardwareTypeExample.LARGE.getName(),
-                                  ImageTypeExample.CENTOS_6.getName(), "flavor", "image", "sshuser", null, null));
+               NodeProperties.builder()
+                 .setHardwaretype(HardwareTypeExample.LARGE.getName())
+                 .setImagetype(ImageTypeExample.CENTOS_6.getName()).build());
     public static Node NODE2 =
       new Node(node2,
                clusterId,
                ImmutableSet.of(ServiceExample.DATANODE, ServiceExample.HOSTS),
-               new NodeProperties("host2", "ip2", 2, HardwareTypeExample.LARGE.getName(),
-                                  ImageTypeExample.CENTOS_6.getName(), "flavor", "image", "sshuser", null, null));
+               NodeProperties.builder()
+                 .setHardwaretype(HardwareTypeExample.LARGE.getName())
+                 .setImagetype(ImageTypeExample.CENTOS_6.getName()).build());
   }
 
   public static class NodeExample {
@@ -1239,10 +1241,9 @@ public class Entities {
       node1,
       clusterId,
       ImmutableSet.of(ServiceExample.DATANODE, ServiceExample.HOSTS),
-      new NodeProperties("host", "ip", 1, HardwareTypeExample.MEDIUM.getName(),
-                         ImageTypeExample.UBUNTU_12.getName(), "flavor", "image",
-                         "sshuser", null, null)
-                                                 );
+      NodeProperties.builder()
+        .setImagetype(ImageTypeExample.UBUNTU_12.getName())
+        .setHardwaretype(HardwareTypeExample.MEDIUM.getName()).build());
     public static Set<Node> NODES = createMockNodes(2);
 
     private static Set<Node> createMockNodes(int numberOfNodes) {
@@ -1259,10 +1260,9 @@ public class Entities {
       return createNode(id,
                         clusterId,
                         ImmutableSet.of(ServiceExample.DATANODE, ServiceExample.HOSTS),
-                        new NodeProperties("host", "ip", 1, HardwareTypeExample.LARGE.getName(),
-                                           ImageTypeExample.CENTOS_6.getName(), "flavor", "image",
-                                           "sshuser", null, null)
-                       );
+                        NodeProperties.builder()
+                          .setHardwaretype(HardwareTypeExample.LARGE.getName())
+                          .setImagetype(ImageTypeExample.CENTOS_6.getName()).build());
     }
 
     public static Node createNode(String id, String clusterId, Set<Service> services, NodeProperties properties) {

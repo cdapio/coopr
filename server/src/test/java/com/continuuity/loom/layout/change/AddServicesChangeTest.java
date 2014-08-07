@@ -112,15 +112,13 @@ public class AddServicesChangeTest extends BaseSolverTest {
     // hadoop master node
     Node node = new Node(UUID.randomUUID().toString(), clusterId,
                          ImmutableSet.of(namenode),
-                         new NodeProperties("host1", "ip1", 1, "large-mem", "centos6",
-                                            "flavor", "image", "sshuser", null, null));
+                         NodeProperties.builder().setHardwaretype("large-mem").setImagetype("centos6").build());
     nodeIds.add(node.getId());
     nodes.add(node);
     // slave nodes
     for (int i = 0; i < 50; i++) {
       node = new Node(UUID.randomUUID().toString(), clusterId, ImmutableSet.of(datanode),
-                      new NodeProperties("host" + i, "ip" + i, 2, "medium", "centos6",
-                                         "flavor", "image", "sshuser", null, null));
+                      NodeProperties.builder().setHardwaretype("medium").setImagetype("centos6").build());
       nodeIds.add(node.getId());
       nodes.add(node);
     }

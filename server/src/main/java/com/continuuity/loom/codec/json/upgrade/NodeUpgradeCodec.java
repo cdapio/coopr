@@ -57,8 +57,18 @@ public class NodeUpgradeCodec implements JsonDeserializer<Node> {
     String imagetype = context.deserialize(properties.get("imagetype"), String.class);
     String flavor = context.deserialize(properties.get("flavor"), String.class);
     String image = context.deserialize(properties.get("image"), String.class);
-    NodeProperties nodeProperties = new NodeProperties(hostname, ipaddress, nodenum, hardwaretype, imagetype,
-                                                       flavor, image, null, automators, nodeServices);
+    NodeProperties nodeProperties = NodeProperties.builder()
+      .setHostname(hostname)
+      .setIpaddress(ipaddress)
+      .setNodenum(nodenum)
+      .setHardwaretype(hardwaretype)
+      .setImagetype(imagetype)
+      .setFlavor(flavor)
+      .setImage(image)
+      .setAutomators(automators)
+      .setServices(nodeServices)
+      .setSSHUser("root")
+      .build();
     return new Node(id, clusterId, services, nodeProperties);
   }
 }

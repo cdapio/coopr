@@ -93,8 +93,19 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
       context.deserialize(jsonObj.remove("services"), new TypeToken<Set<String>>() {}.getType());
     Set<String> automators =
       context.deserialize(jsonObj.remove("automators"), new TypeToken<Set<String>>() {}.getType());
-    NodeProperties nodeProperties = new NodeProperties(hostname, ipaddress, nodeNum, hardwaretype,
-                                                       imagetype, flavor, image, sshUser, automators, serviceNames);
+    NodeProperties nodeProperties = NodeProperties.builder()
+      .setHostname(hostname)
+      .setIpaddress(ipaddress)
+      .setNodenum(nodeNum)
+      .setHardwaretype(hardwaretype)
+      .setImagetype(imagetype)
+      .setFlavor(flavor)
+      .setImage(image)
+      .setSSHUser(sshUser)
+      .setAutomators(automators)
+      .setServices(serviceNames)
+      .build();
+
     // what's left is the provisioner results
     return new TaskConfig(nodeProperties, provider, nodePropertiesMap, taskServiceAction, clusterConfig, jsonObj);
   }

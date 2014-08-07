@@ -34,6 +34,7 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
@@ -43,12 +44,10 @@ import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
-import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.scheduler.CallbackScheduler;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.ClusterScheduler;
 import com.continuuity.loom.scheduler.JobScheduler;
-import com.continuuity.loom.scheduler.Scheduler;
 import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -73,7 +72,6 @@ import org.apache.http.util.EntityUtils;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -885,13 +883,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                ImmutableSet.<Service>of(
                  new Service("s1", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of()),
                  new Service("s2", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of())),
-               TestHelper.nodePropertiesOf("node1-host", "node1-ip")),
+               NodeProperties.builder().setHostname("node1-host").setIpaddress("node1-ip").build()),
       "node2",
       new Node("node2", "123",
                ImmutableSet.<Service>of(
                  new Service("s2", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of()),
                  new Service("s3", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of())),
-               TestHelper.nodePropertiesOf("node2-host", "node2-ip")));
+               NodeProperties.builder().setHostname("node2-host").setIpaddress("node2-ip").build()));
     Cluster cluster = new Cluster("123", USER1_ACCOUNT, "my-cluster", System.currentTimeMillis(),
                                   "my cluster", null, null, nodes.keySet(), ImmutableSet.of("s1", "s2", "s3"));
     clusterStoreService.getView(USER1_ACCOUNT).writeCluster(cluster);

@@ -37,6 +37,7 @@ import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.LowercaseEnumTypeAdapterFactory;
 import com.continuuity.loom.codec.json.current.AddServicesRequestCodec;
 import com.continuuity.loom.codec.json.current.AdministrationCodec;
@@ -71,6 +72,7 @@ import com.continuuity.loom.codec.json.current.TaskConfigCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
 import com.continuuity.loom.codec.json.current.TenantSpecificationCodec;
 import com.continuuity.loom.codec.json.upgrade.ClusterUpgradeCodec;
+import com.continuuity.loom.codec.json.upgrade.NodeUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceUpgradeCodec;
@@ -123,6 +125,7 @@ public class CodecModules {
             .registerTypeAdapter(Provider.class, new ProviderUpgradeCodec())
             .registerTypeAdapter(Service.class, new ServiceUpgradeCodec())
             .registerTypeAdapter(ServiceAction.class, new ServiceActionUpgradeCodec())
+            .registerTypeAdapter(Node.class, new NodeUpgradeCodec())
             .create()
         );
       }

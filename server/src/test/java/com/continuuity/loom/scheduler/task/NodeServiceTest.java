@@ -60,7 +60,7 @@ public class NodeServiceTest extends LoomServiceTestBase {
     conf.setInt(Constants.MAX_PER_NODE_LOG_LENGTH, 100);
     NodeService nodeService = injector.getInstance(NodeService.class);
 
-    Node node = new Node("1", "1", ImmutableSet.<Service>of(), TestHelper.nodePropertiesOf("host", "ip"));
+    Node node = new Node("1", "1", ImmutableSet.<Service>of(), TestHelper.EMPTY_NODE_PROPERTIES);
     Assert.assertTrue(node.getActions().isEmpty());
 
     for (int i = 0; i < 3; ++i) {
@@ -91,7 +91,7 @@ public class NodeServiceTest extends LoomServiceTestBase {
     conf.setInt(Constants.MAX_PER_NODE_LOG_LENGTH, 8);
     NodeService nodeService = injector.getInstance(NodeService.class);
 
-    Node node = new Node("1", "1", ImmutableSet.<Service>of(), TestHelper.nodePropertiesOf("host", "ip"));
+    Node node = new Node("1", "1", ImmutableSet.<Service>of(), TestHelper.EMPTY_NODE_PROPERTIES);
     nodeService.startAction(node, "taskId", "service", "action");
     nodeService.failAction(node, "1234567890", "0987654321");
 
@@ -106,7 +106,7 @@ public class NodeServiceTest extends LoomServiceTestBase {
     conf.setInt(Constants.MAX_PER_NODE_LOG_LENGTH, 10);
     NodeService nodeService = injector.getInstance(NodeService.class);
 
-    Node node = new Node("1", "1", ImmutableSet.<Service>of(), TestHelper.nodePropertiesOf("host", "ip"));
+    Node node = new Node("1", "1", ImmutableSet.<Service>of(), TestHelper.EMPTY_NODE_PROPERTIES);
     nodeService.startAction(node, "taskId", "service", "action");
     nodeService.failAction(node, "1234567890", "0987654321");
 

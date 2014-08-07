@@ -18,6 +18,7 @@ package com.continuuity.loom.cluster;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.admin.ServiceAction;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
@@ -72,8 +73,8 @@ public class NodeProperties {
                               flavor, image, sshUser, automators, serviceNames);
   }
 
-  public NodeProperties(String hostname, String ipaddress, int nodenum, String hardwaretype, String imagetype,
-                        String flavor, String image, String sshUser, Set<String> automators, Set<String> services) {
+  private NodeProperties(String hostname, String ipaddress, int nodenum, String hardwaretype, String imagetype,
+                         String flavor, String image, String sshUser, Set<String> automators, Set<String> services) {
     this.ipaddress = ipaddress;
     this.hostname = hostname;
     this.imagetype = imagetype;
@@ -184,6 +185,87 @@ public class NodeProperties {
    */
   public void setIpaddress(String ipaddress) {
     this.ipaddress = ipaddress;
+    ImmutableMap.builder();
+  }
+
+  /**
+   * Get a builder for building node properties.
+   *
+   * @return Builder for building node properties.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for creating node properties.
+   */
+  public static class Builder {
+    private String ipaddress;
+    private String hostname;
+    private int nodenum;
+    private String hardwaretype;
+    private String imagetype;
+    private String flavor;
+    private String image;
+    private String sshUser;
+    private Set<String> services;
+    private Set<String> automators;
+
+    public Builder setIpaddress(String ipaddress) {
+      this.ipaddress = ipaddress;
+      return this;
+    }
+
+    public Builder setHostname(String hostname) {
+      this.hostname = hostname;
+      return this;
+    }
+
+    public Builder setNodenum(int nodenum) {
+      this.nodenum = nodenum;
+      return this;
+    }
+
+    public Builder setHardwaretype(String hardwaretype) {
+      this.hardwaretype = hardwaretype;
+      return this;
+    }
+
+    public Builder setImagetype(String imagetype) {
+      this.imagetype = imagetype;
+      return this;
+    }
+
+    public Builder setFlavor(String flavor) {
+      this.flavor = flavor;
+      return this;
+    }
+
+    public Builder setImage(String image) {
+      this.image = image;
+      return this;
+    }
+
+    public Builder setSSHUser(String sshUser) {
+      this.sshUser = sshUser;
+      return this;
+    }
+
+    public Builder setServices(Set<String> services) {
+      this.services = services;
+      return this;
+    }
+
+    public Builder setAutomators(Set<String> automators) {
+      this.automators = automators;
+      return this;
+    }
+
+    public NodeProperties build() {
+      return new NodeProperties(hostname, ipaddress, nodenum, hardwaretype, imagetype,
+                                flavor, image, sshUser, automators, services);
+    }
   }
 
   @Override

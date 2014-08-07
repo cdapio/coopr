@@ -54,15 +54,15 @@ public class ExpressionTest {
     Service svc3 = new Service("svc3", "service 3", ImmutableSet.<String>of(),
                                ImmutableMap.<ProvisionerAction, ServiceAction>of());
     Node foo = new Node("foo", "1", ImmutableSet.of(svc1, svc2),
-                        new NodeProperties("oof", "9.7.8.4", 0, null, null, null, null, null, null, null));
+                        NodeProperties.builder().setHostname("oof").setIpaddress("9.7.8.4").setNodenum(0).build());
     Node bar = new Node("bar", "1", ImmutableSet.of(svc1),
-                        new NodeProperties("rab", "9.6.8.1", 5, null, null, null, null, null, null, null));
+                        NodeProperties.builder().setHostname("rab").setIpaddress("9.6.8.1").setNodenum(5).build());
     Node one = new Node("one", "1", ImmutableSet.of(svc1),
-                        new NodeProperties("eno", "9.1.3.4", 8, null, null, null, null, null, null, null));
+                        NodeProperties.builder().setHostname("eno").setIpaddress("9.1.3.4").setNodenum(8).build());
     Node two = new Node("two", "1", ImmutableSet.of(svc2),
-                        new NodeProperties("owt", null, 9, null, null, null, null, null, null, null));
+                        NodeProperties.builder().setHostname("owt").setNodenum(9).build());
     Node thr = new Node("thr", "1", ImmutableSet.of(svc3),
-                        new NodeProperties(null, "9.6.8.8", 10, null, null, null, null, null, null, null));
+                        NodeProperties.builder().setIpaddress("9.6.8.8").setNodenum(10).build());
     cluster = new Cluster("1", new Account("user", "tenant"), "cluster", System.currentTimeMillis(), "testy cluster",
                           null, null, ImmutableSet.of(foo.getId(), bar.getId(), one.getId(), two.getId(), thr.getId()),
                           ImmutableSet.of(svc1.getName(), svc2.getName(), svc3.getName()));
