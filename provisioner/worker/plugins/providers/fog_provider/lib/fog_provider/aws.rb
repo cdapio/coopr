@@ -89,7 +89,7 @@ class FogProviderAWS < Provider
         if server.public_ip_address
           server.public_ip_address
         else
-          Resolv.getaddress(server.dns_name)
+          Resolv.getaddress(server.dns_name) unless server.dns_name.nil?
         end
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
