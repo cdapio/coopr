@@ -178,7 +178,7 @@ function wait_for_server () {
     RETRIES=0
     until [[ $(curl http://localhost:55054/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
         sleep 2
-        RETRIES=$[$RETRIES + 1]
+        ((RETRIES++))
     done
 
     if [ $RETRIES -gt 60 ]; then
@@ -190,7 +190,7 @@ function wait_for_provisioner () {
     RETRIES=0
     until [[ $(curl http://localhost:55056/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
         sleep 2
-        RETRIES=$[$RETRIES + 1]
+        ((RETRIES++))
     done
 
     if [ $RETRIES -gt 60 ]; then
