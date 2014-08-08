@@ -80,6 +80,9 @@ module Loom
 
     # main run block
     def run
+      begin
+
+      Thread.abort_on_exception = true
       # start the api server
       spawn_sinatra_thread
       # wait for sinatra to fully initialize
@@ -96,14 +99,31 @@ module Loom
       # wait for signal_handler to exit in response to signals
       @signal_thread.join
       # kill the other threads
-      @heartbeat_thread.kill
-      @sinatra_thread.kill
-      @resource_thread.kill
-      @heartbeat_thread.join
-      @sinatra_thread.join
-      @resource_thread.join
+      [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|
+        t.kill
+        t.join
+      end
       log.info "provisioner gracefully shut down"
       exit
+      rescue RuntimeError => e
+        log.error "Exception raised in thread: #{e.inspect}, shutting down..."
+        # if signal_handler thread alive, use it to shutdown gracefully
+        if @signal_thread.alive?
+          Process.kill('TERM', 0)
+          @signal_thread.join
+          [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|
+            puts "killing thread #{t}, alive #{t.alive?}"
+            t.kill if t.alive?
+          end
+          log.info "provisioner forced graceful shutdown"
+          exit 1
+        else
+          # last resort, kill entire process group
+          Process.kill('TERM', -Process.getpgrp)
+          log.info "provisioner forced shutdown"
+          exit 1
+        end
+      end
     end
 
     def spawn_sinatra_thread
@@ -118,8 +138,6 @@ module Loom
         # let sinatra take over from here
         Api.run!
       }
-      # surface any exceptions immediately
-      @sinatra_thread.abort_on_exception=true
 
     end
 
@@ -189,8 +207,6 @@ module Loom
           sleep 10
         }
       }
-      # abort on any uncaught exception during registration, etc
-      @heartbeat_thread.abort_on_exception=true
     end
 
     def spawn_resource_thread
@@ -209,8 +225,6 @@ module Loom
           sleep 1
         }
       }
-      # abort on any uncaught exception
-      @resource_thread.abort_on_exception=true
     end
 
     def register_with_server
