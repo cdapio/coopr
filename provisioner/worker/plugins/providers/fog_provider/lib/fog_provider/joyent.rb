@@ -86,7 +86,6 @@ class FogProviderJoyent < Provider
       log.debug "Server #{server.name} sshd is up"
 
       # Process results
-      @result['result']['ipaddress'] = bootstrap_ip # TODO: remove this
       @result['ipaddresses'] = {
         'access_v4' => bootstrap_ip,
         'bind_v4' => bootstrap_ip

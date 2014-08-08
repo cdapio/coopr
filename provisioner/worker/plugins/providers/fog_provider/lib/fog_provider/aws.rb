@@ -104,7 +104,6 @@ class FogProviderAWS < Provider
       log.debug "Server #{server.id} sshd is up"
 
       # Process results
-      @result['result']['ipaddress'] = bootstrap_ip
       @result['ipaddresses'] = {
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
