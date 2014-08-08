@@ -104,7 +104,7 @@ class FogProviderRackspace < Provider
       # Additional checks
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
-      Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+      Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
       end
       # Return 0
