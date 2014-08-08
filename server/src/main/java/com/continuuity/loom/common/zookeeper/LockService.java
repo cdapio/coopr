@@ -40,11 +40,6 @@ public class LockService {
     return new ZKInterProcessReentrantLock(zkClient, path);
   }
 
-  public ZKInterProcessReentrantLock getResourceSyncLock(String tenantId) {
-    String path = Joiner.on('/').join(Constants.Lock.PLUGIN_NAMESPACE, "sync", tenantId);
-    return new ZKInterProcessReentrantLock(zkClient, path);
-  }
-
   public ZKInterProcessReentrantLock getJobLock(String tenantId, String clusterId) {
     String path = Joiner.on('/').join(Constants.Lock.TASK_NAMESPACE, "jobs", tenantId, clusterId);
     return new ZKInterProcessReentrantLock(zkClient, path);

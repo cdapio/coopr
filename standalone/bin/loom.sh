@@ -17,6 +17,10 @@ export LOOM_NODE=${LOOM_NODE:-node}
 # Provisioner environment
 export LOOM_RUBY=${LOOM_RUBY:-ruby}
 export LOOM_USE_DUMMY_PROVISIONER=${LOOM_USE_DUMMY_PROVISIONER:-false}
+export LOOM_API_USER=${LOOM_API_USER:-admin}
+export LOOM_TENANT=${LOOM_TENANT:-superadmin}
+export LOOM_NUM_WORKERS=${LOOM_NUM_WORKERS:-5}
+
 
 APP_NAME="loom-standalone"
 APP_BASE_NAME=`basename "$0"`
@@ -153,19 +157,28 @@ function load_defaults () {
 
         # register the default plugins with the server
         provisioner register
-
-        echo
-        echo "Go to http://localhost:8100. Have fun creating clusters!"
     fi
-    
     return 0;
+}
+
+function request_superadmin_workers () {
+
+    wait_for_provisioner
+
+    echo "Requesting ${LOOM_NUM_WORKERS} workers for default tenant..."
+    curl --silent --request PUT \
+      --header "Content-Type:application/json" \
+      --header "X-Loom-UserID:${LOOM_API_USER}" \
+      --header "X-Loom-TenantID:${LOOM_TENANT}" \
+      --connect-timeout 5 --data "{\"workers\":${LOOM_NUM_WORKERS}, \"name\":\"superadmin\"}" \
+      http://localhost:55054/v1/tenants/superadmin
 }
 
 function wait_for_server () {
     RETRIES=0
     until [[ $(curl http://localhost:55054/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
         sleep 2
-        RETRIES=$[$RETRIES + 1]
+        ((RETRIES++))
     done
 
     if [ $RETRIES -gt 60 ]; then
@@ -173,26 +186,45 @@ function wait_for_server () {
     fi 
 }
 
+function wait_for_provisioner () {
+    RETRIES=0
+    until [[ $(curl http://localhost:55056/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
+        sleep 2
+        ((RETRIES++))
+    done
+
+    if [ $RETRIES -gt 60 ]; then
+        die "ERROR: Provisioner did not successfully start"
+    fi
+}
+
 function provisioner () {
+    if [ "x$1" == "xstart" ]
+    then
+        echo "Waiting for server to start before running provisioner..."
+        wait_for_server
+    fi
     if [ "x${LOOM_USE_DUMMY_PROVISIONER}" == "xtrue" ] 
     then
-        if [ "x$1" == "xstart" ]
-        then
-            echo "Waiting for server to start before running dummy provisioner..."
-            wait_for_server
-        fi
         $LOOM_HOME/bin/loom-dummy-provisioner.sh $1 
     else
         $LOOM_HOME/bin/loom-provisioner.sh $1
     fi
 }
 
+function greeting () {
+    echo
+    echo "Go to http://localhost:8100. Have fun creating clusters!"
+}
+
 case "$1" in
   start)
     $LOOM_HOME/bin/loom-server.sh start && \
     $LOOM_HOME/bin/loom-ui.sh start && \
+    load_defaults && \
     provisioner start && \
-    load_defaults 
+    request_superadmin_workers && \
+    greeting
   ;;
 
   stop)
@@ -202,9 +234,12 @@ case "$1" in
   ;;
 
   restart)
-    $LOOM_HOME/bin/loom-server.sh restart
-    $LOOM_HOME/bin/loom-ui.sh restart
-    provisioner restart
+    provisioner stop
+    $LOOM_HOME/bin/loom-ui.sh stop
+    $LOOM_HOME/bin/loom-server.sh stop
+    $LOOM_HOME/bin/loom-server.sh start
+    $LOOM_HOME/bin/loom-ui.sh start
+    provisioner start
   ;;
 
   status)

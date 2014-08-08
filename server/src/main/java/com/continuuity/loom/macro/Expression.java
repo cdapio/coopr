@@ -22,7 +22,6 @@ import com.continuuity.loom.common.utils.ImmutablePair;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.gson.JsonElement;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -42,8 +41,6 @@ public class Expression {
 
   private static final String DEFAULT_SEPARATOR = ",";
   private static final char PLACEHOLDER = '$';
-  private static final String PROPERTY_FOR_HOST = Node.Properties.HOSTNAME.name().toLowerCase();
-  private static final String PROPERTY_FOR_IP = Node.Properties.IPADDRESS.name().toLowerCase();
 
   /**
    * Distinguishes the type of substitute - currently the host name or the ip address of a node with a service.
@@ -160,19 +157,32 @@ public class Expression {
     StringBuilder builder = new StringBuilder();
     boolean first = true;
     for (Node serviceNode : serviceNodes) {
-      JsonElement json = serviceNode.getProperties().get(propertyFor(type));
-      if (json == null) {
+      String property = getNodeProperty(serviceNode);
+      if (property == null) {
         throw new IncompleteClusterException(
-          "Property '" + propertyFor(type) + "' not defined for node '" + node.getId() + "'.");
+          "Property '" + type + "' not defined for node '" + node.getId() + "'.");
       }
       if (!first) {
         builder.append(separator == null ? DEFAULT_SEPARATOR : separator);
       } else {
         first = false;
       }
-      format(json.getAsString(), builder);
+      format(property, builder);
     }
     return builder.toString();
+  }
+
+  private String getNodeProperty(Node node) {
+    switch (type) {
+      case HOST_OF_SERVICE:
+      case SELF_HOST_OF_SERVICE:
+        return node.getProperties().getHostname();
+      case IP_OF_SERVICE:
+      case SELF_IP_OF_SERVICE:
+        return node.getProperties().getIpaddress();
+      default:
+        return null;
+    }
   }
 
   private String evaluateClusterProperty(Cluster cluster) {
@@ -206,12 +216,12 @@ public class Expression {
         }
         serviceNode = serviceNodes.get(instanceNum);
       }
-      JsonElement json = serviceNode.getProperties().get(propertyFor(type));
-      if (json == null) {
+      String property = getNodeProperty(serviceNode);
+      if (property == null) {
         throw new IncompleteClusterException(
-          "Property '" + propertyFor(type) + "' not defined for node '" + node.getId() + "'.");
+          "Property '" + type + "' not defined for node '" + node.getId() + "'.");
       }
-      return json.getAsString();
+      return property;
     }
   }
 
@@ -238,19 +248,6 @@ public class Expression {
         builder.append(format.charAt(i));
       }
     }
-  }
-
-  /**
-   * Depending on the type of an expression, return the node property to use for the substitute.
-   */
-  private static String propertyFor(Type type) {
-    switch (type) {
-      case HOST_OF_SERVICE: return PROPERTY_FOR_HOST;
-      case IP_OF_SERVICE: return PROPERTY_FOR_IP;
-      case SELF_HOST_OF_SERVICE: return PROPERTY_FOR_HOST;
-      case SELF_IP_OF_SERVICE: return PROPERTY_FOR_IP;
-    }
-    return null; // unreachable
   }
 
   /**
@@ -291,6 +288,6 @@ public class Expression {
   }
 
   private int getNodeNum(Node node) {
-    return node.getProperties().get(Node.Properties.NODENUM.name().toLowerCase()).getAsInt();
+    return node.getProperties().getNodenum();
   }
 }

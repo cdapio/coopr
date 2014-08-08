@@ -183,26 +183,21 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
    *
    * @param request Request to get an automator type resource
    * @param responder Responder for responding to the request
+   * @param tenantId Id of the tenant that owns the resource
    * @param automatortypeId Id of the automator type that owns the resource
    * @param resourceType Type of resource to get
    * @param name Name of the resource to get
    * @param version Version of the resource to get
    */
   @GET
-  @Path("/loom/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}")
+  @Path("/tenants/{tenant-id}/automatortypes/{automatortype-id}/{type}/{name}/versions/{version}")
   public void getAutomatorResource(HttpRequest request, HttpResponder responder,
+                                   @PathParam("tenant-id") String tenantId,
                                    @PathParam("automatortype-id") String automatortypeId,
-                                   @PathParam("resource-type") String resourceType,
-                                   @PathParam("resource-name") String name,
+                                   @PathParam("type") String resourceType,
+                                   @PathParam("name") String name,
                                    @PathParam("version") String version) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isAdmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "User must be admin.");
-      return;
-    }
+    Account account = new Account(Constants.ADMIN_USER, tenantId);
 
     ResourceType resourceTypeObj = new ResourceType(PluginType.AUTOMATOR, automatortypeId, resourceType);
     sendResourceInChunks(responder, account, resourceTypeObj, name, version);
@@ -213,26 +208,21 @@ public final class LoomProvisionerHandler extends LoomAuthHandler {
    *
    * @param request Request to get an provider type resource
    * @param responder Responder for responding to the request
+   * @param tenantId Id of the tenant that owns the resource
    * @param providertypeId Id of the provider type that owns the resource
    * @param resourceType Type of resource to get
    * @param name Name of the resource to get
    * @param version Version of the resource to get
    */
   @GET
-  @Path("/loom/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}")
-  public void deleteProviderTypeModuleVersion(HttpRequest request, HttpResponder responder,
-                                              @PathParam("providertype-id") String providertypeId,
-                                              @PathParam("resource-type") String resourceType,
-                                              @PathParam("resource-name") String name,
-                                              @PathParam("version") String version) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isAdmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "User must be admin.");
-      return;
-    }
+  @Path("/tenants/{tenant-id}/providertypes/{providertype-id}/{type}/{name}/versions/{version}")
+  public void getProviderTypeResource(HttpRequest request, HttpResponder responder,
+                                      @PathParam("tenant-id") String tenantId,
+                                      @PathParam("providertype-id") String providertypeId,
+                                      @PathParam("type") String resourceType,
+                                      @PathParam("name") String name,
+                                      @PathParam("version") String version) {
+    Account account = new Account(Constants.ADMIN_USER, tenantId);
 
     ResourceType resourceTypeObj = new ResourceType(PluginType.PROVIDER, providertypeId, resourceType);
     sendResourceInChunks(responder, account, resourceTypeObj, name, version);

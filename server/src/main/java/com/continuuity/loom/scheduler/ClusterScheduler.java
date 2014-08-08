@@ -29,7 +29,6 @@ import com.continuuity.loom.scheduler.dag.TaskNode;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
-import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
 import com.continuuity.loom.store.cluster.ClusterStore;
@@ -38,8 +37,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
@@ -63,7 +60,6 @@ public class ClusterScheduler implements Runnable {
   private final ClusterStore clusterStore;
   private final TaskService taskService;
   private final IdService idService;
-  private final Gson gson;
   private final QueueGroup clusterQueues;
 
   private final Actions actions = Actions.getInstance();
@@ -73,13 +69,11 @@ public class ClusterScheduler implements Runnable {
                            ClusterStoreService clusterStoreService,
                            TaskService taskService,
                            IdService idService,
-                           Gson gson,
                            @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues) {
     this.id = id;
     this.clusterStore = clusterStoreService.getSystemView();
     this.taskService = taskService;
     this.idService = idService;
-    this.gson = gson;
     this.clusterQueues = clusterQueues;
   }
 
@@ -172,19 +166,18 @@ public class ClusterScheduler implements Runnable {
       Set<ClusterTask> stageTasks = Sets.newHashSet();
       for (TaskNode taskNode : taskNodes) {
         // Get the config for the task
-        Node node = nodeMap.get(taskNode.getHostId());
         Service service = serviceMap.get(taskNode.getService());
-        JsonObject taskConfig =
-          TaskConfig.getConfig(cluster, node, service, ProvisionerAction.valueOf(taskNode.getTaskName()), gson);
-        if (taskConfig == null) {
-          LOG.debug("Not scheduling {} for job {} since config is null", taskNode, job.getJobId());
+        // TODO: why is this a string in the taskNode instead of a ProvisionerAction
+        ProvisionerAction action = ProvisionerAction.valueOf(taskNode.getTaskName());
+        // if this is a service action task, but the service action is not defined, skip it.
+        if (service != null && !service.getProvisionerActions().containsKey(action)) {
+          LOG.debug("Not scheduling {} for job {} since the service has no {} action.",
+                    taskNode, job.getJobId(), action);
           continue;
         }
 
         TaskId taskId = idService.getNewTaskId(JobId.fromString(job.getJobId()));
-        ClusterTask task = new ClusterTask(ProvisionerAction.valueOf(taskNode.getTaskName()), taskId,
-                                           taskNode.getHostId(), taskNode.getService(), clusterAction,
-                                           taskConfig);
+        ClusterTask task = new ClusterTask(action, taskId, taskNode.getHostId(), taskNode.getService(), clusterAction);
         clusterStore.writeClusterTask(task);
         stageTasks.add(task);
       }

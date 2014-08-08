@@ -7,7 +7,7 @@
       "requires": [ "base" ],
       "uses": []
     },
-    "provides": [],
+    "provides": [ "web-server" ],
     "runtime": {
       "requires": [],
       "uses": []

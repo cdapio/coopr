@@ -2,7 +2,9 @@ package com.continuuity.loom.provisioner;
 
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,15 +29,15 @@ import java.util.concurrent.TimeUnit;
  * deleting a tenant or putting tenant information.
  */
 public class HttpProvisionerRequestService implements ProvisionerRequestService {
-  private static final Gson GSON = new Gson();
   private static final Logger LOG  = LoggerFactory.getLogger(HttpProvisionerRequestService.class);
   private static final String BASE_TENANT_PATH = "/v1/tenants/";
   private final int maxRetries;
   private final long msBetweenRetries;
   private final CloseableHttpClient httpClient;
+  private final Gson gson;
 
   @Inject
-  private HttpProvisionerRequestService(Configuration conf) {
+  private HttpProvisionerRequestService(Configuration conf, Gson gson) {
     this.maxRetries = conf.getInt(Constants.PROVISIONER_REQUEST_MAX_RETRIES);
     this.msBetweenRetries = conf.getLong(Constants.PROVISIONER_REQUEST_MS_BETWEEN_RETRIES);
     int socketTimeout = conf.getInt(Constants.PROVISIONER_REQUEST_SOCKET_TIMEOUT_MS);
@@ -43,6 +46,7 @@ public class HttpProvisionerRequestService implements ProvisionerRequestService 
       .setConnectionReuseStrategy(NoConnectionReuseStrategy.INSTANCE)
       .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(socketTimeout).build())
       .build();
+    this.gson = gson;
   }
 
   @Override
@@ -52,14 +56,46 @@ public class HttpProvisionerRequestService implements ProvisionerRequestService 
   }
 
   @Override
-  public boolean putTenant(Provisioner provisioner, String tenantId) {
+  public boolean putTenant(Provisioner provisioner, String tenantId, ResourceCollection resourceCollection) {
     HttpPut put = new HttpPut(getTenantURL(provisioner, tenantId));
-    ProvisionerTenant provisionerTenant = new ProvisionerTenant(provisioner.getAssignedWorkers(tenantId));
+    int workers = provisioner.getAssignedWorkers(tenantId);
     try {
-      put.setEntity(new StringEntity(GSON.toJson(provisionerTenant)));
+      String body = gson.toJson(new ProvisionerTenant(workers, resourceCollection));
+      put.setEntity(new StringEntity(body));
     } catch (UnsupportedEncodingException e) {
       // should never happen
-      LOG.error("Unsupported encoding when putting tenant {} to provisioner {}", tenantId, provisioner.getId());
+      LOG.error("Unsupported encoding when writing tenant {} to provisioner {}",
+                tenantId, provisioner.getId());
+      Throwables.propagate(e);
+    }
+    return makeRequestWithRetries(put);
+  }
+
+  @Override
+  public boolean putTenantWorkers(Provisioner provisioner, String tenantId) {
+    HttpPut put = new HttpPut(getTenantURL(provisioner, tenantId) + "/workers");
+    Map<String, Integer> body = ImmutableMap.of("workers", provisioner.getAssignedWorkers(tenantId));
+    try {
+      put.setEntity(new StringEntity(gson.toJson(body)));
+    } catch (UnsupportedEncodingException e) {
+      // should never happen
+      LOG.error("Unsupported encoding when writing workers for tenant {} to provisioner {}",
+                tenantId, provisioner.getId());
+      Throwables.propagate(e);
+    }
+    return makeRequestWithRetries(put);
+  }
+
+  @Override
+  public boolean putTenantResources(Provisioner provisioner, String tenantId, ResourceCollection resourceCollection) {
+    HttpPut put = new HttpPut(getTenantURL(provisioner, tenantId) + "/resources");
+    Map<String, ResourceCollection> body = ImmutableMap.of("resources", resourceCollection);
+    try {
+      put.setEntity(new StringEntity(gson.toJson(body)));
+    } catch (UnsupportedEncodingException e) {
+      // should never happen
+      LOG.error("Unsupported encoding when writing resources for tenant {} to provisioner {}",
+                tenantId, provisioner.getId());
       Throwables.propagate(e);
     }
     return makeRequestWithRetries(put);

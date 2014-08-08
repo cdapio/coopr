@@ -6,7 +6,7 @@
       "flavor": "Large 16GB"
     },
     "rackspace": {
-      "flavor": "performance2-15"
+      "flavor": "7"
     }
   }
 }

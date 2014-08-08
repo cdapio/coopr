@@ -23,7 +23,6 @@ import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -52,7 +51,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   abstract boolean allowedToWrite(Cluster cluster);
 
   abstract PreparedStatement getSetClusterStatement(
-    Connection conn, long id, Cluster cluster, ByteArrayInputStream clusterBytes) throws SQLException;
+    Connection conn, long id, Cluster cluster, byte[] clusterBytes) throws SQLException;
 
   abstract PreparedStatement getClusterExistsStatement(Connection conn, long id) throws SQLException;
 
@@ -149,7 +148,7 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        ByteArrayInputStream clusterBytes = dbQueryExecutor.toByteStream(cluster, Cluster.class);
+        byte[] clusterBytes = dbQueryExecutor.toBytes(cluster, Cluster.class);
         DBPut clusterPut = new ClusterDBPut(clusterNum, cluster, clusterBytes);
         clusterPut.executePut(conn);
       } finally {
@@ -222,11 +221,11 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   }
 
   private PreparedStatement getInsertClusterStatement(
-    Connection conn, long id, Cluster cluster, ByteArrayInputStream clusterBytes) throws SQLException {
+    Connection conn, long id, Cluster cluster, byte[] clusterBytes) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "INSERT INTO  clusters (cluster, owner_id, tenant_id, status, expire_time, create_time, name, id) " +
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    statement.setBlob(1, clusterBytes);
+    statement.setBytes(1, clusterBytes);
     statement.setString(2, cluster.getAccount().getUserId());
     statement.setString(3, cluster.getAccount().getTenantId());
     statement.setString(4, cluster.getStatus().name());
@@ -240,9 +239,9 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   private class ClusterDBPut extends DBPut {
     private final long clusterId;
     private final Cluster cluster;
-    private final ByteArrayInputStream clusterBytes;
+    private final byte[] clusterBytes;
 
-    private ClusterDBPut(long clusterId, Cluster cluster, ByteArrayInputStream clusterBytes) {
+    private ClusterDBPut(long clusterId, Cluster cluster, byte[] clusterBytes) {
       this.clusterId = clusterId;
       this.cluster = cluster;
       this.clusterBytes = clusterBytes;

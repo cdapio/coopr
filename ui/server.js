@@ -36,7 +36,7 @@ var CLIENT_ADDR = argv.loomhost || 'http://127.0.0.1:55054';
 var BOX_ADDR = CLIENT_ADDR + '/v1/loom';
 var CLIENT_DIR = env === 'production' ? 'client-built' : 'client';
 // temporary 
-var TENANT = argv.tenant || 'loom';
+var TENANT = argv.tenant || 'superadmin';
 console.info('Environment:', env, BOX_ADDR, CLIENT_DIR);
 
 /**

@@ -14,7 +14,6 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -134,7 +133,7 @@ public class SQLClusterStore implements ClusterStore {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        ByteArrayInputStream jobBytes = dbQueryExecutor.toByteStream(clusterJob, ClusterJob.class);
+        byte[] jobBytes = dbQueryExecutor.toBytes(clusterJob, ClusterJob.class);
         DBPut jobPut = new ClusterJobDBPut(clusterJob, jobBytes, jobId, clusterId);
         jobPut.executePut(conn);
       } finally {
@@ -197,7 +196,7 @@ public class SQLClusterStore implements ClusterStore {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        ByteArrayInputStream taskBytes = dbQueryExecutor.toByteStream(clusterTask, ClusterTask.class);
+        byte[] taskBytes = dbQueryExecutor.toBytes(clusterTask, ClusterTask.class);
         DBPut taskPut = new ClusterTaskDBPut(clusterTask, taskBytes, taskId, clusterId);
         taskPut.executePut(conn);
       } finally {
@@ -256,7 +255,7 @@ public class SQLClusterStore implements ClusterStore {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        ByteArrayInputStream nodeBytes = dbQueryExecutor.toByteStream(node, Node.class);
+        byte[] nodeBytes = dbQueryExecutor.toBytes(node, Node.class);
         DBPut nodePut = new NodeDBPut(node, nodeBytes);
         nodePut.executePut(conn);
       } finally {
@@ -374,11 +373,11 @@ public class SQLClusterStore implements ClusterStore {
 
   private class ClusterJobDBPut extends DBPut {
     private final ClusterJob clusterJob;
-    private final ByteArrayInputStream jobBytes;
+    private final byte[] jobBytes;
     private final JobId jobId;
     private final long clusterId;
 
-    private ClusterJobDBPut(ClusterJob clusterJob, ByteArrayInputStream jobBytes, JobId jobId, long clusterId) {
+    private ClusterJobDBPut(ClusterJob clusterJob, byte[] jobBytes, JobId jobId, long clusterId) {
       this.clusterJob = clusterJob;
       this.jobBytes = jobBytes;
       this.jobId = jobId;
@@ -389,7 +388,7 @@ public class SQLClusterStore implements ClusterStore {
     public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement updateStatement =
         conn.prepareStatement("UPDATE jobs SET job=?, status=? WHERE job_num=? AND cluster_id=?");
-      updateStatement.setBlob(1, jobBytes);
+      updateStatement.setBytes(1, jobBytes);
       updateStatement.setString(2, clusterJob.getJobStatus().name());
       updateStatement.setLong(3, jobId.getJobNum());
       updateStatement.setLong(4, clusterId);
@@ -404,18 +403,18 @@ public class SQLClusterStore implements ClusterStore {
       statement.setLong(2, clusterId);
       statement.setString(3, clusterJob.getJobStatus().name());
       statement.setTimestamp(4, DBHelper.getTimestamp(System.currentTimeMillis()));
-      statement.setBlob(5, jobBytes);
+      statement.setBytes(5, jobBytes);
       return statement;
     }
   }
 
   private class ClusterTaskDBPut extends DBPut {
     private final ClusterTask clusterTask;
-    private final ByteArrayInputStream taskBytes;
+    private final byte[] taskBytes;
     private final TaskId taskId;
     private final long clusterId;
 
-    private ClusterTaskDBPut(ClusterTask clusterTask, ByteArrayInputStream taskBytes, TaskId taskId, long clusterId) {
+    private ClusterTaskDBPut(ClusterTask clusterTask, byte[] taskBytes, TaskId taskId, long clusterId) {
       this.clusterTask = clusterTask;
       this.taskBytes = taskBytes;
       this.taskId = taskId;
@@ -427,7 +426,7 @@ public class SQLClusterStore implements ClusterStore {
       PreparedStatement statement = conn.prepareStatement(
         "UPDATE tasks SET task=?, status=?, submit_time=?, status_time=?" +
           " WHERE task_num=? AND job_num=? AND cluster_id=?");
-      statement.setBlob(1, dbQueryExecutor.toByteStream(clusterTask, ClusterTask.class));
+      statement.setBytes(1, dbQueryExecutor.toBytes(clusterTask, ClusterTask.class));
       statement.setString(2, clusterTask.getStatus().name());
       statement.setTimestamp(3, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
       statement.setTimestamp(4, DBHelper.getTimestamp(clusterTask.getStatusTime()));
@@ -447,16 +446,16 @@ public class SQLClusterStore implements ClusterStore {
       statement.setLong(3, clusterId);
       statement.setString(4, clusterTask.getStatus().name());
       statement.setTimestamp(5, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
-      statement.setBlob(6, taskBytes);
+      statement.setBytes(6, taskBytes);
       return statement;
     }
   }
 
   private class NodeDBPut extends DBPut {
     private final Node node;
-    private final ByteArrayInputStream nodeBytes;
+    private final byte[] nodeBytes;
 
-    private NodeDBPut(Node node, ByteArrayInputStream nodeBytes) {
+    private NodeDBPut(Node node, byte[] nodeBytes) {
       this.node = node;
       this.nodeBytes = nodeBytes;
     }
@@ -464,7 +463,7 @@ public class SQLClusterStore implements ClusterStore {
     @Override
     public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement("UPDATE nodes SET node=? WHERE id=?");
-      statement.setBlob(1, nodeBytes);
+      statement.setBytes(1, nodeBytes);
       statement.setString(2, node.getId());
       return statement;
     }
@@ -475,7 +474,7 @@ public class SQLClusterStore implements ClusterStore {
         "INSERT INTO nodes (id, cluster_id, node) VALUES (?, ?, ?)");
       statement.setString(1, node.getId());
       statement.setLong(2, Long.parseLong(node.getClusterId()));
-      statement.setBlob(3, nodeBytes);
+      statement.setBytes(3, nodeBytes);
       return statement;
     }
   }

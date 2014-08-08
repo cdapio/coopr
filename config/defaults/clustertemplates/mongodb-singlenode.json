@@ -1,0 +1,58 @@
+{
+  "name": "mongodb-singlenode",
+  "description": "Single-node single-instance MongoDB",
+  "defaults": {
+    "services": [
+      "base",
+      "mongodb-single"
+    ],
+    "provider": "rackspace",
+    "hardwaretype": "medium",
+    "imagetype": "ubuntu12",
+    "config": {
+      "mongodb": {
+        "config": {
+          "bind_ip": "%ip.service.mongodb-single%"
+        }
+      }
+    }
+  },
+  "compatibility": {
+    "hardwaretypes": [
+      "small",
+      "medium",
+      "large",
+      "xlarge",
+      "xxlarge"
+    ],
+    "imagetypes": [
+      "centos6",
+      "ubuntu12"
+    ],
+    "services": [
+      "base",
+      "mongodb-single"
+    ]
+  },
+  "constraints": {
+    "layout": {
+      "mustcoexist": [
+        [ "base", "mongodb-single" ]
+      ]
+    },
+    "services": {
+      "mongodb-single": {
+        "quantities": {
+          "max": "1"
+        }
+      }
+    }
+  },
+  "administration": {
+    "leaseduration": {
+      "initial":0,
+      "max":0,
+      "step":0
+    }
+  }
+}

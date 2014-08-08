@@ -6,11 +6,12 @@
       "base",
       "apache-httpd",
       "php",
+      "php-modules",
       "mysql-server"
     ],
     "provider": "rackspace",
     "hardwaretype": "medium",
-    "imagetype": "centos6",
+    "imagetype": "ubuntu12",
     "config": {
       "apache": {
         "default_site_enabled": "true",
@@ -46,7 +47,11 @@
       "php": {
         "directives": {
           "mysql.default_host": "%host.service.mysql-server%"
-        }
+        },
+        "modules": [
+          "memcache",
+          "mysql"
+        ]
       }
     }
   },
@@ -54,7 +59,9 @@
     "hardwaretypes": [
       "small",
       "medium",
-      "large"
+      "large",
+      "xlarge",
+      "xxlarge"
     ],
     "imagetypes": [
       "centos6",
@@ -64,14 +71,16 @@
       "base",
       "haproxy",
       "apache-httpd",
+      "memcached",
       "php",
+      "php-modules",
       "mysql-server"
     ]
   },
   "constraints": {
     "layout": {
       "mustcoexist": [
-        [ "apache-httpd", "php" ]
+        [ "apache-httpd", "php", "php-modules" ]
       ]
     },
     "services": {

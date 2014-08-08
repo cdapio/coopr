@@ -20,6 +20,7 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.QuotaException;
@@ -256,6 +257,11 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     }
     if (!account.isSuperadmin()) {
       responder.sendStatus(HttpResponseStatus.FORBIDDEN);
+      return;
+    }
+
+    if (Constants.SUPERADMIN_TENANT.equals(tenantName)) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "Superadmin cannot be deleted.");
       return;
     }
 

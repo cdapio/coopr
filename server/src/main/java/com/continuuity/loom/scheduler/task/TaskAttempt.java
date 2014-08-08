@@ -16,7 +16,6 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.google.common.base.Objects;
-import com.google.gson.JsonObject;
 
 /**
  * A task attempt is one run of an action on a node. Attempts can be retried, in which case a {@link ClusterTask} will
@@ -30,14 +29,9 @@ class TaskAttempt {
   private String statusMessage;
   private long statusTime;
 
-  private JsonObject config;
-
-  private ClusterTask rollbackTask;
-
-  TaskAttempt(int id, JsonObject config) {
+  TaskAttempt(int id) {
     this.id = id;
     this.status = ClusterTask.Status.NOT_SUBMITTED;
-    this.config = config;
   }
 
   /**
@@ -104,24 +98,6 @@ class TaskAttempt {
   }
 
   /**
-   * Get the configuration to send to the provisioner executing the task attempt.
-   *
-   * @return Configuration to send to the provisioner executing the task attempt.
-   */
-  public JsonObject getConfig() {
-    return config;
-  }
-
-  /**
-   * Set the configuration to send to the provisioner executing the task attempt.
-   *
-   * @param config Configuration to set to send to the provisioner executing the task attempt.
-   */
-  public void setConfig(JsonObject config) {
-    this.config = config;
-  }
-
-  /**
    * Get the status message for the task attempt.
    *
    * @return Status message for the task attempt.
@@ -157,24 +133,6 @@ class TaskAttempt {
     this.statusTime = statusTime;
   }
 
-  /**
-   * Get the rollback task associated with this attempt should the task fail.
-   *
-   * @return Rollback task associated with this attempt should the task fail.
-   */
-  public ClusterTask getRollbackTask() {
-    return rollbackTask;
-  }
-
-  /**
-   * Set the rollback task that should run should this task fail.
-   *
-   * @param rollbackTask Rollback task to run should this task fail.
-   */
-  public void setRollbackTask(ClusterTask rollbackTask) {
-    this.rollbackTask = rollbackTask;
-  }
-
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
@@ -184,8 +142,6 @@ class TaskAttempt {
       .add("statusCode", statusCode)
       .add("statusMessage", statusMessage)
       .add("statusTime", statusTime)
-      .add("config", config)
-      .add("rollbackTask", rollbackTask)
       .toString();
   }
 }

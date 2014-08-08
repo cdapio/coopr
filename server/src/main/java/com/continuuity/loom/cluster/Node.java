@@ -16,15 +16,13 @@
 package com.continuuity.loom.cluster;
 
 import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import java.util.List;
 import java.util.Map;
@@ -34,29 +32,13 @@ import java.util.Set;
  * Represents a machine in a cluster.
  */
 public final class Node implements Comparable<Node> {
-
+  private static final String IPADDRESS_KEY = "ipaddress";
   private final String id;
   private final String clusterId;
   private final Set<Service> services;
-  private final JsonObject properties;
-
+  private final NodeProperties properties;
   private final List<Action> actions;
-
-  /**
-   * Node properties.
-   * TODO: these should just be fields instead of keys in the properties
-   */
-  public enum Properties {
-    IPADDRESS,
-    HOSTNAME,
-    NODENUM,
-    AUTOMATORS,
-    HARDWARETYPE,
-    IMAGETYPE,
-    SERVICES,
-    FLAVOR,
-    IMAGE
-  }
+  private final JsonObject provisionerResults;
 
   /**
    * Node status.
@@ -67,34 +49,18 @@ public final class Node implements Comparable<Node> {
     FAILED
   }
 
-  public Node(String id, String clusterId, Set<Service> services, Map<String, String> properties) {
+  public Node(String id, String clusterId, Set<Service> services, NodeProperties properties) {
+    this(id, clusterId, services, properties, Lists.<Action>newArrayList(), new JsonObject());
+  }
+
+  public Node(String id, String clusterId, Set<Service> services,
+              NodeProperties properties, List<Action> actions, JsonObject provisionerResults) {
     this.id = id;
     this.clusterId = clusterId;
     this.services = Sets.newHashSet(services);
-    this.properties = new JsonObject();
-
-    for (Map.Entry<String, String> entry : properties.entrySet()) {
-      this.properties.addProperty(entry.getKey(), entry.getValue());
-    }
-
-    // get the set of automators required on the node. Used during bootstrap tasks.
-    Set<String> automatorSet = Sets.newHashSet();
-    JsonArray serviceNames = new JsonArray();
-    JsonArray automators = new JsonArray();
-    for (Service service : services) {
-      for (ServiceAction serviceAction : service.getProvisionerActions().values()) {
-        String automatorType = serviceAction.getType();
-        if (!automatorSet.contains(automatorType)) {
-          automators.add(new JsonPrimitive(serviceAction.getType()));
-          automatorSet.add(automatorType);
-        }
-      }
-      serviceNames.add(new JsonPrimitive(service.getName()));
-    }
-    this.properties.add(Properties.AUTOMATORS.name().toLowerCase(), automators);
-    this.properties.add(Properties.SERVICES.name().toLowerCase(), serviceNames);
-
-    this.actions = Lists.newArrayList();
+    this.properties = properties == null ? NodeProperties.builder().build() : properties;
+    this.actions = actions == null ? Lists.<Action>newArrayList() : actions;
+    this.provisionerResults = provisionerResults == null ? new JsonObject() : provisionerResults;
   }
 
   /**
@@ -130,8 +96,17 @@ public final class Node implements Comparable<Node> {
    *
    * @return Node properties.
    */
-  public JsonObject getProperties() {
+  public NodeProperties getProperties() {
     return properties;
+  }
+
+  /**
+   * Get data returned by provisioners that should be passed on to future tasks.
+   *
+   * @return Data returned by provisioners that should be passed on to future tasks
+   */
+  public JsonObject getProvisionerResults() {
+    return provisionerResults;
   }
 
   /**
@@ -171,6 +146,23 @@ public final class Node implements Comparable<Node> {
    */
   public void addService(Service service) {
     this.services.add(service);
+  }
+
+  /**
+   * Add the provisioner results from a task to the current provisioner results.
+   *
+   * @param results Results of a task to add to the overall node results
+   */
+  public void addResults(JsonObject results) {
+    for (Map.Entry<String, JsonElement> entry : results.entrySet()) {
+      // special cased for now
+      // TODO: make ip a required field for confirm tasks
+      if (IPADDRESS_KEY.equals(entry.getKey())) {
+        this.properties.setIpaddress(entry.getValue().getAsString());
+      } else {
+        this.provisionerResults.add(entry.getKey(), entry.getValue());
+      }
+    }
   }
 
   @Override

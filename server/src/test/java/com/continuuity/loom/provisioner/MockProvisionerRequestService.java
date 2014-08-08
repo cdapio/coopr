@@ -1,5 +1,6 @@
 package com.continuuity.loom.provisioner;
 
+import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
@@ -17,7 +18,17 @@ public class MockProvisionerRequestService implements ProvisionerRequestService 
   }
 
   @Override
-  public boolean putTenant(Provisioner provisioner, String tenantId) {
+  public boolean putTenant(Provisioner provisioner, String tenantId, ResourceCollection resourceCollection) {
+    return !deadProvisioners.contains(provisioner.getId());
+  }
+
+  @Override
+  public boolean putTenantWorkers(Provisioner provisioner, String tenantId) {
+    return !deadProvisioners.contains(provisioner.getId());
+  }
+
+  @Override
+  public boolean putTenantResources(Provisioner provisioner, String tenantId, ResourceCollection resourceCollection) {
     return !deadProvisioners.contains(provisioner.getId());
   }
 

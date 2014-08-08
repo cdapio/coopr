@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.scheduler;
 
+import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Configuration;
@@ -29,6 +30,7 @@ import com.continuuity.loom.macro.Expander;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.scheduler.task.SchedulableTask;
 import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
@@ -40,6 +42,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
@@ -153,8 +156,7 @@ public class JobScheduler implements Runnable {
             // Handle retry tasks if any
             if (!retryTasks.isEmpty()) {
               for (ClusterTask task : retryTasks) {
-                notSubmittedTasks.add(
-                  scheduleRetry(cluster, job, task, nodeMap.get(task.getNodeId()), queueName));
+                notSubmittedTasks.add(scheduleRetry(job, task, queueName));
               }
             }
 
@@ -195,18 +197,17 @@ public class JobScheduler implements Runnable {
 
   private void submitTasks(Set<ClusterTask> notSubmittedTasks, Cluster cluster, Map<String, Node> nodeMap,
                            Set<Node> clusterNodes, ClusterJob job, String queueName) throws Exception {
+    JsonObject unexpandedClusterConfig = cluster.getConfig();
 
     for (final ClusterTask task : notSubmittedTasks) {
       Node taskNode = nodeMap.get(task.getNodeId());
-      TaskConfig.updateNodeProperties(task.getConfig(), taskNode);
-
-      // Add the node list
-      TaskConfig.addNodeList(task.getConfig(), clusterNodes);
+      JsonObject clusterConfig = unexpandedClusterConfig;
 
       // TODO: do this only once and save it
       if (!task.getTaskName().isHardwareAction()) {
         try {
-          task.setConfig(Expander.expand(task.getConfig(), null, cluster, clusterNodes, taskNode).getAsJsonObject());
+          // expansion does not modify the original input, but creates a new object
+          clusterConfig = Expander.expand(clusterConfig, null, cluster, clusterNodes, taskNode).getAsJsonObject();
         } catch (Throwable e) {
           LOG.error("Exception while expanding macros for task {}", task.getTaskId(), e);
           taskService.failTask(task, -1);
@@ -217,9 +218,18 @@ public class JobScheduler implements Runnable {
         }
       }
 
+      Service tService = null;
+      for (Service service : taskNode.getServices()) {
+        if (service.getName().equals(task.getService())) {
+          tService = service;
+          break;
+        }
+      }
+      TaskConfig taskConfig = TaskConfig.from(cluster, taskNode, tService, clusterConfig,
+                                              task.getTaskName(), clusterNodes);
       LOG.debug("Submitting task {}", task.getTaskId());
       LOG.trace("Task {}", task);
-      SchedulableTask schedulableTask = new SchedulableTask(task);
+      SchedulableTask schedulableTask = new SchedulableTask(task, taskConfig);
       LOG.trace("Schedulable task {}", schedulableTask);
 
       // Submit task
@@ -232,13 +242,12 @@ public class JobScheduler implements Runnable {
     }
   }
 
-  ClusterTask scheduleRetry(Cluster cluster, ClusterJob job, ClusterTask task,
-                            Node node, String queueName) throws Exception {
+  ClusterTask scheduleRetry(ClusterJob job, ClusterTask task, String queueName) throws Exception {
     // Schedule rollback task before retrying
     scheduleRollbackTask(task, queueName);
 
     task.addAttempt();
-    List<ClusterTask> retryTasks = taskService.getRetryTask(cluster, task, node);
+    List<ClusterTask> retryTasks = taskService.getRetryTask(task);
 
     if (retryTasks.size() == 1) {
       LOG.trace("Only one retry task for job {} for task {}", job, task);
@@ -272,7 +281,7 @@ public class JobScheduler implements Runnable {
 
     clusterStore.writeClusterTask(rollbackTask);
 
-    SchedulableTask schedulableTask = new SchedulableTask(rollbackTask);
+    SchedulableTask schedulableTask = new SchedulableTask(rollbackTask, null);
     LOG.debug("Submitting rollback task {} for task {}", rollbackTask.getTaskId(), task.getTaskId());
     LOG.trace("Task = {}. Rollback task = {}", task, rollbackTask);
 
