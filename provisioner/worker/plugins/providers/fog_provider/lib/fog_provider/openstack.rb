@@ -79,6 +79,7 @@ class FogProviderOpenstack < Provider
       bootstrap_ip = ip_address(server, 'public')
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
+        raise 'No IP address available for bootstrapping.'
       else
         log.debug "Bootstrap IP address #{bootstrap_ip}"
       end

@@ -2,6 +2,15 @@
   "name": "ubuntu12",
   "description": "Ubuntu 12.04 LTS",
   "providermap": {
+    "aws-us-east-1": {
+      "image": "ami-b0b37bd8"
+    },
+    "aws-us-west-1": {
+      "image": "ami-a9999aec"
+    },
+    "aws-us-west-2": {
+      "image": "ami-f199e1c1"
+    },
     "joyent": {
       "image": "d2ba0f30-bbe8-11e2-a9a2-6bc116856d85"
     },
