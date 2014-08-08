@@ -214,7 +214,6 @@ module Loom
         log.info "starting resource thread"
         loop {
           @tenantmanagers.each do |id, tmgr|
-            #puts "checking tmgr #{id} #{tmgr.id}: #{tmgr.resource_sync_needed?} #{tmgr.num_workers}"
             if tmgr.resource_sync_needed? && tmgr.num_workers == 0
               log.debug "resource thread invoking sync for tenant #{tmgr.id}"
               tmgr.sync

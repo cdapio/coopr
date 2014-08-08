@@ -38,12 +38,6 @@ module Loom
       @datadir = %W( #{config.get(PROVISIONER_DATA_DIR)} #{tenant} ).join('/')
       @workdir = %W( #{config.get(PROVISIONER_WORK_DIR)} #{tenant} ).join('/')
       @active = {}
-      # temporary
-#      @tenantnames = {}
-#      @tenantnames['e7fd030d-59f8-435b-ad5b-ce76de25d11e'] = 'tenant1'
-#      @tenantnames['4e987276-e87b-44eb-9b56-92413fecb40f'] = 'tenant2'
-#      @tenantnames['5fee6bea-9c21-4bd4-aea9-c5271451abe7'] = 'tenant3'
-#      @tenantnames['9ba44dcc-922f-4d58-9188-5870b60a1dda'] = 'loom'
     end
 
     # syncs and activates all resources, first determining which ones need to be fetched locally
@@ -63,23 +57,15 @@ module Loom
           log.debug "resource #{resource} version #{version} is already synced"
         else
           # sync resource locally from server
-          case @resourcespec.resource_formats[resource]
-          when /archive/i
-            sync_archive_resource(resource, version)
-          when /file/i
-            sync_file_resource(resource, version)
-          else
-            fail "Unknown format for resource #{resource}: #{@resourcespec.resource_formats[resource]}"
-          end
+          sync_resource(@resourcespec.resource_formats[resource], resource, version)
         end
       end
 
-      # check and activate resources,
+      # check and activate resources
       @resourcespec.resources.each do |resource, version|
         if is_active?(resource, version)
           log.debug "resource #{resource} version #{version} is already active"
         else
-          # activate new resource
           activate_resource(resource, version)
         end
       end
@@ -88,10 +74,12 @@ module Loom
     # sync a resource to the local data directory
     def sync_resource(format, resource, version)
       case format
-        when 'file'
-          sync_file_resource(resource, version)
-        when 'archive'
-          sync_archive_resource(resource, version)
+      when 'file'
+        sync_file_resource(resource, version)
+      when 'archive'
+        sync_archive_resource(resource, version)
+      else
+        fail "Unknown format for resource #{resource} version #{version}: #{format}"
       end
       log.debug "synced resource #{resource} version #{version}"
     end
@@ -118,7 +106,7 @@ module Loom
           dest = nil
           targz.each do |entry|
             dest = File.join dest_dir, entry.full_name
-            # check if any old data exists, could happen if same resource name but different format
+            # check if any old data exists, could happen if same resource name reused with different format
             if File.directory? dest
               log.debug "removing existing directory (#{dest} before extracting archive there"
               FileUtils.rm_rf dest
@@ -147,26 +135,26 @@ module Loom
     def fetch_resource(resource, version)
       begin
         uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v1/tenants/#{@tenant} #{resource} versions #{version} ).join('/')
-        log.debug "fetching resource at #{uri} with tenantID #{@tenant}"
+        log.debug "fetching resource at #{uri} for tenant #{@tenant}"
         begin
-          #response = RestClient.get(uri, {'X-Loom-UserID' => 'admin', 'X-Loom-TenantID' => @tenant})
-          # temporary
           response = RestClient.get(uri, {'X-Loom-UserID' => 'admin', 'X-Loom-TenantID' => @tenant})
         rescue => e
           log.error "unable to fetch resource: #{e.inspect}"
           return
         end
 
-        log.debug "server responded with code #{response.code}"
-        #tenantID should be tenantNAME currently
+        unless response.code == 200
+          log.debug "server responded with non-200 code: #{response.code}"
+          return
+        end
 
+        # write the response to tmp file
         tmpdir = Dir.mktmpdir
         tmpfile = %W( #{tmpdir} #{resource.split('/')[-1]} ).join('/')
         File.open(tmpfile, 'w') do |f|
           f.write response.body
         end
         yield tmpfile
-
       ensure
         if defined? tmpfile
           unless tmpfile.nil?
@@ -233,38 +221,20 @@ module Loom
 
     # determine which resources and versions are currently active in the work_dir
     def load_active_from_disk
-      # loop recursively through work dir
       workdir = Pathname.new(@workdir)
       if workdir.exist?
         workdir.find do |path|
-          #puts "path: #{path}"
-          #puts path.relative_path_from(@workdir)
           # symlinks indicate an active version of a resource
           if File.symlink?( path )
-            #puts "^^^ link"
-            resource_name = File.basename(path)
-            #puts "name: #{resource_name}"
             # determine where the link points
             target = File.readlink( path )
-            #puts "  target: #{target}"
             # the version will be the parent directory
             version = target.split('/')[-2]
-            #puts "    version: #{version}"
             @active[path.relative_path_from(workdir).to_s] = version
           end
         end
       end
     end
 
-  end
-end
-
-if __FILE__ == $PROGRAM_NAME
-  puts `pwd`
-  rm = Loom::ResourceManager.new
-  rm.load_active_from_disk
-
-  rm.active.each do |k, v|
-    puts "#{k.to_s}: #{v}"
   end
 end
