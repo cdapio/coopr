@@ -17,6 +17,10 @@ export LOOM_NODE=${LOOM_NODE:-node}
 # Provisioner environment
 export LOOM_RUBY=${LOOM_RUBY:-ruby}
 export LOOM_USE_DUMMY_PROVISIONER=${LOOM_USE_DUMMY_PROVISIONER:-false}
+export LOOM_API_USER=${LOOM_API_USER:-admin}
+export LOOM_TENANT=${LOOM_TENANT:-superadmin}
+export LOOM_NUM_WORKERS=${LOOM_NUM_WORKERS:-5}
+
 
 APP_NAME="loom-standalone"
 APP_BASE_NAME=`basename "$0"`
@@ -161,18 +165,14 @@ function request_superadmin_workers () {
 
     wait_for_provisioner
 
-    echo "Requesting 5 workers for default tenant..."
-    # set the initial number of workers for the superadmin tenant
-    #--header "X-Loom-UserID:${LOOM_API_USER}" \
-    #--header "X-Loom-TenantID:${LOOM_TENANT}" \
+    echo "Requesting ${LOOM_NUM_WORKERS} workers for default tenant..."
     curl --silent --request PUT \
       --header "Content-Type:application/json" \
-      --header "X-Loom-UserID:admin" \
-      --header "X-Loom-TenantID:superadmin" \
-      --connect-timeout 5 --data '{"workers":5, "name":"superadmin"}' \
+      --header "X-Loom-UserID:${LOOM_API_USER}" \
+      --header "X-Loom-TenantID:${LOOM_TENANT}" \
+      --connect-timeout 5 --data "{\"workers\":${LOOM_NUM_WORKERS}, \"name\":\"superadmin\"}" \
       http://localhost:55054/v1/tenants/superadmin
 }
-
 
 function wait_for_server () {
     RETRIES=0
