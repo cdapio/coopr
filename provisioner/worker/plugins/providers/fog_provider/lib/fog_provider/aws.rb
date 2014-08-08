@@ -99,7 +99,6 @@ class FogProviderAWS < Provider
       end
       bind_ip = server.private_ip_address
 
-      sleep 30
       wait_for_sshd(bootstrap_ip, 22)
       log.debug "Server #{server.id} sshd is up"
 
