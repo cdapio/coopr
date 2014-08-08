@@ -102,7 +102,7 @@ class FogProviderRackspace < Provider
       # Validate connectivity and Mount data disk
       Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
-        ssh_exec!(ssh, "test -e /dev/xvde1 && (#{sudo} /sbin/mkfs.ext4 /dev/xvde1 && #{sudo} mkdir -p /data && #{sudo} mount /dev/xvde
+        ssh_exec!(ssh, "test -e /dev/xvde1 && (#{sudo} /sbin/mkfs.ext4 /dev/xvde1 && #{sudo} mkdir -p /data && #{sudo} mount /dev/xvde1 /data) || true")
       end
       # Return 0
       @result['status'] = 0
