@@ -87,11 +87,9 @@ module Loom
         sleep 1 until Api.running?
         # register our own signal handlers
         setup_signal_traps
-        # spawn the heartbeat thread
+        # spawn the heartbeat, signal-handler, and resource threads
         spawn_heartbeat_thread
-        # spawn the signal handler thread
         spawn_signal_thread
-        # spawn the thread to sync data resources
         spawn_resource_thread
 
         # wait for signal_handler to exit in response to signals
