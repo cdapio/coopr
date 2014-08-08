@@ -101,11 +101,13 @@ class FogProviderRackspace < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bootstrap_ip
       }
-      # Additional checks
+      # do we need sudo bash?
+      sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
-      # Validate connectivity
+      # Validate connectivity and Mount data disk
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+        ssh_exec!(ssh, "test -e /dev/xvde1 && (#{sudo} /sbin/mkfs.ext4 /dev/xvde1 && #{sudo} mkdir -p /data && #{sudo} mount /dev/xvde1 /data) || true")
       end
       # Return 0
       @result['status'] = 0

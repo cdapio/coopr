@@ -281,10 +281,10 @@ public class LoomRPCHandler extends LoomAuthHandler {
       // if the node has all services needed
       if (nodeServices.containsAll(requiredServices)) {
         JsonObject outputProperties;
+        JsonObject nodeProperties = GSON.toJsonTree(node.getProperties()).getAsJsonObject();
         // if the request contains a list of properties, just include those properties
         if (properties.size() > 0) {
           outputProperties = new JsonObject();
-          JsonObject nodeProperties = node.getProperties();
           // add all requested node properties
           for (String property : properties) {
             if (nodeProperties.has(property)) {
@@ -293,7 +293,7 @@ public class LoomRPCHandler extends LoomAuthHandler {
           }
         } else {
           // request did not contain a list of properties, include them all
-          outputProperties = node.getProperties();
+          outputProperties = nodeProperties;
         }
         output.put(node.getId(), outputProperties);
       }

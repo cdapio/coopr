@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.scheduler;
+package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.google.common.base.Objects;
-import com.google.gson.JsonObject;
 
 /**
  * A Gson serializable task object that will be handed off to provisioners.
@@ -28,16 +26,15 @@ public class SchedulableTask {
   private final String clusterId;
   private final String taskName;
   private final String nodeId;
+  private final TaskConfig config;
 
-  private final JsonObject config;
-
-  public SchedulableTask(ClusterTask clusterTask) {
+  public SchedulableTask(ClusterTask clusterTask, TaskConfig config) {
     this.taskId = clusterTask.getTaskId();
     this.jobId = clusterTask.getJobId();
     this.clusterId = clusterTask.getClusterId();
     this.taskName = clusterTask.getTaskName().name();
     this.nodeId = clusterTask.getNodeId();
-    this.config = clusterTask.getConfig();
+    this.config = config;
   }
 
   /**
@@ -90,7 +87,7 @@ public class SchedulableTask {
    *
    * @return Configuration json object needed by the provisioner.
    */
-  public JsonObject getConfig() {
+  public TaskConfig getConfig() {
     return config;
   }
 

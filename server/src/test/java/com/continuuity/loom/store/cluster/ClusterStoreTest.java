@@ -28,7 +28,6 @@ import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -200,7 +199,7 @@ public abstract class ClusterStoreTest {
   public void testGetStoreDeleteTask() throws IOException {
     TaskId id = new TaskId(new JobId("1", 1), 1);
     ClusterTask task = new ClusterTask(ProvisionerAction.CONFIGURE, id,
-                                       "node1", "service", ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                       "node1", "service", ClusterAction.CLUSTER_CREATE);
     Assert.assertNull(systemView.getClusterTask(id));
 
     systemView.writeClusterTask(task);
@@ -365,15 +364,15 @@ public abstract class ClusterStoreTest {
   @Test
   public void testGetRunningTasks() throws Exception {
     ClusterTask task1 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node1", "service",
-                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                        ClusterAction.CLUSTER_CREATE);
     ClusterTask task2 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-2"), "node2", "service",
-                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                        ClusterAction.CLUSTER_CREATE);
     ClusterTask task3 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-3"), "node3", "service",
-                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                        ClusterAction.CLUSTER_CREATE);
     ClusterTask task4 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-4"), "node4", "service",
-                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                        ClusterAction.CLUSTER_CREATE);
     ClusterTask task5 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-5"), "node5", "service",
-                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                        ClusterAction.CLUSTER_CREATE);
 
     long currentTime = System.currentTimeMillis();
     task1.setSubmitTime(currentTime - 1000);
@@ -434,7 +433,8 @@ public abstract class ClusterStoreTest {
   }
 
   private Cluster createCluster(String id, long createTime, long expireTime, Cluster.Status status) throws Exception {
-    Cluster cluster = new Cluster(id, tenant1_user1, "expire" + id, createTime, "", null, null,
+    Cluster cluster = new Cluster(id, tenant1_user1, "expire" + id, createTime, "",
+                                  Entities.ProviderExample.RACKSPACE, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of(), null);
     cluster.setStatus(status);
     cluster.setExpireTime(expireTime);

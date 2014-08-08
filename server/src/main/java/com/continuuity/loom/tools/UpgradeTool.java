@@ -1,6 +1,7 @@
 package com.continuuity.loom.tools;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
@@ -43,9 +44,13 @@ public class UpgradeTool {
 
   private static void migrateClusters(ClusterStoreService clusterStoreService) throws IOException,
     IllegalAccessException {
+    System.out.println("migrating clusters");
     ClusterStore clusterStore = clusterStoreService.getSystemView();
     for (Cluster cluster : clusterStore.getAllClusters()) {
       clusterStore.writeCluster(cluster);
+      for (Node node : clusterStore.getClusterNodes(cluster.getId())) {
+        clusterStore.writeNode(node);
+      }
     }
   }
 

@@ -3,7 +3,7 @@
   "description": "8+ vCPU, 30+ GB RAM, 240+ GB Disk",
   "providermap": {
     "rackspace": {
-      "flavor": "performance2-30"
+      "flavor": "8"
     }
   }
 }

@@ -63,7 +63,9 @@
   },
   "compatibility": {
     "hardwaretypes": [
-      "large"
+      "large",
+      "xlarge",
+      "xxlarge"
     ],
     "imagetypes": [
       "centos6",
