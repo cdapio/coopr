@@ -79,7 +79,7 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
   @Test
   public void testFinishTaskForDeadProvisionerErrors() throws Exception {
     FinishTaskRequest finishRequest = new FinishTaskRequest("workerX", "nonexistant-provider", "tenantY", "taskId",
-                                                            "stdout", "stderr", 0, null);
+                                                            "stdout", "stderr", 0, null, null);
     assertResponseStatus(doPost("/v1/loom/tasks/finish", gson.toJson(finishRequest)), HttpResponseStatus.FORBIDDEN);
   }
 
@@ -109,7 +109,7 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
 
     FinishTaskRequest finishRequest =
       new FinishTaskRequest("worker1", PROVISIONER_ID, tenantId, clusterTask.getTaskId(),
-                            "some stdout", "some stderr", 0, provisionerResult);
+                            "some stdout", "some stderr", 0, null, provisionerResult);
     TestHelper.finishTask(getBaseUrl(), finishRequest);
 
     ClusterTask actualTask = clusterStore.getClusterTask(TaskId.fromString(clusterTask.getTaskId()));
@@ -148,7 +148,7 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
 
     FinishTaskRequest finishRequest =
       new FinishTaskRequest("worker1", PROVISIONER_ID, tenantId, clusterTask.getTaskId(),
-                            "some stdout", "some stderr", 1, null);
+                            "some stdout", "some stderr", 1, null, null);
     TestHelper.finishTask(getBaseUrl(), finishRequest);
 
     ClusterTask actualTask = clusterStore.getClusterTask(TaskId.fromString(clusterTask.getTaskId()));

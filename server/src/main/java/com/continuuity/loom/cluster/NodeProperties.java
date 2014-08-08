@@ -20,15 +20,17 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Properties of a node.
  */
 public class NodeProperties {
-  private String ipaddress;
+  private Map<String, String> ipaddresses;
   private final String hostname;
   private final int nodenum;
   // this is the name of the hardware type
@@ -44,9 +46,10 @@ public class NodeProperties {
   // list of automators that could be used on the node
   private final Set<String> automators;
 
-  private NodeProperties(String hostname, String ipaddress, int nodenum, String hardwaretype, String imagetype,
-                         String flavor, String image, String sshUser, Set<String> automators, Set<String> services) {
-    this.ipaddress = ipaddress;
+  private NodeProperties(String hostname, Map<String, String> ipaddresses, int nodenum, String hardwaretype,
+                         String imagetype, String flavor, String image, String sshUser,
+                         Set<String> automators, Set<String> services) {
+    this.ipaddresses = ipaddresses;
     this.hostname = hostname;
     this.imagetype = imagetype;
     this.hardwaretype = hardwaretype;
@@ -59,12 +62,25 @@ public class NodeProperties {
   }
 
   /**
-   * Get the IP address of the node.
+   * Get the IP addresses of the node.
    *
-   * @return IP address of the node.
+   * @return IP addresses of the node.
    */
-  public String getIpaddress() {
-    return ipaddress;
+  public Map<String, String> getIPAddresses() {
+    return ipaddresses;
+  }
+
+  /**
+   * Get a specific type of IP address of the node.
+   *
+   * @param ipType Type of IP address to get.
+   * @return IP address of the given type of the node, or null if it does not exist.
+   */
+  public String getIPAddress(String ipType) {
+    if (ipaddresses != null) {
+      return ipaddresses.get(ipType);
+    }
+    return null;
   }
 
   /**
@@ -150,12 +166,12 @@ public class NodeProperties {
   }
 
   /**
-   * Set the IP address of the node.
+   * Set the IP addresses of the node.
    *
-   * @param ipaddress IP address to set.
+   * @param ipaddresses IP addresses to set.
    */
-  public void setIpaddress(String ipaddress) {
-    this.ipaddress = ipaddress;
+  public void setIpaddresses(Map<String, String> ipaddresses) {
+    this.ipaddresses = ipaddresses;
     ImmutableMap.builder();
   }
 
@@ -172,7 +188,7 @@ public class NodeProperties {
    * Builder for creating node properties.
    */
   public static class Builder {
-    private String ipaddress;
+    private Map<String, String> ipaddresses = Maps.newHashMap();
     private String hostname;
     private int nodenum;
     private String hardwaretype;
@@ -183,8 +199,13 @@ public class NodeProperties {
     private Set<String> serviceNames;
     private Set<String> automators;
 
-    public Builder setIpaddress(String ipaddress) {
-      this.ipaddress = ipaddress;
+    public Builder addIPAddress(String ipType, String ipaddress) {
+      this.ipaddresses.put(ipType, ipaddress);
+      return this;
+    }
+
+    public Builder setIPAddresses(Map<String, String> ipAddresses) {
+      this.ipaddresses = ipAddresses;
       return this;
     }
 
@@ -248,7 +269,7 @@ public class NodeProperties {
     }
 
     public NodeProperties build() {
-      return new NodeProperties(hostname, ipaddress, nodenum, hardwaretype, imagetype,
+      return new NodeProperties(hostname, ipaddresses, nodenum, hardwaretype, imagetype,
                                 flavor, image, sshUser, automators, serviceNames);
     }
   }
@@ -265,7 +286,7 @@ public class NodeProperties {
     NodeProperties that = (NodeProperties) o;
 
     return Objects.equal(hostname, that.hostname) &&
-      Objects.equal(ipaddress, that.ipaddress) &&
+      Objects.equal(ipaddresses, that.ipaddresses) &&
       Objects.equal(nodenum, that.nodenum) &&
       Objects.equal(hardwaretype, that.hardwaretype) &&
       Objects.equal(imagetype, that.imagetype) &&
@@ -278,7 +299,7 @@ public class NodeProperties {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(hostname, ipaddress, nodenum, hardwaretype, imagetype,
+    return Objects.hashCode(hostname, ipaddresses, nodenum, hardwaretype, imagetype,
                             flavor, image, sshUser, services, automators);
   }
 
@@ -286,7 +307,7 @@ public class NodeProperties {
   public String toString() {
     return Objects.toStringHelper(this)
       .add("hostname", hostname)
-      .add("ipaddress", ipaddress)
+      .add("ipaddresses", ipaddresses)
       .add("nodenum", nodenum)
       .add("hardwaretype", hardwaretype)
       .add("imagetype", imagetype)

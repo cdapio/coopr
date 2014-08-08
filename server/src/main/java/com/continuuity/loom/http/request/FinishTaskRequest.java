@@ -4,6 +4,8 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 
+import java.util.Map;
+
 /**
  * Request sent by provisioners for finishing a task that was performed perform.
  */
@@ -15,10 +17,12 @@ public class FinishTaskRequest {
   private final String stdout;
   private final String stderr;
   private final int status;
+  private final Map<String, String> ipaddresses;
   private final JsonObject result;
 
   public FinishTaskRequest(String workerId, String provisionerId, String tenantId, String taskId,
-                           String stdout, String stderr, Integer status, JsonObject result) {
+                           String stdout, String stderr, Integer status, Map<String, String> ipaddresses,
+                           JsonObject result) {
     Preconditions.checkArgument(workerId != null && !workerId.isEmpty(), "workerId must be specified.");
     Preconditions.checkArgument(provisionerId != null && !provisionerId.isEmpty(), "provisionerId must be specified.");
     Preconditions.checkArgument(tenantId != null && !tenantId.isEmpty(), "tenantId must be specified.");
@@ -30,6 +34,7 @@ public class FinishTaskRequest {
     this.stdout = stdout;
     this.stderr = stderr;
     this.status = status;
+    this.ipaddresses = ipaddresses;
     this.result = result == null ? new JsonObject() : result;
   }
 
@@ -61,6 +66,10 @@ public class FinishTaskRequest {
     return status;
   }
 
+  public Map<String, String> getIpaddresses() {
+    return ipaddresses;
+  }
+
   public JsonObject getResult() {
     return result;
   }
@@ -83,6 +92,7 @@ public class FinishTaskRequest {
       Objects.equal(stdout, that.stdout) &&
       Objects.equal(stderr, that.stderr) &&
       status == that.status &&
+      Objects.equal(ipaddresses, that.ipaddresses) &&
       Objects.equal(result, that.result);
   }
 
@@ -101,6 +111,7 @@ public class FinishTaskRequest {
       .add("stdout", stdout)
       .add("stderr", stderr)
       .add("status", status)
+      .add("ipaddresses", ipaddresses)
       .add("result", result)
       .toString();
   }

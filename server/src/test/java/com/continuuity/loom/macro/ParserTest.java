@@ -15,13 +15,13 @@
  */
 package com.continuuity.loom.macro;
 
+import com.continuuity.loom.macro.eval.HostServiceEvaluator;
+import com.continuuity.loom.macro.eval.IPServiceEvaluator;
+import com.continuuity.loom.macro.eval.ServiceCardinalityEvaluator;
+import com.continuuity.loom.macro.eval.ServiceInstanceEvaluator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.continuuity.loom.macro.Expression.Type.HOST_OF_SERVICE;
-import static com.continuuity.loom.macro.Expression.Type.IP_OF_SERVICE;
-import static com.continuuity.loom.macro.Expression.Type.NUM_OF_SERVICE;
-import static com.continuuity.loom.macro.Expression.Type.SELF_INSTANCE_OF_SERVICE;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -31,41 +31,41 @@ public class ParserTest {
 
   @Test
   public void testParseOK() throws SyntaxException {
-    assertEquals(new Expression(HOST_OF_SERVICE, "abc", null, null, null),
+    assertEquals(new Expression(new HostServiceEvaluator("abc", null), null, null),
                  new Parser("host.service.abc").parse());
-    assertEquals(new Expression(IP_OF_SERVICE, "namenode", null, null, null),
-                 new Parser("ip.service.namenode").parse());
-    assertEquals(new Expression(IP_OF_SERVICE, "a-b-c", null, null, null),
-                 new Parser("ip.service.a-b-c").parse());
-    assertEquals(new Expression(IP_OF_SERVICE, "a.b.c", null, null, null),
-                 new Parser("ip.service.a.b.c").parse());
-    assertEquals(new Expression(IP_OF_SERVICE, "a_b_c", null, null, null),
-                 new Parser("ip.service.a_b_c").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("namenode", "access_v4", null), null, null),
+                 new Parser("ip.access_v4.service.namenode").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("a-b-c", "bind_v4", null), null, null),
+                 new Parser("ip.bind_v4.service.a-b-c").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("a.b.c", "external", null), null, null),
+                 new Parser("ip.external.service.a.b.c").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("a_b_c", "internal", null), null, null),
+                 new Parser("ip.internal.service.a_b_c").parse());
 
-    assertEquals(new Expression(IP_OF_SERVICE, "nn", "$:80", null, null),
-                 new Parser("map(ip.service.nn,'$:80')").parse());
-    assertEquals(new Expression(IP_OF_SERVICE, "nn", "\"$\"", null, null),
-                 new Parser("map(ip.service.nn,'\"$\"')").parse());
-    assertEquals(new Expression(IP_OF_SERVICE, "nn", "$:80", null, null),
-                 new Parser("map(ip.service.nn,\"$:80\")").parse());
-    assertEquals(new Expression(IP_OF_SERVICE, "nn", "'$'", null, null)
-      , new Parser("map(ip.service.nn,\"'$'\")").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("nn", "access", null), "$:80", null),
+                 new Parser("map(ip.access.service.nn,'$:80')").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("nn", "access", null), "\"$\"", null),
+                 new Parser("map(ip.access.service.nn,'\"$\"')").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("nn", "access", null), "$:80", null),
+                 new Parser("map(ip.access.service.nn,\"$:80\")").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("nn", "access", null), "'$'", null),
+                 new Parser("map(ip.access.service.nn,\"'$'\")").parse());
 
-    assertEquals(new Expression(IP_OF_SERVICE, "nn", null, "-", null),
-                 new Parser("join(ip.service.nn,'-')").parse());
-    assertEquals(new Expression(IP_OF_SERVICE, "nn", null, "\n", null),
-                 new Parser("join(ip.service.nn,\"\n\")").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("nn", "access", null), null, "-"),
+                 new Parser("join(ip.access.service.nn,'-')").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("nn", "access", null), null, "\n"),
+                 new Parser("join(ip.access.service.nn,\"\n\")").parse());
 
-    assertEquals(new Expression(HOST_OF_SERVICE, "abc", "$:2181", ",", null),
+    assertEquals(new Expression(new HostServiceEvaluator("nn", null), "$:2181", ","),
                  new Parser("join(map(host.service.abc,'$:2181'),',')").parse());
 
-    assertEquals(new Expression(HOST_OF_SERVICE, "abc", null, null, 1),
+    assertEquals(new Expression(new HostServiceEvaluator("abc", 1), null, null),
                  new Parser("host.service.abc[1]").parse());
-    assertEquals(new Expression(IP_OF_SERVICE, "abc", null, null, 0),
-                 new Parser("ip.service.abc[0]").parse());
-    assertEquals(new Expression(SELF_INSTANCE_OF_SERVICE, "abc", null, null, null),
+    assertEquals(new Expression(new IPServiceEvaluator("abc", "access", 0), null, null),
+                 new Parser("ip.access.service.abc[0]").parse());
+    assertEquals(new Expression(new ServiceInstanceEvaluator("abc"), null, null),
                  new Parser("instance.self.service.abc").parse());
-    assertEquals(new Expression(NUM_OF_SERVICE, "abc", null, null, null),
+    assertEquals(new Expression(new ServiceCardinalityEvaluator("abc"), null, null),
                  new Parser("num.service.abc").parse());
   }
 

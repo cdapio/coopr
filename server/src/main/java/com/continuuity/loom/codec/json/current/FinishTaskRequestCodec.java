@@ -16,14 +16,15 @@
 package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.http.request.FinishTaskRequest;
-import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Codec for deserializing a {@link com.continuuity.loom.http.request.FinishTaskRequest}.
@@ -43,8 +44,11 @@ public class FinishTaskRequestCodec implements JsonDeserializer<FinishTaskReques
     String stdout = context.deserialize(jsonObj.get("stdout"), String.class);
     String stderr = context.deserialize(jsonObj.get("stderr"), String.class);
     Integer status = context.deserialize(jsonObj.get("status"), Integer.class);
+    Map<String, String> ipAddresses = context.deserialize(jsonObj.get("ipaddresses"),
+                                                          new TypeToken<Map<String, String>>() {}.getType());
     JsonObject result = context.deserialize(jsonObj.get("result"), JsonObject.class);
 
-    return new FinishTaskRequest(workerId, provisionerId, tenantId, taskId, stdout, stderr, status, result);
+    return new FinishTaskRequest(workerId, provisionerId, tenantId, taskId,
+                                 stdout, stderr, status, ipAddresses, result);
   }
 }

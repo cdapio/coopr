@@ -155,13 +155,7 @@ public final class Node implements Comparable<Node> {
    */
   public void addResults(JsonObject results) {
     for (Map.Entry<String, JsonElement> entry : results.entrySet()) {
-      // special cased for now
-      // TODO: make ip a required field for confirm tasks
-      if (IPADDRESS_KEY.equals(entry.getKey())) {
-        this.properties.setIpaddress(entry.getValue().getAsString());
-      } else {
-        this.provisionerResults.add(entry.getKey(), entry.getValue());
-      }
+      this.provisionerResults.add(entry.getKey(), entry.getValue());
     }
   }
 
@@ -177,7 +171,6 @@ public final class Node implements Comparable<Node> {
     Node node = (Node) o;
 
     return id.equals(node.id);
-
   }
 
   @Override

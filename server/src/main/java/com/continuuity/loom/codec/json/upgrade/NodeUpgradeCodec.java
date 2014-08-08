@@ -59,7 +59,7 @@ public class NodeUpgradeCodec implements JsonDeserializer<Node> {
     String image = context.deserialize(properties.get("image"), String.class);
     NodeProperties nodeProperties = NodeProperties.builder()
       .setHostname(hostname)
-      .setIpaddress(ipaddress)
+      .addIPAddress("access_v4", ipaddress)
       .setNodenum(nodenum)
       .setHardwaretype(hardwaretype)
       .setImagetype(imagetype)

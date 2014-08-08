@@ -315,19 +315,19 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     Node nodeA = new Node("nodeA", "123", ImmutableSet.of(svcA),
                           NodeProperties.builder()
                             .setHostname("testcluster-1-1000.local")
-                            .setIpaddress("123.456.0.1").build());
+                            .addIPAddress("access_v4", "123.456.0.1").build());
     Node nodeAB = new Node("nodeAB", "123", ImmutableSet.of(svcA, svcB),
                            NodeProperties.builder()
                              .setHostname("testcluster-1-1001.local")
-                             .setIpaddress("123.456.0.2").build());
+                             .addIPAddress("access_v4", "123.456.0.2").build());
     Node nodeABC = new Node("nodeABC", "123", ImmutableSet.of(svcA, svcB, svcC),
                             NodeProperties.builder()
                               .setHostname("testcluster-1-1002.local")
-                              .setIpaddress("123.456.0.3").build());
+                              .addIPAddress("access_v4", "123.456.0.3").build());
     Node nodeBC = new Node("nodeBC", "123", ImmutableSet.of(svcB, svcC),
                            NodeProperties.builder()
                              .setHostname("testcluster-1-1003.local")
-                             .setIpaddress("123.456.0.4").build());
+                             .addIPAddress("access_v4", "123.456.0.4").build());
     Cluster cluster = new Cluster("123", USER1_ACCOUNT, "testcluster", System.currentTimeMillis(), "description",
                                   Entities.ProviderExample.RACKSPACE, smallTemplate,
                                   ImmutableSet.of(nodeA.getId(), nodeAB.getId(), nodeABC.getId(), nodeBC.getId()),
@@ -377,7 +377,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals(expected, responseBody);
 
     // test with filter on service A and property list
-    requestBody.add("properties", TestHelper.jsonArrayOf("hostname", "ipaddress"));
+    requestBody.add("properties", TestHelper.jsonArrayOf("hostname", "ipaddresses"));
     response = doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
@@ -386,7 +386,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     for (Node expectedNode : expectedNodes) {
       JsonObject value = new JsonObject();
       value.addProperty("hostname", expectedNode.getProperties().getHostname());
-      value.addProperty("ipaddress", expectedNode.getProperties().getIpaddress());
+      value.add("ipaddresses", gson.toJsonTree(expectedNode.getProperties().getIPAddresses()));
       expected.add(expectedNode.getId(), value);
     }
     Assert.assertEquals(expected, responseBody);

@@ -40,13 +40,15 @@ specific service. The basic macros available are:
 ::
 
   %host.service.<service name>%
-  %ip.service.<service name>%
+  %ip.<ip type>.service.<service name>%
   %num.service.<service name>%
   %cluster.owner%
 
 Basic macros return a comma separated list of the specified entity for all nodes that contain the specified service.
 For example, '%host.service.datanode%' will be replaced with a comma separated list of all nodes in the cluster that
-have the datanode service. '%cluster.owner%' will be replaced with the owner of the cluster.
+have the datanode service. '%cluster.owner%' will be replaced with the owner of the cluster. IP macros require the 
+type of IP to be given, which is either 'access_v4' or 'bind_v4'. The 'access_v4' IP address is the address used
+to connect to the node from the outside world, whereas 'bind_v4' is the address services on the node should bind to. 
 
 Basic Macro Instances
 =====================
@@ -57,7 +59,7 @@ macro instances:
 
   %instance.self.service.<service name>%
   %host.service.<service name>[instance number]%
-  %ip.service.<service name>[instance number]%
+  %ip.<ip type>.service.<service name>[instance number]%
 
 Instead of returning a comma separated list of hosts or ips, an instance macro returns a single value corresponding
 to the entity of a single node that contains the specified service. For example, '%host.service.zookeeper[0]%' gets
@@ -101,7 +103,7 @@ that contain the ``hadoop-hdfs-namenode`` service. Since the namenode service is
 
   "fs.defaultFS":"hdfs://hadoop-dev-1001.local"
 
-Similarly, if we had used the ``%ip.service.hadoop-hdfs-namenode%`` macro instead, it would resolve to:
+Similarly, if we had used the ``%ip.bind_v4.service.hadoop-hdfs-namenode%`` macro instead, it would resolve to:
 ::
 
   "fs.defaultFS":"hdfs://123.456.0.1"
@@ -118,7 +120,7 @@ This can be achieved with the ``join`` and ``map`` macro:
 
   hbase.zookeeper.quorum":"%join(map(host.service.zookeeper-server,'$:2181'),',')%/namespace
 
-Similarly, if we wanted IP addresses, we could have replaced ``host.service.zookeeper-server`` with ``ip.service.zookeeper-server``.
+Similarly, if we wanted IP addresses, we could have replaced ``host.service.zookeeper-server`` with ``ip.bind_v4.service.zookeeper-server``.
 
 
 Now, let's look at the configuration for Zookeeper. Each Zookeeper configuration file needs the list of servers
@@ -150,6 +152,6 @@ the ``server.2`` setting), and so on. To achieve this, we can use the self macro
 This variable will be replaced by the instance number of that service, beginning at 1. To be exact,
 ``hadoop-dev-1002.local`` will receive ``"myId":"1"``, ``hadoop-dev-1003.local`` will receive ``"myId":"2"``, and
 ``hadoop-dev-1004.local`` will receive ``"myId:3"``. Similarly, if a node needs its own hostname or IP address, you can use
-``%host.self.service.[service name]%`` and ``%ip.self.service.[service name]%``, respectively. Finally, say if you need a
+``%host.self.service.[service name]%`` and ``%ip.bind_v4.self.service.[service name]%``, respectively. Finally, say if you need a
 configuration setting that needs to resolve to the number of zookeeper-servers running in your cluster. This
 can be achieved with the ``%num.service.zookeeper-server%`` macro.

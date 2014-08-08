@@ -35,8 +35,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
@@ -221,7 +219,7 @@ public class TaskQueueService {
       taskService.failTask(clusterTask, status);
     }
 
-    finishNodeAction(clusterTask, finishRequest.getResult(), finishRequest.getStdout(), finishRequest.getStderr());
+    finishNodeAction(clusterTask, finishRequest);
 
     // Schedule the job for processing
     jobQueues.add(queueName, new Element(clusterTask.getJobId()));
@@ -244,8 +242,7 @@ public class TaskQueueService {
     }
   }
 
-  void finishNodeAction(ClusterTask clusterTask, JsonObject result, String stdout,
-                        String stderr) throws IOException {
+  void finishNodeAction(ClusterTask clusterTask, FinishTaskRequest finish) throws IOException {
     // Update node properties if task is associated with a nodeId.
     // There are cases when we don't associate a nodeId with a task so that the node properties don't get overridden
     // by the task output.
@@ -257,13 +254,17 @@ public class TaskQueueService {
                   clusterTask.getNodeId(), clusterTask.getTaskId());
       } else {
         // Update provisioner results stored with the node and passed on to future tasks
-        node.addResults(result);
+        node.addResults(finish.getResult());
 
         // Update node action
         if (clusterTask.getStatus() == ClusterTask.Status.COMPLETE) {
+          Map<String, String> ipAddresses = finish.getIpaddresses();
+          if (ipAddresses != null) {
+            node.getProperties().setIpaddresses(ipAddresses);
+          }
           nodeService.completeAction(node);
         } else {
-          nodeService.failAction(node, stdout, stderr);
+          nodeService.failAction(node, finish.getStdout(), finish.getStderr());
         }
 
         LOG.trace("Updated Node = {}", node);
