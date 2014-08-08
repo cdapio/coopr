@@ -106,14 +106,14 @@ status() {
     pidToCheck=`cat $pid`
     if kill -0 $pidToCheck > /dev/null 2>&1; then
       echo "${APP_NAME} running as process $pidToCheck"
-      ret=0
+      return 0
     else
       echo "${APP_NAME} pidfile exists, but process does not appear to be running"
-      ret=3
+      return 3
     fi
   else
     echo "${APP_NAME} is not running"
-    ret=2
+    return 2
   fi
 }
 
