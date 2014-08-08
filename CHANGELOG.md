@@ -22,6 +22,7 @@ Unreleased
 - Queue Metrics ( Issues: #301 )
 - Settable max for clusters and nodes in a tenant ( Issues: #302 )
 - Bootstrap a tenant ( Issues: #304 )
+- Larger HW: xlarge, xxlarge ( Issues: #312 #346 )
 - Allow non-root users for SSH ( Issues: #314 #320 )
 - PHP module support ( Issues: #317 )
 - Support for multiple IP addresses ( Issues: #343 #347 )

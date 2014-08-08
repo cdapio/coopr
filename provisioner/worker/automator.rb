@@ -27,7 +27,7 @@ class Automator
   def runTask
     sshauth = @task['config']['ssh-auth']
     hostname = @task['config']['hostname']
-    ipaddress = @task['config']['ipaddress']
+    ipaddress = @task['config']['ipaddresses']['access_v4']
     fields = @task['config']['service']['action']['fields'] rescue nil
 
     case task['taskName'].downcase
