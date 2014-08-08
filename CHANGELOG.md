@@ -3,6 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- AWS provider support ( Issues: #22 #322 )
 - MongoDB support for clusters ( Issues: #43 #130 )
 - Remove 'ALL RIGHTS RESERVED' footer ( Issues: #123 #340 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
@@ -26,6 +27,7 @@ Unreleased
 - Allow non-root users for SSH ( Issues: #314 #320 )
 - PHP module support ( Issues: #317 )
 - Support for multiple IP addresses ( Issues: #343 #347 )
+- Standalone build updates for multitenancy ( Issues #349 )
 
 v0.9.7 (May 27, 2014)
 ---------------------

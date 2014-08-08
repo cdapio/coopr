@@ -88,6 +88,7 @@ class FogProviderRackspace < Provider
       bootstrap_ip = ip_address(server, 'public')
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
+        raise 'No IP address available for bootstrapping.'
       else
         log.debug "Bootstrap IP address #{bootstrap_ip}"
       end
@@ -106,8 +107,17 @@ class FogProviderRackspace < Provider
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity and Mount data disk
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
-        ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
-        ssh_exec!(ssh, "test -e /dev/xvde1 && (#{sudo} /sbin/mkfs.ext4 /dev/xvde1 && #{sudo} mkdir -p /data && #{sudo} mount /dev/xvde1 /data) || true")
+        # Backwards-compatibility... ssh_exec! takes 2 arguments prior to 0.9.8
+        ssho = method(:ssh_exec!)
+        if ssho.arity == 2
+          log.debug 'Validating external connectivity and DNS resolution via ping'
+          ssh_exec!(ssh, 'ping -c1 www.opscode.com')
+          log.debug 'Mounting any additional data disks'
+          ssh_exec!(ssh, "test -e /dev/xvde1 && (#{sudo} /sbin/mkfs.ext4 /dev/xvde1 && #{sudo} mkdir -p /data && #{sudo} mount /dev/xvde1 /data) || true")
+        else
+          ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+          ssh_exec!(ssh, "test -e /dev/xvde1 && (#{sudo} /sbin/mkfs.ext4 /dev/xvde1 && #{sudo} mkdir -p /data && #{sudo} mount /dev/xvde1 /data) || true", 'Mounting any additional data disks')
+        end
       end
       # Return 0
       @result['status'] = 0
