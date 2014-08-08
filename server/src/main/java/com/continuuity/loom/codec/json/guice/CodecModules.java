@@ -37,6 +37,7 @@ import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.LowercaseEnumTypeAdapterFactory;
 import com.continuuity.loom.codec.json.current.AddServicesRequestCodec;
 import com.continuuity.loom.codec.json.current.AdministrationCodec;
@@ -67,9 +68,11 @@ import com.continuuity.loom.codec.json.current.ServiceConstraintCodec;
 import com.continuuity.loom.codec.json.current.ServiceDependenciesCodec;
 import com.continuuity.loom.codec.json.current.ServiceStageDependenciesCodec;
 import com.continuuity.loom.codec.json.current.TakeTaskRequestCodec;
+import com.continuuity.loom.codec.json.current.TaskConfigCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
 import com.continuuity.loom.codec.json.current.TenantSpecificationCodec;
 import com.continuuity.loom.codec.json.upgrade.ClusterUpgradeCodec;
+import com.continuuity.loom.codec.json.upgrade.NodeUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceUpgradeCodec;
@@ -82,6 +85,7 @@ import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
+import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.AbstractModule;
@@ -121,6 +125,7 @@ public class CodecModules {
             .registerTypeAdapter(Provider.class, new ProviderUpgradeCodec())
             .registerTypeAdapter(Service.class, new ServiceUpgradeCodec())
             .registerTypeAdapter(ServiceAction.class, new ServiceActionUpgradeCodec())
+            .registerTypeAdapter(Node.class, new NodeUpgradeCodec())
             .create()
         );
       }
@@ -159,6 +164,7 @@ public class CodecModules {
       .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
       .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
       .registerTypeAdapter(TakeTaskRequest.class, new TakeTaskRequestCodec())
+      .registerTypeAdapter(TaskConfig.class, new TaskConfigCodec())
       .registerTypeAdapter(Tenant.class, new TenantCodec())
       .registerTypeAdapter(TenantSpecification.class, new TenantSpecificationCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())

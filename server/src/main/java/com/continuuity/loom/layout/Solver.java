@@ -24,6 +24,7 @@ import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.layout.change.ClusterLayoutChange;
 import com.continuuity.loom.layout.change.ClusterLayoutTracker;
 import com.continuuity.loom.scheduler.task.NodeService;
@@ -122,6 +123,7 @@ public class Solver {
    */
   public Map<String, Node> solveClusterNodes(Cluster cluster, ClusterCreateRequest request) throws Exception {
     EntityStoreView entityStore = entityStoreService.getView(cluster.getAccount());
+    // TODO: these checks should happen at request time, not at solve time
     // make sure the template exists
     String clusterTemplateName = request.getClusterTemplate();
     ClusterTemplate template = entityStore.getClusterTemplate(clusterTemplateName);
@@ -130,6 +132,9 @@ public class Solver {
     }
 
     cluster.setClusterTemplate(template);
+    if (request.getConfig() == null) {
+      cluster.setConfig(template.getClusterDefaults().getConfig());
+    }
 
     // make sure the provider exists
     String providerName = request.getProvider();
@@ -426,20 +431,21 @@ public class Solver {
         String hardwaretype = nodeLayout.getHardwareTypeName();
         String imagetype = nodeLayout.getImageTypeName();
         String imageId = imageTypeMap.get(imagetype).get("image");
-        String sshUser = imageTypeMap.get(imagetype).get("ssh-user");
-        Map<String, String> nodeProperties = Maps.newHashMap();
-        // TODO: these should be proper fields and logic for populating node properties should not be in the solver.
-        nodeProperties.put(Node.Properties.HARDWARETYPE.name().toLowerCase(), hardwaretype);
-        nodeProperties.put(Node.Properties.IMAGETYPE.name().toLowerCase(), imagetype);
-        nodeProperties.put(Node.Properties.FLAVOR.name().toLowerCase(), hardwareTypeMap.get(hardwaretype));
-        nodeProperties.put(Node.Properties.IMAGE.name().toLowerCase(), imageId);
-        // used for macro expansion and when expanding service numbers.  For every new node added to the cluster,
-        // the nodenum should be greater than any other nodenum in the cluster.
-        nodeProperties.put(Node.Properties.NODENUM.name().toLowerCase(), String.valueOf(nodeNum));
-        nodeProperties.put(Node.Properties.HOSTNAME.name().toLowerCase(),
-                           NodeService.createHostname(clusterName, clusterId, nodeNum, dnsSuffix));
         // TODO: temporary workaround, need to refactor the task json
-        nodeProperties.put("ssh-user", sshUser);
+        String sshUser = imageTypeMap.get(imagetype).get("ssh-user");
+        String hostname = NodeService.createHostname(clusterName, clusterId, nodeNum, dnsSuffix);
+        String flavor = hardwareTypeMap.get(hardwaretype);
+        // TODO: these should be proper fields and logic for populating node properties should not be in the solver.
+        NodeProperties nodeProperties = NodeProperties.builder()
+          .setHostname(hostname)
+          .setNodenum(nodeNum)
+          .setHardwaretype(hardwaretype)
+          .setImagetype(imagetype)
+          .setFlavor(flavor)
+          .setImage(imageId)
+          .setSSHUser(sshUser)
+          .setServices(nodeServices)
+          .build();
         nodeNum++;
         clusterNodes.put(nodeId, new Node(nodeId, clusterId, nodeServices, nodeProperties));
       }
