@@ -1,3 +1,4 @@
 source 'https://rubygems.org'
 
 gem 'fog', '~> 1.21.0'
+gem 'ipaddr'
