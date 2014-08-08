@@ -58,8 +58,8 @@ public final class Node implements Comparable<Node> {
     this.id = id;
     this.clusterId = clusterId;
     this.services = Sets.newHashSet(services);
-    this.properties = properties;
-    this.actions = actions;
+    this.properties = properties == null ? NodeProperties.builder().build() : properties;
+    this.actions = actions == null ? Lists.<Action>newArrayList() : actions;
     this.provisionerResults = provisionerResults == null ? new JsonObject() : provisionerResults;
   }
 

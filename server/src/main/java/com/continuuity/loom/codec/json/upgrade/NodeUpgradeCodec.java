@@ -66,7 +66,7 @@ public class NodeUpgradeCodec implements JsonDeserializer<Node> {
       .setFlavor(flavor)
       .setImage(image)
       .setAutomators(automators)
-      .setServices(nodeServices)
+      .setServiceNames(nodeServices)
       .setSSHUser("root")
       .build();
     return new Node(id, clusterId, services, nodeProperties);

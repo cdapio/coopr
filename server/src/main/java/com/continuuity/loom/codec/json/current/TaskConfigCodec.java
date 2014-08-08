@@ -103,7 +103,7 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
       .setImage(image)
       .setSSHUser(sshUser)
       .setAutomators(automators)
-      .setServices(serviceNames)
+      .setServiceNames(serviceNames)
       .build();
 
     // what's left is the provisioner results

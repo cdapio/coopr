@@ -44,35 +44,6 @@ public class NodeProperties {
   // list of automators that could be used on the node
   private final Set<String> automators;
 
-  /**
-   * Create node properties from the given fields.
-   *
-   * @param hostname Hostname of the node.
-   * @param ipaddress IP address of the node.
-   * @param nodenum Number of the node in a cluster. Each node in a cluster has a different number.
-   * @param hardwaretype Name of the hardware type of the node.
-   * @param imagetype Name of the image type of the node.
-   * @param flavor Flavor of the node.
-   * @param image Image of the node.
-   * @param sshUser User the provisioner will use to ssh in to the node.
-   * @param services Set of {@link Service services} on the node.
-   * @return Node properties created from the given input.
-   */
-  public static NodeProperties from(String hostname, String ipaddress, int nodenum, String hardwaretype,
-                                    String imagetype, String flavor, String image, String sshUser,
-                                    Set<Service> services) {
-    Set<String> serviceNames = Sets.newHashSet();
-    Set<String> automators = Sets.newHashSet();
-    for (Service service : services) {
-      serviceNames.add(service.getName());
-      for (ServiceAction serviceAction : service.getProvisionerActions().values()) {
-        automators.add(serviceAction.getType());
-      }
-    }
-    return new NodeProperties(hostname, ipaddress, nodenum, hardwaretype, imagetype,
-                              flavor, image, sshUser, automators, serviceNames);
-  }
-
   private NodeProperties(String hostname, String ipaddress, int nodenum, String hardwaretype, String imagetype,
                          String flavor, String image, String sshUser, Set<String> automators, Set<String> services) {
     this.ipaddress = ipaddress;
@@ -209,7 +180,7 @@ public class NodeProperties {
     private String flavor;
     private String image;
     private String sshUser;
-    private Set<String> services;
+    private Set<String> serviceNames;
     private Set<String> automators;
 
     public Builder setIpaddress(String ipaddress) {
@@ -252,8 +223,8 @@ public class NodeProperties {
       return this;
     }
 
-    public Builder setServices(Set<String> services) {
-      this.services = services;
+    public Builder setServiceNames(Set<String> serviceNames) {
+      this.serviceNames = serviceNames;
       return this;
     }
 
@@ -262,9 +233,23 @@ public class NodeProperties {
       return this;
     }
 
+    public Builder setServices(Set<Service> services) {
+      Set<String> serviceNames = Sets.newHashSet();
+      Set<String> automators = Sets.newHashSet();
+      for (Service service : services) {
+        serviceNames.add(service.getName());
+        for (ServiceAction serviceAction : service.getProvisionerActions().values()) {
+          automators.add(serviceAction.getType());
+        }
+      }
+      this.serviceNames = serviceNames;
+      this.automators = automators;
+      return this;
+    }
+
     public NodeProperties build() {
       return new NodeProperties(hostname, ipaddress, nodenum, hardwaretype, imagetype,
-                                flavor, image, sshUser, automators, services);
+                                flavor, image, sshUser, automators, serviceNames);
     }
   }
 

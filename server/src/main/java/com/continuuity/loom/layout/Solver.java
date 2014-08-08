@@ -436,8 +436,16 @@ public class Solver {
         String hostname = NodeService.createHostname(clusterName, clusterId, nodeNum, dnsSuffix);
         String flavor = hardwareTypeMap.get(hardwaretype);
         // TODO: these should be proper fields and logic for populating node properties should not be in the solver.
-        NodeProperties nodeProperties = NodeProperties.from(hostname, null, nodeNum, hardwaretype,
-                                                            imagetype, flavor, imageId, sshUser, nodeServices);
+        NodeProperties nodeProperties = NodeProperties.builder()
+          .setHostname(hostname)
+          .setNodenum(nodeNum)
+          .setHardwaretype(hardwaretype)
+          .setImagetype(imagetype)
+          .setFlavor(flavor)
+          .setImage(imageId)
+          .setSSHUser(sshUser)
+          .setServices(nodeServices)
+          .build();
         nodeNum++;
         clusterNodes.put(nodeId, new Node(nodeId, clusterId, nodeServices, nodeProperties));
       }
