@@ -15,7 +15,9 @@
     "hardwaretypes": [
       "small",
       "medium",
-      "large"
+      "large",
+      "xlarge",
+      "xxlarge"
     ],
     "imagetypes": [
       "centos6",
