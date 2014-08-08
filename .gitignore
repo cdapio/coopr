@@ -29,6 +29,7 @@ coverage
 
 /server/target/
 /server/build/
+/server/derby.log
 /ui/client-built/
 /web-app/client-built/
 /ui/build/
