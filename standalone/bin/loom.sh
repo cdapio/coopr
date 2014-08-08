@@ -199,13 +199,13 @@ function wait_for_provisioner () {
 }
 
 function provisioner () {
+    if [ "x$1" == "xstart" ]
+    then
+        echo "Waiting for server to start before running provisioner..."
+        wait_for_server
+    fi
     if [ "x${LOOM_USE_DUMMY_PROVISIONER}" == "xtrue" ] 
     then
-        if [ "x$1" == "xstart" ]
-        then
-            echo "Waiting for server to start before running dummy provisioner..."
-            wait_for_server
-        fi
         $LOOM_HOME/bin/loom-dummy-provisioner.sh $1 
     else
         $LOOM_HOME/bin/loom-provisioner.sh $1
@@ -234,9 +234,12 @@ case "$1" in
   ;;
 
   restart)
-    $LOOM_HOME/bin/loom-server.sh restart
-    $LOOM_HOME/bin/loom-ui.sh restart
-    provisioner restart
+    provisioner stop
+    $LOOM_HOME/bin/loom-ui.sh stop
+    $LOOM_HOME/bin/loom-server.sh stop
+    $LOOM_HOME/bin/loom-server.sh start
+    $LOOM_HOME/bin/loom-ui.sh start
+    provisioner start
   ;;
 
   status)
