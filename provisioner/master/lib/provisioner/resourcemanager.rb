@@ -26,6 +26,7 @@ require 'rubygems/package'
 require 'zlib'
 
 module Loom
+  # class which manages data resources locally on the provisioner. can sync from server, and activate
   class ResourceManager
     include Logging
 
@@ -47,13 +48,13 @@ module Loom
       log.debug "currently active: #{@active}"
 
       # first deactivate everything to handle the case of resource removal
-      @active.each do |resource, version|
+      @active.each do |resource, _|
         deactivate_resource(resource)
       end
 
       # check and sync resources
       @resourcespec.resources.each do |resource, version|
-        if is_synced?(resource, version)
+        if synced?(resource, version)
           log.debug "resource #{resource} version #{version} is already synced"
         else
           # sync resource locally from server
@@ -63,7 +64,7 @@ module Loom
 
       # check and activate resources
       @resourcespec.resources.each do |resource, version|
-        if is_active?(resource, version)
+        if active?(resource, version)
           log.debug "resource #{resource} version #{version} is already active"
         else
           activate_resource(resource, version)
@@ -111,14 +112,14 @@ module Loom
               log.debug "removing existing directory (#{dest} before extracting archive there"
               FileUtils.rm_rf dest
             elsif File.file? dest.chomp('/')
-              log.debug "removing existing file (#{dest.chomp()}) before extracting archive there"
+              log.debug "removing existing file (#{dest.chomp}) before extracting archive there"
               File.delete dest.chomp('/')
             end
             # extract
             if entry.directory?
               FileUtils.mkdir_p dest, :mode => entry.header.mode
             elsif entry.file?
-              File.open dest, "wb" do |f|
+              File.open dest, 'wb' do |f|
                 f.print entry.read
               end
               FileUtils.chmod entry.header.mode, dest
@@ -133,33 +134,31 @@ module Loom
 
     # fetches a resource from the server to a tmp directory, yields the file location to a block
     def fetch_resource(resource, version)
+      uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v1/tenants/#{@tenant} #{resource} versions #{version} ).join('/')
+      log.debug "fetching resource at #{uri} for tenant #{@tenant}"
       begin
-        uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v1/tenants/#{@tenant} #{resource} versions #{version} ).join('/')
-        log.debug "fetching resource at #{uri} for tenant #{@tenant}"
-        begin
-          response = RestClient.get(uri, {'X-Loom-UserID' => 'admin', 'X-Loom-TenantID' => @tenant})
-        rescue => e
-          log.error "unable to fetch resource: #{e.inspect}"
-          return
-        end
+        response = RestClient.get(uri, { 'X-Loom-UserID' => 'admin', 'X-Loom-TenantID' => @tenant })
+      rescue => e
+        log.error "unable to fetch resource: #{e.inspect}"
+        return
+      end
 
-        unless response.code == 200
-          log.debug "server responded with non-200 code: #{response.code}"
-          return
-        end
+      unless response.code == 200
+        log.debug "server responded with non-200 code: #{response.code}"
+        return
+      end
 
-        # write the response to tmp file
-        tmpdir = Dir.mktmpdir
-        tmpfile = %W( #{tmpdir} #{resource.split('/')[-1]} ).join('/')
-        File.open(tmpfile, 'w') do |f|
-          f.write response.body
-        end
-        yield tmpfile
-      ensure
-        if defined? tmpfile
-          unless tmpfile.nil?
-            FileUtils.rm_rf tmpfile
-          end
+      # write the response to tmp file
+      tmpdir = Dir.mktmpdir
+      tmpfile = %W( #{tmpdir} #{resource.split('/')[-1]} ).join('/')
+      File.open(tmpfile, 'w') do |f|
+        f.write response.body
+      end
+      yield tmpfile
+    ensure
+      if defined? tmpfile
+        unless tmpfile.nil?
+          FileUtils.rm_rf tmpfile
         end
       end
     end
@@ -175,7 +174,7 @@ module Loom
 
     # activates a resource by creating a symlink from the work_dir to a particular version in the data directory
     def activate_resource(resource, version)
-      unless is_synced?(resource, version)
+      unless synced?(resource, version)
         log.error "attempt to activate resource #{resource} version #{version} but it is not synced from server"
         return
       end
@@ -199,19 +198,19 @@ module Loom
     def active_version(resource)
       work_link = %W( #{@workdir} #{resource} ).join('/')
       return nil unless File.symlink? work_link
-      target = File.readlink( work_link )
-      return target.split('/')[-2]
+      target = File.readlink(work_link)
+      target.split('/')[-2]
     end
 
     # determine if a versioned resource exists in the data dir
-    def is_synced?(resource, version)
+    def synced?(resource, version)
       data = %W( #{@datadir} #{resource} #{version} #{resource.split('/')[-1]}).join('/')
       File.file?(data) || File.directory?(data)
     end
 
     # determine if a versioned resource is active
-    def is_active?(resource, version)
-      return false unless is_synced?(resource, version)
+    def active?(resource, version)
+      return false unless synced?(resource, version)
       if version == active_version(resource)
         return true
       else
@@ -225,9 +224,9 @@ module Loom
       if workdir.exist?
         workdir.find do |path|
           # symlinks indicate an active version of a resource
-          if File.symlink?( path )
+          if File.symlink?(path)
             # determine where the link points
-            target = File.readlink( path )
+            target = File.readlink(path)
             # the version will be the parent directory
             version = target.split('/')[-2]
             @active[path.relative_path_from(workdir).to_s] = version
@@ -235,6 +234,5 @@ module Loom
         end
       end
     end
-
   end
 end

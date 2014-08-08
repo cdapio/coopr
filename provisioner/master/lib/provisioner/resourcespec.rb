@@ -32,18 +32,18 @@ module Loom
       #   ex: "automatortype/chef-solo/cookbooks/hadoop" => "archive"
       @resource_formats = {}
       unless resource_jsonobj.nil?
-        resource_jsonobj.each do |type, h|
-          next if h.nil?
-          h.each do |id, h|
-            next if h.nil?
-            h.each do |resource_type, h|
-              next if h.nil?
+        resource_jsonobj.each do |type, h_type|
+          next if h_type.nil?
+          h_type.each do |id, h_id|
+            next if h_id.nil?
+            h_id.each do |resource_type, h_resource|
+              next if h_resource.nil?
               format = nil
-              if h.key?('format')
-                format = h['format']
+              if h_resource.key?('format')
+                format = h_resource['format']
               end
-              if h.key?('active')
-                h['active'].each do |nv|
+              if h_resource.key?('active')
+                h_resource['active'].each do |nv|
                   name = nv['name']
                   version = nv['version']
                   resource_name = %W( #{type} #{id} #{resource_type} #{name}).join('/')
