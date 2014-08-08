@@ -93,7 +93,14 @@ class FogProviderOpenstack < Provider
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
       Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
-        ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+        # Backwards-compatibility... ssh_exec! takes 2 arguments prior to 0.9.8
+        ssho = method(:ssh_exec!)
+        if ssho.arity == 2
+          log.debug 'Validating external connectivity and DNS resolution via ping'
+          ssh_exec!(ssh, 'ping -c1 www.opscode.com')
+        else
+          ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+        end
       end
       # Return 0
       @result['status'] = 0
