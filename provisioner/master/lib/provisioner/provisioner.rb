@@ -112,7 +112,6 @@ module Loom
           Process.kill('TERM', 0)
           @signal_thread.join
           [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|
-            puts "killing thread #{t}, alive #{t.alive?}"
             t.kill if t.alive?
           end
           log.info "provisioner forced graceful shutdown"
