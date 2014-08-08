@@ -16,7 +16,6 @@
 # limitations under the License.
 #
 
-
 require 'thin'
 require 'sinatra/base'
 require 'json'
@@ -33,6 +32,7 @@ require_relative 'config'
 require_relative 'constants'
 
 module Loom
+  # top-level class for provisioner
   class Provisioner
     include Logging
 
@@ -52,7 +52,6 @@ module Loom
 
     # invoked from bin/provisioner
     def self.run(options)
-
       # read configuration
       config = Config.new(options)
       config.load
@@ -62,7 +61,7 @@ module Loom
       Logging.level = config.get(PROVISIONER_LOG_LEVEL)
       Logging.shift_age = config.get(PROVISIONER_LOG_ROTATION_SHIFT_AGE)
       Logging.shift_size = config.get(PROVISIONER_LOG_ROTATION_SHIFT_SIZE)
-      Logging.log.debug "Provisioner starting up"
+      Logging.log.debug 'Provisioner starting up'
       config.properties.each do |k, v|
         Logging.log.debug "  #{k}: #{v}"
       end
@@ -81,30 +80,29 @@ module Loom
     # main run block
     def run
       begin
+        Thread.abort_on_exception = true
+        # start the api server
+        spawn_sinatra_thread
+        # wait for sinatra to fully initialize
+        sleep 1 until Api.running?
+        # register our own signal handlers
+        setup_signal_traps
+        # spawn the heartbeat thread
+        spawn_heartbeat_thread
+        # spawn the signal handler thread
+        spawn_signal_thread
+        # spawn the thread to sync data resources
+        spawn_resource_thread
 
-      Thread.abort_on_exception = true
-      # start the api server
-      spawn_sinatra_thread
-      # wait for sinatra to fully initialize
-      sleep 1 until Api.running?
-      # register our own signal handlers
-      setup_signal_traps
-      # spawn the heartbeat thread
-      spawn_heartbeat_thread
-      # spawn the signal handler thread
-      spawn_signal_thread
-      # spawn the thread to sync data resources
-      spawn_resource_thread
-
-      # wait for signal_handler to exit in response to signals
-      @signal_thread.join
-      # kill the other threads
-      [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|
-        t.kill
-        t.join
-      end
-      log.info "provisioner gracefully shut down"
-      exit
+        # wait for signal_handler to exit in response to signals
+        @signal_thread.join
+        # kill the other threads
+        [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|
+          t.kill
+          t.join
+        end
+        log.info "provisioner gracefully shut down"
+        exit
       rescue RuntimeError => e
         log.error "Exception raised in thread: #{e.inspect}, shutting down..."
         # if signal_handler thread alive, use it to shutdown gracefully
