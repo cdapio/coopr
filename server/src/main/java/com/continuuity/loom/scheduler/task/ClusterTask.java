@@ -19,8 +19,6 @@ import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import java.util.List;
 
@@ -41,8 +39,6 @@ public class ClusterTask {
     DROPPED
   }
 
-  private static final Gson GSON = new Gson();
-
   private final String taskId;
   private final String jobId;
   private final String clusterId;
@@ -50,12 +46,10 @@ public class ClusterTask {
   private final ClusterAction clusterAction;
   private final String nodeId;
   private final String service;
-
-  private final JsonObject originalConfig;
   private List<TaskAttempt> attempts;
 
   public ClusterTask(ProvisionerAction taskName, TaskId taskId, String nodeId, String service,
-                     ClusterAction clusterAction, JsonObject config) {
+                     ClusterAction clusterAction) {
     this.taskId = taskId.getId();
     this.jobId = String.valueOf(taskId.getJobId().getId());
     this.clusterId = taskId.getClusterId();
@@ -63,7 +57,6 @@ public class ClusterTask {
     this.clusterAction = clusterAction;
     this.nodeId = nodeId;
     this.service = service;
-    this.originalConfig = config;
     this.attempts = Lists.newArrayList();
     addAttempt();
   }
@@ -109,14 +102,6 @@ public class ClusterTask {
   }
 
   /**
-   * Sets the config for the latest task attempt.
-   * @param config task config.
-   */
-  public void setConfig(JsonObject config) {
-    attempts.get(currentAttemptIndex()).setConfig(config);
-  }
-
-  /**
    * Sets the status for the latest task attempt.
    *
    * @param status task status.
@@ -150,15 +135,6 @@ public class ClusterTask {
    */
   public String getNodeId() {
     return nodeId;
-  }
-
-  /**
-   * Get the task config for the latest task attempt.
-   *
-   * @return task config for the latest task attempt.
-   */
-  public JsonObject getConfig() {
-    return attempts.get(currentAttemptIndex()).getConfig();
   }
 
   /**
@@ -266,7 +242,7 @@ public class ClusterTask {
    */
   public void addAttempt() {
     // copy config into task attempt
-    attempts.add(new TaskAttempt(attempts.size() + 1, GSON.fromJson(originalConfig, JsonObject.class)));
+    attempts.add(new TaskAttempt(attempts.size() + 1));
   }
 
   @Override
@@ -279,7 +255,6 @@ public class ClusterTask {
       .add("clusterAction", clusterAction)
       .add("nodeId", nodeId)
       .add("service", service)
-      .add("originalConfig", originalConfig)
       .add("attempts", attempts)
       .toString();
   }

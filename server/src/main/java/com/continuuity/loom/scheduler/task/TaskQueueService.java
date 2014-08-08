@@ -256,10 +256,8 @@ public class TaskQueueService {
         LOG.error("Cannot find node {} for task {} to update the properties",
                   clusterTask.getNodeId(), clusterTask.getTaskId());
       } else {
-        // Update node properties
-        for (Map.Entry<String, JsonElement> entry : result.entrySet()) {
-          node.getProperties().add(entry.getKey(), entry.getValue());
-        }
+        // Update provisioner results stored with the node and passed on to future tasks
+        node.addResults(result);
 
         // Update node action
         if (clusterTask.getStatus() == ClusterTask.Status.COMPLETE) {

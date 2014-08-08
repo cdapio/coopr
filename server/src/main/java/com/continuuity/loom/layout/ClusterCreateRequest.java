@@ -60,7 +60,7 @@ public class ClusterCreateRequest {
     this.imagetype = imageType;
     this.initialLeaseDuration = initialLeaseDuration == null ? -1 : initialLeaseDuration;
     this.dnsSuffix = dnsSuffix;
-    this.config = config == null ? new JsonObject() : config;
+    this.config = config;
   }
 
   /**

@@ -41,6 +41,7 @@ import com.continuuity.loom.admin.ServiceDependencies;
 import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Constants;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -1217,18 +1218,16 @@ public class Entities {
       new Node(node1,
                clusterId,
                ImmutableSet.of(ServiceExample.NAMENODE, ServiceExample.HOSTS),
-               ImmutableMap.<String, String>of(
-                 Node.Properties.HARDWARETYPE.name().toLowerCase(), HardwareTypeExample.LARGE.getName(),
-                 Node.Properties.IMAGETYPE.name().toLowerCase(), ImageTypeExample.CENTOS_6.getName()
-               ));
+               NodeProperties.builder()
+                 .setHardwaretype(HardwareTypeExample.LARGE.getName())
+                 .setImagetype(ImageTypeExample.CENTOS_6.getName()).build());
     public static Node NODE2 =
       new Node(node2,
                clusterId,
                ImmutableSet.of(ServiceExample.DATANODE, ServiceExample.HOSTS),
-               ImmutableMap.<String, String>of(
-                 Node.Properties.HARDWARETYPE.name().toLowerCase(), HardwareTypeExample.LARGE.getName(),
-                 Node.Properties.IMAGETYPE.name().toLowerCase(), ImageTypeExample.CENTOS_6.getName()
-               ));
+               NodeProperties.builder()
+                 .setHardwaretype(HardwareTypeExample.LARGE.getName())
+                 .setImagetype(ImageTypeExample.CENTOS_6.getName()).build());
   }
 
   public static class NodeExample {
@@ -1238,14 +1237,13 @@ public class Entities {
     private static final String baseMockHostName = ".test.chi.intsm.net";
     public static Node NODE1 = createNode(node1, clusterId);
     public static Node NODE2 = createNode(node2, clusterId);
-    public static Node NODE1_UPDATED = createNode(node1,
-                                                  clusterId,
-                                                  ImmutableSet.of(ServiceExample.DATANODE, ServiceExample.HOSTS),
-                                                  ImmutableMap.of(Node.Properties.HARDWARETYPE.name().toLowerCase(),
-                                                                  HardwareTypeExample.MEDIUM.getName(),
-                                                                  Node.Properties.IMAGETYPE.name().toLowerCase(),
-                                                                  ImageTypeExample.UBUNTU_12.getName())
-                                                 );
+    public static Node NODE1_UPDATED = createNode(
+      node1,
+      clusterId,
+      ImmutableSet.of(ServiceExample.DATANODE, ServiceExample.HOSTS),
+      NodeProperties.builder()
+        .setImagetype(ImageTypeExample.UBUNTU_12.getName())
+        .setHardwaretype(HardwareTypeExample.MEDIUM.getName()).build());
     public static Set<Node> NODES = createMockNodes(2);
 
     private static Set<Node> createMockNodes(int numberOfNodes) {
@@ -1262,14 +1260,12 @@ public class Entities {
       return createNode(id,
                         clusterId,
                         ImmutableSet.of(ServiceExample.DATANODE, ServiceExample.HOSTS),
-                        ImmutableMap.of(Node.Properties.HARDWARETYPE.name().toLowerCase(),
-                                        HardwareTypeExample.LARGE.getName(),
-                                        Node.Properties.IMAGETYPE.name().toLowerCase(),
-                                        ImageTypeExample.CENTOS_6.getName())
-                       );
+                        NodeProperties.builder()
+                          .setHardwaretype(HardwareTypeExample.LARGE.getName())
+                          .setImagetype(ImageTypeExample.CENTOS_6.getName()).build());
     }
 
-    public static Node createNode(String id, String clusterId, Set<Service> services, Map<String, String> properties) {
+    public static Node createNode(String id, String clusterId, Set<Service> services, NodeProperties properties) {
       return new Node(id, clusterId, services, properties);
     }
   }
