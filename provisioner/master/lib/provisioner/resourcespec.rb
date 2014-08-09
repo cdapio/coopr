@@ -32,10 +32,13 @@ module Loom
       #   ex: "automatortype/chef-solo/cookbooks/hadoop" => "archive"
       @resource_formats = {}
       unless resource_jsonobj.nil?
+        # example resource_jsonobj: "automatortype" => {...}
         resource_jsonobj.each do |type, h_type|
           next if h_type.nil?
+          # example h_type hash: "chef-solo" => {...}
           h_type.each do |id, h_id|
             next if h_id.nil?
+            # example h_id hash: "cookbooks" => {"format" => "...", "active => [...]"}
             h_id.each do |resource_type, h_resource|
               next if h_resource.nil?
               format = nil
@@ -43,6 +46,7 @@ module Loom
                 format = h_resource['format']
               end
               if h_resource.key?('active')
+                # example h_resource['active'] array: [{"name" => "hadoop", "version" => "2"}]
                 h_resource['active'].each do |nv|
                   name = nv['name']
                   version = nv['version']
