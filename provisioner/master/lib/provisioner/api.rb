@@ -46,7 +46,7 @@ module Loom
         end
       end
 
-      post '/v1/tenants' do
+      post "/#{PROVISIONER_API_VERSION}/tenants" do
         begin
           log.info 'adding tenant'
           data = JSON.parse request.body.read
@@ -66,7 +66,7 @@ module Loom
         end
       end
 
-      put '/v1/tenants/:t_id' do
+      put "/#{PROVISIONER_API_VERSION}/tenants/:t_id" do
         begin
           log.info "adding/updating tenant id: #{params[:t_id]}"
           data = JSON.parse request.body.read
@@ -88,7 +88,7 @@ module Loom
         end
       end
 
-      delete '/v1/tenants/:t_id' do
+      delete "/#{PROVISIONER_API_VERSION}/tenants/:t_id" do
         begin
           if settings.provisioner.tenantmanagers.key?(params[:t_id])
             settings.provisioner.delete_tenant(params[:t_id])
