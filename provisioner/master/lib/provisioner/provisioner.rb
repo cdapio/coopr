@@ -210,8 +210,11 @@ module Loom
         loop {
           @tenantmanagers.each do |id, tmgr|
             if tmgr.resource_sync_needed? && tmgr.num_workers == 0
-              log.debug "resource thread invoking sync for tenant #{tmgr.id}"
-              tmgr.sync
+              # handle stacked sync calls, last one wins
+              while tmgr.resource_sync_needed?
+                log.debug "resource thread invoking sync for tenant #{tmgr.id}"
+                tmgr.sync
+              end
               log.debug "done syncing tenant #{tmgr.id}, resuming workers"
               tmgr.resume
             end

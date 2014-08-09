@@ -26,7 +26,7 @@ module Loom
   class TenantManager
     include Logging
     attr_accessor :spec, :resourcemanager
-    attr_reader :status, :config, :provisioner_id
+    attr_reader :status, :config, :provisioner_id, :sync_requests
 
     def initialize(spec, config, provisioner_id)
       unless spec.instance_of?(TenantSpec)
@@ -38,6 +38,7 @@ module Loom
       @workerpids = []
       @terminating_workers = []
       @resourcemanager = ResourceManager.new(spec.resourcespec, spec.id, config)
+      @sync_requests = 0
 
     end 
 
@@ -58,15 +59,17 @@ module Loom
 
     def resource_sync_needed
       @status = 'STALE'
+      @sync_requests += 1
       terminate_all_worker_processes
     end
 
     def resource_sync_needed?
-      'STALE' == @status
+      'STALE' == @status && @sync_requests > 0
     end
 
     def sync
       @resourcemanager.sync
+      @sync_requests -= 1
     end
 
     def resume

@@ -190,7 +190,7 @@ module Loom
     def deactivate_resource(resource)
       work_link = %W( #{@workdir} #{resource} ).join('/')
       log.debug "deactivating: #{work_link}"
-      File.delete(work_link)
+      File.delete(work_link) if File.symlink?(work_link)
       log.debug "deactivated resource #{resource}"
     end
 
