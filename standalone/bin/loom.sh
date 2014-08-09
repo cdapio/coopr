@@ -163,7 +163,11 @@ function load_defaults () {
 
 function request_superadmin_workers () {
 
-    wait_for_provisioner
+    if [ "x${LOOM_USE_DUMMY_PROVISIONER}" != "xtrue" ]; then
+        wait_for_provisioner
+    else
+        sleep 5
+    fi
 
     echo "Requesting ${LOOM_NUM_WORKERS} workers for default tenant..."
     curl --silent --request PUT \
