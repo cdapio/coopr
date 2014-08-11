@@ -90,6 +90,8 @@ module Loom
       spawn_heartbeat_thread
       # spawn the signal handler thread
       spawn_signal_thread
+      # announce we are started up
+      @status = 'OK'
 
       # wait for signal_handler to exit in response to signals
       @signal_thread.join
@@ -298,6 +300,11 @@ module Loom
         hb['usage'][id] = tm.num_workers
       end
       hb
+    end
+
+    # get current status
+    def status
+      @status ||= 'UNKNOWN'
     end
 
     # determine ip to register with server from routing info
