@@ -17,6 +17,8 @@ package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -24,8 +26,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Codec for serializing/deserializing a {@link Node}. Used for backwards compatibility.
@@ -37,7 +39,9 @@ public class NodeCodec implements JsonDeserializer<Node> {
 
     String id = context.deserialize(jsonObj.get("id"), String.class);
     String clusterId = context.deserialize(jsonObj.get("clusterId"), String.class);
+    HashSet<Service> services = context.deserialize(jsonObj.get("services"), new TypeToken<Set<Service>>() {}.getType());
+    NodeProperties properties = context.deserialize(jsonObj.get("properties"), NodeProperties.class);
 
-    return new Node(id, clusterId, new HashSet<Service>() {}, new HashMap<String, String>());
+    return new Node(id, clusterId, services, properties);
   }
 }

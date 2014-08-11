@@ -17,6 +17,7 @@ package com.continuuity.loom.http;
 
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
 import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -127,6 +127,6 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
   }
 
   private Node createNode(String id) {
-    return new Node(id, "1234", new HashSet<Service>() {}, new HashMap<String, String>());
+    return new Node(id, "1234", new HashSet<Service>() {}, NodeProperties.builder().build());
   }
 }
