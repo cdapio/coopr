@@ -55,8 +55,11 @@ OptionParser.new do |opts|
   opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
     options[:log_level] = f
   end
-  opts.on('-l', '--log-dir DIRECTORY', 'Path to log directory') do |f|
-    options[:log_directory] = f
+  opts.on('-l', '--log-dir DIRECTORY', 'Path to log directory') do |d|
+    options[:log_directory] = d
+  end
+  opts.on('-w', '--work-dir DIRECTORY', 'Path to work directory') do |d|
+    options[:work_directory] = d
   end
   options[:once] = false
   opts.on('-o', '--once', 'Only poll and run a single task') do
