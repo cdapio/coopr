@@ -23,12 +23,16 @@ class ShellAutomator < Automator
 
   def initialize(env, task)
     super(env, task)
+    work_dir = @env['work_dir']
+    tenant = @env['tenant']
     # local and remote top-level script directory name
     @scripts_parent_dir = "scripts"
     # local scripts dir
-    @scripts_dir = "#{File.expand_path(File.dirname(__FILE__))}/#{@scripts_parent_dir}"
+    #@scripts_dir = "#{File.expand_path(File.dirname(__FILE__))}/#{@scripts_parent_dir}"
+    @scripts_dir = %W[ #{work_dir} #{tenant} automatortypes shell #{@scripts_parent_dir} ].join('/')
     # name of tarball to generate
-    @scripts_tar = "#{File.expand_path(File.dirname(__FILE__))}/scripts.tar.gz"
+    #@scripts_tar = "#{File.expand_path(File.dirname(__FILE__))}/scripts.tar.gz"
+    @scripts_tar = %W[ #{work_dir} #{tenant} automatortypes shell scripts.tar.gz ].join('/')
     # remote storage directory
     @remote_cache_dir = "/var/cache/loom"
     # remote script location to be exported in $PATH

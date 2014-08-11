@@ -24,7 +24,10 @@ class ChefSoloAutomator < Automator
 
   def initialize(env, task)
     super(env, task)
-    @chef_primitives_path = "#{File.expand_path(File.dirname(__FILE__))}/chef_solo_automator"
+    work_dir = @env['work_dir']
+    tenant = @env['tenant']
+    #@chef_primitives_path = "#{File.expand_path(File.dirname(__FILE__))}/chef_solo_automator"
+    @chef_primitives_path = %W[ #{work_dir} #{tenant} automatortypes chef-solo ].join('/')
     @remote_cache_dir = "/var/cache/loom"
     @remote_chef_dir = "/var/chef"
   end
