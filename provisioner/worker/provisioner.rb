@@ -73,7 +73,7 @@ if loom_uri.nil? && !options[:file]
   exit(1)
 end
 
-if(!options[:work_directory])
+if(!options[:work_dir])
   puts "--work-dir option must be specified"
   exit(1)
 end
