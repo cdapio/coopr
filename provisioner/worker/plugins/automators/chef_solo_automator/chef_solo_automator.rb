@@ -22,8 +22,8 @@ require 'net/scp'
 class ChefSoloAutomator < Automator
   attr_accessor :credentials, :cookbooks_path, :cookbooks_tar, :remote_cache_dir
 
-  def initialize(task)
-    super(task)
+  def initialize(env, task)
+    super(env, task)
     @chef_primitives_path = "#{File.expand_path(File.dirname(__FILE__))}/chef_solo_automator"
     @remote_cache_dir = "/var/cache/loom"
     @remote_chef_dir = "/var/chef"

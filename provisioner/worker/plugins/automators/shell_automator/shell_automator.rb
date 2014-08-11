@@ -21,8 +21,8 @@ require 'net/scp'
 class ShellAutomator < Automator
   attr_accessor :credentials, :scripts_dir, :scripts_tar, :remote_cache_dir
 
-  def initialize(task)
-    super(task)
+  def initialize(env, task)
+    super(env, task)
     # local and remote top-level script directory name
     @scripts_parent_dir = "scripts"
     # local scripts dir

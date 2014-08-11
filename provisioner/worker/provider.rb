@@ -19,8 +19,10 @@
 # base class for all provider plugins.  This should be extended, not modified
 class Provider
   attr_accessor :task, :flavor, :image, :hostname, :providerid, :result
-  def initialize(task)
+  attr_reader :env
+  def initialize(task, env)
     @task = task
+    @env = env
     @result = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
   end
 
