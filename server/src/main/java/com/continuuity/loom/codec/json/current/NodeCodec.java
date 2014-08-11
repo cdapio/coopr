@@ -27,6 +27,7 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -41,7 +42,9 @@ public class NodeCodec implements JsonDeserializer<Node> {
     String clusterId = context.deserialize(jsonObj.get("clusterId"), String.class);
     HashSet<Service> services = context.deserialize(jsonObj.get("services"), new TypeToken<Set<Service>>() {}.getType());
     NodeProperties properties = context.deserialize(jsonObj.get("properties"), NodeProperties.class);
+    List<Node.Action> actions = context.deserialize(jsonObj.get("actions"), new TypeToken<List<Node.Action>>() {}.getType());
+    JsonObject provisionerResults = jsonObj.getAsJsonObject("provisionerResults");
 
-    return new Node(id, clusterId, services, properties);
+    return new Node(id, clusterId, services, properties, actions, provisionerResults);
   }
 }
