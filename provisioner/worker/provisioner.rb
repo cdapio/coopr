@@ -55,7 +55,7 @@ OptionParser.new do |opts|
   opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
     options[:log_level] = f
   end
-  opts.on('-l', '--log-directory DIRECTORY', 'Path to log directory') do |f|
+  opts.on('-l', '--log-dir DIRECTORY', 'Path to log directory') do |f|
     options[:log_directory] = f
   end
   options[:once] = false
