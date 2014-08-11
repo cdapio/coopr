@@ -7,9 +7,9 @@ XCode Command Line Developer Tools (Mac only)
 
 Install
 ======
-sudo gem install knife-joyent --version 0.4.8
-sudo gem install knife-rackspace --version 0.9.1
-sudo gem install knife-openstack --version 0.8.1
+sudo gem install fog --version 1.21.0
+sudo gem install sinatra --version 1.4.5
+sudo gem install thin --version 1.6.2
 
 Start
 =====
@@ -28,5 +28,3 @@ It contains step by step instructions for creating a Hadoop cluster with differe
 
 Known Issues
 ============
- * XCode Command Line Developer Tools 5.1 (Mar 2014) will cause compilation failure of the knife plugins
- * Continuuity Loom standalone invocations of knife plugins are not isolated from any existing chef environment settings.  Please ensure there are no active knife.rb files before running Loom standalone.
