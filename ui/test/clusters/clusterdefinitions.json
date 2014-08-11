@@ -374,12 +374,14 @@
                 "hostname": "test-woo139-1004.local",
                 "image": "80fbcb55-b206-41f9-9bc2-2dd7aac6c061",
                 "imagetype": "ubuntu12",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "42f83630-765d-41e1-bd16-679a3be8605e",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -798,12 +800,14 @@
                 "hostname": "test-woo139-1000.local",
                 "image": "80fbcb55-b206-41f9-9bc2-2dd7aac6c061",
                 "imagetype": "ubuntu12",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "440316da-f5dc-41ea-aa0b-4929da64ec3e",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -1162,12 +1166,14 @@
                 "hostname": "test-woo139-1002.local",
                 "image": "80fbcb55-b206-41f9-9bc2-2dd7aac6c061",
                 "imagetype": "ubuntu12",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "0a26e871-b968-47c0-a4e2-33c7069b2fa4",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -1449,12 +1455,14 @@
                 "hostname": "test-woo139-1003.local",
                 "image": "80fbcb55-b206-41f9-9bc2-2dd7aac6c061",
                 "imagetype": "ubuntu12",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "d2216ca5-a0d6-43f2-a784-ab3c92b88b6a",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -1736,12 +1744,14 @@
                 "hostname": "test-woo139-1001.local",
                 "image": "80fbcb55-b206-41f9-9bc2-2dd7aac6c061",
                 "imagetype": "ubuntu12",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "7062c54b-de1e-4ee1-a9b6-918b0767068a",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2133,12 +2143,14 @@
                 "hostname": "loom-prod138-1000.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "c641984f-3f2d-4269-ac4e-6ad49918c5cd",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2245,12 +2257,14 @@
                 "hostname": "loom-prod138-1005.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "17b7677e-9cdc-4562-8ae9-1dc4280e5e69",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2357,12 +2371,14 @@
                 "hostname": "loom-prod138-1003.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "fa0bc9c8-7860-449a-bc16-2802ad46bcd6",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2469,12 +2485,14 @@
                 "hostname": "loom-prod138-1001.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "7638c6d0-21e1-43d7-b49e-f4677d7c1bcf",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2606,12 +2624,14 @@
                 "hostname": "loom-prod138-1008.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "2739c510-b969-4b25-bdd9-69f42c5b69e8",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2764,12 +2784,14 @@
                 "hostname": "loom-prod138-1007.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "787c5035-0c1d-4737-911f-ec0263458d64",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2916,12 +2938,14 @@
                 "hostname": "loom-prod138-1004.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "60a48a5b-f2c1-4f93-975f-ef5e61a99098",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -3042,12 +3066,14 @@
                 "hostname": "loom-prod138-1002.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "30536939-5bc3-4abf-b4e2-e8feb03efc8f",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -3179,12 +3205,14 @@
                 "hostname": "loom-prod138-1006.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "70457f67-09e2-4ab7-a48e-6da725efb5bd",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -3487,12 +3515,14 @@
                 "hostname": "test-nitin135-1000.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
+                "ipaddress": "1.2.3.4"
+            },
+            "provisionerResults": {
                 "providerid": "7eccc0db-1d50-4c17-93cd-7fcb3b6ae2e6",
                 "ssh-auth": {
                     "user": "root",
                     "password": "12345"
-                },
-                "ipaddress": "1.2.3.4"
+                }
             },
             "actions": [
                 {
