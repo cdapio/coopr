@@ -59,6 +59,8 @@ module FogProvider
     ssh_test_max = 10*60
     ssh_test = 0
     log.debug 'Waiting for sshd'
+    # Initial sleep, to prevent getting caught by provider firewall rules
+    sleep 30
     begin
       until tcp_test_port(host, port)
         if ssh_test < ssh_test_max
