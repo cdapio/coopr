@@ -53,7 +53,7 @@ public class NodeProperties {
     this.flavor = flavor;
     this.image = image;
     this.nodenum = nodenum;
-    this.sshUser = sshUser;
+    this.sshUser = sshUser == null ? "root" : sshUser;
     this.automators = automators == null ? ImmutableSet.<String>of() : ImmutableSet.copyOf(automators);
     this.services = services == null ? ImmutableSet.<String>of() : ImmutableSet.copyOf(services);
   }
