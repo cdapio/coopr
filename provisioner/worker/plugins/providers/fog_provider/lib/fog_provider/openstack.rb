@@ -111,8 +111,8 @@ class FogProviderOpenstack < Provider
       log.error 'Timeout waiting for the server to be created'
       @result['stderr'] = 'Timed out waiting for server to be created'
     rescue Net::SSH::AuthenticationFailed => e
-      log.error("SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}")
-      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}: #{e.inspect}"
+      log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
+      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue Exception => e
       log.error('Unexpected Error Occurred in FogProviderOpenstack.confirm:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.confirm: #{e.inspect}"
