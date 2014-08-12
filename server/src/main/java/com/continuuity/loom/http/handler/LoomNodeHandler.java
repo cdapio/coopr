@@ -51,7 +51,6 @@ import java.util.Set;
 @Path("/v1/loom/nodes")
 public class LoomNodeHandler extends LoomAuthHandler {
   private static final Logger LOG = LoggerFactory.getLogger(LoomNodeHandler.class);
-  //  private final NodeService clusterService;
   private final NodeStoreService nodeStoreService;
   private final NodeStore nodeStore;
   private final Gson gson;
@@ -60,8 +59,7 @@ public class LoomNodeHandler extends LoomAuthHandler {
    * Initializes a new instance of a LoomNodeHandler.
    */
   @Inject
-  public LoomNodeHandler(TenantStore tenantStore, NodeService nodeService, NodeStoreService nodeStoreService,
-                         Gson gson) {
+  private LoomNodeHandler(TenantStore tenantStore, NodeService nodeService, NodeStoreService nodeStoreService, Gson gson) {
     super(tenantStore);
     this.nodeStoreService = nodeStoreService;
     this.nodeStore = this.nodeStoreService.getSystemView();
@@ -69,7 +67,7 @@ public class LoomNodeHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get all noes visible to the user.
+   * Get all nodes visible to the user.
    * @param request Request for clusters.
    * @param responder Responder for sending the response.
    */
@@ -80,23 +78,44 @@ public class LoomNodeHandler extends LoomAuthHandler {
       return;
     }
 
-    Set<Node> nodes = null;
+    Set<Node> nodes;
     try {
       nodes = nodeStoreService.getView(account).getAllNodes();
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting nodes.");
+      return;
     }
 
     JsonArray jsonArray = new JsonArray();
     for (Node node : nodes) {
-      JsonObject obj = new JsonObject();
-      obj.addProperty("id", node.getId());
-      obj.addProperty("clusterId", node.getClusterId());
-      //      obj.add("properties", node.getProperties());
-      jsonArray.add(obj);
+      jsonArray.add(createNodeJsonObject(node));
     }
 
     responder.sendJson(HttpResponseStatus.OK, jsonArray);
+  }
+
+  /**
+   * Get a node visible to the user.
+   * @param request Request for clusters.
+   * @param responder Responder for sending the response.
+   */
+  @GET
+  @Path("/{node-id}")
+  public void getNode(HttpRequest request, HttpResponder responder, @PathParam("node-id") String nodeId) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    Node node;
+    try {
+      node = nodeStoreService.getView(account).getNode(nodeId);
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting nodes.");
+      return;
+    }
+
+    responder.sendJson(HttpResponseStatus.OK, createNodeJsonObject(node));
   }
 
   @POST
@@ -106,20 +125,26 @@ public class LoomNodeHandler extends LoomAuthHandler {
       return;
     }
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    Set<Node> nodes = gson.fromJson(reader, new TypeToken<Set<Node>>(){}.getType());
+    Set<Node> nodes = gson.fromJson(reader, new TypeToken<Set<Node>>() {}.getType());
     try {
       nodeStoreService.getView(account).writeNodes(nodes);
+      responder.sendStatus(HttpResponseStatus.CREATED);
     } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception creating nodes.");
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "Exception creating nodes.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception creating nodes.");
+    } finally {
+      try {
+        reader.close();
+      } catch (IOException e) {
+        LOG.warn("Exception while closing request reader", e);
+      }
     }
-
-    responder.sendStatus(HttpResponseStatus.CREATED);
   }
 
   @PUT
-  public void updateNode(HttpRequest request, HttpResponder responder) {
+  @Path("/{node-id}")
+  public void updateNode(HttpRequest request, HttpResponder responder, @PathParam("node-id") String nodeId) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -128,13 +153,18 @@ public class LoomNodeHandler extends LoomAuthHandler {
     Node node = gson.fromJson(reader, Node.class);
     try {
       nodeStoreService.getView(account).writeNode(node);
+      responder.sendStatus(HttpResponseStatus.NO_CONTENT);
     } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception updating node.");
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "Exception updating node.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception updating node.");
+    } finally {
+      try {
+        reader.close();
+      } catch (IOException e) {
+        LOG.warn("Exception while closing request reader", e);
+      }
     }
-
-    responder.sendStatus(HttpResponseStatus.NO_CONTENT);
   }
 
   @DELETE
@@ -146,10 +176,24 @@ public class LoomNodeHandler extends LoomAuthHandler {
     }
     try {
       nodeStoreService.getView(account).deleteNode(nodeId);
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "Exception deleting node.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception deleting node.");
     }
 
     responder.sendStatus(HttpResponseStatus.NO_CONTENT);
+  }
+
+  private JsonObject createNodeJsonObject(final Node node) {
+    JsonObject obj = new JsonObject();
+    obj.addProperty("id", node.getId());
+    obj.addProperty("clusterId", node.getClusterId());
+    obj.add("actions", gson.toJsonTree(node.getActions()));
+    obj.add("provisionerResults", gson.toJsonTree(node.getProvisionerResults()));
+    obj.add("services", gson.toJsonTree(node.getServices()));
+    obj.add("properties", gson.toJsonTree(node.getProperties()));
+
+    return obj;
   }
 }

@@ -48,7 +48,7 @@ public class SQLNodeStore implements NodeStore {
   }
 
   @Override
-  public void deleteNode(final String nodeId) throws IOException {
+  public void deleteNode(final String nodeId) throws IOException, IllegalAccessException {
     systemView.deleteNode(nodeId);
   }
 

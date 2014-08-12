@@ -52,7 +52,7 @@ public interface NodeStoreView {
    * @param nodeId Id of the node to delete.
    * @throws IOException if there was a problem deleting the node.
    */
-  void deleteNode(String nodeId) throws IOException;
+  void deleteNode(String nodeId) throws IllegalAccessException, IOException;
 
   /**
    * Write a node to the store using its id.

@@ -35,6 +35,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -46,7 +47,16 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
 
   protected static List<JsonObject> getJsonListFromResponse(HttpResponse response) throws IOException {
     Reader reader = getInputStreamReaderFromResponse(response);
-    return gson.fromJson(reader, new TypeToken<List<JsonObject>>() {}.getType());
+    List<JsonObject> result = gson.fromJson(reader, new TypeToken<List<JsonObject>>() {}.getType());
+    reader.close();
+    return result;
+  }
+
+  protected static JsonObject getJsonObjectFromResponse(HttpResponse response) throws IOException {
+    Reader reader = getInputStreamReaderFromResponse(response);
+    JsonObject object = gson.fromJson(reader, JsonObject.class);
+    reader.close();
+    return object;
   }
 
   protected static Reader getInputStreamReaderFromResponse(HttpResponse response) throws IOException {
@@ -89,16 +99,27 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
   @Test
   public void testUpdateNodeAsUser() throws Exception {
     Node node = postNodes(2, USER1_HEADERS).get(0);
-    String nodeJsonString = getNodeAsJsonString(node);
-    HttpResponse response = doPut("/v1/loom/nodes", nodeJsonString, USER1_HEADERS);
+    NodeProperties.Builder propertiesBuilder = NodeProperties.builder();
+    propertiesBuilder.setHostname("my-updated-host");
+    Node updatedNode = createNode(node.getId(),node.getClusterId(), node.getServices(), propertiesBuilder.build());
+    String updatedNodeJsonString = getNodeAsJsonString(updatedNode);
+    HttpResponse response = doPut("/v1/loom/nodes/" + node.getId(), updatedNodeJsonString, USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.NO_CONTENT);
-    // test to see that it has been updated
+    Node updatedNodeFromServer = convertNodeFromJson(getNode(USER1_HEADERS, updatedNode.getId()));
+    Assert.assertEquals(node.getId(), updatedNodeFromServer.getId());
+    Assert.assertNotEquals(node.getProperties(), updatedNodeFromServer.getProperties());
   }
 
   private List<JsonObject> getNodes(final Header[] headers) throws Exception {
     HttpResponse response = doGet("/v1/loom/nodes", headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     return getJsonListFromResponse(response);
+  }
+
+  private JsonObject getNode(final Header[] headers, final String nodeId) throws Exception {
+    HttpResponse response = doGet("/v1/loom/nodes/" + nodeId, headers);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    return getJsonObjectFromResponse(response);
   }
 
   private List<Node> postNodes(int numberOfNodes, Header[] headers) throws Exception {
@@ -126,7 +147,15 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
     return createdNodes;
   }
 
+  private Node createNode(String id, String clusterId, Set<Service> services, NodeProperties nodeProperties) {
+    return new Node(id, clusterId, services, nodeProperties);
+  }
+
   private Node createNode(String id) {
-    return new Node(id, "1234", new HashSet<Service>() {}, NodeProperties.builder().build());
+    return createNode(id, "1234", new HashSet<Service>(){}, NodeProperties.builder().build());
+  }
+
+  private Node convertNodeFromJson(JsonObject jsonNode) {
+    return gson.fromJson(jsonNode, Node.class);
   }
 }
