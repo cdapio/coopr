@@ -2,6 +2,15 @@
   "name": "centos6",
   "description": "CentOS 6",
   "providermap": {
+    "aws-us-east-1": {
+      "image": "ami-eb6b0182"
+    },
+    "aws-us-west-1": {
+      "image": "ami-b9341afc"
+    },
+    "aws-us-west-2": {
+      "image": "ami-b158c981"
+    },
     "joyent": {
       "image": "19daa264-c4c4-11e3-bec3-c30e2c0d4ec0"
     },

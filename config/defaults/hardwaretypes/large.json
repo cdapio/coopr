@@ -2,6 +2,15 @@
   "name": "large",
   "description": "4+ vCPU, 8 GB RAM, 240+ GB Disk",
   "providermap": {
+    "aws-us-east-1": {
+      "flavor": "m1.large"
+    },
+    "aws-us-west-1": {
+      "flavor": "m1.large"
+    },
+    "aws-us-west-2": {
+      "flavor": "m1.large"
+    },
     "joyent": {
       "flavor": "Large 8GB"
     },

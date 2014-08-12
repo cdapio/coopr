@@ -9,7 +9,7 @@
             "format": "archive"
         },
         "roles": {
-            "format": "archive"
+            "format": "file"
         }
     },
     "parameters": {

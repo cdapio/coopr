@@ -68,8 +68,8 @@ module Loom
     end
 
     def sync
+      @sync_requests = 0
       @resourcemanager.sync
-      @sync_requests -= 1
     end
 
     def resume

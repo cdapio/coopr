@@ -8,7 +8,7 @@
         "archives": {
             "format": "archive"
         }
-    }
+    },
     "parameters": {
         "admin": {
             "fields": {

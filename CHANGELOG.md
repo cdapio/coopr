@@ -3,6 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- AWS provider support ( Issues: #22 #322 )
 - MongoDB support for clusters ( Issues: #43 #130 )
 - Remove 'ALL RIGHTS RESERVED' footer ( Issues: #123 #340 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
@@ -23,6 +24,7 @@ Unreleased
 - Settable max for clusters and nodes in a tenant ( Issues: #302 )
 - Bootstrap a tenant ( Issues: #304 )
 - Larger HW: xlarge, xxlarge ( Issues: #312 #346 )
+- SSH hangs on some providers ( Issues: #313 #351 )
 - Allow non-root users for SSH ( Issues: #314 #320 )
 - PHP module support ( Issues: #317 )
 - Standalone build updates for multitenancy ( Issues #349 )
