@@ -62,7 +62,7 @@
                   <span class="icon-bar"></span>
                 </button>
                 <div class="navbar-brand" href="#">
-                  <a href="{% if authenticated === 'admin' %}/{% else %}/user/clusters{% endif %}" id="logo"></a>
+                  <a href="{% if authenticated.id === 'admin' %}/{% else %}/user/clusters{% endif %}" id="logo"></a>
                 </div>
               </div>
               <div class="navbar-collapse collapse">
