@@ -50,7 +50,7 @@ class FogProviderRackspace < Provider
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
-      @result['result']['ssh-auth']['user'] = @task['config']['ssh-user'] || 'root'
+      @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
       @result['result']['ssh-auth']['identityfile'] = @rackspace_keyfile unless @rackspace_keyfile.nil?
       @result['status'] = 0
