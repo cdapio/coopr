@@ -38,7 +38,7 @@ public class NodeProperties {
   // TODO: remove flavor, image, sshUser when hardware/image type switches to the objects instead of names
   private final String flavor;
   private final String image;
-  private final String sshUser;
+  private final String sshuser;
   // list of service names
   private final Set<String> services;
   // list of automators that could be used on the node
@@ -53,7 +53,7 @@ public class NodeProperties {
     this.flavor = flavor;
     this.image = image;
     this.nodenum = nodenum;
-    this.sshUser = sshUser == null ? "root" : sshUser;
+    this.sshuser = sshUser == null ? "root" : sshUser;
     this.automators = automators == null ? ImmutableSet.<String>of() : ImmutableSet.copyOf(automators);
     this.services = services == null ? ImmutableSet.<String>of() : ImmutableSet.copyOf(services);
   }
@@ -128,7 +128,7 @@ public class NodeProperties {
    * @return User the provisioner will use to ssh in to the node.
    */
   public String getSshUser() {
-    return sshUser;
+    return sshuser;
   }
 
   /**
@@ -271,7 +271,7 @@ public class NodeProperties {
       Objects.equal(imagetype, that.imagetype) &&
       Objects.equal(flavor, that.flavor) &&
       Objects.equal(image, that.image) &&
-      Objects.equal(sshUser, that.sshUser) &&
+      Objects.equal(sshuser, that.sshuser) &&
       Objects.equal(services, that.services) &&
       Objects.equal(automators, that.automators);
   }
@@ -279,7 +279,7 @@ public class NodeProperties {
   @Override
   public int hashCode() {
     return Objects.hashCode(hostname, ipaddress, nodenum, hardwaretype, imagetype,
-                            flavor, image, sshUser, services, automators);
+                            flavor, image, sshuser, services, automators);
   }
 
   @Override
@@ -292,7 +292,7 @@ public class NodeProperties {
       .add("imagetype", imagetype)
       .add("flavor", flavor)
       .add("image", image)
-      .add("sshUser", sshUser)
+      .add("sshuser", sshuser)
       .add("services", services)
       .add("automators", automators)
       .toString();
