@@ -21,6 +21,7 @@ To learn more about Continuuity Loom, here are the resources available:
 ## Building Source
 
 **Backend Java Server**
+
 _Prerequisites_
   * [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
     * Set JAVA_HOME environment variable
@@ -28,6 +29,7 @@ _Prerequisites_
     * brew install maven (Mac OSX)
 
 **Provisioner**
+
 _Prerequisites_
   * [Ruby](https://www.ruby-lang.org/en/downloads/) 
     * [rbenv](https://github.com/sstephenson/rbenv/releases)
@@ -39,6 +41,7 @@ _Build_
   * `bundler install`
 
 **NodeJS - Front end server**
+
 _Prerequisites_
   * [Node Package Manager](http://nodejs.org/download/)
     * brew install node (Mac OSX)
@@ -49,16 +52,21 @@ _Build_
 
 ## Running Source
 **Backend Java Server**
+
 _Prerequisites_
 
 **Provisioner**
+
 _Prerequisites_
   
 **NodeJS - Front end server**
+
 _Prerequisites_
-  * kj
+  
 
 ## Run in IntelliJ
+
+TODO
 
 ## Contributing to Continuuity Loom
 
