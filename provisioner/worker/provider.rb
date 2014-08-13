@@ -20,7 +20,7 @@
 class Provider
   attr_accessor :task, :flavor, :image, :hostname, :providerid, :result
   attr_reader :env
-  def initialize(task, env)
+  def initialize(env, task)
     @task = task
     @env = env
     @result = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
