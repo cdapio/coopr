@@ -170,13 +170,11 @@ public class MockWorker extends AbstractScheduledService {
       JsonObject result = new JsonObject();
       result.addProperty(RandomStringUtils.randomAlphanumeric(4), RandomStringUtils.randomAlphanumeric(8));
       if (action == ProvisionerAction.CONFIRM) {
-        String ip = Joiner.on('.').join(
-          RandomStringUtils.randomNumeric(3),
-          RandomStringUtils.randomNumeric(3),
-          RandomStringUtils.randomNumeric(3),
-          RandomStringUtils.randomNumeric(3));
-        result.addProperty("ipaddress", ip);
-        LOG.debug("adding ip {}.", ip);
+        JsonObject ips = new JsonObject();
+        ips.addProperty("access_v4", randomIP());
+        ips.addProperty("bind_v4", randomIP());
+        body.add("ipaddresses", ips);
+        LOG.debug("adding ips {}.", ips);
       }
       body.add("result", result);
 
@@ -205,5 +203,13 @@ public class MockWorker extends AbstractScheduledService {
     } finally {
       reader.close();
     }
+  }
+
+  private String randomIP() {
+    return Joiner.on('.').join(
+      RandomStringUtils.randomNumeric(3),
+      RandomStringUtils.randomNumeric(3),
+      RandomStringUtils.randomNumeric(3),
+      RandomStringUtils.randomNumeric(3));
   }
 }

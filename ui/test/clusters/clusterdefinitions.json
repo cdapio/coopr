@@ -379,7 +379,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -803,7 +805,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -1167,7 +1171,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -1454,7 +1460,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -1741,7 +1749,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2138,7 +2148,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2250,7 +2262,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2362,7 +2376,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2474,7 +2490,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2611,7 +2629,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2769,7 +2789,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -2921,7 +2943,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -3047,7 +3071,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -3184,7 +3210,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {
@@ -3492,7 +3520,9 @@
                     "user": "root",
                     "password": "12345"
                 },
-                "ipaddress": "1.2.3.4"
+                "ipaddresses": {
+                    "access_v4": "1.2.3.4"
+                }
             },
             "actions": [
                 {

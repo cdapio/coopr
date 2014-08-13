@@ -132,7 +132,7 @@ public class ClustersInstanceTest extends GenericTest {
       JsonObject properties = jsonArray.get(i).getAsJsonObject().getAsJsonObject("properties");
       String hostname = properties.get("hostname").getAsString();
       String id = cluster.getAsJsonArray("nodes").get(i).getAsJsonObject().get("id").getAsString();
-      String ip = properties.get("ipaddress").getAsString();
+      String ip = properties.get("ipaddresses").getAsJsonObject().get("access_v4").getAsString();
       String username = properties.getAsJsonObject("ssh-auth").get("user").getAsString();
       String password = properties.getAsJsonObject("ssh-auth").get("password").getAsString();
       Set<TestNode.Action> actions = getExpectedActions(jsonArray.get(i).getAsJsonObject());

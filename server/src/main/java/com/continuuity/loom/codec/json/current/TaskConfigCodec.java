@@ -44,7 +44,7 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
     jsonObj.add("cluster", taskConfig.getClusterConfig());
     jsonObj.add("service", context.serialize(taskConfig.getTaskServiceAction(), TaskServiceAction.class));
     jsonObj.addProperty("hostname", taskConfig.getNodeProperties().getHostname());
-    jsonObj.addProperty("ipaddress", taskConfig.getNodeProperties().getIpaddress());
+    jsonObj.add("ipaddresses", context.serialize(taskConfig.getNodeProperties().getIPAddresses()));
     jsonObj.addProperty("nodenum", taskConfig.getNodeProperties().getNodenum());
     jsonObj.addProperty("sshuser", taskConfig.getNodeProperties().getSshUser());
     // these should be changed to be the full object instead of the name
@@ -82,7 +82,8 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
     TaskServiceAction taskServiceAction = context.deserialize(jsonObj.remove("service"), TaskServiceAction.class);
     // build node properties
     String hostname = context.deserialize(jsonObj.remove("hostname"), String.class);
-    String ipaddress = context.deserialize(jsonObj.remove("ipaddress"), String.class);
+    Map<String, String> ipaddresses = context.deserialize(jsonObj.remove("ipaddresses"),
+                                                          new TypeToken<Map<String, String>>() {}.getType());
     String imagetype = context.deserialize(jsonObj.remove("imagetype"), String.class);
     String hardwaretype = context.deserialize(jsonObj.remove("hardwaretype"), String.class);
     String flavor = context.deserialize(jsonObj.remove("flavor"), String.class);
@@ -95,7 +96,7 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
       context.deserialize(jsonObj.remove("automators"), new TypeToken<Set<String>>() {}.getType());
     NodeProperties nodeProperties = NodeProperties.builder()
       .setHostname(hostname)
-      .setIpaddress(ipaddress)
+      .setIPAddresses(ipaddresses)
       .setNodenum(nodeNum)
       .setHardwaretype(hardwaretype)
       .setImagetype(imagetype)

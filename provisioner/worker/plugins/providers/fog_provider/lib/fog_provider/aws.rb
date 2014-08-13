@@ -103,7 +103,6 @@ class FogProviderAWS < Provider
       log.debug "Server #{server.id} sshd is up"
 
       # Process results
-      @result['result']['ipaddress'] = bootstrap_ip
       @result['ipaddresses'] = {
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
@@ -127,8 +126,8 @@ class FogProviderAWS < Provider
       log.error 'Timeout waiting for the server to be created'
       @result['stderr'] = 'Timed out waiting for server to be created'
     rescue Net::SSH::AuthenticationFailed => e
-      log.error("SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}")
-      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}: #{e.inspect}"
+      log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
+      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue Exception => e
       log.error('Unexpected Error Occurred in FogProviderAWS.confirm:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderAWS.confirm: #{e.inspect}"
