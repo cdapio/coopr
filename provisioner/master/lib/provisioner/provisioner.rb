@@ -48,6 +48,7 @@ module Loom
       host = Socket.gethostname.downcase
       @provisioner_id = "#{host}.#{pid}"
       log.info "provisioner #{@provisioner_id} initialized"
+      @registered = false
     end
 
     # invoked from bin/provisioner
@@ -80,6 +81,7 @@ module Loom
     # main run block
     def run
       begin
+        @status = 'STARTING'
         Thread.abort_on_exception = true
         # start the api server
         spawn_sinatra_thread
@@ -91,6 +93,8 @@ module Loom
         spawn_heartbeat_thread
         spawn_signal_thread
         spawn_resource_thread
+
+        # heartbeat thread will update status to 'OK'
 
         # wait for signal_handler to exit in response to signals
         @signal_thread.join
@@ -182,8 +186,8 @@ module Loom
     def spawn_heartbeat_thread
       @heartbeat_thread = Thread.new {
         log.info "starting heartbeat thread"
-        register_with_server
         loop {
+          register_with_server unless @registered
           uri = "#{@server_uri}/v1/provisioners/#{provisioner_id}/heartbeat"
           begin
             json = heartbeat.to_json
@@ -238,6 +242,9 @@ module Loom
         resp = RestClient.put("#{uri}", data.to_json, :'X-Loom-UserID' => "admin")
         if(resp.code == 200)
           log.info "Successfully registered"
+          @registered = true
+          # announce provisioner is ready
+          @status = 'OK'
         else
           log.warn "Response code #{resp.code}, #{resp.to_str} when registering with loom server #{uri}"
         end
@@ -330,6 +337,11 @@ module Loom
         hb['usage'][id] = tm.num_workers
       end
       hb
+    end
+
+    # get current status
+    def status
+      @status ||= 'UNKNOWN'
     end
 
     # determine ip to register with server from routing info

@@ -35,7 +35,7 @@ module Loom
       set :environment, :production
 
       get '/status' do
-        body 'OK'
+        body settings.provisioner.status
       end
 
       get '/heartbeat' do
