@@ -6,4 +6,9 @@
     <name>server.local.data.dir</name>
     <value>LOOM_DATA_DIR</value>
   </property>
+  <property>
+    <name>server.plugin.store.localfilestore.data.dir</name>
+    <value>LOOM_DATA_DIR/plugins/resources</value>
+  </property>
+
 </configuration>
