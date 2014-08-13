@@ -46,7 +46,7 @@ class ShellAutomator < Automator
       log.debug "Generating #{@scripts_tar} from #{@scripts_dir}"
       scripts_tar_path = File.dirname(@scripts_dir)
       scripts_parent_dir = File.basename(@scripts_dir)
-      `tar -czf "#{@scripts_tar}.new" -C "#{scripts_tar_path}" #{scripts_parent_dir}`
+      `tar -cLzf "#{@scripts_tar}.new" -C "#{scripts_tar_path}" #{scripts_parent_dir}`
       `mv "#{@scripts_tar}.new" "#{@scripts_tar}"`
       log.debug "Generation complete: #{@scripts_tar}"
     end
