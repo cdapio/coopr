@@ -26,7 +26,7 @@ class ChefSoloAutomator < Automator
     super(env, task)
     work_dir = @env[:work_dir]
     tenant = @env[:tenant]
-    @chef_primitives_path = %W[ #{work_dir} #{tenant} automatortypes chef-solo ].join('/')
+    @chef_primitives_path = %W( #{work_dir} #{tenant} automatortypes chef-solo ).join('/')
     @remote_cache_dir = "/var/cache/loom"
     @remote_chef_dir = "/var/chef"
   end
