@@ -66,6 +66,7 @@ export PID_DIR=/var/tmp
 export LOOM_HOME=$APP_HOME
 export LOOM_SERVER_HOME=$APP_HOME/server
 export LOOM_SERVER_CONF=$LOOM_HOME/server/conf/
+export LOOM_PROVISIONER_CONF=$LOOM_HOME/provisioner/master/conf
 export LOOM_LOG_DIR=$LOOM_HOME/logs
 export LOOM_DATA_DIR=$LOOM_HOME/data
 
@@ -81,6 +82,7 @@ mkdir -p $LOOM_LOG_DIR || die "Could not create dir $LOOM_LOG_DIR: $!"
 mkdir -p $LOOM_DATA_DIR || die "Could not create dir $LOOM_DATA_DIR: $!"
 SED_LOOM_DATA_DIR=`echo $LOOM_DATA_DIR | sed 's:/:\\\/:g'`
 sed -i.old "s/LOOM_DATA_DIR/$SED_LOOM_DATA_DIR/g" $LOOM_SERVER_CONF/loom-site.xml
+sed -i.old "s/LOOM_DATA_DIR/$SED_LOOM_DATA_DIR/g" $LOOM_PROVISIONER_CONF/provisioner-site.xml
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
