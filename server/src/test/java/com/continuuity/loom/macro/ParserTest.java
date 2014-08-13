@@ -16,6 +16,7 @@
 package com.continuuity.loom.macro;
 
 import com.continuuity.loom.macro.eval.HostServiceEvaluator;
+import com.continuuity.loom.macro.eval.IPSelfEvaluator;
 import com.continuuity.loom.macro.eval.IPServiceEvaluator;
 import com.continuuity.loom.macro.eval.ServiceCardinalityEvaluator;
 import com.continuuity.loom.macro.eval.ServiceInstanceEvaluator;
@@ -37,6 +38,12 @@ public class ParserTest {
                  new Parser("ip.access_v4.service.namenode").parse());
     assertEquals(new Expression(new IPServiceEvaluator("a-b-c", "bind_v4", null), null, null),
                  new Parser("ip.bind_v4.service.a-b-c").parse());
+    assertEquals(new Expression(new IPSelfEvaluator("access_v4"), null, null),
+                 new Parser("ip.access_v4.self").parse());
+    assertEquals(new Expression(new IPSelfEvaluator("bind_v4"), null, null),
+                 new Parser("ip.self").parse());
+    assertEquals(new Expression(new IPServiceEvaluator("a-b-c", "bind_v4", null), null, null),
+                 new Parser("ip.service.a-b-c").parse());
     assertEquals(new Expression(new IPServiceEvaluator("a.b.c", "external", null), null, null),
                  new Parser("ip.external.service.a.b.c").parse());
     assertEquals(new Expression(new IPServiceEvaluator("a_b_c", "internal", null), null, null),
