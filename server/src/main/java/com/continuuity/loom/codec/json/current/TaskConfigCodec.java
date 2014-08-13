@@ -46,7 +46,7 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
     jsonObj.addProperty("hostname", taskConfig.getNodeProperties().getHostname());
     jsonObj.add("ipaddresses", context.serialize(taskConfig.getNodeProperties().getIPAddresses()));
     jsonObj.addProperty("nodenum", taskConfig.getNodeProperties().getNodenum());
-    jsonObj.addProperty("ssh-user", taskConfig.getNodeProperties().getSshUser());
+    jsonObj.addProperty("sshuser", taskConfig.getNodeProperties().getSshUser());
     // these should be changed to be the full object instead of the name
     jsonObj.add("hardwaretype", context.serialize(taskConfig.getNodeProperties().getHardwaretype(), String.class));
     jsonObj.add("imagetype", context.serialize(taskConfig.getNodeProperties().getImagetype(), String.class));
@@ -88,7 +88,7 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
     String hardwaretype = context.deserialize(jsonObj.remove("hardwaretype"), String.class);
     String flavor = context.deserialize(jsonObj.remove("flavor"), String.class);
     String image = context.deserialize(jsonObj.remove("image"), String.class);
-    String sshUser = context.deserialize(jsonObj.remove("ssh-user"), String.class);
+    String sshUser = context.deserialize(jsonObj.remove("sshuser"), String.class);
     Integer nodeNum = context.deserialize(jsonObj.remove("nodenum"), Integer.class);
     Set<String> serviceNames =
       context.deserialize(jsonObj.remove("services"), new TypeToken<Set<String>>() {}.getType());
