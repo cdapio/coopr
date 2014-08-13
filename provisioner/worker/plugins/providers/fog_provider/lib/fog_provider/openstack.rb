@@ -46,7 +46,7 @@ class FogProviderOpenstack < Provider
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
-      @result['result']['ssh-auth']['user'] = 'root'
+      @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
       @result['result']['ssh-auth']['identityfile'] = @openstack_keyfile unless @openstack_keyfile.nil?
       @result['status'] = 0
@@ -88,11 +88,14 @@ class FogProviderOpenstack < Provider
       log.debug "Server #{server.name} sshd is up"
 
       # Process results
-      @result['result']['ipaddress'] = bootstrap_ip
+      @result['ipaddresses'] = {
+        'access_v4' => bootstrap_ip,
+        'bind_v4' => bootstrap_ip
+      }
       # Additional checks
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
-      Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+      Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         # Backwards-compatibility... ssh_exec! takes 2 arguments prior to 0.9.8
         ssho = method(:ssh_exec!)
         if ssho.arity == 2
@@ -108,8 +111,8 @@ class FogProviderOpenstack < Provider
       log.error 'Timeout waiting for the server to be created'
       @result['stderr'] = 'Timed out waiting for server to be created'
     rescue Net::SSH::AuthenticationFailed => e
-      log.error("SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}")
-      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}: #{e.inspect}"
+      log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
+      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue Exception => e
       log.error('Unexpected Error Occurred in FogProviderOpenstack.confirm:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.confirm: #{e.inspect}"

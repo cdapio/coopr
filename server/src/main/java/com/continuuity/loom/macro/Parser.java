@@ -16,6 +16,8 @@
 package com.continuuity.loom.macro;
 
 import com.continuuity.loom.common.utils.ImmutablePair;
+import com.continuuity.loom.macro.eval.Evaluator;
+import com.continuuity.loom.macro.eval.Evaluators;
 
 /**
  * Parses a macro expression. Syntax:
@@ -67,8 +69,8 @@ public class Parser {
     if (macro == null) {
       throw new SyntaxException("A macro name must be present.");
     }
-    ImmutablePair<Expression.Type, String> pair = Expression.typeAndNameOf(macro);
-    return new Expression(pair.getFirst(), pair.getSecond(), format, separator, instanceNum);
+    Evaluator evaluator = Evaluators.evaluatorFor(macro, instanceNum);
+    return new Expression(evaluator, format, separator);
   }
 
   /**

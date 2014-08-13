@@ -50,7 +50,7 @@ class FogProviderRackspace < Provider
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
-      @result['result']['ssh-auth']['user'] = 'root'
+      @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
       @result['result']['ssh-auth']['identityfile'] = @rackspace_keyfile unless @rackspace_keyfile.nil?
       @result['status'] = 0
@@ -96,12 +96,16 @@ class FogProviderRackspace < Provider
       wait_for_sshd(bootstrap_ip, 22)
       log.debug "Server #{server.name} sshd is up"
 
-      @result['result']['ipaddress'] = bootstrap_ip
+      # Process results
+      @result['ipaddresses'] = {
+        'access_v4' => bootstrap_ip,
+        'bind_v4' => bootstrap_ip
+      }
       # do we need sudo bash?
       sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity and Mount data disk
-      Net::SSH.start(@result['result']['ipaddress'], @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+      Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         # Backwards-compatibility... ssh_exec! takes 2 arguments prior to 0.9.8
         ssho = method(:ssh_exec!)
         if ssho.arity == 2
@@ -120,8 +124,8 @@ class FogProviderRackspace < Provider
       log.error 'Timeout waiting for the server to be created'
       @result['stderr'] = 'Timed out waiting for server to be created'
     rescue Net::SSH::AuthenticationFailed => e
-      log.error("SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}")
-      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{@result['result']['ipaddress']}: #{e.inspect}"
+      log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
+      @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue Exception => e
       log.error('Unexpected Error Occurred in FogProviderRackspace.confirm:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderRackspace.confirm: #{e.inspect}"

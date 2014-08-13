@@ -131,13 +131,12 @@ public class ClustersInstanceTest extends GenericTest {
 
   private Set<TestNode> getExpectedTestNodes() {
     Set<TestNode> idTestNodes = Sets.newHashSet();
-    List<Node> nodes = GSON.fromJson(cluster.get("nodes"), new TypeToken<List<Node>>() {
-    }.getType());
+    List<Node> nodes = GSON.fromJson(cluster.get("nodes"), new TypeToken<List<Node>>() {}.getType());
 
     for (Node node : nodes) {
       String hostname = node.getProperties().getHostname();
       String id = node.getId();
-      String ip = node.getProperties().getIpaddress();
+      String ip = node.getProperties().getIPAddress("access_v4");
       JsonObject provisionerResults = node.getProvisionerResults();
       String username = provisionerResults.getAsJsonObject("ssh-auth").get("user").getAsString();
       String password = provisionerResults.getAsJsonObject("ssh-auth").get("password").getAsString();

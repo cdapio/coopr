@@ -41,12 +41,18 @@ specific service. The basic macros available are:
 
   %host.service.<service name>%
   %ip.service.<service name>%
+  %ip.<ip type>.service.<service name>%
   %num.service.<service name>%
   %cluster.owner%
 
 Basic macros return a comma separated list of the specified entity for all nodes that contain the specified service.
 For example, '%host.service.datanode%' will be replaced with a comma separated list of all nodes in the cluster that
-have the datanode service. '%cluster.owner%' will be replaced with the owner of the cluster.
+have the datanode service. '%cluster.owner%' will be replaced with the owner of the cluster. Since there can be multiple
+types of IP addresses for a single node, IP macros support specifying the type of macro,  
+which is either 'access_v4' or 'bind_v4'. The 'access_v4' IP address is the address used
+to connect to the node from the outside world, whereas 'bind_v4' is the address services on the node should bind to. 
+In most cases, configuration will use the bind_v4 address, so if no IP address type is given, the bind_v4 address
+will be used.
 
 Basic Macro Instances
 =====================
@@ -58,6 +64,7 @@ macro instances:
   %instance.self.service.<service name>%
   %host.service.<service name>[instance number]%
   %ip.service.<service name>[instance number]%
+  %ip.<ip type>.service.<service name>[instance number]%
 
 Instead of returning a comma separated list of hosts or ips, an instance macro returns a single value corresponding
 to the entity of a single node that contains the specified service. For example, '%host.service.zookeeper[0]%' gets

@@ -27,6 +27,7 @@ Unreleased
 - SSH hangs on some providers ( Issues: #313 #351 )
 - Allow non-root users for SSH ( Issues: #314 #320 )
 - PHP module support ( Issues: #317 )
+- Support for multiple IP addresses ( Issues: #343 #347 )
 - Standalone build updates for multitenancy ( Issues #349 )
 
 v0.9.7 (May 27, 2014)
