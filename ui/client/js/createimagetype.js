@@ -54,10 +54,8 @@ define([], function () {
             sshuser: entry.find("[name=inputSshuser]").val(),
           };
         }
-      })
-      for (var i = 0; i < providerEntries.length; i++) {
+      });
 
-      }
       Helpers.submitPost(e, postJson, '/imagetypes');
     }
 
