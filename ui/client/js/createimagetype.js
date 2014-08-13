@@ -43,12 +43,20 @@ define([], function () {
         description: $("#inputDescription").val(),
         providermap: {}
       };
-      var providerEntries = $(".provider-entry");
-      for (var i = 0; i < providerEntries.length; i++) {
-        if ($(providerEntries[i]).find("[name=inputImage]").val()) {
-          postJson.providermap[$(providerEntries[i]).find("[name=inputProvider]").val()] = 
-            { image: $(providerEntries[i]).find("[name=inputImage]").val()}
+
+      $(".provider-entry").each(function() {
+        var entry = $(this),
+            image = entry.find("[name=inputImage]").val(),
+            provider = entry.find("[name=inputProvider]").val();
+        if (image && provider) {
+          postJson.providermap[provider] = { 
+            image: image,
+            sshuser: entry.find("[name=inputSshuser]").val(),
+          };
         }
+      })
+      for (var i = 0; i < providerEntries.length; i++) {
+
       }
       Helpers.submitPost(e, postJson, '/imagetypes');
     }
