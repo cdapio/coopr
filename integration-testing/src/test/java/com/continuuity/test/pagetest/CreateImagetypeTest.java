@@ -57,11 +57,11 @@ public class CreateImagetypeTest extends GenericTest {
 
     List<WebElement> providerEntries = globalDriver.findElements(By.cssSelector(".provider-entry"));
     providerEntries.get(0).findElement(By.cssSelector("select")).sendKeys("joyent");
-    providerEntries.get(0).findElement(By.cssSelector("input")).sendKeys(
+    providerEntries.get(0).findElement(By.cssSelector("input[name=inputImage]")).sendKeys(
       imageType.getProviderMap().get("joyent").get("image"));
 
     providerEntries.get(1).findElement(By.cssSelector("select")).sendKeys("rackspace");
-    providerEntries.get(1).findElement(By.cssSelector("input")).sendKeys(
+    providerEntries.get(1).findElement(By.cssSelector("input[name=inputImage]")).sendKeys(
       imageType.getProviderMap().get("rackspace").get("image"));
 
     globalDriver.findElement(By.cssSelector("#create-imagetype-form")).submit();
