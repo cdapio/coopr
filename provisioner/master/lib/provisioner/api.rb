@@ -16,19 +16,19 @@
 # limitations under the License.
 #
 
-
 require 'thin'
 require 'sinatra/base'
 require 'json'
 require 'rest_client'
 
-require_relative 'tenantmanager'
+require_relative 'tenantspec'
 require_relative 'provisioner'
 require_relative 'cli'
 require_relative 'logging'
 
 module Loom
   class Provisioner
+    # class to define provisioner API
     class Api < Sinatra::Base
       include Logging
 
@@ -40,16 +40,15 @@ module Loom
 
       get '/heartbeat' do
         begin
-          log.info "heartbeat called"
           settings.provisioner.heartbeat.to_json
         rescue
           halt 500
         end
       end
 
-      post "/v1/tenants" do
+      post "/#{PROVISIONER_API_VERSION}/tenants" do
         begin
-          log.info "adding tenant"
+          log.info 'adding tenant'
           data = JSON.parse request.body.read
           id = data['id']
           workers = data['workers']
@@ -57,9 +56,8 @@ module Loom
           plugins = data['plugins'] || nil
 
           ts = TenantSpec.new(id, workers, resources, plugins)
-          tm = TenantManager.new(ts)
 
-          settings.provisioner.add_tenant(tm)
+          settings.provisioner.add_tenant(ts)
 
           data['status'] = 0
           body data.to_json
@@ -68,7 +66,7 @@ module Loom
         end
       end
 
-      put "/v1/tenants/:t_id" do
+      put "/#{PROVISIONER_API_VERSION}/tenants/:t_id" do
         begin
           log.info "adding/updating tenant id: #{params[:t_id]}"
           data = JSON.parse request.body.read
@@ -80,9 +78,8 @@ module Loom
           log.debug "requesting plugins: #{plugins}"
 
           ts = TenantSpec.new(params[:t_id], workers, resources, plugins)
-          tm = TenantManager.new(ts)
 
-          settings.provisioner.add_tenant(tm)
+          settings.provisioner.add_tenant(ts)
 
           data['status'] = 0
           body data.to_json
@@ -91,11 +88,11 @@ module Loom
         end
       end
 
-      delete "/v1/tenants/:t_id" do
+      delete "/#{PROVISIONER_API_VERSION}/tenants/:t_id" do
         begin
           if settings.provisioner.tenantmanagers.key?(params[:t_id])
             settings.provisioner.delete_tenant(params[:t_id])
-            body "OK"
+            body 'OK'
           else
             halt 404
           end
@@ -106,4 +103,3 @@ module Loom
     end
   end
 end
-

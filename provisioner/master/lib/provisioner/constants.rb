@@ -31,6 +31,9 @@ module Loom
   PROVISIONER_LOG_ROTATION_SHIFT_SIZE = 'provisioner.log.rotation.shift.size'
   PROVISIONER_LOG_LEVEL = 'provisioner.log.level'
 
+  # api version
+  PROVISIONER_API_VERSION = 'v1'
+
 end
 
 

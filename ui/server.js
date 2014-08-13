@@ -35,8 +35,7 @@ var PORT = argv.port || 8100;
 var CLIENT_ADDR = argv.loomhost || 'http://127.0.0.1:55054';
 var BOX_ADDR = CLIENT_ADDR + '/v1/loom';
 var CLIENT_DIR = env === 'production' ? 'client-built' : 'client';
-// temporary 
-var TENANT = argv.tenant || 'superadmin';
+
 console.info('Environment:', env, BOX_ADDR, CLIENT_DIR);
 
 /**
@@ -193,8 +192,8 @@ site.getEntity = function (path, user) {
       url: BOX_ADDR + path,
       method: 'GET',
       headers: {
-        'X-Loom-UserID': user,
-        'X-Loom-TenantID': TENANT,
+        'X-Loom-UserID': user && user.id,
+        'X-Loom-TenantID': user && user.tenant,
         'X-Loom-ApiKey': DEFAULT_API_KEY
       }
     };
@@ -226,8 +225,8 @@ site.getEntity = function (path, user) {
  */
 site.sendRequestAndHandleResponse = function (options, user, res) {
   options['headers'] = {
-    'X-Loom-UserID': user,
-    'X-Loom-TenantID': TENANT,
+    'X-Loom-UserID': user.id,
+    'X-Loom-TenantID': user.tenant,
     'X-Loom-ApiKey': DEFAULT_API_KEY
   };
   request(options, this.getGenericResponseHandler(res, options.method));
@@ -274,7 +273,7 @@ site.verifyData = function (arr) {
  * !! This is not a secure auth checker and can be easily broken.
  * Mock auth checker to sign each request and redirect the user.
  * @param  {Boolean} admin Admin previlage required.
- * @return {Boolean} Whether user is authenticated.
+ * @return {Object} describing authenticated user.
  */
 site.checkAuth = function (req, res, admin) {
   var authenticated = site.COOKIE_NAME in req.cookies;
@@ -287,13 +286,16 @@ site.checkAuth = function (req, res, admin) {
     res.redirect('/login');
     return;
   }
-  var user = auth.user;
+  var userid = auth.user;
   if (admin) {
-    if (user !== 'admin') {
+    if (userid !== 'admin') {
       res.redirect('/login');
     }
   }
-  return user;
+  return {
+    id: userid,
+    tenant: auth.tenant || 'superadmin'
+  };
 };
 
 /**
@@ -426,8 +428,8 @@ site.app.post('/import', function (req, res) {
             url: BOX_ADDR + '/import',
             method: 'POST',
             headers: {
-              'X-Loom-UserID': user,
-              'X-Loom-TenantID': TENANT,
+              'X-Loom-UserID': user.id,
+              'X-Loom-TenantID': user.tenant,
               'X-Loom-ApiKey': DEFAULT_API_KEY
             },
             json: config
@@ -455,8 +457,8 @@ site.app.get('/export', function (req, res) {
     url: BOX_ADDR + '/export',
     method: 'GET',
     headers: {
-      'X-Loom-UserID': user,
-      'X-Loom-TenantID': TENANT,
+      'X-Loom-UserID': user.id,
+      'X-Loom-TenantID': user.tenant,
       'X-Loom-ApiKey': DEFAULT_API_KEY
     }
   };
@@ -1285,12 +1287,13 @@ site.app.post('/login', function (req, res) {
     return;
   }
   var selectedSkin = site.DEFAULT_SKIN;
+  var tenant = req.body.tenant;
   var options = {
     url: BOX_ADDR + '/profiles/' + user,
     method: 'GET',
     headers: {
       'X-Loom-UserID': user,
-      'X-Loom-TenantID': TENANT,
+      'X-Loom-TenantID': tenant,
       'X-Loom-ApiKey': DEFAULT_API_KEY
     }
   };
@@ -1305,6 +1308,7 @@ site.app.post('/login', function (req, res) {
       var permissionLevel = site.determinePermissionLevel(user, password);
       res.cookie(site.COOKIE_NAME, { 
         user: user,
+        tenant: tenant,
         permission: permissionLevel,
         skin: selectedSkin
       });

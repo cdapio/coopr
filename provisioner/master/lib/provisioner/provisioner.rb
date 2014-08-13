@@ -16,7 +16,6 @@
 # limitations under the License.
 #
 
-
 require 'thin'
 require 'sinatra/base'
 require 'json'
@@ -33,6 +32,7 @@ require_relative 'config'
 require_relative 'constants'
 
 module Loom
+  # top-level class for provisioner
   class Provisioner
     include Logging
 
@@ -53,7 +53,6 @@ module Loom
 
     # invoked from bin/provisioner
     def self.run(options)
-
       # read configuration
       config = Config.new(options)
       config.load
@@ -63,7 +62,7 @@ module Loom
       Logging.level = config.get(PROVISIONER_LOG_LEVEL)
       Logging.shift_age = config.get(PROVISIONER_LOG_ROTATION_SHIFT_AGE)
       Logging.shift_size = config.get(PROVISIONER_LOG_ROTATION_SHIFT_SIZE)
-      Logging.log.debug "Provisioner starting up"
+      Logging.log.debug 'Provisioner starting up'
       config.properties.each do |k, v|
         Logging.log.debug "  #{k}: #{v}"
       end
@@ -81,29 +80,49 @@ module Loom
 
     # main run block
     def run
-      @status = 'STARTING'
-      # start the api server
-      spawn_sinatra_thread
-      # wait for sinatra to fully initialize
-      sleep 1 until Api.running?
-      # register our own signal handlers
-      setup_signal_traps
-      # spawn the heartbeat thread
-      spawn_heartbeat_thread
-      # spawn the signal handler thread
-      spawn_signal_thread
+      begin
+        @status = 'STARTING'
+        Thread.abort_on_exception = true
+        # start the api server
+        spawn_sinatra_thread
+        # wait for sinatra to fully initialize
+        sleep 1 until Api.running?
+        # register our own signal handlers
+        setup_signal_traps
+        # spawn the heartbeat, signal-handler, and resource threads
+        spawn_heartbeat_thread
+        spawn_signal_thread
+        spawn_resource_thread
 
-      # heartbeat thread will update status to 'OK'
+        # heartbeat thread will update status to 'OK'
 
-      # wait for signal_handler to exit in response to signals
-      @signal_thread.join
-      # kill the other threads
-      @heartbeat_thread.kill
-      @sinatra_thread.kill
-      @heartbeat_thread.join
-      @sinatra_thread.join
-      log.info "provisioner gracefully shut down"
-      exit
+        # wait for signal_handler to exit in response to signals
+        @signal_thread.join
+        # kill the other threads
+        [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|
+          t.kill
+          t.join
+        end
+        log.info "provisioner gracefully shut down"
+        exit
+      rescue RuntimeError => e
+        log.error "Exception raised in thread: #{e.inspect}, shutting down..."
+        # if signal_handler thread alive, use it to shutdown gracefully
+        if @signal_thread.alive?
+          Process.kill('TERM', 0)
+          @signal_thread.join
+          [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|
+            t.kill if t.alive?
+          end
+          log.info "provisioner forced graceful shutdown"
+          exit 1
+        else
+          # last resort, kill entire process group
+          Process.kill('TERM', -Process.getpgrp)
+          log.info "provisioner forced shutdown"
+          exit 1
+        end
+      end
     end
 
     def spawn_sinatra_thread
@@ -118,8 +137,6 @@ module Loom
         # let sinatra take over from here
         Api.run!
       }
-      # surface any exceptions immediately
-      @sinatra_thread.abort_on_exception=true
 
     end
 
@@ -189,8 +206,26 @@ module Loom
           sleep 10
         }
       }
-      # abort on any uncaught exception during registration, etc
-      @heartbeat_thread.abort_on_exception=true
+    end
+
+    def spawn_resource_thread
+      @resource_thread = Thread.new {
+        log.info "starting resource thread"
+        loop {
+          @tenantmanagers.each do |id, tmgr|
+            if tmgr.resource_sync_needed? && tmgr.num_workers == 0
+              # handle stacked sync calls, last one wins
+              while tmgr.resource_sync_needed?
+                log.debug "resource thread invoking sync for tenant #{tmgr.id}"
+                tmgr.sync
+              end
+              log.debug "done syncing tenant #{tmgr.id}, resuming workers"
+              tmgr.resume
+            end
+          end
+          sleep 1
+        }
+      }
     end
 
     def register_with_server
@@ -244,20 +279,16 @@ module Loom
     end
 
     # api method to add or edit tenant
-    def add_tenant(tenantmgr)
-      unless tenantmgr.instance_of?(TenantManager)
-        raise ArgumentError, "only instances of TenantManager can be added to provisioner", caller
+    def add_tenant(tenantspec)
+      unless tenantspec.instance_of?(TenantSpec)
+        raise ArgumentError, "only instances of TenantSpec can be added to provisioner", caller
       end
       # validate input
-      id = tenantmgr.id
+      id = tenantspec.id
       log.debug "Adding/Editing tenant: #{id}"
       fail "cannot add a TenantManager without an id: #{tenantmgr.inspect}" if id.nil?
 
-      # set provisionerId
-      tenantmgr.provisioner_id = @provisioner_id
-
-      # set configuration
-      tenantmgr.config = @config
+      tenantmgr = TenantManager.new(tenantspec, @config, @provisioner_id)
 
       if @tenantmanagers.key? id
         # edit tenant
@@ -266,7 +297,8 @@ module Loom
       else
         # new tenant
         log.debug "Adding new tenant: #{id}"
-        tenantmgr.spawn
+        #tenantmgr.spawn
+        tenantmgr.resource_sync_needed
         @tenantmanagers[id] = tenantmgr
       end
     end
