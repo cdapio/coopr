@@ -14,14 +14,16 @@
    limitations under the License.
 
 =======================
-Administration Guide
+Super Admin Guide
 =======================
 
 .. toctree::
    :maxdepth: 2
 
    overview
-   ../installation/index
-   ui
-   macros
-   plugin-resources
+   server-config
+   tenants
+   callbacks
+   plugins
+   monitoring
+   ../bcp/index
