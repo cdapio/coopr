@@ -23,8 +23,8 @@ class ShellAutomator < Automator
 
   def initialize(env, task)
     super(env, task)
-    work_dir = @env['work_dir']
-    tenant = @env['tenant']
+    work_dir = @env[:work_dir]
+    tenant = @env[:tenant]
     # local and remote top-level script directory name
     @scripts_parent_dir = "scripts"
     # local scripts dir
