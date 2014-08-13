@@ -53,7 +53,7 @@ public class IPServiceEvaluator extends ServiceEvaluator {
           if (serviceName.equals(service.getName())) {
             String ip = clusterNode.getProperties().getIPAddress(ipType);
             if (ip == null) {
-              throw new IncompleteClusterException("node has no ip for macro expansion.");
+              throw new IncompleteClusterException("node " + clusterNode.getId() + " has no ip for macro expansion.");
             }
             output.add(ip);
           }

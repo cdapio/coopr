@@ -18,7 +18,7 @@ package com.continuuity.loom.macro.eval;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.macro.IncompleteClusterException;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Set;
@@ -40,6 +40,6 @@ public class ServiceInstanceEvaluator extends ServiceEvaluator {
     if (instanceNum < 0) {
       return null;
     }
-    return Lists.newArrayList(String.valueOf(instanceNum));
+    return ImmutableList.of(String.valueOf(instanceNum));
   }
 }

@@ -2,8 +2,10 @@ package com.continuuity.loom.http.request;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -34,7 +36,7 @@ public class FinishTaskRequest {
     this.stdout = stdout;
     this.stderr = stderr;
     this.status = status;
-    this.ipaddresses = ipaddresses;
+    this.ipaddresses = ipaddresses == null ? null : Collections.unmodifiableMap(ipaddresses);
     this.result = result == null ? new JsonObject() : result;
   }
 

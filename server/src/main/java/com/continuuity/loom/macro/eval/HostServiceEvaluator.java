@@ -51,7 +51,8 @@ public class HostServiceEvaluator extends ServiceEvaluator {
           if (serviceName.equals(service.getName())) {
             String hostname = clusterNode.getProperties().getHostname();
             if (hostname == null) {
-              throw new IncompleteClusterException("node has no hostname for macro expansion.");
+              throw new IncompleteClusterException("node " + clusterNode.getId() +
+                                                     " has no hostname for macro expansion.");
             }
             output.add(hostname);
           }

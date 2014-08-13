@@ -49,7 +49,7 @@ public class NodeProperties {
   private NodeProperties(String hostname, Map<String, String> ipaddresses, int nodenum, String hardwaretype,
                          String imagetype, String flavor, String image, String sshUser,
                          Set<String> automators, Set<String> services) {
-    this.ipaddresses = ipaddresses;
+    this.ipaddresses = ImmutableMap.copyOf(ipaddresses);
     this.hostname = hostname;
     this.imagetype = imagetype;
     this.hardwaretype = hardwaretype;
@@ -62,9 +62,9 @@ public class NodeProperties {
   }
 
   /**
-   * Get the IP addresses of the node.
+   * Get an immutable mapping of IP type to IP address.
    *
-   * @return IP addresses of the node.
+   * @return Immutable mapping of IP type to IP address.
    */
   public Map<String, String> getIPAddresses() {
     return ipaddresses;
@@ -148,18 +148,18 @@ public class NodeProperties {
   }
 
   /**
-   * Get the names of the automators that can perform actions on the node.
+   * Get an immutable set of the names of the automators that can perform actions on the node.
    *
-   * @return Names of the automators that can perform actions on the node.
+   * @return Immutable set of the names of the automators that can perform actions on the node.
    */
   public Set<String> getAutomators() {
     return automators;
   }
 
   /**
-   * Get the names of the services on the node.
+   * Get an immutable set of the names of the services on the node.
    *
-   * @return Names of the services on the node.
+   * @return Immutable set of the names of the services on the node.
    */
   public Set<String> getServices() {
     return services;
@@ -172,7 +172,6 @@ public class NodeProperties {
    */
   public void setIpaddresses(Map<String, String> ipaddresses) {
     this.ipaddresses = ipaddresses;
-    ImmutableMap.builder();
   }
 
   /**

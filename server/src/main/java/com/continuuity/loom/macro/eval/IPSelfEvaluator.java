@@ -19,6 +19,7 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.macro.IncompleteClusterException;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -38,9 +39,9 @@ public class IPSelfEvaluator implements Evaluator {
   public List<String> evaluate(Cluster cluster, Set<Node> clusterNodes, Node node) throws IncompleteClusterException {
     String ip = node.getProperties().getIPAddress(ipType);
     if (ip == null) {
-      throw new IncompleteClusterException("node has no ip for macro expansion.");
+      throw new IncompleteClusterException("node " + node.getId() + " has no ip for macro expansion.");
     }
-    return Lists.newArrayList(ip);
+    return ImmutableList.of(ip);
   }
 
   @Override
