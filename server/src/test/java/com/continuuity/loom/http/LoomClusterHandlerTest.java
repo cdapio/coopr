@@ -1248,9 +1248,6 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Cluster cluster = clusterStoreService.getView(USER1_ACCOUNT).getCluster(clusterId);
     Assert.assertEquals(Cluster.Status.PENDING, cluster.getStatus());
 
-    if (cluster.getStatus() == Cluster.Status.TERMINATED) {
-      return;
-    }
 
     if (expectedExpireTime == 0) {
       Assert.assertEquals(expectedExpireTime, cluster.getExpireTime());
@@ -1475,7 +1472,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       .setClusterTemplate(Entities.ClusterTemplateExample.HDFS)
       .build();
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    String requestStr = gson.toJson(new ClusterConfigureRequest(new JsonObject(), false));
+    String requestStr = gson.toJson(new ClusterConfigureRequest(null, new JsonObject(), false));
 
     assertResponseStatus(doPut("/clusters/" + cluster.getId() + "/config", "{}", USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
@@ -1503,7 +1500,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       .build();
     cluster.setStatus(Cluster.Status.INCONSISTENT);
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    String requestStr = gson.toJson(new ClusterConfigureRequest(new JsonObject(), false));
+    String requestStr = gson.toJson(new ClusterConfigureRequest(null, new JsonObject(), false));
 
     assertResponseStatus(doPut("/clusters/" + cluster.getId() + "/config", requestStr, USER1_HEADERS),
                          HttpResponseStatus.OK);
@@ -1532,7 +1529,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     JsonObject newConfig = new JsonObject();
     newConfig.addProperty("key2", "val2");
-    ClusterConfigureRequest configRequest = new ClusterConfigureRequest(newConfig, false);
+    ClusterConfigureRequest configRequest = new ClusterConfigureRequest(null, newConfig, false);
     assertResponseStatus(doPut("/clusters/123/config", gson.toJson(configRequest), USER1_HEADERS),
                          HttpResponseStatus.OK);
 
@@ -1664,11 +1661,11 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       .build();
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     // can't add nodemanager without resourcemanager
-    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("nodemanager"));
+    AddServicesRequest body = new AddServicesRequest(null, ImmutableSet.of("nodemanager"));
     assertResponseStatus(doPost("/clusters/123/services", gson.toJson(body), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
     // can't add nonexistant service
-    body = new AddServicesRequest(ImmutableSet.of("fakeservice"));
+    body = new AddServicesRequest(null, ImmutableSet.of("fakeservice"));
     assertResponseStatus(doPost("/clusters/123/services", gson.toJson(body), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
@@ -1684,7 +1681,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       .setStatus(Cluster.Status.ACTIVE)
       .build();
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
+    AddServicesRequest body = new AddServicesRequest(null, ImmutableSet.of("resourcemanager", "nodemanager"));
     assertResponseStatus(doPost("/clusters/1123/services", gson.toJson(body), USER1_HEADERS),
                          HttpResponseStatus.NOT_FOUND);
     assertResponseStatus(doPost("/clusters/123/services", gson.toJson(body), USER2_HEADERS),
@@ -1702,7 +1699,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       .build();
     Set<Cluster.Status> badStatuses = ImmutableSet.of(
       Cluster.Status.INCOMPLETE, Cluster.Status.PENDING, Cluster.Status.TERMINATED, Cluster.Status.INCONSISTENT);
-    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
+    AddServicesRequest body = new AddServicesRequest(null, ImmutableSet.of("resourcemanager", "nodemanager"));
     for (Cluster.Status status : badStatuses) {
       cluster.setStatus(status);
       clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);

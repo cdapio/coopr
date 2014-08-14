@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,8 +33,8 @@ public class ParametersSpecification {
   private final Set<Set<String>> required;
 
   public ParametersSpecification(Map<String, FieldSchema> fields, Set<Set<String>> required) {
-    this.fields = fields == null ? ImmutableMap.<String, FieldSchema>of() : fields;
-    this.required = required == null ? ImmutableSet.<Set<String>>of() : required;
+    this.fields = fields == null ? ImmutableMap.<String, FieldSchema>of() : ImmutableMap.copyOf(fields);
+    this.required = required == null ? ImmutableSet.<Set<String>>of() : ImmutableSet.copyOf(required);
     Set<String> flattenedRequires = Sets.newHashSet();
     for (Set<String> requiredSet : this.required) {
       flattenedRequires.addAll(requiredSet);
@@ -48,22 +47,22 @@ public class ParametersSpecification {
   }
 
   /**
-   * Get the mapping of field name to the {@link FieldSchema} to use for the field.
+   * Get the immutable mapping of field name to the {@link FieldSchema} to use for the field.
    *
-   * @return Mapping of field name to the {@link FieldSchema} to use for the field.
+   * @return Immutable mapping of field name to the {@link FieldSchema} to use for the field.
    */
   public Map<String, FieldSchema> getFields() {
-    return Collections.unmodifiableMap(fields);
+    return fields;
   }
 
   /**
-   * Get the set of required field combinations, one of which must be satisfied. For example, if it contains the sets
-   * {f1, f2} and {f3, f4}, then it means either f1 and f2 must be given, or f3 and f4 must be given.
+   * Get the immutable set of required field combinations, one of which must be satisfied. For example, if it contains
+   * the sets {f1, f2} and {f3, f4}, then it means either f1 and f2 must be given, or f3 and f4 must be given.
    *
-   * @return Set of required field sets.
+   * @return Immutable set of required field sets.
    */
   public Set<Set<String>> getRequiredFields() {
-    return Collections.unmodifiableSet(required);
+    return required;
   }
 
   @Override

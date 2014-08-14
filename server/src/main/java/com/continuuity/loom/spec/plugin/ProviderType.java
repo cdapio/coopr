@@ -50,7 +50,7 @@ public class ProviderType extends AbstractPluginSpecification {
 
       // see if this is an overridable admin field
       FieldSchema fieldSchema = adminFields.get(field);
-      if (fieldSchema == null || !fieldSchema.getOverride()) {
+      if (fieldSchema == null || !fieldSchema.isOverride()) {
         // not an overridable admin field. check if its a user field
         fieldSchema = userFields.get(field);
       }

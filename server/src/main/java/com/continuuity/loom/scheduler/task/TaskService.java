@@ -27,6 +27,7 @@ import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.spec.ProvisionerAction;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.credential.CredentialStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -45,6 +46,7 @@ public class TaskService {
   private static final Logger LOG = LoggerFactory.getLogger(TaskService.class);
 
   private final ClusterStore clusterStore;
+  private final CredentialStore credentialStore;
   private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
   private final IdService idService;
@@ -53,11 +55,13 @@ public class TaskService {
 
   @Inject
   private TaskService(ClusterStoreService clusterStoreService,
+                      CredentialStore credentialStore,
                       LoomStats loomStats,
                       @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
                       IdService idService,
                       Gson gson) {
     this.clusterStore = clusterStoreService.getSystemView();
+    this.credentialStore = credentialStore;
     this.loomStats = loomStats;
     this.idService = idService;
     this.gson = gson;
@@ -148,6 +152,7 @@ public class TaskService {
     clusterStore.writeClusterJob(job);
 
     loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
+    wipeSensitiveFields(cluster);
     callbackQueues.add(cluster.getAccount().getTenantId(),
                        new Element(gson.toJson(new CallbackData(CallbackData.Type.FAILURE, cluster, job))));
   }
@@ -229,6 +234,7 @@ public class TaskService {
     clusterStore.writeCluster(cluster);
 
     loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
+    wipeSensitiveFields(cluster);
     callbackQueues.add(cluster.getAccount().getTenantId(),
                        new Element(gson.toJson(new CallbackData(CallbackData.Type.SUCCESS, cluster, job))));
   }
@@ -303,4 +309,10 @@ public class TaskService {
     loomStats.getSuccessfulProvisionerStats().incrementStat(clusterTask.getTaskName());
   }
 
+  private void wipeSensitiveFields(Cluster cluster) throws IOException {
+    String tenantId = cluster.getAccount().getTenantId();
+    String clusterId = cluster.getId();
+    LOG.trace("wiping credentials for cluster {} with account {}.", cluster.getId(), cluster.getAccount());
+    credentialStore.wipe(tenantId, clusterId);
+  }
 }

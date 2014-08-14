@@ -243,7 +243,6 @@ public class JobScheduler implements Runnable {
   }
 
   ClusterTask scheduleRetry(ClusterJob job, ClusterTask task) throws Exception {
-
     task.addAttempt();
     List<ClusterTask> retryTasks = taskService.getRetryTask(task);
 

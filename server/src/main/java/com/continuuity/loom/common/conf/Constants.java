@@ -60,14 +60,23 @@ public class Constants {
   public static final String ID_INCREMENT_BY = "server.ids.increment.by";
 
   public static final String CALLBACK_CLASS = "server.callback.class";
-
   public static final String PLUGIN_STORE_CLASS = "server.plugin.store.class";
+  public static final String CREDENTIAL_STORE_CLASS = "server.credential.store.class";
 
   public static final String PROVISIONER_TIMEOUT_SECS = "server.provisioner.timeout.secs";
   public static final String PROVISIONER_TIMEOUT_CHECK_INTERVAL_SECS = "server.provisioner.timeout.check.interval.secs";
   public static final String PROVISIONER_REQUEST_MAX_RETRIES = "server.provisioner.request.max.retries";
   public static final String PROVISIONER_REQUEST_MS_BETWEEN_RETRIES = "server.provisioner.request.ms.between.retries";
   public static final String PROVISIONER_REQUEST_SOCKET_TIMEOUT_MS = "server.provisioner.request.socket.timeout.ms";
+
+  public static final class MemcachedCredentialStore {
+    private static final String prefix = "server.credential.store.memcached.";
+    public static final String ADDRESSES = prefix + "addresses";
+    public static final String TTL = prefix + "ttl.seconds";
+    public static final int DEFAULT_TTL = 6 * 60 * 60;
+    public static final String TIMEOUT = prefix + "timeout.seconds";
+    public static final int DEFAULT_TIMEOUT = 20;
+  }
 
   /**
    * Metric config settings.

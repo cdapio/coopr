@@ -144,6 +144,11 @@
     </property>
 
     <property>
+        <name>server.credential.store.class</name>
+        <value>com.continuuity.loom.store.credential.InProcessCredentialStore</value>
+    </property>
+
+    <property>
         <name>server.plugin.store.class</name>
         <value>com.continuuity.loom.store.provisioner.LocalFilePluginStore</value>
         <description>class to use to store plugin resources</description>

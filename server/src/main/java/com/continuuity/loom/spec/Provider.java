@@ -15,12 +15,8 @@
  */
 package com.continuuity.loom.spec;
 
-import com.continuuity.loom.spec.plugin.FieldSchema;
-import com.continuuity.loom.spec.plugin.ParameterType;
-import com.continuuity.loom.spec.plugin.ProviderType;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
@@ -79,10 +75,10 @@ public final class Provider extends NamedIconEntity {
   }
 
   /**
-   * Add the given fields to the provisioner fields of this provider.
+   * Add some fields to the provisioner fields. If the field already exists, its value will be overwritten.
    *
-   * @param fields Fields to add.
-   */
+   * @param fields Fields to add to the provisioner fields.
+  */
   public void addFields(Map<String, String> fields) {
     if (fields != null) {
       provisionerFields.putAll(fields);
