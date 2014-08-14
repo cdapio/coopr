@@ -389,7 +389,7 @@ public class SQLPluginResourceTypeView implements PluginResourceTypeView {
   }
 
   @Override
-  public void unstage(String name, int version) throws IOException {
+  public void recall(String name, int version) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {

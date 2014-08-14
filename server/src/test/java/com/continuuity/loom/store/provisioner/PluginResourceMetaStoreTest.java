@@ -58,7 +58,7 @@ public abstract class PluginResourceMetaStoreTest {
     service.getResourceTypeView(account1, type1).add(new ResourceMeta("r1", 2, ResourceStatus.INACTIVE));
     service.getResourceTypeView(account1, type1).add(new ResourceMeta("r2", 1, ResourceStatus.INACTIVE));
     service.getResourceTypeView(account1, type1).add(new ResourceMeta("r2", 2, ResourceStatus.STAGED));
-    service.getResourceTypeView(account1, type2).add(new ResourceMeta("r3", 1, ResourceStatus.UNSTAGED));
+    service.getResourceTypeView(account1, type2).add(new ResourceMeta("r3", 1, ResourceStatus.RECALLED));
     service.getResourceTypeView(account1, type2).add(new ResourceMeta("r3", 2, ResourceStatus.STAGED));
     service.getResourceTypeView(account1, type2).add(new ResourceMeta("r3", 3, ResourceStatus.STAGED));
     service.getResourceTypeView(account1, type2).delete("r3", 3);
@@ -169,7 +169,7 @@ public abstract class PluginResourceMetaStoreTest {
     ResourceMeta hadoop3 = new ResourceMeta("hadoop", 3, ResourceStatus.ACTIVE);
     ResourceMeta mysql1 = new ResourceMeta("mysql", 1, ResourceStatus.STAGED);
     ResourceMeta mysql2 = new ResourceMeta("mysql", 2, ResourceStatus.ACTIVE);
-    ResourceMeta apache = new ResourceMeta("apache", 1, ResourceStatus.UNSTAGED);
+    ResourceMeta apache = new ResourceMeta("apache", 1, ResourceStatus.RECALLED);
 
     Set<ResourceMeta> all = ImmutableSet.of(hadoop1, hadoop2, hadoop3, mysql1, mysql2, apache);
     Set<ResourceMeta> hadoops = ImmutableSet.of(hadoop1, hadoop2, hadoop3);
@@ -212,15 +212,15 @@ public abstract class PluginResourceMetaStoreTest {
     Assert.assertEquals(Sets.newHashSet(mysql1), view.getAll("mysql", ResourceStatus.STAGED));
     Assert.assertTrue(view.getAll("apache", ResourceStatus.STAGED).isEmpty());
 
-    // test get unstaged
+    // test get recalled
     Assert.assertEquals(
       ImmutableMap.<String, Set<ResourceMeta>>of(
         "apache", ImmutableSet.<ResourceMeta>of(apache)),
-      ImmutableMap.copyOf(view.getAll(ResourceStatus.UNSTAGED))
+      ImmutableMap.copyOf(view.getAll(ResourceStatus.RECALLED))
     );
-    Assert.assertTrue(view.getAll("hadoop", ResourceStatus.UNSTAGED).isEmpty());
-    Assert.assertTrue(view.getAll("mysql", ResourceStatus.UNSTAGED).isEmpty());
-    Assert.assertEquals(Sets.newHashSet(apache), view.getAll("apache", ResourceStatus.UNSTAGED));
+    Assert.assertTrue(view.getAll("hadoop", ResourceStatus.RECALLED).isEmpty());
+    Assert.assertTrue(view.getAll("mysql", ResourceStatus.RECALLED).isEmpty());
+    Assert.assertEquals(Sets.newHashSet(apache), view.getAll("apache", ResourceStatus.RECALLED));
 
     // test get inactive
     Assert.assertEquals(
@@ -238,7 +238,7 @@ public abstract class PluginResourceMetaStoreTest {
     PluginMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceTypeView view = service.getResourceTypeView(account1, type1);
     ResourceMeta hadoop1 = new ResourceMeta("hadoop", 1, ResourceStatus.INACTIVE);
-    ResourceMeta hadoop2 = new ResourceMeta("hadoop", 2, ResourceStatus.UNSTAGED);
+    ResourceMeta hadoop2 = new ResourceMeta("hadoop", 2, ResourceStatus.RECALLED);
     ResourceMeta hadoop3 = new ResourceMeta("hadoop", 3, ResourceStatus.INACTIVE);
     ResourceMeta mysql = new ResourceMeta("mysql", 1, ResourceStatus.STAGED);
     ResourceMeta apache = new ResourceMeta("apache", 1, ResourceStatus.ACTIVE);
@@ -260,7 +260,7 @@ public abstract class PluginResourceMetaStoreTest {
     view.stage(apache.getName(), apache.getVersion());
     Assert.assertEquals(ResourceStatus.ACTIVE, view.get(apache.getName(), apache.getVersion()).getStatus());
 
-    // check staging an unstaged makes it active
+    // check staging a recalled makes it active
     view.stage(hadoop2.getName(), hadoop2.getVersion());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
     Assert.assertEquals(ResourceStatus.ACTIVE, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
@@ -269,13 +269,13 @@ public abstract class PluginResourceMetaStoreTest {
     // check staging from inactive
     view.stage(hadoop1.getName(), hadoop1.getVersion());
     Assert.assertEquals(ResourceStatus.STAGED, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
-    Assert.assertEquals(ResourceStatus.UNSTAGED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(ResourceStatus.RECALLED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
 
     // check staging deactivates previous staged version
     view.stage(hadoop3.getName(), hadoop3.getVersion());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
-    Assert.assertEquals(ResourceStatus.UNSTAGED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(ResourceStatus.RECALLED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
     Assert.assertEquals(ResourceStatus.STAGED, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
   }
 
@@ -291,11 +291,11 @@ public abstract class PluginResourceMetaStoreTest {
   }
 
   @Test
-  public void testUnstage() throws Exception {
+  public void testRecall() throws Exception {
     PluginMetaStoreService service = getPluginResourceMetaStoreService();
     PluginResourceTypeView view = service.getResourceTypeView(account1, type1);
     ResourceMeta hadoop1 = new ResourceMeta("hadoop", 1, ResourceStatus.INACTIVE);
-    ResourceMeta hadoop2 = new ResourceMeta("hadoop", 2, ResourceStatus.UNSTAGED);
+    ResourceMeta hadoop2 = new ResourceMeta("hadoop", 2, ResourceStatus.RECALLED);
     ResourceMeta hadoop3 = new ResourceMeta("hadoop", 3, ResourceStatus.INACTIVE);
     ResourceMeta mysql1 = new ResourceMeta("mysql", 1, ResourceStatus.STAGED);
     ResourceMeta mysql2 = new ResourceMeta("mysql", 2, ResourceStatus.ACTIVE);
@@ -307,30 +307,30 @@ public abstract class PluginResourceMetaStoreTest {
     view.add(mysql2);
 
     // check no-ops
-    view.unstage(hadoop1.getName(), hadoop1.getVersion());
+    view.recall(hadoop1.getName(), hadoop1.getVersion());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
-    Assert.assertEquals(ResourceStatus.UNSTAGED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(ResourceStatus.RECALLED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
 
-    view.unstage(hadoop2.getName(), hadoop2.getVersion());
+    view.recall(hadoop2.getName(), hadoop2.getVersion());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
-    Assert.assertEquals(ResourceStatus.UNSTAGED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(ResourceStatus.RECALLED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
 
-    view.unstage(hadoop3.getName(), hadoop3.getVersion());
+    view.recall(hadoop3.getName(), hadoop3.getVersion());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
-    Assert.assertEquals(ResourceStatus.UNSTAGED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
+    Assert.assertEquals(ResourceStatus.RECALLED, view.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
 
-    // check unstaging a staged resource deactivates it
-    view.unstage(mysql1.getName(), mysql1.getVersion());
+    // check recalling a staged resource deactivates it
+    view.recall(mysql1.getName(), mysql1.getVersion());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(mysql1.getName(), mysql1.getVersion()).getStatus());
     Assert.assertEquals(ResourceStatus.ACTIVE, view.get(mysql2.getName(), mysql2.getVersion()).getStatus());
 
-    // check unstaging an active moves it to unstaged
-    view.unstage(mysql2.getName(), mysql2.getVersion());
+    // check recalling an active moves it to recalled
+    view.recall(mysql2.getName(), mysql2.getVersion());
     Assert.assertEquals(ResourceStatus.INACTIVE, view.get(mysql1.getName(), mysql1.getVersion()).getStatus());
-    Assert.assertEquals(ResourceStatus.UNSTAGED, view.get(mysql2.getName(), mysql2.getVersion()).getStatus());
+    Assert.assertEquals(ResourceStatus.RECALLED, view.get(mysql2.getName(), mysql2.getVersion()).getStatus());
   }
 
   @Test
@@ -340,11 +340,11 @@ public abstract class PluginResourceMetaStoreTest {
     PluginResourceTypeView view2 = service.getResourceTypeView(account1, type2);
     ResourceMeta hadoop1 = new ResourceMeta("hadoop", 1, ResourceStatus.INACTIVE);
     ResourceMeta hadoop2 = new ResourceMeta("hadoop", 2, ResourceStatus.STAGED);
-    ResourceMeta hadoop3 = new ResourceMeta("hadoop", 3, ResourceStatus.UNSTAGED);
+    ResourceMeta hadoop3 = new ResourceMeta("hadoop", 3, ResourceStatus.RECALLED);
     ResourceMeta mysql1 = new ResourceMeta("mysql", 1, ResourceStatus.INACTIVE);
     ResourceMeta mysql2 = new ResourceMeta("mysql", 2, ResourceStatus.STAGED);
     ResourceMeta apache1 = new ResourceMeta("apache", 1, ResourceStatus.INACTIVE);
-    ResourceMeta apache2 = new ResourceMeta("apache", 2, ResourceStatus.UNSTAGED);
+    ResourceMeta apache2 = new ResourceMeta("apache", 2, ResourceStatus.RECALLED);
 
     view1.add(hadoop1);
     view1.add(hadoop2);
@@ -357,7 +357,7 @@ public abstract class PluginResourceMetaStoreTest {
     ResourceMeta bob1 = new ResourceMeta("bob", 1, ResourceStatus.INACTIVE);
     ResourceMeta bob2 = new ResourceMeta("bob", 2, ResourceStatus.STAGED);
     ResourceMeta sally1 = new ResourceMeta("sally", 1, ResourceStatus.ACTIVE);
-    ResourceMeta sue1 = new ResourceMeta("sue", 1, ResourceStatus.UNSTAGED);
+    ResourceMeta sue1 = new ResourceMeta("sue", 1, ResourceStatus.RECALLED);
 
     view2.add(bob1);
     view2.add(bob2);
@@ -373,7 +373,7 @@ public abstract class PluginResourceMetaStoreTest {
     Assert.assertEquals(ResourceStatus.INACTIVE, view1.get(hadoop1.getName(), hadoop1.getVersion()).getStatus());
     // staged should become active
     Assert.assertEquals(ResourceStatus.ACTIVE, view1.get(hadoop2.getName(), hadoop2.getVersion()).getStatus());
-    // unstaged should become inactive
+    // recalled should become inactive
     Assert.assertEquals(ResourceStatus.INACTIVE, view1.get(hadoop3.getName(), hadoop3.getVersion()).getStatus());
 
     // inactive should stay inactive
@@ -383,7 +383,7 @@ public abstract class PluginResourceMetaStoreTest {
 
     // inactive should stay inactive
     Assert.assertEquals(ResourceStatus.INACTIVE, view1.get(apache1.getName(), apache1.getVersion()).getStatus());
-    // unstaged should become inactive
+    // recalled should become inactive
     Assert.assertEquals(ResourceStatus.INACTIVE, view1.get(apache2.getName(), apache2.getVersion()).getStatus());
 
     // check other type
@@ -393,7 +393,7 @@ public abstract class PluginResourceMetaStoreTest {
     Assert.assertEquals(ResourceStatus.ACTIVE, view2.get(bob2.getName(), bob2.getVersion()).getStatus());
     // active should stay active
     Assert.assertEquals(ResourceStatus.ACTIVE, view2.get(sally1.getName(), sally1.getVersion()).getStatus());
-    // unstaged should become inactive
+    // recalled should become inactive
     Assert.assertEquals(ResourceStatus.INACTIVE, view2.get(sue1.getName(), sue1.getVersion()).getStatus());
   }
 }

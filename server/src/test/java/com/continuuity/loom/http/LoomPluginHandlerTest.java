@@ -116,7 +116,7 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
   }
 
   @Test
-  public void testStageUnstageOnNonexistentReturns404() throws Exception {
+  public void testStageRecallOnNonexistentReturns404() throws Exception {
     ResourceType cookbooks = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
     ResourceType keys = new ResourceType(PluginType.PROVIDER, "joyent", "keys");
 
@@ -125,9 +125,9 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
 
     List<String> paths = ImmutableList.of(
       getVersionedPath(cookbooks, "hadoop", 2) + "/stage",
-      getVersionedPath(cookbooks, "hadoop", 2) + "/unstage",
+      getVersionedPath(cookbooks, "hadoop", 2) + "/recall",
       getVersionedPath(keys, "dev", 2) + "/stage",
-      getVersionedPath(keys, "dev", 2) + "/unstage"
+      getVersionedPath(keys, "dev", 2) + "/recall"
     );
     for (String path : paths) {
       assertResponseStatus(doPost(path, "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
@@ -195,8 +195,8 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     // stage version3 of hadoop
     assertResponseStatus(doPost(getVersionedPath(cookbooks, "hadoop", 3) + "/stage", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
-    // unstage version1 of mysql
-    assertResponseStatus(doPost(getVersionedPath(cookbooks, "mysql", 1) + "/unstage", "", ADMIN_HEADERS),
+    // recall version1 of mysql
+    assertResponseStatus(doPost(getVersionedPath(cookbooks, "mysql", 1) + "/recall", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     response = doGet(getTypePath(cookbooks), ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -310,9 +310,9 @@ public class LoomPluginHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(Sets.newHashSet(meta1), bodyToMetaSet(response));
 
-    // unstage
+    // recall
     meta1 = new ResourceMeta(meta1.getName(), meta1.getVersion(), ResourceStatus.INACTIVE);
-    assertResponseStatus(doPost(getVersionedPath(pluginResourceType, meta1) + "/unstage", "", ADMIN_HEADERS),
+    assertResponseStatus(doPost(getVersionedPath(pluginResourceType, meta1) + "/recall", "", ADMIN_HEADERS),
                          HttpResponseStatus.OK);
     // should still see both versions when getting all versions of the resource name
     response = doGet(getNamePath(pluginResourceType, meta1.getName()), ADMIN_HEADERS);

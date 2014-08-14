@@ -246,15 +246,15 @@ public class ResourceService extends AbstractIdleService {
   }
 
   /**
-   * Atomically stage the specified resource version for the given account and unstage the previous staged version.
-   * A staged version will get pushed to provisioners during a sync, and will stay staged unless explicitly unstaged.
+   * Atomically stage the specified resource version for the given account and recall the previous staged version.
+   * A staged version will get pushed to provisioners during a sync, and will stay staged unless explicitly recalled.
    *
    * @param account Account that contains the resource
    * @param resourceType Type of resource to stage
    * @param name Name of resource to stage
    * @param version Version of resource to stage
    * @throws MissingEntityException if there is no such resource version
-   * @throws IOException if there was an error stsaging the resource
+   * @throws IOException if there was an error staging the resource
    */
   public void stage(Account account, ResourceType resourceType, String name, int version)
     throws MissingEntityException, IOException {
@@ -274,7 +274,7 @@ public class ResourceService extends AbstractIdleService {
   }
 
   /**
-   * Unstage the given resource for the given account. A no-op if there is no staged version.
+   * Recall the given resource for the given account. A no-op if there is no staged version.
    *
    * @param account Account that contains the resource
    * @param resourceType Type of resource to deactivate
@@ -283,9 +283,9 @@ public class ResourceService extends AbstractIdleService {
    * @throws MissingEntityException if there is no such module
    * @throws IOException if there was an error deactivating all versions of the module
    */
-  public void unstage(Account account, ResourceType resourceType, String name, int version)
+  public void recall(Account account, ResourceType resourceType, String name, int version)
     throws MissingEntityException, IOException {
-    LOG.debug("unstaging version {} of resource {} of type {} for account {}.",
+    LOG.debug("Recalling version {} of resource {} of type {} for account {}.",
               version, name, resourceType, account);
     ZKInterProcessReentrantLock lock = getResourceLock(account, resourceType, name);
     lock.acquire();
@@ -294,7 +294,7 @@ public class ResourceService extends AbstractIdleService {
       if (!view.exists(name, version)) {
         throw new MissingEntityException("Resource " + name + " does not exist.");
       }
-      view.unstage(name, version);
+      view.recall(name, version);
     } finally {
       lock.release();
     }

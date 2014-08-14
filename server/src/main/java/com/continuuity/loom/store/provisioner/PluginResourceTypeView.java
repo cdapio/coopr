@@ -139,7 +139,7 @@ public interface PluginResourceTypeView {
 
   /**
    * Atomically stage an inactive resource version and deactivate the current staged version if there is one.
-   * Staging an unstage resource puts it back in an active state. This is a no-op if the given resource is already
+   * Staging a recalled resource puts it back in an active state. This is a no-op if the given resource is already
    * staged or active, or if the given resource does not exist.
    *
    * @param name Name of resource to stage
@@ -149,13 +149,13 @@ public interface PluginResourceTypeView {
   public void stage(String name, int version) throws IOException;
 
   /**
-   * Unstage the given resource, moving a resource in the staged state into the inactive state, or moving a resource
-   * in the active state into the unstaged state. This a no-op if the given resource is already unstaged or inactive,
+   * Recall the given resource, moving a resource in the staged state into the inactive state, or moving a resource
+   * in the active state into the recalled state. This a no-op if the given resource is already recalled or inactive,
    * or if the given resource does not exist.
    *
-   * @param name Name of resource to unstage
-   * @param version Version of resource to unstage
+   * @param name Name of resource to recall
+   * @param version Version of resource to recall
    * @throws IOException
    */
-  public void unstage(String name, int version) throws IOException;
+  public void recall(String name, int version) throws IOException;
 }

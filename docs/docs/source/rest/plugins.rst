@@ -196,10 +196,10 @@ HTTP Responses
 ^^^^^^^^^^^^^^
 
 Metadata for the resource is returned in the response body. The response is a JSON Object that contains the resource
-name, version, and status. The status will be one of "inactive", "active", "staged", or "unstaged". An inactive resource
+name, version, and status. The status will be one of "inactive", "active", "staged", or "recalled". An inactive resource
 is one that has been added to the system, but which is not in use by provisioners. An active resource is one that is 
 current in use by provisioners. A staged resource is one that is not currently in use by provisioners, but which will be 
-pushed to and used by provisioners after the next sync call. An unstaged resource is one that is currently in use by 
+pushed to and used by provisioners after the next sync call. A recalled resource is one that is currently in use by
 provisioners, but which will be removed from use after the next sync call. 
 
 .. list-table::
@@ -254,7 +254,7 @@ HTTP Parameters
    * - Parameter
      - Description
    * - status
-     - filter results to only contain resources in the given status. Must be one of "active", "inactive", "staged", or "unstaged"
+     - filter results to only contain resources in the given status. Must be one of "active", "inactive", "staged", or "recalled"
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -332,7 +332,7 @@ HTTP Parameters
    * - Parameter
      - Description
    * - status
-     - filter results to only contain resources in the given status. Must be one of "active", "inactive", "staged", or "unstaged"
+     - filter results to only contain resources in the given status. Must be one of "active", "inactive", "staged", or "recalled"
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -475,7 +475,7 @@ Tenant admins can stage a specific version of a resource by making a HTTP POST r
  /{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}/stage
 
 Staging a resource will make it so that the next sync call will push the resource version to the provisioners.
-Staging an active or staged resource will not do anything. Staging an unstaged resource will put it back in the active 
+Staging an active or staged resource will not do anything. Staging a recalled resource will put it back in the active
 state. 
 
 HTTP Responses
@@ -506,19 +506,19 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/reactor/versions/4/stage
 
-.. _plugin-resource-unstage:
+.. _plugin-resource-recall:
 
-Unstage a specific version of a resource
+Recall a specific version of a resource
 ========================================
 
-Tenant admins can unstage a specific version of a resource by making a HTTP POST request to URI:
+Tenant admins can recall a specific version of a resource by making a HTTP POST request to URI:
 ::
 
- /{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}/unstage
+ /{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}/recall
 
-Unstaging a resource will make it so that the next sync call will remove that resource version from use.
-Unstaging an inactive or unstaged resource version will have no effect. Unstaging a staged resource puts it
-back in the inactive state and unstaging an active resource puts it in the unstaged state.
+Recalling a resource will make it so that the next sync call will remove that resource version from use.
+Recalling an inactive or recalled resource version will have no effect. Recalling a staged resource puts it
+back in the inactive state and recalling an active resource puts it in the recalled state.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -546,7 +546,7 @@ Example
         -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-Tenant:ID:loom'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/reactor/versions/4/unstage
+        http://<loom-server>:<admin-port>/<version>/loom/automatortypes/chef-solo/reactor/versions/4/recall
 
 
 .. _plugin-sync:
@@ -560,7 +560,7 @@ Tenant admins can sync plugin resources to provisioners by making a HTTP POST re
  /sync
 
 Syncing will push all staged resources to the provisioners, making them available for use. Syncing will
-also remove all unstaged resources from use, making them unavailable for use.
+also remove all recalled resources from use, making them unavailable for use.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
