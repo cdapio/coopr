@@ -19,6 +19,7 @@ import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.AbstractPluginSpecification;
+import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
@@ -64,8 +65,9 @@ public class LoomPluginHandler extends LoomAuthHandler {
                             ResourceService resourceService,
                             EntityStoreService entityStoreService,
                             TenantProvisionerService tenantProvisionerService,
+                            Configuration conf,
                             Gson gson) {
-    super(tenantStore);
+    super(tenantStore, conf);
     this.resourceService = resourceService;
     this.entityStoreService = entityStoreService;
     this.tenantProvisionerService = tenantProvisionerService;

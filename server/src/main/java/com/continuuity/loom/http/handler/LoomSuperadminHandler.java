@@ -20,6 +20,7 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.Provisioner;
@@ -60,8 +61,8 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
 
   @Inject
   private LoomSuperadminHandler(TenantStore store, TenantProvisionerService tenantProvisionerService,
-                                EntityStoreService entityStoreService, Gson gson) {
-    super(store);
+                                EntityStoreService entityStoreService, Configuration conf, Gson gson) {
+    super(store, conf);
     this.gson = gson;
     this.entityStoreService = entityStoreService;
     this.tenantProvisionerService = tenantProvisionerService;
@@ -76,6 +77,9 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   @GET
   @Path("/tenants")
   public void getAllTenants(HttpRequest request, HttpResponder responder) {
+    if (!checkForMultitenancy(responder)) {
+      return;
+    }
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -103,6 +107,9 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   @GET
   @Path("/tenants/{tenant-name}")
   public void getTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-name") String tenantName) {
+    if (!checkForMultitenancy(responder)) {
+      return;
+    }
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -134,6 +141,9 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   @POST
   @Path("/tenants")
   public void createTenant(HttpRequest request, HttpResponder responder) {
+    if (!checkForMultitenancy(responder)) {
+      return;
+    }
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -195,6 +205,9 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   @PUT
   @Path("/tenants/{tenant-name}")
   public void writeTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-name") String tenantName) {
+    if (!tenantName.equals(Constants.SUPERADMIN_TENANT) && !checkForMultitenancy(responder)) {
+      return;
+    }
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -251,6 +264,9 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   @DELETE
   @Path("/tenants/{tenant-name}")
   public void deleteTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-name") String tenantName) {
+    if (!checkForMultitenancy(responder)) {
+      return;
+    }
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -476,6 +492,14 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized to write automator type.");
     }
+  }
+
+  private boolean checkForMultitenancy(HttpResponder responder) {
+    if (!multiTenancyEnabled) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "Multi-tenancy is disabled.");
+      return false;
+    }
+    return true;
   }
 
   private <T> T getEntityFromRequest(HttpRequest request, HttpResponder responder, Type tClass) {

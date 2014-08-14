@@ -18,9 +18,6 @@ package com.continuuity.loom.common.conf;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.HttpPostClusterCallback;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableSet;
-
-import java.util.Set;
 
 /**
  * Constants used by Loom.
@@ -60,6 +57,7 @@ public class Constants {
   public static final String CALLBACK_CLASS = "server.callback.class";
 
   public static final String PLUGIN_STORE_CLASS = "server.plugin.store.class";
+  public static final String MULTITENANCY_ENABLED = "server.multitenancy.enabled";
 
   public static final String PROVISIONER_TIMEOUT_SECS = "server.provisioner.timeout.secs";
   public static final String PROVISIONER_TIMEOUT_CHECK_INTERVAL_SECS = "server.provisioner.timeout.check.interval.secs";

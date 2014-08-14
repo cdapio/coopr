@@ -24,6 +24,7 @@ import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.QueueMetrics;
 import com.continuuity.loom.scheduler.task.TaskQueueService;
@@ -35,7 +36,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
@@ -83,10 +83,10 @@ public class LoomAdminHandler extends LoomAuthHandler {
 
   @Inject
   private LoomAdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService,
-                           TaskQueueService taskQueueService, Gson gson) {
-    super(tenantStore);
-    this.taskQueueService = taskQueueService;
+                           TaskQueueService taskQueueService, Configuration conf, Gson gson) {
+    super(tenantStore, conf);
     this.entityStoreService = entityStoreService;
+    this.taskQueueService = taskQueueService;
     this.gson = gson;
   }
 

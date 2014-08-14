@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
 /**
  * Service for managing provisioners.
  */
@@ -46,6 +45,7 @@ public class TenantProvisionerService {
   private final ProvisionerRequestService provisionerRequestService;
   private final ClusterStoreService clusterStoreService;
   private final ResourceService resourceService;
+  private final boolean multiTenancyEnabled;
 
   @Inject
   private TenantProvisionerService(ProvisionerStore provisionerStore,
@@ -70,6 +70,7 @@ public class TenantProvisionerService {
     this.tenantLock = lockService.getTenantProvisionerLock();
     this.provisionerTimeoutSecs = conf.getLong(Constants.PROVISIONER_TIMEOUT_SECS);
     this.balanceQueue = balanceQueue;
+    this.multiTenancyEnabled = conf.getBoolean(Constants.MULTITENANCY_ENABLED);
   }
 
   /**
@@ -286,8 +287,12 @@ public class TenantProvisionerService {
     try {
       provisionerStore.writeProvisioner(provisioner);
       // rebalance tenants every time a provisioner registers itself
-      for (Tenant tenant : tenantStore.getAllTenants()) {
-        balanceQueue.add(new Element(tenant.getId()));
+      if (multiTenancyEnabled) {
+        for (Tenant tenant : tenantStore.getAllTenants()) {
+          balanceQueue.add(new Element(tenant.getId()));
+        }
+      } else {
+        balanceQueue.add(new Element(Constants.SUPERADMIN_TENANT));
       }
     } finally {
       tenantLock.release();
