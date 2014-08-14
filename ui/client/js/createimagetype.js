@@ -49,12 +49,10 @@ define([], function () {
             image = entry.find("[name=inputImage]").val(),
             provider = entry.find("[name=inputProvider]").val();
         if (image && provider) {
-          var out = {image:image},
-              sshuser = entry.find("[name=inputSshuser]").val();
-          if(sshuser) {
-            out.sshuser = sshuser;
-          }
-          postJson.providermap[provider] = out;
+          postJson.providermap[provider] = {
+            image: image,
+            sshuser: entry.find("[name=inputSshuser]").val()
+          };
         }
       });
 
