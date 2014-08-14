@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Handler for plugin resource related operations, such as uploading resources, staging, and unstaging resources,
+ * Handler for plugin resource related operations, such as uploading resources, staging, and recalling resources,
  * and syncing resources. Only a tenant admin can access these APIs.
  */
 @Path("/v1/loom")
@@ -132,7 +132,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
 
   /**
    * Stage a particular resource version, which means that version of the resource will get pushed to provisioners
-   * on the next sync call. Staging one version unstages other versions of the resource.
+   * on the next sync call. Staging one version recalls other versions of the resource.
    *
    * @param request Request to stage a resource
    * @param responder Responder for responding to the request
@@ -164,7 +164,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
 
   /**
    * Stage a particular resource version, which means that version of the resource will get pushed to provisioners
-   * on the next sync call. Staging one version unstages other versions of the resource.
+   * on the next sync call. Staging one version recalls other versions of the resource.
    *
    * @param request Request to stage a resource
    * @param responder Responder for responding to the request
@@ -194,51 +194,20 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   /**
-   * Unstage a particular resource version, which means that version of the resource will get removed from provisioners
+   * Recall a particular resource version, which means that version of the resource will get removed from provisioners
    * on the next sync call.
    *
-   * @param request Request to unstage a resource
+   * @param request Request to recall a resource
    * @param responder Responder for responding to the request
    * @param automatortypeId Id of the automator type that has the resource
-   * @param resourceType Type of resource to unstage
-   * @param resourceName Name of the resource to unstage
-   * @param version Version of the resource to unstage
+   * @param resourceType Type of resource to recall
+   * @param resourceName Name of the resource to recall
+   * @param version Version of the resource to recall
    */
   @POST
-  @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}/unstage")
-  public void unstageAutomatorTypeModule(HttpRequest request, HttpResponder responder,
-                                         @PathParam("automatortype-id") String automatortypeId,
-                                         @PathParam("resource-type") String resourceType,
-                                         @PathParam("resource-name") String resourceName,
-                                         @PathParam("version") String version) {
-    Account account = getAndAuthenticateAccount(request, responder);
-    if (account == null) {
-      return;
-    }
-    if (!account.isAdmin()) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
-      return;
-    }
-
-    unstageResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
-  }
-
-
-  /**
-   * Unstage a particular resource version, which means that version of the resource will get removed from provisioners
-   * on the next sync call.
-   *
-   * @param request Request to unstage a resource
-   * @param responder Responder for responding to the request
-   * @param providertypeId Id of the provider type that has the resource
-   * @param resourceType Type of resource to unstage
-   * @param resourceName Name of the resource to unstage
-   * @param version Version of the resource to unstage
-   */
-  @POST
-  @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}/unstage")
-  public void unstageProviderTypeModule(HttpRequest request, HttpResponder responder,
-                                        @PathParam("providertype-id") String providertypeId,
+  @Path("/automatortypes/{automatortype-id}/{resource-type}/{resource-name}/versions/{version}/recall")
+  public void recallAutomatorTypeModule(HttpRequest request, HttpResponder responder,
+                                        @PathParam("automatortype-id") String automatortypeId,
                                         @PathParam("resource-type") String resourceType,
                                         @PathParam("resource-name") String resourceName,
                                         @PathParam("version") String version) {
@@ -251,12 +220,43 @@ public class LoomPluginHandler extends LoomAuthHandler {
       return;
     }
 
-    unstageResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName, version);
+    recallResource(responder, account, PluginType.AUTOMATOR, automatortypeId, resourceType, resourceName, version);
+  }
+
+
+  /**
+   * Recall a particular resource version, which means that version of the resource will get removed from provisioners
+   * on the next sync call.
+   *
+   * @param request Request to recall a resource
+   * @param responder Responder for responding to the request
+   * @param providertypeId Id of the provider type that has the resource
+   * @param resourceType Type of resource to recall
+   * @param resourceName Name of the resource to recall
+   * @param version Version of the resource to recall
+   */
+  @POST
+  @Path("/providertypes/{providertype-id}/{resource-type}/{resource-name}/versions/{version}/recall")
+  public void recallProviderTypeModule(HttpRequest request, HttpResponder responder,
+                                       @PathParam("providertype-id") String providertypeId,
+                                       @PathParam("resource-type") String resourceType,
+                                       @PathParam("resource-name") String resourceName,
+                                       @PathParam("version") String version) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "user unauthorized, must be admin.");
+      return;
+    }
+
+    recallResource(responder, account, PluginType.PROVIDER, providertypeId, resourceType, resourceName, version);
   }
 
   /**
    * Get a mapping of all resources of the given type for the given automator type. Request can optionally contain
-   * a 'status' http param whose value is one of 'active', 'inactive', 'staged', or 'unstaged' to filter the results
+   * a 'status' http param whose value is one of 'active', 'inactive', 'staged', or 'recalled' to filter the results
    * to only contain resource that have the given status.
    *
    * @param request Request to get resources of the given type
@@ -283,7 +283,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
 
   /**
    * Get a mapping of all resources of the given type for the given provider type. Request can optionally contain
-   * a 'status' http param whose value is one of 'active', 'inactive', 'staged', or 'unstaged' to filter the results
+   * a 'status' http param whose value is one of 'active', 'inactive', 'staged', or 'recalled' to filter the results
    * to only contain resource that have the given status.
    *
    * @param request Request to get resources of the given type
@@ -311,7 +311,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
   /**
    * Get a list of all versions of the given resource of the given type for the given automator type.
    * Request can optionally contain a 'status' http param whose value is one of 'active', 'inactive', 'staged',
-   * or 'unstaged' to filter the results to only contain resource that have the given status.
+   * or 'recalled' to filter the results to only contain resource that have the given status.
    *
    * @param request Request to get resources of the given type
    * @param responder Responder for responding to the request
@@ -340,7 +340,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
   /**
    * Get a list of all versions of the given resource of the given type for the given provider type.
    * Request can optionally contain a 'status' http param whose value is one of 'active', 'inactive', 'staged',
-   * or 'unstaged' to filter the results to only contain resource that have the given status.
+   * or 'recalled' to filter the results to only contain resource that have the given status.
    *
    * @param request Request to get resources of the given type
    * @param responder Responder for responding to the request
@@ -479,7 +479,7 @@ public class LoomPluginHandler extends LoomAuthHandler {
   }
 
   /**
-   * Push staged resources to the provisioners, and remove unstaged resources from the provisioners.
+   * Push staged resources to the provisioners, and remove recalled resources from the provisioners.
    *
    * @param request Request to sync resources to the provisioners
    * @param responder Responder for responding to the request
@@ -564,19 +564,19 @@ public class LoomPluginHandler extends LoomAuthHandler {
     }
   }
 
-  private void unstageResource(HttpResponder responder, Account account, PluginType type,
-                               String pluginName, String resourceType, String resourceName, String versionStr) {
+  private void recallResource(HttpResponder responder, Account account, PluginType type,
+                              String pluginName, String resourceType, String resourceName, String versionStr) {
     ResourceType pluginResourceType = new ResourceType(type, pluginName, resourceType);
     try {
       int version = Integer.parseInt(versionStr);
       validateTypeExists(account, pluginResourceType);
-      resourceService.unstage(account, pluginResourceType, resourceName, version);
+      resourceService.recall(account, pluginResourceType, resourceName, version);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (NumberFormatException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid version " + versionStr);
     } catch (IOException e) {
-      LOG.error("Exception unstaging resource.", e);
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error unstaging resource version.");
+      LOG.error("Exception recalling resource.", e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error recalling resource version.");
     } catch (MissingEntityException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, type.name().toLowerCase() + " resource not found.");
     }
