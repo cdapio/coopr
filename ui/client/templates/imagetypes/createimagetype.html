@@ -52,7 +52,7 @@
                 {% if imagetype.providermap %}
                   {% for item in imagetype.providermap %}
                   <div class="provider-entry">
-                    <div class="col-sm-offset-2 col-sm-4">
+                    <div class="col-sm-offset-2 col-sm-2">
                       <select class="form-control" name="inputProvider">
                         <option selected="selected">{{loop.key}}</option>
                         {% set currentProvider = loop.key %}
@@ -66,11 +66,14 @@
                     <div class="col-sm-4">
                       <input type="text" class="form-control" name="inputImage" placeholder="Image" value="{{item.image}}">
                     </div>
+                    <div class="col-sm-2">
+                      <input type="text" class="form-control" name="inputSshuser" placeholder="SSH User" value="{{item.sshuser}}">
+                    </div>
                   </div>                    
                   {% endfor %}
                 {% else %}
                   <div class="provider-entry">
-                    <div class="col-sm-offset-2 col-sm-4">
+                    <div class="col-sm-offset-2 col-sm-2">
                       <select class="form-control" name="inputProvider">
                         <option selected="selected"></option>
                         {% for entry in providers  %}
@@ -80,6 +83,9 @@
                     </div>
                     <div class="col-sm-4">
                       <input type="text" class="form-control" name="inputImage" placeholder="Image">
+                    </div>
+                    <div class="col-sm-2">
+                      <input type="text" class="form-control" name="inputSshuser" placeholder="SSH User">
                     </div>
                   </div>
                 {% endif %}

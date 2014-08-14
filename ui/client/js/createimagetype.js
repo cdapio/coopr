@@ -37,20 +37,35 @@ define([], function () {
     },
 
     getFormDataAndSubmit: function (e) {
-      var self = this;
       var postJson = {
         name: $("#inputName").val(),
         description: $("#inputDescription").val(),
         providermap: {}
       };
-      var providerEntries = $(".provider-entry");
-      for (var i = 0; i < providerEntries.length; i++) {
-        if ($(providerEntries[i]).find("[name=inputImage]").val()) {
-          postJson.providermap[$(providerEntries[i]).find("[name=inputProvider]").val()] = 
-            { image: $(providerEntries[i]).find("[name=inputImage]").val()}
+
+      var valid = false;
+
+      $(".provider-entry").each(function() {
+        var entry = $(this),
+            image = entry.find("[name=inputImage]").val(),
+            provider = entry.find("[name=inputProvider]").val();
+        if (image && provider) {
+          valid = true;
+          postJson.providermap[provider] = {
+            image: image,
+            sshuser: entry.find("[name=inputSshuser]").val()
+          };
         }
+      });
+
+      if(valid) {
+        Helpers.submitPost(e, postJson, '/imagetypes');
       }
-      Helpers.submitPost(e, postJson, '/imagetypes');
+      else {
+        $("#notification").text("At least one provider is required");
+        $("html, body").animate({ scrollTop: 0 }, "slow");        
+      }
+
     }
 
   };
