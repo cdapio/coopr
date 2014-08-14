@@ -52,8 +52,8 @@ define([], function () {
         if (image && provider) {
           valid = true;
           postJson.providermap[provider] = {
-            image: image
-          , sshuser: 'root'
+            image: image,
+            sshuser: entry.find("[name=inputSshuser]").val()
           };
         }
       });
