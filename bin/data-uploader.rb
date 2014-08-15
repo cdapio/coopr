@@ -24,7 +24,8 @@ require 'fileutils'
 require 'rubygems/package'
 require 'zlib'
 
-# ./data-uploader [-u http://localhost:55054] [-t superadmin] [-U admin] upload|stage|sync ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop
+# ./data-uploader [-u http://localhost:55054] [-t superadmin] [-U admin] upload|stage|sync \ 
+#   ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop
 
 def usage(optionparser)
   puts optionparser.banner
@@ -43,15 +44,15 @@ OptionParser.new do |opts|
   opts.on('-U', '--user USER', 'User, defaults to ENV[\'LOOM_API_USER\'] else "admin"') do |u|
     options[:user] = u
   end
-  opts.separator ""
-  opts.separator "Required Arguments:"
-  opts.separator "         <action>: one of upload, stage, or sync (sync can be dangerous)"
-  opts.separator "     <local-path>: path to the local copy of the resource to upload"
-  opts.separator "  <remote-target>: api path defining the resource "
-  opts.separator ""
-  opts.separator "Example:"
+  opts.separator ''
+  opts.separator 'Required Arguments:'
+  opts.separator '         <action>: one of upload, stage, or sync (sync can be dangerous)'
+  opts.separator '     <local-path>: path to the local copy of the resource to upload'
+  opts.separator '  <remote-target>: api path defining the resource'
+  opts.separator ''
+  opts.separator 'Example:'
   opts.separator "  #{$PROGRAM_NAME} -u http://localhost:55054 -t superadmin -U admin sync ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop"
-  opts.separator ""
+  opts.separator ''
 end.parse!(ARGV)
 
 server_uri = options[:uri] || ENV['LOOM_SERVER_URI'] || 'http://localhost:55054'
@@ -69,6 +70,7 @@ options[:target] = ARGV.shift
 
 module Loom
   module DataUploader
+    # class representing the resource to be uploaded
     class Resource
       attr_accessor :options
       def initialize(options)
@@ -86,17 +88,17 @@ module Loom
       def basic_validate
         # action required
         unless @options[:action] =~ /^(upload|stage|sync)$/i
-          fail "missing or invalid action argument: must be one of 'upload', 'stage', or 'sync'"
+          fail 'missing or invalid action argument: must be one of "upload", "stage", or "sync"'
         end
         # path required
         if @options[:path].nil?
-          fail "missing local-path argument"
+          fail 'missing local-path argument'
         elsif !File.exist?(@options[:path])
           fail "local-path argument supplied, but no such file or directory: #{@options[:path]}"
         end
         # api target required
         if @options[:target].nil?
-          fail "missing remote-target argument"
+          fail 'missing remote-target argument'
         else
           plugin_type, plugin_name, resource_type, resource_name = @options[:target].split('/')
           unless plugin_type =~ /^(automatortypes|providertypes)$/i
@@ -120,13 +122,9 @@ module Loom
 
       def validate_server_connectivity
         uri = %W( #{@options[:uri]} status ).join('/')
-        begin
-          resp = RestClient.get(uri, @headers)
-          unless resp.code == 200
-            fail "non-ok response code #{resp.code} from server at: #{uri}"
-          end
-        rescue => e
-          fail "Caught exception connecting to server at #{uri}: #{e.inspect}"
+        resp = RestClient.get(uri, @headers)
+        unless resp.code == 200
+          fail "non-ok response code #{resp.code} from server at: #{uri}"
         end
       end
 
@@ -134,25 +132,21 @@ module Loom
       def validate_server_target
         validate_server_connectivity
         uri = %W( #{@options[:uri]} v1/loom #{@options[:plugin_type]} #{@options[:plugin_name]}).join('/')
-        begin
-          resp = RestClient.get(uri, @headers)
-          if resp.code == 200
-             resp_plugin = JSON.parse(resp.to_str)
-             if resp_plugin.key?('resourceTypes') && resp_plugin['resourceTypes'].key?(@options[:resource_type])
-               resp_resource = resp_plugin['resourceTypes'][@options[:resource_type]]
-               if resp_resource.key?('format')
-                 @expected_format = resp_resource['format'] 
-               else
-                 fail "plugin plugin #{@options[:plugin_type]} #{@options[:plugin_name]}, resource #{@options[:resource_type]} does not have a registered format"
-               end
-             else
-               fail "plugin #{@options[:plugin_type]} #{@options[:plugin_name]} has not registered resource type #{@options[:resource_type]} at server #{uri}"
-             end
+        resp = RestClient.get(uri, @headers)
+        if resp.code == 200
+          resp_plugin = JSON.parse(resp.to_str)
+          if resp_plugin.key?('resourceTypes') && resp_plugin['resourceTypes'].key?(@options[:resource_type])
+            resp_resource = resp_plugin['resourceTypes'][@options[:resource_type]]
+            if resp_resource.key?('format')
+              @expected_format = resp_resource['format']
+            else
+              fail "plugin plugin #{@options[:plugin_type]} #{@options[:plugin_name]}, resource #{@options[:resource_type]} does not have a registered format"
+            end
           else
-            fail "non-ok response code #{resp.code} from server at: #{:uri}"
+            fail "plugin #{@options[:plugin_type]} #{@options[:plugin_name]} has not registered resource type #{@options[:resource_type]} at server #{uri}"
           end
-        rescue => e
-          fail "Caught exception querying server api at #{uri}: #{e.inspect}"
+        else
+          fail "non-ok response code #{resp.code} from server at: #{:uri}"
         end
       end
 
@@ -185,7 +179,6 @@ module Loom
         File.directory?(@options[:path])
       end
 
-
       def upload
         case @options[:format]
         when 'archive'
@@ -208,40 +201,30 @@ module Loom
       end
 
       def upload_file_resource
-        #payload = File.read(@options[:path])
         payload = File.new(@options[:path], 'rb')
         upload_resource(payload)
       end
 
       def upload_resource(payload)
         uri = %W( #{@options[:uri]} v1/loom #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]}).join('/')
-        #puts "uploading to #{uri}" 
-        begin
-          resp = RestClient.post(uri, payload, @headers)
-          if resp.code == 200
-            resp_obj = JSON.parse(resp.to_str)
-            puts "upload successful, uri: #{uri}, version: #{resp_obj['version']}"
-            @upload_results = resp_obj
-          else
-            fail "non-ok response code #{resp.code} from server at: #{uri}"
-          end
-        rescue => e
-          fail "Caught exception uploading resource to server at #{uri}: #{e.inspect}"
+        resp = RestClient.post(uri, payload, @headers)
+        if resp.code == 200
+          resp_obj = JSON.parse(resp.to_str)
+          puts "upload successful, uri: #{uri}, version: #{resp_obj['version']}"
+          @upload_results = resp_obj
+        else
+          fail "non-ok response code #{resp.code} from server at: #{uri}"
         end
       end
 
       def stage
         version = @upload_results['version']
         uri = %W( #{@options[:uri]} v1/loom #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]} versions #{version} stage).join('/')
-        begin
-          resp = RestClient.post(uri, nil, @headers)
-          if resp.code == 200
-            puts "stage successful: #{uri}"
-          else
-            fail "stage request at #{uri} failed with code #{resp.code}"
-          end
-        rescue => e
-          fail "Caught exception staging resource: #{e.inspect}"
+        resp = RestClient.post(uri, nil, @headers)
+        if resp.code == 200
+          puts "stage successful: #{uri}"
+        else
+          fail "stage request at #{uri} failed with code #{resp.code}"
         end
       end
 
@@ -250,31 +233,31 @@ module Loom
         uri = %W( #{@options[:uri]} v1/loom/sync).join('/')
         resp = RestClient.post(uri, nil, @headers)
         if resp.code == 200
-          puts "sync successful"
+          puts 'sync successful'
         else
           fail "non-ok response code: #{resp.code} from server for sync request: #{uri}"
         end
       end
 
-      # borrowed/modified from http://old.thoughtsincomputation.com/posts/tar-and-a-few-feathers-in-ruby
+      # modified from http://old.thoughtsincomputation.com/posts/tar-and-a-few-feathers-in-ruby
       # Creates a tar file in memory recursively
       # from the given path.
       #
       # Returns a StringIO whose underlying String
       # is the contents of the tar file.
       def tar_with_resourcename(path)
-        tarfile = StringIO.new("")
+        tarfile = StringIO.new('')
         Gem::Package::TarWriter.new(tarfile) do |tar|
-          Dir[File.join(path, "**/*")].each do |file|
+          Dir[File.join(path, '**/*')].each do |file|
             mode = File.stat(file).mode
-            relative_file = file.sub /^#{Regexp::escape path}\/?/, ''
-            relative_file = File.join(@options[:resource_name], relative_file) 
+            relative_file = file.sub(/^#{Regexp.escape path}\/?/, '')
+            relative_file = File.join(@options[:resource_name], relative_file)
 
             if File.directory?(file)
               tar.mkdir relative_file, mode
             else
               tar.add_file relative_file, mode do |tf|
-                File.open(file, "rb") { |f| tf.write f.read }
+                File.open(file, 'rb') { |f| tf.write f.read }
               end
             end
           end
@@ -287,7 +270,7 @@ module Loom
       # returning a new StringIO representing the
       # compressed file.
       def gzip(tarfile)
-        gz = StringIO.new("")
+        gz = StringIO.new('')
         z = Zlib::GzipWriter.new(gz)
         z.write tarfile.string
         z.close # this is necessary!
@@ -295,7 +278,6 @@ module Loom
         # now we need a new StringIO
         StringIO.new gz.string
       end
-
     end
   end
 end
