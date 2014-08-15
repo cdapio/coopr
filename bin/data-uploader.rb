@@ -27,10 +27,6 @@ require 'zlib'
 # ./data-uploader [-u http://localhost:55054] [-t superadmin] [-U admin] upload|stage|sync \ 
 #   ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop
 
-def usage(optionparser)
-  puts optionparser.banner
-end
-
 # Parse command line options.
 options = {}
 OptionParser.new do |opts|
@@ -76,7 +72,6 @@ module Loom
       def initialize(options)
         @options = options
         @headers = { :'X-Loom-UserID' => options[:user], :'X-Loom-TenantID' => options[:tenant] }
-        RestClient.log = 'STDOUT'
       end
 
       def validate
@@ -210,7 +205,7 @@ module Loom
         resp = RestClient.post(uri, payload, @headers)
         if resp.code == 200
           resp_obj = JSON.parse(resp.to_str)
-          puts "upload successful, uri: #{uri}, version: #{resp_obj['version']}"
+          puts "upload successful for #{uri}, version: #{resp_obj['version']}"
           @upload_results = resp_obj
         else
           fail "non-ok response code #{resp.code} from server at: #{uri}"
@@ -222,7 +217,7 @@ module Loom
         uri = %W( #{@options[:uri]} v1/loom #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]} versions #{version} stage).join('/')
         resp = RestClient.post(uri, nil, @headers)
         if resp.code == 200
-          puts "stage successful: #{uri}"
+          puts "stage successful for #{uri}"
         else
           fail "stage request at #{uri} failed with code #{resp.code}"
         end
@@ -282,17 +277,23 @@ module Loom
   end
 end
 
-ldr = Loom::DataUploader::Resource.new(options)
-ldr.validate
+# main block
+begin
+  ldr = Loom::DataUploader::Resource.new(options)
+  ldr.validate
 
-case ldr.options[:action]
-when /upload/i
-  ldr.upload
-when /stage/i
-  ldr.upload
-  ldr.stage
-when /sync/i
-  ldr.upload
-  ldr.stage
-  ldr.sync
+  case ldr.options[:action]
+  when /upload/i
+    ldr.upload
+  when /stage/i
+    ldr.upload
+    ldr.stage
+  when /sync/i
+    ldr.upload
+    ldr.stage
+    ldr.sync
+  end
+rescue => e
+  puts "Error: #{e.message}"
+  puts e.backtrace
 end
