@@ -40,6 +40,10 @@ OptionParser.new do |opts|
   opts.on('-U', '--user USER', 'User, defaults to ENV[\'LOOM_API_USER\'] else "admin"') do |u|
     options[:user] = u
   end
+  opts.on('-q', '--quiet', 'Suppress all non-error output') do
+    options[:quiet] = true
+  end
+
   opts.separator ''
   opts.separator 'Required Arguments:'
   opts.separator '         <action>: one of upload, stage, or sync (sync acts on all staged resources, so can be dangerous)'
@@ -205,7 +209,7 @@ module Loom
         resp = RestClient.post(uri, payload, @headers)
         if resp.code == 200
           resp_obj = JSON.parse(resp.to_str)
-          puts "upload successful for #{uri}, version: #{resp_obj['version']}"
+          puts "upload successful for #{uri}, version: #{resp_obj['version']}" unless options[:quiet]
           @upload_results = resp_obj
         else
           fail "non-ok response code #{resp.code} from server at: #{uri}"
@@ -217,7 +221,7 @@ module Loom
         uri = %W( #{@options[:uri]} v1/loom #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]} versions #{version} stage).join('/')
         resp = RestClient.post(uri, nil, @headers)
         if resp.code == 200
-          puts "stage successful for #{uri}"
+          puts "stage successful for #{uri}" unless options[:quiet]
         else
           fail "stage request at #{uri} failed with code #{resp.code}"
         end
@@ -228,7 +232,7 @@ module Loom
         uri = %W( #{@options[:uri]} v1/loom/sync).join('/')
         resp = RestClient.post(uri, nil, @headers)
         if resp.code == 200
-          puts 'sync successful'
+          puts 'sync successful' unless options[:quiet]
         else
           fail "non-ok response code: #{resp.code} from server for sync request: #{uri}"
         end
@@ -294,6 +298,6 @@ begin
     ldr.sync
   end
 rescue => e
-  puts "Error: #{e.message}"
+  puts "Error: #{e.message} #{e.backtrace}"
   puts e.backtrace
 end
