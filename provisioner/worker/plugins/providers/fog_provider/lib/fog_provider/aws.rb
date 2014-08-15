@@ -192,7 +192,7 @@ class FogProviderAWS < Provider
     if profile && profile.key?('arn')
       name = profile['arn'].split('/')[-1]
     end
-    name ||= ''
+    name || ''
   end
 
   def validate!(keys = [@aws_access_key, @aws_secret_key])
