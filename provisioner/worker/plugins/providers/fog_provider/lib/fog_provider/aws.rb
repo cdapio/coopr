@@ -195,7 +195,7 @@ class FogProviderAWS < Provider
     name ||= ''
   end
 
-  def validate!(keys=[@aws_access_key, @aws_secret_key])
+  def validate!(keys = [@aws_access_key, @aws_secret_key])
     errors = []
     # Check for credential file and load it
     unless @aws_credential_file.nil?
