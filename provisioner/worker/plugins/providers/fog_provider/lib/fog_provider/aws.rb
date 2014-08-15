@@ -215,9 +215,7 @@ class FogProviderAWS < Provider
       errors << "You did not provide a valid '#{pretty_key}' value." if k.nil?
     end
     # Check for errors
-    if errors.each{|e| log.error(e)}.any?
-      raise 'Credential validation failed!'
-    end
+    raise 'Credential validation failed!' if errors.each{|e| log.error(e)}.any?
   end
 
   def vpc_mode?
