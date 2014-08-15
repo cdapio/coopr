@@ -177,6 +177,7 @@ class FogProviderAWS < Provider
     log.debug "- aws_region #{@aws_region}"
 
     # Create connection
+    # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
         :provider => 'AWS',
@@ -185,6 +186,7 @@ class FogProviderAWS < Provider
         :region                => @aws_region
       )
     end
+    # rubocop:enable UselessAssignment
   end
 
   def iam_name_from_profile(profile)

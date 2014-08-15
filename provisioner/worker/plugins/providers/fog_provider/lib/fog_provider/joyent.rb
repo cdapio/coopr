@@ -164,6 +164,7 @@ class FogProviderJoyent < Provider
     log.debug "- joyent_version #{@joyent_version}"
 
     # Create connection
+    # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
         :provider => 'Joyent',
@@ -175,6 +176,7 @@ class FogProviderJoyent < Provider
         :joyent_version  => @joyent_version
       )
     end
+    # rubocop:enable UselessAssignment
   end
 
   def ip_address(server)

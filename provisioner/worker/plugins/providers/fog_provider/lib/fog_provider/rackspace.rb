@@ -174,6 +174,7 @@ class FogProviderRackspace < Provider
     log.debug "- rackspace_auth_url #{auth_endpoint}"
 
     # Create connection
+    # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
         :provider => 'Rackspace',
@@ -184,6 +185,7 @@ class FogProviderRackspace < Provider
         :rackspace_auth_url => auth_endpoint
       )
     end
+    # rubocop:enable UselessAssignment
   end
 
   def parse_file_argument(arg)
