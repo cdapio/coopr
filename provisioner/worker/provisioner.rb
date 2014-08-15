@@ -106,7 +106,6 @@ end
 @plugin_env = options 
 
 def delegate_task(task, pluginmanager)
-  task_id = nil
   providerName = nil # rubocop:disable UselessAssignment
   automatorName = nil # rubocop:disable UselessAssignment
   clazz = nil # rubocop:disable UselessAssignment
