@@ -266,6 +266,11 @@ module.exports = function (nock, argv, clientAddr) {
     .get('/v1/loom/imagetypes')
     .reply(200, imagetypesResponse);
 
+  nock(clientAddr)
+    .persist()
+    .post('/v1/loom/imagetypes')
+    .reply(200, imagetypesResponse);
+
 
   /**
    * Mocks for all services calls.

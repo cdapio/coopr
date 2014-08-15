@@ -22,7 +22,7 @@
           </div>
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-              {% if authenticated === 'admin' %}
+              {% if authenticated.id === 'admin' %}
               {% include "partials/left-menu.html" %}
               {% else %}
               <li id="nav-clusters-container" class="{% if activeTab == 'clusters' %}active{% endif %} nav-item last">
@@ -67,13 +67,19 @@
         <div class="panel-body spl-panel-body">
           <form class="form-horizontal" role="form" id="create-provider-form" method="POST" action="/login">
           <div class="form-group">
-            <label for="inputName" class="col-sm-2 control-label">Username</label>
+            <label for="tenant" class="col-sm-2 control-label">Tenant</label>
             <div class="col-sm-4">
-              <input type="text" class="form-control" id="username" name="username" placeholder="username" />
+              <input type="text" class="form-control" id="tenant" name="tenant" placeholder="tenant" />
             </div>
           </div>
           <div class="form-group">
-            <label for="inputName" class="col-sm-2 control-label">Password</label>
+            <label for="username" class="col-sm-2 control-label">Username</label>
+            <div class="col-sm-4">
+              <input type="text" class="form-control" id="username" name="username" placeholder="username" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="password" class="col-sm-2 control-label">Password</label>
             <div class="col-sm-4">
               <input type="password" class="form-control" id="password" name="password" placeholder="password" />
             </div>
@@ -88,7 +94,7 @@
       </div>
     </div>
   {% endblock %}
-  <div id="footer" style="clear: both;"><span id="copyright">COPYRIGHT © 2014 CONTINUUITY INC. ALL RIGHTS RESERVED.</span><br>
+  <div id="footer" style="clear: both;"><span id="copyright">COPYRIGHT © 2014 CONTINUUITY INC.</span><br>
 
     <a href="http://www.continuuity.com/terms-and-privacy" id="footer-terms" target="blank">Terms and Privacy</a>
     <span>&nbsp;·&nbsp;</`span>

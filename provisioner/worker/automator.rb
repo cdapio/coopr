@@ -19,15 +19,17 @@
 # base class for all automator plugins.  This should be extended, not modified
 class Automator
   attr_accessor :task, :flavor, :image, :hostname, :providerid, :result
-  def initialize(task)
+  attr_reader :env
+  def initialize(env, task)
     @task = task
+    @env = env
     @result = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
   end
 
   def runTask
     sshauth = @task['config']['ssh-auth']
     hostname = @task['config']['hostname']
-    ipaddress = @task['config']['ipaddress']
+    ipaddress = @task['config']['ipaddresses']['access_v4']
     fields = @task['config']['service']['action']['fields'] rescue nil
 
     case task['taskName'].downcase

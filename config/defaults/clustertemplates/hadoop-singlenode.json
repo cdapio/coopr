@@ -57,13 +57,15 @@
         "server_debian_password": "somedefaultpassword",
         "server_root_password": "somedefaultpassword",
         "server_repl_password": "somedefaultpassword",
-        "bind_address": "%ip.service.mysql-server%"
+        "bind_address": "%ip.bind_v4.service.mysql-server%"
       }
     }
   },
   "compatibility": {
     "hardwaretypes": [
-      "large"
+      "large",
+      "xlarge",
+      "xxlarge"
     ],
     "imagetypes": [
       "centos6",

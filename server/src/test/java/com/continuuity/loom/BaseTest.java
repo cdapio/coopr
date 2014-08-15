@@ -34,7 +34,9 @@ import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.SQLClusterStoreService;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.guice.TestStoreModule;
+import com.continuuity.loom.store.provisioner.MemoryPluginStore;
 import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
+import com.continuuity.loom.store.provisioner.PluginStore;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.provisioner.SQLPluginMetaStoreService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
@@ -80,6 +82,7 @@ public class BaseTest {
   protected static ClusterStore clusterStore;
   protected static TenantStore tenantStore;
   protected static ProvisionerStore provisionerStore;
+  protected static MemoryPluginStore pluginStore;
   protected static Configuration conf;
   protected static MockClusterCallback mockClusterCallback;
   protected static IdService idService;
@@ -154,6 +157,7 @@ public class BaseTest {
     sqlTenantStore = injector.getInstance(SQLTenantStore.class);
     tenantStore = sqlTenantStore;
     gson = injector.getInstance(Gson.class);
+    pluginStore = injector.getInstance(MemoryPluginStore.class);
   }
 
   @AfterClass
@@ -170,5 +174,6 @@ public class BaseTest {
     sqlProvisionerStore.clearData();
     sqlMetaStoreService.clearData();
     sqlTenantStore.clearData();
+    pluginStore.clearData();
   }
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012-2014, Continuuity, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.continuuity.loom.codec.json.guice;
 
 import com.continuuity.loom.admin.Administration;
@@ -22,6 +37,7 @@ import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.LowercaseEnumTypeAdapterFactory;
 import com.continuuity.loom.codec.json.current.AddServicesRequestCodec;
 import com.continuuity.loom.codec.json.current.AdministrationCodec;
@@ -44,6 +60,7 @@ import com.continuuity.loom.codec.json.current.PluginResourceMetaCodec;
 import com.continuuity.loom.codec.json.current.ProviderCodec;
 import com.continuuity.loom.codec.json.current.ProviderTypeCodec;
 import com.continuuity.loom.codec.json.current.ProvisionerCodec;
+import com.continuuity.loom.codec.json.current.ResourceCollectionCodec;
 import com.continuuity.loom.codec.json.current.ResourceTypeSpecificationCodec;
 import com.continuuity.loom.codec.json.current.ServiceActionCodec;
 import com.continuuity.loom.codec.json.current.ServiceCodec;
@@ -51,9 +68,11 @@ import com.continuuity.loom.codec.json.current.ServiceConstraintCodec;
 import com.continuuity.loom.codec.json.current.ServiceDependenciesCodec;
 import com.continuuity.loom.codec.json.current.ServiceStageDependenciesCodec;
 import com.continuuity.loom.codec.json.current.TakeTaskRequestCodec;
+import com.continuuity.loom.codec.json.current.TaskConfigCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
 import com.continuuity.loom.codec.json.current.TenantSpecificationCodec;
 import com.continuuity.loom.codec.json.upgrade.ClusterUpgradeCodec;
+import com.continuuity.loom.codec.json.upgrade.NodeUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceUpgradeCodec;
@@ -64,7 +83,9 @@ import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.provisioner.Provisioner;
+import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
+import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.AbstractModule;
@@ -104,6 +125,7 @@ public class CodecModules {
             .registerTypeAdapter(Provider.class, new ProviderUpgradeCodec())
             .registerTypeAdapter(Service.class, new ServiceUpgradeCodec())
             .registerTypeAdapter(ServiceAction.class, new ServiceActionUpgradeCodec())
+            .registerTypeAdapter(Node.class, new NodeUpgradeCodec())
             .create()
         );
       }
@@ -134,6 +156,7 @@ public class CodecModules {
       .registerTypeAdapter(Provider.class, new ProviderCodec())
       .registerTypeAdapter(ProviderType.class, new ProviderTypeCodec())
       .registerTypeAdapter(Provisioner.class, new ProvisionerCodec())
+      .registerTypeAdapter(ResourceCollection.class, new ResourceCollectionCodec())
       .registerTypeAdapter(ResourceTypeSpecification.class, new ResourceTypeSpecificationCodec())
       .registerTypeAdapter(Service.class, new ServiceCodec())
       .registerTypeAdapter(ServiceAction.class, new ServiceActionCodec())
@@ -141,6 +164,7 @@ public class CodecModules {
       .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
       .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
       .registerTypeAdapter(TakeTaskRequest.class, new TakeTaskRequestCodec())
+      .registerTypeAdapter(TaskConfig.class, new TaskConfigCodec())
       .registerTypeAdapter(Tenant.class, new TenantCodec())
       .registerTypeAdapter(TenantSpecification.class, new TenantSpecificationCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())

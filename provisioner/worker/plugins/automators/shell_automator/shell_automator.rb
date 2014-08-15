@@ -21,14 +21,16 @@ require 'net/scp'
 class ShellAutomator < Automator
   attr_accessor :credentials, :scripts_dir, :scripts_tar, :remote_cache_dir
 
-  def initialize(task)
-    super(task)
+  def initialize(env, task)
+    super(env, task)
+    work_dir = @env[:work_dir]
+    tenant = @env[:tenant]
     # local and remote top-level script directory name
     @scripts_parent_dir = "scripts"
     # local scripts dir
-    @scripts_dir = "#{File.expand_path(File.dirname(__FILE__))}/#{@scripts_parent_dir}"
+    @scripts_dir = %W[ #{work_dir} #{tenant} automatortypes shell #{@scripts_parent_dir} ].join('/')
     # name of tarball to generate
-    @scripts_tar = "#{File.expand_path(File.dirname(__FILE__))}/scripts.tar.gz"
+    @scripts_tar = %W[ #{work_dir} #{tenant} automatortypes shell scripts.tar.gz ].join('/')
     # remote storage directory
     @remote_cache_dir = "/var/cache/loom"
     # remote script location to be exported in $PATH
@@ -42,7 +44,7 @@ class ShellAutomator < Automator
       log.debug "Generating #{@scripts_tar} from #{@scripts_dir}"
       scripts_tar_path = File.dirname(@scripts_dir)
       scripts_parent_dir = File.basename(@scripts_dir)
-      `tar -czf "#{@scripts_tar}.new" -C "#{scripts_tar_path}" #{scripts_parent_dir}`
+      `tar -cLzf "#{@scripts_tar}.new" -C "#{scripts_tar_path}" #{scripts_parent_dir}`
       `mv "#{@scripts_tar}.new" "#{@scripts_tar}"`
       log.debug "Generation complete: #{@scripts_tar}"
     end

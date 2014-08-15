@@ -120,7 +120,7 @@ Provisioner Plugins
   * :ref:`Delete all versions of a resource <plugin-resource-delete>`
   * :ref:`Delete a specific version of a resource <plugin-resource-delete-version>`
   * :ref:`Stage a specific version of a resource <plugin-resource-stage>` 
-  * :ref:`Unstage a specific version of a resource <plugin-resource-unstage>` 
+  * :ref:`Recall a specific version of a resource <plugin-resource-recall>`
   * :ref:`Sync plugins <plugin-sync>`
 
 Import/Export

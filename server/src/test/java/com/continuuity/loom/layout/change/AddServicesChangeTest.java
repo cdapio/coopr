@@ -22,6 +22,7 @@ import com.continuuity.loom.admin.LayoutConstraint;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.layout.BaseSolverTest;
 import com.continuuity.loom.layout.ClusterLayout;
@@ -111,17 +112,13 @@ public class AddServicesChangeTest extends BaseSolverTest {
     // hadoop master node
     Node node = new Node(UUID.randomUUID().toString(), clusterId,
                          ImmutableSet.of(namenode),
-                         ImmutableMap.<String, String>of(
-                           Node.Properties.HARDWARETYPE.name().toLowerCase(), "large-mem",
-                           Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
+                         NodeProperties.builder().setHardwaretype("large-mem").setImagetype("centos6").build());
     nodeIds.add(node.getId());
     nodes.add(node);
     // slave nodes
     for (int i = 0; i < 50; i++) {
       node = new Node(UUID.randomUUID().toString(), clusterId, ImmutableSet.of(datanode),
-                      ImmutableMap.<String, String>of(
-                        Node.Properties.HARDWARETYPE.name().toLowerCase(), "medium",
-                        Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
+                      NodeProperties.builder().setHardwaretype("medium").setImagetype("centos6").build());
       nodeIds.add(node.getId());
       nodes.add(node);
     }

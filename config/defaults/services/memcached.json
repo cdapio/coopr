@@ -1,6 +1,6 @@
 {
   "name": "memcached",
-  "description": "Memory Cache Daemon (memcached)"
+  "description": "Memory Cache Daemon (memcached)",
   "dependencies": {
     "conflicts": [],
     "install": {

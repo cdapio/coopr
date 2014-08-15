@@ -15,111 +15,159 @@
  */
 package com.continuuity.loom.scheduler.task;
 
+import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
+import com.continuuity.loom.cluster.NodeProperties;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Methods for getting config to attach to a cluster task.
+ * The config section of a cluster task sent to provisioners. Part of a {@link SchedulableTask}.
  */
 public class TaskConfig {
-  private static final Logger LOG = LoggerFactory.getLogger(TaskConfig.class);
+  private final NodeProperties nodeProperties;
+  private final Provider provider;
+  // list of other nodes in the cluster
+  private final Map<String, NodeProperties> nodes;
+  // service action to perform
+  private final TaskServiceAction taskServiceAction;
+  // arbitrary cluster config that comes from the cluster template
+  private final JsonObject clusterConfig;
+  private final JsonObject provisionerResults;
 
   /**
-   * Create a configuration json object to use for a given cluster, node, service, and action.
+   * Create a task config from the given input.
    *
-   * @param cluster Cluster to use.
-   * @param node Node that configuration will be sent to.
-   * @param service Service that the configuration is for.
-   * @param action Action that will be performed that needs the configuration.
-   * @return Configuration json object to use for a given cluster, node, service, and action.
+   * @param cluster Cluster the task is operating on.
+   * @param node Node the task should take place on.
+   * @param service Service the task is operating on.
+   *                May be null for tasks that are on the node itself but not on a service.
+   * @param clusterConfig Cluster config with expanded macros.
+   * @param action Action to perform.
+   * @param clusterNodes Collection of all nodes in the cluster.
+   * @return Task config created from the given input.
    */
-  public static JsonObject getConfig(Cluster cluster, Node node, Service service, ProvisionerAction action, Gson gson) {
-    JsonObject jsonObject = new JsonObject();
-
-    // cluster config
-    // If user config is present use it, otherwise use default cluster config.
-    if (cluster.getConfig() == null || cluster.getConfig().entrySet().isEmpty()) {
-      jsonObject.add("cluster", cluster.getClusterTemplate().getClusterDefaults().getConfig());
-    } else {
-      jsonObject.add("cluster", cluster.getConfig());
-    }
-
-    // service config
-    if (service != null) {
-      JsonObject serviceObject = new JsonObject();
-      serviceObject.addProperty("name", service.getName());
-      ServiceAction serviceAction = service.getProvisionerActions().get(action);
-
-      // If service action is null for a service, then the task can be ignored.
-      if (serviceAction == null) {
-        LOG.debug("Service {} with no service action for provisioner action {}. Not generating config.", service,
-                  action);
-        return null;
+  public static TaskConfig from(Cluster cluster, Node node, Service service, JsonObject clusterConfig,
+                                ProvisionerAction action, Collection<Node> clusterNodes) {
+    Provider provider = cluster.getProvider();
+    // will be null if the config is for a node action like create, confirm, bootstrap, delete
+    TaskServiceAction taskServiceAction = service == null ? null :
+      new TaskServiceAction(service.getName(), service.getProvisionerActions().get(action));
+    ImmutableMap.Builder builder = ImmutableMap.<String, NodeProperties>builder();
+    if (clusterNodes != null) {
+      for (Node clusterNode : clusterNodes) {
+        builder.put(clusterNode.getId(), clusterNode.getProperties());
       }
-
-      serviceObject.add("action", gson.toJsonTree(serviceAction));
-      jsonObject.add("service", serviceObject);
     }
+    JsonObject provisionerResults = node.getProvisionerResults();
+    return new TaskConfig(node.getProperties(), provider, builder.build(),
+                          taskServiceAction, clusterConfig, provisionerResults);
+  }
 
-    // node config
-    for (Map.Entry<String, JsonElement> entry : node.getProperties().entrySet()) {
-      jsonObject.add(entry.getKey(), entry.getValue());
-    }
-
-    // provider config
-    jsonObject.add("provider", gson.toJsonTree(cluster.getProvider()));
-
-    return jsonObject;
+  public TaskConfig(NodeProperties nodeProperties, Provider provider, Map<String, NodeProperties> nodes,
+                    TaskServiceAction taskServiceAction, JsonObject clusterConfig, JsonObject provisionerResults) {
+    this.nodeProperties = nodeProperties;
+    this.provider = provider;
+    this.nodes = nodes;
+    this.taskServiceAction = taskServiceAction;
+    this.clusterConfig = clusterConfig;
+    this.provisionerResults = provisionerResults;
   }
 
   /**
-   * Add all the properties from the node into the given json object configuration.
+   * Get the provider to use to perform node operations.
    *
-   * @param jsonObject Configuration to update.
-   * @param node Node containing properties that need to be copied to the given configuration.
-   * @return Updated json object.
+   * @return Provider to use to perform node operations.
    */
-  public static JsonObject updateNodeProperties(JsonObject jsonObject, Node node) {
-    for (Map.Entry<String, JsonElement> entry : node.getProperties().entrySet()) {
-      jsonObject.add(entry.getKey(), entry.getValue());
-    }
-    return jsonObject;
+  public Provider getProvider() {
+    return provider;
   }
 
   /**
-   * Add all node properties to a json object configuration.
+   * Get the mapping of node id to node properties for all nodes in the cluster.
    *
-   * @param jsonObject Configuration to add node properties to.
-   * @param clusterNodes Set of nodes whose properties need to be added to the configuration.
-   * @return Updated json object.
+   * @return Mapping of node id to node properties for all nodes in the cluster.
    */
-  public static JsonObject addNodeList(JsonObject jsonObject, Set<Node> clusterNodes) {
-    JsonObject nodesJson = new JsonObject();
-    for (Node node : clusterNodes) {
-      JsonObject nodeJson = new JsonObject();
-      for (Node.Properties property : Node.Properties.values()) {
-        String key = property.name().toLowerCase();
-        JsonElement value = node.getProperties().get(key);
-        if (value != null) {
-          nodeJson.add(key, value);
-        }
-      }
+  public Map<String, NodeProperties> getNodes() {
+    return nodes;
+  }
 
-      nodesJson.add(node.getId(), nodeJson);
+  /**
+   * Get the condensed service object containing just the relevant action to perform.
+   *
+   * @return Condensed service object containing just the relevant action to perform.
+   */
+  public TaskServiceAction getTaskServiceAction() {
+    return taskServiceAction;
+  }
+
+  /**
+   * Get the cluster config with macros expanded.
+   *
+   * @return Cluster config with macros expanded.
+   */
+  public JsonObject getClusterConfig() {
+    return clusterConfig;
+  }
+
+  /**
+   * Get the properties of the node the task should be performed on.
+   *
+   * @return Properties of the node the task should be performed on.
+   */
+  public NodeProperties getNodeProperties() {
+    return nodeProperties;
+  }
+
+  /**
+   * Get the payload returned by provisioners that should be passed on to current and future tasks.
+   *
+   * @return Payload returned by provisioners that should be passed on to current and future tasks.
+   */
+  public JsonObject getProvisionerResults() {
+    return provisionerResults;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
 
-    jsonObject.add("nodes", nodesJson);
-    return jsonObject;
+    TaskConfig that = (TaskConfig) o;
+
+    return Objects.equal(nodeProperties, that.nodeProperties) &&
+      Objects.equal(provider, that.provider) &&
+      Objects.equal(taskServiceAction, that.taskServiceAction) &&
+      Objects.equal(provisionerResults, that.provisionerResults) &&
+      Objects.equal(clusterConfig, that.clusterConfig) &&
+      Objects.equal(nodes, that.nodes);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(nodeProperties, provider, taskServiceAction, provisionerResults, clusterConfig, nodes);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("nodeProperties", nodeProperties)
+      .add("provider", provider)
+      .add("taskServiceAction", taskServiceAction)
+      .add("provisionerResults", provisionerResults)
+      .add("clusterConfig", clusterConfig)
+      .add("nodes", nodes)
+      .toString();
   }
 }

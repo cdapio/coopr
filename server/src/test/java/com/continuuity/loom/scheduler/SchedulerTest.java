@@ -18,12 +18,8 @@ package com.continuuity.loom.scheduler;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.cluster.Cluster;
-import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.common.zookeeper.IdService;
-import com.continuuity.loom.http.LoomService;
 import com.continuuity.loom.http.LoomServiceTestBase;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
@@ -31,24 +27,24 @@ import com.continuuity.loom.scheduler.callback.CallbackData;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.scheduler.task.SchedulableTask;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.gson.JsonObject;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -157,20 +153,20 @@ public class SchedulerTest extends LoomServiceTestBase {
 
     // Two tasks should have been submitted for provisioning.
     TakeTaskRequest takeRequest = new TakeTaskRequest("consumer1", PROVISIONER_ID, tenantId);
-    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
+    SchedulableTask task = TestHelper.takeTask(getLoomUrl(), takeRequest);
 
     JsonObject result = new JsonObject();
-    result.addProperty("ipaddress", "123.456.789.123");
+    Map<String, String> ipAddresses = ImmutableMap.of("access", "123.456.789.123");
     FinishTaskRequest finishRequest =
-      new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId, taskJson.get("taskId").getAsString(),
-                            null, null, 0, result);
+      new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId, task.getTaskId(),
+                            null, null, 0, ipAddresses, result);
     TestHelper.finishTask(getLoomUrl(), finishRequest);
 
-    taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
+    task = TestHelper.takeTask(getLoomUrl(), takeRequest);
     result = new JsonObject();
-    result.addProperty("ipaddress", "456.789.123.123");
+    ipAddresses = ImmutableMap.of("access", "456.789.123.123");
     finishRequest = new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
-                                          taskJson.get("taskId").getAsString(), null, null, 0, result);
+                                          task.getTaskId(), null, null, 0, ipAddresses, result);
     TestHelper.finishTask(getLoomUrl(), finishRequest);
 
     TestHelper.takeTask(getLoomUrl(), takeRequest);
@@ -183,9 +179,9 @@ public class SchedulerTest extends LoomServiceTestBase {
     jobScheduler.run();
 
     for (int i = 0; i < 5; i++) {
-      taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
+      task = TestHelper.takeTask(getLoomUrl(), takeRequest);
       finishRequest = new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
-                                            taskJson.get("taskId").getAsString(), null, null, 0, null);
+                                            task.getTaskId(), null, null, 0, null, null);
       TestHelper.finishTask(getLoomUrl(), finishRequest);
       jobScheduler.run();
       jobScheduler.run();
@@ -259,15 +255,15 @@ public class SchedulerTest extends LoomServiceTestBase {
 
     // take tasks until there are no more
     TakeTaskRequest takeRequest = new TakeTaskRequest("consumer1", PROVISIONER_ID, tenantId);
-    JsonObject taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
-    while (taskJson.entrySet().size() > 0) {
+    SchedulableTask task = TestHelper.takeTask(getLoomUrl(), takeRequest);
+    while (task != null) {
       FinishTaskRequest finishRequest =
         new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
-                              taskJson.get("taskId").getAsString(), null, null, failJob ? 1 : 0, null);
+                              task.getTaskId(), null, null, failJob ? 1 : 0, null, null);
       TestHelper.finishTask(getLoomUrl(), finishRequest);
       jobScheduler.run();
       jobScheduler.run();
-      taskJson = TestHelper.takeTask(getLoomUrl(), takeRequest);
+      task = TestHelper.takeTask(getLoomUrl(), takeRequest);
     }
     jobScheduler.run();
     waitForCallback(callbackScheduler);

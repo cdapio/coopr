@@ -24,9 +24,9 @@ module FogProvider
     @credentials[:paranoid] = false
     sshauth.each do |k, v|
       if (k =~ /identityfile/)
-	@credentials[:keys] = [ v ]
+        @credentials[:keys] = [ v ]
       elsif (k =~ /password/)
-	@credentials[:password] = v
+        @credentials[:password] = v
       end
     end
   end
@@ -42,13 +42,13 @@ module FogProvider
       false
     end
   rescue SocketError,
-	 IOError,
-	 Errno::ETIMEDOUT,
-	 Errno::EPERM,
-	 Errno::ECONNREFUSED,
-	 Errno::ECONNRESET,
-	 Errno::EHOSTUNREACH,
-	 Errno::ENETUNREACH
+         IOError,
+         Errno::ETIMEDOUT,
+         Errno::EPERM,
+         Errno::ECONNREFUSED,
+         Errno::ECONNRESET,
+         Errno::EHOSTUNREACH,
+         Errno::ENETUNREACH
     sleep 2
     false
   ensure
@@ -59,13 +59,15 @@ module FogProvider
     ssh_test_max = 10*60
     ssh_test = 0
     log.debug 'Waiting for sshd'
+    # Initial sleep, to prevent getting caught by provider firewall rules
+    sleep 30
     begin
       until tcp_test_port(host, port)
-	if ssh_test < ssh_test_max
-	  ssh_test += 1
-	else
-	  break
-	end
+        if ssh_test < ssh_test_max
+          ssh_test += 1
+        else
+          break
+        end
       end
       sleep 10
     end

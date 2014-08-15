@@ -22,9 +22,11 @@ require 'net/scp'
 class ChefSoloAutomator < Automator
   attr_accessor :credentials, :cookbooks_path, :cookbooks_tar, :remote_cache_dir
 
-  def initialize(task)
-    super(task)
-    @chef_primitives_path = "#{File.expand_path(File.dirname(__FILE__))}/chef_solo_automator"
+  def initialize(env, task)
+    super(env, task)
+    work_dir = @env[:work_dir]
+    tenant = @env[:tenant]
+    @chef_primitives_path = %W( #{work_dir} #{tenant} automatortypes chef-solo ).join('/')
     @remote_cache_dir = "/var/cache/loom"
     @remote_chef_dir = "/var/chef"
   end
@@ -38,7 +40,7 @@ class ChefSoloAutomator < Automator
     # limit tarball regeneration to once per 10min
     if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
       log.debug "Generating #{chef_primitive_tar} from #{chef_primitive_path}"
-      `tar -czf "#{chef_primitive_tar}.new" -C "#{@chef_primitives_path}" #{chef_primitive}`
+      `tar -cLzf "#{chef_primitive_tar}.new" -C "#{@chef_primitives_path}" #{chef_primitive}`
       `mv "#{chef_primitive_tar}.new" "#{chef_primitive_tar}"`
       log.debug "Generation complete: #{chef_primitive_tar}"
     end
@@ -118,7 +120,7 @@ class ChefSoloAutomator < Automator
       generate_chef_primitive_tar(chef_primitive)
     end
 
-    log.debug "Attempting ssh into ip: #{@task["config"]["ipaddress"]}, user: #{sshauth['user']}"
+    log.debug "Attempting ssh into ip: #{ipaddress}, user: #{sshauth['user']}"
 
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|

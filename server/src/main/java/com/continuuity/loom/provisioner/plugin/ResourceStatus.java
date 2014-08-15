@@ -19,7 +19,7 @@ package com.continuuity.loom.provisioner.plugin;
  * Status of a plugin resource. If a resource is inactive, it has been uploaded to the plugin store, but has not been
  * marked to get pushed to provisioners on the next sync. If a resource it active, it is being used on the provisioners.
  * If a resource is staged, it has been marked to be pushed to provisioners on the next sync, but has not yet been
- * pushed. If a resource is unstaged, it has been marked to be removed from provisioners on the next sync, but is still
+ * pushed. If a resource is recalled, it has been marked to be removed from provisioners on the next sync, but is still
  * being used on the provisioners.
  */
 public enum ResourceStatus {
@@ -29,8 +29,8 @@ public enum ResourceStatus {
   ACTIVE,
   // staged means it is not in use but will be in use after a sync
   STAGED,
-  // unstaged means it is in use but will not be in use after a sync
-  UNSTAGED;
+  // recalled means it is in use but will not be in use after a sync
+  RECALLED;
 
   /**
    * Whether or not the resource is live, meaning it is the version of the resource being used on the provisioners.
@@ -38,7 +38,7 @@ public enum ResourceStatus {
    * @return Whether or not the resource is live
    */
   public boolean isLive() {
-    return this == ACTIVE || this == UNSTAGED;
+    return this == ACTIVE || this == RECALLED;
   }
 
 
@@ -63,7 +63,7 @@ public enum ResourceStatus {
     if (live && slated) {
       return ACTIVE;
     } else if (live && !slated) {
-      return UNSTAGED;
+      return RECALLED;
     } else if (!live && slated) {
       return STAGED;
     } else {

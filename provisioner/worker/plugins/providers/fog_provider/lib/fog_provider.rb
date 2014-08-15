@@ -16,12 +16,14 @@
 # limitations under the License.
 #
 
+require_relative 'fog_provider/aws'
 require_relative 'fog_provider/joyent'
 require_relative 'fog_provider/openstack'
 require_relative 'fog_provider/rackspace'
 
 require 'fog'
 require 'ipaddr'
+require 'net/ssh'
 
 gem 'fog', '~> 1.21.0'
 

@@ -2,11 +2,20 @@
   "name": "xlarge",
   "description": "4+ vCPU, 15+ GB RAM, 240+ GB Disk",
   "providermap": {
+    "aws-us-east-1": {
+      "flavor": "m1.xlarge"
+    },
+    "aws-us-west-1": {
+      "flavor": "m1.xlarge"
+    },
+    "aws-us-west-2": {
+      "flavor": "m1.xlarge"
+    },
     "joyent": {
       "flavor": "Large 16GB"
     },
     "rackspace": {
-      "flavor": "performance2-15"
+      "flavor": "7"
     }
   }
 }

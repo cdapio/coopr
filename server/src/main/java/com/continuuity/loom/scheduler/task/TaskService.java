@@ -16,9 +16,7 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
-import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
@@ -84,12 +82,8 @@ public class TaskService {
     // Eg. deleting a box during a rollback operation since we reuse nodeIds.
     TaskId rollbackTaskId = idService.getNewTaskId(JobId.fromString(task.getJobId()));
     ClusterTask rollbackTask = new ClusterTask(rollback, rollbackTaskId, null,
-                                               task.getService(), task.getClusterAction(),
-                                               task.getAttempts().get(task.currentAttemptIndex()).getConfig());
-    rollbackTask.setConfig(task.getConfig());
+                                               task.getService(), task.getClusterAction());
 
-    // Associate the rollback task with the task attempt
-    task.getAttempts().get(task.currentAttemptIndex()).setRollbackTask(rollbackTask);
     return rollbackTask;
   }
 
@@ -98,25 +92,15 @@ public class TaskService {
    * For example, to retry a service installation, we just retry the task again. However, to retry a node confirm,
    * we need to create another node first and then confirm that node.
    *
-   * @param cluster Cluster associated with the failed task.
    * @param task Task that failed and must be retried.
-   * @param node Node the task failed on.
    * @return List of tasks that must be executed to retry the given failed task.
    */
-  public List<ClusterTask> getRetryTask(Cluster cluster, ClusterTask task, Node node) {
+  public List<ClusterTask> getRetryTask(ClusterTask task) {
     ProvisionerAction retryAction = actions.getRetryAction().get(task.getTaskName());
 
     // If no retry action, return self.
     if (retryAction == null) {
       return ImmutableList.of(task);
-    }
-
-    // Get service object
-    Service serviceObj = null;
-    for (Service s : node.getServices()) {
-      if (s.getName().equals(task.getService())) {
-        serviceObj = s;
-      }
     }
 
     List<ProvisionerAction> taskOrder = actions.getActionOrder().get(task.getClusterAction());
@@ -132,8 +116,7 @@ public class TaskService {
       ProvisionerAction action = taskOrder.get(i);
       TaskId retryTaskId = idService.getNewTaskId(JobId.fromString(task.getJobId()));
       ClusterTask retry = new ClusterTask(action, retryTaskId, task.getNodeId(), task.getService(),
-                                          task.getClusterAction(),
-                                          TaskConfig.getConfig(cluster, node, serviceObj, action, gson));
+                                          task.getClusterAction());
       retryTasks.add(retry);
     }
     retryTasks.add(task);
