@@ -42,7 +42,7 @@ OptionParser.new do |opts|
   end
   opts.separator ''
   opts.separator 'Required Arguments:'
-  opts.separator '         <action>: one of upload, stage, or sync (sync can be dangerous)'
+  opts.separator '         <action>: one of upload, stage, or sync (sync acts on all staged resources, so can be dangerous)'
   opts.separator '     <local-path>: path to the local copy of the resource to upload'
   opts.separator '  <remote-target>: api path defining the resource'
   opts.separator ''
@@ -223,7 +223,7 @@ module Loom
         end
       end
 
-      # syncing can be dangerous!
+      # syncing will act on all staged resources, not just the resource being staged
       def sync
         uri = %W( #{@options[:uri]} v1/loom/sync).join('/')
         resp = RestClient.post(uri, nil, @headers)
