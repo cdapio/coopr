@@ -67,6 +67,7 @@ export LOOM_HOME=$APP_HOME
 export LOOM_SERVER_HOME=$APP_HOME/server
 export LOOM_SERVER_CONF=$LOOM_HOME/server/conf/
 export LOOM_PROVISIONER_CONF=$LOOM_HOME/provisioner/master/conf
+export LOOM_PROVISIONER_PLUGIN_DIR=$LOOM_HOME/provisioner/worker/plugins
 export LOOM_LOG_DIR=$LOOM_HOME/logs
 export LOOM_DATA_DIR=$LOOM_HOME/data
 
@@ -159,8 +160,35 @@ function load_defaults () {
 
         # register the default plugins with the server
         provisioner register
+
+        # load the initial plugin bundled data
+        stage_default_data
+
+        # sync the initial data to the provisioner
+        sync_default_data
+
     fi
     return 0;
+}
+
+function stage_default_data () {
+    echo "Waiting for plugins to be registered..."
+    wait_for_plugin_registration
+
+    cd ${LOOM_PROVISIONER_PLUGIN_DIR}
+    echo "Loading initial data..."
+    for script in $(ls -1 */*/load-bundled-data.sh) ; do
+      . ${script}
+    done
+}
+
+function sync_default_data () {
+    echo "Syncing initial data..."
+    curl --silent --request POST \
+      --header "X-Loom-UserID:${LOOM_API_USER}" \
+      --header "X-Loom-TenantID:${LOOM_TENANT}" \
+      --connect-timeout 5 \
+      http://localhost:55054/v1/loom/sync
 }
 
 function request_superadmin_workers () {
@@ -190,6 +218,22 @@ function wait_for_server () {
     if [ $RETRIES -gt 60 ]; then
         die "ERROR: Server did not successfully start" 
     fi 
+}
+
+function wait_for_plugin_registration () {
+    RETRIES=0
+    until [[ $(curl --silent --request GET \
+                 --output /dev/null --write-out "%{http_code}" \
+                 --header "X-Loom-UserID:${LOOM_API_USER}" \
+                 --header "X-Loom-TenantID:${LOOM_TENANT}" \
+                 http://localhost:55054/v1/loom/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
+        sleep 2
+        ((RETRIES++))
+    done
+
+    if [ $RETRIES -gt 60 ]; then
+        die "ERROR: Provisioner did not successfully register plugins"
+    fi
 }
 
 function wait_for_provisioner () {
