@@ -221,7 +221,7 @@ public class NodeLayoutGeneratorTest extends BaseSolverTest {
       new ClusterDefaults(services, "joyent", null, null, null, new JsonObject()),
       new Compatibilities(null, null, services),
       new Constraints(
-        ImmutableMap.<String, ServiceConstraint>of("svc1", new ServiceConstraint(null, null, 1, 1, 1, null)),
+        ImmutableMap.<String, ServiceConstraint>of("svc1", new ServiceConstraint(null, null, 1, 1)),
         new LayoutConstraint(
           ImmutableSet.<Set<String>>of(ImmutableSet.of("svc1", "svc2", "svc3")),
           ImmutableSet.<Set<String>>of()

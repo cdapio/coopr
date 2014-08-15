@@ -42,8 +42,6 @@ public class ServiceConstraintCodec extends AbstractCodec<ServiceConstraint> {
     JsonObject quantities = new JsonObject();
     quantities.add("min", context.serialize(serviceConstraint.getMinCount()));
     quantities.add("max", context.serialize(serviceConstraint.getMaxCount()));
-    quantities.add("stepSize", context.serialize(serviceConstraint.getStepSize()));
-    quantities.add("ratio", context.serialize(ratioToString(serviceConstraint.getRatio())));
     jsonObj.add("quantities", quantities);
 
     return jsonObj;
@@ -57,29 +55,12 @@ public class ServiceConstraintCodec extends AbstractCodec<ServiceConstraint> {
     JsonObject quantities = jsonObj.get("quantities").getAsJsonObject();
     Integer min = context.deserialize(quantities.get("min"), Integer.class);
     Integer max = context.deserialize(quantities.get("max"), Integer.class);
-    Integer stepSize = context.deserialize(quantities.get("stepSize"), Integer.class);
-    ImmutablePair<Integer, Integer> ratio =
-      stringToRatio(context.<String>deserialize(quantities.get("ratio"), String.class));
     Set<String> requiredHardwareTypes = context.deserialize(jsonObj.get("hardwaretypes"),
                                                             new TypeToken<Set<String>>() {}.getType());
     Set<String> requiredImageTypes = context.deserialize(jsonObj.get("imagetypes"),
                                                          new TypeToken<Set<String>>() {}.getType());
 
 
-    return new ServiceConstraint(requiredHardwareTypes, requiredImageTypes, min, max, stepSize, ratio);
-  }
-
-  private String ratioToString(ImmutablePair<Integer, Integer> ratio) {
-    return (ratio == null) ? null : ratio.getFirst() + ":" + ratio.getSecond();
-  }
-
-  private ImmutablePair<Integer, Integer> stringToRatio(String ratioStr) {
-    if (ratioStr == null) {
-      return null;
-    }
-    int index = ratioStr.indexOf(":");
-    return ImmutablePair.of(
-      Integer.valueOf(ratioStr.substring(0, index)), Integer.valueOf(ratioStr.substring(index + 1))
-    );
+    return new ServiceConstraint(requiredHardwareTypes, requiredImageTypes, min, max);
   }
 }
