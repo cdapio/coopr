@@ -25,7 +25,9 @@ import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
@@ -86,12 +88,7 @@ public class LoomNodeHandler extends LoomAuthHandler {
       return;
     }
 
-    JsonArray jsonArray = new JsonArray();
-    for (Node node : nodes) {
-      jsonArray.add(createNodeJsonObject(node));
-    }
-
-    responder.sendJson(HttpResponseStatus.OK, jsonArray);
+    responder.sendJson(HttpResponseStatus.OK, nodes);
   }
 
   /**
@@ -115,7 +112,7 @@ public class LoomNodeHandler extends LoomAuthHandler {
       return;
     }
 
-    responder.sendJson(HttpResponseStatus.OK, createNodeJsonObject(node));
+    responder.sendJson(HttpResponseStatus.OK, node);
   }
 
   @POST
@@ -150,14 +147,23 @@ public class LoomNodeHandler extends LoomAuthHandler {
       return;
     }
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    Node node = gson.fromJson(reader, Node.class);
+
     try {
-      nodeStoreService.getView(account).writeNode(node);
-      responder.sendStatus(HttpResponseStatus.NO_CONTENT);
+      Node node = gson.fromJson(reader, Node.class);
+      if (node.getId().equals(nodeId)) {
+        nodeStoreService.getView(account).writeNode(node);
+        responder.sendStatus(HttpResponseStatus.NO_CONTENT);
+      } else {
+        responder.sendError(HttpResponseStatus.BAD_REQUEST, "Node ID in body does not match Node ID in URI path");
+      }
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "Exception updating node.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception updating node.");
+    } catch (JsonIOException e){
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Exception reading node from body.");
+    } catch (JsonSyntaxException e){
+        responder.sendError(HttpResponseStatus.BAD_REQUEST, "Exception reading node from body.");
     } finally {
       try {
         reader.close();
@@ -183,17 +189,5 @@ public class LoomNodeHandler extends LoomAuthHandler {
     }
 
     responder.sendStatus(HttpResponseStatus.NO_CONTENT);
-  }
-
-  private JsonObject createNodeJsonObject(final Node node) {
-    JsonObject obj = new JsonObject();
-    obj.addProperty("id", node.getId());
-    obj.addProperty("clusterId", node.getClusterId());
-    obj.add("actions", gson.toJsonTree(node.getActions()));
-    obj.add("provisionerResults", gson.toJsonTree(node.getProvisionerResults()));
-    obj.add("services", gson.toJsonTree(node.getServices()));
-    obj.add("properties", gson.toJsonTree(node.getProperties()));
-
-    return obj;
   }
 }
