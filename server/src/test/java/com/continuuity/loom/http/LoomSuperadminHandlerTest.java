@@ -231,14 +231,14 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testProviderTypes() throws Exception {
-    testNonPostRestAPIs("providertypes", Entities.ProviderTypeExample.JOYENT_JSON,
-                        Entities.ProviderTypeExample.RACKSPACE_JSON, SUPERADMIN_HEADERS);
+    testNonPostRestAPIs("providertypes", gson.toJsonTree(Entities.ProviderTypeExample.JOYENT).getAsJsonObject(),
+                        gson.toJsonTree(Entities.ProviderTypeExample.RACKSPACE).getAsJsonObject(), SUPERADMIN_HEADERS);
   }
 
   @Test
   public void testAutomatorTypes() throws Exception {
-    testNonPostRestAPIs("automatortypes", Entities.AutomatorTypeExample.CHEF_JSON,
-                        Entities.AutomatorTypeExample.SHELL_JSON, SUPERADMIN_HEADERS);
+    testNonPostRestAPIs("automatortypes", gson.toJsonTree(Entities.AutomatorTypeExample.CHEF).getAsJsonObject(),
+                        gson.toJsonTree(Entities.AutomatorTypeExample.SHELL).getAsJsonObject(), SUPERADMIN_HEADERS);
   }
 
   @Test

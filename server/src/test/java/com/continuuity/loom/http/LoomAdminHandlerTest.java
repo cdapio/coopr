@@ -57,28 +57,32 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testProviders() throws Exception {
-    testRestAPIs("providers", Entities.ProviderExample.JOYENT_JSON, Entities.ProviderExample.RACKSPACE_JSON);
+    testRestAPIs("providers", gson.toJsonTree(Entities.ProviderExample.JOYENT).getAsJsonObject(),
+                 gson.toJsonTree(Entities.ProviderExample.RACKSPACE).getAsJsonObject());
   }
 
   @Test
   public void testHardwareTypes() throws Exception {
-    testRestAPIs("hardwaretypes", Entities.HardwareTypeExample.SMALL_JSON, Entities.HardwareTypeExample.MEDIUM_JSON);
+    testRestAPIs("hardwaretypes", gson.toJsonTree(Entities.HardwareTypeExample.SMALL).getAsJsonObject(),
+                 gson.toJsonTree(Entities.HardwareTypeExample.MEDIUM).getAsJsonObject());
   }
 
   @Test
   public void testImageTypes() throws Exception {
-    testRestAPIs("imagetypes", Entities.ImageTypeExample.CENTOS_6_JSON, Entities.ImageTypeExample.UBUNTU_12_JSON);
+    testRestAPIs("imagetypes", gson.toJsonTree(Entities.ImageTypeExample.CENTOS_6).getAsJsonObject(),
+                 gson.toJsonTree(Entities.ImageTypeExample.UBUNTU_12).getAsJsonObject());
   }
 
   @Test
   public void testServices() throws Exception {
-    testRestAPIs("services", Entities.ServiceExample.HOSTS_JSON, Entities.ServiceExample.NAMENODE_JSON);
+    testRestAPIs("services", gson.toJsonTree(Entities.ServiceExample.HOSTS).getAsJsonObject(),
+                 gson.toJsonTree(Entities.ServiceExample.NAMENODE).getAsJsonObject());
   }
 
   @Test
   public void testClusterTemplates() throws Exception {
-    testRestAPIs("clustertemplates", Entities.ClusterTemplateExample.HDFS_JSON,
-                 Entities.ClusterTemplateExample.REACTOR_JSON);
+    testRestAPIs("clustertemplates", gson.toJsonTree(Entities.ClusterTemplateExample.HDFS).getAsJsonObject(),
+                 gson.toJsonTree(Entities.ClusterTemplateExample.REACTOR).getAsJsonObject());
   }
 
   @Test

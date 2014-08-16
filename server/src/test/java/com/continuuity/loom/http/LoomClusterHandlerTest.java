@@ -38,7 +38,6 @@ import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.FinishTaskRequest;
@@ -1560,19 +1559,19 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
           "namenode",
           new ServiceConstraint(
             ImmutableSet.of("large-mem"),
-            ImmutableSet.of("centos6", "ubuntu12"), 1, 1, 1, null),
+            ImmutableSet.of("centos6", "ubuntu12"), 1, 1),
           "datanode",
           new ServiceConstraint(
             ImmutableSet.of("medium", "large-cpu"),
-            ImmutableSet.of("centos6", "ubuntu12"), 1, 50, 1, null),
+            ImmutableSet.of("centos6", "ubuntu12"), 1, 50),
           "zookeeper",
           new ServiceConstraint(
             ImmutableSet.of("small", "medium"),
-            ImmutableSet.of("centos6"), 1, 5, 2, ImmutablePair.of(1, 20)),
+            ImmutableSet.of("centos6"), 1, 5),
           "reactor",
           new ServiceConstraint(
             ImmutableSet.of("medium", "large"),
-            null, 1, 5, 1, ImmutablePair.of(1, 10))
+            null, 1, 5)
         ),
         new LayoutConstraint(
           ImmutableSet.<Set<String>>of(
