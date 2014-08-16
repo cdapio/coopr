@@ -46,7 +46,10 @@ OptionParser.new do |opts|
 
   opts.separator ''
   opts.separator 'Required Arguments:'
-  opts.separator '         <action>: one of upload, stage, or sync (sync acts on all staged resources, so can be dangerous)'
+  opts.separator '         <action>: one of upload, stage, or sync:'
+  opts.separator '                     upload: uploads a single resource to the server'
+  opts.separator '                     stage: uploads and stages a single resource to the server'
+  opts.separator '                     sync: uploads and stages a single resource, then executes a sync on all staged resources'
   opts.separator '     <local-path>: path to the local copy of the resource to upload'
   opts.separator '  <remote-target>: api path defining the resource'
   opts.separator ''
