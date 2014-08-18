@@ -249,11 +249,12 @@ module Loom
       # is the contents of the tar file.
       def tar_with_resourcename(path)
         tarfile = StringIO.new('')
+        path_dir = File.dirname(path)
+        path_base = File.basename(path)
         Gem::Package::TarWriter.new(tarfile) do |tar|
-          Dir[File.join(path, '**/*')].each do |file|
+          Dir[path, File.join(path_dir, "#{path_base}/**/*")].each do |file|
             mode = File.stat(file).mode
-            relative_file = file.sub(/^#{Regexp.escape path}\/?/, '')
-            relative_file = File.join(@options[:resource_name], relative_file)
+            relative_file = file.sub(/^#{Regexp.escape path_dir}\/?/, '')
 
             if File.directory?(file)
               tar.mkdir relative_file, mode

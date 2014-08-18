@@ -119,6 +119,10 @@ module Loom
             if entry.directory?
               FileUtils.mkdir_p dest, :mode => entry.header.mode
             elsif entry.file?
+              # ensure extraction directory exists
+              d_dir = File.dirname(dest)
+              FileUtils.mkdir_p d_dir unless File.exist? d_dir
+
               File.open dest, 'wb' do |f|
                 f.print entry.read
               end
