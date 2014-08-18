@@ -252,7 +252,7 @@ module Loom
         path_dir = File.dirname(path)
         path_base = File.basename(path)
         Gem::Package::TarWriter.new(tarfile) do |tar|
-          Dir[File.join(path_dir, "#{path_base}/**/*")].each do |file|
+          Dir[path, File.join(path_dir, "#{path_base}/**/*")].each do |file|
             mode = File.stat(file).mode
             relative_file = file.sub(/^#{Regexp.escape path_dir}\/?/, '')
 
