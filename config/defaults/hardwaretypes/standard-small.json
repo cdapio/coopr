@@ -1,5 +1,5 @@
 {
-  "name": "small",
+  "name": "standard-small",
   "description": "1 vCPU, 1 GB RAM, 30+ GB Disk",
   "providermap": {
     "aws-us-east-1": {

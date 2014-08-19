@@ -1,5 +1,5 @@
 {
-  "name": "xlarge",
+  "name": "standard-xlarge",
   "description": "4+ vCPU, 15+ GB RAM, 240+ GB Disk",
   "providermap": {
     "aws-us-east-1": {

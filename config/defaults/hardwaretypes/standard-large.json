@@ -1,5 +1,5 @@
 {
-  "name": "large",
+  "name": "standard-large",
   "description": "4+ vCPU, 8 GB RAM, 240+ GB Disk",
   "providermap": {
     "aws-us-east-1": {
