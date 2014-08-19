@@ -38,10 +38,12 @@ class SignalHandler
   def dont_interupt
     @interuptable = false
     @enqueued     = []
+    # rubocop:disable GuardClause
     if block_given?
       yield
       allow_interuptions
     end
+    # rubocop:enable GuardClause
   end
 
   def allow_interuptions
@@ -125,9 +127,7 @@ module Logging
   end
 
   def configure(out)
-    if out != 'STDOUT'
-      @out = out
-    end
+    @out = out unless out == 'STDOUT'
   end
 
   def level=(level)

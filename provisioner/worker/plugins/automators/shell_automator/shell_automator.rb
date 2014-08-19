@@ -40,6 +40,7 @@ class ShellAutomator < Automator
   end
 
   def generate_scripts_tar
+    # rubocop:disable GuardClause
     if !File.exist?(@scripts_tar) or ((Time.now - File.stat(@scripts_tar).mtime).to_i > 600)
       log.debug "Generating #{@scripts_tar} from #{@scripts_dir}"
       scripts_tar_path = File.dirname(@scripts_dir)
@@ -48,6 +49,7 @@ class ShellAutomator < Automator
       `mv "#{@scripts_tar}.new" "#{@scripts_tar}"`
       log.debug "Generation complete: #{@scripts_tar}"
     end
+    # rubocop:enable GuardClause
   end
 
   def set_credentials(sshauth)
