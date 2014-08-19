@@ -116,20 +116,30 @@ public class LoomNodeHandler extends LoomAuthHandler {
   }
 
   @POST
-  public void createNodes(HttpRequest request, HttpResponder responder) {
+  public void createNode(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
     }
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    Set<Node> nodes = gson.fromJson(reader, new TypeToken<Set<Node>>() {}.getType());
+
     try {
-      nodeStoreService.getView(account).writeNodes(nodes);
+      Node node = gson.fromJson(reader, Node.class);
+
+      if (node.getId() == null || node.getId().isEmpty()) {
+        responder.sendError(HttpResponseStatus.BAD_REQUEST, "Node ID is not set");
+        return;
+      }
+      nodeStoreService.getView(account).writeNode(node);
       responder.sendStatus(HttpResponseStatus.CREATED);
     } catch (IllegalAccessException e) {
-      responder.sendError(HttpResponseStatus.FORBIDDEN, "Exception creating nodes.");
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "Exception creating node.");
     } catch (IOException e) {
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception creating nodes.");
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception creating node.");
+    } catch (JsonIOException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Exception reading node from body.");
+    } catch (JsonSyntaxException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Exception reading node from body.");
     } finally {
       try {
         reader.close();
@@ -150,6 +160,11 @@ public class LoomNodeHandler extends LoomAuthHandler {
 
     try {
       Node node = gson.fromJson(reader, Node.class);
+      if (node.getId() == null || node.getId().isEmpty()) {
+        responder.sendError(HttpResponseStatus.BAD_REQUEST, "Node ID is not set");
+        return;
+      }
+
       if (node.getId().equals(nodeId)) {
         nodeStoreService.getView(account).writeNode(node);
         responder.sendStatus(HttpResponseStatus.NO_CONTENT);
@@ -163,7 +178,7 @@ public class LoomNodeHandler extends LoomAuthHandler {
     } catch (JsonIOException e){
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Exception reading node from body.");
     } catch (JsonSyntaxException e){
-        responder.sendError(HttpResponseStatus.BAD_REQUEST, "Exception reading node from body.");
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Exception reading node from body.");
     } finally {
       try {
         reader.close();
