@@ -36,6 +36,7 @@ coverage
 /build
 /integration-testing/target
 .gradle
+/server/derby*
 
 # Cookbooks tarball
 /provisioner/daemon/plugins/automators/chef_automator/chef_automator/*.tar.gz

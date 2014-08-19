@@ -54,6 +54,7 @@ import com.continuuity.loom.codec.json.current.HardwareTypeCodec;
 import com.continuuity.loom.codec.json.current.ImageTypeCodec;
 import com.continuuity.loom.codec.json.current.LayoutConstraintCodec;
 import com.continuuity.loom.codec.json.current.LeaseDurationCodec;
+import com.continuuity.loom.codec.json.current.NodeCodec;
 import com.continuuity.loom.codec.json.current.NodePropertiesRequestCodec;
 import com.continuuity.loom.codec.json.current.ParametersSpecificationCodec;
 import com.continuuity.loom.codec.json.current.PluginResourceMetaCodec;
@@ -139,6 +140,7 @@ public class CodecModules {
       .registerTypeAdapter(Administration.class, new AdministrationCodec())
       .registerTypeAdapter(AutomatorType.class, new AutomatorTypeCodec())
       .registerTypeAdapter(Cluster.class, new ClusterCodec())
+      .registerTypeAdapter(Node.class, new NodeCodec())
       .registerTypeAdapter(ClusterConfigureRequest.class, new ClusterConfigureRequestCodec())
       .registerTypeAdapter(ClusterCreateRequest.class, new ClusterCreateRequestCodec())
       .registerTypeAdapter(ClusterDefaults.class, new ClusterDefaultsCodec())
