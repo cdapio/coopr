@@ -31,12 +31,20 @@ class ShellAutomator < Automator
     @scripts_dir = %W[ #{work_dir} #{tenant} automatortypes shell #{@scripts_parent_dir} ].join('/')
     # name of tarball to generate
     @scripts_tar = %W[ #{work_dir} #{tenant} automatortypes shell scripts.tar.gz ].join('/')
+    # local and remote top-level lib directory name
+    @lib_parent_dir = ".lib"
+    # local lib dir
+    @lib_dir = File.join( File.dirname(__FILE__), @lib_parent_dir)
+    # name of tarball to generate
+    @lib_tar = %W[ #{work_dir} #{tenant} automatortypes shell lib.tar.gz ].join('/')
     # remote storage directory
-    @remote_cache_dir = "/var/cache/loom"
+    @remote_cache_dir = "/var/cache/loom/shell_automator"
     # remote script location to be exported in $PATH
     @remote_scripts_dir = "#{@remote_cache_dir}/#{@scripts_parent_dir}"
+    # remote lib location
+    @remote_lib_dir = "#{@remote_cache_dir}/#{@lib_parent_dir}"
     # loom wrapper for common functions
-    @wrapper_script = "#{@remote_scripts_dir}/.lib/loom_wrapper.sh"
+    @wrapper_script = "#{@remote_lib_dir}/loom_wrapper.sh"
   end
 
   def generate_scripts_tar
@@ -47,6 +55,17 @@ class ShellAutomator < Automator
       `tar -cLzf "#{@scripts_tar}.new" -C "#{scripts_tar_path}" #{scripts_parent_dir}`
       `mv "#{@scripts_tar}.new" "#{@scripts_tar}"`
       log.debug "Generation complete: #{@scripts_tar}"
+    end
+  end
+
+  def generate_lib_tar
+    if !File.exist?(@lib_tar) or ((Time.now - File.stat(@lib_tar).mtime).to_i > 600)
+      log.debug "Generating #{@lib_tar} from #{@lib_dir}"
+      lib_tar_path = File.dirname(@lib_dir)
+      lib_parent_dir = File.basename(@lib_dir)
+      `tar -cLzf "#{@lib_tar}.new" -C "#{lib_tar_path}" #{lib_parent_dir}`
+      `mv "#{@lib_tar}.new" "#{@lib_tar}"`
+      log.debug "Generation complete: #{@lib_tar}"
     end
   end
 
@@ -126,6 +145,7 @@ class ShellAutomator < Automator
     set_credentials(sshauth)
 
     generate_scripts_tar()
+    generate_lib_tar()
 
     # check to ensure scp is installed and attempt to install it
     begin
@@ -177,6 +197,24 @@ class ShellAutomator < Automator
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
+
+    # scp lib tarball to target machine
+    begin
+      Net::SCP.upload!(ipaddress, sshauth['user'], "#{@lib_tar}", "#{@remote_cache_dir}/lib.tar.gz", :ssh =>
+          @credentials, :verbose => true)
+    rescue Net::SSH::AuthenticationFailed
+      raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
+    end
+
+    # extract lib tarball on remote machine
+    begin
+      Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
+        ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/lib.tar.gz -C #{@remote_cache_dir}", "Extract remote #{@remote_cache_dir}/lib.tar.gz")
+      end
+    rescue Net::SSH::AuthenticationFailed
+      raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
+    end
+
 
     @result['status'] = 0
     log.info "ShellAutomator bootstrap completed successfully: #{@result}"
