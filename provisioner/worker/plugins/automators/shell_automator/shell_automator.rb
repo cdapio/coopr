@@ -32,7 +32,7 @@ class ShellAutomator < Automator
     # name of tarball to generate
     @scripts_tar = %W[ #{work_dir} #{tenant} automatortypes shell scripts.tar.gz ].join('/')
     # local and remote top-level lib directory name
-    @lib_parent_dir = ".lib"
+    @lib_parent_dir = "lib"
     # local lib dir
     @lib_dir = File.join( File.dirname(__FILE__), @lib_parent_dir)
     # name of tarball to generate
