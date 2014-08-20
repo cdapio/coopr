@@ -2,7 +2,25 @@
 
 # Requirements
 
+This cookbook requires the `krb5` cookbook, version `1.0.0` or greater.
+
+# Usage
+
+This cookbook is intended for use in creating secure Hadoop clusters. As such, it will add the HTTP service
+principal to all other service principals.
+
 # Attributes
+
+* `krb5_utils['admin_principal']` - Initial administrator principal, created on KDC. Default `admin/admin`
+* `krb5_utils['admin_password']` - Password for `krb5_utils['admin_principal']`. Default `password`
+* `krb5_utils['keytabs_dir']` - On-disk location for storing keytab files. Default `/etc/security/keytabs`
+* `krb5_utils['krb5_service_keytabs']` - Hash of service keytabs to create. Default `{}`
+* `krb5_utils['krb5_user_keytabs']` - Hash of user keytabs to create, in the same format as `krb5_utils['krb5_service_keytabs']`. Default `{}`
+
+Hash format:
+```ruby
+{ 'HTTP' => { 'owner' => 'hdfs', 'group' => 'hadoop', 'mode' => '0640' } }
+```
 
 # License
 

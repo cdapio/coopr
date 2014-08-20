@@ -1,3 +1,7 @@
+## v1.0.1
+
+  Fix a bug with the new default realm attributes
+
 ## v1.0.0
 
   Switch to attribute-driven templates
