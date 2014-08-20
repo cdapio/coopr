@@ -432,7 +432,7 @@ public class Solver {
         String imagetype = nodeLayout.getImageTypeName();
         String imageId = imageTypeMap.get(imagetype).get("image");
         // TODO: temporary workaround, need to refactor the task json
-        String sshUser = imageTypeMap.get(imagetype).get("ssh-user");
+        String sshUser = imageTypeMap.get(imagetype).get("sshuser");
         String hostname = NodeService.createHostname(clusterName, clusterId, nodeNum, dnsSuffix);
         String flavor = hardwareTypeMap.get(hardwaretype);
         // TODO: these should be proper fields and logic for populating node properties should not be in the solver.
