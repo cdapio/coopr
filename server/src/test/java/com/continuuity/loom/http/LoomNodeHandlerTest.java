@@ -124,14 +124,11 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
 
   private List<Node> postNodes(int numberOfNodes, Header[] headers) throws Exception {
     List<Node> nodes = createNodes(numberOfNodes);
-    String nodesToPost = getNodeListAsJsonString(nodes);
-    HttpResponse response = doPost("/v1/loom/nodes", nodesToPost, headers);
-    assertResponseStatus(response, HttpResponseStatus.CREATED);
+    for (Node node : nodes) {
+      HttpResponse response = doPost("/v1/loom/nodes", gson.toJson(node), headers);
+      assertResponseStatus(response, HttpResponseStatus.CREATED);
+    }
     return nodes;
-  }
-
-  private String getNodeListAsJsonString(final List<Node> nodes) {
-    return gson.toJson(nodes);
   }
 
   private String getNodeAsJsonString(final Node node) {
