@@ -45,8 +45,6 @@ import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Constants;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.util.HashSet;
@@ -82,7 +80,7 @@ public class Entities {
         ParameterType.USER,
         ParametersSpecification.EMPTY_SPECIFICATION),
       ImmutableMap.<String, ResourceTypeSpecification>of(
-        "keys", new ResourceTypeSpecification(ResourceTypeFormat.FILE)
+        "keys", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "0400")
       )
     );
     public static final ProviderType RACKSPACE =
@@ -131,8 +129,8 @@ public class Entities {
           )
         )),
         ImmutableMap.<String, ResourceTypeSpecification>of(
-          "scripts", new ResourceTypeSpecification(ResourceTypeFormat.FILE),
-          "data", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE)
+          "scripts", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "755"),
+          "data", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null)
         )
       );
     public static final AutomatorType CHEF =
@@ -150,9 +148,9 @@ public class Entities {
           )
         )),
         ImmutableMap.<String, ResourceTypeSpecification>of(
-          "cookbooks", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
-          "data_bags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
-          "roles", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE)
+          "cookbooks", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
+          "data_bags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
+          "roles", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "644")
         )
       );
     public static final AutomatorType PUPPET =
@@ -170,8 +168,8 @@ public class Entities {
           )
         )),
         ImmutableMap.<String, ResourceTypeSpecification>of(
-          "modules", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
-          "manifests", new ResourceTypeSpecification(ResourceTypeFormat.FILE)
+          "modules", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
+          "manifests", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "644")
         )
       );
   }

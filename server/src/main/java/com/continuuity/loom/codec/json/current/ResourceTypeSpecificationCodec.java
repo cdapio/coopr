@@ -37,6 +37,7 @@ public class ResourceTypeSpecificationCodec extends AbstractCodec<ResourceTypeSp
     JsonObject jsonObj = new JsonObject();
 
     jsonObj.add("format", context.serialize(spec.getFormat()));
+    jsonObj.add("permissions", context.serialize(spec.getPermissions()));
 
     return jsonObj;
   }
@@ -47,7 +48,8 @@ public class ResourceTypeSpecificationCodec extends AbstractCodec<ResourceTypeSp
     JsonObject jsonObj = json.getAsJsonObject();
 
     ResourceTypeFormat format = context.deserialize(jsonObj.get("format"), ResourceTypeFormat.class);
+    String permissions = context.deserialize(jsonObj.get("permissions"), String.class);
 
-    return new ResourceTypeSpecification(format);
+    return new ResourceTypeSpecification(format, permissions);
   }
 }

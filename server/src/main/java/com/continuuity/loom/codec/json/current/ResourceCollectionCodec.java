@@ -16,6 +16,7 @@
 package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.admin.ResourceTypeFormat;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
@@ -61,9 +62,11 @@ public class ResourceCollectionCodec implements JsonSerializer<ResourceCollectio
      *   },
      * }
      */
-    for (ImmutablePair<ResourceType, ResourceTypeFormat> key : src.getResources().keySet()) {
+    for (ImmutablePair<ResourceType, ResourceTypeSpecification> key : src.getResources().keySet()) {
       ResourceType resourceType = key.getFirst();
-      ResourceTypeFormat format = key.getSecond();
+      ResourceTypeSpecification typeSpec = key.getSecond();
+      ResourceTypeFormat format = typeSpec.getFormat();
+      String permissions = typeSpec.getPermissions();
       String pluginTypeStr = pluginTypeToStr(resourceType.getPluginType());
       String pluginName = resourceType.getPluginName();
       String resourceTypeStr = resourceType.getTypeName();
@@ -81,6 +84,9 @@ public class ResourceCollectionCodec implements JsonSerializer<ResourceCollectio
       JsonObject resourceListObj = pluginObj.getAsJsonObject(resourceTypeStr);
       // write the format
       resourceListObj.add("format", context.serialize(format));
+      if (permissions != null) {
+        resourceListObj.addProperty("permissions", permissions);
+      }
       // write the list of active resources
       JsonArray activeList = new JsonArray();
       for (ResourceMeta meta : src.getResources().get(key)) {

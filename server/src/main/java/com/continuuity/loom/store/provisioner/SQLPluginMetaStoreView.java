@@ -17,6 +17,7 @@ package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ResourceTypeFormat;
+import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
@@ -69,7 +70,7 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
             "resource_type=? AND name=? AND version=?");
         try {
           statement.setString(1, tenantId);
-          for (Map.Entry<ImmutablePair<ResourceType, ResourceTypeFormat>, ResourceMeta> entry :
+          for (Map.Entry<ImmutablePair<ResourceType, ResourceTypeSpecification>, ResourceMeta> entry :
             resources.getResources().entries()) {
             ResourceType type = entry.getKey().getFirst();
             ResourceMeta meta = entry.getValue();
