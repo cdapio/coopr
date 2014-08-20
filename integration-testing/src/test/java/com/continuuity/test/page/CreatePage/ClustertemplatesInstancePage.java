@@ -148,7 +148,7 @@ public class ClustertemplatesInstancePage extends GenericPage {
       Integer maxCount = getQuantity(cols.get(4), QUANTITY_MAX);
 
       serviceConstraints.put(service, new ServiceConstraint(requiredHardwaretypes, requiredImagetypes,
-                                                            minCount, maxCount, null, null));
+                                                            minCount, maxCount));
     }
     return serviceConstraints;
   }
