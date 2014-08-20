@@ -32,6 +32,36 @@ on your own cluster with the official installation image.
 System Requirements
 ===================
 
+.. _minimum-hardware:
+
+Minimum Hardware Requirements
+-----------------------------
+Systems hosting the Continuuity Loom components must meet these hardware specifications, in addition to having CPUs
+with a minimum speed of 2 GHz.
+
+.. list-table::
+   :widths: 15 10 20
+   :header-rows: 1
+
+   * - Component
+     - Hardware Component
+     - Specifications
+   * - Continuuity Loom UI
+     - RAM
+     - 1 GB minimum, 2 GB recommended
+   * - Continuuity Loom Server 
+     - RAM
+     - 1 GB minimum, 2 GB recommended
+   * - Continuuity Loom Provisioners
+     - RAM
+     - 256 MB per provisioner worker. For example, with 10 workers 2.5 GB minimum
+   * - Database (ex: MySQL)
+     - RAM
+     - 2 GB minimum, 4 GB recommended
+   * - 
+     - Disk
+     - Disk usage increases as Continuuity Loom usage increases. Suggested minimum of 50GB
+
 .. _system-requirements:
 
 Supported Operating System
