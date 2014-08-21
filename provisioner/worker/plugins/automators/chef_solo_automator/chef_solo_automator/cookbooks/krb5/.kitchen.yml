@@ -1,0 +1,20 @@
+---
+driver:
+  name: vagrant 
+
+provisioner:
+  name: chef_solo
+
+platforms:
+- name: centos-6.5
+
+suites:
+- name: default
+  run_list:
+  - recipe[krb5]
+- name: kadmin
+  run_list:
+  - recipe[krb5::kadmin]
+- name: kdc
+  run_list:
+  - recipe[krb5::kdc]

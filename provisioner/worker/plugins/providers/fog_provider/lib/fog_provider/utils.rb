@@ -73,17 +73,17 @@ module FogProvider
     end
   end
 
-  def is_linklocal(ip)
+  def linklocal?(ip)
     linklocal = IPAddr.new '169.254.0.0/16'
     return linklocal.include?(ip)
   end
 
-  def is_loopback(ip)
+  def loopback?(ip)
     loopback = IPAddr.new '127.0.0.0/8'
     return loopback.include?(ip)
   end
 
-  def is_private(ip)
+  def private?(ip)
     block_a = IPAddr.new '10.0.0.0/8'
     block_b = IPAddr.new '172.16.0.0/12'
     block_c = IPAddr.new '192.168.0.0/16'

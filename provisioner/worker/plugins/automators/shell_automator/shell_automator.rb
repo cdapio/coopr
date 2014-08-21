@@ -50,12 +50,11 @@ class ShellAutomator < Automator
   #   file: full path of destination tar.gz
   #   path: full path to directory, parent dir will be used as cwd
   def generate_tar(file, path)
-    if !File.exist?(file) or ((Time.now - File.stat(file).mtime).to_i > 600)
-      log.debug "Generating #{file} from #{path}"
-      `tar -cLzf "#{file}.new" -C "#{File.dirname(path)}" #{File.basename(path)}`
-      `mv "#{file}.new" "#{file}"`
-      log.debug "Generation complete: #{file}"
-    end
+    return if File.exist?(file) && ((Time.now - File.stat(file).mtime).to_i < 600)
+    log.debug "Generating #{file} from #{path}"
+    `tar -cLzf "#{file}.new" -C "#{File.dirname(path)}" #{File.basename(path)}`
+    `mv "#{file}.new" "#{file}"`
+    log.debug "Generation complete: #{file}"
   end
 
   def set_credentials(sshauth)

@@ -186,6 +186,11 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
       services: $scope.selectedServices,
       initialLeaseDuration: $scope.leaseDuration.initial
     };
+
+    if ($scope.dnsSuffix) {
+      postJson.dnsSuffix = $scope.dnsSuffix;
+    }
+
     if ($scope.defaultConfig) {
       if (!Helpers.isValidJSON($scope.defaultConfig)) {
         $scope.notification = Helpers.JSON_ERR;

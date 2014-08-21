@@ -170,3 +170,8 @@ table.tablesorter thead tr .header {
 }
 
 /**************************************************************************************************/
+
+body #nav .login-dropdown li a span {
+  margin-left: 15px;
+}
+

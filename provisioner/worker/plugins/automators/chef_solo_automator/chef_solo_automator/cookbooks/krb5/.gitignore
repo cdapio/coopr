@@ -1,0 +1,10 @@
+.coverage/
+metadata.json
+*.lock
+.kitchen/
+.kitchen.local.yml
+*.swp
+checkstyle.xml
+.vagrant
+.bundle
+.chef

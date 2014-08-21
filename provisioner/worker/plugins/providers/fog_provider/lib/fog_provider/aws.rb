@@ -177,6 +177,7 @@ class FogProviderAWS < Provider
     log.debug "- aws_region #{@aws_region}"
 
     # Create connection
+    # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
         :provider => 'AWS',
@@ -185,6 +186,7 @@ class FogProviderAWS < Provider
         :region                => @aws_region
       )
     end
+    # rubocop:enable UselessAssignment
   end
 
   def iam_name_from_profile(profile)
@@ -192,10 +194,10 @@ class FogProviderAWS < Provider
     if profile && profile.key?('arn')
       name = profile['arn'].split('/')[-1]
     end
-    name ||= ''
+    name || ''
   end
 
-  def validate!(keys=[@aws_access_key, @aws_secret_key])
+  def validate!(keys = [@aws_access_key, @aws_secret_key])
     errors = []
     # Check for credential file and load it
     unless @aws_credential_file.nil?
@@ -212,19 +214,15 @@ class FogProviderAWS < Provider
     # Validate keys
     keys.each do |k|
       pretty_key = k.to_s.gsub(/_/, ' ').gsub(/\w+/){ |w| (w =~ /(ssh)|(aws)/i) ? w.upcase  : w.capitalize }
-      if k.nil?
-        errors << "You did not provide a valid '#{pretty_key}' value."
-      end
+      errors << "You did not provide a valid '#{pretty_key}' value." if k.nil?
     end
     # Check for errors
-    if errors.each{|e| log.error(e)}.any?
-      raise 'Credential validation failed!'
-    end
+    raise 'Credential validation failed!' if errors.each{|e| log.error(e)}.any?
   end
 
   def vpc_mode?
     # Amazon Virtual Private Cloud requires a subnet_id
-    !!@subnet_id
+    !@subnet_id.nil?
   end
 
   def ami
@@ -253,7 +251,7 @@ class FogProviderAWS < Provider
     }
     server_def[:subnet_id] = @subnet_id if vpc_mode?
     server_def[:tenancy] = 'dedicated' if vpc_mode? && @dedicated_instance
-    server_def[:associate_public_ip] = !!@associate_public_ip if vpc_mode? && @associate_public_ip
+    server_def[:associate_public_ip] = !@associate_public_ip.nil? if vpc_mode? && @associate_public_ip
     server_def
   end
 

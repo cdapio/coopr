@@ -164,6 +164,7 @@ class FogProviderJoyent < Provider
     log.debug "- joyent_version #{@joyent_version}"
 
     # Create connection
+    # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
         :provider => 'Joyent',
@@ -175,14 +176,15 @@ class FogProviderJoyent < Provider
         :joyent_version  => @joyent_version
       )
     end
+    # rubocop:enable UselessAssignment
   end
 
   def ip_address(server)
-    server_ips = server.ips.select{ |ip| ip && !(is_loopback(ip) || is_linklocal(ip)) }
+    server_ips = server.ips.select{ |ip| ip && !(loopback?(ip) || linklocal?(ip)) }
     if server_ips.count === 1
       server_ips.first
     else
-      server_ips.find{ |ip| !is_private(ip) }
+      server_ips.find{ |ip| !private?(ip) }
     end
   end
 

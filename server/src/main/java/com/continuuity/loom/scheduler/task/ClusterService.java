@@ -374,7 +374,7 @@ public class ClusterService {
 
       loomStats.getClusterStats().incrementStat(action);
       SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, gson.toJson(addRequest));
-      clusterQueues.add(account.getTenantId(), new Element(clusterId, gson.toJson(solverRequest)));
+      solverQueues.add(account.getTenantId(), new Element(clusterId, gson.toJson(solverRequest)));
     } finally {
       lock.release();
     }

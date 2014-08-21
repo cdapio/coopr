@@ -158,9 +158,7 @@ class PluginManager
   def getAllHandlerActionObjectsForAutomators
     results = []
     @automatormap.each do |k, v|
-      if v.key?('classname')
-        results.push(v['classname'])
-      end
+      results.push(v['classname']) if v.key?('classname')
     end
     results
   end

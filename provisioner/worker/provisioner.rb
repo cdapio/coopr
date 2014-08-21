@@ -73,7 +73,7 @@ if loom_uri.nil? && !options[:file]
   exit(1)
 end
 
-if(!options[:work_dir])
+unless(options[:work_dir])
   puts "--work-dir option must be specified"
   exit(1)
 end
@@ -106,7 +106,6 @@ end
 @plugin_env = options 
 
 def delegate_task(task, pluginmanager)
-  task_id = nil
   providerName = nil # rubocop:disable UselessAssignment
   automatorName = nil # rubocop:disable UselessAssignment
   clazz = nil # rubocop:disable UselessAssignment

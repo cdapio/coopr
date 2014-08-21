@@ -162,6 +162,7 @@ class FogProviderOpenstack < Provider
     log.debug "- openstack_ssl_verify_peer #{@openstack_ssl_verify_peer}"
 
     # Create connection
+    # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
         :provider => 'OpenStack',
@@ -174,6 +175,7 @@ class FogProviderOpenstack < Provider
         }
       )
     end
+    # rubocop:enable UselessAssignment
   end
 
   def ip_address(server, network = 'public')
