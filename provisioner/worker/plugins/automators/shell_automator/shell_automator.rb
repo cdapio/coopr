@@ -46,25 +46,15 @@ class ShellAutomator < Automator
     @wrapper_script = "#{@remote_lib_dir}/loom_wrapper.sh"
   end
 
-  def generate_resource_tar(resource)
-    resource_path = %W[ #{@resources_path} #{resource} ].join('/')
-    resource_tar  = %W[ #{@resources_path} #{resource}.tar.gz ].join('/')
-    if !File.exist?(resource_tar) or ((Time.now - File.stat(resource_tar).mtime).to_i > 600)
-      log.debug "Generating #{resource_tar} from #{resource_path}"
-      `tar -cLzf "#{resource_tar}.new" -C "#{@resources_path}" #{resource}`
-      `mv "#{resource_tar}.new" "#{resource_tar}"`
-      log.debug "Generation complete: #{resource_tar}"
-    end
-  end
-
-  def generate_lib_tar
-    if !File.exist?(@lib_tar) or ((Time.now - File.stat(@lib_tar).mtime).to_i > 600)
-      log.debug "Generating #{@lib_tar} from #{@lib_dir}"
-      lib_tar_path = File.dirname(@lib_dir)
-      lib_parent_dir = File.basename(@lib_dir)
-      `tar -cLzf "#{@lib_tar}.new" -C "#{lib_tar_path}" #{lib_parent_dir}`
-      `mv "#{@lib_tar}.new" "#{@lib_tar}"`
-      log.debug "Generation complete: #{@lib_tar}"
+  # tar up a directory
+  #   file: full path of destination tar.gz
+  #   path: full path to directory, parent dir will be used as cwd
+  def generate_tar(file, path)
+    if !File.exist?(file) or ((Time.now - File.stat(file).mtime).to_i > 600)
+      log.debug "Generating #{file} from #{path}"
+      `tar -cLzf "#{file}.new" -C "#{File.dirname(path)}" #{File.basename(path)}`
+      `mv "#{file}.new" "#{file}"`
+      log.debug "Generation complete: #{file}"
     end
   end
 
@@ -143,10 +133,13 @@ class ShellAutomator < Automator
 
     set_credentials(sshauth)
 
+    # generate the local tarballs for resources and for our own wrapper libs
     @resources.each do |resource|
-      generate_resource_tar(resource)
+      tar = %W[ #{@resources_path} #{resource}.tar.gz ].join('/')
+      path = %W[ #{@resources_path} #{resource} ].join('/')
+      generate_tar(tar, path)
     end
-    generate_lib_tar()
+    generate_tar(@lib_tar, @lib_dir)
 
     # check to ensure scp is installed and attempt to install it
     begin
