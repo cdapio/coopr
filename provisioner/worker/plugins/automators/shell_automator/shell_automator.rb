@@ -25,31 +25,36 @@ class ShellAutomator < Automator
     super(env, task)
     work_dir = @env[:work_dir]
     tenant = @env[:tenant]
-    # local and remote top-level script directory name
-    @scripts_parent_dir = "scripts"
-    # local scripts dir
-    @scripts_dir = %W[ #{work_dir} #{tenant} automatortypes shell #{@scripts_parent_dir} ].join('/')
+
+    @resources = %w( scripts archives )
+    @resources_path = %W[ #{work_dir} #{tenant} automatortypes shell ].join('/')
+
+    # local and remote top-level lib directory name
+    @lib_parent_dir = "lib"
+    # local lib dir
+    @lib_dir = File.join( File.dirname(__FILE__), @lib_parent_dir)
     # name of tarball to generate
-    @scripts_tar = %W[ #{work_dir} #{tenant} automatortypes shell scripts.tar.gz ].join('/')
+    @lib_tar = %W[ #{work_dir} #{tenant} automatortypes shell lib.tar.gz ].join('/')
+
     # remote storage directory
-    @remote_cache_dir = "/var/cache/loom"
+    @remote_cache_dir = "/var/cache/loom/shell_automator"
     # remote script location to be exported in $PATH
-    @remote_scripts_dir = "#{@remote_cache_dir}/#{@scripts_parent_dir}"
+    @remote_scripts_dir = "#{@remote_cache_dir}/scripts"
+    # remote lib location
+    @remote_lib_dir = "#{@remote_cache_dir}/#{@lib_parent_dir}"
     # loom wrapper for common functions
-    @wrapper_script = "#{@remote_scripts_dir}/.lib/loom_wrapper.sh"
+    @wrapper_script = "#{@remote_lib_dir}/loom_wrapper.sh"
   end
 
-  def generate_scripts_tar
-    # rubocop:disable GuardClause
-    if !File.exist?(@scripts_tar) or ((Time.now - File.stat(@scripts_tar).mtime).to_i > 600)
-      log.debug "Generating #{@scripts_tar} from #{@scripts_dir}"
-      scripts_tar_path = File.dirname(@scripts_dir)
-      scripts_parent_dir = File.basename(@scripts_dir)
-      `tar -cLzf "#{@scripts_tar}.new" -C "#{scripts_tar_path}" #{scripts_parent_dir}`
-      `mv "#{@scripts_tar}.new" "#{@scripts_tar}"`
-      log.debug "Generation complete: #{@scripts_tar}"
-    end
-    # rubocop:enable GuardClause
+  # tar up a directory
+  #   file: full path of destination tar.gz
+  #   path: full path to directory, parent dir will be used as cwd
+  def generate_tar(file, path)
+    return if File.exist?(file) && ((Time.now - File.stat(file).mtime).to_i < 600)
+    log.debug "Generating #{file} from #{path}"
+    `tar -cLzf "#{file}.new" -C "#{File.dirname(path)}" #{File.basename(path)}`
+    `mv "#{file}.new" "#{file}"`
+    log.debug "Generation complete: #{file}"
   end
 
   def set_credentials(sshauth)
@@ -127,7 +132,13 @@ class ShellAutomator < Automator
 
     set_credentials(sshauth)
 
-    generate_scripts_tar()
+    # generate the local tarballs for resources and for our own wrapper libs
+    @resources.each do |resource|
+      tar = %W[ #{@resources_path} #{resource}.tar.gz ].join('/')
+      path = %W[ #{@resources_path} #{resource} ].join('/')
+      generate_tar(tar, path)
+    end
+    generate_tar(@lib_tar, @lib_dir)
 
     # check to ensure scp is installed and attempt to install it
     begin
@@ -161,20 +172,41 @@ class ShellAutomator < Automator
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
-    log.debug "ShellAutomator bootstrap uploading scripts to #{ipaddress}"
+    # scp resource tarballs to target machine
+    @resources.each do |resource|
+      log.debug "Uploading #{resource} from #{@resources_path}/#{resource}.tar.gz to #{ipaddress}:#{@remote_cache_dir}/#{resource}.tar.gz"
+      begin
+        Net::SCP.upload!(ipaddress, sshauth['user'], "#{@resources_path}/#{resource}.tar.gz", "#{@remote_cache_dir}/#{resource}.tar.gz", :ssh =>
+          @credentials, :verbose => true)
+      rescue Net::SSH::AuthenticationFailed
+        raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
+      end
+      log.debug "Upload complete"
+    end
 
-    # scp tarball to target machine
+    # extract resource tarballs to target machine
+    @resources.each do |resource|
+      begin
+        Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
+          ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/#{resource}.tar.gz -C #{@remote_cache_dir}", "Extract remote #{@remote_cache_dir}/#{resource}.tar.gz")
+        end
+      rescue Net::SSH::AuthenticationFailed
+        raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
+      end
+    end
+
+    # scp lib tarball to target machine
     begin
-      Net::SCP.upload!(ipaddress, sshauth['user'], "#{@scripts_tar}", "#{@remote_cache_dir}/scripts.tar.gz", :ssh =>
+      Net::SCP.upload!(ipaddress, sshauth['user'], "#{@lib_tar}", "#{@remote_cache_dir}/lib.tar.gz", :ssh =>
           @credentials, :verbose => true)
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
     end
 
-    # extract scripts tarball on remote machine
+    # extract lib tarball on remote machine
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
-        ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/scripts.tar.gz -C #{@remote_cache_dir}", "Extract remote #{@remote_cache_dir}/scripts.tar.gz")
+        ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/lib.tar.gz -C #{@remote_cache_dir}", "Extract remote #{@remote_cache_dir}/lib.tar.gz")
       end
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace

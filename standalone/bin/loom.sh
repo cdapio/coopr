@@ -178,6 +178,7 @@ function stage_default_data () {
     cd ${LOOM_PROVISIONER_PLUGIN_DIR}
     echo "Loading initial data..."
     for script in $(ls -1 */*/load-bundled-data.sh) ; do
+      cd ${LOOM_PROVISIONER_PLUGIN_DIR}
       . ${script}
     done
 }
