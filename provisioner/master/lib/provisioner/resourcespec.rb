@@ -19,7 +19,7 @@
 module Loom
   # simple specification for a tenant's required resources
   class ResourceSpec
-    attr_accessor :resources, :resource_formats
+    attr_accessor :resources, :resource_formats, :resource_permissions
 
     # initialized from the json object per API spec
     # {"automatortype"=>{"chef-solo"=>{"cookbooks"=>{"format"=>"archive",
@@ -31,6 +31,10 @@ module Loom
       # resource_formats is a hash of '/'-delimited resource paths and their formats
       #   ex: "automatortype/chef-solo/cookbooks/hadoop" => "archive"
       @resource_formats = {}
+      # resource_oermissions is a hash of '/'-delimited resource paths and their file permissions
+      # only applicable to resources with format = 'file'
+      #   ex: "automatortype/shell/scripts/my_script.sh" => "0755"
+      @resource_permissions = {}
       unless resource_jsonobj.nil?
         # example resource_jsonobj: "automatortype" => {...}
         resource_jsonobj.each do |type, h_type|
@@ -45,6 +49,10 @@ module Loom
               if h_resource.key?('format')
                 format = h_resource['format']
               end
+              permissions = nil
+              if h_resource.key?('permissions')
+                permissions = h_resource['permissions']
+              end
               if h_resource.key?('active')
                 # example h_resource['active'] array: [{"name" => "hadoop", "version" => "2"}]
                 h_resource['active'].each do |nv|
@@ -53,6 +61,7 @@ module Loom
                   resource_name = %W( #{type} #{id} #{resource_type} #{name}).join('/')
                   @resources[resource_name] = version
                   @resource_formats[resource_name] = format
+                  @resource_permissions[resource_name] = permissions
                 end
               end
             end
@@ -63,7 +72,8 @@ module Loom
 
     # define two ResourceSpecs as equal if @resources hash has same contents
     def ==(other)
-      @resources == other.resources && @resource_formats == other.resource_formats
+      @resources == other.resources && @resource_formats == other.resource_formats \
+                    && @resource_permissions == other.resource_permissions
     end
   end
 end

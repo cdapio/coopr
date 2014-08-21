@@ -92,6 +92,12 @@ module Loom
         # ex: data/tenant1/automatortype/chef-solo/roles/cluster.json/1/cluster.json
         data_file = %W( #{@datadir} #{resource} #{version} #{resource.split('/')[-1]}).join('/')
         log.debug "storing fetched file #{download_file} into data dir: #{data_file}"
+        # set file permissions if specified
+        if @resourcespec.resource_permissions.key?(resource)
+          log.debug "setting file permissions #{@resourcespec.resource_permissions[resource]}"
+          octal_mode = @resourcespec.resource_permissions[resource].to_i(8)
+          FileUtils.chmod octal_mode, download_file
+        end
         FileUtils.mkdir_p(File.dirname(data_file))
         FileUtils.mv(download_file, data_file)
       end
