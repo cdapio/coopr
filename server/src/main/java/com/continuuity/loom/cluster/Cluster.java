@@ -16,9 +16,9 @@
 package com.continuuity.loom.cluster;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.NamedEntity;
-import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.NamedEntity;
+import com.continuuity.loom.spec.Provider;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;

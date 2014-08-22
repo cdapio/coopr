@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.FieldSchema;
+import com.continuuity.loom.spec.plugin.FieldSchema;
 import com.continuuity.loom.codec.json.AbstractCodec;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Codec for serializing/deserializing a {@link com.continuuity.loom.admin.FieldSchema}. Used so that the constructor
+ * Codec for serializing/deserializing a {@link com.continuuity.loom.spec.plugin.FieldSchema}. Used so that the constructor
  * is called to avoid null values where they do not make sense, and to use 'default' as a key.
  */
 public class FieldSchemaCodec extends AbstractCodec<FieldSchema> {

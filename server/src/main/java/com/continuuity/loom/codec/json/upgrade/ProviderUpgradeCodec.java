@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.codec.json.upgrade;
 
-import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.spec.Provider;
 import com.continuuity.loom.codec.json.AbstractCodec;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;

@@ -15,10 +15,10 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ParameterType;
-import com.continuuity.loom.admin.ParametersSpecification;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.ResourceTypeSpecification;
+import com.continuuity.loom.spec.plugin.ParameterType;
+import com.continuuity.loom.spec.plugin.ParametersSpecification;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -30,7 +30,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.admin.ProviderType}. Used so that the constructor is called to
+ * Codec for deserializing a {@link com.continuuity.loom.spec.plugin.ProviderType}. Used so that the constructor is called to
  * avoid null values where they do not make sense.
  */
 public class ProviderTypeCodec implements JsonDeserializer<ProviderType> {

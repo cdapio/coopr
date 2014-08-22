@@ -15,11 +15,10 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
-import com.continuuity.loom.admin.ServiceDependencies;
-import com.continuuity.loom.admin.ServiceStageDependencies;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
+import com.continuuity.loom.spec.service.ServiceDependencies;
 import com.continuuity.loom.codec.json.AbstractCodec;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
@@ -31,7 +30,6 @@ import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Codec for serializing/deserializing a {@link Service}.

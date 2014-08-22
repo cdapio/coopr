@@ -16,8 +16,8 @@
 package com.continuuity.loom.codec.json.upgrade;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Provider;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.Provider;
 import com.continuuity.loom.cluster.Cluster;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;

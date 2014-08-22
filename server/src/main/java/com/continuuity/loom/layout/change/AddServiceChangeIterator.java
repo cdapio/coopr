@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.layout.change;
 
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.NodeLayout;
 import com.continuuity.loom.layout.NodeLayoutComparator;

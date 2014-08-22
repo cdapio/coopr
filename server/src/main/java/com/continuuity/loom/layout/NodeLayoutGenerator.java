@@ -15,9 +15,9 @@
  */
 package com.continuuity.loom.layout;
 
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -29,15 +29,14 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 
 /**
  * Generates an ordered list of {@link NodeLayout}s sorted by preference given a {@link ClusterTemplate},
  * set of names of services that should be placed on the cluster,
- * set of allowed {@link com.continuuity.loom.admin.HardwareType}s, and set of allowed
- * {@link com.continuuity.loom.admin.ImageType}s.
+ * set of allowed {@link com.continuuity.loom.spec.HardwareType}s, and set of allowed
+ * {@link com.continuuity.loom.spec.ImageType}s.
  */
 public class NodeLayoutGenerator {
   private static final Logger LOG  = LoggerFactory.getLogger(NodeLayoutGenerator.class);

@@ -16,7 +16,7 @@
 
 package com.continuuity.loom.codec.json.upgrade;
 
-import com.continuuity.loom.admin.ServiceAction;
+import com.continuuity.loom.spec.service.ServiceAction;
 import com.continuuity.loom.codec.json.AbstractCodec;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonDeserializationContext;
@@ -30,7 +30,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Codec for serializing/deserializing a {@link com.continuuity.loom.admin.ServiceAction}.
+ * Codec for serializing/deserializing a {@link com.continuuity.loom.spec.service.ServiceAction}.
  */
 public class ServiceActionUpgradeCodec extends AbstractCodec<ServiceAction> {
 

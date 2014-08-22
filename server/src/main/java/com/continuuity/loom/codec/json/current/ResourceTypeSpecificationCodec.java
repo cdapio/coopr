@@ -16,8 +16,8 @@
 
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ResourceTypeFormat;
-import com.continuuity.loom.admin.ResourceTypeSpecification;
+import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
 import com.continuuity.loom.codec.json.AbstractCodec;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;

@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.spec.Tenant;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;

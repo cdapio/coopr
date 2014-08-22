@@ -16,10 +16,10 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;

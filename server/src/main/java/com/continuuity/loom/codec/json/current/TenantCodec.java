@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -26,7 +26,7 @@ import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.admin.Tenant}. Used so field validation is done.
+ * Codec for deserializing a {@link com.continuuity.loom.spec.Tenant}. Used so field validation is done.
  */
 public class TenantCodec implements JsonDeserializer<Tenant> {
 

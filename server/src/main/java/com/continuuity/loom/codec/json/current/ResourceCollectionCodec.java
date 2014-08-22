@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ResourceTypeFormat;
+import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
 import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;

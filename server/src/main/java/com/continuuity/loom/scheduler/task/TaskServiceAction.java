@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.admin.ServiceAction;
+import com.continuuity.loom.spec.service.ServiceAction;
 import com.google.common.base.Objects;
 
 /**

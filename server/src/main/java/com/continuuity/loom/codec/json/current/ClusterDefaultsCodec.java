@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterDefaults;
 import com.continuuity.loom.codec.json.AbstractCodec;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Codec for serializing/deserializing a {@link com.continuuity.loom.admin.ClusterTemplate}.
+ * Codec for serializing/deserializing a {@link com.continuuity.loom.spec.template.ClusterTemplate}.
  */
 public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
 

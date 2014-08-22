@@ -15,12 +15,12 @@
  */
 package com.continuuity.test.input;
 
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.NamedEntity;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.NamedEntity;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;

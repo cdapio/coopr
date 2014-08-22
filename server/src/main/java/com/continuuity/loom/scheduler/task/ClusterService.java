@@ -16,7 +16,7 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ClusterTemplate;
+import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;

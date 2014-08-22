@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.layout.change;
 
-import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.layout.ClusterLayout;

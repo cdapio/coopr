@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.spec.ProvisionerAction;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;

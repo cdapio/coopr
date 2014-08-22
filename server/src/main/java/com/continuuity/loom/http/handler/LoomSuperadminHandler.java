@@ -17,9 +17,9 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.Provisioner;
@@ -335,7 +335,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     }
   }
   /**
-   * Delete a specific {@link com.continuuity.loom.admin.ProviderType}. User must be admin or a 403 is returned.
+   * Delete a specific {@link com.continuuity.loom.spec.plugin.ProviderType}. User must be admin or a 403 is returned.
    *
    * @param request The request to delete a provider type.
    * @param responder Responder for sending the response.
@@ -366,7 +366,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Delete a specific {@link com.continuuity.loom.admin.AutomatorType}. User must be admin or a 403 is returned.
+   * Delete a specific {@link com.continuuity.loom.spec.plugin.AutomatorType}. User must be admin or a 403 is returned.
    *
    * @param request The request to delete an automator type.
    * @param responder Responder for sending the response.
@@ -397,7 +397,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Writes a {@link com.continuuity.loom.admin.ProviderType}. User must be admin or a 403 is returned.
+   * Writes a {@link com.continuuity.loom.spec.plugin.ProviderType}. User must be admin or a 403 is returned.
    * If the name in the path does not match the name in the put body, a 400 is returned.
    *
    * @param request Request to write provider type.
@@ -438,7 +438,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Writes a {@link com.continuuity.loom.admin.AutomatorType}. User must be admin or a 403 is returned.
+   * Writes a {@link com.continuuity.loom.spec.plugin.AutomatorType}. User must be admin or a 403 is returned.
    * If the name in the path does not match the name in the put body, a 400 is returned.
    *
    * @param request Request to write provider type.

@@ -15,13 +15,13 @@
  */
 package com.continuuity.loom.store.entity;
 
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.service.Service;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -34,7 +34,7 @@ import java.util.Collection;
 public interface EntityStoreView {
 
   /**
-   * Get the {@link com.continuuity.loom.admin.Provider} associated with the given unique name
+   * Get the {@link com.continuuity.loom.spec.Provider} associated with the given unique name
    * or null if no such provider exists.
    *
    * @param providerName Unique name of the provider to get.
@@ -44,7 +44,7 @@ public interface EntityStoreView {
   Provider getProvider(String providerName) throws IOException;
 
   /**
-   * Get all {@link com.continuuity.loom.admin.Provider}s.
+   * Get all {@link com.continuuity.loom.spec.Provider}s.
    *
    * @return Collection of all providers.
    * @throws Exception
@@ -52,8 +52,8 @@ public interface EntityStoreView {
   Collection<Provider> getAllProviders() throws IOException;
 
   /**
-   * Write the given {@link com.continuuity.loom.admin.Provider} to the store. Will overwrite the
-   * existing {@link com.continuuity.loom.admin.Provider} if it exists.
+   * Write the given {@link com.continuuity.loom.spec.Provider} to the store. Will overwrite the
+   * existing {@link com.continuuity.loom.spec.Provider} if it exists.
    *
    * @param provider Provider to write.
    * @throws Exception
@@ -61,7 +61,7 @@ public interface EntityStoreView {
   void writeProvider(Provider provider) throws IOException, IllegalAccessException;
 
   /**
-   * Delete the {@link com.continuuity.loom.admin.Provider} associated with the given unique name.
+   * Delete the {@link com.continuuity.loom.spec.Provider} associated with the given unique name.
    *
    * @param providerName Name of the provider to delete.
    * @throws Exception
@@ -69,7 +69,7 @@ public interface EntityStoreView {
   void deleteProvider(String providerName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link com.continuuity.loom.admin.HardwareType} associated with the
+   * Get the {@link com.continuuity.loom.spec.HardwareType} associated with the
    * given unique name or null if no such provider exists.
    *
    * @param hardwareTypeName Unique name of the provider to get.
@@ -79,7 +79,7 @@ public interface EntityStoreView {
   HardwareType getHardwareType(String hardwareTypeName) throws IOException;
 
   /**
-   * Get all {@link com.continuuity.loom.admin.HardwareType}s.
+   * Get all {@link com.continuuity.loom.spec.HardwareType}s.
    *
    * @return Collection of all hardware types.
    * @throws Exception
@@ -87,8 +87,8 @@ public interface EntityStoreView {
   Collection<HardwareType> getAllHardwareTypes() throws IOException;
 
   /**
-   * Write the given {@link com.continuuity.loom.admin.HardwareType} to the store.
-   * Will overwrite the existing {@link com.continuuity.loom.admin.HardwareType} if it exists.
+   * Write the given {@link com.continuuity.loom.spec.HardwareType} to the store.
+   * Will overwrite the existing {@link com.continuuity.loom.spec.HardwareType} if it exists.
    *
    * @param hardwareType Hardware type to write.
    * @throws Exception
@@ -96,7 +96,7 @@ public interface EntityStoreView {
   void writeHardwareType(HardwareType hardwareType) throws IOException, IllegalAccessException;
 
   /**
-   * Delete the {@link com.continuuity.loom.admin.HardwareType} associated with the given unique name.
+   * Delete the {@link com.continuuity.loom.spec.HardwareType} associated with the given unique name.
    *
    * @param hardwareTypeName Name of the hardware type to delete.
    * @throws Exception
@@ -104,7 +104,7 @@ public interface EntityStoreView {
   void deleteHardwareType(String hardwareTypeName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link com.continuuity.loom.admin.ImageType} associated with the
+   * Get the {@link com.continuuity.loom.spec.ImageType} associated with the
    * given unique name or null if no such provider exists.
    *
    * @param imageTypeName Unique name of the provider to get.
@@ -114,7 +114,7 @@ public interface EntityStoreView {
   ImageType getImageType(String imageTypeName) throws IOException;
 
   /**
-   * Get all {@link com.continuuity.loom.admin.ImageType}s.
+   * Get all {@link com.continuuity.loom.spec.ImageType}s.
    *
    * @return Collection of all image types.
    * @throws Exception
@@ -122,8 +122,8 @@ public interface EntityStoreView {
   Collection<ImageType> getAllImageTypes() throws IOException;
 
   /**
-   * Write the given {@link com.continuuity.loom.admin.ImageType} to the store.
-   * Will overwrite the existing {@link com.continuuity.loom.admin.ImageType} if it exists.
+   * Write the given {@link com.continuuity.loom.spec.ImageType} to the store.
+   * Will overwrite the existing {@link com.continuuity.loom.spec.ImageType} if it exists.
    *
    * @param imageType Image type to write.
    * @throws Exception
@@ -131,7 +131,7 @@ public interface EntityStoreView {
   void writeImageType(ImageType imageType) throws IOException, IllegalAccessException;
 
   /**
-   * Delete the {@link com.continuuity.loom.admin.ImageType} associated with the given unique name.
+   * Delete the {@link com.continuuity.loom.spec.ImageType} associated with the given unique name.
    *
    * @param imageTypeName Name of the image type to delete.
    * @throws Exception
@@ -139,7 +139,7 @@ public interface EntityStoreView {
   void deleteImageType(String imageTypeName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link com.continuuity.loom.admin.Service} associated with the given
+   * Get the {@link com.continuuity.loom.spec.service.Service} associated with the given
    * unique name or null if no such provider exists.
    *
    * @param serviceName Unique name of the provider to get.
@@ -149,7 +149,7 @@ public interface EntityStoreView {
   Service getService(String serviceName) throws IOException;
 
   /**
-   * Get all {@link com.continuuity.loom.admin.Service}s.
+   * Get all {@link com.continuuity.loom.spec.service.Service}s.
    *
    * @return Collection of all services.
    * @throws Exception
@@ -157,8 +157,8 @@ public interface EntityStoreView {
   Collection<Service> getAllServices() throws IOException;
 
   /**
-   * Write the given {@link com.continuuity.loom.admin.Service} to the store.
-   * Will overwrite the existing {@link com.continuuity.loom.admin.Service} if it exists.
+   * Write the given {@link com.continuuity.loom.spec.service.Service} to the store.
+   * Will overwrite the existing {@link com.continuuity.loom.spec.service.Service} if it exists.
    *
    * @param service Service to write.
    * @throws Exception
@@ -166,7 +166,7 @@ public interface EntityStoreView {
   void writeService(Service service) throws IOException, IllegalAccessException;
 
   /**
-   * Delete the {@link com.continuuity.loom.admin.Service} associated with the given unique name.
+   * Delete the {@link com.continuuity.loom.spec.service.Service} associated with the given unique name.
    *
    * @param serviceName Name of the service to delete.
    * @throws Exception
@@ -174,7 +174,7 @@ public interface EntityStoreView {
   void deleteService(String serviceName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link com.continuuity.loom.admin.ClusterTemplate} associated with the given unique name
+   * Get the {@link com.continuuity.loom.spec.template.ClusterTemplate} associated with the given unique name
    * or null if no such provider exists.
    *
    * @param clusterTemplateName Unique name of the provider to get.
@@ -184,7 +184,7 @@ public interface EntityStoreView {
   ClusterTemplate getClusterTemplate(String clusterTemplateName) throws IOException;
 
   /**
-   * Get all {@link com.continuuity.loom.admin.ClusterTemplate}s.
+   * Get all {@link com.continuuity.loom.spec.template.ClusterTemplate}s.
    *
    * @return Collection of all cluster templates.
    * @throws Exception
@@ -192,8 +192,8 @@ public interface EntityStoreView {
   Collection<ClusterTemplate> getAllClusterTemplates() throws IOException;
 
   /**
-   * Write the given {@link com.continuuity.loom.admin.ClusterTemplate} to the store.
-   * Will overwrite the existing {@link com.continuuity.loom.admin.ClusterTemplate} if it exists.
+   * Write the given {@link com.continuuity.loom.spec.template.ClusterTemplate} to the store.
+   * Will overwrite the existing {@link com.continuuity.loom.spec.template.ClusterTemplate} if it exists.
    *
    * @param clusterTemplate Cluster template to write.
    * @throws Exception
@@ -201,7 +201,7 @@ public interface EntityStoreView {
   void writeClusterTemplate(ClusterTemplate clusterTemplate) throws IOException, IllegalAccessException;
 
   /**
-   * Delete the {@link com.continuuity.loom.admin.ClusterTemplate} associated with the given unique name.
+   * Delete the {@link com.continuuity.loom.spec.template.ClusterTemplate} associated with the given unique name.
    *
    * @param clusterTemplateName Name of the cluster template to delete.
    * @throws Exception
@@ -209,7 +209,7 @@ public interface EntityStoreView {
   void deleteClusterTemplate(String clusterTemplateName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link com.continuuity.loom.admin.ProviderType} associated with the given unique name
+   * Get the {@link com.continuuity.loom.spec.plugin.ProviderType} associated with the given unique name
    * or null if no such provider type exists.
    *
    * @param providerTypeName Unique name of the provider type to get.
@@ -219,7 +219,7 @@ public interface EntityStoreView {
   ProviderType getProviderType(String providerTypeName) throws IOException;
 
   /**
-   * Get all {@link com.continuuity.loom.admin.ProviderType}s.
+   * Get all {@link com.continuuity.loom.spec.plugin.ProviderType}s.
    *
    * @return Collection of all provider types.
    * @throws Exception
@@ -227,8 +227,8 @@ public interface EntityStoreView {
   Collection<ProviderType> getAllProviderTypes() throws IOException;
 
   /**
-   * Write the given {@link com.continuuity.loom.admin.ProviderType} to the store.
-   * Will overwrite the existing {@link com.continuuity.loom.admin.ProviderType} if it exists.
+   * Write the given {@link com.continuuity.loom.spec.plugin.ProviderType} to the store.
+   * Will overwrite the existing {@link com.continuuity.loom.spec.plugin.ProviderType} if it exists.
    *
    * @param providerType Provider type to write.
    * @throws Exception
@@ -236,7 +236,7 @@ public interface EntityStoreView {
   void writeProviderType(ProviderType providerType) throws IOException, IllegalAccessException;
 
   /**
-   * Delete the {@link com.continuuity.loom.admin.ProviderType} associated with the given unique name.
+   * Delete the {@link com.continuuity.loom.spec.plugin.ProviderType} associated with the given unique name.
    *
    * @param providerTypeName Name of the provider type to delete.
    * @throws Exception
@@ -244,7 +244,7 @@ public interface EntityStoreView {
   void deleteProviderType(String providerTypeName) throws IOException, IllegalAccessException;
 
   /**
-   * Get the {@link com.continuuity.loom.admin.AutomatorType} associated with the given unique name or null if
+   * Get the {@link com.continuuity.loom.spec.plugin.AutomatorType} associated with the given unique name or null if
    * no such automator type exists.
    *
    * @param automatorTypeName Unique name of the automator type to get.
@@ -254,7 +254,7 @@ public interface EntityStoreView {
   AutomatorType getAutomatorType(String automatorTypeName) throws IOException;
 
   /**
-   * Get all {@link com.continuuity.loom.admin.AutomatorType}s.
+   * Get all {@link com.continuuity.loom.spec.plugin.AutomatorType}s.
    *
    * @return Collection of all automator types.
    * @throws Exception
@@ -262,8 +262,8 @@ public interface EntityStoreView {
   Collection<AutomatorType> getAllAutomatorTypes() throws IOException;
 
   /**
-   * Write the given {@link com.continuuity.loom.admin.AutomatorType} to the store.
-   * Will overwrite the existing {@link com.continuuity.loom.admin.AutomatorType} if it exists.
+   * Write the given {@link com.continuuity.loom.spec.plugin.AutomatorType} to the store.
+   * Will overwrite the existing {@link com.continuuity.loom.spec.plugin.AutomatorType} if it exists.
    *
    * @param automatorType Automator type to write.
    * @throws Exception
@@ -271,7 +271,7 @@ public interface EntityStoreView {
   void writeAutomatorType(AutomatorType automatorType) throws IOException, IllegalAccessException;
 
   /**
-   * Delete the {@link com.continuuity.loom.admin.AutomatorType} associated with the given unique name.
+   * Delete the {@link com.continuuity.loom.spec.plugin.AutomatorType} associated with the given unique name.
    *
    * @param automatorTypeName Name of the automator type to delete.
    * @throws Exception

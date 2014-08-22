@@ -15,11 +15,10 @@
  */
 package com.continuuity.loom.layout;
 
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.google.common.collect.Maps;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

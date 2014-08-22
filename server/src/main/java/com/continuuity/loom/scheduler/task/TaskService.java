@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.spec.ProvisionerAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;

@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.http;
 
-import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.google.common.base.Charsets;

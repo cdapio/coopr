@@ -17,8 +17,8 @@ package com.continuuity.loom.http;
 
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.internal.ElementsTrackingQueue;

@@ -15,11 +15,10 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ServiceStageDependencies;
+import com.continuuity.loom.spec.service.ServiceStageDependencies;
 import com.continuuity.loom.codec.json.AbstractCodec;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -29,7 +28,7 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.admin.ServiceStageDependencies}. Just used to make sure
+ * Codec for deserializing a {@link com.continuuity.loom.spec.service.ServiceStageDependencies}. Just used to make sure
  * null checks in the constructor are used.
  */
 public class ServiceStageDependenciesCodec extends AbstractCodec<ServiceStageDependencies> {

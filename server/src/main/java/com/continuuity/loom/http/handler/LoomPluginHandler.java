@@ -18,7 +18,7 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.AbstractPluginSpecification;
+import com.continuuity.loom.spec.plugin.AbstractPluginSpecification;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;

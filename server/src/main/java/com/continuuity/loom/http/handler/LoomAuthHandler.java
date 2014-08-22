@@ -18,7 +18,7 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.spec.Tenant;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.tenant.TenantStore;
 import org.jboss.netty.handler.codec.http.HttpRequest;

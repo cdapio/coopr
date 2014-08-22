@@ -15,11 +15,11 @@
  */
 package com.continuuity.test.page.CreatePage;
 
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.test.Constants;
 import com.google.common.collect.Maps;

@@ -15,11 +15,11 @@
  */
 package com.continuuity.loom.layout;
 
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.cluster.Node;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultiset;
