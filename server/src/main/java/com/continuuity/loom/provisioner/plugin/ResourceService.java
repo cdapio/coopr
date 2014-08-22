@@ -114,7 +114,7 @@ public class ResourceService extends AbstractIdleService {
           } catch (IOException e) {
             LOG.error("Error during upload of version {} of resource {} for account {}.",
                       version, name, account, e);
-            responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
           }
         }
 
@@ -122,12 +122,12 @@ public class ResourceService extends AbstractIdleService {
         public void finished(HttpResponder responder) {
           try {
             os.close();
-            responder.sendString(HttpResponseStatus.OK, gson.toJson(resourceMeta));
+            responder.sendJson(HttpResponseStatus.OK, resourceMeta, ResourceMeta.class, gson);
             LOG.debug("finished uploading resource.");
           } catch (Exception e) {
             LOG.error("Error finishing upload of resource {} of type {} for account {}.",
                       resourceMeta, resourceType, account, e);
-            responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
           }
         }
 
@@ -141,7 +141,7 @@ public class ResourceService extends AbstractIdleService {
             metaStoreService.getResourceTypeView(account, resourceType).delete(name, version);
             // dont need the file in the plugin store if there was an error so delete it
             pluginStore.deleteResource(account, resourceType, name, version);
-            responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
+            responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
           } catch (IOException e) {
             LOG.error("Error uploading resource {} of type {} for account {}.", resourceMeta, resourceType, account, e);
           }
