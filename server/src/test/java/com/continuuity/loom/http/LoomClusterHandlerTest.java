@@ -52,6 +52,7 @@ import com.continuuity.loom.scheduler.SolverScheduler;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.SchedulableTask;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.base.Charsets;
@@ -152,6 +153,20 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Assert.assertEquals("imageB", createRequest.getImageType());
     Assert.assertEquals("hardwareC", createRequest.getHardwareType());
     Assert.assertEquals(ImmutableSet.of("service1", "service2"), createRequest.getServices());
+  }
+
+  @Test
+  public void testInvalidNumMachines() throws Exception {
+    // when its below the min
+    ClusterCreateRequest clusterCreateRequest =
+      createClusterRequest("my-cluster", "my cluster", reactorTemplate.getName(), 1);
+    assertResponseStatus(doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS),
+                         HttpResponseStatus.BAD_REQUEST);
+    // when its above the max
+    clusterCreateRequest =
+      createClusterRequest("my-cluster", "my cluster", reactorTemplate.getName(), 500);
+    assertResponseStatus(doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS),
+                         HttpResponseStatus.BAD_REQUEST);
   }
 
   @Test
@@ -474,7 +489,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     //Create cluster
     String clusterName = "test-cluster-unsolvable";
     ClusterCreateRequest clusterCreateRequest =
-      createClusterRequest(clusterName, "unsolvable cluster", reactorTemplate.getName(), 1);
+      createClusterRequest(clusterName, "unsolvable cluster", reactorTemplate.getName(), 2);
     HttpResponse response = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
@@ -1585,7 +1600,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
             ImmutableSet.of("datanode", "reactor"),
             ImmutableSet.of("namenode", "reactor")
           )
-        )
+        ),
+        new SizeConstraint(2, 50)
       ),
       Administration.EMPTY_ADMINISTRATION
     );

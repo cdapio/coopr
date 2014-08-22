@@ -43,6 +43,7 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
@@ -323,7 +324,8 @@ public class Entities {
             ImmutableSet.<Set<String>>of(
               ImmutableSet.<String>of("namenode", "datanode")
             )
-          )
+          ),
+          SizeConstraint.EMPTY
         ),
         null
       );
@@ -352,7 +354,8 @@ public class Entities {
             ImmutableSet.<Set<String>>of(
               ImmutableSet.<String>of("namenode", "datanode")
             )
-          )
+          ),
+          SizeConstraint.EMPTY
         ),
         new Administration(new LeaseDuration(10000, 900000, 1000))
       );
@@ -387,7 +390,8 @@ public class Entities {
               ImmutableSet.<String>of("datanode", "reactor"),
               ImmutableSet.<String>of("hbasemaster", "regionserver")
             )
-          )
+          ),
+          SizeConstraint.EMPTY
         ),
         new Administration(new LeaseDuration(0, 0, 0))
       );
@@ -424,7 +428,8 @@ public class Entities {
               ImmutableSet.<String>of("hadoop-hdfs-datanode", "mysql-server"),
               ImmutableSet.<String>of("hbase-master", "hbase-regionserver")
             )
-          )
+          ),
+          SizeConstraint.EMPTY
         ),
         new Administration(new LeaseDuration(0, 0, 0))
       );

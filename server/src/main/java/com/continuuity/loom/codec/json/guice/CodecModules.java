@@ -47,6 +47,7 @@ import com.continuuity.loom.codec.json.current.ServiceCodec;
 import com.continuuity.loom.codec.json.current.ServiceConstraintCodec;
 import com.continuuity.loom.codec.json.current.ServiceDependenciesCodec;
 import com.continuuity.loom.codec.json.current.ServiceStageDependenciesCodec;
+import com.continuuity.loom.codec.json.current.SizeConstraintCodec;
 import com.continuuity.loom.codec.json.current.TakeTaskRequestCodec;
 import com.continuuity.loom.codec.json.current.TaskConfigCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
@@ -87,6 +88,7 @@ import com.continuuity.loom.spec.template.Constraints;
 import com.continuuity.loom.spec.template.LayoutConstraint;
 import com.continuuity.loom.spec.template.LeaseDuration;
 import com.continuuity.loom.spec.template.ServiceConstraint;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.AbstractModule;
@@ -165,6 +167,7 @@ public class CodecModules {
       .registerTypeAdapter(ServiceConstraint.class, new ServiceConstraintCodec())
       .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
       .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
+      .registerTypeAdapter(SizeConstraint.class, new SizeConstraintCodec())
       .registerTypeAdapter(TakeTaskRequest.class, new TakeTaskRequestCodec())
       .registerTypeAdapter(TaskConfig.class, new TaskConfigCodec())
       .registerTypeAdapter(Tenant.class, new TenantCodec())

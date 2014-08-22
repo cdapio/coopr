@@ -87,49 +87,9 @@
     ]
   },
   "constraints": {
-    "layout": {
-      "mustcoexist": [
-        [
-          "base",
-          "hadoop-hdfs-datanode",
-          "hadoop-yarn-nodemanager",
-          "hbase-regionserver",
-          "hadoop-hdfs-namenode",
-          "hadoop-yarn-resourcemanager",
-          "zookeeper-server",
-          "hbase-master",
-          "mysql-server",
-          "hive-metastore-database",
-          "hive-metastore",
-          "hive-server2"
-        ]
-      ]
-    },
-    "services": {
-      "hadoop-hdfs-namenode": {
-        "quantities": {
-          "min": "1",
-          "max": "1"
-        }
-      },
-      "hadoop-yarn-resourcemanager": {
-        "quantities": {
-          "min": "1",
-          "max": "1"
-        }
-      },
-      "zookeeper-server": {
-        "quantities": {
-          "min": "1",
-          "max": "1"
-        }
-      },
-      "hbase-master": {
-        "quantities": {
-          "min": "1",
-          "max": "1"
-        }
-      }
+    "size": {
+      "min": 1,
+      "max": 1
     }
   },
   "administration": {

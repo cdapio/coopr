@@ -124,7 +124,10 @@ Example Default Section
 
 Constraints
 ^^^^^^^^^^^
-Templates can define 2 types of constraints -- layout and service.
+Templates can define 3 types of constraints -- size, layout, and service.
+
+Size constraints determine how many nodes a cluster can have. Currently, a minimum and maximum can be defined. If no minimum is defined, a minimum of 1 node will be used.
+If no maximum is defined, there is no maximum. The maximum must be greater than or equal to the minimum.
 
 Layout constraints define which services must and can't coexist on the same node.  Must coexist constraints are given as an array of arrays. 
 Each inner array is a set of services that must all coexist together on the same node.  For example, in a hadoop cluster, you generally want datanodes, regionservers, 
@@ -155,6 +158,10 @@ Example Constraints Section
 .. code-block:: bash
 
     "constraints": {
+        "size": {
+            "min": 3,
+            "max": 50
+        },
         "layout": {
             "mustcoexist": [
                 [ "hadoop-hdfs-datanode", "hadoop-yarn-nodemanager", "hbase-regionserver" ],
@@ -316,6 +323,10 @@ Example
                    }   
                 },
                 "constraints": {
+                    "size": {
+                        "min": 3,
+                        "max": 50
+                    },
                     "layout": {
                         "mustcoexist": [
                             [ "hadoop-hdfs-datanode", "hadoop-yarn-nodemanager", "hbase-regionserver" ],
@@ -438,6 +449,10 @@ Example
           }
       },
       "constraints": {
+          "size": {
+              "min": 3,
+              "max": 50
+          },
           "layout": {
                "mustcoexist": [
                    [ "hadoop-hdfs-datanode", "hadoop-yarn-nodemanager", "hbase-regionserver" ],
@@ -614,6 +629,10 @@ Example
            }
        },
        "constraints": {
+           "size": {
+               "min": 3,
+               "max": 50
+           },
            "layout": {
                "mustcoexist": [
                    [

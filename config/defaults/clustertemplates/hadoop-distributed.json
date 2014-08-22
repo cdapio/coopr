@@ -88,6 +88,9 @@
     ]
   },
   "constraints": {
+    "size": {
+      "min": 2
+    },
     "layout": {
       "mustcoexist": [
         [

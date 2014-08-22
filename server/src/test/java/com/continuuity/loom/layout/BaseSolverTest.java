@@ -32,6 +32,7 @@ import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.spec.service.ServiceAction;
 import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -100,7 +101,8 @@ public class BaseSolverTest extends BaseTest {
             ImmutableSet.of("datanode", "reactor"),
             ImmutableSet.of("namenode", "reactor")
           )
-        )
+        ),
+        SizeConstraint.EMPTY
       ),
       Administration.EMPTY_ADMINISTRATION
     );

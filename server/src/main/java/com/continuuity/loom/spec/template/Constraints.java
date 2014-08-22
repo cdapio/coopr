@@ -25,14 +25,17 @@ import java.util.Map;
  * and a {@link LayoutConstraint} for the cluster.
  */
 public final class Constraints {
-  public static final Constraints EMPTY_CONSTRAINTS = new Constraints(null, null);
+  public static final Constraints EMPTY_CONSTRAINTS = new Constraints(null, null, null);
   private final Map<String, ServiceConstraint> serviceConstraints;
   private final LayoutConstraint layoutConstraint;
+  private final SizeConstraint sizeConstraint;
 
-  public Constraints(Map<String, ServiceConstraint> serviceConstraints, LayoutConstraint layoutConstraint) {
+  public Constraints(Map<String, ServiceConstraint> serviceConstraints, LayoutConstraint layoutConstraint,
+                     SizeConstraint sizeConstraint) {
     this.serviceConstraints = serviceConstraints == null ?
       ImmutableMap.<String, ServiceConstraint>of() : serviceConstraints;
     this.layoutConstraint = layoutConstraint == null ? LayoutConstraint.EMPTY_LAYOUT_CONSTRAINT : layoutConstraint;
+    this.sizeConstraint = sizeConstraint == null ? SizeConstraint.EMPTY : sizeConstraint;
   }
 
   /**
@@ -53,6 +56,15 @@ public final class Constraints {
     return layoutConstraint;
   }
 
+  /**
+   * Get the {@link SizeConstraint} for the cluster.
+   *
+   * @return {@link SizeConstraint} for the cluster.
+   */
+  public SizeConstraint getSizeConstraint() {
+    return sizeConstraint;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof Constraints)) {
@@ -60,12 +72,13 @@ public final class Constraints {
     }
     Constraints other = (Constraints) o;
     return Objects.equal(serviceConstraints, other.serviceConstraints) &&
-      Objects.equal(layoutConstraint, other.layoutConstraint);
+      Objects.equal(layoutConstraint, other.layoutConstraint) &&
+      Objects.equal(sizeConstraint, other.sizeConstraint);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(serviceConstraints, layoutConstraint);
+    return Objects.hashCode(serviceConstraints, layoutConstraint, sizeConstraint);
   }
 
   @Override
@@ -73,6 +86,7 @@ public final class Constraints {
     return Objects.toStringHelper(this)
       .add("serviceConstraints", serviceConstraints)
       .add("layoutConstraint", layoutConstraint)
+      .add("sizeContraint", sizeConstraint)
       .toString();
   }
 }
