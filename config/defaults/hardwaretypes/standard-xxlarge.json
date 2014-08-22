@@ -2,6 +2,10 @@
   "name": "standard-xxlarge",
   "description": "8+ vCPU, 30+ GB RAM, 240+ GB Disk",
   "providermap": {
+    "joyent": {
+      "flavor": "g3-standard-30-kvm",
+      "cost": "0.96"
+    },
     "rackspace": {
       "flavor": "8"
     }

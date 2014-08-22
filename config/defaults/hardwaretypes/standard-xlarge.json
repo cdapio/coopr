@@ -15,7 +15,8 @@
       "cost": "0.350"
     },
     "joyent": {
-      "flavor": "Large 16GB"
+      "flavor": "g3-standard-15-kvm",
+      "cost": "0.48"
     },
     "rackspace": {
       "flavor": "7"

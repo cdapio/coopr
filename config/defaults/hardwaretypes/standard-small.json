@@ -15,7 +15,8 @@
       "cost": "0.044"
     },
     "joyent": {
-      "flavor": "Small 1GB"
+      "flavor": "g3-standard-1.75-kvm",
+      "cost": "0.056"
     },
     "rackspace": {
       "flavor": 3
