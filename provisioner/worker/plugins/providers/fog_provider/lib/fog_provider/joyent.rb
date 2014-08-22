@@ -90,7 +90,8 @@ class FogProviderJoyent < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bootstrap_ip
       }
-      # Additional checks
+      # do we need sudo bash?
+      sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
@@ -100,10 +101,11 @@ class FogProviderJoyent < Provider
           log.debug 'Validating external connectivity and DNS resolution via ping'
           ssh_exec!(ssh, 'ping -c1 www.opscode.com')
           log.debug 'Temporarily setting hostname'
-          ssh_exec!(ssh, "hostname #{@task['config']['hostname']}")
+          ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}")
         else
           ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
-          ssh_exec!(ssh, "hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
+          ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
+          # ssh_exec!(ssh, "test -e /dev/xvde1 && (#{sudo} /sbin/mkfs.ext4 /dev/xvde1 && #{sudo} mkdir -p /data && #{sudo} mount /dev/xvde1 /data) || true", 'Mounting any additional data disks')
         end
       end
       # Return 0
