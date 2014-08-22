@@ -101,8 +101,6 @@ public class FieldSchema {
   }
 
   /**
-<<<<<<< HEAD:server/src/main/java/com/continuuity/loom/spec/plugin/FieldSchema.java
-=======
    * Get whether or not the field is sensitive and should not be persisted to disk.
    *
    * @return Whether or not the field is sensitive and should not be persisted to disk.
@@ -112,7 +110,6 @@ public class FieldSchema {
   }
 
   /**
->>>>>>> add support for "sensitive" provider fields which will be stored:server/src/main/java/com/continuuity/loom/admin/FieldSchema.java
    * Get a builder for creating a field schema.
    *
    * @return Builder for creating a field schema.

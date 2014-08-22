@@ -22,7 +22,6 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
-import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
@@ -40,6 +39,7 @@ import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.spec.Provider;
 import com.continuuity.loom.spec.plugin.ParameterType;
+import com.continuuity.loom.spec.plugin.PluginFields;
 import com.continuuity.loom.spec.plugin.ProviderType;
 import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.continuuity.loom.spec.template.SizeConstraint;
@@ -610,14 +610,15 @@ public class ClusterService {
     }
 
     // take sensitive fields out and write them to the credential store
-    ImmutablePair<Map<String, String>, Map<String, String>> fields = providerType.separateFields(providerFields);
-    Map<String, String> nonSensitiveFields = fields.getFirst();
-    Map<String, String> sensitiveFields = fields.getSecond();
+    PluginFields pluginFields = providerType.groupFields(providerFields);
+    Map<String, String> nonSensitiveFields = pluginFields.getNonsensitive();
+    Map<String, String> sensitiveFields = pluginFields.getSensitive();
     if (!sensitiveFields.isEmpty()) {
       LOG.trace("writing fields {} to credential store for account {} and cluster {}.",
                 sensitiveFields.keySet(), account, clusterId);
       credentialStore.set(account.getTenantId(), clusterId, sensitiveFields);
     }
+    // add non sensitive fields to the provider
     if (!nonSensitiveFields.isEmpty()) {
       provider.addFields(nonSensitiveFields);
     }

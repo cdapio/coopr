@@ -34,16 +34,17 @@ public class ProviderType extends AbstractPluginSpecification {
   }
 
   /**
-   * Filter the given input fields, removing fields that are not user fields and are not admin overridable.
+   * Given a map of field name to value, filter out all fields that are not admin overridable fields or user fields,
+   * and group fields by type. For example, sensitive fields will be grouped together, as will non sensitive fields.
    *
-   * @param input Input map of fields to values
-   * @return Filtered fields, containing only user and overridable admin fields.
+   * @param input Mapping of field name to value.
+   * @return {@link PluginFields} containing fields grouped by type.
    */
-  public Map<String, String> filterFields(Map<String, String> input) {
+  public PluginFields groupFields(Map<String, String> input) {
+    PluginFields.Builder builder = PluginFields.builder();
     Map<String, FieldSchema> adminFields = getParametersSpecification(ParameterType.ADMIN).getFields();
     Map<String, FieldSchema> userFields = getParametersSpecification(ParameterType.USER).getFields();
 
-    Map<String, String> filtered = Maps.newHashMap();
     for (Map.Entry<String, String> entry : input.entrySet()) {
       String field = entry.getKey();
       String fieldVal = entry.getValue();
@@ -57,11 +58,15 @@ public class ProviderType extends AbstractPluginSpecification {
 
       // if its not a user field or an overridable admin field, ignore it
       if (fieldSchema != null) {
-        filtered.put(field, fieldVal);
+        if (fieldSchema.isSensitive()) {
+          builder.putSensitive(field, fieldVal);
+        } else {
+          builder.putNonsensitive(field, fieldVal);
+        }
       } else {
         LOG.info("Ignoring field {} as its not an overridable admin field or user field.", field);
       }
     }
-    return filtered;
+    return builder.build();
   }
 }

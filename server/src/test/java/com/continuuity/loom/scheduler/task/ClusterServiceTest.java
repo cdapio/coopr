@@ -3,21 +3,6 @@ package com.continuuity.loom.scheduler.task;
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.FieldSchema;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.ParameterType;
-import com.continuuity.loom.admin.ParametersSpecification;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.request.AddServicesRequest;
@@ -27,6 +12,21 @@ import com.continuuity.loom.http.request.ClusterOperationRequest;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.scheduler.ClusterAction;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
+import com.continuuity.loom.spec.plugin.FieldSchema;
+import com.continuuity.loom.spec.plugin.ParameterType;
+import com.continuuity.loom.spec.plugin.ParametersSpecification;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.Administration;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -317,15 +317,17 @@ public class ClusterServiceTest extends BaseTest {
                                         "url", "http://abc.com/api",
                                         "keyname", "mykey"));
     // write the cluster to the store
+    String clusterId = "123";
     Cluster cluster = Cluster.builder()
       .setName("cluster1")
-      .setID("123")
+      .setID(clusterId)
       .setProvider(provider1)
       .setClusterTemplate(basicTemplate)
       .setServices(ImmutableSet.of(service1.getName()))
       .setNodes(ImmutableSet.of("node1"))
       .setAccount(account)
       .setStatus(Cluster.Status.ACTIVE)
+      .setLatestJobID(new JobId(clusterId, 1).getId())
       .build();
     clusterStore.writeCluster(cluster);
     return cluster;

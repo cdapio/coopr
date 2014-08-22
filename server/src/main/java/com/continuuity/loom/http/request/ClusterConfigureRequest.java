@@ -36,20 +36,15 @@ public class ClusterConfigureRequest extends ClusterOperationRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
-      return false;
-    }
 
     ClusterConfigureRequest that = (ClusterConfigureRequest) o;
-    return Objects.equal(restart, that.restart) &&
+    return super.equals(that) &&
+      Objects.equal(restart, that.restart) &&
       Objects.equal(config, that.config);
   }
 
   @Override
   public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (restart ? 1 : 0);
-    result = 31 * result + (config != null ? config.hashCode() : 0);
-    return result;
+    return Objects.hashCode(super.hashCode(), restart, config);
   }
 }

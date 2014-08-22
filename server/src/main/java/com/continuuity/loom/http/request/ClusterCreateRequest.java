@@ -169,7 +169,8 @@ public class ClusterCreateRequest extends ClusterOperationRequest {
    * Get a builder for creating cluster create requests.
    *
    * @return Builder for creating cluster create requests.
-   */  public static Builder builder() {
+   */
+  public static Builder builder() {
     return new Builder();
   }
 
