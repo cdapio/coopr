@@ -160,7 +160,9 @@ class FogProviderAWS < Provider
             # Install mdadm
             if apt
               ssh_exec!(ssh, "#{sudo} apt-get update", 'Running apt-get update')
-              ### TODO: fix this with postfix
+              # Setup nullmailer
+              ssh_exec!(ssh, "echo 'nullmailer shared/mailname string localhost' | #{sudo} debconf-set-selections && echo 'nullmailer nullmailer/relayhost string localhost' | #{sudo} debconf-set-selections", 'Configuring nullmailer')
+              ssh_exec!(ssh, "#{sudo} apt-get install nullmailer -y", 'Installing nullmailer')
               ssh_exec!(ssh, "#{sudo} apt-get install mdadm -y", 'Installing mdadm')
             else
               ssh_exec!(ssh, "#{sudo} yum install mdadm -y", 'Installing mdadm')
