@@ -36,10 +36,20 @@ public class SizeConstraint {
     }
   }
 
+  /**
+   * Get the minimum size allowed.
+   *
+   * @return Minimum size allowed.
+   */
   public int getMin() {
     return min;
   }
 
+  /**
+   * Get the maximum size allowed.
+   *
+   * @return Maximum size allowed.
+   */
   public int getMax() {
     return max;
   }
