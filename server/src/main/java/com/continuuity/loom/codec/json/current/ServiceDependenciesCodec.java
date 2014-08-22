@@ -15,9 +15,9 @@
  */
 package com.continuuity.loom.codec.json.current;
 
+import com.continuuity.loom.codec.json.AbstractCodec;
 import com.continuuity.loom.spec.service.ServiceDependencies;
 import com.continuuity.loom.spec.service.ServiceStageDependencies;
-import com.continuuity.loom.codec.json.AbstractCodec;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;

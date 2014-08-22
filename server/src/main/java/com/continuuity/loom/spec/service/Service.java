@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A service defines a set of services it is dependent on, as well as a mapping of {@link com.continuuity.loom.spec.ProvisionerAction} to
- * {@link ServiceAction} that provisioners will need to execute when performing cluster operations
- * such as creation and deletion.
+ * A service defines a set of services it is dependent on, as well as a mapping of
+ * {@link com.continuuity.loom.spec.ProvisionerAction} to {@link ServiceAction} that provisioners will need to execute
+ * when performing cluster operations such as creation and deletion.
  */
 public final class Service extends NamedEntity {
   private final String description;

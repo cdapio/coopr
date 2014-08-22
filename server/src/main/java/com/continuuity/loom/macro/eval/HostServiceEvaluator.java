@@ -15,10 +15,10 @@
  */
 package com.continuuity.loom.macro.eval;
 
-import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.macro.IncompleteClusterException;
+import com.continuuity.loom.spec.service.Service;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 

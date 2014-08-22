@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.provisioner.plugin;
 
-import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
 import com.continuuity.loom.common.utils.ImmutablePair;
+import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 

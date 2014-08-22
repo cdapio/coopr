@@ -16,7 +16,8 @@
 package com.continuuity.loom.spec.plugin;
 
 /**
- * Type of parameter for {@link com.continuuity.loom.spec.plugin.ProviderType} and {@link com.continuuity.loom.spec.plugin.AutomatorType}.
+ * Type of parameter for {@link com.continuuity.loom.spec.plugin.ProviderType} and
+ * {@link com.continuuity.loom.spec.plugin.AutomatorType}.
  */
 public enum ParameterType {
   ADMIN,

@@ -18,8 +18,8 @@ package com.continuuity.loom.spec.plugin;
 import java.util.Map;
 
 /**
- * A Provider type defines what parameters admins and users need to provide to a {@link com.continuuity.loom.spec.Provider} in order for it
- * to provide machines properly.
+ * A Provider type defines what parameters admins and users need to provide to a
+ * {@link com.continuuity.loom.spec.Provider} in order for it to provide machines properly.
  */
 public class ProviderType extends AbstractPluginSpecification {
 

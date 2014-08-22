@@ -26,8 +26,9 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 
 /**
- * Machine providers are instances of some {@link com.continuuity.loom.spec.plugin.ProviderType} like openstack, aws, rackspace, or joyent that can
- * provision machines.  Providers are referenced by {@link ImageType} and {@link HardwareType}.
+ * Machine providers are instances of some {@link com.continuuity.loom.spec.plugin.ProviderType}
+ * like openstack, aws, rackspace, or joyent that can provision machines.
+ * Providers are referenced by {@link ImageType} and {@link HardwareType}.
  */
 public final class Provider extends NamedEntity {
   private final String description;

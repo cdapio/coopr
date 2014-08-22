@@ -15,13 +15,13 @@
  */
 package com.continuuity.loom.store.entity;
 
-import com.continuuity.loom.spec.plugin.AutomatorType;
-import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.continuuity.loom.spec.HardwareType;
 import com.continuuity.loom.spec.ImageType;
 import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.plugin.AutomatorType;
 import com.continuuity.loom.spec.plugin.ProviderType;
 import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.gson.Gson;

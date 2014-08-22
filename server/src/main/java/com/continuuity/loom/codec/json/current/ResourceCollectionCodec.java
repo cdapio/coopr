@@ -15,12 +15,12 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
 import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
+import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

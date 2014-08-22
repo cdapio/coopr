@@ -18,7 +18,8 @@ package com.continuuity.loom.spec.plugin;
 import java.util.Map;
 
 /**
- * An Automator type defines what parameters admins need to provide to a {@link com.continuuity.loom.spec.service.ServiceAction} in order for the
+ * An Automator type defines what parameters admins need to provide to a
+ * {@link com.continuuity.loom.spec.service.ServiceAction} in order for the
  * provisioner automator plugin to do its job.
  */
 public class AutomatorType extends AbstractPluginSpecification {

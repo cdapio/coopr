@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.spec.service.ServiceAction;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.service.ServiceAction;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

@@ -17,14 +17,14 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.spec.plugin.AutomatorType;
-import com.continuuity.loom.spec.plugin.ProviderType;
-import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.QuotaException;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.spec.TenantSpecification;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.ProviderType;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;

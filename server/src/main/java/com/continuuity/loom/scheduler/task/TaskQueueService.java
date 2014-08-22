@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.spec.Tenant;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
@@ -27,6 +26,7 @@ import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.spec.Tenant;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.tenant.TenantStore;

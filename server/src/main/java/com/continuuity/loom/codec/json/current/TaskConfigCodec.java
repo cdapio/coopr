@@ -15,11 +15,11 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.spec.Provider;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.codec.json.AbstractCodec;
 import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskServiceAction;
+import com.continuuity.loom.spec.Provider;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

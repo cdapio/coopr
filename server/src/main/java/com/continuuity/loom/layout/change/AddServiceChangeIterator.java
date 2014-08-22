@@ -15,11 +15,11 @@
  */
 package com.continuuity.loom.layout.change;
 
-import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.NodeLayout;
 import com.continuuity.loom.layout.NodeLayoutComparator;
 import com.continuuity.loom.layout.SlottedCombinationIterator;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;

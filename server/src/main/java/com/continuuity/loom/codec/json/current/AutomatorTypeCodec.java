@@ -30,8 +30,8 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.spec.plugin.AutomatorType}. Used so that the constructor is called to
- * avoid null values where they do not make sense.
+ * Codec for deserializing a {@link com.continuuity.loom.spec.plugin.AutomatorType}.
+ * Used so that the constructor is called to avoid null values where they do not make sense.
  */
 public class AutomatorTypeCodec implements JsonDeserializer<AutomatorType> {
 

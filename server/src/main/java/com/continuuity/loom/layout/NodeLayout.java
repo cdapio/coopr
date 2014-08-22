@@ -15,10 +15,10 @@
  */
 package com.continuuity.loom.layout;
 
-import com.continuuity.loom.spec.template.Constraints;
-import com.continuuity.loom.spec.service.Service;
-import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;

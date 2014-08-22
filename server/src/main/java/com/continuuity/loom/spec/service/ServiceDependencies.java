@@ -8,7 +8,8 @@ import java.util.Set;
 
 /**
  * Service dependencies define what a service provides, other services it conflicts with, install time dependencies,
- * and runtime dependencies. See {@link com.continuuity.loom.spec.service.ServiceStageDependencies} for a description of what types of dependencies can
+ * and runtime dependencies. See {@link com.continuuity.loom.spec.service.ServiceStageDependencies} for a description
+ * of what types of dependencies can
  * be defined at install time and runtime for services. Provides is a way for a service to say it satisfies the
  * dependency it provides, and is useful when there are multiple services that provide the same sort of functionality.
  * For example, an admin may create both a "mysql-db" and "oracle-db" that both provide the "sql-db" service. Some other

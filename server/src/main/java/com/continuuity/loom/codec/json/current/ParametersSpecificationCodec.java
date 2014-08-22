@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.spec.plugin.ParametersSpecification}. Used so that the constructor
- * is called to avoid null values where they do not make sense.
+ * Codec for deserializing a {@link com.continuuity.loom.spec.plugin.ParametersSpecification}.
+ * Used so that the constructor is called to avoid null values where they do not make sense.
  */
 public class ParametersSpecificationCodec implements JsonDeserializer<ParametersSpecification> {
 

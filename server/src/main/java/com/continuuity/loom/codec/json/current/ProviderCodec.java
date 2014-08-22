@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.spec.Provider;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.Provider;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
