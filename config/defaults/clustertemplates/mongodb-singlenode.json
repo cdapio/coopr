@@ -12,7 +12,8 @@
     "config": {
       "mongodb": {
         "config": {
-          "bind_ip": "%ip.bind_v4.service.mongodb-single%"
+          "bind_ip": "%ip.bind_v4.service.mongodb-single%",
+          "dbpath": "/data/mongodb"
         }
       }
     }
