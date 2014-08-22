@@ -61,7 +61,8 @@ public class LoomNodeHandler extends LoomAuthHandler {
    * Initializes a new instance of a LoomNodeHandler.
    */
   @Inject
-  private LoomNodeHandler(TenantStore tenantStore, NodeService nodeService, NodeStoreService nodeStoreService, Gson gson) {
+  private LoomNodeHandler(TenantStore tenantStore, NodeService nodeService,
+                          NodeStoreService nodeStoreService, Gson gson) {
     super(tenantStore);
     this.nodeStoreService = nodeStoreService;
     this.nodeStore = this.nodeStoreService.getSystemView();
