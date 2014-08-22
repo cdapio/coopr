@@ -1,6 +1,6 @@
 {
   "name": "standard-medium",
-  "description": "2+ vCPU, 4 GB RAM, 120+ GB Disk",
+  "description": "Standard server - Medium 4GB",
   "providermap": {
     "aws-us-east-1": {
       "flavor": "m1.medium",

@@ -1,6 +1,6 @@
 {
   "name": "standard-large",
-  "description": "4+ vCPU, 8 GB RAM, 240+ GB Disk",
+  "description": "Standard server - Large 8GB",
   "providermap": {
     "aws-us-east-1": {
       "flavor": "m1.large",

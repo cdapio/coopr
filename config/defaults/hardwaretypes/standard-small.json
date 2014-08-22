@@ -1,6 +1,6 @@
 {
   "name": "standard-small",
-  "description": "1 vCPU, 1 GB RAM, 20+ GB Disk",
+  "description": "Standard server - Small 2GB",
   "providermap": {
     "aws-us-east-1": {
       "flavor": "m1.small",
