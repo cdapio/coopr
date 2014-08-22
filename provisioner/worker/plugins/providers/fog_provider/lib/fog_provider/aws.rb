@@ -167,6 +167,7 @@ class FogProviderAWS < Provider
             else
               ssh_exec!(ssh, "#{sudo} yum install mdadm -y", 'Installing mdadm')
             end
+            ssh_exec!(ssh, "mount | grep ^/dev/xvdb 2>&1 >/dev/null && #{sudo} umount /dev/xvdb || true", 'Unmounting /dev/xvdb')
             # Setup RAID
             log.debug 'Setting up RAID0'
             ssh_exec!(ssh, "echo yes | #{sudo} mdadm --create /dev/md0 --level=0 --raid-devices=$(ls -1 /dev/xvd[b-z] | wc -l) $(ls -1 /dev/xvd[b-z])", 'Creating /dev/md0 RAID0 array')
@@ -176,6 +177,7 @@ class FogProviderAWS < Provider
               ssh_exec!(ssh, "#{sudo} su - -c 'mdadm --detail --scan >> /etc/mdadm.conf'", 'Write /etc/mdadm.conf')
             end
             ssh_exec!(ssh, "#{sudo} sed -i -e 's:xvdb:md0:' /etc/fstab", 'Update /etc/fstab for md0')
+            ssh_exec!(ssh, "#{sudo} /sbin/mkfs.ext4 /dev/md0 && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/md0 /data", 'Mounting /dev/md0 as /data')
           elsif xvdb
             ssh_exec!(ssh, "mount | grep ^/dev/xvdb 2>&1 >/dev/null && #{sudo} umount /dev/xvdb && #{sudo} /sbin/mkfs.ext4 /dev/xvdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/xvdb /data", 'Mounting /dev/xvdb as /data')
           else
