@@ -19,7 +19,8 @@
       "cost": "0.056"
     },
     "rackspace": {
-      "flavor": 3
+      "flavor": "4",
+      "cost": "0.12"
     }
   }
 }
