@@ -215,7 +215,20 @@ module Loom
     # determine if a versioned resource exists in the data dir
     def synced?(resource, version)
       data = %W( #{@datadir} #{resource} #{version} #{resource.split('/')[-1]}).join('/')
-      File.file?(data) || File.directory?(data)
+
+      # if data is a directory, its an archive resource and its synced
+      return true if File.directory?(data)
+      # if data is a file, we need to check permissions
+      if File.file?(data)
+        if @resourcespec.resource_permissions.key?(resource)
+          expected_mode = @resourcespec.resource_permissions[resource]
+          # get mode as Fixnum, convert to octal string, then take last 4 digits
+          mode = File.stat(data).mode.to_s(8)[-4..-1]
+          return false unless mode =~ /^0*#{expected_mode}$/
+        end
+        return true
+      end
+      return false
     end
 
     # determine if a versioned resource is active
