@@ -20,7 +20,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 /**
- * Specification for a plugin resource type. Includes the format of the resource, and if its a file format, optionally
+ * Specification for a plugin resource type. Includes the format of the resource, and if it's a file format, optionally
  * includes the file permissions as well.
  */
 public class ResourceTypeSpecification {
