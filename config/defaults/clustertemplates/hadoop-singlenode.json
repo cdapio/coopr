@@ -19,7 +19,7 @@
       "hadoop": {
         "core_site": {
           "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
-          "hadoop.tmp.dir": "/data"
+          "hadoop.tmp.dir": "/data/hadoop"
         },
         "hdfs_site": {
           "dfs.datanode.max.transfer.threads": "4096",
