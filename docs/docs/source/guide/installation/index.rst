@@ -34,13 +34,13 @@ System Requirements
 
 .. _minimum-hardware:
 
-Minimum Hardware Requirements
------------------------------
+Hardware Requirements
+---------------------
 Systems hosting the Continuuity Loom components must meet these hardware specifications, in addition to having CPUs
-with a minimum speed of 2 GHz.
+with a minimum speed of 2 GHz
 
 .. list-table::
-   :widths: 15 10 20
+   :widths: 25 25 50
    :header-rows: 1
 
    * - Component
@@ -48,52 +48,43 @@ with a minimum speed of 2 GHz.
      - Specifications
    * - Continuuity Loom UI
      - RAM
-     - 1 GB minimum, 2 GB recommended
+     - 512MB minimum, 1 GB recommended
    * - Continuuity Loom Server 
      - RAM
-     - 1 GB minimum, 2 GB recommended
+     - 1 GB minimum, 3 GB recommended
    * - Continuuity Loom Provisioners
      - RAM
-     - 256 MB per provisioner worker. For example, with 10 workers 2.5 GB minimum
+     - 256 MB per provisioner worker; for example, with 10 workers, 2.5 GB minimum
    * - Database (ex: MySQL)
      - RAM
      - 2 GB minimum, 4 GB recommended
    * - 
      - Disk
-     - Disk usage increases as Continuuity Loom usage increases. Suggested minimum of 50GB
+     - Disk usage increases as Continuuity Loom usage increases; suggested minimum of 50GB
 
 .. _system-requirements:
 
-Supported Operating System
---------------------------
+Supported Operating Systems
+---------------------------
 
-Various systems of Continuuity Loom have been tested against the following platforms:
-
-* **Loom Server**
-
- * CentOS 6.4
- * Ubuntu 12.04
-
-* **Loom Provisioner**
-
- * CentOS 6.4
- * Ubuntu 12.04
-
-* **Loom UI**
+Continuuity Loom has been tested against these platforms:
 
  * CentOS 6.4
  * Ubuntu 12.04
 
 Supported Databases
 -------------------
+
+Continuuity Loom supports any database with a jdbc driver that supports standard SQL queries. It has been tested with these databases:
+
  * (Default) Derby
  * MySQL version 5.1 or above
- * Oracle DB
- * SQLite
- * PostgreSQL version 8.4 or above
 
 Supported Zookeeper Versions
 ----------------------------
+
+Continuuity Loom has been tested with these versions of Zookeeper:
+
  * Apache Zookeeper version 3.4 or above
  * CDH4 or CDH5 Zookeeper
  * HDP1 or HDP2 Zookeeper
