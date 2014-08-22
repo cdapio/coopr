@@ -105,7 +105,17 @@ class FogProviderJoyent < Provider
         else
           ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
           ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
-          # ssh_exec!(ssh, "test -e /dev/xvde1 && (#{sudo} /sbin/mkfs.ext4 /dev/xvde1 && #{sudo} mkdir -p /data && #{sudo} mount /dev/xvde1 /data) || true", 'Mounting any additional data disks')
+          # Check for /dev/vdb
+          begin
+            vdb = true
+            ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
+          rescue
+            vdb = false
+          end
+          if vdb
+            ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
+            ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
+          end
         end
       end
       # Return 0
