@@ -31,7 +31,7 @@ module Loom
       # resource_formats is a hash of '/'-delimited resource paths and their formats
       #   ex: "automatortype/chef-solo/cookbooks/hadoop" => "archive"
       @resource_formats = {}
-      # resource_oermissions is a hash of '/'-delimited resource paths and their file permissions
+      # resource_permissions is a hash of '/'-delimited resource paths and their file permissions
       # only applicable to resources with format = 'file'
       #   ex: "automatortype/shell/scripts/my_script.sh" => "0755"
       @resource_permissions = {}
