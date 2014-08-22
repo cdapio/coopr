@@ -15,39 +15,17 @@
  */
 package com.continuuity.loom.scheduler;
 
-import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.cluster.Cluster;
-import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
-import com.continuuity.loom.scheduler.dag.TaskNode;
-import com.continuuity.loom.scheduler.task.ClusterJob;
-import com.continuuity.loom.scheduler.task.ClusterTask;
-import com.continuuity.loom.scheduler.task.JobId;
-import com.continuuity.loom.scheduler.task.TaskConfig;
-import com.continuuity.loom.scheduler.task.TaskId;
-import com.continuuity.loom.scheduler.task.TaskService;
-import com.continuuity.loom.store.cluster.ClusterStore;
-import com.continuuity.loom.store.cluster.ClusterStoreService;
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Balances number of workers to place on each provisioner.

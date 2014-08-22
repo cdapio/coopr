@@ -15,12 +15,12 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.template.Administration;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

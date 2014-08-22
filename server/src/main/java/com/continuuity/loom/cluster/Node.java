@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.cluster;
 
-import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.spec.service.Service;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

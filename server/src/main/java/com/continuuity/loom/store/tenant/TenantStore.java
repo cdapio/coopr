@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.store.tenant;
 
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.google.common.util.concurrent.Service;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.util.List;
 public interface TenantStore extends Service {
 
   /**
-   * Get the {@link com.continuuity.loom.admin.Tenant} associated with the given id or null if none exists.
+   * Get the {@link com.continuuity.loom.spec.Tenant} associated with the given id or null if none exists.
    *
    * @param id Id of the tenant.
    * @return Tenant for the given id or null if no such tenant exists.
@@ -37,7 +37,7 @@ public interface TenantStore extends Service {
   Tenant getTenantByID(String id) throws IOException;
 
   /**
-   * Get the {@link com.continuuity.loom.admin.Tenant} associated with the given name or null if none exists.
+   * Get the {@link com.continuuity.loom.spec.Tenant} associated with the given name or null if none exists.
    *
    * @param name Name of the tenant.
    * @return Tenant for the given name or null if no such tenant exists.
@@ -46,7 +46,7 @@ public interface TenantStore extends Service {
   Tenant getTenantByName(String name) throws IOException;
 
   /**
-   * Get an immutable list of all {@link com.continuuity.loom.admin.Tenant tenants}.
+   * Get an immutable list of all {@link com.continuuity.loom.spec.Tenant tenants}.
    *
    * @return Collection of all tenants.
    * @throws IOException
@@ -54,7 +54,7 @@ public interface TenantStore extends Service {
   List<Tenant> getAllTenants() throws IOException;
 
   /**
-   * Get an immutable list of all {@link com.continuuity.loom.admin.TenantSpecification}.
+   * Get an immutable list of all {@link com.continuuity.loom.spec.TenantSpecification}.
    *
    * @return Collection of all tenant specifications.
    * @throws IOException
@@ -62,8 +62,8 @@ public interface TenantStore extends Service {
   List<TenantSpecification> getAllTenantSpecifications() throws IOException;
 
   /**
-   * Write the given {@link com.continuuity.loom.admin.Tenant} to the store. Will overwrite the existing
-   * {@link com.continuuity.loom.admin.Tenant} if one exists.
+   * Write the given {@link com.continuuity.loom.spec.Tenant} to the store. Will overwrite the existing
+   * {@link com.continuuity.loom.spec.Tenant} if one exists.
    *
    * @param tenant Tenant to write.
    * @throws IOException
@@ -71,7 +71,7 @@ public interface TenantStore extends Service {
   void writeTenant(Tenant tenant) throws IOException;
 
   /**
-   * Delete the {@link com.continuuity.loom.admin.Tenant} associated with the given name.
+   * Delete the {@link com.continuuity.loom.spec.Tenant} associated with the given name.
    *
    * @param name Name of the tenant to delete.
    * @throws IOException

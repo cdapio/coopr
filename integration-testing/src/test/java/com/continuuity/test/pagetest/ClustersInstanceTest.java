@@ -15,7 +15,7 @@
  */
 package com.continuuity.test.pagetest;
 
-import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.spec.ProvisionerAction;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.test.Constants;

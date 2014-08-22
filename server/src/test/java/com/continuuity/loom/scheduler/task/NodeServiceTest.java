@@ -16,7 +16,7 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.TestHelper;
-import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.LoomServiceTestBase;

@@ -15,9 +15,9 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ServiceDependencies;
-import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.service.ServiceDependencies;
+import com.continuuity.loom.spec.service.ServiceStageDependencies;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -29,7 +29,7 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Codec for serializing/deserializing a {@link com.continuuity.loom.admin.ServiceDependencies}.
+ * Codec for serializing/deserializing a {@link com.continuuity.loom.spec.service.ServiceDependencies}.
  */
 public class ServiceDependenciesCodec extends AbstractCodec<ServiceDependencies> {
 

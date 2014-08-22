@@ -15,7 +15,7 @@
  */
 package com.continuuity.test.pagetest;
 
-import com.continuuity.loom.admin.ImageType;
+import com.continuuity.loom.spec.ImageType;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.drivers.Global;

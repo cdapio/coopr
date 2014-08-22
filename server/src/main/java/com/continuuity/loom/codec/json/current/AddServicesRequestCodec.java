@@ -16,7 +16,6 @@
 package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.http.request.AddServicesRequest;
-import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

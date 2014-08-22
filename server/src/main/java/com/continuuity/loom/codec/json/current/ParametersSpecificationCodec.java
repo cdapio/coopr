@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.FieldSchema;
-import com.continuuity.loom.admin.ParametersSpecification;
+import com.continuuity.loom.spec.plugin.FieldSchema;
+import com.continuuity.loom.spec.plugin.ParametersSpecification;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.admin.ParametersSpecification}. Used so that the constructor
- * is called to avoid null values where they do not make sense.
+ * Codec for deserializing a {@link com.continuuity.loom.spec.plugin.ParametersSpecification}.
+ * Used so that the constructor is called to avoid null values where they do not make sense.
  */
 public class ParametersSpecificationCodec implements JsonDeserializer<ParametersSpecification> {
 

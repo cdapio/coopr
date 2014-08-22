@@ -15,10 +15,10 @@
  */
 package com.continuuity.loom.layout;
 
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
@@ -43,7 +43,7 @@ public class NodeLayout {
   }
 
   /**
-   * Get the name of the {@link com.continuuity.loom.admin.HardwareType} used on the node.
+   * Get the name of the {@link com.continuuity.loom.spec.HardwareType} used on the node.
    *
    * @return Name of the hardware type used on the node.
    */
@@ -52,7 +52,7 @@ public class NodeLayout {
   }
 
   /**
-   * Get the name of the {@link com.continuuity.loom.admin.ImageType} used on the node.
+   * Get the name of the {@link com.continuuity.loom.spec.ImageType} used on the node.
    *
    * @return Name of the image type used on the node.
    */

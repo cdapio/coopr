@@ -1,8 +1,6 @@
 package com.continuuity.loom.provisioner;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
@@ -13,6 +11,8 @@ import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;

@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.provisioner.mock;
 
-import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.spec.ProvisionerAction;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;

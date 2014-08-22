@@ -16,13 +16,13 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueMetrics;

@@ -15,8 +15,8 @@
  */
 package com.continuuity.test.page.CreatePage;
 
-import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.ServiceAction;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.service.ServiceAction;
 import com.continuuity.test.Constants;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

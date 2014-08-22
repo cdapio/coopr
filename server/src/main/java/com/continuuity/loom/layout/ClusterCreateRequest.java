@@ -112,7 +112,7 @@ public class ClusterCreateRequest {
   }
 
   /**
-   * Get the name of the {@link com.continuuity.loom.admin.ClusterTemplate} to use for cluster creation.
+   * Get the name of the {@link com.continuuity.loom.spec.template.ClusterTemplate} to use for cluster creation.
    *
    * @return Name of the cluster template to use for cluster creation.
    */
@@ -121,7 +121,7 @@ public class ClusterCreateRequest {
   }
 
   /**
-   * Get the name of the {@link com.continuuity.loom.admin.HardwareType} to use across the entire cluster or null
+   * Get the name of the {@link com.continuuity.loom.spec.HardwareType} to use across the entire cluster or null
    * if the template default should be used.
    *
    * @return Name of the hardware type to use across the entire cluster or null if the template default should be used.
@@ -131,7 +131,7 @@ public class ClusterCreateRequest {
   }
 
   /**
-   * Get the name of the {@link com.continuuity.loom.admin.ImageType} to use across the entire cluster or null
+   * Get the name of the {@link com.continuuity.loom.spec.ImageType} to use across the entire cluster or null
    * if the template default should be used.
    *
    * @return Name of the image type to use across the entire cluster or null if the template default should be used.

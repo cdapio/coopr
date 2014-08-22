@@ -17,9 +17,9 @@ package com.continuuity.loom.layout.change;
 
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;

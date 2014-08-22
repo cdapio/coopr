@@ -17,16 +17,16 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.QueueMetrics;
 import com.continuuity.loom.scheduler.task.TaskQueueService;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.tenant.TenantStore;
@@ -243,7 +243,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get a specific {@link com.continuuity.loom.admin.ProviderType} if readable by the user.
+   * Get a specific {@link com.continuuity.loom.spec.plugin.ProviderType} if readable by the user.
    *
    * @param request The request for the provider type.
    * @param responder Responder for sending the response.
@@ -268,7 +268,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get a specific {@link com.continuuity.loom.admin.AutomatorType} if readable by the user.
+   * Get a specific {@link com.continuuity.loom.spec.plugin.AutomatorType} if readable by the user.
    *
    * @param request The request for the automator type.
    * @param responder Responder for sending the response.
@@ -381,7 +381,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get all {@link com.continuuity.loom.admin.ProviderType}s readable by the user.
+   * Get all {@link com.continuuity.loom.spec.plugin.ProviderType}s readable by the user.
    *
    * @param request The request for services.
    * @param responder Responder for sending the response.
@@ -403,7 +403,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get all {@link com.continuuity.loom.admin.AutomatorType}s readable by the user.
+   * Get all {@link com.continuuity.loom.spec.plugin.AutomatorType}s readable by the user.
    *
    * @param request The request for services.
    * @param responder Responder for sending the response.

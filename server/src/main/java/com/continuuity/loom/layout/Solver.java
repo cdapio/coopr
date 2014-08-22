@@ -15,19 +15,19 @@
  */
 package com.continuuity.loom.layout;
 
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.layout.change.ClusterLayoutChange;
 import com.continuuity.loom.layout.change.ClusterLayoutTracker;
 import com.continuuity.loom.scheduler.task.NodeService;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.base.Joiner;

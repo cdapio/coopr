@@ -16,23 +16,17 @@
 package com.continuuity.loom.codec.json.current;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
