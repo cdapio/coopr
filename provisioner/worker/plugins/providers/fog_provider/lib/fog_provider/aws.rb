@@ -184,9 +184,6 @@ class FogProviderAWS < Provider
             ssh_exec!(ssh, "mount | grep ^/dev/xvda2 2>&1 >/dev/null && #{sudo} umount /dev/xvda2 && #{sudo} /sbin/mkfs.ext4 /dev/xvda2 && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/xvda2 /data", 'Mounting /dev/xvda2 as /data')
           end
           ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
-
-
-
         end
       end
       # Return 0
