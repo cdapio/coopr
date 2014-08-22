@@ -35,7 +35,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
@@ -1191,7 +1190,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
     if (entity == null) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, Joiner.on(" ").join(entityType, entityId, " not found."));
     } else {
-      responder.sendString(HttpResponseStatus.OK, gson.toJson(entity, entityClass));
+      responder.sendJson(HttpResponseStatus.OK, entity, entityClass, gson);
     }
   }
 

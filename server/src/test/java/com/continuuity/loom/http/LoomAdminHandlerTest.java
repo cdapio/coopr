@@ -280,6 +280,7 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     // make sure entity was added correctly
     HttpResponse response = doGet(entity1Path, ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
+    Assert.assertEquals("application/json", response.getEntity().getContentType().getValue());
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     JsonObject result = new Gson().fromJson(reader, JsonObject.class);
     Assert.assertEquals(entity1, result);
