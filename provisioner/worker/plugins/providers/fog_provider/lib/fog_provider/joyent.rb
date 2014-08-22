@@ -161,7 +161,7 @@ class FogProviderJoyent < Provider
   def connection
     log.debug "Connection options for Joyent:"
     log.debug "- joyent_username #{@joyent_username}"
-    log.debug "- joyent_password #{@joyent_password}"
+    log.debug "- joyent_password #{@joyent_password}" if @joyent_password
     log.debug "- joyent_keyname #{@joyent_keyname}"
     log.debug "- joyent_keyfile #{@joyent_keyfile}"
     log.debug "- joyent_api_url #{@joyent_api_url}"
