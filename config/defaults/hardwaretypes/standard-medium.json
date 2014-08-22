@@ -3,13 +3,16 @@
   "description": "2+ vCPU, 4 GB RAM, 120+ GB Disk",
   "providermap": {
     "aws-us-east-1": {
-      "flavor": "m1.medium"
+      "flavor": "m1.medium",
+      "cost": "0.087"
     },
     "aws-us-west-1": {
-      "flavor": "m1.medium"
+      "flavor": "m1.medium",
+      "cost": "0.087"
     },
     "aws-us-west-2": {
-      "flavor": "m1.medium"
+      "flavor": "m1.medium",
+      "cost": "0.087"
     },
     "joyent": {
       "flavor": "Medium 4GB"

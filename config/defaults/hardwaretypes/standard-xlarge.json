@@ -3,13 +3,16 @@
   "description": "4+ vCPU, 15+ GB RAM, 240+ GB Disk",
   "providermap": {
     "aws-us-east-1": {
-      "flavor": "m1.xlarge"
+      "flavor": "m1.xlarge",
+      "cost": "0.350"
     },
     "aws-us-west-1": {
-      "flavor": "m1.xlarge"
+      "flavor": "m1.xlarge",
+      "cost": "0.350"
     },
     "aws-us-west-2": {
-      "flavor": "m1.xlarge"
+      "flavor": "m1.xlarge",
+      "cost": "0.350"
     },
     "joyent": {
       "flavor": "Large 16GB"
