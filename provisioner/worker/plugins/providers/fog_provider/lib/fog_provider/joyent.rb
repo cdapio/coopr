@@ -141,6 +141,8 @@ class FogProviderJoyent < Provider
         server.destroy
       rescue NoMethodError
         log.warn "Could not locate server '#{providerid}'... skipping"
+      else
+        sleep 30
       end
       # Return 0
       @result['status'] = 0
