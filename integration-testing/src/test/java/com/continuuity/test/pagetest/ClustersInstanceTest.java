@@ -16,6 +16,8 @@
 package com.continuuity.test.pagetest;
 
 import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;
@@ -24,8 +26,10 @@ import com.continuuity.test.input.TestNode;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.google.inject.Guice;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -48,6 +52,7 @@ import static org.junit.Assert.assertEquals;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ClustersInstanceTest extends GenericTest {
+  private static final Gson GSON = Guice.createInjector(new CodecModules().getModule()).getInstance(Gson.class);
   private static final TestUtil TEST_UTIL = new TestUtil();
   private static final String CLUSTERTEMPLATE = "clusterTemplate";
   private static final By TABLE = By.cssSelector(".table.table-striped");
@@ -126,16 +131,16 @@ public class ClustersInstanceTest extends GenericTest {
 
   private Set<TestNode> getExpectedTestNodes() {
     Set<TestNode> idTestNodes = Sets.newHashSet();
-    JsonArray jsonArray = cluster.getAsJsonArray("nodes");
+    List<Node> nodes = GSON.fromJson(cluster.get("nodes"), new TypeToken<List<Node>>() {}.getType());
 
-    for (int i = 0; i < jsonArray.size(); i++) {
-      JsonObject properties = jsonArray.get(i).getAsJsonObject().getAsJsonObject("properties");
-      String hostname = properties.get("hostname").getAsString();
-      String id = cluster.getAsJsonArray("nodes").get(i).getAsJsonObject().get("id").getAsString();
-      String ip = properties.get("ipaddress").getAsString();
-      String username = properties.getAsJsonObject("ssh-auth").get("user").getAsString();
-      String password = properties.getAsJsonObject("ssh-auth").get("password").getAsString();
-      Set<TestNode.Action> actions = getExpectedActions(jsonArray.get(i).getAsJsonObject());
+    for (Node node : nodes) {
+      String hostname = node.getProperties().getHostname();
+      String id = node.getId();
+      String ip = node.getProperties().getIPAddress("access_v4");
+      JsonObject provisionerResults = node.getProvisionerResults();
+      String username = provisionerResults.getAsJsonObject("ssh-auth").get("user").getAsString();
+      String password = provisionerResults.getAsJsonObject("ssh-auth").get("password").getAsString();
+      Set<TestNode.Action> actions = getExpectedActions(node.getActions());
       idTestNodes.add(new TestNode(hostname, id, actions, ip, username, password));
     }
     return idTestNodes;
@@ -224,17 +229,15 @@ public class ClustersInstanceTest extends GenericTest {
     return endIndex;
   }
 
-  private Set<TestNode.Action> getExpectedActions(JsonObject jsonObject) {
+  private Set<TestNode.Action> getExpectedActions(List<Node.Action> actions) {
     Set<TestNode.Action> results = Sets.newHashSet();
-    JsonArray actionArray = jsonObject.getAsJsonObject().getAsJsonArray("actions");
-    for (int i = 0; i < actionArray.size(); i++) {
-      JsonObject json = actionArray.get(i).getAsJsonObject();
-      String service = json.get("service").getAsString();
-      ProvisionerAction action = ProvisionerAction.valueOf(json.get("action").getAsString().toUpperCase());
-      long submitTime = Long.parseLong(json.get("submitTime").getAsString());
-      long statusTime = Long.parseLong(json.get("statusTime").getAsString());
+    for (Node.Action nodeAction : actions) {
+      ProvisionerAction action = ProvisionerAction.valueOf(nodeAction.getAction().toUpperCase());
+      String service = nodeAction.getService();
+      long submitTime = nodeAction.getSubmitTime();
+      long statusTime = nodeAction.getStatusTime();
       long duration = Math.round((statusTime - submitTime) / 1000.0);
-      String status = json.get("status").getAsString();
+      String status = nodeAction.getStatus().name().toLowerCase();
       results.add(new TestNode.Action(action, service, submitTime / 1000, duration, status));
     }
     return results;

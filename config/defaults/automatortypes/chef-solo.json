@@ -1,6 +1,17 @@
 {
     "description": "",
     "name": "chef-solo",
+    "resourceTypes": {
+        "cookbooks": {
+            "format": "archive"
+        },
+        "data_bags": {
+            "format": "archive"
+        },
+        "roles": {
+            "format": "file"
+        }
+    },
     "parameters": {
         "admin": {
             "fields": {

@@ -11,7 +11,7 @@
           <thead>
             <tr>
               <th>Name</th>
-              {% if authenticated === 'admin' %}
+              {% if authenticated.id === 'admin' %}
               <th>User</th>
               {% endif %}
               <th>Id</th>
@@ -28,7 +28,7 @@
               {% if entry.status !== 'TERMINATED' %}
                 <tr id="{{entry.id}}" class="cluster-entry">
                   <td class="cluster-name"><a href="/user/clusters/cluster/{{entry.id}}">{{ entry.name }}</a></td>
-                  {% if authenticated === 'admin' %}
+                  {% if authenticated.id === 'admin' %}
                   <td>{{entry.ownerId}}</td>
                   {% endif %}
                   <td class="cluster-hash">{{ entry.id }}</td>
@@ -69,7 +69,7 @@
           <thead>
             <tr>
               <th>Name</th>
-              {% if authenticated === 'admin' %}
+              {% if authenticated.id === 'admin' %}
               <th>User</th>
               {% endif %}
               <th>Id</th>
@@ -86,7 +86,7 @@
               {% if entry.status === 'TERMINATED' %}
                 <tr id="{{entry.id}}" class="cluster-entry">
                   <td class="cluster-name"><a href="/user/clusters/cluster/{{entry.id}}">{{ entry.name }}</a></td>
-                  {% if authenticated === 'admin' %}
+                  {% if authenticated.id === 'admin' %}
                   <td>{{entry.ownerId}}</td>
                   {% endif %}
                   <td class="cluster-hash">{{ entry.id }}</td>

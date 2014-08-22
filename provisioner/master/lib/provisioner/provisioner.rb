@@ -16,7 +16,6 @@
 # limitations under the License.
 #
 
-
 require 'thin'
 require 'sinatra/base'
 require 'json'
@@ -29,36 +28,49 @@ require_relative 'tenantmanager'
 require_relative 'provisioner'
 require_relative 'cli'
 require_relative 'logging'
+require_relative 'config'
+require_relative 'constants'
 
 module Loom
+  # top-level class for provisioner
   class Provisioner
     include Logging
 
     attr_accessor :tenantmanagers, :provisioner_id, :server_uri
 
-    def initialize(options)
+    def initialize(options, config)
       @options = options
+      @config = config
       @tenantmanagers = {}
       @terminating_tenants = []
-      @server_uri = options[:uri]
+      @server_uri = config.get('provisioner.server.uri')
       pid = Process.pid
       host = Socket.gethostname.downcase
       @provisioner_id = "#{host}.#{pid}"
       log.info "provisioner #{@provisioner_id} initialized"
+      @registered = false
     end
 
     # invoked from bin/provisioner
     def self.run(options)
+      # read configuration
+      config = Config.new(options)
+      config.load
 
       # initialize logging
-      Logging.configure(options[:log_directory] ? "#{options[:log_directory]}/provisioner.log" : nil)
-      Logging.level = options[:log_level]
-      Logging.log.info "Loom api starting up"
+      Logging.configure(config.get(PROVISIONER_LOG_DIR) ? "#{config.get(PROVISIONER_LOG_DIR)}/provisioner.log" : nil)
+      Logging.level = config.get(PROVISIONER_LOG_LEVEL)
+      Logging.shift_age = config.get(PROVISIONER_LOG_ROTATION_SHIFT_AGE)
+      Logging.shift_size = config.get(PROVISIONER_LOG_ROTATION_SHIFT_SIZE)
+      Logging.log.debug 'Provisioner starting up'
+      config.properties.each do |k, v|
+        Logging.log.debug "  #{k}: #{v}"
+      end
 
       # daemonize
-      daemonize if options[:daemonize]
+      daemonize if config.get(PROVISIONER_DAEMONIZE)
 
-      pg = Loom::Provisioner.new(options)
+      pg = Loom::Provisioner.new(options, config)
       if options[:register]
         pg.register_plugins
       else
@@ -68,26 +80,49 @@ module Loom
 
     # main run block
     def run
-      # start the api server
-      spawn_sinatra_thread
-      # wait for sinatra to fully initialize
-      sleep 1 until Api.running?
-      # register our own signal handlers
-      setup_signal_traps
-      # spawn the heartbeat thread
-      spawn_heartbeat_thread
-      # spawn the signal handler thread
-      spawn_signal_thread
+      begin
+        @status = 'STARTING'
+        Thread.abort_on_exception = true
+        # start the api server
+        spawn_sinatra_thread
+        # wait for sinatra to fully initialize
+        sleep 1 until Api.running?
+        # register our own signal handlers
+        setup_signal_traps
+        # spawn the heartbeat, signal-handler, and resource threads
+        spawn_heartbeat_thread
+        spawn_signal_thread
+        spawn_resource_thread
 
-      # wait for signal_handler to exit in response to signals
-      @signal_thread.join
-      # kill the other threads
-      @heartbeat_thread.kill
-      @sinatra_thread.kill
-      @heartbeat_thread.join
-      @sinatra_thread.join
-      log.info "provisioner gracefully shut down"
-      exit
+        # heartbeat thread will update status to 'OK'
+
+        # wait for signal_handler to exit in response to signals
+        @signal_thread.join
+        # kill the other threads
+        [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|
+          t.kill
+          t.join
+        end
+        log.info "provisioner gracefully shut down"
+        exit
+      rescue RuntimeError => e
+        log.error "Exception raised in thread: #{e.inspect}, shutting down..."
+        # if signal_handler thread alive, use it to shutdown gracefully
+        if @signal_thread.alive?
+          Process.kill('TERM', 0)
+          @signal_thread.join
+          [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|
+            t.kill if t.alive?
+          end
+          log.info "provisioner forced graceful shutdown"
+          exit 1
+        else
+          # last resort, kill entire process group
+          Process.kill('TERM', -Process.getpgrp)
+          log.info "provisioner forced shutdown"
+          exit 1
+        end
+      end
     end
 
     def spawn_sinatra_thread
@@ -95,15 +130,13 @@ module Loom
         # set reference to provisioner
         Api.set :provisioner, self
         # set bind settings
-        bind_ip = @options[:bind_ip] || '0.0.0.0'
-        bind_port = @options[:bind_port] || '55056'
+        bind_ip = @config.get(PROVISIONER_BIND_IP)
+        bind_port = @config.get(PROVISIONER_BIND_PORT)
         Api.set :bind, bind_ip
         Api.set :port, bind_port
         # let sinatra take over from here
         Api.run!
       }
-      # surface any exceptions immediately
-      @sinatra_thread.abort_on_exception=true
 
     end
 
@@ -153,8 +186,8 @@ module Loom
     def spawn_heartbeat_thread
       @heartbeat_thread = Thread.new {
         log.info "starting heartbeat thread"
-        register_with_server
         loop {
+          register_with_server unless @registered
           uri = "#{@server_uri}/v1/provisioners/#{provisioner_id}/heartbeat"
           begin
             json = heartbeat.to_json
@@ -175,13 +208,33 @@ module Loom
       }
     end
 
+    def spawn_resource_thread
+      @resource_thread = Thread.new {
+        log.info "starting resource thread"
+        loop {
+          @tenantmanagers.each do |id, tmgr|
+            if tmgr.resource_sync_needed? && tmgr.num_workers == 0
+              # handle stacked sync calls, last one wins
+              while tmgr.resource_sync_needed?
+                log.debug "resource thread invoking sync for tenant #{tmgr.id}"
+                tmgr.sync
+              end
+              log.debug "done syncing tenant #{tmgr.id}, resuming workers"
+              tmgr.resume
+            end
+          end
+          sleep 1
+        }
+      }
+    end
+
     def register_with_server
       uri = "#{@server_uri}/v1/provisioners/#{@provisioner_id}"
       data = {}
       data['id'] = @provisioner_id
-      data['capacityTotal'] = @options[:capacity] || '10'
-      data['host'] = local_ip
-      data['port'] = @options[:bind_port] || '55056'
+      data['capacityTotal'] = @config.get(PROVISIONER_CAPACITY)
+      data['host'] = @config.get(PROVISIONER_REGISTER_IP) || local_ip
+      data['port'] = @config.get(PROVISIONER_BIND_PORT)
 
       log.info "Registering with server at #{uri}: #{data.to_json}"
 
@@ -189,6 +242,9 @@ module Loom
         resp = RestClient.put("#{uri}", data.to_json, :'X-Loom-UserID' => "admin")
         if(resp.code == 200)
           log.info "Successfully registered"
+          @registered = true
+          # announce provisioner is ready
+          @status = 'OK'
         else
           log.warn "Response code #{resp.code}, #{resp.to_str} when registering with loom server #{uri}"
         end
@@ -200,7 +256,7 @@ module Loom
     # this is temporary until provisioner process manages worker data
     def register_plugins
       # launch a single worker with register flag
-      exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../../../worker/provisioner.rb --uri #{@server_uri} --register")
+      exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../../../worker/provisioner.rb --work-dir #{@config.get(PROVISIONER_WORK_DIR)} --uri #{@server_uri} --register")
     end
 
     def unregister_from_server
@@ -223,20 +279,16 @@ module Loom
     end
 
     # api method to add or edit tenant
-    def add_tenant(tenantmgr)
-      unless tenantmgr.instance_of?(TenantManager)
-        raise ArgumentError, "only instances of TenantManager can be added to provisioner", caller
+    def add_tenant(tenantspec)
+      unless tenantspec.instance_of?(TenantSpec)
+        raise ArgumentError, "only instances of TenantSpec can be added to provisioner", caller
       end
       # validate input
-      id = tenantmgr.id
+      id = tenantspec.id
       log.debug "Adding/Editing tenant: #{id}"
       fail "cannot add a TenantManager without an id: #{tenantmgr.inspect}" if id.nil?
 
-      # set provisionerId
-      tenantmgr.provisioner_id = @provisioner_id
-
-      # set options
-      tenantmgr.options = @options
+      tenantmgr = TenantManager.new(tenantspec, @config, @provisioner_id)
 
       if @tenantmanagers.key? id
         # edit tenant
@@ -245,7 +297,8 @@ module Loom
       else
         # new tenant
         log.debug "Adding new tenant: #{id}"
-        tenantmgr.spawn
+        #tenantmgr.spawn
+        tenantmgr.resource_sync_needed
         @tenantmanagers[id] = tenantmgr
       end
     end
@@ -286,18 +339,28 @@ module Loom
       hb
     end
 
+    # get current status
+    def status
+      @status ||= 'UNKNOWN'
+    end
+
     # determine ip to register with server from routing info
     # http://coderrr.wordpress.com/2008/05/28/get-your-local-ip-address/
     def local_ip
-      server_ip = Resolv.getaddress( @server_uri.sub(%r{^https?://}, '').split(':').first ) rescue '127.0.0.1'
-      orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true # turn off reverse DNS resolution temporarily
-      UDPSocket.open do |s|
-        s.connect server_ip, 1
-        s.addr.last
+      begin
+        server_ip = Resolv.getaddress( @server_uri.sub(%r{^https?://}, '').split(':').first ) rescue '127.0.0.1'
+        orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true # turn off reverse DNS resolution temporarily
+        UDPSocket.open do |s|
+          s.connect server_ip, 1
+          s.addr.last
+        end
+      rescue => e
+        log.error "Unable to determine provisioner.register.ip, defaulting to 127.0.0.1. Please set it explicitly. "\
+          "Server may not be able to connect to this provisioner: #{e.inspect}"
+        '127.0.0.1'
+      ensure
+        Socket.do_not_reverse_lookup = orig
       end
-    ensure
-      Socket.do_not_reverse_lookup = orig
     end
-
   end
 end

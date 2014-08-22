@@ -24,8 +24,70 @@ RPC
 
 .. include:: /rest/rest-links.rst
 
-In addition to the standard REST endpoints, a few RPC functions are available to obtain
-cluster information.
+In addition to the standard REST endpoints, a few RPC functions are available.
+
+.. _rpc-bootstrap:
+
+Bootstrap Tenant
+================
+Bootstrapping a tenant will copy all providers, hardware types, image types, services, 
+cluster templates, and plugin resources from the superadmin to the tenant making the request.
+The user making the request must be the tenant admin. This is a copy, meaning if the 
+superadmin updates the entities, the changes will not be reflected in the tenant.
+
+To bootstrap a tenant, making a POST HTTP request to URI:
+::
+
+ /bootstrap
+
+Normally, a bootstrap is only allowed if the tenant is in an completely clean state, meaning
+there are no providers, hardware types, image types, services, cluster templates, or 
+plugin resources. The tenant admin can force a potentially destructive bootstrap by setting
+a variable in the request body.
+The body is a JSON Object containing one optional key ``force`` which indicates whether or 
+not superadmin data should be copied regardless of the state of the tenant. This will overwrite
+any existing data.
+
+POST Parameters
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Parameter
+     - Description
+   * - force 
+     - Boolean indicating whether or not to force a bootstrap regardless of the tenant state. Defaults to false.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - If update was successful
+   * - 403 (FORBIDDEN)
+     - If the user is not allowed to make this request.
+   * - 409 (CONFLICT)
+     - If the tenant is not in a clean slate and cannot be bootstrapped.
+
+Example
+^^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Loom-TenantID:<tenantid>'
+        -X POST
+        -d '{ 
+                "overwrite": "true"
+            }'
+        http://<loom-server>:<loom-port>/<version>/loom/bootstrap
 
 .. _rpc-statuses:
 
@@ -57,6 +119,7 @@ Example
 .. code-block:: bash
 
  $ curl -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/status
  $ {
@@ -70,6 +133,7 @@ Example
 
  $ curl -X POST
         -H 'X-Loom-UserID:<userid>'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         http://<loom-server>:<loom-port>/<version>/loom/getClusterStatuses
  $ [
@@ -150,6 +214,7 @@ Example
 
  $ curl -X POST
         -H 'X-Loom-UserID:<userid>'
+        -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{ 
                 "clusterId":"00000051",

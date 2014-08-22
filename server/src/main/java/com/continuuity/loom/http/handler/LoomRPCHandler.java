@@ -17,15 +17,24 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.admin.ClusterTemplate;
+import com.continuuity.loom.admin.HardwareType;
+import com.continuuity.loom.admin.ImageType;
+import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.current.NodePropertiesRequestCodec;
+import com.continuuity.loom.http.request.BootstrapRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
+import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
@@ -38,9 +47,12 @@ import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
@@ -52,17 +64,132 @@ import java.util.Set;
  */
 @Path("/v1/loom")
 public class LoomRPCHandler extends LoomAuthHandler {
+  private static final Logger LOG  = LoggerFactory.getLogger(LoomRPCHandler.class);
   private static final Gson GSON = new GsonBuilder()
     .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec()).create();
+  private final EntityStoreService entityStoreService;
   private final ClusterStoreService clusterStoreService;
   private final ClusterStore clusterStore;
+  private final ResourceService resourceService;
+  private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
   private LoomRPCHandler(TenantStore tenantStore,
-                         ClusterStoreService clusterStoreService) {
+                         EntityStoreService entityStoreService,
+                         ClusterStoreService clusterStoreService,
+                         ResourceService resourceService,
+                         TenantProvisionerService tenantProvisionerService) {
     super(tenantStore);
+    this.entityStoreService = entityStoreService;
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
+    this.resourceService = resourceService;
+    this.tenantProvisionerService = tenantProvisionerService;
+  }
+
+  /**
+   * Bootstraps a tenant by copying all entities and plugin resources from the superadmin into the tenant. Will not
+   * overwrite existing content unless the body contains overwrite=true.
+   *
+   * @param request Request to bootstrap the tenant
+   * @param responder Responder for responding to the request
+   * @throws Exception
+   */
+  @POST
+  @Path("/bootstrap")
+  public void bootstrapTenant(HttpRequest request, HttpResponder responder) {
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+    if (account.isSuperadmin()) {
+      responder.sendString(HttpResponseStatus.OK, "Nothing to bootstrap for superadmin.");
+      return;
+    }
+    if (!account.isAdmin()) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User is not allowed to bootstrap.");
+      return;
+    }
+
+    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
+    BootstrapRequest bootstrapRequest = null;
+    try {
+      bootstrapRequest = GSON.fromJson(reader, BootstrapRequest.class);
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+      return;
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body. Must be a valid JSON Object.");
+      return;
+    }
+
+    boolean forced = bootstrapRequest == null ? false : bootstrapRequest.isForced();
+    EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
+    EntityStoreView tenantView = entityStoreService.getView(account);
+
+    try {
+      if (!forced && !canBootstrap(account)) {
+        responder.sendError(HttpResponseStatus.CONFLICT, "Cannot bootstrap unless the tenant is empty.");
+        return;
+      }
+
+      // copy entities
+      LOG.debug("Bootstrapping entities");
+      for (HardwareType hardwareType : superadminView.getAllHardwareTypes()) {
+        if (!forced && tenantView.getHardwareType(hardwareType.getName()) != null) {
+          continue;
+        }
+        tenantView.writeHardwareType(hardwareType);
+      }
+      for (ImageType imageType : superadminView.getAllImageTypes()) {
+        if (!forced && tenantView.getImageType(imageType.getName()) != null) {
+          continue;
+        }
+        tenantView.writeImageType(imageType);
+      }
+      for (Service service : superadminView.getAllServices()) {
+        if (!forced && tenantView.getService(service.getName()) != null) {
+          continue;
+        }
+        tenantView.writeService(service);
+      }
+      for (ClusterTemplate template : superadminView.getAllClusterTemplates()) {
+        if (!forced && tenantView.getClusterTemplate(template.getName()) != null) {
+          continue;
+        }
+        tenantView.writeClusterTemplate(template);
+      }
+      for (Provider provider : superadminView.getAllProviders()) {
+        if (!forced && tenantView.getProvider(provider.getName()) != null) {
+          continue;
+        }
+        tenantView.writeProvider(provider);
+      }
+
+      // bootstrap plugin resources
+      LOG.debug("Bootstrapping plugin resources");
+      resourceService.bootstrapResources(account);
+      LOG.debug("Syncing plugin resources");
+      tenantProvisionerService.syncResources(account);
+
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (IOException e) {
+      LOG.error("Exception bootstrapping account {}", account);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error boostrapping account.");
+    } catch (IllegalAccessException e) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "User not allowed to write entities.");
+    }
+  }
+
+  // can bootstrap if there is nothing in the account
+  private boolean canBootstrap(Account account) throws IOException {
+    EntityStoreView tenantView = entityStoreService.getView(account);
+    return tenantView.getAllProviders().isEmpty() &&
+      tenantView.getAllHardwareTypes().isEmpty() &&
+      tenantView.getAllImageTypes().isEmpty() &&
+      tenantView.getAllServices().isEmpty() &&
+      tenantView.getAllClusterTemplates().isEmpty() &&
+      resourceService.numResources(account) == 0;
   }
 
   /**
@@ -154,10 +281,10 @@ public class LoomRPCHandler extends LoomAuthHandler {
       // if the node has all services needed
       if (nodeServices.containsAll(requiredServices)) {
         JsonObject outputProperties;
+        JsonObject nodeProperties = GSON.toJsonTree(node.getProperties()).getAsJsonObject();
         // if the request contains a list of properties, just include those properties
         if (properties.size() > 0) {
           outputProperties = new JsonObject();
-          JsonObject nodeProperties = node.getProperties();
           // add all requested node properties
           for (String property : properties) {
             if (nodeProperties.has(property)) {
@@ -166,7 +293,7 @@ public class LoomRPCHandler extends LoomAuthHandler {
           }
         } else {
           // request did not contain a list of properties, include them all
-          outputProperties = node.getProperties();
+          outputProperties = nodeProperties;
         }
         output.put(node.getId(), outputProperties);
       }

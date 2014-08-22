@@ -16,22 +16,25 @@
 package com.continuuity.loom.store.tenant;
 
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Implementation of {@link TenantStore} using a SQL database as the persistent store.
@@ -41,14 +44,16 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
 
   private final DBConnectionPool dbConnectionPool;
   private final DBQueryExecutor dbQueryExecutor;
+  private final ConcurrentMap<String, String> idToNameMap;
 
   // for unit tests only.  Truncate is not supported in derby.
   public void clearData() throws SQLException {
     Connection conn = dbConnectionPool.getConnection();
     try {
-      Statement stmt = conn.createStatement();
+      PreparedStatement stmt = conn.prepareStatement("DELETE FROM tenants WHERE id<>?");
       try {
-        stmt.execute("DELETE FROM tenants");
+        stmt.setString(1, Constants.SUPERADMIN_TENANT);
+        stmt.executeUpdate();
       } finally {
         stmt.close();
       }
@@ -62,13 +67,26 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     throws SQLException, ClassNotFoundException {
     this.dbConnectionPool = dbConnectionPool;
     this.dbQueryExecutor = dbQueryExecutor;
+    this.idToNameMap = Maps.newConcurrentMap();
   }
 
   @Override
   protected void startUp() throws Exception {
     if (dbConnectionPool.isEmbeddedDerbyDB()) {
       DBHelper.createDerbyTableIfNotExists(
-        "CREATE TABLE tenants ( id VARCHAR(255), name VARCHAR(255), workers INT, tenant BLOB )", dbConnectionPool);
+        "CREATE TABLE tenants ( " +
+          "id VARCHAR(255), " +
+          "name VARCHAR(255), " +
+          "workers INT, " +
+          "deleted BOOLEAN, " +
+          "create_time TIMESTAMP, " +
+          "delete_time TIMESTAMP, " +
+          "tenant BLOB )", dbConnectionPool);
+    }
+    // add superadmin if it doesn't exist
+    Tenant superadminTenant = getTenantByName(Constants.SUPERADMIN_TENANT);
+    if (superadminTenant == null) {
+      writeTenant(Tenant.DEFAULT_SUPERADMIN);
     }
   }
 
@@ -78,11 +96,12 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   }
 
   @Override
-  public Tenant getTenant(String id) throws IOException {
+  public Tenant getTenantByID(String id) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants WHERE id=?");
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT tenant FROM tenants WHERE id=? AND deleted=false");
         statement.setString(1, id);
         try {
           return dbQueryExecutor.getQueryItem(statement, Tenant.class);
@@ -93,7 +112,29 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
         conn.close();
       }
     } catch (SQLException e) {
-      LOG.error("Exception getting tenant {}", id, e);
+      LOG.error("Exception getting tenant with id {}", id, e);
+      throw new IOException(e);
+    }
+  }
+
+  @Override
+  public Tenant getTenantByName(String name) throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement(
+          "SELECT tenant FROM tenants WHERE name=? AND deleted=false");
+        statement.setString(1, name);
+        try {
+          return dbQueryExecutor.getQueryItem(statement, Tenant.class);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting tenant with name {}", name, e);
       throw new IOException(e);
     }
   }
@@ -103,9 +144,35 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants");
+        PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants WHERE deleted=false");
         try {
           return dbQueryExecutor.getQueryList(statement, Tenant.class);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting all tenants", e);
+      throw new IOException(e);
+    }
+  }
+
+  @Override
+  public List<TenantSpecification> getAllTenantSpecifications() throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement("SELECT tenant FROM tenants WHERE deleted=false");
+        try {
+          return dbQueryExecutor.getQueryList(statement, Tenant.class,
+                                              new Function<Tenant, TenantSpecification>() {
+                                                @Override
+                                                public TenantSpecification apply(Tenant input) {
+                                                  return input.getSpecification();
+                                                }
+                                              });
         } finally {
           statement.close();
         }
@@ -123,7 +190,7 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        DBPut tenantPut = new TenantDBPut(tenant, dbQueryExecutor.toByteStream(tenant, Tenant.class));
+        DBPut tenantPut = new TenantDBPut(tenant, dbQueryExecutor.toBytes(tenant, Tenant.class));
         tenantPut.executePut(conn);
       } finally {
         conn.close();
@@ -135,12 +202,14 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
   }
 
   @Override
-  public void deleteTenant(String id) throws IOException {
+  public void deleteTenantByName(String name) throws IOException {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        PreparedStatement statement = conn.prepareStatement("DELETE FROM tenants WHERE id=? ");
-        statement.setString(1, id);
+        PreparedStatement statement = conn.prepareStatement(
+          "UPDATE tenants SET deleted=true, delete_time=? WHERE name=? ");
+        statement.setTimestamp(1, DBHelper.getTimestamp(System.currentTimeMillis()));
+        statement.setString(2, name);
         try {
           statement.executeUpdate();
         } finally {
@@ -150,16 +219,59 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
         conn.close();
       }
     } catch (SQLException e) {
-      LOG.error("Exception deleting tenant {}", id);
+      LOG.error("Exception deleting tenant {}", name);
+      throw new IOException(e);
+    }
+  }
+
+  /**
+   * Get the name of the tenant with the given id. Id to name mapping is cached, so this will not involve an io
+   * operation except for the first time it is called.
+   *
+   * @param id Id of the tenant to get the name for
+   * @return Name of the tenant with the given id, or null if the tenant does not exist
+   * @throws IOException
+   */
+  @Override
+  public String getNameForId(String id) throws IOException {
+    if (idToNameMap.containsKey(id)) {
+      return idToNameMap.get(id);
+    }
+    String name = getNameFromDB(id);
+    // if there is no tenant, return null
+    if (name == null) {
+      return null;
+    }
+    // cache the result since id to name will never change
+    idToNameMap.put(id, name);
+    return name;
+  }
+
+  private String getNameFromDB(String id) throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = conn.prepareStatement("SELECT name FROM tenants WHERE id=? AND deleted=false ");
+        try {
+          statement.setString(1, id);
+          return dbQueryExecutor.getString(statement);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting name of tenant {}", id);
       throw new IOException(e);
     }
   }
 
   private class TenantDBPut extends DBPut {
     private final Tenant tenant;
-    private final ByteArrayInputStream tenantBytes;
+    private final byte[] tenantBytes;
 
-    private TenantDBPut(Tenant tenant, ByteArrayInputStream tenantBytes) {
+    private TenantDBPut(Tenant tenant, byte[] tenantBytes) {
       this.tenant = tenant;
       this.tenantBytes = tenantBytes;
     }
@@ -168,8 +280,8 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
         "UPDATE tenants SET tenant=?, workers=? WHERE id=?");
-      statement.setBlob(1, tenantBytes);
-      statement.setInt(2, tenant.getWorkers());
+      statement.setBytes(1, tenantBytes);
+      statement.setInt(2, tenant.getSpecification().getWorkers());
       statement.setString(3, tenant.getId());
       return statement;
     }
@@ -177,10 +289,13 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     @Override
     public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
-        "INSERT INTO tenants (id, workers, tenant) VALUES (?, ?, ?)");
+        "INSERT INTO tenants (id, name, workers, tenant, create_time, delete_time, deleted) " +
+          "VALUES (?, ?, ?, ?, ?, null, false)");
       statement.setString(1, tenant.getId());
-      statement.setInt(2, tenant.getWorkers());
-      statement.setBlob(3, tenantBytes);
+      statement.setString(2, tenant.getSpecification().getName());
+      statement.setInt(3, tenant.getSpecification().getWorkers());
+      statement.setBytes(4, tenantBytes);
+      statement.setTimestamp(5, DBHelper.getTimestamp(System.currentTimeMillis()));
       return statement;
     }
   }

@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
  * An Account represents all information about a user, such as the user id and tenant id.
  */
 public final class Account {
+  public static final Account SUPERADMIN = new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT);
   private final String userId;
   private final String tenantId;
 

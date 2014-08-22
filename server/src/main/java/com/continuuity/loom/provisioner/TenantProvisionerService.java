@@ -1,25 +1,36 @@
 package com.continuuity.loom.provisioner;
 
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
+import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
+import com.continuuity.loom.provisioner.plugin.ResourceCollection;
+import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
+import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.apache.twill.zookeeper.ZKClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 
 /**
  * Service for managing provisioners.
@@ -28,116 +39,194 @@ public class TenantProvisionerService {
   private static final Logger LOG  = LoggerFactory.getLogger(TenantProvisionerService.class);
   private final ProvisionerStore provisionerStore;
   private final TenantStore tenantStore;
-  private final ZKInterProcessReentrantLock lock;
+  private final LockService lockService;
+  private final ZKInterProcessReentrantLock tenantLock;
   private final long provisionerTimeoutSecs;
   private final TrackingQueue balanceQueue;
   private final ProvisionerRequestService provisionerRequestService;
+  private final ClusterStoreService clusterStoreService;
+  private final ResourceService resourceService;
 
   @Inject
   private TenantProvisionerService(ProvisionerStore provisionerStore,
-                                   TenantStore tenantStore,
-                                   ZKClient zkClient,
+                                   final TenantStore tenantStore,
+                                   LockService lockService,
                                    @Named(Constants.Queue.WORKER_BALANCE) TrackingQueue balanceQueue,
+                                   ClusterStoreService clusterStoreService,
                                    ProvisionerRequestService provisionerRequestService,
+                                   ResourceService resourceService,
                                    Configuration conf) {
     this.provisionerStore = provisionerStore;
     this.tenantStore = tenantStore;
+    this.lockService = lockService;
     this.provisionerRequestService = provisionerRequestService;
+    this.clusterStoreService = clusterStoreService;
+    this.resourceService = resourceService;
     // a single lock is used across all tenants and provisioners. This is so that a request modifies worker assignments
     // across multiple provisioners does not conflict with requests that modify worker capacity. For example, if a
     // tenant is added the same time a tenant is deleted, we don't want to be modifying the same provisioner at the
     // same time and cause conflicts. Similarly, if we're moving workers from one provisioner to another at the same
     // time as we're adding a tenant, we don't want to both add workers to the same provisioner at the same time.
-    this.lock = new ZKInterProcessReentrantLock(zkClient, Constants.TENANT_NAMESPACE);
+    this.tenantLock = lockService.getTenantProvisionerLock();
     this.provisionerTimeoutSecs = conf.getLong(Constants.PROVISIONER_TIMEOUT_SECS);
     this.balanceQueue = balanceQueue;
   }
 
   /**
-   * Get an unmodifiable collection of all tenants.
+   * Get an unmodifiable collection of all tenant specifications.
    *
-   * @return Unmodifiable collection of all tenants
+   * @return Unmodifiable collection of all tenant specifications
    * @throws IOException
    */
-  public Collection<Tenant> getAllTenants() throws IOException {
-    return tenantStore.getAllTenants();
+  public Collection<TenantSpecification> getAllTenantSpecifications() throws IOException {
+    return tenantStore.getAllTenantSpecifications();
   }
 
   /**
-   * Get a specific tenant.
+   * Get a tenant specification by tenant name.
    *
-   * @param tenantId Id of the tenant to get
-   * @return Tenant for the given id, or null if none exists
+   * @param name Name of the tenant to get
+   * @return Tenant for the given name, or null if none exists
    * @throws IOException
    */
-  public Tenant getTenant(String tenantId) throws IOException {
-    return tenantStore.getTenant(tenantId);
+  public TenantSpecification getTenantSpecification(String name) throws IOException {
+    Tenant tenant = tenantStore.getTenantByName(name);
+    return tenant == null ? null : tenant.getSpecification();
   }
 
   /**
-   * Get an unmodifiable collection of all provisioners.
+   * Get an immutable collection of all provisioners for external display, with tenant ids mapped to tenant names.
    *
-   * @return Unmodifiable collection of all provisioners
+   * @return Immutable collection of all provisioners for external display, with tenant ids mapped to tenant names
    * @throws IOException
    */
   public Collection<Provisioner> getAllProvisioners() throws IOException {
-    return provisionerStore.getAllProvisioners();
+    Collection<Provisioner> provisioners = provisionerStore.getAllProvisioners();
+    List<Provisioner> externalProvisioners = Lists.newArrayListWithCapacity(provisioners.size());
+    for (Provisioner provisioner : provisioners) {
+      externalProvisioners.add(createExternalProvisioner(provisioner));
+    }
+    return externalProvisioners;
   }
 
   /**
-   * Get the provisioner for the given id, or null if none exists.
+   * Get the provisioner for the given id for external display, with tenant ids mapped to tenant names,
+   * or null if none exists.
    *
    * @param provisionerId Id of the provisioner to get
-   * @return Provisioner for the given id, or null if none exists
+   * @return Provisioner for the given id with tenant ids mapped to tenant names, or null if none exists
    * @throws IOException
    */
   public Provisioner getProvisioner(String provisionerId) throws IOException {
-    return provisionerStore.getProvisioner(provisionerId);
+    return createExternalProvisioner(provisionerStore.getProvisioner(provisionerId));
   }
 
   /**
    * Write the tenant to the store and balance the tenant workers across provisioners.
    *
-   * @param tenant Tenant to write
+   * @param tenantSpecification Tenant to write
    * @throws IOException if there was an exception persisting the tenant
    * @throws CapacityException if there is not enough capacity to support all tenant workers
+   * @throws QuotaException if a tenant quota would be violated by the change
    */
-  public void writeTenant(Tenant tenant) throws IOException, CapacityException {
-    lock.acquire();
+  public void writeTenantSpecification(TenantSpecification tenantSpecification)
+    throws IOException, CapacityException, QuotaException {
+    tenantLock.acquire();
     try {
-      Tenant prevTenant = tenantStore.getTenant(tenant.getId());
+      Tenant prevTenant = tenantStore.getTenantByName(tenantSpecification.getName());
+      String id;
       if (prevTenant == null) {
         // if we're adding a new tenant
-        checkCapacity(tenant.getWorkers());
+        id = UUID.randomUUID().toString();
+        checkCapacity(tenantSpecification.getWorkers());
       } else {
         // we're updating an existing tenant
-        checkCapacity(tenant.getWorkers() - prevTenant.getWorkers());
+        id = prevTenant.getId();
+        checkCapacity(tenantSpecification.getWorkers() - prevTenant.getSpecification().getWorkers());
       }
-      balanceQueue.add(new Element(tenant.getId()));
-      tenantStore.writeTenant(tenant);
+      Tenant updatedTenant = new Tenant(id, tenantSpecification);
+      // check if changing the tenant would cause the cluster or node quotas to be exceeded.
+      if (!satisfiesTenantQuotas(updatedTenant, 0, 0)) {
+        throw new QuotaException("Writing tenant would cause cluster or node quotas to be violated.");
+      }
+
+      balanceQueue.add(new Element(id));
+      tenantStore.writeTenant(updatedTenant);
     } finally {
-      lock.release();
+      tenantLock.release();
     }
+  }
+
+  /**
+   * Verify that tenant cluster and node quotas would not be exceeded if the given number of additional clusters and
+   * nodes would be added.
+   *
+   * @param tenantId Id of the tenant to verify quotas for
+   * @param additionalClusters Number of clusters that would be added
+   * @param additionalNodes Number of nodes that would be added
+   * @returns True if the tenantQuotas would be satisfied, false if they would be exceeded.
+   */
+  public boolean satisfiesTenantQuotas(String tenantId, int additionalClusters,
+                                       int additionalNodes) throws IOException {
+    Tenant tenant = tenantStore.getTenantByID(tenantId);
+    // if there is no tenant there are no quotas to voilate
+    if (tenant == null) {
+      return true;
+    }
+    return satisfiesTenantQuotas(tenant, additionalClusters, additionalNodes);
+  }
+
+  /**
+   * Verify that tenant cluster and node quotas would not be exceeded if the given number of additional clusters and
+   * nodes would be added.
+   *
+   * @param tenant Tenant to verify quotas for
+   * @param additionalClusters Number of clusters that would be added
+   * @param additionalNodes Number of nodes that would be added
+   * @returns True if the tenantQuotas would be satisfied, false if they would be exceeded.
+   */
+  public boolean satisfiesTenantQuotas(Tenant tenant, int additionalClusters, int additionalNodes) throws IOException {
+    ClusterStoreView view = clusterStoreService.getView(new Account(Constants.ADMIN_USER, tenant.getId()));
+    List<Cluster> nonTerminatedClusters = view.getNonTerminatedClusters();
+
+    int numClusters = additionalClusters + nonTerminatedClusters.size();
+    if (numClusters > tenant.getSpecification().getMaxClusters()) {
+      return false;
+    }
+
+    int numNodes = additionalNodes;
+    for (Cluster cluster : nonTerminatedClusters) {
+      numNodes += cluster.getNodes().size();
+    }
+    if (numNodes > tenant.getSpecification().getMaxNodes()) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
    * Delete the given tenant. A tenant must not have any assigned workers in order for deletion to be allowed.
    *
-   * @param tenantId Id of the tenant to delete
+   * @param name Name of the tenant to delete
    * @throws IllegalStateException if the tenant has one or more assigned workers
    * @throws IOException if there was an exception persisting the deletion
    */
-  public void deleteTenant(String tenantId) throws IllegalStateException, IOException {
-    lock.acquire();
+  public void deleteTenantByName(String name) throws IllegalStateException, IOException {
+    tenantLock.acquire();
     try {
-      int numAssignedWorkers = provisionerStore.getNumAssignedWorkers(tenantId);
+      Tenant tenant = tenantStore.getTenantByName(name);
+      if (tenant == null) {
+        return;
+      }
+      int numAssignedWorkers = provisionerStore.getNumAssignedWorkers(tenant.getId());
       if (numAssignedWorkers > 0) {
-        throw new IllegalStateException("Tenant " + tenantId + " still has " + numAssignedWorkers + " workers. " +
+        throw new IllegalStateException("Tenant " + name + " still has " + numAssignedWorkers + " workers. " +
                                           "Cannot delete it until workers are set to 0.");
       }
-      tenantStore.deleteTenant(tenantId);
+      tenantStore.deleteTenantByName(name);
     } finally {
-      lock.release();
+      tenantLock.release();
     }
   }
 
@@ -148,7 +237,7 @@ public class TenantProvisionerService {
    * @throws IOException
    */
   public void deleteProvisioner(String provisionerId) throws IOException {
-    lock.acquire();
+    tenantLock.acquire();
     try {
       Provisioner provisioner = provisionerStore.getProvisioner(provisionerId);
       if (provisioner == null) {
@@ -157,7 +246,7 @@ public class TenantProvisionerService {
 
       deleteProvisioner(provisioner);
     } finally {
-      lock.release();
+      tenantLock.release();
     }
   }
 
@@ -193,7 +282,7 @@ public class TenantProvisionerService {
    * @throws IOException
    */
   public void writeProvisioner(Provisioner provisioner) throws IOException {
-    lock.acquire();
+    tenantLock.acquire();
     try {
       provisionerStore.writeProvisioner(provisioner);
       // rebalance tenants every time a provisioner registers itself
@@ -201,7 +290,7 @@ public class TenantProvisionerService {
         balanceQueue.add(new Element(tenant.getId()));
       }
     } finally {
-      lock.release();
+      tenantLock.release();
     }
   }
 
@@ -213,26 +302,77 @@ public class TenantProvisionerService {
    * @throws IOException if there was an exception persisting the worker rebalance
    */
   public void rebalanceTenantWorkers(String tenantId) throws IOException, CapacityException {
-    lock.acquire();
+    // lock across all tenants to protect against conflicts in setting worker counts for different tenants across
+    // different provisioners
+    tenantLock.acquire();
     try {
-      Tenant tenant = tenantStore.getTenant(tenantId);
+      Tenant tenant = tenantStore.getTenantByID(tenantId);
       if (tenant == null) {
         return;
       }
 
-      int diff = tenant.getWorkers() - provisionerStore.getNumAssignedWorkers(tenantId);
+      int diff = tenant.getSpecification().getWorkers() - provisionerStore.getNumAssignedWorkers(tenantId);
       if (diff < 0) {
+        Account tenantAdmin = new Account(Constants.ADMIN_USER, tenantId);
+        ResourceCollection liveResources = resourceService.getLiveResources(tenantAdmin);
         // too many workers assigned, remove some.
         int toRemove = 0 - diff;
         LOG.debug("Removing {} workers from tenant {}", toRemove, tenantId);
-        removeWorkers(tenantId, toRemove);
+        removeWorkers(tenantId, toRemove, liveResources);
       } else if (diff > 0) {
+        Account tenantAdmin = new Account(Constants.ADMIN_USER, tenantId);
+        ResourceCollection liveResources = resourceService.getLiveResources(tenantAdmin);
         // not enough workers assigned, assign some more.
         LOG.debug("Adding {} workers to tenant {}", diff, tenantId);
-        addWorkers(tenantId, diff);
+        addWorkers(tenantId, diff, liveResources);
       }
     } finally {
-      lock.release();
+      tenantLock.release();
+    }
+  }
+
+  /**
+   * Get a snapshot of what plugin resources are slated to be active on the provisioners that are running workers
+   * for the given account, and push those resources to the provisioners.
+   *
+   * @param account Account to sync
+   * @throws IOException
+   */
+  public void syncResources(Account account) throws IOException {
+    // this will mean that a sync from one tenant will block a sync from another, but we need this because when
+    // workers are being re-balanced, the live resource collection is sent to the provisioners. We don't want a
+    // scenario where the live collection is read for rebalancing, a sync is called, and the sync and rebalance
+    // fight over what resource versions should be live on the provisioners, resulting in inconsistent state.
+    // Since syncs are uncommon, this should be ok...
+    tenantLock.acquire();
+    try {
+      ResourceCollection resources = resourceService.getResourcesToSync(account);
+
+      // TODO: failures will cause inconsistencies between metadata state and provisioner state.
+      // We can add an ability to block tasks for a given tenant from going out here, then make the calls to the
+      // provisioners and update the metadata store, then unblock tasks for the tenant. That way if the sync fails,
+      // tasks are not being taken so there is no ambiguity on what code is running. Maybe add a blockTakes call
+      // to the queue group interface.
+
+      // update tenant provisioners
+      syncProvisionerResources(account.getTenantId(), resources);
+
+      // update metadata store
+      resourceService.syncResourceMeta(account, resources);
+
+    } finally {
+      tenantLock.release();
+    }
+  }
+
+  private void syncProvisionerResources(String tenantId, ResourceCollection resourceCollection) throws IOException {
+    for (Provisioner provisioner : provisionerStore.getTenantProvisioners(tenantId)) {
+      if (!provisionerRequestService.putTenant(provisioner, tenantId, resourceCollection)) {
+        LOG.error("Could not write resource metadata for tenant {} to provisioner {}. " +
+                    "The provisioner appears broken, deleting it and rebalancing its tenant workers",
+                  tenantId, provisioner.getId());
+        deleteProvisioner(provisioner);
+      }
     }
   }
 
@@ -241,10 +381,10 @@ public class TenantProvisionerService {
    * milliseconds.
    *
    * @param timeoutTs Timestamp in milliseconds to use as a cut off for deleting provisioners.
-   * @throws Exception
+   * @throws IOException
    */
   public void timeoutProvisioners(long timeoutTs) throws IOException {
-    lock.acquire();
+    tenantLock.acquire();
     try {
       Set <String> affectedTenants = Sets.newHashSet();
       for (Provisioner provisioner : provisionerStore.getTimedOutProvisioners(timeoutTs)) {
@@ -258,13 +398,13 @@ public class TenantProvisionerService {
         balanceQueue.add(new Element(affectedTenant));
       }
     } finally {
-      lock.release();
+      tenantLock.release();
     }
   }
 
   // TODO: abstract out to support different types of balancing policies
   // Currently a greedy approach, just remove from first available.
-  private void removeWorkers(String tenantId, int numToRemove) throws IOException {
+  private void removeWorkers(String tenantId, int numToRemove, ResourceCollection resources) throws IOException {
     // go through each provisioner, removing workers for the tenant until we've removed enough.
     for (Provisioner provisioner : provisionerStore.getTenantProvisioners(tenantId)) {
       int numRemoved = provisioner.tryRemoveTenantAssignments(tenantId, numToRemove);
@@ -272,13 +412,14 @@ public class TenantProvisionerService {
         provisionerStore.writeProvisioner(provisioner);
         LOG.debug("Requesting provisioner {} to set workers to {} for tenant {} (removing {})",
                   provisioner.getId(), provisioner.getAssignedWorkers(tenantId), tenantId, numRemoved);
-        if (provisionerRequestService.putTenant(provisioner, tenantId)) {
+        if (provisionerRequestService.putTenant(provisioner, tenantId, resources)) {
           numToRemove -= numRemoved;
         } else {
           // request failed with retries. something is wrong with the provisioner, delete it and rebalance its workers
           // TODO: what if this fails?
-          LOG.error("Could not write tenant {} to provisioner {}. The provisioner appears broken, deleting it and " +
-                     "rebalancing its tenant workers", tenantId, provisioner.getId());
+          LOG.error("Could not set workers for tenant {} to provisioner {}. " +
+                      "The provisioner appears broken, deleting it and rebalancing its tenant workers",
+                    tenantId, provisioner.getId());
           deleteProvisioner(provisioner);
         }
       }
@@ -287,7 +428,8 @@ public class TenantProvisionerService {
 
   // TODO: abstract out to support different types of balancing policies
   // Currently a greedy approach, just add to first available.
-  private void addWorkers(String tenantId, int numToAdd) throws CapacityException, IOException {
+  private void addWorkers(String tenantId, int numToAdd, ResourceCollection resources)
+    throws CapacityException, IOException {
     for (Provisioner provisioner : provisionerStore.getProvisionersWithFreeCapacity()) {
       if (numToAdd <= 0) {
         break;
@@ -297,7 +439,7 @@ public class TenantProvisionerService {
         provisionerStore.writeProvisioner(provisioner);
         LOG.debug("Requesting provisioner {} to set workers to {} for tenant {} (adding {})",
                   provisioner.getId(), provisioner.getAssignedWorkers(tenantId), tenantId, numAdded);
-        if (provisionerRequestService.putTenant(provisioner, tenantId)) {
+        if (provisionerRequestService.putTenant(provisioner, tenantId, resources)) {
           numToAdd -= numAdded;
         } else {
           // request failed with retries. something is wrong with the provisioner, delete it and rebalance its workers.
@@ -305,8 +447,9 @@ public class TenantProvisionerService {
           // lock that is held.
           // TODO: what if this fails due to db failure or something of that sort?
           // should be ok as long as the tenant balance task is in the queue and retried.
-          LOG.error("Could not write tenant {} to provisioner {}. The provisioner appears broken, deleting it and " +
-                     "rebalancing its tenant workers", tenantId, provisioner.getId());
+          LOG.error("Could not set workers for tenant {} to provisioner {}. " +
+                      "The provisioner appears broken, deleting it and rebalancing its tenant workers",
+                    tenantId, provisioner.getId());
           deleteProvisioner(provisioner);
         }
       }
@@ -315,6 +458,40 @@ public class TenantProvisionerService {
       throw new CapacityException("Unable to add all " + numToAdd + " workers to tenant "
                                     + tenantId + " without exceeding worker capacity.");
     }
+  }
+
+  /**
+   * Create a new Provisioner object where the tenant ids have been replaced with tenant names for external
+   * consumption.
+   *
+   * @param provisioner Internal provisioner that uses tenant ids
+   * @return New Provisioner where the tenant ids have been replaced with tenant names
+   * @throws IOException
+   */
+  private Provisioner createExternalProvisioner(Provisioner provisioner) throws IOException {
+    if (provisioner == null) {
+      return null;
+    }
+    Map<String, Integer> nameUsage = Maps.newHashMap();
+    for (Map.Entry<String, Integer> entry : provisioner.getUsage().entrySet()) {
+      nameUsage.put(tenantIdToName(entry.getKey()), entry.getValue());
+    }
+    Map<String, Integer> nameAssignments = Maps.newHashMap();
+    for (String tenantId : provisioner.getAssignedTenants()) {
+      nameAssignments.put(tenantIdToName(tenantId), provisioner.getAssignedWorkers(tenantId));
+    }
+    return new Provisioner(provisioner.getId(), provisioner.getHost(), provisioner.getPort(),
+                           provisioner.getCapacityTotal(), nameUsage, nameAssignments);
+  }
+
+  // id to name mapping is cached, so this mapping should not be expensive
+  private String tenantIdToName(String id) throws IOException {
+    String tenantName = tenantStore.getNameForId(id);
+    if (tenantName == null) {
+      LOG.warn("Could not map tenant id {} to a name, will use the id.");
+      tenantName = id;
+    }
+    return tenantName;
   }
 
   private void deleteProvisioner(Provisioner provisioner) throws IOException {

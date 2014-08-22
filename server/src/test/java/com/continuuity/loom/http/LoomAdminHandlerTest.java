@@ -16,15 +16,19 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
-import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
 import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.common.queue.Element;
+import com.continuuity.loom.common.queue.QueueMetrics;
 import com.continuuity.loom.http.handler.LoomAdminHandler;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -34,6 +38,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.message.BasicHeader;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,6 +48,7 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  *
@@ -51,28 +57,32 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testProviders() throws Exception {
-    testRestAPIs("providers", Entities.ProviderExample.JOYENT_JSON, Entities.ProviderExample.RACKSPACE_JSON);
+    testRestAPIs("providers", gson.toJsonTree(Entities.ProviderExample.JOYENT).getAsJsonObject(),
+                 gson.toJsonTree(Entities.ProviderExample.RACKSPACE).getAsJsonObject());
   }
 
   @Test
   public void testHardwareTypes() throws Exception {
-    testRestAPIs("hardwaretypes", Entities.HardwareTypeExample.SMALL_JSON, Entities.HardwareTypeExample.MEDIUM_JSON);
+    testRestAPIs("hardwaretypes", gson.toJsonTree(Entities.HardwareTypeExample.SMALL).getAsJsonObject(),
+                 gson.toJsonTree(Entities.HardwareTypeExample.MEDIUM).getAsJsonObject());
   }
 
   @Test
   public void testImageTypes() throws Exception {
-    testRestAPIs("imagetypes", Entities.ImageTypeExample.CENTOS_6_JSON, Entities.ImageTypeExample.UBUNTU_12_JSON);
+    testRestAPIs("imagetypes", gson.toJsonTree(Entities.ImageTypeExample.CENTOS_6).getAsJsonObject(),
+                 gson.toJsonTree(Entities.ImageTypeExample.UBUNTU_12).getAsJsonObject());
   }
 
   @Test
   public void testServices() throws Exception {
-    testRestAPIs("services", Entities.ServiceExample.HOSTS_JSON, Entities.ServiceExample.NAMENODE_JSON);
+    testRestAPIs("services", gson.toJsonTree(Entities.ServiceExample.HOSTS).getAsJsonObject(),
+                 gson.toJsonTree(Entities.ServiceExample.NAMENODE).getAsJsonObject());
   }
 
   @Test
   public void testClusterTemplates() throws Exception {
-    testRestAPIs("clustertemplates", Entities.ClusterTemplateExample.HDFS_JSON,
-                 Entities.ClusterTemplateExample.REACTOR_JSON);
+    testRestAPIs("clustertemplates", gson.toJsonTree(Entities.ClusterTemplateExample.HDFS).getAsJsonObject(),
+                 gson.toJsonTree(Entities.ClusterTemplateExample.REACTOR).getAsJsonObject());
   }
 
   @Test
@@ -87,6 +97,53 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     }
     assertResponseStatus(doGet(base + "export", USER1_HEADERS), HttpResponseStatus.OK);
     assertResponseStatus(doPost(base + "import", "{}", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void testForbiddenIfNonadminGetsQueueMetrics() throws Exception {
+    tenantStore.writeTenant(
+      new Tenant(UUID.randomUUID().toString(), new TenantSpecification(USER1_ACCOUNT.getTenantId(), 10, 10, 100)));
+    assertResponseStatus(doGet("/v1/loom/metrics/queues", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void testGetQueueMetrics() throws Exception {
+    try {
+      tenantStore.writeTenant(new Tenant("idA", new TenantSpecification("tenantA", 10, 10, 100)));
+      tenantStore.writeTenant(new Tenant("idB", new TenantSpecification("tenantB", 10, 10, 100)));
+      tenantStore.writeTenant(new Tenant("idC", new TenantSpecification("tenantC", 10, 10, 100)));
+      tenantStore.writeTenant(new Tenant("idD", new TenantSpecification("tenantD", 10, 10, 100)));
+      provisionerQueues.add("idA", new Element("task1"));
+      provisionerQueues.add("idA", new Element("task2"));
+      provisionerQueues.add("idA", new Element("task3"));
+      provisionerQueues.take("idA", "consumer");
+      provisionerQueues.add("idB", new Element("task4"));
+      provisionerQueues.add("idC", new Element("task5"));
+      provisionerQueues.take("idC", "consumer");
+      provisionerQueues.add("idD", new Element("task6"));
+      provisionerQueues.add("idD", new Element("task7"));
+      provisionerQueues.take("idD", "consumer");
+
+      Map<String, QueueMetrics> expected = Maps.newHashMap();
+      expected.put("tenantA", new QueueMetrics(2, 1));
+      expected.put("tenantB", new QueueMetrics(1, 0));
+      expected.put("tenantC", new QueueMetrics(0, 1));
+      expected.put("tenantD", new QueueMetrics(1, 1));
+      expected.put(TENANT, new QueueMetrics(0, 0));
+      expected.put(Constants.SUPERADMIN_TENANT, new QueueMetrics(0, 0));
+
+      assertQueueMetrics(Constants.SUPERADMIN_TENANT, expected);
+      assertQueueMetrics("tenantA", ImmutableMap.of("tenantA", new QueueMetrics(2, 1)));
+      assertQueueMetrics("tenantB", ImmutableMap.of("tenantB", new QueueMetrics(1, 0)));
+      assertQueueMetrics("tenantC", ImmutableMap.of("tenantC", new QueueMetrics(0, 1)));
+      assertQueueMetrics("tenantD", ImmutableMap.of("tenantD", new QueueMetrics(1, 1)));
+    } finally {
+      provisionerQueues.removeAll();
+      tenantStore.deleteTenantByName("tenantA");
+      tenantStore.deleteTenantByName("tenantB");
+      tenantStore.deleteTenantByName("tenantC");
+      tenantStore.deleteTenantByName("tenantD");
+    }
   }
 
   @Test
@@ -263,5 +320,18 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
 
     assertResponseStatus(doDelete(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
     assertResponseStatus(doDelete(entity2Path, ADMIN_HEADERS), HttpResponseStatus.OK);
+  }
+
+  private void assertQueueMetrics(String tenant, Map<String, QueueMetrics> expected) throws Exception {
+    Header[] headers = {
+      new BasicHeader(Constants.USER_HEADER, Constants.ADMIN_USER),
+      new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
+      new BasicHeader(Constants.TENANT_HEADER, tenant)
+    };
+    HttpResponse response = doGet("/v1/loom/metrics/queues", headers);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    Map<String, QueueMetrics> result = gson.fromJson(reader, new TypeToken<Map<String, QueueMetrics>>() {}.getType());
+    Assert.assertEquals(expected, result);
   }
 }

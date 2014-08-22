@@ -55,8 +55,11 @@ OptionParser.new do |opts|
   opts.on('-L', '--log-level LEVEL', 'Log level') do |f|
     options[:log_level] = f
   end
-  opts.on('-l', '--log-directory DIRECTORY', 'Path to log directory') do |f|
-    options[:log_directory] = f
+  opts.on('-l', '--log-dir DIRECTORY', 'Path to log directory') do |d|
+    options[:log_directory] = d
+  end
+  opts.on('-w', '--work-dir DIRECTORY', 'Path to work directory') do |d|
+    options[:work_dir] = d
   end
   options[:once] = false
   opts.on('-o', '--once', 'Only poll and run a single task') do
@@ -67,6 +70,11 @@ end.parse!
 loom_uri = options[:uri]
 if loom_uri.nil? && !options[:file]
   puts 'Either URI for loom server or --file must be specified'
+  exit(1)
+end
+
+unless(options[:work_dir])
+  puts "--work-dir option must be specified"
   exit(1)
 end
 
@@ -94,8 +102,10 @@ if pluginmanager.providermap.empty? or pluginmanager.automatormap.empty?
   exit(1)
 end
 
+# the environment passed to plugins
+@plugin_env = options 
+
 def delegate_task(task, pluginmanager)
-  task_id = nil
   providerName = nil # rubocop:disable UselessAssignment
   automatorName = nil # rubocop:disable UselessAssignment
   clazz = nil # rubocop:disable UselessAssignment
@@ -115,11 +125,11 @@ def delegate_task(task, pluginmanager)
   case taskName.downcase
   when 'create', 'confirm', 'delete'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForProvider(providerName))
-    object = clazz.new(task)
+    object = clazz.new(@plugin_env, task)
     result = object.runTask
   when 'install', 'configure', 'initialize', 'start', 'stop', 'remove'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
-    object = clazz.new(task)
+    object = clazz.new(@plugin_env, task)
     result = object.runTask
   when 'bootstrap'
     combinedresult = {}
@@ -139,7 +149,7 @@ def delegate_task(task, pluginmanager)
 
     classes.each do |klass|
       klass = Object.const_get(klass)
-      object = klass.new(task)
+      object = klass.new(@plugin_env, task)
       result = object.runTask
       combinedresult.merge!(result)
     end

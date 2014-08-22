@@ -22,10 +22,10 @@ import com.continuuity.loom.admin.LayoutConstraint;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
+import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.layout.BaseSolverTest;
 import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.NodeLayout;
-import com.continuuity.utils.ImmutablePair;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -111,17 +111,13 @@ public class AddServicesChangeTest extends BaseSolverTest {
     // hadoop master node
     Node node = new Node(UUID.randomUUID().toString(), clusterId,
                          ImmutableSet.of(namenode),
-                         ImmutableMap.<String, String>of(
-                           Node.Properties.HARDWARETYPE.name().toLowerCase(), "large-mem",
-                           Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
+                         NodeProperties.builder().setHardwaretype("large-mem").setImagetype("centos6").build());
     nodeIds.add(node.getId());
     nodes.add(node);
     // slave nodes
     for (int i = 0; i < 50; i++) {
       node = new Node(UUID.randomUUID().toString(), clusterId, ImmutableSet.of(datanode),
-                      ImmutableMap.<String, String>of(
-                        Node.Properties.HARDWARETYPE.name().toLowerCase(), "medium",
-                        Node.Properties.IMAGETYPE.name().toLowerCase(), "centos6"));
+                      NodeProperties.builder().setHardwaretype("medium").setImagetype("centos6").build());
       nodeIds.add(node.getId());
       nodes.add(node);
     }
@@ -215,19 +211,19 @@ public class AddServicesChangeTest extends BaseSolverTest {
         "namenode",
         new ServiceConstraint(
           ImmutableSet.of("large-mem"),
-          ImmutableSet.of("centos6", "ubuntu12"), 1, 1, 1, null),
+          ImmutableSet.of("centos6", "ubuntu12"), 1, 1),
         "datanode",
         new ServiceConstraint(
           ImmutableSet.of("medium", "large-cpu"),
-          ImmutableSet.of("centos6", "ubuntu12"), 1, 50, 1, null),
+          ImmutableSet.of("centos6", "ubuntu12"), 1, 50),
         "zookeeper",
         new ServiceConstraint(
           ImmutableSet.of("small", "medium"),
-          ImmutableSet.of("centos6"), 1, 5, 2, ImmutablePair.of(1, 20)),
+          ImmutableSet.of("centos6"), 1, 5),
         "reactor",
         new ServiceConstraint(
           ImmutableSet.of("medium", "large"),
-          null, 1, 5, 1, ImmutablePair.of(1, 10))
+          null, 1, 5)
       ),
       new LayoutConstraint(
         ImmutableSet.<Set<String>>of(

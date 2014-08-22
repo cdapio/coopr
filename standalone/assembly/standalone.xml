@@ -7,8 +7,8 @@
     <baseDirectory>loom-${project.version}-standalone</baseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}/../provisioner/daemon</directory>
-            <outputDirectory>/provisioner/daemon</outputDirectory>
+            <directory>${project.basedir}/../provisioner</directory>
+            <outputDirectory>/provisioner</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../ui</directory>
@@ -30,6 +30,7 @@
             <outputDirectory>/bin</outputDirectory>
             <includes>
                 <include>loom-*.sh</include>
+                <include>data-uploader*</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -46,6 +47,10 @@
         </fileSet>
     </fileSets>
         <files>
+            <file>
+                <source>${project.basedir}/../standalone/provisioner/master/conf/provisioner-site.xml</source>
+                <outputDirectory>/provisioner/master/conf</outputDirectory>
+            </file>
             <file>
                 <source>${project.basedir}/../standalone/README.md</source>
                 <outputDirectory>/</outputDirectory>

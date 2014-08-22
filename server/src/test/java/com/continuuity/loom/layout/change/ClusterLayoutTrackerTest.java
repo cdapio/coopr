@@ -98,15 +98,15 @@ public class ClusterLayoutTrackerTest {
         "master1",
         new ServiceConstraint(
           ImmutableSet.of("large"),
-          ImmutableSet.of("centos6", "ubuntu12"), 1, 1, 1, null),
+          ImmutableSet.of("centos6", "ubuntu12"), 1, 1),
         "slave1",
         new ServiceConstraint(
           ImmutableSet.of("medium"),
-          ImmutableSet.of("centos6", "ubuntu12"), 1, 50, 1, null),
+          ImmutableSet.of("centos6", "ubuntu12"), 1, 50),
         "slave2",
         new ServiceConstraint(
           ImmutableSet.of("medium"),
-          ImmutableSet.of("centos6", "ubuntu12"), 1, 50, 1, null)
+          ImmutableSet.of("centos6", "ubuntu12"), 1, 50)
       ),
       new LayoutConstraint(
         ImmutableSet.<Set<String>>of(

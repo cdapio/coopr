@@ -22,7 +22,6 @@ import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -105,7 +104,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
       // immune to sql injection since it comes from the enum.
       String queryStr = "UPDATE " + entityTypeId + "s SET " + entityTypeId + "=? WHERE name=? AND tenant_id=?";
       PreparedStatement statement = conn.prepareStatement(queryStr);
-      statement.setBlob(1, new ByteArrayInputStream(data));
+      statement.setBytes(1, data);
       statement.setString(2, entityName);
       statement.setString(3, account.getTenantId());
       return statement;
@@ -119,7 +118,7 @@ public class SQLAdminEntityStoreView extends BaseSQLEntityStoreView {
       PreparedStatement statement = conn.prepareStatement(queryStr);
       statement.setString(1, entityName);
       statement.setString(2, account.getTenantId());
-      statement.setBlob(3, new ByteArrayInputStream(data));
+      statement.setBytes(3, data);
       return statement;
     }
   }

@@ -33,7 +33,6 @@ import com.continuuity.loom.admin.ServiceAction;
 import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.store.entity.EntityStoreView;
-import com.continuuity.utils.ImmutablePair;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -75,19 +74,19 @@ public class BaseSolverTest extends BaseTest {
           "namenode",
           new ServiceConstraint(
             ImmutableSet.of("large-mem"),
-            ImmutableSet.of("centos6", "ubuntu12"), 1, 1, 1, null),
+            ImmutableSet.of("centos6", "ubuntu12"), 1, 1),
           "datanode",
           new ServiceConstraint(
             ImmutableSet.of("medium", "large-cpu"),
-            ImmutableSet.of("centos6", "ubuntu12"), 1, 50, 1, null),
+            ImmutableSet.of("centos6", "ubuntu12"), 1, 50),
           "zookeeper",
           new ServiceConstraint(
             ImmutableSet.of("small", "medium"),
-            ImmutableSet.of("centos6"), 1, 5, 2, ImmutablePair.of(1, 20)),
+            ImmutableSet.of("centos6"), 1, 5),
           "reactor",
           new ServiceConstraint(
             ImmutableSet.of("medium", "large"),
-            null, 1, 5, 1, ImmutablePair.of(1, 10))
+            null, 1, 5)
         ),
         new LayoutConstraint(
           ImmutableSet.<Set<String>>of(
@@ -105,7 +104,7 @@ public class BaseSolverTest extends BaseTest {
       ),
       Administration.EMPTY_ADMINISTRATION
     );
-    reactorTemplate2 = gson.fromJson(Entities.ClusterTemplateExample.REACTOR2_STRING, ClusterTemplate.class);
+    reactorTemplate2 = Entities.ClusterTemplateExample.REACTOR2;
 
     EntityStoreView adminView = entityStoreService.getView(account);
     // create providers

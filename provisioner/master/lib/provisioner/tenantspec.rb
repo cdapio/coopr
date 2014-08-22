@@ -16,17 +16,24 @@
 # limitations under the License.
 #
 
+require_relative 'resourcespec'
 
 # simple specification for a tenant
 module Loom
   class TenantSpec
-    attr_accessor :id, :workers, :resources, :plugins
+    attr_accessor :id, :workers, :resourcespec, :plugins
 
     def initialize(id, workers, resources = nil, plugins = nil)
       @id = id
       @workers = workers
-      # @resources = resources ||= Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
+      @resourcespec = ResourceSpec.new(resources)
       # @plugins = plugins ||= Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
     end
+
+    # define two TenantSpecs as equal if @workers and @resourcespec are equal
+    def ==(other)
+      @workers == other.workers && @resourcespec == other.resourcespec
+    end
+
   end
 end

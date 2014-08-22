@@ -44,7 +44,7 @@ start ( ) {
   check_before_start
 
   echo "Starting Loom Dummy Provisioner ..."
-  nohup nice -1 java -cp server/lib/*:server/conf com.continuuity.loom.runtime.DummyProvisioner  >> ${LOOM_LOG_DIR}/${APP_NAME}${p}.log 2>&1 &
+  nohup nice -1 java -cp server/lib/*:server/conf com.continuuity.loom.runtime.MockProvisionerMain  >> ${LOOM_LOG_DIR}/${APP_NAME}${p}.log 2>&1 &
   pid="${PID_DIR}/${APP_NAME}${p}.pid"
   echo $! > $pid
 }

@@ -11,7 +11,6 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -194,7 +193,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
       conn = dbConnectionPool.getConnection(false);
       try {
         DBPut provisionerPut =
-          new ProvisionerDBPut(provisioner, dbQueryExecutor.toByteStream(provisioner, Provisioner.class));
+          new ProvisionerDBPut(provisioner, dbQueryExecutor.toBytes(provisioner, Provisioner.class));
         provisionerPut.executePut(conn);
         writeProvisionerWorkers(conn, provisioner);
         conn.commit();
@@ -392,9 +391,9 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
 
   private class ProvisionerDBPut extends DBPut {
     private final Provisioner provisioner;
-    private final ByteArrayInputStream provisionerBytes;
+    private final byte[] provisionerBytes;
 
-    private ProvisionerDBPut(Provisioner provisioner, ByteArrayInputStream provisionerBytes) {
+    private ProvisionerDBPut(Provisioner provisioner, byte[] provisionerBytes) {
       this.provisioner = provisioner;
       this.provisionerBytes = provisionerBytes;
     }
@@ -405,7 +404,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
         "UPDATE provisioners SET capacity_total=?, capacity_free=?, provisioner=? WHERE id=?");
       statement.setInt(1, provisioner.getCapacityTotal());
       statement.setInt(2, provisioner.getCapacityFree());
-      statement.setBlob(3, provisionerBytes);
+      statement.setBytes(3, provisionerBytes);
       statement.setString(4, provisioner.getId());
       return statement;
     }
@@ -419,7 +418,7 @@ public class SQLProvisionerStore extends AbstractIdleService implements Provisio
       statement.setTimestamp(2, DBHelper.getTimestamp(System.currentTimeMillis()));
       statement.setInt(3, provisioner.getCapacityTotal());
       statement.setInt(4, provisioner.getCapacityFree());
-      statement.setBlob(5, provisionerBytes);
+      statement.setBytes(5, provisionerBytes);
       return statement;
     }
   }

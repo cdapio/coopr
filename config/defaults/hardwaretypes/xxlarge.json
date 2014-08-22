@@ -1,0 +1,9 @@
+{
+  "name": "xxlarge",
+  "description": "8+ vCPU, 30+ GB RAM, 240+ GB Disk",
+  "providermap": {
+    "rackspace": {
+      "flavor": "8"
+    }
+  }
+}

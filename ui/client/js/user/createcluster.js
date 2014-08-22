@@ -186,6 +186,11 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
       services: $scope.selectedServices,
       initialLeaseDuration: $scope.leaseDuration.initial
     };
+
+    if ($scope.dnsSuffix) {
+      postJson.dnsSuffix = $scope.dnsSuffix;
+    }
+
     if ($scope.defaultConfig) {
       if (!Helpers.isValidJSON($scope.defaultConfig)) {
         $scope.notification = Helpers.JSON_ERR;
@@ -219,8 +224,11 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
  * @return {Boolean} Whether fields are valid.
  */
 CreateCluster.areFieldsValid = function (postJson, scope) {
-  var valid = Helpers.isInputValid(
-      postJson.providerFields, scope.providerFields.parameters.admin.required);
+  var valid = true;
+  if ('admin' in scope.providerFields.parameters) {
+    valid = Helpers.isInputValid(
+       postJson.providerFields, scope.providerFields.parameters.admin.required);
+  }
   if ('user' in scope.providerFields.parameters) {
     valid = valid && Helpers.isInputValid(
       postJson.providerFields, scope.providerFields.parameters.user.required);

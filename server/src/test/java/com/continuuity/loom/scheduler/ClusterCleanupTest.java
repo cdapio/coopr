@@ -15,6 +15,8 @@
  */
 package com.continuuity.loom.scheduler;
 
+import com.continuuity.loom.Entities;
+import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.admin.Service;
@@ -27,12 +29,12 @@ import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.NodeService;
+import com.continuuity.loom.scheduler.task.SchedulableTask;
+import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
-import com.google.gson.JsonObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -70,13 +72,13 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     String queueName = account.getTenantId();
 
     ClusterTask task1 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("2-1-1"), "node1", "service",
-                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                        ClusterAction.CLUSTER_CREATE);
     ClusterTask task2 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("2-2-2"), "node2", "service",
-                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                        ClusterAction.CLUSTER_CREATE);
     ClusterTask task3 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("2-3-3"), "node3", "service",
-                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                        ClusterAction.CLUSTER_CREATE);
     ClusterTask task4 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("2-4-4"), "node3", "service",
-                                        ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                        ClusterAction.CLUSTER_CREATE);
 
     task1.setStatus(ClusterTask.Status.IN_PROGRESS);
     task2.setStatus(ClusterTask.Status.IN_PROGRESS);
@@ -88,19 +90,19 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     clusterStore.writeClusterTask(task3);
     clusterStore.writeClusterTask(task4);
 
-    Node node1 = new Node("node1", "2", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
+    Node node1 = new Node("node1", "2", ImmutableSet.<Service>of(), TestHelper.EMPTY_NODE_PROPERTIES);
     nodeService.startAction(node1, task1.getTaskId(), "service", "action");
     Assert.assertEquals(Node.Status.IN_PROGRESS, node1.getActions().get(0).getStatus());
 
-    Node node2 = new Node("node2", "2", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
+    Node node2 = new Node("node2", "2", ImmutableSet.<Service>of(), TestHelper.EMPTY_NODE_PROPERTIES);
     nodeService.startAction(node2, task2.getTaskId(), "service", "action");
     Assert.assertEquals(Node.Status.IN_PROGRESS, node2.getActions().get(0).getStatus());
 
-    Node node3 = new Node("node3", "2", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
+    Node node3 = new Node("node3", "2", ImmutableSet.<Service>of(), TestHelper.EMPTY_NODE_PROPERTIES);
     nodeService.startAction(node3, task3.getTaskId(), "service", "action");
     Assert.assertEquals(Node.Status.IN_PROGRESS, node3.getActions().get(0).getStatus());
 
-    Node node4 = new Node("node4", "2", ImmutableSet.<Service>of(), ImmutableMap.<String, String>of());
+    Node node4 = new Node("node4", "2", ImmutableSet.<Service>of(), TestHelper.EMPTY_NODE_PROPERTIES);
     nodeService.startAction(node4, task4.getTaskId(), "service", "action");
     Assert.assertEquals(Node.Status.IN_PROGRESS, node4.getActions().get(0).getStatus());
 
@@ -205,9 +207,12 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
     String queueName = account.getTenantId();
 
     ClusterTask task = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("3-1-1"), "node1", "service",
-                                       ClusterAction.CLUSTER_CREATE, new JsonObject());
+                                       ClusterAction.CLUSTER_CREATE);
     task.setStatus(ClusterTask.Status.IN_PROGRESS);
-    SchedulableTask schedulableTask = new SchedulableTask(task);
+    Cluster cluster = Entities.ClusterExample.createCluster();
+    TaskConfig taskConfig = TaskConfig.from(cluster, Entities.ClusterExample.NODE1, Entities.ServiceExample.NAMENODE,
+                                            cluster.getConfig(), ProvisionerAction.START, null);
+    SchedulableTask schedulableTask = new SchedulableTask(task, taskConfig);
 
     // add a task to the queue without storing it.x
     provisionerQueues.add(queueName, new Element(task.getTaskId(), gson.toJson(schedulableTask)));
@@ -244,7 +249,8 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
   }
 
   private Cluster createCluster(String id, long createTime, long expireTime, Cluster.Status status) throws Exception {
-    Cluster cluster = new Cluster(id, account, "expire" + id, createTime, "", null, null,
+    Cluster cluster = new Cluster(id, account, "expire" + id, createTime, "",
+                                  Entities.ProviderExample.JOYENT, Entities.ClusterTemplateExample.HDFS,
                                   ImmutableSet.<String>of(), ImmutableSet.<String>of(), null);
     cluster.setStatus(status);
     cluster.setExpireTime(expireTime);

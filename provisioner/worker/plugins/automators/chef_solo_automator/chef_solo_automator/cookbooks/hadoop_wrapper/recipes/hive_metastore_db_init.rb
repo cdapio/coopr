@@ -25,6 +25,7 @@ include_recipe 'hadoop::hive_metastore'
 if node['hive'].key?('hive_site') && node['hive']['hive_site'].key?('javax.jdo.option.ConnectionURL')
   jdo_array = node['hive']['hive_site']['javax.jdo.option.ConnectionURL'].split(':')
   hive_uris = node['hive']['hive_site']['hive.metastore.uris'].gsub('thrift://', '').gsub(':9083', '').split(',')
+  hive_uris.push('localhost')
   db_type = jdo_array[1]
   db_name = jdo_array[3].split('/').last.split('?').first
   db_user =
@@ -102,7 +103,6 @@ if node['hive'].key?('hive_site') && node['hive']['hive_site'].key?('javax.jdo.o
         database_name db_name
         password db_pass
         host hive_host
-#        privileges %w(SELECT INSERT UPDATE DELETE)
         privileges [:all]
         action :grant
       end

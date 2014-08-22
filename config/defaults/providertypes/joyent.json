@@ -1,65 +1,65 @@
 {
-    "description": "",
-    "name": "joyent",
-    "parameters": {
-        "admin": {
-            "fields": {
-                "joyent_api_url": {
-                    "default": "https://us-west-1.api.joyentcloud.com",
-                    "label": "Region",
-                    "options": [
-                        "https://us-west-1.api.joyentcloud.com",
-                        "https://us-sw-1.api.joyentcloud.com",
-                        "https://us-east-1.api.joyentcloud.com",
-                        "https://eu-ams-1.api.joyentcloud.com"
-                    ],
-                    "override": true,
-                    "tip": "Joyent Region (us-west-1 default)",
-                    "type": "select"
-                },
-                "joyent_keyfile": {
-                    "label": "Key file",
-                    "override": false,
-                    "tip": "Full path and file name to your Joyent SSH private key",
-                    "type": "text"
-                },
-                "joyent_keyname": {
-                    "label": "Key name",
-                    "override": false,
-                    "tip": "Your Joyent SSH public key name",
-                    "type": "text"
-                },
-                "joyent_password": {
-                    "label": "Password",
-                    "override": false,
-                    "tip": "Your Joyent CloudAPI password",
-                    "type": "password"
-                },
-                "joyent_username": {
-                    "label": "User",
-                    "override": false,
-                    "tip": "Your Joyent CloudAPI user name",
-                    "type": "text"
-                },
-                "joyent_version": {
-                    "default": "~7.0",
-                    "label": "API version",
-                    "override": false,
-                    "tip": "CloudAPI version (~7.0 default)",
-                    "type": "text"
-                }
-            },
-            "required": [
-                [
-                    "joyent_username",
-                    "joyent_password"
-                ],
-                [
-                    "joyent_username",
-                    "joyent_keyname",
-                    "joyent_keyfile"
-                ]
-            ]
+  "description": "",
+  "name": "joyent",
+  "parameters": {
+    "admin": {
+      "fields": {
+        "joyent_api_url": {
+          "default": "https://us-sw-1.api.joyentcloud.com",
+          "label": "Region",
+          "options": [
+            "https://us-west-1.api.joyentcloud.com",
+            "https://us-sw-1.api.joyentcloud.com",
+            "https://us-east-1.api.joyentcloud.com",
+            "https://eu-ams-1.api.joyentcloud.com"
+          ],
+          "override": true,
+          "tip": "Joyent Region",
+          "type": "select"
+        },
+        "joyent_keyfile": {
+          "label": "Key file",
+          "override": false,
+          "tip": "Full path and file name to your Joyent SSH private key",
+          "type": "text"
+        },
+        "joyent_keyname": {
+          "label": "Key name",
+          "override": false,
+          "tip": "Your Joyent SSH public key name",
+          "type": "text"
+        },
+        "joyent_password": {
+          "label": "Password",
+          "override": false,
+          "tip": "Your Joyent CloudAPI password",
+          "type": "password"
+        },
+        "joyent_username": {
+          "label": "User",
+          "override": false,
+          "tip": "Your Joyent CloudAPI user name",
+          "type": "text"
+        },
+        "joyent_version": {
+          "default": "~7.0",
+          "label": "API version",
+          "override": false,
+          "tip": "CloudAPI version (~7.0 default)",
+          "type": "text"
         }
+      },
+      "required": [
+        [
+          "joyent_username",
+          "joyent_password"
+        ],
+        [
+          "joyent_username",
+          "joyent_keyname",
+          "joyent_keyfile"
+        ]
+      ]
     }
+  }
 }

@@ -20,20 +20,26 @@
 require_relative 'tenantspec'
 require_relative 'logging'
 require_relative 'workerlauncher'
+require_relative 'resourcemanager'
 
 module Loom
   class TenantManager
     include Logging
-    attr_accessor :spec, :provisioner_id, :options
+    attr_accessor :spec, :resourcemanager
+    attr_reader :status, :config, :provisioner_id, :sync_requests
 
-    def initialize(spec)
+    def initialize(spec, config, provisioner_id)
       unless spec.instance_of?(TenantSpec)
         raise ArgumentError, "TenantManager needs to be initialized with object of type TenantSpec", caller
       end
       @spec = spec
-      @provisioner_id = 'default'
+      @config = config
+      @provisioner_id = provisioner_id
       @workerpids = []
       @terminating_workers = []
+      @resourcemanager = ResourceManager.new(spec.resourcespec, spec.id, config)
+      @sync_requests = 0
+
     end 
 
     def id
@@ -50,6 +56,27 @@ module Loom
         spawn_worker_process
       end
     end
+
+    def resource_sync_needed
+      @status = 'STALE'
+      @sync_requests += 1
+      terminate_all_worker_processes
+    end
+
+    def resource_sync_needed?
+      'STALE' == @status && @sync_requests > 0
+    end
+
+    def sync
+      @sync_requests = 0
+      @resourcemanager.sync
+    end
+
+    def resume
+      @status = 'ACTIVE'
+      spawn
+    end
+
 
     # check worker processes, called after CLD signal processed (child process termination)
     def verify_workers
@@ -85,7 +112,7 @@ module Loom
 
     # spawn a new child worker process
     def spawn_worker_process
-      worker_launcher = WorkerLauncher.new(@options)
+      worker_launcher = WorkerLauncher.new(@config)
       worker_launcher.provisioner = @provisioner_id
       worker_launcher.tenant = id
       worker_launcher.name = "worker-" + id + "-"  + (@workerpids.size + 1).to_s
@@ -104,6 +131,15 @@ module Loom
 
     # process new specifications for this tenant
     def update(new_tm)
+      # first check for new resource requirements
+      unless @spec.resourcespec == new_tm.spec.resourcespec
+        resource_sync_needed
+        log.debug "current expected resources: #{@spec.resourcespec.resources}"
+        @spec = new_tm.spec
+        log.debug "new expected resources: #{@spec.resourcespec.resources}"
+        @resourcemanager.resourcespec = @spec.resourcespec
+        return
+      end
       log.debug "update workers from #{@spec.workers} to #{new_tm.spec.workers}"
       difference = new_tm.spec.workers - @spec.workers
       if difference > 0
@@ -132,12 +168,18 @@ module Loom
       @spec.workers = new_tm.spec.workers
     end
 
-    # delete sends kill to all workers
-    def delete
-      workerpids = @workerpids.dup 
+    # send kill to all workers
+    def terminate_all_worker_processes
+      workerpids = @workerpids.dup
       workerpids.each do |pid|
         terminate_worker_process(pid)
       end
+    end
+
+    # delete sends kill to all workers
+    def delete
+      @status = 'DELETING'
+      terminate_all_worker_processes
     end
 
   end

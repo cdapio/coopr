@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.admin;
 
-import com.continuuity.utils.ImmutablePair;
 import com.google.common.base.Objects;
 
 import java.util.Set;
@@ -31,18 +30,13 @@ public final class ServiceConstraint {
   private final Set<String> requiredImageTypes;
   private final Integer minCount;
   private final Integer maxCount;
-  private final Integer stepSize;
-  private final ImmutablePair<Integer, Integer> ratio;
 
   public ServiceConstraint(Set<String> requiredHardwareTypes, Set<String> requiredImageTypes,
-                           Integer minCount, Integer maxCount, Integer stepSize,
-                           ImmutablePair<Integer, Integer> ratio) {
+                           Integer minCount, Integer maxCount) {
     this.requiredHardwareTypes = requiredHardwareTypes;
     this.requiredImageTypes = requiredImageTypes;
     this.minCount = minCount == null ? 0 : minCount;
     this.maxCount = maxCount == null ? Integer.MAX_VALUE : maxCount;
-    this.stepSize = stepSize == null ? 1 : stepSize;
-    this.ratio = ratio;
   }
 
   /**
@@ -81,25 +75,6 @@ public final class ServiceConstraint {
     return maxCount;
   }
 
-  /**
-   * Get the step size that the service must grow/shrink by.  For example, a step size of 2 means that when the cluster
-   * size is being increased or decreased, the service is only allowed to grow or shrink by 2 machines at a time.
-   *
-   * @return Step size that the service must grow/shrink by.
-   */
-  public int getStepSize() {
-    return stepSize;
-  }
-
-  /**
-   * Get the ratio of machines with the service to the total size of the cluster.
-   *
-   * @return Ratio of machines with the service to the total size of the cluster.
-   */
-  public ImmutablePair<Integer, Integer> getRatio() {
-    return ratio;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof ServiceConstraint) || o == null) {
@@ -108,15 +83,13 @@ public final class ServiceConstraint {
     ServiceConstraint other = (ServiceConstraint) o;
     return Objects.equal(minCount, other.minCount) &&
       Objects.equal(maxCount, other.maxCount) &&
-      Objects.equal(stepSize, other.stepSize) &&
-      Objects.equal(ratio, other.ratio) &&
       Objects.equal(requiredHardwareTypes, other.requiredHardwareTypes) &&
       Objects.equal(requiredImageTypes, other.requiredImageTypes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(minCount, maxCount, stepSize, ratio, requiredHardwareTypes, requiredImageTypes);
+    return Objects.hashCode(minCount, maxCount, requiredHardwareTypes, requiredImageTypes);
   }
 
   @Override
@@ -126,8 +99,6 @@ public final class ServiceConstraint {
       .add("requiredImageTypes", requiredImageTypes)
       .add("minCount", minCount)
       .add("maxCount", maxCount)
-      .add("stepSize", stepSize)
-      .add("ratio", ratio)
       .toString();
   }
 }

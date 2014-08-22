@@ -60,8 +60,9 @@ default['krb5']['forwardable'] = 'true'
 default_realm =
   if node['krb5']['default_realm']
     node['krb5']['default_realm'].upcase
-  elsif node['krb5']['krb5_conf']['libdefaults']['default_realm']
-    ['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase
+  elsif node['krb5'].key?('krb5_conf') && node['krb5']['krb5_conf'].key?('libdefaults') &&
+    node['krb5']['krb5_conf']['libdefaults'].key?('default_realm')
+    node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase
   else
     'LOCAL'
   end

@@ -50,10 +50,18 @@ public class ExpanderTest {
   }
 
   @Test
+  public void testExpansionCreatesNewJson() throws SyntaxException, IncompleteClusterException {
+    JsonObject input = new JsonObject();
+    input.addProperty("host", "%host.service.svc1%");
+    JsonObject output = Expander.expand(input, null, cluster, clusterNodes, node2).getAsJsonObject();
+    Assert.assertEquals("rab,oof,eno", output.get("host").getAsString());
+    Assert.assertEquals("%host.service.svc1%", input.get("host").getAsString());
+  }
+
+  @Test
   public void testJsonExpansion() throws SyntaxException, IncompleteClusterException {
     JsonElement json = new Gson().fromJson(jsonIn, JsonElement.class);
     JsonElement json1 = Expander.expand(json, ImmutableList.of("defaults", "config"), cluster, clusterNodes, node2);
-    System.out.println(json1);
     Assert.assertNotSame(json, json1);
     Assert.assertTrue(json1.toString().contains("hdfs://rab,oof,eno"));
     Assert.assertTrue(json1.toString().contains("quorum\":\"oof:2181,owt:2181\""));

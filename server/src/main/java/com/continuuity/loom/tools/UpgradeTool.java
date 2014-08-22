@@ -1,8 +1,10 @@
 package com.continuuity.loom.tools;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
@@ -23,13 +25,13 @@ import java.util.Set;
  * Tool for upgrading data from older versions of the system to the current version.
  */
 public class UpgradeTool {
-  private static final String NEW_TENANT_ID = "loom";
+  private static final String NEW_TENANT_ID = Constants.SUPERADMIN_TENANT;
 
   public static void main(String[] args) throws Exception {
     Configuration conf = Configuration.create();
     Injector injector = Guice.createInjector(
       new ConfigurationModule(conf),
-      new StoreModule(),
+      new StoreModule(conf),
       new CodecModules().getUpgradeModule(NEW_TENANT_ID)
     );
     ClusterStoreService clusterStoreService = injector.getInstance(ClusterStoreService.class);
@@ -42,9 +44,13 @@ public class UpgradeTool {
 
   private static void migrateClusters(ClusterStoreService clusterStoreService) throws IOException,
     IllegalAccessException {
+    System.out.println("migrating clusters");
     ClusterStore clusterStore = clusterStoreService.getSystemView();
     for (Cluster cluster : clusterStore.getAllClusters()) {
       clusterStore.writeCluster(cluster);
+      for (Node node : clusterStore.getClusterNodes(cluster.getId())) {
+        clusterStore.writeNode(node);
+      }
     }
   }
 

@@ -208,7 +208,7 @@
                         <th>Hostname</th>
                         <th>Id</th>
                         <th>Actions</th>
-                        <th>Ip</th>
+                        <th>IP</th>
                         <th>User</th>
                         <th>Password</th>
                         <th>Status</th>
@@ -258,9 +258,9 @@
                           </div><!-- /.modal -->
                           <button type="button" class="btn-spl btn-default small-font" data-toggle="modal" data-target="#[[node.id]]">Show actions</button>
                         </td>
-                        <td>[[node.properties.ipaddress]]</td>
-                        <td>[[node.properties['ssh-auth'].user]]</td>
-                        <td>[[node.properties['ssh-auth'].password]]</td>
+                        <td>[[node.properties['ipaddresses'].access_v4]]</td>
+                        <td>[[node.provisionerResults['ssh-auth'].user]]</td>
+                        <td>[[node.provisionerResults['ssh-auth'].password]]</td>
                         <td ng-class="{'text-danger': 'failed' == node.actions[node.actions.length -1].status, 'text-success': 'complete' == node.actions[node.actions.length -1].status}"><span class="lowercasify">[[node.actions[node.actions.length -1].action]]</span> [[node.actions[node.actions.length -1].status]]</td>
                         <td>
                           <button type="button" class="btn btn-default small-font" ng-if="node.actions[node.actions.length -1].stderr || node.actions[node.actions.length -1].stdout" ng-hide="nodeDisplayMapping[node.id]" ng-click="toggleLogs(node.id)">Show logs</button>

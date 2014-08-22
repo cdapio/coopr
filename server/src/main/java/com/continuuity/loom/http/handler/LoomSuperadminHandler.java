@@ -19,14 +19,15 @@ import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.admin.AutomatorType;
 import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Tenant;
+import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.Provisioner;
+import com.continuuity.loom.provisioner.QuotaException;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
@@ -45,7 +46,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.util.UUID;
 
 /**
  * Handler for performing tenant operations.
@@ -86,7 +86,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     }
 
     try {
-      responder.sendJson(HttpResponseStatus.OK, tenantProvisionerService.getAllTenants());
+      responder.sendJson(HttpResponseStatus.OK, tenantProvisionerService.getAllTenantSpecifications());
     } catch (IOException e) {
       LOG.error("Exception while getting all tenants.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting all tenants.");
@@ -94,15 +94,15 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get a specific tenant.
+   * Get a specific tenant by name.
    *
    * @param request Request for a tenant.
    * @param responder Responder for sending the response.
-   * @param tenantId Id of the tenant to get.
+   * @param tenantName Name of the tenant to get.
    */
   @GET
-  @Path("/tenants/{tenant-id}")
-  public void getTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
+  @Path("/tenants/{tenant-name}")
+  public void getTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-name") String tenantName) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -113,15 +113,15 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     }
 
     try {
-      Tenant tenant = tenantProvisionerService.getTenant(tenantId);
-      if (tenant == null) {
-        responder.sendError(HttpResponseStatus.NOT_FOUND, "tenant " + tenantId + " not found");
+      TenantSpecification tenantSpec = tenantProvisionerService.getTenantSpecification(tenantName);
+      if (tenantSpec == null) {
+        responder.sendError(HttpResponseStatus.NOT_FOUND, "tenant " + tenantName + " not found");
         return;
       }
-      responder.sendJson(HttpResponseStatus.OK, tenant);
+      responder.sendJson(HttpResponseStatus.OK, tenantSpec);
     } catch (IOException e) {
-      LOG.error("Exception while getting tenant {}." , tenantId, e);
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while getting tenant " + tenantId);
+      LOG.error("Exception while getting tenant {}." , tenantName, e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while getting tenant " + tenantName);
     }
   }
 
@@ -143,10 +143,10 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
       return;
     }
 
-    Tenant requestedTenant;
+    TenantSpecification requestedFields;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      requestedTenant = gson.fromJson(reader, Tenant.class);
+      requestedFields = gson.fromJson(reader, TenantSpecification.class);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
       return;
@@ -160,22 +160,28 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
         LOG.warn("Exception while closing request reader", e);
       }
     }
-    if (requestedTenant == null) {
+    if (requestedFields == null) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input");
       return;
     }
 
     try {
-      Tenant tenant = new Tenant(requestedTenant.getName(), UUID.randomUUID().toString(), requestedTenant.getWorkers(),
-                                 requestedTenant.getMaxClusters(), requestedTenant.getMaxNodes());
-      tenantProvisionerService.writeTenant(tenant);
-      responder.sendJson(HttpResponseStatus.OK, ImmutableMap.<String, String>of("id", tenant.getId()));
+      String name = requestedFields.getName();
+      if (tenantProvisionerService.getTenantSpecification(name) != null) {
+        responder.sendError(HttpResponseStatus.CONFLICT, "Tenant " + name + " already exists.");
+        return;
+      }
+      tenantProvisionerService.writeTenantSpecification(requestedFields);
+      responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       LOG.error("Exception adding tenant.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception adding tenant.");
     } catch (CapacityException e) {
-      LOG.info("Could not add tenant due to lack of free workers.", e);
+      LOG.info("Could not add tenant due to lack of free workers.");
       responder.sendError(HttpResponseStatus.CONFLICT, "Not enough capacity to add tenant.");
+    } catch (QuotaException e) {
+      // should not happen
+      responder.sendError(HttpResponseStatus.CONFLICT, e.getMessage());
     }
   }
 
@@ -184,11 +190,11 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
    *
    * @param request Request for writing a tenant.
    * @param responder Responder for sending the response.
-   * @param tenantId Id of the tenant to write.
+   * @param tenantName Name of the tenant to write.
    */
   @PUT
-  @Path("/tenants/{tenant-id}")
-  public void writeTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
+  @Path("/tenants/{tenant-name}")
+  public void writeTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-name") String tenantName) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -198,10 +204,10 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
       return;
     }
 
-    Tenant tenant = null;
+    TenantSpecification tenantSpecification = null;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      tenant = gson.fromJson(reader, Tenant.class);
+      tenantSpecification = gson.fromJson(reader, TenantSpecification.class);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
       return;
@@ -216,20 +222,22 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
       }
     }
 
-    if (tenant.getId() == null || !tenant.getId().equals(tenantId)) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "tenant id does not match id in path.");
+    if (tenantSpecification.getName() == null || !tenantSpecification.getName().equals(tenantName)) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "tenant name in body does not match name in path.");
       return;
     }
 
     try {
-      tenantProvisionerService.writeTenant(tenant);
+      tenantProvisionerService.writeTenantSpecification(tenantSpecification);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
-      LOG.error("Exception while setting workers for tenant {}", tenantId);
+      LOG.error("Exception while writing tenant {}", tenantName);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception setting tenant workers.");
     } catch (CapacityException e) {
-      LOG.error("Could not edit tenant {} due to lack of free workers.", tenantId, e);
+      LOG.error("Could not edit tenant {} due to lack of free workers.", tenantName);
       responder.sendError(HttpResponseStatus.CONFLICT, "Not enough capacity to update tenant.");
+    } catch (QuotaException e) {
+      responder.sendError(HttpResponseStatus.CONFLICT, e.getMessage());
     }
   }
 
@@ -238,11 +246,11 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
    *
    * @param request Request to delete a tenant.
    * @param responder Responder for sending the response.
-   * @param tenantId Id of the tenant to delete.
+   * @param tenantName Name of the tenant to delete.
    */
   @DELETE
-  @Path("/tenants/{tenant-id}")
-  public void deleteTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
+  @Path("/tenants/{tenant-name}")
+  public void deleteTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-name") String tenantName) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -252,14 +260,19 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
       return;
     }
 
+    if (Constants.SUPERADMIN_TENANT.equals(tenantName)) {
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "Superadmin cannot be deleted.");
+      return;
+    }
+
     try {
-      tenantProvisionerService.deleteTenant(tenantId);
+      tenantProvisionerService.deleteTenantByName(tenantName);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, e.getMessage());
     } catch (IOException e) {
-      LOG.error("Exception while deleting tenant {}", tenantId, e);
-      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while deleting tenant " + tenantId);
+      LOG.error("Exception while deleting tenant {}", tenantName, e);
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception while deleting tenant " + tenantName);
     }
   }
 
