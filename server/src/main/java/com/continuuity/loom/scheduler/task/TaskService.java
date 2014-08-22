@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
@@ -25,6 +24,7 @@ import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Actions;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.CallbackData;
+import com.continuuity.loom.spec.ProvisionerAction;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.collect.ImmutableList;

@@ -15,7 +15,7 @@
  */
 package com.continuuity.test.input;
 
-import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.spec.ProvisionerAction;
 import com.google.common.base.Objects;
 
 import java.util.Set;

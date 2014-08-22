@@ -157,12 +157,14 @@
             "label": "Region",
             "type": "select",
             "options": [
-              "https://us-west-1.api.joyentcloud.com",
-              "https://us-sw-1.api.joyentcloud.com",
               "https://us-east-1.api.joyentcloud.com",
+              "https://us-east-2.api.joyentcloud.com",
+              "https://us-east-3.api.joyentcloud.com",
+              "https://us-sw-1.api.joyentcloud.com",
+              "https://us-west-1.api.joyentcloud.com",
               "https://eu-ams-1.api.joyentcloud.com"
             ],
-            "default": "https://us-west-1.api.joyentcloud.com",
+            "default": "https://us-east-1.api.joyentcloud.com",
             "override": true,
             "tip": "Joyent Region"
           }

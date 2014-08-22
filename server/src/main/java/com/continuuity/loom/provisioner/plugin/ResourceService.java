@@ -18,14 +18,14 @@ package com.continuuity.loom.provisioner.plugin;
 import com.continuuity.http.BodyConsumer;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
@@ -113,7 +113,7 @@ public class ResourceService extends AbstractIdleService {
           } catch (IOException e) {
             LOG.error("Error during upload of version {} of resource {} for account {}.",
                       version, name, account, e);
-            responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
           }
         }
 
@@ -121,12 +121,12 @@ public class ResourceService extends AbstractIdleService {
         public void finished(HttpResponder responder) {
           try {
             os.close();
-            responder.sendString(HttpResponseStatus.OK, gson.toJson(resourceMeta));
+            responder.sendJson(HttpResponseStatus.OK, resourceMeta, ResourceMeta.class, gson);
             LOG.debug("finished uploading resource.");
           } catch (Exception e) {
             LOG.error("Error finishing upload of resource {} of type {} for account {}.",
                       resourceMeta, resourceType, account, e);
-            responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
           }
         }
 
@@ -140,7 +140,7 @@ public class ResourceService extends AbstractIdleService {
             metaStoreService.getResourceTypeView(account, resourceType).delete(name, version);
             // dont need the file in the plugin store if there was an error so delete it
             pluginStore.deleteResource(account, resourceType, name, version);
-            responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
+            responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, t.getCause().getMessage());
           } catch (IOException e) {
             LOG.error("Error uploading resource {} of type {} for account {}.", resourceMeta, resourceType, account, e);
           }

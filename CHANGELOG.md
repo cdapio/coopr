@@ -3,6 +3,7 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
+- UI fix when a provider type has no admin fields ( Issues: #409 )
 - UI: Add 'sshuser' field to imagetypes ( Issues: #366 )
 - AWS provider support ( Issues: #22 #322 )
 - MongoDB support for clusters ( Issues: #43 #130 )

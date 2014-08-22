@@ -17,7 +17,7 @@ package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.spec.ProvisionerAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;

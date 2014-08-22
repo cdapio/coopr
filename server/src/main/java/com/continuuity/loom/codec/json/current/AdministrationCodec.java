@@ -15,9 +15,9 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.admin.LeaseDuration;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.template.Administration;
+import com.continuuity.loom.spec.template.LeaseDuration;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,7 +27,7 @@ import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 
 /**
- * Codec for serializing/deserializing a {@link com.continuuity.loom.admin.Administration}.
+ * Codec for serializing/deserializing a {@link com.continuuity.loom.spec.template.Administration}.
  */
 public class AdministrationCodec extends AbstractCodec<Administration> {
   @Override

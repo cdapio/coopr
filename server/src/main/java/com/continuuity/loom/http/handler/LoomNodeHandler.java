@@ -24,11 +24,8 @@ import com.continuuity.loom.store.node.NodeStoreService;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonIOException;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -61,7 +58,8 @@ public class LoomNodeHandler extends LoomAuthHandler {
    * Initializes a new instance of a LoomNodeHandler.
    */
   @Inject
-  private LoomNodeHandler(TenantStore tenantStore, NodeService nodeService, NodeStoreService nodeStoreService, Gson gson) {
+  private LoomNodeHandler(TenantStore tenantStore, NodeService nodeService,
+                          NodeStoreService nodeStoreService, Gson gson) {
     super(tenantStore);
     this.nodeStoreService = nodeStoreService;
     this.nodeStore = this.nodeStoreService.getSystemView();

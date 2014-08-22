@@ -16,12 +16,11 @@
 package com.continuuity.loom.store.provisioner;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ResourceTypeFormat;
-import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryExecutor;
 import org.slf4j.Logger;

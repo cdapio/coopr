@@ -15,9 +15,9 @@
  */
 package com.continuuity.loom.codec.json.upgrade;
 
-import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
+import com.continuuity.loom.spec.service.Service;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
