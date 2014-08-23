@@ -48,7 +48,11 @@
     },
     "rackspace": {
       "flavor": "5",
-      "cost": "0.36"
+      "cost": "0.36",
+      "hardware": {
+        "vcpu": "2",
+        "ram": "4"
+      }
     }
   }
 }
