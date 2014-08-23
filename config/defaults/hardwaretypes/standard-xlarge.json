@@ -4,15 +4,45 @@
   "providermap": {
     "aws-us-east-1": {
       "flavor": "m1.xlarge",
-      "cost": "0.350"
+      "cost": "0.350",
+      "hardware": {
+        "vcpu": "4",
+        "ram": "15",
+        "disks": {
+          "/dev/xvdb": "420",
+          "/dev/xvdc": "420",
+          "/dev/xvdd": "420",
+          "/dev/xvde": "420"
+        }
+      }
     },
     "aws-us-west-1": {
       "flavor": "m1.xlarge",
-      "cost": "0.350"
+      "cost": "0.350",
+      "hardware": {
+        "vcpu": "4",
+        "ram": "15",
+        "disks": {
+          "/dev/xvdb": "420",
+          "/dev/xvdc": "420",
+          "/dev/xvdd": "420",
+          "/dev/xvde": "420"
+        }
+      }
     },
     "aws-us-west-2": {
       "flavor": "m1.xlarge",
-      "cost": "0.350"
+      "cost": "0.350",
+      "hardware": {
+        "vcpu": "4",
+        "ram": "15",
+        "disks": {
+          "/dev/xvdb": "420",
+          "/dev/xvdc": "420",
+          "/dev/xvdd": "420",
+          "/dev/xvde": "420"
+        }
+      }
     },
     "joyent": {
       "flavor": "g3-standard-15-kvm",
