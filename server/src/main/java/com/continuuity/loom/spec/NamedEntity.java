@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 /**
  * A named entity has a name that must only consist of alphanumeric characters, underscore, period, and dash.
  */
-public abstract class NamedEntity {
+public class NamedEntity {
   private static final Pattern whitelist = Pattern.compile("[\\w\\.-]+");
   protected final String name;
 
@@ -41,6 +41,25 @@ public abstract class NamedEntity {
    */
   public String getName() {
     return name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    NamedEntity that = (NamedEntity) o;
+
+    return Objects.equal(name, that.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return name != null ? name.hashCode() : 0;
   }
 
   @Override

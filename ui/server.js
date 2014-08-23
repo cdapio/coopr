@@ -339,7 +339,7 @@ site.parseClusterData = function (clusters) {
     if (cluster.createTime) {
       cluster.createTime = site.formatDate(cluster.createTime);
     }
-    if (cluster.status !== 'TERMINATED') {
+    if (cluster.status !== 'terminated') {
       activeClusters++;
     } else {
       deletedClusters++;
@@ -403,11 +403,11 @@ site.app.post('/import', function (req, res) {
           var clusters = results[1], activeNodes = 0, totalNodes = 0, totalClusters = 0,
           pendingClusters = 0;
           clusters.map(function (cluster) {
-            if (cluster.status === 'ACTIVE') {
+            if (cluster.status === 'active') {
               activeNodes += cluster.numNodes;
               totalClusters++;
             }
-            if (cluster.status === 'PENDING') {
+            if (cluster.status === 'pending') {
               pendingClusters++;
             }
             totalNodes += cluster.numNodes;
@@ -493,11 +493,11 @@ site.app.get('/', function (req, res) {
       var clusters = results[1], activeNodes = 0, totalNodes = 0, totalClusters = 0,
       pendingClusters = 0;
       clusters.map(function (cluster) {
-        if (cluster.status === 'ACTIVE') {
+        if (cluster.status === 'active') {
           activeNodes += cluster.numNodes;
           totalClusters++;
         }
-        if (cluster.status === 'PENDING') {
+        if (cluster.status === 'pending') {
           pendingClusters++;
         }
         totalNodes += cluster.numNodes;

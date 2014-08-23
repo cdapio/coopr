@@ -18,6 +18,7 @@
 
 ALTER TABLE clusters
     ADD COLUMN tenant_id VARCHAR(64),
+    ADD COLUMN latest_job_num BIGINT,
     DROP INDEX cluster_user_index,
     ADD INDEX cluster_account_index (tenant_id, owner_id, id);
 

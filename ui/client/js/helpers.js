@@ -46,24 +46,24 @@ Helpers.JSON_ERR = 'Invalid config JSON';
  * Friendly status message mappings.
  */
 Helpers.FRIENDLY_STATUS = {
-  'COMPLETE': 'Completed',
-  'FAILED': 'Failed',
-  'NOT_SUBMITTED': 'Pending...',
-  'CREATING': 'Building cluster...',
-  'RUNNING': 'Running...'
+  'complete': 'Completed',
+  'failed': 'Failed',
+  'not_submitted': 'Pending...',
+  'creating': 'Building cluster...',
+  'running': 'Running...'
 };
 
 Helpers.READABLE_ACTIONS = {
-  CLUSTER_CREATE: "Creation",
-  CLUSTER_DELETE: "Deletion",
-  SOLVE_LAYOUT: "Solve layout",
-  CLUSTER_EXPIRE: "Deletion on expiry",
-  CLUSTER_CONFIGURE: "Configure",
-  CLUSTER_CONFIGURE_WITH_RESTART: "Configure and restart",
-  STOP_SERVICES: "Stop services",
-  RESTART_SERVICES: "Restart services",
-  START_SERVICES: "Start services",
-  ADD_SERVICES: "Add services"
+  cluster_create: "Creation",
+  cluster_delete: "Deletion",
+  solve_layout: "Solve layout",
+  cluster_expire: "Deletion on expiry",
+  cluster_configure: "Configure",
+  cluster_configure_with_restart: "Configure and restart",
+  stop_services: "Stop services",
+  restart_services: "Restart services",
+  start_services: "Start services",
+  add_services: "Add services"
 };
 
 /**
@@ -272,11 +272,11 @@ Helpers.isValidJSON = function (input) {
  */
 Helpers.getClassByStatus = function (statusText) {
   switch(statusText) {
-    case 'FAILED':
+    case 'failed':
       return 'text-danger';
-    case 'COMPLETE':
+    case 'complete':
       return 'text-success';
-    case 'IN_PROGRESS':
+    case 'in_progress':
       return 'text-info';
     default:
       return '';    
