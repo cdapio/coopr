@@ -4,7 +4,14 @@
   "providermap": {
     "joyent": {
       "flavor": "g3-standard-30-kvm",
-      "cost": "0.96"
+      "cost": "0.96",
+      "hardware": {
+        "vcpu": "8",
+        "ram": "30",
+        "disks": {
+          "/dev/vdb": "1683"
+        }
+      }
     },
     "rackspace": {
       "flavor": "8",

@@ -40,7 +40,14 @@
     },
     "joyent": {
       "flavor": "g3-standard-7.5-kvm",
-      "cost": "0.24"
+      "cost": "0.24",
+      "hardware": {
+        "vcpu": "2",
+        "ram": "7.5",
+        "disks": {
+          "/dev/vdb": "738"
+        }
+      }
     },
     "rackspace": {
       "flavor": "6",
