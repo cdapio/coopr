@@ -208,19 +208,21 @@ AppHelpers.addInputSchema = function (currProvider, providerInputs) {
         if (entry === item) {
           var userinput = currProvider.provisioner[entry];
 
-          if(typeof currProvider.provisioner[entry] !== 'object') {
+          if(typeof userinput !== 'object') {
             currProvider.provisioner[entry] = {
               default: userinput
             };
           }
 
           for (var field in providerInputs.parameters.admin.fields[entry]) {
-            currProvider.provisioner[entry][field] = (
-              providerInputs.parameters.admin.fields[entry][field]);
+            if(!currProvider.provisioner[entry][field]) {
+              currProvider.provisioner[entry][field] = providerInputs.parameters.admin.fields[entry][field];
+            }
           }
         }
       }
     }
   }
+
   return currProvider;
 };
