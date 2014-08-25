@@ -234,7 +234,9 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
 CreateCluster.populateDefaults = function (providerInfo, data) {
   angular.forEach(data.parameters, function(o) {
     angular.forEach(o.fields, function(v, name) {
-      providerInfo.provisioner[name] = v.default || ''; 
+      if(v.default) {
+        providerInfo.provisioner[name] = v.default;
+      }
     });
   });
   return providerInfo;
