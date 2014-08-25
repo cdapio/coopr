@@ -61,7 +61,7 @@
         "data_dir": "/data/mysql",
         "server": {
           "directories": {
-            "log_dir": "/data/mysql",
+            "log_dir": "/data/mysql"
           }
         },
         "bind_address": "%ip.bind_v4.service.mysql-server%"
