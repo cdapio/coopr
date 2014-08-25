@@ -114,9 +114,11 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
   $scope.$watch('defaultProvider', function () {
     if ($scope.defaultProvider) {
       dataFactory.getProviderFields($scope.defaultProvider, function (providerInfo) {
-        $scope.providerFields = $scope.providerData[providerInfo.providertype];
+        var data = $scope.providerData[providerInfo.providertype];
+        $scope.providerFields = data;
+
         if(!$scope.clusterId) {
-          $scope.defaultProviderInfo = providerInfo;
+          $scope.defaultProviderInfo = CreateCluster.populateDefaults(providerInfo, data);
         }
       });  
     }
@@ -220,6 +222,27 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
 
   };
 }]);
+
+
+
+/**
+ * sets default values for provisioner data
+ * @param  {Object} providerInfo from getProviderFields, will be modified
+ * @param  {Object} data         from providerData
+ * @return {Object}              ref to modified providerInfo
+ */
+CreateCluster.populateDefaults = function (providerInfo, data) {
+  angular.forEach(data.parameters, function(o) {
+    angular.forEach(o.fields, function(v, name) {
+      providerInfo.provisioner[name] = v.default || ''; 
+    });
+  });
+  return providerInfo;
+};
+
+
+
+
 
 /**
  * Validates fields based on user and admin parameters and provider type.
