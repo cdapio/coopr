@@ -20,14 +20,30 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 /**
- * Specification for a plugin resource type.
+ * Specification for a plugin resource type. Includes the format of the resource, and if it's a file format, optionally
+ * includes the file permissions as well.
  */
 public class ResourceTypeSpecification {
   private final ResourceTypeFormat format;
+  private final String permissions;
 
-  public ResourceTypeSpecification(ResourceTypeFormat format) {
+  public ResourceTypeSpecification(ResourceTypeFormat format, String permissions) {
     Preconditions.checkArgument(format != null, "Format must be given.");
     this.format = format;
+    validatePermissions(format, permissions);
+    this.permissions = permissions;
+  }
+
+  private void validatePermissions(ResourceTypeFormat format, String permissions) {
+    if (permissions != null) {
+      Preconditions.checkArgument(format == ResourceTypeFormat.FILE, "permissions are only allowed for file format.");
+      int length = permissions.length();
+      String errMsg = permissions + " is an invalid file permission";
+      Preconditions.checkArgument(length == 3 || length == 4, errMsg);
+      for (int i = 0; i < length; i++) {
+        Preconditions.checkArgument(Character.isDigit(permissions.charAt(i)), errMsg);
+      }
+    }
   }
 
   /**
@@ -37,6 +53,15 @@ public class ResourceTypeSpecification {
    */
   public ResourceTypeFormat getFormat() {
     return format;
+  }
+
+  /**
+   * Get the permissions of the resource.
+   *
+   * @return Permissions of the resource.
+   */
+  public String getPermissions() {
+    return permissions;
   }
 
   @Override

@@ -7,7 +7,8 @@
     "classname": "ShellAutomator",
     "resourceTypes": {
         "scripts": {
-            "format": "file"
+            "format": "file",
+            "permissions": "0755"
         },
         "archives": {
             "format": "archive"

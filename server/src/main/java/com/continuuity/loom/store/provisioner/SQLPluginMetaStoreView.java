@@ -20,7 +20,7 @@ import com.continuuity.loom.common.utils.ImmutablePair;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
-import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBQueryExecutor;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class SQLPluginMetaStoreView implements PluginMetaStoreView {
             "resource_type=? AND name=? AND version=?");
         try {
           statement.setString(1, tenantId);
-          for (Map.Entry<ImmutablePair<ResourceType, ResourceTypeFormat>, ResourceMeta> entry :
+          for (Map.Entry<ImmutablePair<ResourceType, ResourceTypeSpecification>, ResourceMeta> entry :
             resources.getResources().entries()) {
             ResourceType type = entry.getKey().getFirst();
             ResourceMeta meta = entry.getValue();

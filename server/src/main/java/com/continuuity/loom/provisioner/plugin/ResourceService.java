@@ -25,7 +25,6 @@ import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
 import com.continuuity.loom.spec.plugin.AutomatorType;
 import com.continuuity.loom.spec.plugin.ProviderType;
-import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
 import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.entity.EntityStoreView;
@@ -169,7 +168,7 @@ public class ResourceService extends AbstractIdleService {
    * @param account Account to bootstrap
    */
   public void bootstrapResources(Account account) throws IOException {
-    for (ImmutablePair<ResourceType, ResourceTypeFormat> typePair : getTypesAndFormats(Account.SUPERADMIN)) {
+    for (ImmutablePair<ResourceType, ResourceTypeSpecification> typePair : getTypesAndFormats(Account.SUPERADMIN)) {
       ResourceType type = typePair.getFirst();
       Map<String, Set<ResourceMeta>> resources =
         metaStoreService.getResourceTypeView(Account.SUPERADMIN, type).getAll();
@@ -408,11 +407,11 @@ public class ResourceService extends AbstractIdleService {
    */
   public ResourceCollection getLiveResources(Account account) throws IOException {
     ResourceCollection resourceCollection = new ResourceCollection();
-    for (ImmutablePair<ResourceType, ResourceTypeFormat> typeFormat : getTypesAndFormats(account)) {
-      ResourceType resourceType = typeFormat.getFirst();
-      ResourceTypeFormat format = typeFormat.getSecond();
+    for (ImmutablePair<ResourceType, ResourceTypeSpecification> typeSpecs : getTypesAndFormats(account)) {
+      ResourceType resourceType = typeSpecs.getFirst();
+      ResourceTypeSpecification typeSpec = typeSpecs.getSecond();
       Set<ResourceMeta> resources = metaStoreService.getResourceTypeView(account, resourceType).getLiveResources();
-      resourceCollection.addResources(resourceType, format, resources);
+      resourceCollection.addResources(resourceType, typeSpec, resources);
     }
     return resourceCollection;
   }
@@ -426,13 +425,13 @@ public class ResourceService extends AbstractIdleService {
   public ResourceCollection getResourcesToSync(Account account) throws IOException {
     ResourceCollection resourceCollection = new ResourceCollection();
 
-    Set<ImmutablePair<ResourceType, ResourceTypeFormat>> typeFormats = getTypesAndFormats(account);
+    Set<ImmutablePair<ResourceType, ResourceTypeSpecification>> typeFormats = getTypesAndFormats(account);
     Set<ResourceType> resourceTypes = Sets.newHashSet();
-    for (ImmutablePair<ResourceType, ResourceTypeFormat> typeFormat : typeFormats) {
+    for (ImmutablePair<ResourceType, ResourceTypeSpecification> typeFormat : typeFormats) {
       ResourceType resourceType = typeFormat.getFirst();
-      ResourceTypeFormat format = typeFormat.getSecond();
+      ResourceTypeSpecification typeSpec = typeFormat.getSecond();
       Set<ResourceMeta> resources = metaStoreService.getResourceTypeView(account, resourceType).getResourcesToSync();
-      resourceCollection.addResources(resourceType, format, resources);
+      resourceCollection.addResources(resourceType, typeSpec, resources);
       resourceTypes.add(resourceType);
     }
 
@@ -451,16 +450,16 @@ public class ResourceService extends AbstractIdleService {
   }
 
   // Helper function for getting all the resource types and formats for plugins belonging to an account.
-  private Set<ImmutablePair<ResourceType, ResourceTypeFormat>> getTypesAndFormats(Account account) throws IOException {
-    Set<ImmutablePair<ResourceType, ResourceTypeFormat>> typesAndFormats = Sets.newHashSet();
+  private Set<ImmutablePair<ResourceType, ResourceTypeSpecification>> getTypesAndFormats(Account account)
+    throws IOException {
+    Set<ImmutablePair<ResourceType, ResourceTypeSpecification>> typesAndFormats = Sets.newHashSet();
     EntityStoreView entityStoreView = entityStoreService.getView(account);
 
     for (AutomatorType plugin : entityStoreView.getAllAutomatorTypes()) {
       String pluginName = plugin.getName();
       for (Map.Entry<String, ResourceTypeSpecification> entry : plugin.getResourceTypes().entrySet()) {
         ResourceType resourceType = new ResourceType(PluginType.AUTOMATOR, pluginName, entry.getKey());
-        ResourceTypeFormat format = entry.getValue().getFormat();
-        typesAndFormats.add(ImmutablePair.of(resourceType, format));
+        typesAndFormats.add(ImmutablePair.of(resourceType, entry.getValue()));
       }
     }
 
@@ -468,8 +467,7 @@ public class ResourceService extends AbstractIdleService {
       String pluginName = plugin.getName();
       for (Map.Entry<String, ResourceTypeSpecification> entry : plugin.getResourceTypes().entrySet()) {
         ResourceType resourceType = new ResourceType(PluginType.PROVIDER, pluginName, entry.getKey());
-        ResourceTypeFormat format = entry.getValue().getFormat();
-        typesAndFormats.add(ImmutablePair.of(resourceType, format));
+        typesAndFormats.add(ImmutablePair.of(resourceType, entry.getValue()));
       }
     }
 

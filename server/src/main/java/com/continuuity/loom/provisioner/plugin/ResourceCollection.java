@@ -16,7 +16,7 @@
 package com.continuuity.loom.provisioner.plugin;
 
 import com.continuuity.loom.common.utils.ImmutablePair;
-import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -27,13 +27,13 @@ import java.util.Collection;
  * are available for each plugin.
  */
 public class ResourceCollection {
-  private final Multimap<ImmutablePair<ResourceType, ResourceTypeFormat>, ResourceMeta> resources;
+  private final Multimap<ImmutablePair<ResourceType, ResourceTypeSpecification>, ResourceMeta> resources;
 
   public ResourceCollection() {
     this.resources = HashMultimap.create();
   }
 
-  public Multimap<ImmutablePair<ResourceType, ResourceTypeFormat>, ResourceMeta> getResources() {
+  public Multimap<ImmutablePair<ResourceType, ResourceTypeSpecification>, ResourceMeta> getResources() {
     return resources;
   }
 
@@ -41,10 +41,10 @@ public class ResourceCollection {
    * Add resources of the given type and format with the given metadata.
    *
    * @param type Type of resource
-   * @param format Format of resource
+   * @param spec Type specification of the resource
    * @param metas Collection of resource metadata to add
    */
-  public void addResources(ResourceType type, ResourceTypeFormat format, Collection<ResourceMeta> metas) {
-    resources.putAll(ImmutablePair.of(type, format), metas);
+  public void addResources(ResourceType type, ResourceTypeSpecification spec, Collection<ResourceMeta> metas) {
+    resources.putAll(ImmutablePair.of(type, spec), metas);
   }
 }
