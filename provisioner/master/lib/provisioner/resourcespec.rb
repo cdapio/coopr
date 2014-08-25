@@ -61,7 +61,7 @@ module Loom
                   resource_name = %W( #{type} #{id} #{resource_type} #{name}).join('/')
                   @resources[resource_name] = version
                   @resource_formats[resource_name] = format
-                  @resource_permissions[resource_name] = permissions
+                  @resource_permissions[resource_name] = permissions unless permissions.nil?
                 end
               end
             end
