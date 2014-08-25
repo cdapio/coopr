@@ -93,7 +93,7 @@ module Loom
         data_file = %W( #{@datadir} #{resource} #{version} #{resource.split('/')[-1]}).join('/')
         log.debug "storing fetched file #{download_file} into data dir: #{data_file}"
         # set file permissions if specified
-        if @resourcespec.resource_permissions.key?(resource)
+        if @resourcespec.resource_permissions.key?(resource) && !@resourcespec.resource_permissions[resource].nil?
           log.debug "setting file permissions #{@resourcespec.resource_permissions[resource]}"
           octal_mode = @resourcespec.resource_permissions[resource].to_i(8)
           FileUtils.chmod octal_mode, download_file
