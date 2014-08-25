@@ -5,7 +5,7 @@ Unreleased
 ----------
 - AWS provider support ( Issues: #22 #322 )
 - MongoDB support for clusters ( Issues: #43 #130 )
-- Cluster size constraint ( Issues: #76 )
+- Cluster size constraint ( Issues: #76 #418 )
 - Remove 'ALL RIGHTS RESERVED' footer ( Issues: #123 #340 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 #323 )
