@@ -3,10 +3,9 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
-- UI fix when a provider type has no admin fields ( Issues: #409 )
-- UI: Add 'sshuser' field to imagetypes ( Issues: #366 )
 - AWS provider support ( Issues: #22 #322 )
 - MongoDB support for clusters ( Issues: #43 #130 )
+- Cluster size constraint ( Issues: #76 #418 )
 - Remove 'ALL RIGHTS RESERVED' footer ( Issues: #123 #340 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 #323 )
@@ -31,6 +30,8 @@ Unreleased
 - PHP module support ( Issues: #317 )
 - Support for multiple IP addresses ( Issues: #343 #347 )
 - Standalone build updates for multitenancy ( Issues #349 )
+- UI: Add 'sshuser' field to imagetypes ( Issues: #366 )
+- UI: fix when a provider type has no admin fields ( Issues: #409 )
 
 v0.9.7 (May 27, 2014)
 ---------------------

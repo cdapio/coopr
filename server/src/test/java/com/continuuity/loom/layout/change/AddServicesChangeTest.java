@@ -26,6 +26,7 @@ import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.layout.BaseSolverTest;
 import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.NodeLayout;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -237,7 +238,8 @@ public class AddServicesChangeTest extends BaseSolverTest {
           ImmutableSet.of("datanode", "reactor"),
           ImmutableSet.of("namenode", "reactor")
         )
-      )
+      ),
+      SizeConstraint.EMPTY
     );
   }
 }

@@ -38,6 +38,7 @@ import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultiset;
@@ -162,7 +163,8 @@ public class SolverSchedulerTest extends BaseTest {
             ImmutableSet.of("datanode", "reactor"),
             ImmutableSet.of("namenode", "reactor")
           )
-        )
+        ),
+        SizeConstraint.EMPTY
       ),
       null
     );

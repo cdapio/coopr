@@ -35,6 +35,7 @@ import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.SolverRequest;
 import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
@@ -108,7 +109,7 @@ public class ClusterService {
    * @throws QuotaException if the operation would cause the tenant quotas to be exceeded.
    */
   public String requestClusterCreate(ClusterCreateRequest clusterCreateRequest, Account account)
-    throws IOException, IllegalAccessException, QuotaException {
+    throws IOException, IllegalAccessException, QuotaException, MissingEntityException, InvalidClusterException {
     // the create lock is shared across an entire tenant and is needed so that concurrent create requests
     // cannot cause the quota to be exceeded if they both read the old value and both add clusters and nodes
     ZKInterProcessReentrantLock lock = lockService.getClusterCreateLock(account.getTenantId());
@@ -124,6 +125,21 @@ public class ClusterService {
       String templateName = clusterCreateRequest.getClusterTemplate();
       LOG.debug(String.format("Received a request to create cluster %s with %d machines from template %s", name,
                               numMachines, templateName));
+      ClusterTemplate template = entityStoreService.getView(account).getClusterTemplate(templateName);
+      if (template == null) {
+        throw new MissingEntityException("Template " + template + " not found.");
+      }
+      SizeConstraint sizeConstraint = template.getConstraints().getSizeConstraint();
+      int minMachines = sizeConstraint.getMin();
+      int maxMachines = sizeConstraint.getMax();
+      if (numMachines < minMachines) {
+        throw new InvalidClusterException("Cluster size cannot be below " + minMachines + " nodes.");
+      }
+      if (numMachines > maxMachines) {
+        String errMsg = "Cluster size cannot exceed " + maxMachines;
+        errMsg += maxMachines == 1 ? " node." : " nodes.";
+        throw new InvalidClusterException(errMsg);
+      }
       String clusterId = idService.getNewClusterId();
       Cluster cluster = new Cluster(clusterId, account, name, System.currentTimeMillis(),
                                     clusterCreateRequest.getDescription(), null, null,

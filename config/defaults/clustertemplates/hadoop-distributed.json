@@ -95,6 +95,9 @@
     ]
   },
   "constraints": {
+    "size": {
+      "min": 3
+    },
     "layout": {
       "mustcoexist": [
         [

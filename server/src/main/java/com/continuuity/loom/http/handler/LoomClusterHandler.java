@@ -317,13 +317,16 @@ public class LoomClusterHandler extends LoomAuthHandler {
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "User not authorized to create cluster.");
     } catch (IllegalArgumentException e) {
-      LOG.error("Exception trying to create cluster.", e);
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     } catch (IOException e) {
       LOG.error("Exception while trying to create cluster.", e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error requesting cluster create operation.");
     } catch (QuotaException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, e.getMessage());
+    } catch (InvalidClusterException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
     } finally {
       try {
         reader.close();
