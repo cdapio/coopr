@@ -115,7 +115,9 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
     if ($scope.defaultProvider) {
       dataFactory.getProviderFields($scope.defaultProvider, function (providerInfo) {
         $scope.providerFields = $scope.providerData[providerInfo.providertype];
-        $scope.defaultProviderInfo = providerInfo;
+        if(!$scope.clusterId) {
+          $scope.defaultProviderInfo = providerInfo;
+        }
       });  
     }
   });
@@ -130,6 +132,8 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
 
       // Since cluster already exists, overwrite template config with cluster config.
       $scope.defaultConfig = JSON.stringify(cluster.config);
+
+      $scope.defaultProviderInfo = cluster.provider;
     });
   }
 
