@@ -18,6 +18,7 @@ package com.continuuity.loom.layout;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.layout.change.ClusterLayoutChange;
 import com.continuuity.loom.layout.change.ClusterLayoutTracker;
 import com.continuuity.loom.scheduler.task.NodeService;

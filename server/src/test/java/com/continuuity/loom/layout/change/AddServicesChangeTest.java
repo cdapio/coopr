@@ -122,9 +122,15 @@ public class AddServicesChangeTest extends BaseSolverTest {
       nodeIds.add(node.getId());
       nodes.add(node);
     }
-    Cluster cluster = new Cluster("123", new Account("user1", "tenant1"), "hadoop", System.currentTimeMillis(),
-                                  "hadoop cluster",  Entities.ProviderExample.RACKSPACE, reactorTemplate, nodeIds,
-                                  ImmutableSet.of(namenode.getName(), datanode.getName()));
+    Cluster cluster = Cluster.builder()
+      .setID("123")
+      .setAccount(new Account("user1", "tenant1"))
+      .setName("hadoop")
+      .setProvider(Entities.ProviderExample.RACKSPACE)
+      .setClusterTemplate(reactorTemplate)
+      .setNodes(nodeIds)
+      .setServices(ImmutableSet.of(namenode.getName(), datanode.getName()))
+      .build();
     Constraints constraints = cluster.getClusterTemplate().getConstraints();
 
     // create the change objects
@@ -200,9 +206,17 @@ public class AddServicesChangeTest extends BaseSolverTest {
   }
 
   private Cluster copyOfClusterWith(Cluster cluster, Set<String> services) {
-    return new Cluster(cluster.getId(), cluster.getAccount(), cluster.getName(),
-                       cluster.getCreateTime(), cluster.getDescription(), cluster.getProvider(),
-                       cluster.getClusterTemplate(), cluster.getNodes(), services);
+    return Cluster.builder()
+      .setID(cluster.getId())
+      .setAccount(cluster.getAccount())
+      .setName(cluster.getName())
+      .setDescription(cluster.getDescription())
+      .setCreateTime(cluster.getCreateTime())
+      .setProvider(cluster.getProvider())
+      .setClusterTemplate(cluster.getClusterTemplate())
+      .setNodes(cluster.getNodes())
+      .setServices(services)
+      .build();
   }
 
   @BeforeClass

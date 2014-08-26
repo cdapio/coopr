@@ -46,6 +46,7 @@ import java.util.Set;
  *
  */
 public class BaseSolverTest extends BaseTest {
+  protected static Provider provider;
   protected static ClusterTemplate reactorTemplate;
   protected static ClusterTemplate reactorTemplate2;
   protected static Service namenode;
@@ -110,8 +111,9 @@ public class BaseSolverTest extends BaseTest {
 
     EntityStoreView adminView = entityStoreService.getView(account);
     // create providers
-    adminView.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
-                                           ImmutableMap.<String, String>of()));
+    provider = new Provider("joyent", "joyent provider", Entities.JOYENT,
+                            ImmutableMap.<String, String>of());
+    adminView.writeProvider(provider);
     // create hardware types
     adminView.writeHardwareType(
       new HardwareType(

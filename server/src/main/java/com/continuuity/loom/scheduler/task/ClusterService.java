@@ -25,7 +25,7 @@ import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.http.request.AddServicesRequest;
-import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.InvalidClusterException;
 import com.continuuity.loom.layout.Solver;
@@ -141,10 +141,14 @@ public class ClusterService {
         throw new InvalidClusterException(errMsg);
       }
       String clusterId = idService.getNewClusterId();
-      Cluster cluster = new Cluster(clusterId, account, name, System.currentTimeMillis(),
-                                    clusterCreateRequest.getDescription(), null, null,
-                                    ImmutableSet.<String>of(), ImmutableSet.<String>of(),
-                                    clusterCreateRequest.getConfig());
+      Cluster cluster = Cluster.builder()
+        .setID(clusterId)
+        .setAccount(account)
+        .setName(name)
+        .setDescription(clusterCreateRequest.getDescription())
+        .setCreateTime(System.currentTimeMillis())
+        .setConfig(clusterCreateRequest.getConfig())
+        .build();
       JobId clusterJobId = idService.getNewJobId(clusterId);
       ClusterJob clusterJob = new ClusterJob(clusterJobId, ClusterAction.SOLVE_LAYOUT);
       cluster.setLatestJobId(clusterJob.getJobId());

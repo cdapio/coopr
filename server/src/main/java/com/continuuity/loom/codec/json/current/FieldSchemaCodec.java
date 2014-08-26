@@ -53,13 +53,13 @@ public class FieldSchemaCodec extends AbstractCodec<FieldSchema> {
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    String label = context.deserialize(jsonObj.get("label"), String.class);
-    String fieldType = context.deserialize(jsonObj.get("type"), String.class);
-    String tip = context.deserialize(jsonObj.get("tip"), String.class);
-    String defaultValue = context.deserialize(jsonObj.get("default"), String.class);
-    Boolean override = context.deserialize(jsonObj.get("override"), Boolean.class);
-    Set<String> options = context.deserialize(jsonObj.get("options"), new TypeToken<Set<String>>() {}.getType());
-
-    return new FieldSchema(label, fieldType, tip, options, defaultValue, override);
+    return FieldSchema.builder()
+      .setLabel(context.<String>deserialize(jsonObj.get("label"), String.class))
+      .setType(context.<String>deserialize(jsonObj.get("type"), String.class))
+      .setTip(context.<String>deserialize(jsonObj.get("tip"), String.class))
+      .setDefaultValue(context.<String>deserialize(jsonObj.get("default"), String.class))
+      .setOverride(context.<Boolean>deserialize(jsonObj.get("override"), Boolean.class))
+      .setOptions(context.<Set<String>>deserialize(jsonObj.get("options"), new TypeToken<Set<String>>() {}.getType()))
+      .build();
   }
 }
