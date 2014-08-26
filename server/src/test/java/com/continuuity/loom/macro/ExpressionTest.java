@@ -76,9 +76,14 @@ public class ExpressionTest {
                         NodeProperties.builder()
                           .addIPAddress("access_v4", "9.6.8.8")
                           .setNodenum(10).build());
-    cluster = new Cluster("1", new Account("user", "tenant"), "cluster", System.currentTimeMillis(), "testy cluster",
-                          null, null, ImmutableSet.of(foo.getId(), bar.getId(), one.getId(), two.getId(), thr.getId()),
-                          ImmutableSet.of(svc1.getName(), svc2.getName(), svc3.getName()));
+    cluster = Cluster.builder()
+      .setID("1")
+      .setAccount(new Account("user", "tenant"))
+      .setName("cluster")
+      .setDescription("testy cluster")
+      .setNodes(ImmutableSet.of(foo.getId(), bar.getId(), one.getId(), two.getId(), thr.getId()))
+      .setServices(ImmutableSet.of(svc1.getName(), svc2.getName(), svc3.getName()))
+      .build();
     clusterNodes = Sets.newTreeSet(Sets.newHashSet(foo, bar, one, two, thr));
     node1 = foo;
     node2 = bar;

@@ -62,51 +62,35 @@ public abstract class ClusterStoreTest {
 
   @Test
   public void testGetStoreDeleteClusterAsSystem() throws Exception {
-    Cluster cluster = new Cluster(
-      "104", tenant1_user1, "example-hdfs-delete", System.currentTimeMillis(), "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node1", "node2"),
-      ImmutableSet.of("s1", "s2")
-    );
+    Cluster cluster = Cluster.builder()
+      .setID("104")
+      .setAccount(tenant1_user1)
+      .setName("example-hdfs-delete")
+      .setProvider(Entities.ProviderExample.RACKSPACE)
+      .setClusterTemplate(Entities.ClusterTemplateExample.HDFS)
+      .setNodes(ImmutableSet.of("node1", "node2"))
+      .setServices(ImmutableSet.of("s1", "s2"))
+      .build();
     assertGetStoreDeleteCluster(systemView, cluster);
   }
 
   @Test
   public void testGetStoreDeleteClusterAsUser() throws Exception {
     ClusterStoreView view = clusterStoreService.getView(tenant1_user1);
-    Cluster cluster = new Cluster(
-      "104", tenant1_user1, "example-hdfs-delete", System.currentTimeMillis(), "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node1", "node2"),
-      ImmutableSet.of("s1", "s2")
-    );
+    Cluster cluster = createClusterObj("104");
     assertGetStoreDeleteCluster(view, cluster);
   }
 
   @Test
   public void testGetStoreDeleteClusterAsAdmin() throws Exception {
     ClusterStoreView view = clusterStoreService.getView(tenant1_admin);
-    Cluster cluster = new Cluster(
-      "104", tenant1_user1, "example-hdfs-delete", System.currentTimeMillis(), "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node1", "node2"),
-      ImmutableSet.of("s1", "s2")
-    );
+    Cluster cluster = createClusterObj("104");
     assertGetStoreDeleteCluster(view, cluster);
   }
 
   @Test
   public void testUserSeparation() throws Exception {
-    Cluster cluster = new Cluster(
-      "104", tenant1_user1, "example-hdfs-delete", System.currentTimeMillis(), "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node1", "node2"),
-      ImmutableSet.of("s1", "s2")
-    );
+    Cluster cluster = createClusterObj("104");
     clusterStoreService.getView(tenant1_user1).writeCluster(cluster);
     Assert.assertEquals(cluster, clusterStoreService.getView(tenant1_user1).getCluster(cluster.getId()));
     Assert.assertNull(clusterStoreService.getView(tenant1_user2).getCluster(cluster.getId()));
@@ -114,13 +98,7 @@ public abstract class ClusterStoreTest {
 
   @Test
   public void testTenantSeparation() throws Exception {
-    Cluster cluster = new Cluster(
-      "104", tenant1_user1, "example-hdfs-delete", System.currentTimeMillis(), "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node1", "node2"),
-      ImmutableSet.of("s1", "s2")
-    );
+    Cluster cluster = createClusterObj("104");
     clusterStoreService.getView(tenant1_admin).writeCluster(cluster);
     Assert.assertNull(clusterStoreService.getView(tenant2_admin).getCluster(cluster.getId()));
   }
@@ -159,13 +137,7 @@ public abstract class ClusterStoreTest {
 
   @Test
   public void testGetClusterJobs() throws Exception {
-    Cluster cluster = new Cluster(
-      "1", tenant1_user1, "example-hdfs-delete", System.currentTimeMillis(), "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node1", "node2"),
-      ImmutableSet.of("s1", "s2")
-    );
+    Cluster cluster = createClusterObj("1");
     ClusterStoreView user1view = clusterStoreService.getView(cluster.getAccount());
     user1view.writeCluster(cluster);
     Set<ClusterJob> jobs = Sets.newHashSet();
@@ -216,22 +188,11 @@ public abstract class ClusterStoreTest {
     Assert.assertEquals(0, systemView.getAllClusters().size());
 
     String clusterId1 = "123";
-    Cluster cluster1 = new Cluster(
-      clusterId1, tenant1_user1, "example-hdfs", System.currentTimeMillis(), "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node1", "node2"),
-      ImmutableSet.of("s1", "s2")
-    );
+    long createTime = System.currentTimeMillis();
+    Cluster cluster1 = createClusterObj(clusterId1, createTime);
 
     // Make sure new cluster is at least 1ms older than the previous one.
-    Cluster cluster2 = new Cluster(
-      "1234", tenant1_user1, "example-hdfs2", System.currentTimeMillis() + 1, "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node3", "node4"),
-      ImmutableSet.of("s1", "s4")
-    );
+    Cluster cluster2 = createClusterObj(clusterId1 + "4", createTime + 1);
 
     ClusterStoreView store = clusterStoreService.getView(tenant1_user1);
     store.writeCluster(cluster1);
@@ -261,22 +222,11 @@ public abstract class ClusterStoreTest {
     Assert.assertEquals(0, systemView.getAllClusters().size());
 
     String clusterId1 = "123";
-    Cluster cluster1 = new Cluster(
-      clusterId1, tenant1_user1, "example-hdfs", System.currentTimeMillis(), "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node1", "node2"),
-      ImmutableSet.of("s1", "s2")
-    );
+    long createTime = System.currentTimeMillis();
+    Cluster cluster1 = createClusterObj(clusterId1, createTime);
 
     // Make sure new cluster is at least 1ms older than the previous one.
-    Cluster cluster2 = new Cluster(
-      "1234", tenant1_user2, "example-hdfs2", System.currentTimeMillis() + 1, "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node3", "node4"),
-      ImmutableSet.of("s1", "s4")
-    );
+    Cluster cluster2 = createClusterObj(clusterId1 + "4", createTime + 1);
 
     ClusterStoreView store = clusterStoreService.getView(tenant1_admin);
     store.writeCluster(cluster1);
@@ -433,13 +383,35 @@ public abstract class ClusterStoreTest {
   }
 
   private Cluster createCluster(String id, long createTime, long expireTime, Cluster.Status status) throws Exception {
-    Cluster cluster = new Cluster(id, tenant1_user1, "expire" + id, createTime, "",
-                                  Entities.ProviderExample.RACKSPACE, Entities.ClusterTemplateExample.HDFS,
-                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), null);
-    cluster.setStatus(status);
-    cluster.setExpireTime(expireTime);
+    Cluster cluster = Cluster.builder()
+      .setID(id)
+      .setName("expire" + id)
+      .setCreateTime(createTime)
+      .setExpireTime(expireTime)
+      .setStatus(status)
+      .setAccount(tenant1_user1)
+      .setProvider(Entities.ProviderExample.RACKSPACE)
+      .setClusterTemplate(Entities.ClusterTemplateExample.HDFS)
+      .build();
 
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     return cluster;
+  }
+
+  private Cluster createClusterObj(String id) {
+    return createClusterObj(id, System.currentTimeMillis());
+  }
+
+  private Cluster createClusterObj(String id, long createTime) {
+    return Cluster.builder()
+      .setID(id)
+      .setAccount(tenant1_user1)
+      .setName("example-hdfs-delete")
+      .setProvider(Entities.ProviderExample.RACKSPACE)
+      .setClusterTemplate(Entities.ClusterTemplateExample.HDFS)
+      .setNodes(ImmutableSet.of("node1", "node2"))
+      .setServices(ImmutableSet.of("s1", "s2"))
+      .setCreateTime(createTime)
+      .build();
   }
 }

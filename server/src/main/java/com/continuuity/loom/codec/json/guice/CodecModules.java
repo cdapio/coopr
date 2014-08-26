@@ -62,7 +62,7 @@ import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
-import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;

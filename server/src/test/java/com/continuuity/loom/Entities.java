@@ -68,11 +68,30 @@ public class Entities {
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
-            "joyent_username", new FieldSchema("user name", "text", "your joyent username", null, null, false),
-            "joyent_keyname", new FieldSchema("key name", "text", "your joyent key name", null, null, false),
-            "joyent_keyfile", new FieldSchema("path to key file", "text",
-                                              "path to your joyent key file", null, null, false),
-            "joyent_version", new FieldSchema("version", "text", "joyent version", null, null, false)
+            "joyent_username",
+            FieldSchema.builder()
+              .setLabel("user name")
+              .setType("text")
+              .setTip("your joyent username")
+              .build(),
+            "joyent_keyname",
+            FieldSchema.builder()
+              .setLabel("key name")
+              .setType("text")
+              .setTip("your joyent key name")
+              .build(),
+            "joyent_keyfile",
+            FieldSchema.builder()
+              .setLabel("path to key file")
+              .setType("text")
+              .setTip("path to your joyent key file")
+              .build(),
+            "joyent_version",
+            FieldSchema.builder()
+              .setLabel("version")
+              .setType("text")
+              .setTip("joyent version")
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("joyent_username", "joyent_keyname", "joyent_keyfile", "joyent_version")
@@ -89,8 +108,20 @@ public class Entities {
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
-            "rackspace_username", new FieldSchema("user name", "text", "your rackspace username", null, null, true),
-            "rackspace_apikey", new FieldSchema("key name", "text", "your rackspace key name", null, null, true)
+            "rackspace_username",
+            FieldSchema.builder()
+              .setLabel("user name")
+              .setType("text")
+              .setTip("your rackspace username")
+              .setOverride(true)
+              .build(),
+            "rackspace_apikey",
+            FieldSchema.builder()
+              .setLabel("key name")
+              .setType("text")
+              .setTip("your rackspace key name")
+              .setOverride(true)
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
@@ -103,8 +134,18 @@ public class Entities {
         ParameterType.USER,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
-            "rackspace_username", new FieldSchema("user name", "text", "your rackspace username", null, null, false),
-            "rackspace_apikey", new FieldSchema("key name", "text", "your rackspace key name", null, null, false)
+            "rackspace_username",
+            FieldSchema.builder()
+              .setLabel("user name")
+              .setType("text")
+              .setTip("your rackspace username")
+              .build(),
+            "rackspace_apikey",
+            FieldSchema.builder()
+              .setLabel("key name")
+              .setType("text")
+              .setTip("your rackspace key name")
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
@@ -121,9 +162,18 @@ public class Entities {
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
             "script",
-            new FieldSchema("script", "text", "path to script", null, null, false),
+            FieldSchema.builder()
+              .setLabel("script")
+              .setType("text")
+              .setTip("path to script")
+              .build(),
             "data",
-            new FieldSchema("script arguments", "text", "args", ImmutableSet.<String>of("opt1", "opt2"), null, false)
+            FieldSchema.builder()
+              .setLabel("script arguments")
+              .setType("text")
+              .setTip("args")
+              .setOptions(ImmutableSet.<String>of("opt1", "opt2"))
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("script")
@@ -140,9 +190,18 @@ public class Entities {
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
             "recipe",
-            new FieldSchema("chef recipe", "text", "recipe name", null, null, false),
+            FieldSchema.builder()
+              .setLabel("chef recipe")
+              .setType("text")
+              .setTip("recipe name")
+              .build(),
             "args",
-            new FieldSchema("chef arguments", "text", "args", ImmutableSet.<String>of("opt1", "opt2"), null, false)
+            FieldSchema.builder()
+              .setLabel("chef arguments")
+              .setType("text")
+              .setTip("args")
+              .setOptions(ImmutableSet.<String>of("opt1", "opt2"))
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("recipe")
@@ -160,9 +219,18 @@ public class Entities {
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
             "manifest",
-            new FieldSchema("puppet manifest", "text", "manifest name", null, null, false),
+            FieldSchema.builder()
+              .setLabel("puppet manifest")
+              .setType("text")
+              .setTip("manifest name")
+              .build(),
             "args",
-            new FieldSchema("puppet arguments", "text", "args", ImmutableSet.<String>of("opt1", "opt2"), null, false)
+            FieldSchema.builder()
+              .setLabel("puppet arguments")
+              .setType("text")
+              .setTip("args")
+              .setOptions(ImmutableSet.<String>of("opt1", "opt2"))
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("manifest")
@@ -440,14 +508,21 @@ public class Entities {
     private static String node2 = "node2";
     private static String clusterId = "2";
     public static Cluster createCluster() {
-      return new Cluster(clusterId, USER_ACCOUNT, "name", 1234567890, "description",
-                         ProviderExample.RACKSPACE, ClusterTemplateExample.HDFS,
-                         ImmutableSet.of(node1, node2),
-                         ImmutableSet.of(
-                           ServiceExample.NAMENODE.getName(),
-                           ServiceExample.DATANODE.getName(),
-                           ServiceExample.HOSTS.getName()
-                         ));
+      return Cluster.builder()
+        .setID(clusterId)
+        .setAccount(USER_ACCOUNT)
+        .setName("name")
+        .setDescription("description")
+        .setCreateTime(1234567890)
+        .setProvider(ProviderExample.RACKSPACE)
+        .setClusterTemplate(ClusterTemplateExample.HDFS)
+        .setNodes(ImmutableSet.of(node1, node2))
+        .setServices(ImmutableSet.of(
+          ServiceExample.NAMENODE.getName(),
+          ServiceExample.DATANODE.getName(),
+          ServiceExample.HOSTS.getName()
+        ))
+        .build();
     }
     public static Node NODE1 =
       new Node(node1,

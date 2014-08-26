@@ -74,36 +74,24 @@ public final class Cluster extends NamedEntity {
   private Status status;
   private JsonObject config;
 
-  public Cluster(String id, Account account, String name, long createTime,
-                 long expireTime, String description, Provider provider,
-                 ClusterTemplate clusterTemplate, Set<String> nodes,
-                 Set<String> services, JsonObject config, Cluster.Status status, String latestJobId) {
+  private Cluster(String id, Account account, String name, Long createTime,
+                  Long expireTime, String description, Provider provider,
+                  ClusterTemplate clusterTemplate, Set<String> nodes,
+                  Set<String> services, JsonObject config, Cluster.Status status, String latestJobId) {
     super(name);
-    Preconditions.checkArgument(account != null, "account must not be null");
+    Preconditions.checkArgument(account != null, "cluster account must be specified.");
     this.id = id;
     this.account = account;
     this.description = description;
-    this.createTime = createTime;
-    this.expireTime = expireTime;
+    this.createTime = createTime == null ? System.currentTimeMillis() : createTime;
+    this.expireTime = expireTime == null ? 0 : expireTime;
     this.provider = provider;
     this.clusterTemplate = clusterTemplate;
-    this.nodes = nodes;
-    this.services = Sets.newHashSet(services);
+    this.nodes = nodes == null ? Sets.<String>newHashSet() : Sets.newHashSet(nodes);
+    this.services = services == null ? Sets.<String>newHashSet() : Sets.newHashSet(services);
     this.latestJobId = latestJobId;
-    this.status = status;
-    this.config = config;
-  }
-
-  public Cluster(String id, Account account, String name, long createTime, String description, Provider provider,
-                 ClusterTemplate clusterTemplate, Set<String> nodes, Set<String> services, JsonObject config) {
-    this(id, account, name, createTime, 0, description, provider,
-         clusterTemplate, nodes, services, config, Status.PENDING, null);
-  }
-
-  public Cluster(String id, Account account, String name, long createTime, String description, Provider provider,
-                 ClusterTemplate clusterTemplate, Set<String> nodes, Set<String> services) {
-    this(id, account, name, createTime, description, provider, clusterTemplate,
-         nodes, services, new JsonObject());
+    this.status = status == null ? Status.PENDING : status;
+    this.config = config == null ? new JsonObject() : config;
   }
 
   /**
@@ -297,6 +285,104 @@ public final class Cluster extends NamedEntity {
    */
   public void setConfig(JsonObject config) {
     this.config = config;
+  }
+
+  /**
+   * Get a builder for creating a cluster object.
+   *
+   * @return Builder for creating a cluster object.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builds a cluster object.
+   */
+  public static class Builder {
+    private String name;
+    private String id;
+    private String description;
+    private long createTime;
+    private long expireTime;
+    private Provider provider;
+    private ClusterTemplate clusterTemplate;
+    private Set<String> nodes;
+    private Set<String> services;
+    private String latestJobId;
+    private Account account;
+    private Status status;
+    private JsonObject config;
+
+    public Builder setName(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder setID(String id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder setDescription(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public Builder setCreateTime(long createTime) {
+      this.createTime = createTime;
+      return this;
+    }
+
+    public Builder setExpireTime(long expireTime) {
+      this.expireTime = expireTime;
+      return this;
+    }
+
+    public Builder setProvider(Provider provider) {
+      this.provider = provider;
+      return this;
+    }
+
+    public Builder setClusterTemplate(ClusterTemplate clusterTemplate) {
+      this.clusterTemplate = clusterTemplate;
+      return this;
+    }
+
+    public Builder setNodes(Set<String> nodes) {
+      this.nodes = nodes;
+      return this;
+    }
+
+    public Builder setServices(Set<String> services) {
+      this.services = services;
+      return this;
+    }
+
+    public Builder setLatestJobID(String latestJobID) {
+      this.latestJobId = latestJobID;
+      return this;
+    }
+
+    public Builder setAccount(Account account) {
+      this.account = account;
+      return this;
+    }
+
+    public Builder setStatus(Status status) {
+      this.status = status;
+      return this;
+    }
+
+    public Builder setConfig(JsonObject config) {
+      this.config = config;
+      return this;
+    }
+
+    public Cluster build() {
+      return new Cluster(id, account, name, createTime, expireTime, description, provider, clusterTemplate,
+                         nodes, services, config, status, latestJobId);
+    }
   }
 
   @Override

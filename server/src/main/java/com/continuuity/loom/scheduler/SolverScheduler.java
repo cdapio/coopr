@@ -24,7 +24,7 @@ import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.http.request.AddServicesRequest;
-import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.layout.Solver;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.task.ClusterJob;
@@ -47,7 +47,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
- * Polls a queue which contains {@link com.continuuity.loom.layout.ClusterCreateRequest} and a cluster id, and
+ * Polls a queue which contains {@link com.continuuity.loom.http.request.ClusterCreateRequest} and a cluster id, and
  * runs the solver to determine what the cluster layout should be for the specified cluster and cluster request.
  * If the solver fails to find a valid solution, statuses are updated accordingly. If the solver finds a valid solution,
  * the cluster is sent on to the {@link ClusterScheduler} by writing to a queue that the cluster scheduler reads.

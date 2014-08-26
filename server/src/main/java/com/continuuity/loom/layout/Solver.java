@@ -18,6 +18,7 @@ package com.continuuity.loom.layout;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.layout.change.ClusterLayoutChange;
 import com.continuuity.loom.layout.change.ClusterLayoutTracker;
 import com.continuuity.loom.scheduler.task.NodeService;
@@ -112,7 +113,7 @@ public class Solver {
   }
 
   /**
-   * Given a {@link Cluster} and {@link ClusterCreateRequest}, return a mapping of node id to {@link Node} describing
+   * Given a {@link Cluster} and {@link com.continuuity.loom.http.request.ClusterCreateRequest}, return a mapping of node id to {@link Node} describing
    * how the cluster should be laid out. If multiple possible cluster layouts are possible, one will be chosen
    * deterministically.
    *

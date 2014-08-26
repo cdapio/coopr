@@ -15,9 +15,8 @@
  */
 package com.continuuity.loom.http;
 
+import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
-import com.continuuity.loom.spec.ProvisionerAction;
-import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
@@ -29,8 +28,14 @@ import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.SchedulableTask;
+import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
+import com.continuuity.loom.scheduler.task.TaskServiceAction;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
@@ -61,7 +66,16 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);
-    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(clusterTask)));
+    TaskConfig taskConfig = new TaskConfig(
+      NodeProperties.builder().build(),
+      Entities.ProviderExample.JOYENT,
+      ImmutableMap.<String, NodeProperties>of(),
+      new TaskServiceAction("svcA", new ServiceAction("shell", ImmutableMap.<String, String>of())),
+      new JsonObject(),
+      new JsonObject()
+    );
+    SchedulableTask schedulableTask= new SchedulableTask(clusterTask, taskConfig);
+    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(schedulableTask)));
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, TENANT_ID);
     HttpResponse response = doPost("/v1/loom/tasks/take", gson.toJson(takeRequest));
@@ -97,7 +111,16 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);
 
-    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(clusterTask)));
+    TaskConfig taskConfig = new TaskConfig(
+      node.getProperties(),
+      Entities.ProviderExample.JOYENT,
+      ImmutableMap.<String, NodeProperties>of(node.getId(), node.getProperties()),
+      new TaskServiceAction("svcA", new ServiceAction("shell", ImmutableMap.<String, String>of())),
+      new JsonObject(),
+      new JsonObject()
+    );
+    SchedulableTask schedulableTask= new SchedulableTask(clusterTask, taskConfig);
+    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(schedulableTask)));
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, tenantId);
     SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
@@ -131,8 +154,11 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
                          NodeProperties.builder().setHostname("host").build());
     clusterStore.writeNode(node);
 
-    Cluster cluster = new Cluster("1", USER1_ACCOUNT, "cluster1" , System.currentTimeMillis(), "", null, null,
-                                  ImmutableSet.<String>of(), ImmutableSet.<String>of());
+    Cluster cluster = Cluster.builder()
+      .setID("1")
+      .setAccount(USER1_ACCOUNT)
+      .setName("cluster1")
+      .build();
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
 
     ClusterTask clusterTask = new ClusterTask(
@@ -140,7 +166,16 @@ public class LoomTaskHandlerTest extends LoomServiceTestBase {
     clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);
-    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(clusterTask)));
+    TaskConfig taskConfig = new TaskConfig(
+      node.getProperties(),
+      Entities.ProviderExample.JOYENT,
+      ImmutableMap.<String, NodeProperties>of(node.getId(), node.getProperties()),
+      new TaskServiceAction("svcA", new ServiceAction("shell", ImmutableMap.<String, String>of())),
+      new JsonObject(),
+      new JsonObject()
+    );
+    SchedulableTask schedulableTask= new SchedulableTask(clusterTask, taskConfig);
+    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(schedulableTask)));
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, tenantId);
     SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);

@@ -32,8 +32,8 @@ public class FieldSchema {
   private final String defaultValue;
   private final boolean override;
 
-  public FieldSchema(String label, String type, String tip, Set<String> options, String defaultValue,
-                     Boolean override) {
+  private FieldSchema(String label, String type, String tip, Set<String> options, String defaultValue,
+                      Boolean override) {
     Preconditions.checkArgument(type != null, "Field type must be specified.");
     Preconditions.checkArgument(label != null && !label.isEmpty(), "Field label must be specified.");
     this.type = type;
@@ -96,6 +96,62 @@ public class FieldSchema {
    */
   public boolean getOverride() {
     return override;
+  }
+
+  /**
+   * Get a builder for creating a field schema.
+   *
+   * @return Builder for creating a field schema.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builds a {@link FieldSchema}. Used so that optional fields don't have to be sent to a constructor and so that its
+   * clear what fields are being set.
+   */
+  public static class Builder {
+    private String label;
+    private String type;
+    private String tip;
+    private Set<String> options;
+    private String defaultValue;
+    private Boolean override;
+
+    public Builder setLabel(String label) {
+      this.label = label;
+      return this;
+    }
+
+    public Builder setType(String type) {
+      this.type = type;
+      return this;
+    }
+
+    public Builder setTip(String tip) {
+      this.tip = tip;
+      return this;
+    }
+
+    public Builder setOptions(Set<String> options) {
+      this.options = options;
+      return this;
+    }
+
+    public Builder setDefaultValue(String defaultValue) {
+      this.defaultValue = defaultValue;
+      return this;
+    }
+
+    public Builder setOverride(Boolean override) {
+      this.override = override;
+      return this;
+    }
+
+    public FieldSchema build() {
+      return new FieldSchema(label, type, tip, options, defaultValue, override);
+    }
   }
 
   @Override

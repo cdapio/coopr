@@ -36,7 +36,7 @@ import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.request.BootstrapRequest;
-import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceStatus;
@@ -207,17 +207,27 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testGetAllStatusesFunction() throws Exception {
+    entityStoreService.getView(ADMIN_ACCOUNT).writeClusterTemplate(smallTemplate);
+    entityStoreService.getView(ADMIN_ACCOUNT).writeProvider(Entities.ProviderExample.RACKSPACE);
+    entityStoreService.getView(SUPERADMIN_ACCOUNT).writeProviderType(Entities.ProviderTypeExample.RACKSPACE);
+
     // create the clusters
-    ClusterCreateRequest clusterCreateRequest = LoomClusterHandlerTest.createClusterRequest("cluster1", "my 1st cluster",
-                                                                                            smallTemplate.getName(), 5);
+    ClusterCreateRequest clusterCreateRequest = ClusterCreateRequest.builder()
+      .setName("cluster1")
+      .setClusterTemplateName(smallTemplate.getName())
+      .setNumMachines(5)
+      .build();
     HttpResponse creationResponse = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(creationResponse, HttpResponseStatus.OK);
     String cluster1Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
     LoomClusterHandlerTest.assertStatus(cluster1Id, Cluster.Status.PENDING, "NOT_SUBMITTED",
                                         ClusterAction.SOLVE_LAYOUT, 0, 0, USER1_HEADERS);
 
-    clusterCreateRequest = LoomClusterHandlerTest.createClusterRequest("cluster2", "my 2nd cluster",
-                                                                 smallTemplate.getName(), 6);
+    clusterCreateRequest = ClusterCreateRequest.builder()
+      .setName("cluster2")
+      .setClusterTemplateName(smallTemplate.getName())
+      .setNumMachines(6)
+      .build();
 
     creationResponse = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS);
     assertResponseStatus(creationResponse, HttpResponseStatus.OK);
@@ -225,8 +235,11 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     LoomClusterHandlerTest.assertStatus(cluster2Id, Cluster.Status.PENDING, "NOT_SUBMITTED",
                                         ClusterAction.SOLVE_LAYOUT, 0, 0, USER1_HEADERS);
 
-    clusterCreateRequest = LoomClusterHandlerTest.createClusterRequest("cluster3", "my 3rd cluster",
-                                                                 smallTemplate.getName(), 6);
+    clusterCreateRequest = ClusterCreateRequest.builder()
+      .setName("cluster3")
+      .setClusterTemplateName(smallTemplate.getName())
+      .setNumMachines(6)
+      .build();
 
     creationResponse = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER2_HEADERS);
     assertResponseStatus(creationResponse, HttpResponseStatus.OK);
@@ -328,10 +341,15 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
                            NodeProperties.builder()
                              .setHostname("testcluster-1-1003.local")
                              .addIPAddress("access_v4", "123.456.0.4").build());
-    Cluster cluster = new Cluster("123", USER1_ACCOUNT, "testcluster", System.currentTimeMillis(), "description",
-                                  Entities.ProviderExample.RACKSPACE, smallTemplate,
-                                  ImmutableSet.of(nodeA.getId(), nodeAB.getId(), nodeABC.getId(), nodeBC.getId()),
-                                  ImmutableSet.of(svcA.getName(), svcB.getName(), svcC.getName()));
+    Cluster cluster = Cluster.builder()
+      .setID("123")
+      .setAccount(USER1_ACCOUNT)
+      .setName("testcluster")
+      .setProvider(Entities.ProviderExample.RACKSPACE)
+      .setClusterTemplate(smallTemplate)
+      .setNodes(ImmutableSet.of(nodeA.getId(), nodeAB.getId(), nodeABC.getId(), nodeBC.getId()))
+      .setServices(ImmutableSet.of(svcA.getName(), svcB.getName(), svcC.getName()))
+      .build();
     clusterStoreService.getView(USER1_ACCOUNT).writeCluster(cluster);
     clusterStore.writeNode(nodeA);
     clusterStore.writeNode(nodeAB);

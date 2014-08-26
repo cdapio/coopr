@@ -42,13 +42,15 @@ public class TenantProvisionerServiceTest extends BaseTest {
 
     // write a cluster with 2 nodes, quotas should be fine
     Account account = new Account("user1", tenant.getId());
-    Cluster cluster = new Cluster(
-      "104", account, "example-hdfs-delete", System.currentTimeMillis(), "hdfs cluster",
-      Entities.ProviderExample.RACKSPACE,
-      Entities.ClusterTemplateExample.HDFS,
-      ImmutableSet.of("node1", "node2"),
-      ImmutableSet.of("s1", "s2")
-    );
+    Cluster cluster = Cluster.builder()
+      .setID("104")
+      .setAccount(account)
+      .setName("example-hdfs-delete")
+      .setProvider(Entities.ProviderExample.RACKSPACE)
+      .setClusterTemplate(Entities.ClusterTemplateExample.HDFS)
+      .setNodes(ImmutableSet.of("node1", "node2"))
+      .setServices(ImmutableSet.of("s1", "s2"))
+      .build();
     clusterStoreService.getView(account).writeCluster(cluster);
 
     // quotas should be fine with 1 more cluster

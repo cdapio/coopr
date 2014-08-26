@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.layout;
+package com.continuuity.loom.http.request;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -174,6 +174,97 @@ public class ClusterCreateRequest {
    */
   public JsonObject getConfig() {
     return config;
+  }  /**
+   * Get a builder for creating cluster create requests.
+   *
+   * @return Builder for creating cluster create requests.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for creating cluster create requests.
+   */
+  public static class Builder {
+    private String name;
+    private String description;
+    private String clusterTemplateName;
+    private Integer numMachines;
+    private String providerName;
+    private Set<String> serviceNames;
+    private String hardwareTypeName;
+    private String imageTypeName;
+    private Long initialLeaseDuration;
+    private String dnsSuffix;
+    private JsonObject config;
+    private Map<String, String> providerFields;
+
+    public Builder setName(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder setDescription(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public Builder setClusterTemplateName(String clusterTemplateName) {
+      this.clusterTemplateName = clusterTemplateName;
+      return this;
+    }
+
+    public Builder setNumMachines(Integer numMachines) {
+      this.numMachines = numMachines;
+      return this;
+    }
+
+    public Builder setProviderName(String providerName) {
+      this.providerName = providerName;
+      return this;
+    }
+
+    public Builder setServiceNames(Set<String> serviceNames) {
+      this.serviceNames = serviceNames;
+      return this;
+    }
+
+    public Builder setHardwareTypeName(String hardwareTypeName) {
+      this.hardwareTypeName = hardwareTypeName;
+      return this;
+    }
+
+    public Builder setImageTypeName(String imageTypeName) {
+      this.imageTypeName = imageTypeName;
+      return this;
+    }
+
+    public Builder setInitialLeaseDuration(Long initialLeaseDuration) {
+      this.initialLeaseDuration = initialLeaseDuration;
+      return this;
+    }
+
+    public Builder setDNSSuffix(String dnsSuffix) {
+      this.dnsSuffix = dnsSuffix;
+      return this;
+    }
+
+    public Builder setConfig(JsonObject config) {
+      this.config = config;
+      return this;
+    }
+
+    public Builder setProviderFields(Map<String, String> providerFields) {
+      this.providerFields = providerFields;
+      return this;
+    }
+
+    public ClusterCreateRequest build() {
+      return new ClusterCreateRequest(name, description, clusterTemplateName, numMachines, providerName,
+                                      providerFields, serviceNames, hardwareTypeName, imageTypeName,
+                                      initialLeaseDuration, dnsSuffix, config);
+    }
   }
 
   @Override
@@ -187,6 +278,7 @@ public class ClusterCreateRequest {
       Objects.equal(clusterTemplate, other.clusterTemplate) &&
       Objects.equal(numMachines, other.numMachines) &&
       Objects.equal(provider, other.provider) &&
+      Objects.equal(providerFields, other.providerFields) &&
       Objects.equal(services, other.services) &&
       Objects.equal(hardwaretype, other.hardwaretype) &&
       Objects.equal(imagetype, other.imagetype) &&
@@ -197,7 +289,7 @@ public class ClusterCreateRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, clusterTemplate, numMachines, provider, services,
+    return Objects.hashCode(name, description, clusterTemplate, numMachines, provider, providerFields, services,
                             hardwaretype, imagetype, initialLeaseDuration, dnsSuffix, config);
   }
 
@@ -209,6 +301,7 @@ public class ClusterCreateRequest {
       .add("clusterTemplate", clusterTemplate)
       .add("numMachines", numMachines)
       .add("provider", provider)
+      .add("providerFields", providerFields)
       .add("services", services)
       .add("hardwareType", hardwaretype)
       .add("imageType", imagetype)
