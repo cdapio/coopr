@@ -5,7 +5,7 @@
 </div>
 <div class="modal-body">
     <div class="row" ng-repeat="(propertyName, propertyValue) in item">
-      <div class="col-md-4">[{propertyName | camelCase | titleCase }]</div>
+      <div class="col-md-4">[{propertyName | uncamel | capitalize}]</div>
       <div class="col-md-8">[{propertyValue}]</div>
     </div>
 </div>

@@ -25,7 +25,8 @@ var express = require('express'),
     request = require('request'),
     async = require('async'),
     argv = require('optimist').argv,
-    nock = require('nock');
+    nock = require('nock'),
+    extend = require('util')._extend;
 
 /**
  * Set environment vars.
@@ -55,6 +56,13 @@ var ADMINS = {
     password: 'admin'
   }
 };
+var USERS = {
+  'read': {
+    username: 'read',
+    password: 'readonly'
+  }
+};
+
 var DEFAULT_API_KEY = '123456789abcdef';
 
 /*
@@ -116,7 +124,7 @@ site.AVAILABLE_SKINS = ['dark', 'light'];
 site.DEFAULT_SKIN = 'dark';
 site.skins = {};
 
-fs.readFile("server.conf.json", "utf8", function(err, data) {
+fs.readFile("server.json", "utf8", function(err, data) {
   if (err) {
     throw err;
   }
@@ -124,8 +132,18 @@ fs.readFile("server.conf.json", "utf8", function(err, data) {
   site.conf = JSON.parse(data);
 });
 
-var DEFAULT_NODE_TABLE_COLUMNS = [
-];
+fs.exists("server-site.json", function(exists) {
+  if (exists) {
+
+    fs.readFile("server-site.json", "utf8", function(err, data) {
+      if (err) {
+        throw err;
+      }
+
+      site.conf = extend(site.conf, JSON.parse(data));
+    });
+  }
+});
 
 /**
  * Configure static files server.
@@ -211,7 +229,7 @@ site.getEntity = function (path, user) {
     request(options, function (err, response, body) {
       if (err) {
         callback('Error: ' + JSON.stringify(err));
-        return "";
+        return;
       } else {
         if (body) {
           try {
@@ -222,10 +240,10 @@ site.getEntity = function (path, user) {
         } else {
           callback(null, []);
         }
-        return "";
+        return;
       }
     });
-  };
+  }
 };
 
 /**
@@ -250,7 +268,7 @@ site.sendRequestAndHandleResponse = function (options, user, res) {
  */
 site.getGenericResponseHandler = function (res, method) {
   return function (err, response, body) {
-    if (!err && response.statusCode === 200) {
+    if (!err && response.statusCode == 200) {
       if (method === 'GET') {
         res.send(body);
       } else {
@@ -264,7 +282,7 @@ site.getGenericResponseHandler = function (res, method) {
       respMessage += ' ' + body;
       res.send(respMessage);
     }
-  };
+  }
 };
 
 /**
@@ -290,12 +308,12 @@ site.checkAuth = function (req, res, admin, tenant) {
   var authenticated = site.COOKIE_NAME in req.cookies;
   if (!authenticated) {
     res.redirect('/login');
-    return false;
+    return;
   }
   var auth = req.cookies[site.COOKIE_NAME];
   if (!auth.user || (tenant && tenant!==auth.tenant) ) {
     res.redirect('/login');
-    return false;
+    return;
   }
   var userid = auth.user;
   if (admin) {
@@ -318,13 +336,11 @@ site.checkAuth = function (req, res, admin, tenant) {
  */
 site.determinePermissionLevel = function (username, password) {
   var permissionLevel = 'user';
-  for (var item in ADMINS) {
+  for (item in ADMINS) {
     if (username === item) {
-      if (ADMINS.hasOwnProperty(item)) {
-        if (ADMINS[item].password === password) {
-          permissionLevel = 'admin';
-          return permissionLevel;
-        }
+      if (ADMINS[item].password === password) {
+        permissionLevel = 'admin';
+        return permissionLevel;
       }
     }
   }
@@ -348,7 +364,7 @@ site.formatDate = function (timestamp) {
  */
 site.parseClusterData = function (clusters) {
   var activeClusters = 0, deletedClusters = 0;
-  var parsedClusters = clusters.map(function (cluster) {
+  var clusters = clusters.map(function (cluster) {
     if (cluster.createTime) {
       cluster.createTime = site.formatDate(cluster.createTime);
     }
@@ -362,7 +378,7 @@ site.parseClusterData = function (clusters) {
   return {
     activeClusters: activeClusters,
     deletedClusters: deletedClusters,
-    clusters: parsedClusters
+    clusters: clusters
   };
 };
 
@@ -372,11 +388,7 @@ site.parseNodeData = function(nodeData) {
     if (node.createTime) {
       node.createTime = site.formatDate(node.createTime);
     }
-//    if (node.status !== 'TERMINATED') {
-      activeNodes++;
-//    } else {
-//      deletedNodes++;
-//    }
+    activeNodes++;
     return node;
   });
   return {
@@ -409,7 +421,7 @@ site.app.get('/pipeApiCall', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + req.query.path,
-    method: 'GET'
+    method: 'GET',
 
   };
   res.setHeader('Content-type', 'application/json');
@@ -422,7 +434,7 @@ site.app.post('/import', function (req, res) {
     fs.readFile(req.files['import-file'].path, function (err, data) {
       async.parallel([
         site.getEntity('/clustertemplates', user),
-        site.getEntity('/clusters', user)
+        site.getEntity('/clusters', user),
       ], function (err, results) {
         var context = {
           authenticated: user,
@@ -467,8 +479,8 @@ site.app.post('/import', function (req, res) {
             },
             json: config
           };
-          request(options, function (err, response) {
-            if (!err && response.statusCode === 200) {
+          request(options, function (err, response, body) {
+            if (!err && response.statusCode == 200) {
               res.redirect('/');
             } else {
               context.err = "Request could not be processed.";
@@ -496,7 +508,7 @@ site.app.get('/export', function (req, res) {
     }
   };
   request(options, function (err, response, body) {
-    if (!err && response.statusCode === 200) {
+    if (!err && response.statusCode == 200) {
       res.setHeader('Content-disposition', 'attachment; filename=export.json');
       res.setHeader('Content-type', 'application/json');
       res.charset = 'UTF-8';
@@ -512,7 +524,7 @@ site.app.get('/', function (req, res) {
   var user = site.checkAuth(req, res, true);
   async.parallel([
     site.getEntity('/clustertemplates', user),
-    site.getEntity('/clusters', user)
+    site.getEntity('/clusters', user),
   ], function (err, results) {
     var context = {
       authenticated: user,
@@ -557,18 +569,16 @@ site.app.get('/profile', function (req, res) {
 site.app.post('/setskin', function (req, res) {
   var user = site.checkAuth(req, res, false);
   var myCookie = {};
-  for (var item in req.cookies) {
+  for (item in req.cookies) {
     if (item === site.COOKIE_NAME) {
-      if (req.cookies.hasOwnProperty(item)) {
-        myCookie = req.cookies[item];
-      }
+      myCookie = req.cookies[item];
     }
   }
   var packageBody = {
     id: user,
     skin: req.body.skin,
     mods: {}
-  };
+  }
   var options = {
     uri: BOX_ADDR + '/profiles/' + user,
     method: 'PUT',
@@ -991,7 +1001,7 @@ site.app.get('/providers', function (req, res) {
     } else {
       var providers = site.verifyData(results[0]);
       for (var i = 0; i < providers.length; i++) {
-        providers[i].provisioner.auth = JSON.stringify(providers[i].provisioner.auth);
+        providers[i].provisioner.auth = JSON.stringify(providers[i].provisioner.auth)
       }
       context.providers = providers;
     }
@@ -1147,7 +1157,7 @@ site.app.get('/services/service/:id', function (req, res) {
   var user = site.checkAuth(req, res, true);
   var serviceId = req.params.id;
   async.parallel([
-    site.getEntity('/services', user)
+    site.getEntity('/services', user),
   ], function (err, results) {
     res.render('services/createservice.html', {
       services: results[0],
@@ -1163,7 +1173,7 @@ site.app.get('/services/service/:id', function (req, res) {
 site.app.get('/admin/clusters', function (req, res) {
   var user = site.checkAuth(req, res, true);
   async.parallel([
-    site.getEntity('/clusters', user)
+    site.getEntity('/clusters', user),
   ], function (err, results) {
     var context = {
       activeTab: 'clusters',
@@ -1175,9 +1185,9 @@ site.app.get('/admin/clusters', function (req, res) {
       context.err = err;
     } else {
       var clusterData = site.parseClusterData(results[0]);
-      context.activeClusters = clusterData.activeClusters;
-      context.deletedClusters = clusterData.deletedClusters;
-      context.clusters = clusterData.clusters;
+      context.activeClusters = clusterData['activeClusters'];
+      context.deletedClusters = clusterData['deletedClusters'];
+      context.clusters = clusterData['clusters'];
     }
     res.render('clusters/clusters.html', context);
   });
@@ -1190,7 +1200,7 @@ site.app.get('/user', function (req, res) {
 site.app.get('/user/clusters', function (req, res) {
   var user = site.checkAuth(req, res);
   async.parallel([
-    site.getEntity('/clusters', user)
+    site.getEntity('/clusters', user),
   ], function (err, results) {
     var context = {
       activeTab: 'clusters',
@@ -1202,9 +1212,9 @@ site.app.get('/user/clusters', function (req, res) {
       context.err = err;
     } else {
       var clusterData = site.parseClusterData(results[0]);
-      context.activeClusters = clusterData.activeClusters;
-      context.deletedClusters = clusterData.deletedClusters;
-      context.clusters = clusterData.clusters;
+      context.activeClusters = clusterData['activeClusters'];
+      context.deletedClusters = clusterData['deletedClusters'];
+      context.clusters = clusterData['clusters'];
     }
     res.render('user/clusters/clusters.html', context);
   });
@@ -1214,7 +1224,7 @@ site.app.get('/user/clusters/cluster/:id', function (req, res) {
   var user = site.checkAuth(req, res);
   var clusterId = req.params.id;
   async.parallel([
-    site.getEntity('/clusters', user)
+    site.getEntity('/clusters', user),
   ], function (err, results) {
     var context = {
       activeTab: 'clusters',
@@ -1400,7 +1410,7 @@ site.app.get('/nodes/columns', function(req, res) {
 });
 
 site.app.get('/user/nodes', function(req, res) {
-  var user = site.checkAuth(req, res, true);
+  var user = site.checkAuth(req, res);
   async.parallel([
     site.getEntity('/nodes', user) ], function(err, results) {
     var context = {
@@ -1464,10 +1474,16 @@ site.app.post('/login', function (req, res) {
   }
   var user = req.body.username;
   var password = req.body.password;
-  if (user === 'admin' && password !== ADMINS.admin.password) {
+  if (user === 'admin' && password != ADMINS.admin.password) {
     res.redirect('/login');
     return;
   }
+
+  if (user === 'readonly' && password !== USERS.read.password) {
+    res.redirect('/login');
+    return;
+  }
+
   var selectedSkin = site.DEFAULT_SKIN;
   var tenant = req.body.tenant;
   var options = {
@@ -1494,7 +1510,7 @@ site.app.post('/login', function (req, res) {
         permission: permissionLevel,
         skin: selectedSkin
       });
-
+      var authenticated = true;
       if (permissionLevel === 'admin') {
         res.redirect('/');
       } else {
@@ -1526,7 +1542,7 @@ site.app.get('/error', function (req, res) {
 site.app.get('/*', function(req, res) {
 
   var page = req.originalUrl.slice(1).split('?')[0];
-  page = page.substr(-1) === '/' ? page.substr(0, page.length - 1) : page;
+  page = page.substr(-1) == '/' ? page.substr(0, page.length - 1) : page;
   res.status(404);
 
   // respond with html page

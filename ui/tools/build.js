@@ -16,6 +16,7 @@
 {
     appDir: '../client',
     baseUrl: '.',
-    paths: { },
+    paths: {
+    },
     dir: '../client-built'
 }

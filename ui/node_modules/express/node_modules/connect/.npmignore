@@ -1,4 +1,12 @@
-coverage/
+*.markdown
+*.md
+.git*
+Makefile
+benchmarks/
 docs/
+examples/
+install.sh
+support/
 test/
-.travis.yml
+.DS_Store
+coverage.html

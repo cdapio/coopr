@@ -274,7 +274,7 @@ public class TaskQueueService {
         if (clusterTask.getStatus() == ClusterTask.Status.COMPLETE) {
           Map<String, String> ipAddresses = finish.getIpaddresses();
           if (ipAddresses != null) {
-            node.getProperties().setIpAddresses(ipAddresses);
+            node.getProperties().setIpaddresses(ipAddresses);
           }
           String hostname = finish.getHostname();
           if (hostname != null && !hostname.isEmpty()) {

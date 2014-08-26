@@ -45,11 +45,11 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
     jsonObj.add("service", context.serialize(taskConfig.getTaskServiceAction(), TaskServiceAction.class));
     jsonObj.addProperty("hostname", taskConfig.getNodeProperties().getHostname());
     jsonObj.add("ipaddresses", context.serialize(taskConfig.getNodeProperties().getIPAddresses()));
-    jsonObj.addProperty("nodenum", taskConfig.getNodeProperties().getNodeNum());
+    jsonObj.addProperty("nodenum", taskConfig.getNodeProperties().getNodenum());
     jsonObj.addProperty("sshuser", taskConfig.getNodeProperties().getSshUser());
     // these should be changed to be the full object instead of the name
-    jsonObj.add("hardwaretype", context.serialize(taskConfig.getNodeProperties().getHardwareType(), String.class));
-    jsonObj.add("imagetype", context.serialize(taskConfig.getNodeProperties().getImageType(), String.class));
+    jsonObj.add("hardwaretype", context.serialize(taskConfig.getNodeProperties().getHardwaretype(), String.class));
+    jsonObj.add("imagetype", context.serialize(taskConfig.getNodeProperties().getImagetype(), String.class));
     // these should go away once the full hardwaretype/imagetype is included
     jsonObj.addProperty("flavor", taskConfig.getNodeProperties().getFlavor());
     jsonObj.addProperty("image", taskConfig.getNodeProperties().getImage());

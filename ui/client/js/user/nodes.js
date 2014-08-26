@@ -16,7 +16,7 @@
 
 var NodeView = {};
 
-NodeView.app = angular.module("nodeview", ["ui.bootstrap", "ngTable", "ngSanitize", "CaseFilter"], ['$interpolateProvider', function($interpolateProvider) {
+NodeView.app = angular.module("nodeview", ["ui.bootstrap", "ngTable", "ngSanitize"], ['$interpolateProvider', function($interpolateProvider) {
   $interpolateProvider.startSymbol('[{');
   $interpolateProvider.endSymbol('}]');
 }]);
@@ -49,7 +49,7 @@ function createColumns(rows, filterVisible, defaultColumns) {
       });
       var column = {
         id: i++,
-        title: Case.title(Case.camel(property)),
+        title: property,
         field: property,
         visible: columnVisibility,
         filterVisible: filterVisible
@@ -201,6 +201,22 @@ function createCheckboxes($scope) {
     angular.element(document.getElementById("select_all")).prop("indeterminate", (checked != 0 && unchecked != 0));
   }, true);
 }
+
+NodeView.app.filter('capitalize', function() {
+  return function(input) {
+    return (!!input) ? input.replace(/([^\W_]+[^\s-]*) */g, function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }) : '';
+  };
+});
+
+NodeView.app.filter('uncamel', function() {
+  return function(input) {
+    return input.replace(/([A-Z])/g, function($1) {
+      return " " + $1.toLowerCase();
+    });
+  };
+});
 
 NodeView.app.filter('regex', function() {
   return function(input, field, $scope) {

@@ -146,5 +146,7 @@ public class Constants {
   public static final String API_KEY_HEADER = "X-Loom-ApiKey";
   public static final String TENANT_HEADER = "X-Loom-TenantID";
   public static final String SUPERADMIN_TENANT = "superadmin";
+  public static final String READONLY_TENANT = "readonly";
+  public static final String READONLY_USER = "read";
   public static final String ADMIN_USER = "admin";
 }

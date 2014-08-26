@@ -1,26 +1,15 @@
 <div ng-controller="NodeViewCtrl">
-  <!--<label class="checkbox" ng-repeat="column in columns">-->
-  <!--<input type="checkbox" ng-click="toggleColumn(column)" ng-model="column.visible"/> [{column.title}]-->
-  <!--</label>-->
-
   <div class="row">
     <div class="col-md-2">
       <input id=inputGlobalSearch" type="text" class="form-control" placeholder="Search" ng-model="inputGlobalSearch" ng-show="!globalFilterVisibleState"/>
       Filtered: [{totalShowingRows}] / [{rows.length}]
     </div>
-    <!--<div class="col-md-2">-->
-      <!--<button id="btnToggleFilters" class="btn btn-default" ng-click="toggleFilters()">Toggle Filters</button>-->
-    <!--</div>-->
     <div class="col-md-2 pull-right">
       <select class="form-control" ng-model="selectedTopLevelFilter" ng-options="filterName for filterName in topLevelFilters">
-        <option value="">All [{topLevelFilterName|capitalCase}]s</option>
+        <option value="">All [{topLevelFilterName | uncamel | capitalize}]s</option>
       </select>
     </div>
   </div>
-
-  <!--<p><strong>Filter:</strong> [{tableParams.filter()|json}]-->
-
-  <!--<p><strong>Global Filter:</strong> [{inputGlobalSearch|json}]-->
   <table ng-table="tableParams" show-filter="false" class="table table-striped table-condensed ng-table-rowselected">
     <thead>
     <tr>
@@ -33,24 +22,10 @@
                     'sort-desc': tableParams.isSortBy(column.field, 'desc')
                   }"
           ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
-        <div>[{column.title}]</div>
+        <div>[{column.title | uncamel | capitalize}]</div>
       </th>
       <th></th>
     </tr>
-    <!--<tr class="ng-table-filters" ng-init="tableParams">-->
-      <!--<th></th>-->
-      <!--<th ng-repeat="column in columns" ng-show="column.filterVisible" class="filter">-->
-        <!--<div ng-repeat="(name, filter) in column.filter">-->
-          <!--<div ng-if="column.filterTemplateURL" ng-show="column.filterTemplateURL">-->
-            <!--<div ng-include="column.filterTemplateURL"></div>-->
-          <!--</div>-->
-          <!--<div ng-if="!column.filterTemplateURL" ng-show="!column.filterTemplateURL">-->
-            <!--<div ng-include="'ng-table/filters/' + filter + '.html'"></div>-->
-          <!--</div>-->
-        <!--</div>-->
-      <!--</th>-->
-      <!--<th></th>-->
-    <!--</tr>-->
     </thead>
     <tbody>
     <tr ng-repeat="row in $data"

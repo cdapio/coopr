@@ -27,6 +27,9 @@ public final class Tenant {
     new Tenant(Constants.SUPERADMIN_TENANT,
                new TenantSpecification(Constants.SUPERADMIN_TENANT,
                                        "super admin tenant", 0, Integer.MAX_VALUE, Integer.MAX_VALUE));
+  public static final Tenant DEFAULT_READONLY = new Tenant(Constants.READONLY_TENANT, new TenantSpecification(Constants.READONLY_TENANT, "read only tenant", 0, Integer.MAX_VALUE,
+                                                                                                                  Integer.MAX_VALUE)
+  );
   private final String id;
   private final TenantSpecification specification;
 

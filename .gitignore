@@ -18,14 +18,8 @@ target/
 Gemfile.lock
 .bundle/*
 
-# NodeJs
-ui/node_modules/
-
 # Bower
-ui/client/bower_components/
-
-# Local site config
-*-site.xml
+/ui/client/bower_components/
 
 # Coverage reports
 coverage
