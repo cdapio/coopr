@@ -113,7 +113,7 @@ public class Solver {
   }
 
   /**
-   * Given a {@link Cluster} and {@link com.continuuity.loom.http.request.ClusterCreateRequest}, return a mapping of node id to {@link Node} describing
+   * Given a {@link Cluster} and {@link ClusterCreateRequest}, return a mapping of node id to {@link Node} describing
    * how the cluster should be laid out. If multiple possible cluster layouts are possible, one will be chosen
    * deterministically.
    *
