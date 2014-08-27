@@ -139,6 +139,7 @@ The User Web service provides methods that can be used to create, delete and man
 Clusters
 ------------
   * :ref:`Create a Cluster <cluster-create>`
+  * :ref:`Get all Clusters <cluster-retrieve-all>`
   * :ref:`Get Cluster Details <cluster-details>`
   * :ref:`Delete a Cluster <cluster-delete>`
   * :ref:`Get Cluster Status <cluster-status>`
@@ -158,7 +159,7 @@ In addition to the standard REST endpoints, a few RPC functions are available to
 
 RPC
 ---
-  * :ref:`Getting Status of All Clusters <rpc-statuses>`
+  * :ref:`Bootstrapping a Tenant <rpc-bootstrap>`
   * :ref:`Getting Properties of Nodes in a Cluster <rpc-properties>`
 
 About REST (REpresentational State Transfer)

@@ -25,7 +25,6 @@ import com.google.common.io.Closeables;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
@@ -51,7 +50,7 @@ public final class DBQueryExecutor {
    * Queries the store for a set of items, deserializing the items and returning an immutable set of them. If no items
    * exist, the set will be empty. Statement passed in must be closed by the caller.
    *
-   * @param statement PreparedStatement of the query, ready for execution. Will be closed by this method.
+   * @param statement PreparedStatement of the query, ready for execution.
    * @param clazz Class of the items being queried.
    * @param <T> Type of the items being queried.
    * @return Immutable set of items queried for.
