@@ -10,33 +10,57 @@
       "hadoop-yarn-nodemanager",
       "zookeeper-server",
       "hbase-master",
-      "hbase-regionserver"
+      "hbase-regionserver",
+      "mysql-server",
+      "hive-metastore-database",
+      "hive-metastore"
     ],
     "provider": "rackspace",
-    "hardwaretype": "large",
+    "hardwaretype": "xlarge",
     "imagetype": "ubuntu12",
     "config": {
       "hadoop": {
         "core_site": {
           "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
+          "io.file.buffer.size": "131072",
           "hadoop.tmp.dir": "/data/hadoop"
+        },
+        "hadoop_env": {
+          "hadoop_heapsize": "512"
         },
         "hdfs_site": {
           "dfs.datanode.max.transfer.threads": "4096",
-          "dfs.replication": "1"
+          "dfs.replication": "1",
+          "dfs.blocksize": "134217728",
+          "dfs.namenode.handler.count": "6",
+          "dfs.datanode.handler.count": "5"
         },
         "mapred_site": {
-          "mapreduce.framework.name": "yarn"
+          "mapreduce.framework.name": "yarn",
+          "mapreduce.map.java.opts": "-Xmx256m",
+          "mapreduce.reduce.java.opts": "-Xmx256m",
+          "mapreduce.job.maps": "3",
+          "mapreduce.job.reduces": "3",
+          "mapreduce.task.io.sort.factor": "10",
+          "mapreduce.task.io.sort.mb": "100"
+        },
+        "yarn_env": {
+          "yarn_nodemanager_heapsize": "512",
+          "yarn_resourcemanager_heapsize": "512"
         },
         "yarn_site": {
+          "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+          "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030",
+          "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
           "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
           "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
-          "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
-          "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
-          "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+          "yarn.scheduler.minimum-allocation-mb": "256"
         }
       },
       "hbase": {
+        "hbase_env": {
+          "hbase_heapsize": "512"
+        },
         "hbase_site": {
           "hbase.rootdir": "hdfs://%host.service.hadoop-hdfs-namenode%/hbase",
           "hbase.cluster.distributed": "true",
@@ -45,13 +69,14 @@
       },
       "hive": {
         "hive_site": {
-          "javax.jdo.option.ConnectionURL": "jdbc:mysql://%host.service.mysql-server%:3306/hive",
+          "javax.jdo.option.ConnectionURL": "jdbc:mysql://localhost:3306/hive?createDatabaseIfNotExist=true",
           "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
           "javax.jdo.option.ConnectionUserName": "dbuser",
           "javax.jdo.option.ConnectionPassword": "dbuserpassword",
           "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%",
+          "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$'),',')%",
           "hive.support.concurrency": "true",
-          "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$'),',')%"
+          "hive.server2.thrift.port": "10010"
         }
       },
       "mysql": {
@@ -64,7 +89,15 @@
             "log_dir": "/data/mysql"
           }
         },
-        "bind_address": "%ip.bind_v4.service.mysql-server%"
+        "bind_address": "127.0.0.1"
+      },
+      "zookeeper": {
+        "zoocfg": {
+          "maxClientCnxns": "0",
+          "tickTime": "2000",
+          "initLimit": "10",
+          "syncLimit": "2"
+        }
       }
     }
   },
@@ -95,8 +128,8 @@
   },
   "constraints": {
     "size": {
-      "min": 1,
-      "max": 1
+      "min": "1",
+      "max": "1"
     }
   },
   "administration": {
