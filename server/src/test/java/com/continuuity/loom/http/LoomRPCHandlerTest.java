@@ -18,30 +18,28 @@ package com.continuuity.loom.http;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.spec.template.Administration;
-import com.continuuity.loom.spec.template.ClusterDefaults;
-import com.continuuity.loom.spec.template.ClusterTemplate;
-import com.continuuity.loom.spec.template.Compatibilities;
-import com.continuuity.loom.spec.HardwareType;
-import com.continuuity.loom.spec.ImageType;
-import com.continuuity.loom.spec.template.LeaseDuration;
-import com.continuuity.loom.spec.Provider;
-import com.continuuity.loom.spec.ProvisionerAction;
-import com.continuuity.loom.spec.service.Service;
-import com.continuuity.loom.spec.service.ServiceAction;
-import com.continuuity.loom.spec.Tenant;
-import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.request.BootstrapRequest;
-import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.provisioner.plugin.PluginType;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
-import com.continuuity.loom.scheduler.ClusterAction;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
+import com.continuuity.loom.spec.template.Administration;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.LeaseDuration;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.entity.SQLEntityStoreService;
 import com.google.common.base.Charsets;
@@ -52,7 +50,6 @@ import com.google.gson.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.After;
 import org.junit.Assert;
@@ -203,86 +200,6 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     body = new BootstrapRequest(true);
     assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), headers), HttpResponseStatus.OK);
     Assert.assertEquals(template1, tenantView.getClusterTemplate(name));
-  }
-
-  @Test
-  public void testGetAllStatusesFunction() throws Exception {
-    entityStoreService.getView(ADMIN_ACCOUNT).writeClusterTemplate(smallTemplate);
-    entityStoreService.getView(ADMIN_ACCOUNT).writeProvider(Entities.ProviderExample.RACKSPACE);
-    entityStoreService.getView(SUPERADMIN_ACCOUNT).writeProviderType(Entities.ProviderTypeExample.RACKSPACE);
-
-    // create the clusters
-    ClusterCreateRequest clusterCreateRequest = ClusterCreateRequest.builder()
-      .setName("cluster1")
-      .setClusterTemplateName(smallTemplate.getName())
-      .setNumMachines(5)
-      .build();
-    HttpResponse creationResponse = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS);
-    assertResponseStatus(creationResponse, HttpResponseStatus.OK);
-    String cluster1Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
-    LoomClusterHandlerTest.assertStatus(cluster1Id, Cluster.Status.PENDING, "NOT_SUBMITTED",
-                                        ClusterAction.SOLVE_LAYOUT, 0, 0, USER1_HEADERS);
-
-    clusterCreateRequest = ClusterCreateRequest.builder()
-      .setName("cluster2")
-      .setClusterTemplateName(smallTemplate.getName())
-      .setNumMachines(6)
-      .build();
-
-    creationResponse = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS);
-    assertResponseStatus(creationResponse, HttpResponseStatus.OK);
-    String cluster2Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
-    LoomClusterHandlerTest.assertStatus(cluster2Id, Cluster.Status.PENDING, "NOT_SUBMITTED",
-                                        ClusterAction.SOLVE_LAYOUT, 0, 0, USER1_HEADERS);
-
-    clusterCreateRequest = ClusterCreateRequest.builder()
-      .setName("cluster3")
-      .setClusterTemplateName(smallTemplate.getName())
-      .setNumMachines(6)
-      .build();
-
-    creationResponse = doPost("/v1/loom/clusters", gson.toJson(clusterCreateRequest), USER2_HEADERS);
-    assertResponseStatus(creationResponse, HttpResponseStatus.OK);
-    String cluster3Id = LoomClusterHandlerTest.getIdFromResponse(creationResponse);
-
-    LoomClusterHandlerTest.assertStatus(cluster3Id, Cluster.Status.PENDING, "NOT_SUBMITTED",
-                                        ClusterAction.SOLVE_LAYOUT, 0, 0, USER2_HEADERS);
-
-    // test user 1, two clusters
-    HttpResponse statusCheckResponse = doPost("/v1/loom/getClusterStatuses", "", USER1_HEADERS);
-    assertResponseStatus(statusCheckResponse, HttpResponseStatus.OK);
-    String user1StatusResponseStr = EntityUtils.toString(statusCheckResponse.getEntity());
-    JsonObject[] jsonList = gson.fromJson(user1StatusResponseStr, JsonObject[].class);
-    Assert.assertEquals(2, jsonList.length);
-    for (JsonObject aJsonList : jsonList) {
-      LoomClusterHandlerTest.assertStatus(aJsonList, Cluster.Status.PENDING, "NOT_SUBMITTED",
-                                          ClusterAction.SOLVE_LAYOUT, 0, 0);
-
-    }
-
-    // test user 2, one cluster
-    statusCheckResponse = doPost("/v1/loom/getClusterStatuses", "", USER2_HEADERS);
-    assertResponseStatus(statusCheckResponse, HttpResponseStatus.OK);
-    String user2StatusResponseStr = EntityUtils.toString(statusCheckResponse.getEntity());
-    jsonList = gson.fromJson(user2StatusResponseStr, JsonObject[].class);
-    Assert.assertEquals(1, jsonList.length);
-    for (JsonObject aJsonList : jsonList) {
-      LoomClusterHandlerTest.assertStatus(aJsonList, Cluster.Status.PENDING, "NOT_SUBMITTED",
-                                          ClusterAction.SOLVE_LAYOUT, 0, 0);
-
-    }
-
-    // test admin, three clusters
-    statusCheckResponse = doPost("/v1/loom/getClusterStatuses", "", ADMIN_HEADERS);
-    assertResponseStatus(statusCheckResponse, HttpResponseStatus.OK);
-    String adminStatusResponseStr = EntityUtils.toString(statusCheckResponse.getEntity());
-    jsonList = gson.fromJson(adminStatusResponseStr, JsonObject[].class);
-    Assert.assertEquals(3, jsonList.length);
-    for (JsonObject aJsonList : jsonList) {
-      LoomClusterHandlerTest.assertStatus(aJsonList, Cluster.Status.PENDING, "NOT_SUBMITTED",
-                                          ClusterAction.SOLVE_LAYOUT, 0, 0);
-
-    }
   }
 
   @Test

@@ -17,6 +17,7 @@ package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.ClusterSummary;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
@@ -56,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -102,6 +104,17 @@ public class ClusterService {
     this.clusterQueues = clusterQueues;
     this.solverQueues = solverQueues;
     this.jobQueues = jobQueues;
+  }
+
+  /**
+   * Get a list of summaries of all clusters visible to the given account.
+   *
+   * @param account Account to get cluster summaries for.
+   * @return List of summaries of all clusters visible to the given account.
+   * @throws IOException if there was an exception reading the cluster data from the store.
+   */
+  public List<ClusterSummary> getClusterSummaries(Account account) throws IOException {
+    return clusterStoreService.getView(account).getAllClusterSummaries();
   }
 
   /**

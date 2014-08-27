@@ -16,18 +16,26 @@
 package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.ClusterSummary;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.scheduler.task.ClusterJob;
+import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 import java.io.IOException;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,6 +67,8 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
 
   abstract PreparedStatement getSelectClusterJobsStatement(Connection conn, long id) throws SQLException;
 
+  abstract PreparedStatement getSelectAllClusterJobsStatement(Connection conn) throws SQLException;
+
   abstract PreparedStatement getSelectClusterNodesStatement(Connection conn, long id) throws SQLException;
 
   @Override
@@ -69,6 +79,25 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
         PreparedStatement statement = getSelectAllClustersStatement(conn);
         try {
           return dbQueryExecutor.getQueryList(statement, Cluster.class);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      throw new IOException("Exception getting all clusters");
+    }
+  }
+
+  @Override
+  public List<ClusterSummary> getAllClusterSummaries() throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = getSelectAllClusterJobsStatement(conn);
+        try {
+          return getSummaries(statement);
         } finally {
           statement.close();
         }
@@ -223,8 +252,8 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   private PreparedStatement getInsertClusterStatement(
     Connection conn, long id, Cluster cluster, byte[] clusterBytes) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
-      "INSERT INTO  clusters (cluster, owner_id, tenant_id, status, expire_time, create_time, name, id) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+      "INSERT INTO  clusters (cluster, owner_id, tenant_id, status, expire_time," +
+        " create_time, name, id, latest_job_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     statement.setBytes(1, clusterBytes);
     statement.setString(2, cluster.getAccount().getUserId());
     statement.setString(3, cluster.getAccount().getTenantId());
@@ -233,7 +262,25 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
     statement.setTimestamp(6, DBHelper.getTimestamp(cluster.getCreateTime()));
     statement.setString(7, cluster.getName());
     statement.setLong(8, id);
+    String latestJobStr = cluster.getLatestJobId();
+    long latestJobNum = latestJobStr == null ? 0 : JobId.fromString(latestJobStr).getJobNum();
+    statement.setLong(9, latestJobNum);
     return statement;
+  }
+
+  private List<ClusterSummary> getSummaries(PreparedStatement statement) throws SQLException {
+    ResultSet rs = statement.executeQuery();
+    try {
+      List<ClusterSummary> summaries = Lists.newArrayList();
+      while (rs.next()) {
+        Cluster cluster = dbQueryExecutor.deserializeBlob(rs.getBlob(1), Cluster.class);
+        ClusterJob clusterJob = dbQueryExecutor.deserializeBlob(rs.getBlob(2), ClusterJob.class);
+        summaries.add(new ClusterSummary(cluster, clusterJob));
+      }
+      return ImmutableList.copyOf(summaries);
+    } finally {
+      rs.close();
+    }
   }
 
   private class ClusterDBPut extends DBPut {

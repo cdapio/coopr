@@ -15,6 +15,8 @@
  */
 package com.continuuity.test.input;
 
+import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.ClusterSummary;
 import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.test.Constants;
 import com.google.common.collect.ImmutableList;
@@ -22,6 +24,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
@@ -30,8 +33,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -72,31 +75,26 @@ public class ClusterReader {
   }
 
 
-  public Set<TestCluster> getClusters(String status) throws Exception {
+  public Set<TestCluster> getClusters(Cluster.Status status) throws Exception {
     Set<TestCluster> testClusters = Sets.newHashSet();
     try {
-      JsonObject clusters = gson.fromJson(readCluster(Constants.CLUSTERS_FILE_NAME), JsonObject.class);
+      Map<String, ClusterSummary> clusters = gson.fromJson(
+        new FileReader(Constants.CLUSTERS_FILE_NAME), new TypeToken<Map<String, ClusterSummary>>() {}.getType());
       for (String key : KEYS) {
-        TestCluster cluster = parseCluster(clusters.get(key).getAsJsonObject(), status);
-        if (cluster != null) {
+        ClusterSummary clusterSummary = clusters.get(key);
+        if (clusterSummary != null && clusterSummary.getStatus() == status) {
+          TestCluster cluster = new TestCluster(clusterSummary.getName(),
+                                                clusterSummary.getId(),
+                                                // round the timestamp to nearest second.
+                                                1000 * (clusterSummary.getCreateTime() / 1000),
+                                                clusterSummary.getClusterTemplate().getName(),
+                                                clusterSummary.getNumNodes());
           testClusters.add(cluster);
         }
       }
       return testClusters;
     } catch (JsonSyntaxException e) {
       LOG.error("Got exception while parsing JSON ", e);
-    }
-    return null;
-  }
-
-  private TestCluster parseCluster(JsonObject json, String status) {
-    if (status.equalsIgnoreCase(json.get("status").getAsString())) {
-      // Lop off milliseconds.
-      long ts = 1000 * (json.get("createTime").getAsLong() / 1000);
-
-      return new TestCluster(json.get("name").getAsString(), json.get("id").getAsString(),
-                                       ts, json.get("clusterTemplate").getAsString(),
-                                       Integer.parseInt(json.get("numNodes").getAsString()));
     }
     return null;
   }

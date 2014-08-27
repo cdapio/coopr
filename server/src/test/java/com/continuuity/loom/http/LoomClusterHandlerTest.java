@@ -19,6 +19,7 @@ import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.ClusterSummary;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Configuration;
@@ -27,6 +28,7 @@ import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterStatusResponse;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.continuuity.loom.scheduler.CallbackScheduler;
@@ -210,22 +212,26 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     String clusterId = getIdFromResponse(response);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     solverScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.CLUSTER_CREATE, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.CLUSTER_CREATE, 0, 0);
 
     clusterScheduler.run();
     callbackScheduler.run();
 
     // Get the status - 0 tasks completed and RUNNING
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     jobScheduler.run();  // run scheduler put in queue
     jobScheduler.run();  // run scheduler take from queue
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     SchedulableTask task = TestHelper.takeTask(getBaseUrl(), new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId));
 
@@ -251,17 +257,20 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     String clusterId = getIdFromResponse(response);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     solverScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.CLUSTER_CREATE, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.CLUSTER_CREATE, 0, 0);
 
     clusterScheduler.run();
     callbackScheduler.run();
 
     // Get the status - 0 tasks completed and RUNNING
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId);
 
@@ -270,7 +279,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       jobScheduler.run();  // run scheduler put in queue
       jobScheduler.run();  // run scheduler take from queue
 
-      assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, i);
+      assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                            ClusterAction.CLUSTER_CREATE, 3, i);
 
       SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
       Assert.assertEquals(defaultClusterConfig,
@@ -307,7 +317,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     jobScheduler.run();
 
     //All tasks completed and status complete
-    assertStatusWithUser1(clusterId, Cluster.Status.ACTIVE, "COMPLETE", ClusterAction.CLUSTER_CREATE, 3, 3);
+    assertStatusWithUser1(clusterId, Cluster.Status.ACTIVE, ClusterJob.Status.COMPLETE,
+                          ClusterAction.CLUSTER_CREATE, 3, 3);
 
     // Assert cluster object returned from REST call has real Node objects in it.
     JsonObject restCluster = gson.fromJson(
@@ -343,7 +354,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     clusterScheduler.run();
     callbackScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_DELETE, 2, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_DELETE, 2, 0);
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId);
     //Take 2 delete tasks and finish them
@@ -369,7 +381,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     jobScheduler.run();
 
     //All tasks completed and status complete
-    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, "COMPLETE", ClusterAction.CLUSTER_DELETE, 2, 2);
+    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, ClusterJob.Status.COMPLETE,
+                          ClusterAction.CLUSTER_DELETE, 2, 2);
 
     //Test invalid cluster's status
     response = doGet(String.format("/v1/loom/clusters/%s/status","567"), USER1_HEADERS);
@@ -416,7 +429,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     //take a job and fail it. Failed tasks are retried 3 times.
     for (int i = 0; i < 3; ++i) {
-      assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
+      assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                            ClusterAction.CLUSTER_CREATE, 3, 0);
 
       jobScheduler.run();
       jobScheduler.run();
@@ -437,7 +451,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     jobScheduler.run();
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, "FAILED", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
   }
 
   @Test
@@ -460,7 +475,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     callbackScheduler.run();
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId);
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
     for (int i = 0; i < 3; ++i) {
       // Let create complete successfully
       jobScheduler.run();
@@ -482,7 +498,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       jobScheduler.run();
       jobScheduler.run();
 
-      assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3 + i, 1 + i);
+      assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                            ClusterAction.CLUSTER_CREATE, 3 + i, 1 + i);
 
       //Fail confirm.
       task = TestHelper.takeTask(getBaseUrl(), takeRequest);
@@ -514,7 +531,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     jobScheduler.run();
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, "FAILED", ClusterAction.CLUSTER_CREATE, 5, 3);
+    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 5, 3);
   }
 
   @Test
@@ -532,17 +550,20 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     String clusterId = getIdFromResponse(response);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     solverScheduler.run();
     // Get the status - 0 tasks completed and TERMINATED
-    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, "FAILED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, ClusterJob.Status.FAILED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     clusterScheduler.run();
     jobScheduler.run();  // run scheduler put in queue
     jobScheduler.run();  // run scheduler take from queue
 
-    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, "FAILED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, ClusterJob.Status.FAILED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     // Delete the cluster now.
     response = doDelete("/v1/loom/clusters/" + clusterId, USER1_HEADERS);
@@ -550,12 +571,14 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     clusterScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, "FAILED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, ClusterJob.Status.FAILED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     jobScheduler.run();  // run scheduler put in queue
     jobScheduler.run();  // run scheduler take from queue
 
-    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, "FAILED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, ClusterJob.Status.FAILED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
   }
 
   @Test
@@ -573,17 +596,20 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     String clusterId = getIdFromResponse(response);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     solverScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.CLUSTER_CREATE, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.CLUSTER_CREATE, 0, 0);
 
     clusterScheduler.run();
     callbackScheduler.run();
 
     // Get the status - 0 tasks completed and RUNNING
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 6, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 6, 0);
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId);
     //Take 3 tasks and finish them
@@ -591,7 +617,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       jobScheduler.run();  // run scheduler put in queue
       jobScheduler.run();  // run scheduler take from queue
 
-      assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 6, i);
+      assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                            ClusterAction.CLUSTER_CREATE, 6, i);
 
       SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
       JsonObject result = new JsonObject();
@@ -612,14 +639,16 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     jobScheduler.run();
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "FAILED", ClusterAction.CLUSTER_CREATE, 6, 3);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 6, 3);
 
     // We should be not be able to take any more tasks once the job has been failed.
     SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
     Assert.assertNull(task);
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, "FAILED", ClusterAction.CLUSTER_CREATE, 6, 3);
+    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 6, 3);
   }
 
   @Test
@@ -637,13 +666,15 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     String clusterId = getIdFromResponse(response);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     // Not possible to cancel the job before solving is done.
     response = doPost("/v1/loom/clusters/" + clusterId + "/abort", "", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     solverScheduler.run();
 
@@ -651,11 +682,13 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     response = doPost("/v1/loom/clusters/" + clusterId + "/abort", "", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.CLUSTER_CREATE, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.CLUSTER_CREATE, 0, 0);
 
     clusterScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     jobScheduler.run();
 
@@ -671,7 +704,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     Assert.assertNull(task);
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, "FAILED", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     response = doGet("/v1/loom/clusters/" + clusterId, USER1_HEADERS);
     JsonObject clusterJson = gson.fromJson(EntityUtils.toString(response.getEntity()), JsonObject.class);
@@ -692,13 +726,15 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     String clusterId = getIdFromResponse(response);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     // Not possible to cancel the job before solving is done.
     response = doPost("/v1/loom/clusters/" + clusterId + "/abort", "", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     solverScheduler.run();
 
@@ -706,21 +742,25 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     response = doPost("/v1/loom/clusters/" + clusterId + "/abort", "", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.CLUSTER_CREATE, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.CLUSTER_CREATE, 0, 0);
 
     clusterScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     // Cancel the job after cluster scheduler is done.
     response = doPost("/v1/loom/clusters/" + clusterId + "/abort", "", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "FAILED", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, "FAILED", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     response = doGet("/v1/loom/clusters/" + clusterId, USER1_HEADERS);
     JsonObject clusterJson = gson.fromJson(EntityUtils.toString(response.getEntity()), JsonObject.class);
@@ -742,67 +782,67 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     String clusterId = getIdFromResponse(response);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "NOT_SUBMITTED", ClusterAction.SOLVE_LAYOUT, 0, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
 
     solverScheduler.run();
 
     clusterScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     // Cancel the job after cluster scheduler is done.
     response = doPost("/v1/loom/clusters/" + clusterId + "/abort", "", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "FAILED", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     jobQueues.removeAll(tenantId);
     Assert.assertEquals(0, jobQueues.size(tenantId));
 
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "FAILED", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     // Should reschedule the job, even though it is FAILED
     response = doPost("/v1/loom/clusters/" + clusterId + "/abort", "", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "FAILED", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, "FAILED", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     response = doGet("/v1/loom/clusters/" + clusterId, USER1_HEADERS);
     JsonObject clusterJson = gson.fromJson(EntityUtils.toString(response.getEntity()), JsonObject.class);
     Assert.assertEquals("Aborted by user.", clusterJson.get("message").getAsString());
   }
 
-  protected static void assertStatusWithUser1(String clusterId, Cluster.Status status, String actionStatus,
+  protected static void assertStatusWithUser1(String clusterId, Cluster.Status status, ClusterJob.Status actionStatus,
                                      ClusterAction action, int totalSteps, int completeSteps) throws Exception {
     // by default uses user1
     assertStatus(clusterId, status, actionStatus, action, totalSteps, completeSteps, USER1_HEADERS);
   }
 
-  protected static void assertStatus(String clusterId, Cluster.Status status, String actionStatus,
+  protected static void assertStatus(String clusterId, Cluster.Status status, ClusterJob.Status actionStatus,
       ClusterAction action, int totalSteps, int completeSteps, Header[] userHeaders) throws Exception {
     HttpResponse response = doGet(String.format("/v1/loom/clusters/%s/status", clusterId), userHeaders);
     assertResponseStatus(response, HttpResponseStatus.OK);
     InputStreamReader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonObject statusJson = gson.fromJson(reader, JsonObject.class);
+    ClusterStatusResponse statusResponse = gson.fromJson(reader, ClusterStatusResponse.class);
 
-    Assert.assertEquals(clusterId, statusJson.get("clusterid").getAsString());
-    assertStatus(statusJson, status, actionStatus, action, totalSteps, completeSteps);
-  }
-
-  protected static void assertStatus(JsonObject statusJson, Cluster.Status status, String actionStatus,
-      ClusterAction action, int totalSteps, int completeSteps) throws Exception {
-
-    Assert.assertEquals(totalSteps, statusJson.get("stepstotal").getAsInt());
-    Assert.assertEquals(completeSteps, statusJson.get("stepscompleted").getAsInt());
-    Assert.assertEquals(actionStatus, statusJson.get("actionstatus").getAsString());
-    Assert.assertEquals(action.name(), statusJson.get("action").getAsString());
-    Assert.assertEquals(status.name(), statusJson.get("status").getAsString());
+    Assert.assertEquals(clusterId, statusResponse.getClusterid());
+    Assert.assertEquals(totalSteps, statusResponse.getStepstotal());
+    Assert.assertEquals(completeSteps, statusResponse.getStepscompleted());
+    Assert.assertEquals(actionStatus, statusResponse.getActionstatus());
+    Assert.assertEquals(action, statusResponse.getAction());
+    Assert.assertEquals(status, statusResponse.getStatus());
   }
 
   @Test
@@ -834,21 +874,20 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
 
     response = doGet("/v1/loom/clusters", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    String responseStr = EntityUtils.toString(response.getEntity());
-    List<Map<String, String>> clusterInfos =
-      gson.fromJson(responseStr, new TypeToken<List<Map<String, String>>>() {}.getType());
+    InputStreamReader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    List<ClusterSummary> clusterInfos = gson.fromJson(reader, new TypeToken<List<ClusterSummary>>() {}.getType());
 
-    Assert.assertNotNull(clusterInfos.get(0).get("id"));
-    Assert.assertNotNull(clusterInfos.get(0).get("createTime"));
-    Assert.assertEquals("cluster2", clusterInfos.get(0).get("name"));
-    Assert.assertEquals("reactor-medium", clusterInfos.get(0).get("clusterTemplate"));
-    Assert.assertEquals("6", clusterInfos.get(0).get("numNodes"));
+    Assert.assertNotNull(clusterInfos.get(0).getId());
+    Assert.assertNotNull(clusterInfos.get(0).getCreateTime());
+    Assert.assertEquals("cluster2", clusterInfos.get(0).getName());
+    Assert.assertEquals("reactor-medium", clusterInfos.get(0).getClusterTemplate().getName());
+    Assert.assertEquals(6, clusterInfos.get(0).getNumNodes());
 
-    Assert.assertNotNull(clusterInfos.get(1).get("id"));
-    Assert.assertNotNull(clusterInfos.get(1).get("createTime"));
-    Assert.assertEquals("cluster1", clusterInfos.get(1).get("name"));
-    Assert.assertEquals("reactor-medium", clusterInfos.get(1).get("clusterTemplate"));
-    Assert.assertEquals("5", clusterInfos.get(1).get("numNodes"));
+    Assert.assertNotNull(clusterInfos.get(1).getId());
+    Assert.assertNotNull(clusterInfos.get(1).getCreateTime());
+    Assert.assertEquals("cluster1", clusterInfos.get(1).getName());
+    Assert.assertEquals("reactor-medium", clusterInfos.get(1).getClusterTemplate().getName());
+    Assert.assertEquals(5, clusterInfos.get(1).getNumNodes());
   }
 
   @Test
@@ -940,29 +979,28 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     // check get call from user1 only gets back cluster1
     response = doGet("/v1/loom/clusters", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    String responseStr = EntityUtils.toString(response.getEntity());
-    List<Map<String, String>> clusterInfos =
-      gson.fromJson(responseStr, new TypeToken<List<Map<String, String>>>() {}.getType());
+    InputStreamReader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    List<ClusterSummary> clusterInfos = gson.fromJson(reader, new TypeToken<List<ClusterSummary>>() {}.getType());
     Assert.assertEquals(1, clusterInfos.size());
-    Assert.assertEquals(cluster1, clusterInfos.get(0).get("id"));
+    Assert.assertEquals(cluster1, clusterInfos.get(0).getId());
 
     // check get call from user2 only gets back cluster2
     response = doGet("/v1/loom/clusters", USER2_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    responseStr = EntityUtils.toString(response.getEntity());
-    clusterInfos = gson.fromJson(responseStr, new TypeToken<List<Map<String, String>>>() {}.getType());
+    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    clusterInfos = gson.fromJson(reader, new TypeToken<List<ClusterSummary>>() {}.getType());
     Assert.assertEquals(1, clusterInfos.size());
-    Assert.assertEquals(cluster2, clusterInfos.get(0).get("id"));
+    Assert.assertEquals(cluster2, clusterInfos.get(0).getId());
 
     // check admin get all clusters
     response = doGet("/v1/loom/clusters", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
-    responseStr = EntityUtils.toString(response.getEntity());
-    clusterInfos = gson.fromJson(responseStr, new TypeToken<List<Map<String, String>>>() {}.getType());
+    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
+    clusterInfos = gson.fromJson(reader, new TypeToken<List<ClusterSummary>>() {}.getType());
     Assert.assertEquals(2, clusterInfos.size());
     Set<String> ids = Sets.newHashSet();
-    for (Map<String, String> clusterInfo : clusterInfos) {
-      ids.add(clusterInfo.get("id"));
+    for (ClusterSummary clusterInfo : clusterInfos) {
+      ids.add(clusterInfo.getId());
     }
     Assert.assertEquals(ImmutableSet.of(cluster1, cluster2), ids);
   }
@@ -1020,7 +1058,8 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     clusterScheduler.run();
 
     // Get the status - 0 tasks completed and RUNNING
-    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, "RUNNING", ClusterAction.CLUSTER_CREATE, 3, 0);
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 3, 0);
 
     // Setup expected plan
     JsonObject expected = gson.fromJson(SAMPLE_PLAN, JsonObject.class);

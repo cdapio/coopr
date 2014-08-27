@@ -31,6 +31,7 @@ Unreleased
 - Support for multiple IP addresses ( Issues: #343 #347 )
 - Standalone build updates for multitenancy ( Issues #349 )
 - UI: Add 'sshuser' field to imagetypes ( Issues: #366 )
+- Added additional info in get clusters API ( Issues: #401 #430 )
 - UI: fix when a provider type has no admin fields ( Issues: #409 )
 
 v0.9.7 (May 27, 2014)
