@@ -23,14 +23,18 @@ import java.util.Map;
  * Image type defines different images to use on on clusters, and include information needed by provisioners to
  * provision machines from different providers.
  */
-public final class ImageType extends NamedEntity {
+public final class ImageType extends NamedIconEntity {
   private final String description;
   private final Map<String, Map<String, String>> providerMap;
 
-  public ImageType(String name, String description, Map<String, Map<String, String>> providerMap) {
-    super(name);
+  public ImageType(String name, String icon, String description, Map<String, Map<String, String>> providerMap) {
+    super(name, icon);
     this.description = description;
     this.providerMap = providerMap;
+  }
+
+  public ImageType(String name, String description, Map<String, Map<String, String>> providerMap) {
+    this(name, null, description, providerMap);
   }
 
   /**
@@ -59,13 +63,13 @@ public final class ImageType extends NamedEntity {
       return false;
     }
     ImageType other = (ImageType) o;
-    return Objects.equal(name, other.name) &&
+    return super.equals(other) &&
       Objects.equal(description, other.description) &&
       providerMap.equals(other.providerMap);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, providerMap);
+    return Objects.hashCode(super.hashCode(), description, providerMap);
   }
 }

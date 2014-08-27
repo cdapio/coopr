@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.spec.service;
 
-import com.continuuity.loom.spec.NamedEntity;
+import com.continuuity.loom.spec.NamedIconEntity;
 import com.continuuity.loom.spec.ProvisionerAction;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -28,28 +28,31 @@ import java.util.Set;
  * {@link com.continuuity.loom.spec.ProvisionerAction} to {@link ServiceAction} that provisioners will need to execute
  * when performing cluster operations such as creation and deletion.
  */
-public final class Service extends NamedEntity {
+public final class Service extends NamedIconEntity {
   private final String description;
   private final ServiceDependencies dependencies;
   private final Map<ProvisionerAction, ServiceAction> provisionerActions;
 
-  public Service(String name, String description, Set<String> runtimeRequirements,
+  public Service(String name, String logolink, String description, ServiceDependencies dependencies,
                  Map<ProvisionerAction, ServiceAction> provisionerActions) {
-    super(name);
-    Preconditions.checkArgument(provisionerActions != null, "service must contain provisioner actions");
-    this.description = description;
-    this.dependencies =
-      new ServiceDependencies(null, null, null, new ServiceStageDependencies(runtimeRequirements, null));
-    this.provisionerActions = provisionerActions;
-  }
-
-  public Service(String name, String description, ServiceDependencies dependencies,
-                 Map<ProvisionerAction, ServiceAction> provisionerActions) {
-    super(name);
+    super(name, logolink);
     Preconditions.checkArgument(provisionerActions != null, "service must contain provisioner actions");
     this.description = description;
     this.dependencies = dependencies == null ? ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES : dependencies;
     this.provisionerActions = provisionerActions;
+  }
+
+  // TODO: put in a builder so we dont need multiple constructors for optional fields
+  public Service(String name, String description, ServiceDependencies dependencies,
+                 Map<ProvisionerAction, ServiceAction> provisionerActions) {
+    this(name, null, description, dependencies, provisionerActions);
+  }
+
+  public Service(String name, String description, Set<String> runtimeRequirements,
+                 Map<ProvisionerAction, ServiceAction> provisionerActions) {
+    this(name, null, description,
+         new ServiceDependencies(null, null, null, new ServiceStageDependencies(runtimeRequirements, null)),
+         provisionerActions);
   }
 
   /**
@@ -85,7 +88,7 @@ public final class Service extends NamedEntity {
       return false;
     }
     Service other = (Service) o;
-    return Objects.equal(name, other.name) &&
+    return super.equals(other) &&
       Objects.equal(description, other.description) &&
       Objects.equal(dependencies, other.dependencies) &&
       Objects.equal(provisionerActions, other.provisionerActions);
@@ -93,7 +96,7 @@ public final class Service extends NamedEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, dependencies, provisionerActions);
+    return Objects.hashCode(super.hashCode(), description, icon, dependencies, provisionerActions);
   }
 
   @Override

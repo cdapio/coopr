@@ -24,14 +24,18 @@ import java.util.Map;
  * different providers and information needed by the provisioner to create the hardware for each provider, which should
  * contain the provider specific flavor and any other information needed to create the hardware.
  */
-public final class HardwareType extends NamedEntity {
+public final class HardwareType extends NamedIconEntity {
   private final String description;
   private final Map<String, Map<String, String>> providerMap;
 
-  public HardwareType(String name, String description, Map<String, Map<String, String>> providerMap) {
-    super(name);
+  public HardwareType(String name, String icon, String description, Map<String, Map<String, String>> providerMap) {
+    super(name, icon);
     this.description = description;
     this.providerMap = providerMap;
+  }
+
+  public HardwareType(String name, String description, Map<String, Map<String, String>> providerMap) {
+    this(name, null, description, providerMap);
   }
 
   /**
@@ -60,13 +64,13 @@ public final class HardwareType extends NamedEntity {
       return false;
     }
     HardwareType other = (HardwareType) o;
-    return Objects.equal(name, other.name) &&
+    return super.equals(other) &&
       Objects.equal(description, other.description) &&
       providerMap.equals(other.providerMap);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, providerMap);
+    return Objects.hashCode(super.hashCode(), description, providerMap);
   }
 }

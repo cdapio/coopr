@@ -49,4 +49,23 @@ public abstract class NamedEntity {
       .add("name", name)
       .toString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof NamedEntity)) {
+      return false;
+    }
+
+    NamedEntity that = (NamedEntity) o;
+
+    return Objects.equal(name, that.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return name != null ? name.hashCode() : 0;
+  }
 }

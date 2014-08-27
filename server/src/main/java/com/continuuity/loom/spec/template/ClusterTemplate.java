@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.spec.template;
 
-import com.continuuity.loom.spec.NamedEntity;
+import com.continuuity.loom.spec.NamedIconEntity;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -25,22 +25,27 @@ import com.google.common.base.Preconditions;
  * will be used to determine which services to place on which nodes, and what hardware and images to use.  A cluster
  * template also specifies the full set of configuration key values that are needed on the cluster.
  */
-public final class ClusterTemplate extends NamedEntity {
+public final class ClusterTemplate extends NamedIconEntity {
   private final String description;
   private final ClusterDefaults clusterDefaults;
   private final Constraints constraints;
   private final Compatibilities compatibilities;
   private final Administration administration;
 
-  public ClusterTemplate(String name, String description, ClusterDefaults clusterDefaults,
+  public ClusterTemplate(String name, String logolink, String description, ClusterDefaults clusterDefaults,
                          Compatibilities compatibilities, Constraints constraints, Administration administration) {
-    super(name);
+    super(name, logolink);
     Preconditions.checkArgument(clusterDefaults != null, "cluster defaults must be specified");
     this.clusterDefaults = clusterDefaults;
     this.description = description == null ? "" : description;
     this.constraints = constraints == null ? Constraints.EMPTY_CONSTRAINTS : constraints;
     this.compatibilities = compatibilities == null ? Compatibilities.EMPTY_COMPATIBILITIES : compatibilities;
     this.administration = administration == null ? Administration.EMPTY_ADMINISTRATION : administration;
+  }
+
+  public ClusterTemplate(String name, String description, ClusterDefaults clusterDefaults,
+                         Compatibilities compatibilities, Constraints constraints, Administration administration) {
+    this(name, null, description, clusterDefaults, compatibilities, constraints, administration);
   }
 
   /**
@@ -94,7 +99,7 @@ public final class ClusterTemplate extends NamedEntity {
       return false;
     }
     ClusterTemplate other = (ClusterTemplate) o;
-    return Objects.equal(name, other.name) &&
+    return super.equals(other) &&
       Objects.equal(description, other.description) &&
       Objects.equal(compatibilities, other.compatibilities) &&
       Objects.equal(constraints, other.constraints) &&
@@ -103,7 +108,7 @@ public final class ClusterTemplate extends NamedEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, compatibilities, constraints, administration);
+    return Objects.hashCode(super.hashCode(), description, compatibilities, constraints, administration);
   }
 
   @Override
