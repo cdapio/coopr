@@ -37,8 +37,8 @@
         },
         "mapred_site": {
           "mapreduce.framework.name": "yarn",
-          "mapreduce.map.java.opts": "-Xmx256m",
-          "mapreduce.reduce.java.opts": "-Xmx256m",
+          "mapreduce.map.java.opts": "-Xmx384m",
+          "mapreduce.reduce.java.opts": "-Xmx384m",
           "mapreduce.job.maps": "3",
           "mapreduce.job.reduces": "3",
           "mapreduce.task.io.sort.factor": "10",
