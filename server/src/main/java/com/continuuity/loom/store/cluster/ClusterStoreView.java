@@ -1,11 +1,13 @@
 package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.ClusterSummary;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -14,13 +16,23 @@ import java.util.Set;
 public interface ClusterStoreView {
   /**
    * Get an immutable list of all clusters in the store.
+   *
    * @return All clusters in the store.
    * @throws IOException if there was a problem getting the clusters.
    */
   List<Cluster> getAllClusters() throws IOException;
 
   /**
+   * Get an immutable list of a summary of all clusters in the store.
+   *
+   * @return Immutable list of summaries of all clusters.
+   * @throws IOException if there was a problem getting the clusters.
+   */
+  List<ClusterSummary> getAllClusterSummaries() throws IOException;
+
+  /**
    * Get an immutable list of all clusters in the store that are not in the terminated state.
+   *
    * @return All clusters in the store.
    * @throws IOException if there was a problem getting the clusters.
    */
@@ -28,6 +40,7 @@ public interface ClusterStoreView {
 
   /**
    * Get a specific cluster by id.
+   *
    * @param clusterId Id of the cluster to find.
    * @return The cluster matching the id, or null if no cluster exists.
    * @throws IOException if there was a problem getting the cluster.
@@ -46,6 +59,7 @@ public interface ClusterStoreView {
 
   /**
    * Write a cluster to the store using its id.
+   *
    * @param cluster Cluster to write.
    * @throws IOException if there was a problem writing the cluster.
    */
@@ -53,6 +67,7 @@ public interface ClusterStoreView {
 
   /**
    * Delete the cluster that has the given id.
+   *
    * @param clusterId Id of the cluster to delete.
    * @throws IOException if there was a problem deleting the cluster.
    */
@@ -60,6 +75,7 @@ public interface ClusterStoreView {
 
   /**
    * Get all jobs performed or being performed on the given cluster owned by the given user.
+   *
    * @param clusterId Id of the cluster for which to get jobs.
    * @param limit Max number of jobs to return. If there are more, the most recent jobs will be returned. A
    *              negative number is interpreted as no limit.
@@ -71,6 +87,7 @@ public interface ClusterStoreView {
 
   /**
    * Get an immutable set of all nodes belonging to a specific cluster.
+   *
    * @param clusterId Id of the cluster whose nodes will be fetched.
    * @return Set of all nodes belonging to specified cluster. Empty if no cluster or cluster nodes exist.
    * @throws IOException if there was a problem getting the cluster nodes.

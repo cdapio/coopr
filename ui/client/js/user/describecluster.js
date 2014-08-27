@@ -68,11 +68,11 @@ ClusterView.app.filter('stringifyTime', function () {
 ClusterView.app.factory('Globals', [function () {
   return {
     STATUS_CLASSES : {
-      COMPLETE: "text-success",
-      CREATING: "",
-      FAILED: "text-danger",
-      NOT_SUBMITTED: "",
-      SOLVING_LAYOUT: ""
+      complete: "text-success",
+      creating: "",
+      failed: "text-danger",
+      not_submitted: "",
+      solving_layout: ""
     },
 
     READABLE_ACTIONS: Helpers.READABLE_ACTIONS,
@@ -362,7 +362,7 @@ ClusterView.getStatusFn = function (rootScope, scope, dataFactory, Globals) {
       if (!isNaN(progressPercent)) {
         scope.status.progressPercent = progressPercent.toFixed(0);
       }
-      if (data.actionstatus in Helpers.FRIENDLY_STATUS) {
+      if (progress.actionstatus in Helpers.FRIENDLY_STATUS) {
         scope.status.statusText = Helpers.FRIENDLY_STATUS[data.actionstatus];
         scope.status.class= Globals.STATUS_CLASSES[data.actionstatus];
         scope.status.action = Globals.READABLE_ACTIONS[data.action];

@@ -1,6 +1,7 @@
 package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.ClusterSummary;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -10,18 +11,14 @@ import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,71 +56,6 @@ public class SQLClusterStore implements ClusterStore {
       LOG.error("Exception getting cluster job {}", jobId, e);
       throw new IOException("Exception getting cluster job " + jobId, e);
     }
-  }
-
-  @Override
-  public Map<JobId, ClusterJob> getClusterJobs(Set<JobId> jobIds, String tenantId) throws IOException {
-    Map<JobId, ClusterJob> jobMap = Maps.newHashMap();
-
-    if (jobIds.isEmpty()) {
-      return jobMap;
-    }
-
-    Map<Long, JobId> clusterIdToJobId = Maps.newHashMap();
-    for (JobId jobId : jobIds) {
-      clusterIdToJobId.put(Long.parseLong(jobId.getClusterId()), jobId);
-    }
-
-    ClusterJob job;
-    try {
-      Connection conn = dbConnectionPool.getConnection();
-      try {
-
-        int bufferSize = jobIds.size();
-
-        StringBuilder looperString = new StringBuilder(bufferSize * 3);
-        for (int i = 0; i < bufferSize; i++) {
-          looperString.append("?, ");
-        }
-        looperString.setLength(looperString.length() - 2);
-
-        String preparedStatementString =
-          "SELECT cluster_id, job FROM jobs WHERE job_num IN (" + looperString.toString() +
-            ") AND cluster_id IN (" + looperString.toString() + ")";
-
-        PreparedStatement statement = conn.prepareStatement(preparedStatementString);
-
-        // TODO: This method currently has a limit of 10k items. Fix this using a table join
-        int count = 1;
-        for (JobId jobId : jobIds) {
-          statement.setLong(count, jobId.getJobNum());
-          statement.setLong(bufferSize + count, Long.parseLong(jobId.getClusterId()));
-          count++;
-        }
-
-        try {
-          ResultSet rs = statement.executeQuery();
-          try {
-            while (rs.next()) {
-              long clusterId = rs.getLong(1);
-              Blob blob = rs.getBlob(2);
-              job = dbQueryExecutor.deserializeBlob(blob, ClusterJob.class);
-              jobMap.put(clusterIdToJobId.get(clusterId), job);
-            }
-          } finally {
-            rs.close();
-          }
-        } finally {
-          statement.close();
-        }
-      } finally {
-        conn.close();
-      }
-    } catch (SQLException e) {
-      LOG.error("Exception getting jobs for multiple clusters", e);
-      throw new IOException("Exception getting cluster jobs for multiple clusters", e);
-    }
-    return jobMap;
   }
 
   @Override
@@ -334,6 +266,11 @@ public class SQLClusterStore implements ClusterStore {
   @Override
   public List<Cluster> getAllClusters() throws IOException {
     return systemView.getAllClusters();
+  }
+
+  @Override
+  public List<ClusterSummary> getAllClusterSummaries() throws IOException {
+    return systemView.getAllClusterSummaries();
   }
 
   @Override

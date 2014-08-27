@@ -1,6 +1,7 @@
 package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.store.DBConnectionPool;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBQueryExecutor;
@@ -52,14 +53,15 @@ public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
   protected PreparedStatement getSetClusterStatement(
     Connection conn, long id, Cluster cluster, byte[] clusterBytes) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
-      "UPDATE clusters SET cluster=?, owner_id=?, tenant_id=?, status=?, expire_time=? WHERE id=?");
+      "UPDATE clusters SET cluster=?, owner_id=?, tenant_id=?, status=?, expire_time=?, latest_job_num=? WHERE id=?");
     statement.setBytes(1, clusterBytes);
     statement.setString(2, cluster.getAccount().getUserId());
     statement.setString(3, cluster.getAccount().getTenantId());
     statement.setString(4, cluster.getStatus().name());
     statement.setTimestamp(5, DBHelper.getTimestamp(cluster.getExpireTime()));
+    statement.setLong(6, JobId.fromString(cluster.getLatestJobId()).getJobNum());
     // where clause
-    statement.setLong(6, id);
+    statement.setLong(7, id);
     return statement;
   }
 
@@ -83,6 +85,14 @@ public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
     PreparedStatement statement =
       conn.prepareStatement("SELECT job FROM jobs WHERE cluster_id=? ORDER BY job_num DESC");
     statement.setLong(1, id);
+    return statement;
+  }
+
+  @Override
+  PreparedStatement getSelectAllClusterJobsStatement(Connection conn) throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "SELECT C.cluster, J.job FROM clusters C, jobs J " +
+        "WHERE C.latest_job_num=J.job_num AND C.id=J.cluster_id ORDER BY C.create_time DESC");
     return statement;
   }
 
