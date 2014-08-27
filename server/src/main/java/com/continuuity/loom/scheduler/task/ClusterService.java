@@ -519,28 +519,31 @@ public class ClusterService {
 
     // check cluster size constraints
     SizeConstraint sizeConstraint = template.getConstraints().getSizeConstraint();
-    int minMachines = sizeConstraint.getMin();
-    int maxMachines = sizeConstraint.getMax();
-    if (numMachines < minMachines) {
-      throw new InvalidClusterException("Cluster size cannot be below " + minMachines + " nodes.");
-    }
-    if (numMachines > maxMachines) {
-      String errMsg = "Cluster size cannot exceed " + maxMachines;
-      errMsg += maxMachines == 1 ? " node." : " nodes.";
-      throw new InvalidClusterException(errMsg);
-    }
+    sizeConstraint.verify(numMachines);
     builder.setClusterTemplate(template);
 
-    setProvider(builder, account, template, createRequest, entityStore);
-    setConfig(builder, template, createRequest);
-    setCreateExpireTimes(builder, template, createRequest);
-    setServices(builder, template, createRequest);
+    // set lease times
+    long requestedLease = createRequest.getInitialLeaseDuration();
+    long leaseDuration = template.getAdministration().getLeaseDuration().calcInitialLease(requestedLease);
+    long createTime = System.currentTimeMillis();
+    builder.setCreateTime(createTime);
+    // Lease duration of 0 is forever.
+    builder.setExpireTime(leaseDuration == 0 ? 0 : createTime + leaseDuration);
+
+    Provider provider = getAndVerifyProvider(account, template, createRequest, entityStore);
+    builder.setProvider(provider);
+
+    Set<String> serviceNames = getServices(template, createRequest);
+    builder.setServices(serviceNames);
+
+    JsonObject config = getConfig(template, createRequest);
+    builder.setConfig(config);
 
     return builder.build();
   }
 
-  private void setProvider(Cluster.Builder builder, Account account, ClusterTemplate template,
-                           ClusterCreateRequest createRequest, EntityStoreView entityStore)
+  private Provider getAndVerifyProvider(Account account, ClusterTemplate template,
+                                        ClusterCreateRequest createRequest, EntityStoreView entityStore)
     throws IOException, MissingEntityException {
     // make sure the provider exists
     String providerName = createRequest.getProvider();
@@ -553,7 +556,7 @@ public class ClusterService {
     }
 
     validateAndAddFieldsToProvider(provider, createRequest, account);
-    builder.setProvider(provider);
+    return provider;
   }
 
   // add provider fields to the cluster's provider object.
@@ -585,53 +588,21 @@ public class ClusterService {
     provider.addFields(filteredFields);
   }
 
-  private void setConfig(Cluster.Builder builder, ClusterTemplate template, ClusterCreateRequest createRequest) {
+  private JsonObject getConfig(ClusterTemplate template, ClusterCreateRequest createRequest) {
     // use the config from the request if it exists. Otherwise use the template default
     JsonObject config = createRequest.getConfig();
     if (config == null) {
       config = template.getClusterDefaults().getConfig();
     }
-    builder.setConfig(config);
+    return config;
   }
 
-  private void setCreateExpireTimes(Cluster.Builder builder, ClusterTemplate template,
-                                    ClusterCreateRequest createRequest) {
-    // Determine valid lease duration for the cluster.
-    // It has to be less than the initial lease duration set in template.
-    long requestedLease = createRequest.getInitialLeaseDuration();
-    long templateLease = template.getAdministration().getLeaseDuration().getInitial();
-    long leaseDuration;
-
-    // if it's -1, use the lease specified in the template
-    if (requestedLease == -1) {
-      leaseDuration = templateLease;
-    } else if (templateLease == 0) {
-      // lease of 0 means it's an unlimited lease, so anything in the request is valid
-      leaseDuration = requestedLease;
-    } else if (templateLease >= requestedLease && requestedLease != 0) {
-      // template's initial lease is bigger than the requested one so its ok. requested lease of 0 is an unlimited
-      // lease, so need to check for that explicitly.
-      leaseDuration = requestedLease;
-    } else {
-      // this happens if the requested lease is greater than the template lease
-      throw new IllegalArgumentException("lease duration cannot be greater than duration specified in template");
-    }
-
-    if (leaseDuration < 0) {
-      throw new IllegalArgumentException("invalid lease duration: " + leaseDuration);
-    }
-    long createTime = System.currentTimeMillis();
-    builder.setCreateTime(createTime);
-    // Lease duration of 0 is forever.
-    builder.setExpireTime(leaseDuration == 0 ? 0 : createTime + leaseDuration);
-  }
-
-  private void setServices(Cluster.Builder builder, ClusterTemplate template, ClusterCreateRequest createRequest) {
-    // set cluster service names. Dependency checking is done later on since it involves a lot of potential lookups.
+  // set cluster service names. Dependency checking is done later on since it involves a lot of potential lookups.
+  private Set<String> getServices(ClusterTemplate template, ClusterCreateRequest createRequest) {
     Set<String> serviceNames = createRequest.getServices();
     if (serviceNames == null || serviceNames.isEmpty()) {
       serviceNames = template.getClusterDefaults().getServices();
     }
-    builder.setServices(serviceNames);
+    return serviceNames;
   }
 }

@@ -16,6 +16,8 @@
 package com.continuuity.loom.spec.plugin;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -24,6 +26,7 @@ import java.util.Map;
  * {@link com.continuuity.loom.spec.Provider} in order for it to provide machines properly.
  */
 public class ProviderType extends AbstractPluginSpecification {
+  private static final Logger LOG = LoggerFactory.getLogger(ProviderType.class);
 
   public ProviderType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
                       Map<String, ResourceTypeSpecification> resourceTypes) {
@@ -55,6 +58,8 @@ public class ProviderType extends AbstractPluginSpecification {
       // if its not a user field or an overridable admin field, ignore it
       if (fieldSchema != null) {
         filtered.put(field, fieldVal);
+      } else {
+        LOG.info("Ignoring field {} as its not an overridable admin field or user field.", field);
       }
     }
     return filtered;
