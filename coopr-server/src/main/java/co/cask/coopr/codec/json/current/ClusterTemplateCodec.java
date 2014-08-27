@@ -54,14 +54,14 @@ public class ClusterTemplateCodec extends AbstractCodec<ClusterTemplate> {
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    String name = context.deserialize(jsonObj.get("name"), String.class);
-    String icon = context.deserialize(jsonObj.get("icon"), String.class);
-    String description = context.deserialize(jsonObj.get("description"), String.class);
-    ClusterDefaults defaults = context.deserialize(jsonObj.get("defaults"), ClusterDefaults.class);
-    Compatibilities compatibilites = context.deserialize(jsonObj.get("compatibility"), Compatibilities.class);
-    Constraints constraints = context.deserialize(jsonObj.get("constraints"), Constraints.class);
-    Administration administration = context.deserialize(jsonObj.get("administration"), Administration.class);
-
-    return new ClusterTemplate(name, icon, description, defaults, compatibilites, constraints, administration);
+    return ClusterTemplate.builder()
+      .setName(context.<String>deserialize(jsonObj.get("name"), String.class))
+      .setIcon(context.<String>deserialize(jsonObj.get("icon"), String.class))
+      .setDescription(context.<String>deserialize(jsonObj.get("description"), String.class))
+      .setClusterDefaults(context.<ClusterDefaults>deserialize(jsonObj.get("defaults"), ClusterDefaults.class))
+      .setCompatibilities(context.<Compatibilities>deserialize(jsonObj.get("compatibility"), Compatibilities.class))
+      .setConstraints(context.<Constraints>deserialize(jsonObj.get("constraints"), Constraints.class))
+      .setAdministration(context.<Administration>deserialize(jsonObj.get("administration"), Administration.class))
+      .build();
   }
 }

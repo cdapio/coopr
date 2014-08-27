@@ -18,6 +18,8 @@ package co.cask.coopr.spec.template;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 
 import java.util.Set;
@@ -33,24 +35,24 @@ public class ClusterDefaults {
   private final String dnsSuffix;
   private final JsonObject config;
 
-  public ClusterDefaults(Set<String> services, String provider, String hardwaretype,
-                         String imagetype, String dnsSuffix, JsonObject config) {
-    Preconditions.checkArgument(services != null, "default services must be specified");
+  private ClusterDefaults(Set<String> services, String provider, String hardwaretype,
+                          String imagetype, String dnsSuffix, JsonObject config) {
+    Preconditions.checkArgument(services != null && !services.isEmpty(), "default services must be specified");
     Preconditions.checkArgument(provider != null, "default provider must be specified");
     this.services = services;
     this.provider = provider;
     this.hardwaretype = hardwaretype;
     this.imagetype = imagetype;
     this.dnsSuffix = dnsSuffix;
-    this.config = config == null ? new JsonObject() : config;
+    this.config = config;
   }
 
   /**
-   * Get the set of services to place on a cluster by default.  When solving for a cluster layout, a set of
+   * Get the immutable set of services to place on a cluster by default.  When solving for a cluster layout, a set of
    * services can be given to the solver to place on the cluster.  If no service set is given, this default set will
    * be used.
    *
-   * @return Set of services that will be placed on the cluster by default.
+   * @return Immutable set of services that will be placed on the cluster by default.
    */
   public Set<String> getServices() {
     return services;
@@ -101,6 +103,66 @@ public class ClusterDefaults {
    */
   public JsonObject getConfig() {
     return config;
+  }
+
+  /**
+   * Get a builder for creating cluster defaults.
+   *
+   * @return Builder for creating cluster defaults.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for creating cluster defaults.
+   */
+  public static class Builder {
+    private Set<String> services;
+    private String provider;
+    private String hardwaretype;
+    private String imagetype;
+    private String dnsSuffix;
+    private JsonObject config = new JsonObject();
+
+    public Builder setServices(Set<String> services) {
+      this.services = ImmutableSet.copyOf(services);
+      return this;
+    }
+
+    public Builder setServices(String... services) {
+      this.services = ImmutableSet.copyOf(services);
+      return this;
+    }
+
+    public Builder setProvider(String provider) {
+      this.provider = provider;
+      return this;
+    }
+
+    public Builder setHardwaretype(String hardwaretype) {
+      this.hardwaretype = hardwaretype;
+      return this;
+    }
+
+    public Builder setImagetype(String imagetype) {
+      this.imagetype = imagetype;
+      return this;
+    }
+
+    public Builder setDNSSuffix(String getDNSSuffix) {
+      this.dnsSuffix = getDNSSuffix;
+      return this;
+    }
+
+    public Builder setConfig(JsonObject config) {
+      this.config = config;
+      return this;
+    }
+
+    public ClusterDefaults build() {
+      return new ClusterDefaults(services, provider, hardwaretype, imagetype, dnsSuffix, config);
+    }
   }
 
   @Override

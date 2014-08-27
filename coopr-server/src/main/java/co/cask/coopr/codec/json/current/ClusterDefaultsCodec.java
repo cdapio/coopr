@@ -53,12 +53,14 @@ public class ClusterDefaultsCodec extends AbstractCodec<ClusterDefaults> {
 
     Set<String> services = context.deserialize(jsonObj.get("services"),
                                                new TypeToken<Set<String>>() {}.getType());
-    String provider = context.deserialize(jsonObj.get("provider"), String.class);
-    String hardwaretype = context.deserialize(jsonObj.get("hardwaretype"), String.class);
-    String imagetype = context.deserialize(jsonObj.get("imagetype"), String.class);
-    String dnsSuffix = context.deserialize(jsonObj.get("dnsSuffix"), String.class);
-    JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
 
-    return new ClusterDefaults(services, provider, hardwaretype, imagetype, dnsSuffix, config);
+    return ClusterDefaults.builder()
+      .setServices(services)
+      .setProvider(context.<String>deserialize(jsonObj.get("provider"), String.class))
+      .setHardwaretype(context.<String>deserialize(jsonObj.get("hardwaretype"), String.class))
+      .setImagetype(context.<String>deserialize(jsonObj.get("imagetype"), String.class))
+      .setDNSSuffix(context.<String>deserialize(jsonObj.get("dnsSuffix"), String.class))
+      .setConfig(context.<JsonObject>deserialize(jsonObj.get("config"), JsonObject.class))
+      .build();
   }
 }

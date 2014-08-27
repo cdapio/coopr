@@ -29,10 +29,10 @@ public final class Compatibilities {
   private final Set<String> imagetypes;
   private final Set<String> services;
 
-  public Compatibilities(Set<String> hardwaretypes, Set<String> imagetypes, Set<String> services) {
-    this.hardwaretypes = hardwaretypes == null ? ImmutableSet.<String>of() : hardwaretypes;
-    this.imagetypes = imagetypes == null ? ImmutableSet.<String>of() : imagetypes;
-    this.services = services == null ? ImmutableSet.<String>of() : services;
+  private Compatibilities(Set<String> hardwaretypes, Set<String> imagetypes, Set<String> services) {
+    this.hardwaretypes = hardwaretypes;
+    this.imagetypes = imagetypes;
+    this.services = services;
   }
 
   /**
@@ -118,6 +118,58 @@ public final class Compatibilities {
    */
   public boolean compatibleWithHardwareType(String hardwareType) {
     return hardwaretypes.isEmpty() || hardwaretypes.contains(hardwareType);
+  }
+
+  /**
+   * Get a builder for creating compatibilities.
+   *
+   * @return Builder for creating compatibilities.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for creating Compatibilities.
+   */
+  public static class Builder {
+    private Set<String> hardwaretypes = ImmutableSet.of();
+    private Set<String> imagetypes = ImmutableSet.of();
+    private Set<String> services = ImmutableSet.of();
+
+    public Builder setHardwaretypes(Set<String> hardwaretypes) {
+      this.hardwaretypes = ImmutableSet.copyOf(hardwaretypes);
+      return this;
+    }
+
+    public Builder setHardwaretypes(String... hardwaretypes) {
+      this.hardwaretypes = ImmutableSet.copyOf(hardwaretypes);
+      return this;
+    }
+
+    public Builder setImagetypes(Set<String> imagetypes) {
+      this.imagetypes = ImmutableSet.copyOf(imagetypes);
+      return this;
+    }
+
+    public Builder setImagetypes(String... imagetypes) {
+      this.imagetypes = ImmutableSet.copyOf(imagetypes);
+      return this;
+    }
+
+    public Builder setServices(Set<String> services) {
+      this.services = ImmutableSet.copyOf(services);
+      return this;
+    }
+
+    public Builder setServices(String... services) {
+      this.services = ImmutableSet.copyOf(services);
+      return this;
+    }
+
+    public Compatibilities build() {
+      return new Compatibilities(hardwaretypes, imagetypes, services);
+    }
   }
 
   @Override

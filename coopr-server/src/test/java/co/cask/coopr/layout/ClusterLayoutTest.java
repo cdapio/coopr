@@ -93,34 +93,42 @@ public class ClusterLayoutTest {
     Assert.assertTrue(layout.isCompatibleWithTemplate(template));
 
     // test if service compatibilities are violated.
-    Compatibilities newCompatibilities = new Compatibilities(
-      template.getCompatibilities().getHardwaretypes(),
-      template.getCompatibilities().getImagetypes(),
-      ImmutableSet.<String>of("namenode", "datanode", "zookeeper")
-    );
-    template = new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
-                                   newCompatibilities, template.getConstraints(), template.getAdministration());
+    Compatibilities newCompatibilities = Compatibilities.builder()
+      .setHardwaretypes(template.getCompatibilities().getHardwaretypes())
+      .setImagetypes(template.getCompatibilities().getImagetypes())
+      .setServices("namenode", "datanode", "zookeeper")
+      .build();
+    template = copyWithNewCompatibilities(template, newCompatibilities);
     Assert.assertFalse(layout.isCompatibleWithTemplate(template));
 
     // test if hardware type compatibilities are violated
-    newCompatibilities = new Compatibilities(
-      ImmutableSet.<String>of("large"),
-      template.getCompatibilities().getImagetypes(),
-      template.getCompatibilities().getServices()
-    );
-    template = new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
-                                   newCompatibilities, template.getConstraints(), template.getAdministration());
+    newCompatibilities = Compatibilities.builder()
+      .setHardwaretypes("large")
+      .setImagetypes(template.getCompatibilities().getImagetypes())
+      .setServices(template.getCompatibilities().getServices())
+      .build();
+    template = copyWithNewCompatibilities(template, newCompatibilities);
     Assert.assertFalse(layout.isCompatibleWithTemplate(template));
 
     // test if image type compatibilities are violated
-    newCompatibilities = new Compatibilities(
-      template.getCompatibilities().getHardwaretypes(),
-      ImmutableSet.<String>of("ubuntu12"),
-      template.getCompatibilities().getServices()
-    );
-    template = new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
-                                   newCompatibilities, template.getConstraints(), template.getAdministration());
+    newCompatibilities = Compatibilities.builder()
+      .setHardwaretypes(template.getCompatibilities().getHardwaretypes())
+      .setImagetypes("ubuntu12")
+      .setServices(template.getCompatibilities().getServices())
+      .build();
+    template = copyWithNewCompatibilities(template, newCompatibilities);
     Assert.assertFalse(layout.isCompatibleWithTemplate(template));
+  }
+
+  private ClusterTemplate copyWithNewCompatibilities(ClusterTemplate template, Compatibilities newCompatibilities) {
+    return ClusterTemplate.builder()
+      .setName(template.getName())
+      .setDescription(template.getDescription())
+      .setClusterDefaults(template.getClusterDefaults())
+      .setCompatibilities(newCompatibilities)
+      .setConstraints(template.getConstraints())
+      .setAdministration(template.getAdministration())
+      .build();
   }
 
   @BeforeClass

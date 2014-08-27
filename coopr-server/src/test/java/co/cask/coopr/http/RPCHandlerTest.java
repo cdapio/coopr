@@ -57,12 +57,17 @@ public class RPCHandlerTest extends ServiceTestBase {
     JsonObject defaultClusterConfig = new JsonObject();
     defaultClusterConfig.addProperty("defaultconfig", "value1");
 
-    smallTemplate =  new ClusterTemplate("one-machine",
-                                         "one machine cluster template",
-                                         new ClusterDefaults(ImmutableSet.of("zookeeper"), "rackspace", null, null,
-                                                             null, defaultClusterConfig),
-                                         new Compatibilities(null, null, ImmutableSet.of("zookeeper")),
-                                         null, new Administration(new LeaseDuration(10000, 30000, 5000)));
+    smallTemplate = ClusterTemplate.builder()
+      .setName("one-machine")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices("zookeeper")
+          .setProvider("rackspace")
+          .setConfig(defaultClusterConfig)
+          .build())
+      .setCompatibilities(Compatibilities.builder().setServices("zookeeper").build())
+      .setAdministration(new Administration(new LeaseDuration(10000, 30000, 5000)))
+      .build();
   }
 
   @Before

@@ -25,7 +25,6 @@ import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.service.ServiceAction;
-import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Compatibilities;
@@ -66,12 +65,16 @@ public class BaseSolverTest extends BaseTest {
 
     Set<String> services = ImmutableSet.of("namenode", "datanode", "resourcemanager", "nodemanager",
                                            "hbasemaster", "regionserver", "zookeeper", "reactor");
-    reactorTemplate = new ClusterTemplate(
-      "reactor-medium",
-      "medium reactor cluster template",
-      new ClusterDefaults(services, "joyent", null, null, null, Entities.ClusterTemplateExample.clusterConf),
-      new Compatibilities(null, null, services),
-      new Constraints(
+    reactorTemplate = ClusterTemplate.builder()
+      .setName("reactor-medium")
+      .setDescription("medium reactor cluster template")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices(services)
+          .setProvider("joyent")
+          .setConfig(Entities.ClusterTemplateExample.clusterConf).build())
+      .setCompatibilities(Compatibilities.builder().setServices(services).build())
+      .setConstraints(new Constraints(
         ImmutableMap.<String, ServiceConstraint>of(
           "namenode",
           new ServiceConstraint(
@@ -104,9 +107,7 @@ public class BaseSolverTest extends BaseTest {
           )
         ),
         SizeConstraint.EMPTY
-      ),
-      Administration.EMPTY_ADMINISTRATION
-    );
+      )).build();
     reactorTemplate2 = Entities.ClusterTemplateExample.REACTOR2;
 
     EntityStoreView adminView = entityStoreService.getView(account);

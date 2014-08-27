@@ -1133,12 +1133,18 @@ public class ClusterHandlerTest extends ServiceTestBase {
     Set<String> newCompatibleServices = Sets.newHashSet(template.getCompatibilities().getServices());
     newCompatibleServices.add("new-service");
     Compatibilities newCompatibilities =
-      new Compatibilities(template.getCompatibilities().getHardwaretypes(),
-                          template.getCompatibilities().getImagetypes(),
-                          newCompatibleServices);
-    ClusterTemplate updatedTemplate =
-      new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
-                          newCompatibilities, template.getConstraints(), template.getAdministration());
+      Compatibilities.builder()
+        .setHardwaretypes(template.getCompatibilities().getHardwaretypes())
+        .setImagetypes(template.getCompatibilities().getImagetypes())
+        .setServices(newCompatibleServices).build();
+    ClusterTemplate updatedTemplate = ClusterTemplate.builder()
+      .setName(template.getName())
+      .setDescription(template.getDescription())
+      .setClusterDefaults(template.getClusterDefaults())
+      .setCompatibilities(newCompatibilities)
+      .setConstraints(template.getConstraints())
+      .setAdministration(template.getAdministration())
+      .build();
     entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(updatedTemplate);
 
     // now sync the cluster
@@ -1213,12 +1219,19 @@ public class ClusterHandlerTest extends ServiceTestBase {
     // now edit the template, making centos incompatible with the template
     Set<String> newCompatibleImages = ImmutableSet.of(Entities.ImageTypeExample.UBUNTU_12.getName());
     Compatibilities newCompatibilities =
-      new Compatibilities(template.getCompatibilities().getHardwaretypes(),
-                          newCompatibleImages,
-                          template.getCompatibilities().getServices());
-    ClusterTemplate updatedTemplate =
-      new ClusterTemplate(template.getName(), template.getDescription(), template.getClusterDefaults(),
-                          newCompatibilities, template.getConstraints(), template.getAdministration());
+      Compatibilities.builder()
+        .setHardwaretypes(template.getCompatibilities().getHardwaretypes())
+        .setImagetypes(newCompatibleImages)
+        .setServices(template.getCompatibilities().getServices())
+        .build();
+    ClusterTemplate updatedTemplate = ClusterTemplate.builder()
+      .setName(template.getName())
+      .setDescription(template.getDescription())
+      .setClusterDefaults(template.getClusterDefaults())
+      .setCompatibilities(newCompatibilities)
+      .setConstraints(template.getConstraints())
+      .setAdministration(template.getAdministration())
+      .build();
     entityStoreService.getView(Entities.ADMIN_ACCOUNT).writeClusterTemplate(updatedTemplate);
 
     // syncing the cluster would make it invalid, should not be allowed
@@ -1259,11 +1272,14 @@ public class ClusterHandlerTest extends ServiceTestBase {
 
   @Test
   public void testClusterProlongForever() throws Exception {
-    ClusterTemplate foreverTemplate =
-      new ClusterTemplate("forever-template", "",
-                          new ClusterDefaults(ImmutableSet.<String>of(), "", "", "", null, new JsonObject()),
-                          Compatibilities.EMPTY_COMPATIBILITIES,
-                          Constraints.EMPTY_CONSTRAINTS, Administration.EMPTY_ADMINISTRATION);
+    ClusterTemplate foreverTemplate = ClusterTemplate.builder()
+      .setName("forever-template")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices("base")
+          .setProvider("rackspace")
+          .build())
+      .build();
 
     long currentTime = 10000;
     Cluster foreverCluster = Cluster.builder()
@@ -1288,11 +1304,14 @@ public class ClusterHandlerTest extends ServiceTestBase {
 
   @Test
   public void testClusterProlong() throws Exception {
-    ClusterTemplate template =
-      new ClusterTemplate("limited-template", "",
-                          new ClusterDefaults(ImmutableSet.<String>of(), "", "", "", null, new JsonObject()),
-                          Compatibilities.EMPTY_COMPATIBILITIES,
-                          Constraints.EMPTY_CONSTRAINTS, new Administration(new LeaseDuration(1000, 12000, 1000)));
+    ClusterTemplate template = ClusterTemplate.builder()
+      .setName("limited-template")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices("base")
+          .setProvider("rackspace")
+          .build())
+      .setAdministration(new Administration(new LeaseDuration(1000, 12000, 1000))).build();
 
     long currentTime = 10000;
     Cluster cluster = Cluster.builder()
@@ -1732,61 +1751,63 @@ public class ClusterHandlerTest extends ServiceTestBase {
   public static void initData() throws Exception {
     Set<String> services = ImmutableSet.of("namenode", "datanode", "resourcemanager", "nodemanager",
                                            "hbasemaster", "regionserver", "zookeeper", "reactor");
-    reactorTemplate = new ClusterTemplate(
-      "reactor-medium",
-      "medium reactor cluster template",
-      new ClusterDefaults(services, "joyent", null, null, null, new JsonObject()),
-      new Compatibilities(
-        ImmutableSet.<String>of("large-mem", "large-cpu", "large", "medium", "small"),
-        null,
-        null
-      ),
-      new Constraints(
-        ImmutableMap.<String, ServiceConstraint>of(
-          "namenode",
-          new ServiceConstraint(
-            ImmutableSet.of("large-mem"),
-            ImmutableSet.of("centos6", "ubuntu12"), 1, 1),
-          "datanode",
-          new ServiceConstraint(
-            ImmutableSet.of("medium", "large-cpu"),
-            ImmutableSet.of("centos6", "ubuntu12"), 1, 50),
-          "zookeeper",
-          new ServiceConstraint(
-            ImmutableSet.of("small", "medium"),
-            ImmutableSet.of("centos6"), 1, 5),
-          "reactor",
-          new ServiceConstraint(
-            ImmutableSet.of("medium", "large"),
-            null, 1, 5)
-        ),
-        new LayoutConstraint(
-          ImmutableSet.<Set<String>>of(
-            ImmutableSet.of("datanode", "nodemanager", "regionserver"),
-            ImmutableSet.of("namenode", "resourcemanager", "hbasemaster")
+    reactorTemplate = ClusterTemplate.builder()
+      .setName("reactor-medium")
+      .setDescription("medium reactor cluster template")
+      .setClusterDefaults(ClusterDefaults.builder().setServices(services).setProvider("joyent").build())
+      .setCompatibilities(
+        Compatibilities.builder().setHardwaretypes("large-mem", "large-cpu", "large", "medium", "small").build())
+      .setConstraints(
+        new Constraints(
+          ImmutableMap.<String, ServiceConstraint>of(
+            "namenode",
+            new ServiceConstraint(
+              ImmutableSet.of("large-mem"),
+              ImmutableSet.of("centos6", "ubuntu12"), 1, 1),
+            "datanode",
+            new ServiceConstraint(
+              ImmutableSet.of("medium", "large-cpu"),
+              ImmutableSet.of("centos6", "ubuntu12"), 1, 50),
+            "zookeeper",
+            new ServiceConstraint(
+              ImmutableSet.of("small", "medium"),
+              ImmutableSet.of("centos6"), 1, 5),
+            "reactor",
+            new ServiceConstraint(
+              ImmutableSet.of("medium", "large"),
+              null, 1, 5)
           ),
-          ImmutableSet.<Set<String>>of(
-            ImmutableSet.of("datanode", "namenode"),
-            ImmutableSet.of("datanode", "zookeeper"),
-            ImmutableSet.of("namenode", "zookeeper"),
-            ImmutableSet.of("datanode", "reactor"),
-            ImmutableSet.of("namenode", "reactor")
-          )
-        ),
-        new SizeConstraint(2, 50)
-      ),
-      Administration.EMPTY_ADMINISTRATION
-    );
+          new LayoutConstraint(
+            ImmutableSet.<Set<String>>of(
+              ImmutableSet.of("datanode", "nodemanager", "regionserver"),
+              ImmutableSet.of("namenode", "resourcemanager", "hbasemaster")
+            ),
+            ImmutableSet.<Set<String>>of(
+              ImmutableSet.of("datanode", "namenode"),
+              ImmutableSet.of("datanode", "zookeeper"),
+              ImmutableSet.of("namenode", "zookeeper"),
+              ImmutableSet.of("datanode", "reactor"),
+              ImmutableSet.of("namenode", "reactor")
+            )
+          ),
+          new SizeConstraint(2, 50)
+        )).build();
 
     defaultClusterConfig = new JsonObject();
     defaultClusterConfig.addProperty("defaultconfig", "value1");
 
-    smallTemplate =  new ClusterTemplate("one-machine",
-                                         "one machine cluster template",
-                                         new ClusterDefaults(ImmutableSet.of("zookeeper"), "joyent", null, null,
-                                                             null, defaultClusterConfig),
-                                         new Compatibilities(null, null, ImmutableSet.of("zookeeper")),
-                                         null, new Administration(new LeaseDuration(10000, 30000, 5000)));
+    smallTemplate = ClusterTemplate.builder()
+      .setName("one-machine")
+      .setDescription("one machine cluster template")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices("zookeeper")
+          .setProvider("joyent")
+          .setConfig(defaultClusterConfig)
+          .build())
+      .setCompatibilities(Compatibilities.builder().setServices("zookeeper").build())
+      .setAdministration(new Administration(new LeaseDuration(10000, 30000, 5000)))
+      .build();
 
     EntityStoreView adminView = entityStoreService.getView(ADMIN_ACCOUNT);
     EntityStoreView superadminView = entityStoreService.getView(SUPERADMIN_ACCOUNT);

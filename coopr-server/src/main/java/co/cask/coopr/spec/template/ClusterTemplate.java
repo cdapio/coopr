@@ -32,20 +32,15 @@ public final class ClusterTemplate extends NamedIconEntity {
   private final Compatibilities compatibilities;
   private final Administration administration;
 
-  public ClusterTemplate(String name, String logolink, String description, ClusterDefaults clusterDefaults,
-                         Compatibilities compatibilities, Constraints constraints, Administration administration) {
-    super(name, logolink);
+  private ClusterTemplate(String name, String icon, String description, ClusterDefaults clusterDefaults,
+                          Compatibilities compatibilities, Constraints constraints, Administration administration) {
+    super(name, icon);
     Preconditions.checkArgument(clusterDefaults != null, "cluster defaults must be specified");
     this.clusterDefaults = clusterDefaults;
-    this.description = description == null ? "" : description;
-    this.constraints = constraints == null ? Constraints.EMPTY_CONSTRAINTS : constraints;
-    this.compatibilities = compatibilities == null ? Compatibilities.EMPTY_COMPATIBILITIES : compatibilities;
-    this.administration = administration == null ? Administration.EMPTY_ADMINISTRATION : administration;
-  }
-
-  public ClusterTemplate(String name, String description, ClusterDefaults clusterDefaults,
-                         Compatibilities compatibilities, Constraints constraints, Administration administration) {
-    this(name, null, description, clusterDefaults, compatibilities, constraints, administration);
+    this.description = description;
+    this.constraints = constraints;
+    this.compatibilities = compatibilities;
+    this.administration = administration;
   }
 
   /**
@@ -91,6 +86,68 @@ public final class ClusterTemplate extends NamedIconEntity {
    */
   public Administration getAdministration() {
     return administration;
+  }
+
+  /**
+   * Return a builder for creating a cluster template.
+   *
+   * @return Builder for creating a cluster template.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for creating cluster templates.
+   */
+  public static class Builder {
+    private String name;
+    private String icon;
+    private String description;
+    private ClusterDefaults clusterDefaults;
+    private Constraints constraints = Constraints.EMPTY_CONSTRAINTS;
+    private Compatibilities compatibilities = Compatibilities.EMPTY_COMPATIBILITIES;
+    private Administration administration = Administration.EMPTY_ADMINISTRATION;
+
+    public Builder setName(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder setIcon(String icon) {
+      this.icon = icon;
+      return this;
+    }
+
+    public Builder setDescription(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public Builder setClusterDefaults(ClusterDefaults clusterDefaults) {
+      this.clusterDefaults = clusterDefaults;
+      return this;
+    }
+
+    public Builder setConstraints(Constraints constraints) {
+      this.constraints = constraints;
+      return this;
+    }
+
+    public Builder setCompatibilities(Compatibilities compatibilities) {
+      this.compatibilities = compatibilities;
+      return this;
+    }
+
+    public Builder setAdministration(Administration administration) {
+      this.administration = administration;
+      return this;
+    }
+
+    public ClusterTemplate build() {
+      return new ClusterTemplate(name, icon, description, clusterDefaults,
+                                 compatibilities, constraints, administration);
+    }
   }
 
   @Override
