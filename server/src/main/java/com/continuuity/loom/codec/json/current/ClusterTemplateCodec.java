@@ -55,13 +55,13 @@ public class ClusterTemplateCodec extends AbstractCodec<ClusterTemplate> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
-    String logolink = context.deserialize(jsonObj.get("icon"), String.class);
+    String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
     ClusterDefaults defaults = context.deserialize(jsonObj.get("defaults"), ClusterDefaults.class);
     Compatibilities compatibilites = context.deserialize(jsonObj.get("compatibility"), Compatibilities.class);
     Constraints constraints = context.deserialize(jsonObj.get("constraints"), Constraints.class);
     Administration administration = context.deserialize(jsonObj.get("administration"), Administration.class);
 
-    return new ClusterTemplate(name, logolink, description, defaults, compatibilites, constraints, administration);
+    return new ClusterTemplate(name, icon, description, defaults, compatibilites, constraints, administration);
   }
 }
