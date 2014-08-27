@@ -319,7 +319,7 @@ Status of a cluster is a JSON Object with a clusterid, stepstotal, stepscomplete
 status, actionstatus, and action.  
 
 The status can be one of pending, active, incomplete, and terminated.
-pending means there is some actions pending, active means the cluster 
+Pending means there is some actions pending, active means the cluster 
 is active and can be used, incomplete means there was some previous action failure so 
 the cluster may not be usable, but is deletable, and terminated means the cluster is 
 inaccessible and all nodes have been removed. 
