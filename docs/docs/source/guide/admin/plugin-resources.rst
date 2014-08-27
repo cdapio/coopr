@@ -32,7 +32,7 @@ execute all tasks it needs to perform. However, administrators may wish to manag
 services. For example, you may want to create an Elastic Search template to create an indexing and search cluster. 
 In order to allow simple and easy expansion of service and template capabilities, plugins are able to define different
 types of resources they can use to perform tasks. For example, the Chef Automator plugin defines 3 types of resources: 
-cookbooks, databags, and roles. We include several cookbooks out of the box, but the plugin resource system allows administrators to
+cookbooks, data bags, and roles. We include several cookbooks out of the box, but the plugin resource system allows administrators to
 add and manage any number of cookbooks, enabling support of any service desired. Similarly, plugin resources can be used on the 
 provider plugin side to upload and manage tenant specific data, such as user keys or credentials. 
 
@@ -62,8 +62,8 @@ Uploading Resources
 Plugin resources can only be uploaded by a tenant administrator. It can be done through the UI, or through the REST API
 documented :doc:`here </rest/plugins>`. Each time a resource is uploaded, a new version of the resource is created. Subsequent
 interactions require the version of a resource as well as the name. Archive resources are assumed to be constructed such that
-the name of the resource is a top level folder in the expanded archive. A newly uploaded resource beings in the 'inactive' state.
-An inactive resource is not visible to provisioners, meaning it cannot be used. It is also  not scheduled to be used at any point 
+the name of the resource is a top level folder in the expanded archive. A newly uploaded resource begins in the 'inactive' state.
+An inactive resource is not visible to provisioners, meaning it cannot be used. It is also not scheduled to be used at any point 
 in the future.  
 
 Staging Resources
