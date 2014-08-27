@@ -59,26 +59,3 @@ API</rest/templates>` or :doc:`Admin UI </guide/admin/ui>` carefully to design t
 
 .. _provision-templates2:
 
-Tools
-=====
-Continuuity Loom includes several tools for administrators to simplify their administrative tasks. Apart from the
-:doc:`Admin UI </guide/admin/ui>`, Continuuity Loom provides several additional :doc:`metrics and monitoring </guide/admin/monitoring>` tools.
-Continuuity Loom allows administrators to :doc:`configure their servers </guide/admin/server-config>`
-and  :doc:`write custom plugins </guide/admin/plugins>` for allocating machines with your providers or to implement custom services.
-Administrators who are more command line driven, or who wish to write quick administrative scripts,
-can employ the :doc:`Web services API </rest/index>`.
-
-Please refer to the following pages for more details:
-
-        * :doc:`Administration User Interface </guide/admin/ui>`
-
-        * :doc:`Server Configuration </guide/admin/server-config>`
-
-        * :doc:`Monitoring and Metrics </guide/admin/monitoring>`
-
-        * :doc:`Macros </guide/admin/macros>`
-
-        * :doc:`Provisioner Plugins </guide/admin/plugins>`
-
-        * :doc:`REST Web Service Interface </rest/index>`
-

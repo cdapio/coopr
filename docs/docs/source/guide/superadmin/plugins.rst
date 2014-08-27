@@ -283,8 +283,11 @@ Loom plugins are required to provide a JSON file which defines the plugin, inclu
   * named providertypes and automatortypes
   * the class name for each providertype and automatortype
   * any custom fields required by each providertype and automatortype
+  * types of resources the plugin can use to perform tasks
 
 Custom fields allow a plugin to announce the fields that it requires.  For example a Rackspace provider plugin may require a username and password while the Joyent provider plugin can require either a password or a key.  Likewise, the Chef Automator plugin requires a run-list and JSON attributes, while the Shell Automator plugin requires a command and arguments.
+
+Plugin resources specify files or archives that can be used by plugins to perform tasks.  For example, the Chef Automator plugin uses cookbooks, data bags, and roles, while the Shell Automator plugin uses scripts and archives. Administrators can then upload and manage resources as needed.  For example, an administrator may want to add support for a new service without having to update the plugin. To do so, the administrator can make a cookbook that manages the service, upload it, then sync it so it becomes available for plugins to use. 
 
 For example, consider the JSON definition file for the Rackspace provider plugin:
 ::
@@ -400,3 +403,47 @@ Included Plugins
    chef-solo-automator-plugin
    shell-automator-plugin
 
+Resource types
+==============
+
+Resource types are defined by plugins and are useful when you want to let administrators provide data for your plugin to use.
+For example, the Chef Automator plugin defines 3 types of resources:
+cookbooks, databags, and roles. Several cookbooks are included out of the box, but the plugin resource system allows administrators to
+add and manage any number of cookbooks, enabling support of any service desired. Similarly, plugin resources can be used on the
+provider plugin side to upload and manage tenant specific data, such as user keys or credentials. More details about how 
+plugin resources are managed by tenant administrators can be seen on the :doc:`Plugin Resources Guide </guide/admin/plugin-resources>` 
+
+Defining Resource Types
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Resource types are defined by plugins. A resource type is simply some plugin specific name for data the plugin can use, along with
+a data format of the resource. Supported formats are 'file' and 'archive'. Resource types of the 'archive' format are zips or tarballs
+of that will be expanded by provisioners before use. It is expected that the top level of the archive is a folder of the same name as
+the name of the resource. For example, the Chef Automator plugin defines a 'cookbooks' resource type that uses the 'archive' format. This
+means that if a cookbook named 'my-service' is uploaded, it is expected that the top level directory of the archive is named 'my-service'.
+
+Below is an example of the section of the plugin specification detailing the 3 resource types the Chef Automator supports.
+::
+  "resourceTypes": {
+        "cookbooks": {
+            "format": "archive"
+        },
+        "data_bags": {
+            "format": "archive"
+        },
+        "roles": {
+            "format": "file"
+        }
+  }
+
+Plugin Resource Storage
+^^^^^^^^^^^^^^^^^^^^^^^
+
+By default, plugin resources uploaded to the Server are simply stored as local files.  If you are running multiple servers for HA
+purposes, you will have to configure the servers to write to a distributed system such as NFS so that all servers have access
+to the resources. This can be achieved by configuring the ``server.plugin.store.localfilestore.data.dir`` setting in the server
+config. If you wish to use a different system for persistently storing the plugin resources, you can implement the ``PluginStore``
+interface, add your jar to the lib directory for the server, and change the ``server.plugin.store.class`` setting to be the
+fully qualified class name of your implementation. The interface provides methods for getting input and output streams for reading
+and writing plugin resources. This allows you to swap in any persistent storage implementation needed. You can see more details
+about the interface and default ``LocalFilePluginStore`` class by viewing the :doc:`javadocs </javadocs/index>`
