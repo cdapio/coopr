@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.spec.template;
 
+import com.continuuity.loom.layout.InvalidClusterException;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -62,6 +63,42 @@ public class LeaseDuration {
    */
   public long getStep() {
     return step;
+  }
+
+  /**
+   * Calculate the initial lease to use given the initial lease here and a requested initial lease. The requested
+   * lease must be equal to or less than the initial lease here. Takes into account that a lease of 0 is an infinite
+   * lease.
+   *
+   * @param requestedInitialLease Requested initial lease.
+   * @return The smaller of the leases.
+   * @throws InvalidClusterException if the requested lease is larger than the allowed initial lease, or if it is
+   *                                  less than negative one.
+   */
+  public long calcInitialLease(long requestedInitialLease) throws InvalidClusterException {
+    // Determine valid lease duration for the cluster.
+    // It has to be less than the initial lease duration set in template.
+    long leaseDuration;
+
+    // if it's -1, use the lease specified in the template
+    if (requestedInitialLease == -1) {
+      leaseDuration = initial;
+    } else if (initial == 0) {
+      // lease of 0 means it's an unlimited lease, so anything in the request is valid
+      leaseDuration = requestedInitialLease;
+    } else if (initial >= requestedInitialLease && requestedInitialLease != 0) {
+      // initial lease is bigger than the requested one so its ok. requested lease of 0 is an unlimited
+      // lease, so need to check for that explicitly.
+      leaseDuration = requestedInitialLease;
+    } else {
+      // this happens if the requested lease is greater than the template lease
+      throw new InvalidClusterException("lease duration cannot be greater than duration specified in template");
+    }
+
+    if (leaseDuration < 0) {
+      throw new InvalidClusterException("invalid lease duration: " + leaseDuration);
+    }
+    return leaseDuration;
   }
 
   @Override
