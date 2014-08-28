@@ -16,7 +16,7 @@
       "hive-metastore"
     ],
     "provider": "rackspace",
-    "hardwaretype": "xlarge",
+    "hardwaretype": "standard-large",
     "imagetype": "ubuntu12",
     "config": {
       "hadoop": {
@@ -103,9 +103,9 @@
   },
   "compatibility": {
     "hardwaretypes": [
-      "large",
-      "xlarge",
-      "xxlarge"
+      "standard-large",
+      "standard-xlarge",
+      "standard-xxlarge"
     ],
     "imagetypes": [
       "centos6",

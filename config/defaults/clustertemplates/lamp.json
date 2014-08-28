@@ -10,7 +10,7 @@
       "mysql-server"
     ],
     "provider": "rackspace",
-    "hardwaretype": "medium",
+    "hardwaretype": "standard-medium",
     "imagetype": "ubuntu12",
     "config": {
       "apache": {
@@ -55,19 +55,18 @@
           "mysql.default_host": "%host.service.mysql-server%"
         },
         "modules": [
-          "memcache",
-          "mysql"
+          "memcache"
         ]
       }
     }
   },
   "compatibility": {
     "hardwaretypes": [
-      "small",
-      "medium",
-      "large",
-      "xlarge",
-      "xxlarge"
+      "standard-small",
+      "standard-medium",
+      "standard-large",
+      "standard-xlarge",
+      "standard-xxlarge"
     ],
     "imagetypes": [
       "centos6",

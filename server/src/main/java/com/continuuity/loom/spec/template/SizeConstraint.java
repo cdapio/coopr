@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.spec.template;
 
+import com.continuuity.loom.layout.InvalidClusterException;
 import com.google.common.base.Objects;
 
 /**
@@ -33,6 +34,18 @@ public class SizeConstraint {
     this.max = max == null ? Integer.MAX_VALUE : max;
     if (this.max < this.min) {
       throw new IllegalArgumentException("Maximum must greater than or equal to the minimum.");
+    }
+  }
+
+  /**
+   * Verifies that the given number of machines meets the size constraint.
+   *
+   * @param numMachines Number of machines to validate.
+   * @throws InvalidClusterException if the input does not meet the size constraint.
+   */
+  public void verify(int numMachines) throws InvalidClusterException {
+    if (numMachines < min || numMachines > max) {
+      throw new InvalidClusterException("Size must be at least " + min + " but not greater than " + max);
     }
   }
 
