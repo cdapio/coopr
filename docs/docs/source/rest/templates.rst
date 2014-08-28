@@ -24,7 +24,7 @@ REST API: Cluster Templates
 
 .. include:: /rest/rest-links.rst
 
-TheREST APIs allow you to create templates describing different types of clusters.  For example, there may be a template for Hadoop clusters, 
+The REST APIs allow you to create templates describing different types of clusters.  For example, there may be a template for Hadoop clusters, 
 a template for LAMP clusters, a template for Solr clusters, etc. Templates contain enough information that a user only needs to specify a template 
 and a number of machines to create a cluster. This is done by first describing the set of services, hardware types, 
 and image types that a cluster is compatible with. Next, default values for provider, services, and configuration are given, with optional defaults for 
