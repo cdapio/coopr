@@ -37,8 +37,9 @@ Base URL
 All URLs referenced in the documentation have the following base:
 ::
 
- http://<server>:<port>|api_base|
+ http://<server>:<port>/<version>
 
+The current API version is 'v2'.
 The default server port is 55054 but can be reconfigured as described in :doc:`Configuring the server </guide/admin/server-config>`. 
 In addition, three headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
 the id of the user making the request. The second is ``X-Loom-ApiKey`` and is used to specify the api key used to
