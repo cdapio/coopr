@@ -97,7 +97,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testNonAdminCantBootstrap() throws Exception {
-    assertResponseStatus(doPost("/v1/loom/bootstrap", "", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doPost("/bootstrap", "", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
@@ -147,7 +147,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
       new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
       new BasicHeader(Constants.TENANT_HEADER, "tenantX")
     };
-    assertResponseStatus(doPost("/v1/loom/bootstrap", "", headers), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/bootstrap", "", headers), HttpResponseStatus.OK);
 
     // make sure tenant account has copied superadmin entities
     Assert.assertEquals(providers, ImmutableSet.copyOf(tenantView.getAllProviders()));
@@ -193,42 +193,42 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
       new BasicHeader(Constants.TENANT_HEADER, "tenantX")
     };
     BootstrapRequest body = new BootstrapRequest(false);
-    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), headers), HttpResponseStatus.CONFLICT);
+    assertResponseStatus(doPost("/bootstrap", gson.toJson(body), headers), HttpResponseStatus.CONFLICT);
     Assert.assertEquals(template2, tenantView.getClusterTemplate(name));
 
     // check that with force true, the template is overwritten
     body = new BootstrapRequest(true);
-    assertResponseStatus(doPost("/v1/loom/bootstrap", gson.toJson(body), headers), HttpResponseStatus.OK);
+    assertResponseStatus(doPost("/bootstrap", gson.toJson(body), headers), HttpResponseStatus.OK);
     Assert.assertEquals(template1, tenantView.getClusterTemplate(name));
   }
 
   @Test
   public void testInvalidGetNodePropertiesReturns400() throws Exception {
     // not a json object
-    assertResponseStatus(doPost("/v1/loom/getNodeProperties", "body", USER1_HEADERS),
+    assertResponseStatus(doPost("/getNodeProperties", "body", USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // no cluster id
     JsonObject requestBody = new JsonObject();
-    assertResponseStatus(doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS),
+    assertResponseStatus(doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // bad cluster id
     requestBody = new JsonObject();
     requestBody.add("clusterId", new JsonObject());
-    assertResponseStatus(doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS),
+    assertResponseStatus(doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // bad properties
     requestBody = new JsonObject();
     requestBody.addProperty("properties", "prop1,prop2");
-    assertResponseStatus(doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS),
+    assertResponseStatus(doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // bad services
     requestBody = new JsonObject();
     requestBody.addProperty("services", "service1,service2");
-    assertResponseStatus(doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS),
+    assertResponseStatus(doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 
@@ -276,20 +276,20 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
     // test with nonexistant cluster
     JsonObject requestBody = new JsonObject();
     requestBody.addProperty("clusterId", "123" + cluster.getId());
-    HttpResponse response = doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS);
+    HttpResponse response = doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     JsonObject responseBody = getJsonObjectBodyFromResponse(response);
     Assert.assertTrue(responseBody.entrySet().isEmpty());
 
     // test with unowned cluster
     requestBody.addProperty("clusterId", cluster.getId());
-    response = doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER2_HEADERS);
+    response = doPost("/getNodeProperties", requestBody.toString(), USER2_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
     Assert.assertTrue(responseBody.entrySet().isEmpty());
 
     // test without any filters
-    response = doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS);
+    response = doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
     JsonObject expected = new JsonObject();
@@ -301,7 +301,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
 
     // test with filter on service A
     requestBody.add("services", TestHelper.jsonArrayOf(svcA.getName()));
-    response = doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS);
+    response = doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
     expected = new JsonObject();
@@ -313,7 +313,7 @@ public class LoomRPCHandlerTest extends LoomServiceTestBase {
 
     // test with filter on service A and property list
     requestBody.add("properties", TestHelper.jsonArrayOf("hostname", "ipaddresses"));
-    response = doPost("/v1/loom/getNodeProperties", requestBody.toString(), USER1_HEADERS);
+    response = doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
     expected = new JsonObject();

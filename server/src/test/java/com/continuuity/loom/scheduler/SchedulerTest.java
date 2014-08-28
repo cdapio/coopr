@@ -18,6 +18,7 @@ package com.continuuity.loom.scheduler;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.http.LoomServiceTestBase;
@@ -276,7 +277,7 @@ public class SchedulerTest extends LoomServiceTestBase {
 
   private String getLoomUrl() {
     InetSocketAddress address = loomService.getBindAddress();
-    return String.format("http://%s:%s", address.getHostName(), address.getPort());
+    return String.format("http://%s:%s%s", address.getHostName(), address.getPort(), Constants.API_BASE);
   }
 
   private static class ActionService {

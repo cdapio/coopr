@@ -24,7 +24,7 @@ REST API: Clusters
 
 .. include:: /rest/rest-links.rst
 
-Using the Loom REST API, users can create clusters, get cluster details, action plans, and delete clusters.  
+Using the REST API, users can create clusters, get cluster details, action plans, and delete clusters.  
 
 .. _cluster-create:
 
@@ -103,7 +103,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{ "name":"hadoop-dev", "description":"my hadoop dev cluster", "numMachines":"5", "clusterTemplate":"hadoop.example" }'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters
+        http://<server>:<port>/<version>/clusters
  $ { "id":"00000079" }
 
 .. _cluster-retrieve-all:
@@ -218,7 +218,7 @@ Example
  $ curl -H 'X-Loom-UserID:<userid>' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079
+        http://<server>:<port>/<version>/clusters/00000079
  $ {
        "id":"00000079",
        "name":"hadoop-dev",
@@ -238,7 +238,7 @@ Example
                "properties": {
                    "hardwaretype": "medium",
                    "flavor": "5",
-                   "hostname": "loom-beamer90-1003.local",
+                   "hostname": "beamer90-1003.local",
                    "imagetype": "centos6",
                    "ipaddress": "123.456.0.1"
                },
@@ -303,7 +303,7 @@ Example
         -H 'X-Loom-UserID:<userid>' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079
+        http://<server>:<port>/<version>/clusters/00000079
 
 .. _cluster-status:
 
@@ -410,7 +410,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/plans/00000079-001
+        http://<server>:<port>/<version>/clusters/00000079/plans/00000079-001
  $ {
       "id":"1",
       "clusterId":"2",
@@ -481,7 +481,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/plans
+        http://<server>:<port>/<version>/clusters/00000079/plans
 
 .. _cluster-get-config:
 
@@ -514,7 +514,7 @@ Example
  $ curl -H 'X-Loom-UserID:<user-id>' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
+        http://<server>:<port>/<version>/clusters/<cluster-id>/config
  $ {
      "hadoop": {
          "core_site": {
@@ -616,7 +616,7 @@ Example
                 },
                 "restart": "false" 
             }'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
+        http://<server>:<port>/<version>/clusters/<cluster-id>/config
 
 .. _cluster-get-services:
 
@@ -651,7 +651,7 @@ Example
  $ curl -H 'X-Loom-UserID:<user-id>' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services
  [
      "hadoop-hdfs-namenode",
      "hadoop-hdfs-datanode",
@@ -703,7 +703,7 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         -d '{ "services": [ "zookeeper-server", "hbase-master", "hbase-regionserver" ] }'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services
 
 .. _cluster-stop-services:
 
@@ -745,7 +745,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/stop
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/stop
 
 .. _cluster-stop-service:
 
@@ -788,7 +788,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/stop
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/<service-id>/stop
 
 .. _cluster-start-services:
 
@@ -830,7 +830,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/start
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/start
 
 .. _cluster-start-service:
 
@@ -873,7 +873,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/start
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/<service-id>/start
 
 .. _cluster-restart-services:
 
@@ -917,7 +917,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/restart
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/restart
 
 
 .. _cluster-restart-service:
@@ -963,7 +963,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/restart
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/<service-id>/restart
 
 .. _cluster-sync-template:
 
@@ -1016,4 +1016,4 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/clustertemplate/sync
+        http://<server>:<port>/<version>/clusters/<cluster-id>/clustertemplate/sync

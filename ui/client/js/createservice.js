@@ -41,7 +41,7 @@ ServiceCtrl.factory('dataFactory', ['$http', '$q', 'fetchUrl',
       $http.get(fetchUrl + '/services').success(callback);
     },
     getAutomators: function (callback) {
-      $http.get(fetchUrl + '/automatortypes').success(callback);
+      $http.get(fetchUrl + '/plugins/automatortypes').success(callback);
     }
   }
 }]);

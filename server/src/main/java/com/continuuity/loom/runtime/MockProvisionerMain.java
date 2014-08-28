@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.runtime;
 
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.daemon.DaemonMain;
 import com.continuuity.loom.provisioner.mock.MockProvisionerService;
 import com.google.common.base.Throwables;
@@ -60,7 +61,7 @@ public final class MockProvisionerMain extends DaemonMain {
       int capacity = cmd.hasOption('c') ? Integer.valueOf(cmd.getOptionValue('c')) : 10;
       long msBetweenTasks = cmd.hasOption('f') ? Long.valueOf(cmd.getOptionValue('f')) : 1000;
       long taskMs = cmd.hasOption('d') ? Long.valueOf(cmd.getOptionValue('d')) : 1000;
-      String serverUrl = "http://" + host + ":" + port;
+      String serverUrl = "http://" + host + ":" + port + Constants.API_BASE;
       LOG.info("id = {}, capacity = {}, server url = {}, task frequency = {}, task duration = {}",
                id, capacity, serverUrl, msBetweenTasks, taskMs);
 

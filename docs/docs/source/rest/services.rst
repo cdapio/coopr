@@ -24,10 +24,10 @@ REST API: Services
 
 .. include:: /rest/rest-links.rst
 
-Loom REST APIs allow the administrator to add services. A service is some piece of software
+The REST APIs allow the administrator to add services. A service is some piece of software
 that can be placed on a cluster. Examples include a mysql server, a Hadoop namenode, a 
 Lucene indexer, and much more. The administrator defines the service entirely, so any software
-supported by the underlying provisioners can be added to Continuuity Loom. By writing a provisioner
+supported by the underlying provisioners can be added. By writing a provisioner
 automator plugin, or by using the included chef-solo and shell plugins, an administrator can manage
 any service they want.
 
@@ -258,7 +258,7 @@ Example
                     }
                 }
             }'
-        http://<loom-server>:<loom-port>/<version>/loom/services
+        http://<server>:<port>/<version>/services
 
 .. _service-retrieve:
 
@@ -293,7 +293,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/services/small.example
+        http://<server>:<port>/<version>/services/small.example
  $ {
        "name": "hadoop-hdfs-datanode",
        "description": "Hadoop HDFS DataNode",
@@ -362,7 +362,7 @@ Example
         -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/services/example
+        http://<server>:<port>/<version>/services/example
 
 .. _service-modify:
 
@@ -440,14 +440,14 @@ Example
                      }
                  }
            }'
-        http://<loom-server>:<loom-port>/<version>/loom/services/myapp
+        http://<server>:<port>/<version>/services/myapp
 
 .. _service-all-list:
 
 List all Services
 =============================
 
-To list all the services configured within Continuuity Loom, make a GET HTTP request to URI:
+To list all the services, make a GET HTTP request to URI:
 ::
 
  /services
@@ -473,5 +473,5 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/services
+        http://<server>:<port>/<version>/services
 

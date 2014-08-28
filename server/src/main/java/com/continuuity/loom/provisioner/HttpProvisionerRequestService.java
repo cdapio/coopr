@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpProvisionerRequestService implements ProvisionerRequestService {
   private static final Logger LOG  = LoggerFactory.getLogger(HttpProvisionerRequestService.class);
-  private static final String BASE_TENANT_PATH = "/v1/tenants/";
+  private static final String BASE_TENANT_PATH = Constants.API_BASE + "/tenants/";
   private final int maxRetries;
   private final long msBetweenRetries;
   private final CloseableHttpClient httpClient;

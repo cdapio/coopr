@@ -70,7 +70,7 @@ import java.util.Set;
 /**
  * Handler for performing cluster operations.
  */
-@Path("/v1/loom/clusters")
+@Path(Constants.API_BASE + "/clusters")
 public class LoomClusterHandler extends LoomAuthHandler {
   private static final Logger LOG = LoggerFactory.getLogger(LoomClusterHandler.class);
 

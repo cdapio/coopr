@@ -19,6 +19,7 @@
       "hadoop": {
         "core_site": {
           "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
+          "io.file.buffer.size": "131072",
           "hadoop.tmp.dir": "/data/hadoop"
         },
         "hdfs_site": {
@@ -29,11 +30,11 @@
           "mapreduce.framework.name": "yarn"
         },
         "yarn_site": {
-          "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
-          "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
           "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+          "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030",
           "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
-          "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+          "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+          "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033"
         }
       },
       "hbase": {
@@ -96,7 +97,7 @@
   },
   "constraints": {
     "size": {
-      "min": 3
+      "min": "3"
     },
     "layout": {
       "mustcoexist": [
