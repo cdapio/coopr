@@ -1102,16 +1102,16 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
   @Test
   public void testClusterCreateLeaseDuration() throws Exception {
     // Reactor template has forever initial lease duration
-    verifyInitialLeaseDuration(200, Cluster.Status.PENDING, 200, reactorTemplate.getName());
-    verifyInitialLeaseDuration(0, Cluster.Status.PENDING, 0, reactorTemplate.getName());
-    verifyInitialLeaseDuration(0, Cluster.Status.PENDING, -1, reactorTemplate.getName());
+    verifyInitialLeaseDuration(200, HttpResponseStatus.OK, 200, reactorTemplate.getName());
+    verifyInitialLeaseDuration(0, HttpResponseStatus.OK, 0, reactorTemplate.getName());
+    verifyInitialLeaseDuration(0, HttpResponseStatus.OK, -1, reactorTemplate.getName());
 
     // Small template has 10000 initial lease duration
-    verifyInitialLeaseDuration(10000, Cluster.Status.TERMINATED, 20000, smallTemplate.getName());
-    verifyInitialLeaseDuration(10000, Cluster.Status.PENDING, 10000, smallTemplate.getName());
-    verifyInitialLeaseDuration(500, Cluster.Status.PENDING, 500, smallTemplate.getName());
-    verifyInitialLeaseDuration(10000, Cluster.Status.TERMINATED, 0, smallTemplate.getName());
-    verifyInitialLeaseDuration(10000, Cluster.Status.PENDING, -1, smallTemplate.getName());
+    verifyInitialLeaseDuration(10000, HttpResponseStatus.BAD_REQUEST, 20000, smallTemplate.getName());
+    verifyInitialLeaseDuration(10000, HttpResponseStatus.OK, 10000, smallTemplate.getName());
+    verifyInitialLeaseDuration(500, HttpResponseStatus.OK, 500, smallTemplate.getName());
+    verifyInitialLeaseDuration(10000, HttpResponseStatus.BAD_REQUEST, 0, smallTemplate.getName());
+    verifyInitialLeaseDuration(10000, HttpResponseStatus.OK, -1, smallTemplate.getName());
   }
 
   @Test
@@ -1220,7 +1220,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     assertResponseStatus(doPost(path, "", USER1_HEADERS), HttpResponseStatus.BAD_REQUEST);
   }
 
-  private void verifyInitialLeaseDuration(long expectedExpireTime, Cluster.Status expectedStatus,
+  private void verifyInitialLeaseDuration(long expectedExpireTime, HttpResponseStatus expectedStatus,
                                           long requestedLeaseDuration,
                                           String clusterTemplate) throws Exception {
     ClusterCreateRequest clusterCreateRequest = ClusterCreateRequest.builder()
@@ -1231,13 +1231,16 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       .build();
 
     HttpResponse response = doPost("/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS);
-    assertResponseStatus(response, HttpResponseStatus.OK);
+    assertResponseStatus(response, expectedStatus);
+    if (expectedStatus == HttpResponseStatus.BAD_REQUEST) {
+      return;
+    }
 
     solverScheduler.run();
 
     String clusterId = getIdFromResponse(response);
     Cluster cluster = clusterStoreService.getView(USER1_ACCOUNT).getCluster(clusterId);
-    Assert.assertEquals(expectedStatus, cluster.getStatus());
+    Assert.assertEquals(Cluster.Status.PENDING, cluster.getStatus());
 
     if (cluster.getStatus() == Cluster.Status.TERMINATED) {
       return;

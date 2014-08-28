@@ -13,7 +13,7 @@
       "hbase-regionserver"
     ],
     "provider": "rackspace",
-    "hardwaretype": "large",
+    "hardwaretype": "standard-large",
     "imagetype": "ubuntu12",
     "config": {
       "hadoop": {
@@ -70,10 +70,10 @@
   },
   "compatibility": {
     "hardwaretypes": [
-      "medium",
-      "large",
-      "xlarge",
-      "xxlarge"
+      "standard-medium",
+      "standard-large",
+      "standard-xlarge",
+      "standard-xxlarge"
     ],
     "imagetypes": [
       "centos6",

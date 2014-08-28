@@ -19,6 +19,7 @@ Unreleased
 - Multi Tenancy ( Issues: #239, #253, #277, #284, #292, #325, #326 )
 - Include automator and provider types in export and import ( Issues: #246 )
 - Upgrade script ( Issues: #258 )
+- Fix Joyent server delete ( Issues: #272 )
 - Provisioner Multi Tenancy ( Issues: #290 #296 )
 - Updated provider plugin using fog ( Issues: #288 #310 )
 - Queue Metrics ( Issues: #301 )

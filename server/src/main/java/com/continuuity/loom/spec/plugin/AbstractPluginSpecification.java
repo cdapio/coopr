@@ -21,6 +21,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Plugin specification.
@@ -65,6 +66,39 @@ public abstract class AbstractPluginSpecification extends NamedEntity {
    */
   public Map<String, ResourceTypeSpecification> getResourceTypes() {
     return resourceTypes;
+  }
+
+  /**
+   * Get the {@link ParametersSpecification} for the given parameter type.
+   *
+   * @param parameterType Parameter type to get the specifications for.
+   * @return Specification for the given parameter type.
+   */
+  public ParametersSpecification getParametersSpecification(ParameterType parameterType) {
+    return parameters.containsKey(parameterType) ?
+      parameters.get(parameterType) : ParametersSpecification.EMPTY_SPECIFICATION;
+  }
+
+  /**
+   * Check that the given type of fields contain all required fields.
+   *
+   * @param parameterType Type of fields to check.
+   * @param fields Fields to check.
+   * @return True if the given fields contain all required fields, false if not.
+   */
+  public boolean requiredFieldsExist(ParameterType parameterType, Set<String> fields) {
+    Set<Set<String>> requiredSets = getParametersSpecification(parameterType).getRequiredFields();
+    // if nothing required is specified, anything is ok
+    if (requiredSets == null || requiredSets.isEmpty()) {
+      return true;
+    }
+    // required fields is a set of sets. As long as the fields contains all of one of these required sets, we're good.
+    for (Set<String> requiredSet : getParametersSpecification(parameterType).getRequiredFields()) {
+      if (fields.containsAll(requiredSet)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

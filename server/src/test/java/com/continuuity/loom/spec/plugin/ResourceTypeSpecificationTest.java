@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.continuuity.loom.admin;
+package com.continuuity.loom.spec.plugin;
 
 import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
 import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;

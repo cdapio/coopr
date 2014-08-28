@@ -6,18 +6,18 @@
       "base"
     ],
     "provider": "rackspace",
-    "hardwaretype": "small",
+    "hardwaretype": "standard-small",
     "imagetype": "ubuntu12",
     "config": {
     }
   },
   "compatibility": {
     "hardwaretypes": [
-      "small",
-      "medium",
-      "large",
-      "xlarge",
-      "xxlarge"
+      "standard-small",
+      "standard-medium",
+      "standard-large",
+      "standard-xlarge",
+      "standard-xxlarge"
     ],
     "imagetypes": [
       "centos6",
