@@ -16,15 +16,15 @@
 package com.continuuity.loom.http.guice;
 
 import com.continuuity.http.HttpHandler;
-import com.continuuity.loom.http.handler.LoomAdminHandler;
-import com.continuuity.loom.http.handler.LoomClusterHandler;
-import com.continuuity.loom.http.handler.LoomNodeHandler;
-import com.continuuity.loom.http.handler.LoomPluginHandler;
-import com.continuuity.loom.http.handler.LoomProvisionerHandler;
-import com.continuuity.loom.http.handler.LoomRPCHandler;
-import com.continuuity.loom.http.handler.LoomStatusHandler;
-import com.continuuity.loom.http.handler.LoomSuperadminHandler;
-import com.continuuity.loom.http.handler.LoomTaskHandler;
+import com.continuuity.loom.http.handler.AdminHandler;
+import com.continuuity.loom.http.handler.ClusterHandler;
+import com.continuuity.loom.http.handler.NodeHandler;
+import com.continuuity.loom.http.handler.PluginHandler;
+import com.continuuity.loom.http.handler.ProvisionerHandler;
+import com.continuuity.loom.http.handler.RPCHandler;
+import com.continuuity.loom.http.handler.StatusHandler;
+import com.continuuity.loom.http.handler.SuperadminHandler;
+import com.continuuity.loom.http.handler.TaskHandler;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 
@@ -37,14 +37,14 @@ public class HttpModule extends AbstractModule {
   protected void configure() {
 
     Multibinder<HttpHandler> handlerBinder = Multibinder.newSetBinder(binder(), HttpHandler.class);
-    handlerBinder.addBinding().to(LoomAdminHandler.class);
-    handlerBinder.addBinding().to(LoomClusterHandler.class);
-    handlerBinder.addBinding().to(LoomNodeHandler.class);
-    handlerBinder.addBinding().to(LoomTaskHandler.class);
-    handlerBinder.addBinding().to(LoomStatusHandler.class);
-    handlerBinder.addBinding().to(LoomRPCHandler.class);
-    handlerBinder.addBinding().to(LoomSuperadminHandler.class);
-    handlerBinder.addBinding().to(LoomProvisionerHandler.class);
-    handlerBinder.addBinding().to(LoomPluginHandler.class);
+    handlerBinder.addBinding().to(AdminHandler.class);
+    handlerBinder.addBinding().to(ClusterHandler.class);
+    handlerBinder.addBinding().to(NodeHandler.class);
+    handlerBinder.addBinding().to(TaskHandler.class);
+    handlerBinder.addBinding().to(StatusHandler.class);
+    handlerBinder.addBinding().to(RPCHandler.class);
+    handlerBinder.addBinding().to(SuperadminHandler.class);
+    handlerBinder.addBinding().to(ProvisionerHandler.class);
+    handlerBinder.addBinding().to(PluginHandler.class);
   }
 }

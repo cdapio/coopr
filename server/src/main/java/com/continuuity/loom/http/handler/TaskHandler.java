@@ -38,14 +38,14 @@ import java.io.IOException;
  * Handles requests to take and finish tasks from provisioners.
  */
 @Path(Constants.API_BASE + "/tasks")
-public final class LoomTaskHandler extends AbstractHttpHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(LoomTaskHandler.class);
+public final class TaskHandler extends AbstractHttpHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(TaskHandler.class);
 
   private final Gson gson;
   private final TaskQueueService taskQueueService;
 
   @Inject
-  private LoomTaskHandler(TaskQueueService taskQueueService, Gson gson) {
+  private TaskHandler(TaskQueueService taskQueueService, Gson gson) {
     this.taskQueueService = taskQueueService;
     this.gson = gson;
   }

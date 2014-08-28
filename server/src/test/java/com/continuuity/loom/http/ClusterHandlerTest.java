@@ -88,7 +88,7 @@ import java.util.Set;
 /**
  *
  */
-public class LoomClusterHandlerTest extends LoomServiceTestBase {
+public class ClusterHandlerTest extends ServiceTestBase {
   private static ClusterTemplate reactorTemplate;
   private static ClusterTemplate smallTemplate;
   private static JsonObject defaultClusterConfig;

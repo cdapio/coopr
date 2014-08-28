@@ -53,19 +53,19 @@ import java.util.Set;
  * and syncing resources. Only a tenant admin can access these APIs.
  */
 @Path(Constants.API_BASE + "/plugins")
-public class LoomPluginHandler extends LoomAuthHandler {
-  private static final Logger LOG  = LoggerFactory.getLogger(LoomPluginHandler.class);
+public class PluginHandler extends AbstractAuthHandler {
+  private static final Logger LOG  = LoggerFactory.getLogger(PluginHandler.class);
   private final Gson gson;
   private final ResourceService resourceService;
   private final EntityStoreService entityStoreService;
   private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
-  private LoomPluginHandler(TenantStore tenantStore,
-                            ResourceService resourceService,
-                            EntityStoreService entityStoreService,
-                            TenantProvisionerService tenantProvisionerService,
-                            Gson gson) {
+  private PluginHandler(TenantStore tenantStore,
+                        ResourceService resourceService,
+                        EntityStoreService entityStoreService,
+                        TenantProvisionerService tenantProvisionerService,
+                        Gson gson) {
     super(tenantStore);
     this.resourceService = resourceService;
     this.entityStoreService = entityStoreService;

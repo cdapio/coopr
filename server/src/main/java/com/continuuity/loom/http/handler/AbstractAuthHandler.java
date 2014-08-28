@@ -29,10 +29,10 @@ import java.io.IOException;
 /**
  * Abstract handler that provides some base methods for authenticating and authorizing requests.
  */
-public abstract class LoomAuthHandler extends AbstractHttpHandler {
+public abstract class AbstractAuthHandler extends AbstractHttpHandler {
   private final TenantStore tenantStore;
 
-  protected LoomAuthHandler(TenantStore tenantStore) {
+  protected AbstractAuthHandler(TenantStore tenantStore) {
     this.tenantStore = tenantStore;
   }
 

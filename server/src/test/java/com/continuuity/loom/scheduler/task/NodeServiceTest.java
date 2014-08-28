@@ -16,10 +16,10 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.TestHelper;
+import com.continuuity.loom.http.ServiceTestBase;
 import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
-import com.continuuity.loom.http.LoomServiceTestBase;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * Test NodeService
  */
-public class NodeServiceTest extends LoomServiceTestBase {
+public class NodeServiceTest extends ServiceTestBase {
 
   @Test
   public void testCreateHostname() {

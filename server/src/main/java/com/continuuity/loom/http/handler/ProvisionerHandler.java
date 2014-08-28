@@ -53,18 +53,18 @@ import java.io.Reader;
  * resources.
  */
 @Path(Constants.API_BASE)
-public final class LoomProvisionerHandler extends LoomAuthHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(LoomProvisionerHandler.class);
+public final class ProvisionerHandler extends AbstractAuthHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(ProvisionerHandler.class);
 
   private final Gson gson;
   private final ResourceService resourceService;
   private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
-  private LoomProvisionerHandler(TenantStore tenantStore,
-                                 TenantProvisionerService tenantProvisionerService,
-                                 ResourceService resourceService,
-                                 Gson gson) {
+  private ProvisionerHandler(TenantStore tenantStore,
+                             TenantProvisionerService tenantProvisionerService,
+                             ResourceService resourceService,
+                             Gson gson) {
     super(tenantStore);
     this.gson = gson;
     this.resourceService = resourceService;
