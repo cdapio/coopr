@@ -160,14 +160,14 @@ public class SchedulerTest extends LoomServiceTestBase {
     Map<String, String> ipAddresses = ImmutableMap.of("access", "123.456.789.123");
     FinishTaskRequest finishRequest =
       new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId, task.getTaskId(),
-                            null, null, 0, ipAddresses, result);
+                            null, null, 0, null, ipAddresses, result);
     TestHelper.finishTask(getLoomUrl(), finishRequest);
 
     task = TestHelper.takeTask(getLoomUrl(), takeRequest);
     result = new JsonObject();
     ipAddresses = ImmutableMap.of("access", "456.789.123.123");
     finishRequest = new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
-                                          task.getTaskId(), null, null, 0, ipAddresses, result);
+                                          task.getTaskId(), null, null, 0, null, ipAddresses, result);
     TestHelper.finishTask(getLoomUrl(), finishRequest);
 
     TestHelper.takeTask(getLoomUrl(), takeRequest);
@@ -182,7 +182,7 @@ public class SchedulerTest extends LoomServiceTestBase {
     for (int i = 0; i < 5; i++) {
       task = TestHelper.takeTask(getLoomUrl(), takeRequest);
       finishRequest = new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
-                                            task.getTaskId(), null, null, 0, null, null);
+                                            task.getTaskId(), null, null, 0, null, null, null);
       TestHelper.finishTask(getLoomUrl(), finishRequest);
       jobScheduler.run();
       jobScheduler.run();
@@ -260,7 +260,7 @@ public class SchedulerTest extends LoomServiceTestBase {
     while (task != null) {
       FinishTaskRequest finishRequest =
         new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
-                              task.getTaskId(), null, null, failJob ? 1 : 0, null, null);
+                              task.getTaskId(), null, null, failJob ? 1 : 0, null, null, null);
       TestHelper.finishTask(getLoomUrl(), finishRequest);
       jobScheduler.run();
       jobScheduler.run();

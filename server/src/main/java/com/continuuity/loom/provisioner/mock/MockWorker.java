@@ -175,6 +175,7 @@ public class MockWorker extends AbstractScheduledService {
         ips.addProperty("bind_v4", randomIP());
         body.add("ipaddresses", ips);
         LOG.debug("adding ips {}.", ips);
+        body.addProperty("hostname", "host-" + randomIP() + ".local");
       }
       body.add("result", result);
 
