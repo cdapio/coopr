@@ -61,10 +61,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Handler for getting, adding, modifying, and deleting admin defined Loom entities.
+ * Handler for getting, adding, modifying, and deleting admin defined entities.
  * GET calls work for any user, non-GET calls work only for admin.
  */
-@Path("/v1/loom")
+@Path(Constants.API_BASE)
 public class LoomAdminHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomAdminHandler.class);
 
@@ -73,8 +73,6 @@ public class LoomAdminHandler extends LoomAuthHandler {
   public static final String IMAGE_TYPES = "imagetypes";
   public static final String CLUSTER_TEMPLATES = "clustertemplates";
   public static final String SERVICES = "services";
-  public static final String AUTOMATOR_TYPES = "automatortypes";
-  public static final String PROVIDER_TYPES = "providertypes";
 
   private final EntityStoreService entityStoreService;
   private final TaskQueueService taskQueueService;
@@ -250,7 +248,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param providertypeId Id of the provider type to get.
    */
   @GET
-  @Path("/providertypes/{providertype-id}")
+  @Path("/plugins/providertypes/{providertype-id}")
   public void getProviderType(HttpRequest request, HttpResponder responder,
                               @PathParam("providertype-id") String providertypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -275,7 +273,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param automatortypeId Id of the automator type to get.
    */
   @GET
-  @Path("/automatortypes/{automatortype-id}")
+  @Path("/plugins/automatortypes/{automatortype-id}")
   public void getAutomatorType(HttpRequest request, HttpResponder responder,
                               @PathParam("automatortype-id") String automatortypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -387,7 +385,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param responder Responder for sending the response.
    */
   @GET
-  @Path("/providertypes")
+  @Path("/plugins/providertypes")
   public void getProviderTypes(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
@@ -409,7 +407,7 @@ public class LoomAdminHandler extends LoomAuthHandler {
    * @param responder Responder for sending the response.
    */
   @GET
-  @Path("/automatortypes")
+  @Path("/plugins/automatortypes")
   public void getAutomatorTypes(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {

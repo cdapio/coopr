@@ -56,7 +56,7 @@ CreateProviderApp.factory('dataFactory', ['$http', '$q', 'fetchUrl',
       $http.get(fetchUrl + '/providers/' + currentProvider).success(callback);
     },
     getProviderTypes: function (callback) {
-      $http.get(fetchUrl + '/providertypes').success(callback);
+      $http.get(fetchUrl + '/plugins/providertypes').success(callback);
     }
   }
 }]);

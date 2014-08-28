@@ -155,7 +155,7 @@ Example
                 "properties":["hostname", "ipaddress"],
                 "services":["hadoop-hdfs-datanode"]
             }'
-        http://<loom-server>:<loom-port>/<version>/loom/getNodeProperties
+        http://<server>:<port>/<version>/getNodeProperties
  $ {
        "16b10331-0bd4-4e0e-9de5-45334cdcf459": {
            "hostname": "host-1001.local",

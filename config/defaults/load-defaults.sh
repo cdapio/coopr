@@ -12,7 +12,7 @@ dirs="clustertemplates hardwaretypes imagetypes providers services"
 
 if [ "x$LOOM_USE_DUMMY_PROVISIONER" == "xtrue" ]
 then
-  dirs="$dirs providertypes automatortypes"
+  dirs="$dirs plugins/providertypes plugins/automatortypes"
 fi
 
 for d in ${dirs} ; do
@@ -25,7 +25,7 @@ for d in ${dirs} ; do
       --header "X-Loom-ApiKey:${LOOM_API_KEY}" \
       --header "X-Loom-TenantID:${LOOM_TENANT}" \
       --connect-timeout ${TIMEOUT} --data @${f} \
-      ${LOOM_SERVER_URI}/v1/loom/${d}/${f/.json/}
+      ${LOOM_SERVER_URI}/v2/${d}/${f/.json/}
     ret=$?
     [[ ${ret} -ne 0 ]] && failed="${failed} ${d}/${f}"
   done

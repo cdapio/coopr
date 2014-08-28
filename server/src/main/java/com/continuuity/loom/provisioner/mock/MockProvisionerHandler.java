@@ -17,6 +17,7 @@ package com.continuuity.loom.provisioner.mock;
 
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.common.conf.Constants;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -36,7 +37,7 @@ import java.io.Reader;
 /**
  * Mock Provisioner REST APIs.
  */
-@Path("/v1/tenants")
+@Path(Constants.API_BASE + "/tenants")
 public class MockProvisionerHandler extends AbstractHttpHandler {
   private static final Logger LOG = LoggerFactory.getLogger(MockProvisionerHandler.class);
   private final MockProvisionerTenantStore provisionerTenantStore = MockProvisionerTenantStore.getInstance();

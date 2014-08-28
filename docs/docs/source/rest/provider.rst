@@ -24,9 +24,9 @@ REST API: Provider
 
 .. include:: /rest/rest-links.rst
 
-Using the Loom REST API, you can manage providers as well as query available flavors of hardware or instance sizes.
+Using the REST API, you can manage providers as well as query available flavors of hardware or instance sizes.
 (This API call is also used during the provisioning of instances of machines.) Even though new providers are automatically 
-registered, the APIs are available if administrators desire to configure them manually. By default, the Loom system supports
+registered, the APIs are available if administrators desire to configure them manually. By default, the system supports
 Openstack out of the box.
 
 Each provider configured in the system has a unique name, a short description, and a list of key-value pairs that are required by the backend hardware provisioner.
@@ -87,7 +87,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"example", "providertype":"openstack", "description": "Example"}' 
-        http://<loom-server>:<loom-port>/<version>/loom/providers
+        http://<server>:<port>/<version>/providers
 
 .. _provider-retrieve:
 
@@ -122,7 +122,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/providers/example
+        http://<server>:<port>/<version>/providers/example
  $ {"name":"example","description":"Example","providertype":"openstack","provisioner":{}}
 
 
@@ -160,7 +160,7 @@ Example
         -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/providers/example
+        http://<server>:<port>/<version>/providers/example
 
 .. _provider-modify:
 
@@ -219,11 +219,11 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name": "example", "description": "Updated example", "providertype":"openstack"}'  
-        http://<loom-server>:<loom-port>/<version>/loom/providers/example
+        http://<server>:<port>/<version>/providers/example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/providers/example
+        http://<server>:<port>/<version>/providers/example
  $ {"name":"example","description":"Updated example","providertype":"openstack","provisioner":{}}
 
 .. _provider-all-list:
@@ -233,9 +233,9 @@ List All Providers
 
 A configured provider represents a resource used for querying resource types as well as for provisioning the 
 resources. The list of all configured providers are available for you to retrieve. The provider list resource represents 
-the comprehensive set of providers configured within the Loom system.
+the comprehensive set of providers configured within the system.
 
-To list all the providers configured within Continuuity Loom, make GET HTTP request to URI:
+To list all the providers, make GET HTTP request to URI:
 ::
 
  /providers
@@ -261,5 +261,5 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/providers
+        http://<server>:<port>/<version>/providers
 

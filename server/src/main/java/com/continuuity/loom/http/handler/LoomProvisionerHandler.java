@@ -52,7 +52,7 @@ import java.io.Reader;
  * Handles requests from provisioners to register themselves, send heartbeats, delete themselves, and get plugin
  * resources.
  */
-@Path("/v1")
+@Path(Constants.API_BASE)
 public final class LoomProvisionerHandler extends LoomAuthHandler {
   private static final Logger LOG = LoggerFactory.getLogger(LoomProvisionerHandler.class);
 

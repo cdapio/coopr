@@ -3,6 +3,7 @@ package com.continuuity.loom.provisioner;
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.http.NettyHttpService;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.scheduler.callback.DummyService;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
@@ -92,17 +93,18 @@ public class StubProvisioner extends AbstractIdleService {
     return httpService.getBindAddress();
   }
 
+  @Path(Constants.API_BASE)
   public class StubTenantHandler extends AbstractHttpHandler {
 
     @PUT
-    @Path("/v1/tenants/{tenant-id}")
+    @Path("/tenants/{tenant-id}")
     public void putTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
       tenantPutCounts.add(tenantId);
       responder.sendStatus(HttpResponseStatus.OK);
     }
 
     @PUT
-    @Path("/v1/tenants/{tenant-id}/workers")
+    @Path("/tenants/{tenant-id}/workers")
     public void putTenantWorkers(HttpRequest request, HttpResponder responder,
                                  @PathParam("tenant-id") String tenantId) {
       tenantWorkerPutCounts.add(tenantId);
@@ -110,7 +112,7 @@ public class StubProvisioner extends AbstractIdleService {
     }
 
     @PUT
-    @Path("/v1/tenants/{tenant-id}/resources")
+    @Path("/tenants/{tenant-id}/resources")
     public void putTenantResources(HttpRequest request, HttpResponder responder,
                                    @PathParam("tenant-id") String tenantId) {
       tenantResourcePutCounts.add(tenantId);
@@ -118,7 +120,7 @@ public class StubProvisioner extends AbstractIdleService {
     }
 
     @DELETE
-    @Path("/v1/tenants/{tenant-id}")
+    @Path("/tenants/{tenant-id}")
     public void deleteTenant(HttpRequest request, HttpResponder responder, @PathParam("tenant-id") String tenantId) {
       tenantDeleteCounts.add(tenantId);
       responder.sendStatus(HttpResponseStatus.OK);

@@ -24,7 +24,7 @@ REST API: Provisioners
 
 .. include:: /rest/rest-links.rst
 
-Using the Loom Superadmin REST API, you can get information about provisioners in the system.
+Using the Superadmin REST API, you can get information about provisioners in the system.
 
 .. _provisioners-retrieve:
 
@@ -59,10 +59,10 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:superadmin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/provisioners/p1
+        http://<server>:<port>/<version>/provisioners/p1
  $ {
        "id": "p1",
        "host": "host1",
@@ -113,10 +113,10 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:superadmin' 
-        -H 'X-Loom-Tenant:ID:loom'
+        -H 'X-Loom-UserID:admin' 
+        -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<superadmin-port>/<version>/provisioners
+        http://<server>:<port>/<version>/provisioners
  $ [
        {
            "id": "p1",

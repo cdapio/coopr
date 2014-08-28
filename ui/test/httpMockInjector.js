@@ -88,17 +88,17 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in profiles) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/profiles/' + item)
+      .get('/v2/profiles/' + item)
       .reply(200, profiles[item]);
 
     nock(clientAddr)
       .persist()
-      .put('/v1/loom/profiles', profiles[item])
+      .put('/v2/profiles', profiles[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .delete('/v1/loom/profiles/' + item)
+      .delete('/v2/profiles/' + item)
       .reply(200);
   }
 
@@ -109,14 +109,14 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in automators) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/automatortypes/' + item)
+      .get('/v2/plugins/automatortypes/' + item)
       .reply(200, automators[item]);
     automatorsResponse.push(automators[item]);
   }
 
   nock(clientAddr)
     .persist()
-    .get('/v1/loom/automatortypes')
+    .get('/v2/plugins/automatortypes')
     .reply(200, automatorsResponse);
 
   /**
@@ -126,14 +126,14 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in plugins) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/providertypes/' + item)
+      .get('/v2/plugins/providertypes/' + item)
       .reply(200, plugins[item]);
     pluginsResponse.push(plugins[item]);
   }
 
   nock(clientAddr)
     .persist()
-    .get('/v1/loom/providertypes')
+    .get('/v2/plugins/providertypes')
     .reply(200, pluginsResponse);
 
   /**
@@ -143,17 +143,17 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in clusters) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/clusters/' + item)
+      .get('/v2/clusters/' + item)
       .reply(200, clusterDefinitions[item]);
 
     nock(clientAddr)      
       .persist()
-      .get('/v1/loom/clusters/' + item + '/status')
+      .get('/v2/clusters/' + item + '/status')
       .reply(200, clusterStatuses[item]);
 
     nock(clientAddr)
       .persist()
-      .delete('/v1/loom/clusters/' + item)
+      .delete('/v2/clusters/' + item)
       .reply(200);
 
     clustersResponse.push(clusters[item]);
@@ -161,12 +161,12 @@ module.exports = function (nock, argv, clientAddr) {
 
   nock(clientAddr)
     .persist()
-    .post('/v1/loom/clusters', createCluster)
+    .post('/v2/clusters', createCluster)
     .reply(200);
 
   nock(clientAddr)
     .persist()
-    .get('/v1/loom/clusters')
+    .get('/v2/clusters')
     .reply(200, clustersResponse);
 
 
@@ -177,29 +177,29 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in providers) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/providers/' + item)
+      .get('/v2/providers/' + item)
       .reply(200, providers[item]);
 
     nock(clientAddr)
       .persist()
-      .post('/v1/loom/providers', providers[item])
+      .post('/v2/providers', providers[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .put('/v1/loom/providers/' + item, providers[item])
+      .put('/v2/providers/' + item, providers[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .delete('/v1/loom/providers/' + item)
+      .delete('/v2/providers/' + item)
       .reply(200);
 
     providersResponse.push(providers[item]);
   }
   nock(clientAddr)
     .persist()
-    .get('/v1/loom/providers')
+    .get('/v2/providers')
     .reply(200, providersResponse);
 
   /**
@@ -209,29 +209,29 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in hardwaretypes) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/hardwaretypes/' + item)
+      .get('/v2/hardwaretypes/' + item)
       .reply(200, hardwaretypes[item]);
 
     nock(clientAddr)
       .persist()
-      .post('/v1/loom/hardwaretypes', hardwaretypes[item])
+      .post('/v2/hardwaretypes', hardwaretypes[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .put('/v1/loom/hardwaretypes/' + item, hardwaretypes[item])
+      .put('/v2/hardwaretypes/' + item, hardwaretypes[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .delete('/v1/loom/hardwaretypes/' + item)
+      .delete('/v2/hardwaretypes/' + item)
       .reply(200);
 
     hardwaretypesResponse.push(hardwaretypes[item]);
   }
   nock(clientAddr)
     .persist()
-    .get('/v1/loom/hardwaretypes')
+    .get('/v2/hardwaretypes')
     .reply(200, hardwaretypesResponse);
 
   /**
@@ -241,34 +241,34 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in imagetypes) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/imagetypes/' + item)
+      .get('/v2/imagetypes/' + item)
       .reply(200, imagetypes[item]);
 
     nock(clientAddr)
       .persist()
-      .post('/v1/loom/imagetypes', imagetypes[item])
+      .post('/v2/imagetypes', imagetypes[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .put('/v1/loom/imagetypes/' + item, imagetypes[item])
+      .put('/v2/imagetypes/' + item, imagetypes[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .delete('/v1/loom/imagetypes/' + item)
+      .delete('/v2/imagetypes/' + item)
       .reply(200);
 
     imagetypesResponse.push(imagetypes[item]);
   }
   nock(clientAddr)
     .persist()
-    .get('/v1/loom/imagetypes')
+    .get('/v2/imagetypes')
     .reply(200, imagetypesResponse);
 
   nock(clientAddr)
     .persist()
-    .post('/v1/loom/imagetypes')
+    .post('/v2/imagetypes')
     .reply(200, imagetypesResponse);
 
 
@@ -279,29 +279,29 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in services) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/services/' + item)
+      .get('/v2/services/' + item)
       .reply(200, services[item]);
 
     nock(clientAddr)
       .persist()
-      .post('/v1/loom/services', services[item])
+      .post('/v2/services', services[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .put('/v1/loom/services/' + item, services[item])
+      .put('/v2/services/' + item, services[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .delete('/v1/loom/services/' + item)
+      .delete('/v2/services/' + item)
       .reply(200);
 
     servicesResponse.push(services[item]);
   }
   nock(clientAddr)
     .persist()
-    .get('/v1/loom/services')
+    .get('/v2/services')
     .reply(200, servicesResponse);
 
   /**
@@ -311,29 +311,29 @@ module.exports = function (nock, argv, clientAddr) {
   for (var item in clustertemplates) {
     nock(clientAddr)
       .persist()
-      .get('/v1/loom/clustertemplates/' + item)
+      .get('/v2/clustertemplates/' + item)
       .reply(200, clustertemplates[item]);
 
     nock(clientAddr)
       .persist()
-      .post('/v1/loom/clustertemplates', clustertemplates[item])
+      .post('/v2/clustertemplates', clustertemplates[item])
       .reply(200);
 
     nock(clientAddr)
       .persist()
-      .put('/v1/loom/clustertemplates/' + item, clustertemplates[item])
+      .put('/v2/clustertemplates/' + item, clustertemplates[item])
       .reply(200);
 
     nock(clientAddr)      
       .persist()
-      .delete('/v1/loom/clustertemplates/' + item)
+      .delete('/v2/clustertemplates/' + item)
       .reply(200);
 
     clustertemplatesResponse.push(clustertemplates[item]);
   }
   nock(clientAddr)
     .persist()
-    .get('/v1/loom/clustertemplates')
+    .get('/v2/clustertemplates')
     .reply(200, clustertemplatesResponse);
 
   /**

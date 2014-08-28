@@ -28,7 +28,7 @@ import java.net.InetSocketAddress;
 import java.util.Set;
 
 /**
- * Netty Loom service.
+ * Netty service for running the server.
  */
 public class LoomService extends AbstractIdleService {
 

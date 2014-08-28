@@ -104,10 +104,10 @@ class PluginManager
 
   def register_plugins(uri)
     @providermap.each do |name, json_obj|
-      register_plugintype(name, json_obj, "#{uri}/v1/loom/providertypes/#{name}")
+      register_plugintype(name, json_obj, "#{uri}/v2/plugins/providertypes/#{name}")
     end
     @automatormap.each do |name, json_obj|
-      register_plugintype(name, json_obj, "#{uri}/v1/loom/automatortypes/#{name}")
+      register_plugintype(name, json_obj, "#{uri}/v2/plugins/automatortypes/#{name}")
     end
   end
 

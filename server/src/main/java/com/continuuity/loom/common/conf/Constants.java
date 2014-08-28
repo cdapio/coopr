@@ -27,6 +27,8 @@ import java.util.Set;
  */
 public class Constants {
 
+  public static final String API_BASE = "/v2";
+
   public static final String PORT = "server.port";
   public static final String HOST = "server.host";
   public static final String ZOOKEEPER_QUORUM = "server.zookeeper.quorum";
