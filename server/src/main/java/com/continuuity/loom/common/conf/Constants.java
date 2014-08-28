@@ -18,9 +18,6 @@ package com.continuuity.loom.common.conf;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.HttpPostClusterCallback;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableSet;
-
-import java.util.Set;
 
 /**
  * Constants used by Loom.
@@ -76,7 +73,8 @@ public class Constants {
     private static final String prefix = "server.credential.store.memcached.";
     public static final String ADDRESSES = prefix + "addresses";
     public static final String TTL = prefix + "ttl.seconds";
-    public static final int DEFAULT_TTL = 6 * 60 * 60;
+    // 0 is infinite.
+    public static final int DEFAULT_TTL = 0;
     public static final String TIMEOUT = prefix + "timeout.seconds";
     public static final int DEFAULT_TIMEOUT = 20;
   }

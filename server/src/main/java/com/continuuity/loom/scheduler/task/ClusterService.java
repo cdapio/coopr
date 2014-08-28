@@ -599,6 +599,19 @@ public class ClusterService {
     }
 
     // check all required user fields are present
+    // if there are no fields in the request, they may be in the credential store
+    if (providerFields.isEmpty()) {
+      try {
+        Map<String, String> existingSensitiveFields = credentialStore.get(account.getTenantId(), clusterId);
+        if (existingSensitiveFields != null) {
+          providerFields = existingSensitiveFields;
+        }
+      } catch (IOException e) {
+        // its possible we get an exception looking up the fields, but we didn't need them anyway.
+        // so log an error and proceed.  If we needed the fields, it will fail below when checking required fields.
+        LOG.error("Exception looking up sensitive fields for account {} for cluster {}.", account, clusterId, e);
+      }
+    }
     Set<String> allProviderFields = Sets.union(provider.getProvisionerFields().keySet(), providerFields.keySet());
     if (!providerType.requiredFieldsExist(ParameterType.USER, allProviderFields)) {
       throw new IllegalArgumentException("Request is missing required user fields.");
@@ -609,9 +622,9 @@ public class ClusterService {
       return;
     }
 
-    // take sensitive fields out and write them to the credential store
     PluginFields pluginFields = providerType.groupFields(providerFields);
-    Map<String, String> nonSensitiveFields = pluginFields.getNonsensitive();
+    // take sensitive fields out and write them to the credential store
+    // this will overwrite anything that's already there
     Map<String, String> sensitiveFields = pluginFields.getSensitive();
     if (!sensitiveFields.isEmpty()) {
       LOG.trace("writing fields {} to credential store for account {} and cluster {}.",
@@ -619,6 +632,7 @@ public class ClusterService {
       credentialStore.set(account.getTenantId(), clusterId, sensitiveFields);
     }
     // add non sensitive fields to the provider
+    Map<String, String> nonSensitiveFields = pluginFields.getNonsensitive();
     if (!nonSensitiveFields.isEmpty()) {
       provider.addFields(nonSensitiveFields);
     }

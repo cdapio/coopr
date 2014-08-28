@@ -152,7 +152,6 @@ public class TaskService {
     clusterStore.writeClusterJob(job);
 
     loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
-    wipeSensitiveFields(cluster);
     callbackQueues.add(cluster.getAccount().getTenantId(),
                        new Element(gson.toJson(new CallbackData(CallbackData.Type.FAILURE, cluster, job))));
   }
@@ -234,7 +233,9 @@ public class TaskService {
     clusterStore.writeCluster(cluster);
 
     loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
-    wipeSensitiveFields(cluster);
+    if (job.getClusterAction() == ClusterAction.CLUSTER_DELETE) {
+      wipeSensitiveFields(cluster);
+    }
     callbackQueues.add(cluster.getAccount().getTenantId(),
                        new Element(gson.toJson(new CallbackData(CallbackData.Type.SUCCESS, cluster, job))));
   }

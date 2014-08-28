@@ -306,6 +306,20 @@ public class ClusterServiceTest extends BaseTest {
     Assert.assertEquals(sensitiveFields, credentialStore.get(account.getTenantId(), cluster.getId()));
   }
 
+  @Test
+  public void testUsesExistingCredentials() throws Exception {
+    Cluster cluster = createActiveCluster();
+    // add required sensitive user field
+    Map<String, String> sensitiveFields = Maps.newHashMap();
+    sensitiveFields.put("key", "keycontents");
+    credentialStore.set(account.getTenantId(), cluster.getId(), sensitiveFields);
+
+    // request doesn't contain the required key field, but it should be picked up from the credential store
+    // so this should go through without throwing an exception.
+    AddServicesRequest addServicesRequest = new AddServicesRequest(null, ImmutableSet.of(service2.getName()));
+    clusterService.requestAddServices(cluster.getId(), account, addServicesRequest);
+  }
+
   private Cluster createActiveCluster() throws IOException, IllegalAccessException {
     // Simulates an active cluster. The existing cluster will have
     // some user fields already specified from the initial cluster create operation, but another user field will

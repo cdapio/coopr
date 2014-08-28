@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -86,7 +87,7 @@ public class MemcachedCredentialStore implements CredentialStore {
                 tenantId, clusterId, e);
     }
 
-    return (Map<String, String>) result;
+    return result == null ? Collections.<String, String>emptyMap() : (Map<String, String>) result;
   }
 
   @Override
