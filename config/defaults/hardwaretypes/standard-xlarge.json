@@ -14,7 +14,7 @@
       "cost": "0.350",
       "vcpu": "4",
       "ram": "15",
-      "disks": "/dev/xvdb=420,/dev/xvdc=420",/dev/xvdd=420,/dev/xvde=420"
+      "disks": "/dev/xvdb=420,/dev/xvdc=420,/dev/xvdd=420,/dev/xvde=420"
     },
     "aws-us-west-2": {
       "flavor": "m1.xlarge",
