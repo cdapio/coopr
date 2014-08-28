@@ -5,21 +5,15 @@
     "joyent": {
       "flavor": "g3-standard-30-kvm",
       "cost": "0.96",
-      "hardware": {
-        "vcpu": "8",
-        "ram": "30",
-        "disks": {
-          "/dev/vdb": "1683"
-        }
-      }
+      "vcpu": "8",
+      "ram": "30",
+      "disk_/dev/vdb": "1683"
     },
     "rackspace": {
       "flavor": "8",
       "cost": "1.14",
-      "hardware": {
-        "vcpu": "8",
-        "ram": "30"
-      }
+      "vcpu": "8",
+      "ram": "30"
     }
   }
 }
