@@ -7,7 +7,7 @@
       "cost": "0.96",
       "vcpu": "8",
       "ram": "30",
-      "disk_/dev/vdb": "1683"
+      "disks": "/dev/vdb=1683"
     },
     "rackspace": {
       "flavor": "8",

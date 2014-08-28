@@ -7,28 +7,28 @@
       "cost": "0.087",
       "vcpu": "1",
       "ram": "3.75",
-      "disk_/dev/xvdb": "410"
+      "disks": "/dev/xvdb=410"
     },
     "aws-us-west-1": {
       "flavor": "m1.medium",
       "cost": "0.087",
       "vcpu": "1",
       "ram": "3.75",
-      "disk_/dev/xvdb": "410"
+      "disks": "/dev/xvdb=410"
     },
     "aws-us-west-2": {
       "flavor": "m1.medium",
       "cost": "0.087",
       "vcpu": "1",
       "ram": "3.75",
-      "disk_/dev/xvdb": "410"
+      "disks": "/dev/xvdb=410"
     },
     "joyent": {
       "flavor": "g3-standard-3.75-kvm",
       "cost": "0.12",
       "vcpu": "1",
       "ram": "3.75",
-      "disk_/dev/vdb": "123"
+      "disks": "/dev/vdb=123"
     },
     "rackspace": {
       "flavor": "5",
