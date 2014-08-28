@@ -1,7 +1,7 @@
 {
   "name": "fog",
-  "description": "Multi-cloud fog-based provider (Openstack, Rackspace, Joyent)",
-  "providertypes": [ "aws", "joyent", "openstack", "rackspace" ],
+  "description": "Multi-cloud fog-based provider (AWS, Google, Openstack, Rackspace, Joyent)",
+  "providertypes": [ "aws", "google", "joyent", "openstack", "rackspace" ],
   "aws" : {
     "name": "aws",
     "classname": "FogProviderAWS",
@@ -117,6 +117,61 @@
         "required": [
           [ "security_groups" ],
           [ "security_group_ids", "subnet_id" ]
+        ]
+      }
+    }
+  },
+  "google": {
+    "name": "google",
+    "classname": "FogProviderGoogle",
+    "parameters": {
+      "admin": {
+        "fields": {
+          "project_id": {
+            "label": "Project ID",
+            "type": "text",
+            "tip": "GCE Project ID"
+          },
+          "client_email": {
+            "label": "Service account email address",
+            "type": "text",
+            "tip": "Service account email address, should be of the form 123456789@developer.gserviceaccount.com"
+          },
+          "key_location": {
+            "label": "P12 key location",
+            "type": "text",
+            "tip": "Path to your P12 key, as downloaded from GCE encrypted with their default passphrase (notasecret)"
+          },
+          "ssh_keyfile": {
+            "label": "ssh private key file",
+            "type": "text",
+            "override": true,
+            "tip": "Full path and file name to your GCE SSH private key"
+          },
+          "zone_name": {
+            "label": "Zone",
+            "type": "select",
+            "options": [
+              "asia-east1-a",
+              "asia-east1-b",
+              "asia-east1-c",
+              "europe-west1-a",
+              "europe-west1-b",
+              "us-central1-a",
+              "us-central1-b",
+              "us-central1-f"
+            ],
+            "default": "us-central1-a",
+            "override": true,
+            "tip": "Zone"
+          }
+        },
+        "required": [
+          [ "project_id" ],
+          [ "client_email" ],
+          [ "key_location" ],
+          [ "ssh_keyfile" ],
+          [ "zone_name" ]
         ]
       }
     }
