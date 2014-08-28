@@ -5,54 +5,36 @@
     "aws-us-east-1": {
       "flavor": "m1.small",
       "cost": "0.044",
-      "hardware": {
-        "vcpu": "1",
-        "ram": "1.7",
-        "disks": {
-          "/dev/xvda3": "160"
-        }
-      }
+      "vcpu": "1",
+      "ram": "1.7",
+      "disks": "/dev/xvda3=160"
     },
     "aws-us-west-1": {
       "flavor": "m1.small",
       "cost": "0.044",
-      "hardware": {
-        "vcpu": "1",
-        "ram": "1.7",
-        "disks": {
-          "/dev/xvda3": "160"
-        }
-      }
+      "vcpu": "1",
+      "ram": "1.7",
+      "disks": "/dev/xvda3=160"
     },
     "aws-us-west-2": {
       "flavor": "m1.small",
       "cost": "0.044",
-      "hardware": {
-        "vcpu": "1",
-        "ram": "1.7",
-        "disks": {
-          "/dev/xvda3": "160"
-        }
-      }
+      "vcpu": "1",
+      "ram": "1.7",
+      "disks": "/dev/xvda3=160"
     },
     "joyent": {
       "flavor": "g3-standard-1.75-kvm",
       "cost": "0.056",
-      "hardware": {
-        "vcpu": "1",
-        "ram": "1.75",
-        "disks": {
-          "/dev/vdb": "56"
-        }
-      }
+      "vcpu": "1",
+      "ram": "1.75",
+      "disks": "/dev/vdb=56"
     },
     "rackspace": {
       "flavor": "4",
       "cost": "0.24",
-      "hardware": {
-        "vcpu": "2",
-        "ram": "2"
-      }
+      "vcpu": "2",
+      "ram": "2"
     }
   }
 }
