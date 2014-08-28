@@ -50,7 +50,7 @@ import java.lang.reflect.Type;
 /**
  * Handler for performing tenant operations.
  */
-@Path("/v1")
+@Path(Constants.API_BASE)
 public class LoomSuperadminHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomSuperadminHandler.class);
 
@@ -342,7 +342,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
    * @param providertypeId Id of the provider type to delete.
    */
   @DELETE
-  @Path("/loom/providertypes/{providertype-id}")
+  @Path("/plugins/providertypes/{providertype-id}")
   public void deleteProviderType(HttpRequest request, HttpResponder responder,
                                  @PathParam("providertype-id") String providertypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -373,7 +373,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
    * @param automatortypeId Id of the automator type to delete.
    */
   @DELETE
-  @Path("/loom/automatortypes/{automatortype-id}")
+  @Path("/plugins/automatortypes/{automatortype-id}")
   public void deleteAutomatorType(HttpRequest request, HttpResponder responder,
                                   @PathParam("automatortype-id") String automatortypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -405,7 +405,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
    * @param providertypeId Id of the provider type to write.
    */
   @PUT
-  @Path("/loom/providertypes/{providertype-id}")
+  @Path("/plugins/providertypes/{providertype-id}")
   public void putProviderType(HttpRequest request, HttpResponder responder,
                               @PathParam("providertype-id") String providertypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -446,7 +446,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
    * @param automatortypeId Id of the provider type to write.
    */
   @PUT
-  @Path("/loom/automatortypes/{automatortype-id}")
+  @Path("/plugins/automatortypes/{automatortype-id}")
   public void putAutomatorType(HttpRequest request, HttpResponder responder,
                                @PathParam("automatortype-id") String automatortypeId) {
     Account account = getAndAuthenticateAccount(request, responder);

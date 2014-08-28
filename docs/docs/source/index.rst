@@ -44,6 +44,7 @@ Contents
    /guide/quickstart/index
    /overview/features
    /overview/architecture
+   /guide/superadmin/index
    /guide/admin/index
    /guide/user/index
    /rest/index

@@ -70,18 +70,14 @@ public class TaskService {
    * @param task Task that needs to get rolled back.
    * @return Cluster task that will roll back the given failed task.
    */
-  public ClusterTask getRollbackTask(ClusterTask task) {
+  private ClusterTask getRollbackTask(ClusterTask task) {
     ProvisionerAction rollback = actions.getRollbackActions().get(task.getTaskName());
     if (rollback == null) {
       return null;
     }
 
-    // Note: rollback tasks do not have nodeId
-    // There are cases when we don't associate a nodeId with a task so that the node properties don't get overridden
-    // by the task output.
-    // Eg. deleting a box during a rollback operation since we reuse nodeIds.
     TaskId rollbackTaskId = idService.getNewTaskId(JobId.fromString(task.getJobId()));
-    ClusterTask rollbackTask = new ClusterTask(rollback, rollbackTaskId, null,
+    ClusterTask rollbackTask = new ClusterTask(rollback, rollbackTaskId, task.getNodeId(),
                                                task.getService(), task.getClusterAction());
 
     return rollbackTask;
@@ -90,7 +86,7 @@ public class TaskService {
   /**
    * Get tasks that must be run in order to retry the given task that failed on a given node in a given cluster.
    * For example, to retry a service installation, we just retry the task again. However, to retry a node confirm,
-   * we need to create another node first and then confirm that node.
+   * we need to first delete the created node, create another node, and then confirm that node.
    *
    * @param task Task that failed and must be retried.
    * @return List of tasks that must be executed to retry the given failed task.
@@ -109,6 +105,12 @@ public class TaskService {
     }
 
     List<ClusterTask> retryTasks = Lists.newArrayList();
+    // check if the task needs to be rolled back. Currently only the case for confirm tasks, which need to delete
+    // the node they were confirming before they can create another node.
+    ClusterTask rollbackTask = getRollbackTask(task);
+    if (rollbackTask != null) {
+      retryTasks.add(rollbackTask);
+    }
     // Create tasks from retry task to current task.
     int retryActionIndex = taskOrder.indexOf(retryAction);
     int currentActionIndex = taskOrder.indexOf(task.getTaskName());

@@ -18,12 +18,15 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.ClusterJobProgress;
+import com.continuuity.loom.cluster.ClusterSummary;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterStatusResponse;
 import com.continuuity.loom.layout.InvalidClusterException;
 import com.continuuity.loom.provisioner.QuotaException;
 import com.continuuity.loom.scheduler.ClusterAction;
@@ -43,6 +46,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -66,7 +70,7 @@ import java.util.Set;
 /**
  * Handler for performing cluster operations.
  */
-@Path("/v1/loom/clusters")
+@Path(Constants.API_BASE + "/clusters")
 public class LoomClusterHandler extends LoomAuthHandler {
   private static final Logger LOG = LoggerFactory.getLogger(LoomClusterHandler.class);
 
@@ -103,30 +107,13 @@ public class LoomClusterHandler extends LoomAuthHandler {
       return;
     }
 
-    List<Cluster> clusters = null;
     try {
-      clusters = clusterStoreService.getView(account).getAllClusters();
+      List<ClusterSummary> summaries = clusterService.getClusterSummaries(account);
+      responder.sendJson(HttpResponseStatus.OK, summaries, new TypeToken<List<ClusterSummary>>() {}.getType(), gson);
     } catch (IOException e) {
+      LOG.error("Exception getting all clusters for account {}.", account);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting clusters.");
     }
-
-    JsonArray jsonArray = new JsonArray();
-    for (Cluster cluster : clusters) {
-      JsonObject obj = new JsonObject();
-      obj.addProperty("id", cluster.getId());
-      obj.addProperty("name", cluster.getName());
-      obj.addProperty("createTime", cluster.getCreateTime());
-      obj.addProperty("expireTime", cluster.getExpireTime());
-      obj.addProperty("clusterTemplate",
-                      cluster.getClusterTemplate() == null ? "..." : cluster.getClusterTemplate().getName());
-      obj.addProperty("numNodes", cluster.getNodes().size());
-      obj.addProperty("status", cluster.getStatus().name());
-      obj.addProperty("ownerId", cluster.getAccount().getUserId());
-
-      jsonArray.add(obj);
-    }
-
-    responder.sendJson(HttpResponseStatus.OK, jsonArray);
   }
 
   /**
@@ -164,6 +151,7 @@ public class LoomClusterHandler extends LoomAuthHandler {
       if (clusterJob.getStatusMessage() != null) {
         jsonObject.addProperty("message", clusterJob.getStatusMessage());
       }
+      jsonObject.add("progress", gson.toJsonTree(new ClusterJobProgress(clusterJob)));
 
       responder.sendJson(HttpResponseStatus.OK, jsonObject);
     } catch (IOException e) {
@@ -260,31 +248,11 @@ public class LoomClusterHandler extends LoomAuthHandler {
         return;
       }
 
-      responder.sendJson(HttpResponseStatus.OK, getClusterResponseJson(cluster, job));
+      ClusterStatusResponse statusResponse = new ClusterStatusResponse(cluster, job);
+      responder.sendJson(HttpResponseStatus.OK, statusResponse, ClusterStatusResponse.class, gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting status of cluster " + clusterId);
     }
-  }
-
-  protected static JsonObject getClusterResponseJson(Cluster cluster, ClusterJob job) {
-    Map<String, ClusterTask.Status> taskStatus = job.getTaskStatus();
-
-    int completedTasks = 0;
-    for (Map.Entry<String, ClusterTask.Status> entry : taskStatus.entrySet()) {
-      if (entry.getValue().equals(ClusterTask.Status.COMPLETE)) {
-        completedTasks++;
-      }
-    }
-
-    JsonObject object = new JsonObject();
-    object.addProperty("clusterid", cluster.getId());
-    object.addProperty("stepstotal", taskStatus.size());
-    object.addProperty("stepscompleted", completedTasks);
-    object.addProperty("status", cluster.getStatus().name());
-    object.addProperty("actionstatus", job.getJobStatus().toString());
-    object.addProperty("action", job.getClusterAction().name());
-
-    return object;
   }
 
   /**

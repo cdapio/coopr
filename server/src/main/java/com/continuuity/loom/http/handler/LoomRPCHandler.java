@@ -20,6 +20,7 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.current.NodePropertiesRequestCodec;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.request.BootstrapRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
@@ -62,7 +63,7 @@ import java.util.Set;
 /**
  * Handler for RPCs.
  */
-@Path("/v1/loom")
+@Path(Constants.API_BASE)
 public class LoomRPCHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomRPCHandler.class);
   private static final Gson GSON = new GsonBuilder()
@@ -206,34 +207,6 @@ public class LoomRPCHandler extends LoomAuthHandler {
     if (account == null) {
       return;
     }
-
-    // TODO: Improve this logic by using a table join instead of separate calls for cluster and jobId
-
-    List<Cluster> clusters = clusterStoreService.getView(account).getAllClusters();
-    if (clusters.size() == 0) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, String.format("No clusters found"));
-      return;
-    }
-
-    JsonArray response = new JsonArray();
-
-    Map<JobId, Cluster> clusterMap = Maps.newHashMap();
-    for (Cluster cluster : clusters) {
-      clusterMap.put(JobId.fromString(cluster.getLatestJobId()), cluster);
-    }
-
-    Map<JobId, ClusterJob> jobs = clusterStore.getClusterJobs(clusterMap.keySet(), account.getTenantId());
-
-    if (jobs.size() == 0) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, String.format("No jobs found for clusters"));
-      return;
-    }
-
-    for (JobId jobId : jobs.keySet()) {
-      response.add(LoomClusterHandler.getClusterResponseJson(clusterMap.get(jobId), jobs.get(jobId)));
-    }
-
-    responder.sendJson(HttpResponseStatus.OK, response);
   }
 
   /**

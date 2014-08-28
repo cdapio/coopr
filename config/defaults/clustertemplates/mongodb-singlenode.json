@@ -7,7 +7,7 @@
       "mongodb-single"
     ],
     "provider": "rackspace",
-    "hardwaretype": "medium",
+    "hardwaretype": "standard-medium",
     "imagetype": "ubuntu12",
     "config": {
       "mongodb": {
@@ -20,11 +20,11 @@
   },
   "compatibility": {
     "hardwaretypes": [
-      "small",
-      "medium",
-      "large",
-      "xlarge",
-      "xxlarge"
+      "standard-small",
+      "standard-medium",
+      "standard-large",
+      "standard-xlarge",
+      "standard-xxlarge"
     ],
     "imagetypes": [
       "centos6",

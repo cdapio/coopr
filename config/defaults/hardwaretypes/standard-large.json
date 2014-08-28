@@ -1,0 +1,40 @@
+{
+  "name": "standard-large",
+  "description": "Standard server - Large 8GB",
+  "providermap": {
+    "aws-us-east-1": {
+      "flavor": "m1.large",
+      "cost": "0.175",
+      "vcpu": "2",
+      "ram": "7.5",
+      "disks": "/dev/xvdb=420,/dev/xvdc=420"
+    },
+    "aws-us-west-1": {
+      "flavor": "m1.large",
+      "cost": "0.175",
+      "vcpu": "2",
+      "ram": "7.5",
+      "disks": "/dev/xvdb=420,/dev/xvdc=420"
+    },
+    "aws-us-west-2": {
+      "flavor": "m1.large",
+      "cost": "0.175",
+      "vcpu": "2",
+      "ram": "7.5",
+      "disks": "/dev/xvdb=420,/dev/xvdc=420"
+    },
+    "joyent": {
+      "flavor": "g3-standard-7.5-kvm",
+      "cost": "0.24",
+      "vcpu": "2",
+      "ram": "7.5",
+      "disks": "/dev/vdb=738"
+    },
+    "rackspace": {
+      "flavor": "6",
+      "cost": "0.60",
+      "vcpu": "4",
+      "ram": "8"
+    }
+  }
+}

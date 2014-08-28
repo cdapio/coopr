@@ -83,7 +83,7 @@ expected to be of the same type.
 
 Can I customize provisioners?
 -----------------------------
-Yes, you can. Please look for more information :doc:`here</guide/admin/plugins>`
+Yes, you can. Please look for more information :doc:`here</guide/superadmin/plugins>`
 
 What happens when I stop a provisioner while it is performing a task?
 ---------------------------------------------------------------------

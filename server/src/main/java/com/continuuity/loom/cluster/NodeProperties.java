@@ -31,7 +31,7 @@ import java.util.Set;
  */
 public class NodeProperties {
   private Map<String, String> ipaddresses;
-  private final String hostname;
+  private String hostname;
   private final int nodenum;
   // this is the name of the hardware type
   private final String hardwaretype;
@@ -172,6 +172,15 @@ public class NodeProperties {
    */
   public void setIpaddresses(Map<String, String> ipaddresses) {
     this.ipaddresses = ipaddresses;
+  }
+
+  /**
+   * Set the hostname of the node.
+   *
+   * @param hostname Hostname to set.
+   */
+  public void setHostname(String hostname) {
+    this.hostname = hostname;
   }
 
   /**

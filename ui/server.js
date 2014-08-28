@@ -33,7 +33,7 @@ var express = require('express'),
 var env = argv.env || 'production';
 var PORT = argv.port || 8100;
 var CLIENT_ADDR = argv.loomhost || 'http://127.0.0.1:55054';
-var BOX_ADDR = CLIENT_ADDR + '/v1/loom';
+var BOX_ADDR = CLIENT_ADDR + '/v2';
 var CLIENT_DIR = env === 'production' ? 'client-built' : 'client';
 
 console.info('Environment:', env, BOX_ADDR, CLIENT_DIR);
@@ -339,7 +339,7 @@ site.parseClusterData = function (clusters) {
     if (cluster.createTime) {
       cluster.createTime = site.formatDate(cluster.createTime);
     }
-    if (cluster.status !== 'TERMINATED') {
+    if (cluster.status !== 'terminated') {
       activeClusters++;
     } else {
       deletedClusters++;
@@ -368,9 +368,9 @@ site.getSkin = function (req) {
 
 /**
  * Pipes all frontend calls through to the loom server and returns responses. Expects path to come
- * in the form of query string after /v1/loom ex:
- * /v1/loom/providers => /pipeApiCall?path=/providers
- * /v1/loom/providers/rackspace => /pipeApiCall?path=/providers/rackspace
+ * in the form of query string after /v2 ex:
+ * /v2/providers => /pipeApiCall?path=/providers
+ * /v2/providers/rackspace => /pipeApiCall?path=/providers/rackspace
  */
 site.app.get('/pipeApiCall', function (req, res) {
   var user = site.checkAuth(req, res);
@@ -403,11 +403,11 @@ site.app.post('/import', function (req, res) {
           var clusters = results[1], activeNodes = 0, totalNodes = 0, totalClusters = 0,
           pendingClusters = 0;
           clusters.map(function (cluster) {
-            if (cluster.status === 'ACTIVE') {
+            if (cluster.status === 'active') {
               activeNodes += cluster.numNodes;
               totalClusters++;
             }
-            if (cluster.status === 'PENDING') {
+            if (cluster.status === 'pending') {
               pendingClusters++;
             }
             totalNodes += cluster.numNodes;
@@ -493,11 +493,11 @@ site.app.get('/', function (req, res) {
       var clusters = results[1], activeNodes = 0, totalNodes = 0, totalClusters = 0,
       pendingClusters = 0;
       clusters.map(function (cluster) {
-        if (cluster.status === 'ACTIVE') {
+        if (cluster.status === 'active') {
           activeNodes += cluster.numNodes;
           totalClusters++;
         }
-        if (cluster.status === 'PENDING') {
+        if (cluster.status === 'pending') {
           pendingClusters++;
         }
         totalNodes += cluster.numNodes;

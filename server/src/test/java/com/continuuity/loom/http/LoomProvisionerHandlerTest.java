@@ -35,7 +35,7 @@ public class LoomProvisionerHandlerTest extends LoomServiceTestBase {
   @Test
   public void testPutAndGetProvisioner() throws Exception {
     Provisioner provisioner = new Provisioner("p1", "host", 12345, 100, null, null);
-    String resource = "/v1/provisioners/" + provisioner.getId();
+    String resource = "/provisioners/" + provisioner.getId();
 
     // haven't added it yet, should get a 404
     assertResponseStatus(doGet(resource, SUPERADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
@@ -54,27 +54,27 @@ public class LoomProvisionerHandlerTest extends LoomServiceTestBase {
   public void testInvalidProvisionerInputReturns400() throws Exception {
     Provisioner provisioner = new Provisioner("p1", "host", 12345, 100, null, null);
     // test mismatching ids
-    assertResponseStatus(doPut("/v1/provisioners/not-" + provisioner.getId(), GSON.toJson(provisioner)),
+    assertResponseStatus(doPut("/provisioners/not-" + provisioner.getId(), GSON.toJson(provisioner)),
                          HttpResponseStatus.BAD_REQUEST);
 
     // missing all fields
     JsonObject body = new JsonObject();
-    assertResponseStatus(doPut("/v1/provisioners/p1", body.toString()), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPut("/provisioners/p1", body.toString()), HttpResponseStatus.BAD_REQUEST);
     // can't decode body
-    assertResponseStatus(doPut("/v1/provisioners/p1", "non-json object"), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPut("/provisioners/p1", "non-json object"), HttpResponseStatus.BAD_REQUEST);
     // missing capacity
     body.addProperty("id", "p1");
     body.addProperty("host", "hostname");
     body.addProperty("port", 12345);
-    assertResponseStatus(doPut("/v1/provisioners/p1", body.toString()), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPut("/provisioners/p1", body.toString()), HttpResponseStatus.BAD_REQUEST);
     // missing host
     body.addProperty("capacityTotal", 16);
     body.remove("host");
-    assertResponseStatus(doPut("/v1/provisioners/p1", body.toString()), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPut("/provisioners/p1", body.toString()), HttpResponseStatus.BAD_REQUEST);
     // missing port
     body.addProperty("host", "hostname");
     body.remove("port");
-    assertResponseStatus(doPut("/v1/provisioners/p1", body.toString()), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPut("/provisioners/p1", body.toString()), HttpResponseStatus.BAD_REQUEST);
   }
 
   @Test
@@ -84,7 +84,7 @@ public class LoomProvisionerHandlerTest extends LoomServiceTestBase {
     Provisioner provisioner3 = new Provisioner("p3", "host3", 12345, 100, null, null);
 
     // should return empty array if there are no provisioners
-    HttpResponse response = doGet("/v1/provisioners", SUPERADMIN_HEADERS);
+    HttpResponse response = doGet("/provisioners", SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     InputStreamReader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     JsonArray output = GSON.fromJson(reader, JsonArray.class);
@@ -93,11 +93,11 @@ public class LoomProvisionerHandlerTest extends LoomServiceTestBase {
     // put all 3 provisioners
     List<Provisioner> provisioners = Lists.newArrayList(provisioner1, provisioner2, provisioner3);
     for (Provisioner provisioner : provisioners) {
-      assertResponseStatus(doPut("/v1/provisioners/" + provisioner.getId(), GSON.toJson(provisioner)),
+      assertResponseStatus(doPut("/provisioners/" + provisioner.getId(), GSON.toJson(provisioner)),
                            HttpResponseStatus.OK);
     }
 
-    response = doGet("/v1/provisioners", SUPERADMIN_HEADERS);
+    response = doGet("/provisioners", SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     output = GSON.fromJson(reader, JsonArray.class);
@@ -113,8 +113,8 @@ public class LoomProvisionerHandlerTest extends LoomServiceTestBase {
     Provisioner provisioner = new Provisioner("p1", "host", 12345, 100, null, null);
     ProvisionerHeartbeat heartbeat = new ProvisionerHeartbeat(
       ImmutableMap.of("tenantX", 10, "tenantY", 20, "tenantZ", 10));
-    String heartbeatUrl = "/v1/provisioners/" + provisioner.getId() + "/heartbeat";
-    String provisionerUrl = "/v1/provisioners/" + provisioner.getId();
+    String heartbeatUrl = "/provisioners/" + provisioner.getId() + "/heartbeat";
+    String provisionerUrl = "/provisioners/" + provisioner.getId();
 
     // haven't registered the provisioner, heartbeat should return 404
     assertResponseStatus(doPost(heartbeatUrl, GSON.toJson(heartbeat)), HttpResponseStatus.NOT_FOUND);

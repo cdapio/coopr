@@ -89,72 +89,6 @@ Example
             }'
         http://<loom-server>:<loom-port>/<version>/loom/bootstrap
 
-.. _rpc-statuses:
-
-Get Status of All Clusters
-==========================
-To get the status of all clusters accessible to the caller, make a POST HTTP request to URI:
-::
-
- /getClusterStatuses
-
-HTTP Responses
-^^^^^^^^^^^^^^
-
-.. list-table::
-   :widths: 15 10
-   :header-rows: 1
-
-   * - Status Code
-     - Description
-   * - 200 (OK)
-     - If update was successful
-   * - 401 (UNAUTHORIZED)
-     - If the user is unauthorized to make this request.
-   * - 404 (NOT FOUND)
-     - If the resource requested is not found.
-
-Example
-^^^^^^^^
-.. code-block:: bash
-
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/status
- $ {
-       "clusterid":"00000079",
-       "stepstotal":109,
-       "stepscompleted":8,
-       "status":"PENDING",
-       "actionStatus":"RUNNING",
-       "action":"CLUSTER_CREATE"
-   }
-
- $ curl -X POST
-        -H 'X-Loom-UserID:<userid>'
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/getClusterStatuses
- $ [
-       {
-           "action": "CLUSTER_DELETE",
-           "actionstatus": "COMPLETE",
-           "clusterid": "00000051",
-           "status": "TERMINATED",
-           "stepscompleted": 3,
-           "stepstotal": 3
-       },
-       {
-           "action": "CLUSTER_DELETE",
-           "actionstatus": "COMPLETE",
-           "clusterid": "00000021",
-           "status": "TERMINATED",
-           "stepscompleted": 4,
-           "stepstotal": 4
-       }
-   ]
-
 .. _rpc-properties:
 
 Get Properties of Nodes in a Cluster
@@ -221,7 +155,7 @@ Example
                 "properties":["hostname", "ipaddress"],
                 "services":["hadoop-hdfs-datanode"]
             }'
-        http://<loom-server>:<loom-port>/<version>/loom/getNodeProperties
+        http://<server>:<port>/<version>/getNodeProperties
  $ {
        "16b10331-0bd4-4e0e-9de5-45334cdcf459": {
            "hostname": "host-1001.local",

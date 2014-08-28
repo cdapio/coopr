@@ -17,6 +17,7 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.AbstractHttpHandler;
 import com.continuuity.http.HttpResponder;
+import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.HttpHelper;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
@@ -36,7 +37,7 @@ import java.io.IOException;
 /**
  * Handles requests to take and finish tasks from provisioners.
  */
-@Path("/v1/loom/tasks")
+@Path(Constants.API_BASE + "/tasks")
 public final class LoomTaskHandler extends AbstractHttpHandler {
   private static final Logger LOG = LoggerFactory.getLogger(LoomTaskHandler.class);
 

@@ -43,6 +43,7 @@ public class ServiceUpgradeCodec extends AbstractCodec<Service> {
     JsonObject jsonObj = new JsonObject();
 
     jsonObj.add("name", context.serialize(service.getName()));
+    jsonObj.add("icon", context.serialize(service.getIcon()));
     jsonObj.add("description", context.serialize(service.getDescription()));
     jsonObj.add("dependencies", context.serialize(service.getDependencies()));
     JsonObject provisioner = new JsonObject();
@@ -58,6 +59,7 @@ public class ServiceUpgradeCodec extends AbstractCodec<Service> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
+    String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
     Set<String> dependsOn = context.deserialize(jsonObj.get("dependson"),
                                                 new TypeToken<Set<String>>() {}.getType());
@@ -81,6 +83,6 @@ public class ServiceUpgradeCodec extends AbstractCodec<Service> {
                                    new TypeToken<Map<ProvisionerAction, ServiceAction>>(){}.getType());
     }
 
-    return new Service(name, description, dependencies, actions);
+    return new Service(name, icon, description, dependencies, actions);
   }
 }

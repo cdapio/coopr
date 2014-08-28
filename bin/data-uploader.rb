@@ -133,7 +133,7 @@ module Loom
       # query server api for given plugin_type and ensure the resource can be uploaded
       def validate_server_target
         validate_server_connectivity
-        uri = %W( #{@options[:uri]} v1/loom #{@options[:plugin_type]} #{@options[:plugin_name]}).join('/')
+        uri = %W( #{@options[:uri]} v2/plugins #{@options[:plugin_type]} #{@options[:plugin_name]}).join('/')
         resp = RestClient.get(uri, @headers)
         if resp.code == 200
           resp_plugin = JSON.parse(resp.to_str)
@@ -208,7 +208,7 @@ module Loom
       end
 
       def upload_resource(payload)
-        uri = %W( #{@options[:uri]} v1/loom #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]}).join('/')
+        uri = %W( #{@options[:uri]} v2/plugins #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]}).join('/')
         resp = RestClient.post(uri, payload, @headers)
         if resp.code == 200
           resp_obj = JSON.parse(resp.to_str)
@@ -221,7 +221,7 @@ module Loom
 
       def stage
         version = @upload_results['version']
-        uri = %W( #{@options[:uri]} v1/loom #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]} versions #{version} stage).join('/')
+        uri = %W( #{@options[:uri]} v2/plugins #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]} versions #{version} stage).join('/')
         resp = RestClient.post(uri, nil, @headers)
         if resp.code == 200
           puts "stage successful for #{uri}" unless options[:quiet]
@@ -232,7 +232,7 @@ module Loom
 
       # syncing will act on all staged resources, not just the resource being staged
       def sync
-        uri = %W( #{@options[:uri]} v1/loom/sync).join('/')
+        uri = %W( #{@options[:uri]} v2/plugins/sync).join('/')
         resp = RestClient.post(uri, nil, @headers)
         if resp.code == 200
           puts 'sync successful' unless options[:quiet]

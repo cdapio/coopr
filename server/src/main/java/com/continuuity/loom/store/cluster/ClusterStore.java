@@ -25,14 +25,6 @@ public interface ClusterStore extends ClusterStoreView {
   ClusterJob getClusterJob(JobId jobId) throws IOException;
 
   /**
-   * Get a map of jobid to cluster job for that job id.
-   * @param jobIds Set of jobs ids to get.
-   * @return Map of job id to cluster job. Job ids without a cluster job are not included.
-   * @throws IOException if there was a problem getting the cluster jobs.
-   */
-  Map<JobId, ClusterJob> getClusterJobs(Set<JobId> jobIds, String tenantId) throws IOException;
-
-  /**
    * Write a cluster job to the store.
    * @param clusterJob The cluster job to write.
    * @throws IOException if there was a problem writing the cluster job.

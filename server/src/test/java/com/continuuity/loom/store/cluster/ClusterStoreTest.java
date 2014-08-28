@@ -71,6 +71,7 @@ public abstract class ClusterStoreTest {
       .setNodes(ImmutableSet.of("node1", "node2"))
       .setServices(ImmutableSet.of("s1", "s2"))
       .build();
+    cluster.setLatestJobId(new JobId(cluster.getId(), 1).getId());
     assertGetStoreDeleteCluster(systemView, cluster);
   }
 
@@ -309,6 +310,11 @@ public abstract class ClusterStoreTest {
 
     systemView.deleteNode(node2.getId());
     Assert.assertNull(systemView.getNode(node1.getId()));
+  }
+
+  @Test
+  public void testGetClustersWithJobs() throws Exception {
+    
   }
 
   @Test

@@ -30,18 +30,24 @@ import java.util.Map;
  * like openstack, aws, rackspace, or joyent that can provision machines.
  * Providers are referenced by {@link ImageType} and {@link HardwareType}.
  */
-public final class Provider extends NamedEntity {
+public final class Provider extends NamedIconEntity {
   private final String description;
   private final String providerType;
   private final Map<String, String> provisionerFields;
 
-  public Provider(String name, String description, String providerType, Map<String, String> provisionerFields) {
-    super(name);
+  public Provider(String name, String logolink, String description,
+                  String providerType, Map<String, String> provisionerFields) {
+    super(name, logolink);
     Preconditions.checkArgument(providerType != null, "invalid provider type.");
     this.description = description;
     this.providerType = providerType;
     this.provisionerFields = provisionerFields == null ?
       Maps.<String, String>newHashMap() : Maps.newHashMap(provisionerFields);
+  }
+
+  public Provider(String name, String description,
+                  String providerType, Map<String, String> provisionerFields) {
+    this(name, null, description, providerType, provisionerFields);
   }
 
   /**
@@ -73,29 +79,13 @@ public final class Provider extends NamedEntity {
   }
 
   /**
-   * Add some user defined fields to the provider's fields, checking that the provider type for this provider allows
-   * those fields as user specified fields.
+   * Add the given fields to the provisioner fields of this provider.
    *
-   * @param userFields User specified fields to add.
-   * @param providerType Provider type for this provider.
+   * @param fields Fields to add.
    */
-  public void addUserFields(Map<String, String> userFields, ProviderType providerType) {
-    Preconditions.checkArgument(providerType != null, "Provider type must be specified.");
-    Preconditions.checkArgument(this.providerType.equals(providerType.getName()),
-                                "Invalid provider type " + providerType.getName());
-    Map<String, FieldSchema> typeAdminFields = providerType.getParameters().containsKey(ParameterType.ADMIN) ?
-      providerType.getParameters().get(ParameterType.ADMIN).getFields() :
-      ImmutableMap.<String, FieldSchema>of();
-    Map<String, FieldSchema> typeUserFields = providerType.getParameters().containsKey(ParameterType.USER) ?
-      providerType.getParameters().get(ParameterType.USER).getFields() :
-      ImmutableMap.<String, FieldSchema>of();
-    for (Map.Entry<String, String> fieldEntry : userFields.entrySet()) {
-      String field = fieldEntry.getKey();
-      // if this is a user field or an overridable field.
-      if (typeUserFields.containsKey(field) ||
-        (typeAdminFields.containsKey(field) && typeAdminFields.get(field).getOverride())) {
-        provisionerFields.put(field, fieldEntry.getValue());
-      }
+  public void addFields(Map<String, String> fields) {
+    if (fields != null) {
+      provisionerFields.putAll(fields);
     }
   }
 
@@ -105,7 +95,7 @@ public final class Provider extends NamedEntity {
       return false;
     }
     Provider other = (Provider) o;
-    return Objects.equal(name, other.name) &&
+    return super.equals(other) &&
       Objects.equal(description, other.description) &&
       Objects.equal(providerType, other.providerType) &&
       Objects.equal(provisionerFields, other.provisionerFields);
@@ -113,7 +103,7 @@ public final class Provider extends NamedEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, providerType, provisionerFields);
+    return Objects.hashCode(super.hashCode(), description, providerType, provisionerFields);
   }
 
   @Override

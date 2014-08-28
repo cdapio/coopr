@@ -24,8 +24,8 @@ REST API: Image
 
 .. include:: /rest/rest-links.rst
 
-Loom REST APIs allow you to manage the mapping of image capabilities to "flavors" supported by configured images. The Loom image type maps to multiple flavors as specified by different images. 
-Using the image Loom REST APIs, you can manage the image specifications.
+The REST APIs allow you to manage the mapping of image capabilities to "flavors" supported by configured images. An image type maps to multiple flavors as specified by different images. 
+Using the image REST APIs, you can manage the image specifications.
 
 Each image configured in the system has a unique name, a short description, and a list of key-value pairs that are required by the backend image provisioner.
 
@@ -83,7 +83,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"small.example", "description":"Example 1 vCPU, 1 GB RAM, 30+ GB Disk", "providermap": {"openstack": {"flavor":"m1.small"}}}' 
-        http://<loom-server>:<loom-port>/<version>/loom/imagetypes
+        http://<server>:<port>/<version>/imagetypes
 
 .. _image-retrieve:
 
@@ -118,7 +118,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/imagetypes/small.example
+        http://<server>:<port>/<version>/imagetypes/small.example
  $ {"name":"small.example","description":"Example 1 vCPU, 1 GB RAM, 30+ GB Disk","providermap":{"openstack":{"flavor":"m1.small"}}}
 
 
@@ -156,7 +156,7 @@ Example
         -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/imagetypes/example
+        http://<server>:<port>/<version>/imagetypes/example
 
 .. _image-modify:
 
@@ -215,11 +215,11 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"small.example", "description":"New Example 1 vCPU, 1 GB RAM, 30+ GB Disk", 
              "providermap": {"openstack": {"flavor":"m1.small"},"aws":{"flavor":"aws.small"}}}' 
-        http://<loom-server>:<loom-port>/<version>/loom/imagetypes/small.example
+        http://<server>:<port>/<version>/imagetypes/small.example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/imagetypes/small.example
+        http://<server>:<port>/<version>/imagetypes/small.example
  $ {"name":"small.example","description":"New Example 1 vCPU, 1 GB RAM, 30+ GB Disk",
      "providermap":{"openstack":{"flavor":"m1.small"},"aws":{"flavor":"aws.small"}}}
 
@@ -228,7 +228,7 @@ Example
 List All Image Type
 =============================
 
-To list all the image types configured within Continuuity Loom, make a GET HTTP request to URI:
+To list all the image types, make a GET HTTP request to URI:
 ::
 
  /imagetypes
@@ -254,5 +254,5 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/imagetypes
+        http://<server>:<port>/<version>/imagetypes
 

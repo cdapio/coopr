@@ -63,7 +63,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-ApiKey:<apikey>'
         -H 'X-Loom-TenantID:superadmin'
-        http://<loom-server>:<loom-port>/<version>/loom/metrics/queues
+        http://<server>:<port>/<version>/metrics/queues
  $ {
        "superadmin": {
            "inProgress": 0,

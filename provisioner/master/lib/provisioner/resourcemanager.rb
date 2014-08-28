@@ -144,7 +144,7 @@ module Loom
 
     # fetches a resource from the server to a tmp directory, yields the file location to a block
     def fetch_resource(resource, version)
-      uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v1/tenants/#{@tenant} #{resource} versions #{version} ).join('/')
+      uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v2/tenants/#{@tenant} #{resource} versions #{version} ).join('/')
       log.debug "fetching resource at #{uri} for tenant #{@tenant}"
       begin
         response = RestClient.get(uri, { 'X-Loom-UserID' => 'admin', 'X-Loom-TenantID' => @tenant })

@@ -27,7 +27,7 @@ public class LoomStatusHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testStatus() throws Exception {
-    HttpResponse response = doGet("/status");
+    HttpResponse response = doGetWithoutVersion("/status");
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
     Assert.assertEquals("OK\n", EntityUtils.toString(response.getEntity()));
   }
