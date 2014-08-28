@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
+import net.spy.memcached.internal.OperationFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,16 @@ public class MemcachedCredentialStore implements CredentialStore {
 
   @Override
   public void set(String tenantId, String clusterId, Map<String, String> fields) throws IOException {
-    client.set(getKey(tenantId, clusterId), ttlSeconds, fields);
+    OperationFuture<Boolean> future = client.set(getKey(tenantId, clusterId), ttlSeconds, fields);
+    try {
+      if (!future.get(timeoutSeconds, TimeUnit.SECONDS)) {
+        throw new IOException("Unable to set credentials");
+      }
+    } catch (Exception e) {
+      LOG.error("Exception while setting credentials for tenant {} and cluster {} to memcache.",
+                tenantId, clusterId, e);
+      throw new IOException("Unable to set credentials", e);
+    }
   }
 
   @Override
