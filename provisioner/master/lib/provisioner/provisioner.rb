@@ -46,9 +46,10 @@ module Loom
       @server_uri = config.get('provisioner.server.uri')
       pid = Process.pid
       host = Socket.gethostname.downcase
-      @provisioner_id = "#{host}.#{pid}"
+      @provisioner_id = "master-#{host}-#{pid}"
       log.info "provisioner #{@provisioner_id} initialized"
       @registered = false
+      Logging.process_name = @provisioner_id
     end
 
     # invoked from bin/provisioner
