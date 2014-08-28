@@ -477,6 +477,9 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     TakeTaskRequest takeRequest = new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId);
     assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
                           ClusterAction.CLUSTER_CREATE, 3, 0);
+    // 3 loops for 3 retries.  We will simulate a situation where the confirm step always fails, which results
+    // in a delete task for rollback, then a create task for retry.
+    // So we should expect the following task chain 3 times: create success -> confirm failure -> delete success
     for (int i = 0; i < 3; ++i) {
       // Let create complete successfully
       jobScheduler.run();
@@ -494,12 +497,15 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);
 
-
       jobScheduler.run();
       jobScheduler.run();
 
+      // total steps is 3 + 2 * i because there are 3 steps in the plan (create, confirm, boostrap),
+      // plus 2 steps (delete success + create success) added for each confirm retry.
+      // steps completed is 1 + 2 * i because there is 1 complete (create),
+      // plus 2 steps (confirm failure + delete success) for each confirm retry.
       assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
-                            ClusterAction.CLUSTER_CREATE, 3 + i, 1 + i);
+                            ClusterAction.CLUSTER_CREATE, 3 + 2 * i, 1 + 2 * i);
 
       //Fail confirm.
       task = TestHelper.takeTask(getBaseUrl(), takeRequest);
@@ -532,7 +538,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
     jobScheduler.run();
 
     assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
-                          ClusterAction.CLUSTER_CREATE, 5, 3);
+                          ClusterAction.CLUSTER_CREATE, 7, 5);
   }
 
   @Test
