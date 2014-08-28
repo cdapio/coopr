@@ -303,7 +303,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       );
       FinishTaskRequest finishRequest =
         new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, task.getTaskId(),
-                              null, null, 0, ipAddresses, result);
+                              null, null, 0, null, ipAddresses, result);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);
@@ -368,7 +368,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
                  ImmutableList.of(Node.Status.IN_PROGRESS.name()));
 
       FinishTaskRequest finishRequest =
-        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, task.getTaskId(), null, null, 0, null, null);
+        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, task.getTaskId(), null, null, 0, null, null, null);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);
@@ -442,7 +442,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       result.addProperty("ipaddress", "111.222.333." + i);
       FinishTaskRequest finishRequest =
         new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, task.getTaskId(),
-                              null, null, 1, null, result);
+                              null, null, 1, null, null, result);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);
@@ -489,7 +489,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       result.addProperty("ipaddress", "111.222.333." + i);
       FinishTaskRequest finishRequest =
         new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId, task.getTaskId(),
-                              null, null, 0, null, result);
+                              null, null, 0, null, null, result);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);
@@ -506,7 +506,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       Assert.assertEquals("CONFIRM", task.getTaskName());
 
       finishRequest = new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId,
-                                            task.getTaskId(), null, null, 1, null, result);
+                                            task.getTaskId(), null, null, 1, null, null, result);
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);
 
@@ -521,7 +521,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
         result = new JsonObject();
         result.addProperty("ipaddress", "111.222.333." + i);
         finishRequest = new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId,
-                                              task.getTaskId(), null, null, 0, null, result);
+                                              task.getTaskId(), null, null, 0, null, null, result);
 
         TestHelper.finishTask(getBaseUrl(), finishRequest);
         assertResponseStatus(response, HttpResponseStatus.OK);
@@ -625,7 +625,7 @@ public class LoomClusterHandlerTest extends LoomServiceTestBase {
       result.addProperty("ipaddress", "111.222.333." + i);
       FinishTaskRequest finishRequest =
         new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId,
-                              task.getTaskId(), null, null, 0, null, result);
+                              task.getTaskId(), null, null, 0, null, null, result);
 
       TestHelper.finishTask(getBaseUrl(), finishRequest);
       assertResponseStatus(response, HttpResponseStatus.OK);

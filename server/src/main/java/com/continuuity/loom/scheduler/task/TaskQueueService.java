@@ -262,6 +262,10 @@ public class TaskQueueService {
           if (ipAddresses != null) {
             node.getProperties().setIpaddresses(ipAddresses);
           }
+          String hostname = finish.getHostname();
+          if (hostname != null && !hostname.isEmpty()) {
+            node.getProperties().setHostname(hostname);
+          }
           nodeService.completeAction(node);
         } else {
           nodeService.failAction(node, finish.getStdout(), finish.getStderr());
