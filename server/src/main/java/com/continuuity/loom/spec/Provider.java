@@ -30,18 +30,24 @@ import java.util.Map;
  * like openstack, aws, rackspace, or joyent that can provision machines.
  * Providers are referenced by {@link ImageType} and {@link HardwareType}.
  */
-public final class Provider extends NamedEntity {
+public final class Provider extends NamedIconEntity {
   private final String description;
   private final String providerType;
   private final Map<String, String> provisionerFields;
 
-  public Provider(String name, String description, String providerType, Map<String, String> provisionerFields) {
-    super(name);
+  public Provider(String name, String logolink, String description,
+                  String providerType, Map<String, String> provisionerFields) {
+    super(name, logolink);
     Preconditions.checkArgument(providerType != null, "invalid provider type.");
     this.description = description;
     this.providerType = providerType;
     this.provisionerFields = provisionerFields == null ?
       Maps.<String, String>newHashMap() : Maps.newHashMap(provisionerFields);
+  }
+
+  public Provider(String name, String description,
+                  String providerType, Map<String, String> provisionerFields) {
+    this(name, null, description, providerType, provisionerFields);
   }
 
   /**
@@ -89,7 +95,7 @@ public final class Provider extends NamedEntity {
       return false;
     }
     Provider other = (Provider) o;
-    return Objects.equal(name, other.name) &&
+    return super.equals(other) &&
       Objects.equal(description, other.description) &&
       Objects.equal(providerType, other.providerType) &&
       Objects.equal(provisionerFields, other.provisionerFields);
@@ -97,7 +103,7 @@ public final class Provider extends NamedEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, providerType, provisionerFields);
+    return Objects.hashCode(super.hashCode(), description, providerType, provisionerFields);
   }
 
   @Override
