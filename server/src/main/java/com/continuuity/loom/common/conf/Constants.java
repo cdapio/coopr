@@ -77,6 +77,13 @@ public class Constants {
     public static final int DEFAULT_TTL = 0;
     public static final String TIMEOUT = prefix + "timeout.seconds";
     public static final int DEFAULT_TIMEOUT = 20;
+    public static final String ENCRYPT_TRANSFORMATION = prefix + "encrypt.transformation";
+    public static final String ENCRYPT_IV_HEX = prefix + "encrypt.iv.hex";
+    public static final String KEYSTORE_PATH = prefix + "encrypt.keystore.path";
+    public static final String KEYSTORE_TYPE = prefix + "encrypt.keystore.type";
+    public static final String KEYSTORE_PASSWORD = prefix + "encrypt.keystore.password";
+    public static final String KEY_ALIAS = prefix + "encrypt.key.alias";
+    public static final String KEY_PASSWORD = prefix + "encrypt.key.password";
   }
 
   /**
