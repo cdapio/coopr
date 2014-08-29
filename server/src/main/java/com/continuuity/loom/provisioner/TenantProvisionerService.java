@@ -164,7 +164,7 @@ public class TenantProvisionerService {
    * @param tenantId Id of the tenant to verify quotas for
    * @param additionalClusters Number of clusters that would be added
    * @param additionalNodes Number of nodes that would be added
-   * @return True if the tenant quotas would be satisfied, false if they would be exceeded.
+   * @return true if the tenant quotas would be satisfied, false if they would be exceeded.
    */
   public boolean satisfiesTenantQuotas(String tenantId, int additionalClusters,
                                        int additionalNodes) throws IOException {
@@ -183,7 +183,7 @@ public class TenantProvisionerService {
    * @param tenant Tenant to verify quotas for
    * @param additionalClusters Number of clusters that would be added
    * @param additionalNodes Number of nodes that would be added
-   * @return True if the tenant quotas would be satisfied, false if they would be exceeded.
+   * @return true if the tenant quotas would be satisfied, false if they would be exceeded.
    */
   public boolean satisfiesTenantQuotas(Tenant tenant, int additionalClusters, int additionalNodes) throws IOException {
     ClusterStoreView view = clusterStoreService.getView(new Account(Constants.ADMIN_USER, tenant.getId()));
