@@ -22,15 +22,26 @@ import com.google.common.base.Objects;
  * A tenant as seen from external world, meaning it contains the name and settings for a tenant, but no id.
  */
 public final class TenantSpecification extends NamedEntity {
-  protected final int workers;
-  protected final int maxClusters;
-  protected final int maxNodes;
+  private final String description;
+  private final int workers;
+  private final int maxClusters;
+  private final int maxNodes;
 
-  public TenantSpecification(String name, Integer workers, Integer maxClusters, Integer maxNodes) {
+  public TenantSpecification(String name, String description, Integer workers, Integer maxClusters, Integer maxNodes) {
     super(name);
+    this.description = description;
     this.workers = workers == null ? 0 : workers;
     this.maxClusters = maxClusters == null ? Integer.MAX_VALUE : maxClusters;
     this.maxNodes = maxNodes == null ? Integer.MAX_VALUE : maxNodes;
+  }
+
+  // TODO: add builder so optional fields are easier to handle
+  public TenantSpecification(String name, Integer workers, Integer maxClusters, Integer maxNodes) {
+    this(name, "", workers, maxClusters, maxNodes);
+  }
+
+  public String getDescription() {
+    return description;
   }
 
   public int getWorkers() {
@@ -52,6 +63,7 @@ public final class TenantSpecification extends NamedEntity {
     }
     TenantSpecification other = (TenantSpecification) o;
     return Objects.equal(name, other.name) &&
+      Objects.equal(description, other.description) &&
       Objects.equal(workers, other.workers) &&
       Objects.equal(maxClusters, other.maxClusters) &&
       Objects.equal(maxNodes, other.maxNodes);
@@ -59,13 +71,14 @@ public final class TenantSpecification extends NamedEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, workers, maxClusters, maxNodes);
+    return Objects.hashCode(name, description, workers, maxClusters, maxNodes);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
       .add("name", name)
+      .add("description", description)
       .add("workers", workers)
       .add("maxClusters", maxClusters)
       .add("maxNodes", maxNodes)

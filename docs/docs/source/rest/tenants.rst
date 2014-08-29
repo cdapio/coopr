@@ -58,6 +58,8 @@ Required Parameters
    * - name
      - Specifies the name for the tenant. The assigned name must have only
        alphanumeric, dash(-), dot(.), or underscore(_) characters.
+   * - description
+       Optional description of the tenant.
    * - workers
      - Number of workers assigned to the tenant.
    * - maxClusters

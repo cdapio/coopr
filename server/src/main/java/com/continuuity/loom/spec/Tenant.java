@@ -25,7 +25,8 @@ import com.google.common.base.Preconditions;
 public final class Tenant {
   public static final Tenant DEFAULT_SUPERADMIN =
     new Tenant(Constants.SUPERADMIN_TENANT,
-               new TenantSpecification(Constants.SUPERADMIN_TENANT, 0, Integer.MAX_VALUE, Integer.MAX_VALUE));
+               new TenantSpecification(Constants.SUPERADMIN_TENANT,
+                                       "super admin tenant", 0, Integer.MAX_VALUE, Integer.MAX_VALUE));
   private final String id;
   private final TenantSpecification specification;
 
