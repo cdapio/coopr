@@ -27,6 +27,7 @@ node['loom']['cluster']['nodes'].each do |n, v|
     unique true
     action :create
   end
+  next if v['ipaddresses']['bind_v4'] == v['ipaddresses']['access_v4']
   hostsfile_entry v['ipaddresses']['access_v4'] do
     hostname v.hostname
     aliases [ short_host ]
