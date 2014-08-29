@@ -55,9 +55,13 @@ public class ClusterServiceTest extends BaseTest {
   private static ImageType imageType = Entities.ImageTypeExample.UBUNTU_12;
   private static HardwareType hardwareType = Entities.HardwareTypeExample.LARGE;
 
+  @Override
+  protected boolean shouldClearDataBetweenTests() {
+    return false;
+  }
+
   @BeforeClass
   public static void setupClusterServiceTests() throws Exception {
-    clearData = false;
     clusterService = injector.getInstance(ClusterService.class);
     TenantProvisionerService tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
     // setup data

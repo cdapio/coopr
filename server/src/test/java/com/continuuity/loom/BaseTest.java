@@ -71,7 +71,6 @@ public class BaseTest {
   private static SQLProvisionerStore sqlProvisionerStore;
   private static SQLPluginMetaStoreService sqlMetaStoreService;
   private static SQLTenantStore sqlTenantStore;
-  protected static boolean clearData = true;
   protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
   protected static ZKClientService zkClientService;
@@ -176,7 +175,7 @@ public class BaseTest {
 
   @After
   public void cleanupBaseTest() throws Exception {
-    if (clearData) {
+    if (shouldClearDataBetweenTests()) {
       sqlTenantStore.clearData();
       sqlClusterStoreService.clearData();
       sqlProvisionerStore.clearData();
@@ -185,5 +184,9 @@ public class BaseTest {
       pluginStore.clearData();
       credentialStore.wipe();
     }
+  }
+
+  protected boolean shouldClearDataBetweenTests() {
+    return true;
   }
 }
