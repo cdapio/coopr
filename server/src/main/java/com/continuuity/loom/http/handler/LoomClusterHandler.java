@@ -26,6 +26,7 @@ import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterOperationRequest;
 import com.continuuity.loom.http.request.ClusterStatusResponse;
 import com.continuuity.loom.layout.InvalidClusterException;
 import com.continuuity.loom.provisioner.QuotaException;
@@ -64,7 +65,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -321,6 +321,15 @@ public class LoomClusterHandler extends LoomAuthHandler {
       return;
     }
 
+    ClusterOperationRequest deleteRequest;
+    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
+    try {
+      deleteRequest = gson.fromJson(reader, ClusterOperationRequest.class);
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body.");
+      return;
+    }
+
     try {
       Cluster cluster = clusterStoreService.getView(account).getCluster(clusterId);
       if (cluster == null) {
@@ -342,12 +351,16 @@ public class LoomClusterHandler extends LoomAuthHandler {
         responder.sendError(HttpResponseStatus.CONFLICT, message);
         return;
       }
-      clusterService.requestClusterDelete(clusterId, account);
+      clusterService.requestClusterDelete(clusterId, account, deleteRequest);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error deleting cluster.");
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "User unauthorized to perform delete.");
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     }
   }
 
@@ -528,11 +541,12 @@ public class LoomClusterHandler extends LoomAuthHandler {
     }
 
     try {
-      clusterService.requestClusterReconfigure(clusterId, account,
-                                               configRequest.getRestart(), configRequest.getConfig());
+      clusterService.requestClusterReconfigure(clusterId, account, configRequest);
       responder.sendStatus(HttpResponseStatus.OK);
-    } catch (MissingClusterException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT, "Cluster is not in a configurable state.");
     } catch (IllegalAccessException e) {
@@ -578,8 +592,8 @@ public class LoomClusterHandler extends LoomAuthHandler {
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
-    } catch (MissingClusterException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT,
                           "Cluster is not in a state where service actions can be performed.");
@@ -724,16 +738,27 @@ public class LoomClusterHandler extends LoomAuthHandler {
       return;
     }
 
+    ClusterOperationRequest operationRequest;
+    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      clusterService.requestServiceRuntimeAction(clusterId, account, action, service);
+      operationRequest = gson.fromJson(reader, ClusterOperationRequest.class);
+    } catch (Exception e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body.");
+      return;
+    }
+
+    try {
+      clusterService.requestServiceRuntimeAction(clusterId, account, action, service, operationRequest);
       responder.sendStatus(HttpResponseStatus.OK);
-    } catch (MissingClusterException e) {
-      responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
+    } catch (MissingEntityException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     } catch (IllegalStateException e) {
       responder.sendError(HttpResponseStatus.CONFLICT,
                           "Cluster is not in a state where service actions can be performed.");
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "User not authorized to perform service action.");
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
     } catch (IOException e) {
       LOG.error("Exception performing service action for cluster {}", clusterId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal error performing service action");

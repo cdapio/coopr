@@ -31,9 +31,10 @@ public class FieldSchema {
   private final Set<String> options;
   private final String defaultValue;
   private final boolean override;
+  private final boolean sensitive;
 
   private FieldSchema(String label, String type, String tip, Set<String> options, String defaultValue,
-                      Boolean override) {
+                      Boolean override, Boolean sensitive) {
     Preconditions.checkArgument(type != null, "Field type must be specified.");
     Preconditions.checkArgument(label != null && !label.isEmpty(), "Field label must be specified.");
     this.type = type;
@@ -42,6 +43,7 @@ public class FieldSchema {
     this.override = override == null ? false : override;
     this.options = options;
     this.defaultValue = defaultValue;
+    this.sensitive = sensitive == null ? false : sensitive;
   }
 
   /**
@@ -94,8 +96,17 @@ public class FieldSchema {
    *
    * @return Whether or not the admin defined value can be overwritten by the user.
    */
-  public boolean getOverride() {
+  public boolean isOverride() {
     return override;
+  }
+
+  /**
+   * Get whether or not the field is sensitive and should not be persisted to disk.
+   *
+   * @return Whether or not the field is sensitive and should not be persisted to disk.
+   */
+  public boolean isSensitive() {
+    return sensitive;
   }
 
   /**
@@ -118,6 +129,7 @@ public class FieldSchema {
     private Set<String> options;
     private String defaultValue;
     private Boolean override;
+    private Boolean sensitive;
 
     public Builder setLabel(String label) {
       this.label = label;
@@ -149,8 +161,13 @@ public class FieldSchema {
       return this;
     }
 
+    public Builder setSensitive(Boolean sensitive) {
+      this.sensitive = sensitive;
+      return this;
+    }
+
     public FieldSchema build() {
-      return new FieldSchema(label, type, tip, options, defaultValue, override);
+      return new FieldSchema(label, type, tip, options, defaultValue, override, sensitive);
     }
   }
 
@@ -169,13 +186,14 @@ public class FieldSchema {
       Objects.equal(label, that.label) &&
       Objects.equal(options, that.options) &&
       Objects.equal(override, that.override) &&
+      Objects.equal(sensitive, that.sensitive) &&
       Objects.equal(tip, that.tip) &&
       Objects.equal(type, that.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(label, type, tip, options, defaultValue, override);
+    return Objects.hashCode(label, type, tip, options, defaultValue, override, sensitive);
   }
 
   @Override
@@ -187,6 +205,7 @@ public class FieldSchema {
       .add("options", options)
       .add("default", defaultValue)
       .add("override", override)
+      .add("sensitive", sensitive)
       .toString();
   }
 }

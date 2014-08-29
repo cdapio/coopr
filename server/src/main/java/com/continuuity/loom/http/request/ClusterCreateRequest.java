@@ -17,7 +17,6 @@ package com.continuuity.loom.http.request;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 
 import java.util.Map;
@@ -26,13 +25,12 @@ import java.util.Set;
 /**
  * Request to create a cluster, containing values for optional cluster settings.
  */
-public class ClusterCreateRequest {
+public class ClusterCreateRequest extends ClusterOperationRequest {
   private final String name;
   private final String description;
   private final String clusterTemplate;
   private final int numMachines;
   private final String provider;
-  private final Map<String, String> providerFields;
   private final Set<String> services;
   private final String hardwaretype;
   private final String imagetype;
@@ -40,10 +38,11 @@ public class ClusterCreateRequest {
   private final String dnsSuffix;
   private final JsonObject config;
 
-  public ClusterCreateRequest(String name, String description, String clusterTemplate,
-                              int numMachines, String provider, Map<String, String> providerFields,
-                              Set<String> services, String hardwareType, String imageType, Long initialLeaseDuration,
-                              String dnsSuffix, JsonObject config) {
+  private ClusterCreateRequest(String name, String description, String clusterTemplate,
+                               int numMachines, String provider, Map<String, String> providerFields,
+                               Set<String> services, String hardwareType, String imageType, Long initialLeaseDuration,
+                               String dnsSuffix, JsonObject config) {
+    super(providerFields);
     // check that the arguments that don't have defaults are not null.
     Preconditions.checkArgument(name != null && !name.isEmpty(), "cluster name must be specified");
     Preconditions.checkArgument(clusterTemplate != null && !clusterTemplate.isEmpty(),
@@ -54,7 +53,6 @@ public class ClusterCreateRequest {
     this.clusterTemplate = clusterTemplate;
     this.numMachines = numMachines;
     this.provider = provider;
-    this.providerFields = providerFields == null ? ImmutableMap.<String, String>of() : providerFields;
     this.services = services;
     this.hardwaretype = hardwareType;
     this.imagetype = imageType;
@@ -159,22 +157,15 @@ public class ClusterCreateRequest {
   }
 
   /**
-   * Get provider fields specified by the user at creation time.
-   *
-   * @return Provider fields specified by the user.
-   */
-  public Map<String, String> getProviderFields() {
-    return providerFields;
-  }
-
-  /**
    * Get the configuration to use for the cluster, with null meaning to use the template defaults.
    *
    * @return Configuration to use for the cluster, with null meaning to use the template defaults.
    */
   public JsonObject getConfig() {
     return config;
-  }  /**
+  }
+
+  /**
    * Get a builder for creating cluster create requests.
    *
    * @return Builder for creating cluster create requests.
@@ -269,16 +260,20 @@ public class ClusterCreateRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof ClusterCreateRequest)) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     ClusterCreateRequest other = (ClusterCreateRequest) o;
-    return Objects.equal(name, other.name) &&
+    return super.equals(other) &&
+      Objects.equal(name, other.name) &&
       Objects.equal(description, other.description) &&
       Objects.equal(clusterTemplate, other.clusterTemplate) &&
       Objects.equal(numMachines, other.numMachines) &&
       Objects.equal(provider, other.provider) &&
-      Objects.equal(providerFields, other.providerFields) &&
       Objects.equal(services, other.services) &&
       Objects.equal(hardwaretype, other.hardwaretype) &&
       Objects.equal(imagetype, other.imagetype) &&
@@ -289,8 +284,8 @@ public class ClusterCreateRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(name, description, clusterTemplate, numMachines, provider, providerFields, services,
-                            hardwaretype, imagetype, initialLeaseDuration, dnsSuffix, config);
+    return Objects.hashCode(super.hashCode(), name, description, clusterTemplate, numMachines, provider,
+                            services, hardwaretype, imagetype, initialLeaseDuration, dnsSuffix, config);
   }
 
   @Override
@@ -301,7 +296,6 @@ public class ClusterCreateRequest {
       .add("clusterTemplate", clusterTemplate)
       .add("numMachines", numMachines)
       .add("provider", provider)
-      .add("providerFields", providerFields)
       .add("services", services)
       .add("hardwareType", hardwaretype)
       .add("imageType", imagetype)

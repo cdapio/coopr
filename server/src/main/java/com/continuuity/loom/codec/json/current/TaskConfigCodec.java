@@ -78,7 +78,7 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
     Provider provider = context.deserialize(jsonObj.remove("provider"), Provider.class);
     Map<String, NodeProperties> nodePropertiesMap =
       context.deserialize(jsonObj.remove("nodes"), new TypeToken<Map<String, NodeProperties>>() {}.getType());
-    JsonObject clusterConfig = jsonObj.remove("cluster").getAsJsonObject();
+    JsonObject clusterConfig = context.deserialize(jsonObj.remove("cluster"), JsonObject.class);
     TaskServiceAction taskServiceAction = context.deserialize(jsonObj.remove("service"), TaskServiceAction.class);
     // build node properties
     String hostname = context.deserialize(jsonObj.remove("hostname"), String.class);

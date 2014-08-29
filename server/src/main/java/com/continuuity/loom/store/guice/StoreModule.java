@@ -17,6 +17,7 @@ package com.continuuity.loom.store.guice;
 
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.store.credential.CredentialStore;
 import com.continuuity.loom.store.provisioner.PluginStore;
 import com.google.inject.Scopes;
 
@@ -25,14 +26,17 @@ import com.google.inject.Scopes;
  */
 public class StoreModule extends AbstractStoreModule {
   private final Class pluginStoreClass;
+  private final Class credentialStoreClass;
 
   public StoreModule(Configuration conf) throws ClassNotFoundException {
     this.pluginStoreClass = Class.forName(conf.get(Constants.PLUGIN_STORE_CLASS));
+    this.credentialStoreClass = Class.forName(conf.get(Constants.CREDENTIAL_STORE_CLASS));
   }
 
   @Override
   void bindPluginStore() {
     bind(PluginStore.class).to(pluginStoreClass).in(Scopes.SINGLETON);
+    bind(CredentialStore.class).to(credentialStoreClass).in(Scopes.SINGLETON);
   }
 
 }
