@@ -19,8 +19,15 @@
 
 node['loom']['cluster']['nodes'].each do |n, v|
   short_host = v.hostname.split('.').first
-  next unless v.key?('ipaddresses') && v['ipaddresses'].key?('bind_v4')
+  next unless v.key?('ipaddresses') && v['ipaddresses'].key?('bind_v4') && v['ipaddresses'].key?('access_v4')
+  # Hosts entry for bind_v4 goes before access_v4, so bind_v4 resolves first
   hostsfile_entry v['ipaddresses']['bind_v4'] do
+    hostname v.hostname
+    aliases [ short_host ]
+    unique true
+    action :create
+  end
+  hostsfile_entry v['ipaddresses']['access_v4'] do
     hostname v.hostname
     aliases [ short_host ]
     unique true
