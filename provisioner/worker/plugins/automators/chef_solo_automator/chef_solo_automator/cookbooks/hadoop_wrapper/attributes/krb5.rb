@@ -117,5 +117,7 @@ if node['zookeeper'].key?('zoocfg') && node['zookeeper']['zoocfg'].key?('authPro
 
   # zoo.cfg
   default['zookeeper']['zoocfg']['jaasLoginRenew'] = '3600000' unless node['zookeeper']['zoocfg']['jaasLoginRenew']
+  default['zookeeper']['zoocfg']['kerberos.removeHostFromPrincipal'] = 'true'
+  default['zookeeper']['zoocfg']['kerberos.removeRealmFromPrincipal'] = 'true'
 
 end
