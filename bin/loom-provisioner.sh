@@ -19,6 +19,7 @@ LOOM_SERVER_URI=${LOOM_SERVER_URI:-http://localhost:55054}
 LOOM_LOG_DIR=${LOOM_LOG_DIR:-/var/log/loom}
 LOOM_LOG_LEVEL=${LOOM_LOG_LEVEL:-info}
 LOOM_HOME=${LOOM_HOME:-/opt/loom} ; export LOOM_HOME
+PROVISIONER_SITE_CONF=${PROVISIONER_SITE_CONF:-/etc/loom/conf/provisioner-site.xml}
 
 die ( ) {
   echo
@@ -28,6 +29,10 @@ die ( ) {
 }
 
 PROVISIONER_PATH="${LOOM_HOME}/provisioner/master"
+PROVISIONER_CONF_OPT=""
+if [ -f ${PROVISIONER_SITE_CONF} ] ; then
+  PROVISIONER_CONF_OPT="--config ${PROVISIONER_SITE_CONF}"
+fi
 
 APP_NAME="loom-provisioner"
 LOOM_RUBY=${LOOM_RUBY:-"${LOOM_HOME}/embedded/bin/ruby"}
@@ -53,7 +58,7 @@ start ( ) {
 
   # multi-provisioner
   echo "Starting Loom Provisioner ..."
-  nohup nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner --config ${PROVISIONER_PATH}/conf/provisioner-site.xml \
+  nohup nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner ${PROVISIONER_CONF_OPT} \
     >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 &
   pid="${PID_DIR}/${APP_NAME}${p}.pid"
   echo $! > $pid
@@ -61,7 +66,7 @@ start ( ) {
 
 register ( ) {
   echo "Registering provisioner plugins with configured server"
-  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner --config ${PROVISIONER_PATH}/conf/provisioner-site.xml --register \
+  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner ${PROVISIONER_CONF_OPT} --register \
     >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 &
 }
 

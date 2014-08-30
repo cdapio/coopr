@@ -18,22 +18,9 @@
 
 -->
 <configuration>
-
-  <property>
-    <name>provisioner.server.uri</name>
-    <value>http://SERVER_IP:SERVER_PORT</value>
-    <description>URI of server to connect to</description>
-  </property>
-  <property>
-    <name>provisioner.register.ip</name>
-    <value>PROVISIONER_IP</value>
-    <description>Routable IP for the server to call back to this provisioner's API</description>
-  </property>
-  <property>
-    <name>provisioner.log.level</name>
-    <value>debug</value>
-    <description>log level, one of debug, info, warn, error, fatal</description>
-  </property>
+  <!--
+    Your site level configuration goes here
+  -->
 
 </configuration>
 
