@@ -7,7 +7,7 @@ RSpec::Core::RakeTask.new(:rspec)
 # rubocop rake task
 desc 'Ruby style guide linter'
 task :rubocop do
-  sh 'rubocop'
+  sh 'rubocop -D'
 end
 
 task :default => %w(rubocop rspec)
