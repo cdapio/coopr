@@ -131,7 +131,7 @@ class FogProviderAWS < Provider
           ssh_exec!(ssh, "#{sudo} hostname #{hostname}")
         else
           ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
-          ssh_exec!(ssh, "#{sudo} hostname #{hostname}", "Setting hostname to #{server.dns_name}")
+          ssh_exec!(ssh, "#{sudo} hostname #{hostname}", "Setting hostname to #{hostname}")
           # Setting up disks
           begin
             # m1.small uses /dev/xvda2 for data
