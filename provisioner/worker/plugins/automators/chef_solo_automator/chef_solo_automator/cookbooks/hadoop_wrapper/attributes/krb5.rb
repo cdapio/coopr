@@ -7,6 +7,17 @@ if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.
   include_attribute 'krb5'
   include_attribute 'krb5_utils'
 
+  # Create service keytabs for all services, since we may be a client
+  default['krb5_utils']['krb5_service_keytabs']['HTTP'] = { 'owner' => 'hdfs', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['hdfs'] = { 'owner' => 'hdfs', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['hbase'] = { 'owner' => 'hbase', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['hive'] = { 'owner' => 'hive', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['jhs'] = { 'owner' => 'mapred', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['mapred'] = { 'owner' => 'mapred', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['yarn'] = { 'owner' => 'yarn', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['zookeeper'] = { 'owner' => 'zookeeper', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_user_keytabs']['yarn'] = { 'owner' => 'yarn', 'group' => 'hadoop', 'mode' => '0640' }
+
   # container-executor.cfg
   default['hadoop']['container_executor']['banned.users'] = 'hdfs,yarn,mapred,bin'
   default['hadoop']['container_executor']['min.user.id'] = 500
@@ -109,7 +120,8 @@ if node['zookeeper'].key?('zoocfg') && node['zookeeper']['zoocfg'].key?('authPro
   # jaas.conf hbase-env.sh zookeeper-env.sh
   %w(hbase zookeeper).each do |client|
     default[client]['jaas']['client']['usekeytab'] = 'true'
-    default[client]['jaas']['client']['principal'] = "#{client}/_HOST@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
+    # We cannot use _HOST here... https://issues.apache.org/jira/browse/ZOOKEEPER-1422
+    default[client]['jaas']['client']['principal'] = "#{client}/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
     default[client]['jaas']['client']['keytab'] = "#{node['krb5_utils']['keytabs_dir']}/#{client}.service.keytab"
     default[client]["#{client}_env"]['jvmflags'] = "-Djava.security.auth.login.config=/etc/#{client}/conf/jaas.conf"
   end
