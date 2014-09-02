@@ -213,7 +213,7 @@ class ShellAutomator < Automator
     end
 
     @result['status'] = 0
-    log.info "ShellAutomator bootstrap completed successfully: #{@result}"
+    log.debug "ShellAutomator bootstrap completed successfully: #{@result}"
   end
 
   def install(inputmap)
