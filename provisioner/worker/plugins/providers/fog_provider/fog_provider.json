@@ -148,6 +148,18 @@
             "override": true,
             "tip": "Full path and file name to your GCE SSH private key"
           },
+          "ssh_username": {
+            "label": "ssh username",
+            "type": "text",
+            "override": true,
+            "tip": "SSH username to use. Must match private key file, and have sudo permissions"
+          },
+          "data_disk_size_gb": {
+            "label": "Data disk size in Gb",
+            "type": "text",
+            "override": true,
+            "tip": "Size of the persistent disk to be created and mounted to /data"
+          },
           "zone_name": {
             "label": "Zone",
             "type": "select",

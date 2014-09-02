@@ -45,20 +45,34 @@ class FogProviderGoogle < Provider
       confirm_disk(@hostname)
       disk = connection.disks.get(@hostname)
 
+      disks = [disk]
+
+      if fields['data_disk_size_gb']
+        data_disk_name = "#{@hostname}-data"
+        log.info "Creating data disk: #{data_disk_name} of size #{fields['data_disk_size_gb']}"
+        create_disk(data_disk_name, fields['data_disk_size_gb'], @zone_name, nil)
+        confirm_disk(data_disk_name)
+        data_disk = connection.disks.get(data_disk_name)
+        disks.push(data_disk)
+      end
+
       # create the VM
       server = connection.servers.create({
-        :name => @hostname,
-        :disks => [disk],
-        :machine_type => @flavor,
-        :zone_name => @zone_name,
-        :tags => ['loom']
-      })
+                                           :name => @hostname,
+                                           :disks => disks,
+                                           :machine_type => @flavor,
+                                           :zone_name => @zone_name,
+                                           :tags => ['loom']
+                                         })
 
       # Process results
       @result['result']['providerid'] = server.name
-      @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
-      @result['result']['ssh-auth']['user'] = 'root' if @result['result']['ssh-auth']['user'] == ''
-      @result['result']['ssh-auth']['identityfile'] = @ssh_keyfile unless @ssh_keyfile.nil?
+      # set ssh user
+      ssh_user = 'root'
+      ssh_user = @ssh_username unless @ssh_username.to_s == ''
+      ssh_user = @task['config']['sshuser'] unless @task['config']['sshuser'].to_s == ''
+      @result['result']['ssh-auth']['user'] = ssh_user
+      @result['result']['ssh-auth']['identityfile'] = @ssh_keyfile unless @ssh_keyfile.to_s == ''
       @result['status'] = 0
     rescue Exception => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
@@ -70,13 +84,13 @@ class FogProviderGoogle < Provider
     end
   end
 
-  def create_disk(name, size_gb = 20, zone_name = 'us-central1-a', source_image = 'centos-6-v20140718')
-    disk = connection.disks.create({
-      :name => name,
-      :size_gb => size_gb,
-      :zone_name => zone_name,
-      :source_image => source_image
-    })
+  def create_disk(name, size_gb = 20, zone_name = 'us-central1-a', source_image)
+    args = {}
+    args[:name] = name
+    args[:size_gb] = size_gb
+    args[:zone_name] = zone_name
+    args[:source_image] = source_image unless source_image.nil?
+    disk = connection.disks.create(args)
     disk.name
   end
 
@@ -147,6 +161,26 @@ class FogProviderGoogle < Provider
           ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
         end
       end
+
+      # search for data disk
+      server.disks.each do |disk|
+        next if disk.key?('boot') && disk['boot'] == true
+        # fog attaches additional disks as 'persistent-disk-[index]', google prepends 'google-'
+        if disk.key?('deviceName') && disk['deviceName'] =~ /^persistent-disk-(\d+)/
+          mount_point = "/data#{Regexp.last_match[1]}"
+          mount_point = '/data' if mount_point == '/data1'
+          google_disk_id = "google-#{disk['deviceName']}"
+
+          # Mount the data disk
+          log.debug "mounting device #{google_disk_id} on #{mount_point}"
+          Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+            cmd = %Q[sudo mkdir #{mount_point} && sudo /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/$(basename $(readlink /dev/disk/by-id/#{google_disk_id})) #{mount_point} && sudo chmod a+w #{mount_point}]
+            ssh_exec!(ssh, cmd, "mounting device #{google_disk_id} on #{mount_point}")
+          end
+        else
+          log.warn "unexpected disk device found, ignoring: #{disk}"
+        end
+      end
       @result['status'] = 0
     rescue Fog::Errors::TimeoutError
       log.error 'Timeout waiting for the server to be created'
@@ -174,21 +208,29 @@ class FogProviderGoogle < Provider
       end
       # placeholder
       validate!
-      # Delete server
+      # delete server
       log.debug 'Invoking server delete'
       server = self.connection.servers.get(providerid)
+      disks = server.disks
       begin
         server.destroy
         server.wait_for(120) { !ready? }
       rescue Fog::Errors::NotFound
-        log.debug "server wait_for ready returned not found... didn't catch the non-ready state"
+        # ok, can be thrown by wait_for
+        log.debug "disk no longer found"
       end
-      disk = connection.disks.get(providerid)
-      begin
-        disk.destroy
-        disk.wait_for(120) { !ready? }
-      rescue Fog::Errors::NotFound
-        log.debug "disk wait_for ready returned not found... didn't catch the non-ready state"
+      # delete all attached disks
+      disks.each do |d|
+        name = d['source'].split('/')[-1]
+        disk = connection.disks.get(name)
+        log.debug "deleting disk #{name}"
+        begin
+          disk.destroy
+          disk.wait_for(120) { !ready? }
+        rescue Fog::Errors::NotFound
+          # ok, can be thrown by wait_for
+          log.debug "disk no longer found"
+        end
       end
       # Return 0
       @result['status'] = 0
@@ -220,6 +262,7 @@ class FogProviderGoogle < Provider
   end
 
   def validate!
+    # validate keys
   end
 
 end
