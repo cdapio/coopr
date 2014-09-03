@@ -19,8 +19,8 @@
 require_relative 'utils'
 require 'resolv'
 
+# top level class for interacting with Google Compute via Fog
 class FogProviderGoogle < Provider
-
   include FogProvider
 
   def create(inputmap)
@@ -32,7 +32,7 @@ class FogProviderGoogle < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # validate credentials
@@ -70,7 +70,7 @@ class FogProviderGoogle < Provider
       @result['result']['ssh-auth']['user'] = ssh_user
       @result['result']['ssh-auth']['identityfile'] = @ssh_keyfile unless @ssh_keyfile.to_s == ''
       @result['status'] = 0
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.create: #{e.inspect}"
     else
@@ -82,19 +82,18 @@ class FogProviderGoogle < Provider
 
   def create_server_def
     server_def = {
-      :name    => @hostname,
-      :disks   => @disks,
+      :name         => @hostname,
+      :disks        => @disks,
       :machine_type => @flavor,
-      :zone_name => @zone_name,
-      :tags => ['coopr']
+      :zone_name    => @zone_name,
+      :tags         => ['coopr']
     }
     # optional attrs
     server_def[:network] = @network unless @network.to_s == ''
     server_def
   end
 
-
-  def create_disk(name, size_gb = 20, zone_name = 'us-central1-a', source_image)
+  def create_disk(name, size_gb = 10, zone_name, source_image)
     args = {}
     args[:name] = name
     args[:size_gb] = size_gb
@@ -114,16 +113,16 @@ class FogProviderGoogle < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # validate credentials
       validate!
       # Confirm server
       log.debug "Invoking server confirm for id: #{providerid}"
-      server = self.connection.servers.get(providerid)
+      server = connection.servers.get(providerid)
       # Wait until the server is ready
-      raise 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
+      fail 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
@@ -135,7 +134,7 @@ class FogProviderGoogle < Provider
         end
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
-        raise 'No IP address available for bootstrapping.'
+        fail 'No IP address available for bootstrapping.'
       else
         log.debug "Bootstrap IP address #{bootstrap_ip}"
       end
@@ -198,7 +197,7 @@ class FogProviderGoogle < Provider
     rescue Net::SSH::AuthenticationFailed => e
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.confirm:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.confirm: #{e.inspect}"
     else
@@ -213,21 +212,21 @@ class FogProviderGoogle < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # validate credentials
       validate!
       # delete server
       log.debug 'Invoking server delete'
-      server = self.connection.servers.get(providerid)
+      server = connection.servers.get(providerid)
       disks = server.disks
       begin
         server.destroy
         server.wait_for(120) { !ready? }
       rescue Fog::Errors::NotFound
         # ok, can be thrown by wait_for
-        log.debug "disk no longer found"
+        log.debug 'disk no longer found'
       end
       # delete all attached disks
       disks.each do |d|
@@ -239,7 +238,7 @@ class FogProviderGoogle < Provider
           disk.wait_for(120) { !ready? }
         rescue Fog::Errors::NotFound
           # ok, can be thrown by wait_for
-          log.debug "disk no longer found"
+          log.debug 'disk no longer found'
         end
       end
       # Return 0
@@ -257,13 +256,12 @@ class FogProviderGoogle < Provider
   # Shared definitions (borrowed from knife-ec2 gem, Apache 2.0 license)
 
   def connection
-
     # Create connection
     # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
-        :provider => 'google',
-        :google_project => @project_id,
+        :provider            => 'google',
+        :google_project      => @project_id,
         :google_client_email => @client_email,
         :google_key_location => @key_location
       )
@@ -276,12 +274,11 @@ class FogProviderGoogle < Provider
     unless @client_email =~ /.*gserviceaccount.com$/
       errors << 'Invalid service account email address. It must be in the gserviceaccount.com domain'
     end
-    [ @key_location, @ssh_keyfile ].each do |key|
+    [@key_location, @ssh_keyfile].each do |key|
       unless File.readable?(key)
         errors << "cannot read specified key location: #{key}"
       end
     end
-    raise 'Credential validation failed!' if errors.each{|e| log.error(e)}.any?
+    fail 'Credential validation failed!' if errors.each { |e| log.error(e) }.any?
   end
-
 end
