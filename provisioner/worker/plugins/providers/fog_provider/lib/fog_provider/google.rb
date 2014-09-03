@@ -35,7 +35,7 @@ class FogProviderGoogle < Provider
       fields.each do |k,v|
         instance_variable_set('@' + k, v)
       end
-      # placeholder
+      # validate credentials
       validate!
       # Create the server
       log.info "Creating #{hostname} on GCE using flavor: #{flavor}, image: #{image}"
@@ -117,7 +117,7 @@ class FogProviderGoogle < Provider
       fields.each do |k,v|
         instance_variable_set('@' + k, v)
       end
-      # placeholder
+      # validate credentials
       validate!
       # Confirm server
       log.debug "Invoking server confirm for id: #{providerid}"
@@ -216,7 +216,7 @@ class FogProviderGoogle < Provider
       fields.each do |k,v|
         instance_variable_set('@' + k, v)
       end
-      # placeholder
+      # validate credentials
       validate!
       # delete server
       log.debug 'Invoking server delete'
@@ -272,7 +272,16 @@ class FogProviderGoogle < Provider
   end
 
   def validate!
-    # validate keys
+    errors = []
+    unless @client_email =~ /.*gserviceaccount.com$/
+      errors << 'Invalid service account email address. It must be in the gserviceaccount.com domain'
+    end
+    [ @key_location, @ssh_keyfile ].each do |key|
+      unless File.readable?(key)
+        errors << "cannot read specified key location: #{key}"
+      end
+    end
+    raise 'Credential validation failed!' if errors.each{|e| log.error(e)}.any?
   end
 
 end
