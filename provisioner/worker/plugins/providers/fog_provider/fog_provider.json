@@ -142,6 +142,16 @@
             "type": "text",
             "tip": "Path to your P12 key, as downloaded from GCE encrypted with their default passphrase (notasecret)"
           },
+          "ssh_keyfile": {
+            "label": "ssh private key file",
+            "type": "text",
+            "tip": "Full path and file name to your GCE SSH private key"
+          },
+          "ssh_username": {
+            "label": "ssh username",
+            "type": "text",
+            "tip": "SSH username to use. Must match private key file, and have sudo permissions"
+          },
           "zone_name": {
             "label": "Zone",
             "type": "select",
@@ -165,23 +175,14 @@
             "project_id",
             "client_email",
             "key_location",
-            "zone_name"
+            "zone_name",
+            "ssh_keyfile",
+            "ssh_username"
           ]
         ]
       },
       "user": {
         "fields": {
-          "ssh_keyfile": {
-            "label": "ssh private key file",
-            "type": "text",
-            "tip": "Full path and file name to your GCE SSH private key"
-          },
-          "ssh_username": {
-            "label": "ssh username",
-            "type": "text",
-            "override": true,
-            "tip": "SSH username to use. Must match private key file, and have sudo permissions"
-          },
           "data_disk_size_gb": {
             "label": "Data disk size in Gb",
             "type": "text",
@@ -195,12 +196,7 @@
             "tip": "GCE custom network"
           }
         },
-        "required": [
-          [
-            "ssh_keyfile",
-            "ssh_username"
-          ]
-        ]
+        "required": []
       }
     }
   },
