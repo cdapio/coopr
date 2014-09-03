@@ -298,6 +298,17 @@ CreateCluster.addTemplateToScope = function (template, scope) {
   scope.defaultHardwareType = template.defaults.hardwaretype;
   scope.defaultImageType = template.defaults.imagetype;
   scope.defaultConfig = JSON.stringify(template.defaults.config);
+
+  if(!scope.clusterId) {
+    scope.clusterNumMachines = Math.min(
+      Math.max(
+        scope.clusterNumMachines || 0,
+        template.constraints.size.min || 1
+      ), 
+      template.constraints.size.max || 1
+    );
+  }
+
   if ('administration' in template) {
     scope.leaseDuration.initial = Helpers.parseMilliseconds(
       template.administration.leaseduration.initial);
