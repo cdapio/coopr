@@ -532,6 +532,7 @@ public class ClusterService {
     Cluster.Builder builder = Cluster.builder()
       .setAccount(account)
       .setName(name)
+      .setDescription(createRequest.getDescription())
       .setID(clusterId);
 
     EntityStoreView entityStore = entityStoreService.getView(account);
