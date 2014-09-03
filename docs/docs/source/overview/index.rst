@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ Future development will focus more on managing clusters of machines or clusters 
 
 History of Continuuity Loom
 ===========================
-At Continuuity, we built our Loom product to fill an ongoing need - to quickly build and deploy clusters for developers.
+At  Cask Data, we built our Loom product to fill an ongoing need - to quickly build and deploy clusters for developers.
 Since Reactor, our flagship product, utilizes several technologies within the Hadoop ecosystem, it was a constant battle
 to build, use and tear down clusters regularly on a variety of IaaS providers. Continuuity Loom solved this problem by
 rapidly provisioning our clusters to meet the needs of our business, developers and customers. Continuuity Loom's

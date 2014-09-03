@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,12 +13,3 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-.. Where to Go Next
-.. ================
-.. - `Continuuity.com <http://continuuity.com>`_
-.. - `Download Continuuity Loom <download>`_
-.. - `Support <http://support.continuuity.com/>`_
-.. 
-.. | Copyright © 2014 Continuuity, Inc.
-.. | Continuuity, Continuuity Loom and Continuuity Reactor are trademarks of Continuuity, Inc. All rights reserved.
-.. | Apache, Apache Hadoop, HBase are trademarks of the Apache Software Foundation.

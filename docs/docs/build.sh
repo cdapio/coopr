@@ -21,8 +21,8 @@ APIDOCS="apidocs"
 JAVADOCS="javadocs"
 LICENSES="licenses"
 LICENSES_PDF="licenses-pdf"
-PRODUCT="loom"
-PRODUCT_CAPS="Loom"
+PRODUCT="coopr"
+PRODUCT_CAPS="Coopr"
 
 SCRIPT_PATH=`pwd`
 

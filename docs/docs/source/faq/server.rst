@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@
 .. _faq_toplevel:
 
 .. index::
-   single: FAQ: Loom Server
+   single: FAQ: Coopr Server
 
 ============================
-Loom Server
+Coopr Server
 ============================
 
-How many concurrent provisioning jobs can Continuuity Loom handle?
+How many concurrent provisioning jobs can Cask Coopr handle?
 ------------------------------------------------------------------
-Loom Server is built upon Netty. It's highly asynchronous. We have tested it to handle tens of thousands of concurrent requests.
+Coopr Server is built upon Netty. It's highly asynchronous. We have tested it to handle tens of thousands of concurrent requests.
 However, we believe that there is lot of room for improvement. We are committed on improving its performance in the future releases.
 
 Can I scale-up or scale-down a cluster?
@@ -42,15 +42,15 @@ Where are the configurations of cluster template and it's metadata stored?
 ----------------------------------------------------------------------------
 Cluster templates and their associated metadata are stored in a database.
 
-How do I setup a database for Continuuity Loom to use?
+How do I setup a database for Cask Coopr to use?
 ------------------------------------------------------
-Loom Server persists runtime information of provisioned clusters in a relational database. 
-If you are running Loom Server in the default mode, it's using the embedded Derby DB for storing all 
+Coopr Server persists runtime information of provisioned clusters in a relational database. 
+If you are running Coopr Server in the default mode, it's using the embedded Derby DB for storing all 
 the runtime metadata. We don't recommend running an embedded derby DB in production. 
-Loom Server can be configured to connect to standard relational database like MySQL or PostgreSQL
-by simple configurations specified in loom.xml.
+Coopr Server can be configured to connect to standard relational database like MySQL or PostgreSQL
+by simple configurations specified in coopr.xml.
 
-Following are the configuration required for enabling Loom Server to connect to external relational database:
+Following are the configuration required for enabling Coopr Server to connect to external relational database:
 ::
 
  ...
@@ -61,17 +61,17 @@ Following are the configuration required for enabling Loom Server to connect to 
   </property>
   <property>
     <name>server.jdbc.connection.string</name>
-    <value>jdbc:mysql://127.0.0.1:3306/loom?useLegacyDatetimeCode=false</value>
+    <value>jdbc:mysql://127.0.0.1:3306/coopr?useLegacyDatetimeCode=false</value>
     <description>specifies how to connect to mysql</description>
   </property>
   <property>
     <name>server.db.user</name>
-    <value>loom</value>
+    <value>coopr</value>
     <description>mysql user</description>
   </property>
   <property>
     <name>server.db.password</name>
-    <value>looming</value>
+    <value>coopring</value>
     <description>mysql user password</description>
   </property>
   ...
@@ -110,14 +110,13 @@ Is there anyway to inspect the plan for cluster being provisioned?
 --------------------------------------------------------------------
 There is web service endpoint for retrieving the plan for the cluster being provisioned. The plan includes actions
 that are executed on the node. Actions are divided into stages. An action in each stage can be executed in parallel.
-Loom server implements a distributed barrier at each stage ensuring that the planned stage actions are all completed
+Coopr Server implements a distributed barrier at each stage ensuring that the planned stage actions are all completed
 before proceeding to the next stage. This ensures the actions are executed in the right dependency order.
 
-Following is an example web service call along with the output returned from the Loom Server provisioning a web server
-on a single node.:
-::
+Following is an example web service call along with the output returned from the Coopr Server provisioning a web server
+on a single node::
 
-  $ curl -H 'X-Loom-UserID:<user id>' http://<loom-host-name>:<loom-host-port>/v1/loom/clusters/<cluster-id>/plans
+  $ curl -H 'X-Coopr-UserID:<user id>' http://<coopr-host-name>:<coopr-host-port>/v1/coopr/clusters/<cluster-id>/plans
   $ [{
         "action": "SOLVE_LAYOUT",
         "clusterId": "00000071",

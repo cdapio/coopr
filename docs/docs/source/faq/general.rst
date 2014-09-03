@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ are welcome and encouraged!
 
 Does Continuuity Loom make it easy for me to migrate from one cloud to another?
 --------------------------------------------------------------------------------
-Absolutely. When we originally built Continuuity Loom at Continuuity, the main goal was to make it a seamless process to migrate from
+Absolutely. When we originally built Continuuity Loom at  Cask Data, the main goal was to make it a seamless process to migrate from
 one cloud to another.
 
 Can Continuuity Loom work on my laptop?

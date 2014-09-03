@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -25,10 +25,12 @@
 Security
 ===================
 
-At Continuuity, we take security very seriously and invest a lot of time to make sure we secure communication between 
-different aspects of any system that we build. Continuuity Loom beta release does not include a lot of much needed security features,
-but upcoming releases of Continuuity Loom will make it secure and more reliable for provisioning clusters. This document describes how
-we are planning to secure different aspects of Continuuity Loom.
+At Cask Data, we take security very seriously and invest a lot of time to make sure we
+secure communication between different aspects of any system that we build. Continuuity
+Loom beta release does not include a lot of much needed security features, but upcoming
+releases of Continuuity Loom will make it secure and more reliable for provisioning
+clusters. This document describes how we are planning to secure different aspects of
+Continuuity Loom.
 
 .. figure:: security-diagram.png
     :align: right
@@ -72,7 +74,9 @@ Communication Channels
  * 8 - Intra-Node
 
   * We recommend firewalling nodes to limit cross cluster communication.  
-  * Configurable firewall support included out of the box through a firewall service.  Different clusters can be configured differently through configuration changes when a cluster is requested.
+  * Configurable firewall support included out of the box through a firewall service. 
+    Different clusters can be configured differently through configuration changes when a
+    cluster is requested.
 
 Data Stores
 ===========
