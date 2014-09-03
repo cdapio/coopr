@@ -160,6 +160,19 @@
             "override": true,
             "tip": "Size of the persistent disk to be created and mounted to /data"
           },
+          "network": {
+            "label": "Network",
+            "type": "text",
+            "override": true,
+            "tip": "GCE custom network"
+          },
+          "external_ip": {
+            "label": "Associate public IP",
+            "type": "text",
+            "default": "EPHEMERAL",
+            "override": true,
+            "tip": "EPHEMERAL, static IP address, or NONE"
+          },
           "zone_name": {
             "label": "Zone",
             "type": "select",

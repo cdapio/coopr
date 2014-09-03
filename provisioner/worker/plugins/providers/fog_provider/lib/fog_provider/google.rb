@@ -40,30 +40,26 @@ class FogProviderGoogle < Provider
       # Create the server
       log.info "Creating #{hostname} on GCE using flavor: #{flavor}, image: #{image}"
 
-      # disks are managed separately, so the CREATE call must first create and confirm the disk to be usedd
+      # disks are managed separately, so CREATE must first create and confirm the disk to be usedd
+      # handle boot disk
       create_disk(@hostname, nil, @zone_name, @image)
       confirm_disk(@hostname)
       disk = connection.disks.get(@hostname)
 
-      disks = [disk]
+      @disks = [disk]
 
+      # handle additional data disk
       if fields['data_disk_size_gb']
         data_disk_name = "#{@hostname}-data"
         log.info "Creating data disk: #{data_disk_name} of size #{fields['data_disk_size_gb']}"
         create_disk(data_disk_name, fields['data_disk_size_gb'], @zone_name, nil)
         confirm_disk(data_disk_name)
         data_disk = connection.disks.get(data_disk_name)
-        disks.push(data_disk)
+        @disks.push(data_disk)
       end
 
       # create the VM
-      server = connection.servers.create({
-                                           :name => @hostname,
-                                           :disks => disks,
-                                           :machine_type => @flavor,
-                                           :zone_name => @zone_name,
-                                           :tags => ['loom']
-                                         })
+      server = connection.servers.create(create_server_def)
 
       # Process results
       @result['result']['providerid'] = server.name
@@ -83,6 +79,26 @@ class FogProviderGoogle < Provider
       @result['status'] = 1 if @result['status'].nil? || (@result['status'].is_a?(Hash) && @result['status'].empty?)
     end
   end
+
+  def create_server_def
+    server_def = {
+      :name    => @hostname,
+      :disks   => @disks,
+      :machine_type => @flavor,
+      :zone_name => @zone_name,
+      :tags => ['coopr']
+    }
+    # optional attrs
+    # ephemeral ip is the default
+    if @external_ip =~ /\d+\.\d+\.\d+\.\d+/
+      server_def[:external_ip] = @external_ip
+    elsif @external_ip == 'NONE'
+      server_def[:external_ip] = false
+    end
+    server_def[:network] = @network unless @network.to_s == ''
+    server_def
+  end
+
 
   def create_disk(name, size_gb = 20, zone_name = 'us-central1-a', source_image)
     args = {}
