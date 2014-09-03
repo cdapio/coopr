@@ -117,6 +117,7 @@
       "hadoop-hdfs-datanode",
       "hadoop-yarn-resourcemanager",
       "hadoop-yarn-nodemanager",
+      "hadoop-mapreduce-historyserver",
       "zookeeper-server",
       "hbase-master",
       "hbase-regionserver",

@@ -86,6 +86,7 @@
       "hadoop-hdfs-datanode",
       "hadoop-yarn-resourcemanager",
       "hadoop-yarn-nodemanager",
+      "hadoop-mapreduce-historyserver",
       "zookeeper-server",
       "hbase-master",
       "hbase-regionserver",
@@ -109,6 +110,7 @@
         [
           "hadoop-hdfs-namenode",
           "hadoop-yarn-resourcemanager",
+          "hadoop-mapreduce-historyserver",
           "hbase-master",
           "mysql-server",
           "hive-metastore-database",
@@ -131,6 +133,12 @@
         }
       },
       "hadoop-yarn-resourcemanager": {
+        "quantities": {
+          "min": "1",
+          "max": "1"
+        }
+      },
+      "hadoop-mapreduce-historyserver": {
         "quantities": {
           "min": "1",
           "max": "1"
