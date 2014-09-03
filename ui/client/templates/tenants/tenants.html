@@ -1,0 +1,85 @@
+{% extends 'index.html' %}
+
+{% block title %}Tenants{% endblock %}
+
+{% block header %}
+    {% include "page-header.html" %}
+{% endblock %}
+
+{% block content %}
+  <div id="content-body">
+
+    <ul class="list-unstyled row tenants-tickers">
+      <li class="col-sm-2 col-sm-offset-2">
+        <div>
+          Total # of workers
+          <em>0</em>
+        </div>
+      </li>
+      <li class="col-sm-2">
+        <div>
+          Available workers
+          <em>0</em>
+        </div>
+      </li>
+      <li class="col-sm-2">
+        <div>
+          In progress tasks
+          <em>0</em>
+        </div>
+      </li>
+      <li class="col-sm-2">
+        <div>
+          Queued tasks
+          <em>0</em>
+        </div>
+      </li>
+    </ul>
+
+    <div id="title" class="clearfix">
+      <a href="/tenants/create" class="pull-right btn btn-default">
+        + Add tenant
+      </a>
+      <h3>Tenants</h3>
+    </div>
+
+    <div id="panels">
+
+      <div class="panel spl-panel">
+        <div class="panel-body spl-panel-body">
+          {% if tenants and tenants.length %}
+            <table class="table table-striped tablesorter spl-panel-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Workers</th>
+                  <th class="no-sort"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in tenants %}
+                  <tr>
+                    <td><a href="/tenants/tenant/{{entry.name}}">{{ entry.name }}</a></td>
+                    <td>{{entry.workers}}</td>
+                    <td width="1">
+                      <form role="form" method="POST" action="/tenants/delete/{{entry.name}}" class="delete-form">
+                        <input type="hidden" value="{{entry.name}}" name="name" />
+                        <button type="submit" class="btn-spl btn-delete"></button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+              
+            </table>
+            {% else %}
+              <p>You haven't configured any tenants.</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script data-main="/static/js/generic-form-control" src="/static/third_party/require.js"></script>
+{% endblock %}

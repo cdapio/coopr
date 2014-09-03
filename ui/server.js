@@ -548,6 +548,41 @@ site.app.post('/setskin', function (req, res) {
   });
 });
 
+
+
+site.app.get('/tenants', function (req, res) {
+  var user = site.checkAuth(req, res, true);
+  async.parallel([
+    site.getEntity('/tenants', user)
+  ], function (err, results) {
+    var context = {
+      activeTab: 'tenants',
+      authenticated: user,
+      env: env,
+      skin: site.getSkin(req)  
+    };
+    if (err) {
+      context.err = err;
+    } else {
+      context.tenants = site.verifyData(results[0]);
+    }
+    res.render('tenants/tenants.html', context);
+  });
+});
+
+
+site.app.get('/tenants/create', function (req, res) {
+  var user = site.checkAuth(req, res, true);
+  res.render('tenants/createtenant.html', {
+    activeTab: 'tenants',
+    authenticated: user,
+    env: env,
+    skin: site.getSkin(req)
+  });
+});
+
+
+
 site.app.get('/clustertemplates', function (req, res) {
   var user = site.checkAuth(req, res, true);
   async.parallel([

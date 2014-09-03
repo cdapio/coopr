@@ -175,3 +175,19 @@ body #nav .login-dropdown li a span {
   margin-left: 15px;
 }
 
+/**************************************************************************************************/
+
+
+ul.tenants-tickers li > div {
+  font-weight: bold;
+  text-align: center;
+  border: 2px solid white;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  background-color: #3E495D;
+}
+
+ul.tenants-tickers em {
+  display: block;
+  font-size: 60px;
+}
