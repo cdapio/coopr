@@ -17,14 +17,14 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.QuotaException;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.spec.TenantSpecification;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.ProviderType;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
@@ -50,7 +50,7 @@ import java.lang.reflect.Type;
 /**
  * Handler for performing tenant operations.
  */
-@Path("/v1")
+@Path(Constants.API_BASE)
 public class LoomSuperadminHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomSuperadminHandler.class);
 
@@ -335,14 +335,14 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
     }
   }
   /**
-   * Delete a specific {@link com.continuuity.loom.admin.ProviderType}. User must be admin or a 403 is returned.
+   * Delete a specific {@link com.continuuity.loom.spec.plugin.ProviderType}. User must be admin or a 403 is returned.
    *
    * @param request The request to delete a provider type.
    * @param responder Responder for sending the response.
    * @param providertypeId Id of the provider type to delete.
    */
   @DELETE
-  @Path("/loom/providertypes/{providertype-id}")
+  @Path("/plugins/providertypes/{providertype-id}")
   public void deleteProviderType(HttpRequest request, HttpResponder responder,
                                  @PathParam("providertype-id") String providertypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -366,14 +366,14 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Delete a specific {@link com.continuuity.loom.admin.AutomatorType}. User must be admin or a 403 is returned.
+   * Delete a specific {@link com.continuuity.loom.spec.plugin.AutomatorType}. User must be admin or a 403 is returned.
    *
    * @param request The request to delete an automator type.
    * @param responder Responder for sending the response.
    * @param automatortypeId Id of the automator type to delete.
    */
   @DELETE
-  @Path("/loom/automatortypes/{automatortype-id}")
+  @Path("/plugins/automatortypes/{automatortype-id}")
   public void deleteAutomatorType(HttpRequest request, HttpResponder responder,
                                   @PathParam("automatortype-id") String automatortypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -397,7 +397,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Writes a {@link com.continuuity.loom.admin.ProviderType}. User must be admin or a 403 is returned.
+   * Writes a {@link com.continuuity.loom.spec.plugin.ProviderType}. User must be admin or a 403 is returned.
    * If the name in the path does not match the name in the put body, a 400 is returned.
    *
    * @param request Request to write provider type.
@@ -405,7 +405,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
    * @param providertypeId Id of the provider type to write.
    */
   @PUT
-  @Path("/loom/providertypes/{providertype-id}")
+  @Path("/plugins/providertypes/{providertype-id}")
   public void putProviderType(HttpRequest request, HttpResponder responder,
                               @PathParam("providertype-id") String providertypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -438,7 +438,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Writes a {@link com.continuuity.loom.admin.AutomatorType}. User must be admin or a 403 is returned.
+   * Writes a {@link com.continuuity.loom.spec.plugin.AutomatorType}. User must be admin or a 403 is returned.
    * If the name in the path does not match the name in the put body, a 400 is returned.
    *
    * @param request Request to write provider type.
@@ -446,7 +446,7 @@ public class LoomSuperadminHandler extends LoomAuthHandler {
    * @param automatortypeId Id of the provider type to write.
    */
   @PUT
-  @Path("/loom/automatortypes/{automatortype-id}")
+  @Path("/plugins/automatortypes/{automatortype-id}")
   public void putAutomatorType(HttpRequest request, HttpResponder responder,
                                @PathParam("automatortype-id") String automatortypeId) {
     Account account = getAndAuthenticateAccount(request, responder);

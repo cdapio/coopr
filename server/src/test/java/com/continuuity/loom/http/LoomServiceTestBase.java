@@ -17,8 +17,8 @@ package com.continuuity.loom.http;
 
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.internal.ElementsTrackingQueue;
@@ -51,8 +51,8 @@ public class LoomServiceTestBase extends BaseTest {
   protected static final String TENANT_ID = "tenant1";
   protected static final String PROVISIONER_ID = "provisioner1";
   protected static final String TENANT = "tenant1";
-  protected static final Account USER1_ACCOUNT = new Account(USER1, TENANT);
-  protected static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, TENANT);
+  protected static final Account USER1_ACCOUNT = new Account(USER1, TENANT_ID);
+  protected static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, TENANT_ID);
   protected static final Account SUPERADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT);
   protected static final Header[] USER1_HEADERS = {
     new BasicHeader(Constants.USER_HEADER, USER1),
@@ -75,6 +75,7 @@ public class LoomServiceTestBase extends BaseTest {
     new BasicHeader(Constants.TENANT_HEADER, Constants.SUPERADMIN_TENANT)
   };
   private static int port;
+  private static String base;
   protected static LoomService loomService;
   protected static ElementsTrackingQueue balancerQueue;
   protected static QueueGroup provisionerQueues;
@@ -98,6 +99,7 @@ public class LoomServiceTestBase extends BaseTest {
     loomService.startAndWait();
     port = loomService.getBindAddress().getPort();
     tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
+    base = "http://" + HOSTNAME + ":" + port + Constants.API_BASE;
   }
 
   @Before
@@ -111,13 +113,20 @@ public class LoomServiceTestBase extends BaseTest {
     loomService.stopAndWait();
   }
 
+  public static HttpResponse doGetWithoutVersion(String resource) throws Exception {
+    DefaultHttpClient client = new DefaultHttpClient();
+    HttpGet get = new HttpGet("http://" + HOSTNAME + ":" + port + resource);
+    return client.execute(get);
+  }
+
+
   public static HttpResponse doGet(String resource) throws Exception {
     return doGet(resource, null);
   }
 
   public static HttpResponse doGet(String resource, Header[] headers) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
-    HttpGet get = new HttpGet("http://" + HOSTNAME + ":" + port + resource);
+    HttpGet get = new HttpGet(base + resource);
 
     if (headers != null) {
       get.setHeaders(headers);
@@ -132,7 +141,7 @@ public class LoomServiceTestBase extends BaseTest {
 
   public static HttpResponse doPut(String resource, String body, Header[] headers) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
-    HttpPut put = new HttpPut("http://" + HOSTNAME + ":" + port + resource);
+    HttpPut put = new HttpPut(base + resource);
 
     if (headers != null) {
       put.setHeaders(headers);
@@ -149,7 +158,7 @@ public class LoomServiceTestBase extends BaseTest {
 
   public static HttpResponse doPost(String resource, String body, Header[] headers) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
-    HttpPost post = new HttpPost("http://" + HOSTNAME + ":" + port + resource);
+    HttpPost post = new HttpPost(base + resource);
 
     if (headers != null) {
       post.setHeaders(headers);
@@ -163,7 +172,7 @@ public class LoomServiceTestBase extends BaseTest {
 
   public static HttpResponse doDelete(String resource, Header[] headers) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
-    HttpDelete delete = new HttpDelete("http://" + HOSTNAME + ":" + port + resource);
+    HttpDelete delete = new HttpDelete(base + resource);
     if (headers != null) {
       delete.setHeaders(headers);
     }
@@ -176,6 +185,6 @@ public class LoomServiceTestBase extends BaseTest {
   }
 
   public static String getBaseUrl() {
-    return String.format("http://%s:%d", HOSTNAME, port);
+    return String.format("http://%s:%d%s", HOSTNAME, port, Constants.API_BASE);
   }
 }

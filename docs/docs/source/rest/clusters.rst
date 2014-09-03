@@ -24,7 +24,7 @@ REST API: Clusters
 
 .. include:: /rest/rest-links.rst
 
-Using the Loom REST API, users can create clusters, get cluster details, action plans, and delete clusters.  
+Using the REST API, users can create clusters, get cluster details, action plans, and delete clusters.  
 
 .. _cluster-create:
 
@@ -103,8 +103,76 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{ "name":"hadoop-dev", "description":"my hadoop dev cluster", "numMachines":"5", "clusterTemplate":"hadoop.example" }'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters
+        http://<server>:<port>/<version>/clusters
  $ { "id":"00000079" }
+
+.. _cluster-retrieve-all:
+
+Get All Cluster Details
+=======================
+
+To retrieve a summary of details about all clusters visible to a user, make a GET HTTP request to URI:
+::
+
+ /clusters
+
+This returns an JSON Array of JSON Objects that represent a cluster. Each cluster contains an id, name, description,
+createTime, expireTime, services, numNodes, status, provider, clusterTemplate, and progress.
+The provider and clusterTemplate fields are JSON Objects containing a single field called name,
+with the entity name as the value. The services field is a JSON Array of the names of all services on the cluster.
+The progress field contains the progress of the last job performed on the cluster, or the progress of the job
+currently being performed on the cluster. It contains an action, actionstatus, stepstotal, and stepscompleted.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+
+The server will respond with the id of the cluster added.
+
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successfully created
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+
+Example
+^^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<userid>'
+        -H 'X-Loom-TenantID:<tenantid>'
+        -H 'X-Loom-ApiKey:<apikey>'
+        http://<loom-server>:<loom-port>/<version>/loom/clusters
+ $ [
+       {
+           "id":"00000079",
+           "name":"hadoop-dev",
+           "description":"my hadoop dev cluster",
+           "createTime": 1391756249454,
+           "expireTime": 1391767249454,
+           "provider": {
+               "name": "aws"
+           },
+           "clusterTemplate": {
+               "name": "hadoop-distributed"
+           },
+           "services": [ "hadoop-hdfs-namenode", "hadoop-hdfs-datanode", ... ],
+           "ownerId": "user123",
+           "status": "pending",
+           "numNodes": 3,
+           "progress": {
+               "action": "cluster_create",
+               "actionstatus": "running",
+               "stepstotal": 81,
+               "stepscompleted" 49
+           }
+       },
+       ...
+   ]
 
 .. _cluster-details:
 
@@ -150,7 +218,7 @@ Example
  $ curl -H 'X-Loom-UserID:<userid>' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079
+        http://<server>:<port>/<version>/clusters/00000079
  $ {
        "id":"00000079",
        "name":"hadoop-dev",
@@ -170,7 +238,7 @@ Example
                "properties": {
                    "hardwaretype": "medium",
                    "flavor": "5",
-                   "hostname": "loom-beamer90-1003.local",
+                   "hostname": "beamer90-1003.local",
                    "imagetype": "centos6",
                    "ipaddress": "123.456.0.1"
                },
@@ -235,7 +303,7 @@ Example
         -H 'X-Loom-UserID:<userid>' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079
+        http://<server>:<port>/<version>/clusters/00000079
 
 .. _cluster-status:
 
@@ -250,17 +318,52 @@ To get the status of a cluster, make a GET HTTP request to URI:
 Status of a cluster is a JSON Object with a clusterid, stepstotal, stepscompleted, 
 status, actionstatus, and action.  
 
-The status can be one of PENDING, ACTIVE, INCOMPLETE,
-and TERMINATED.  PENDING means there is some actions pending, ACTIVE means the cluster 
-is active and can be used, INCOMPLETE means there was some previous action failure so 
-the cluster may not be usable, but is deletable, and TERMINATED means the cluster is 
+The status can be one of pending, active, incomplete, and terminated.
+Pending means there is some actions pending, active means the cluster 
+is active and can be used, incomplete means there was some previous action failure so 
+the cluster may not be usable, but is deletable, and terminated means the cluster is 
 inaccessible and all nodes have been removed. 
 
-The action represents the different types of actions that can be performed on a cluster.  As
-of today, it is one of SOLVE_LAYOUT, CLUSTER_CREATE, and CLUSTER_DELETE. The actionstatus
-describes the status of the action being performed on the cluster, and is one of 
-NOT_SUBMITTED, RUNNING, COMPLETE, and FAILED.  
+The action represents the different types of actions that can be performed on a cluster.  
+It is one of solve_layout, cluster_create, cluster_delete, cluster_configure,
+cluster_configure_with_restart, stop_services, start_services, restart_services, and add_services. 
+The actionstatus describes the status of the action being performed on the cluster, and is one of 
+not_submitted, running, complete, or failed.
 
+HTTP Responses
+^^^^^^^^^^^^^^
+
+The server will respond with the id of the cluster added.
+
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successfully created
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT_FOUND)
+     - If the cluster could not be found.
+
+Example
+^^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'X-Loom-UserID:<userid>'
+        -H 'X-Loom-TenantID:<tenantid>'
+        -H 'X-Loom-ApiKey:<apikey>'
+        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/status
+ $ {
+       "clusterid":"00000079",
+       "status": "pending",
+       "action": "cluster_create",
+       "actionstatus": "running",
+       "stepstotal": 81,
+       "stepscompleted" 49
+   }
 
 .. _cluster-plan:
 
@@ -307,7 +410,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/plans/00000079-001
+        http://<server>:<port>/<version>/clusters/00000079/plans/00000079-001
  $ {
       "id":"1",
       "clusterId":"2",
@@ -378,7 +481,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/plans
+        http://<server>:<port>/<version>/clusters/00000079/plans
 
 .. _cluster-get-config:
 
@@ -411,7 +514,7 @@ Example
  $ curl -H 'X-Loom-UserID:<user-id>' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
+        http://<server>:<port>/<version>/clusters/<cluster-id>/config
  $ {
      "hadoop": {
          "core_site": {
@@ -513,7 +616,7 @@ Example
                 },
                 "restart": "false" 
             }'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/config
+        http://<server>:<port>/<version>/clusters/<cluster-id>/config
 
 .. _cluster-get-services:
 
@@ -548,7 +651,7 @@ Example
  $ curl -H 'X-Loom-UserID:<user-id>' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services
  [
      "hadoop-hdfs-namenode",
      "hadoop-hdfs-datanode",
@@ -600,7 +703,7 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
         -d '{ "services": [ "zookeeper-server", "hbase-master", "hbase-regionserver" ] }'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services
 
 .. _cluster-stop-services:
 
@@ -642,7 +745,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/stop
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/stop
 
 .. _cluster-stop-service:
 
@@ -685,7 +788,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/stop
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/<service-id>/stop
 
 .. _cluster-start-services:
 
@@ -727,7 +830,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/start
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/start
 
 .. _cluster-start-service:
 
@@ -770,7 +873,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/start
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/<service-id>/start
 
 .. _cluster-restart-services:
 
@@ -814,7 +917,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/restart
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/restart
 
 
 .. _cluster-restart-service:
@@ -860,7 +963,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/services/<service-id>/restart
+        http://<server>:<port>/<version>/clusters/<cluster-id>/services/<service-id>/restart
 
 .. _cluster-sync-template:
 
@@ -913,4 +1016,4 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -X POST
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/<cluster-id>/clustertemplate/sync
+        http://<server>:<port>/<version>/clusters/<cluster-id>/clustertemplate/sync

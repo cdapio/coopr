@@ -15,12 +15,12 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.template.Administration;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -39,6 +39,7 @@ public class ClusterTemplateCodec extends AbstractCodec<ClusterTemplate> {
     JsonObject jsonObj = new JsonObject();
 
     jsonObj.add("name", context.serialize(clusterTemplate.getName()));
+    jsonObj.add("icon", context.serialize(clusterTemplate.getIcon()));
     jsonObj.add("description", context.serialize(clusterTemplate.getDescription()));
     jsonObj.add("defaults", context.serialize(clusterTemplate.getClusterDefaults()));
     jsonObj.add("compatibility", context.serialize(clusterTemplate.getCompatibilities()));
@@ -54,12 +55,13 @@ public class ClusterTemplateCodec extends AbstractCodec<ClusterTemplate> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
+    String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
     ClusterDefaults defaults = context.deserialize(jsonObj.get("defaults"), ClusterDefaults.class);
     Compatibilities compatibilites = context.deserialize(jsonObj.get("compatibility"), Compatibilities.class);
     Constraints constraints = context.deserialize(jsonObj.get("constraints"), Constraints.class);
     Administration administration = context.deserialize(jsonObj.get("administration"), Administration.class);
 
-    return new ClusterTemplate(name, description, defaults, compatibilites, constraints, administration);
+    return new ClusterTemplate(name, icon, description, defaults, compatibilites, constraints, administration);
   }
 }

@@ -68,11 +68,11 @@ ClusterView.app.filter('stringifyTime', function () {
 ClusterView.app.factory('Globals', [function () {
   return {
     STATUS_CLASSES : {
-      COMPLETE: "text-success",
-      CREATING: "",
-      FAILED: "text-danger",
-      NOT_SUBMITTED: "",
-      SOLVING_LAYOUT: ""
+      complete: "text-success",
+      creating: "",
+      failed: "text-danger",
+      not_submitted: "",
+      solving_layout: ""
     },
 
     READABLE_ACTIONS: Helpers.READABLE_ACTIONS,

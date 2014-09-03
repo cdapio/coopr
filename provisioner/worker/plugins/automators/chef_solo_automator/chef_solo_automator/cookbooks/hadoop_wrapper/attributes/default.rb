@@ -70,3 +70,8 @@ default['hadoop']['yarn_env']['yarn_nodemanager_opts'] = '$YARN_NODEMANAGER_OPTS
 default['hbase']['hbase_site']['hbase.cluster.distributed'] = 'true'
 default['hbase']['hbase_site']['hbase.defaults.for.version.skip'] = 'false'
 default['hbase']['hbase_site']['hbase.regionserver.handler.count'] = '100'
+
+# ZooKeeper
+# zoo.cfg
+default['zookeeper']['zoocfg']['autopurge.snapRetainCount'] = '7'
+default['zookeeper']['zoocfg']['autopurge.purgeInterval'] = '24'

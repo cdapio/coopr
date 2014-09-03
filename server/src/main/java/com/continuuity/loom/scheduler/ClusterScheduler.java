@@ -15,8 +15,6 @@
  */
 package com.continuuity.loom.scheduler;
 
-import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
@@ -31,6 +29,8 @@ import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.base.Function;

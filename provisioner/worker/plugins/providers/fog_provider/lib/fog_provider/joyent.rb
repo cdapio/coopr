@@ -33,7 +33,7 @@ class FogProviderJoyent < Provider
         instance_variable_set('@' + k, v)
       end
       # Create the server
-      log.info "Creating #{hostname} on Joyent using flavor: #{flavor}, image: #{image}"
+      log.debug "Creating #{hostname} on Joyent using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
       begin
         server = connection.servers.create(
@@ -90,7 +90,8 @@ class FogProviderJoyent < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bootstrap_ip
       }
-      # Additional checks
+      # do we need sudo bash?
+      sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
@@ -100,10 +101,21 @@ class FogProviderJoyent < Provider
           log.debug 'Validating external connectivity and DNS resolution via ping'
           ssh_exec!(ssh, 'ping -c1 www.opscode.com')
           log.debug 'Temporarily setting hostname'
-          ssh_exec!(ssh, "hostname #{@task['config']['hostname']}")
+          ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}")
         else
           ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
-          ssh_exec!(ssh, "hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
+          ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
+          # Check for /dev/vdb
+          begin
+            vdb = true
+            ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
+          rescue
+            vdb = false
+          end
+          if vdb
+            ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
+            ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
+          end
         end
       end
       # Return 0
@@ -139,6 +151,8 @@ class FogProviderJoyent < Provider
         server.destroy
       rescue NoMethodError
         log.warn "Could not locate server '#{providerid}'... skipping"
+      else
+        sleep 30
       end
       # Return 0
       @result['status'] = 0
@@ -157,7 +171,7 @@ class FogProviderJoyent < Provider
   def connection
     log.debug "Connection options for Joyent:"
     log.debug "- joyent_username #{@joyent_username}"
-    log.debug "- joyent_password #{@joyent_password}"
+    log.debug "- joyent_password #{@joyent_password}" if @joyent_password
     log.debug "- joyent_keyname #{@joyent_keyname}"
     log.debug "- joyent_keyfile #{@joyent_keyfile}"
     log.debug "- joyent_api_url #{@joyent_api_url}"

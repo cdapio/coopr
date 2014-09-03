@@ -15,12 +15,11 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
-import com.continuuity.loom.admin.ServiceDependencies;
-import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
+import com.continuuity.loom.spec.service.ServiceDependencies;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -31,7 +30,6 @@ import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Codec for serializing/deserializing a {@link Service}.
@@ -44,6 +42,7 @@ public class ServiceCodec extends AbstractCodec<Service> {
 
     jsonObj.add("name", context.serialize(service.getName()));
     jsonObj.add("description", context.serialize(service.getDescription()));
+    jsonObj.add("icon", context.serialize(service.getIcon()));
     jsonObj.add("dependencies", context.serialize(service.getDependencies()));
     JsonObject provisioner = new JsonObject();
     provisioner.add("actions", context.serialize(service.getProvisionerActions()));
@@ -59,6 +58,7 @@ public class ServiceCodec extends AbstractCodec<Service> {
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
+    String icon = context.deserialize(jsonObj.get("icon"), String.class);
     ServiceDependencies dependencies = context.deserialize(jsonObj.get("dependencies"), ServiceDependencies.class);
 
     JsonObject provisioner = context.deserialize(jsonObj.get("provisioner"), JsonObject.class);
@@ -68,6 +68,6 @@ public class ServiceCodec extends AbstractCodec<Service> {
                                    new TypeToken<Map<ProvisionerAction, ServiceAction>>(){}.getType());
     }
 
-    return new Service(name, description, dependencies, actions);
+    return new Service(name, icon, description, dependencies, actions);
   }
 }

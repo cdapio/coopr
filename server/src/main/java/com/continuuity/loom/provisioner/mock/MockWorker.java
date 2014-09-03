@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.provisioner.mock;
 
-import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.spec.ProvisionerAction;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
@@ -64,8 +64,8 @@ public class MockWorker extends AbstractScheduledService {
     this.executorService = executorService;
     this.taskMs = taskMs;
     this.msBetweenTasks = msBetweenTasks;
-    this.finishRequest = new HttpPost(String.format(serverUrl + "/v1/loom/tasks/finish"));
-    this.takeRequest = new HttpPost(serverUrl + "/v1/loom/tasks/take");
+    this.finishRequest = new HttpPost(String.format(serverUrl + "/tasks/finish"));
+    this.takeRequest = new HttpPost(serverUrl + "/tasks/take");
     this.httpClient = httpClient;
     this.httpContext = HttpClientContext.create();
   }
@@ -175,6 +175,7 @@ public class MockWorker extends AbstractScheduledService {
         ips.addProperty("bind_v4", randomIP());
         body.add("ipaddresses", ips);
         LOG.debug("adding ips {}.", ips);
+        body.addProperty("hostname", "host-" + randomIP() + ".local");
       }
       body.add("result", result);
 

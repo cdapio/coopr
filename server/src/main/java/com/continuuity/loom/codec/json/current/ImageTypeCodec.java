@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ImageType;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.ImageType;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -37,6 +37,7 @@ public class ImageTypeCodec extends AbstractCodec<ImageType> {
     JsonObject jsonObj = new JsonObject();
 
     jsonObj.add("name", context.serialize(imageType.getName()));
+    jsonObj.add("icon", context.serialize(imageType.getIcon()));
     jsonObj.add("description", context.serialize(imageType.getDescription()));
     jsonObj.add("providermap", context.serialize(imageType.getProviderMap()));
 
@@ -49,10 +50,11 @@ public class ImageTypeCodec extends AbstractCodec<ImageType> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
+    String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
     Map<String, Map<String, String>> providerMap =
       context.deserialize(jsonObj.get("providermap"), new TypeToken<Map<String, Map<String, String>>>() {}.getType());
 
-    return new ImageType(name, description, providerMap);
+    return new ImageType(name, icon, description, providerMap);
   }
 }

@@ -73,7 +73,7 @@ The graph above depicts Continuuity Loom's management capabilities on the horizo
    * - Support for any automation system
      - Y
      - N
-     - Ambari only supports Puppet. Continuuity Loom can support any automation framework through :doc:`Provisioner Plugins </guide/admin/plugins>`
+     - Ambari only supports Puppet. Continuuity Loom can support any automation framework through :doc:`Provisioner Plugins </guide/superadmin/plugins>`
    * - Cluster template support 
      - Y
      - Y/N
@@ -129,7 +129,7 @@ Is Continuuity Loom designed only for provisioning compute and storage?
 ------------------------------------------------------------------------
 Continuuity Loom is a generic provisioning coordination system, and it can be used for provisioning more than
 just compute and storage. Though Continuuity Loom has not yet been tested, the architecture supports provisioning
-and configuring of other resources. Please refer to the :doc:`Provisioner Plugins</guide/admin/plugins>` page
+and configuring of other resources. Please refer to the :doc:`Provisioner Plugins</guide/superadmin/plugins>` page
 for more details on how to write plugins for provisioners to support Providers and Automators that can provision and 
 configure different resources.
 

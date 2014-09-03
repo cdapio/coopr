@@ -19,8 +19,6 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
 import com.google.common.util.concurrent.Service;
 
-import java.util.Set;
-
 /**
  * Service that provides views for reading and writing to and from the plugin resource metadata store.
  */

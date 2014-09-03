@@ -25,6 +25,7 @@ module Loom
     @level = ::Logger::INFO
     @shift_age = nil
     @shift_size = nil
+    @process_name = '-'
     @out = nil
     def log
       Loom::Logging.log
@@ -61,6 +62,10 @@ module Loom
       @shift_size = shift_size
     end
 
+    def self.process_name=(process_name)
+      @process_name = process_name
+    end
+
     def self.log
       unless @logger
         if @out
@@ -70,7 +75,7 @@ module Loom
         end
         @logger.level = @level
         @logger.formatter = proc do |severity, datetime, progname, msg|
-          "#{datetime} #{severity}: #{msg}\n"
+          "#{datetime} #{@process_name} #{severity}: #{msg}\n"
         end
       end
       @logger

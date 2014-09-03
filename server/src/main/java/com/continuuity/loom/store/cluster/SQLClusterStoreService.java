@@ -64,6 +64,7 @@ public class SQLClusterStoreService extends AbstractIdleService implements Clust
                                                                "create_time TIMESTAMP, " +
                                                                "expire_time TIMESTAMP, " +
                                                                "status VARCHAR(32), " +
+                                                               "latest_job_num BIGINT, " +
                                                                "cluster BLOB, " +
                                                                "PRIMARY KEY (id) )",
                                                              dbConnectionPool);

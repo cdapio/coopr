@@ -18,8 +18,8 @@ package com.continuuity.loom.scheduler;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.queue.Element;
@@ -40,6 +40,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,10 +53,11 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
   private static final Account account = new Account(USER1, TENANT_ID);
 
   @BeforeClass
-  public static void initTest() {
+  public static void initTests() throws IOException, IllegalAccessException {
     nodeService = injector.getInstance(NodeService.class);
     clusterService = injector.getInstance(ClusterService.class);
     taskService = injector.getInstance(TaskService.class);
+    entityStoreService.getView(SUPERADMIN_ACCOUNT).writeProviderType(Entities.ProviderTypeExample.JOYENT);
   }
 
   @Before
@@ -249,9 +251,14 @@ public class ClusterCleanupTest extends LoomServiceTestBase {
   }
 
   private Cluster createCluster(String id, long createTime, long expireTime, Cluster.Status status) throws Exception {
-    Cluster cluster = new Cluster(id, account, "expire" + id, createTime, "",
-                                  Entities.ProviderExample.JOYENT, Entities.ClusterTemplateExample.HDFS,
-                                  ImmutableSet.<String>of(), ImmutableSet.<String>of(), null);
+    Cluster cluster = Cluster.builder()
+      .setID(id)
+      .setAccount(account)
+      .setName("expire" + id)
+      .setCreateTime(createTime)
+      .setProvider(Entities.ProviderExample.JOYENT)
+      .setClusterTemplate(Entities.ClusterTemplateExample.HDFS)
+      .build();
     cluster.setStatus(status);
     cluster.setExpireTime(expireTime);
 

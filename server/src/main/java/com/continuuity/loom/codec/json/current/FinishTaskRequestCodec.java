@@ -44,11 +44,12 @@ public class FinishTaskRequestCodec implements JsonDeserializer<FinishTaskReques
     String stdout = context.deserialize(jsonObj.get("stdout"), String.class);
     String stderr = context.deserialize(jsonObj.get("stderr"), String.class);
     Integer status = context.deserialize(jsonObj.get("status"), Integer.class);
+    String hostname = context.deserialize(jsonObj.get("hostname"), String.class);
     Map<String, String> ipAddresses = context.deserialize(jsonObj.get("ipaddresses"),
                                                           new TypeToken<Map<String, String>>() {}.getType());
     JsonObject result = context.deserialize(jsonObj.get("result"), JsonObject.class);
 
     return new FinishTaskRequest(workerId, provisionerId, tenantId, taskId,
-                                 stdout, stderr, status, ipAddresses, result);
+                                 stdout, stderr, status, hostname, ipAddresses, result);
   }
 }

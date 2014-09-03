@@ -10,7 +10,7 @@
       "mysql-server"
     ],
     "provider": "rackspace",
-    "hardwaretype": "medium",
+    "hardwaretype": "standard-medium",
     "imagetype": "ubuntu12",
     "config": {
       "apache": {
@@ -42,6 +42,12 @@
         "server_debian_password": "somedefaultpassword",
         "server_root_password": "somedefaultpassword",
         "server_repl_password": "somedefaultpassword",
+        "data_dir": "/data/mysql",
+        "server": {
+          "directories": {
+            "log_dir": "/data/mysql"
+          }
+        },
         "bind_address": "%ip.bind_v4.service.mysql-server%"
       },
       "php": {
@@ -49,19 +55,18 @@
           "mysql.default_host": "%host.service.mysql-server%"
         },
         "modules": [
-          "memcache",
-          "mysql"
+          "memcache"
         ]
       }
     }
   },
   "compatibility": {
     "hardwaretypes": [
-      "small",
-      "medium",
-      "large",
-      "xlarge",
-      "xxlarge"
+      "standard-small",
+      "standard-medium",
+      "standard-large",
+      "standard-xlarge",
+      "standard-xxlarge"
     ],
     "imagetypes": [
       "centos6",

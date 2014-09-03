@@ -32,11 +32,11 @@ import com.continuuity.loom.scheduler.guice.SchedulerModule;
 import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.SQLClusterStoreService;
+import com.continuuity.loom.store.credential.CredentialStore;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.guice.TestStoreModule;
 import com.continuuity.loom.store.provisioner.MemoryPluginStore;
 import com.continuuity.loom.store.provisioner.PluginMetaStoreService;
-import com.continuuity.loom.store.provisioner.PluginStore;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.provisioner.SQLPluginMetaStoreService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
@@ -60,7 +60,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
-import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -86,22 +85,28 @@ public class BaseTest {
   protected static Configuration conf;
   protected static MockClusterCallback mockClusterCallback;
   protected static IdService idService;
+  protected static CredentialStore credentialStore;
   protected static Gson gson;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
+
+  public static Configuration createTestConf() {
+    Configuration conf = Configuration.create();
+    conf.set(Constants.PORT, "0");
+    conf.set(Constants.HOST, HOSTNAME);
+    conf.set(Constants.SCHEDULER_INTERVAL_SECS, "1");
+    conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
+    conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+    return conf;
+  }
 
   @BeforeClass
   public static void setupBase() throws Exception {
     zkServer = InMemoryZKServer.builder().setDataDir(tmpFolder.newFolder()).setTickTime(5000).build();
     zkServer.startAndWait();
 
-    conf = Configuration.create();
-    conf.set(Constants.PORT, "0");
-    conf.set(Constants.HOST, HOSTNAME);
-    conf.set(Constants.SCHEDULER_INTERVAL_SECS, "1");
-    conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
-    conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+    conf = createTestConf();
 
     zkClientService = ZKClientServices.delegate(
       ZKClients.reWatchOnExpire(
@@ -158,6 +163,7 @@ public class BaseTest {
     tenantStore = sqlTenantStore;
     gson = injector.getInstance(Gson.class);
     pluginStore = injector.getInstance(MemoryPluginStore.class);
+    credentialStore = injector.getInstance(CredentialStore.class);
   }
 
   @AfterClass
@@ -168,12 +174,19 @@ public class BaseTest {
   }
 
   @After
-  public void cleanupBaseTest() throws SQLException {
-    sqlTenantStore.clearData();
-    sqlClusterStoreService.clearData();
-    sqlProvisionerStore.clearData();
-    sqlMetaStoreService.clearData();
-    sqlTenantStore.clearData();
-    pluginStore.clearData();
+  public void cleanupBaseTest() throws Exception {
+    if (shouldClearDataBetweenTests()) {
+      sqlTenantStore.clearData();
+      sqlClusterStoreService.clearData();
+      sqlProvisionerStore.clearData();
+      sqlMetaStoreService.clearData();
+      sqlTenantStore.clearData();
+      pluginStore.clearData();
+      credentialStore.wipe();
+    }
+  }
+
+  protected boolean shouldClearDataBetweenTests() {
+    return true;
   }
 }

@@ -24,7 +24,7 @@ REST API: Tenants
 
 .. include:: /rest/rest-links.rst
 
-Using the Loom Superadmin REST API, you can create, modify, retrieve, and delete tenants.
+Using the Superadmin REST API, you can create, modify, retrieve, and delete tenants.
 Each tenant consists of a unique id, a name, some number of workers, and optional additional 
 settings, such as max clusters allowed in the tenant or max nodes allowed in the tenant.
 Only the superadmin is allowed to access the tenant APIs.
@@ -58,6 +58,8 @@ Required Parameters
    * - name
      - Specifies the name for the tenant. The assigned name must have only
        alphanumeric, dash(-), dot(.), or underscore(_) characters.
+   * - description
+       Optional description of the tenant.
    * - workers
      - Number of workers assigned to the tenant.
    * - maxClusters
@@ -90,7 +92,7 @@ Example
         -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"my-company", "workers":10}' 
-        http://<loom-server>:<loom-port>/<version>/tenants
+        http://<server>:<port>/<version>/tenants
 
 .. _tenants-retrieve:
 
@@ -129,7 +131,7 @@ Example
         -H 'X-Loom-UserID:admin'
         -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/tenants/f78dae92-a27b-4e3b-8c6a-cfc19f844259
+        http://<server>:<port>/<version>/tenants/my-company
  $ { "name":"my-company", "workers":10, "maxClusters":20, "maxNodes":100 }
 
 
@@ -170,7 +172,7 @@ Example
         -H 'X-Loom-UserID:admin'
         -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/tenants/my-company
+        http://<server>:<port>/<version>/tenants/my-company
 
 .. _tenants-modify:
 
@@ -236,12 +238,12 @@ Example
         -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{ "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }'  
-        http://<loom-server>:<loom-port>/<version>/tenants/my-company
+        http://<server>:<port>/<version>/tenants/my-company
  $ curl -X GET 
         -H 'X-Loom-UserID:admin'
         -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/tenants/my-company
+        http://<server>:<port>/<version>/tenants/my-company
  $ { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }
 
 .. _tenants-all-list:
@@ -250,7 +252,7 @@ List All Tenants
 ================
 
 The list of all tenants is also available for you to retrieve. The tenant list resource represents 
-the comprehensive set of tenants within the Continuuity Loom system.
+the comprehensive set of tenants within the system.
 
 To list all the tenants, make GET HTTP request to URI:
 ::
@@ -279,7 +281,7 @@ Example
         -H 'X-Loom-UserID:admin'
         -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/tenants
+        http://<server>:<port>/<version>/tenants
  $ [
      { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 },
      { "name":"companyX", "workers":100, "maxClusters":100, "maxNodes":1000 }

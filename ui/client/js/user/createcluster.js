@@ -48,7 +48,7 @@ CreateCluster.app.factory('dataFactory', ['$http', '$q', 'fetchUrl',
         $http.get(fetchUrl + '/providers/' + provider).success(callback);
       },
       getProviderTypes: function (callback) {
-        $http.get(fetchUrl + '/providertypes').success(callback);
+        $http.get(fetchUrl + '/plugins/providertypes').success(callback);
       }
     };
 }]);
@@ -114,8 +114,12 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
   $scope.$watch('defaultProvider', function () {
     if ($scope.defaultProvider) {
       dataFactory.getProviderFields($scope.defaultProvider, function (providerInfo) {
-        $scope.providerFields = $scope.providerData[providerInfo.providertype];
-        $scope.defaultProviderInfo = providerInfo;
+        var data = $scope.providerData[providerInfo.providertype];
+        $scope.providerFields = data;
+
+        if(!$scope.clusterId) {
+          $scope.defaultProviderInfo = CreateCluster.populateDefaults(providerInfo, data);
+        }
       });  
     }
   });
@@ -130,6 +134,8 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
 
       // Since cluster already exists, overwrite template config with cluster config.
       $scope.defaultConfig = JSON.stringify(cluster.config);
+
+      $scope.defaultProviderInfo = cluster.provider;
     });
   }
 
@@ -216,6 +222,29 @@ CreateCluster.app.controller('CreateClusterCtrl', ['$scope', '$interval', 'dataF
 
   };
 }]);
+
+
+
+/**
+ * sets default values for provisioner data
+ * @param  {Object} providerInfo from getProviderFields, will be modified
+ * @param  {Object} data         from providerData
+ * @return {Object}              ref to modified providerInfo
+ */
+CreateCluster.populateDefaults = function (providerInfo, data) {
+  angular.forEach(data.parameters, function(o) {
+    angular.forEach(o.fields, function(v, name) {
+      if(v.default && !providerInfo.provisioner[name]) {
+        providerInfo.provisioner[name] = v.default;
+      }
+    });
+  });
+  return providerInfo;
+};
+
+
+
+
 
 /**
  * Validates fields based on user and admin parameters and provider type.

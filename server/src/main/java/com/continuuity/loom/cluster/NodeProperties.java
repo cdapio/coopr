@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.cluster;
 
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -31,7 +31,7 @@ import java.util.Set;
  */
 public class NodeProperties {
   private Map<String, String> ipaddresses;
-  private final String hostname;
+  private String hostname;
   private final int nodenum;
   // this is the name of the hardware type
   private final String hardwaretype;
@@ -139,7 +139,7 @@ public class NodeProperties {
 
   /**
    * Get the user the provisioner will use to use to ssh in to the node.
-   * Set in {@link com.continuuity.loom.admin.ImageType}.
+   * Set in {@link com.continuuity.loom.spec.ImageType}.
    *
    * @return User the provisioner will use to ssh in to the node.
    */
@@ -172,6 +172,15 @@ public class NodeProperties {
    */
   public void setIpaddresses(Map<String, String> ipaddresses) {
     this.ipaddresses = ipaddresses;
+  }
+
+  /**
+   * Set the hostname of the node.
+   *
+   * @param hostname Hostname to set.
+   */
+  public void setHostname(String hostname) {
+    this.hostname = hostname;
   }
 
   /**

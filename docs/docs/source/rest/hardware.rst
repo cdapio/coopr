@@ -24,8 +24,8 @@ REST API: Hardware
 
 .. include:: /rest/rest-links.rst
 
-Loom REST APIs allow you to manage the mapping of hardware capabilities to "flavors" supported by configured hardwares. The Loom hardware type maps to multiple flavors as specified by 
-different hardwares. By using hardware Loom REST APIs, you can manage or specify the hardware specifications.
+The REST APIs allow you to manage the mapping of hardware capabilities to "flavors" supported by configured hardwares. A hardware type maps to multiple flavors as specified by 
+different hardwares. By using the hardware REST APIs, you can manage or specify the hardware specifications.
 
 Each hardware configured in the system has a unique name, a short description, and a list of key-value pairs that are required by the backend hardware provisioner.
 
@@ -83,7 +83,7 @@ Example
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"small.example", "description":"Example 1 vCPU, 1 GB RAM, 30+ GB Disk", "providermap": {"openstack": {"flavor":"m1.small"}}}' 
-        http://<loom-server>:<loom-port>/<version>/loom/hardwaretypes
+        http://<server>:<port>/<version>/hardwaretypes
 
 .. _hardware-retrieve:
 
@@ -118,7 +118,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/hardwaretypes/small.example
+        http://<server>:<port>/<version>/hardwaretypes/small.example
  $ {"name":"small.example","description":"Example 1 vCPU, 1 GB RAM, 30+ GB Disk","providermap":{"openstack":{"flavor":"m1.small"}}}
 
 
@@ -156,7 +156,7 @@ Example
         -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/hardwaretypes/example
+        http://<server>:<port>/<version>/hardwaretypes/example
 
 .. _hardware-modify:
 
@@ -215,8 +215,8 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{"name":"small.example", "description":"New Example 1 vCPU, 1 GB RAM, 30+ GB Disk", 
              "providermap": {"openstack": {"flavor":"m1.small"},"aws":{"flavor":"aws.small"}}}' 
-        http://<loom-server>:<loom-port>/<version>/loom/hardwaretypes/small.example
- $ curl http://<loom-server>:<loom-port>/<version>/loom/hardwaretypes/small.example
+        http://<server>:<port>/<version>/hardwaretypes/small.example
+ $ curl http://<server>:<port>/<version>/hardwaretypes/small.example
  $ {"name":"small.example","description":"New Example 1 vCPU, 1 GB RAM, 30+ GB Disk",
      "providermap":{"openstack":{"flavor":"m1.small"},"aws":{"flavor":"aws.small"}}}
 
@@ -225,7 +225,7 @@ Example
 List All Hardware Type
 =============================
 
-To list all the hardware types configured within Continuuity Loom, make GET HTTP request to URI:
+To list all the hardware types, make GET HTTP request to URI:
 ::
 
  /hardwaretypes
@@ -251,5 +251,5 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/hardwaretypes
+        http://<server>:<port>/<version>/hardwaretypes
 

@@ -16,7 +16,7 @@
 
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -26,7 +26,7 @@ import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.admin.TenantSpecification}. Used so field validation is done.
+ * Codec for deserializing a {@link com.continuuity.loom.spec.TenantSpecification}. Used so field validation is done.
  */
 public class TenantSpecificationCodec implements JsonDeserializer<TenantSpecification> {
 
@@ -36,10 +36,11 @@ public class TenantSpecificationCodec implements JsonDeserializer<TenantSpecific
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
+    String description = context.deserialize(jsonObj.get("description"), String.class);
     Integer workers = context.deserialize(jsonObj.get("workers"), Integer.class);
     Integer maxClusters = context.deserialize(jsonObj.get("maxClusters"), Integer.class);
     Integer maxNodes = context.deserialize(jsonObj.get("maxNodes"), Integer.class);
 
-    return new TenantSpecification(name, workers, maxClusters, maxNodes);
+    return new TenantSpecification(name, description, workers, maxClusters, maxNodes);
   }
 }

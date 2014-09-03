@@ -15,7 +15,7 @@
  */
 package com.continuuity.test.pagetest;
 
-import com.continuuity.loom.admin.HardwareType;
+import com.continuuity.loom.spec.HardwareType;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;

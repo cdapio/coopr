@@ -15,19 +15,19 @@
  */
 package com.continuuity.loom.layout;
 
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.layout.change.ClusterLayoutChange;
 import com.continuuity.loom.layout.change.ClusterLayoutTracker;
 import com.continuuity.loom.scheduler.task.NodeService;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.base.Joiner;
@@ -123,37 +123,9 @@ public class Solver {
    */
   public Map<String, Node> solveClusterNodes(Cluster cluster, ClusterCreateRequest request) throws Exception {
     EntityStoreView entityStore = entityStoreService.getView(cluster.getAccount());
-    // TODO: these checks should happen at request time, not at solve time
-    // make sure the template exists
-    String clusterTemplateName = request.getClusterTemplate();
-    ClusterTemplate template = entityStore.getClusterTemplate(clusterTemplateName);
-    if (template == null) {
-      throw new IllegalArgumentException("cluster template " + clusterTemplateName + " does not exist.");
-    }
-
-    cluster.setClusterTemplate(template);
-    if (request.getConfig() == null) {
-      cluster.setConfig(template.getClusterDefaults().getConfig());
-    }
-
-    // make sure the provider exists
-    String providerName = request.getProvider();
-    if (providerName == null || providerName.isEmpty()) {
-      providerName = template.getClusterDefaults().getProvider();
-    }
-    Provider provider = entityStore.getProvider(providerName);
-    if (provider == null) {
-      throw new IllegalArgumentException("provider " + providerName + " does not exist.");
-    }
-
-    ProviderType providerType = entityStore.getProviderType(provider.getProviderType());
-    if (providerType == null) {
-      throw new IllegalArgumentException("provider type " + providerType + " does not exist.");
-    }
-
-    // add user given provider fields to the provider object
-    provider.addUserFields(request.getProviderFields(), providerType);
-    cluster.setProvider(provider);
+    ClusterTemplate template = cluster.getClusterTemplate();
+    Provider provider = cluster.getProvider();
+    String providerName = provider.getName();
 
     // make sure there are hardware types that can be used
     String requiredHardwareType = request.getHardwareType();
@@ -187,27 +159,6 @@ public class Solver {
       throw new IllegalArgumentException("no image types are available to use with template "
                                            + template.getName() + " and provider " + providerName);
     }
-
-    // Determine valid lease duration for the cluster. It has to be less than the initial lease duration set in
-    // template.
-    long initialLeaseDuration = template.getAdministration().getLeaseDuration().getInitial();
-    long effectiveRequestLeaseDuration = request.getInitialLeaseDuration() == 0
-      ? Long.MAX_VALUE : request.getInitialLeaseDuration();
-    long leaseDuration;
-
-    if (request.getInitialLeaseDuration() == -1) {
-      leaseDuration = initialLeaseDuration;
-    } else if (initialLeaseDuration == 0 || initialLeaseDuration >= effectiveRequestLeaseDuration) {
-      leaseDuration = request.getInitialLeaseDuration();
-    } else {
-      throw new IllegalArgumentException("lease duration cannot be greater than specified in template");
-    }
-
-    if (leaseDuration < 0) {
-      throw new IllegalArgumentException("invalid lease duration: " + leaseDuration);
-    }
-    // Lease duration of 0 is forever.
-    cluster.setExpireTime(leaseDuration == 0 ? 0 : cluster.getCreateTime() + leaseDuration);
 
     // make sure the services to place on the cluster are all valid
     Set<String> serviceNames = request.getServices();

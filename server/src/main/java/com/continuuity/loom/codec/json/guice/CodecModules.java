@@ -15,27 +15,6 @@
  */
 package com.continuuity.loom.codec.json.guice;
 
-import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.FieldSchema;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.LeaseDuration;
-import com.continuuity.loom.admin.ParametersSpecification;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.ResourceTypeSpecification;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
-import com.continuuity.loom.admin.ServiceConstraint;
-import com.continuuity.loom.admin.ServiceDependencies;
-import com.continuuity.loom.admin.ServiceStageDependencies;
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.LowercaseEnumTypeAdapterFactory;
@@ -68,6 +47,7 @@ import com.continuuity.loom.codec.json.current.ServiceCodec;
 import com.continuuity.loom.codec.json.current.ServiceConstraintCodec;
 import com.continuuity.loom.codec.json.current.ServiceDependenciesCodec;
 import com.continuuity.loom.codec.json.current.ServiceStageDependenciesCodec;
+import com.continuuity.loom.codec.json.current.SizeConstraintCodec;
 import com.continuuity.loom.codec.json.current.TakeTaskRequestCodec;
 import com.continuuity.loom.codec.json.current.TaskConfigCodec;
 import com.continuuity.loom.codec.json.current.TenantCodec;
@@ -79,14 +59,36 @@ import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceUpgradeCodec;
 import com.continuuity.loom.http.request.AddServicesRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
-import com.continuuity.loom.layout.ClusterCreateRequest;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceMeta;
 import com.continuuity.loom.scheduler.task.TaskConfig;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.FieldSchema;
+import com.continuuity.loom.spec.plugin.ParametersSpecification;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
+import com.continuuity.loom.spec.service.ServiceDependencies;
+import com.continuuity.loom.spec.service.ServiceStageDependencies;
+import com.continuuity.loom.spec.template.Administration;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.LeaseDuration;
+import com.continuuity.loom.spec.template.ServiceConstraint;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.AbstractModule;
@@ -165,6 +167,7 @@ public class CodecModules {
       .registerTypeAdapter(ServiceConstraint.class, new ServiceConstraintCodec())
       .registerTypeAdapter(ServiceDependencies.class, new ServiceDependenciesCodec())
       .registerTypeAdapter(ServiceStageDependencies.class, new ServiceStageDependenciesCodec())
+      .registerTypeAdapter(SizeConstraint.class, new SizeConstraintCodec())
       .registerTypeAdapter(TakeTaskRequest.class, new TakeTaskRequestCodec())
       .registerTypeAdapter(TaskConfig.class, new TaskConfigCodec())
       .registerTypeAdapter(Tenant.class, new TenantCodec())

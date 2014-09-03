@@ -16,37 +16,36 @@
 package com.continuuity.loom;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.FieldSchema;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.LeaseDuration;
-import com.continuuity.loom.admin.ParameterType;
-import com.continuuity.loom.admin.ParametersSpecification;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.ResourceTypeFormat;
-import com.continuuity.loom.admin.ResourceTypeSpecification;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
-import com.continuuity.loom.admin.ServiceConstraint;
-import com.continuuity.loom.admin.ServiceDependencies;
-import com.continuuity.loom.admin.ServiceStageDependencies;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.FieldSchema;
+import com.continuuity.loom.spec.plugin.ParameterType;
+import com.continuuity.loom.spec.plugin.ParametersSpecification;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
+import com.continuuity.loom.spec.service.ServiceDependencies;
+import com.continuuity.loom.spec.service.ServiceStageDependencies;
+import com.continuuity.loom.spec.template.Administration;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.LeaseDuration;
+import com.continuuity.loom.spec.template.ServiceConstraint;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.util.HashSet;
@@ -69,11 +68,30 @@ public class Entities {
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
-            "joyent_username", new FieldSchema("user name", "text", "your joyent username", null, null, false),
-            "joyent_keyname", new FieldSchema("key name", "text", "your joyent key name", null, null, false),
-            "joyent_keyfile", new FieldSchema("path to key file", "text",
-                                              "path to your joyent key file", null, null, false),
-            "joyent_version", new FieldSchema("version", "text", "joyent version", null, null, false)
+            "joyent_username",
+            FieldSchema.builder()
+              .setLabel("user name")
+              .setType("text")
+              .setTip("your joyent username")
+              .build(),
+            "joyent_keyname",
+            FieldSchema.builder()
+              .setLabel("key name")
+              .setType("text")
+              .setTip("your joyent key name")
+              .build(),
+            "joyent_keyfile",
+            FieldSchema.builder()
+              .setLabel("path to key file")
+              .setType("text")
+              .setTip("path to your joyent key file")
+              .build(),
+            "joyent_version",
+            FieldSchema.builder()
+              .setLabel("version")
+              .setType("text")
+              .setTip("joyent version")
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("joyent_username", "joyent_keyname", "joyent_keyfile", "joyent_version")
@@ -82,7 +100,7 @@ public class Entities {
         ParameterType.USER,
         ParametersSpecification.EMPTY_SPECIFICATION),
       ImmutableMap.<String, ResourceTypeSpecification>of(
-        "keys", new ResourceTypeSpecification(ResourceTypeFormat.FILE)
+        "keys", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "0400")
       )
     );
     public static final ProviderType RACKSPACE =
@@ -90,8 +108,20 @@ public class Entities {
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
-            "rackspace_username", new FieldSchema("user name", "text", "your rackspace username", null, null, true),
-            "rackspace_apikey", new FieldSchema("key name", "text", "your rackspace key name", null, null, true)
+            "rackspace_username",
+            FieldSchema.builder()
+              .setLabel("user name")
+              .setType("text")
+              .setTip("your rackspace username")
+              .setOverride(true)
+              .build(),
+            "rackspace_apikey",
+            FieldSchema.builder()
+              .setLabel("key name")
+              .setType("text")
+              .setTip("your rackspace key name")
+              .setOverride(true)
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
@@ -104,8 +134,19 @@ public class Entities {
         ParameterType.USER,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
-            "rackspace_username", new FieldSchema("user name", "text", "your rackspace username", null, null, false),
-            "rackspace_apikey", new FieldSchema("key name", "text", "your rackspace key name", null, null, false)
+            "rackspace_username",
+            FieldSchema.builder()
+              .setLabel("user name")
+              .setType("text")
+              .setTip("your rackspace username")
+              .build(),
+            "rackspace_apikey",
+            FieldSchema.builder()
+              .setLabel("key name")
+              .setType("text")
+              .setTip("your rackspace key name")
+              .setSensitive(true)
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
@@ -122,17 +163,26 @@ public class Entities {
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
             "script",
-            new FieldSchema("script", "text", "path to script", null, null, false),
+            FieldSchema.builder()
+              .setLabel("script")
+              .setType("text")
+              .setTip("path to script")
+              .build(),
             "data",
-            new FieldSchema("script arguments", "text", "args", ImmutableSet.<String>of("opt1", "opt2"), null, false)
+            FieldSchema.builder()
+              .setLabel("script arguments")
+              .setType("text")
+              .setTip("args")
+              .setOptions(ImmutableSet.<String>of("opt1", "opt2"))
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("script")
           )
         )),
         ImmutableMap.<String, ResourceTypeSpecification>of(
-          "scripts", new ResourceTypeSpecification(ResourceTypeFormat.FILE),
-          "data", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE)
+          "scripts", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "755"),
+          "data", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null)
         )
       );
     public static final AutomatorType CHEF =
@@ -141,18 +191,27 @@ public class Entities {
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
             "recipe",
-            new FieldSchema("chef recipe", "text", "recipe name", null, null, false),
+            FieldSchema.builder()
+              .setLabel("chef recipe")
+              .setType("text")
+              .setTip("recipe name")
+              .build(),
             "args",
-            new FieldSchema("chef arguments", "text", "args", ImmutableSet.<String>of("opt1", "opt2"), null, false)
+            FieldSchema.builder()
+              .setLabel("chef arguments")
+              .setType("text")
+              .setTip("args")
+              .setOptions(ImmutableSet.<String>of("opt1", "opt2"))
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("recipe")
           )
         )),
         ImmutableMap.<String, ResourceTypeSpecification>of(
-          "cookbooks", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
-          "data_bags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
-          "roles", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE)
+          "cookbooks", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
+          "data_bags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
+          "roles", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "644")
         )
       );
     public static final AutomatorType PUPPET =
@@ -161,17 +220,26 @@ public class Entities {
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
             "manifest",
-            new FieldSchema("puppet manifest", "text", "manifest name", null, null, false),
+            FieldSchema.builder()
+              .setLabel("puppet manifest")
+              .setType("text")
+              .setTip("manifest name")
+              .build(),
             "args",
-            new FieldSchema("puppet arguments", "text", "args", ImmutableSet.<String>of("opt1", "opt2"), null, false)
+            FieldSchema.builder()
+              .setLabel("puppet arguments")
+              .setType("text")
+              .setTip("args")
+              .setOptions(ImmutableSet.<String>of("opt1", "opt2"))
+              .build()
           ),
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("manifest")
           )
         )),
         ImmutableMap.<String, ResourceTypeSpecification>of(
-          "modules", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE),
-          "manifests", new ResourceTypeSpecification(ResourceTypeFormat.FILE)
+          "modules", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
+          "manifests", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "644")
         )
       );
   }
@@ -325,7 +393,8 @@ public class Entities {
             ImmutableSet.<Set<String>>of(
               ImmutableSet.<String>of("namenode", "datanode")
             )
-          )
+          ),
+          SizeConstraint.EMPTY
         ),
         null
       );
@@ -354,7 +423,8 @@ public class Entities {
             ImmutableSet.<Set<String>>of(
               ImmutableSet.<String>of("namenode", "datanode")
             )
-          )
+          ),
+          SizeConstraint.EMPTY
         ),
         new Administration(new LeaseDuration(10000, 900000, 1000))
       );
@@ -389,7 +459,8 @@ public class Entities {
               ImmutableSet.<String>of("datanode", "reactor"),
               ImmutableSet.<String>of("hbasemaster", "regionserver")
             )
-          )
+          ),
+          SizeConstraint.EMPTY
         ),
         new Administration(new LeaseDuration(0, 0, 0))
       );
@@ -426,7 +497,8 @@ public class Entities {
               ImmutableSet.<String>of("hadoop-hdfs-datanode", "mysql-server"),
               ImmutableSet.<String>of("hbase-master", "hbase-regionserver")
             )
-          )
+          ),
+          SizeConstraint.EMPTY
         ),
         new Administration(new LeaseDuration(0, 0, 0))
       );
@@ -437,14 +509,21 @@ public class Entities {
     private static String node2 = "node2";
     private static String clusterId = "2";
     public static Cluster createCluster() {
-      return new Cluster(clusterId, USER_ACCOUNT, "name", 1234567890, "description",
-                         ProviderExample.RACKSPACE, ClusterTemplateExample.HDFS,
-                         ImmutableSet.of(node1, node2),
-                         ImmutableSet.of(
-                           ServiceExample.NAMENODE.getName(),
-                           ServiceExample.DATANODE.getName(),
-                           ServiceExample.HOSTS.getName()
-                         ));
+      return Cluster.builder()
+        .setID(clusterId)
+        .setAccount(USER_ACCOUNT)
+        .setName("name")
+        .setDescription("description")
+        .setCreateTime(1234567890)
+        .setProvider(ProviderExample.RACKSPACE)
+        .setClusterTemplate(ClusterTemplateExample.HDFS)
+        .setNodes(ImmutableSet.of(node1, node2))
+        .setServices(ImmutableSet.of(
+          ServiceExample.NAMENODE.getName(),
+          ServiceExample.DATANODE.getName(),
+          ServiceExample.HOSTS.getName()
+        ))
+        .build();
     }
     public static Node NODE1 =
       new Node(node1,

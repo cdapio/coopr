@@ -92,6 +92,7 @@ elsif options[:log_directory]
 end
 Logging.configure(log_file)
 Logging.level = options[:log_level]
+Logging.process_name = options[:name] if options[:name]
 
 # load plugins
 pluginmanager = PluginManager.new
@@ -221,9 +222,9 @@ else
     response = nil
     task = nil
     begin
-      response = RestClient.post "#{loom_uri}/v1/loom/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
+      response = RestClient.post "#{loom_uri}/v2/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
     rescue => e
-      log.error "Caught exception connecting to loom server #{loom_uri}/v1/loom/tasks/take: #{e}"
+      log.error "Caught exception connecting to loom server #{loom_uri}/v2/tasks/take: #{e}"
       sleep 10
       next
     end
@@ -259,9 +260,9 @@ else
 
         log.debug "Task <#{task["taskId"]}> completed, updating results <#{result}>"
         begin
-          response = RestClient.post "#{loom_uri}/v1/loom/tasks/finish", result.to_json
+          response = RestClient.post "#{loom_uri}/v2/tasks/finish", result.to_json
         rescue => e
-          log.error "Caught exception posting back to loom server #{loom_uri}/v1/loom/tasks/finish: #{e}"
+          log.error "Caught exception posting back to loom server #{loom_uri}/v2/tasks/finish: #{e}"
         end
 
       rescue => e
@@ -281,9 +282,9 @@ else
         end
         log.error "Task <#{task["taskId"]}> failed, updating results <#{result}>"
         begin
-          response = RestClient.post "#{loom_uri}/v1/loom/tasks/finish", result.to_json
+          response = RestClient.post "#{loom_uri}/v2/tasks/finish", result.to_json
         rescue => e
-          log.error "Caught exception posting back to server #{loom_uri}/v1/loom/tasks/finish: #{e}"
+          log.error "Caught exception posting back to server #{loom_uri}/v2/tasks/finish: #{e}"
         end
       end
     }

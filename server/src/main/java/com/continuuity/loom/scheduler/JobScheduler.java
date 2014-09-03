@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.scheduler;
 
-import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Configuration;
@@ -34,6 +33,7 @@ import com.continuuity.loom.scheduler.task.SchedulableTask;
 import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskId;
 import com.continuuity.loom.scheduler.task.TaskService;
+import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.google.common.base.Function;
@@ -156,7 +156,7 @@ public class JobScheduler implements Runnable {
             // Handle retry tasks if any
             if (!retryTasks.isEmpty()) {
               for (ClusterTask task : retryTasks) {
-                notSubmittedTasks.add(scheduleRetry(job, task, queueName));
+                notSubmittedTasks.add(scheduleRetry(job, task));
               }
             }
 
@@ -242,10 +242,7 @@ public class JobScheduler implements Runnable {
     }
   }
 
-  ClusterTask scheduleRetry(ClusterJob job, ClusterTask task, String queueName) throws Exception {
-    // Schedule rollback task before retrying
-    scheduleRollbackTask(task, queueName);
-
+  ClusterTask scheduleRetry(ClusterJob job, ClusterTask task) throws Exception {
     task.addAttempt();
     List<ClusterTask> retryTasks = taskService.getRetryTask(task);
 
@@ -269,25 +266,6 @@ public class JobScheduler implements Runnable {
     LOG.trace("Retry job {} for task {}", job, task);
 
     return retryTasks.get(0);
-  }
-
-  void scheduleRollbackTask(ClusterTask task, String queueName) throws Exception {
-    ClusterTask rollbackTask = taskService.getRollbackTask(task);
-
-    if (rollbackTask == null) {
-      LOG.debug("No rollback task for {}", task.getTaskId());
-      return;
-    }
-
-    clusterStore.writeClusterTask(rollbackTask);
-
-    SchedulableTask schedulableTask = new SchedulableTask(rollbackTask, null);
-    LOG.debug("Submitting rollback task {} for task {}", rollbackTask.getTaskId(), task.getTaskId());
-    LOG.trace("Task = {}. Rollback task = {}", task, rollbackTask);
-
-    // No need to retry roll back tasks.
-    provisionerQueues.add(
-      queueName, new Element(rollbackTask.getTaskId(), gson.toJson(schedulableTask)));
   }
 
   private static final Function<ClusterTask, String> CLUSTER_TASK_STRING_FUNCTION =

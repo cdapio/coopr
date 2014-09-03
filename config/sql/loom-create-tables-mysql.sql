@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS clusters (
     create_time TIMESTAMP DEFAULT '0000-00-00 00:00:00',
     expire_time TIMESTAMP NULL,
     status VARCHAR(32),
+    latest_job_num BIGINT,
     cluster MEDIUMBLOB,
     PRIMARY KEY (id),
     INDEX cluster_account_index (tenant_id, owner_id, id),

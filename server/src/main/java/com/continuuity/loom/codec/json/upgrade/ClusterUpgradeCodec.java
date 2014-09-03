@@ -16,9 +16,9 @@
 package com.continuuity.loom.codec.json.upgrade;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -45,19 +45,7 @@ public class ClusterUpgradeCodec implements JsonDeserializer<Cluster> {
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    String id = context.deserialize(jsonObj.get("id"), String.class);
-    String name = context.deserialize(jsonObj.get("name"), String.class);
-    String description = context.deserialize(jsonObj.get("description"), String.class);
-    long createTime = jsonObj.get("createTime").getAsLong();
-    Long expireTime = context.deserialize(jsonObj.get("expireTime"), Long.class);
-    Provider provider = context.deserialize(jsonObj.get("provider"), Provider.class);
-    ClusterTemplate template = context.deserialize(jsonObj.get("clusterTemplate"), ClusterTemplate.class);
-    Set<String> nodes = context.deserialize(jsonObj.get("nodes"), new TypeToken<Set<String>>() {}.getType());
-    Set<String> services = context.deserialize(jsonObj.get("services"), new TypeToken<Set<String>>() {}.getType());
     String latestJobId = context.deserialize(jsonObj.get("latestJobId"), String.class);
-    Cluster.Status status = context.deserialize(jsonObj.get("status"), Cluster.Status.class);
-    JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
-
     // 'jobs' got replaced by 'latestJobId'
     if (latestJobId == null) {
       List<String> jobIds = context.deserialize(jsonObj.get("jobs"), new TypeToken<List<String>>() {}.getType());
@@ -67,9 +55,21 @@ public class ClusterUpgradeCodec implements JsonDeserializer<Cluster> {
     }
     // owner id replaced with account
     String ownerId = context.deserialize(jsonObj.get("ownerId"), String.class);
-    Account account = new Account(ownerId, tenant);
 
-    return new Cluster(id, account, name, createTime, expireTime == null ? 0 : expireTime, description,
-                       provider, template, nodes, services, config, status, latestJobId);
+    return Cluster.builder()
+      .setID(context.<String>deserialize(jsonObj.get("id"), String.class))
+      .setName(context.<String>deserialize(jsonObj.get("name"), String.class))
+      .setDescription(context.<String>deserialize(jsonObj.get("description"), String.class))
+      .setAccount(new Account(ownerId, tenant))
+      .setCreateTime(jsonObj.get("createTime").getAsLong())
+      .setExpireTime(context.<Long>deserialize(jsonObj.get("expireTime"), Long.class))
+      .setProvider(context.<Provider>deserialize(jsonObj.get("provider"), Provider.class))
+      .setClusterTemplate(context.<ClusterTemplate>deserialize(jsonObj.get("clusterTemplate"), ClusterTemplate.class))
+      .setNodes(context.<Set<String>>deserialize(jsonObj.get("nodes"), new TypeToken<Set<String>>() {}.getType()))
+      .setServices(context.<Set<String>>deserialize(jsonObj.get("services"), new TypeToken<Set<String>>() {}.getType()))
+      .setLatestJobID(latestJobId)
+      .setStatus(context.<Cluster.Status>deserialize(jsonObj.get("status"), Cluster.Status.class))
+      .setConfig(context.<JsonObject>deserialize(jsonObj.get("config"), JsonObject.class))
+      .build();
   }
 }

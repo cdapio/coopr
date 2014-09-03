@@ -15,10 +15,11 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.ServiceConstraint;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -38,8 +39,9 @@ public class ConstraintsCodec extends AbstractCodec<Constraints> {
   public JsonElement serialize(Constraints constraints, Type type, JsonSerializationContext context) {
     JsonObject jsonObj = new JsonObject();
 
-    jsonObj.add("layout", context.serialize(constraints.getLayoutConstraint(), LayoutConstraint.class));
+    jsonObj.add("layout", context.serialize(constraints.getLayoutConstraint()));
     jsonObj.add("services", context.serialize(constraints.getServiceConstraints()));
+    jsonObj.add("size", context.serialize(constraints.getSizeConstraint()));
 
     return jsonObj;
   }
@@ -53,7 +55,8 @@ public class ConstraintsCodec extends AbstractCodec<Constraints> {
     Map<String, ServiceConstraint> serviceConstraints =
       context.deserialize(jsonObj.get("services"),
                           new TypeToken<Map<String, ServiceConstraint>>() {}.getType());
+    SizeConstraint sizeConstraint = context.deserialize(jsonObj.get("size"), SizeConstraint.class);
 
-    return new Constraints(serviceConstraints, layoutConstraint);
+    return new Constraints(serviceConstraints, layoutConstraint, sizeConstraint);
   }
 }

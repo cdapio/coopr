@@ -15,7 +15,7 @@
  */
 package com.continuuity.test.pagetest;
 
-import com.continuuity.loom.admin.ClusterTemplate;
+import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;

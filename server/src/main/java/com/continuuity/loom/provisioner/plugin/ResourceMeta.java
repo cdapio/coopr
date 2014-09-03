@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.provisioner.plugin;
 
-import com.continuuity.loom.admin.NamedEntity;
+import com.continuuity.loom.spec.NamedEntity;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 

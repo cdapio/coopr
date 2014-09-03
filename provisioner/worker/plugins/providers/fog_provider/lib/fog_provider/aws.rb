@@ -40,7 +40,7 @@ class FogProviderAWS < Provider
       # Run EC2 credential validation
       validate!
       # Create the server
-      log.info "Creating #{hostname} on AWS using flavor: #{flavor}, image: #{image}"
+      log.debug "Creating #{hostname} on AWS using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
       server = connection.servers.create(create_server_def)
       # Process results
@@ -76,12 +76,21 @@ class FogProviderAWS < Provider
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
+      hostname =
+        if !server.dns_name.nil?
+          server.dns_name
+        elsif !server.public_ip_address.nil?
+          Resolv.getname(server.public_ip_address)
+        else
+          @task['config']['hostname']
+        end
+
       # Handle tags
       hashed_tags = {}
       @tags.map{ |t| key,val=t.split('='); hashed_tags[key]=val} unless @tags.nil?
       # Always set the Name tag, so we display correctly in AWS console UI
       unless hashed_tags.keys.include?('Name')
-        hashed_tags['Name'] = @task['config']['hostname']
+        hashed_tags['Name'] = hostname
       end
       create_tags(hashed_tags, providerid) unless hashed_tags.empty?
 
@@ -107,7 +116,9 @@ class FogProviderAWS < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
       }
-      # Additional checks
+      @result['hostname'] = hostname
+      # do we need sudo bash?
+      sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
@@ -116,8 +127,76 @@ class FogProviderAWS < Provider
         if ssho.arity == 2
           log.debug 'Validating external connectivity and DNS resolution via ping'
           ssh_exec!(ssh, 'ping -c1 www.opscode.com')
+          log.debug "Setting hostname to #{hostname}"
+          ssh_exec!(ssh, "#{sudo} hostname #{hostname}")
         else
           ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+          ssh_exec!(ssh, "#{sudo} hostname #{hostname}", "Setting hostname to #{hostname}")
+          # Setting up disks
+          begin
+            # m1.small uses /dev/xvda2 for data
+            xvda = true
+            xvdb = false
+            xvdc = false
+            ssh_exec!(ssh, 'test -e /dev/xvda2 && echo yes', 'Checking for /dev/xvda2')
+          rescue
+            xvda = false
+            begin
+              xvdb = true
+              ssh_exec!(ssh, 'test -e /dev/xvdb && echo yes', 'Checking for /dev/xvdb')
+              # Do we have /dev/xvdc, too?
+              begin
+                xvdc = true
+                ssh_exec!(ssh, 'test -e /dev/xvdc && echo yes', 'Checking for /dev/xvdc')
+              rescue
+                xvdc = false
+              end
+            rescue
+              xvdb = false
+            end
+          end
+
+          log.debug 'Found the following:'
+          log.debug "- xvda = #{xvda}"
+          log.debug "- xvdb = #{xvdb}"
+          log.debug "- xvdc = #{xvdc}"
+
+          # Now, do the right thing
+          if xvdc
+            # Check for APT
+            begin
+              apt = true
+              ssh_exec!(ssh, 'which apt-get', 'Checking for apt-get')
+            rescue
+              apt = false
+            end
+            # Install mdadm
+            if apt
+              ssh_exec!(ssh, "#{sudo} apt-get update", 'Running apt-get update')
+              # Setup nullmailer
+              ssh_exec!(ssh, "echo 'nullmailer shared/mailname string localhost' | #{sudo} debconf-set-selections && echo 'nullmailer nullmailer/relayhost string localhost' | #{sudo} debconf-set-selections", 'Configuring nullmailer')
+              ssh_exec!(ssh, "#{sudo} apt-get install nullmailer -y", 'Installing nullmailer')
+              ssh_exec!(ssh, "#{sudo} apt-get install mdadm -y", 'Installing mdadm')
+            else
+              ssh_exec!(ssh, "#{sudo} yum install mdadm -y", 'Installing mdadm')
+            end
+            ssh_exec!(ssh, "mount | grep ^/dev/xvdb 2>&1 >/dev/null && #{sudo} umount /dev/xvdb || true", 'Unmounting /dev/xvdb')
+            # Setup RAID
+            log.debug 'Setting up RAID0'
+            ssh_exec!(ssh, "echo yes | #{sudo} mdadm --create /dev/md0 --level=0 --raid-devices=$(ls -1 /dev/xvd[b-z] | wc -l) $(ls -1 /dev/xvd[b-z])", 'Creating /dev/md0 RAID0 array')
+            if apt
+              ssh_exec!(ssh, "#{sudo} su - -c 'mdadm --detail --scan >> /etc/mdadm/mdadm.conf'", 'Write /etc/mdadm/mdadm.conf')
+            else
+              ssh_exec!(ssh, "#{sudo} su - -c 'mdadm --detail --scan >> /etc/mdadm.conf'", 'Write /etc/mdadm.conf')
+            end
+            ssh_exec!(ssh, "#{sudo} sed -i -e 's:xvdb:md0:' /etc/fstab", 'Update /etc/fstab for md0')
+            ssh_exec!(ssh, "#{sudo} /sbin/mkfs.ext4 /dev/md0 && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/md0 /data", 'Mounting /dev/md0 as /data')
+          elsif xvdb
+            ssh_exec!(ssh, "mount | grep ^/dev/xvdb 2>&1 >/dev/null && #{sudo} umount /dev/xvdb && #{sudo} /sbin/mkfs.ext4 /dev/xvdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/xvdb /data", 'Mounting /dev/xvdb as /data')
+          else
+            ssh_exec!(ssh, "mount | grep ^/dev/xvda2 2>&1 >/dev/null && #{sudo} umount /dev/xvda2 && #{sudo} /sbin/mkfs.ext4 /dev/xvda2 && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/xvda2 /data", 'Mounting /dev/xvda2 as /data')
+          end
+          ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
         end
       end
       # Return 0
@@ -251,7 +330,7 @@ class FogProviderAWS < Provider
     }
     server_def[:subnet_id] = @subnet_id if vpc_mode?
     server_def[:tenancy] = 'dedicated' if vpc_mode? && @dedicated_instance
-    server_def[:associate_public_ip] = !@associate_public_ip.nil? if vpc_mode? && @associate_public_ip
+    server_def[:associate_public_ip] = 'true' if vpc_mode? && @associate_public_ip
     server_def
   end
 

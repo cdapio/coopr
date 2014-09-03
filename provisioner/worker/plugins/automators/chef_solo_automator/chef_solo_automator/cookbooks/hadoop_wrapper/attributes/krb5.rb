@@ -7,6 +7,17 @@ if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.
   include_attribute 'krb5'
   include_attribute 'krb5_utils'
 
+  # Create service keytabs for all services, since we may be a client
+  default['krb5_utils']['krb5_service_keytabs']['HTTP'] = { 'owner' => 'hdfs', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['hdfs'] = { 'owner' => 'hdfs', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['hbase'] = { 'owner' => 'hbase', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['hive'] = { 'owner' => 'hive', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['jhs'] = { 'owner' => 'mapred', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['mapred'] = { 'owner' => 'mapred', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['yarn'] = { 'owner' => 'yarn', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_service_keytabs']['zookeeper'] = { 'owner' => 'zookeeper', 'group' => 'hadoop', 'mode' => '0640' }
+  default['krb5_utils']['krb5_user_keytabs']['yarn'] = { 'owner' => 'yarn', 'group' => 'hadoop', 'mode' => '0640' }
+
   # container-executor.cfg
   default['hadoop']['container_executor']['banned.users'] = 'hdfs,yarn,mapred,bin'
   default['hadoop']['container_executor']['min.user.id'] = 500
@@ -14,10 +25,10 @@ if node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.
   default['hadoop']['container_executor']['yarn.nodemanager.local-dirs'] =
     if node['hadoop'].key?('yarn_site') && node['hadoop']['yarn_site'].key?('yarn.nodemanager.local-dirs')
       node['hadoop']['yarn_site']['yarn.nodemanager.local-dirs']
-    elsif node['hadoop'].key? 'hadoop.tmp.dir'
-      "#{node['hadoop']['hadoop.tmp.dir']}/nm-local-dir"
+    elsif node['hadoop'].key?('core_site') && node['hadoop']['core_site'].key?('hadoop.tmp.dir')
+      "#{node['hadoop']['core_site']['hadoop.tmp.dir']}/nm-local-dir"
     else
-      '/tmp/hadoop-yarn/nm-local-dir'
+      'file:///tmp/hadoop-yarn/nm-local-dir'
     end
   default['hadoop']['container_executor']['yarn.nodemanager.log-dirs'] = '/var/log/hadoop-yarn/userlogs'
 
@@ -102,19 +113,23 @@ if node['hive'].key?('hive_site') && node['hive']['hive_site'].key?('hive.server
 
 end
 
-# ZooKeeper Server
+# ZooKeeper
 if node['zookeeper'].key?('zoocfg') && node['zookeeper']['zoocfg'].key?('authProvider.1') &&
   node['zookeeper']['zoocfg']['authProvider.1'] == 'org.apache.zookeeper.server.auth.SASLAuthenticationProvider'
 
-  # jaas.conf
-  default['zookeeper']['jaas']['keyTab'] = "zookeeper/_HOST@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
-  default['zookeeper']['jaas']['useKeyTab'] = 'true'
-  default['zookeeper']['jaas']['principal'] = "#{node['krb5_utils']['keytabs_dir']}/zookeeper.service.keytab"
+  # jaas.conf hbase-env.sh zookeeper-env.sh
+  %w(hbase zookeeper).each do |client|
+    default[client]['jaas']['client']['usekeytab'] = 'true'
+    # We cannot use _HOST here... https://issues.apache.org/jira/browse/ZOOKEEPER-1422
+    default[client]['jaas']['client']['principal'] = "#{client}/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
+    default[client]['jaas']['client']['keytab'] = "#{node['krb5_utils']['keytabs_dir']}/#{client}.service.keytab"
+    default[client]["#{client}_env"]['jvmflags'] = "-Djava.security.auth.login.config=/etc/#{client}/conf/jaas.conf"
+  end
+  default['zookeeper']['jaas']['server'] = node['zookeeper']['jaas']['client']
 
   # zoo.cfg
   default['zookeeper']['zoocfg']['jaasLoginRenew'] = '3600000' unless node['zookeeper']['zoocfg']['jaasLoginRenew']
-
-  # zookeeper-env.sh
-  default['zookeeper']['zookeeper_env']['jvmflags'] = "-Djava.security.auth.login.config=#{node['zookeeper']['conf_dir']}/jaas.conf"
+  default['zookeeper']['zoocfg']['kerberos.removeHostFromPrincipal'] = 'true'
+  default['zookeeper']['zoocfg']['kerberos.removeRealmFromPrincipal'] = 'true'
 
 end

@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.management;
 
-import com.continuuity.loom.admin.ProvisionerAction;
+import com.continuuity.loom.spec.ProvisionerAction;
 
 /**
  * Provisioner stats for JMX.

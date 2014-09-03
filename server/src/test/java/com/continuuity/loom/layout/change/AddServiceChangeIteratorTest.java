@@ -15,11 +15,12 @@
  */
 package com.continuuity.loom.layout.change;
 
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.NodeLayout;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -205,7 +206,8 @@ public class AddServiceChangeIteratorTest {
           ImmutableSet.of("master1", "slave1"),
           ImmutableSet.of("master1", "slave2")
         )
-      )
+      ),
+      SizeConstraint.EMPTY
     );
   }
 }

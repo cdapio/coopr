@@ -24,7 +24,7 @@ REST API: Cluster Templates
 
 .. include:: /rest/rest-links.rst
 
-Loom REST APIs allow you to create templates describing different types of clusters.  For example, there may be a template for Hadoop clusters, 
+The REST APIs allow you to create templates describing different types of clusters.  For example, there may be a template for Hadoop clusters, 
 a template for LAMP clusters, a template for Solr clusters, etc. Templates contain enough information that a user only needs to specify a template 
 and a number of machines to create a cluster. This is done by first describing the set of services, hardware types, 
 and image types that a cluster is compatible with. Next, default values for provider, services, and configuration are given, with optional defaults for 
@@ -40,7 +40,7 @@ Compatibility
 ^^^^^^^^^^^^^
 
 A cluster template defines 3 things in its compatibility section. The first is a set of services that are compatible with the template. This means that when a user goes to create a cluster 
-with this template, the user is allowed to specify any service from this set as services to place on the cluster. Loom will not automatically pull in service dependencies, so the full set 
+with this template, the user is allowed to specify any service from this set as services to place on the cluster. The system will not automatically pull in service dependencies, so the full set 
 of compatible services must be defined. 
 
 Next, a set of compatible hardware types is defined.  This means only hardware types in the compatible set can be used to create a cluster. Similarly, the compatible image types are defined, 
@@ -124,13 +124,16 @@ Example Default Section
 
 Constraints
 ^^^^^^^^^^^
-Templates can define 2 types of constraints -- layout and service.
+Templates can define 3 types of constraints -- size, layout, and service.
+
+Size constraints determine how many nodes a cluster can have. Currently, a minimum and maximum can be defined. If no minimum is defined, a minimum of 1 node will be used.
+If no maximum is defined, there is no maximum. The maximum must be greater than or equal to the minimum.
 
 Layout constraints define which services must and can't coexist on the same node.  Must coexist constraints are given as an array of arrays. 
 Each inner array is a set of services that must all coexist together on the same node.  For example, in a hadoop cluster, you generally want datanodes, regionservers, 
 and nodemanagers to all be placed together. To achieve this cloistered coexistancy, you would put all 3 services in the same "must coexist" constraint.  Must coexist constraints 
 are not transitive. If there is one constraint saying serviceA must coexist with serviceB, and another constraint saying serviceB must coexist with serviceC, this does NOT mean 
-that serviceA must coexist with serviceC. Continuuity Loom was designed this way to prevent unintended links between services, especially as the number of must coexist constraints increase.
+that serviceA must coexist with serviceC. It was designed this way to prevent unintended links between services, especially as the number of must coexist constraints increase.
 If a must coexist rule contains a service that is not on the cluster, it is shrunk to ignore the service that is not on the cluster. For example, your template may be compatible with 
 datanodes, nodemanagers, and regionservers. However, by default, you only put datanodes and nodemanagers on the cluster. A constraint stating that datanodes, nodemanagers, and 
 regionservers must coexist on the same node will get transformed into a constraint that just says datanodes and nodemanagers must coexist on the same node.
@@ -155,6 +158,10 @@ Example Constraints Section
 .. code-block:: bash
 
     "constraints": {
+        "size": {
+            "min": 3,
+            "max": 50
+        },
         "layout": {
             "mustcoexist": [
                 [ "hadoop-hdfs-datanode", "hadoop-yarn-nodemanager", "hbase-regionserver" ],
@@ -316,6 +323,10 @@ Example
                    }   
                 },
                 "constraints": {
+                    "size": {
+                        "min": 3,
+                        "max": 50
+                    },
                     "layout": {
                         "mustcoexist": [
                             [ "hadoop-hdfs-datanode", "hadoop-yarn-nodemanager", "hbase-regionserver" ],
@@ -351,7 +362,7 @@ Example
                     }
                 }
             }'
-        http://<loom-server>:<loom-port>/<version>/loom/clustertemplates
+        http://<server>:<port>/<version>/clustertemplates
 
 .. _template-retrieve:
 
@@ -386,7 +397,7 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clustertemplates/hadoop.example
+        http://<server>:<port>/<version>/clustertemplates/hadoop.example
  $ {
        "name": "hadoop.example",
        "description": "Hadoop cluster with hdfs and YARN",
@@ -438,6 +449,10 @@ Example
           }
       },
       "constraints": {
+          "size": {
+              "min": 3,
+              "max": 50
+          },
           "layout": {
                "mustcoexist": [
                    [ "hadoop-hdfs-datanode", "hadoop-yarn-nodemanager", "hbase-regionserver" ],
@@ -508,7 +523,7 @@ Example
         -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clustertemplates/hadoop.example
+        http://<server>:<port>/<version>/clustertemplates/hadoop.example
 
 .. _template-modify:
 
@@ -614,6 +629,10 @@ Example
            }
        },
        "constraints": {
+           "size": {
+               "min": 3,
+               "max": 50
+           },
            "layout": {
                "mustcoexist": [
                    [
@@ -654,14 +673,14 @@ Example
           }
        }
    }
-      http://<loom-server>:<loom-port>/<version>/loom/clustertemplates/hadoop.example
+      http://<server>:<port>/<version>/clustertemplates/hadoop.example
 
 .. _template-all-list:
 
 List all Cluster Templates
 ==========================
 
-To list all the cluster templates configured within Continuuity Loom, make a GET HTTP request to URI:
+To list all the cluster templates, make a GET HTTP request to URI:
 ::
 
   /clustertemplates
@@ -687,5 +706,5 @@ Example
  $ curl -H 'X-Loom-UserID:admin' 
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clustertemplates
+        http://<server>:<port>/<version>/clustertemplates
 

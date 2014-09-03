@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.admin.Tenant;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
@@ -27,14 +26,17 @@ import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.spec.Tenant;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.credential.CredentialStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
@@ -55,9 +57,11 @@ public class TaskQueueService {
   private final TaskService taskService;
   private final NodeService nodeService;
   private final TenantProvisionerService tenantProvisionerService;
+  private final CredentialStore credentialStore;
   private final LoomStats loomStats;
   private final QueueGroup taskQueues;
   private final QueueGroup jobQueues;
+  private final Gson gson;
   private final LoadingCache<String, QueueMetrics> queueMetricsCache;
 
   @Inject
@@ -68,16 +72,20 @@ public class TaskQueueService {
                            TaskService taskService,
                            NodeService nodeService,
                            TenantStore tenantStore,
+                           CredentialStore credentialStore,
                            Configuration conf,
-                           LoomStats loomStats) {
+                           LoomStats loomStats,
+                           Gson gson) {
     this.clusterStore = clusterStoreService.getSystemView();
     this.taskService = taskService;
     this.nodeService = nodeService;
     this.tenantProvisionerService = tenantProvisionerService;
+    this.credentialStore = credentialStore;
     this.loomStats = loomStats;
     this.taskQueues = taskQueues;
     this.jobQueues = jobQueues;
     this.tenantStore = tenantStore;
+    this.gson = gson;
     final int queueCacheSeconds = conf.getInt(Constants.Metrics.QUEUE_CACHE_SECONDS);
     // queue metrics can be expensive to fetch
     this.queueMetricsCache = CacheBuilder.newBuilder()
@@ -130,7 +138,7 @@ public class TaskQueueService {
    */
   public String takeNextClusterTask(TakeTaskRequest takeRequest) throws IOException, MissingEntityException {
     loomStats.setQueueLength(taskQueues.size());
-    String queueName = takeRequest.getTenantId();
+    String tenantId = takeRequest.getTenantId();
     String provisionerId = takeRequest.getProvisionerId();
     String workerId = takeRequest.getWorkerId();
     String consumerId = provisionerId + "." + workerId;
@@ -143,7 +151,7 @@ public class TaskQueueService {
     String taskJson = null;
 
     while (clusterTask == null) {
-      Element task = taskQueues.take(queueName, consumerId);
+      Element task = taskQueues.take(tenantId, consumerId);
       if (task == null) {
         break;
       }
@@ -155,19 +163,25 @@ public class TaskQueueService {
 
         if (clusterJob == null || clusterJob.getJobStatus() == ClusterJob.Status.FAILED) {
           // we don't want to give out tasks for failed jobs.  Remove from the queue and move on.
-          taskQueues.recordProgress(consumerId, queueName, clusterTask.getTaskId(),
+          taskQueues.recordProgress(consumerId, tenantId, clusterTask.getTaskId(),
                                     TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
                                     "Skipped due to job failure.");
           taskService.dropTask(clusterTask);
-          jobQueues.add(queueName, new Element(clusterTask.getJobId()));
+          jobQueues.add(tenantId, new Element(clusterTask.getJobId()));
           clusterTask = null;
         } else {
-          taskJson = task.getValue();
+          SchedulableTask taskObject = gson.fromJson(task.getValue(), SchedulableTask.class);
+          TaskConfig taskConfig = taskObject.getConfig();
+          // fetch any sensitive fields and add them to the provider
+          String clusterId = clusterJob.getClusterId();
+          Map<String, String> sensitiveFields = credentialStore.get(tenantId, clusterId);
+          taskConfig.getProvider().addFields(sensitiveFields);
+          taskJson = gson.toJson(taskObject);
           startNodeAction(clusterTask);
         }
       } else {
         LOG.error("Got empty task JSON for {}, skipping it.", task.getId());
-        taskQueues.recordProgress(consumerId, queueName, task.getId(),
+        taskQueues.recordProgress(consumerId, tenantId, task.getId(),
                                   TrackingQueue.ConsumingStatus.FINISHED_SUCCESSFULLY,
                                   "Skipped due to empty task JSON.");
       }
@@ -261,6 +275,10 @@ public class TaskQueueService {
           Map<String, String> ipAddresses = finish.getIpaddresses();
           if (ipAddresses != null) {
             node.getProperties().setIpaddresses(ipAddresses);
+          }
+          String hostname = finish.getHostname();
+          if (hostname != null && !hostname.isEmpty()) {
+            node.getProperties().setHostname(hostname);
           }
           nodeService.completeAction(node);
         } else {

@@ -18,20 +18,21 @@ package com.continuuity.loom.layout;
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.Administration;
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.Administration;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -45,6 +46,7 @@ import java.util.Set;
  *
  */
 public class BaseSolverTest extends BaseTest {
+  protected static Provider provider;
   protected static ClusterTemplate reactorTemplate;
   protected static ClusterTemplate reactorTemplate2;
   protected static Service namenode;
@@ -100,7 +102,8 @@ public class BaseSolverTest extends BaseTest {
             ImmutableSet.of("datanode", "reactor"),
             ImmutableSet.of("namenode", "reactor")
           )
-        )
+        ),
+        SizeConstraint.EMPTY
       ),
       Administration.EMPTY_ADMINISTRATION
     );
@@ -108,8 +111,8 @@ public class BaseSolverTest extends BaseTest {
 
     EntityStoreView adminView = entityStoreService.getView(account);
     // create providers
-    adminView.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
-                                           ImmutableMap.<String, String>of()));
+    provider = new Provider("joyent", "joyent provider", Entities.JOYENT, ImmutableMap.<String, String>of());
+    adminView.writeProvider(provider);
     // create hardware types
     adminView.writeHardwareType(
       new HardwareType(

@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.FieldSchema;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.plugin.FieldSchema;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -28,8 +28,9 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Codec for serializing/deserializing a {@link com.continuuity.loom.admin.FieldSchema}. Used so that the constructor
- * is called to avoid null values where they do not make sense, and to use 'default' as a key.
+ * Codec for serializing/deserializing a {@link com.continuuity.loom.spec.plugin.FieldSchema}.
+ * Used so that the constructor is called to avoid null values where they do not make sense,
+ * and to use 'default' as a key.
  */
 public class FieldSchemaCodec extends AbstractCodec<FieldSchema> {
 
@@ -41,7 +42,8 @@ public class FieldSchemaCodec extends AbstractCodec<FieldSchema> {
     jsonObj.add("type", context.serialize(fieldSchema.getType()));
     jsonObj.add("tip", context.serialize(fieldSchema.getTip()));
     jsonObj.add("default", context.serialize(fieldSchema.getDefaultValue()));
-    jsonObj.add("override", context.serialize(fieldSchema.getOverride()));
+    jsonObj.add("override", context.serialize(fieldSchema.isOverride()));
+    jsonObj.add("sensitive", context.serialize(fieldSchema.isSensitive()));
     jsonObj.add("options", context.serialize(fieldSchema.getOptions()));
 
     return jsonObj;
@@ -52,13 +54,14 @@ public class FieldSchemaCodec extends AbstractCodec<FieldSchema> {
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    String label = context.deserialize(jsonObj.get("label"), String.class);
-    String fieldType = context.deserialize(jsonObj.get("type"), String.class);
-    String tip = context.deserialize(jsonObj.get("tip"), String.class);
-    String defaultValue = context.deserialize(jsonObj.get("default"), String.class);
-    Boolean override = context.deserialize(jsonObj.get("override"), Boolean.class);
-    Set<String> options = context.deserialize(jsonObj.get("options"), new TypeToken<Set<String>>() {}.getType());
-
-    return new FieldSchema(label, fieldType, tip, options, defaultValue, override);
+    return FieldSchema.builder()
+      .setLabel(context.<String>deserialize(jsonObj.get("label"), String.class))
+      .setType(context.<String>deserialize(jsonObj.get("type"), String.class))
+      .setTip(context.<String>deserialize(jsonObj.get("tip"), String.class))
+      .setDefaultValue(context.<String>deserialize(jsonObj.get("default"), String.class))
+      .setOverride(context.<Boolean>deserialize(jsonObj.get("override"), Boolean.class))
+      .setSensitive(context.<Boolean>deserialize(jsonObj.get("sensitive"), Boolean.class))
+      .setOptions(context.<Set<String>>deserialize(jsonObj.get("options"), new TypeToken<Set<String>>() {}.getType()))
+      .build();
   }
 }

@@ -18,26 +18,27 @@ package com.continuuity.loom.scheduler;
 import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProvisionerAction;
-import com.continuuity.loom.admin.Service;
-import com.continuuity.loom.admin.ServiceAction;
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
-import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.JobId;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultiset;
@@ -65,20 +66,31 @@ public class SolverSchedulerTest extends BaseTest {
   private static QueueGroup clusterQueues;
   private static SolverScheduler solverScheduler;
   private static ClusterTemplate reactorTemplate;
+  private static Provider provider;
   private static Account account = new Account(Constants.ADMIN_USER, "tenant1");
 
   @Test
   public void testAddCluster() throws Exception {
     String clusterName = "my-cluster";
-    Cluster cluster = new Cluster("1", account, clusterName, System.currentTimeMillis(),
-                                  "my cluster", null, null, ImmutableSet.<String>of(), ImmutableSet.<String>of());
+    Cluster cluster = Cluster.builder()
+      .setID("1")
+      .setAccount(account)
+      .setName(clusterName)
+      .setDescription("my cluster")
+      .setClusterTemplate(reactorTemplate)
+      .setProvider(provider)
+      .build();
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CREATE);
     cluster.setLatestJobId(job.getJobId());
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     clusterStore.writeClusterJob(job);
-    ClusterCreateRequest createRequest =
-      new ClusterCreateRequest(cluster.getName(), cluster.getDescription(),
-                               reactorTemplate.getName(), 5, null, null, null, null, null, 0L, null, null);
+    ClusterCreateRequest createRequest = ClusterCreateRequest.builder()
+      .setName(cluster.getName())
+      .setDescription(cluster.getDescription())
+      .setClusterTemplateName(reactorTemplate.getName())
+      .setNumMachines(5)
+      .setInitialLeaseDuration(0L)
+      .build();
     SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.CREATE_CLUSTER, gson.toJson(createRequest));
     String queueName = "tenant123";
     solverQueues.add(queueName, new Element(cluster.getId(), gson.toJson(solverRequest)));
@@ -162,7 +174,8 @@ public class SolverSchedulerTest extends BaseTest {
             ImmutableSet.of("datanode", "reactor"),
             ImmutableSet.of("namenode", "reactor")
           )
-        )
+        ),
+        SizeConstraint.EMPTY
       ),
       null
     );
@@ -173,8 +186,8 @@ public class SolverSchedulerTest extends BaseTest {
 
     EntityStoreView adminView = entityStoreService.getView(account);
     // create providers
-    adminView.writeProvider(new Provider("joyent", "joyent provider", Entities.JOYENT,
-                                           ImmutableMap.<String, String>of()));
+    provider = new Provider("joyent", "joyent provider", Entities.JOYENT, ImmutableMap.<String, String>of());
+    adminView.writeProvider(provider);
     // create hardware types
     adminView.writeHardwareType(
       new HardwareType(

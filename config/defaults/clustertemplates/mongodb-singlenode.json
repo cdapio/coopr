@@ -7,23 +7,24 @@
       "mongodb-single"
     ],
     "provider": "rackspace",
-    "hardwaretype": "medium",
+    "hardwaretype": "standard-medium",
     "imagetype": "ubuntu12",
     "config": {
       "mongodb": {
         "config": {
-          "bind_ip": "%ip.bind_v4.service.mongodb-single%"
+          "bind_ip": "%ip.bind_v4.service.mongodb-single%",
+          "dbpath": "/data/mongodb"
         }
       }
     }
   },
   "compatibility": {
     "hardwaretypes": [
-      "small",
-      "medium",
-      "large",
-      "xlarge",
-      "xxlarge"
+      "standard-small",
+      "standard-medium",
+      "standard-large",
+      "standard-xlarge",
+      "standard-xxlarge"
     ],
     "imagetypes": [
       "centos6",
@@ -35,17 +36,9 @@
     ]
   },
   "constraints": {
-    "layout": {
-      "mustcoexist": [
-        [ "base", "mongodb-single" ]
-      ]
-    },
-    "services": {
-      "mongodb-single": {
-        "quantities": {
-          "max": "1"
-        }
-      }
+    "size": {
+      "min": 1,
+      "max": 1
     }
   },
   "administration": {

@@ -3,10 +3,9 @@ Continuuity Loom CHANGELOG
 
 Unreleased
 ----------
-- UI fix when a provider type has no admin fields ( Issues: #409 )
-- UI: Add 'sshuser' field to imagetypes ( Issues: #366 )
 - AWS provider support ( Issues: #22 #322 )
 - MongoDB support for clusters ( Issues: #43 #130 )
+- Cluster size constraint ( Issues: #76 #418 )
 - Remove 'ALL RIGHTS RESERVED' footer ( Issues: #123 #340 )
 - Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )
 - Nginx support for clusters ( Issues: #131 #323 )
@@ -20,6 +19,7 @@ Unreleased
 - Multi Tenancy ( Issues: #239, #253, #277, #284, #292, #325, #326 )
 - Include automator and provider types in export and import ( Issues: #246 )
 - Upgrade script ( Issues: #258 )
+- Fix Joyent server delete ( Issues: #272 )
 - Provisioner Multi Tenancy ( Issues: #290 #296 )
 - Updated provider plugin using fog ( Issues: #288 #310 )
 - Queue Metrics ( Issues: #301 )
@@ -31,6 +31,10 @@ Unreleased
 - PHP module support ( Issues: #317 )
 - Support for multiple IP addresses ( Issues: #343 #347 )
 - Standalone build updates for multitenancy ( Issues #349 )
+- UI: Add 'sshuser' field to imagetypes ( Issues: #366 )
+- Added 'icon' field to admin entities ( Issues: #371 #431 )
+- Added additional info in get clusters API ( Issues: #401 #430 )
+- UI: fix when a provider type has no admin fields ( Issues: #409 )
 
 v0.9.7 (May 27, 2014)
 ---------------------

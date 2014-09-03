@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.codec.json.upgrade;
 
-import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.Provider;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
@@ -38,6 +38,7 @@ public class ProviderUpgradeCodec extends AbstractCodec<Provider> {
     JsonObject jsonObj = new JsonObject();
 
     jsonObj.add("name", context.serialize(provider.getName()));
+    jsonObj.add("icon", context.serialize(provider.getIcon()));
     jsonObj.add("description", context.serialize(provider.getDescription()));
     jsonObj.add("providertype", context.serialize(provider.getProviderType()));
     jsonObj.add("provisioner", context.serialize(provider.getProvisionerFields()));
@@ -51,11 +52,12 @@ public class ProviderUpgradeCodec extends AbstractCodec<Provider> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
+    String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
     String providerType = context.deserialize(jsonObj.get("providertype"), String.class);
     Map<String, String> provisionerFields = deserializeProvisionerFields(jsonObj, context);
 
-    return new Provider(name, description, providerType, provisionerFields);
+    return new Provider(name, icon, description, providerType, provisionerFields);
   }
 
   private Map<String, String> deserializeProvisionerFields(JsonObject jsonObj, JsonDeserializationContext context) {

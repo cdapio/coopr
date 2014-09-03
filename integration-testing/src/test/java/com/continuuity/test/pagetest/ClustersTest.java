@@ -15,6 +15,7 @@
  */
 package com.continuuity.test.pagetest;
 
+import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.test.Constants;
 import com.continuuity.test.GenericTest;
 import com.continuuity.test.TestUtil;
@@ -48,8 +49,6 @@ import static org.junit.Assert.assertEquals;
 public class ClustersTest extends GenericTest {
   private static final TestUtil TEST_UTIL = new TestUtil();
   private static final ClusterReader CLUSTER_READER = new ClusterReader();
-  private static final String ACTIVE = "active";
-  private static final String NON_ACTIVE = "terminated";
   private static final By ACTIVE_CLUSTER = By.cssSelector("#active-clusters");
   private static final By DEL_CLUSTER = By.cssSelector("#deleted-clusters");
   private static final By TABLE = By.cssSelector(".table.table-striped");
@@ -68,7 +67,7 @@ public class ClustersTest extends GenericTest {
   @Test
   public void test_03_activeClusters() throws Exception {
     WebElement activeTable = globalDriver.findElement(ACTIVE_CLUSTER).findElement(TABLE);
-    assertEquals("active clusters is not correct.", CLUSTER_READER.getClusters(ACTIVE),
+    assertEquals("active clusters is not correct.", CLUSTER_READER.getClusters(Cluster.Status.ACTIVE),
                  getActualClusters(activeTable));
   }
 
@@ -77,7 +76,7 @@ public class ClustersTest extends GenericTest {
     // Click cluster header to make it visible.
     globalDriver.findElement(By.cssSelector(".delete-cluster-header")).click();
     WebElement delTable = globalDriver.findElement(DEL_CLUSTER).findElement(TABLE);
-    assertEquals("nonactive clusters is not correct.", CLUSTER_READER.getClusters(NON_ACTIVE),
+    assertEquals("nonactive clusters is not correct.", CLUSTER_READER.getClusters(Cluster.Status.TERMINATED),
                  getActualClusters(delTable));
   }
 

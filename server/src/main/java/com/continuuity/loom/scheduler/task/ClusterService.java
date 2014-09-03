@@ -16,8 +16,8 @@
 package com.continuuity.loom.scheduler.task;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.ClusterTemplate;
 import com.continuuity.loom.cluster.Cluster;
+import com.continuuity.loom.cluster.ClusterSummary;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
@@ -26,7 +26,9 @@ import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.LockService;
 import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.http.request.AddServicesRequest;
-import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterConfigureRequest;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterOperationRequest;
 import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.InvalidClusterException;
 import com.continuuity.loom.layout.Solver;
@@ -35,12 +37,22 @@ import com.continuuity.loom.provisioner.QuotaException;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.SolverRequest;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.plugin.ParameterType;
+import com.continuuity.loom.spec.plugin.PluginFields;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
+import com.continuuity.loom.store.credential.CredentialStore;
 import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -49,6 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -61,6 +75,7 @@ public class ClusterService {
   private final ClusterStore clusterStore;
   private final EntityStoreService entityStoreService;
   private final TenantProvisionerService tenantProvisionerService;
+  private final CredentialStore credentialStore;
   private final LockService lockService;
   private final LoomStats loomStats;
   private final Solver solver;
@@ -81,11 +96,13 @@ public class ClusterService {
                         LoomStats loomStats,
                         Solver solver,
                         IdService idService,
+                        CredentialStore credentialStore,
                         Gson gson) {
     this.clusterStoreService = clusterStoreService;
     this.clusterStore = clusterStoreService.getSystemView();
     this.entityStoreService = entityStoreService;
     this.tenantProvisionerService = tenantProvisionerService;
+    this.credentialStore = credentialStore;
     this.lockService = lockService;
     this.loomStats = loomStats;
     this.solver = solver;
@@ -94,6 +111,17 @@ public class ClusterService {
     this.clusterQueues = clusterQueues;
     this.solverQueues = solverQueues;
     this.jobQueues = jobQueues;
+  }
+
+  /**
+   * Get a list of summaries of all clusters visible to the given account.
+   *
+   * @param account Account to get cluster summaries for.
+   * @return List of summaries of all clusters visible to the given account.
+   * @throws IOException if there was an exception reading the cluster data from the store.
+   */
+  public List<ClusterSummary> getClusterSummaries(Account account) throws IOException {
+    return clusterStoreService.getView(account).getAllClusterSummaries();
   }
 
   /**
@@ -108,7 +136,7 @@ public class ClusterService {
    * @throws QuotaException if the operation would cause the tenant quotas to be exceeded.
    */
   public String requestClusterCreate(ClusterCreateRequest clusterCreateRequest, Account account)
-    throws IOException, IllegalAccessException, QuotaException {
+    throws IOException, IllegalAccessException, QuotaException, MissingEntityException, InvalidClusterException {
     // the create lock is shared across an entire tenant and is needed so that concurrent create requests
     // cannot cause the quota to be exceeded if they both read the old value and both add clusters and nodes
     ZKInterProcessReentrantLock lock = lockService.getClusterCreateLock(account.getTenantId());
@@ -119,17 +147,8 @@ public class ClusterService {
         throw new QuotaException("Creating the cluster would cause cluster or node quotas to be violated.");
       }
 
-      String name = clusterCreateRequest.getName();
-      int numMachines = clusterCreateRequest.getNumMachines();
-      String templateName = clusterCreateRequest.getClusterTemplate();
-      LOG.debug(String.format("Received a request to create cluster %s with %d machines from template %s", name,
-                              numMachines, templateName));
-      String clusterId = idService.getNewClusterId();
-      Cluster cluster = new Cluster(clusterId, account, name, System.currentTimeMillis(),
-                                    clusterCreateRequest.getDescription(), null, null,
-                                    ImmutableSet.<String>of(), ImmutableSet.<String>of(),
-                                    clusterCreateRequest.getConfig());
-      JobId clusterJobId = idService.getNewJobId(clusterId);
+      Cluster cluster = createEmptyCluster(account, clusterCreateRequest);
+      JobId clusterJobId = idService.getNewJobId(cluster.getId());
       ClusterJob clusterJob = new ClusterJob(clusterJobId, ClusterAction.SOLVE_LAYOUT);
       cluster.setLatestJobId(clusterJob.getJobId());
 
@@ -154,11 +173,15 @@ public class ClusterService {
    *
    * @param clusterId Id of the cluster to delete.
    * @param account Account of the user making the request.
+   * @param request Request to delete the cluster, containing optional provider fields.
    * @throws IOException if there was some error writing to stores.
+   * @throws MissingEntityException if some entity required to complete, such as the provider type
+   *                                used to create the cluster, could not be found.
    * @throws IllegalAccessException if the operation is not allowed for the given account.
+   * @throws IllegalArgumentException if the request does not contain all required fields.
    */
-  public void requestClusterDelete(String clusterId, Account account)
-    throws IOException, IllegalAccessException {
+  public void requestClusterDelete(String clusterId, Account account, ClusterOperationRequest request)
+    throws IOException, IllegalAccessException, MissingEntityException, IllegalArgumentException {
     ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
     lock.acquire();
     try {
@@ -169,6 +192,7 @@ public class ClusterService {
       deleteJob.setJobStatus(ClusterJob.Status.RUNNING);
       cluster.setLatestJobId(deleteJobId.getId());
       cluster.setStatus(Cluster.Status.PENDING);
+      validateAndAddFieldsToProvider(cluster.getProvider(), request, account, clusterId);
 
       LOG.debug("Writing cluster {} to store with delete job {}", clusterId, deleteJobId);
       view.writeCluster(cluster);
@@ -188,14 +212,15 @@ public class ClusterService {
    *
    * @param clusterId Id of cluster to reconfigure.
    * @param account Account of the user that is trying to reconfigure the cluster.
-   * @param restartServices Whether or not services should be restarted as part of the reconfigure.
-   * @param config New value of the config to use.
+   * @param request Request to configure the cluster, containing the new config plus other options.
    * @throws IOException if there was so error writing to stores.
-   * @throws MissingClusterException if there is no cluster for the given id.
+   * @throws MissingEntityException if some entity required to complete, such as the cluster or the provider type
+   *                                used to create the cluster, could not be found.
    * @throws IllegalAccessException if the operation is not allowed for the given account.
+   * @throws IllegalArgumentException if the request does not contain all required fields.
    */
-  public void requestClusterReconfigure(String clusterId, Account account, boolean restartServices, JsonObject config)
-    throws IOException, MissingClusterException, IllegalAccessException {
+  public void requestClusterReconfigure(String clusterId, Account account, ClusterConfigureRequest request)
+    throws IOException, MissingEntityException, IllegalAccessException, IllegalArgumentException {
     ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
     lock.acquire();
     try {
@@ -209,6 +234,8 @@ public class ClusterService {
         throw new IllegalStateException("cluster " + clusterId + " is not in a configurable state");
       }
       JobId configureJobId = idService.getNewJobId(clusterId);
+      boolean restartServices = request.getRestart();
+      JsonObject config = request.getConfig();
 
       ClusterAction action =
         restartServices ? ClusterAction.CLUSTER_CONFIGURE_WITH_RESTART : ClusterAction.CLUSTER_CONFIGURE;
@@ -219,6 +246,7 @@ public class ClusterService {
 
       LOG.debug("Writing cluster {} to store with configure job {}", clusterId, configureJobId);
       cluster.setConfig(config);
+      validateAndAddFieldsToProvider(cluster.getProvider(), request, account, clusterId);
       view.writeCluster(cluster);
       clusterStore.writeClusterJob(configureJob);
 
@@ -238,12 +266,16 @@ public class ClusterService {
    * @param account Account of the user that is trying to perform an action on the cluster service.
    * @param action Action to perform on the service.
    * @param service Service to perform the action on. Null means perform the action on all services.
+   * @param request Service action request, containing optional provider fields.
    * @throws IOException if there was so error writing to stores.
-   * @throws MissingClusterException if there is no cluster for the given id.
+   * @throws MissingEntityException if some entity required to complete, such as the cluster or the provider type
+   *                                used to create the cluster, could not be found.
    * @throws IllegalAccessException if the operation is not allowed for the given account.
+   * @throws IllegalArgumentException if the request does not contain all required fields.
    */
-  public void requestServiceRuntimeAction(String clusterId, Account account, ClusterAction action, String service)
-    throws IOException, MissingClusterException, IllegalAccessException {
+  public void requestServiceRuntimeAction(String clusterId, Account account, ClusterAction action, String service,
+                                          ClusterOperationRequest request)
+    throws IOException, MissingEntityException, IllegalAccessException, IllegalArgumentException {
     Preconditions.checkArgument(ClusterAction.SERVICE_RUNTIME_ACTIONS.contains(action),
                                 action + " is not a service runtime action.");
     ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
@@ -265,6 +297,7 @@ public class ClusterService {
       job.setJobStatus(ClusterJob.Status.RUNNING);
       cluster.setLatestJobId(job.getJobId());
       cluster.setStatus(Cluster.Status.PENDING);
+      validateAndAddFieldsToProvider(cluster.getProvider(), request, account, clusterId);
       view.writeCluster(cluster);
       clusterStore.writeClusterJob(job);
 
@@ -343,11 +376,13 @@ public class ClusterService {
    * @param account Account of the user that is trying to add services to the cluster.
    * @param addRequest Request to add services.
    * @throws IOException if there was some problem writing to stores.
-   * @throws MissingClusterException if there is no cluster with the given id.
+   * @throws MissingEntityException if some entity required to complete, such as the cluster or the provider type
+   *                                used to create the cluster, could not be found.
    * @throws IllegalAccessException if the operation is not allowed for the given account.
+   * @throws IllegalArgumentException if the request does not contain all required fields.
    */
   public void requestAddServices(String clusterId, Account account, AddServicesRequest addRequest)
-    throws IOException, MissingClusterException, IllegalAccessException {
+    throws IOException, MissingEntityException, IllegalAccessException, IllegalArgumentException {
     ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
     lock.acquire();
     try {
@@ -369,6 +404,7 @@ public class ClusterService {
       job.setJobStatus(ClusterJob.Status.RUNNING);
       cluster.setLatestJobId(job.getJobId());
       cluster.setStatus(Cluster.Status.PENDING);
+      validateAndAddFieldsToProvider(cluster.getProvider(), addRequest, account, clusterId);
       view.writeCluster(cluster);
       clusterStore.writeClusterJob(job);
 
@@ -481,5 +517,142 @@ public class ClusterService {
     } finally {
       lock.release();
     }
+  }
+
+  private Cluster createEmptyCluster(Account account, ClusterCreateRequest createRequest)
+    throws MissingEntityException, IOException, InvalidClusterException {
+
+    String name = createRequest.getName();
+    int numMachines = createRequest.getNumMachines();
+    String templateName = createRequest.getClusterTemplate();
+    LOG.debug(String.format("Received a request to create cluster %s with %d machines from template %s", name,
+                            numMachines, templateName));
+
+    String clusterId = idService.getNewClusterId();
+    Cluster.Builder builder = Cluster.builder()
+      .setAccount(account)
+      .setName(name)
+      .setID(clusterId);
+
+    EntityStoreView entityStore = entityStoreService.getView(account);
+    // make sure the template exists
+    ClusterTemplate template = entityStore.getClusterTemplate(templateName);
+    if (template == null) {
+      throw new MissingEntityException("cluster template " + templateName + " does not exist.");
+    }
+
+    // check cluster size constraints
+    SizeConstraint sizeConstraint = template.getConstraints().getSizeConstraint();
+    sizeConstraint.verify(numMachines);
+    builder.setClusterTemplate(template);
+
+    // set lease times
+    long requestedLease = createRequest.getInitialLeaseDuration();
+    long leaseDuration = template.getAdministration().getLeaseDuration().calcInitialLease(requestedLease);
+    long createTime = System.currentTimeMillis();
+    builder.setCreateTime(createTime);
+    // Lease duration of 0 is forever.
+    builder.setExpireTime(leaseDuration == 0 ? 0 : createTime + leaseDuration);
+
+    Provider provider = getAndVerifyProvider(account, template, createRequest, entityStore, clusterId);
+    builder.setProvider(provider);
+
+    Set<String> serviceNames = getServices(template, createRequest);
+    builder.setServices(serviceNames);
+
+    JsonObject config = getConfig(template, createRequest);
+    builder.setConfig(config);
+
+    return builder.build();
+  }
+
+  private Provider getAndVerifyProvider(Account account, ClusterTemplate template, ClusterCreateRequest createRequest,
+                                        EntityStoreView entityStore, String clusterId)
+    throws IOException, MissingEntityException {
+    // make sure the provider exists
+    String providerName = createRequest.getProvider();
+    if (providerName == null || providerName.isEmpty()) {
+      providerName = template.getClusterDefaults().getProvider();
+    }
+    Provider provider = entityStore.getProvider(providerName);
+    if (provider == null) {
+      throw new MissingEntityException("provider " + providerName + " does not exist.");
+    }
+
+    validateAndAddFieldsToProvider(provider, createRequest, account, clusterId);
+    return provider;
+  }
+
+  // add provider fields to the cluster's provider object.
+  private void validateAndAddFieldsToProvider(
+    Provider provider, ClusterOperationRequest request, Account account, String clusterId)
+    throws IOException, MissingEntityException, IllegalArgumentException {
+    Map<String, String> providerFields = request == null ?
+      Maps.<String, String>newHashMap() : request.getProviderFields();
+
+    // make sure the provider type for the provider exists.
+    // Will need this to add any provider fields given in the request
+    String providerTypeName = provider.getProviderType();
+    ProviderType providerType = entityStoreService.getView(account).getProviderType(providerTypeName);
+    if (providerType == null) {
+      throw new MissingEntityException("provider type " + providerTypeName + " does not exist.");
+    }
+
+    // check all required user fields are present
+    // if there are no fields in the request, they may be in the credential store
+    if (providerFields.isEmpty()) {
+      try {
+        Map<String, String> existingSensitiveFields = credentialStore.get(account.getTenantId(), clusterId);
+        if (existingSensitiveFields != null) {
+          providerFields = existingSensitiveFields;
+        }
+      } catch (IOException e) {
+        // its possible we get an exception looking up the fields, but we didn't need them anyway.
+        // so log an error and proceed.  If we needed the fields, it will fail below when checking required fields.
+        LOG.error("Exception looking up sensitive fields for account {} for cluster {}.", account, clusterId, e);
+      }
+    }
+    Set<String> allProviderFields = Sets.union(provider.getProvisionerFields().keySet(), providerFields.keySet());
+    if (!providerType.requiredFieldsExist(ParameterType.USER, allProviderFields)) {
+      throw new IllegalArgumentException("Request is missing required user fields.");
+    }
+
+    // if there's nothing to add, just return. Has to happen after the required fields check.
+    if (providerFields.isEmpty()) {
+      return;
+    }
+
+    PluginFields pluginFields = providerType.groupFields(providerFields);
+    // take sensitive fields out and write them to the credential store
+    // this will overwrite anything that's already there
+    Map<String, String> sensitiveFields = pluginFields.getSensitive();
+    if (!sensitiveFields.isEmpty()) {
+      LOG.trace("writing fields {} to credential store for account {} and cluster {}.",
+                sensitiveFields.keySet(), account, clusterId);
+      credentialStore.set(account.getTenantId(), clusterId, sensitiveFields);
+    }
+    // add non sensitive fields to the provider
+    Map<String, String> nonSensitiveFields = pluginFields.getNonsensitive();
+    if (!nonSensitiveFields.isEmpty()) {
+      provider.addFields(nonSensitiveFields);
+    }
+  }
+
+  private JsonObject getConfig(ClusterTemplate template, ClusterCreateRequest createRequest) {
+    // use the config from the request if it exists. Otherwise use the template default
+    JsonObject config = createRequest.getConfig();
+    if (config == null) {
+      config = template.getClusterDefaults().getConfig();
+    }
+    return config;
+  }
+
+  private Set<String> getServices(ClusterTemplate template, ClusterCreateRequest createRequest) {
+    // set cluster service names. Dependency checking is done later on since it involves a lot of potential lookups.
+    Set<String> serviceNames = createRequest.getServices();
+    if (serviceNames == null || serviceNames.isEmpty()) {
+      serviceNames = template.getClusterDefaults().getServices();
+    }
+    return serviceNames;
   }
 }

@@ -7,7 +7,6 @@ import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.base.Preconditions;
 
-import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,20 +16,20 @@ import java.sql.SQLException;
  * within the tenant.
  */
 public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
-  private final Account account;
+  private final String tenantId;
 
   public SQLAdminClusterStoreView(DBConnectionPool dbConnectionPool,
                                   Account account, DBQueryExecutor dbQueryExecutor) {
     super(dbConnectionPool, dbQueryExecutor);
     Preconditions.checkArgument(account.isAdmin(), "Cannot create admin view with a non-admin user.");
-    this.account = account;
+    this.tenantId = account.getTenantId();
   }
 
   @Override
   protected PreparedStatement getSelectAllClustersStatement(Connection conn) throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "SELECT cluster FROM clusters WHERE tenant_id=? ORDER BY create_time DESC");
-    statement.setString(1, account.getTenantId());
+    statement.setString(1, tenantId);
     return statement;
   }
 
@@ -39,7 +38,7 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
     throws SQLException {
     PreparedStatement statement = conn.prepareStatement(
       "SELECT cluster FROM clusters WHERE tenant_id=? AND status<>? ORDER BY create_time DESC");
-    statement.setString(1, account.getTenantId());
+    statement.setString(1, tenantId);
     statement.setString(2, Cluster.Status.TERMINATED.name());
     return statement;
   }
@@ -48,13 +47,13 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
   protected PreparedStatement getSelectClusterStatement(Connection conn, long id) throws SQLException {
     PreparedStatement statement = conn.prepareStatement("SELECT cluster FROM clusters WHERE id=? AND tenant_id=?");
     statement.setLong(1, id);
-    statement.setString(2, account.getTenantId());
+    statement.setString(2, tenantId);
     return statement;
   }
 
   @Override
   boolean allowedToWrite(Cluster cluster) {
-    return this.account.getTenantId().equals(cluster.getAccount().getTenantId());
+    return this.tenantId.equals(cluster.getAccount().getTenantId());
   }
 
   @Override
@@ -69,7 +68,7 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
     statement.setTimestamp(5, DBHelper.getTimestamp(cluster.getExpireTime()));
     // where clause
     statement.setLong(6, id);
-    statement.setString(7, account.getTenantId());
+    statement.setString(7, tenantId);
     return statement;
   }
 
@@ -78,7 +77,7 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
     PreparedStatement statement = conn.prepareStatement(
       "SELECT id FROM clusters WHERE id=? AND tenant_id=?");
     statement.setLong(1, id);
-    statement.setString(2, account.getTenantId());
+    statement.setString(2, tenantId);
     return statement;
   }
 
@@ -86,7 +85,7 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
   protected PreparedStatement getDeleteClusterStatement(Connection conn, long id) throws SQLException {
     PreparedStatement statement = conn.prepareStatement("DELETE FROM clusters WHERE id=? AND tenant_id=?");
     statement.setLong(1, id);
-    statement.setString(2, account.getTenantId());
+    statement.setString(2, tenantId);
     return statement;
   }
 
@@ -96,7 +95,16 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
       "SELECT J.job FROM jobs J, clusters C " +
         "WHERE C.id=? AND C.tenant_id=? and J.cluster_id=C.id ORDER BY job_num DESC");
     statement.setLong(1, id);
-    statement.setString(2, account.getTenantId());
+    statement.setString(2, tenantId);
+    return statement;
+  }
+
+  @Override
+  PreparedStatement getSelectAllClusterJobsStatement(Connection conn) throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "SELECT C.cluster, J.job FROM clusters C, jobs J WHERE " +
+        "C.latest_job_num=J.job_num AND C.id=J.cluster_id AND C.tenant_id=? ORDER BY C.create_time DESC");
+    statement.setString(1, tenantId);
     return statement;
   }
 
@@ -105,7 +113,7 @@ public class SQLAdminClusterStoreView extends BaseSQLClusterStoreView {
     PreparedStatement statement = conn.prepareStatement(
       "SELECT N.node FROM nodes N, clusters C WHERE C.id=? AND C.tenant_id=? AND N.cluster_id=C.id");
     statement.setLong(1, id);
-    statement.setString(2, account.getTenantId());
+    statement.setString(2, tenantId);
     return statement;
   }
 }

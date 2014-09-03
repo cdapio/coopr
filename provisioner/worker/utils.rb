@@ -127,6 +127,8 @@ end
 module Logging
   attr_accessor :level
   @out = nil
+  @process_name = '-'
+
   def log
     Logging.log
   end
@@ -152,6 +154,10 @@ module Logging
     end
   end
 
+  def self.process_name=(process_name)
+    @process_name = process_name
+  end
+
   def self.log
     unless @logger
       if @out
@@ -161,7 +167,7 @@ module Logging
       end
       @logger.level = @level
       @logger.formatter = proc do |severity, datetime, progname, msg|
-        "#{datetime} #{severity}: #{msg}\n"
+        "#{datetime} #{@process_name} #{severity}: #{msg}\n"
       end
     end
     @logger

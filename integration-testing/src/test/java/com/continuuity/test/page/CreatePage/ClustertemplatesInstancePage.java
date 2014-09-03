@@ -15,12 +15,13 @@
  */
 package com.continuuity.test.page.CreatePage;
 
-import com.continuuity.loom.admin.ClusterDefaults;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.ServiceConstraint;
 import com.continuuity.loom.codec.json.guice.CodecModules;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.ServiceConstraint;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.continuuity.test.Constants;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -113,14 +114,6 @@ public class ClustertemplatesInstancePage extends GenericPage {
       imagetypes.add(element.getAttribute(Constants.INNER_HTML));
     }
     return new Compatibilities(hardwaretypes, imagetypes, services);
-  }
-
-  public Constraints getConstraints() {
-    Map<String, ServiceConstraint> serviceConstraints = getServiceConstraints();
-    Set<Set<String>> servicesThatMustCoexist = getLayoutConstraint(MUST_COEXIST_GROUP, MUST_COEXIST_ENTRY);
-    Set<Set<String>> servicesThatMustNotCoexist = getLayoutConstraint(CANT_COEXIST_GROUP, CANT_COEXIST_ENTRY);
-    LayoutConstraint layoutConstraint = new LayoutConstraint(servicesThatMustCoexist, servicesThatMustNotCoexist);
-    return new Constraints(serviceConstraints, layoutConstraint);
   }
 
   public Map<String, ServiceConstraint> getServiceConstraints() {

@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+# Add some build pre-requisites
+include_recipe 'build-essential'
+
 # Install PHP modules, from a list
 if node['php'].key?('modules')
   node['php']['modules'].each do |m|

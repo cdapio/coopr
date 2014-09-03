@@ -92,6 +92,12 @@ module Loom
         # ex: data/tenant1/automatortype/chef-solo/roles/cluster.json/1/cluster.json
         data_file = %W( #{@datadir} #{resource} #{version} #{resource.split('/')[-1]}).join('/')
         log.debug "storing fetched file #{download_file} into data dir: #{data_file}"
+        # set file permissions if specified
+        if @resourcespec.resource_permissions.key?(resource) && !@resourcespec.resource_permissions[resource].nil?
+          log.debug "setting file permissions #{@resourcespec.resource_permissions[resource]}"
+          octal_mode = @resourcespec.resource_permissions[resource].to_i(8)
+          FileUtils.chmod octal_mode, download_file
+        end
         FileUtils.mkdir_p(File.dirname(data_file))
         FileUtils.mv(download_file, data_file)
       end
@@ -138,7 +144,7 @@ module Loom
 
     # fetches a resource from the server to a tmp directory, yields the file location to a block
     def fetch_resource(resource, version)
-      uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v1/tenants/#{@tenant} #{resource} versions #{version} ).join('/')
+      uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v2/tenants/#{@tenant} #{resource} versions #{version} ).join('/')
       log.debug "fetching resource at #{uri} for tenant #{@tenant}"
       begin
         response = RestClient.get(uri, { 'X-Loom-UserID' => 'admin', 'X-Loom-TenantID' => @tenant })
@@ -209,7 +215,20 @@ module Loom
     # determine if a versioned resource exists in the data dir
     def synced?(resource, version)
       data = %W( #{@datadir} #{resource} #{version} #{resource.split('/')[-1]}).join('/')
-      File.file?(data) || File.directory?(data)
+
+      # if data is a directory, its an archive resource and its synced
+      return true if File.directory?(data)
+      # if data is a file, we need to check permissions
+      if File.file?(data)
+        if @resourcespec.resource_permissions.key?(resource)
+          expected_mode = @resourcespec.resource_permissions[resource]
+          # get mode as Fixnum, convert to octal string, then take last 4 digits
+          mode = File.stat(data).mode.to_s(8)[-4..-1]
+          return false unless mode =~ /^0*#{expected_mode}$/
+        end
+        return true
+      end
+      return false
     end
 
     # determine if a versioned resource is active

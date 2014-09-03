@@ -45,10 +45,11 @@ module Loom
       @terminating_tenants = []
       @server_uri = config.get('provisioner.server.uri')
       pid = Process.pid
-      host = Socket.gethostname.downcase
-      @provisioner_id = "#{host}.#{pid}"
+      host = Socket.gethostname.downcase.split('.').first
+      @provisioner_id = "master-#{host}-#{pid}"
       log.info "provisioner #{@provisioner_id} initialized"
       @registered = false
+      Logging.process_name = @provisioner_id
     end
 
     # invoked from bin/provisioner
@@ -188,7 +189,7 @@ module Loom
         log.info "starting heartbeat thread"
         loop {
           register_with_server unless @registered
-          uri = "#{@server_uri}/v1/provisioners/#{provisioner_id}/heartbeat"
+          uri = "#{@server_uri}/v2/provisioners/#{provisioner_id}/heartbeat"
           begin
             json = heartbeat.to_json
             resp = RestClient.post("#{uri}", json, :'X-Loom-UserID' => "admin")
@@ -229,7 +230,7 @@ module Loom
     end
 
     def register_with_server
-      uri = "#{@server_uri}/v1/provisioners/#{@provisioner_id}"
+      uri = "#{@server_uri}/v2/provisioners/#{@provisioner_id}"
       data = {}
       data['id'] = @provisioner_id
       data['capacityTotal'] = @config.get(PROVISIONER_CAPACITY)
@@ -260,7 +261,7 @@ module Loom
     end
 
     def unregister_from_server
-      uri = "#{@server_uri}/v1/provisioners/#{@provisioner_id}"
+      uri = "#{@server_uri}/v2/provisioners/#{@provisioner_id}"
       log.info "Unregistering with server at #{uri}"
       begin
         resp = RestClient.delete("#{uri}", :'X-Loom-UserID' => "admin")

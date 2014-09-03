@@ -67,6 +67,7 @@ export LOOM_HOME=$APP_HOME
 export LOOM_SERVER_HOME=$APP_HOME/server
 export LOOM_SERVER_CONF=$LOOM_HOME/server/conf/
 export LOOM_PROVISIONER_CONF=$LOOM_HOME/provisioner/master/conf
+export PROVISIONER_SITE_CONF=$LOOM_PROVISIONER_CONF/provisioner-site.xml
 export LOOM_PROVISIONER_PLUGIN_DIR=$LOOM_HOME/provisioner/worker/plugins
 export LOOM_LOG_DIR=$LOOM_HOME/logs
 export LOOM_DATA_DIR=$LOOM_HOME/data
@@ -189,7 +190,7 @@ function sync_default_data () {
       --header "X-Loom-UserID:${LOOM_API_USER}" \
       --header "X-Loom-TenantID:${LOOM_TENANT}" \
       --connect-timeout 5 \
-      http://localhost:55054/v1/loom/sync
+      http://localhost:55054/v2/plugins/sync
 }
 
 function request_superadmin_workers () {
@@ -206,7 +207,7 @@ function request_superadmin_workers () {
       --header "X-Loom-UserID:${LOOM_API_USER}" \
       --header "X-Loom-TenantID:${LOOM_TENANT}" \
       --connect-timeout 5 --data "{\"workers\":${LOOM_NUM_WORKERS}, \"name\":\"superadmin\"}" \
-      http://localhost:55054/v1/tenants/superadmin
+      http://localhost:55054/v2/tenants/superadmin
 }
 
 function wait_for_server () {
@@ -227,7 +228,7 @@ function wait_for_plugin_registration () {
                  --output /dev/null --write-out "%{http_code}" \
                  --header "X-Loom-UserID:${LOOM_API_USER}" \
                  --header "X-Loom-TenantID:${LOOM_TENANT}" \
-                 http://localhost:55054/v1/loom/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
+                 http://localhost:55054/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
         sleep 2
         ((RETRIES++))
     done

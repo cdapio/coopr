@@ -17,16 +17,16 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.HardwareType;
-import com.continuuity.loom.admin.ImageType;
-import com.continuuity.loom.admin.Provider;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Service;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.QueueMetrics;
 import com.continuuity.loom.scheduler.task.TaskQueueService;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.tenant.TenantStore;
@@ -61,10 +61,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Handler for getting, adding, modifying, and deleting admin defined Loom entities.
+ * Handler for getting, adding, modifying, and deleting admin defined entities.
  * GET calls work for any user, non-GET calls work only for admin.
  */
-@Path("/v1/loom")
+@Path(Constants.API_BASE)
 public class LoomAdminHandler extends LoomAuthHandler {
   private static final Logger LOG  = LoggerFactory.getLogger(LoomAdminHandler.class);
 
@@ -73,8 +73,6 @@ public class LoomAdminHandler extends LoomAuthHandler {
   public static final String IMAGE_TYPES = "imagetypes";
   public static final String CLUSTER_TEMPLATES = "clustertemplates";
   public static final String SERVICES = "services";
-  public static final String AUTOMATOR_TYPES = "automatortypes";
-  public static final String PROVIDER_TYPES = "providertypes";
 
   private final EntityStoreService entityStoreService;
   private final TaskQueueService taskQueueService;
@@ -243,14 +241,14 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get a specific {@link com.continuuity.loom.admin.ProviderType} if readable by the user.
+   * Get a specific {@link com.continuuity.loom.spec.plugin.ProviderType} if readable by the user.
    *
    * @param request The request for the provider type.
    * @param responder Responder for sending the response.
    * @param providertypeId Id of the provider type to get.
    */
   @GET
-  @Path("/providertypes/{providertype-id}")
+  @Path("/plugins/providertypes/{providertype-id}")
   public void getProviderType(HttpRequest request, HttpResponder responder,
                               @PathParam("providertype-id") String providertypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -268,14 +266,14 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get a specific {@link com.continuuity.loom.admin.AutomatorType} if readable by the user.
+   * Get a specific {@link com.continuuity.loom.spec.plugin.AutomatorType} if readable by the user.
    *
    * @param request The request for the automator type.
    * @param responder Responder for sending the response.
    * @param automatortypeId Id of the automator type to get.
    */
   @GET
-  @Path("/automatortypes/{automatortype-id}")
+  @Path("/plugins/automatortypes/{automatortype-id}")
   public void getAutomatorType(HttpRequest request, HttpResponder responder,
                               @PathParam("automatortype-id") String automatortypeId) {
     Account account = getAndAuthenticateAccount(request, responder);
@@ -381,13 +379,13 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get all {@link com.continuuity.loom.admin.ProviderType}s readable by the user.
+   * Get all {@link com.continuuity.loom.spec.plugin.ProviderType}s readable by the user.
    *
    * @param request The request for services.
    * @param responder Responder for sending the response.
    */
   @GET
-  @Path("/providertypes")
+  @Path("/plugins/providertypes")
   public void getProviderTypes(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
@@ -403,13 +401,13 @@ public class LoomAdminHandler extends LoomAuthHandler {
   }
 
   /**
-   * Get all {@link com.continuuity.loom.admin.AutomatorType}s readable by the user.
+   * Get all {@link com.continuuity.loom.spec.plugin.AutomatorType}s readable by the user.
    *
    * @param request The request for services.
    * @param responder Responder for sending the response.
    */
   @GET
-  @Path("/automatortypes")
+  @Path("/plugins/automatortypes")
   public void getAutomatorTypes(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {

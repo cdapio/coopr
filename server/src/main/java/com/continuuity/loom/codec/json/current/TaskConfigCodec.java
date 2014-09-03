@@ -15,11 +15,11 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.Provider;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.codec.json.AbstractCodec;
 import com.continuuity.loom.scheduler.task.TaskConfig;
 import com.continuuity.loom.scheduler.task.TaskServiceAction;
+import com.continuuity.loom.spec.Provider;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -78,7 +78,7 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
     Provider provider = context.deserialize(jsonObj.remove("provider"), Provider.class);
     Map<String, NodeProperties> nodePropertiesMap =
       context.deserialize(jsonObj.remove("nodes"), new TypeToken<Map<String, NodeProperties>>() {}.getType());
-    JsonObject clusterConfig = jsonObj.remove("cluster").getAsJsonObject();
+    JsonObject clusterConfig = context.deserialize(jsonObj.remove("cluster"), JsonObject.class);
     TaskServiceAction taskServiceAction = context.deserialize(jsonObj.remove("service"), TaskServiceAction.class);
     // build node properties
     String hostname = context.deserialize(jsonObj.remove("hostname"), String.class);

@@ -16,10 +16,10 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
-import com.continuuity.loom.admin.AutomatorType;
-import com.continuuity.loom.admin.ProviderType;
-import com.continuuity.loom.admin.Tenant;
-import com.continuuity.loom.admin.TenantSpecification;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
@@ -70,23 +70,23 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
 
   @Test
   public void testDeleteSuperadminForbidden() throws Exception {
-    assertResponseStatus(doDelete("/v1/tenants/" + Constants.SUPERADMIN_TENANT, SUPERADMIN_HEADERS),
+    assertResponseStatus(doDelete("/tenants/" + Constants.SUPERADMIN_TENANT, SUPERADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
   public void testNonSuperadminReturnsError() throws Exception {
-    assertResponseStatus(doGet("/v1/tenants", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doGet("/v1/tenants/123", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doPost("/v1/tenants", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doPut("/v1/tenants/123", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGet("/tenants", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGet("/tenants/123", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPost("/tenants", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPut("/tenants/123", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
   }
 
   @Test
   public void testCreateTenant() throws Exception {
     String name = "companyX";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
-    HttpResponse response = doPost("/v1/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS);
+    HttpResponse response = doPost("/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -104,16 +104,16 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
   public void testDuplicateTenantNameNotAllowed() throws Exception {
     String name = "companyX";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
-    assertResponseStatus(doPost("/v1/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPost("/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS),
                          HttpResponseStatus.OK);
-    assertResponseStatus(doPost("/v1/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPost("/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS),
                          HttpResponseStatus.CONFLICT);
   }
 
   @Test
   public void testCreateTenantWithTooManyWorkersReturnsConflict() throws Exception {
     TenantSpecification requestedTenant = new TenantSpecification("companyX", 10000, 100, 1000);
-    HttpResponse response = doPost("/v1/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS);
+    HttpResponse response = doPost("/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
@@ -129,7 +129,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     // perform request to write tenant
     TenantSpecification updatedTenant = new TenantSpecification("companyX", 10, 100, 500);
     HttpResponse response =
-      doPut("/v1/tenants/" + updatedTenant.getName(), gson.toJson(updatedTenant), SUPERADMIN_HEADERS);
+      doPut("/tenants/" + updatedTenant.getName(), gson.toJson(updatedTenant), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     Assert.assertEquals(updatedTenant, tenantStore.getTenantByID(actualTenant.getId()).getSpecification());
@@ -145,7 +145,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
 
     // perform request to write tenant
     TenantSpecification updatedFields = new TenantSpecification(name, 100000, 100, 500);
-    HttpResponse response = doPut("/v1/tenants/" + name, gson.toJson(updatedFields), SUPERADMIN_HEADERS);
+    HttpResponse response = doPut("/tenants/" + name, gson.toJson(updatedFields), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
   }
 
@@ -155,7 +155,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     tenantProvisionerService.writeTenantSpecification(new TenantSpecification("companyX", 0, 100, 1000));
 
     // perform request to delete tenant
-    HttpResponse response = doDelete("/v1/tenants/" + id, SUPERADMIN_HEADERS);
+    HttpResponse response = doDelete("/tenants/" + id, SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     Assert.assertNull(tenantStore.getTenantByID(id));
@@ -170,7 +170,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     tenantProvisionerService.rebalanceTenantWorkers(id);
 
     // perform request to delete tenant
-    assertResponseStatus(doDelete("/v1/tenants/" + name, SUPERADMIN_HEADERS), HttpResponseStatus.CONFLICT);
+    assertResponseStatus(doDelete("/tenants/" + name, SUPERADMIN_HEADERS), HttpResponseStatus.CONFLICT);
   }
 
   @Test
@@ -180,7 +180,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     tenantProvisionerService.writeTenantSpecification(spec);
 
     // perform request to get tenant
-    HttpResponse response = doGet("/v1/tenants/" + spec.getName(), SUPERADMIN_HEADERS);
+    HttpResponse response = doGet("/tenants/" + spec.getName(), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     Assert.assertEquals(spec, gson.fromJson(reader, TenantSpecification.class));
@@ -195,7 +195,7 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     tenantProvisionerService.writeTenantSpecification(spec2);
 
     // perform request to get tenant
-    HttpResponse response = doGet("/v1/tenants", SUPERADMIN_HEADERS);
+    HttpResponse response = doGet("/tenants", SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     Set<Tenant> actualTenants = gson.fromJson(reader, new TypeToken<Set<TenantSpecification>>() {}.getType());
@@ -205,23 +205,23 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
   @Test
   public void testBadRequestReturns400() throws Exception {
     // test malformed requests
-    assertResponseStatus(doPost("/v1/tenants", "{}", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
-    assertResponseStatus(doPost("/v1/tenants", "", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPost("/tenants", "{}", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPost("/tenants", "", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
 
     // id in object does not match id in path
     TenantSpecification tenantSpecification = new TenantSpecification("name", 10, 10, 10);
-    assertResponseStatus(doPut("/v1/tenants/10", gson.toJson(tenantSpecification), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPut("/tenants/10", gson.toJson(tenantSpecification), SUPERADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // missing id in object
     tenantSpecification = new TenantSpecification("name", 10, 10, 10);
-    assertResponseStatus(doPut("/v1/tenants/10", gson.toJson(tenantSpecification), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPut("/tenants/10", gson.toJson(tenantSpecification), SUPERADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 
   @Test
   public void testMissingObjectReturn404() throws Exception {
-    assertResponseStatus(doGet("/v1/tenants/123", SUPERADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGet("/tenants/123", SUPERADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
   }
 
   @Test
@@ -246,9 +246,9 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     tenantStore.writeTenant(
       new Tenant(ADMIN_ACCOUNT.getTenantId(), new TenantSpecification(TENANT, 500, 1000, 10000)));
     ProviderType type = Entities.ProviderTypeExample.RACKSPACE;
-    assertResponseStatus(doPut("/v1/loom/providertypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
+    assertResponseStatus(doPut("/plugins/providertypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doDelete("/v1/loom/providertypes/" + type.getName(), ADMIN_HEADERS),
+    assertResponseStatus(doDelete("/plugins/providertypes/" + type.getName(), ADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
   }
 
@@ -257,15 +257,15 @@ public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
     tenantStore.writeTenant(
       new Tenant(ADMIN_ACCOUNT.getTenantId(), new TenantSpecification(TENANT, 500, 1000, 10000)));
     AutomatorType type = Entities.AutomatorTypeExample.CHEF;
-    assertResponseStatus(doPut("/v1/loom/automatortypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
+    assertResponseStatus(doPut("/plugins/automatortypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doDelete("/v1/loom/automatortypes/" + type.getName(), ADMIN_HEADERS),
+    assertResponseStatus(doDelete("/plugins/automatortypes/" + type.getName(), ADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
   }
 
   private void testNonPostRestAPIs(String entityType, JsonObject entity1, JsonObject entity2,
                                    Header[] headers) throws Exception {
-    String base = "/v1/loom/" + entityType;
+    String base = "/plugins/" + entityType;
     String entity1Path = base + "/" + entity1.get("name").getAsString();
     String entity2Path = base + "/" + entity2.get("name").getAsString();
     // should start off with no entities

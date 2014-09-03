@@ -16,11 +16,12 @@
 package com.continuuity.loom.layout;
 
 import com.continuuity.loom.Entities;
-import com.continuuity.loom.admin.ClusterTemplate;
-import com.continuuity.loom.admin.Compatibilities;
-import com.continuuity.loom.admin.Constraints;
-import com.continuuity.loom.admin.LayoutConstraint;
-import com.continuuity.loom.admin.ServiceConstraint;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.ServiceConstraint;
+import com.continuuity.loom.spec.template.SizeConstraint;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -155,7 +156,8 @@ public class ClusterLayoutTest {
           ImmutableSet.of("datanode", "reactor"),
           ImmutableSet.of("namenode", "reactor")
         )
-      )
+      ),
+      SizeConstraint.EMPTY
     );
   }
 }

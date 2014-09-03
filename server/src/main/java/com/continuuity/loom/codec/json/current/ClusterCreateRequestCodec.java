@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.layout.ClusterCreateRequest;
+import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.layout.ClusterCreateRequest}, used so some validation is done
- * on required fields.
+ * Codec for deserializing a {@link com.continuuity.loom.http.request.ClusterCreateRequest}, used so some validation
+ * is done on required fields.
  */
 public class ClusterCreateRequestCodec implements JsonDeserializer<ClusterCreateRequest> {
 
@@ -38,22 +38,21 @@ public class ClusterCreateRequestCodec implements JsonDeserializer<ClusterCreate
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    String name = context.deserialize(jsonObj.get("name"), String.class);
-    String description = context.deserialize(jsonObj.get("description"), String.class);
-    String clusterTemplate = context.deserialize(jsonObj.get("clusterTemplate"), String.class);
-    Integer numMachines = context.deserialize(jsonObj.get("numMachines"), Integer.class);
-    String provider = context.deserialize(jsonObj.get("provider"), String.class);
-    Map<String, String> providerFields =
-      context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, String>>() {}.getType());
-    Set<String> services = context.deserialize(jsonObj.get("services"),
-                                               new TypeToken<Set<String>>() {}.getType());
-    String hardwaretype = context.deserialize(jsonObj.get("hardwaretype"), String.class);
-    String imagetype = context.deserialize(jsonObj.get("imagetype"), String.class);
-    Long initialLeaseDuration = context.deserialize(jsonObj.get("initialLeaseDuration"), Long.class);
-    String dnsSuffix = context.deserialize(jsonObj.get("dnsSuffix"), String.class);
-    JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
-
-    return new ClusterCreateRequest(name, description, clusterTemplate, numMachines, provider, providerFields,
-                                    services, hardwaretype, imagetype, initialLeaseDuration, dnsSuffix, config);
+    return ClusterCreateRequest.builder()
+      .setName(context.<String>deserialize(jsonObj.get("name"), String.class))
+      .setDescription(context.<String>deserialize(jsonObj.get("description"), String.class))
+      .setClusterTemplateName(context.<String>deserialize(jsonObj.get("clusterTemplate"), String.class))
+      .setNumMachines(context.<Integer>deserialize(jsonObj.get("numMachines"), Integer.class))
+      .setProviderName(context.<String>deserialize(jsonObj.get("provider"), String.class))
+      .setHardwareTypeName(context.<String>deserialize(jsonObj.get("hardwaretype"), String.class))
+      .setImageTypeName(context.<String>deserialize(jsonObj.get("imagetype"), String.class))
+      .setInitialLeaseDuration(context.<Long>deserialize(jsonObj.get("initialLeaseDuration"), Long.class))
+      .setDNSSuffix(context.<String>deserialize(jsonObj.get("dnsSuffix"), String.class))
+      .setConfig(context.<JsonObject>deserialize(jsonObj.get("config"), JsonObject.class))
+      .setServiceNames(context.<Set<String>>deserialize(jsonObj.get("services"),
+                                                        new TypeToken<Set<String>>() {}.getType()))
+      .setProviderFields(context.<Map<String, String>>deserialize(jsonObj.get("providerFields"),
+                                                                  new TypeToken<Map<String, String>>() {}.getType()))
+      .build();
   }
 }

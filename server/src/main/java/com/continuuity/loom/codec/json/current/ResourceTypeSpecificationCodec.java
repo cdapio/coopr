@@ -16,9 +16,9 @@
 
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.ResourceTypeFormat;
-import com.continuuity.loom.admin.ResourceTypeSpecification;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,6 +37,7 @@ public class ResourceTypeSpecificationCodec extends AbstractCodec<ResourceTypeSp
     JsonObject jsonObj = new JsonObject();
 
     jsonObj.add("format", context.serialize(spec.getFormat()));
+    jsonObj.add("permissions", context.serialize(spec.getPermissions()));
 
     return jsonObj;
   }
@@ -47,7 +48,8 @@ public class ResourceTypeSpecificationCodec extends AbstractCodec<ResourceTypeSp
     JsonObject jsonObj = json.getAsJsonObject();
 
     ResourceTypeFormat format = context.deserialize(jsonObj.get("format"), ResourceTypeFormat.class);
+    String permissions = context.deserialize(jsonObj.get("permissions"), String.class);
 
-    return new ResourceTypeSpecification(format);
+    return new ResourceTypeSpecification(format, permissions);
   }
 }

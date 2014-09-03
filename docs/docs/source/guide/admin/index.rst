@@ -22,10 +22,6 @@ Administration Guide
 
    overview
    ../installation/index
-   server-config
-   callbacks
    ui
    macros
-   plugins
-   monitoring
-   ../bcp/index
+   plugin-resources

@@ -18,56 +18,6 @@ To learn more about Continuuity Loom, here are the resources available:
       * [Documentation 0.9.6](http://www.continuuity.com/docs/loom/0.9.6/en/index.html)
       * [Documentation 0.9.5](http://www.continuuity.com/docs/loom/0.9.5/en/index.html)
 
-## Building Source
-
-**Backend Java Server**
-
-_Prerequisites_
-  * [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
-    * Set JAVA_HOME environment variable
-  * [Maven](http://maven.apache.org/download.cgi)
-    * brew install maven (Mac OSX)
-
-**Provisioner**
-
-_Prerequisites_
-  * [Ruby](https://www.ruby-lang.org/en/downloads/) 
-    * [rbenv](https://github.com/sstephenson/rbenv/releases)
-      * brew install rbenv (Mac OSX)
-      * rbenv install (>=1.9.3)
-      
-_Build_
-  * cd to source provisioner directory loom/provisioner
-  * `bundler install`
-
-**NodeJS - Front end server**
-
-_Prerequisites_
-  * [Node Package Manager](http://nodejs.org/download/)
-    * brew install node (Mac OSX)
-    
-_Build_
-  * cd to source ui directory loom/ui
-  * `npm install`
-
-## Running Source
-**Backend Java Server**
-
-_Prerequisites_
-
-**Provisioner**
-
-_Prerequisites_
-  
-**NodeJS - Front end server**
-
-_Prerequisites_
-  
-
-## Run in IntelliJ
-
-TODO
-
 ## Contributing to Continuuity Loom
 
 Are you interested in making Continuuity Loom better? Our development model is a simple pull-based model with a consensus building phase, similar to the Apache's voting process. If you want to help make Continuuity Loom better, by adding new features, fixing bugs, or suggesting improvements to something that's already there, here's how you can contribute:

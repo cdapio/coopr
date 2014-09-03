@@ -13,26 +13,31 @@
       "hbase-regionserver"
     ],
     "provider": "rackspace",
-    "hardwaretype": "large",
+    "hardwaretype": "standard-large",
     "imagetype": "ubuntu12",
     "config": {
       "hadoop": {
         "core_site": {
-          "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%"
+          "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
+          "io.file.buffer.size": "131072",
+          "hadoop.tmp.dir": "/data/hadoop"
         },
         "hdfs_site": {
           "dfs.datanode.max.transfer.threads": "4096",
-          "dfs.replication": "2"
+          "dfs.replication": "2",
+          "dfs.namenode.rpc-bind-host": "%ip.bind_v4.self%",
+          "dfs.namenode.servicerpc-bind-host": "%ip.bind_v4.self%",
+          "dfs.namenode.datanode.registration.ip-hostname-check": "false"
         },
         "mapred_site": {
           "mapreduce.framework.name": "yarn"
         },
         "yarn_site": {
-          "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
-          "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033",
           "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+          "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030",
           "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
-          "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030"
+          "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+          "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033"
         }
       },
       "hbase": {
@@ -57,16 +62,22 @@
         "server_debian_password": "somedefaultpassword",
         "server_root_password": "somedefaultpassword",
         "server_repl_password": "somedefaultpassword",
+        "data_dir": "/data/mysql",
+        "server": {
+          "directories": {
+            "log_dir": "/data/mysql"
+          }
+        },
         "bind_address": "%ip.bind_v4.service.mysql-server%"
       }
     }
   },
   "compatibility": {
     "hardwaretypes": [
-      "medium",
-      "large",
-      "xlarge",
-      "xxlarge"
+      "standard-medium",
+      "standard-large",
+      "standard-xlarge",
+      "standard-xxlarge"
     ],
     "imagetypes": [
       "centos6",
@@ -78,6 +89,7 @@
       "hadoop-hdfs-datanode",
       "hadoop-yarn-resourcemanager",
       "hadoop-yarn-nodemanager",
+      "hadoop-mapreduce-historyserver",
       "zookeeper-server",
       "hbase-master",
       "hbase-regionserver",
@@ -88,6 +100,9 @@
     ]
   },
   "constraints": {
+    "size": {
+      "min": "3"
+    },
     "layout": {
       "mustcoexist": [
         [
@@ -98,6 +113,7 @@
         [
           "hadoop-hdfs-namenode",
           "hadoop-yarn-resourcemanager",
+          "hadoop-mapreduce-historyserver",
           "hbase-master",
           "mysql-server",
           "hive-metastore-database",
@@ -120,6 +136,12 @@
         }
       },
       "hadoop-yarn-resourcemanager": {
+        "quantities": {
+          "min": "1",
+          "max": "1"
+        }
+      },
+      "hadoop-mapreduce-historyserver": {
         "quantities": {
           "min": "1",
           "max": "1"

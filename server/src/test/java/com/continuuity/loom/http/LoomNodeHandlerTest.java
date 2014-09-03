@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.http;
 
-import com.continuuity.loom.admin.Service;
+import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.google.common.base.Charsets;
@@ -90,7 +90,7 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
   @Test
   public void testDeleteNodeAsUser() throws Exception {
     Node node = postNodes(1, USER1_HEADERS).get(0);
-    HttpResponse response = doDelete("/v1/loom/nodes/" + node.getId(), USER1_HEADERS);
+    HttpResponse response = doDelete("/nodes/" + node.getId(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.NO_CONTENT);
     List<JsonObject> nodes = getNodes(USER1_HEADERS);
     Assert.assertEquals(0, nodes.size());
@@ -103,7 +103,7 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
     propertiesBuilder.setHostname("my-updated-host");
     Node updatedNode = createNode(node.getId(),node.getClusterId(), node.getServices(), propertiesBuilder.build());
     String updatedNodeJsonString = getNodeAsJsonString(updatedNode);
-    HttpResponse response = doPut("/v1/loom/nodes/" + node.getId(), updatedNodeJsonString, USER1_HEADERS);
+    HttpResponse response = doPut("/nodes/" + node.getId(), updatedNodeJsonString, USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.NO_CONTENT);
     Node updatedNodeFromServer = convertNodeFromJson(getNode(USER1_HEADERS, updatedNode.getId()));
     Assert.assertEquals(node.getId(), updatedNodeFromServer.getId());
@@ -111,13 +111,13 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
   }
 
   private List<JsonObject> getNodes(final Header[] headers) throws Exception {
-    HttpResponse response = doGet("/v1/loom/nodes", headers);
+    HttpResponse response = doGet("/nodes", headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     return getJsonListFromResponse(response);
   }
 
   private JsonObject getNode(final Header[] headers, final String nodeId) throws Exception {
-    HttpResponse response = doGet("/v1/loom/nodes/" + nodeId, headers);
+    HttpResponse response = doGet("/nodes/" + nodeId, headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     return getJsonObjectFromResponse(response);
   }
@@ -125,7 +125,7 @@ public class LoomNodeHandlerTest extends LoomServiceTestBase {
   private List<Node> postNodes(int numberOfNodes, Header[] headers) throws Exception {
     List<Node> nodes = createNodes(numberOfNodes);
     for (Node node : nodes) {
-      HttpResponse response = doPost("/v1/loom/nodes", gson.toJson(node), headers);
+      HttpResponse response = doPost("/nodes", gson.toJson(node), headers);
       assertResponseStatus(response, HttpResponseStatus.CREATED);
     }
     return nodes;

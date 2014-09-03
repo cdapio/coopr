@@ -15,7 +15,6 @@
  */
 package com.continuuity.loom.scheduler.task;
 
-import com.continuuity.loom.admin.ProvisionerAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
@@ -25,8 +24,10 @@ import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.scheduler.Actions;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.CallbackData;
+import com.continuuity.loom.spec.ProvisionerAction;
 import com.continuuity.loom.store.cluster.ClusterStore;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
+import com.continuuity.loom.store.credential.CredentialStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -45,6 +46,7 @@ public class TaskService {
   private static final Logger LOG = LoggerFactory.getLogger(TaskService.class);
 
   private final ClusterStore clusterStore;
+  private final CredentialStore credentialStore;
   private final Actions actions = Actions.getInstance();
   private final LoomStats loomStats;
   private final IdService idService;
@@ -53,11 +55,13 @@ public class TaskService {
 
   @Inject
   private TaskService(ClusterStoreService clusterStoreService,
+                      CredentialStore credentialStore,
                       LoomStats loomStats,
                       @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
                       IdService idService,
                       Gson gson) {
     this.clusterStore = clusterStoreService.getSystemView();
+    this.credentialStore = credentialStore;
     this.loomStats = loomStats;
     this.idService = idService;
     this.gson = gson;
@@ -70,18 +74,14 @@ public class TaskService {
    * @param task Task that needs to get rolled back.
    * @return Cluster task that will roll back the given failed task.
    */
-  public ClusterTask getRollbackTask(ClusterTask task) {
+  private ClusterTask getRollbackTask(ClusterTask task) {
     ProvisionerAction rollback = actions.getRollbackActions().get(task.getTaskName());
     if (rollback == null) {
       return null;
     }
 
-    // Note: rollback tasks do not have nodeId
-    // There are cases when we don't associate a nodeId with a task so that the node properties don't get overridden
-    // by the task output.
-    // Eg. deleting a box during a rollback operation since we reuse nodeIds.
     TaskId rollbackTaskId = idService.getNewTaskId(JobId.fromString(task.getJobId()));
-    ClusterTask rollbackTask = new ClusterTask(rollback, rollbackTaskId, null,
+    ClusterTask rollbackTask = new ClusterTask(rollback, rollbackTaskId, task.getNodeId(),
                                                task.getService(), task.getClusterAction());
 
     return rollbackTask;
@@ -90,7 +90,7 @@ public class TaskService {
   /**
    * Get tasks that must be run in order to retry the given task that failed on a given node in a given cluster.
    * For example, to retry a service installation, we just retry the task again. However, to retry a node confirm,
-   * we need to create another node first and then confirm that node.
+   * we need to first delete the created node, create another node, and then confirm that node.
    *
    * @param task Task that failed and must be retried.
    * @return List of tasks that must be executed to retry the given failed task.
@@ -109,6 +109,12 @@ public class TaskService {
     }
 
     List<ClusterTask> retryTasks = Lists.newArrayList();
+    // check if the task needs to be rolled back. Currently only the case for confirm tasks, which need to delete
+    // the node they were confirming before they can create another node.
+    ClusterTask rollbackTask = getRollbackTask(task);
+    if (rollbackTask != null) {
+      retryTasks.add(rollbackTask);
+    }
     // Create tasks from retry task to current task.
     int retryActionIndex = taskOrder.indexOf(retryAction);
     int currentActionIndex = taskOrder.indexOf(task.getTaskName());
@@ -227,6 +233,9 @@ public class TaskService {
     clusterStore.writeCluster(cluster);
 
     loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
+    if (job.getClusterAction() == ClusterAction.CLUSTER_DELETE) {
+      wipeSensitiveFields(cluster);
+    }
     callbackQueues.add(cluster.getAccount().getTenantId(),
                        new Element(gson.toJson(new CallbackData(CallbackData.Type.SUCCESS, cluster, job))));
   }
@@ -301,4 +310,10 @@ public class TaskService {
     loomStats.getSuccessfulProvisionerStats().incrementStat(clusterTask.getTaskName());
   }
 
+  private void wipeSensitiveFields(Cluster cluster) throws IOException {
+    String tenantId = cluster.getAccount().getTenantId();
+    String clusterId = cluster.getId();
+    LOG.trace("wiping credentials for cluster {} with account {}.", cluster.getId(), cluster.getAccount());
+    credentialStore.wipe(tenantId, clusterId);
+  }
 }

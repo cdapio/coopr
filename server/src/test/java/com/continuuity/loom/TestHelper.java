@@ -43,7 +43,7 @@ public class TestHelper {
   public static final NodeProperties EMPTY_NODE_PROPERTIES = NodeProperties.builder().build();
 
   public static SchedulableTask takeTask(String loomUrl, TakeTaskRequest request) throws Exception {
-    HttpPost httpPost = new HttpPost(String.format("%s/v1/loom/tasks/take", loomUrl));
+    HttpPost httpPost = new HttpPost(String.format("%s/tasks/take", loomUrl));
     httpPost.setEntity(new StringEntity(GSON.toJson(request)));
 
     CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -60,7 +60,7 @@ public class TestHelper {
   }
 
   public static void finishTask(String loomUrl, FinishTaskRequest finishRequest) throws Exception {
-    HttpPost httpPost = new HttpPost(String.format("%s/v1/loom/tasks/finish", loomUrl));
+    HttpPost httpPost = new HttpPost(String.format("%s/tasks/finish", loomUrl));
     httpPost.setEntity(new StringEntity(GSON.toJson(finishRequest)));
 
     CloseableHttpClient httpClient = HttpClients.createDefault();

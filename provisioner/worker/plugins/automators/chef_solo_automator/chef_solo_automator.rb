@@ -202,7 +202,7 @@ class ChefSoloAutomator < Automator
 
     @result['status'] = 0
 
-    log.info "ChefSoloAutomator bootstrap completed successfully: #{@result}"
+    log.debug "ChefSoloAutomator bootstrap completed successfully: #{@result}"
     @result
   end
 
@@ -259,37 +259,37 @@ class ChefSoloAutomator < Automator
     end
 
     @result['status'] = 0
-    log.info "Chef-solo run completed successfully for task #{@task['taskId']}: #{@result}"
+    log.debug "Chef-solo run completed successfully for task #{@task['taskId']}: #{@result}"
     @result
   end
 
   def install(inputmap)
-    log.info "ChefSoloAutomator performing install task #{@task['taskId']}"
+    log.debug "ChefSoloAutomator performing install task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def configure(inputmap)
-    log.info "ChefSoloAutomator performing configure task #{@task['taskId']}"
+    log.debug "ChefSoloAutomator performing configure task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def init(inputmap)
-    log.info "ChefSoloAutomator performing initialize task #{@task['taskId']}"
+    log.debug "ChefSoloAutomator performing initialize task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def start(inputmap)
-    log.info "ChefSoloAutomator performing start task #{@task['taskId']}"
+    log.debug "ChefSoloAutomator performing start task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def stop(inputmap)
-    log.info "ChefSoloAutomator performing stop task #{@task['taskId']}"
+    log.debug "ChefSoloAutomator performing stop task #{@task['taskId']}"
     runchef(inputmap)
   end
 
   def remove(inputmap)
-    log.info "ChefSoloAutomator performing remove task #{@task['taskId']}"
+    log.debug "ChefSoloAutomator performing remove task #{@task['taskId']}"
     runchef(inputmap)
   end
 

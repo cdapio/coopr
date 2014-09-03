@@ -15,8 +15,8 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.admin.HardwareType;
 import com.continuuity.loom.codec.json.AbstractCodec;
+import com.continuuity.loom.spec.HardwareType;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -37,6 +37,7 @@ public class HardwareTypeCodec extends AbstractCodec<HardwareType> {
     JsonObject jsonObj = new JsonObject();
 
     jsonObj.add("name", context.serialize(hardwareType.getName()));
+    jsonObj.add("icon", context.serialize(hardwareType.getIcon()));
     jsonObj.add("description", context.serialize(hardwareType.getDescription()));
     jsonObj.add("providermap", context.serialize(hardwareType.getProviderMap()));
 
@@ -49,10 +50,11 @@ public class HardwareTypeCodec extends AbstractCodec<HardwareType> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
+    String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
     Map<String, Map<String, String>> providerMap =
       context.deserialize(jsonObj.get("providermap"), new TypeToken<Map<String, Map<String, String>>>() {}.getType());
 
-    return new HardwareType(name, description, providerMap);
+    return new HardwareType(name, icon, description, providerMap);
   }
 }

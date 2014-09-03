@@ -112,8 +112,14 @@ public class ClusterLayoutUpdaterTest extends BaseSolverTest {
       nodeIds.add(node.getId());
       nodes.add(node);
     }
-    cluster = new Cluster(clusterId, new Account("user1", "tenant1"), "hadoop", System.currentTimeMillis(),
-                          "hadoop cluster", Entities.ProviderExample.RACKSPACE, reactorTemplate, nodeIds,
-                          ImmutableSet.of(namenode.getName(), datanode.getName()));
+    cluster = Cluster.builder()
+      .setID(clusterId)
+      .setAccount(new Account("user1", "tenant1"))
+      .setName("hadoop")
+      .setProvider(Entities.ProviderExample.RACKSPACE)
+      .setClusterTemplate(reactorTemplate)
+      .setNodes(nodeIds)
+      .setServices(ImmutableSet.of(namenode.getName(), datanode.getName()))
+      .build();
   }
 }
