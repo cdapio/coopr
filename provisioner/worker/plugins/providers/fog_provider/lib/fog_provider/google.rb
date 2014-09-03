@@ -62,7 +62,10 @@ class FogProviderGoogle < Provider
       server = connection.servers.create(create_server_def)
 
       # Process results
+      # use the server name as the unique key
       @result['result']['providerid'] = server.name
+      # hostname will also be the server name
+      @result['hostname'] = server.name
       # set ssh user
       ssh_user =
         if @task['config']['sshuser'].to_s != ''
