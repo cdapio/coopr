@@ -33,7 +33,7 @@ class FogProviderOpenstack < Provider
         instance_variable_set('@' + k, v)
       end
       # Create the server
-      log.info "Creating #{hostname} on Openstack using flavor: #{flavor}, image: #{image}"
+      log.debug "Creating #{hostname} on Openstack using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
       begin
         server = connection.servers.create(

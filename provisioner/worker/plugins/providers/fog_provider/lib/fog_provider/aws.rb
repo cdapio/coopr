@@ -40,7 +40,7 @@ class FogProviderAWS < Provider
       # Run EC2 credential validation
       validate!
       # Create the server
-      log.info "Creating #{hostname} on AWS using flavor: #{flavor}, image: #{image}"
+      log.debug "Creating #{hostname} on AWS using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
       server = connection.servers.create(create_server_def)
       # Process results
