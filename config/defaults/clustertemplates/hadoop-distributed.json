@@ -24,7 +24,10 @@
         },
         "hdfs_site": {
           "dfs.datanode.max.transfer.threads": "4096",
-          "dfs.replication": "2"
+          "dfs.replication": "2",
+          "dfs.namenode.rpc-bind-host": "%ip.bind_v4.self%",
+          "dfs.namenode.servicerpc-bind-host": "%ip.bind_v4.self%",
+          "dfs.namenode.datanode.registration.ip-hostname-check": "false"
         },
         "mapred_site": {
           "mapreduce.framework.name": "yarn"
