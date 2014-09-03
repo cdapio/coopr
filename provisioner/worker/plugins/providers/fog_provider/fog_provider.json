@@ -142,30 +142,6 @@
             "type": "text",
             "tip": "Path to your P12 key, as downloaded from GCE encrypted with their default passphrase (notasecret)"
           },
-          "ssh_keyfile": {
-            "label": "ssh private key file",
-            "type": "text",
-            "override": true,
-            "tip": "Full path and file name to your GCE SSH private key"
-          },
-          "ssh_username": {
-            "label": "ssh username",
-            "type": "text",
-            "override": true,
-            "tip": "SSH username to use. Must match private key file, and have sudo permissions"
-          },
-          "data_disk_size_gb": {
-            "label": "Data disk size in Gb",
-            "type": "text",
-            "override": true,
-            "tip": "Size of the persistent disk to be created and mounted to /data"
-          },
-          "network": {
-            "label": "Network",
-            "type": "text",
-            "override": true,
-            "tip": "GCE custom network"
-          },
           "zone_name": {
             "label": "Zone",
             "type": "select",
@@ -185,11 +161,45 @@
           }
         },
         "required": [
-          [ "project_id" ],
-          [ "client_email" ],
-          [ "key_location" ],
-          [ "ssh_keyfile" ],
-          [ "zone_name" ]
+          [
+            "project_id",
+            "client_email",
+            "key_location",
+            "zone_name"
+          ]
+        ]
+      },
+      "user": {
+        "fields": {
+          "ssh_keyfile": {
+            "label": "ssh private key file",
+            "type": "text",
+            "tip": "Full path and file name to your GCE SSH private key"
+          },
+          "ssh_username": {
+            "label": "ssh username",
+            "type": "text",
+            "override": true,
+            "tip": "SSH username to use. Must match private key file, and have sudo permissions"
+          },
+          "data_disk_size_gb": {
+            "label": "Data disk size in Gb",
+            "type": "text",
+            "override": true,
+            "tip": "Size of the persistent disk to be created and mounted to /data"
+          },
+          "network": {
+            "label": "Network",
+            "type": "text",
+            "override": true,
+            "tip": "GCE custom network"
+          }
+        },
+        "required": [
+          [
+            "ssh_keyfile",
+            "ssh_username"
+          ]
         ]
       }
     }
