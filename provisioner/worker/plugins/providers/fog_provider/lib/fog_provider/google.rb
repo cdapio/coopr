@@ -31,7 +31,7 @@ class FogProviderGoogle < Provider
     @hostname = @hostname[/[a-zA-Z0-9\-]*/]
     fields = inputmap['fields']
     begin
-      # Our fields are fog symbols
+      # set instance variables from our fields
       fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
@@ -43,8 +43,8 @@ class FogProviderGoogle < Provider
       # disks are managed separately, so CREATE must first create and confirm the disk to be usedd
       # handle boot disk
       create_disk(@hostname, nil, @zone_name, @image)
-      confirm_disk(@hostname)
-      disk = connection.disks.get(@hostname)
+      disk = confirm_disk(@hostname)
+      #disk = connection.disks.get(@hostname)
 
       @disks = [disk]
 
@@ -53,8 +53,8 @@ class FogProviderGoogle < Provider
         data_disk_name = "#{@hostname}-data"
         log.debug "Creating data disk: #{data_disk_name} of size #{fields['data_disk_size_gb']}"
         create_disk(data_disk_name, fields['data_disk_size_gb'], @zone_name, nil)
-        confirm_disk(data_disk_name)
-        data_disk = connection.disks.get(data_disk_name)
+        data_disk = confirm_disk(data_disk_name)
+        #data_disk = connection.disks.get(data_disk_name)
         @disks.push(data_disk)
       end
 
@@ -64,9 +64,17 @@ class FogProviderGoogle < Provider
       # Process results
       @result['result']['providerid'] = server.name
       # set ssh user
-      ssh_user = 'root'
-      ssh_user = @ssh_username unless @ssh_username.to_s == ''
-      ssh_user = @task['config']['sshuser'] unless @task['config']['sshuser'].to_s == ''
+      ssh_user =
+        if @task['config']['sshuser'].to_s != ''
+          # prefer ssh-user as defined by image
+          @task['config']['ssh_user']
+        elsif @ssh_username.to_s != ''
+          # use ssh_user as specified in provider field
+          @ssh_username
+        else
+          # default to root
+          'root'
+        end
       @result['result']['ssh-auth']['user'] = ssh_user
       @result['result']['ssh-auth']['identityfile'] = @ssh_keyfile unless @ssh_keyfile.to_s == ''
       @result['status'] = 0
@@ -80,39 +88,11 @@ class FogProviderGoogle < Provider
     end
   end
 
-  def create_server_def
-    server_def = {
-      name: @hostname,
-      disks: @disks,
-      machine_type: @flavor,
-      zone_name: @zone_name,
-      tags: ['coopr']
-    }
-    # optional attrs
-    server_def[:network] = @network unless @network.to_s == ''
-    server_def
-  end
-
-  def create_disk(name, size_gb = 10, zone_name, source_image)
-    args = {}
-    args[:name] = name
-    args[:size_gb] = size_gb
-    args[:zone_name] = zone_name
-    args[:source_image] = source_image unless source_image.nil?
-    disk = connection.disks.create(args)
-    disk.name
-  end
-
-  def confirm_disk(name)
-    disk = connection.disks.get(name)
-    disk.wait_for(120) { disk.ready? }
-  end
-
   def confirm(inputmap)
     providerid = inputmap['providerid']
     fields = inputmap['fields']
     begin
-      # Our fields are fog symbols
+      # set instance variables from our fields
       fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
@@ -211,7 +191,7 @@ class FogProviderGoogle < Provider
     providerid = inputmap['providerid']
     fields = inputmap['fields']
     begin
-      # Our fields are fog symbols
+      # set instance variables from our fields
       fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
@@ -241,7 +221,6 @@ class FogProviderGoogle < Provider
           log.debug 'disk no longer found'
         end
       end
-      # Return 0
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.delete:' + e.inspect)
@@ -253,7 +232,6 @@ class FogProviderGoogle < Provider
     end
   end
 
-  # Shared definitions (borrowed from knife-ec2 gem, Apache 2.0 license)
 
   def connection
     # Create connection
@@ -267,6 +245,36 @@ class FogProviderGoogle < Provider
       )
     end
     # rubocop:enable UselessAssignment
+  end
+
+  def create_server_def
+    server_def = {
+      name: @hostname,
+      disks: @disks,
+      machine_type: @flavor,
+      zone_name: @zone_name,
+      tags: ['coopr']
+    }
+    # optional attrs
+    server_def[:network] = @network unless @network.to_s == ''
+    server_def
+  end
+
+  def create_disk(name, size_gb = 10, zone_name, source_image)
+    args = {}
+    args[:name] = name
+    args[:size_gb] = size_gb
+    args[:zone_name] = zone_name
+    args[:source_image] = source_image unless source_image.nil?
+    disk = connection.disks.create(args)
+    disk.name
+  end
+
+  def confirm_disk(name)
+    disk = connection.disks.get(name)
+    disk.wait_for(120) { disk.ready? }
+    disk.reload
+    disk
   end
 
   def validate!
