@@ -82,11 +82,11 @@ class FogProviderGoogle < Provider
 
   def create_server_def
     server_def = {
-      :name         => @hostname,
-      :disks        => @disks,
-      :machine_type => @flavor,
-      :zone_name    => @zone_name,
-      :tags         => ['coopr']
+      name: @hostname,
+      disks: @disks,
+      machine_type: @flavor,
+      zone_name: @zone_name,
+      tags: ['coopr']
     }
     # optional attrs
     server_def[:network] = @network unless @network.to_s == ''
@@ -260,10 +260,10 @@ class FogProviderGoogle < Provider
     # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
-        :provider            => 'google',
-        :google_project      => @project_id,
-        :google_client_email => @client_email,
-        :google_key_location => @key_location
+        provider: 'google',
+        google_project: @project_id,
+        google_client_email: @client_email,
+        google_key_location: @key_location
       )
     end
     # rubocop:enable UselessAssignment
