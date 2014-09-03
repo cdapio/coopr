@@ -89,12 +89,6 @@ class FogProviderGoogle < Provider
       :tags => ['coopr']
     }
     # optional attrs
-    # ephemeral ip is the default
-    if @external_ip =~ /\d+\.\d+\.\d+\.\d+/
-      server_def[:external_ip] = @external_ip
-    elsif @external_ip == 'NONE'
-      server_def[:external_ip] = false
-    end
     server_def[:network] = @network unless @network.to_s == ''
     server_def
   end
