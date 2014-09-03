@@ -38,7 +38,7 @@ class FogProviderGoogle < Provider
       # validate credentials
       validate!
       # Create the server
-      log.info "Creating #{hostname} on GCE using flavor: #{flavor}, image: #{image}"
+      log.debug "Creating #{hostname} on GCE using flavor: #{flavor}, image: #{image}"
 
       # disks are managed separately, so CREATE must first create and confirm the disk to be usedd
       # handle boot disk
@@ -51,7 +51,7 @@ class FogProviderGoogle < Provider
       # handle additional data disk
       if fields['data_disk_size_gb']
         data_disk_name = "#{@hostname}-data"
-        log.info "Creating data disk: #{data_disk_name} of size #{fields['data_disk_size_gb']}"
+        log.debug "Creating data disk: #{data_disk_name} of size #{fields['data_disk_size_gb']}"
         create_disk(data_disk_name, fields['data_disk_size_gb'], @zone_name, nil)
         confirm_disk(data_disk_name)
         data_disk = connection.disks.get(data_disk_name)
