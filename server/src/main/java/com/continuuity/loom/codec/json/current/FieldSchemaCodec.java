@@ -42,7 +42,8 @@ public class FieldSchemaCodec extends AbstractCodec<FieldSchema> {
     jsonObj.add("type", context.serialize(fieldSchema.getType()));
     jsonObj.add("tip", context.serialize(fieldSchema.getTip()));
     jsonObj.add("default", context.serialize(fieldSchema.getDefaultValue()));
-    jsonObj.add("override", context.serialize(fieldSchema.getOverride()));
+    jsonObj.add("override", context.serialize(fieldSchema.isOverride()));
+    jsonObj.add("sensitive", context.serialize(fieldSchema.isSensitive()));
     jsonObj.add("options", context.serialize(fieldSchema.getOptions()));
 
     return jsonObj;
@@ -59,6 +60,7 @@ public class FieldSchemaCodec extends AbstractCodec<FieldSchema> {
       .setTip(context.<String>deserialize(jsonObj.get("tip"), String.class))
       .setDefaultValue(context.<String>deserialize(jsonObj.get("default"), String.class))
       .setOverride(context.<Boolean>deserialize(jsonObj.get("override"), Boolean.class))
+      .setSensitive(context.<Boolean>deserialize(jsonObj.get("sensitive"), Boolean.class))
       .setOptions(context.<Set<String>>deserialize(jsonObj.get("options"), new TypeToken<Set<String>>() {}.getType()))
       .build();
   }

@@ -15,6 +15,9 @@
  */
 package com.continuuity.loom.spec.plugin;
 
+import com.continuuity.loom.common.utils.ImmutablePair;
+import com.google.common.collect.Maps;
+
 import java.util.Map;
 
 /**
@@ -27,5 +30,42 @@ public class AutomatorType extends AbstractPluginSpecification {
   public AutomatorType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
                        Map<String, ResourceTypeSpecification> resourceTypes) {
     super(name, description, parameters, resourceTypes);
+  }
+
+  /**
+   * Separate fields based on whether or not they are sensitive, and also removing fields that are not user fields and
+   * are not admin overridable.
+   *
+   * @param input Input map of fields to values
+   * @return Pair of maps of valid fields, the first containing non-sensitive fields and the second containing
+   *         sensitive fields. Maps can be empty but not null.
+   */
+  public ImmutablePair<Map<String, String>, Map<String, String>> separateFields(Map<String, String> input) {
+    Map<String, FieldSchema> adminFields = getParametersSpecification(ParameterType.ADMIN).getFields();
+    Map<String, FieldSchema> userFields = getParametersSpecification(ParameterType.USER).getFields();
+
+    Map<String, String> nonSensitive = Maps.newHashMap();
+    Map<String, String> sensitive = Maps.newHashMap();
+    for (Map.Entry<String, String> entry : input.entrySet()) {
+      String field = entry.getKey();
+      String fieldVal = entry.getValue();
+
+      // see if this is an overridable admin field
+      FieldSchema fieldSchema = adminFields.get(field);
+      if (fieldSchema == null || !fieldSchema.isOverride()) {
+        // not an overridable admin field. check if its a user field
+        fieldSchema = userFields.get(field);
+      }
+
+      // if its not a user field or an overridable admin field, ignore it
+      if (fieldSchema != null) {
+        if (fieldSchema.isSensitive()) {
+          sensitive.put(field, fieldVal);
+        } else {
+          nonSensitive.put(field, fieldVal);
+        }
+      }
+    }
+    return ImmutablePair.of(nonSensitive, sensitive);
   }
 }

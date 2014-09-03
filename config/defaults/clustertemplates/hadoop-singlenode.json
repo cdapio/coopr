@@ -33,7 +33,10 @@
           "dfs.replication": "1",
           "dfs.blocksize": "134217728",
           "dfs.namenode.handler.count": "6",
-          "dfs.datanode.handler.count": "5"
+          "dfs.datanode.handler.count": "5",
+          "dfs.namenode.rpc-bind-host": "%ip.bind_v4.self%",
+          "dfs.namenode.servicerpc-bind-host": "%ip.bind_v4.self%",
+          "dfs.namenode.datanode.registration.ip-hostname-check": "false"
         },
         "mapred_site": {
           "mapreduce.framework.name": "yarn",
@@ -117,6 +120,7 @@
       "hadoop-hdfs-datanode",
       "hadoop-yarn-resourcemanager",
       "hadoop-yarn-nodemanager",
+      "hadoop-mapreduce-historyserver",
       "zookeeper-server",
       "hbase-master",
       "hbase-regionserver",

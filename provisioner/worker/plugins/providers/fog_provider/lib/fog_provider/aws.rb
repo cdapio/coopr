@@ -40,7 +40,7 @@ class FogProviderAWS < Provider
       # Run EC2 credential validation
       validate!
       # Create the server
-      log.info "Creating #{hostname} on AWS using flavor: #{flavor}, image: #{image}"
+      log.debug "Creating #{hostname} on AWS using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
       server = connection.servers.create(create_server_def)
       # Process results
@@ -76,12 +76,21 @@ class FogProviderAWS < Provider
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
+      hostname =
+        if !server.dns_name.nil?
+          server.dns_name
+        elsif !server.public_ip_address.nil?
+          Resolv.getname(server.public_ip_address)
+        else
+          @task['config']['hostname']
+        end
+
       # Handle tags
       hashed_tags = {}
       @tags.map{ |t| key,val=t.split('='); hashed_tags[key]=val} unless @tags.nil?
       # Always set the Name tag, so we display correctly in AWS console UI
       unless hashed_tags.keys.include?('Name')
-        hashed_tags['Name'] = @task['config']['hostname']
+        hashed_tags['Name'] = hostname
       end
       create_tags(hashed_tags, providerid) unless hashed_tags.empty?
 
@@ -107,6 +116,7 @@ class FogProviderAWS < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
       }
+      @result['hostname'] = hostname
       # do we need sudo bash?
       sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
@@ -117,8 +127,11 @@ class FogProviderAWS < Provider
         if ssho.arity == 2
           log.debug 'Validating external connectivity and DNS resolution via ping'
           ssh_exec!(ssh, 'ping -c1 www.opscode.com')
+          log.debug "Setting hostname to #{hostname}"
+          ssh_exec!(ssh, "#{sudo} hostname #{hostname}")
         else
           ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+          ssh_exec!(ssh, "#{sudo} hostname #{hostname}", "Setting hostname to #{hostname}")
           # Setting up disks
           begin
             # m1.small uses /dev/xvda2 for data
@@ -317,7 +330,7 @@ class FogProviderAWS < Provider
     }
     server_def[:subnet_id] = @subnet_id if vpc_mode?
     server_def[:tenancy] = 'dedicated' if vpc_mode? && @dedicated_instance
-    server_def[:associate_public_ip] = !@associate_public_ip.nil? if vpc_mode? && @associate_public_ip
+    server_def[:associate_public_ip] = 'true' if vpc_mode? && @associate_public_ip
     server_def
   end
 

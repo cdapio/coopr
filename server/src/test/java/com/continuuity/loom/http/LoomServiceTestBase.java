@@ -51,8 +51,8 @@ public class LoomServiceTestBase extends BaseTest {
   protected static final String TENANT_ID = "tenant1";
   protected static final String PROVISIONER_ID = "provisioner1";
   protected static final String TENANT = "tenant1";
-  protected static final Account USER1_ACCOUNT = new Account(USER1, TENANT);
-  protected static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, TENANT);
+  protected static final Account USER1_ACCOUNT = new Account(USER1, TENANT_ID);
+  protected static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, TENANT_ID);
   protected static final Account SUPERADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT);
   protected static final Header[] USER1_HEADERS = {
     new BasicHeader(Constants.USER_HEADER, USER1),

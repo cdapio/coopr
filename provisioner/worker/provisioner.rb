@@ -92,6 +92,7 @@ elsif options[:log_directory]
 end
 Logging.configure(log_file)
 Logging.level = options[:log_level]
+Logging.process_name = options[:name] if options[:name]
 
 # load plugins
 pluginmanager = PluginManager.new

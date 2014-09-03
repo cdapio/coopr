@@ -16,33 +16,33 @@
 package com.continuuity.loom;
 
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.spec.template.Administration;
-import com.continuuity.loom.spec.plugin.AutomatorType;
-import com.continuuity.loom.spec.template.ClusterDefaults;
-import com.continuuity.loom.spec.template.ClusterTemplate;
-import com.continuuity.loom.spec.template.Compatibilities;
-import com.continuuity.loom.spec.template.Constraints;
-import com.continuuity.loom.spec.plugin.FieldSchema;
-import com.continuuity.loom.spec.HardwareType;
-import com.continuuity.loom.spec.ImageType;
-import com.continuuity.loom.spec.template.LayoutConstraint;
-import com.continuuity.loom.spec.template.LeaseDuration;
-import com.continuuity.loom.spec.plugin.ParameterType;
-import com.continuuity.loom.spec.plugin.ParametersSpecification;
-import com.continuuity.loom.spec.Provider;
-import com.continuuity.loom.spec.plugin.ProviderType;
-import com.continuuity.loom.spec.ProvisionerAction;
-import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
-import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
-import com.continuuity.loom.spec.service.Service;
-import com.continuuity.loom.spec.service.ServiceAction;
-import com.continuuity.loom.spec.template.ServiceConstraint;
-import com.continuuity.loom.spec.service.ServiceDependencies;
-import com.continuuity.loom.spec.service.ServiceStageDependencies;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.ProvisionerAction;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.FieldSchema;
+import com.continuuity.loom.spec.plugin.ParameterType;
+import com.continuuity.loom.spec.plugin.ParametersSpecification;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.plugin.ResourceTypeFormat;
+import com.continuuity.loom.spec.plugin.ResourceTypeSpecification;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.service.ServiceAction;
+import com.continuuity.loom.spec.service.ServiceDependencies;
+import com.continuuity.loom.spec.service.ServiceStageDependencies;
+import com.continuuity.loom.spec.template.Administration;
+import com.continuuity.loom.spec.template.ClusterDefaults;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.spec.template.Compatibilities;
+import com.continuuity.loom.spec.template.Constraints;
+import com.continuuity.loom.spec.template.LayoutConstraint;
+import com.continuuity.loom.spec.template.LeaseDuration;
+import com.continuuity.loom.spec.template.ServiceConstraint;
 import com.continuuity.loom.spec.template.SizeConstraint;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -145,6 +145,7 @@ public class Entities {
               .setLabel("key name")
               .setType("text")
               .setTip("your rackspace key name")
+              .setSensitive(true)
               .build()
           ),
           ImmutableSet.<Set<String>>of(

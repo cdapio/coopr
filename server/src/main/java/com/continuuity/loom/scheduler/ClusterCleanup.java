@@ -22,6 +22,7 @@ import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.queue.QueuedElement;
+import com.continuuity.loom.http.request.ClusterOperationRequest;
 import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.ClusterTask;
 import com.continuuity.loom.scheduler.task.NodeService;
@@ -170,7 +171,7 @@ public class ClusterCleanup implements Runnable {
         // mod check done here instead of db to avoid full table scan.
         if (Long.valueOf(cluster.getId()) % incrementBy == myMod) {
           LOG.debug("Deleting cluster {} with expire time {}", cluster.getId(), cluster.getExpireTime());
-          clusterService.requestClusterDelete(cluster.getId(), cluster.getAccount());
+          clusterService.requestClusterDelete(cluster.getId(), cluster.getAccount(), new ClusterOperationRequest(null));
         }
       }
     } catch (Throwable e) {

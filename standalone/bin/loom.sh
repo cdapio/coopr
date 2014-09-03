@@ -67,6 +67,7 @@ export LOOM_HOME=$APP_HOME
 export LOOM_SERVER_HOME=$APP_HOME/server
 export LOOM_SERVER_CONF=$LOOM_HOME/server/conf/
 export LOOM_PROVISIONER_CONF=$LOOM_HOME/provisioner/master/conf
+export PROVISIONER_SITE_CONF=$LOOM_PROVISIONER_CONF/provisioner-site.xml
 export LOOM_PROVISIONER_PLUGIN_DIR=$LOOM_HOME/provisioner/worker/plugins
 export LOOM_LOG_DIR=$LOOM_HOME/logs
 export LOOM_DATA_DIR=$LOOM_HOME/data

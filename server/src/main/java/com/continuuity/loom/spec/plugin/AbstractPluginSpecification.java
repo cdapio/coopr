@@ -24,20 +24,22 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Plugin specification.
+ * Plugin specification, including what parameters are supported and required and what types of resources are supported.
  */
 public abstract class AbstractPluginSpecification extends NamedEntity {
   private final String description;
-  private final Map<ParameterType, ParametersSpecification> parameters;
   private final Map<String, ResourceTypeSpecification> resourceTypes;
+  protected final Map<ParameterType, ParametersSpecification> parameters;
 
   public AbstractPluginSpecification(String name, String description,
                                      Map<ParameterType, ParametersSpecification> parameters,
                                      Map<String, ResourceTypeSpecification> resourceTypes) {
     super(name);
     this.description = description == null ? "" : description;
-    this.parameters = parameters == null ? ImmutableMap.<ParameterType, ParametersSpecification>of() : parameters;
-    this.resourceTypes = resourceTypes == null ? ImmutableMap.<String, ResourceTypeSpecification>of() : resourceTypes;
+    this.parameters = parameters == null ?
+      ImmutableMap.<ParameterType, ParametersSpecification>of() : ImmutableMap.copyOf(parameters);
+    this.resourceTypes = resourceTypes == null ?
+      ImmutableMap.<String, ResourceTypeSpecification>of() : ImmutableMap.copyOf(resourceTypes);
   }
 
   /**
@@ -50,7 +52,7 @@ public abstract class AbstractPluginSpecification extends NamedEntity {
   }
 
   /**
-   * Get the mapping of {@link ParameterType} to {@link ParametersSpecification} for that type.
+   * Get an immutable mapping of {@link ParameterType} to {@link ParametersSpecification} for that type.
    *
    * @return Mapping of {@link ParameterType} to {@link ParametersSpecification} for that type.
    *
@@ -60,23 +62,23 @@ public abstract class AbstractPluginSpecification extends NamedEntity {
   }
 
   /**
-   * Get the mapping of resource type to {@link ResourceTypeSpecification} for that type.
+   * Get the specification for parameters of the given type.
+   *
+   * @param parameterType Type of parameter to get.
+   * @return Specification for parameters of the given type.
+   */
+  public ParametersSpecification getParametersSpecification(ParameterType parameterType) {
+    return parameters.containsKey(parameterType) ?
+      parameters.get(parameterType) : ParametersSpecification.EMPTY_SPECIFICATION;
+  }
+
+  /**
+   * Get an immutable mapping of resource type to {@link ResourceTypeSpecification} for that type.
    *
    * @return Mapping of resource type to {@link ResourceTypeSpecification} for that type.
    */
   public Map<String, ResourceTypeSpecification> getResourceTypes() {
     return resourceTypes;
-  }
-
-  /**
-   * Get the {@link ParametersSpecification} for the given parameter type.
-   *
-   * @param parameterType Parameter type to get the specifications for.
-   * @return Specification for the given parameter type.
-   */
-  public ParametersSpecification getParametersSpecification(ParameterType parameterType) {
-    return parameters.containsKey(parameterType) ?
-      parameters.get(parameterType) : ParametersSpecification.EMPTY_SPECIFICATION;
   }
 
   /**

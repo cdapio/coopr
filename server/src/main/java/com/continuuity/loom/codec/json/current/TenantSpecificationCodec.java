@@ -36,10 +36,11 @@ public class TenantSpecificationCodec implements JsonDeserializer<TenantSpecific
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
+    String description = context.deserialize(jsonObj.get("description"), String.class);
     Integer workers = context.deserialize(jsonObj.get("workers"), Integer.class);
     Integer maxClusters = context.deserialize(jsonObj.get("maxClusters"), Integer.class);
     Integer maxNodes = context.deserialize(jsonObj.get("maxNodes"), Integer.class);
 
-    return new TenantSpecification(name, workers, maxClusters, maxNodes);
+    return new TenantSpecification(name, description, workers, maxClusters, maxNodes);
   }
 }
