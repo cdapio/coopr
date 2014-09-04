@@ -28,7 +28,9 @@ class FogProviderGoogle < Provider
     @image = inputmap['image']
     @hostname = inputmap['hostname']
     # GCE does not allow dots, including the loom-server-appended .local
-    @hostname = @hostname[/[a-zA-Z0-9\-]*/]
+    # we generate the unique providerid from the loom-hostname
+    #  and leave the loom hostname for use in /etc/hosts
+    @providerid = @hostname[/[a-zA-Z0-9\-]*/]
     fields = inputmap['fields']
     begin
       # set instance variables from our fields
@@ -38,23 +40,21 @@ class FogProviderGoogle < Provider
       # validate credentials
       validate!
       # Create the server
-      log.debug "Creating #{hostname} on GCE using flavor: #{flavor}, image: #{image}"
+      log.debug "Creating #{@providerid} on GCE using flavor: #{flavor}, image: #{image}"
 
       # disks are managed separately, so CREATE must first create and confirm the disk to be usedd
       # handle boot disk
-      create_disk(@hostname, nil, @zone_name, @image)
-      disk = confirm_disk(@hostname)
-      #disk = connection.disks.get(@hostname)
+      create_disk(@providerid, nil, @zone_name, @image)
+      disk = confirm_disk(@providerid)
 
       @disks = [disk]
 
       # handle additional data disk
       if fields['data_disk_size_gb']
-        data_disk_name = "#{@hostname}-data"
+        data_disk_name = "#{@providerid}-data"
         log.debug "Creating data disk: #{data_disk_name} of size #{fields['data_disk_size_gb']}"
         create_disk(data_disk_name, fields['data_disk_size_gb'], @zone_name, nil)
         data_disk = confirm_disk(data_disk_name)
-        #data_disk = connection.disks.get(data_disk_name)
         @disks.push(data_disk)
       end
 
@@ -62,10 +62,8 @@ class FogProviderGoogle < Provider
       server = connection.servers.create(create_server_def)
 
       # Process results
-      # use the server name as the unique key
-      @result['result']['providerid'] = server.name
-      # hostname will also be the server name
-      @result['hostname'] = server.name
+      # return the unique providerid we used
+      @result['result']['providerid'] = @providerid
       # set ssh user
       ssh_user =
         if @task['config']['sshuser'].to_s != ''
@@ -264,7 +262,7 @@ class FogProviderGoogle < Provider
 
   def create_server_def
     server_def = {
-      name: @hostname,
+      name: @providerid,
       disks: @disks,
       machine_type: @flavor,
       zone_name: @zone_name,
