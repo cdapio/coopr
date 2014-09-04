@@ -27,10 +27,9 @@ class FogProviderGoogle < Provider
     @flavor = inputmap['flavor']
     @image = inputmap['image']
     @hostname = inputmap['hostname']
-    # GCE does not allow dots, including the loom-server-appended .local
-    # we generate the unique providerid from the loom-hostname
-    # and leave the loom hostname for use in /etc/hosts
-    @providerid = @hostname[/[a-zA-Z0-9\-]*/]
+    # GCE uses the short hostname as an identifier
+    # we keep the loom hostname for use in /etc/hosts
+    @providerid = @hostname.split('.').first
     fields = inputmap['fields']
     begin
       # set instance variables from our fields
