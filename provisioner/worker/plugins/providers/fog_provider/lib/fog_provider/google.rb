@@ -137,7 +137,7 @@ class FogProviderGoogle < Provider
       # login with pseudotty and turn off sudo requiretty option
       log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
-        cmd = %Q[#{sudo} cat /etc/sudoers | sed 's/^\\(Defaults\\s\\+requiretty.*\\)$/#\\1/i' > /tmp/sudoers.new && #{sudo} visudo -c -f /tmp/sudoers.new && #{sudo} EDITOR="cp /tmp/sudoers.new" visudo && rm -f /tmp/sudoers.new]
+        cmd = %Q[#{sudo} sed -i -e sed 's/^\\(Defaults\\s\\+requiretty.*\\)$/#\\1/i' /etc/sudoers]
         ssh_exec!(ssh, cmd, 'Disabling requiretty via pseudotty session', true)
       end
 
