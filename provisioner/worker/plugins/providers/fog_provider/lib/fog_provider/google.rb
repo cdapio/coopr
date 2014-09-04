@@ -102,8 +102,8 @@ class FogProviderGoogle < Provider
       log.debug "Invoking server confirm for id: #{providerid}"
       server = connection.servers.get(providerid)
       # Wait until the server is ready
-      fail 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
-      log.debug "waiting for server to come up: #{providerid}"
+      fail "Server #{server.name} is in ERROR state" if server.state == 'ERROR'
+      log.debug "Waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
       bootstrap_ip =
@@ -135,10 +135,10 @@ class FogProviderGoogle < Provider
       set_credentials(@task['config']['ssh-auth'])
 
       # login with pseudotty and turn off sudo requiretty option
-      log.debug "attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
+      log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         cmd = %Q[#{sudo} cat /etc/sudoers | sed 's/^\\(Defaults\\s\\+requiretty.*\\)$/#\\1/i' > /tmp/sudoers.new && #{sudo} visudo -c -f /tmp/sudoers.new && #{sudo} EDITOR="cp /tmp/sudoers.new" visudo && rm -f /tmp/sudoers.new]
-        ssh_exec!(ssh, cmd, 'disabling requiretty via pseudotty session', true)
+        ssh_exec!(ssh, cmd, 'Disabling requiretty via pseudotty session', true)
       end
 
       # Validate connectivity
@@ -162,7 +162,7 @@ class FogProviderGoogle < Provider
             ssh_exec!(ssh, cmd, "mounting device #{google_disk_id} on #{mount_point}")
             # update /etc/fstab
             cmd = %Q[echo "/dev/$(basename $(readlink /dev/disk/by-id/#{google_disk_id})) #{mount_point} ext4 defaults,auto,noatime 0 2" | #{sudo} tee -a /etc/fstab]
-            ssh_exec!(ssh, cmd, "updating fstab for device #{google_disk_id} on #{mount_point}")
+            ssh_exec!(ssh, cmd, "Updating fstab for device #{google_disk_id} on #{mount_point}")
           end
         else
           log.warn "unexpected disk device found, ignoring: #{disk}"
