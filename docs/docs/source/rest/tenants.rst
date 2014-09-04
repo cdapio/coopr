@@ -88,9 +88,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin'
+        -H 'TenantID:superadmin'
+        -H 'ApiKey:<apikey>'
         -d '{"name":"my-company", "workers":10}' 
         http://<server>:<port>/<version>/tenants
 
@@ -128,9 +128,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin'
+        -H 'TenantID:superadmin'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants/my-company
  $ { "name":"my-company", "workers":10, "maxClusters":20, "maxNodes":100 }
 
@@ -169,9 +169,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin'
+        -H 'TenantID:superadmin'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants/my-company
 
 .. _tenants-modify:
@@ -234,15 +234,15 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin'
+        -H 'TenantID:superadmin'
+        -H 'ApiKey:<apikey>'
         -d '{ "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }'  
         http://<server>:<port>/<version>/tenants/my-company
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin'
+        -H 'TenantID:superadmin'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants/my-company
  $ { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }
 
@@ -278,9 +278,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin'
+        -H 'TenantID:superadmin'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants
  $ [
      { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 },

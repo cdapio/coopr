@@ -222,9 +222,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         -d '{
                 "name": "hadoop-hdfs-datanode",
                 "description": "Hadoop HDFS DataNode",
@@ -290,9 +290,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/services/small.example
  $ {
        "name": "hadoop-hdfs-datanode",
@@ -359,9 +359,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/services/example
 
 .. _service-modify:
@@ -416,9 +416,9 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         -d '{
                  "name": "myapp",
                  "description": "my application",
@@ -470,8 +470,8 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/services
 

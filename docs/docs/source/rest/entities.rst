@@ -56,9 +56,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/export
    {
      "providers":[ ... ],
@@ -101,9 +101,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         -d '{ 
               "providers":[...],
               "imagetypes":[...],

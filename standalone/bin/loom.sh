@@ -187,8 +187,8 @@ function stage_default_data () {
 function sync_default_data () {
     echo "Syncing initial data..."
     curl --silent --request POST \
-      --header "X-Loom-UserID:${LOOM_API_USER}" \
-      --header "X-Loom-TenantID:${LOOM_TENANT}" \
+      --header "UserID:${LOOM_API_USER}" \
+      --header "TenantID:${LOOM_TENANT}" \
       --connect-timeout 5 \
       http://localhost:55054/v2/plugins/sync
 }
@@ -204,8 +204,8 @@ function request_superadmin_workers () {
     echo "Requesting ${LOOM_NUM_WORKERS} workers for default tenant..."
     curl --silent --request PUT \
       --header "Content-Type:application/json" \
-      --header "X-Loom-UserID:${LOOM_API_USER}" \
-      --header "X-Loom-TenantID:${LOOM_TENANT}" \
+      --header "UserID:${LOOM_API_USER}" \
+      --header "TenantID:${LOOM_TENANT}" \
       --connect-timeout 5 --data "{\"workers\":${LOOM_NUM_WORKERS}, \"name\":\"superadmin\"}" \
       http://localhost:55054/v2/tenants/superadmin
 }
@@ -226,8 +226,8 @@ function wait_for_plugin_registration () {
     RETRIES=0
     until [[ $(curl --silent --request GET \
                  --output /dev/null --write-out "%{http_code}" \
-                 --header "X-Loom-UserID:${LOOM_API_USER}" \
-                 --header "X-Loom-TenantID:${LOOM_TENANT}" \
+                 --header "UserID:${LOOM_API_USER}" \
+                 --header "TenantID:${LOOM_TENANT}" \
                  http://localhost:55054/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
         sleep 2
         ((RETRIES++))

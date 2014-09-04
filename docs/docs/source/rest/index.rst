@@ -41,9 +41,9 @@ All URLs referenced in the documentation have the following base:
 
 The current API version is 'v2'.
 The default server port is 55054 but can be reconfigured as described in :doc:`Configuring the server </guide/admin/server-config>`. 
-In addition, three headers must be sent to all REST endpoints.  The first is ``X-Loom-UserID`` and is used to specify
-the id of the user making the request. The second is ``X-Loom-ApiKey`` and is used to specify the api key used to
-communicate with the server. The third is ``X-Loom-TenantID`` and is used to specify the id of the tenant that the
+In addition, three headers must be sent to all REST endpoints.  The first is ``UserID`` and is used to specify
+the id of the user making the request. The second is ``ApiKey`` and is used to specify the api key used to
+communicate with the server. The third is ``TenantID`` and is used to specify the id of the tenant that the
 user belongs to.
 
 

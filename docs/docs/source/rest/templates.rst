@@ -269,9 +269,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         -d '{
                 "name": "hadoop.example",
                 "description": "Hadoop cluster with hdfs and YARN",
@@ -394,9 +394,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/clustertemplates/hadoop.example
  $ {
        "name": "hadoop.example",
@@ -520,9 +520,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/clustertemplates/hadoop.example
 
 .. _template-modify:
@@ -582,9 +582,9 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         -d 
   '{
        "name": "hadoop.example",
@@ -703,8 +703,8 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/clustertemplates
 
