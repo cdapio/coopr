@@ -169,7 +169,6 @@ class FogProviderGoogle < Provider
       end
 
       # disable SELinux
-      # if [ -x /usr/sbin/sestatus ] ; then /usr/sbin/sestatus | grep disabled || ( test -x /usr/sbin/setenforce && /usr/sbin/setenforce Permissive ) ; fi
       log.debug 'disabling SELinux'
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         cmd = "if [ -x /usr/sbin/sestatus ] ; then #{sudo} /usr/sbin/sestatus | grep disabled || ( test -x /usr/sbin/setenforce && #{sudo} /usr/sbin/setenforce Permissive ) ; fi"
