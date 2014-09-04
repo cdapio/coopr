@@ -131,13 +131,16 @@ class FogProviderGoogle < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
       }
-      # Additional checks
+
+      # do we need sudo bash?
+      sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
+
       set_credentials(@task['config']['ssh-auth'])
 
       # login with pseudotty and turn off sudo requiretty option
       log.debug "attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
-        cmd = %q[sudo cat /etc/sudoers | sed 's/^\(Defaults\s\+requiretty.*\)$/#\1/i' > /tmp/sudoers.new && sudo visudo -c -f /tmp/sudoers.new && sudo EDITOR="cp /tmp/sudoers.new" visudo && rm -f /tmp/sudoers.new]
+        cmd = %Q[#{sudo} cat /etc/sudoers | sed 's/^\(Defaults\s\+requiretty.*\)$/#\1/i' > /tmp/sudoers.new && #{sudo} visudo -c -f /tmp/sudoers.new && #{sudo} EDITOR="cp /tmp/sudoers.new" visudo && rm -f /tmp/sudoers.new]
         ssh_exec!(ssh, cmd, 'disabling requiretty via pseudotty session', true)
       end
 
@@ -166,7 +169,7 @@ class FogProviderGoogle < Provider
           # Mount the data disk
           log.debug "mounting device #{google_disk_id} on #{mount_point}"
           Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
-            cmd = %Q[sudo mkdir #{mount_point} && sudo /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/$(basename $(readlink /dev/disk/by-id/#{google_disk_id})) #{mount_point} && sudo chmod a+w #{mount_point}]
+            cmd = %Q[#{sudo} mkdir #{mount_point} && #{sudo} /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/$(basename $(readlink /dev/disk/by-id/#{google_disk_id})) #{mount_point} && #{sudo} chmod a+w #{mount_point}]
             ssh_exec!(ssh, cmd, "mounting device #{google_disk_id} on #{mount_point}")
           end
         else
@@ -178,7 +181,7 @@ class FogProviderGoogle < Provider
       # if [ -x /usr/sbin/sestatus ] ; then /usr/sbin/sestatus | grep disabled || ( test -x /usr/sbin/setenforce && /usr/sbin/setenforce Permissive ) ; fi
       log.debug "disabling SELinux"
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
-        cmd = 'if [ -x /usr/sbin/sestatus ] ; then sudo /usr/sbin/sestatus | grep disabled || ( test -x /usr/sbin/setenforce && sudo /usr/sbin/setenforce Permissive ) ; fi'
+        cmd = "if [ -x /usr/sbin/sestatus ] ; then #{sudo} /usr/sbin/sestatus | grep disabled || ( test -x /usr/sbin/setenforce && #{sudo} /usr/sbin/setenforce Permissive ) ; fi"
         ssh_exec!(ssh, cmd, "disabling SELinux")
       end
 
