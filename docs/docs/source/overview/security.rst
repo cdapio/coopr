@@ -26,22 +26,22 @@ Security
 ===================
 
 At Cask Data, we take security very seriously and invest a lot of time to make sure we
-secure communication between different aspects of any system that we build. Continuuity
-Loom beta release does not include a lot of much needed security features, but upcoming
-releases of Continuuity Loom will make it secure and more reliable for provisioning
+secure communication between different aspects of any system that we build. Cask
+Coopr beta release does not include a lot of much needed security features, but upcoming
+releases of Cask Coopr will make it secure and more reliable for provisioning
 clusters. This document describes how we are planning to secure different aspects of
-Continuuity Loom.
+Cask Coopr.
 
 .. figure:: security-diagram.png
     :align: right
     :width: 800px
-    :alt: Continuuity Loom architecture and security
+    :alt: Cask Coopr architecture and security
     :figclass: align-center
 
 Communication Channels
 ======================
 
- * 1 - Browser to Loom UI (Node.js)
+ * 1 - Browser to Coopr UI (Node.js)
 
   * Uses TLS/SSL.
 
@@ -49,17 +49,17 @@ Communication Channels
 
   * Uses TLS/SSL.
 
- * 3 - Loom Server to Database
+ * 3 - Coopr Server to Database
 
   * Uses TLS/SSL.
   * We recommend firewalling databases
 
- * 4 - Loom Server to Zookeeper.
+ * 4 - Coopr Server to Zookeeper.
 
   * Uses SASL.
   * We recommend firewalling Zookeeper.
 
- * 5 - Loom Server to Provisioners
+ * 5 - Coopr Server to Provisioners
 
   * Uses mutual authentication with TLS/SSL. 
 
@@ -84,33 +84,33 @@ Data Stores
  * Zookeeper
 
   * Kerberos support.
-  * ACLs set on znodes so only loom user can read/write.
+  * ACLs set on znodes so only coopr user can read/write.
 
  * Database
 
-  * Setup permissions so only loom user from Loom server hosts can read/write from the database.
+  * Setup permissions so only coopr user from Coopr server hosts can read/write from the database.
   * Encryption of sensitive data.
 
 
-Continuuity Loom Components
+Cask Coopr Components
 ===========================
 
- * Loom Server
+ * Coopr Server
 
   * Database password encryption in configuration file.
   * Integration with external user management systems like LDAP.  
   * User REST APIs require a user ID in the headers, used for authentication and authorization.
-  * User REST APIs use group level ACLs on Loom resources (providers, templates, clusters, etc) to authorize actions.
-  * ACLs modifiable by admin or users with grant level access on Loom resources. 
+  * User REST APIs use group level ACLs on Coopr resources (providers, templates, clusters, etc) to authorize actions.
+  * ACLs modifiable by admin or users with grant level access on Coopr resources. 
   * All cluster tasks are persistently stored to support audit logging of full details of all user actions and resource allocations. 
 
- * Loom Provisioner
+ * Coopr Provisioner
 
   * Encryption of provider credentials.
   * Shell provisioners only allowed to run pre-defined set of scripts and not arbitrary commands.
   * Provisioner REST APIs require mutual authentication with TLS/SSL to ensure only valid provisioners can take tasks from the server.
 
- * Loom UI
+ * Coopr UI
 
   * XSS protection.
   * CSRF protection.

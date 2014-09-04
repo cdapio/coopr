@@ -24,7 +24,7 @@ REST API: Importing & Exporting Cluster Templates
 
 .. include:: /rest/rest-links.rst
 
-The REST APIs allow you to export all Providers, Hardware Types, Image Types, Services, and Cluster Templates created into a JSON Object that can then be imported into another Loom server.  
+The REST APIs allow you to export all Providers, Hardware Types, Image Types, Services, and Cluster Templates created into a JSON Object that can then be imported into another Coopr server.  
 
 .. _entity-export:
 
@@ -56,9 +56,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/export
    {
      "providers":[ ... ],
@@ -101,9 +101,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         -d '{ 
               "providers":[...],
               "imagetypes":[...],

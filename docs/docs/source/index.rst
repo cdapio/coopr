@@ -14,26 +14,26 @@
    limitations under the License.
 
 ========================================
-Continuuity Loom |release| Documentation
+Cask Coopr |release| Documentation
 ========================================
 
-Continuuity Loom is a software system that enables end users to provision clusters based on templates and settings defined by
-administrators. Continuuity Loom exposes simple interfaces to administrators and allows easy customization of the properties of provisioned
+Cask Coopr is a software system that enables end users to provision clusters based on templates and settings defined by
+administrators. Cask Coopr exposes simple interfaces to administrators and allows easy customization of the properties of provisioned
 clusters, including software services, hardware configurations and infrastructure providers.
 
-This documentation provides information about Continuuity Loom, its operational management capabilities, and its functionality available for both end users and
+This documentation provides information about Cask Coopr, its operational management capabilities, and its functionality available for both end users and
 administrators. This document presumes you have some familiarity with the SQL databases, Zookeeper, the REST protocol and the Ruby programming language.
 
 
 Contents
 ========
 
-.. sidebar:: Continuuity Support
+.. sidebar:: Cask Support
 
-   Thanks for downloading Continuuity Loom Beta. We 
+   Thanks for downloading Cask Coopr Beta. We 
    would love to help you get started with this product. 
    We would also love to hear about how 
-   we can make this product better. Contact support@continuuity.com 
+   we can make this product better. Contact coopr-dev@googlegroups.com 
    and tell us what you think.
 
 

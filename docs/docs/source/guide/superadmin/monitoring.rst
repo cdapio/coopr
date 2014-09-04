@@ -27,70 +27,70 @@ Monitoring and Metrics
 Overview
 ========
 
-This section outlines the tools that Continuuity Loom provides to enable an administrator to monitor the system. Since the
+This section outlines the tools that Cask Coopr provides to enable an administrator to monitor the system. Since the
 output from these tools and checks are easily parseable and since the output is written to standard out, writing a simple
 parsing script and integrating with Nagios are relatively easy. 
 
 Process Monitoring
 ==================
 
-Continuuity Loom provides HTTP endpoints to check for the status of the running processes.
+Cask Coopr provides HTTP endpoints to check for the status of the running processes.
 
-Loom Server
+Coopr Server
 -----------
-The Loom Server runs as a java process. Similar to the UI, we recommend a standard http monitoring check on the
+The Coopr Server runs as a Java process. Similar to the UI, we recommend a standard http monitoring check on the
 ``/status`` endpoint
 ::
 
-  http://<loom-host>:<loom-server-port>/status
+  http://<coopr-host>:<coopr-server-port>/status
 
 The server should respond with "OK" and HTTP return code 200.
 
 
-Loom Provisioner
+Coopr Provisioner
 ----------------
-The Loom provisioner runs as an individual Ruby process on each provisioner. We recommend any standard process presence check. The Loom init script itself can be used:
+The Coopr provisioner runs as an individual Ruby process on each provisioner. We recommend any standard process presence check. The Coopr init script itself can be used:
 ::
 
-  /etc/init.d/loom-provisioner status
+  /etc/init.d/coopr-provisioner status
 
 This will display brief status for all configured provisioner process, and return non-zero if any one of them is not running.
 Alternatively, any standard process presence monitoring can check for the process:
 ::
 
-  /opt/loom/provisioner/embedded/bin/ruby /opt/loom/provisioner/daemon/provisioner.rb
+  /opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/daemon/provisioner.rb
   
 An example of the output from the above run is:
 ::
 
-  $ /etc/init.d/loom-provisioner status
-   loom-provisioner 1 running as process 2436
-   loom-provisioner 2 running as process 2437
-   loom-provisioner 3 running as process 2438
-   loom-provisioner 4 is not running
-   loom-provisioner 5 pidfile exists, but process does not appear to be running
+  $ /etc/init.d/coopr-provisioner status
+   coopr-provisioner 1 running as process 2436
+   coopr-provisioner 2 running as process 2437
+   coopr-provisioner 3 running as process 2438
+   coopr-provisioner 4 is not running
+   coopr-provisioner 5 pidfile exists, but process does not appear to be running
    At least one provisioner failed
 
-Loom UI
+Coopr UI
 -------
-The UI runs as a Node.js process. We recommend a standard http monitoring check on the /status endpoint of the Loom UI:
+The UI runs as a Node.js process. We recommend a standard http monitoring check on the /status endpoint of the Coopr UI:
 ::
 
-  http://<loom-host>:<loom-ui-port>/status
+  http://<coopr-host>:<coopr-ui-port>/status
 
 The UI should respond with "OK" and HTTP return code 200.
 
 
 Provisioning Metrics
 ====================
-Continuuity Loom provides a number of cluster provisioning metrics through the use of
+Cask Coopr provides a number of cluster provisioning metrics through the use of
 `Java Management Extensions (JMX) <http://docs.oracle.com/javase/7/docs/technotes/guides/jmx/>`_.
 
 By default, JMX support is disabled. To enable JMX, the administrator will need to uncomment out the following line in
-``/etc/default/loom-server`` and can customize any of the options:
+``/etc/default/coopr-server`` and can customize any of the options:
 ::
 
-  export LOOM_JAVA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010
+  export COOPR_JAVA_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010
               -Dcom.sun.management.jmxremote.local.only=false
               -Dcom.sun.management.jmxremote.authenticate=false
               -Dcom.sun.management.jmxremote.ssl=false"
@@ -103,7 +103,7 @@ By default, JMX support is disabled. To enable JMX, the administrator will need 
 Available Metrics
 -----------------
 
-The following is a list of top-level metrics available through the Loom JMX extension:
+The following is a list of top-level metrics available through the Coopr JMX extension:
 
 .. list-table::
    :widths: 20 15 75
@@ -192,7 +192,7 @@ Below is a description of the metrics found in cluster metrics, namely
 
 Log Output
 ==========
-By default, the log files in Loom are written to ``/var/log/loom``. The output directory can be configured using the
-``LOOM_LOG_DIR`` environment variable for each of the Loom services (for more information, see
+By default, the log files in Coopr are written to ``/var/log/coopr``. The output directory can be configured using the
+``COOPR_LOG_DIR`` environment variable for each of the Coopr services (for more information, see
 :doc:`Installation Guide </guide/installation/index>`).
 

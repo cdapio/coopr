@@ -22,16 +22,16 @@
 Licenses
 =======================
 
-Loom Server
+Coopr Server
 ===========
-The Loom Server uses and depends on the following licenses:
+The Coopr Server uses and depends on the following licenses:
 
 .. list-table::
    :header-rows: 1
 
    * - Software Dependency
      - License
-   * - Continuuity Http
+   * - Cask Http
      - Apache License, Version 2.0
    * - Apache Twill
      - Apache License, Version 2.0
@@ -107,9 +107,9 @@ The Loom Server uses and depends on the following licenses:
    * - MySQL Connector
      - GPL
  
-Loom Provisioner
+Coopr Provisioner
 ================
-The Loom Provisioner uses and depends on the following licenses:
+The Coopr Provisioner uses and depends on the following licenses:
 
 .. list-table::
    :header-rows: 1
@@ -237,9 +237,9 @@ The Loom Provisioner uses and depends on the following licenses:
    * - yajl-ruby
      - MIT
  
-Loom UI
+Coopr UI
 =======
-The Loom UI uses and depends on the following licenses:
+The Coopr UI uses and depends on the following licenses:
 
 .. list-table::
    :header-rows: 1

@@ -22,10 +22,10 @@ Architecture
 ============
 
 .. _architecture:
-.. figure:: /_images/Loom-Architecture.png
+.. figure:: /_images/Coopr-Architecture.png
     :width: 800px
     :align: center
-    :alt: Continuuity Loom Architecture
+    :alt: Cask Coopr Architecture
     :figclass: align-center
 
 Server
@@ -44,11 +44,11 @@ after execution completes. Additionally, the provisioner syncs resources on requ
 manage what configuration and code should be used to perform various node and service actions. 
 
 Provisioners support a pluggable architecture for integrating different infrastructure providers (e.g. OpenStack, Rackspace, Amazon Web Services, Google App Engine, and Joyent) 
-and automators (e.g. Chef, Puppet, Shell scripts). Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Continuuity Loom's architecture simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent tasks to render scalability.
+and automators (e.g. Chef, Puppet, Shell scripts). Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Cask Coopr's architecture simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent tasks to render scalability.
 
 Web UI
 ===========
-Loom Web UI exposes two major functionalities: an Admin view and a User view. The Admin view allows system administrators or server administrators to configure
+Coopr Web UI exposes two major functionalities: an Admin view and a User view. The Admin view allows system administrators or server administrators to configure
 providers, disk images, machine hardware types, and software services. The UI also supports the construction of cluster templates that
 can be accessed and executed by users. Cluster templates are blueprints that administrators expose
 to their users that enable their users to instantiate clusters.

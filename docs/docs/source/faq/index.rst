@@ -25,30 +25,30 @@ FAQs
 General
 =======
 
-#. :doc:`What are the differences between Continuuity Loom and Ambari/Savanna?<general>`
-#. :doc:`Does Continuuity Loom work with Ambari?<general>`
-#. :doc:`What are the differences between Continuuity Loom and Amazon EMR?<general>`
-#. :doc:`Will Continuuity Loom support docker based clusters ?<general>`
-#. :doc:`Does Continuuity Loom support bare metal ?<general>`
-#. :doc:`What providers are supported by Continuuity Loom ?<general>`
-#. :doc:`Does Continuuity Loom make it easy for me to move from one cloud to another ?<general>`
-#. :doc:`Can Continuuity Loom work on my laptop ?<general>`
-#. :doc:`How long has Continuuity Loom been used in a production enviroment and where is it being used?<general>`
-#. :doc:`Is Continuuity Loom designed only for provisioning compute and storage?<general>`
-#. :doc:`What is the recommended setup for Continuuity Loom in terms of hardware and configuration?<general>`
-#. :doc:`Does Continuuity Loom support monitoring and alerting of services deployed ?<general>`
-#. :doc:`Does Continuuity Loom support metering ?<general>`
-#. :doc:`I use puppet will I be able to use puppet with Continuuity Loom ?<general>`
-#. :doc:`Can Continuuity Loom support approval workflows or ability to pause provisioning for approval ?<general>`
+#. :doc:`What are the differences between Cask Coopr and Ambari/Savanna?<general>`
+#. :doc:`Does Cask Coopr work with Ambari?<general>`
+#. :doc:`What are the differences between Cask Coopr and Amazon EMR?<general>`
+#. :doc:`Will Cask Coopr support docker based clusters ?<general>`
+#. :doc:`Does Cask Coopr support bare metal ?<general>`
+#. :doc:`What providers are supported by Cask Coopr ?<general>`
+#. :doc:`Does Cask Coopr make it easy for me to move from one cloud to another ?<general>`
+#. :doc:`Can Cask Coopr work on my laptop ?<general>`
+#. :doc:`How long has Cask Coopr been used in a production enviroment and where is it being used?<general>`
+#. :doc:`Is Cask Coopr designed only for provisioning compute and storage?<general>`
+#. :doc:`What is the recommended setup for Cask Coopr in terms of hardware and configuration?<general>`
+#. :doc:`Does Cask Coopr support monitoring and alerting of services deployed ?<general>`
+#. :doc:`Does Cask Coopr support metering ?<general>`
+#. :doc:`I use puppet will I be able to use puppet with Cask Coopr ?<general>`
+#. :doc:`Can Cask Coopr support approval workflows or ability to pause provisioning for approval ?<general>`
 
-Loom Server
+Coopr Server
 ===========
 
-#. :doc:`How many concurrent provisioning jobs can Continuuity Loom handle?<server>`
+#. :doc:`How many concurrent provisioning jobs can Cask Coopr handle?<server>`
 #. :doc:`Can I scale-up or scale-down a cluster?<server>`
 #. :doc:`Do I have the ability to import and export configurations from one cluster to another?<server>`
 #. :doc:`Where are the configurations of cluster template and it's metadata stored?<server>`
-#. :doc:`How do I setup a database for Continuuity Loom to use it?<server>`
+#. :doc:`How do I setup a database for Cask Coopr to use it?<server>`
 #. :doc:`Is node pooling supported?<server>`
 #. :doc:`What is node pooling?<server>`
 #. :doc:`Can I run multiple servers concurrently for HA?<server>`
@@ -57,7 +57,7 @@ Loom Server
 #. :doc:`Is there anyway to inspect the plan for cluster being provisioned?<server>`
 
 
-Loom Provisioner
+Coopr Provisioner
 ================
 
 #. :doc:`When something goes wrong, how can I look at the logs?<provisioner>`
@@ -70,7 +70,7 @@ Loom Provisioner
 #. :doc:`What happens when I stop a provisioner while it is performing a task?<provisioner>`
 #. :doc:`Can the Chef Solo Automator plugin use a chef server ?<provisioner>`
 
-Loom Administration
+Coopr Administration
 ===================
 
 #. :doc:`What operations are only available to the admin versus other users?<admin>`
@@ -82,13 +82,13 @@ Loom Administration
 
 Security
 ========
-#. :doc:`Does Continuuity Loom support authentication?<security>`
-#. :doc:`Are all the communication between Loom Server and Loom Provisioners secure?<security>`
-#. :doc:`Can Continuuity Loom integrate with any authentication system?<security>`
-#. :doc:`Will Continuuity Loom support authorization and granular control in the future?<security>`
+#. :doc:`Does Cask Coopr support authentication?<security>`
+#. :doc:`Are all the communication between Coopr Server and Coopr Provisioners secure?<security>`
+#. :doc:`Can Cask Coopr integrate with any authentication system?<security>`
+#. :doc:`Will Cask Coopr support authorization and granular control in the future?<security>`
 
 Licensing and Open Source
 =========================
 
-#. :doc:`What type of license is Continuuity Loom open sourced under?<oss>`
+#. :doc:`What type of license is Cask Coopr open sourced under?<oss>`
 #. :doc:`How can I contribute?<oss>`

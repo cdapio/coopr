@@ -83,9 +83,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/plugins/automatortypes/chef-solo
  $ {
        "name": "chef-solo",
@@ -158,9 +158,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/plugins/automatortypes
  $ [
        {
@@ -218,9 +218,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         --data-binary @<hadoop-cookbook-file>
         http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/cookbooks/hadoop
  $ { 
@@ -277,9 +277,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/cookbooks
  $ {
        "reactor": [
@@ -357,9 +357,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor
  $ [
        {
@@ -419,9 +419,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor
 
 .. _plugin-resource-delete-version:
@@ -459,9 +459,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor/versions/1
 
 .. _plugin-resource-stage:
@@ -501,9 +501,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor/versions/4/stage
 
 .. _plugin-resource-recall:
@@ -543,9 +543,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/plugins/automatortypes/chef-solo/reactor/versions/4/recall
 
 
@@ -581,7 +581,7 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/plugins/sync

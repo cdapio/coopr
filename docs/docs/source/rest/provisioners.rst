@@ -59,9 +59,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:superadmin'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/provisioners/p1
  $ {
        "id": "p1",
@@ -113,9 +113,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:superadmin'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/provisioners
  $ [
        {

@@ -21,37 +21,37 @@
 Datacenter High Availability
 =============================
 
-Continuuity Loom can be configured to be resilient to machine or component failures. This document describes the recommended configuration
-for setting up Continuuity Loom for HA within a single datacenter. Please refer to :doc:`multi-datacenter HA <multi-data-center-bcp>` documentation
+Cask Coopr can be configured to be resilient to machine or component failures. This document describes the recommended configuration
+for setting up Cask Coopr for HA within a single datacenter. Please refer to :doc:`multi-datacenter HA <multi-data-center-bcp>` documentation
 for configuring HA across multiple datacenters.
 
-In order to support resiliency against machine or component failures within a datacenter, Loom components can be configured to 
-run with redundancies on multiple machines. Each machine running Continuuity Loom can have a maximum of -
+In order to support resiliency against machine or component failures within a datacenter, Coopr components can be configured to 
+run with redundancies on multiple machines. Each machine running Cask Coopr can have a maximum of -
 
-* One loom-ui process
-* One loom-server process
-* Multiple loom-provisioner processes (See config LOOM_NUM_WORKERS in :doc:`installation guide </guide/installation/index>`)
+* One coopr-ui process
+* One coopr-server process
+* Multiple coopr-provisioner processes (See config COOPR_NUM_WORKERS in :doc:`installation guide </guide/installation/index>`)
 * One ZooKeeper process
 * One database process
 
-The diagram below shows the logical deployment diagram of Continuuity Loom for HA in a datacenter-
+The diagram below shows the logical deployment diagram of Cask Coopr for HA in a datacenter-
 
 .. _single-dc:
 .. figure:: /_images/ha_within_colo.png
     :align: center
     :alt: Within Datacenter Architecture Diagram
 
-Loom UI
+Coopr UI
 -------
-Loom UI (loom-ui) is stateless, and communicates with Loom Server using REST endpoints. Hence Loom UI can be easily run on multiple machines. User traffic is routed to multiple instances of Loom UI using load balancers (such as HAproxy or Varnish or VIP).
+Coopr UI (coopr-ui) is stateless, and communicates with Coopr Server using REST endpoints. Hence Coopr UI can be easily run on multiple machines. User traffic is routed to multiple instances of Coopr UI using load balancers (such as HAproxy or Varnish or VIP).
 
-Loom Provisioner
+Coopr Provisioner
 ----------------
-Loom Provisioner (loom-provisioner) is also stateless, and communicates with Loom Server using REST endpoints. Hence Loom Provisioner can be easily run on multiple machines.
+Coopr Provisioner (coopr-provisioner) is also stateless, and communicates with Coopr Server using REST endpoints. Hence Coopr Provisioner can be easily run on multiple machines.
 
-Loom Server
+Coopr Server
 -----------
-Loom Server (loom-server) can be run on multiple machines too. When run in this mode, there will be a load balancer fronting the Loom Servers. Loom UI and Loom Provisioners will be configured to communicate via a load balancer with the Loom Server. Also, all Loom Servers in a datacenter should connect to the same ZooKeeper quorum.
+Coopr Server (coopr-server) can be run on multiple machines too. When run in this mode, there will be a load balancer fronting the Coopr Servers. Coopr UI and Coopr Provisioners will be configured to communicate via a load balancer with the Coopr Server. Also, all Coopr Servers in a datacenter should connect to the same ZooKeeper quorum.
 
 ZooKeeper
 ---------
@@ -59,5 +59,5 @@ A ZooKeeper quorum of at least 3 machines is required for redundancy. Note that 
 
 Database
 --------
-Database needs to be replicated with automatic failover in case the master database goes down. Database is also fronted by a proxy that directs all operations to master database, and Loom Server connects to database using the proxy.
+Database needs to be replicated with automatic failover in case the master database goes down. Database is also fronted by a proxy that directs all operations to master database, and Coopr Server connects to database using the proxy.
 

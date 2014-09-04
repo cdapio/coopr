@@ -80,14 +80,14 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-ApiKey:<apikey>'
-        -H 'X-Loom-TenantID:<tenantid>'
+ $ curl -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'X-Coopr-TenantID:<tenantid>'
         -X POST
         -d '{ 
                 "overwrite": "true"
             }'
-        http://<loom-server>:<loom-port>/<version>/loom/bootstrap
+        http://<coopr-server>:<coopr-port>/<version>/coopr/bootstrap
 
 .. _rpc-properties:
 
@@ -147,9 +147,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST
-        -H 'X-Loom-UserID:<userid>'
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:<userid>'
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         -d '{ 
                 "clusterId":"00000051",
                 "properties":["hostname", "ipaddress"],
