@@ -152,6 +152,13 @@
             "type": "text",
             "tip": "SSH username to use. Must match private key file, and have sudo permissions"
           },
+          "google_data_disk_size_gb": {
+            "label": "Data disk size in GB",
+            "type": "text",
+            "default": 10,
+            "override": true,
+            "tip": "Size of the persistent disk to be created and mounted to /data"
+          },
           "zone_name": {
             "label": "Zone",
             "type": "select",
@@ -182,12 +189,6 @@
       },
       "user": {
         "fields": {
-          "google_data_disk_size_gb": {
-            "label": "Data disk size in GB",
-            "type": "text",
-            "default": 10,
-            "tip": "Size of the persistent disk to be created and mounted to /data"
-          },
           "network": {
             "label": "Network",
             "type": "text",
