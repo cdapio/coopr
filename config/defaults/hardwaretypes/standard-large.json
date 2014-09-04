@@ -23,6 +23,12 @@
       "ram": "7.5",
       "disks": "/dev/xvdb=420,/dev/xvdc=420"
     },
+    "google": {
+      "flavor": "n1-standard-2",
+      "cost": "0.14",
+      "vcpu": "2",
+      "ram": "7.5"
+    },
     "joyent": {
       "flavor": "g3-standard-7.5-kvm",
       "cost": "0.24",
