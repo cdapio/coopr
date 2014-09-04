@@ -142,7 +142,7 @@ class FogProviderGoogle < Provider
       end
 
       # Validate connectivity
-      log.debug "attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials}"
+      log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials}"
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
       end
@@ -211,19 +211,19 @@ class FogProviderGoogle < Provider
         server.wait_for(120) { !ready? }
       rescue Fog::Errors::NotFound
         # ok, can be thrown by wait_for
-        log.debug 'disk no longer found'
+        log.debug 'Server no longer found'
       end
       # delete all attached disks
       disks.each do |d|
         name = d['source'].split('/')[-1]
         disk = connection.disks.get(name)
-        log.debug "deleting disk #{name}"
+        log.debug "Deleting disk #{name}"
         begin
           disk.destroy
           disk.wait_for(120) { !ready? }
         rescue Fog::Errors::NotFound
           # ok, can be thrown by wait_for
-          log.debug 'disk no longer found'
+          log.debug 'Disk no longer found'
         end
       end
       @result['status'] = 0
