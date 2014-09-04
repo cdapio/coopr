@@ -42,15 +42,15 @@ The diagram below shows the logical deployment diagram of Cask Coopr for HA in a
     :alt: Within Datacenter Architecture Diagram
 
 Coopr UI
--------
+--------
 Coopr UI (coopr-ui) is stateless, and communicates with Coopr Server using REST endpoints. Hence Coopr UI can be easily run on multiple machines. User traffic is routed to multiple instances of Coopr UI using load balancers (such as HAproxy or Varnish or VIP).
 
 Coopr Provisioner
-----------------
+-----------------
 Coopr Provisioner (coopr-provisioner) is also stateless, and communicates with Coopr Server using REST endpoints. Hence Coopr Provisioner can be easily run on multiple machines.
 
 Coopr Server
------------
+------------
 Coopr Server (coopr-server) can be run on multiple machines too. When run in this mode, there will be a load balancer fronting the Coopr Servers. Coopr UI and Coopr Provisioners will be configured to communicate via a load balancer with the Coopr Server. Also, all Coopr Servers in a datacenter should connect to the same ZooKeeper quorum.
 
 ZooKeeper

@@ -42,7 +42,7 @@ General
 #. :doc:`Can Cask Coopr support approval workflows or ability to pause provisioning for approval ?<general>`
 
 Coopr Server
-===========
+============
 
 #. :doc:`How many concurrent provisioning jobs can Cask Coopr handle?<server>`
 #. :doc:`Can I scale-up or scale-down a cluster?<server>`
@@ -58,7 +58,7 @@ Coopr Server
 
 
 Coopr Provisioner
-================
+=================
 
 #. :doc:`When something goes wrong, how can I look at the logs?<provisioner>`
 #. :doc:`How many provisioners should I run?<provisioner>`
@@ -71,7 +71,7 @@ Coopr Provisioner
 #. :doc:`Can the Chef Solo Automator plugin use a chef server ?<provisioner>`
 
 Coopr Administration
-===================
+====================
 
 #. :doc:`What operations are only available to the admin versus other users?<admin>`
 #. :doc:`What happens to existing clusters when the template used to create them changes?<admin>`

@@ -23,7 +23,7 @@ Licenses
 =======================
 
 Coopr Server
-===========
+============
 The Coopr Server uses and depends on the following licenses:
 
 .. list-table::
@@ -108,7 +108,7 @@ The Coopr Server uses and depends on the following licenses:
      - GPL
  
 Coopr Provisioner
-================
+=================
 The Coopr Provisioner uses and depends on the following licenses:
 
 .. list-table::
@@ -238,7 +238,7 @@ The Coopr Provisioner uses and depends on the following licenses:
      - MIT
  
 Coopr UI
-=======
+========
 The Coopr UI uses and depends on the following licenses:
 
 .. list-table::

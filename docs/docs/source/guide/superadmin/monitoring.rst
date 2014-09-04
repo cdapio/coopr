@@ -37,7 +37,7 @@ Process Monitoring
 Cask Coopr provides HTTP endpoints to check for the status of the running processes.
 
 Coopr Server
------------
+------------
 The Coopr Server runs as a Java process. Similar to the UI, we recommend a standard http monitoring check on the
 ``/status`` endpoint
 ::
@@ -48,7 +48,7 @@ The server should respond with "OK" and HTTP return code 200.
 
 
 Coopr Provisioner
-----------------
+-----------------
 The Coopr provisioner runs as an individual Ruby process on each provisioner. We recommend any standard process presence check. The Coopr init script itself can be used:
 ::
 
@@ -72,7 +72,7 @@ An example of the output from the above run is:
    At least one provisioner failed
 
 Coopr UI
--------
+--------
 The UI runs as a Node.js process. We recommend a standard http monitoring check on the /status endpoint of the Coopr UI:
 ::
 

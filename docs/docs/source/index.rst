@@ -60,3 +60,18 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
+
+.. toctree::
+   :hidden:
+
+   /guide/admin/admin-links
+   /guide/installation/openstack-config
+   /guide/recommended-deployment
+   /includes/footer
+   /misc/jboss-automator-script
+   /overview/design-goals
+   /overview/licenses
+   /overview/overview-links
+   /overview/use-cases
+   /rest/rest-links
+   /toplevel-links

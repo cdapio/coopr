@@ -120,11 +120,9 @@ Example
                "required": [
                    [ "run_list" ]
                ]
-            }
-        }
-    }
-}
-
+           }
+       }
+   }
 
 .. _plugin-spec-retrieve:
 
@@ -389,8 +387,7 @@ Example
 Delete all versions of a resource
 =================================
 
-Tenant admins can delete all versions of a resource by making a HTTP DELETE request to URI:
-::
+Tenant admins can delete all versions of a resource by making a HTTP DELETE request to URI::
 
  /plugins/{plugin-type}/{plugin-name}/{resource-type}/{resource-name}
 
@@ -429,8 +426,7 @@ Example
 Delete a specific version of a resource
 =======================================
 
-Tenant admins can delete a specific version of a resource by making a HTTP DELETE request to URI:
-::
+Tenant admins can delete a specific version of a resource by making a HTTP DELETE request to URI::
 
  /plugins/{plugin-type}/{plugin-name}/{resource-type}/{resource-name}/versions/{version}
 

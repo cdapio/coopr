@@ -226,7 +226,7 @@ action of type "chef-solo" and run_list ``recipe[coopr_base::default]`` (which i
 Note that the community "hostsfile" cookbook is not needed in the run-list since it is declared in coopr_hosts's metadata.
 
 **coopr_service_runner**
------------------------
+------------------------
 
 This cookbook comes in handy as a simple way to isolate the starting and stopping of various services within your
 cluster. It allows you to simply specify the name of a Chef service resource and an action within a Coopr service
@@ -240,7 +240,7 @@ to set the following attribute to "start" or "stop":
 
 
 **coopr_firewall**
------------------
+------------------
 
 This cookbook is a simple iptables firewall manager, with the added functionality of automatically whitelisting all
 nodes of a cluster. To use, simply set any of the following attributes:

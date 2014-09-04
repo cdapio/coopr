@@ -263,10 +263,10 @@ If you are setting up a MySQL database from scratch you can run the following on
 where coopr.sql is the example schema file at ``/opt/coopr/server/config/sql``, and where passwords are replaced and entered as needed.
 
 Coopr Server Configuration
--------------------------
+--------------------------
 
 Coopr Server settings can be changed under the ``/etc/coopr/conf/coopr-site.xml`` configuration file. For a list of
-available configurations, see the :doc:`Server Configuration </guide/admin/server-config>` page.
+available configurations, see the :doc:`Server Configuration </guide/superadmin/server-config>` page.
 
 
 .. _setting-environmental-variables:
@@ -277,7 +277,7 @@ Setting Environmental Variables
 Several environmental variables can be set in Coopr Provisioner and Coopr UI.
 
 Coopr Server
------------
+------------
 The Server environmental variables can be set at ``/etc/default/coopr-server``. The configurable variables are as below:
 
 .. list-table::
@@ -300,7 +300,7 @@ The Server environmental variables can be set at ``/etc/default/coopr-server``. 
      - java options to use when running the Coopr Server
 
 Coopr Provisioner
-----------------
+-----------------
 The Provisioner environmental variables can be set at ``/etc/default/coopr-provisioner``. The configurable variables are as below:
 
 .. list-table::
@@ -324,7 +324,7 @@ The Provisioner environmental variables can be set at ``/etc/default/coopr-provi
 
 
 Coopr UI
--------
+--------
 The UI environmental variables can be set at ``/etc/default/coopr-ui``. The configurable variables are as below:
 
 .. list-table::
@@ -346,7 +346,7 @@ The UI environmental variables can be set at ``/etc/default/coopr-ui``. The conf
 .. _starting_stopping:
 
 Starting and Stopping Coopr Services
-===================================
+====================================
 By default, Cask Coopr's installation RPMs and PKGs do not configure auto start of the services in the ``init.d``. We leave
 that privilege to the administrator. For each Coopr component and its related service (such as the Server, Provisioner, and UI),
 there is a launch script, which you may use to execute a desired operation. For example, to start, stop, or check status

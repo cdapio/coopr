@@ -414,7 +414,7 @@ provider plugin side to upload and manage tenant specific data, such as user key
 plugin resources are managed by tenant administrators can be seen on the :doc:`Plugin Resources Guide </guide/admin/plugin-resources>` 
 
 Defining Resource Types
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 Resource types are defined by plugins. A resource type is simply some plugin specific name for data the plugin can use, along with
 a data format of the resource. Supported formats are 'file' and 'archive'. Resource types of the 'archive' format are zips or tarballs
@@ -422,8 +422,8 @@ of that will be expanded by provisioners before use. It is expected that the top
 the name of the resource. For example, the Chef Automator plugin defines a 'cookbooks' resource type that uses the 'archive' format. This
 means that if a cookbook named 'my-service' is uploaded, it is expected that the top level directory of the archive is named 'my-service'.
 
-Below is an example of the section of the plugin specification detailing the 3 resource types the Chef Automator supports.
-::
+Below is an example of the section of the plugin specification detailing the three resource types the Chef Automator supports::
+
   "resourceTypes": {
         "cookbooks": {
             "format": "archive"
@@ -437,7 +437,7 @@ Below is an example of the section of the plugin specification detailing the 3 r
   }
 
 Plugin Resource Storage
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 By default, plugin resources uploaded to the Server are simply stored as local files.  If you are running multiple servers for HA
 purposes, you will have to configure the servers to write to a distributed system such as NFS so that all servers have access

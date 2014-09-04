@@ -92,7 +92,7 @@ The Server can be configured to run callbacks before any cluster operation begin
 operation succeeds, and after an operation fails. By default, no callbacks are run. Out of the
 box, the Server supports sending an HTTP POST request containing cluster and job information to
 configurable endpoints. You can also write your own custom callback and plug it in.
-See :doc:`Cluster Callbacks </guide/admin/callbacks>` for more information on how to write your own custom callbacks.
+See :doc:`Cluster Callbacks </guide/superadmin/callbacks>` for more information on how to write your own custom callbacks.
 
 To enable HTTP POST callbacks you must specify a url to send the request to.  There is a configuration
 setting for the url to use on start, success, and failure of a cluster operation. If a url is not given,
