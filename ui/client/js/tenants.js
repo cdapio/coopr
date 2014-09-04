@@ -5,6 +5,8 @@ var app = angular.module('loom', [], ['$interpolateProvider', function ($interpo
   $interpolateProvider.endSymbol(']]');
 }]);
 
+
+
 app.factory('dataFactory', ['$http', function ($http) {
   var fetchUrl = '/pipeApiCall?path=';
 
@@ -20,6 +22,25 @@ app.factory('dataFactory', ['$http', function ($http) {
     }
   };
 }]);
+
+
+
+
+app.controller('TenantCreateCtrl', ['$scope', function ($scope) {
+
+  $scope.tenant = {
+    workers: 3
+  };
+
+  $scope.submitForm = function (event) {
+    event.preventDefault();
+    Helpers.submitPost(event, $scope.tenant, '/tenants');
+  };
+
+}]);
+
+
+
 
 app.controller('TenantListCtrl', ['$scope','$interval','dataFactory', function ($scope, $interval, dataFactory) {
 

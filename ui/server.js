@@ -582,6 +582,61 @@ site.app.get('/tenants/create', function (req, res) {
 });
 
 
+site.app.get('/tenants/tenant/:name', function (req, res) {
+  var user = site.checkAuth(req, res, true);
+  async.parallel([
+    site.getEntity('/tenants/'+req.params.name, user)
+  ], function (err, results) {
+    var context = {
+      activeTab: 'tenants',
+      authenticated: user,
+      env: env,
+      skin: site.getSkin(req)  
+    };
+    if (err) {
+      context.err = err;
+    } else {
+      context.tenant = results[0];
+      context.tenantJson = JSON.stringify(results[0]); // FML
+    }
+    res.render('tenants/createtenant.html', context);
+  });
+});
+
+
+site.app.post('/tenants/create', function (req, res) {
+  var user = site.checkAuth(req, res, true);
+  var options = {
+    uri: BOX_ADDR + '/tenants',
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/tenants/update', function (req, res) {
+  var user = site.checkAuth(req, res, true);
+  var options = {
+    uri: BOX_ADDR + '/tenants/' + req.body.name,
+    method: 'PUT',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/tenants/delete/:name', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/tenants/' + req.params.name,
+    method: 'DELETE'
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+
+
+
+
 
 site.app.get('/clustertemplates', function (req, res) {
   var user = site.checkAuth(req, res, true);
