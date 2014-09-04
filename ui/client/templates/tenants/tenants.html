@@ -2,36 +2,41 @@
 
 {% block title %}Tenants{% endblock %}
 
+{% block headscript %}
+<script src="/static/third_party/angular/angular.min.js" type="text/javascript"></script>
+<script src="/static/js/tenants.js" type="text/javascript"></script>
+{% endblock %}
+
 {% block header %}
     {% include "page-header.html" %}
 {% endblock %}
 
 {% block content %}
-  <div id="content-body">
+  <div id="content-body" ng-app="loom" ng-controller="TenantListCtrl">
 
     <ul class="list-unstyled row tenants-tickers">
       <li class="col-sm-2 col-sm-offset-2">
         <div>
           Total # of workers
-          <em>0</em>
+          <em>[[totalWorkers]]</em>
         </div>
       </li>
       <li class="col-sm-2">
         <div>
           Available workers
-          <em>0</em>
+          <em>[[availableWorkers]]</em>
         </div>
       </li>
       <li class="col-sm-2">
         <div>
           In progress tasks
-          <em>0</em>
+          <em>[[tasksInProgress]]</em>
         </div>
       </li>
       <li class="col-sm-2">
         <div>
           Queued tasks
-          <em>0</em>
+          <em>[[tasksQueued]]</em>
         </div>
       </li>
     </ul>
@@ -52,6 +57,7 @@
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Description</th>
                   <th>Workers</th>
                   <th class="no-sort"></th>
                 </tr>
@@ -60,6 +66,7 @@
                 {% for entry in tenants %}
                   <tr>
                     <td><a href="/tenants/tenant/{{entry.name}}">{{ entry.name }}</a></td>
+                    <td>{{entry.description}}</td>
                     <td>{{entry.workers}}</td>
                     <td width="1">
                       <form role="form" method="POST" action="/tenants/delete/{{entry.name}}" class="delete-form">
