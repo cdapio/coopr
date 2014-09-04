@@ -8419,7 +8419,7 @@ define('esprimaAdapter', ['./esprima', 'env'], function (esprima, env) {
 });
 define('uglifyjs/consolidator', ["require", "exports", "module", "./parse-js", "./process"], function(require, exports, module) {
 /**
- * @preserve Copyright 2012 Robert Gust-Bardon <http://robert.gust-bardon.org/>.
+ * @preserve Copyright © 2012 Robert Gust-Bardon <http://robert.gust-bardon.org/>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -9667,7 +9667,7 @@ define('uglifyjs/parse-js', ["exports"], function(exports) {
 
   Distributed under the BSD license:
 
-    Copyright 2010 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2010 (c) Mihai Bazon <mihai.bazon@gmail.com>
     Based on parse-js (http://marijn.haverbeke.nl/parse-js/).
 
     Redistribution and use in source and binary forms, with or without
@@ -11119,7 +11119,7 @@ define('uglifyjs/process', ["require", "exports", "module", "./parse-js", "./squ
 
   Distributed under the BSD license:
 
-    Copyright 2010 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2010 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -13228,7 +13228,7 @@ uglify.consolidator = require("./consolidator");
 module.exports = uglify
 });/* -*- Mode: js; js-indent-level: 2; -*- */
 /*
- * Copyright 2011 Mozilla Foundation and contributors
+ * Copyright © 2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE or:
  * http://opensource.org/licenses/BSD-3-Clause
  */
@@ -13323,14 +13323,14 @@ define('source-map/array-set', function (require, exports, module) {
 });
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
- * Copyright 2011 Mozilla Foundation and contributors
+ * Copyright © 2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE or:
  * http://opensource.org/licenses/BSD-3-Clause
  *
  * Based on the Base 64 VLQ implementation in Closure Compiler:
  * https://code.google.com/p/closure-compiler/source/browse/trunk/src/com/google/debugging/sourcemap/Base64VLQ.java
  *
- * Copyright 2011 The Closure Compiler Authors. All rights reserved.
+ * Copyright © 2011 The Closure Compiler Authors. All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
@@ -13465,7 +13465,7 @@ define('source-map/base64-vlq', function (require, exports, module) {
 });
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
- * Copyright 2011 Mozilla Foundation and contributors
+ * Copyright © 2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE or:
  * http://opensource.org/licenses/BSD-3-Clause
  */
@@ -13505,7 +13505,7 @@ define('source-map/base64', function (require, exports, module) {
 });
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
- * Copyright 2011 Mozilla Foundation and contributors
+ * Copyright © 2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE or:
  * http://opensource.org/licenses/BSD-3-Clause
  */
@@ -13584,7 +13584,7 @@ define('source-map/binary-search', function (require, exports, module) {
 });
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
- * Copyright 2011 Mozilla Foundation and contributors
+ * Copyright © 2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE or:
  * http://opensource.org/licenses/BSD-3-Clause
  */
@@ -14059,7 +14059,7 @@ define('source-map/source-map-consumer', function (require, exports, module) {
 });
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
- * Copyright 2011 Mozilla Foundation and contributors
+ * Copyright © 2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE or:
  * http://opensource.org/licenses/BSD-3-Clause
  */
@@ -14437,7 +14437,7 @@ define('source-map/source-map-generator', function (require, exports, module) {
 });
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
- * Copyright 2011 Mozilla Foundation and contributors
+ * Copyright © 2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE or:
  * http://opensource.org/licenses/BSD-3-Clause
  */
@@ -14806,7 +14806,7 @@ define('source-map/source-node', function (require, exports, module) {
 });
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
- * Copyright 2011 Mozilla Foundation and contributors
+ * Copyright © 2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE or:
  * http://opensource.org/licenses/BSD-3-Clause
  */
@@ -15010,7 +15010,7 @@ define('source-map/util', function (require, exports, module) {
 define('source-map', function (require, exports, module) {
 
 /*
- * Copyright 2009-2011 Mozilla Foundation and contributors
+ * Copyright © 2009-2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE.txt or:
  * http://opensource.org/licenses/BSD-3-Clause
  */
@@ -15021,7 +15021,7 @@ exports.SourceNode = require('./source-map/source-node').SourceNode;
 });
 
 //Distributed under the BSD license:
-//Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+//Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
 define('uglifyjs2', ['exports', 'source-map', 'logger', 'env!env/file'], function (exports, MOZ_SourceMap, logger, rjsFile) {
 
 /***********************************************************************
@@ -15037,7 +15037,7 @@ define('uglifyjs2', ['exports', 'source-map', 'logger', 'env!env/file'], functio
 
   Distributed under the BSD license:
 
-    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -15340,7 +15340,7 @@ Dictionary.prototype = {
 
   Distributed under the BSD license:
 
-    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -16325,7 +16325,7 @@ TreeWalker.prototype = {
 
   Distributed under the BSD license:
 
-    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
     Parser based on parse-js (http://marijn.haverbeke.nl/parse-js/).
 
     Redistribution and use in source and binary forms, with or without
@@ -17783,7 +17783,7 @@ function parse($TEXT, options) {
 
   Distributed under the BSD license:
 
-    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -18002,7 +18002,7 @@ TreeTransformer.prototype = new TreeWalker;
 
   Distributed under the BSD license:
 
-    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -18566,7 +18566,7 @@ AST_Toplevel.DEFMETHOD("scope_warnings", function(options){
 
   Distributed under the BSD license:
 
-    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -19822,7 +19822,7 @@ function OutputStream(options) {
 
   Distributed under the BSD license:
 
-    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -22096,7 +22096,7 @@ merge(Compressor.prototype, {
 
   Distributed under the BSD license:
 
-    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -22181,7 +22181,7 @@ function SourceMap(options) {
 
   Distributed under the BSD license:
 
-    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+    Copyright © 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions

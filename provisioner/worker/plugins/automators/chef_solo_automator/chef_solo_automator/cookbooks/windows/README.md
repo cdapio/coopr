@@ -646,10 +646,10 @@ License & Authors
 - Author:: Doug Ireton (<doug.ireton@nordstrom.com>)
 
 ```text
-Copyright 2011-2013, Opscode, Inc.
-Copyright 2010, VMware, Inc.
-Copyright 2011, Business Intelligence Associates, Inc
-Copyright 2012, Nordstrom, Inc.
+Copyright © 2011-2013, Opscode, Inc.
+Copyright © 2010, VMware, Inc.
+Copyright © 2011, Business Intelligence Associates, Inc
+Copyright © 2012, Nordstrom, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -2,7 +2,7 @@
 # Cookbook Name:: krb5
 # Attributes:: kadmin
 #
-# Copyright 2014, Continuuity, Inc.
+# Copyright © 2014, Continuuity, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

@@ -200,13 +200,13 @@ License & Authors
 - Contributor:: Brad Knowles (<bknowles@momentumsi.com>)
 
 ```text
-Copyright 2009-2013, Opscode, Inc.
-Copyright 2012, Eric G. Wolfe
-Copyright 2012, Fletcher Nichol
-Copyright 2012, Webtrends, Inc.
-Copyright 2013, Limelight Networks, Inc.
-Copyright 2013, Brad Knowles
-Copyright 2013, Brad Beam
+Copyright © 2009-2013, Opscode, Inc.
+Copyright © 2012, Eric G. Wolfe
+Copyright © 2012, Fletcher Nichol
+Copyright © 2012, Webtrends, Inc.
+Copyright © 2013, Limelight Networks, Inc.
+Copyright © 2013, Brad Knowles
+Copyright © 2013, Brad Beam
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -2,7 +2,7 @@
 # Cookbook Name:: mongodb
 # Recipe:: 10gen_repo
 #
-# Copyright 2011, edelight GmbH
+# Copyright © 2011, edelight GmbH
 # Authors:
 #       Miquel Torres <miquel.torres@edelight.de>
 #
