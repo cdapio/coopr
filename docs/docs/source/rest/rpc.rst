@@ -80,9 +80,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-ApiKey:<apikey>'
-        -H 'X-Loom-TenantID:<tenantid>'
+ $ curl -H 'UserID:admin' 
+        -H 'ApiKey:<apikey>'
+        -H 'TenantID:<tenantid>'
         -X POST
         -d '{ 
                 "overwrite": "true"
@@ -147,9 +147,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST
-        -H 'X-Loom-UserID:<userid>'
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:<userid>'
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         -d '{ 
                 "clusterId":"00000051",
                 "properties":["hostname", "ipaddress"],

@@ -83,9 +83,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         -d '{"name":"example", "providertype":"openstack", "description": "Example"}' 
         http://<server>:<port>/<version>/providers
 
@@ -119,9 +119,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/providers/example
  $ {"name":"example","description":"Example","providertype":"openstack","provisioner":{}}
 
@@ -157,9 +157,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/providers/example
 
 .. _provider-modify:
@@ -215,14 +215,14 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         -d '{"name": "example", "description": "Updated example", "providertype":"openstack"}'  
         http://<server>:<port>/<version>/providers/example
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/providers/example
  $ {"name":"example","description":"Updated example","providertype":"openstack","provisioner":{}}
 
@@ -258,8 +258,8 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'UserID:admin' 
+        -H 'TenantID:<tenantid>'
+        -H 'ApiKey:<apikey>'
         http://<server>:<port>/<version>/providers
 

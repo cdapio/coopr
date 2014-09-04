@@ -142,9 +142,9 @@ public class Constants {
   }
 
   public static final int PLUGIN_RESOURCE_CHUNK_SIZE = 1024 * 64;
-  public static final String USER_HEADER = "X-Loom-UserID";
-  public static final String API_KEY_HEADER = "X-Loom-ApiKey";
-  public static final String TENANT_HEADER = "X-Loom-TenantID";
+  public static final String USER_HEADER = "UserID";
+  public static final String API_KEY_HEADER = "ApiKey";
+  public static final String TENANT_HEADER = "TenantID";
   public static final String SUPERADMIN_TENANT = "superadmin";
   public static final String ADMIN_USER = "admin";
 }

@@ -62,7 +62,7 @@ JBoss AS requires Oracle Java 7. The following will add a service to Continuuity
 ::
 
  $ curl -o /tmp/oracle-java-7 $REMOTE_LOOM_PLUGINS/jboss/services/oracle-java-7
- $ curl -X POST -H "X-Loom-UserId:admin"\
+ $ curl -X POST -H "UserId:admin"\
      -d @/tmp/oracle-java-7 http://$LOOM_SERVER:$LOOM_PORT/v1/loom/services
 
 Configure JBoss AS Service in Continuuity Loom
@@ -74,7 +74,7 @@ The following adds service 'jboss' to the service list.
 ::
 
  $ curl -o /tmp/jboss $REMOTE_LOOM_PLUGINS/jboss/services/jboss
- $ curl -X POST -H "X-Loom-UserId:admin"\
+ $ curl -X POST -H "UserId:admin"\
      -d @/tmp/jboss http://$LOOM_SERVER:$LOOM_PORT/v1/loom/services
 
 Create JBoss AS Cluster Template in Continuuity Loom
@@ -93,7 +93,7 @@ Use the following command to create the 'jboss-application-server' cluster templ
 
  $ curl -o /tmp/jboss-application-server \
      $REMOTE_LOOM_PLUGINS/jboss/templates/jboss-application-server
- $ curl -X POST -H "X-Loom-UserId:admin"\
+ $ curl -X POST -H "UserId:admin"\
      -d @/tmp/jboss-application-server http://$LOOM_SERVER:$LOOM_PORT/v1/loom/clustertemplates
 
 Provision an instance of 'jboss-application-cluster' with Continuuity Loom

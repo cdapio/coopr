@@ -21,9 +21,9 @@ for d in ${dirs} ; do
   for f in $(ls -1 *.json) ; do
     curl --silent --request PUT \
       --header "Content-Type:application/json" \
-      --header "X-Loom-UserID:${LOOM_API_USER}" \
-      --header "X-Loom-ApiKey:${LOOM_API_KEY}" \
-      --header "X-Loom-TenantID:${LOOM_TENANT}" \
+      --header "UserID:${LOOM_API_USER}" \
+      --header "ApiKey:${LOOM_API_KEY}" \
+      --header "TenantID:${LOOM_TENANT}" \
       --connect-timeout ${TIMEOUT} --data @${f} \
       ${LOOM_SERVER_URI}/v2/${d}/${f/.json/}
     ret=$?

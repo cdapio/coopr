@@ -117,7 +117,7 @@ Following is an example web service call along with the output returned from the
 on a single node.:
 ::
 
-  $ curl -H 'X-Loom-UserID:<user id>' http://<loom-host-name>:<loom-host-port>/v1/loom/clusters/<cluster-id>/plans
+  $ curl -H 'UserID:<user id>' http://<loom-host-name>:<loom-host-port>/v1/loom/clusters/<cluster-id>/plans
   $ [{
         "action": "SOLVE_LAYOUT",
         "clusterId": "00000071",
