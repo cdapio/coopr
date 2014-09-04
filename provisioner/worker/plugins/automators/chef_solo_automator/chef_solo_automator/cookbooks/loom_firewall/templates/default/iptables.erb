@@ -100,15 +100,15 @@ COMMIT
 <% node['loom_firewall']['whitelist_nodes'].each do |n| %>
 -A INPUT -s <%= n =%> -j ACCEPT
 <% end %>
-<% end %>
 
+<% end %>
 <% if node['loom_firewall']['blacklist_nodes'] %>
 # Blacklisted nodes
 <% node['loom_firewall']['blacklist_nodes'].each do |n| %>
 -A INPUT -s <%= n =%> -j DROP
 <% end %>
-<% end %>
 
+<% end %>
 ###
 ## Logging rule for testing/diagnostics (be sure to add a syslog.conf
 ## like this: 
