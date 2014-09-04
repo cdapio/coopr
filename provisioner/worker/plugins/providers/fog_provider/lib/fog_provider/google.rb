@@ -158,7 +158,6 @@ class FogProviderGoogle < Provider
           google_disk_id = "google-#{disk['deviceName']}"
 
           # Mount the data disk
-          log.debug "mounting device #{google_disk_id} on #{mount_point}"
           Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
             cmd = %Q[#{sudo} mkdir #{mount_point} && #{sudo} /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/$(basename $(readlink /dev/disk/by-id/#{google_disk_id})) #{mount_point} && #{sudo} chmod a+w #{mount_point}]
             ssh_exec!(ssh, cmd, "mounting device #{google_disk_id} on #{mount_point}")
@@ -172,7 +171,6 @@ class FogProviderGoogle < Provider
       end
 
       # disable SELinux
-      log.debug 'disabling SELinux'
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         cmd = "if [ -x /usr/sbin/sestatus ] ; then #{sudo} /usr/sbin/sestatus | grep disabled || ( test -x /usr/sbin/setenforce && #{sudo} /usr/sbin/setenforce Permissive ) ; fi"
         ssh_exec!(ssh, cmd, 'disabling SELinux')
