@@ -1,4 +1,4 @@
-## [Cask](http://cask.co) Coopr : Modern Cluster Management
+## [Cask](http://cask.co) Coopr: Modern Cluster Management
 
 Cask Coopr is cluster management software that manages clusters on public, private
 clouds. Clusters created with Cask Coopr utilize templates of any hardware and
@@ -38,7 +38,7 @@ Bugs and suggestions should be made by filing a [GitHub Issue](https://github.co
 
 ## License
 
-   Copyright 2014 Cask Data, Inc.
+   Copyright © 2014 Cask Data, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
 software except in compliance with the License. You may obtain a copy of the License at
