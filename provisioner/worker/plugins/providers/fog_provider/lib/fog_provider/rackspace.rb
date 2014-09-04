@@ -75,7 +75,7 @@ class FogProviderRackspace < Provider
       log.debug "Invoking server confirm for id: #{providerid}"
       server = connection.servers.get(providerid)
       # Wait until the server is ready
-      fail 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
+      fail "Server #{server.name} is in ERROR state" if server.state == 'ERROR'
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) {
         if @rackconnect_wait
