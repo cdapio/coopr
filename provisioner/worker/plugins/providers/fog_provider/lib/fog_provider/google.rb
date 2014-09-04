@@ -215,7 +215,7 @@ class FogProviderGoogle < Provider
       end
       # delete all attached disks
       disks.each do |d|
-        name = d['source'].split('/')[-1]
+        name = d['source'].split('/').last
         disk = connection.disks.get(name)
         log.debug "Deleting disk #{name}"
         begin
