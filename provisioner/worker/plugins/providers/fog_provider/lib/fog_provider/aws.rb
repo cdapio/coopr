@@ -72,8 +72,8 @@ class FogProviderAWS < Provider
       log.debug "Invoking server confirm for id: #{providerid}"
       server = self.connection.servers.get(providerid)
       # Wait until the server is ready
-      raise 'Server #{server.id} is in ERROR state' if server.state == 'ERROR'
-      log.debug "waiting for server to come up: #{providerid}"
+      raise "Server #{server.id} is in ERROR state" if server.state == 'ERROR'
+      log.debug "Waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
       hostname =
