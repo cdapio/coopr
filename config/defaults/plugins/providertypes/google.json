@@ -1,0 +1,81 @@
+{
+  "description": "",
+  "name": "google",
+  "parameters": {
+    "admin": {
+      "fields": {
+        "client_email": {
+          "label": "Service account email address",
+          "tip": "Service account email address, should be of the form 123456789@developer.gserviceaccount.com",
+          "type": "text"
+        },
+        "key_location": {
+          "label": "P12 key location",
+          "tip": "Path to your P12 key, as downloaded from GCE encrypted with their default passphrase (notasecret)",
+          "type": "text"
+        },
+        "project_id": {
+          "label": "Project ID",
+          "tip": "GCE Project ID",
+          "type": "text"
+        },
+        "ssh_keyfile": {
+          "label": "ssh private key file",
+          "tip": "Full path and file name to your GCE SSH private key",
+          "type": "text"
+        },
+        "ssh_username": {
+          "label": "ssh username",
+          "tip": "SSH username to use. Must match private key file, and have sudo permissions",
+          "type": "text"
+        },
+        "zone_name": {
+          "default": "us-central1-a",
+          "label": "Zone",
+          "options": [
+            "asia-east1-a",
+            "asia-east1-b",
+            "asia-east1-c",
+            "europe-west1-a",
+            "europe-west1-b",
+            "us-central1-a",
+            "us-central1-b",
+            "us-central1-f"
+          ],
+          "override": true,
+          "tip": "Zone",
+          "type": "select"
+        }
+      },
+      "required": [
+        [
+          "project_id",
+          "client_email",
+          "key_location",
+          "zone_name",
+          "ssh_keyfile",
+          "ssh_username"
+        ]
+      ]
+    },
+    "user": {
+      "fields": {
+        "data_disk_size_gb": {
+          "default": "30",
+          "label": "Data disk size in Gb",
+          "tip": "Size of the persistent disk to be created and mounted to /data",
+          "type": "text"
+        },
+        "network": {
+          "label": "Network",
+          "tip": "GCE custom network",
+          "type": "text"
+        }
+      },
+      "required": [
+        []
+      ]
+    }
+  },
+  "resourceTypes": {}
+}
