@@ -275,14 +275,14 @@ site.verifyData = function (arr) {
  * @param  {Boolean} admin Admin previlage required.
  * @return {Object} describing authenticated user.
  */
-site.checkAuth = function (req, res, admin) {
+site.checkAuth = function (req, res, admin, tenant) {
   var authenticated = site.COOKIE_NAME in req.cookies;
   if (!authenticated) {
     res.redirect('/login');
     return;
   }
   var auth = req.cookies[site.COOKIE_NAME];
-  if (!('user' in auth)) {
+  if (!auth.user || (tenant && tenant!==auth.tenant) ) {
     res.redirect('/login');
     return;
   }
@@ -551,7 +551,7 @@ site.app.post('/setskin', function (req, res) {
 
 
 site.app.get('/tenants', function (req, res) {
-  var user = site.checkAuth(req, res, true);
+  var user = site.checkAuth(req, res, true, 'superadmin');
   async.parallel([
     site.getEntity('/tenants', user)
   ], function (err, results) {
@@ -572,7 +572,7 @@ site.app.get('/tenants', function (req, res) {
 
 
 site.app.get('/tenants/create', function (req, res) {
-  var user = site.checkAuth(req, res, true);
+  var user = site.checkAuth(req, res, true, 'superadmin');
   res.render('tenants/createtenant.html', {
     activeTab: 'tenants',
     authenticated: user,
@@ -583,7 +583,7 @@ site.app.get('/tenants/create', function (req, res) {
 
 
 site.app.get('/tenants/tenant/:name', function (req, res) {
-  var user = site.checkAuth(req, res, true);
+  var user = site.checkAuth(req, res, true, 'superadmin');
   async.parallel([
     site.getEntity('/tenants/'+req.params.name, user)
   ], function (err, results) {
@@ -605,7 +605,7 @@ site.app.get('/tenants/tenant/:name', function (req, res) {
 
 
 site.app.post('/tenants/create', function (req, res) {
-  var user = site.checkAuth(req, res, true);
+  var user = site.checkAuth(req, res, true, 'superadmin');
   var options = {
     uri: BOX_ADDR + '/tenants',
     method: 'POST',
@@ -615,7 +615,7 @@ site.app.post('/tenants/create', function (req, res) {
 });
 
 site.app.post('/tenants/update', function (req, res) {
-  var user = site.checkAuth(req, res, true);
+  var user = site.checkAuth(req, res, true, 'superadmin');
   var options = {
     uri: BOX_ADDR + '/tenants/' + req.body.name,
     method: 'PUT',
@@ -625,7 +625,7 @@ site.app.post('/tenants/update', function (req, res) {
 });
 
 site.app.post('/tenants/delete/:name', function (req, res) {
-  var user = site.checkAuth(req, res);
+  var user = site.checkAuth(req, res, true, 'superadmin');
   var options = {
     uri: BOX_ADDR + '/tenants/' + req.params.name,
     method: 'DELETE'
