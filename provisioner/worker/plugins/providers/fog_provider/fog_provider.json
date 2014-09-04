@@ -185,7 +185,7 @@
           "data_disk_size_gb": {
             "label": "Data disk size in Gb",
             "type": "text",
-            "default": 30,
+            "default": 10,
             "tip": "Size of the persistent disk to be created and mounted to /data"
           },
           "network": {
