@@ -29,7 +29,7 @@ class FogProviderGoogle < Provider
     @hostname = inputmap['hostname']
     # GCE does not allow dots, including the loom-server-appended .local
     # we generate the unique providerid from the loom-hostname
-    #  and leave the loom hostname for use in /etc/hosts
+    # and leave the loom hostname for use in /etc/hosts
     @providerid = @hostname[/[a-zA-Z0-9\-]*/]
     fields = inputmap['fields']
     begin
@@ -59,7 +59,7 @@ class FogProviderGoogle < Provider
       end
 
       # create the VM
-      server = connection.servers.create(create_server_def)
+      connection.servers.create(create_server_def)
 
       # Process results
       # return the unique providerid we used
