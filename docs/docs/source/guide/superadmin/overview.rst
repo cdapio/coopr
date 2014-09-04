@@ -34,7 +34,7 @@ other users in their own tenant.
 
 System Tools
 ============
-Cask Coopr allows administrators to :doc:`configure their servers </guide/superadmin/server-config>`
+Coopr allows administrators to :doc:`configure their servers </guide/superadmin/server-config>`
 and  :doc:`write custom plugins </guide/superadmin/plugins>` for allocating machines with your providers or to implement custom services.
 Administrators who are more command line driven, or who wish to write quick administrative scripts,
 can employ the :doc:`Web services API </rest/index>`.

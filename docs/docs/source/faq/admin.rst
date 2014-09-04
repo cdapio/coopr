@@ -62,5 +62,5 @@ The default admin password is 'admin'.
 Any user password works. What are the user passwords for?
 ---------------------------------------------------------
 
-Currently, Cask Coopr will allow any user to login through the UI. Authentication has not been implemented yet so the usernames
+Currently, Coopr will allow any user to login through the UI. Authentication has not been implemented yet so the usernames
 and passwords are simply placeholders at this time. Authentication will be added in a future release.

@@ -93,5 +93,5 @@ before a provisioner shuts itself down after receiving a kill signal.
 
 Can the Chef Solo Automator plugin use a Chef server?
 -----------------------------------------------------
-Currently, it does not. The current version uses only chef-solo, however, future version of Cask Coopr will support both chef-solo and
+Currently, it does not. The current version uses only chef-solo, however, future version of Coopr will support both chef-solo and
 chef-client. 

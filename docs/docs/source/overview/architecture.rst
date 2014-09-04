@@ -25,7 +25,7 @@ Architecture
 .. figure:: /_images/Coopr-Architecture.png
     :width: 800px
     :align: center
-    :alt: Cask Coopr Architecture
+    :alt: Coopr Architecture
     :figclass: align-center
 
 Server
@@ -44,7 +44,7 @@ after execution completes. Additionally, the provisioner syncs resources on requ
 manage what configuration and code should be used to perform various node and service actions. 
 
 Provisioners support a pluggable architecture for integrating different infrastructure providers (e.g. OpenStack, Rackspace, Amazon Web Services, Google App Engine, and Joyent) 
-and automators (e.g. Chef, Puppet, Shell scripts). Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Cask Coopr's architecture simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent tasks to render scalability.
+and automators (e.g. Chef, Puppet, Shell scripts). Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Coopr's architecture simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent tasks to render scalability.
 
 Web UI
 ===========

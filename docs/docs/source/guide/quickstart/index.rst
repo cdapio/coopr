@@ -22,10 +22,10 @@
 Quick Start Guide
 ==================
 
-This guide will help you get started with Cask Coopr. In this section, you will learn to provision a cluster
+This guide will help you get started with Coopr. In this section, you will learn to provision a cluster
 using one of the preset templates.
 
-Installing Cask Coopr
+Installing Coopr
 ===========================
 
 Please follow the steps found in the :doc:`Installation Guide </guide/installation/index>`. Once successfully installed,
@@ -86,7 +86,7 @@ Enter the necessary fields and click on 'Save' to persist them.
 Joyent
 ^^^^^^
 Joyent requires a region, key file, key name, user, and api version. The key file must be present on all machines
-running the Provisioner, must be owned by the user running Cask Coopr, and must be readable only by the user that owns it
+running the Provisioner, must be owned by the user running Coopr, and must be readable only by the user that owns it
 (0400 permissions). 
 
 .. figure:: /guide/quickstart/joyent.png
@@ -101,10 +101,10 @@ OpenStack
 ^^^^^^^^^
 OpenStack has been extensively tested on Havana, but it also supports Grizzly out of the box. OpenStack support has 
 some limitations that are described :doc:`here </guide/installation/openstack-config>`.
-Several of these limitations will be eliminated in future releases of Cask Coopr.
+Several of these limitations will be eliminated in future releases of Coopr.
 The first step is to configure the openstack provider to use your credentials. 
 OpenStack requires a key file, auth url, password, key name, tenant, and user. The key file must be 
-present on all machines running the Provisioner, must be owned by the user running Cask Coopr, and must be readable only by
+present on all machines running the Provisioner, must be owned by the user running Coopr, and must be readable only by
 the user that owns it (0400 permissions).
 
 .. figure:: /guide/quickstart/openstack-provider.png

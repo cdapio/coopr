@@ -24,14 +24,14 @@ Openstack Configuration
 
 * Admin:
 
- * There must be a user in OpenStack which is a member of all projects which will have hosts provisioned by Cask Coopr.
+ * There must be a user in OpenStack which is a member of all projects which will have hosts provisioned by Coopr.
 
 * Networking:
 
  * Instance networks must be routable from Coopr provisioners.
  * If multiple networks, any network named "public" becomes network Coopr Provisioner uses for SSH.
  * If there is only one network, coopr provisioner will use it for SSH.
- * Cask Coopr currently does not support specifying a network.
+ * Coopr currently does not support specifying a network.
 
 * SSH Keys:
 

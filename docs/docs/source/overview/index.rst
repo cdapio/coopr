@@ -22,42 +22,42 @@
 ========
 Overview
 ========
-Cask Coopr is a cluster provisioning system designed from the ground up to fully facilitate cluster lifecycle management
+Coopr is a cluster provisioning system designed from the ground up to fully facilitate cluster lifecycle management
 in both public and private clouds. It streamlines the process of provisioning clusters of any kind, right from an end user's workstation.
 Administrators can easily create cluster templates, which allows end users to quickly instantiate live clusters.
 
-Cask Coopr exposes two primary user interfaces: Coopr Admin and Coopr User. Coopr Admin makes it easy for
-administrators to create and maintain complex cluster templates across multiple IaaS clouds, while Cask Coopr User
+Coopr exposes two primary user interfaces: Coopr Admin and Coopr User. Coopr Admin makes it easy for
+administrators to create and maintain complex cluster templates across multiple IaaS clouds, while Coopr User
 makes it easy for any end user to select and build complex clusters using these templates. This empowers the end users
-eliminating the need for filing tickets or the pain of configuring complicated clusters. In essence, Cask Coopr
+eliminating the need for filing tickets or the pain of configuring complicated clusters. In essence, Coopr
 has been designed to offer a comprehensive self-service provisioning system.
 
 .. figure:: /_images/coopr-diagram.png
     :align: center
-    :alt: What is Cask Coopr?
+    :alt: What is Coopr?
     :figclass: align-center
 
-Within Cask Coopr, a cluster is the basic indivisible element that supports create, delete, amend, update, and
+Within Coopr, a cluster is the basic indivisible element that supports create, delete, amend, update, and
 monitor operations. These complex operations are masked by simple REST services that allow easy integrations with
-existing IT operations' systems. Cask Coopr is built with DevOps and IT in mind: it's highly flexible (through lifecycle hooks)
+existing IT operations' systems. Coopr is built with DevOps and IT in mind: it's highly flexible (through lifecycle hooks)
 and easily pluggable (via Chef, Puppet, and other automation tools).
 Future development will focus more on managing clusters of machines or clusters of clusters and less around individual machines.
 
 .. _history-of-coopr:
 
-History of Cask Coopr
+History of Coopr
 ===========================
 At  Cask Data, we built our Coopr product to fill an ongoing need - to quickly build and deploy clusters for developers.
 Since Reactor, our flagship product, utilizes several technologies within the Hadoop ecosystem, it was a constant battle
-to build, use and tear down clusters regularly on a variety of IaaS providers. Cask Coopr solved this problem by
-rapidly provisioning our clusters to meet the needs of our business, developers and customers. Cask Coopr's
+to build, use and tear down clusters regularly on a variety of IaaS providers. Coopr solved this problem by
+rapidly provisioning our clusters to meet the needs of our business, developers and customers. Coopr's
 streamlined cluster management was a key investment for Cask.
 
 .. _coopr-in-production:
 
-Cask Coopr in Production
+Coopr in Production
 ==============================
-Currently, Cask Coopr is used to provision Cask Data Application Platform (CDAP) on the Coopr Cloud and as an IT tool by developers to
-test new and incremental features on an ongoing basis. Within the Cask build system, Cask Coopr is used via REST APIs to provision
+Currently, Coopr is used to provision Cask Data Application Platform (CDAP) on the Coopr Cloud and as an IT tool by developers to
+test new and incremental features on an ongoing basis. Within the Cask build system, Coopr is used via REST APIs to provision
 multi-node CDAP clusters to perform functional testing.
 

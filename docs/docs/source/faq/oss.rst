@@ -24,9 +24,9 @@
 Licensing and Open Source 
 ============================
 
-What type of license is Cask Coopr open sourced under?
+What type of license is Coopr open sourced under?
 -------------------------------------------------------------
-Cask Coopr is licensed under an `Apache 2.0 license <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
+Coopr is licensed under an `Apache 2.0 license <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
 
 How can I contribute?
 ---------------------

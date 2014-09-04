@@ -17,7 +17,7 @@
 JBoss Application Server
 ===========================
 
-This document describes how to install and configure JBoss Application Server (AS) and template with Cask Coopr in less than 10 minutes.
+This document describes how to install and configure JBoss Application Server (AS) and template with Coopr in less than 10 minutes.
 JBoss AS is an open source Java Application Server. For more information please visit the `JBoss AS site <http://www.jboss.org/jbossas>`_
 
 Prerequisite
@@ -56,18 +56,18 @@ After the JBoss bundle is installed, you should see the following directory stru
 
 .. note:: More JBoss applications can be added to the 'jboss-apps' directory and will be installed into the '$JBOSS_HOME/standalone/deployments' directory by default.
 
-Configure Oracle Java 7 Service in Cask Coopr
+Configure Oracle Java 7 Service in Coopr
 ---------------------------------------------------
-JBoss AS requires Oracle Java 7. The following will add a service to Cask Coopr for installing and configuring Java:
+JBoss AS requires Oracle Java 7. The following will add a service to Coopr for installing and configuring Java:
 ::
 
  $ curl -o /tmp/oracle-java-7 $REMOTE_COOPR_PLUGINS/jboss/services/oracle-java-7
  $ curl -X POST -H "X-Coopr-UserId:admin"\
      -d @/tmp/oracle-java-7 http://$COOPR_SERVER:$COOPR_PORT/v1/coopr/services
 
-Configure JBoss AS Service in Cask Coopr
+Configure JBoss AS Service in Coopr
 ----------------------------------------------
-Now that we have installed the scripts and dependent services, we must configure the JBoss AS service within Cask Coopr and then define a cluster template to enable Coopr provisioning of JBoss AS clusters.
+Now that we have installed the scripts and dependent services, we must configure the JBoss AS service within Coopr and then define a cluster template to enable Coopr provisioning of JBoss AS clusters.
 This configuration can be achieved using either the Coopr Admin UI or Webservices.
 
 The following adds service 'jboss' to the service list.
@@ -77,10 +77,10 @@ The following adds service 'jboss' to the service list.
  $ curl -X POST -H "X-Coopr-UserId:admin"\
      -d @/tmp/jboss http://$COOPR_SERVER:$COOPR_PORT/v1/coopr/services
 
-Create JBoss AS Cluster Template in Cask Coopr
+Create JBoss AS Cluster Template in Coopr
 -----------------------------------------------------
-Once the 'jboss' service has been added to Cask Coopr, you are ready to create a cluster template or even add this service to an existing cluster template.
-The easiest way to get started running JBoss AS is to use the Webservices to add a new JBoss cluster template to Cask Coopr.
+Once the 'jboss' service has been added to Coopr, you are ready to create a cluster template or even add this service to an existing cluster template.
+The easiest way to get started running JBoss AS is to use the Webservices to add a new JBoss cluster template to Coopr.
 
 .. sidebar:: Cluster template details
 
@@ -96,7 +96,7 @@ Use the following command to create the 'jboss-application-server' cluster templ
  $ curl -X POST -H "X-Coopr-UserId:admin"\
      -d @/tmp/jboss-application-server http://$COOPR_SERVER:$COOPR_PORT/v1/coopr/clustertemplates
 
-Provision an instance of 'jboss-application-cluster' with Cask Coopr
+Provision an instance of 'jboss-application-cluster' with Coopr
 --------------------------------------------------------------------------
 Once the cluster template has been created, you are now ready to create a cluster. Please
 follow the cluster creation procedure from the main Coopr documentation. You can either choose

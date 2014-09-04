@@ -22,7 +22,7 @@
 User Guide
 ==========
 
-This page describes the different interfaces and functions that end users can use to manage their own set of clusters within Cask Coopr.
+This page describes the different interfaces and functions that end users can use to manage their own set of clusters within Coopr.
 As mentioned earlier in the administration guide, all clusters and nodes within clusters are dictated by templates created by
 the administrator, made accessible to individual users (or developers), and displayed in the Catalog. These accessible templates  
 are users' blueprint for their individual cluster instantiation.

@@ -24,7 +24,7 @@
 Coopr Server
 ============================
 
-How many concurrent provisioning jobs can Cask Coopr handle?
+How many concurrent provisioning jobs can Coopr handle?
 ------------------------------------------------------------------
 Coopr Server is built upon Netty. It's highly asynchronous. We have tested it to handle tens of thousands of concurrent requests.
 However, we believe that there is lot of room for improvement. We are committed on improving its performance in the future releases.
@@ -42,7 +42,7 @@ Where are the configurations of cluster template and it's metadata stored?
 ----------------------------------------------------------------------------
 Cluster templates and their associated metadata are stored in a database.
 
-How do I setup a database for Cask Coopr to use?
+How do I setup a database for Coopr to use?
 ------------------------------------------------------
 Coopr Server persists runtime information of provisioned clusters in a relational database. 
 If you are running Coopr Server in the default mode, it's using the embedded Derby DB for storing all 

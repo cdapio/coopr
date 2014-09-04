@@ -26,7 +26,7 @@ Installation Guide
 Overview
 ========
 
-This document will guide you through the process of installing Cask Coopr
+This document will guide you through the process of installing Coopr
 on your own cluster with the official installation image.
 
 System Requirements
@@ -36,7 +36,7 @@ System Requirements
 
 Hardware Requirements
 ---------------------
-Systems hosting the Cask Coopr components must meet these hardware specifications, in addition to having CPUs
+Systems hosting the Coopr components must meet these hardware specifications, in addition to having CPUs
 with a minimum speed of 2 GHz
 
 .. list-table::
@@ -46,13 +46,13 @@ with a minimum speed of 2 GHz
    * - Component
      - Hardware Component
      - Specifications
-   * - Cask Coopr UI
+   * - Coopr UI
      - RAM
      - 512MB minimum, 1 GB recommended
-   * - Cask Coopr Server 
+   * - Coopr Server 
      - RAM
      - 1 GB minimum, 3 GB recommended
-   * - Cask Coopr Provisioners
+   * - Coopr Provisioners
      - RAM
      - 256 MB per provisioner worker; for example, with 10 workers, 2.5 GB minimum
    * - Database (ex: MySQL)
@@ -60,14 +60,14 @@ with a minimum speed of 2 GHz
      - 2 GB minimum, 4 GB recommended
    * - 
      - Disk
-     - Disk usage increases as Cask Coopr usage increases; suggested minimum of 50GB
+     - Disk usage increases as Coopr usage increases; suggested minimum of 50GB
 
 .. _system-requirements:
 
 Supported Operating Systems
 ---------------------------
 
-Cask Coopr has been tested against these platforms:
+Coopr has been tested against these platforms:
 
  * CentOS 6.4
  * Ubuntu 12.04
@@ -75,7 +75,7 @@ Cask Coopr has been tested against these platforms:
 Supported Databases
 -------------------
 
-Cask Coopr supports any database with a jdbc driver that supports standard SQL queries. It has been tested with these databases:
+Coopr supports any database with a jdbc driver that supports standard SQL queries. It has been tested with these databases:
 
  * (Default) Derby
  * MySQL version 5.1 or above
@@ -83,7 +83,7 @@ Cask Coopr supports any database with a jdbc driver that supports standard SQL q
 Supported Zookeeper Versions
 ----------------------------
 
-Cask Coopr has been tested with these versions of Zookeeper:
+Coopr has been tested with these versions of Zookeeper:
 
  * Apache Zookeeper version 3.4 or above
  * CDH4 or CDH5 Zookeeper
@@ -91,13 +91,13 @@ Cask Coopr has been tested with these versions of Zookeeper:
 
 Supported OpenStack Versions
 ----------------------------
-Cask Coopr has been extensively tested on Havana, but it also supports Grizzly out of the box.
+Coopr has been extensively tested on Havana, but it also supports Grizzly out of the box.
 
-.. note:: Click here for more information on how :doc:`Openstack should be configured <openstack-config>` currently to support provisioning with Coopr. Several limitations that exist will be eliminated in future releases of Cask Coopr.
+.. note:: Click here for more information on how :doc:`Openstack should be configured <openstack-config>` currently to support provisioning with Coopr. Several limitations that exist will be eliminated in future releases of Coopr.
 
 Supported Internet Protocols
 ----------------------------
-Cask Coopr requires IPv4. IPv6 is currently not supported.
+Coopr requires IPv4. IPv6 is currently not supported.
 
 Supported Browsers
 ------------------
@@ -107,14 +107,14 @@ Supported Browsers
 
 Supported Node.js Versions
 ----------------------------
-Cask Coopr supports Node.js version 0.10.26 or above.
+Coopr supports Node.js version 0.10.26 or above.
 
 .. _prerequisites:
 
 Software Prerequisites
 ======================
 
-Cask Coopr requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Cask Coopr is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.
+Coopr requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Coopr is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.
 
 Linux
 -----
@@ -163,7 +163,7 @@ To add the Cask Yum repository, add the following content to the file ``/etc/yum
 ::
 
   [cask]
-  name=Cask Coopr Releases
+  name=Coopr Releases
   baseurl=https://<username>:<password>@repository.continuuity.com/content/repositories/coopr
   enabled=1
   protect=0
@@ -205,7 +205,7 @@ Coopr packages by default use the ``alternatives`` system to initialize a config
 
 Database Configuration
 ----------------------
-By default, Cask Coopr uses an embedded Derby database. However, you can optionally choose to enable remote database for Coopr Server.
+By default, Coopr uses an embedded Derby database. However, you can optionally choose to enable remote database for Coopr Server.
 Additional steps are required to configure this setting.
 
 Sample MySQL setup
@@ -347,7 +347,7 @@ The UI environmental variables can be set at ``/etc/default/coopr-ui``. The conf
 
 Starting and Stopping Coopr Services
 ====================================
-By default, Cask Coopr's installation RPMs and PKGs do not configure auto start of the services in the ``init.d``. We leave
+By default, Coopr's installation RPMs and PKGs do not configure auto start of the services in the ``init.d``. We leave
 that privilege to the administrator. For each Coopr component and its related service (such as the Server, Provisioner, and UI),
 there is a launch script, which you may use to execute a desired operation. For example, to start, stop, or check status
 for a Coopr Provisioner, you can use:
@@ -362,7 +362,7 @@ for a Coopr Provisioner, you can use:
 Loading Default Templates
 =========================
 
-Coopr provides a set of useful default templates that covers most supported use cases. For new users and administrators of Cask Coopr, we
+Coopr provides a set of useful default templates that covers most supported use cases. For new users and administrators of Coopr, we
 recommend installing these defaults as a starting point for template definition. These defaults are required for running
 the example in the :doc:`Quick Start Guide </guide/quickstart/index>`. To load these templates, run:
 ::
@@ -391,7 +391,7 @@ the provisioner can be changed by editing the ``/etc/default/coopr-provisioner``
 
 Rotation
 --------
-Cask Coopr depends on the external Linux utility logrotate to rotate its logs. Cask Coopr
+Coopr depends on the external Linux utility logrotate to rotate its logs. Coopr
 packages contain logrotate configurations in ``/etc/logrotate.d`` but it does not perform the rotations itself.
 Please ensure logrotate is enabled on your Coopr hosts.
 
@@ -400,7 +400,7 @@ Please ensure logrotate is enabled on your Coopr hosts.
 Common Installation Issues
 ==========================
 
-* A common issue is installing Cask Coopr on machines that have Open JDK installed rather than Oracle JDK.
+* A common issue is installing Coopr on machines that have Open JDK installed rather than Oracle JDK.
 
 * If you see JDBC exceptions in the Coopr Server log like:
   ::

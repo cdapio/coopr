@@ -24,7 +24,7 @@ Glossary
 .. glossary::
 
     Administrator
-        An administrator of Cask Coopr defines the various configuration elements for creating clusters in Cask Coopr.
+        An administrator of Coopr defines the various configuration elements for creating clusters in Coopr.
         These include settings such as the provider to host the cluster, the hardware configuration of the nodes,
         the base disk image of nodes, the software services installed on the cluster, and the duration of lease
         on the clusters. These settings are all tied together via templates that can be used by Coopr
@@ -58,19 +58,19 @@ Glossary
         deleted.
 
     Hardware
-        Hardware in Cask Coopr refers to a type of machine, either physical or in the cloud, that a Provider can provide.
+        Hardware in Coopr refers to a type of machine, either physical or in the cloud, that a Provider can provide.
 
 
     Image
-        An Image in Cask Coopr refers to some type of base image that a Provider can provide. Any software
-        that the image may contain is not managed by Cask Coopr. Its main use is to specify the OS on a machine.
+        An Image in Coopr refers to some type of base image that a Provider can provide. Any software
+        that the image may contain is not managed by Coopr. Its main use is to specify the OS on a machine.
 
     Lease Time
         A lease time is an optional cluster setting that specifies the amount of time a cluster can run for
         before being automatically deleted.
 
     Coopr Server
-        The Coopr Server is a component of Cask Coopr that stores admin defined providers, hardware types,
+        The Coopr Server is a component of Coopr that stores admin defined providers, hardware types,
         image types, services, and cluster templates. Coopr server takes cluster action requests, such
         as requests to create or delete a cluster. It also manages the tasks each node need to run,
         as well as the order of tasks to complete the actions.
@@ -80,12 +80,12 @@ Glossary
         Rackspace, and Amazon EC2.
 
     Provisioner
-        The provisioner is a component of Cask Coopr that performs cluster management tasks.
+        The provisioner is a component of Coopr that performs cluster management tasks.
         It performs all the actual tasks, including communicating with different
         providers to request machines, installing services, and configuring services.
 
     Service
-        A service in Cask Coopr is a piece of software that can be made available on a cluster. It defines at least one
+        A service in Coopr is a piece of software that can be made available on a cluster. It defines at least one
         provisioner action that will occur during cluster creation and management. Provisioner actions fall
         into one of the following types: install, configure, initialize, start, stop, and remove.
 
@@ -102,7 +102,7 @@ Glossary
         what services can and cannot exist together on the same node.
 
     User
-        A user of Coopr can create clusters through Cask Coopr within the permitted configurations set
+        A user of Coopr can create clusters through Coopr within the permitted configurations set
         by the Administrator, as specified through the templates in the catalog.
 
     Zookeeper

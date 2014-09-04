@@ -87,7 +87,7 @@ the run-list to use. The ``json_attributes`` field is any additional JSON data w
 later). When the Chef Solo Automator plugin executes any of these actions for the apache-httpd service, it performs
 the following actions:
 
-        1. generate a task-specific JSON file containing any attributes defined in the json_attributes field, as well as base cluster attributes defined elsewhere in Cask Coopr.
+        1. generate a task-specific JSON file containing any attributes defined in the json_attributes field, as well as base cluster attributes defined elsewhere in Coopr.
         2. invoke chef-solo using the ``run_list`` field as the run-list as follows:  ``chef-solo -o [run_list] -j [task-specific json]``
 
 
@@ -111,7 +111,7 @@ corresponding Chef service resource, and invokes the specified action.
 JSON Attributes
 ================
 
-Cask Coopr maintains significant JSON data for a cluster, and makes it available for each task. This JSON data includes:
+Coopr maintains significant JSON data for a cluster, and makes it available for each task. This JSON data includes:
     * cluster-wide configuration defined in cluster templates (Catalog -> cluster template -> defaults -> config)
     * node data for each node of the cluster: hostname, ip, etc
     * service data, specified in the actions for each service
@@ -200,7 +200,7 @@ Then simply add your service to a cluster template.
 Helper Cookbooks
 ================
 
-Cask Coopr ships with several helper cookbooks.
+Coopr ships with several helper cookbooks.
 
 
 **coopr_base**
@@ -259,7 +259,7 @@ If this recipe is included in the run-list and no attributes specified, the defa
 Best Practices
 ==============
 
-* Cask Coopr is designed to use attribute-driven cookbooks. All user-defined attributes are specified in Coopr primitives. Recipes that use Chef server capabilities like discovery and such do not operate well with Cask Coopr.
-* Separate the install, configuration, initialization, starting/stopping, and deletion logic of your cookbooks into granular recipes. This way Coopr services can often be defined with a 1:1 mapping to recipes. Remember that Cask Coopr will need to install, configure, initialize, start, stop, and remove your services, each independently through a combination of run-list and attributes.
+* Coopr is designed to use attribute-driven cookbooks. All user-defined attributes are specified in Coopr primitives. Recipes that use Chef server capabilities like discovery and such do not operate well with Coopr.
+* Separate the install, configuration, initialization, starting/stopping, and deletion logic of your cookbooks into granular recipes. This way Coopr services can often be defined with a 1:1 mapping to recipes. Remember that Coopr will need to install, configure, initialize, start, stop, and remove your services, each independently through a combination of run-list and attributes.
 * Use wrapper cookbooks in order to customize community cookbooks to suit your needs.
 * Remember to declare cookbook dependencies in metadata.

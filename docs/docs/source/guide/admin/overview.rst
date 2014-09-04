@@ -24,7 +24,7 @@ Overview
 
 .. include:: /guide/admin/admin-links.rst
 
-In this page, we explore various concepts behind Cask Coopr administration and explain various tools used in Cask Coopr for
+In this page, we explore various concepts behind Coopr administration and explain various tools used in Coopr for
 administrators to configure and manage their clusters. At the core of a Coopr cluster is the notion of a **Template**, which
 is the blueprint or the primordial stuff of what Coopr clusters are comprised of—it is the essence or the DNA of how different
 parts and components come together to materialize into a cluster.
@@ -32,11 +32,11 @@ parts and components come together to materialize into a cluster.
 Concepts
 ========
 
-As mentioned above, Cask Coopr works through the use of **Templates**, which dictate the configuration of the
+As mentioned above, Coopr works through the use of **Templates**, which dictate the configuration of the
 clusters that users can spin up. An administrator can specify any number of such templates to put into
 their **Catalog** for users. 
 
-Several concepts central to cluster configuration are definable in Cask Coopr. These aspects are:
+Several concepts central to cluster configuration are definable in Coopr. These aspects are:
 
 * **Providers** - Infrastructure providers (such as Amazon or OpenStack) that supply machines.
 

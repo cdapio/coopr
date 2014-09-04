@@ -26,16 +26,16 @@ Security
 ===================
 
 At Cask Data, we take security very seriously and invest a lot of time to make sure we
-secure communication between different aspects of any system that we build. Cask
+secure communication between different aspects of any system that we build.
 Coopr beta release does not include a lot of much needed security features, but upcoming
-releases of Cask Coopr will make it secure and more reliable for provisioning
+releases of Coopr will make it secure and more reliable for provisioning
 clusters. This document describes how we are planning to secure different aspects of
-Cask Coopr.
+Coopr.
 
 .. figure:: security-diagram.png
     :align: right
     :width: 800px
-    :alt: Cask Coopr architecture and security
+    :alt: Coopr architecture and security
     :figclass: align-center
 
 Communication Channels
@@ -92,7 +92,7 @@ Data Stores
   * Encryption of sensitive data.
 
 
-Cask Coopr Components
+Coopr Components
 ===========================
 
  * Coopr Server

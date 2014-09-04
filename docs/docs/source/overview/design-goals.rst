@@ -24,7 +24,7 @@ Design Goals
 Highlights and Features
 =======================
 
-Cask Coopr was designed to simplify and unify the
+Coopr was designed to simplify and unify the
 process of cluster provisioning across infrastructure systems,
 while still allowing the flexibility to individually
 specify cluster settings.
@@ -37,7 +37,7 @@ specify cluster settings.
     :figclass: align-center
 
 
-Cask Coopr streamlines the process of cluster provisioning, reducing
+Coopr streamlines the process of cluster provisioning, reducing
 the amount of work necessary for administrators and users.
-Cask Coopr also allows cluster administrators to more easily manage and
+Coopr also allows cluster administrators to more easily manage and
 monitor clusters through a higher level interface system.

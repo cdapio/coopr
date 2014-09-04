@@ -23,7 +23,7 @@ Release Notes
 =============
 .. _release-notes:
 
-Welcome to Cask Coopr |release| release. Release notes with links to issue details can be seen from the github project at https://github.com/caskco/coopr/releases.
+Welcome to Coopr |release| release. Release notes with links to issue details can be seen from the github project at https://github.com/caskco/coopr/releases.
 
 Release Theme : Extensibility 
 --------------------------------

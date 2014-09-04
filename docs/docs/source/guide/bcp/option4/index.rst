@@ -28,7 +28,7 @@ Hot-Hot : With Custom Replication
 
 Overview
 ========
-Synchronous database cluster may turn out to be not optimal for large Cask Coopr installations due to the amount of data that needs to be replicated across datacenters.
+Synchronous database cluster may turn out to be not optimal for large Coopr installations due to the amount of data that needs to be replicated across datacenters.
 In such a case we have to consider an alternative solution where we use local databases in each datacenter with a custom data replication service. 
 This will allow for all datacenters to share the data, while reducing the need to replicate all the data in the database.
 

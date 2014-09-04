@@ -21,12 +21,12 @@
 Datacenter High Availability
 =============================
 
-Cask Coopr can be configured to be resilient to machine or component failures. This document describes the recommended configuration
-for setting up Cask Coopr for HA within a single datacenter. Please refer to :doc:`multi-datacenter HA <multi-data-center-bcp>` documentation
+Coopr can be configured to be resilient to machine or component failures. This document describes the recommended configuration
+for setting up Coopr for HA within a single datacenter. Please refer to :doc:`multi-datacenter HA <multi-data-center-bcp>` documentation
 for configuring HA across multiple datacenters.
 
 In order to support resiliency against machine or component failures within a datacenter, Coopr components can be configured to 
-run with redundancies on multiple machines. Each machine running Cask Coopr can have a maximum of -
+run with redundancies on multiple machines. Each machine running Coopr can have a maximum of -
 
 * One coopr-ui process
 * One coopr-server process
@@ -34,7 +34,7 @@ run with redundancies on multiple machines. Each machine running Cask Coopr can 
 * One ZooKeeper process
 * One database process
 
-The diagram below shows the logical deployment diagram of Cask Coopr for HA in a datacenter-
+The diagram below shows the logical deployment diagram of Coopr for HA in a datacenter-
 
 .. _single-dc:
 .. figure:: /_images/ha_within_colo.png

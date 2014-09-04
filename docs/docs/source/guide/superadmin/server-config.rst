@@ -31,7 +31,7 @@ Configuring the server
 
 Coopr Server uses Zookeeper for task coordination and a database for persistent data. The server will work out of the box
 without any configuration options with an in-process Zookeeper and an embedded Derby DB; however, we 
-strongly recommend that administrators supply their own Zookeeper quorum and database outside of Cask Coopr for performance and
+strongly recommend that administrators supply their own Zookeeper quorum and database outside of Coopr for performance and
 maintainability. Below we indicate how you can supply your own database (in this case MySQL server) for storage, 
 and the associated JDBC connector in the server configuration file.
 
@@ -41,7 +41,7 @@ The zookeeper quorum, a collection of nodes running instances of Zookeeper, is s
 
 Database
 ^^^^^^^^
-Cask Coopr uses JDBC for database access. To provide your own database, and for Cask Coopr to access it, you must specify a driver, a connection string,
+Coopr uses JDBC for database access. To provide your own database, and for Coopr to access it, you must specify a driver, a connection string,
 a user, and a password, as shown in the following example.  We also recommend specifying a validation query to be used with jdbc connection 
 pooling.  The query will change based on which database you are using.  
 ::
