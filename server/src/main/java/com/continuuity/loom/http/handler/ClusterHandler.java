@@ -71,8 +71,8 @@ import java.util.Set;
  * Handler for performing cluster operations.
  */
 @Path(Constants.API_BASE + "/clusters")
-public class LoomClusterHandler extends LoomAuthHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(LoomClusterHandler.class);
+public class ClusterHandler extends AbstractAuthHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(ClusterHandler.class);
 
   private final ClusterService clusterService;
   private final ClusterStoreService clusterStoreService;
@@ -81,11 +81,11 @@ public class LoomClusterHandler extends LoomAuthHandler {
   private final Gson gson;
 
   @Inject
-  private LoomClusterHandler(TenantStore tenantStore,
-                             ClusterService clusterService,
-                             ClusterStoreService clusterStoreService,
-                             Configuration conf,
-                             Gson gson) {
+  private ClusterHandler(TenantStore tenantStore,
+                         ClusterService clusterService,
+                         ClusterStoreService clusterStoreService,
+                         Configuration conf,
+                         Gson gson) {
     super(tenantStore);
     this.clusterService = clusterService;
     this.clusterStoreService = clusterStoreService;

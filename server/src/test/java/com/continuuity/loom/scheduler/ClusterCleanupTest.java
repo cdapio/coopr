@@ -18,12 +18,12 @@ package com.continuuity.loom.scheduler;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.TestHelper;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.http.ServiceTestBase;
 import com.continuuity.loom.spec.ProvisionerAction;
 import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.common.queue.Element;
-import com.continuuity.loom.http.LoomServiceTestBase;
 import com.continuuity.loom.scheduler.task.ClusterJob;
 import com.continuuity.loom.scheduler.task.ClusterService;
 import com.continuuity.loom.scheduler.task.ClusterTask;
@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Test ClusterCleanup.
  */
-public class ClusterCleanupTest extends LoomServiceTestBase {
+public class ClusterCleanupTest extends ServiceTestBase {
   static NodeService nodeService;
   static ClusterService clusterService;
   static TaskService taskService;

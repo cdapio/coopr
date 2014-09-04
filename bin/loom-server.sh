@@ -38,7 +38,7 @@ splitJvmOpts ( ) {
 APP_NAME="loom-server"
 LOOM_SERVER_CONF=${LOOM_SERVER_CONF:-/etc/loom/conf}
 CLASSPATH="${LOOM_HOME}/server/lib/*:${LOOM_SERVER_CONF}"
-MAIN_CLASS="com.continuuity.loom.runtime.LoomServerMain"
+MAIN_CLASS="com.continuuity.loom.runtime.ServerMain"
 PID_DIR=${PID_DIR:-/var/run/loom}
 pid="${PID_DIR}/${APP_NAME}.pid"
 

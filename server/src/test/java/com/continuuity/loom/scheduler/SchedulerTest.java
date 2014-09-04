@@ -21,7 +21,7 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.TrackingQueue;
-import com.continuuity.loom.http.LoomServiceTestBase;
+import com.continuuity.loom.http.ServiceTestBase;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
 import com.continuuity.loom.scheduler.callback.CallbackData;
@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Test ClusterScheduler
  */
-public class SchedulerTest extends LoomServiceTestBase {
+public class SchedulerTest extends ServiceTestBase {
   private static Cluster cluster;
   private static ClusterJob job;
 
@@ -276,7 +276,7 @@ public class SchedulerTest extends LoomServiceTestBase {
 
 
   private String getLoomUrl() {
-    InetSocketAddress address = loomService.getBindAddress();
+    InetSocketAddress address = handlerServer.getBindAddress();
     return String.format("http://%s:%s%s", address.getHostName(), address.getPort(), Constants.API_BASE);
   }
 

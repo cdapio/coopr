@@ -23,7 +23,7 @@ import com.continuuity.loom.common.daemon.DaemonMain;
 import com.continuuity.loom.common.queue.guice.QueueModule;
 import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
-import com.continuuity.loom.http.LoomService;
+import com.continuuity.loom.http.HandlerServer;
 import com.continuuity.loom.http.guice.HttpModule;
 import com.continuuity.loom.management.LoomStats;
 import com.continuuity.loom.management.guice.ManagementModule;
@@ -60,13 +60,13 @@ import java.util.concurrent.TimeUnit;
 /**
  * Loom server.
  */
-public final class LoomServerMain extends DaemonMain {
-  private static final Logger LOG = LoggerFactory.getLogger(LoomServerMain.class);
+public final class ServerMain extends DaemonMain {
+  private static final Logger LOG = LoggerFactory.getLogger(ServerMain.class);
 
   private InMemoryZKServer inMemoryZKServer;
   private ZKClientService zkClientService;
   private Injector injector;
-  private LoomService loomService;
+  private HandlerServer handlerServer;
   private Scheduler scheduler;
   private Configuration conf;
   private int solverNumThreads;
@@ -80,7 +80,7 @@ public final class LoomServerMain extends DaemonMain {
   private TenantStore tenantStore;
 
   public static void main(final String[] args) throws Exception {
-    new LoomServerMain().doMain(args);
+    new ServerMain().doMain(args);
   }
 
   @Override
@@ -164,9 +164,9 @@ public final class LoomServerMain extends DaemonMain {
       LOG.error("Exception starting up.", e);
       System.exit(-1);
     }
-    loomService = injector.getInstance(LoomService.class);
-    loomService.startAndWait();
-    LOG.info("Loom service started on {}", loomService.getBindAddress());
+    handlerServer = injector.getInstance(HandlerServer.class);
+    handlerServer.startAndWait();
+    LOG.info("Loom service started on {}", handlerServer.getBindAddress());
 
     scheduler = injector.getInstance(Scheduler.class);
     scheduler.startAndWait();
@@ -200,7 +200,7 @@ public final class LoomServerMain extends DaemonMain {
       }
     }
 
-    stopAll(loomService, resourceService, provisionerStore, tenantStore, clusterStoreService,
+    stopAll(handlerServer, resourceService, provisionerStore, tenantStore, clusterStoreService,
             entityStoreService, idService, zkClientService, inMemoryZKServer);
   }
 

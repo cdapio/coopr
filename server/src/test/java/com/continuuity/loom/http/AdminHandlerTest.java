@@ -16,6 +16,7 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
+import com.continuuity.loom.http.handler.AdminHandler;
 import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.continuuity.loom.spec.HardwareType;
 import com.continuuity.loom.spec.ImageType;
@@ -26,7 +27,6 @@ import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueMetrics;
-import com.continuuity.loom.http.handler.LoomAdminHandler;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -53,7 +53,7 @@ import java.util.UUID;
 /**
  *
  */
-public class LoomAdminHandlerTest extends LoomServiceTestBase {
+public class AdminHandlerTest extends ServiceTestBase {
 
   @Test
   public void testProviders() throws Exception {
@@ -149,27 +149,27 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
   public void testExportImport() throws Exception {
     // Import some config
     Map<String, JsonElement> import1 = Maps.newHashMap();
-    import1.put(LoomAdminHandler.PROVIDERS,
+    import1.put(AdminHandler.PROVIDERS,
                 gson.toJsonTree(Lists.newArrayList(Entities.ProviderExample.JOYENT),
                                 new TypeToken<List<Provider>>() {
                                 }.getType()));
-    import1.put(LoomAdminHandler.HARDWARE_TYPES,
+    import1.put(AdminHandler.HARDWARE_TYPES,
                 gson.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.LARGE,
                                                    Entities.HardwareTypeExample.MEDIUM),
                                 new TypeToken<List<HardwareType>>() {
                                 }.getType()));
-    import1.put(LoomAdminHandler.IMAGE_TYPES,
+    import1.put(AdminHandler.IMAGE_TYPES,
                 gson.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6,
                                                    Entities.ImageTypeExample.UBUNTU_12),
                                 new TypeToken<List<ImageType>>() {}.getType()));
 
-    import1.put(LoomAdminHandler.SERVICES,
+    import1.put(AdminHandler.SERVICES,
                 gson.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
                                                    Entities.ServiceExample.NAMENODE),
                                 new TypeToken<List<Service>>() {
                                 }.getType()));
 
-    import1.put(LoomAdminHandler.CLUSTER_TEMPLATES,
+    import1.put(AdminHandler.CLUSTER_TEMPLATES,
                 gson.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
                                                    Entities.ClusterTemplateExample.REACTOR),
                                 new TypeToken<List<ClusterTemplate>>() {}.getType()));
@@ -180,26 +180,26 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
 
     // Import some other config
     Map<String, JsonElement> import2 = Maps.newHashMap();
-    import2.put(LoomAdminHandler.PROVIDERS,
+    import2.put(AdminHandler.PROVIDERS,
                 gson.toJsonTree(Lists.newArrayList(Entities.ProviderExample.RACKSPACE,
                                                    Entities.ProviderExample.JOYENT),
                                 new TypeToken<List<Provider>>() {}.getType()));
-    import2.put(LoomAdminHandler.HARDWARE_TYPES,
+    import2.put(AdminHandler.HARDWARE_TYPES,
                 gson.toJsonTree(Lists.newArrayList(Entities.HardwareTypeExample.MEDIUM,
                                                    Entities.HardwareTypeExample.SMALL),
                                 new TypeToken<List<HardwareType>>() {
                                 }.getType()));
-    import2.put(LoomAdminHandler.IMAGE_TYPES,
+    import2.put(AdminHandler.IMAGE_TYPES,
                 gson.toJsonTree(Lists.newArrayList(Entities.ImageTypeExample.CENTOS_6),
                                 new TypeToken<List<ImageType>>() {}.getType()));
 
-    import2.put(LoomAdminHandler.SERVICES,
+    import2.put(AdminHandler.SERVICES,
                 gson.toJsonTree(Lists.newArrayList(Entities.ServiceExample.DATANODE,
                                                    Entities.ServiceExample.NAMENODE,
                                                    Entities.ServiceExample.HOSTS),
                                 new TypeToken<List<Service>>() {}.getType()));
 
-    import2.put(LoomAdminHandler.CLUSTER_TEMPLATES,
+    import2.put(AdminHandler.CLUSTER_TEMPLATES,
                 gson.toJsonTree(Lists.newArrayList(Entities.ClusterTemplateExample.HDFS,
                                                    Entities.ClusterTemplateExample.REACTOR),
                                 new TypeToken<List<ClusterTemplate>>() {
@@ -210,11 +210,11 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
 
     // Import empty config
     Map<String, JsonElement> import3 = Maps.newHashMap();
-    import3.put(LoomAdminHandler.PROVIDERS, new JsonArray());
-    import3.put(LoomAdminHandler.HARDWARE_TYPES, new JsonArray());
-    import3.put(LoomAdminHandler.IMAGE_TYPES, new JsonArray());
-    import3.put(LoomAdminHandler.SERVICES, new JsonArray());
-    import3.put(LoomAdminHandler.CLUSTER_TEMPLATES, new JsonArray());
+    import3.put(AdminHandler.PROVIDERS, new JsonArray());
+    import3.put(AdminHandler.HARDWARE_TYPES, new JsonArray());
+    import3.put(AdminHandler.IMAGE_TYPES, new JsonArray());
+    import3.put(AdminHandler.SERVICES, new JsonArray());
+    import3.put(AdminHandler.CLUSTER_TEMPLATES, new JsonArray());
     // Verify import worked by exporting
     runImportExportTest(import3);
   }
@@ -229,11 +229,11 @@ public class LoomAdminHandlerTest extends LoomServiceTestBase {
     Map<String, JsonElement> exportJson = new Gson().fromJson(reader,
                                                               new TypeToken<Map<String, JsonElement>>() {}.getType());
     Assert.assertEquals(importJson.size(), exportJson.size());
-    assertImport(importJson, exportJson, LoomAdminHandler.PROVIDERS);
-    assertImport(importJson, exportJson, LoomAdminHandler.HARDWARE_TYPES);
-    assertImport(importJson, exportJson, LoomAdminHandler.IMAGE_TYPES);
-    assertImport(importJson, exportJson, LoomAdminHandler.SERVICES);
-    assertImport(importJson, exportJson, LoomAdminHandler.CLUSTER_TEMPLATES);
+    assertImport(importJson, exportJson, AdminHandler.PROVIDERS);
+    assertImport(importJson, exportJson, AdminHandler.HARDWARE_TYPES);
+    assertImport(importJson, exportJson, AdminHandler.IMAGE_TYPES);
+    assertImport(importJson, exportJson, AdminHandler.SERVICES);
+    assertImport(importJson, exportJson, AdminHandler.CLUSTER_TEMPLATES);
   }
 
   private void assertImport(Map<String, JsonElement> import1, Map<String, JsonElement> export1, String key) {

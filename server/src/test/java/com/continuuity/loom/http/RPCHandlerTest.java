@@ -66,7 +66,7 @@ import java.util.Set;
 /**
  *
  */
-public class LoomRPCHandlerTest extends LoomServiceTestBase {
+public class RPCHandlerTest extends ServiceTestBase {
   private static ClusterTemplate smallTemplate;
 
   @BeforeClass
