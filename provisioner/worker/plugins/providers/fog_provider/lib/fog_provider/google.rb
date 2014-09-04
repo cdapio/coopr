@@ -42,7 +42,7 @@ class FogProviderGoogle < Provider
       # Create the server
       log.debug "Creating #{@providerid} on GCE using flavor: #{flavor}, image: #{image}"
 
-      # disks are managed separately, so CREATE must first create and confirm the disk to be usedd
+      # disks are managed separately, so CREATE must first create and confirm the disk to be used
       # handle boot disk
       create_disk(@providerid, nil, @zone_name, @image)
       disk = confirm_disk(@providerid)
