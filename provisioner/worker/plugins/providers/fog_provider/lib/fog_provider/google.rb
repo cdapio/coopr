@@ -162,6 +162,9 @@ class FogProviderGoogle < Provider
           Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
             cmd = %Q[#{sudo} mkdir #{mount_point} && #{sudo} /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/$(basename $(readlink /dev/disk/by-id/#{google_disk_id})) #{mount_point} && #{sudo} chmod a+w #{mount_point}]
             ssh_exec!(ssh, cmd, "mounting device #{google_disk_id} on #{mount_point}")
+            # update /etc/fstab
+            cmd = %Q[echo "/dev/$(basename $(readlink /dev/disk/by-id/#{google_disk_id})) #{mount_point} ext4 defaults,auto,noatime 0 2" | #{sudo} tee -a /etc/fstab]
+            ssh_exec!(ssh, cmd, "updating fstab for device #{google_disk_id} on #{mount_point}")
           end
         else
           log.warn "unexpected disk device found, ignoring: #{disk}"
