@@ -193,10 +193,9 @@ body #nav .login-dropdown li a span {
 ul.tenants-tickers li > div {
   font-weight: bold;
   text-align: center;
-  border: 2px solid white;
   border-radius: 3px;
   padding: 1em 1em 0;
-  background-color: #3E495D;
+  border: 2px solid #eee;
 }
 
 ul.tenants-tickers em {
