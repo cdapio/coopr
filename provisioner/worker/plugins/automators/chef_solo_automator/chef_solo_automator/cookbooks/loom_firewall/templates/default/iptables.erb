@@ -90,7 +90,9 @@ COMMIT
 
 # This cluster (automatic)
 <% node['loom']['cluster']['nodes'].each do |n, v| %>
--A INPUT -s <%= v.ipaddress =%> -j ACCEPT
+-A INPUT -s <%= v['ipaddresses']['access_v4'] =%> -j ACCEPT
+<% next if v['ipaddresses']['bind_v4'] == v['ipaddresses']['access_v4'] %>
+-A INPUT -s <%= v['ipaddresses']['bind_v4'] =%> -j ACCEPT
 <% end %>
 
 <% if node['loom_firewall']['whitelist_nodes'] %>
@@ -98,15 +100,15 @@ COMMIT
 <% node['loom_firewall']['whitelist_nodes'].each do |n| %>
 -A INPUT -s <%= n =%> -j ACCEPT
 <% end %>
-<% end %>
 
+<% end %>
 <% if node['loom_firewall']['blacklist_nodes'] %>
 # Blacklisted nodes
 <% node['loom_firewall']['blacklist_nodes'].each do |n| %>
 -A INPUT -s <%= n =%> -j DROP
 <% end %>
-<% end %>
 
+<% end %>
 ###
 ## Logging rule for testing/diagnostics (be sure to add a syslog.conf
 ## like this: 
