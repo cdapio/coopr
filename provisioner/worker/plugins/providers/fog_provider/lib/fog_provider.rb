@@ -26,4 +26,3 @@ require 'ipaddr'
 require 'net/ssh'
 
 gem 'fog', '~> 1.21.0'
-
