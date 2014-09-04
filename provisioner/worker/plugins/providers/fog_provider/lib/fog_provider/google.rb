@@ -49,10 +49,10 @@ class FogProviderGoogle < Provider
       @disks = [disk]
 
       # handle additional data disk
-      if fields['data_disk_size_gb']
+      if fields['google_data_disk_size_gb']
         data_disk_name = "#{@providerid}-data"
-        log.debug "Creating data disk: #{data_disk_name} of size #{fields['data_disk_size_gb']}"
-        create_disk(data_disk_name, fields['data_disk_size_gb'], @zone_name, nil)
+        log.debug "Creating data disk: #{data_disk_name} of size #{fields['google_data_disk_size_gb']}"
+        create_disk(data_disk_name, fields['google_data_disk_size_gb'], @zone_name, nil)
         data_disk = confirm_disk(data_disk_name)
         @disks.push(data_disk)
       end
@@ -65,9 +65,9 @@ class FogProviderGoogle < Provider
       @result['result']['providerid'] = @providerid
       # set ssh user
       ssh_user =
-        if @ssh_username.to_s != ''
+        if @google_ssh_username.to_s != ''
           # prefer custom plugin field
-          @ssh_username
+          @google_ssh_username
         elsif @task['config']['sshuser'].to_s != ''
           # default to ssh-user as defined by image
           @task['config']['ssh_user']
@@ -76,7 +76,7 @@ class FogProviderGoogle < Provider
           'root'
         end
       @result['result']['ssh-auth']['user'] = ssh_user
-      @result['result']['ssh-auth']['identityfile'] = @ssh_keyfile unless @ssh_keyfile.to_s == ''
+      @result['result']['ssh-auth']['identityfile'] = @google_ssh_keyfile unless @google_ssh_keyfile.to_s == ''
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
@@ -243,9 +243,9 @@ class FogProviderGoogle < Provider
     @connection ||= begin
       connection = Fog::Compute.new(
         provider: 'google',
-        google_project: @project_id,
-        google_client_email: @client_email,
-        google_key_location: @key_location
+        google_project: @google_project,
+        google_client_email: @google_client_email,
+        google_key_location: @google_key_location
       )
     end
     # rubocop:enable UselessAssignment
@@ -283,10 +283,10 @@ class FogProviderGoogle < Provider
 
   def validate!
     errors = []
-    unless @client_email =~ /.*gserviceaccount.com$/
+    unless @google_client_email =~ /.*gserviceaccount.com$/
       errors << 'Invalid service account email address. It must be in the gserviceaccount.com domain'
     end
-    [@key_location, @ssh_keyfile].each do |key|
+    [@google_key_location, @google_ssh_keyfile].each do |key|
       unless File.readable?(key)
         errors << "cannot read specified key location: #{key}"
       end

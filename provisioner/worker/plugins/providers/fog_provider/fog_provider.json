@@ -127,27 +127,27 @@
     "parameters": {
       "admin": {
         "fields": {
-          "project_id": {
+          "google_project": {
             "label": "Project ID",
             "type": "text",
             "tip": "GCE Project ID"
           },
-          "client_email": {
+          "google_client_email": {
             "label": "Service account email address",
             "type": "text",
             "tip": "Service account email address, should be of the form 123456789@developer.gserviceaccount.com"
           },
-          "key_location": {
+          "google_key_location": {
             "label": "P12 key location",
             "type": "text",
             "tip": "Path to your P12 key, as downloaded from GCE encrypted with their default passphrase (notasecret)"
           },
-          "ssh_keyfile": {
+          "google_ssh_keyfile": {
             "label": "ssh private key file",
             "type": "text",
             "tip": "Full path and file name to your GCE SSH private key"
           },
-          "ssh_username": {
+          "google_ssh_username": {
             "label": "ssh username",
             "type": "text",
             "tip": "SSH username to use. Must match private key file, and have sudo permissions"
@@ -182,7 +182,7 @@
       },
       "user": {
         "fields": {
-          "data_disk_size_gb": {
+          "google_data_disk_size_gb": {
             "label": "Data disk size in GB",
             "type": "text",
             "default": 10,
