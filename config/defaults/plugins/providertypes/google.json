@@ -53,8 +53,7 @@
           "client_email",
           "key_location",
           "zone_name",
-          "ssh_keyfile",
-          "ssh_username"
+          "ssh_keyfile"
         ]
       ]
     },
