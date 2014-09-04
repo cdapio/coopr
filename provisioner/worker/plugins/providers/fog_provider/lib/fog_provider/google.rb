@@ -66,12 +66,12 @@ class FogProviderGoogle < Provider
       @result['result']['providerid'] = @providerid
       # set ssh user
       ssh_user =
-        if @task['config']['sshuser'].to_s != ''
-          # prefer ssh-user as defined by image
-          @task['config']['ssh_user']
-        elsif @ssh_username.to_s != ''
-          # use ssh_user as specified in provider field
+        if @ssh_username.to_s != ''
+          # prefer custom plugin field
           @ssh_username
+        elsif @task['config']['sshuser'].to_s != ''
+          # default to ssh-user as defined by image
+          @task['config']['ssh_user']
         else
           # default to root
           'root'
