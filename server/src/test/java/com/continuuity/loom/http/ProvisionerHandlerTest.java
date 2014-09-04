@@ -23,7 +23,7 @@ import java.util.List;
 /**
  *
  */
-public class LoomProvisionerHandlerTest extends LoomServiceTestBase {
+public class ProvisionerHandlerTest extends ServiceTestBase {
   private static final Gson GSON = new Gson();
 
   @Before

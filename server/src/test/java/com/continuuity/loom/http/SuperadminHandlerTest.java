@@ -50,7 +50,7 @@ import java.util.UUID;
 /**
  *
  */
-public class LoomSuperadminHandlerTest extends LoomServiceTestBase {
+public class SuperadminHandlerTest extends ServiceTestBase {
   private static TenantProvisionerService tenantProvisionerService;
 
   @BeforeClass

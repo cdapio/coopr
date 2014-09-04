@@ -51,7 +51,7 @@ import java.io.Reader;
 /**
  *
  */
-public class LoomTaskHandlerTest extends LoomServiceTestBase {
+public class TaskHandlerTest extends ServiceTestBase {
 
   @After
   public void cleanupTaskHandlerTest() {

@@ -21,9 +21,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test LoomStatusHandler.
+ * Test StatusHandler.
  */
-public class LoomStatusHandlerTest extends LoomServiceTestBase {
+public class StatusHandlerTest extends ServiceTestBase {
 
   @Test
   public void testStatus() throws Exception {

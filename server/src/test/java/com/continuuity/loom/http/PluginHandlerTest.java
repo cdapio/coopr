@@ -46,7 +46,7 @@ import java.util.Set;
 /**
  *
  */
-public class LoomPluginHandlerTest extends LoomServiceTestBase {
+public class PluginHandlerTest extends ServiceTestBase {
 
   @Before
   public void setupPluginHandlerTest() throws Exception {
