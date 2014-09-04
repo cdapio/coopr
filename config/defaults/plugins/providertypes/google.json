@@ -60,8 +60,8 @@
     "user": {
       "fields": {
         "data_disk_size_gb": {
-          "default": "30",
-          "label": "Data disk size in Gb",
+          "default": "10",
+          "label": "Data disk size in GB",
           "tip": "Size of the persistent disk to be created and mounted to /data",
           "type": "text"
         },
