@@ -17,7 +17,7 @@
 
 require 'optparse'
 
-module Loom
+module Coopr 
   class CLI
     def self.read(arguments = ARGV)
 

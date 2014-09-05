@@ -19,7 +19,7 @@
 
 require 'logger'
 
-module Loom
+module Coopr 
   module Logging
     attr_accessor :level
     @level = ::Logger::INFO
@@ -28,7 +28,7 @@ module Loom
     @process_name = '-'
     @out = nil
     def log
-      Loom::Logging.log
+      Coopr::Logging.log
     end
 
     def self.configure(out)

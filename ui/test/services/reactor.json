@@ -38,15 +38,15 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }" 
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }" 
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }" 
         }
       }
     }

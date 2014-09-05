@@ -37,13 +37,13 @@ class ShellAutomator < Automator
     @lib_tar = %W[ #{work_dir} #{tenant} automatortypes shell lib.tar.gz ].join('/')
 
     # remote storage directory
-    @remote_cache_dir = "/var/cache/loom/shell_automator"
+    @remote_cache_dir = "/var/cache/coopr/shell_automator"
     # remote script location to be exported in $PATH
     @remote_scripts_dir = "#{@remote_cache_dir}/scripts"
     # remote lib location
     @remote_lib_dir = "#{@remote_cache_dir}/#{@lib_parent_dir}"
-    # loom wrapper for common functions
-    @wrapper_script = "#{@remote_lib_dir}/loom_wrapper.sh"
+    # wrapper for common functions
+    @wrapper_script = "#{@remote_lib_dir}/coopr_wrapper.sh"
   end
 
   # tar up a directory
@@ -88,7 +88,7 @@ class ShellAutomator < Automator
     # copy the task json data to the cache dir on the remote machine
     begin
       # write json task data to a local tmp file
-      tmpjson = Tempfile.new("loom")
+      tmpjson = Tempfile.new("coopr")
       tmpjson.write(jsondata)
       tmpjson.close
 

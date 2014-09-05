@@ -22,7 +22,7 @@ require_relative 'logging'
 require_relative 'workerlauncher'
 require_relative 'resourcemanager'
 
-module Loom
+module Coopr 
   class TenantManager
     include Logging
     attr_accessor :spec, :resourcemanager

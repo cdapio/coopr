@@ -103,7 +103,7 @@ public class ClustersInstanceTest extends GenericTest {
 
   @Test
   public void test_05_topmenu() {
-    ImmutableSet<String> expectedTopList = ImmutableSet.of("test-woo", "loom-prod");
+    ImmutableSet<String> expectedTopList = ImmutableSet.of("test-woo", "coopr-prod");
     assertEquals("The list of the topmenu is not correct.", expectedTopList, TEST_UTIL.getTopList(globalDriver));
     String uriPrefix = Constants.ROOT_URL + "/user/clusters/cluster/";
     ImmutableSet<String> clusterIds = ImmutableSet.of("00000139", "00000138");

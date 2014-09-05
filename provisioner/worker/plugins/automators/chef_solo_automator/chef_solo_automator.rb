@@ -27,7 +27,7 @@ class ChefSoloAutomator < Automator
     work_dir = @env[:work_dir]
     tenant = @env[:tenant]
     @chef_primitives_path = %W( #{work_dir} #{tenant} automatortypes chef-solo ).join('/')
-    @remote_cache_dir = "/var/cache/loom"
+    @remote_cache_dir = "/var/cache/coopr"
     @remote_chef_dir = "/var/chef"
   end
 
@@ -61,7 +61,7 @@ class ChefSoloAutomator < Automator
     end
   end
 
-  # generate the chef run json_attributes from the loom task metadata
+  # generate the chef run json_attributes from the coopr task metadata
   def generate_chef_json_attributes(servicestring)
 
     servicedata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
@@ -91,20 +91,20 @@ class ChefSoloAutomator < Automator
 
     # merge data together into expected layout for json_attributes
     clusterdata['nodes'] = nodesdata
-    servicedata['loom']['cluster'] = clusterdata
-    servicedata['loom']['services'] = node_services_data
+    servicedata['coopr']['cluster'] = clusterdata
+    servicedata['coopr']['services'] = node_services_data
 
     # include the clusterId
-    servicedata['loom']['clusterId'] = @task['clusterId']
+    servicedata['coopr']['clusterId'] = @task['clusterId']
 
     # we also need to merge cluster config top-level
     servicedata.merge!(clusterdata)
 
     # generate the json
-    loomdatajson = JSON.generate(servicedata)
-    log.debug "Generated JSON attributes: #{loomdatajson}"
+    datajson = JSON.generate(servicedata)
+    log.debug "Generated JSON attributes: #{datajson}"
     
-    loomdatajson
+    datajson
   end
 
   # bootstrap remote machine: install chef, copy all cookbooks, data_bags, etc in to place
@@ -220,7 +220,7 @@ class ChefSoloAutomator < Automator
     # additional json attributes defined for this service action
     json_attributes = fields['json_attributes']
 
-    # merge together json_attributes, cluster config, loom node data
+    # merge together json_attributes, cluster config, coopr node data
     jsondata = generate_chef_json_attributes(json_attributes)
 
     # do we need sudo bash?
@@ -230,7 +230,7 @@ class ChefSoloAutomator < Automator
 
     begin
       # write json attributes to a local tmp file
-      tmpjson = Tempfile.new("loom")
+      tmpjson = Tempfile.new("coopr")
       tmpjson.write(jsondata)
       tmpjson.close
 

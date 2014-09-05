@@ -1,6 +1,6 @@
 (function() {
 
-var app = angular.module('loom', [], ['$interpolateProvider', function ($interpolateProvider) {
+var app = angular.module('coopr', [], ['$interpolateProvider', function ($interpolateProvider) {
   $interpolateProvider.startSymbol('[[');
   $interpolateProvider.endSymbol(']]');
 }]);

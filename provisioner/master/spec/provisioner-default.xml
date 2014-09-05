@@ -7,7 +7,7 @@
   <property>
     <name>server.host</name>
     <value></value>
-    <description>Specifies the loom host to bind to</description>
+    <description>Specifies the server host to bind to</description>
   </property>
   <property>
     <name>server.jdbc.driver</name>
@@ -16,7 +16,7 @@
   </property>
   <property>
     <name>server.jdbc.connection.string</name>
-    <value>jdbc:mysql://127.0.0.1:3306/loom?useLegacyDatetimeCode=false</value>
+    <value>jdbc:mysql://127.0.0.1:3306/coopr?useLegacyDatetimeCode=false</value>
     <description>specifies how to connect to mysql</description>
   </property>
   <property>
@@ -61,12 +61,12 @@
   </property>
   <property>
     <name>provisioner.data.dir</name>
-    <value>/tmp/loom/data</value>
+    <value>/tmp/coopr/data</value>
     <description>Provisioner storage directory for plugin data resources</description>
   </property>
   <property>
     <name>provisioner.work.dir</name>
-    <value>/tmp/loom/work</value>
+    <value>/tmp/coopr/work</value>
     <description>Provisioner working directory</description>
   </property>
   <property>

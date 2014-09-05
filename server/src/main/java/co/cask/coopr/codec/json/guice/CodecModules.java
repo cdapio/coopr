@@ -25,6 +25,7 @@ import co.cask.coopr.codec.json.current.ClusterCodec;
 import co.cask.coopr.codec.json.current.ClusterConfigureRequestCodec;
 import co.cask.coopr.codec.json.current.ClusterCreateRequestCodec;
 import co.cask.coopr.codec.json.current.ClusterDefaultsCodec;
+import co.cask.coopr.codec.json.current.ClusterOperationRequestCodec;
 import co.cask.coopr.codec.json.current.ClusterTemplateCodec;
 import co.cask.coopr.codec.json.current.ConstraintsCodec;
 import co.cask.coopr.codec.json.current.FieldSchemaCodec;
@@ -60,6 +61,7 @@ import co.cask.coopr.codec.json.upgrade.ServiceUpgradeCodec;
 import co.cask.coopr.http.request.AddServicesRequest;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
 import co.cask.coopr.http.request.ClusterCreateRequest;
+import co.cask.coopr.http.request.ClusterOperationRequest;
 import co.cask.coopr.http.request.FinishTaskRequest;
 import co.cask.coopr.http.request.NodePropertiesRequest;
 import co.cask.coopr.http.request.TakeTaskRequest;
@@ -146,6 +148,7 @@ public class CodecModules {
       .registerTypeAdapter(ClusterConfigureRequest.class, new ClusterConfigureRequestCodec())
       .registerTypeAdapter(ClusterCreateRequest.class, new ClusterCreateRequestCodec())
       .registerTypeAdapter(ClusterDefaults.class, new ClusterDefaultsCodec())
+      .registerTypeAdapter(ClusterOperationRequest.class, new ClusterOperationRequestCodec())
       .registerTypeAdapter(ClusterTemplate.class, new ClusterTemplateCodec())
       .registerTypeAdapter(Constraints.class, new ConstraintsCodec())
       .registerTypeAdapter(FieldSchema.class, new FieldSchemaCodec())

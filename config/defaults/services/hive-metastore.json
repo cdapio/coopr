@@ -45,15 +45,15 @@
       },
       "start": {
         "fields": {
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hive-metastore\": \"start\" } } } }",
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive_metastore],recipe[loom_service_runner::default]"
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hive-metastore\": \"start\" } } } }",
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive_metastore],recipe[coopr_service_runner::default]"
         },
         "type": "chef-solo"
       },
       "stop": {
         "fields": {
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hive-metastore\": \"stop\" } } } }",
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive_metastore],recipe[loom_service_runner::default]"
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hive-metastore\": \"stop\" } } } }",
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive_metastore],recipe[coopr_service_runner::default]"
         },
         "type": "chef-solo"
       }

@@ -26,15 +26,15 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }" 
         }
       }
     }

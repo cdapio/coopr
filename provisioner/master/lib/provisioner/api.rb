@@ -26,7 +26,7 @@ require_relative 'provisioner'
 require_relative 'cli'
 require_relative 'logging'
 
-module Loom
+module Coopr 
   class Provisioner
     # class to define provisioner API
     class Api < Sinatra::Base

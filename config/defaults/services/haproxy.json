@@ -30,15 +30,15 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[haproxy2::default],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"haproxy\": \"start\" } } } }" 
+          "run_list": "recipe[haproxy2::default],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"haproxy\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[haproxy2::default],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"haproxy\": \"stop\" } } } }" 
+          "run_list": "recipe[haproxy2::default],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"haproxy\": \"stop\" } } } }" 
         }
       }
     }

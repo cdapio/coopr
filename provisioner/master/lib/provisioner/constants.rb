@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-module Loom
+module Coopr 
   # configuration constants
   PROVISIONER_SERVER_URI = 'provisioner.server.uri'
   PROVISIONER_BIND_IP = 'provisioner.bind.ip'

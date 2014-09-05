@@ -15,7 +15,7 @@
  */
 
 /**
- * Helpers/common functions for Loom frontend.
+ * Helpers/common functions for Coopr frontend.
  */
 
 var Helpers = Helpers || {};

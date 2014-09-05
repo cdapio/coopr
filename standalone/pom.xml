@@ -55,7 +55,7 @@
                     <descriptors>
                         <descriptor>assembly/standalone.xml</descriptor>
                     </descriptors>
-                    <finalName>loom-${project.version}</finalName>
+                    <finalName>coopr-${project.version}</finalName>
                 </configuration>
             </plugin> 
         </plugins>

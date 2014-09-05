@@ -16,7 +16,7 @@
 #
 
 
-module Loom
+module Coopr 
 
   class SignalHandler
     def initialize(signal)

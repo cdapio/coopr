@@ -18,7 +18,7 @@
 
 
 # simple class to construct the ruby command used to launch a worker process
-module Loom
+module Coopr 
   class WorkerLauncher
     attr_accessor :tenant, :provisioner, :name, :config
 

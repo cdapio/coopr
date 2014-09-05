@@ -22,7 +22,7 @@ require File.dirname(__FILE__) + '/../lib/provisioner/cli.rb'
 describe 'Provisioner::CLI' do
 
   it 'can parse command line arguments' do
-    options = Loom::CLI.read([
+    options = Coopr::CLI.read([
       '-c', '/tmp/config.xml',
       '-r'
     ])

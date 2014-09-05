@@ -23,5 +23,5 @@ end
 
 require 'provisioner/api'
 
-options = Loom::CLI.read
-Loom::Provisioner.run(options)
+options = Coopr::CLI.read
+Coopr::Provisioner.run(options)

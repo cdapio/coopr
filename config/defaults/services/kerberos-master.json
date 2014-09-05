@@ -36,15 +36,15 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[krb5::kadmin_service],recipe[krb5::kdc_service],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"krb5-admin-server\": \"start\", \"krb5-kdc\": \"start\" } } } }"
+          "run_list": "recipe[krb5::kadmin_service],recipe[krb5::kdc_service],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"krb5-admin-server\": \"start\", \"krb5-kdc\": \"start\" } } } }"
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[krb5::kadmin_service],recipe[krb5::kdc_service],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"krb5-admin-server\": \"stop\", \"krb5-kdc\": \"stop\" } } } }"
+          "run_list": "recipe[krb5::kadmin_service],recipe[krb5::kdc_service],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"krb5-admin-server\": \"stop\", \"krb5-kdc\": \"stop\" } } } }"
         }
       }
     }

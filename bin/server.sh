@@ -15,10 +15,10 @@
 # limitations under the License.
 #
 
-LOOM_LOG_DIR=${LOOM_LOG_DIR:-/var/log/loom}
-LOOM_HOME=${LOOM_HOME:-/opt/loom} ; export LOOM_HOME
+COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
+COOPR_HOME=${COOPR_HOME:-/opt/coopr} ; export COOPR_HOME
 
-if [ -d /opt/loom ]; then
+if [ -d /opt/coopr ]; then
   DEFAULT_JVM_OPTS="-Xmx3072m"
 else
   DEFAULT_JVM_OPTS="-Xmx1024m"
@@ -35,11 +35,11 @@ splitJvmOpts ( ) {
   JVM_OPTS=("$@")
 }
 
-APP_NAME="loom-server"
-LOOM_SERVER_CONF=${LOOM_SERVER_CONF:-/etc/loom/conf}
-CLASSPATH="${LOOM_HOME}/server/lib/*:${LOOM_SERVER_CONF}"
-MAIN_CLASS="com.continuuity.loom.runtime.ServerMain"
-PID_DIR=${PID_DIR:-/var/run/loom}
+APP_NAME="coopr-server"
+COOPR_SERVER_CONF=${COOPR_SERVER_CONF:-/etc/coopr/conf}
+CLASSPATH="${COOPR_HOME}/server/lib/*:${COOPR_SERVER_CONF}"
+MAIN_CLASS="co.cask.coopr.runtime.ServerMain"
+PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
 # Determine the Java command to use to start the JVM.
@@ -91,17 +91,17 @@ check_before_start() {
 }
 
 start ( ) {
-  eval splitJvmOpts ${DEFAULT_JVM_OPTS} ${LOOM_JAVA_OPTS}
+  eval splitJvmOpts ${DEFAULT_JVM_OPTS} ${COOPR_JAVA_OPTS}
   check_before_start
 
-  echo "Starting Loom Server ..."
+  echo "Starting Server ..."
   nohup nice -1 "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" ${MAIN_CLASS} \
-    >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
+    >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
   echo $! > $pid
 }
 
 stop ( ) {
-  echo -n "Stopping Loom Server ..."
+  echo -n "Stopping Server ..."
   if [ -f "${pid}" ] ; then
     pidToKill=`cat $pid`
     # kill -0 == see if the PID exists
