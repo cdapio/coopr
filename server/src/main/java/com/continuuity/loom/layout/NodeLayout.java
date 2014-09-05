@@ -116,8 +116,8 @@ public class NodeLayout {
    * @return Node layout of the node.
    */
   public static NodeLayout fromNode(Node node) {
-    String hardwareType = node.getProperties().getHardwaretype();
-    String imageType = node.getProperties().getImagetype();
+    String hardwareType = node.getProperties().getHardwareType();
+    String imageType = node.getProperties().getImageType();
     Set<String> services = Sets.newHashSet();
     for (Service service : node.getServices()) {
       services.add(service.getName());

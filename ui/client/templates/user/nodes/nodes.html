@@ -1,0 +1,27 @@
+{% extends "user/index.html" %}
+{% block headscript %}
+<script src="/static/bower_components/angular/angular.js" type="text/javascript"></script>
+<script src="/static/bower_components/angular-sanitize/angular-sanitize.min.js" type="text/javascript"></script>
+<script src="/static/bower_components/ng-table/ng-table.js" type="text/javascript"></script>
+<script src="/static/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="/static/bower_components/Case/dist/Case.min.js"></script>
+<script src="/static/bower_components/Case/dist/CaseFilter.min.js"></script>
+<script src="/static/js/user/nodes.js" type="text/javascript"></script>
+<link rel="stylesheet" href="/static/bower_components/ng-table/ng-table.css"/>
+{% endblock %}
+{% block content %}
+<div ng-app="nodeview">
+  <div id="content-body">
+      <div id="title">
+        <div class="pull-right">
+          <div id="global">
+            {% include "user/nodes/topmenu.html" %}
+          </div>
+        </div>
+        <div style="clear: both"></div>
+      </div>
+      {% include "user/nodes/nodes-panel.html" %}
+    </div>
+<script data-main="/static/js/user/nodes" src="/static/bower_components/require.js"></script>
+</div>
+{% endblock %}

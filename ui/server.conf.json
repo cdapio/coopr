@@ -1,0 +1,28 @@
+{
+  "pages": {
+    "nodes": {
+      "columns": [
+        {
+          "header": "hostname",
+          "index": "0"
+        },
+        {
+          "header": "ipAddresses private",
+          "index": "1"
+        },
+        {
+          "header": "flavor"
+        },
+        {
+          "header": "status"
+        },
+        {
+          "header": "image"
+        },
+        {
+          "header": "team"
+        }
+      ]
+    }
+  }
+}

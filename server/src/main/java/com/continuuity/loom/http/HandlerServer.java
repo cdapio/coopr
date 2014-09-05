@@ -44,7 +44,6 @@ public class HandlerServer extends AbstractIdleService {
 
     NettyHttpService.Builder builder = NettyHttpService.builder();
     builder.addHttpHandlers(handlers);
-
     builder.setHost(host);
     builder.setPort(port);
 

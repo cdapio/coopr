@@ -107,8 +107,8 @@ public class ClusterLayout {
       for (Service service : node.getServices()) {
         nodeServices.add(service.getName());
       }
-      String hardwareType = node.getProperties().getHardwaretype();
-      String imageType = node.getProperties().getImagetype();
+      String hardwareType = node.getProperties().getHardwareType();
+      String imageType = node.getProperties().getImageType();
       nodeLayoutCounts.add(new NodeLayout(hardwareType, imageType, nodeServices));
     }
     return new ClusterLayout(constraints, nodeLayoutCounts);

@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,7 @@ public final class Node implements Comparable<Node> {
   private final NodeProperties properties;
   private final List<Action> actions;
   private final JsonObject provisionerResults;
+  private final Map<String, String> metadata;
 
   /**
    * Node status.
@@ -50,17 +52,22 @@ public final class Node implements Comparable<Node> {
   }
 
   public Node(String id, String clusterId, Set<Service> services, NodeProperties properties) {
-    this(id, clusterId, services, properties, Lists.<Action>newArrayList(), new JsonObject());
+    this(id, clusterId, services, properties, Lists.<Action>newArrayList(), null, null);
+  }
+
+  public Node(String id, String clusterId, Set<Service> services, NodeProperties properties, Map<String, String> metadata) {
+    this(id, clusterId, services, properties, Lists.<Action>newArrayList(), null, metadata);
   }
 
   public Node(String id, String clusterId, Set<Service> services,
-              NodeProperties properties, List<Action> actions, JsonObject provisionerResults) {
+              NodeProperties properties, List<Action> actions, JsonObject provisionerResults, Map<String, String> metadata) {
     this.id = id;
     this.clusterId = clusterId;
     this.services = Sets.newHashSet(services);
     this.properties = properties == null ? NodeProperties.builder().build() : properties;
     this.actions = actions == null ? Lists.<Action>newArrayList() : actions;
     this.provisionerResults = provisionerResults == null ? new JsonObject() : provisionerResults;
+    this.metadata = metadata == null ? new HashMap<String, String>(): metadata;
   }
 
   /**
@@ -116,6 +123,10 @@ public final class Node implements Comparable<Node> {
    */
   public void addAction(Action action) {
     actions.add(action);
+  }
+
+  public Map<String, String> getMetadata() {
+    return metadata;
   }
 
   /**
@@ -190,6 +201,7 @@ public final class Node implements Comparable<Node> {
       .add("clusterId", clusterId)
       .add("services", services)
       .add("properties", properties)
+      .add("metadata", metadata)
       .add("actions", actions)
       .toString();
   }

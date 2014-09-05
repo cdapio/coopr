@@ -383,7 +383,7 @@ table.tablesorter thead tr .headerSortUp {
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
   background-color: #707991;
-  color: #c0cddd;
+  color: white;
 }
 .navbar-transparent {
   background-color: transparent;
@@ -475,7 +475,6 @@ a.brand {
 }
 .modal-body {
   font-size: 13px;
-  padding: 0;
 }
 .modal-body .spl-panel-table > thead > tr > th {
   padding: 5px;
@@ -653,6 +652,10 @@ a strong {
 }
 .nav-clustertemplates {
   background-image: url('/static/img/v2-assets/icon_catalog.png');
+  background-repeat: no-repeat;
+}
+.nav-nodes {
+  background-image: url('/static/img/v2-assets/icon_nodes.png');
   background-repeat: no-repeat;
 }
 .auth-group {
@@ -883,6 +886,9 @@ a strong {
   background: #575F74;
   color: #c0cddd;
 }
+.spl-panel-table > tbody > tr > td span {
+  color: #c0cddd;
+}
 .spl-panel-table > tbody > tr > td a {
   color: #c0cddd;
 }
@@ -1002,4 +1008,39 @@ h5 {
 }
 .btn-service-restart:hover {
   background: url('/static/img/v2-assets/icon_refresh_active.png');
+}
+.pagination {
+  margin: 0;
+}
+.pagination > .disabled > a,
+.pagination > .disabled > a:hover {
+  background-color: #e6e6e6;
+}
+.pagination > li span {
+  color: black;
+}
+.ng-table-pager span {
+  color: black;
+}
+th div {
+  text-align: left;
+  font-weight: bold;
+}
+thead {
+  background: #121e39;
+}
+.ng-table th.sortable div::before {
+  border-top: 4px solid white;
+}
+.ng-table th.sortable.sort-desc div:after {
+  border-top: 4px solid white;
+}
+.ng-table th.sortable div::after {
+  border-bottom: 4px solid white;
+}
+.ng-table-rowselected tr {
+  cursor: pointer;
+}
+.table > tbody > tr.active > td {
+  background-color: rgba(22, 28, 51, 0.59);
 }

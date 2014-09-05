@@ -465,7 +465,6 @@ a.brand {
 }
 .modal-body {
   font-size: 13px;
-  padding: 0;
 }
 .modal-body .spl-panel-table > thead > tr > th {
   padding: 5px;
@@ -639,6 +638,10 @@ a strong {
 }
 .nav-clustertemplates {
   background-image: url('/static/img/v2-assets/dark/icon_catalog.png');
+  background-repeat: no-repeat;
+}
+.nav-nodes {
+  background-image: url('/static/img/v2-assets/dark/icon_nodes.png');
   background-repeat: no-repeat;
 }
 .auth-group {
@@ -963,4 +966,7 @@ h5 {
 }
 .btn-service-restart:hover {
   background: url('/static/img/v2-assets/dark/icon_refresh_active.png');
+}
+.pagination {
+  margin: 0;
 }
