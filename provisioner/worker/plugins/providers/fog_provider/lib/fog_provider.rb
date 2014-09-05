@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ require_relative 'fog_provider/joyent'
 require_relative 'fog_provider/openstack'
 require_relative 'fog_provider/rackspace'
 
+gem 'fog', '~> 1.21.0'
+
 require 'fog'
 require 'ipaddr'
 require 'net/ssh'
-
-gem 'fog', '~> 1.21.0'

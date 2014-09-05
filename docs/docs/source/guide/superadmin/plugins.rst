@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ Provisioner Plugins
 
 .. include:: /guide/admin/admin-links.rst
 
-The Loom provisioner allows you to create custom plugins for allocating machines on your providers or to custom
-implement your services. This document provides the necessary information to build a custom plugin for Continuuity Loom.
+The Coopr provisioner allows you to create custom plugins for allocating machines on your providers or to custom
+implement your services. This document provides the necessary information to build a custom plugin for Coopr.
 
 Types of Plugins
 ================
@@ -47,8 +47,8 @@ you may choose to implement with a Puppet plugin, or even Shell commands.
 
 Task Types
 ==========
-In order to build plugins for Continuuity Loom, it is first necessary to understand the tasks each plugin will be responsible for
-executing. To bring up a cluster, Continuuity Loom issues the following tasks:
+In order to build plugins for Coopr, it is first necessary to understand the tasks each plugin will be responsible for
+executing. To bring up a cluster, Coopr issues the following tasks:
 
 .. list-table::
    :header-rows: 1
@@ -105,7 +105,7 @@ requests. This allows for different providers to have different values.
 Writing a Plugin
 ================
 
-Currently, a plugin must be written in Ruby and extend from the Continuuity Loom base plugin classes.
+Currently, a plugin must be written in Ruby and extend from the Coopr base plugin classes.
 
 Writing a Provider plugin
 -------------------------
@@ -268,7 +268,7 @@ During execution, a plugin can write to the provisioner's instance of the Ruby s
   log.warn "my warning message"
   log.error "my error message"
 
-Additionally, each task can return strings representing ``stdout`` and ``stderr`` to be displayed on the Loom UI. Simply return the values:
+Additionally, each task can return strings representing ``stdout`` and ``stderr`` to be displayed on the Coopr UI. Simply return the values:
 ::
 
   @result['stdout'] = "my captured stdout message"
@@ -278,7 +278,7 @@ Additionally, each task can return strings representing ``stdout`` and ``stderr`
 Defining Your Plugin
 --------------------
 
-Loom plugins are required to provide a JSON file which defines the plugin, including the following:
+Coopr plugins are required to provide a JSON file which defines the plugin, including the following:
   * plugin name
   * named providertypes and automatortypes
   * the class name for each providertype and automatortype
@@ -340,9 +340,9 @@ For example, consider the JSON definition file for the Rackspace provider plugin
         }
     }
 
-This JSON defines a single plugin which contains a single providertype named "rackspace".  The implementing ruby class for this "rackspace" providertype is "RackspaceProvider".  Additionally, it defines three custom fields which can be set by a Loom administrator: "rackspace_username", "rackspace_api_key", and "rackspace_region".  In this example, they are defined within an "admin" block, which indicates these fields can be set only by a Loom administrator.  Alternatively, defining fields within a "user" block indicates a Loom user can set them when creating a cluster.  Each field has additional elements to specify behavior and describe how the field should be presented to the user on the Loom UI:
+This JSON defines a single plugin which contains a single providertype named "rackspace".  The implementing ruby class for this "rackspace" providertype is "RackspaceProvider".  Additionally, it defines three custom fields which can be set by a Coopr administrator: "rackspace_username", "rackspace_api_key", and "rackspace_region".  In this example, they are defined within an "admin" block, which indicates these fields can be set only by a Coopr administrator.  Alternatively, defining fields within a "user" block indicates a Coopr user can set them when creating a cluster.  Each field has additional elements to specify behavior and describe how the field should be presented to the user on the Coopr UI:
   * field name: will be used as the key in the hash sent to the provisioner plugin.
-  * ``label``: the user-friendly label presented in the Loom UI.
+  * ``label``: the user-friendly label presented in the Coopr UI.
   * ``type``: any of the HTTP input field types such as ``text`` or ``password``, or "select" for a drop-down menu.
   * ``tip``: the text hint displayed as the value before the user enters anything
   * ``options``: (specific to type "select"), the drop-down menu options
@@ -360,7 +360,7 @@ When the provisioner starts up, it will scan its directories looking for JSON de
 Below is an example directory structure:
 ::
 
-  $LOOM_HOME/
+  $COOPR_HOME/
       provisioner/
           daemon/
               plugins/
@@ -384,14 +384,14 @@ When writing a custom plugin, please consider the following:
 Registering Your Plugin
 -----------------------
 
-The Loom Server needs to be aware of the installed provisioner plugins and their collective list of providertypes and automatortypes.  This can currently be done by starting a provisioner with the ``--register`` argument.  For example:
+The Coopr Server needs to be aware of the installed provisioner plugins and their collective list of providertypes and automatortypes.  This can currently be done by starting a provisioner with the ``--register`` argument.  For example:
 ::
 
-  $LOOM_HOME/provisioner/daemon/provisioner.rb --register --uri http://myloomserver:55054
+  $COOPR_HOME/provisioner/daemon/provisioner.rb --register --uri http://mycooprserver:55054
 
-The above command will start a provisioner which will load its plugins as usual, then register all providertypes and automatortypes using the Loom Server's API.  After registering each providertype or automatortype, it will exit.
+The above command will start a provisioner which will load its plugins as usual, then register all providertypes and automatortypes using the Coopr Server's API.  After registering each providertype or automatortype, it will exit.
 
-When running the Loom standalone distribution, this command is run automatically during initial startup.
+When running the Coopr standalone distribution, this command is run automatically during initial startup.
 
 
 Included Plugins
@@ -414,7 +414,7 @@ provider plugin side to upload and manage tenant specific data, such as user key
 plugin resources are managed by tenant administrators can be seen on the :doc:`Plugin Resources Guide </guide/admin/plugin-resources>` 
 
 Defining Resource Types
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 Resource types are defined by plugins. A resource type is simply some plugin specific name for data the plugin can use, along with
 a data format of the resource. Supported formats are 'file' and 'archive'. Resource types of the 'archive' format are zips or tarballs
@@ -422,8 +422,8 @@ of that will be expanded by provisioners before use. It is expected that the top
 the name of the resource. For example, the Chef Automator plugin defines a 'cookbooks' resource type that uses the 'archive' format. This
 means that if a cookbook named 'my-service' is uploaded, it is expected that the top level directory of the archive is named 'my-service'.
 
-Below is an example of the section of the plugin specification detailing the 3 resource types the Chef Automator supports.
-::
+Below is an example of the section of the plugin specification detailing the three resource types the Chef Automator supports::
+
   "resourceTypes": {
         "cookbooks": {
             "format": "archive"
@@ -437,7 +437,7 @@ Below is an example of the section of the plugin specification detailing the 3 r
   }
 
 Plugin Resource Storage
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 By default, plugin resources uploaded to the Server are simply stored as local files.  If you are running multiple servers for HA
 purposes, you will have to configure the servers to write to a distributed system such as NFS so that all servers have access

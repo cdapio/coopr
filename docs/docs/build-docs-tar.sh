@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-DOC_FOLDER_NAME=loom-1.0-docs
+DOC_FOLDER_NAME=coopr-docs-v0.9.8
 
 make clean html
 cd build
