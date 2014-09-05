@@ -27,7 +27,7 @@ class FogProviderGoogle < Provider
     @flavor = inputmap['flavor']
     @image = inputmap['image']
     @hostname = inputmap['hostname']
-    # GCE uses the short hostname as an identifier
+    # Google uses the short hostname as an identifier
     # we keep the loom hostname for use in /etc/hosts
     @providerid = @hostname.split('.').first
     fields = inputmap['fields']
@@ -39,7 +39,7 @@ class FogProviderGoogle < Provider
       # validate credentials
       validate!
       # Create the server
-      log.debug "Creating #{@providerid} on GCE using flavor: #{flavor}, image: #{image}"
+      log.debug "Creating #{@providerid} on Google using flavor: #{flavor}, image: #{image}"
 
       # disks are managed separately, so CREATE must first create and confirm the disk to be used
       # handle boot disk

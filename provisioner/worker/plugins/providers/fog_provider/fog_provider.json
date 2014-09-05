@@ -130,7 +130,7 @@
           "google_project": {
             "label": "Project ID",
             "type": "text",
-            "tip": "GCE Project ID"
+            "tip": "Google Project ID"
           },
           "google_client_email": {
             "label": "Service account email address",
@@ -140,12 +140,12 @@
           "google_key_location": {
             "label": "P12 key location",
             "type": "text",
-            "tip": "Path to your P12 key, as downloaded from GCE encrypted with their default passphrase (notasecret)"
+            "tip": "Path to your P12 key, as downloaded from Google encrypted with their default passphrase (notasecret)"
           },
           "google_ssh_keyfile": {
             "label": "ssh private key file",
             "type": "text",
-            "tip": "Full path and file name to your GCE SSH private key"
+            "tip": "Full path and file name to your Google SSH private key"
           },
           "google_ssh_username": {
             "label": "ssh username",
@@ -192,7 +192,7 @@
           "network": {
             "label": "Network",
             "type": "text",
-            "tip": "GCE custom network"
+            "tip": "Google custom network"
           }
         },
         "required": [
