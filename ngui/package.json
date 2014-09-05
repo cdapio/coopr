@@ -1,13 +1,14 @@
 {
   "name": "coopr-ngui",
-  "author": "adrien@continuuity.com",
-  "license": "ISC",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Front-end for Coopr",
-  "main": "server.js",
+  "repository" : { 
+    "type": "git", 
+    "url": "http://github.com/continuuity/loom.git"
+  },
   "scripts": {
     "start": "node ./server.js",
-    "pretest": "npm install && bower install && gulp lint build",
+    "pretest": "npm install && bower install && gulp build",
     "test": "./node_modules/karma/bin/karma start test/karma.conf.js",
     "test-single-run": "npm run pretest && ./node_modules/karma/bin/karma start test/karma.conf.js --no-auto-watch --single-run",
     "preupdate-webdriver": "npm run pretest",
