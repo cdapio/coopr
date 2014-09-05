@@ -9,7 +9,7 @@ LOOM_TENANT=${LOOM_TENANT:-superadmin}
 SHELL_DIR=${LOOM_HOME}/provisioner/worker/plugins/automators/shell_automator
 
 LOOM_RUBY=${LOOM_RUBY:-ruby}
-DATA_UPLOADER="${LOOM_RUBY} ${LOOM_HOME}/bin/data-uploader.rb"
+DATA_UPLOADER="${LOOM_RUBY} ${LOOM_HOME}/provisioner/bin/data-uploader.rb"
 
 SCRIPTS_DIR=${SHELL_DIR}/scripts
 ARCHIVES_DIR=${SHELL_DIR}/archives
