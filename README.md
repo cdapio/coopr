@@ -1,3 +1,5 @@
+![Coopr Logo](docs/docs/source/_images/coopr_logo_fullcolor.png)
+
 ## [Coopr](http://cask.co): Modern Cluster Management
 
 Coopr is cluster management software that manages clusters on public, private
