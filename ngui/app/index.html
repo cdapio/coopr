@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="/bundle/lib.css" />
     <link rel="stylesheet" type="text/css" href="/bundle/app.css" />
 </head>
-<body ng-controller="BodyCtrl">
+<body ng-controller="BodyCtrl" ng-class="bodyClass">
 
     <header class="navbar navbar-default navbar-fixed-top">
       <div class="container" role="navigation" my-navbar></div>
@@ -28,7 +28,7 @@
     <footer>
       <div class="container">
         <p class="text-muted">
-          <small><strong>State:</strong> {{$state.current.name}}</small>
+          <small><strong>State:</strong> {{$state.current.name}} <tt>{{$state.params | json}}</tt></small>
           <span class="pull-right">&copy; 2014 Continuuity</span>
         </p>
       </div>

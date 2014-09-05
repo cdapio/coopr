@@ -32,9 +32,9 @@
 </table>
 
 
-<div ng-hide="list.length" class="well text-center">
+<div ng-show="list && !list.length" class="well text-center">
 
-  <p>You don't have any clusters yet!</p>
+  <p>You don't have any clusters!</p>
   <p><a class="btn btn-primary" role="button" ui-sref="clusters.create">
     Create a cluster
   </a></p>
