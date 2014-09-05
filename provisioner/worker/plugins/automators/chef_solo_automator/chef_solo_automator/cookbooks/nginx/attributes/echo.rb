@@ -4,7 +4,7 @@
 #
 # Author:: Danial Pearce (<github@tigris.id.au>)
 #
-# Copyright 2013, Danial Pearce
+# Copyright © 2013, Danial Pearce
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

@@ -2,7 +2,7 @@
 # Cookbook Name:: loom_service_runner
 # Recipe:: default
 #
-# Copyright 2013, Continuuity
+# Copyright © 2013, Continuuity
 #
 # All rights reserved - Do Not Redistribute
 #

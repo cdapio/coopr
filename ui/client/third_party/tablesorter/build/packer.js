@@ -1,6 +1,6 @@
 /*
     packer, version 2.0.2 (2005-08-19)
-    Copyright 2004-2005, Dean Edwards
+    Copyright © 2004-2005, Dean Edwards
     License: http://creativecommons.org/licenses/LGPL/2.1/
 */
 

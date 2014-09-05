@@ -2,7 +2,7 @@
 # Cookbook Name:: mongodb
 # Recipe:: default
 #
-# Copyright 2011, edelight GmbH
+# Copyright © 2011, edelight GmbH
 # Authors:
 #       Markus Korn <markus.korn@edelight.de>
 #

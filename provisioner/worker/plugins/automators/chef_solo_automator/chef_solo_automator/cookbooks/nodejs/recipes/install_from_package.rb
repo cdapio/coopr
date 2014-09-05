@@ -4,8 +4,8 @@
 # Cookbook Name:: nodejs
 # Recipe:: package
 #
-# Copyright 2012, Cramer Development, Inc.
-# Copyright 2013, Opscale
+# Copyright © 2012, Cramer Development, Inc.
+# Copyright © 2013, Opscale
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

@@ -4,7 +4,7 @@
 #
 # Author:: David Radcliffe (<radcliffe.david@gmail.com>)
 #
-# Copyright 2013, David Radcliffe
+# Copyright © 2013, David Radcliffe
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

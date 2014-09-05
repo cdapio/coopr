@@ -3,7 +3,7 @@
 # Provider:: policy
 #
 # Author: Robert Choi <taeilchoi1@gmail.com>
-# Copyright 2013 by Robert Choi
+# Copyright © 2013 by Robert Choi
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
