@@ -30,13 +30,13 @@ import java.util.Set;
 /**
  * Netty service for running the server.
  */
-public class LoomService extends AbstractIdleService {
+public class HandlerServer extends AbstractIdleService {
 
-  private static final Logger LOG  = LoggerFactory.getLogger(LoomService.class);
+  private static final Logger LOG  = LoggerFactory.getLogger(HandlerServer.class);
   private final NettyHttpService httpService;
 
   @Inject
-  private LoomService(Set<HttpHandler> handlers, Configuration conf) {
+  private HandlerServer(Set<HttpHandler> handlers, Configuration conf) {
     String host = conf.get(Constants.HOST);
     int port = conf.getInt(Constants.PORT);
     int numExecThreads = conf.getInt(Constants.NETTY_EXEC_NUM_THREADS);

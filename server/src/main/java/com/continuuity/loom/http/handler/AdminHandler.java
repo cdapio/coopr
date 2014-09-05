@@ -65,8 +65,8 @@ import java.util.Map;
  * GET calls work for any user, non-GET calls work only for admin.
  */
 @Path(Constants.API_BASE)
-public class LoomAdminHandler extends LoomAuthHandler {
-  private static final Logger LOG  = LoggerFactory.getLogger(LoomAdminHandler.class);
+public class AdminHandler extends AbstractAuthHandler {
+  private static final Logger LOG  = LoggerFactory.getLogger(AdminHandler.class);
 
   public static final String PROVIDERS = "providers";
   public static final String HARDWARE_TYPES = "hardwaretypes";
@@ -79,8 +79,8 @@ public class LoomAdminHandler extends LoomAuthHandler {
   private final Gson gson;
 
   @Inject
-  private LoomAdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService,
-                           TaskQueueService taskQueueService, Gson gson) {
+  private AdminHandler(TenantStore tenantStore, EntityStoreService entityStoreService,
+                       TaskQueueService taskQueueService, Gson gson) {
     super(tenantStore);
     this.taskQueueService = taskQueueService;
     this.entityStoreService = entityStoreService;

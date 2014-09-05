@@ -40,7 +40,7 @@ import java.util.Set;
 /**
  *
  */
-public class LoomNodeHandlerTest extends LoomServiceTestBase {
+public class NodeHandlerTest extends ServiceTestBase {
   @BeforeClass
   public static void init() {
   }

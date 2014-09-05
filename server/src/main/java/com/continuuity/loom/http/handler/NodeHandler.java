@@ -49,18 +49,18 @@ import java.util.Set;
  * Handler for performing node operations.
  */
 @Path(Constants.API_BASE + "/nodes")
-public class LoomNodeHandler extends LoomAuthHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(LoomNodeHandler.class);
+public class NodeHandler extends AbstractAuthHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(NodeHandler.class);
   private final NodeStoreService nodeStoreService;
   private final NodeStore nodeStore;
   private final Gson gson;
 
   /**
-   * Initializes a new instance of a LoomNodeHandler.
+   * Initializes a new instance of a NodeHandler.
    */
   @Inject
-  private LoomNodeHandler(TenantStore tenantStore, NodeService nodeService,
-                          NodeStoreService nodeStoreService, Gson gson) {
+  private NodeHandler(TenantStore tenantStore, NodeService nodeService,
+                      NodeStoreService nodeStoreService, Gson gson) {
     super(tenantStore);
     this.nodeStoreService = nodeStoreService;
     this.nodeStore = this.nodeStoreService.getSystemView();

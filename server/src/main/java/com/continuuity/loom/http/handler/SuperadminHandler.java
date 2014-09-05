@@ -51,16 +51,16 @@ import java.lang.reflect.Type;
  * Handler for performing tenant operations.
  */
 @Path(Constants.API_BASE)
-public class LoomSuperadminHandler extends LoomAuthHandler {
-  private static final Logger LOG  = LoggerFactory.getLogger(LoomSuperadminHandler.class);
+public class SuperadminHandler extends AbstractAuthHandler {
+  private static final Logger LOG  = LoggerFactory.getLogger(SuperadminHandler.class);
 
   private final Gson gson;
   private final EntityStoreService entityStoreService;
   private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
-  private LoomSuperadminHandler(TenantStore store, TenantProvisionerService tenantProvisionerService,
-                                EntityStoreService entityStoreService, Gson gson) {
+  private SuperadminHandler(TenantStore store, TenantProvisionerService tenantProvisionerService,
+                            EntityStoreService entityStoreService, Gson gson) {
     super(store);
     this.gson = gson;
     this.entityStoreService = entityStoreService;

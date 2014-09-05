@@ -318,6 +318,31 @@
                 </div><!-- /.modal -->
                 <div class="">
                   <div class="">
+
+                    <div class="form-group">
+                      <label class="col-sm-2 control-label">Size</label>
+                      <div class="col-sm-3">
+                        <label class="input-group">
+                          <span class="input-group-addon">Min:</span>
+                          <input type="number" class="form-control" 
+                            placeholder="Minimum nodes"
+                            ng-model="clustertemplate.constraints.size.min"
+                            max="[[clustertemplate.constraints.size.max]]"
+                            min="1" />
+                        </label>
+                      </div>
+                      <div class="col-sm-3">
+                        <label class="input-group">
+                          <span class="input-group-addon">Max:</span>
+                          <input type="number" class="form-control" 
+                            placeholder="Maximum nodes"
+                            ng-model="clustertemplate.constraints.size.max"
+                            min="[[clustertemplate.constraints.size.min]]"
+                            max="2147483647" />
+                        </label>
+                      </div>
+                    </div>
+
                     <div class="form-group">
                       <label for="inputDefaultServices" class="col-sm-2 control-label">Must coexist</label>
                       <div class="col-sm-8">

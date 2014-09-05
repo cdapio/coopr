@@ -46,7 +46,7 @@
             <div class="form-group">
               <label for="inputNumMachines" class="col-sm-2 control-label">Number of machines</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="inputNumMachines" name="inputNumMachines" placeholder="Machines" ng-model="clusterNumMachines">
+                <input type="number" class="form-control" id="inputNumMachines" name="inputNumMachines" placeholder="Machines" ng-model="clusterNumMachines" min="[[template.constraints.size.min]]" max="[[template.constraints.size.max]]">
               </div>
             </div>
             <div class="panel-head spl-panel-head">

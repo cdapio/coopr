@@ -26,7 +26,7 @@ import javax.ws.rs.Path;
 /**
  * Serves status URL.
  */
-public class LoomStatusHandler extends AbstractHttpHandler{
+public class StatusHandler extends AbstractHttpHandler{
 
   /**
    * Returns the status of the server, which just returns OK if it is handling requests. Used as a healthcheck.

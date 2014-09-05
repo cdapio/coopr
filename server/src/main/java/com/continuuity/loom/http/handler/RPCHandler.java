@@ -17,7 +17,6 @@ package com.continuuity.loom.http.handler;
 
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
-import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.current.NodePropertiesRequestCodec;
 import com.continuuity.loom.common.conf.Constants;
@@ -25,8 +24,6 @@ import com.continuuity.loom.http.request.BootstrapRequest;
 import com.continuuity.loom.http.request.NodePropertiesRequest;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
-import com.continuuity.loom.scheduler.task.ClusterJob;
-import com.continuuity.loom.scheduler.task.JobId;
 import com.continuuity.loom.spec.HardwareType;
 import com.continuuity.loom.spec.ImageType;
 import com.continuuity.loom.spec.Provider;
@@ -42,7 +39,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
@@ -56,7 +52,6 @@ import javax.ws.rs.Path;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -64,8 +59,8 @@ import java.util.Set;
  * Handler for RPCs.
  */
 @Path(Constants.API_BASE)
-public class LoomRPCHandler extends LoomAuthHandler {
-  private static final Logger LOG  = LoggerFactory.getLogger(LoomRPCHandler.class);
+public class RPCHandler extends AbstractAuthHandler {
+  private static final Logger LOG  = LoggerFactory.getLogger(RPCHandler.class);
   private static final Gson GSON = new GsonBuilder()
     .registerTypeAdapter(NodePropertiesRequest.class, new NodePropertiesRequestCodec()).create();
   private final EntityStoreService entityStoreService;
@@ -75,11 +70,11 @@ public class LoomRPCHandler extends LoomAuthHandler {
   private final TenantProvisionerService tenantProvisionerService;
 
   @Inject
-  private LoomRPCHandler(TenantStore tenantStore,
-                         EntityStoreService entityStoreService,
-                         ClusterStoreService clusterStoreService,
-                         ResourceService resourceService,
-                         TenantProvisionerService tenantProvisionerService) {
+  private RPCHandler(TenantStore tenantStore,
+                     EntityStoreService entityStoreService,
+                     ClusterStoreService clusterStoreService,
+                     ResourceService resourceService,
+                     TenantProvisionerService tenantProvisionerService) {
     super(tenantStore);
     this.entityStoreService = entityStoreService;
     this.clusterStoreService = clusterStoreService;

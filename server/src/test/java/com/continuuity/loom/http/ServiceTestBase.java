@@ -44,7 +44,7 @@ import org.junit.BeforeClass;
 /**
  *
  */
-public class LoomServiceTestBase extends BaseTest {
+public class ServiceTestBase extends BaseTest {
   protected static final String USER1 = "user1";
   protected static final String USER2 = "user2";
   protected static final String API_KEY = "apikey";
@@ -76,7 +76,7 @@ public class LoomServiceTestBase extends BaseTest {
   };
   private static int port;
   private static String base;
-  protected static LoomService loomService;
+  protected static HandlerServer handlerServer;
   protected static ElementsTrackingQueue balancerQueue;
   protected static QueueGroup provisionerQueues;
   protected static QueueGroup clusterQueues;
@@ -95,9 +95,9 @@ public class LoomServiceTestBase extends BaseTest {
     solverQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
     jobQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.JOB)));
     callbackQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CALLBACK)));
-    loomService = injector.getInstance(LoomService.class);
-    loomService.startAndWait();
-    port = loomService.getBindAddress().getPort();
+    handlerServer = injector.getInstance(HandlerServer.class);
+    handlerServer.startAndWait();
+    port = handlerServer.getBindAddress().getPort();
     tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
     base = "http://" + HOSTNAME + ":" + port + Constants.API_BASE;
   }
@@ -110,7 +110,7 @@ public class LoomServiceTestBase extends BaseTest {
 
   @AfterClass
   public static void cleanupServiceBase() {
-    loomService.stopAndWait();
+    handlerServer.stopAndWait();
   }
 
   public static HttpResponse doGetWithoutVersion(String resource) throws Exception {
