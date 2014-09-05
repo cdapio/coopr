@@ -9,6 +9,9 @@
         <fileSet>
             <directory>${project.basedir}/../provisioner</directory>
             <outputDirectory>/provisioner</outputDirectory>
+                <excludes>
+                    <exclude>**/provisioner-site.xml</exclude>
+                </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../ui</directory>
