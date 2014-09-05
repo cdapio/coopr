@@ -20,7 +20,7 @@ Unreleased
 - Include automator and provider types in export and import ( Issues: #246 )
 - Upgrade script ( Issues: #258 )
 - Fix Joyent server delete ( Issues: #272 )
-- Google Compute provider support ( Issues: #273 )
+- Google Compute provider support ( Issues: #273 #474 )
 - Provisioner Multi Tenancy ( Issues: #290 #296 )
 - Updated provider plugin using fog ( Issues: #288 #310 )
 - Queue Metrics ( Issues: #301 )
