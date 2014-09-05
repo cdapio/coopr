@@ -308,9 +308,8 @@ class FogProviderGoogle < Provider
       errors << 'Invalid service account email address. It must be in the gserviceaccount.com domain'
     end
     [@google_key_location, @google_ssh_keyfile].each do |key|
-      unless File.readable?(key)
-        errors << "cannot read specified key location: #{key}"
-      end
+      next if File.readable?(key)
+      errors << "cannot read specified key location: #{key}"
     end
     fail 'Credential validation failed!' if errors.each { |e| log.error(e) }.any?
   end
