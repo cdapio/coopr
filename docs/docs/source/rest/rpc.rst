@@ -80,9 +80,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-ApiKey:<apikey>'
-        -H 'X-Coopr-TenantID:<tenantid>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:<tenantid>'
         -X POST
         -d '{ 
                 "overwrite": "true"
@@ -147,9 +147,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST
-        -H 'X-Coopr-UserID:<userid>'
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:<userid>'
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{ 
                 "clusterId":"00000051",
                 "properties":["hostname", "ipaddress"],

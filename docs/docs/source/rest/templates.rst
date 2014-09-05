@@ -269,9 +269,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{
                 "name": "hadoop.example",
                 "description": "Hadoop cluster with hdfs and YARN",
@@ -394,9 +394,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clustertemplates/hadoop.example
  $ {
        "name": "hadoop.example",
@@ -520,9 +520,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clustertemplates/hadoop.example
 
 .. _template-modify:
@@ -582,9 +582,9 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT 
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d 
   '{
        "name": "hadoop.example",
@@ -703,8 +703,8 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clustertemplates
 

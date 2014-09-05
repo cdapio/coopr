@@ -41,9 +41,9 @@ All URLs referenced in the documentation have the following base:
 
 The current API version is 'v2'.
 The default server port is 55054 but can be reconfigured as described in :doc:`Configuring the server </guide/superadmin/server-config>`. 
-In addition, three headers must be sent to all REST endpoints.  The first is ``X-Coopr-UserID`` and is used to specify
-the id of the user making the request. The second is ``X-Coopr-ApiKey`` and is used to specify the api key used to
-communicate with the server. The third is ``X-Coopr-TenantID`` and is used to specify the id of the tenant that the
+In addition, three headers must be sent to all REST endpoints.  The first is ``Coopr-UserID`` and is used to specify
+the id of the user making the request. The second is ``Coopr-ApiKey`` and is used to specify the api key used to
+communicate with the server. The third is ``Coopr-TenantID`` and is used to specify the id of the tenant that the
 user belongs to.
 
 

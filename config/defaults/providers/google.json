@@ -5,8 +5,8 @@
   "provisioner": {
     "google_project": "",
     "google_client_email": "",
-    "google_key_location": "/opt/loom/provisioner/worker/plugins/providers/fog_provider/google-project-id.p12",
-    "google_ssh_keyfile": "/opt/loom/provisioner/worker/plugins/providers/fog_provider/id_rsa",
+    "google_key_location": "/opt/coopr/provisioner/worker/plugins/providers/fog_provider/google-project-id.p12",
+    "google_ssh_keyfile": "/opt/coopr/provisioner/worker/plugins/providers/fog_provider/id_rsa",
     "google_ssh_username": "",
     "google_data_disk_size_gb": "",
     "zone_name": "us-central1-a"

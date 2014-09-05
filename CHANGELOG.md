@@ -14,7 +14,7 @@ Unreleased
 - Configuration settings renamed ( Issues: #213 )
 - Ability to sync an active cluster's template to its current version ( Issues: #214 )
 - Cluster owner macro ( Issues: #221 )
-- Loom Firewall updates ( Issues: #226 #227 )
+- Coopr Firewall updates ( Issues: #226 #227 )
 - Memcached support for clusters ( Issues: #237 )
 - Multi Tenancy ( Issues: #239, #253, #277, #284, #292, #325, #326 )
 - Include automator and provider types in export and import ( Issues: #246 )

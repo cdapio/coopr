@@ -28,7 +28,7 @@ class FogProviderGoogle < Provider
     @image = inputmap['image']
     @hostname = inputmap['hostname']
     # Google uses the short hostname as an identifier
-    # we keep the loom hostname for use in /etc/hosts
+    # we keep the hostname for use in /etc/hosts
     @providerid = @hostname.split('.').first
     fields = inputmap['fields']
     begin

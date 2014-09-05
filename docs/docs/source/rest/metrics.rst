@@ -60,9 +60,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-ApiKey:<apikey>'
-        -H 'X-Coopr-TenantID:superadmin'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:superadmin'
         http://<server>:<port>/<version>/metrics/queues
  $ {
        "superadmin": {

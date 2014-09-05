@@ -59,9 +59,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:superadmin'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/provisioners/p1
  $ {
        "id": "p1",
@@ -113,9 +113,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:superadmin'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/provisioners
  $ [
        {

@@ -167,8 +167,8 @@ function test() {
 function start_standalone() {
   # pass in $1 path to unzipped standalone
   cd $1
-  export LOOM_USE_DUMMY_PROVISIONER=true
-  ./bin/loom.sh start
+  export COOPR_USE_DUMMY_PROVISIONER=true
+  ./bin/coopr.sh start
   open http://localhost:8100/
 }
 
