@@ -31,7 +31,7 @@ Each screen in the administration interface provides ways to create and edit set
 Login as an Administrator
 =========================
 
-The Coopr Admin UI can be accessed at ``http://<coopr-host>:<coopr-ui-port>/``. Login using the admin credentials to access the administrator interface.
+The Admin UI can be accessed at ``http://<coopr-host>:<coopr-ui-port>/``. Login using the admin credentials to access the administrator interface.
 
 .. figure:: /guide/quickstart/quickstart-screenshot-1.png
     :align: center
@@ -57,7 +57,7 @@ Clicking on the name of each element allows an administrator to enter its manage
 Managing Cluster Templates
 ============================
 
-Coopr templates allow the administrator to define blueprints describing how different types of clusters should be laid out.
+Templates allow the administrator to define blueprints describing how different types of clusters should be laid out.
 For example, there may be a template for Hadoop clusters, a template for LAMP clusters, a template for Solr clusters, etc. 
 Templates contain enough information that an end user only needs to specify a template and a number of machines to create a cluster. 
 This is done by first describing the set of services, hardware types, and image types that a cluster is compatible with. 

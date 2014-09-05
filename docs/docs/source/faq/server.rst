@@ -116,7 +116,7 @@ before proceeding to the next stage. This ensures the actions are executed in th
 Following is an example web service call along with the output returned from the Coopr Server provisioning a web server
 on a single node::
 
-  $ curl -H 'X-Coopr-UserID:<user id>' http://<coopr-host-name>:<coopr-host-port>/v1/coopr/clusters/<cluster-id>/plans
+  $ curl -H 'X-Coopr-UserID:<user id>' http://<server>:<port>/v2/clusters/<cluster-id>/plans
   $ [{
         "action": "SOLVE_LAYOUT",
         "clusterId": "00000071",

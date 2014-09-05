@@ -1,5 +1,5 @@
-Cask Coopr CHANGELOG
-====================
+Coopr CHANGELOG
+===============
 
 Unreleased
 ----------
@@ -36,7 +36,7 @@ Unreleased
 - Added additional info in get clusters API ( Issues: #401 #430 )
 - UI: fix when a provider type has no admin fields ( Issues: #409 )
 
-As of version 0.9.8, the name of the product was changed to "Cask Coopr".
+As of version 0.9.8, the name of the product was changed to "Coopr".
 
 v0.9.7 (May 27, 2014)
 ---------------------

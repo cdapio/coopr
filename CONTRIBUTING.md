@@ -1,8 +1,8 @@
-# Contributing to Cask Coopr
+# Contributing to Coopr
 
-Are you interested in making Cask Coopr better? Our development model is a simple
+Are you interested in making Coopr better? Our development model is a simple
 pull-based model with a consensus building phase, similar to the Apache's voting process.
-If you want to help make Cask Coopr better, by adding new features, fixing bugs, or
+If you want to help make Coopr better, by adding new features, fixing bugs, or
 even suggesting improvements to something that's already there, here's how you can
 contribute:
 
@@ -18,6 +18,6 @@ against this repository.
 
 ## License
 
-By contributing to Cask Coopr, you agree that your contributions will be licensed under the
+By contributing to Coopr, you agree that your contributions will be licensed under the
 [Apache License Version 2.0 (APLv2)](LICENSE).
 
