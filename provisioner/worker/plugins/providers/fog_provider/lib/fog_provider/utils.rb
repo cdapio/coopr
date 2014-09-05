@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
 #
 
 module FogProvider
-
   # used by ssh validation in confirm stage
   def set_credentials(sshauth)
-    @credentials = Hash.new
+    @credentials = {}
     @credentials[:paranoid] = false
     sshauth.each do |k, v|
-      if (k =~ /identityfile/)
-        @credentials[:keys] = [ v ]
-      elsif (k =~ /password/)
+      if k =~ /identityfile/
+        @credentials[:keys] = [v]
+      elsif k =~ /password/
         @credentials[:password] = v
       end
     end
@@ -56,7 +55,7 @@ module FogProvider
   end
 
   def wait_for_sshd(host, port = 22)
-    ssh_test_max = 10*60
+    ssh_test_max = 10 * 60
     ssh_test = 0
     log.debug 'Waiting for sshd'
     # Initial sleep, to prevent getting caught by provider firewall rules
@@ -75,20 +74,18 @@ module FogProvider
 
   def linklocal?(ip)
     linklocal = IPAddr.new '169.254.0.0/16'
-    return linklocal.include?(ip)
+    linklocal.include?(ip)
   end
 
   def loopback?(ip)
     loopback = IPAddr.new '127.0.0.0/8'
-    return loopback.include?(ip)
+    loopback.include?(ip)
   end
 
   def private?(ip)
     block_a = IPAddr.new '10.0.0.0/8'
     block_b = IPAddr.new '172.16.0.0/12'
     block_c = IPAddr.new '192.168.0.0/16'
-    return (block_a.include?(ip) || block_b.include?(ip) || block_c.include?(ip))
+    (block_a.include?(ip) || block_b.include?(ip) || block_c.include?(ip))
   end
-
 end
-

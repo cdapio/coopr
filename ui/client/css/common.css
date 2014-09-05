@@ -175,3 +175,30 @@ body #nav .login-dropdown li a span {
   margin-left: 15px;
 }
 
+@media screen and (max-width: 1230px) {
+  body #nav ul.navbar-nav li.nav-item {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+}
+@media screen and (max-width: 910px) {
+  body #nav ul.navbar-nav li.nav-item {
+    display: none;
+  }
+}
+
+/**************************************************************************************************/
+
+
+ul.tenants-tickers li > div {
+  font-weight: bold;
+  text-align: center;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  border: 2px solid #eee;
+}
+
+ul.tenants-tickers em {
+  display: block;
+  font-size: 60px;
+}

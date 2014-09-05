@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Cask Data, Inc.
+ * Copyright © 2012-2014 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -275,14 +275,14 @@ site.verifyData = function (arr) {
  * @param  {Boolean} admin Admin previlage required.
  * @return {Object} describing authenticated user.
  */
-site.checkAuth = function (req, res, admin) {
+site.checkAuth = function (req, res, admin, tenant) {
   var authenticated = site.COOKIE_NAME in req.cookies;
   if (!authenticated) {
     res.redirect('/login');
     return;
   }
   var auth = req.cookies[site.COOKIE_NAME];
-  if (!('user' in auth)) {
+  if (!auth.user || (tenant && tenant!==auth.tenant) ) {
     res.redirect('/login');
     return;
   }
@@ -547,6 +547,96 @@ site.app.post('/setskin', function (req, res) {
     }
   });
 });
+
+
+
+site.app.get('/tenants', function (req, res) {
+  var user = site.checkAuth(req, res, true, 'superadmin');
+  async.parallel([
+    site.getEntity('/tenants', user)
+  ], function (err, results) {
+    var context = {
+      activeTab: 'tenants',
+      authenticated: user,
+      env: env,
+      skin: site.getSkin(req)  
+    };
+    if (err) {
+      context.err = err;
+    } else {
+      context.tenants = site.verifyData(results[0]);
+    }
+    res.render('tenants/tenants.html', context);
+  });
+});
+
+
+site.app.get('/tenants/create', function (req, res) {
+  var user = site.checkAuth(req, res, true, 'superadmin');
+  res.render('tenants/createtenant.html', {
+    activeTab: 'tenants',
+    authenticated: user,
+    env: env,
+    skin: site.getSkin(req)
+  });
+});
+
+
+site.app.get('/tenants/tenant/:name', function (req, res) {
+  var user = site.checkAuth(req, res, true, 'superadmin');
+  async.parallel([
+    site.getEntity('/tenants/'+req.params.name, user)
+  ], function (err, results) {
+    var context = {
+      activeTab: 'tenants',
+      authenticated: user,
+      env: env,
+      skin: site.getSkin(req)  
+    };
+    if (err) {
+      context.err = err;
+    } else {
+      context.tenant = results[0];
+      context.tenantJson = JSON.stringify(results[0]); // FML
+    }
+    res.render('tenants/createtenant.html', context);
+  });
+});
+
+
+site.app.post('/tenants/create', function (req, res) {
+  var user = site.checkAuth(req, res, true, 'superadmin');
+  var options = {
+    uri: BOX_ADDR + '/tenants',
+    method: 'POST',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/tenants/update', function (req, res) {
+  var user = site.checkAuth(req, res, true, 'superadmin');
+  var options = {
+    uri: BOX_ADDR + '/tenants/' + req.body.name,
+    method: 'PUT',
+    json: req.body
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/tenants/delete/:name', function (req, res) {
+  var user = site.checkAuth(req, res, true, 'superadmin');
+  var options = {
+    uri: BOX_ADDR + '/tenants/' + req.params.name,
+    method: 'DELETE'
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+
+
+
+
 
 site.app.get('/clustertemplates', function (req, res) {
   var user = site.checkAuth(req, res, true);

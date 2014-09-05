@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 require_relative 'utils'
 
 class FogProviderRackspace < Provider
-
   include FogProvider
 
   def create(inputmap)
@@ -29,7 +28,7 @@ class FogProviderRackspace < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # Create the server
@@ -37,14 +36,14 @@ class FogProviderRackspace < Provider
       log.debug 'Invoking server create'
       begin
         server = connection.servers.create(
-          :flavor_id    => flavor,
-          :image_id     => image,
-          :name         => hostname,
-          :config_drive => @rackspace_config_drive || false,
-          :metadata     => @rackspace_metadata,
-          :disk_config  => @rackspace_disk_config || 'AUTO',
-          :personality  => files,
-          :key_name      => @rackspace_keyname
+          flavor_id: flavor,
+          image_id: image,
+          name: hostname,
+          config_drive: @rackspace_config_drive || false,
+          metadata: @rackspace_metadata,
+          disk_config: @rackspace_disk_config || 'AUTO',
+          personality: files,
+          key_name: @rackspace_keyname
         )
         server.persisted? || server.save
       end
@@ -54,7 +53,7 @@ class FogProviderRackspace < Provider
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
       @result['result']['ssh-auth']['identityfile'] = @rackspace_keyfile unless @rackspace_keyfile.nil?
       @result['status'] = 0
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occurred in FogProviderRackspace.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderRackspace.create: #{e.inspect}"
     else
@@ -69,18 +68,18 @@ class FogProviderRackspace < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # Confirm server
       log.debug "Invoking server confirm for id: #{providerid}"
-      server = self.connection.servers.get(providerid)
+      server = connection.servers.get(providerid)
       # Wait until the server is ready
-      raise 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
+      fail "Server #{server.name} is in ERROR state" if server.state == 'ERROR'
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) {
         if @rackconnect_wait
-          ready? and metadata.all['rackconnect_automation_status'] == 'DEPLOYED'
+          ready? && metadata.all['rackconnect_automation_status'] == 'DEPLOYED'
         else
           ready?
         end
@@ -88,7 +87,7 @@ class FogProviderRackspace < Provider
       bootstrap_ip = ip_address(server, 'public')
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
-        raise 'No IP address available for bootstrapping.'
+        fail 'No IP address available for bootstrapping.'
       else
         log.debug "Bootstrap IP address #{bootstrap_ip}"
       end
@@ -126,7 +125,7 @@ class FogProviderRackspace < Provider
     rescue Net::SSH::AuthenticationFailed => e
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occurred in FogProviderRackspace.confirm:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderRackspace.confirm: #{e.inspect}"
     else
@@ -141,13 +140,13 @@ class FogProviderRackspace < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # Delete server
       log.debug 'Invoking server delete'
       begin
-        server = self.connection.servers.get(providerid)
+        server = connection.servers.get(providerid)
         server.destroy
       rescue NoMethodError
         log.warn "Could not locate server '#{providerid}'... skipping"
@@ -167,7 +166,7 @@ class FogProviderRackspace < Provider
   # Shared definitions (borrowed from knife-rackspace gem, Apache 2.0 license)
 
   def connection
-    log.debug "Connection options for Rackspace:"
+    log.debug 'Connection options for Rackspace:'
     log.debug "- rackspace_api_key #{@rackspace_api_key}"
     log.debug "- rackspace_username #{@rackspace_username}"
     log.debug "- rackspace_region #{@rackspace_region}"
@@ -177,12 +176,12 @@ class FogProviderRackspace < Provider
     # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
-        :provider => 'Rackspace',
-        :version  => 'v2',
-        :rackspace_username => @rackspace_username,
-        :rackspace_api_key  => @rackspace_api_key,
-        :rackspace_region   => @rackspace_region,
-        :rackspace_auth_url => auth_endpoint
+        provider: 'Rackspace',
+        version: 'v2',
+        rackspace_username: @rackspace_username,
+        rackspace_api_key: @rackspace_api_key,
+        rackspace_region: @rackspace_region,
+        rackspace_auth_url: auth_endpoint
       )
     end
     # rubocop:enable UselessAssignment
@@ -192,7 +191,7 @@ class FogProviderRackspace < Provider
     dest, src = arg.split('=')
     unless dest && src
       log.error "Unable to process file arguments #{arg}. The remote destination and local source using DESTINATION-PATH=SOURCE-PATH are needed"
-      raise "Failed processing file arguments #{arg}"
+      fail "Failed processing file arguments #{arg}"
     end
     [dest, src]
   end
@@ -216,8 +215,8 @@ class FogProviderRackspace < Provider
       dest, src = parse_file_argument(arg)
       Chef::Log.debug("Inject file #{src} into #{dest}")
       files << {
-        :path => dest,
-        :contents => encode_file(src)
+        path: dest,
+        contents: encode_file(src)
       }
     end
     files
@@ -250,5 +249,4 @@ class FogProviderRackspace < Provider
     address = ip_addresses.select { |ip| ip['version'] == 4 }.first
     address ? address['addr'] : ''
   end
-
 end

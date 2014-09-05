@@ -1,5 +1,5 @@
 <!--
- Copyright 2012-2014, Continuuity, Inc.
+ Copyright © 2012-2014 Cask Data, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -13,6 +13,13 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+
+{% if authenticated.tenant === 'superadmin' %}
+<li class="overview {% if activeTab == 'tenants' %}active{% endif %} nav-item" id="nav-tenants-container">
+  <a class="nav-icon nav-tenants" href="/tenants"></a>
+  <a class="nav-link" id="nav-tenants" href="/tenants">Tenants</a>
+</li>
+{% endif %}
 <li class="overview {% if activeTab == 'clustertemplates' %}active{% endif %} nav-item" id="nav-clustertemplates-container">
   <a class="nav-icon nav-clustertemplates" href="/clustertemplates"></a>
   <a class="nav-link" id="nav-clustertemplates" href="/clustertemplates">Catalog</a>

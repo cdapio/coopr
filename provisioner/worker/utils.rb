@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ class CommandExecutionError < RuntimeError
   end
 end
 
-def ssh_exec!(ssh, command, message = command)
+def ssh_exec!(ssh, command, message = command, pty = false)
   stdout_data = ''
   stderr_data = ''
   exit_code = nil
@@ -87,6 +87,11 @@ def ssh_exec!(ssh, command, message = command)
   log.debug message if message != command
   log.debug "---ssh-exec command: #{command}"
   ssh.open_channel do |channel|
+    if pty
+      channel.request_pty do |ch, success|
+        raise "no pty!" if !success
+      end
+    end
     channel.exec(command) do |ch, success|
       unless success
         abort "FAILED: couldn't execute command (ssh.channel.exec)"

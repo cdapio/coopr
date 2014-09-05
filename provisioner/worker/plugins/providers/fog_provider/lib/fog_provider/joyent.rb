@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 require_relative 'utils'
 
 class FogProviderJoyent < Provider
-
   include FogProvider
 
   def create(inputmap)
@@ -29,7 +28,7 @@ class FogProviderJoyent < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # Create the server
@@ -37,10 +36,10 @@ class FogProviderJoyent < Provider
       log.debug 'Invoking server create'
       begin
         server = connection.servers.create(
-          :package         => flavor,
-          :dataset         => image,
-          :name            => hostname,
-          :key_name        => @joyent_keyname
+          package: flavor,
+          dataset: image,
+          name: hostname,
+          key_name: @joyent_keyname
         )
       end
       # Process results
@@ -48,7 +47,7 @@ class FogProviderJoyent < Provider
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['identityfile'] = @joyent_keyfile unless @joyent_keyfile.nil?
       @result['status'] = 0
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.create: #{e.inspect}"
     else
@@ -63,21 +62,21 @@ class FogProviderJoyent < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # Confirm server
       log.debug "Invoking server confirm for id: #{providerid}"
-      server = self.connection.servers.get(providerid)
+      server = connection.servers.get(providerid)
       # Wait until the server is ready
-      raise 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
+      fail "Server #{server.name} is in ERROR state" if server.state == 'ERROR'
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
       bootstrap_ip = ip_address(server)
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
-        raise 'No IP address available for bootstrapping.'
+        fail 'No IP address available for bootstrapping.'
       else
         log.debug "Bootstrap IP address #{bootstrap_ip}"
       end
@@ -126,7 +125,7 @@ class FogProviderJoyent < Provider
     rescue Net::SSH::AuthenticationFailed => e
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.confirm:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.confirm: #{e.inspect}"
     else
@@ -141,13 +140,13 @@ class FogProviderJoyent < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # Delete server
       log.debug 'Invoking server delete'
       begin
-        server = self.connection.servers.get(providerid)
+        server = connection.servers.get(providerid)
         server.destroy
       rescue NoMethodError
         log.warn "Could not locate server '#{providerid}'... skipping"
@@ -169,7 +168,7 @@ class FogProviderJoyent < Provider
   # Shared definitions (borrowed from knife-joyent gem, Apache 2.0 license)
 
   def connection
-    log.debug "Connection options for Joyent:"
+    log.debug 'Connection options for Joyent:'
     log.debug "- joyent_username #{@joyent_username}"
     log.debug "- joyent_password #{@joyent_password}" if @joyent_password
     log.debug "- joyent_keyname #{@joyent_keyname}"
@@ -181,25 +180,24 @@ class FogProviderJoyent < Provider
     # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
-        :provider => 'Joyent',
-        :joyent_username => @joyent_username,
-        :joyent_password => @joyent_password,
-        :joyent_keyname  => @joyent_keyname,
-        :joyent_keyfile  => @joyent_keyfile,
-        :joyent_url      => @joyent_api_url,
-        :joyent_version  => @joyent_version
+        provider: 'Joyent',
+        joyent_username: @joyent_username,
+        joyent_password: @joyent_password,
+        joyent_keyname: @joyent_keyname,
+        joyent_keyfile: @joyent_keyfile,
+        joyent_url: @joyent_api_url,
+        joyent_version: @joyent_version
       )
     end
     # rubocop:enable UselessAssignment
   end
 
   def ip_address(server)
-    server_ips = server.ips.select{ |ip| ip && !(loopback?(ip) || linklocal?(ip)) }
+    server_ips = server.ips.select { |ip| ip && !(loopback?(ip) || linklocal?(ip)) }
     if server_ips.count === 1
       server_ips.first
     else
-      server_ips.find{ |ip| !private?(ip) }
+      server_ips.find { |ip| !private?(ip) }
     end
   end
-
 end

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 require_relative 'utils'
 
 class FogProviderOpenstack < Provider
-
   include FogProvider
 
   def create(inputmap)
@@ -29,7 +28,7 @@ class FogProviderOpenstack < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # Create the server
@@ -37,11 +36,11 @@ class FogProviderOpenstack < Provider
       log.debug 'Invoking server create'
       begin
         server = connection.servers.create(
-          :flavor_ref      => flavor,
-          :image_ref       => image,
-          :name            => hostname,
-          :security_groups => @security_groups,
-          :key_name        => @openstack_keyname
+          flavor_ref: flavor,
+          image_ref: image,
+          name: hostname,
+          security_groups: @security_groups,
+          key_name: @openstack_keyname
         )
       end
       # Process results
@@ -50,7 +49,7 @@ class FogProviderOpenstack < Provider
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
       @result['result']['ssh-auth']['identityfile'] = @openstack_keyfile unless @openstack_keyfile.nil?
       @result['status'] = 0
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occurred in FogProviderOpenstack.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.create: #{e.inspect}"
     else
@@ -65,21 +64,21 @@ class FogProviderOpenstack < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # Confirm server
       log.debug "Invoking server confirm for id: #{providerid}"
-      server = self.connection.servers.get(providerid)
+      server = connection.servers.get(providerid)
       # Wait until the server is ready
-      raise 'Server #{server.name} is in ERROR state' if server.state == 'ERROR'
+      fail "Server #{server.name} is in ERROR state" if server.state == 'ERROR'
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
       bootstrap_ip = ip_address(server, 'public')
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
-        raise 'No IP address available for bootstrapping.'
+        fail 'No IP address available for bootstrapping.'
       else
         log.debug "Bootstrap IP address #{bootstrap_ip}"
       end
@@ -113,7 +112,7 @@ class FogProviderOpenstack < Provider
     rescue Net::SSH::AuthenticationFailed => e
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
-    rescue Exception => e
+    rescue => e
       log.error('Unexpected Error Occurred in FogProviderOpenstack.confirm:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.confirm: #{e.inspect}"
     else
@@ -128,13 +127,13 @@ class FogProviderOpenstack < Provider
     fields = inputmap['fields']
     begin
       # Our fields are fog symbols
-      fields.each do |k,v|
+      fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
       # Delete server
       log.debug 'Invoking server delete'
       begin
-        server = self.connection.servers.get(providerid)
+        server = connection.servers.get(providerid)
         server.destroy
       rescue NoMethodError
         log.warn "Could not locate server '#{providerid}'... skipping"
@@ -154,7 +153,7 @@ class FogProviderOpenstack < Provider
   # Shared definitions (borrowed from knife-openstack gem, Apache 2.0 license)
 
   def connection
-    log.debug "Connection options for Openstack:"
+    log.debug 'Connection options for Openstack:'
     log.debug "- openstack_username #{@openstack_username}"
     log.debug "- openstack_password #{@openstack_password}"
     log.debug "- openstack_tenant #{@openstack_tenant}"
@@ -165,13 +164,13 @@ class FogProviderOpenstack < Provider
     # rubocop:disable UselessAssignment
     @connection ||= begin
       connection = Fog::Compute.new(
-        :provider => 'OpenStack',
-        :openstack_auth_url => @openstack_auth_url,
-        :openstack_username => @openstack_username,
-        :openstack_tenant   => @openstack_tenant,
-        :openstack_api_key  => @openstack_password,
-        :connection_options => {
-          :ssl_verify_peer => @openstack_ssl_verify_peer
+        provider: 'OpenStack',
+        openstack_auth_url: @openstack_auth_url,
+        openstack_username: @openstack_username,
+        openstack_tenant: @openstack_tenant,
+        openstack_api_key: @openstack_password,
+        connection_options: {
+          ssl_verify_peer: @openstack_ssl_verify_peer
         }
       )
     end
@@ -187,5 +186,4 @@ class FogProviderOpenstack < Provider
     address = ip_addresses.select { |ip| ip['version'] == 4 }.first
     address ? address['addr'] : ''
   end
-
 end

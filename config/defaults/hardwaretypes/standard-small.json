@@ -23,6 +23,12 @@
       "ram": "1.7",
       "disks": "/dev/xvda3=160"
     },
+    "google": {
+      "flavor": "g1-small",
+      "cost": "0.035",
+      "vcpu": "1",
+      "ram": "1.7"
+    },
     "joyent": {
       "flavor": "g3-standard-1.75-kvm",
       "cost": "0.056",
