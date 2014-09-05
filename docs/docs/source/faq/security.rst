@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,25 +24,25 @@
 Security
 ====================================
 
-Does Continuuity Loom support authentication?
+Does Coopr support authentication?
 ----------------------------------------------
-Continuuity Loom backend has minimal support for authentication. In the next version, there will
+Coopr backend has minimal support for authentication. In the next version, there will
 be integration with Crowd and LDAP servers allowing users to authenticate against the 
 available directories.
 
-Are all communications between Loom Server and Loom Provisioners secure?
+Are all communications between Coopr Server and Coopr Provisioners secure?
 ------------------------------------------------------------------------------------
 Not right now, but the plan is to move them to communicate on https in future releases. 
 This is not an immediate concern, since there is no user sensitive data passed between 
 them.
 
-Can Continuuity Loom integrate with any authentication system?
+Can Coopr integrate with any authentication system?
 ---------------------------------------------------------------
 It's designed to integrate with any authentication system. The next release will include support
 for OpenID, LDAP and OAuth, and the later releases will open up integration with different systems.
 
-Will Continuuity Loom support authorization and granular control in future?
+Will Coopr support authorization and granular control in future?
 ---------------------------------------------------------------------------
-Absolutely, this feature is few releases down the lane. Indeed, it's one of the most important features that Continuuity Loom
+Absolutely, this feature is few releases down the lane. Indeed, it's one of the most important features that Coopr
 will be supporting. In large scale deployment of clusters and nodes, having granular and role based access control are 
 imperative for auditing and accountability.

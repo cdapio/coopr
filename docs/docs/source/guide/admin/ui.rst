@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ Each screen in the administration interface provides ways to create and edit set
 Login as an Administrator
 =========================
 
-The Loom Admin UI can be accessed at ``http://<loom-host>:<loom-ui-port>/``. Login using the admin credentials to access the administrator interface.
+The Admin UI can be accessed at ``http://<coopr-host>:<coopr-ui-port>/``. Login using the admin credentials to access the administrator interface.
 
 .. figure:: /guide/quickstart/quickstart-screenshot-1.png
     :align: center
@@ -57,7 +57,7 @@ Clicking on the name of each element allows an administrator to enter its manage
 Managing Cluster Templates
 ============================
 
-Loom templates allow the administrator to define blueprints describing how different types of clusters should be laid out.
+Templates allow the administrator to define blueprints describing how different types of clusters should be laid out.
 For example, there may be a template for Hadoop clusters, a template for LAMP clusters, a template for Solr clusters, etc. 
 Templates contain enough information that an end user only needs to specify a template and a number of machines to create a cluster. 
 This is done by first describing the set of services, hardware types, and image types that a cluster is compatible with. 
@@ -94,7 +94,7 @@ to clusters created using this template, as well as a step size for use when ext
 
 The **Compatibility** tab defines sets of services, hardware types, and image types that are allowed for use in a cluster.
 Services not in the list specified in this section cannot be placed on the cluster.
-Continuuity Loom will not automatically pull in service dependencies, so the full set of compatible services must be defined.
+Coopr will not automatically pull in service dependencies, so the full set of compatible services must be defined.
 Hardware types not in the list specified in this section cannot be used in the cluster. Similarly, image types 
 not in the list specified in this section cannot to be used in the cluster.
 Services, hardware types, and image types can all be added by selecting an element from the drop down menu and clicking the 
@@ -136,7 +136,7 @@ A 'Must coexist' constraint is used to specify services that must be placed toge
 cluster, you generally want datanodes, regionservers, and nodemanagers to all be placed together, so
 you would put all 3 services in the same 'Must coexist' constraint. The 'Must coexist' constraints are not transitive. 
 If there is one constraint saying service A must coexist with service B, and another constraint saying service B must
-coexist with service C, this does not mean that service A must coexist with service C. Continuuity Loom was designed to
+coexist with service C, this does not mean that service A must coexist with service C. Coopr was designed to
 prevent unintended links between services, especially as the number of 'Must coexist' constraints increase. If a 'Must
 coexist' rule contains a service that is not on the cluster, it is shrunk to ignore the service not on the
 cluster. For example, your template may be compatible with datanodes, nodemanagers, and regionservers. However, by
@@ -221,8 +221,8 @@ template can be modified and deleted accordingly.
 Managing Infrastructure Providers
 =================================
 
-Continuuity Loom provides functionality to provision servers across a number of infrastructure providers, including but not
-limited to Amazon Web Services, Rackspace, and Joyent. Continuuity Loom also supports OpenStack to enable integration with
+Coopr provides functionality to provision servers across a number of infrastructure providers, including but not
+limited to Amazon Web Services, Rackspace, and Joyent. Coopr also supports OpenStack to enable integration with
 custom infrastructures for both public and private cloud.
 
 The Providers interface allows administrators to add available cloud providers and manage their credentials.

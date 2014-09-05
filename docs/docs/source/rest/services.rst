@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -84,15 +84,15 @@ automator type, which requires a run_list field and also allows an optional json
         "start": {
             "type": "chef-solo",
             "fields": {
-                "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
-                "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+                "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
+                "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[coopr_service_runner::default]"
             }
         },
         "stop": {
             "type": "chef-solo",
             "fields": {
-                "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
-                "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+                "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
+                "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[coopr_service_runner::default]"
             }
         }
     }
@@ -222,9 +222,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         -d '{
                 "name": "hadoop-hdfs-datanode",
                 "description": "Hadoop HDFS DataNode",
@@ -290,9 +290,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/services/small.example
  $ {
        "name": "hadoop-hdfs-datanode",
@@ -359,9 +359,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/services/example
 
 .. _service-modify:
@@ -416,9 +416,9 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT 
-        -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         -d '{
                  "name": "myapp",
                  "description": "my application",
@@ -470,8 +470,8 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'X-Coopr-UserID:admin' 
+        -H 'X-Coopr-TenantID:<tenantid>'
+        -H 'X-Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/services
 

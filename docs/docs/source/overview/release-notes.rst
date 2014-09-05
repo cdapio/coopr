@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ Release Notes
 =============
 .. _release-notes:
 
-Welcome to Continuuity Loom |release| release. Release notes with links to issue details can be seen from the github project at https://github.com/continuuity/loom/releases.
+Welcome to Coopr |release| release. Release notes with links to issue details can be seen from the github project at https://github.com/caskco/coopr/releases.
 
 Release Theme : Extensibility 
 --------------------------------
