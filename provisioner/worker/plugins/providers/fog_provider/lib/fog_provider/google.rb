@@ -159,13 +159,13 @@ class FogProviderGoogle < Provider
           # Mount the data disk
           Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
             # determine mount device
-            cmd = %Q(#{sudo} readlink /dev/disk/by-id/#{google_disk_id})
+            cmd = "#{sudo} readlink /dev/disk/by-id/#{google_disk_id}"
             device_rel_path = ssh_exec!(ssh, cmd, "Querying disk #{google_disk_id}").first.chomp
             device = File.join('/dev', File.basename(device_rel_path))
-            cmd = %Q(#{sudo} mkdir #{mount_point} && #{sudo} /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' #{device} #{mount_point})
+            cmd = "#{sudo} mkdir #{mount_point} && #{sudo} /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' #{device} #{mount_point}"
             ssh_exec!(ssh, cmd, "Mounting device #{device} on #{mount_point}")
             # update /etc/fstab
-            cmd = %Q(echo "#{device} #{mount_point} ext4 defaults,auto,noatime 0 2" | #{sudo} tee -a /etc/fstab)
+            cmd = "echo '#{device} #{mount_point} ext4 defaults,auto,noatime 0 2' | #{sudo} tee -a /etc/fstab"
             ssh_exec!(ssh, cmd, "Updating fstab for device #{device} on #{mount_point}")
           end
         else
