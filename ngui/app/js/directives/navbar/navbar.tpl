@@ -11,7 +11,7 @@
 </div>
 <div class="collapse navbar-collapse" ng-class="{in:navbarCollapsed}">
 
-  <div ng-class="{bigicons: currentUser.hasRole('admin')}">
+  <div ng-class="{bigicons: currentUser.hasRole('admin')}" ng-click="navbarCollapsed = false">
     <ul class="nav navbar-nav" ng-show="currentUser.hasRole('admin')">
       <li ng-repeat="link in navbarAdminLinks" ng-class="{active: $state.includes(link.sref)}">
         <a ui-sref="{{link.sref + '.list'}}">
