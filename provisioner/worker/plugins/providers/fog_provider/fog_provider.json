@@ -179,11 +179,11 @@
         },
         "required": [
           [
-            "project_id",
-            "client_email",
-            "key_location",
+            "google_project",
+            "google_client_email",
+            "google_key_location",
             "zone_name",
-            "ssh_keyfile"
+            "google_ssh_keyfile"
           ]
         ]
       },
