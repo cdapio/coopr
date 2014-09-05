@@ -137,7 +137,7 @@ class FogProviderGoogle < Provider
       # login with pseudotty and turn off sudo requiretty option
       log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
-        cmd = %Q[#{sudo} sed -i -e sed 's/^\\(Defaults\\s\\+requiretty.*\\)$/#\\1/i' /etc/sudoers]
+        cmd = %Q[#{sudo} sed -i -e 's/^\\(Defaults\\s\\+requiretty.*\\)$/#\\1/i' /etc/sudoers]
         ssh_exec!(ssh, cmd, 'Disabling requiretty via pseudotty session', true)
       end
 
@@ -160,7 +160,7 @@ class FogProviderGoogle < Provider
           Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
             # determine mount device
             cmd = %Q[#{sudo} readlink /dev/disk/by-id/#{google_disk_id}]
-            device_rel_path = ssh_exec!(ssh, cmd, "Querying disk #{google_disk_id}").first
+            device_rel_path = ssh_exec!(ssh, cmd, "Querying disk #{google_disk_id}").first.chomp
             device = File.join('/dev', File.basename(device_rel_path))
             #cmd = %Q[#{sudo} mkdir #{mount_point} && #{sudo} /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' /dev/$(basename $(readlink /dev/disk/by-id/#{google_disk_id})) #{mount_point} && #{sudo} chmod a+w #{mount_point}]
             cmd = %Q[#{sudo} mkdir #{mount_point} && #{sudo} /usr/share/google/safe_format_and_mount -m 'mkfs.ext4 -F' #{device} #{mount_point}]
