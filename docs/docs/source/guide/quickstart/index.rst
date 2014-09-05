@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,19 +22,19 @@
 Quick Start Guide
 ==================
 
-This guide will help you get started with Continuuity Loom. In this section, you will learn to provision a cluster
+This guide will help you get started with Coopr. In this section, you will learn to provision a cluster
 using one of the preset templates.
 
-Installing Continuuity Loom
+Installing Coopr
 ===========================
 
 Please follow the steps found in the :doc:`Installation Guide </guide/installation/index>`. Once successfully installed,
-start all the relevant Loom components: the Loom server, provisioners, and UI.
+start all the relevant Coopr components: the Coopr Server, provisioners, and UI.
 
 Getting Started
 ===============
 
-Open the Loom UI using a browser at ``http://<loom-host>:<loom-ui-port>/`` and login as an administrator. The default
+Open the Coopr UI using a browser at ``http://<coopr-host>:<coopr-ui-port>/`` and login as an administrator. The default
 password is 'admin'.  
 
 .. figure:: /guide/quickstart/quickstart-screenshot-1.png
@@ -86,7 +86,7 @@ Enter the necessary fields and click on 'Save' to persist them.
 Joyent
 ^^^^^^
 Joyent requires a region, key file, key name, user, and api version. The key file must be present on all machines
-running the Provisioner, must be owned by the user running Continuuity Loom, and must be readable only by the user that owns it
+running the Provisioner, must be owned by the user running Coopr, and must be readable only by the user that owns it
 (0400 permissions). 
 
 .. figure:: /guide/quickstart/joyent.png
@@ -101,10 +101,10 @@ OpenStack
 ^^^^^^^^^
 OpenStack has been extensively tested on Havana, but it also supports Grizzly out of the box. OpenStack support has 
 some limitations that are described :doc:`here </guide/installation/openstack-config>`.
-Several of these limitations will be eliminated in future releases of Continuuity Loom.
+Several of these limitations will be eliminated in future releases of Coopr.
 The first step is to configure the openstack provider to use your credentials. 
 OpenStack requires a key file, auth url, password, key name, tenant, and user. The key file must be 
-present on all machines running the Provisioner, must be owned by the user running Continuuity Loom, and must be readable only by
+present on all machines running the Provisioner, must be owned by the user running Coopr, and must be readable only by
 the user that owns it (0400 permissions).
 
 .. figure:: /guide/quickstart/openstack-provider.png
@@ -151,7 +151,7 @@ that have been provisioned that are accessible to the logged in user.
     :figclass: align-center
 
 Click on the 'Create' buttom at the top right to enter the cluster creation page. In the 'Name' field,
-enter 'loom-quickstart-01' as the name of the cluster to create. The 'Template' field
+enter 'coopr-quickstart-01' as the name of the cluster to create. The 'Template' field
 specifies which template in the catalog to use for this cluster. For this tutorial, let's
 create a distributed Hadoop and HBase cluster.
 
@@ -182,7 +182,7 @@ Accessing the Cluster
 
 Once creation is complete, the cluster is ready for use.
 
-For more information on your cluster, click on the name 'loom-quickstart-01' on the
+For more information on your cluster, click on the name 'coopr-quickstart-01' on the
 Clusters' home screen. On this cluster description screen, nodes are grouped together by the set
 of services that are available on them. To see node details, click on the white triangles next to each
 service set to expand the list. The expanded list shows a list of attributes for each node.

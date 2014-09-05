@@ -1,8 +1,8 @@
 /*
- * nature.css_t
- * ~~~~~~~~~~~~
+ * cdap.css_t
+ * ~~~~~~~~~~~~~~~~~
  *
- * Sphinx stylesheet -- nature theme.
+ * Sphinx stylesheet -- cdap theme.
  *
  * :copyright: Copyright 2007-2013 by the Sphinx team, see AUTHORS.
  * :license: BSD, see LICENSE for details.
@@ -11,27 +11,27 @@
 
 @import url("basic.css");
 
-@font-face {
-  font-family: 'Maven Pro';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Maven Pro Regular'), local('MavenProRegular'), url(http://themes.googleusercontent.com/static/fonts/mavenpro/v4/MG9KbUZFchDs94Tbv9U-pbO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
-}
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic);
 
 /* -- page layout ----------------------------------------------------------- */
 
 body {
-    font-family: "Maven Pro", "Helvetica", "Arial", sans-serif;
+    font-family: 'Source Sans Pro', "Helvetica", "Arial", sans-serif; font-weight: 400;
     font-size: 100%;
-    background-color: #162d50;
+    background-color: #4B5258;
     color: #555;
     margin: 0;
     padding: 0;
 }
 
+div.document {
+    background-color: #eee;
+}
+
 div.documentwrapper {
     float: left;
     width: 100%;
+    margin-top: 32px;
 }
 
 div.bodywrapper {
@@ -42,15 +42,12 @@ hr {
     border: 1px solid #B1B4B6;
 }
 
-div.document {
-    background-color: #eee;
-}
-
 div.body {
     background-color: #ffffff;
     color: #3E4349;
     padding: 0 30px 30px 30px;
     font-size: 0.9em;
+    min-height: 1200px;
 }
 
 div.footer {
@@ -67,16 +64,20 @@ div.footer a {
 }
 
 div.related {
-    background-color: #162d50;
+background-color: #303840;
     line-height: 32px;
     color: #fff;
     text-shadow: 0px 1px 0 #444;
     font-size: 0.9em;
     width: auto;
-    background-image: url(./Continuuity-Logo.png);
+    background-image: url(./logo.png);
     background-repeat: no-repeat;
     background-position: left middle;
     padding-left: 170px;
+    padding-left: 290px;
+    box-sizing: border-box;
+    width: 100%;
+    position: fixed;
 }
 
 div.related a {
@@ -88,6 +89,12 @@ div.sphinxsidebar {
     font-size: 0.75em;
     line-height: 1.5em;
     width: 270px;
+    top: 30px;
+    bottom: 0;
+    margin: 0;
+    position: fixed;
+    overflow: auto;
+    height: auto;
 }
 
 div.sphinxsidebarwrapper{
@@ -142,6 +149,10 @@ div.sphinxsidebar input[type=text]{
     margin-left: 20px;
 }
 
+a.current {
+    font-weight: bold;
+}
+
 /* -- body styles ----------------------------------------------------------- */
 
 a {
@@ -163,17 +174,25 @@ div.body h6 {
     background-color: #EEE;
     font-weight: normal;
     color: #111;
-    margin: 30px 0px 10px 0px;
-    padding: 5px 0 5px 10px;
+    margin: 30px 0px 10px -15px;
+    padding: 5px 0 5px 15px;
     text-shadow: 0px 1px 0 white
 }
 
 div.body h1 { border-top: 20px solid white; margin-top: 0; font-size: 180%; font-weight:bold;}
-div.body h2 { font-size: 150%; background-color: #EEE; }
-div.body h3 { font-size: 120%; background-color: #EEE; }
-div.body h4 { font-size: 110%; background-color: #EEE; }
-div.body h5 { font-size: 100%; background-color: #EEE; }
-div.body h6 { font-size: 100%; background-color: #EEE; }
+div.body h2 { font-size: 150%; font-weight:bold;}
+div.body h3 { font-size: 120%; }
+div.body h4 { font-size: 110%; font-weight:normal;}
+div.body h5 { font-size: 100%; background-color: #F2F2F2; }
+div.body h6 { font-size: 100%; background-color: #F2F2F2; }
+
+div.body h1 { background-color: #E0E0E0; }
+div.body h2 { background-color: #E0E0E0; }
+div.body h3 { background-color: #E0E0E0; }
+div.body h4 { 
+    background-color: #F2F2F2;
+    margin: 30px 0px 10px 0px;
+}
 
 a.headerlink {
     color: #c60f0f;
@@ -190,6 +209,7 @@ a.headerlink:hover {
 
 div.body p, div.body dd, div.body li {
     line-height: 1.5em;
+    margin-right: 15px;
 }
 
 div.admonition p.admonition-title + p {
@@ -198,6 +218,9 @@ div.admonition p.admonition-title + p {
 
 div.highlight{
     background-color: white;
+    background-color: #ecf0f3;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 div.note {
@@ -228,12 +251,14 @@ p.admonition-title:after {
 }
 
 em {
-    font-style: normal;
+    font-style: italic;
 }
 
 pre {
     padding: 10px;
     background-color: White;
+    background-color: #ecf0f3;
+    background-color: #F9FAFB;
     color: #222;
     line-height: 1.2em;
     border: 1px solid #C6C9CB;
@@ -244,7 +269,7 @@ pre {
 }
 
 tt {
-    background-color: #ecf0f3;
+    /* background-color: #ecf0f3; */
     color: #222;
     /* padding: 1px 2px; */
     font-size: 1.1em;

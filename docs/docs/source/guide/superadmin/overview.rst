@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ other users in their own tenant.
 
 System Tools
 ============
-Continuuity Loom allows administrators to :doc:`configure their servers </guide/superadmin/server-config>`
+Coopr allows administrators to :doc:`configure their servers </guide/superadmin/server-config>`
 and  :doc:`write custom plugins </guide/superadmin/plugins>` for allocating machines with your providers or to implement custom services.
 Administrators who are more command line driven, or who wish to write quick administrative scripts,
 can employ the :doc:`Web services API </rest/index>`.

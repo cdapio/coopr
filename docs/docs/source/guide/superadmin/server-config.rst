@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ Server Configuration
 Configuring the server
 ----------------------
 
-Loom server uses Zookeeper for task coordination and a database for persistent data. The server will work out of the box
+Coopr Server uses Zookeeper for task coordination and a database for persistent data. The server will work out of the box
 without any configuration options with an in-process Zookeeper and an embedded Derby DB; however, we 
-strongly recommend that administrators supply their own Zookeeper quorum and database outside of Continuuity Loom for performance and
+strongly recommend that administrators supply their own Zookeeper quorum and database outside of Coopr for performance and
 maintainability. Below we indicate how you can supply your own database (in this case MySQL server) for storage, 
 and the associated JDBC connector in the server configuration file.
 
@@ -41,7 +41,7 @@ The zookeeper quorum, a collection of nodes running instances of Zookeeper, is s
 
 Database
 ^^^^^^^^
-Continuuity Loom uses JDBC for database access. To provide your own database, and for Continuuity Loom to access it, you must specify a driver, a connection string,
+Coopr uses JDBC for database access. To provide your own database, and for Coopr to access it, you must specify a driver, a connection string,
 a user, and a password, as shown in the following example.  We also recommend specifying a validation query to be used with jdbc connection 
 pooling.  The query will change based on which database you are using.  
 ::
@@ -66,17 +66,17 @@ pooling.  The query will change based on which database you are using.
     </property>
     <property>
       <name>server.jdbc.connection.string</name>
-      <value>jdbc:mysql://127.0.0.1:3306/loom?useLegacyDatetimeCode=false</value>
+      <value>jdbc:mysql://127.0.0.1:3306/coopr?useLegacyDatetimeCode=false</value>
       <description>Specifies DB connection string</description>
     </property>
     <property>
       <name>server.db.user</name>
-      <value>loom</value>
+      <value>coopr</value>
       <description>DB user</description>
     </property>
     <property>
       <name>server.db.password</name>
-      <value>loomers</value>
+      <value>cooprers</value>
       <description>DB user password</description>
     </property>
     <property>
@@ -92,7 +92,7 @@ The Server can be configured to run callbacks before any cluster operation begin
 operation succeeds, and after an operation fails. By default, no callbacks are run. Out of the
 box, the Server supports sending an HTTP POST request containing cluster and job information to
 configurable endpoints. You can also write your own custom callback and plug it in.
-See :doc:`Cluster Callbacks </guide/admin/callbacks>` for more information on how to write your own custom callbacks.
+See :doc:`Cluster Callbacks </guide/superadmin/callbacks>` for more information on how to write your own custom callbacks.
 
 To enable HTTP POST callbacks you must specify a url to send the request to.  There is a configuration
 setting for the url to use on start, success, and failure of a cluster operation. If a url is not given,
@@ -149,7 +149,7 @@ A full list of available configuration settings and their default values are giv
      - A local value determined by an in-memory Zookeeper.
      - Zookeeper quorum for the server.
    * - server.zookeeper.namespace
-     - "/loom"
+     - "/coopr"
      - Namespace to use in Zookeeper
    * - server.zookeeper.session.timeout.millis
      - 40000
@@ -164,7 +164,7 @@ A full list of available configuration settings and their default values are giv
      - org.apache.derby.jdbc.EmbeddedDriver
      - JDBC driver to use for database operations.
    * - server.jdbc.connection.string
-     - "jdbc:derby:/var/loom/data/db/loom;create=true"
+     - "jdbc:derby:/var/coopr/data/db/coopr;create=true"
      - JDBC connection string to user for database operations.
    * - server.jdbc.validation.query
      - "VALUES 1" when using default for server.jdbc.driver (Derby), null otherwise.
@@ -173,7 +173,7 @@ A full list of available configuration settings and their default values are giv
      - 100
      - Maximum active JDBC connections.
    * - server.db.user
-     - "loom"
+     - "coopr"
      - Database user.
    * - server.db.password
      - null
@@ -182,7 +182,7 @@ A full list of available configuration settings and their default values are giv
      - 20
      - Number of threads used for solving cluster layout.
    * - server.local.data.dir
-     - "/var/loom/data"
+     - "/var/coopr/data"
      - Local data directory that default in-memory Zookeeper and embedded Derby will use.
    * - server.task.timeout.seconds
      - 1800
@@ -213,12 +213,12 @@ A full list of available configuration settings and their default values are giv
      - Interval, in seconds, various runs are scheduled on the server.
    * - server.ids.start.num
      - 1
-     - Along with ``server.ids.increment.by``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The ID generation in a datacenter will start from this number. Each datacenter will need to have a different start number so that the IDs do not overlap. All Loom Servers in a datacenter should share the same value of ``server.ids.start.num``.
+     - Along with ``server.ids.increment.by``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The ID generation in a datacenter will start from this number. Each datacenter will need to have a different start number so that the IDs do not overlap. All Coopr Servers in a datacenter should share the same value of ``server.ids.start.num``.
    * - server.ids.increment.by
      - 1
      - Along with ``server.ids.start.num``, this setting is used to partition the ID space for :doc:`Multi-Datacenter High Availability </guide/bcp/multi-data-center-bcp>`. The IDs will increment by this number in a datacenter. All datacenters have to share the same value of ``server.ids.increment.by`` to prevent overlapping of IDs. This number has to be large enough to enable future datacenter expansion.
    * - server.callback.class 
-     - com.continuuity.loom.scheduler.callback.HttpPostClusterCallback
+     - co.cask.coopr.scheduler.callback.HttpPostClusterCallback
      - Class to use for executing cluster callbacks.
    * - server.callback.http.start.url
      - none

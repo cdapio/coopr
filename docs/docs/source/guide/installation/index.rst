@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ Installation Guide
 Overview
 ========
 
-This document will guide you through the process of installing Continuuity Loom
+This document will guide you through the process of installing Coopr
 on your own cluster with the official installation image.
 
 System Requirements
@@ -36,7 +36,7 @@ System Requirements
 
 Hardware Requirements
 ---------------------
-Systems hosting the Continuuity Loom components must meet these hardware specifications, in addition to having CPUs
+Systems hosting the Coopr components must meet these hardware specifications, in addition to having CPUs
 with a minimum speed of 2 GHz
 
 .. list-table::
@@ -46,13 +46,13 @@ with a minimum speed of 2 GHz
    * - Component
      - Hardware Component
      - Specifications
-   * - Continuuity Loom UI
+   * - Coopr UI
      - RAM
      - 512MB minimum, 1 GB recommended
-   * - Continuuity Loom Server 
+   * - Coopr Server 
      - RAM
      - 1 GB minimum, 3 GB recommended
-   * - Continuuity Loom Provisioners
+   * - Coopr Provisioners
      - RAM
      - 256 MB per provisioner worker; for example, with 10 workers, 2.5 GB minimum
    * - Database (ex: MySQL)
@@ -60,14 +60,14 @@ with a minimum speed of 2 GHz
      - 2 GB minimum, 4 GB recommended
    * - 
      - Disk
-     - Disk usage increases as Continuuity Loom usage increases; suggested minimum of 50GB
+     - Disk usage increases as Coopr usage increases; suggested minimum of 50GB
 
 .. _system-requirements:
 
 Supported Operating Systems
 ---------------------------
 
-Continuuity Loom has been tested against these platforms:
+Coopr has been tested against these platforms:
 
  * CentOS 6.4
  * Ubuntu 12.04
@@ -75,7 +75,7 @@ Continuuity Loom has been tested against these platforms:
 Supported Databases
 -------------------
 
-Continuuity Loom supports any database with a jdbc driver that supports standard SQL queries. It has been tested with these databases:
+Coopr supports any database with a jdbc driver that supports standard SQL queries. It has been tested with these databases:
 
  * (Default) Derby
  * MySQL version 5.1 or above
@@ -83,7 +83,7 @@ Continuuity Loom supports any database with a jdbc driver that supports standard
 Supported Zookeeper Versions
 ----------------------------
 
-Continuuity Loom has been tested with these versions of Zookeeper:
+Coopr has been tested with these versions of Zookeeper:
 
  * Apache Zookeeper version 3.4 or above
  * CDH4 or CDH5 Zookeeper
@@ -91,13 +91,13 @@ Continuuity Loom has been tested with these versions of Zookeeper:
 
 Supported OpenStack Versions
 ----------------------------
-Continuuity Loom has been extensively tested on Havana, but it also supports Grizzly out of the box.
+Coopr has been extensively tested on Havana, but it also supports Grizzly out of the box.
 
-.. note:: Click here for more information on how :doc:`Openstack should be configured <openstack-config>` currently to support provisioning with Loom. Several limitations that exist will be eliminated in future releases of Continuuity Loom.
+.. note:: Click here for more information on how :doc:`Openstack should be configured <openstack-config>` currently to support provisioning with Coopr. Several limitations that exist will be eliminated in future releases of Coopr.
 
 Supported Internet Protocols
 ----------------------------
-Continuuity Loom requires IPv4. IPv6 is currently not supported.
+Coopr requires IPv4. IPv6 is currently not supported.
 
 Supported Browsers
 ------------------
@@ -107,14 +107,14 @@ Supported Browsers
 
 Supported Node.js Versions
 ----------------------------
-Continuuity Loom supports Node.js version 0.10.26 or above.
+Coopr supports Node.js version 0.10.26 or above.
 
 .. _prerequisites:
 
 Software Prerequisites
 ======================
 
-Continuuity Loom requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Continuuity Loom is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.
+Coopr requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Coopr is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.
 
 Linux
 -----
@@ -129,42 +129,42 @@ On Mac OS X, the JVM is bundled with the operating system. Following installatio
 Installing from File
 ====================
 
-.. note:: Installation of Loom packages creates a user with the username 'loom'. If the user 'loom' already exists on the system, then that user account will be used to run all Loom services. The username can also be externally created using LDAP.
+.. note:: Installation of Coopr packages creates a user with the username 'coopr'. If the user 'coopr' already exists on the system, then that user account will be used to run all Coopr services. The username can also be externally created using LDAP.
 
 Yum
 ---
-To install each of the Loom components locally from a Yum package:
+To install each of the Coopr components locally from a Yum package:
 
 .. parsed-literal::
-  $ sudo yum localinstall loom-server-\ |version|\ .el6.x86_64.rpm
-  $ sudo yum localinstall loom-provisioner-\ |version|\ .el6.x86_64.rpm
-  $ sudo yum localinstall loom-ui-\ |version|\ .el6.x86_64.rpm
+  $ sudo yum localinstall coopr-server-\ |version|\ .el6.x86_64.rpm
+  $ sudo yum localinstall coopr-provisioner-\ |version|\ .el6.x86_64.rpm
+  $ sudo yum localinstall coopr-ui-\ |version|\ .el6.x86_64.rpm
 
 
 Debian
 ------
-To install each of the Loom components locally from a Debian package:
+To install each of the Coopr components locally from a Debian package:
 
 .. parsed-literal::
-  $ sudo dpkg -i loom-server\_\ |version|\ .ubuntu.12.04_amd64.deb
-  $ sudo dpkg -i loom-provisioner\_\ |version|\ .ubuntu.12.04_amd64.deb
-  $ sudo dpkg -i loom-ui\_\ |version|\ .ubuntu.12.04_amd64.deb
+  $ sudo dpkg -i coopr-server\_\ |version|\ .ubuntu.12.04_amd64.deb
+  $ sudo dpkg -i coopr-provisioner\_\ |version|\ .ubuntu.12.04_amd64.deb
+  $ sudo dpkg -i coopr-ui\_\ |version|\ .ubuntu.12.04_amd64.deb
 
 .. _installation-repository:
 
 Installing from Repository
 ==========================
 
-Access to the Continuuity private repository is required for package installation.
+Access to the Cask private repository is required for package installation.
 
 Yum
 ---
-To add the Continuuity Yum repository, add the following content to the file ``/etc/yum.repos.d/continuuity.repo``:
+To add the Cask Yum repository, add the following content to the file ``/etc/yum.repos.d/cask.repo``:
 ::
 
-  [continuuity]
-  name=Continuuity Loom Releases
-  baseurl=https://<username>:<password>@repository.continuuity.com/content/repositories/loom
+  [cask]
+  name=Coopr Releases
+  baseurl=https://<username>:<password>@repository.continuuity.com/content/repositories/coopr
   enabled=1
   protect=0
   gpgcheck=0
@@ -172,47 +172,47 @@ To add the Continuuity Yum repository, add the following content to the file ``/
   autorefresh=1
   type=rpm-md
 
-.. note:: Username and password are URL encoded. Please request login credentials from Continuuity support.
+.. note:: Username and password are URL encoded. Please request login credentials from Cask support.
 
-Instructions for installing each of the Loom components are as below:
+Instructions for installing each of the Coopr components are as below:
 ::
 
-  $ sudo yum install loom-server
-  $ sudo yum install loom-provisioner
-  $ sudo yum install loom-ui
+  $ sudo yum install coopr-server
+  $ sudo yum install coopr-provisioner
+  $ sudo yum install coopr-ui
 
 Debian
 ------
-To add the Continuuity Debian repository, add the following content to the file ``/etc/apt/sources.list.d/continuuity.list``:
+To add the Cask Debian repository, add the following content to the file ``/etc/apt/sources.list.d/cask.list``:
 ::
 
-  deb     [arch=amd64] https://<username>:<password>@repository.continuuity.com/content/sites/apt-loom precise release
+  deb     [arch=amd64] https://<username>:<password>@repository.continuuity.com/content/sites/apt-coopr precise release
 
-Instructions for installing each of the Loom components are as below:
+Instructions for installing each of the Coopr components are as below:
 ::
 
   $ sudo apt-get update
-  $ sudo apt-get install loom-server
-  $ sudo apt-get install loom-provisioner
-  $ sudo apt-get install loom-ui
+  $ sudo apt-get install coopr-server
+  $ sudo apt-get install coopr-provisioner
+  $ sudo apt-get install coopr-ui
 
 Update-Alternatives
 -------------------
-Loom packages by default use the ``alternatives`` system to initialize a configuration directory which will not be overwritten on subsequent package upgrades.  This directory is ``/etc/loom/conf.loom/`` and is pointed to by the symlink ``/etc/loom/conf/``.  The ``/etc/loom/conf.dist/`` directory is owned by the Loom packages and should not be customized.  To doublecheck that ``/etc/loom/conf.loom/`` is the active configuration, simply run:
+Coopr packages by default use the ``alternatives`` system to initialize a configuration directory which will not be overwritten on subsequent package upgrades.  This directory is ``/etc/coopr/conf.coopr/`` and is pointed to by the symlink ``/etc/coopr/conf/``.  The ``/etc/coopr/conf.dist/`` directory is owned by the Coopr packages and should not be customized.  To doublecheck that ``/etc/coopr/conf.coopr/`` is the active configuration, simply run:
 ::
 
-  $  update-alternatives --display loom-conf
+  $  update-alternatives --display coopr-conf
 
 Database Configuration
 ----------------------
-By default, Continuuity Loom uses an embedded Derby database. However, you can optionally choose to enable remote database for Loom server.
+By default, Coopr uses an embedded Derby database. However, you can optionally choose to enable remote database for Coopr Server.
 Additional steps are required to configure this setting.
 
 Sample MySQL setup
 ^^^^^^^^^^^^^^^^^^
 **Download and add the database connector JAR**
 
-Execute the following command on the Loom server machine:
+Execute the following command on the Coopr Server machine:
 
 For RHEL/CentOS/Oracle Linux:
 ::
@@ -225,7 +225,7 @@ For Ubuntu:
   $ sudo apt-get install libmysql-java*
 
 After the install, the MySQL JAR is placed in ``/usr/share/java/``. Copy the installed JAR files to the
-``/opt/loom/server/lib/`` directory on your Loom server machine. Verify that the JAR file has appropriate permissions.
+``/opt/coopr/server/lib/`` directory on your Coopr Server machine. Verify that the JAR file has appropriate permissions.
 
 .. note::
   * After installing the MySQL connector, the Java version may change.  Make sure you are using Java 1.6 or 1.7 from Oracle.  You may need to run ``update-alternatives --config java`` to do this.
@@ -235,17 +235,17 @@ After the install, the MySQL JAR is placed in ``/usr/share/java/``. Copy the ins
 **Setup database**
 
 You will need to set up an account and a database in MySQL. An example schema file (for MySQL) for this can be found at
-``/opt/loom/server/config/sql``.
+``/opt/coopr/server/config/sql``.
 
 If you are setting up a MySQL database from scratch you can run the following on your mysql machine to complete the database setup:
 
 .. parsed-literal::
-  $ mysql -u root -p -e 'create database loom;'
-  $ mysql -u root -p -e 'grant all privileges on loom.* to "loom"@"<loom-server>" identified by "<password>";'
-  $ mysql -u loom -p loom < /opt/loom/server/config/sql/loom-create-tables-mysql.sql
-  $ mysql -u loom -p loom -e 'show tables;'
+  $ mysql -u root -p -e 'create database coopr;'
+  $ mysql -u root -p -e 'grant all privileges on coopr.* to "coopr"@"<coopr-server>" identified by "<password>";'
+  $ mysql -u coopr -p coopr < /opt/coopr/server/config/sql/coopr-create-tables-mysql.sql
+  $ mysql -u coopr -p coopr -e 'show tables;'
   +------------------+
-  | Tables_in_loom   |
+  | Tables_in_coopr   |
   +------------------+
   | automatorTypes   |
   | clusterTemplates |
@@ -260,13 +260,13 @@ If you are setting up a MySQL database from scratch you can run the following on
   | tasks            |
   +------------------+
 
-where loom.sql is the example schema file at ``/opt/loom/server/config/sql``, and where passwords are replaced and entered as needed.
+where coopr.sql is the example schema file at ``/opt/coopr/server/config/sql``, and where passwords are replaced and entered as needed.
 
-Loom Server Configuration
--------------------------
+Coopr Server Configuration
+--------------------------
 
-Loom server settings can be changed under the ``/etc/loom/conf/loom-site.xml`` configuration file. For a list of
-available configurations, see the :doc:`Server Configuration </guide/admin/server-config>` page.
+Coopr Server settings can be changed under the ``/etc/coopr/conf/coopr-site.xml`` configuration file. For a list of
+available configurations, see the :doc:`Server Configuration </guide/superadmin/server-config>` page.
 
 
 .. _setting-environmental-variables:
@@ -274,11 +274,11 @@ available configurations, see the :doc:`Server Configuration </guide/admin/serve
 Setting Environmental Variables
 ===============================
 
-Several environmental variables can be set in Loom Provisioner and Loom UI.
+Several environmental variables can be set in Coopr Provisioner and Coopr UI.
 
-Loom Server
------------
-The Server environmental variables can be set at ``/etc/default/loom-server``. The configurable variables are as below:
+Coopr Server
+------------
+The Server environmental variables can be set at ``/etc/default/coopr-server``. The configurable variables are as below:
 
 .. list-table::
    :header-rows: 1
@@ -286,22 +286,22 @@ The Server environmental variables can be set at ``/etc/default/loom-server``. T
    * - Variable
      - Default
      - Description
-   * - ``LOOM_LOG_DIR``
-     - /var/log/loom
+   * - ``COOPR_LOG_DIR``
+     - /var/log/coopr
      - Path for the log directory
-   * - ``LOOM_JMX_OPTS``
+   * - ``COOPR_JMX_OPTS``
      -
-     - JMX options for monitoring the Loom Server
-   * - ``LOOM_GC_OPTS``
+     - JMX options for monitoring the Coopr Server
+   * - ``COOPR_GC_OPTS``
      -
-     - java garbage collection options to use when running the Loom Server
-   * - ``LOOM_JAVA_OPTS``
+     - java garbage collection options to use when running the Coopr Server
+   * - ``COOPR_JAVA_OPTS``
      - -XX:+UseConcMarkSweepGC -XX:+UseParNewGC
-     - java options to use when running the Loom Server
+     - java options to use when running the Coopr Server
 
-Loom Provisioner
-----------------
-The Provisioner environmental variables can be set at ``/etc/default/loom-provisioner``. The configurable variables are as below:
+Coopr Provisioner
+-----------------
+The Provisioner environmental variables can be set at ``/etc/default/coopr-provisioner``. The configurable variables are as below:
 
 .. list-table::
    :header-rows: 1
@@ -309,23 +309,23 @@ The Provisioner environmental variables can be set at ``/etc/default/loom-provis
    * - Variable
      - Default
      - Description
-   * - ``LOOM_NUM_WORKERS``
+   * - ``COOPR_NUM_WORKERS``
      - 5
      - The number of provisioner workers spawned
-   * - ``LOOM_LOG_DIR``
-     - /var/log/loom
+   * - ``COOPR_LOG_DIR``
+     - /var/log/coopr
      - Path for the log directory
-   * - ``LOOM_SERVER_URI``
+   * - ``COOPR_SERVER_URI``
      - http://localhost:55054
-     - The URI for Loom Server
-   * - ``LOOM_LOG_LEVEL``
+     - The URI for Coopr Server
+   * - ``COOPR_LOG_LEVEL``
      - info
      - Logging level
 
 
-Loom UI
--------
-The UI environmental variables can be set at ``/etc/default/loom-ui``. The configurable variables are as below:
+Coopr UI
+--------
+The UI environmental variables can be set at ``/etc/default/coopr-ui``. The configurable variables are as below:
 
 .. list-table::
    :header-rows: 1
@@ -333,45 +333,45 @@ The UI environmental variables can be set at ``/etc/default/loom-ui``. The confi
    * - Variable
      - Default
      - Description
-   * - ``LOOM_LOG_DIR``
-     - /var/log/loom
+   * - ``COOPR_LOG_DIR``
+     - /var/log/coopr
      - Path for the log directory
-   * - ``LOOM_SERVER_URI``
+   * - ``COOPR_SERVER_URI``
      - http://localhost:55054
-     - The URI for Loom Server
-   * - ``LOOM_UI_PORT``
+     - The URI for Coopr Server
+   * - ``COOPR_UI_PORT``
      - 8100
      - The port number that hosts the UI
 
 .. _starting_stopping:
 
-Starting and Stopping Loom Services
-===================================
-By default, Continuuity Loom's installation RPMs and PKGs do not configure auto start of the services in the ``init.d``. We leave
-that privilege to the administrator. For each Loom component and its related service (such as the Server, Provisioner, and UI),
+Starting and Stopping Coopr Services
+====================================
+By default, Coopr's installation RPMs and PKGs do not configure auto start of the services in the ``init.d``. We leave
+that privilege to the administrator. For each Coopr component and its related service (such as the Server, Provisioner, and UI),
 there is a launch script, which you may use to execute a desired operation. For example, to start, stop, or check status
-for a Loom Provisioner, you can use:
+for a Coopr Provisioner, you can use:
 ::
 
-  $ sudo /etc/init.d/loom-server start|stop
-  $ sudo /etc/init.d/loom-provisioner start|stop|status
-  $ sudo /etc/init.d/loom-ui start|stop
+  $ sudo /etc/init.d/coopr-server start|stop
+  $ sudo /etc/init.d/coopr-provisioner start|stop|status
+  $ sudo /etc/init.d/coopr-ui start|stop
 
 .. _loading_defaults:
 
 Loading Default Templates
 =========================
 
-Loom provides a set of useful default templates that covers most supported use cases. For new users and administrators of Continuuity Loom, we
+Coopr provides a set of useful default templates that covers most supported use cases. For new users and administrators of Coopr, we
 recommend installing these defaults as a starting point for template definition. These defaults are required for running
 the example in the :doc:`Quick Start Guide </guide/quickstart/index>`. To load these templates, run:
 ::
 
-  $ export LOOM_SERVER_URI=http://<loom-server>:<loom-port>
-  $ /opt/loom/server/config/defaults/load-defaults.sh
+  $ export COOPR_SERVER_URI=http://<coopr-server>:<coopr-port>
+  $ /opt/coopr/server/config/defaults/load-defaults.sh
 
 .. note::
-    Setting the ``LOOM_SERVER_URI`` environment variable is only required if you have configured the Loom Server to
+    Setting the ``COOPR_SERVER_URI`` environment variable is only required if you have configured the Coopr Server to
     bind to an address other than localhost.
 
 .. _logs:
@@ -381,32 +381,32 @@ Log Management
 
 Location
 --------
-By default, Loom logs are located at ``/var/log/loom``.  This can be changed by editing the corresponding ``/etc/default/loom-server``,
-``/etc/default/loom-ui``, or ``/etc/default/loom-provisioner`` file.
+By default, Coopr logs are located at ``/var/log/coopr``.  This can be changed by editing the corresponding ``/etc/default/coopr-server``,
+``/etc/default/coopr-ui``, or ``/etc/default/coopr-provisioner`` file.
 
 Options
 -------
-Log options for the server, such as log level, can be changed by editing the ``/etc/loom/conf/logback.xml`` file.  Log level for
-the provisioner can be changed by editing the ``/etc/default/loom-provisioner`` file.
+Log options for the server, such as log level, can be changed by editing the ``/etc/coopr/conf/logback.xml`` file.  Log level for
+the provisioner can be changed by editing the ``/etc/default/coopr-provisioner`` file.
 
 Rotation
 --------
-Continuuity Loom depends on the external Linux utility logrotate to rotate its logs. Continuuity Loom
+Coopr depends on the external Linux utility logrotate to rotate its logs. Coopr
 packages contain logrotate configurations in ``/etc/logrotate.d`` but it does not perform the rotations itself.
-Please ensure logrotate is enabled on your Loom hosts.
+Please ensure logrotate is enabled on your Coopr hosts.
 
 .. _common-issues:
 
 Common Installation Issues
 ==========================
 
-* A common issue is installing Continuuity Loom on machines that have Open JDK installed rather than Oracle JDK.
+* A common issue is installing Coopr on machines that have Open JDK installed rather than Oracle JDK.
 
-* If you see JDBC exceptions in the Loom Server log like:
+* If you see JDBC exceptions in the Coopr Server log like:
   ::
 
     Caused by: java.lang.AbstractMethodError: com.mysql.jdbc.PreparedStatement.setBlob(ILjava/io/InputStream;)
 
   it means your JDBC connector version is too old.  Upgrade to a newer version to solve the problem.
 
-* If you are running your mysql server on the same machine as the Loom Server and are seeing connection issues in the Loom Server logs, you may need to explicitly grant access to "loom"@"localhost" instead of relying on the wildcard. 
+* If you are running your mysql server on the same machine as the Coopr Server and are seeing connection issues in the Coopr Server logs, you may need to explicitly grant access to "coopr"@"localhost" instead of relying on the wildcard. 

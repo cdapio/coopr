@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-DOC_FOLDER_NAME=loom-1.0-docs
+DOC_FOLDER_NAME=coopr-docs-v0.9.8
 
 make clean html
 cd build

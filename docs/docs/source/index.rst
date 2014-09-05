@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,26 +14,26 @@
    limitations under the License.
 
 ========================================
-Continuuity Loom |release| Documentation
+Coopr |release| Documentation
 ========================================
 
-Continuuity Loom is a software system that enables end users to provision clusters based on templates and settings defined by
-administrators. Continuuity Loom exposes simple interfaces to administrators and allows easy customization of the properties of provisioned
+Coopr is a software system that enables end users to provision clusters based on templates and settings defined by
+administrators. Coopr exposes simple interfaces to administrators and allows easy customization of the properties of provisioned
 clusters, including software services, hardware configurations and infrastructure providers.
 
-This documentation provides information about Continuuity Loom, its operational management capabilities, and its functionality available for both end users and
+This documentation provides information about Coopr, its operational management capabilities, and its functionality available for both end users and
 administrators. This document presumes you have some familiarity with the SQL databases, Zookeeper, the REST protocol and the Ruby programming language.
 
 
 Contents
 ========
 
-.. sidebar:: Continuuity Support
+.. sidebar:: Coopr Support
 
-   Thanks for downloading Continuuity Loom Beta. We 
+   Thanks for downloading Coopr Beta. We 
    would love to help you get started with this product. 
    We would also love to hear about how 
-   we can make this product better. Contact support@continuuity.com 
+   we can make this product better. Contact coopr-dev@googlegroups.com 
    and tell us what you think.
 
 
@@ -60,3 +60,18 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
+
+.. toctree::
+   :hidden:
+
+   /guide/admin/admin-links
+   /guide/installation/openstack-config
+   /guide/recommended-deployment
+   /includes/footer
+   /misc/jboss-automator-script
+   /overview/design-goals
+   /overview/licenses
+   /overview/overview-links
+   /overview/use-cases
+   /rest/rest-links
+   /toplevel-links

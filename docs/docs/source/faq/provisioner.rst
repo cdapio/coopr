@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 .. _faq_toplevel:
 
 .. index::
-   single: FAQ: Loom Provisioner
+   single: FAQ: Coopr Provisioner
 
 ============================
-Loom Provisioner
+Coopr Provisioner
 ============================
 
 When something goes wrong, how can I look at the logs?
@@ -54,7 +54,8 @@ The formula above tries to capture the average number of tasks per cluster creat
 For example, if you need to support 10 concurrent cluster creations, on average each node across the clusters
 contains 4 services, on average each cluster contains 8 services, and each cluster is on average 10 nodes 
 in size, so a good starting point is 10 * 10 * 4 / 8 = 50 provisioners.  Ultimately, if your provisioners are always busy, you probably want to add more.  
-If they are mostly idle, you probably want to decrease number. With a lot of provisioners, you will want to edit the number of worker threads in the loom server accordingly.
+If they are mostly idle, you probably want to decrease number. With a lot of provisioners, you will want to edit the number of worker threads in the Coopr
+Server accordingly.
 
 Memory limits should also be considered when deciding on the number of provisioners to run. On average, each provisioner
 requires roughly 200MB of memory, hence, you may want to consider your system specifications
@@ -92,5 +93,5 @@ before a provisioner shuts itself down after receiving a kill signal.
 
 Can the Chef Solo Automator plugin use a Chef server?
 -----------------------------------------------------
-Currently, it does not. The current version uses only chef-solo, however, future version of Continuuity Loom will support both chef-solo and
+Currently, it does not. The current version uses only chef-solo, however, future version of Coopr will support both chef-solo and
 chef-client. 
