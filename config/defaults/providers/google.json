@@ -1,0 +1,10 @@
+{
+  "name": "google",
+  "description": "Google Compute Engine",
+  "providertype": "google",
+  "provisioner": {
+    "key_location": "/opt/loom/provisioner/worker/plugins/providers/fog_provider/google-project-id.p12",
+    "ssh_keyfile": "/opt/loom/provisioner/worker/plugins/providers/fog_provider/id_rsa",
+    "zone_name": "us-central1-a"
+  }
+}

@@ -11,6 +11,9 @@
     "aws-us-west-2": {
       "image": "ami-b158c981"
     },
+    "google": {
+      "image": "centos-6-v20140718"
+    },
     "joyent": {
       "image": "19daa264-c4c4-11e3-bec3-c30e2c0d4ec0"
     },
