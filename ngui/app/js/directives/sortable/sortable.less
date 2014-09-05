@@ -1,0 +1,21 @@
+[my-sortable] {
+  th {
+
+    > i {
+      visibility: hidden;
+      margin-left: 10px;
+    }
+
+    &.predicate > i {
+      visibility: visible;
+    }
+
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background-color: lightyellow;
+    }
+
+  }
+}

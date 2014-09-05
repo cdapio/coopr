@@ -1,0 +1,31 @@
+<div class="page-header">
+
+  <div class="pull-right" role="navigation">
+    <div class="btn-group">
+
+      <a class="btn btn-default btn-xs" ui-sref=".list" ng-class="{'active': $state.includes('*.list')}">
+        <span class="fa fa-list"></span>
+      </a>
+
+      <div class="btn-group">
+        <a class="btn btn-default btn-xs dropdown-toggle" bs-dropdown="dropdown" data-placement="bottom-right" ng-class="{'disabled': !subnavList.length}">
+          {{$state.current.data.ddLabel | uppercase}}
+          <span class="caret"></span>
+        </a>
+      </div>
+
+      <a class="btn btn-default btn-xs" ui-sref=".create" ng-class="{'active': $state.includes('*.create')}">
+        <span class="fa fa-files-o"></span>
+        CREATE
+      </a>
+    </div>
+  </div>
+
+
+  <h2>
+    {{$state.current.data.title || $state.current.name}}
+    <small>{{$state.params.id || $state.params.name}}</small>
+  </h2>
+</div>
+
+<div ui-view></div>

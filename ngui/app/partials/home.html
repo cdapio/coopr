@@ -1,0 +1,39 @@
+<div class="page-header">
+  <h1>Hello World</h1>
+</div>
+
+<p>
+  <a href="" bs-alert="bodyDemoObj">
+    <span data-title="click to toggle an alert" 
+          data-placement="right" 
+          bs-tooltip>
+      this is a link
+    </span>
+  </a>
+</p>
+
+<p>
+  <span data-title="click to trigger a modal" 
+        data-content="{{bodyDemoObj.content}}"
+        data-trigger="hover" 
+        data-delay="200"
+        data-placement="right" 
+        data-animation="am-fade-and-slide-right"
+        bs-popover>
+    <button class="btn btn-default" 
+            data-placement="center"
+            data-container="body"
+            bs-modal="bodyDemoObj">
+      this is a button
+    </button>
+    &nbsp;
+  </span>
+</p>
+
+
+<p ng-hide="currentUser">
+  you are logged out
+  (<a ui-sref="login">log in</a>)
+</p>
+
+<p ng-show="currentUser">you are logged in {{currentUser}}</p>

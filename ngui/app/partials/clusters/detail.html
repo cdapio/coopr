@@ -1,0 +1,22 @@
+<p class="clearfix">
+
+  <div class="btn-group btn-group-xs pull-right">
+    <a ui-sref="^.edit({id: model.id})"
+      class="btn btn-primary">
+        <span class="fa fa-edit"></span>
+        Reconfigure
+    </a>
+    <a href="" ng-click="myConfirm()" my-confirmable="doDelete(model)" 
+      class="btn btn-danger">
+        <span class="fa fa-trash"></span>
+        Delete
+    </a>
+  </div>
+
+  <strong>
+    {{model.name}}
+  </strong>
+</p>
+
+<pre>{{model | json}}</pre>
+

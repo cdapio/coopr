@@ -1,0 +1,42 @@
+<table class="table table-striped" my-sortable>
+  <thead>
+    <tr>
+      <th>name</th>
+      <th>owner</th>
+      <th data-predicate="createTime" data-predicate-default="reverse">creation time</th>
+      <th data-predicate="clusterTemplate.name">template</th>
+      <th data-predicate="numNodes"># of nodes</th>
+      <th>status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="item in list | orderBy:sortable.predicate:sortable.reverse">
+
+      <td><a ui-sref="^.detail({id: item.id})">{{item.name}}</a></td>
+
+      <td>{{item.ownerId}}</td>
+
+      <td>{{item.createTime | date:'short'}}</td>
+
+      <td>{{item.clusterTemplate.name}}</td>
+
+      <td>{{item.numNodes}}</td>
+
+      <td><span class="label" ng-class="{
+        ACTIVE: 'label-success', 
+        INCOMPLETE: 'label-danger'
+      }[item.status] || 'label-info'">{{item.status}}</span></td>
+
+    </tr>
+  </tbody>
+</table>
+
+
+<div ng-hide="list.length" class="well text-center">
+
+  <p>You don't have any clusters yet!</p>
+  <p><a class="btn btn-primary" role="button" ui-sref="clusters.create">
+    Create a cluster
+  </a></p>
+
+</div>
