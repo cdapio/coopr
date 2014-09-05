@@ -22,8 +22,8 @@ require_relative 'fog_provider/joyent'
 require_relative 'fog_provider/openstack'
 require_relative 'fog_provider/rackspace'
 
+gem 'fog', '~> 1.21.0'
+
 require 'fog'
 require 'ipaddr'
 require 'net/ssh'
-
-gem 'fog', '~> 1.21.0'
