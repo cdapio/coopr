@@ -1,6 +1,18 @@
 var module = angular.module(PKG.name+'.controllers');
 
 
+
+module.controller('ClusterDetailCtrl', function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
+
+  $scope.model = myApi.Cluster.get( {id:$state.params.id}, function (data) {
+    console.log('editing cluster', data);
+  });
+
+});
+
+
+
+
 module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
   var id = $state.params.id;
 

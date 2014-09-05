@@ -18,5 +18,75 @@
   </strong>
 </p>
 
-<pre>{{model | json}}</pre>
+<ul class="list-unstyled coopr-list-striped">
 
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Creation time</label>
+    </div>
+    <div class="col-xs-9">
+      {{model.createTime | date:'short'}}
+    </div>
+  </div></li>
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Expiry time</label>
+    </div>
+    <div class="col-xs-9">
+      {{model.expireTime ? (model.expireTime | date:'short') : 'never'}}
+    </div>
+  </div></li>
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Progress</label>
+    </div>
+    <div class="col-xs-9">
+      TODO
+    </div>
+  </div></li>
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Status</label>
+    </div>
+    <div class="col-xs-9">
+      <em>{{model.progress.action}}</em>
+      <span class="label label-default" ng-class="{
+        'label-danger': model.progress.actionstatus == 'failed'
+      }">
+        {{model.progress.actionstatus}}
+      </span>
+    </div>
+  </div></li>
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Provider</label>
+    </div>
+    <div class="col-xs-9">
+      <em>{{model.provider.name}}</em> ({{model.provider.description}})
+    </div>
+  </div></li>
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Template</label>
+    </div>
+    <div class="col-xs-9">
+      <em>{{model.clusterTemplate.name}}</em> ({{model.clusterTemplate.description}})
+    </div>
+  </div></li>
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Services</label>
+    </div>
+    <div class="col-xs-9">
+      <my-service-picker model="model.services" readonly="true" />
+    </div>
+  </div></li>
+</ul>
+
+<pre>{{model | json}}</pre>
