@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class FogProviderGoogle < Provider
     @image = inputmap['image']
     @hostname = inputmap['hostname']
     # Google uses the short hostname as an identifier
-    # we keep the loom hostname for use in /etc/hosts
+    # we keep the hostname for use in /etc/hosts
     @providerid = @hostname.split('.').first
     fields = inputmap['fields']
     begin

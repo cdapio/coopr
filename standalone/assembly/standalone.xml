@@ -4,7 +4,7 @@
     <formats>
         <format>zip</format>
     </formats>
-    <baseDirectory>loom-${project.version}-standalone</baseDirectory>
+    <baseDirectory>coopr-${project.version}-standalone</baseDirectory>
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/../provisioner</directory>
@@ -32,7 +32,7 @@
             <directory>${project.basedir}/../bin</directory>
             <outputDirectory>/bin</outputDirectory>
             <includes>
-                <include>loom-*.sh</include>
+                <include>*.sh</include>
                 <include>data-uploader*</include>
             </includes>
         </fileSet>

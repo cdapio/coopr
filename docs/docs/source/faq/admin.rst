@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 .. _faq_toplevel:
 
 .. index::
-   single: FAQ: Loom Administration
+   single: FAQ: Coopr Administration
 
 ============================
-Loom Administration
+Coopr Administration
 ============================
 
 What operations are only available to the admin versus other users?
@@ -45,7 +45,7 @@ Ability to update the clusters with the modified template is not currently suppo
 How can I write configuration settings that reference hostnames of other nodes in the cluster?
 ----------------------------------------------------------------------------------------------
 
-Loom provides a set of macros that allow you to do this.  See :doc:`Macros</guide/admin/macros>` for more information. 
+Coopr provides a set of macros that allow you to do this.  See :doc:`Macros</guide/admin/macros>` for more information. 
 
 
 Can I configure clusters to delete themselves after some amount of time?
@@ -62,5 +62,5 @@ The default admin password is 'admin'.
 Any user password works. What are the user passwords for?
 ---------------------------------------------------------
 
-Currently, Continuuity Loom will allow any user to login through the UI. Authentication has not been implemented yet so the usernames
+Currently, Coopr will allow any user to login through the UI. Authentication has not been implemented yet so the usernames
 and passwords are simply placeholders at this time. Authentication will be added in a future release.

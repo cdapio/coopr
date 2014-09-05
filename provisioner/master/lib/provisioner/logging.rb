@@ -1,6 +1,6 @@
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 require 'logger'
 
-module Loom
+module Coopr 
   module Logging
     attr_accessor :level
     @level = ::Logger::INFO
@@ -28,7 +28,7 @@ module Loom
     @process_name = '-'
     @out = nil
     def log
-      Loom::Logging.log
+      Coopr::Logging.log
     end
 
     def self.configure(out)

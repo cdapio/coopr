@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@
 User Guide
 ==========
 
-This page describes the different interfaces and functions that end users can use to manage their own set of clusters within Continuuity Loom.
+This page describes the different interfaces and functions that end users can use to manage their own set of clusters within Coopr.
 As mentioned earlier in the administration guide, all clusters and nodes within clusters are dictated by templates created by
 the administrator, made accessible to individual users (or developers), and displayed in the Catalog. These accessible templates  
 are users' blueprint for their individual cluster instantiation.
 
 The User Home Screen
 ====================
-Login to the Loom UI using your user credentials at ``http://<loom-host>:<loom-ui-port>/``.
+Login to the Coopr UI using your user credentials at ``http://<coopr-host>:<coopr-ui-port>/``.
 This will take you to the user home screen, which shows a list of all clusters provisioned by a user. This page displays basic information for each cluster owned
 by the user, such as current clusters, clusters under construction, and deleted clusters. Active and deleted clusters, however, 
 are shown separately in this interface. Clicking on each of these items launches a separate screen with individual cluster 
@@ -61,7 +61,7 @@ Guide </guide/admin/index>`).
 Advanced Settings
 -----------------
 
-The Loom user interface has a number of advanced configuration options.
+The Coopr User Interface has a number of advanced configuration options.
 To access the advanced options, Click on the gray triangle next to the label 'Advanced'. This exposes the options to
 explicitly specify the provider and image type to be used for the current cluster. The 'Config' field allows the user
 to specify additional custom configurations in a JSON-formatted input (for more information, see

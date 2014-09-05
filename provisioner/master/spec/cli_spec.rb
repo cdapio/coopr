@@ -1,6 +1,6 @@
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ require File.dirname(__FILE__) + '/../lib/provisioner/cli.rb'
 describe 'Provisioner::CLI' do
 
   it 'can parse command line arguments' do
-    options = Loom::CLI.read([
+    options = Coopr::CLI.read([
       '-c', '/tmp/config.xml',
       '-r'
     ])

@@ -1,6 +1,6 @@
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 require 'rexml/document'
 
-module Loom
+module Coopr 
   # class which reads and stores configuration settings from a property file
   class Config
     attr_reader :properties, :default_file, :descriptions

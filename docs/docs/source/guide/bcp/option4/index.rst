@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -28,13 +28,13 @@ Hot-Hot : With Custom Replication
 
 Overview
 ========
-Synchronous database cluster may turn out to be not optimal for large Continuuity Loom installations due to the amount of data that needs to be replicated across datacenters.
+Synchronous database cluster may turn out to be not optimal for large Coopr installations due to the amount of data that needs to be replicated across datacenters.
 In such a case we have to consider an alternative solution where we use local databases in each datacenter with a custom data replication service. 
 This will allow for all datacenters to share the data, while reducing the need to replicate all the data in the database.
 
 Since we will not be sharing a database across datacenters now, we'll need to treat the data slightly differently than before. 
 The data will be divided into shards based on the cluster ID partitioning. Each shard will be exclusively assigned to an owner database in a datacenter. 
-Only Loom Servers running locally will be able to write to such a shard. Any requests to update the clusters in a non-local shard will be routed to the Loom Server running in the datacenter owning the shard. 
+Only Coopr Servers running locally will be able to write to such a shard. Any requests to update the clusters in a non-local shard will be routed to the Coopr Server running in the datacenter owning the shard. 
 This update strategy prevents write conflicts since any updates to a cluster can be done only in a single database.
 
 The custom replication reduces replication overhead in two ways. First, it only replicates data upon completion of operations. 

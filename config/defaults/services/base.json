@@ -18,13 +18,13 @@
       "install": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[loom_base::default]"
+          "run_list": "recipe[coopr_base::default]"
         }
       },
       "configure": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[loom_base::default]"
+          "run_list": "recipe[coopr_base::default]"
         }
       }
     }

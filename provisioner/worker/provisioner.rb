@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ $stdout.sync = true
 options = {}
 OptionParser.new do |opts|
   opts.banner = 'Usage: '
-  opts.on('-u', '--uri URI', 'Loom web server uri') do |u|
+  opts.on('-u', '--uri URI', 'web server uri') do |u|
     options[:uri] = u
   end
   opts.on('-f', '--file FILE', 'Full path to task json') do |f|
@@ -67,9 +67,9 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-loom_uri = options[:uri]
-if loom_uri.nil? && !options[:file]
-  puts 'Either URI for loom server or --file must be specified'
+server_uri = options[:uri]
+if server_uri.nil? && !options[:file]
+  puts 'Either URI for server or --file must be specified'
   exit(1)
 end
 
@@ -78,7 +78,7 @@ unless(options[:work_dir])
   exit(1)
 end
 
-if(loom_uri.nil? && options[:register])
+if(server_uri.nil? && options[:register])
   puts "--register option requires the --uri [server uri] option"
   exit(1)
 end
@@ -165,7 +165,7 @@ end
 
 # register plugins with the server if --register flag passed
 if options[:register]
-  pluginmanager.register_plugins(loom_uri)
+  pluginmanager.register_plugins(server_uri)
   if (pluginmanager.load_errors?)
     log.error "There was at least one provisioner plugin load failure"
     exit(1)
@@ -215,16 +215,16 @@ else
   host = Socket.gethostname.downcase
   myid = "#{host}.#{pid}"
 
-  log.info "Starting provisioner with id #{myid}, connecting to server #{loom_uri}"
+  log.info "Starting provisioner with id #{myid}, connecting to server #{server_uri}"
 
   loop {
     result = nil
     response = nil
     task = nil
     begin
-      response = RestClient.post "#{loom_uri}/v2/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
+      response = RestClient.post "#{server_uri}/v2/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
     rescue => e
-      log.error "Caught exception connecting to loom server #{loom_uri}/v2/tasks/take: #{e}"
+      log.error "Caught exception connecting to server #{server_uri}/v2/tasks/take: #{e}"
       sleep 10
       next
     end
@@ -238,12 +238,12 @@ else
         sleep 1
         next
       else
-        log.error "Received error code #{response.code} from loom server: #{response.to_str}"
+        log.error "Received error code #{response.code} from server: #{response.to_str}"
         sleep 10
         next
       end
     rescue => e
-      log.error "Caught exception processing response from loom server: #{e.inspect}"
+      log.error "Caught exception processing response from server: #{e.inspect}"
     end
 
     # While provisioning, don't allow the provisioner to terminate by disabling signal
@@ -260,9 +260,9 @@ else
 
         log.debug "Task <#{task["taskId"]}> completed, updating results <#{result}>"
         begin
-          response = RestClient.post "#{loom_uri}/v2/tasks/finish", result.to_json
+          response = RestClient.post "#{server_uri}/v2/tasks/finish", result.to_json
         rescue => e
-          log.error "Caught exception posting back to loom server #{loom_uri}/v2/tasks/finish: #{e}"
+          log.error "Caught exception posting back to server #{server_uri}/v2/tasks/finish: #{e}"
         end
 
       rescue => e
@@ -282,9 +282,9 @@ else
         end
         log.error "Task <#{task["taskId"]}> failed, updating results <#{result}>"
         begin
-          response = RestClient.post "#{loom_uri}/v2/tasks/finish", result.to_json
+          response = RestClient.post "#{server_uri}/v2/tasks/finish", result.to_json
         rescue => e
-          log.error "Caught exception posting back to server #{loom_uri}/v2/tasks/finish: #{e}"
+          log.error "Caught exception posting back to server #{server_uri}/v2/tasks/finish: #{e}"
         end
       end
     }

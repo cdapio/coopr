@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ require 'tempfile'
 require_relative 'utils'
 require_relative '../lib/provisioner/logging'
 
-module Loom
+module Coopr
   class Worker
     include Logging
 
@@ -34,7 +34,7 @@ module Loom
       #Logging.configure("#{File.dirname(__FILE__)}/#{@name}.log")
       Logging.level = 0
       log.info "* worker #{name} starting"
-      @sigterm = Loom::SignalHandler.new('TERM')
+      @sigterm = Coopr::SignalHandler.new('TERM')
     end
 
     def work
@@ -54,7 +54,7 @@ end
 
 if __FILE__ == $0
   tenant = ARGV[0] || "superadmin"
-  worker = Loom::Worker.new(tenant)
+  worker = Coopr::Worker.new(tenant)
   worker.work
 end
 

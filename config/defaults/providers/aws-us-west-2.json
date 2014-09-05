@@ -6,7 +6,7 @@
     "aws_access_key": "",
     "aws_secret_key": "",
     "aws_keyname": "aws-us-west-2",
-    "aws_keyfile": "/opt/loom/provisioner/worker/plugins/providers/fog_provider/aws-us-west-2.pem",
+    "aws_keyfile": "/opt/coopr/provisioner/worker/plugins/providers/fog_provider/aws-us-west-2.pem",
     "aws_region": "us-west-2"
   }
 }

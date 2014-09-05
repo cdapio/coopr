@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -99,9 +99,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:<userid>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'Coopr-UserID:<userid>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{ "name":"hadoop-dev", "description":"my hadoop dev cluster", "numMachines":"5", "clusterTemplate":"hadoop.example" }'
         http://<server>:<port>/<version>/clusters
  $ { "id":"00000079" }
@@ -143,10 +143,10 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<userid>'
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters
+ $ curl -H 'Coopr-UserID:<userid>'
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
+        http://<coopr-server>:<coopr-port>/<version>/coopr/clusters
  $ [
        {
            "id":"00000079",
@@ -215,9 +215,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<userid>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<userid>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clusters/00000079
  $ {
        "id":"00000079",
@@ -300,9 +300,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Loom-UserID:<userid>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'Coopr-UserID:<userid>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clusters/00000079
 
 .. _cluster-status:
@@ -352,10 +352,10 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<userid>'
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters/00000079/status
+ $ curl -H 'Coopr-UserID:<userid>'
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
+        http://<coopr-server>:<coopr-port>/<version>/coopr/clusters/00000079/status
  $ {
        "clusterid":"00000079",
        "status": "pending",
@@ -407,9 +407,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clusters/00000079/plans/00000079-001
  $ {
       "id":"1",
@@ -478,9 +478,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clusters/00000079/plans
 
 .. _cluster-get-config:
@@ -511,9 +511,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clusters/<cluster-id>/config
  $ {
      "hadoop": {
@@ -584,9 +584,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-ApiKey:<apikey>'
-        -H 'X-Loom-TenantID:<tenantid>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:<tenantid>'
         -X PUT
         -d '{
                 "config": {
@@ -648,9 +648,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clusters/<cluster-id>/services
  [
      "hadoop-hdfs-namenode",
@@ -698,9 +698,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -X POST
         -d '{ "services": [ "zookeeper-server", "hbase-master", "hbase-regionserver" ] }'
         http://<server>:<port>/<version>/clusters/<cluster-id>/services
@@ -741,9 +741,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -X POST
         http://<server>:<port>/<version>/clusters/<cluster-id>/services/stop
 
@@ -784,9 +784,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -X POST
         http://<server>:<port>/<version>/clusters/<cluster-id>/services/<service-id>/stop
 
@@ -826,9 +826,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -X POST
         http://<server>:<port>/<version>/clusters/<cluster-id>/services/start
 
@@ -869,9 +869,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -X POST
         http://<server>:<port>/<version>/clusters/<cluster-id>/services/<service-id>/start
 
@@ -913,9 +913,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -X POST
         http://<server>:<port>/<version>/clusters/<cluster-id>/services/restart
 
@@ -959,9 +959,9 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -X POST
         http://<server>:<port>/<version>/clusters/<cluster-id>/services/<service-id>/restart
 
@@ -1012,8 +1012,8 @@ Example
 ^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:<user-id>' 
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -X POST
         http://<server>:<port>/<version>/clusters/<cluster-id>/clustertemplate/sync

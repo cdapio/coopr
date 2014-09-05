@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #
 # Arguments are: chef_server_url [run_list]
 
-SCRIPT_DIR="/var/cache/loom/scripts"
+SCRIPT_DIR="/var/cache/coopr/scripts"
 CHEF_DIR="/etc/chef"
 
 CHEF_SERVER_URL=${1}

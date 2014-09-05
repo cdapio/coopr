@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 #
 # quick and dirty test suite to validate bash json key lookups
 
-find "loomtest" -type f -name "*.sh" ! -name '_expect*' | while read TESTSH
+find "wrappertest" -type f -name "*.sh" ! -name '_expect*' | while read TESTSH
 do
         TESTJSON="${TESTSH%.sh}.json"
         echo "--- running tests `basename $TESTSH` ---" >&2
 
-        ./loom_wrapper.sh $TESTJSON $TESTSH
+        ./coopr_wrapper.sh $TESTJSON $TESTSH
 done
 

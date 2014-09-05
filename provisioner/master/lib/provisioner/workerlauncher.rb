@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 
 # simple class to construct the ruby command used to launch a worker process
-module Loom
+module Coopr 
   class WorkerLauncher
     attr_accessor :tenant, :provisioner, :name, :config
 

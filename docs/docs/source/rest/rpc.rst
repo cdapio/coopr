@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -80,14 +80,14 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Loom-UserID:admin' 
-        -H 'X-Loom-ApiKey:<apikey>'
-        -H 'X-Loom-TenantID:<tenantid>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-ApiKey:<apikey>'
+        -H 'Coopr-TenantID:<tenantid>'
         -X POST
         -d '{ 
                 "overwrite": "true"
             }'
-        http://<loom-server>:<loom-port>/<version>/loom/bootstrap
+        http://<coopr-server>:<coopr-port>/<version>/coopr/bootstrap
 
 .. _rpc-properties:
 
@@ -147,9 +147,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST
-        -H 'X-Loom-UserID:<userid>'
-        -H 'X-Loom-TenantID:<tenantid>'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'Coopr-UserID:<userid>'
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{ 
                 "clusterId":"00000051",
                 "properties":["hostname", "ipaddress"],

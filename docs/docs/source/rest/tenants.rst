@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -56,12 +56,12 @@ Required Parameters
    * - Parameter
      - Description
    * - name
-     - Specifies the name for the tenant. The assigned name must have only
-       alphanumeric, dash(-), dot(.), or underscore(_) characters.
+     - Specifies the name for the tenant; the assigned name must have only 
+       alphanumeric, dash(-), dot(.), or underscore(_) characters
    * - description
-       Optional description of the tenant.
+     - Optional description of the tenant
    * - workers
-     - Number of workers assigned to the tenant.
+     - Number of workers assigned to the tenant
    * - maxClusters
      - Max number of clusters allowed for the tenant
    * - maxNodes
@@ -88,9 +88,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{"name":"my-company", "workers":10}' 
         http://<server>:<port>/<version>/tenants
 
@@ -128,9 +128,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants/my-company
  $ { "name":"my-company", "workers":10, "maxClusters":20, "maxNodes":100 }
 
@@ -169,9 +169,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants/my-company
 
 .. _tenants-modify:
@@ -234,15 +234,15 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{ "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }'  
         http://<server>:<port>/<version>/tenants/my-company
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants/my-company
  $ { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }
 
@@ -278,9 +278,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Loom-UserID:admin'
-        -H 'X-Loom-TenantID:superadmin'
-        -H 'X-Loom-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants
  $ [
      { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 },

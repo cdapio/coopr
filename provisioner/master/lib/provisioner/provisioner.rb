@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 #
-# Copyright 2012-2014, Continuuity, Inc.
+# Copyright © 2012-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ require_relative 'logging'
 require_relative 'config'
 require_relative 'constants'
 
-module Loom
+module Coopr 
   # top-level class for provisioner
   class Provisioner
     include Logging
@@ -71,7 +71,7 @@ module Loom
       # daemonize
       daemonize if config.get(PROVISIONER_DAEMONIZE)
 
-      pg = Loom::Provisioner.new(options, config)
+      pg = Coopr::Provisioner.new(options, config)
       if options[:register]
         pg.register_plugins
       else
@@ -192,17 +192,17 @@ module Loom
           uri = "#{@server_uri}/v2/provisioners/#{provisioner_id}/heartbeat"
           begin
             json = heartbeat.to_json
-            resp = RestClient.post("#{uri}", json, :'X-Loom-UserID' => "admin")
+            resp = RestClient.post("#{uri}", json, :'Coopr-UserID' => "admin")
             unless resp.code == 200
               if(resp.code == 404)
                 log.warn "Response code #{resp.code} when sending heartbeat, re-registering provisioner"
                 register_with_server
               else
-                log.warn "Response code #{resp.code}, #{resp.to_str} when sending heartbeat to loom server #{uri}"
+                log.warn "Response code #{resp.code}, #{resp.to_str} when sending heartbeat to server #{uri}"
               end
             end
           rescue => e
-            log.error "Caught exception sending heartbeat to loom server #{uri}: #{e.message}"
+            log.error "Caught exception sending heartbeat to server #{uri}: #{e.message}"
           end
           sleep 10
         }
@@ -240,14 +240,14 @@ module Loom
       log.info "Registering with server at #{uri}: #{data.to_json}"
 
       begin
-        resp = RestClient.put("#{uri}", data.to_json, :'X-Loom-UserID' => "admin")
+        resp = RestClient.put("#{uri}", data.to_json, :'Coopr-UserID' => "admin")
         if(resp.code == 200)
           log.info "Successfully registered"
           @registered = true
           # announce provisioner is ready
           @status = 'OK'
         else
-          log.warn "Response code #{resp.code}, #{resp.to_str} when registering with loom server #{uri}"
+          log.warn "Response code #{resp.code}, #{resp.to_str} when registering with server #{uri}"
         end
       rescue => e
         log.error "Caught exception when registering with server #{uri}: #{e.message}"
@@ -264,14 +264,14 @@ module Loom
       uri = "#{@server_uri}/v2/provisioners/#{@provisioner_id}"
       log.info "Unregistering with server at #{uri}"
       begin
-        resp = RestClient.delete("#{uri}", :'X-Loom-UserID' => "admin")
+        resp = RestClient.delete("#{uri}", :'Coopr-UserID' => "admin")
         if(resp.code == 200)
           log.info "Successfully unregistered"
         else
-          log.warn "Response code #{resp.code}, #{resp.to_str} when unregistering with loom server #{uri}"
+          log.warn "Response code #{resp.code}, #{resp.to_str} when unregistering with server #{uri}"
         end
       rescue => e
-        log.error "Caught exception when unregistering with loom server #{uri}: #{e.message}"
+        log.error "Caught exception when unregistering with server #{uri}: #{e.message}"
       end
     end
 
