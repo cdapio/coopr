@@ -211,7 +211,17 @@ class FogProviderGoogle < Provider
       # delete server
       log.debug 'Invoking server delete'
       server = connection.servers.get(providerid)
+      if server.nil?
+        log.warn "Server #{providerid} cannot be found, ignoring delete request"
+        @result['status'] = 0
+        return
+      end
+
+      # obtain disk info before deleting server
       disks = server.disks
+      disks.map! { |d| connection.disks.get(d['source'].split('/').last) }
+
+      # delete server
       begin
         server.destroy
         server.wait_for(120) { !ready? }
@@ -219,13 +229,20 @@ class FogProviderGoogle < Provider
         # ok, can be thrown by wait_for
         log.debug 'Server no longer found'
       end
-      # delete all attached disks
-      disks.each do |d|
-        name = d['source'].split('/').last
-        disk = connection.disks.get(name)
-        log.debug "Deleting disk #{name}"
+
+      # issue destroy to all attached disks
+      disks.each do |disk|
+        log.debug "Deleting disk #{disk.name}"
         begin
           disk.destroy
+        rescue Fog::Errors::NotFound
+          log.debug 'Disk already deleted'
+        end
+      end
+
+      # confirm all disks deleted
+      disks.each do |disk|
+        begin
           disk.wait_for(120) { !ready? }
         rescue Fog::Errors::NotFound
           # ok, can be thrown by wait_for
