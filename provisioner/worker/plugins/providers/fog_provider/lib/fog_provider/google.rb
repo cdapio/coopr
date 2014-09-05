@@ -19,7 +19,7 @@
 require_relative 'utils'
 require 'resolv'
 
-# top level class for interacting with Google Compute via Fog
+# top level class for interacting with Google via Fog
 class FogProviderGoogle < Provider
   include FogProvider
 
