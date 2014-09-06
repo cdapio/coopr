@@ -28,7 +28,7 @@ class FogProviderGoogle < Provider
     @image = inputmap['image']
     @hostname = inputmap['hostname']
     # Google uses the short hostname as an identifier
-    # we keep the loom hostname for use in /etc/hosts
+    # we keep the server-assigned hostname for use in /etc/hosts
     @providerid = @hostname.split('.').first
     fields = inputmap['fields']
     begin
@@ -208,46 +208,62 @@ class FogProviderGoogle < Provider
       validate!
       # delete server
       log.debug 'Invoking server delete'
+
+      # check for any disks persisted from a previous delete attempt
+      known_disks = @task['config']['disks_to_delete']
+
+      # fetch server object
       server = connection.servers.get(providerid)
-      if server.nil?
-        log.warn "Server #{providerid} cannot be found, ignoring delete request"
-        @result['status'] = 0
-        return
+
+      if known_disks.nil? && !server.nil?
+        # this is the first delete attempt, persist the names of the currently attached disks
+        known_disks = server.disks.map { |d| d['source'].split('/').last }
+        @result['result']['disks_to_delete'] = known_disks
       end
 
-      # obtain disk info before deleting server
-      disks = server.disks
-      disks.map! { |d| connection.disks.get(d['source'].split('/').last) }
-
-      # delete server
-      begin
-        server.destroy
-        server.wait_for(120) { !ready? }
-      rescue Fog::Errors::NotFound
-        # ok, can be thrown by wait_for
-        log.debug 'Server no longer found'
-      end
-
-      # issue destroy to all attached disks
-      disks.each do |disk|
-        log.debug "Deleting disk #{disk.name}"
+      # delete server, if it exists
+      unless server.nil?
         begin
-          disk.destroy
-        rescue Fog::Errors::NotFound
-          log.debug 'Disk already deleted'
-        end
-      end
-
-      # confirm all disks deleted
-      disks.each do |disk|
-        begin
-          disk.wait_for(120) { !ready? }
+          server.destroy
+          server.wait_for(120) { !ready? }
         rescue Fog::Errors::NotFound
           # ok, can be thrown by wait_for
-          log.debug 'Disk no longer found'
+          log.debug 'Server no longer found'
         end
       end
+
+      # delete any disks
+      unless known_disks.nil?
+        # query our known_disks to see if they exist
+        existing_disks = known_disks.map { |d| connection.disks.get(d) }.compact
+        log.debug "existing disks to delete: #{ existing_disks.map(&:name) }"
+
+        # issue destroy to all attached disks
+        existing_disks.each do |disk|
+          log.debug "Issuing delete for disk #{disk.name}"
+          begin
+            disk.destroy
+          rescue Fog::Errors::NotFound
+            log.debug 'Disk already deleted'
+          end
+        end
+
+        # confirm all disks deleted
+        existing_disks.each do |disk|
+          begin
+            disk.wait_for(120) { !ready? }
+          rescue Fog::Errors::NotFound
+            log.debug "Disk #{disk.name} no longer found"
+          end
+          log.debug "Disk #{disk.name} deleted"
+        end
+      end
+
+      # the server and all known disks have been deleted
       @result['status'] = 0
+    rescue Fog::Errors::Error => e
+      log.error('Unable to delete specified components: ' + e.inspect)
+      @result['stderr'] = "Unable to delete specified components: ' + e.inspect"
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.delete:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.delete: #{e.inspect}"
