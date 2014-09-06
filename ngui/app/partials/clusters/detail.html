@@ -1,4 +1,4 @@
-<p class="clearfix">
+<div class="clearfix">
 
   <div class="btn-group btn-group-xs pull-right">
     <a ui-sref="^.edit({id: model.id})"
@@ -13,10 +13,10 @@
     </a>
   </div>
 
-  <strong>
+  <h4>
     {{model.name}}
-  </strong>
-</p>
+  </h4>
+</div>
 
 <ul class="list-unstyled coopr-list-striped">
 
@@ -53,11 +53,7 @@
     </div>
     <div class="col-xs-9">
       <em>{{model.progress.action}}</em>
-      <span class="label label-default" ng-class="{
-        'label-danger': model.progress.actionstatus == 'failed'
-      }">
-        {{model.progress.actionstatus}}
-      </span>
+      <my-status-label value="model.progress.actionstatus" />
     </div>
   </div></li>
 
