@@ -16,11 +16,11 @@
 #
 #
 # chkconfig: 2345 96 15
-# description: Starts and stops the APP_NAME service
+# description: Starts and stops the loom-server service
 # 
 ### BEGIN INIT INFO
-# Provides:          APP_NAME
-# Short-Description: Loom SVC_NAME
+# Provides:          loom-server
+# Short-Description: Loom server
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Required-Start:    $network
@@ -29,8 +29,8 @@
 # Should-Stop:
 ### END INIT INFO
 
-# source /etc/default/APP_NAME
-[ -f /etc/default/APP_NAME ] && source /etc/default/APP_NAME
+# source /etc/default/loom-server
+[ -f /etc/default/loom-server ] && source /etc/default/loom-server
 
 # create pid dir owned by loom user
 mkdir -p /var/run/loom
@@ -39,8 +39,8 @@ chown -R loom:loom /var/run/loom
 # drop permissions to loom user and run service script
 
 if [[ $UID -eq 0 ]]; then
-    su loom -c "cd /opt/loom/SVC_NAME/bin; exec ./APP_NAME.sh $*"
+    su loom -c "cd /opt/loom/server/bin; exec ./loom-server.sh $*"
 else
-    cd /opt/loom/SVC_NAME/bin; exec ./APP_NAME.sh $*
+    cd /opt/loom/server/bin; exec ./loom-server.sh $*
 fi
 
