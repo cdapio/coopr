@@ -1,6 +1,6 @@
 <table class="table table-striped" my-sortable>
   <thead>
-    <tr>
+    <tr ng-class="{'sort-enabled': list.length>1}">
       <th>name</th>
       <th>owner</th>
       <th data-predicate="createTime" data-predicate-default="reverse">creation time</th>
@@ -29,9 +29,9 @@
 </table>
 
 
-<div ng-show="list && !list.length" class="well text-center">
+<div ng-hide="(list.$promise && !list.$resolved) || list.length" class="well text-center">
 
-  <p>You don't have any clusters!</p>
+  <p>You don't have any live clusters!</p>
   <p><a class="btn btn-primary" role="button" ui-sref="clusters.create">
     Create a cluster
   </a></p>

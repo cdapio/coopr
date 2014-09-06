@@ -3,7 +3,7 @@ var module = angular.module(PKG.name+'.controllers');
 /**
  * generic list controller
  */
-module.controller('CrudListCtrl', function ($scope, $state, $modal) {
+module.controller('CrudListCtrl', function ($scope, $state) {
   // we already fetched the list in the parent view
   $scope.$watch('subnavList', function (list) {
     if(list) {
