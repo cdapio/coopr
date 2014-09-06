@@ -2,11 +2,21 @@ var module = angular.module(PKG.name+'.controllers');
 
 
 
-module.controller('ClusterDetailCtrl', function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
+module.controller('ClusterDetailCtrl', function ($scope, CrudFormBase, $state, myApi, $interval) {
+  CrudFormBase.apply($scope);
 
   $scope.model = myApi.Cluster.get( {id:$state.params.id}, function (data) {
     console.log('editing cluster', data);
   });
+
+  // var stop = $interval(function(){
+  //   $scope.model.progress.stepscompleted = Math.random();
+  // }, 2000);
+
+
+  // $scope.$on('$destroy', function() {
+  //   $interval.cancel(stop);
+  // });
 
 });
 

@@ -20,6 +20,16 @@
 
 <ul class="list-unstyled coopr-list-striped">
 
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Status</label>
+    </div>
+    <div class="col-xs-9">
+      <my-status-label data-value="model.status" />
+    </div>
+  </div></li>
+
   <li><div class="row">
     <div class="col-xs-3">
       <label>Creation time</label>
@@ -40,20 +50,20 @@
 
   <li><div class="row">
     <div class="col-xs-3">
-      <label>Progress</label>
+      <label>Action</label>
     </div>
     <div class="col-xs-9">
-      TODO
+      <em>{{model.progress.action}}</em>
+      <my-status-label data-value="model.progress.actionstatus" />
     </div>
   </div></li>
 
   <li><div class="row">
     <div class="col-xs-3">
-      <label>Status</label>
+      <label>Progress</label>
     </div>
     <div class="col-xs-9">
-      <em>{{model.progress.action}}</em>
-      <my-status-label value="model.progress.actionstatus" />
+      <my-progress data-value="model.progress.stepscompleted" data-max="model.progress.stepstotal" data-type="bar" />
     </div>
   </div></li>
 
@@ -80,9 +90,7 @@
       <label>Services</label>
     </div>
     <div class="col-xs-9">
-      <my-service-picker model="model.services" readonly="true" />
+      <my-service-picker data-model="model.services" data-readonly="true" />
     </div>
   </div></li>
 </ul>
-
-<pre>{{model | json}}</pre>

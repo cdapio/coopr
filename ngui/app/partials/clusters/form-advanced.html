@@ -81,7 +81,7 @@
   <label class="col-xs-2 control-label">Provider fields</label>
   <fieldset class="col-xs-10" ng-disabled="model.id">
 
-    <my-provider-fields model="model.providerFields" provider="chosenProvider" />
+    <my-provider-fields data-model="model.providerFields" data-provider="chosenProvider" />
 
   </fieldset>
 </div>
@@ -91,7 +91,7 @@
   <label class="col-xs-2 control-label">Services</label>
   <div class="col-xs-10">
 
-    <my-service-picker model="model.services" available="availableServices" readonly="{{model.id}}" />
+    <my-service-picker data-model="model.services" data-available="availableServices" data-readonly="{{model.id}}" />
 
   </div>
 </div>
