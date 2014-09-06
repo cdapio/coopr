@@ -4,7 +4,9 @@ module.directive('myProgress', function myProgressDirective () {
   return {
     restrict: 'E',
     templateUrl: function(element, attrs) {
-      return 'progress/'+ attrs.type.split(' ')[0] +'.tpl';
+      // there could be other representations of progress than a "bar"...
+      var type = (attrs.type ? attrs.type.split(' ')[0] : 'bar');
+      return 'progress/'+ type +'.tpl';
     },
     replace: true,
     scope: {
@@ -13,7 +15,7 @@ module.directive('myProgress', function myProgressDirective () {
     },
     link: function(scope, element, attrs) {
       var additionalClasses = attrs.type.split(' ').slice(1).map(function(cls) {
-            return 'progress-bar-'+cls;
+            return cls && 'progress-bar-'+cls;
           });
 
       scope.$watch('value', function(newVal) {
@@ -27,7 +29,9 @@ module.directive('myProgress', function myProgressDirective () {
         };
 
         angular.forEach(additionalClasses, function(add) {
-          cls[add] = true;
+          if(add) {
+            cls[add] = true;
+          }
         });
 
         scope.cls = cls;
