@@ -1,25 +1,29 @@
-<div class="clearfix">
-
-  <div class="btn-group btn-group-xs pull-right">
-    <a ui-sref="^.edit({id: model.id})"
-      class="btn btn-primary">
-        <span class="fa fa-edit"></span>
-        Reconfigure
-    </a>
-    <a href="" ng-click="myConfirm()" my-confirmable="doDelete(model)" 
-      class="btn btn-danger">
-        <span class="fa fa-trash"></span>
-        Delete
-    </a>
-  </div>
-
-  <h4>
-    {{model.name}}
-  </h4>
-</div>
-
 <ul class="list-unstyled coopr-list-striped">
 
+
+  <li><div class="row">
+    <div class="col-xs-3">
+      <label>Name</label>
+    </div>
+    <div class="col-xs-9">
+      <div class="btn-group btn-group-xs pull-right">
+        <a ui-sref="^.edit({id: model.id})"
+          class="btn btn-primary">
+            <span class="fa fa-edit"></span>
+            Reconfigure
+        </a>
+        <a href="" ng-click="myConfirm()" my-confirmable="doDelete(model)" 
+          class="btn btn-danger">
+            <span class="fa fa-trash"></span>
+            Delete
+        </a>
+      </div>
+
+      <strong>
+        {{model.name}}
+      </strong>
+    </div>
+  </div></li>
 
   <li><div class="row">
     <div class="col-xs-3">

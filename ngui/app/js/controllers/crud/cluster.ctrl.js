@@ -5,9 +5,18 @@ var module = angular.module(PKG.name+'.controllers');
 module.controller('ClusterDetailCtrl', function ($scope, CrudFormBase, $state, myApi, $interval) {
   CrudFormBase.apply($scope);
 
-  $scope.model = myApi.Cluster.get( {id:$state.params.id}, function (data) {
-    console.log('editing cluster', data);
-  });
+  var failure = function () { $state.go('404'); };
+
+  if($state.params.id) {
+    $scope.model = myApi.Cluster.get( {id:$state.params.id}, function (data) {
+      console.log('editing cluster', data);
+    });
+
+    $scope.model.$promise.catch(failure);
+  }
+  else {
+    failure();
+  }
 
   // var stop = $interval(function(){
   //   $scope.model.progress.stepscompleted = Math.random();
@@ -119,11 +128,10 @@ module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocu
 
 
 
-  if(!id) {
+  if(angular.isUndefined(id)) {
     /*
     creating a new cluster
      */
-
     $scope.$watchCollection('leaseDuration', function (timeObj) {
       $scope.model.initialLeaseDuration = myHelpers.concatMilliseconds(timeObj);
     }); 
@@ -133,31 +141,32 @@ module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocu
 
 
 
-
-
-
   } else {
     /*
     reconfiguring
      */
-    myApi.Cluster.get( {id:id}, function (data) {
-      // what we "get" doesnt look at all like what we will "put"
-      console.log('reconfiguring cluster', data);
+    myApi.Cluster.get( {id:id}).$promise
+      .then(function (data) {
+        // what we "get" doesnt look at all like what we will "put"
+        console.log('reconfiguring cluster', data);
 
-      // but we still need a populated model for display purposes
-      angular.extend($scope.model, {
-        name: data.name,
-        numMachines: data.nodes.length,
-        clusterTemplate: data.clusterTemplate.name,
-        provider: data.provider.name,
-        hardwaretype: data.nodes[0].properties.hardwaretype,
-        imagetype: data.nodes[0].properties.imagetype
+        // but we still need a populated model for display purposes
+        angular.extend($scope.model, {
+          name: data.name,
+          numMachines: data.nodes.length,
+          clusterTemplate: data.clusterTemplate.name,
+          provider: data.provider.name,
+          hardwaretype: data.nodes[0].properties.hardwaretype,
+          imagetype: data.nodes[0].properties.imagetype
+        });
+
+        $scope.leaseDuration = myHelpers.parseMilliseconds(data.expireTime);
+
+        myFocusManager.select('inputClusterConfig');
+      })
+      .catch(function () {
+        $state.go('404');
       });
-
-      $scope.leaseDuration = myHelpers.parseMilliseconds(data.expireTime);
-
-      myFocusManager.select('inputClusterConfig');
-    });
 
 
 

@@ -86,9 +86,15 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
 module.controller('CrudEditCtrl', function ($scope, $state, myApi, CrudFormBase) {
   CrudFormBase.apply($scope);
 
-  var data = $state.current.data;
+  var data = $state.current.data,
+      failure = function () { $state.go('404'); };
+
   if(data) {
     $scope.model = myApi[data.modelName].get($state.params);
+    $scope.model.$promise.catch(failure);
+  }
+  else {
+    failure();
   }
 });
 

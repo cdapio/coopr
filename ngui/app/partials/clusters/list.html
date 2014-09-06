@@ -6,7 +6,7 @@
       <th data-predicate="createTime" data-predicate-default="reverse">creation time</th>
       <th data-predicate="clusterTemplate.name">template</th>
       <th data-predicate="numNodes"># of nodes</th>
-      <th>status</th>
+      <th colspan="2">status</th>
     </tr>
   </thead>
   <tbody>
@@ -23,6 +23,13 @@
       <td>{{item.numNodes}}</td>
 
       <td><my-status-label data-value="item.status" /></td>
+
+      <td class="text-right">
+        <a ui-sref="^.detail({id: item.id})"
+          class="btn btn-default btn-xs">
+            Details
+        </a>
+      </td>
 
     </tr>
   </tbody>
