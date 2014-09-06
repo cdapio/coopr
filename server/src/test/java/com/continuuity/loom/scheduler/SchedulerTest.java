@@ -154,23 +154,23 @@ public class SchedulerTest extends ServiceTestBase {
 
     // Two tasks should have been submitted for provisioning.
     TakeTaskRequest takeRequest = new TakeTaskRequest("consumer1", PROVISIONER_ID, tenantId);
-    SchedulableTask task = TestHelper.takeTask(getLoomUrl(), takeRequest);
+    SchedulableTask task = TestHelper.takeTask(getServerUrl(), takeRequest);
 
     JsonObject result = new JsonObject();
     Map<String, String> ipAddresses = ImmutableMap.of("access", "123.456.789.123");
     FinishTaskRequest finishRequest =
       new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId, task.getTaskId(),
                             null, null, 0, null, ipAddresses, result);
-    TestHelper.finishTask(getLoomUrl(), finishRequest);
+    TestHelper.finishTask(getServerUrl(), finishRequest);
 
-    task = TestHelper.takeTask(getLoomUrl(), takeRequest);
+    task = TestHelper.takeTask(getServerUrl(), takeRequest);
     result = new JsonObject();
     ipAddresses = ImmutableMap.of("access", "456.789.123.123");
     finishRequest = new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
                                           task.getTaskId(), null, null, 0, null, ipAddresses, result);
-    TestHelper.finishTask(getLoomUrl(), finishRequest);
+    TestHelper.finishTask(getServerUrl(), finishRequest);
 
-    TestHelper.takeTask(getLoomUrl(), takeRequest);
+    TestHelper.takeTask(getServerUrl(), takeRequest);
 
     Assert.assertEquals(2, jobQueues.size(tenantId));
 
@@ -180,10 +180,10 @@ public class SchedulerTest extends ServiceTestBase {
     jobScheduler.run();
 
     for (int i = 0; i < 5; i++) {
-      task = TestHelper.takeTask(getLoomUrl(), takeRequest);
+      task = TestHelper.takeTask(getServerUrl(), takeRequest);
       finishRequest = new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
                                             task.getTaskId(), null, null, 0, null, null, null);
-      TestHelper.finishTask(getLoomUrl(), finishRequest);
+      TestHelper.finishTask(getServerUrl(), finishRequest);
       jobScheduler.run();
       jobScheduler.run();
     }
@@ -256,15 +256,15 @@ public class SchedulerTest extends ServiceTestBase {
 
     // take tasks until there are no more
     TakeTaskRequest takeRequest = new TakeTaskRequest("consumer1", PROVISIONER_ID, tenantId);
-    SchedulableTask task = TestHelper.takeTask(getLoomUrl(), takeRequest);
+    SchedulableTask task = TestHelper.takeTask(getServerUrl(), takeRequest);
     while (task != null) {
       FinishTaskRequest finishRequest =
         new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
                               task.getTaskId(), null, null, failJob ? 1 : 0, null, null, null);
-      TestHelper.finishTask(getLoomUrl(), finishRequest);
+      TestHelper.finishTask(getServerUrl(), finishRequest);
       jobScheduler.run();
       jobScheduler.run();
-      task = TestHelper.takeTask(getLoomUrl(), takeRequest);
+      task = TestHelper.takeTask(getServerUrl(), takeRequest);
     }
     jobScheduler.run();
     waitForCallback(callbackScheduler);
@@ -275,7 +275,7 @@ public class SchedulerTest extends ServiceTestBase {
   }
 
 
-  private String getLoomUrl() {
+  private String getServerUrl() {
     InetSocketAddress address = handlerServer.getBindAddress();
     return String.format("http://%s:%s%s", address.getHostName(), address.getPort(), Constants.API_BASE);
   }
