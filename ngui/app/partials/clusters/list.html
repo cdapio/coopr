@@ -10,7 +10,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="item in list | orderBy:sortable.predicate:sortable.reverse">
+    <tr ng-repeat="item in list | filter:clusterFilter | orderBy:sortable.predicate:sortable.reverse">
 
       <td><a ui-sref="^.detail({id: item.id})">{{item.name}}</a></td>
 
@@ -31,9 +31,16 @@
 
 <div ng-hide="(list.$promise && !list.$resolved) || list.length" class="well text-center">
 
-  <p>You don't have any live clusters!</p>
+  <p>You don't have any clusters!</p>
   <p><a class="btn btn-primary" role="button" ui-sref="clusters.create">
     Create a cluster
   </a></p>
 
+</div>
+
+
+<div class="text-center" ng-show="clusterFilter">
+  <button class="btn btn-default btn-sm" ng-click="clusterFilter=null">
+    show inactive
+  </button>
 </div>

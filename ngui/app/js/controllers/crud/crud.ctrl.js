@@ -1,27 +1,42 @@
 var module = angular.module(PKG.name+'.controllers');
 
 /**
+ * a constructor implementing a generic list controller
+ */
+module.factory('CrudListBase', function CrudListBaseFactory() {
+  return function CrudListBase () {
+    var scope = this;
+
+    // we already fetched the list in the parent view
+    scope.$watch('subnavList', function (list) {
+      if(list) {
+        scope.list = list;
+      }
+    });
+
+    // but we want it to be fresh
+    if(!scope.subnavList || scope.subnavList.$resolved) {
+      scope.fetchSubnavList();
+    }
+
+    scope.doDelete = function (model) {
+      model.$delete(function () {
+        scope.fetchSubnavList();
+      });
+    };
+
+  }
+});
+
+
+
+/**
  * generic list controller
  */
-module.controller('CrudListCtrl', function ($scope, $state) {
-  // we already fetched the list in the parent view
-  $scope.$watch('subnavList', function (list) {
-    if(list) {
-      $scope.list = list;
-    }
-  });
-
-  // but we want it to be fresh
-  if(!$scope.subnavList || $scope.subnavList.$resolved) {
-    $scope.fetchSubnavList();
-  }
-
-  $scope.doDelete = function (model) {
-    model.$delete(function () {
-      $scope.fetchSubnavList();
-    });
-  };
+module.controller('CrudListCtrl', function ($scope, CrudListBase) {
+  CrudListBase.apply($scope);
 });
+
 
 
 

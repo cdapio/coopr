@@ -22,6 +22,25 @@ module.controller('ClusterDetailCtrl', function ($scope, CrudFormBase, $state, m
 
 
 
+module.controller('ClusterListCtrl', function ($scope, $filter, CrudListBase) {
+  CrudListBase.apply($scope);
+
+  var notTerminated = {status:'!terminated'}
+  $scope.clusterFilter = notTerminated;
+
+  $scope.$watchCollection('list', function (list) {
+    if (!list.$promise || list.$resolved) {
+      if($filter('filter')(list, notTerminated).length == 0) {
+        // there are no active clusters, so we dont need to filter nor show button
+        $scope.clusterFilter = null;
+      }
+    }
+  });
+
+});
+
+
+
 
 module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
   var id = $state.params.id;
