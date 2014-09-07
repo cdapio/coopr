@@ -23,16 +23,10 @@ require 'resolv'
 class FogProviderGoogle < Provider
   include FogProvider
 
-  def initialize(env, task)
-    super(env, task)
-    work_dir = @env[:work_dir]
-    tenant = @env[:tenant]
-    #work/superadmin/providertypes/google/p12_keys/8fa6e326c48d
-    #rovisioner/work/superadmin/providertypes/google/ssh_private_keys/derek
-    @p12_key_dir = File.join(work_dir, tenant, 'providertypes/google/p12_keys')
-    @ssh_key_dir = File.join(work_dir, tenant, 'providertypes/google/ssh_private_keys')
+  def set_environment
+    @p12_key_dir = File.join(@env[:work_dir], @env[:tenant], 'providertypes/google/p12_keys')
+    @ssh_key_dir = File.join(@env[:work_dir], @env[:tenant], 'providertypes/google/ssh_private_keys')
   end
-
 
   def create(inputmap)
     @flavor = inputmap['flavor']

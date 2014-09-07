@@ -127,10 +127,12 @@ def delegate_task(task, pluginmanager)
   when 'create', 'confirm', 'delete'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForProvider(providerName))
     object = clazz.new(@plugin_env, task)
+    object.set_environment if object.respond_to? :set_environment
     result = object.runTask
   when 'install', 'configure', 'initialize', 'start', 'stop', 'remove'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
     object = clazz.new(@plugin_env, task)
+    object.set_environment if object.respond_to? :set_environment
     result = object.runTask
   when 'bootstrap'
     combinedresult = {}
@@ -151,6 +153,7 @@ def delegate_task(task, pluginmanager)
     classes.each do |klass|
       klass = Object.const_get(klass)
       object = klass.new(@plugin_env, task)
+      object.set_environment if object.respond_to? :set_environment
       result = object.runTask
       combinedresult.merge!(result)
     end
