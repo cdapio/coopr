@@ -35,7 +35,7 @@ gulp.task('fonts', function() {
 gulp.task('css:app', function() {
   return gulp.src([
       './app/js/directives/**/*.{less,css}',
-      './app/css/themes/default.less',
+      './app/css/themes/*.less',
       './app/css/common.less'
     ])
     .pipe(plumber())

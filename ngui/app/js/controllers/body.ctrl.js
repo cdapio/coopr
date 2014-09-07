@@ -1,7 +1,17 @@
 var module = angular.module(PKG.name+'.controllers');
 
 
-module.controller('BodyCtrl', function ($scope) {
+module.controller('BodyCtrl', function ($scope, myTheme, MYTHEME_EVENT) {
+
+  var activeThemeClass = myTheme.getClassName();
+
+
+  $scope.$on(MYTHEME_EVENT.changed, function (event, newClassName) {
+    if(!event.defaultPrevented) {
+      $scope.bodyClass = $scope.bodyClass.replace(activeThemeClass, newClassName);
+      activeThemeClass = newClassName;
+    }
+  });
 
 
   $scope.$on('$stateChangeSuccess', function (event, state) {
@@ -16,6 +26,9 @@ module.controller('BodyCtrl', function ($scope) {
         classes.push('state-' + parts.slice(0,count).join('-'));
       }
     }
+
+    classes.push(activeThemeClass);
+
     $scope.bodyClass = classes.join(' ');
   });
 

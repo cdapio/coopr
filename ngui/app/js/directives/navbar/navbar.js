@@ -1,6 +1,6 @@
 var module = angular.module(PKG.name+'.directives');
 
-module.directive('myNavbar', function myNavbarDirective ($dropdown, myAuth) {
+module.directive('myNavbar', function myNavbarDirective ($dropdown, myAuth, myTheme) {
   return {
     restrict: 'A',
     templateUrl: 'navbar/navbar.tpl',
@@ -15,6 +15,8 @@ module.directive('myNavbar', function myNavbarDirective ($dropdown, myAuth) {
       });
 
       scope.logout = myAuth.logout;
+
+      scope.theme = myTheme;
 
       scope.navbarAdminLinks = [
         { sref: 'templates',     label: 'Catalog',   icon: 'folder-open-o' },

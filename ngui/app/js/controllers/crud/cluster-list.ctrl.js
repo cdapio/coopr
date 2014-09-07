@@ -5,7 +5,7 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
   CrudListBase.apply($scope);
 
   var filterFilter = $filter('filter'),
-      notTerminated = {status:'!terminated'};
+      notTerminated = { status: '!terminated' };
 
   $scope.clusterFilter = notTerminated;
 
@@ -29,10 +29,10 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
           angular.forEach($scope.list, function (cluster) {
             if(cluster.status === 'pending') {
               var update = filterFilter(list, {id:cluster.id});
-              if(update) {
-                console.log('updatePending', cluster.progress);
+              if(update && update.length) {
                 cluster.status = update[0].status;
                 cluster.progress = update[0].progress;
+                console.log('[updatePending]', cluster.progress);
               }
             }
           });

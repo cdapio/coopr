@@ -14,6 +14,23 @@
     </a>
   </li>
 
+
+
+  <li role="presentation" class="divider"></li>
+
+  <li role="presentation" class="dropdown-header">
+    themes
+  </li>
+
+  <li role="presentation" ng-repeat="it in theme.list()" ng-class="{disabled:it==theme.current}">
+    <a role="menuitem" href="" ng-click="theme.set(it)">
+      <span class="fa" ng-class="it==theme.current ? 'fa-dot-circle-o' : 'fa-circle-o'"></span>
+      {{it}}
+    </a>
+  </li>
+
+
+
   <li role="presentation" class="divider"></li>
 
   <li role="presentation" class="dropdown-header" ng-show="currentUser">
