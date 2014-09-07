@@ -1,7 +1,6 @@
 var module = angular.module(PKG.name+'.controllers');
 
 
-
 module.controller('ClusterDetailCtrl', function ($scope, CrudFormBase, $state, myApi, $interval) {
   CrudFormBase.apply($scope);
 
@@ -18,33 +17,52 @@ module.controller('ClusterDetailCtrl', function ($scope, CrudFormBase, $state, m
     failure();
   }
 
-  // var stop = $interval(function(){
-  //   $scope.model.progress.stepscompleted = Math.random();
-  // }, 2000);
-
-
-  // $scope.$on('$destroy', function() {
-  //   $interval.cancel(stop);
-  // });
-
 });
 
 
 
-module.controller('ClusterListCtrl', function ($scope, $filter, CrudListBase) {
+module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi, CrudListBase) {
   CrudListBase.apply($scope);
 
-  var notTerminated = {status:'!terminated'}
+  var filterFilter = $filter('filter'),
+      notTerminated = {status:'!terminated'};
+
   $scope.clusterFilter = notTerminated;
 
   $scope.$watchCollection('list', function (list) {
     if (!list.$promise || list.$resolved) {
-      if($filter('filter')(list, notTerminated).length == 0) {
+      if(filterFilter(list, notTerminated).length == 0) {
         // there are no active clusters, so we dont need to filter nor show button
         $scope.clusterFilter = null;
       }
+      else updatePending();
     }
   });
+
+  function updatePending() {
+    if(filterFilter($scope.list, {status:'pending'}).length) {
+      $timeout(function () {
+
+        myApi.Cluster.query(function (list) {
+          // $scope.list = list works, but then we lose the animation of progress bars
+          // instead we only modify the properties that interest us
+          angular.forEach($scope.list, function (cluster) {
+            if(cluster.status === 'pending') {
+              var update = filterFilter(list, {id:cluster.id});
+              if(update) {
+                console.log('updatePending', cluster.progress);
+                cluster.status = update[0].status;
+                cluster.progress = update[0].progress;
+              }
+            }
+          });
+          updatePending();
+        });
+
+      },
+      1000);
+    }
+  }
 
 });
 

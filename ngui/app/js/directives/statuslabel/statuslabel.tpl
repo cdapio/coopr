@@ -2,12 +2,12 @@
 
   complete: 'label-success',
   running: 'label-warning',
+  pending: 'label-warning',
   active: 'label-info', 
-  pending: 'label-info',
   incomplete: 'label-danger',
   failed: 'label-danger'
 
 }[status] || 'label-default'">
-  {{status}}
+  {{ display[status] || status }}
 </span>
 

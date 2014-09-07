@@ -3,8 +3,7 @@ var module = angular.module(PKG.name+'.controllers');
 
 module.controller('SubnavCtrl', function ($scope, $state, myApi) {
 
-  var path = $state.current.name.split('.')[0],
-      detail = $state.get(path+'.detail') || $state.get(path+'.edit');
+  var path = $state.current.name.split('.')[0];
 
   function fetchSubnavList () {
     $scope.subnavList = myApi[$state.current.data.modelName]
@@ -13,7 +12,7 @@ module.controller('SubnavCtrl', function ($scope, $state, myApi) {
         $scope.dropdown = list.map(function(item) {
           return {
             text: item.name,
-            href: detail ? $state.href(detail, item) : '#/TODO'
+            href: $state.href($state.get(path+'.detail') || $state.get(path+'.edit'), item)
           };
         });
       });

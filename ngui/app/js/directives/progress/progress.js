@@ -4,19 +4,15 @@ module.directive('myProgress', function myProgressDirective () {
   return {
     restrict: 'E',
     templateUrl: function(element, attrs) {
-      // there could be other representations of progress than a "bar"...
-      var type = (attrs.type ? attrs.type.split(' ')[0] : 'bar');
-      return 'progress/'+ type +'.tpl';
+      return 'progress/'+ (attrs.type||'bar') +'.tpl';
     },
     replace: true,
     scope: {
+      addCls: '@',
       value: '=',
       max: '=' 
     },
     link: function(scope, element, attrs) {
-      var additionalClasses = attrs.type.split(' ').slice(1).map(function(cls) {
-            return cls && 'progress-bar-'+cls;
-          });
 
       scope.$watch('value', function(newVal) {
         var max = parseInt(scope.max, 10) || 100;
@@ -28,9 +24,14 @@ module.directive('myProgress', function myProgressDirective () {
           'progress-bar': true
         };
 
-        angular.forEach(additionalClasses, function(add) {
+        angular.forEach(scope.addCls.split(' '), function(add) {
           if(add) {
-            cls[add] = true;
+            switch (attrs.type) {
+              case 'bar':
+              default:
+                cls['progress-bar-'+add] = true;
+                break;
+            }            
           }
         });
 

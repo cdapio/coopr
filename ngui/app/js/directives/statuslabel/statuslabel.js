@@ -6,7 +6,8 @@ module.directive('myStatusLabel', function myStatusLabelDirective () {
     templateUrl: 'statuslabel/statuslabel.tpl',
     replace: true,
     scope: {
-      status: '=value'
+      status: '=value',
+      display: '='
     }
   };
 });

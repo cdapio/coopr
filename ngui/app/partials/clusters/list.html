@@ -23,10 +23,17 @@
       <td>{{item.numNodes}}</td>
 
       <td>
-        <my-status-label data-value="item.status" />
+        <my-status-label data-value="item.status" data-display="{
+          'pending': item.progress.actionstatus
+        }" />
       </td>
       <td>
-        <my-progress data-type="bar {{item.status=='terminated'?'danger':''}}" 
+        <my-progress data-type="bar"
+          data-add-cls="{{{
+            'pending': 'warning',
+            'running': 'warning',
+            'terminated': 'danger'
+          }[item.status]}}"
           data-value="item.progress.stepscompleted" 
           data-max="item.progress.stepstotal" />
       </td>

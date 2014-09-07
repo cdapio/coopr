@@ -6,7 +6,7 @@
       <label>Name</label>
     </div>
     <div class="col-xs-9">
-      <div class="btn-group btn-group-xs pull-right">
+      <div class="btn-group btn-group-xs pull-right" ng-show="model.status!='terminated'">
         <a ui-sref="^.edit({id: model.id})"
           class="btn btn-primary">
             <span class="fa fa-edit"></span>
@@ -62,12 +62,18 @@
     </div>
   </div></li>
 
-  <li><div class="row">
+  <li ng-show="model.status!='terminated'"><div class="row">
     <div class="col-xs-3">
       <label>Progress</label>
     </div>
     <div class="col-xs-9">
-      <my-progress data-value="model.progress.stepscompleted" data-max="model.progress.stepstotal" data-type="bar" />
+      <my-progress data-type="bar" 
+          data-add-cls="{{{
+            'pending': 'warning',
+            'running': 'warning'
+          }[model.status]}}"
+          data-value="model.progress.stepscompleted"
+          data-max="model.progress.stepstotal" />
     </div>
   </div></li>
 
