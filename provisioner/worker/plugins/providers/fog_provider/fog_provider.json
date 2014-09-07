@@ -124,6 +124,16 @@
   "google": {
     "name": "google",
     "classname": "FogProviderGoogle",
+    "resourceTypes": {
+        "p12_keys": {
+            "format": "file",
+            "permissions": "0400"
+        },
+        "ssh_private_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
@@ -142,10 +152,20 @@
             "type": "text",
             "tip": "Path to your P12 key, as downloaded from Google encrypted with their default passphrase (notasecret)"
           },
+          "google_p12_key_name": {
+            "label": "P12 key name",
+            "type": "text",
+            "tip": "Name of the P12 key that has been uploaded"
+          },
           "google_ssh_keyfile": {
             "label": "ssh private key file",
             "type": "text",
             "tip": "Full path and file name to your Google SSH private key"
+          },
+          "google_ssh_key_name": {
+            "label": "ssh private key name",
+            "type": "text",
+            "tip": "Name of the SSH key that has been uploaded"
           },
           "google_ssh_username": {
             "label": "ssh username",

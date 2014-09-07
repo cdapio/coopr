@@ -23,6 +23,17 @@ require 'resolv'
 class FogProviderGoogle < Provider
   include FogProvider
 
+  def initialize(env, task)
+    super(env, task)
+    work_dir = @env[:work_dir]
+    tenant = @env[:tenant]
+    #work/superadmin/providertypes/google/p12_keys/8fa6e326c48d
+    #rovisioner/work/superadmin/providertypes/google/ssh_private_keys/derek
+    @p12_key_dir = File.join(work_dir, tenant, 'providertypes/google/p12_keys')
+    @ssh_key_dir = File.join(work_dir, tenant, 'providertypes/google/ssh_private_keys')
+  end
+
+
   def create(inputmap)
     @flavor = inputmap['flavor']
     @image = inputmap['image']
@@ -76,7 +87,8 @@ class FogProviderGoogle < Provider
           'root'
         end
       @result['result']['ssh-auth']['user'] = ssh_user
-      @result['result']['ssh-auth']['identityfile'] = @google_ssh_keyfile unless @google_ssh_keyfile.to_s == ''
+      #@result['result']['ssh-auth']['identityfile'] = @google_ssh_keyfile unless @google_ssh_keyfile.to_s == ''
+      @result['result']['ssh-auth']['identityfile'] = File.join(@ssh_key_dir, @google_ssh_key_name)
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
@@ -261,12 +273,14 @@ class FogProviderGoogle < Provider
   def connection
     # Create connection
     # rubocop:disable UselessAssignment
+    p12_key = File.join( @p12_key_dir, @google_p12_key_name)
+    log.debug "using p12 key: #{p12_key}"
     @connection ||= begin
       connection = Fog::Compute.new(
         provider: 'google',
         google_project: @google_project,
         google_client_email: @google_client_email,
-        google_key_location: @google_key_location
+        google_key_location: p12_key
       )
     end
     # rubocop:enable UselessAssignment
@@ -307,10 +321,10 @@ class FogProviderGoogle < Provider
     unless @google_client_email =~ /.*gserviceaccount.com$/
       errors << 'Invalid service account email address. It must be in the gserviceaccount.com domain'
     end
-    [@google_key_location, @google_ssh_keyfile].each do |key|
-      next if File.readable?(key)
-      errors << "cannot read specified key location: #{key}"
-    end
+#    [@google_key_location, @google_ssh_keyfile].each do |key|
+#      next if File.readable?(key)
+#      errors << "cannot read specified key location: #{key}"
+#    end
     fail 'Credential validation failed!' if errors.each { |e| log.error(e) }.any?
   end
 end
