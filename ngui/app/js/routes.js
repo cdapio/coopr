@@ -114,6 +114,18 @@ angular.module(PKG.name)
         .state(crud('Service', 'edit'))
         .state(crud('Service', 'create')) 
 
+
+      /*
+        /#/tenants/...
+       */
+      .state(abstractSubnav('Tenant', {
+        authorizedRoles: MYAUTH_ROLE.superadmin
+      }))
+        .state(crud('Tenant', 'list', 'CrudListCtrl'))
+        .state(crud('Tenant', 'edit'))
+        .state(crud('Tenant', 'create')) 
+
+
       ;
 
 
@@ -161,7 +173,7 @@ angular.module(PKG.name)
           tpl += 'form.html';
           /* falls through */
         default:
-          url = url || '/' + action + (name.match(/Cluster|Provisioner|Tenant/) ? '/:id' : '/:name');
+          url = url || '/' + action + (name.match(/Cluster|Provisioner/) ? '/:id' : '/:name');
           if(action.match(/create|edit/)) {
             break;
           }
@@ -205,6 +217,7 @@ angular.module(PKG.name)
 
     $rootScope.$on(MYAUTH_EVENT.notAuthorized, function () {
       $alert({title:'Authentication error!', content:'You are not allowed to access the requested page.', type:'warning', duration:3});
+      $state.go('home');
     });
 
     angular.forEach([

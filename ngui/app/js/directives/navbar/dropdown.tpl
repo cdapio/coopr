@@ -20,6 +20,13 @@
     {{currentUser.username}}/{{currentUser.tenant}}
   </li>
 
+  <li role="presentation" ng-show="currentUser.hasRole('superadmin')" ui-sref-active="disabled">
+    <a role="menuitem" tabindex="-1" ui-sref="tenants.list">
+      <span class="fa fa-user"></span>
+      Tenants
+    </a>
+  </li>
+
   <li role="presentation" ng-show="currentUser">
     <a role="menuitem" tabindex="-1" href="" ng-click="logout()">
       <span class="fa fa-sign-out"></span>

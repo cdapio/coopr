@@ -1,0 +1,39 @@
+<table class="table table-striped" my-sortable>
+  <thead>
+    <tr ng-class="{'sort-enabled': list.length>1}">
+      <th>name</th>
+      <th colspan="2">description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="item in list | orderBy:sortable.predicate:sortable.reverse">
+
+      <td width="1"><a ui-sref="^.edit({name: item.name})">{{item.name}}</a></td>
+
+      <td width="1">{{item.description}}</td>
+
+      <td width="10" class="text-right">
+        <div class="btn-group btn-group-xs">
+          <a ui-sref="^.edit({name: item.name})"
+            class="btn btn-default">
+              <span class="fa fa-edit"></span>
+              Edit
+          </a>
+          <a href="" ng-click="myConfirm()" my-confirmable="doDelete(item)" 
+            ng-disabled="item.name=='superadmin'"
+            class="btn btn-danger">
+              <span class="fa fa-trash"></span>
+              Delete
+          </a>
+        </div>
+      </td>
+
+    </tr>
+  </tbody>
+</table>
+
+
+<div ng-hide="(list.$promise && !list.$resolved) || list.length" class="well text-center">
+  <p>Empty list!</p>
+</div>
+
