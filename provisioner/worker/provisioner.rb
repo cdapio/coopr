@@ -78,6 +78,11 @@ unless(options[:work_dir])
   exit(1)
 end
 
+unless (options[:tenant] || options[:register])
+  puts "Either --tenant or --register options must be specified"
+  exit(1)
+end
+
 if(loom_uri.nil? && options[:register])
   puts "--register option requires the --uri [server uri] option"
   exit(1)
