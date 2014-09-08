@@ -17,6 +17,7 @@ package com.continuuity.loom.http.request;
 
 import com.continuuity.loom.spec.TenantSpecification;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * A request to add a tenant.
@@ -26,6 +27,7 @@ public class AddTenantRequest {
   private final boolean bootstrap;
 
   public AddTenantRequest(TenantSpecification tenant, Boolean bootstrap) {
+    Preconditions.checkArgument(tenant != null, "Tenant specification must be given.");
     this.tenant = tenant;
     this.bootstrap = bootstrap == null ? false : bootstrap;
   }
