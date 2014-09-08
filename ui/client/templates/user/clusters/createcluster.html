@@ -6,7 +6,7 @@
 {% endblock %}
 {% block content %}
 <div ng-app="createcluster">
-  <div id="content-body" ng-controller="CreateClusterCtrl">
+  <div id="content-body" class="page-create-cluster" ng-controller="CreateClusterCtrl">
     <div id="title">
       <div class="pull-right">
         <div id="global">
@@ -17,8 +17,10 @@
     </div>
     <div id="panels">
       <div class="panel spl-panel" style="clear: both;">
-        <div class="panel-head spl-panel-head">
-          <div class="panel-title spl-panel-title" ng-hide="clusterId">Create a cluster</div>
+        <div class="panel-head spl-panel-head edit-cluster">
+          <div class="panel-title spl-panel-title" ng-hide="clusterId">
+            <h3 class="pull-left">Create a cluster</h3>
+          </div>
           <div class="panel-title spl-panel-title" ng-show="clusterId">Reconfigure cluster: [[clusterName]]
           </div>
         </div>
@@ -167,7 +169,7 @@
               <div class="form-group" ng-show="clusterId">
                 <label class="col-sm-2 control-label">Restart</label>
                 <div class="col-sm-8">
-                  <div class="slideThree">  
+                  <div class="slideThree">
                     <input type="checkbox" value="None" id="slideThree" name="check" ng-model="restart" />
                     <label for="slideThree"></label>
                   </div>

@@ -29,7 +29,7 @@
                     <th>Name</th>
                     <th>Description</th>
                     <th>Providertype</th>
-                    <th class="no-sort"></th>
+                    <th class="no-sort garbage"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -38,7 +38,7 @@
                       <td><a href="/providers/provider/{{entry.name}}/#/edit">{{ entry.name }}</a></td>
                       <td>{{ entry.description }}</td>
                       <td>{{ entry.providertype }}</td>
-                      <td>
+                      <td class="garbage">
                         <form role="form" method="POST" action="/providers/delete/{{entry.name}}" class="delete-form">
                           <input type="hidden" value="{{entry.name}}" name="name" />
                           <button type="submit" class="btn-spl btn-delete"></button>
@@ -47,7 +47,7 @@
                     </tr>
                   {% endfor %}
                 </tbody>
-                
+
               </table>
               {% else %}
                 <p>You don't have any providers.</p>

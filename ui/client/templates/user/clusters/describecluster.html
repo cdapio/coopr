@@ -16,12 +16,12 @@
       </div>
     </div>
     <div ng-app="clusterview">
-      <div id="content-body" ng-controller="ClusterCtrl">
+      <div id="content-body" class="describe-cluster" ng-controller="ClusterCtrl">
         <div id="title"></div>
 
         <div id="panels">
           <div class="panel spl-panel" style="clear: both;">
-            <div class="panel-head spl-panel-head clearfix">
+            <div class="panel-head spl-panel-head edit-cluster clearfix">
               <div class="panel-title spl-panel-title">
                 <h3 class="pull-left" style="width: 75%">Cluster description: [[ cluster.name ]]</h3>
                 <div class="pull-right">
@@ -75,7 +75,7 @@
                   <tr ng-controller="ClusterProgressCtrl">
                     <td>Status</td>
                     <td class="cluster-status [[status.class]]">
-                      [[ status.action ]] 
+                      [[ status.action ]]
                       <span class="lowercasify">[[status.statusText]]</span>
                       <span ng-if="cluster.message"> - [[cluster.message]]</span>
                     </td>
@@ -114,7 +114,7 @@
                         </tbody>
                       </table>
                       <div class="small-font text-light" style="padding-left: 10px;" ng-if="cluster.clusterTemplate.administration.leaseduration.step === 0">You can extend your lease by any amount of time.</div>
-                      <div class="small-font text-light" ng-class="{'text-danger': extendLeaseInvalid}" style="padding-left: 10px;" ng-if="cluster.clusterTemplate.administration.leaseduration.step">Max lease extension time is 
+                      <div class="small-font text-light" ng-class="{'text-danger': extendLeaseInvalid}" style="padding-left: 10px;" ng-if="cluster.clusterTemplate.administration.leaseduration.step">Max lease extension time is
                         [[maxLeaseStr]].
                       </div>
                     </td>

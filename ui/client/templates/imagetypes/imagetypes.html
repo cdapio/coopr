@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-  <div id="content-body">
+  <div id="content-body" class="page-image-types">
     <div id="title">
       <h3 class="pull-left">Image types</h3>
       <div class="pull-right">
@@ -29,7 +29,7 @@
                 <tr>
                   <th>Name</th>
                   <th>Description</th>
-                  <th class="no-sort"></th>
+                  <th class="no-sort garbage"></th>
                 </tr>
               </thead>
               <tbody>
@@ -37,7 +37,7 @@
                   <tr>
                     <td><a href="/imagetypes/imagetype/{{entry.name}}">{{ entry.name }}</a></td>
                     <td>{{ entry.description }}</td>
-                    <td>
+                    <td class="garbage">
                       <form role="form" method="POST" action="/imagetypes/delete/{{entry.name}}" class="delete-form">
                         <input type="hidden" value="{{entry.name}}" name="name" />
                         <button type="submit" class="btn-spl btn-delete"></button>
@@ -46,7 +46,7 @@
                   </tr>
                 {% endfor %}
               </tbody>
-              
+
             </table>
             {% else %}
               <p>You don't have any image types.</p>

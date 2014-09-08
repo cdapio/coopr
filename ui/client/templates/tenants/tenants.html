@@ -12,10 +12,10 @@
 {% endblock %}
 
 {% block content %}
-  <div id="content-body" ng-app="loom" ng-controller="TenantListCtrl">
+  <div id="content-body" class="page-tenants" ng-app="loom" ng-controller="TenantListCtrl">
 
     <ul class="list-unstyled row tenants-tickers">
-      <li class="col-sm-2 col-sm-offset-2">
+      <li class="col-sm-2">
         <div>
           Total # of workers
           <em>[[totalWorkers]]</em>
@@ -42,7 +42,7 @@
     </ul>
 
     <div id="title" class="clearfix">
-      <a href="/tenants/create" class="pull-right btn btn-default">
+      <a href="/tenants/create" class="pull-right btn btn-default btn-grey">
         + Add tenant
       </a>
       <h3>Tenants</h3>
@@ -76,7 +76,7 @@
                   </tr>
                 {% endfor %}
               </tbody>
-              
+
             </table>
             {% else %}
               <p>You haven't configured any tenants.</p>

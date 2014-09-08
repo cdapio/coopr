@@ -24,7 +24,7 @@
 
         <link rel="stylesheet" href="/static/css/normalize.css">
         <link rel="stylesheet" href="/static/css/main.css">
-        <link rel="stylesheet" type="text/css" href="/static/css/{{skin}}/custom_tablesorter.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/coopr/custom_tablesorter.css">
         <link rel="stylesheet" href="/static/third_party/bootstrap_3/css/bootstrap.min.css">
         {% if env == 'production' %}
             <link rel="stylesheet" type="text/css" href="/static/css/{{skin}}/custom.css">
@@ -66,7 +66,7 @@
                 </div>
               </div>
               <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav navbar-global">
                   {% include "partials/left-menu.html" %}
                 </ul>
 
@@ -89,24 +89,26 @@
         {% include "partials/notification-div.html" %}
       {% block content %}
         <div id="content-body">
-          <div id="title clearfix">
-            <div>
-              <div class="pull-right" style="margin-right: 24px">
-                <form class="inline-display" id="import-config-form" enctype='multipart/form-data' method="POST" action="/import">
-                  <input id="import-file" type="file" name="import-file"/>
-                  <button type="button" class="btn-spl btn-info" id="import-config">Import</button>
-                </form>
-                <form class="inline-display" method="GET" action="/export">
-                  <button type="submit" class="btn-spl btn-info" id="import-config">Export</button>
-                </form>
+          <div id="test">
+            <div id="title clearfix">
+              <div class="table-header">
+                <div class="pull-right" style="margin-right: 24px">
+                  <form class="inline-display" id="import-config-form" enctype='multipart/form-data' method="POST" action="/import">
+                    <input id="import-file" type="file" name="import-file"/>
+                    <button type="button" class="btn-spl btn-info" id="import-config">Import</button>
+                  </form>
+                  <form class="inline-display" method="GET" action="/export">
+                    <button type="submit" class="btn-spl btn-info" id="import-config">Export</button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
           <div style="clear:both"></div>
 
           <div id="panels">
-            <div class="row">
-              <div class="col-sm-offset-2 col-sm-2">
+            <div class="row live-tiles">
+              <div class="col-sm-2">
                 <div class="panel frontpage-ticker">
                   <div class="panel-head">
                     <div class="panel-title">
@@ -176,7 +178,7 @@
                         </tr>
                       {% endfor %}
                     </tbody>
-                    
+
                   </table>
                   {% else %}
                     <p>You haven't configured any clustertemplates.</p>

@@ -162,11 +162,8 @@
  * Tablesorter overrides for all skins.
  */
 table.tablesorter thead tr .header {
-  background-image: url('/static/img/v2-assets/icon_dropdown.png');
-}
-
-table.tablesorter thead tr .header {
-  background-position: 95% 14px;
+  background-image: url('/static/img/v2-assets/dark/icon_dropdown.png');
+  background-position: 22% 20px;
 }
 
 /**************************************************************************************************/
@@ -196,6 +193,7 @@ ul.tenants-tickers li > div {
   border-radius: 3px;
   padding: 1em 1em 0;
   border: 2px solid #eee;
+  min-height: 150px;
 }
 
 ul.tenants-tickers em {
