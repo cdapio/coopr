@@ -32,7 +32,7 @@ import com.continuuity.loom.http.request.ClusterOperationRequest;
 import com.continuuity.loom.layout.ClusterLayout;
 import com.continuuity.loom.layout.InvalidClusterException;
 import com.continuuity.loom.layout.Solver;
-import com.continuuity.loom.management.LoomStats;
+import com.continuuity.loom.management.ServerStats;
 import com.continuuity.loom.provisioner.QuotaException;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.scheduler.ClusterAction;
@@ -77,7 +77,7 @@ public class ClusterService {
   private final TenantProvisionerService tenantProvisionerService;
   private final CredentialStore credentialStore;
   private final LockService lockService;
-  private final LoomStats loomStats;
+  private final ServerStats serverStats;
   private final Solver solver;
   private final IdService idService;
   private final Gson gson;
@@ -93,7 +93,7 @@ public class ClusterService {
                         @Named(Constants.Queue.SOLVER) QueueGroup solverQueues,
                         @Named(Constants.Queue.JOB) QueueGroup jobQueues,
                         LockService lockService,
-                        LoomStats loomStats,
+                        ServerStats serverStats,
                         Solver solver,
                         IdService idService,
                         CredentialStore credentialStore,
@@ -104,7 +104,7 @@ public class ClusterService {
     this.tenantProvisionerService = tenantProvisionerService;
     this.credentialStore = credentialStore;
     this.lockService = lockService;
-    this.loomStats = loomStats;
+    this.serverStats = serverStats;
     this.solver = solver;
     this.idService = idService;
     this.gson = gson;
@@ -161,7 +161,7 @@ public class ClusterService {
                                                       gson.toJson(clusterCreateRequest));
       solverQueues.add(account.getTenantId(), new Element(cluster.getId(), gson.toJson(solverRequest)));
 
-      loomStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
+      serverStats.getClusterStats().incrementStat(ClusterAction.SOLVE_LAYOUT);
       return cluster.getId();
     } finally {
       lock.release();
@@ -198,7 +198,7 @@ public class ClusterService {
       view.writeCluster(cluster);
       clusterStore.writeClusterJob(deleteJob);
 
-      loomStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_DELETE);
+      serverStats.getClusterStats().incrementStat(ClusterAction.CLUSTER_DELETE);
       clusterQueues.add(account.getTenantId(), new Element(clusterId, ClusterAction.CLUSTER_DELETE.name()));
     } finally {
       lock.release();
@@ -250,7 +250,7 @@ public class ClusterService {
       view.writeCluster(cluster);
       clusterStore.writeClusterJob(configureJob);
 
-      loomStats.getClusterStats().incrementStat(action);
+      serverStats.getClusterStats().incrementStat(action);
       clusterQueues.add(account.getTenantId(), new Element(clusterId, action.name()));
     } finally {
       lock.release();
@@ -301,7 +301,7 @@ public class ClusterService {
       view.writeCluster(cluster);
       clusterStore.writeClusterJob(job);
 
-      loomStats.getClusterStats().incrementStat(action);
+      serverStats.getClusterStats().incrementStat(action);
       clusterQueues.add(account.getTenantId(), new Element(clusterId, action.name()));
     } finally {
       lock.release();
@@ -408,7 +408,7 @@ public class ClusterService {
       view.writeCluster(cluster);
       clusterStore.writeClusterJob(job);
 
-      loomStats.getClusterStats().incrementStat(action);
+      serverStats.getClusterStats().incrementStat(action);
       SolverRequest solverRequest = new SolverRequest(SolverRequest.Type.ADD_SERVICES, gson.toJson(addRequest));
       solverQueues.add(account.getTenantId(), new Element(clusterId, gson.toJson(solverRequest)));
     } finally {

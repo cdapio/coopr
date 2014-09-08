@@ -18,9 +18,9 @@ package com.continuuity.loom.management;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Collects Loom stats for JMX.
+ * Collects Server stats for JMX.
  */
-public class LoomStats implements LoomStatsMXBean {
+public class ServerStats implements ServerStatsMXBean {
   private final AtomicInteger queueLength;
 
   private final ProvisionerStats provisionerStats;
@@ -32,7 +32,7 @@ public class LoomStats implements LoomStatsMXBean {
   private final ClusterStats failedClusterStats;
   private final ClusterStats successfulClusterStats;
 
-  public LoomStats() {
+  public ServerStats() {
     this.queueLength = new AtomicInteger(0);
 
     this.provisionerStats = new ProvisionerStats();

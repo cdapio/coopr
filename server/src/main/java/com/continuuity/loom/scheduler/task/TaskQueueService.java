@@ -24,7 +24,7 @@ import com.continuuity.loom.common.queue.QueueMetrics;
 import com.continuuity.loom.common.queue.TrackingQueue;
 import com.continuuity.loom.http.request.FinishTaskRequest;
 import com.continuuity.loom.http.request.TakeTaskRequest;
-import com.continuuity.loom.management.LoomStats;
+import com.continuuity.loom.management.ServerStats;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.spec.Tenant;
 import com.continuuity.loom.store.cluster.ClusterStore;
@@ -58,7 +58,7 @@ public class TaskQueueService {
   private final NodeService nodeService;
   private final TenantProvisionerService tenantProvisionerService;
   private final CredentialStore credentialStore;
-  private final LoomStats loomStats;
+  private final ServerStats serverStats;
   private final QueueGroup taskQueues;
   private final QueueGroup jobQueues;
   private final Gson gson;
@@ -74,14 +74,14 @@ public class TaskQueueService {
                            TenantStore tenantStore,
                            CredentialStore credentialStore,
                            Configuration conf,
-                           LoomStats loomStats,
+                           ServerStats serverStats,
                            Gson gson) {
     this.clusterStore = clusterStoreService.getSystemView();
     this.taskService = taskService;
     this.nodeService = nodeService;
     this.tenantProvisionerService = tenantProvisionerService;
     this.credentialStore = credentialStore;
-    this.loomStats = loomStats;
+    this.serverStats = serverStats;
     this.taskQueues = taskQueues;
     this.jobQueues = jobQueues;
     this.tenantStore = tenantStore;
@@ -137,7 +137,7 @@ public class TaskQueueService {
    * @throws IOException if there was an error persisting task information.
    */
   public String takeNextClusterTask(TakeTaskRequest takeRequest) throws IOException, MissingEntityException {
-    loomStats.setQueueLength(taskQueues.size());
+    serverStats.setQueueLength(taskQueues.size());
     String tenantId = takeRequest.getTenantId();
     String provisionerId = takeRequest.getProvisionerId();
     String workerId = takeRequest.getWorkerId();
@@ -201,7 +201,7 @@ public class TaskQueueService {
    * @throws IOException if there was an error persisting task information.
    */
   public void finishClusterTask(FinishTaskRequest finishRequest) throws MissingEntityException, IOException {
-    loomStats.setQueueLength(taskQueues.size());
+    serverStats.setQueueLength(taskQueues.size());
 
     String workerId = finishRequest.getWorkerId();
     String queueName = finishRequest.getTenantId();
