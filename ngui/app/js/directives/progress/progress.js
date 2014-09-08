@@ -24,16 +24,19 @@ module.directive('myProgress', function myProgressDirective () {
           'progress-bar': true
         };
 
-        angular.forEach(scope.addCls.split(' '), function(add) {
-          if(add) {
-            switch (attrs.type) {
-              case 'bar':
-              default:
-                cls['progress-bar-'+add] = true;
-                break;
-            }            
-          }
-        });
+        if(scope.addCls) {
+          angular.forEach(scope.addCls.split(' '), function(add) {
+            if(add) {
+              switch (attrs.type) {
+                case 'bar':
+                default:
+                  cls['progress-bar-'+add] = true;
+                  break;
+              }
+            }
+          });
+        }
+
 
         scope.cls = cls;
       });
