@@ -81,7 +81,6 @@ class FogProviderGoogle < Provider
           'root'
         end
       @result['result']['ssh-auth']['user'] = ssh_user
-      #@result['result']['ssh-auth']['identityfile'] = @google_ssh_keyfile unless @google_ssh_keyfile.to_s == ''
       @result['result']['ssh-auth']['identityfile'] = File.join(@ssh_key_dir, @google_ssh_key_name)
       @result['status'] = 0
     rescue => e
@@ -268,7 +267,6 @@ class FogProviderGoogle < Provider
     # Create connection
     # rubocop:disable UselessAssignment
     p12_key = File.join( @p12_key_dir, @google_p12_key_name)
-    log.debug "using p12 key: #{p12_key}"
     @connection ||= begin
       connection = Fog::Compute.new(
         provider: 'google',
@@ -315,10 +313,12 @@ class FogProviderGoogle < Provider
     unless @google_client_email =~ /.*gserviceaccount.com$/
       errors << 'Invalid service account email address. It must be in the gserviceaccount.com domain'
     end
-#    [@google_key_location, @google_ssh_keyfile].each do |key|
-#      next if File.readable?(key)
-#      errors << "cannot read specified key location: #{key}"
-#    end
+    ssh_key = File.join(@ssh_key_dir, @google_ssh_key_name)
+    p12_key = File.join( @p12_key_dir, @google_p12_key_name)
+    [ssh_key, p12_key].each do |key|
+      next if File.readable?(key)
+      errors << "cannot read named key from resource directory: #{key}. Please ensure you have uploaded a key via the UI or API"
+    end
     fail 'Credential validation failed!' if errors.each { |e| log.error(e) }.any?
   end
 end

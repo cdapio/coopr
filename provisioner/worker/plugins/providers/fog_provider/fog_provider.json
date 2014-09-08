@@ -147,20 +147,10 @@
             "type": "text",
             "tip": "Service account email address, should be of the form 123456789@developer.gserviceaccount.com"
           },
-          "google_key_location": {
-            "label": "P12 key location",
-            "type": "text",
-            "tip": "Path to your P12 key, as downloaded from Google encrypted with their default passphrase (notasecret)"
-          },
           "google_p12_key_name": {
             "label": "P12 key name",
             "type": "text",
             "tip": "Name of the P12 key that has been uploaded"
-          },
-          "google_ssh_keyfile": {
-            "label": "ssh private key file",
-            "type": "text",
-            "tip": "Full path and file name to your Google SSH private key"
           },
           "google_ssh_key_name": {
             "label": "ssh private key name",
