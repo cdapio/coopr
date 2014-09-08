@@ -125,6 +125,22 @@ public class ClusterService {
   }
 
   /**
+   * Get a list of summaries of all clusters visible to the given account that are in one of the given states.
+   *
+   * @param account Account to get cluster summaries for.
+   * @param states Returned clusters must be in one of these states.
+   * @return List of summaries of all clusters visible to the given account.
+   * @throws IOException if there was an exception reading the cluster data from the store.
+   */
+  public List<ClusterSummary> getClusterSummaries(Account account, Set<Cluster.Status> states) throws IOException {
+    if (states == null || states.isEmpty()) {
+      return clusterStoreService.getView(account).getAllClusterSummaries();
+    } else {
+      return clusterStoreService.getView(account).getAllClusterSummaries(states);
+    }
+  }
+
+  /**
    * Submit a request to create a cluster, creating a placeholder cluster object and adding a task to solve for a
    * layout to the solver queue.
    *

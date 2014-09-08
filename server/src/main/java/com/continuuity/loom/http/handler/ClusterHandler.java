@@ -43,6 +43,7 @@ import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.base.Charsets;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -52,6 +53,7 @@ import com.google.inject.Inject;
 import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +67,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -95,7 +98,10 @@ public class ClusterHandler extends AbstractAuthHandler {
   }
 
   /**
-   * Get all clusters visible to the user.
+   * Get all clusters visible to the user. Clients can include a status filter as an http param. The key is 'status'
+   * and the value is a comma separated list of statuses. Clusters returned must be in one of the statuses given. If
+   * not status param is given, clusters with any status will be returned. Valid values to include in a status filter
+   * are any one of {@link Cluster.Status}.
    *
    * @param request Request for clusters.
    * @param responder Responder for sending the response.
@@ -108,8 +114,11 @@ public class ClusterHandler extends AbstractAuthHandler {
     }
 
     try {
-      List<ClusterSummary> summaries = clusterService.getClusterSummaries(account);
+      Set<Cluster.Status> statusFilter = getStatusFilter(request);
+      List<ClusterSummary> summaries = clusterService.getClusterSummaries(account, statusFilter);
       responder.sendJson(HttpResponseStatus.OK, summaries, new TypeToken<List<ClusterSummary>>() {}.getType(), gson);
+    } catch (IllegalArgumentException e) {
+      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid status requested.");
     } catch (IOException e) {
       LOG.error("Exception getting all clusters for account {}.", account);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting clusters.");
@@ -793,5 +802,22 @@ public class ClusterHandler extends AbstractAuthHandler {
     jobJson.add("stages", stagesJson);
 
     return jobJson;
+  }
+
+  private Set<Cluster.Status> getStatusFilter(HttpRequest request) {
+    Set<Cluster.Status> filter = Sets.newHashSet();
+    Map<String, List<String>> queryParams = new QueryStringDecoder(request.getUri()).getParameters();
+    if (queryParams.containsKey("status")) {
+      String statusStr = queryParams.get("status").get(0);
+      String[] statuses = statusStr.split(",");
+      for (String status: statuses) {
+        try {
+          filter.add(Cluster.Status.valueOf(status.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+          LOG.info("Unknown cluster status " + status + " requested.");
+        }
+      }
+    }
+    return filter;
   }
 }

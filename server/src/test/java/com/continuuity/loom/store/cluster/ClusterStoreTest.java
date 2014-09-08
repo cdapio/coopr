@@ -17,6 +17,7 @@ package com.continuuity.loom.store.cluster;
 
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.account.Account;
+import com.continuuity.loom.cluster.ClusterSummary;
 import com.continuuity.loom.spec.ProvisionerAction;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
@@ -313,8 +314,63 @@ public abstract class ClusterStoreTest {
   }
 
   @Test
-  public void testGetClustersWithJobs() throws Exception {
-    
+  public void testGetClusterSummaries() throws Exception {
+    ClusterStore clusterStore = clusterStoreService.getSystemView();
+    ClusterStoreView view = clusterStoreService.getView(tenant1_admin);
+    String cluster1ID = "123";
+    String cluster2ID = "321";
+    JobId jobid1 = new JobId(cluster1ID, 1);
+    JobId jobid2 = new JobId(cluster2ID, 2);
+    Cluster cluster1 = Cluster.builder()
+      .setName("cluster1")
+      .setID(cluster1ID)
+      .setLatestJobID(jobid1.getId())
+      .setClusterTemplate(Entities.ClusterTemplateExample.HDFS)
+      .setAccount(tenant1_admin)
+      .setProvider(Entities.ProviderExample.JOYENT)
+      .setStatus(Cluster.Status.PENDING)
+      .setServices(Entities.ClusterTemplateExample.HDFS.getClusterDefaults().getServices())
+      .setNodes(ImmutableSet.of("node1", "node2", "node3"))
+      .build();
+    Cluster cluster2 = Cluster.builder()
+      .setName("cluster2")
+      .setID(cluster2ID)
+      .setLatestJobID(jobid2.getId())
+      .setClusterTemplate(Entities.ClusterTemplateExample.HDFS)
+      .setAccount(tenant1_admin)
+      .setProvider(Entities.ProviderExample.JOYENT)
+      .setStatus(Cluster.Status.TERMINATED)
+      .setServices(Entities.ClusterTemplateExample.HDFS.getClusterDefaults().getServices())
+      .setNodes(ImmutableSet.of("node1", "node2", "node3"))
+      .build();
+    ClusterJob job1 = new ClusterJob(jobid1, ClusterAction.CLUSTER_CREATE);
+    ClusterJob job2 = new ClusterJob(jobid2, ClusterAction.CLUSTER_DELETE);
+    clusterStore.writeCluster(cluster1);
+    clusterStore.writeCluster(cluster2);
+    clusterStore.writeClusterJob(job1);
+    clusterStore.writeClusterJob(job2);
+
+    ClusterSummary summary1 = new ClusterSummary(cluster1, job1);
+    ClusterSummary summary2 = new ClusterSummary(cluster2, job2);
+    Assert.assertEquals(ImmutableSet.of(summary1, summary2),
+                        ImmutableSet.copyOf(view.getAllClusterSummaries()));
+    // test filter
+    Set<Cluster.Status> missingStates =
+      ImmutableSet.of(Cluster.Status.INCOMPLETE, Cluster.Status.INCONSISTENT, Cluster.Status.ACTIVE);
+    for (Cluster.Status state : missingStates) {
+      Assert.assertTrue(view.getAllClusterSummaries(ImmutableSet.of(state)).isEmpty());
+    }
+    Assert.assertTrue(view.getAllClusterSummaries(missingStates).isEmpty());
+
+    Set<Cluster.Status> states = Sets.newHashSet(Cluster.Status.PENDING);
+    Assert.assertEquals(ImmutableSet.of(summary1), ImmutableSet.copyOf(view.getAllClusterSummaries(states)));
+    states.addAll(missingStates);
+    Assert.assertEquals(ImmutableSet.of(summary1), ImmutableSet.copyOf(view.getAllClusterSummaries(states)));
+
+    states = Sets.newHashSet(Cluster.Status.TERMINATED);
+    Assert.assertEquals(ImmutableSet.of(summary2), ImmutableSet.copyOf(view.getAllClusterSummaries(states)));
+    states.addAll(missingStates);
+    Assert.assertEquals(ImmutableSet.of(summary2), ImmutableSet.copyOf(view.getAllClusterSummaries(states)));
   }
 
   @Test
