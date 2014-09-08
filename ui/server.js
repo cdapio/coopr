@@ -112,8 +112,8 @@ site.app = express();
  * Temporary skins related data. Each server instance maintains a record of users
  * and their selected skins.
  */
-site.AVAILABLE_SKINS = ['dark', 'light'];
-site.DEFAULT_SKIN = 'dark';
+site.AVAILABLE_SKINS = 'coopr';
+site.DEFAULT_SKIN = 'coopr';
 site.skins = {};
 
 /**
@@ -200,7 +200,7 @@ site.getEntity = function (path, user) {
     request(options, function (err, response, body) {
       if (err) {
         callback('Error: ' + JSON.stringify(err));
-        return;  
+        return;
       } else {
         if (body) {
           try {
@@ -319,7 +319,7 @@ site.determinePermissionLevel = function (username, password) {
 };
 
 /**
- * Replaces date 
+ * Replaces date
  * @param  {[type]} timestamp [description]
  * @return {[type]}           [description]
  */
@@ -417,7 +417,7 @@ site.app.post('/import', function (req, res) {
           context.activeNodes = activeNodes;
           context.totalClusters = totalClusters;
           var config;
-          try {  
+          try {
             config = JSON.parse(data);
           } catch (err) {
             context.err = "JSON parse error.";
@@ -559,7 +559,7 @@ site.app.get('/tenants', function (req, res) {
       activeTab: 'tenants',
       authenticated: user,
       env: env,
-      skin: site.getSkin(req)  
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -591,7 +591,7 @@ site.app.get('/tenants/tenant/:name', function (req, res) {
       activeTab: 'tenants',
       authenticated: user,
       env: env,
-      skin: site.getSkin(req)  
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -647,7 +647,7 @@ site.app.get('/clustertemplates', function (req, res) {
       activeTab: 'clustertemplates',
       authenticated: user,
       env: env,
-      skin: site.getSkin(req)  
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -1396,7 +1396,7 @@ site.app.post('/login', function (req, res) {
         site.logger.info('Improper JSON for profiles call ' + body);
       }
       var permissionLevel = site.determinePermissionLevel(user, password);
-      res.cookie(site.COOKIE_NAME, { 
+      res.cookie(site.COOKIE_NAME, {
         user: user,
         tenant: tenant,
         permission: permissionLevel,
