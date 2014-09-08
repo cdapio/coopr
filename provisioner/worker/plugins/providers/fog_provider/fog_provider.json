@@ -191,9 +191,9 @@
           [
             "google_project",
             "google_client_email",
-            "google_key_location",
-            "zone_name",
-            "google_ssh_keyfile"
+            "google_p12_key_name",
+            "google_ssh_key_name",
+            "zone_name"
           ]
         ]
       },
