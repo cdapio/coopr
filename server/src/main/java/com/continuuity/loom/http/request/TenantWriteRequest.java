@@ -62,4 +62,12 @@ public class TenantWriteRequest {
   public int hashCode() {
     return Objects.hashCode(tenant, bootstrap);
   }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("tenant", tenant)
+      .add("bootstrap", bootstrap)
+      .toString();
+  }
 }
