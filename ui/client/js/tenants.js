@@ -34,7 +34,13 @@ app.controller('TenantCreateCtrl', ['$scope', function ($scope) {
 
   $scope.submitForm = function (event) {
     event.preventDefault();
-    Helpers.submitPost(event, $scope.tenant, '/tenants');
+
+    var postJson = {tenant: $scope.tenant};
+    if($scope.bootstrap) {
+      postJson.bootstrap = true;
+    }
+
+    Helpers.submitPost(event, postJson, '/tenants');
   };
 
 }]);
