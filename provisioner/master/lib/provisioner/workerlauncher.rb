@@ -20,7 +20,7 @@
 # simple class to construct the ruby command used to launch a worker process
 module Loom
   class WorkerLauncher
-    attr_accessor :tenant, :provisioner, :name, :config
+    attr_accessor :tenant, :provisioner, :name, :config, :register
 
     def initialize(config)
       @config = config || {}
@@ -40,6 +40,7 @@ module Loom
       cmd += " --provisioner #{@provisioner}" unless @provisioner.nil?
       cmd += " --tenant #{@tenant}" unless @tenant.nil?
       cmd += " --name #{@name}" unless @name.nil?
+      cmd += " --register" if @register
       cmd
     end
 
