@@ -46,6 +46,30 @@ angular
     $rootScope.$stateParams = $stateParams;
   })
 
+
+
+
+  .config(function ($httpProvider) {
+    var delay = window.location.search.match(/delay=(\d+)/);
+    if(delay) {
+      delay = parseInt(delay[1], 10);
+      console.log('HTTP interceptor will delay responses for', delay, 'ms');
+      $httpProvider.interceptors.push(function ($q, $timeout) {
+        return {
+          response: function(data) {
+            var defer = $q.defer();
+            $timeout(function () {
+              defer.resolve(data);
+            }, delay);
+            return defer.promise;
+          }
+        };
+      });
+    }
+
+  })
+
+
   .config(function ($alertProvider) {
     angular.extend($alertProvider.defaults, {
       animation: 'am-fade-and-scale',

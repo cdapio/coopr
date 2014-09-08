@@ -35,7 +35,7 @@ describe('service', function() {
       });
 
       it('testing query()', function() {
-        $httpBackend.expectGET(/v1\/loom\/clusters$/).respond([{foo:'bar'}]);
+        $httpBackend.expectGET(/v2\/clusters$/).respond([{foo:'bar'}]);
 
         var list = myApi.Cluster.query();
         $httpBackend.flush();
@@ -43,7 +43,7 @@ describe('service', function() {
       });
 
       it('testing get()', function() {
-        $httpBackend.expectGET(/v1\/loom\/clusters\/123$/).respond({foo:'bar'});
+        $httpBackend.expectGET(/v2\/clusters\/123$/).respond({foo:'bar'});
 
         var item = new myApi.Cluster({id:123});
         item.$get();
@@ -52,7 +52,7 @@ describe('service', function() {
       });
 
       it('should send X-Requested-With header', function() {
-        $httpBackend.expectGET(/v1\/loom\/clusters$/, function(headers) {
+        $httpBackend.expectGET(/v2\/clusters$/, function(headers) {
           return !!headers['X-Requested-With'];
         }).respond(201, '');
 
@@ -61,7 +61,7 @@ describe('service', function() {
       });
 
       it('should send X-Loom headers when logged in', function() {
-        $httpBackend.expectGET(/v1\/loom\/clusters$/, function(headers) {
+        $httpBackend.expectGET(/v2\/clusters$/, function(headers) {
           return headers['X-Loom-UserID'] === 'test';
         }).respond(201, '');
 

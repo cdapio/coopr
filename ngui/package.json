@@ -2,8 +2,8 @@
   "name": "coopr-ngui",
   "version": "0.1.0",
   "description": "Front-end for Coopr",
-  "repository" : { 
-    "type": "git", 
+  "repository": {
+    "type": "git",
     "url": "http://github.com/continuuity/loom.git"
   },
   "scripts": {
