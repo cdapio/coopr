@@ -22,11 +22,15 @@ import com.google.common.base.Preconditions;
 /**
  * A request to add a tenant.
  */
-public class AddTenantRequest {
+public class TenantWriteRequest {
   private final TenantSpecification tenant;
   private final boolean bootstrap;
 
-  public AddTenantRequest(TenantSpecification tenant, Boolean bootstrap) {
+  public TenantWriteRequest(TenantSpecification tenant) {
+    this(tenant, false);
+  }
+
+  public TenantWriteRequest(TenantSpecification tenant, Boolean bootstrap) {
     Preconditions.checkArgument(tenant != null, "Tenant specification must be given.");
     this.tenant = tenant;
     this.bootstrap = bootstrap == null ? false : bootstrap;
@@ -45,11 +49,11 @@ public class AddTenantRequest {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof AddTenantRequest)) {
+    if (!(o instanceof TenantWriteRequest)) {
       return false;
     }
 
-    AddTenantRequest that = (AddTenantRequest) o;
+    TenantWriteRequest that = (TenantWriteRequest) o;
 
     return Objects.equal(tenant, that.tenant) && bootstrap == that.bootstrap;
   }

@@ -103,7 +103,8 @@ Example
         -H 'X-Loom-ApiKey:<apikey>'
         -d '{
                 "tenant": {
-                    "name":"my-company", "workers":10
+                    "name":"my-company", 
+                    "workers":10
                 },
                 "bootstrap": false
             }' 
@@ -215,10 +216,14 @@ Required Parameters
 
    * - Parameter
      - Description
+   * - tenant
+     - JSON Object representing the tenant, whose fields are documented below.
    * - id 
      - Id of the resource to be updated. Id must match.
    * - name
-     - Name of the resource to be updated. 
+     - Name of the tenant. 
+   * - description
+     - Description of the tenant.
    * - workers
      - New number of workers assigned to the tenant.
    * - maxClusters
@@ -252,7 +257,14 @@ Example
         -H 'X-Loom-UserID:admin'
         -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        -d '{ "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }'  
+        -d '{ 
+                "tenant": {
+                    "name":"my-company", 
+                    "workers":20, 
+                    "maxClusters":20, 
+                    "maxNodes":100 
+                }
+            }'  
         http://<server>:<port>/<version>/tenants/my-company
  $ curl -X GET 
         -H 'X-Loom-UserID:admin'
