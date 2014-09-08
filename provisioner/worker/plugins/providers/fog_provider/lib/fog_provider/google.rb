@@ -210,7 +210,7 @@ class FogProviderGoogle < Provider
       log.debug 'Invoking server delete'
 
       # check for any disks persisted from a previous delete attempt
-      known_disks = @task['config']['disks_to_delete']
+      known_disks = @task['config']['disks']
 
       # fetch server object
       server = connection.servers.get(providerid)
@@ -218,7 +218,7 @@ class FogProviderGoogle < Provider
       if known_disks.nil? && !server.nil?
         # this is the first delete attempt, persist the names of the currently attached disks
         known_disks = server.disks.map { |d| d['source'].split('/').last }
-        @result['result']['disks_to_delete'] = known_disks
+        @result['result']['disks'] = known_disks
       end
 
       # delete server, if it exists
