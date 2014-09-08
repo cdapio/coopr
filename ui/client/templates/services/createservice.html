@@ -14,7 +14,7 @@
 
 {% block content %}
   <div ng-app="CreateServiceApp">
-    <div id="content-body" ng-controller="ServiceCtrl">
+    <div id="content-body" class="page-create-service" ng-controller="ServiceCtrl">
       <div id="title">
         <div class="pull-right">
           <div id="global">
@@ -27,8 +27,8 @@
       <div id="panels">
 
         <div class="panel spl-panel" style="clear: both;">
-          <div class="panel-head spl-panel-head clearfix">
-            <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if serviceId %} Edit service: {{serviceId}} {% else %}Create a service{% endif %}</h4>
+          <div class="panel-head spl-panel-head edit-template clearfix">
+            <div class="panel-title spl-panel-title"><h3 class="pull-left">{% if serviceId %} Edit service: {{serviceId}} {% else %}Create a service{% endif %}</h3>
               <div class="pull-right">
                 {% if serviceId %}
                 <form role="form" method="POST" action="/services/delete/{{serviceId}}" class="service-delete-form" ng-submit="handleDeletion($event)">
@@ -143,7 +143,7 @@
                     </div>
                 </div>
               </div>
-              
+
               <!-- Runtime requires dependency lists  -->
               <div class="form-group">
                 <label for="inputRuntimeRequires" class="col-sm-2 control-label">Runtime Requires</label>
@@ -188,7 +188,7 @@
                 </div>
               </div>
 
-              
+
 
 
               <h4>Automator Details</h4>
@@ -232,7 +232,7 @@
                         <button type="button" class="btn-spl btn-default" id="remove-action" ng-click="removeAction($index)">Remove</button>
                       </div>
                     </div>
-                    
+
                   </div>
                 </div>
               </div>
@@ -244,7 +244,7 @@
             </form>
           </div>
         </div>
-        
+
       </div>
     </div>
   </div>

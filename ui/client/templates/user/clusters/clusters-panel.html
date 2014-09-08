@@ -18,9 +18,9 @@
               <th>Create Time</th>
               <th>Template</th>
               <th>Nodes</th>
-              <th>Progress</th>
+              <th class="cluster-step">Progress</th>
               <th class="no-sort"></th>
-              <th>Status</th>
+              <th class="cluster-status">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -49,7 +49,7 @@
               {% endif %}
             {% endfor %}
           </tbody>
-          
+
         </table>
         {% else %}
           <p>You haven't configured any clusters.</p>
@@ -58,7 +58,7 @@
   </div>
   {% if deletedClusters %}
   <div class="panel spl-panel" style="clear: both;">
-    <div class="panel-head spl-panel-head">
+    <div class="panel-head spl-panel-head full-width">
       <div class="smallmargin-nodes-showhide left-float toggle-delete-cluster"></div>
       <div class="panel-title delete-cluster-header">
         <h4>Inactive clusters ({{ deletedClusters }})</h4>
@@ -76,9 +76,9 @@
               <th>Create Time</th>
               <th>Template</th>
               <th>Nodes</th>
-              <th>Progress</th>
+              <th class="cluster-step">Progress</th>
               <th class="no-sort"></th>
-              <th>Status</th>
+              <th class="cluster-status">Status</th>
             </tr>
           </thead>
           <tbody>

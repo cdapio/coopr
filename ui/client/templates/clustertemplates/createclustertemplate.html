@@ -13,7 +13,7 @@
 
 {% block content %}
   <div ng-app="templateview">
-    <div id="content-body" ng-controller="TemplateCtrl">
+    <div id="content-body" ng-controller="TemplateCtrl" class="page-create-cluster">
       <div id="title">
         <div class="pull-right">
           <div id="global">
@@ -26,8 +26,8 @@
     <div id="panels">
 
       <div class="panel spl-panel" style="clear: both;">
-        <div class="panel-head spl-panel-head clearfix">
-          <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if clustertemplateId %} Edit template: {{clustertemplateId}} {% else %}Create a template{% endif %}</h4>
+        <div class="panel-head spl-panel-head edit-template clearfix">
+          <div class="panel-title spl-panel-title"><h3 class="pull-left">{% if clustertemplateId %} Edit template: {{clustertemplateId}} {% else %}Create a template{% endif %}</h3>
           <div class="pull-right">
             {% if clustertemplateId %}
             <form role="form" method="POST" action="/clustertemplates/delete/{{clustertemplateId}}" class="clustertemplate-delete-form inline-display" ng-submit="deleteTemplate($event)">
@@ -324,8 +324,8 @@
                       <div class="col-sm-3">
                         <label class="input-group">
                           <span class="input-group-addon">Min:</span>
-                          <input type="number" class="form-control" 
-                            placeholder="Minimum nodes"
+                          <input type="number" class="form-control"
+
                             ng-model="clustertemplate.constraints.size.min"
                             max="[[clustertemplate.constraints.size.max]]"
                             min="1" />
@@ -334,8 +334,8 @@
                       <div class="col-sm-3">
                         <label class="input-group">
                           <span class="input-group-addon">Max:</span>
-                          <input type="number" class="form-control" 
-                            placeholder="Maximum nodes"
+                          <input type="number" class="form-control"
+
                             ng-model="clustertemplate.constraints.size.max"
                             min="[[clustertemplate.constraints.size.min]]"
                             max="2147483647" />
@@ -400,7 +400,7 @@
                           </div>
                           <div style="clear:both"></div>
                           <div class="form-group">
-                            <label class="col-sm-2 control-label">Service name</label>
+                            <label class="col-sm-3 control-label">Service name</label>
                             <div class="col-sm-4">
                               <select class="form-control service-select" name="service-name" id="service-name" ng-model="currentConstraints.serviceGroup.name" ng-options="item for item in services">
                                  <option selected="selected"></option>
@@ -408,7 +408,7 @@
                             </div>
                           </div>
                           <div class="form-group">
-                            <label class="col-sm-2 control-label">Hardware type</label>
+                            <label class="col-sm-3 control-label">Hardware type</label>
                             <div class="col-sm-4">
                               <select class="form-control hardwaretype-select" ng-model="currentConstraints.serviceGroup.currentHardwareType" ng-options="item for item in hardwaretypes">
                                  <option selected="selected"></option>
@@ -419,7 +419,7 @@
                             </div>
                           </div>
                           <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-6">
+                            <div class="col-sm-offset-3 col-sm-6">
                               <div class="form-control" ng-repeat="item in currentConstraints.serviceGroup.hardwaretypes">
                                 <span class="hardwaretype-name">[[item]]</span>
                                 <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.serviceGroup.hardwaretypes)"></span>
@@ -427,7 +427,7 @@
                             </div>
                           </div>
                           <div class="form-group">
-                            <label class="col-sm-2 control-label">Image type</label>
+                            <label class="col-sm-3 control-label">Image type</label>
                             <div class="col-sm-4">
                               <select class="form-control imagetype-select" ng-model="currentConstraints.serviceGroup.currentImageType" ng-options="item for item in imagetypes">
                                  <option selected="selected"></option>
@@ -438,7 +438,7 @@
                             </div>
                           </div>
                           <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-6">
+                            <div class="col-sm-offset-3 col-sm-6">
                               <div class="form-control" ng-repeat="item in currentConstraints.serviceGroup.imagetypes">
                                 <span class="hardwaretype-name">[[item]]</span>
                                 <span class="service-delete pointer-cursor right-float glyphicon glyphicon-minus" ng-click="removeEntry(item, currentConstraints.serviceGroup.imagetypes)"></span>
@@ -447,13 +447,13 @@
                           </div>
                           <h4>Quantities</h4>
                           <div class="form-group">
-                            <label class="col-sm-2 control-label">Min</label>
+                            <label class="col-sm-3 control-label">Min</label>
                             <div class="col-sm-4">
                               <input type="text" class="form-control constraint-min" ng-model="currentConstraints.serviceGroup.min" id="quantityMin" name="quantityMin" placeholder="Min">
                             </div>
                           </div>
                           <div class="form-group">
-                            <label class="col-sm-2 control-label">Max</label>
+                            <label class="col-sm-3 control-label">Max</label>
                             <div class="col-sm-4">
                               <input type="text" class="form-control constraint-max" ng-model="currentConstraints.serviceGroup.max" id="quantityMax" placeholder="Max">
                             </div>
@@ -520,7 +520,7 @@
                           <td><span class="constraint-delete mid-btn glyphicon glyphicon-remove btn  right-float" ng-click="removeServiceConstraint(name)"></span></td>
                         </tr>
                       </tbody>
-                    </table>  
+                    </table>
                   </div>
                 </div>
                 <div class="form-group">
@@ -543,7 +543,7 @@
           </form>
         </div>
       </div>
-        
+
       </div>
     </div>
   </div>

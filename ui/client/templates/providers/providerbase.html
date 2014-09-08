@@ -14,7 +14,7 @@
 
 {% block content %}
   <div ng-app="CreateProviderApp">
-    <div id="content-body">
+    <div id="content-body" class="page-edit-provider">
       <div id="title">
         <div class="pull-right">
           <div id="global">
@@ -27,9 +27,9 @@
       <div id="panels">
 
         <div class="panel spl-panel" style="clear: both;">
-          <div class="panel-head spl-panel-head clearfix">
+          <div class="panel-head spl-panel-head edit-template clearfix">
             <input type="hidden" id="inputName" value="{{provider.name}}" />
-            <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if provider %} Edit provider: {{provider.name}} {% else %}Create a provider{% endif %}</h4>
+            <div class="panel-title spl-panel-title"><h3 class="pull-left">{% if provider %} Edit provider: {{provider.name}} {% else %}Create a provider{% endif %}</h3>
               <div class="pull-right" ng-controller="DeleteProviderCtrl">
                 {% if provider %}
                 <form role="form" method="POST" action="/providers/delete/{{provider.name}}" class="provider-delete-form" ng-submit="submitDeletion($event)">
@@ -44,7 +44,7 @@
             <div ng-view></div>
           </div>
         </div>
-      </div>  
+      </div>
     </div>
   </div>
 {% endblock %}

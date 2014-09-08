@@ -84,6 +84,12 @@
                     </a>
                     <label for="skin"><input type="radio" name="skin" value="dark" {% if skin == "dark" %} checked {% endif %}/>     Dark</label>
                   </div>
+                  <div class="col-sm-4 skin-container">
+                    <a href="/static/img/v2-assets/dark_skin.png">
+                      <img class="img-responsive" src="/static/img/v2-assets/dark_skin.png" />
+                    </a>
+                    <label for="skin"><input type="radio" name="skin" value="coopr" {% if skin == "coopr" %} checked {% endif %}/>     Coopr</label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -96,6 +102,6 @@
         </div>
       </div>
     </div>
-    
+
   </div>
 {% endblock %}
