@@ -19,6 +19,7 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.LowercaseEnumTypeAdapterFactory;
 import com.continuuity.loom.codec.json.current.AddServicesRequestCodec;
+import com.continuuity.loom.codec.json.current.AddTenantRequestCodec;
 import com.continuuity.loom.codec.json.current.AdministrationCodec;
 import com.continuuity.loom.codec.json.current.AutomatorTypeCodec;
 import com.continuuity.loom.codec.json.current.ClusterCodec;
@@ -58,6 +59,7 @@ import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceUpgradeCodec;
 import com.continuuity.loom.http.request.AddServicesRequest;
+import com.continuuity.loom.http.request.AddTenantRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.http.request.FinishTaskRequest;
@@ -139,6 +141,7 @@ public class CodecModules {
   private GsonBuilder createCurrentBuilder() {
     return new GsonBuilder()
       .registerTypeAdapter(AddServicesRequest.class, new AddServicesRequestCodec())
+      .registerTypeAdapter(AddTenantRequest.class, new AddTenantRequestCodec())
       .registerTypeAdapter(Administration.class, new AdministrationCodec())
       .registerTypeAdapter(AutomatorType.class, new AutomatorTypeCodec())
       .registerTypeAdapter(Cluster.class, new ClusterCodec())

@@ -21,18 +21,8 @@ import com.continuuity.loom.account.Account;
 import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.cluster.NodeProperties;
-import com.continuuity.loom.common.conf.Constants;
-import com.continuuity.loom.http.request.BootstrapRequest;
-import com.continuuity.loom.provisioner.plugin.PluginType;
-import com.continuuity.loom.provisioner.plugin.ResourceMeta;
-import com.continuuity.loom.provisioner.plugin.ResourceStatus;
 import com.continuuity.loom.provisioner.plugin.ResourceType;
-import com.continuuity.loom.spec.HardwareType;
-import com.continuuity.loom.spec.ImageType;
-import com.continuuity.loom.spec.Provider;
 import com.continuuity.loom.spec.ProvisionerAction;
-import com.continuuity.loom.spec.Tenant;
-import com.continuuity.loom.spec.TenantSpecification;
 import com.continuuity.loom.spec.service.Service;
 import com.continuuity.loom.spec.service.ServiceAction;
 import com.continuuity.loom.spec.template.Administration;
@@ -40,16 +30,13 @@ import com.continuuity.loom.spec.template.ClusterDefaults;
 import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.continuuity.loom.spec.template.Compatibilities;
 import com.continuuity.loom.spec.template.LeaseDuration;
-import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.entity.SQLEntityStoreService;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import com.google.gson.JsonObject;
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.message.BasicHeader;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.After;
 import org.junit.Assert;
@@ -93,113 +80,6 @@ public class RPCHandlerTest extends ServiceTestBase {
     solverQueues.removeAll();
     clusterQueues.removeAll();
     ((SQLEntityStoreService) entityStoreService).clearData();
-  }
-
-  @Test
-  public void testNonAdminCantBootstrap() throws Exception {
-    assertResponseStatus(doPost("/bootstrap", "", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-  }
-
-  @Test
-  public void testBootstrapTenant() throws Exception {
-    // write superadmin entities
-    EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
-    Set<Provider> providers = ImmutableSet.of(Entities.ProviderExample.JOYENT, Entities.ProviderExample.RACKSPACE);
-    Set<Service> services = ImmutableSet.of(Entities.ServiceExample.NAMENODE, Entities.ServiceExample.DATANODE);
-    Set<HardwareType> hardwareTypes =
-      ImmutableSet.of(Entities.HardwareTypeExample.SMALL, Entities.HardwareTypeExample.MEDIUM);
-    Set<ImageType> imageTypes =
-      ImmutableSet.of(Entities.ImageTypeExample.UBUNTU_12, Entities.ImageTypeExample.CENTOS_6);
-    Set<ClusterTemplate> clusterTemplates =
-      ImmutableSet.of(Entities.ClusterTemplateExample.HDFS, smallTemplate);
-    for (Provider provider : providers) {
-      superadminView.writeProvider(provider);
-    }
-    for (Service service : services) {
-      superadminView.writeService(service);
-    }
-    for (HardwareType hardwareType : hardwareTypes) {
-      superadminView.writeHardwareType(hardwareType);
-    }
-    for (ImageType imageType : imageTypes) {
-      superadminView.writeImageType(imageType);
-    }
-    for (ClusterTemplate template : clusterTemplates) {
-      superadminView.writeClusterTemplate(template);
-    }
-    // write superadmin plugin resources
-    superadminView.writeAutomatorType(Entities.AutomatorTypeExample.CHEF);
-    ResourceType type1 = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
-    ResourceMeta meta1 = new ResourceMeta("name1", 3, ResourceStatus.ACTIVE);
-    ResourceMeta meta2 = new ResourceMeta("name2", 2, ResourceStatus.INACTIVE);
-    metaStoreService.getResourceTypeView(Account.SUPERADMIN, type1).add(meta1);
-    metaStoreService.getResourceTypeView(Account.SUPERADMIN, type1).add(meta2);
-    writePluginResource(Account.SUPERADMIN, type1, meta1.getName(), meta1.getVersion(), "meta1 contents");
-    writePluginResource(Account.SUPERADMIN, type1, meta2.getName(), meta2.getVersion(), "meta2 contents");
-
-    Account account = new Account(Constants.ADMIN_USER, "tenant-id123");
-    tenantStore.writeTenant(new Tenant("tenant-id123", new TenantSpecification("tenantX", 0, 10, 100)));
-    EntityStoreView tenantView = entityStoreService.getView(account);
-
-    // bootstrap
-    Header[] headers = {
-      new BasicHeader(Constants.USER_HEADER, account.getUserId()),
-      new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
-      new BasicHeader(Constants.TENANT_HEADER, "tenantX")
-    };
-    assertResponseStatus(doPost("/bootstrap", "", headers), HttpResponseStatus.OK);
-
-    // make sure tenant account has copied superadmin entities
-    Assert.assertEquals(providers, ImmutableSet.copyOf(tenantView.getAllProviders()));
-    Assert.assertEquals(services, ImmutableSet.copyOf(tenantView.getAllServices()));
-    Assert.assertEquals(hardwareTypes, ImmutableSet.copyOf(tenantView.getAllHardwareTypes()));
-    Assert.assertEquals(imageTypes, ImmutableSet.copyOf(tenantView.getAllImageTypes()));
-    Assert.assertEquals(clusterTemplates, ImmutableSet.copyOf(tenantView.getAllClusterTemplates()));
-    // check tenant account has copied superadmin plugin resources
-    Assert.assertEquals(meta1,
-                        metaStoreService.getResourceTypeView(account, type1).get(meta1.getName(), meta1.getVersion()));
-    Assert.assertEquals(meta2,
-                        metaStoreService.getResourceTypeView(account, type1).get(meta2.getName(), meta2.getVersion()));
-    Assert.assertEquals("meta1 contents", readPluginResource(account, type1, meta1.getName(), meta1.getVersion()));
-    Assert.assertEquals("meta2 contents", readPluginResource(account, type1, meta2.getName(), meta2.getVersion()));
-  }
-
-  @Test
-  public void testForceBootstrap() throws Exception {
-    // superadmin has a slightly different version than tenant
-    String name = "template";
-    ClusterTemplate template1 = new ClusterTemplate(
-      name, "description1",
-      new ClusterDefaults(ImmutableSet.of("zookeeper"), "rackspace", null, null, null, null),
-      null, null, null);
-    ClusterTemplate template2 = new ClusterTemplate(
-      name, "description2",
-      new ClusterDefaults(ImmutableSet.of("zookeeper"), "rackspace", null, null, null, null),
-      null, null, null);
-
-    Account account = new Account(Constants.ADMIN_USER, "tenant-id123");
-    tenantStore.writeTenant(new Tenant("tenant-id123", new TenantSpecification("tenantX", 0, 10, 100)));
-
-    EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
-    EntityStoreView tenantView = entityStoreService.getView(account);
-
-    superadminView.writeClusterTemplate(template1);
-    tenantView.writeClusterTemplate(template2);
-
-    // check that with force false, bootstrap is not allowed
-    Header[] headers = {
-      new BasicHeader(Constants.USER_HEADER, account.getUserId()),
-      new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
-      new BasicHeader(Constants.TENANT_HEADER, "tenantX")
-    };
-    BootstrapRequest body = new BootstrapRequest(false);
-    assertResponseStatus(doPost("/bootstrap", gson.toJson(body), headers), HttpResponseStatus.CONFLICT);
-    Assert.assertEquals(template2, tenantView.getClusterTemplate(name));
-
-    // check that with force true, the template is overwritten
-    body = new BootstrapRequest(true);
-    assertResponseStatus(doPost("/bootstrap", gson.toJson(body), headers), HttpResponseStatus.OK);
-    Assert.assertEquals(template1, tenantView.getClusterTemplate(name));
   }
 
   @Test
@@ -330,26 +210,5 @@ public class RPCHandlerTest extends ServiceTestBase {
   private JsonObject getJsonObjectBodyFromResponse(HttpResponse response) throws IOException {
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     return gson.fromJson(reader, JsonObject.class);
-  }
-
-  private void writePluginResource(Account account, ResourceType resourceType,
-                                   String name, int version, String content) throws IOException {
-    OutputStream outputStream = pluginStore.getResourceOutputStream(account, resourceType, name, version);
-    try {
-      outputStream.write(content.getBytes(Charsets.UTF_8));
-    } finally {
-      outputStream.close();
-    }
-  }
-
-  private String readPluginResource(Account account, ResourceType resourceType,
-                                    String name, int version) throws IOException {
-    Reader reader = new InputStreamReader(
-      pluginStore.getResourceInputStream(account, resourceType, name, version), Charsets.UTF_8);
-    try {
-      return CharStreams.toString(reader);
-    } finally {
-      reader.close();
-    }
   }
 }

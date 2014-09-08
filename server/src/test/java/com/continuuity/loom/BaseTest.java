@@ -180,7 +180,6 @@ public class BaseTest {
       sqlClusterStoreService.clearData();
       sqlProvisionerStore.clearData();
       sqlMetaStoreService.clearData();
-      sqlTenantStore.clearData();
       pluginStore.clearData();
       credentialStore.wipe();
     }

@@ -39,10 +39,16 @@ To create a new tenant, make a HTTP POST request to URI:
 
  /tenants
 
-The POST body is a JSON Object that must contain ``name`` and ``workers`` as keys specifying 
+The POST body is a JSON Object that must contain a ``tenant``, whose value is another JSON Object
+describing the tenant to create. It must contain ``name`` and ``workers`` as keys specifying 
 the name of the tenant and the number of workers assigned to the tenant. Other key-value pairs
 can be added to specify other tenant specific settings, such as quotas on the maximum number
 of clusters and nodes allowed within the tenant. 
+
+The POST body can optionally contain a ``bootstrap`` key whose value is a boolean indicating
+whether or not to bootstrap the new tenant. Bootstrapping a tenant copies all providers,
+hardware types, image types, services, cluster templates, and plugin resources from the superadmin
+tenant into the new created tenant.
 
 POST Parameters
 ^^^^^^^^^^^^^^^^
@@ -55,6 +61,10 @@ Required Parameters
 
    * - Parameter
      - Description
+   * - bootstrap
+     - whether or not to bootstrap the tenant by copying superadmin data. Defaults to false.
+   * - tenant
+     - JSON Object describing the tenant. Fields are documented below. 
    * - name
      - Specifies the name for the tenant. The assigned name must have only
        alphanumeric, dash(-), dot(.), or underscore(_) characters.
@@ -91,7 +101,12 @@ Example
         -H 'X-Loom-UserID:admin'
         -H 'X-Loom-TenantID:superadmin'
         -H 'X-Loom-ApiKey:<apikey>'
-        -d '{"name":"my-company", "workers":10}' 
+        -d '{
+                "tenant": {
+                    "name":"my-company", "workers":10
+                },
+                "bootstrap": false
+            }' 
         http://<server>:<port>/<version>/tenants
 
 .. _tenants-retrieve:

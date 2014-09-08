@@ -16,18 +16,32 @@
 package com.continuuity.loom.http;
 
 import com.continuuity.loom.Entities;
-import com.continuuity.loom.spec.plugin.AutomatorType;
-import com.continuuity.loom.spec.plugin.ProviderType;
-import com.continuuity.loom.spec.Tenant;
-import com.continuuity.loom.spec.TenantSpecification;
+import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.http.request.AddTenantRequest;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
+import com.continuuity.loom.provisioner.plugin.PluginType;
+import com.continuuity.loom.provisioner.plugin.ResourceMeta;
+import com.continuuity.loom.provisioner.plugin.ResourceStatus;
+import com.continuuity.loom.provisioner.plugin.ResourceType;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
+import com.continuuity.loom.spec.Tenant;
+import com.continuuity.loom.spec.TenantSpecification;
+import com.continuuity.loom.spec.plugin.AutomatorType;
+import com.continuuity.loom.spec.plugin.ProviderType;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.ClusterTemplate;
+import com.continuuity.loom.store.entity.EntityStoreView;
+import com.continuuity.loom.store.entity.SQLEntityStoreService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
 import com.continuuity.loom.store.tenant.SQLTenantStore;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -42,6 +56,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.sql.SQLException;
 import java.util.Set;
@@ -63,6 +78,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     // base tests will write some tenants that we don't want.
     ((SQLTenantStore) tenantStore).clearData();
     ((SQLProvisionerStore) provisionerStore).clearData();
+    ((SQLEntityStoreService) entityStoreService).clearData();
     tenantProvisionerService.writeProvisioner(
       new Provisioner("p1", "host", 12345, 100, ImmutableMap.<String, Integer>of(), ImmutableMap.<String, Integer>of())
     );
@@ -86,11 +102,11 @@ public class SuperadminHandlerTest extends ServiceTestBase {
   public void testCreateTenant() throws Exception {
     String name = "companyX";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
-    HttpResponse response = doPost("/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS);
+    AddTenantRequest addTenantRequest = new AddTenantRequest(requestedTenant, false);
+    HttpResponse response = doPost("/tenants", gson.toJson(addTenantRequest), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.OK);
-    Reader reader = new InputStreamReader(response.getEntity().getContent());
 
     // make sure tenant was actually written
     TenantSpecification actualTenant = tenantStore.getTenantByName(name).getSpecification();
@@ -104,16 +120,18 @@ public class SuperadminHandlerTest extends ServiceTestBase {
   public void testDuplicateTenantNameNotAllowed() throws Exception {
     String name = "companyX";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
-    assertResponseStatus(doPost("/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS),
+    AddTenantRequest addRequest = new AddTenantRequest(requestedTenant, false);
+    assertResponseStatus(doPost("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS),
                          HttpResponseStatus.OK);
-    assertResponseStatus(doPost("/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPost("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS),
                          HttpResponseStatus.CONFLICT);
   }
 
   @Test
   public void testCreateTenantWithTooManyWorkersReturnsConflict() throws Exception {
     TenantSpecification requestedTenant = new TenantSpecification("companyX", 10000, 100, 1000);
-    HttpResponse response = doPost("/tenants", gson.toJson(requestedTenant), SUPERADMIN_HEADERS);
+    AddTenantRequest addRequest = new AddTenantRequest(requestedTenant, false);
+    HttpResponse response = doPost("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
@@ -225,11 +243,6 @@ public class SuperadminHandlerTest extends ServiceTestBase {
   }
 
   @Test
-  public void testAddTenantWithDefaults() {
-    // TODO: implement once bootstrapping with defaults is implemented
-  }
-
-  @Test
   public void testProviderTypes() throws Exception {
     testNonPostRestAPIs("providertypes", gson.toJsonTree(Entities.ProviderTypeExample.JOYENT).getAsJsonObject(),
                         gson.toJsonTree(Entities.ProviderTypeExample.RACKSPACE).getAsJsonObject(), SUPERADMIN_HEADERS);
@@ -261,6 +274,68 @@ public class SuperadminHandlerTest extends ServiceTestBase {
                          HttpResponseStatus.FORBIDDEN);
     assertResponseStatus(doDelete("/plugins/automatortypes/" + type.getName(), ADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
+  }
+
+  @Test
+  public void testBootstrapTenant() throws Exception {
+    // write superadmin entities
+    EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
+    Set<Provider> providers = ImmutableSet.of(Entities.ProviderExample.JOYENT, Entities.ProviderExample.RACKSPACE);
+    Set<Service> services = ImmutableSet.of(Entities.ServiceExample.NAMENODE, Entities.ServiceExample.DATANODE);
+    Set<HardwareType> hardwareTypes =
+      ImmutableSet.of(Entities.HardwareTypeExample.SMALL, Entities.HardwareTypeExample.MEDIUM);
+    Set<ImageType> imageTypes =
+      ImmutableSet.of(Entities.ImageTypeExample.UBUNTU_12, Entities.ImageTypeExample.CENTOS_6);
+    Set<ClusterTemplate> clusterTemplates =
+      ImmutableSet.of(Entities.ClusterTemplateExample.HDFS, Entities.ClusterTemplateExample.HADOOP_DISTRIBUTED);
+    for (Provider provider : providers) {
+      superadminView.writeProvider(provider);
+    }
+    for (Service service : services) {
+      superadminView.writeService(service);
+    }
+    for (HardwareType hardwareType : hardwareTypes) {
+      superadminView.writeHardwareType(hardwareType);
+    }
+    for (ImageType imageType : imageTypes) {
+      superadminView.writeImageType(imageType);
+    }
+    for (ClusterTemplate template : clusterTemplates) {
+      superadminView.writeClusterTemplate(template);
+    }
+    // write superadmin plugin resources
+    superadminView.writeAutomatorType(Entities.AutomatorTypeExample.CHEF);
+    ResourceType type1 = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
+    ResourceMeta meta1 = new ResourceMeta("name1", 3, ResourceStatus.ACTIVE);
+    ResourceMeta meta2 = new ResourceMeta("name2", 2, ResourceStatus.INACTIVE);
+    metaStoreService.getResourceTypeView(Account.SUPERADMIN, type1).add(meta1);
+    metaStoreService.getResourceTypeView(Account.SUPERADMIN, type1).add(meta2);
+    writePluginResource(Account.SUPERADMIN, type1, meta1.getName(), meta1.getVersion(), "meta1 contents");
+    writePluginResource(Account.SUPERADMIN, type1, meta2.getName(), meta2.getVersion(), "meta2 contents");
+
+    // make a request to create a tenant and bootstrap it
+    String name = "company-dev";
+    TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
+    AddTenantRequest addTenantRequest = new AddTenantRequest(requestedTenant, true);
+    HttpResponse response = doPost("/tenants", gson.toJson(addTenantRequest), SUPERADMIN_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+
+    // make sure tenant account has copied superadmin entities
+    Tenant tenant = tenantStore.getTenantByName(name);
+    Account account = new Account(Constants.ADMIN_USER, tenant.getId());
+    EntityStoreView tenantView = entityStoreService.getView(account);
+    Assert.assertEquals(providers, ImmutableSet.copyOf(tenantView.getAllProviders()));
+    Assert.assertEquals(services, ImmutableSet.copyOf(tenantView.getAllServices()));
+    Assert.assertEquals(hardwareTypes, ImmutableSet.copyOf(tenantView.getAllHardwareTypes()));
+    Assert.assertEquals(imageTypes, ImmutableSet.copyOf(tenantView.getAllImageTypes()));
+    Assert.assertEquals(clusterTemplates, ImmutableSet.copyOf(tenantView.getAllClusterTemplates()));
+    // check tenant account has copied superadmin plugin resources
+    Assert.assertEquals(meta1,
+                        metaStoreService.getResourceTypeView(account, type1).get(meta1.getName(), meta1.getVersion()));
+    Assert.assertEquals(meta2,
+                        metaStoreService.getResourceTypeView(account, type1).get(meta2.getName(), meta2.getVersion()));
+    Assert.assertEquals("meta1 contents", readPluginResource(account, type1, meta1.getName(), meta1.getVersion()));
+    Assert.assertEquals("meta2 contents", readPluginResource(account, type1, meta2.getName(), meta2.getVersion()));
   }
 
   private void testNonPostRestAPIs(String entityType, JsonObject entity1, JsonObject entity2,
@@ -311,5 +386,26 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     // check both were deleted
     assertResponseStatus(doGet(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
     assertResponseStatus(doGet(entity2Path, headers), HttpResponseStatus.NOT_FOUND);
+  }
+
+  private void writePluginResource(Account account, ResourceType resourceType,
+                                   String name, int version, String content) throws IOException {
+    OutputStream outputStream = pluginStore.getResourceOutputStream(account, resourceType, name, version);
+    try {
+      outputStream.write(content.getBytes(Charsets.UTF_8));
+    } finally {
+      outputStream.close();
+    }
+  }
+
+  private String readPluginResource(Account account, ResourceType resourceType,
+                                    String name, int version) throws IOException {
+    Reader reader = new InputStreamReader(
+      pluginStore.getResourceInputStream(account, resourceType, name, version), Charsets.UTF_8);
+    try {
+      return CharStreams.toString(reader);
+    } finally {
+      reader.close();
+    }
   }
 }
