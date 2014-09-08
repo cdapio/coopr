@@ -5,34 +5,29 @@
 <script src="/static/js/user/describecluster.js" type="text/javascript"></script>
 {% endblock %}
 {% block content %}
-    <div id="content-body">
-      <div id="title">
-        <div class="pull-right">
-          <div id="global">
-            {% include "user/clusters/topmenu.html" %}
-          </div>
-        </div>
-        <div style="clear: both"></div>
-      </div>
-    </div>
     <div ng-app="clusterview">
       <div id="content-body" class="describe-cluster" ng-controller="ClusterCtrl">
-        <div id="title"></div>
+        <div id="title">
+          <div class="pull-left">
+            <h3>Cluster description: [[ cluster.name ]]</h3>
+          </div>
+          <div class="pull-right">
+            <form role="form" method="POST" ng-submit="deleteCluster($event)" action = "[[ '/user/clusters/delete/' + cluster.id ]]" class="cluster-delete-form">
+              <input type="hidden" value="[[cluster.id]]" name="name" />
+              <a href="/user/clusters/cluster/[[cluster.id]]/reconfigure" class="btn-spl btn-info" ng-show="cluster.status !== 'terminated'" id="reconfigure-cluster-link">Reconfigure</a>
+              <button type="submit" class="btn-spl btn-delete" ng-show="cluster.status !== 'terminated'"></button>
+            </form>
+            <div id="global">
+              {% include "user/clusters/topmenu.html" %}
+            </div>
+          </div>
+          <div style="clear: both"></div>
+        </div>
 
         <div id="panels">
+
           <div class="panel spl-panel" style="clear: both;">
-            <div class="panel-head spl-panel-head edit-cluster clearfix">
-              <div class="panel-title spl-panel-title">
-                <h3 class="pull-left" style="width: 75%">Cluster description: [[ cluster.name ]]</h3>
-                <div class="pull-right">
-                  <form role="form" method="POST" ng-submit="deleteCluster($event)" action = "[[ '/user/clusters/delete/' + cluster.id ]]" class="cluster-delete-form">
-                    <input type="hidden" value="[[cluster.id]]" name="name" />
-                    <a href="/user/clusters/cluster/[[cluster.id]]/reconfigure" class="btn-spl btn-info" ng-show="cluster.status !== 'terminated'" id="reconfigure-cluster-link">Reconfigure</a>
-                    <button type="submit" class="btn-spl btn-delete" ng-show="cluster.status !== 'terminated'"></button>
-                  </form>
-                </div>
-              </div>
-            </div>
+
             <div class="panel-body spl-panel-body">
               <table class="table table-striped spl-panel-table">
                 <tbody>

@@ -26,18 +26,18 @@
               <table class="table table-striped tablesorter spl-panel-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Providertype</th>
+                    <th class="col-name">Name</th>
+                    <th class="col-description">Description</th>
+                    <th class="col-providertype">Providertype</th>
                     <th class="no-sort garbage"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for entry in providers %}
                     <tr>
-                      <td><a href="/providers/provider/{{entry.name}}/#/edit">{{ entry.name }}</a></td>
-                      <td>{{ entry.description }}</td>
-                      <td>{{ entry.providertype }}</td>
+                      <td class="col-name"><a href="/providers/provider/{{entry.name}}/#/edit">{{ entry.name }}</a></td>
+                      <td class="col-description">{{ entry.description }}</td>
+                      <td class="col-providertype">{{ entry.providertype }}</td>
                       <td class="garbage">
                         <form role="form" method="POST" action="/providers/delete/{{entry.name}}" class="delete-form">
                           <input type="hidden" value="{{entry.name}}" name="name" />

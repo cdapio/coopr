@@ -134,6 +134,7 @@
 	line-height: 40px;
 	min-width: 200px;
 	padding: 0;
+	text-align: center;
 	text-transform: uppercase;
 
 	&:hover, &:active, &:focus {
@@ -227,7 +228,7 @@ body {
 
 .progress-bar {
 	.text-danger {
-		background: #E74D4A;
+		background: @red;
 	}
 	.text-success {
 		background: #78EF7B;
@@ -238,7 +239,7 @@ body {
 }
 
 .text-danger {
-	color: #E74D4A !important;
+	color: @red !important;
 }
 
 .text-success {
@@ -254,7 +255,7 @@ body {
 }
 
 .text-light {
-	color: #A8A8A8;
+	color: @grey;
 }
 
 .lowercasify {
@@ -582,16 +583,49 @@ a, a:visited {
 				font-size: 1.1em;
 			}
 		}
+		.toggle-delete-cluster {
+			margin-top: 10px;
+		}
 	}
 }
 
+#content-body.page-create-service {
+	label {
+		white-space: normal;
+	}
+	#panels {
+		button {
+			.btn-grey();
+			height: 50px;
+		}
+		button[type="submit"] {
+			.btn-blue();
+		}
+	}
+}
 #content-body {
+
+	#live-tiles-header {
+		margin-top: 40px;
+	}
+
 	.edit-cluster {
 		.header-offset();
 
 		.panel-title {
 			width: 100%;
 		}
+	}
+	h4 {
+		color: @dark-grey;
+	}
+	.provider-entries {
+		.form-control {
+			margin-bottom: 10px;
+		}
+	}
+	#add-provider {
+		.btn-grey();
 	}
 }
 
@@ -963,7 +997,8 @@ a strong {
 #notification-div {
 	color: white;
 	margin: 0 auto;
-	background: rgb(255, 121, 121);
+	background: @red;
+	line-height: 3;
 	text-align: center;
 }
 
@@ -1064,12 +1099,22 @@ a strong {
 				h4 {
 					color: white;
 				}
+				button {
+					color: @dark-grey !important;
+					&:hover, &:focus {
+						background-color: lighten(@off-white, 10%);
+						color: @dark-grey !important;
+					}
+				}
 				.modal-header {
 					.close {
 						background-color: transparent;
-						color: red;
+						color: red !important;
+						min-width: 0;
 						opacity: 1;
 						text-shadow: none;
+						line-height: 1;
+						height: 25px;
 					}
 				}
 				.modal-body {
@@ -1078,21 +1123,105 @@ a strong {
 					}
 				}
 			}
+			h4 {
+				color: @dark-grey;
+			}
+			td {
+				color: @dark-grey;
+			}
+			button {
+				.btn-grey();
+				height: 50px;
+				line-height: 50px;
+				min-width: 220px;
+			}
+			.add-must-coexist-group, .add-cant-coexist-group, .add-serviceconstraint-modal {
+				min-width: 260px;
+			}
+			.next-tab-button {
+				.btn-blue();
+			}
+			button[type="submit"] {
+				.btn-orange();
+			}
+			.service-constraint-entries {
+				.table-main {
+					.form-control:disabled{
+						background-color: transparent;
+						color: @dark-grey;
+						cursor: default;
+					   -webkit-appearance: none;
+					   -moz-appearance:    none;
+					   appearance:         none;
+					}
+					button {
+						min-width: 50px;
+					}
+					.added-type {
+						margin-top: 10px;
+					}
+				}
+			}
 		}
-		h4 {
+	}
+}
+
+.form-horizontal.reconfigure-cluster {
+	background-color: transparent;
+	#form-group-wrapper, #advanced-options {
+		background-color: white;
+		padding: 20px;
+	}
+	#form-group-wrapper + .form-group {
+		margin-bottom: 0;
+	}
+	button[type="submit"] {
+		.btn-orange();
+		display: block;
+		margin: 0 auto;
+	}
+	.advanced-header {
+		background-color: @grey;
+		margin: 40px auto 0;
+		max-width: 810px;
+		height: 80px;
+
+		h3 {
 			color: @dark-grey;
+			line-height: 80px;
 		}
-		td {
+		.toggle-delete-cluster {
+			margin-top: 30px;
+			margin-left: 20px;
+		}
+	}
+	#advanced-options {
+		th {
 			color: @dark-grey;
+			text-align: center;
 		}
-		button {
-			.btn-grey();
+		.control-label {
+			white-space: normal;
 		}
-		.next-tab-button {
-			.btn-blue();
+		.add-service-btn {
+			background-color: @grey;
+			min-height: 50px;
+			min-width: 140px;
+
+			&:hover, &:focus {
+				background-color: lighten(@grey, 10%) !important;
+				color: @dark-grey;
+			}
 		}
-		button[type="submit"] {
-			.btn-orange();
+		.slideThree {
+			background: @dark-blue;
+			color: white;
+			.box-shadow(none);
+			text-shadow: none;
+
+			&:after {
+				color: white;
+			}
 		}
 	}
 }
@@ -1182,7 +1311,12 @@ a strong {
 .modal-text {
 	line-height: 64px;
 }
-
+.modal-header .close {
+	background-color: transparent;
+	color: @red;
+	opacity: 1;
+	text-shadow: none;
+}
 #deleted-clusters {
 	display: none;
 }
@@ -1331,104 +1465,148 @@ a strong {
 	}
 }
 
-.spl-panel-table {
-	margin-top: 40px;
-
-	> thead > tr > th {
-		color: @navy-blue !important;
-		font-size: 10px;
-		font-family: "GothamMedium";
-		font-weight: bold;
-		background-color: @off-white;
-		padding-left: 15px;
-		padding-top: 15px;
-		padding-bottom: 15px;
-		color: white;
-		font-size: 16px;
-		text-transform: uppercase;
-		border-bottom: 1px solid @space-grey !important;
-		border-right: 1px solid @space-grey !important;
-
-
-		&:last-child {
-			border-left: 1px solid @space-grey !important;
-		}
-	}
-	> thead > tr > th.cluster-step {
-		border-right: 1px solid @space-grey !important;
-	}
-	> thead > tr > th.cluster-status.header {
-		border-left: 0 !important;
-		background-image: none;
-		text-indent: -98px;
-	}
-	> thead > tr > th.garbage {
-		border-left: 0 !important;
-	}
-}
-
-#panels .spl-panel-table > tbody > tr > {
-	background-color: white;
-
-	td {
-		padding-top: 20px;
-		padding-bottom: 20px;
-		padding-left: 15px;
+#panels {
+	.spl-panel-table {
 		background-color: white;
-		color: @dark-grey;
-		border-bottom: 1px solid @space-grey !important;
-		border-right: 1px solid @space-grey !important;
+		margin-top: 40px;
 
-		&:last-child {
-			border-right: 1px solid transparent !important;
-			border-left: 1px solid transparent !important;
-		}
-	}
-	td.cluster-step {
-		border-right: 1px solid @space-grey !important;
-	}
-	td.cluster-status {
-		border-left: 1px solid transparent !important;
-	}
-	&:hover, &:focus {
-		td {
-			background-color: @navy-blue !important;
-			border-bottom: 0 !important;
-			color: white;
-
-			a {
+		> thead > tr {
+			> th {
+				color: @navy-blue !important;
+				font-size: 10px;
+				font-family: "GothamMedium";
+				font-weight: bold;
+				background-color: @off-white;
+				padding-left: 15px;
+				padding-top: 15px;
+				padding-bottom: 15px;
 				color: white;
-			}
+				font-size: 16px;
+				text-transform: uppercase;
+				border-bottom: 1px solid @space-grey !important;
+				border-left: 1px solid @space-grey !important;
 
-			&:last-child {
-				border-left: 1px solid @dark-grey !important;
+				&:last-child {
+					//border-left: 1px solid @space-grey !important;
+				}
+			}
+			> th.cluster-step {
+				//border-right: 1px solid @space-grey !important;
+			}
+			> th.cluster-status.header {
+				border-left: 0 !important;
+				background-image: none;
+				text-indent: -98px;
+			}
+			> th.garbage {
+				border-left: 0 !important;
 			}
 		}
-		td {
-			border: 1px solid transparent !important;
+
+		> tbody > tr {
+			> td {
+				padding-top: 20px;
+				padding-bottom: 20px;
+				padding-left: 15px;
+				background-color: white;
+				color: @dark-grey;
+				border-bottom: 1px solid @space-grey !important;
+				border-left: 1px solid @space-grey !important;
+
+				&:last-child {
+					//border-right: 1px solid transparent !important;
+					//border-left: 1px solid transparent !important;
+				}
+
+				span {
+					color: @dark-grey;
+				}
+				a {
+					color: @dark-grey;
+
+					&:hover {
+						text-decoration: none;
+						color: white;
+					}
+				}
+			}
+			> td.cluster-step {
+				//border-right: 1px solid @space-grey !important;
+			}
+			> td.cluster-status {
+				border-left: 1px solid transparent !important;
+			}
+			> td.garbage {
+				border-left: 1px solid transparent !important;
+				width: 125px;
+				max-width: 125px;
+			}
+			a {
+				color: @dark-grey;
+			}
+			&:hover, &:focus {
+				> td {
+					background-color: @navy-blue !important;
+					border: 1px solid transparent !important;
+					color: white;
+
+					a {
+						color: white;
+					}
+
+					&:last-child {
+						//border-left: 1px solid @dark-grey !important;
+						border-bottom: 1px solid transparent !important;
+					}
+				}
+				> td.garbage {
+					border-left: 0 !important;
+				}
+			}
 		}
-		td.garbage {
-			border-left: 0 !important;
-		}
-	}
-	td.garbage {
-		border-left: 0 !important;
-		width: 125px;
-		max-width: 125px;
-	}
-	a {
-		color: @dark-grey;
 	}
 }
 
-.spl-panel-table > tbody > tr > td {
+// Table styling specific to the Describe Cluster page
+.describe-cluster.ng-scope {
+	#panels {
+		.spl-panel-table {
+			tr {
+				> th {
+					color: @dark-grey;
+				}
+			}
+			> tbody > tr {
 
-	span {
-		color: rgb(192, 205, 221);
-	}
-	a:hover {
-		text-decoration: none;
-		color: white;
+				> td {
+					background-color: white !important;
+
+
+					div[ng-hide="remainingServices"] {
+						color: @dark-grey;
+					}
+				}
+				> td.cluster-status {
+					border-left: 1px solid @space-grey !important;
+				}
+				&:hover, &:focus {
+					> td {
+						background-color: white !important;
+						border: 1px solid @space-grey !important;
+						color: @dark-grey;
+					}
+				}
+			}
+			.btn-spl.btn-info, .btn-spl.btn-default {
+				.btn-grey();
+				color: @dark-grey !important;
+				height: 50px;
+
+				&:hover {
+					color: white !important;
+				}
+			}
+		}
 	}
 }
 
@@ -1436,10 +1614,25 @@ a strong {
 	.full-width();
 	background-color: @grey;
 
-	h1,h2,h3,h4,h5 {
+	h1, h2, h3, h4, h5 {
 		color: @dark-grey;
 		font-weight: bold;
 		text-transform: uppercase;
+	}
+	h3 {
+		line-height: 1.5;
+	}
+	.pull-right {
+		//text-align: right;
+		.btn-delete {
+			background-color: @off-white;
+				&:hover {
+					background-color: @red;
+				}
+		}
+		form, #global {
+			display: inline-block;
+		}
 	}
 }
 
@@ -1448,11 +1641,17 @@ a strong {
 	width: 45px;
 }
 .btn-delete {
-	background: @red url("/static/img/v2-assets/delete_active.png") center center no-repeat;
-	border: none;
-	background-position: 12px 10px;
+	background: white url("/static/img/v2-assets/delete.png") center center no-repeat;
+	border: 1px solid @grey;
+	background-position: 13px 10px; //12px 10px
 	padding: 0 10px;
 	width: 45px;
+
+	&:hover {
+		background-color: @red;
+		background-image: url("/static/img/v2-assets/delete_active.png");
+		border: 1px solid transparent;
+	}
 }
 
 #nav .login-dropdown {
