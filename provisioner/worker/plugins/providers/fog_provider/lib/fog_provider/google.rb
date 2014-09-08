@@ -23,10 +23,9 @@ require 'resolv'
 class FogProviderGoogle < Provider
   include FogProvider
 
-  def set_environment
-    @p12_key_dir = File.join(@env[:work_dir], @env[:tenant], 'providertypes/google/p12_keys')
-    @ssh_key_dir = File.join(@env[:work_dir], @env[:tenant], 'providertypes/google/ssh_private_keys')
-  end
+  # plugin defined resources
+  @@p12_key_dir = 'p12_keys'
+  @@ssh_key_dir = 'ssh_private_keys'
 
   def create(inputmap)
     @flavor = inputmap['flavor']
@@ -45,6 +44,7 @@ class FogProviderGoogle < Provider
       validate!
       # Create the server
       log.debug "Creating #{@providerid} on Google using flavor: #{flavor}, image: #{image}"
+      log.debug "working dir: #{Dir.pwd}"
 
       # disks are managed separately, so CREATE must first create and confirm the disk to be used
       # handle boot disk
@@ -81,10 +81,11 @@ class FogProviderGoogle < Provider
           'root'
         end
       @result['result']['ssh-auth']['user'] = ssh_user
-      @result['result']['ssh-auth']['identityfile'] = File.join(@ssh_key_dir, @google_ssh_key_name)
+      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @google_ssh_key_name)
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
+      log.error(e.backtrace.join("\n"))
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.create: #{e.inspect}"
     else
       log.debug "Create finished successfully: #{@result}"
@@ -266,7 +267,7 @@ class FogProviderGoogle < Provider
   def connection
     # Create connection
     # rubocop:disable UselessAssignment
-    p12_key = File.join( @p12_key_dir, @google_p12_key_name)
+    p12_key = File.join( @@p12_key_dir, @google_p12_key_name)
     @connection ||= begin
       connection = Fog::Compute.new(
         provider: 'google',
@@ -313,11 +314,15 @@ class FogProviderGoogle < Provider
     unless @google_client_email =~ /.*gserviceaccount.com$/
       errors << 'Invalid service account email address. It must be in the gserviceaccount.com domain'
     end
-    ssh_key = File.join(@ssh_key_dir, @google_ssh_key_name)
-    p12_key = File.join( @p12_key_dir, @google_p12_key_name)
-    [ssh_key, p12_key].each do |key|
-      next if File.readable?(key)
-      errors << "cannot read named key from resource directory: #{key}. Please ensure you have uploaded a key via the UI or API"
+    if (@google_ssh_key_name.nil? || @google_p12_key_name.nil?)
+       errors << "fields 'P12 key name' and 'ssh private key name' must be defined'"
+    else
+      ssh_key = File.join(@@ssh_key_dir, @google_ssh_key_name)
+      p12_key = File.join(@@p12_key_dir, @google_p12_key_name)
+      [ssh_key, p12_key].each do |key|
+        next if File.readable?(key)
+        errors << "cannot read named key from resource directory: #{key}. Please ensure you have uploaded a key via the UI or API"
+      end
     end
     fail 'Credential validation failed!' if errors.each { |e| log.error(e) }.any?
   end

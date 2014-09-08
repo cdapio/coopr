@@ -132,7 +132,6 @@ def delegate_task(task, pluginmanager)
   when 'create', 'confirm', 'delete'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForProvider(providerName))
     object = clazz.new(@plugin_env, task)
-    object.set_environment if object.respond_to? :set_environment
     cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'providertypes', providerName)
     Dir.chdir(cwd) do
       result = object.runTask
@@ -140,7 +139,6 @@ def delegate_task(task, pluginmanager)
   when 'install', 'configure', 'initialize', 'start', 'stop', 'remove'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
     object = clazz.new(@plugin_env, task)
-    object.set_environment if object.respond_to? :set_environment
     cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'automatortypes', automatorName)
     Dir.chdir(cwd) do
       result = object.runTask
@@ -154,7 +152,6 @@ def delegate_task(task, pluginmanager)
       task['config']['automators'].each do |automator|
         clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automator))
         object = clazz.new(@plugin_env, task)
-        object.set_environment if object.respond_to? :set_environment
         cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'automatortypes', automator)
         Dir.chdir(cwd) do
           result = object.runTask
