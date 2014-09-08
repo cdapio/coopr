@@ -15,7 +15,7 @@
  */
 package com.continuuity.loom.codec.json.current;
 
-import com.continuuity.loom.http.request.AddTenantRequest;
+import com.continuuity.loom.http.request.TenantWriteRequest;
 import com.continuuity.loom.spec.TenantSpecification;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -26,19 +26,19 @@ import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 
 /**
- * Codec for deserializing a {@link com.continuuity.loom.http.request.AddTenantRequest},
+ * Codec for deserializing a {@link com.continuuity.loom.http.request.TenantWriteRequest},
  * used so some validation is done on required fields.
  */
-public class AddTenantRequestCodec implements JsonDeserializer<AddTenantRequest> {
+public class TenantWriteRequestCodec implements JsonDeserializer<TenantWriteRequest> {
 
   @Override
-  public AddTenantRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
+  public TenantWriteRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
     TenantSpecification tenantSpec = context.deserialize(jsonObj.get("tenant"), TenantSpecification.class);
     Boolean bootstrap = context.deserialize(jsonObj.get("bootstrap"), Boolean.class);
 
-    return new AddTenantRequest(tenantSpec, bootstrap);
+    return new TenantWriteRequest(tenantSpec, bootstrap);
   }
 }

@@ -18,7 +18,7 @@ package com.continuuity.loom.http;
 import com.continuuity.loom.Entities;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
-import com.continuuity.loom.http.request.AddTenantRequest;
+import com.continuuity.loom.http.request.TenantWriteRequest;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.TenantProvisionerService;
 import com.continuuity.loom.provisioner.plugin.PluginType;
@@ -102,8 +102,8 @@ public class SuperadminHandlerTest extends ServiceTestBase {
   public void testCreateTenant() throws Exception {
     String name = "companyX";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
-    AddTenantRequest addTenantRequest = new AddTenantRequest(requestedTenant, false);
-    HttpResponse response = doPost("/tenants", gson.toJson(addTenantRequest), SUPERADMIN_HEADERS);
+    TenantWriteRequest tenantWriteRequest = new TenantWriteRequest(requestedTenant);
+    HttpResponse response = doPost("/tenants", gson.toJson(tenantWriteRequest), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -120,7 +120,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
   public void testDuplicateTenantNameNotAllowed() throws Exception {
     String name = "companyX";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
-    AddTenantRequest addRequest = new AddTenantRequest(requestedTenant, false);
+    TenantWriteRequest addRequest = new TenantWriteRequest(requestedTenant);
     assertResponseStatus(doPost("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS),
                          HttpResponseStatus.OK);
     assertResponseStatus(doPost("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS),
@@ -130,7 +130,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
   @Test
   public void testCreateTenantWithTooManyWorkersReturnsConflict() throws Exception {
     TenantSpecification requestedTenant = new TenantSpecification("companyX", 10000, 100, 1000);
-    AddTenantRequest addRequest = new AddTenantRequest(requestedTenant, false);
+    TenantWriteRequest addRequest = new TenantWriteRequest(requestedTenant);
     HttpResponse response = doPost("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS);
 
     // perform create request
@@ -146,8 +146,9 @@ public class SuperadminHandlerTest extends ServiceTestBase {
 
     // perform request to write tenant
     TenantSpecification updatedTenant = new TenantSpecification("companyX", 10, 100, 500);
+    TenantWriteRequest writeRequest = new TenantWriteRequest(updatedTenant);
     HttpResponse response =
-      doPut("/tenants/" + updatedTenant.getName(), gson.toJson(updatedTenant), SUPERADMIN_HEADERS);
+      doPut("/tenants/" + updatedTenant.getName(), gson.toJson(writeRequest), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     Assert.assertEquals(updatedTenant, tenantStore.getTenantByID(actualTenant.getId()).getSpecification());
@@ -163,7 +164,8 @@ public class SuperadminHandlerTest extends ServiceTestBase {
 
     // perform request to write tenant
     TenantSpecification updatedFields = new TenantSpecification(name, 100000, 100, 500);
-    HttpResponse response = doPut("/tenants/" + name, gson.toJson(updatedFields), SUPERADMIN_HEADERS);
+    TenantWriteRequest writeRequest = new TenantWriteRequest(updatedFields);
+    HttpResponse response = doPut("/tenants/" + name, gson.toJson(writeRequest), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
   }
 
@@ -316,8 +318,8 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     // make a request to create a tenant and bootstrap it
     String name = "company-dev";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
-    AddTenantRequest addTenantRequest = new AddTenantRequest(requestedTenant, true);
-    HttpResponse response = doPost("/tenants", gson.toJson(addTenantRequest), SUPERADMIN_HEADERS);
+    TenantWriteRequest tenantWriteRequest = new TenantWriteRequest(requestedTenant, true);
+    HttpResponse response = doPost("/tenants", gson.toJson(tenantWriteRequest), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     // make sure tenant account has copied superadmin entities
