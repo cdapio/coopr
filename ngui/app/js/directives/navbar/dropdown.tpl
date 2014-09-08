@@ -25,7 +25,7 @@
   <li role="presentation" ng-repeat="it in theme.list()" ng-class="{disabled:it==theme.current}">
     <a role="menuitem" href="" ng-click="theme.set(it)">
       <span class="fa" ng-class="it==theme.current ? 'fa-dot-circle-o' : 'fa-circle-o'"></span>
-      {{it}}
+      {{it | myCapitalizeFilter}}
     </a>
   </li>
 
@@ -47,14 +47,14 @@
   <li role="presentation" ng-show="currentUser">
     <a role="menuitem" tabindex="-1" href="" ng-click="logout()">
       <span class="fa fa-sign-out"></span>
-      Log out
+      Logout
     </a>
   </li>
 
   <li role="presentation" ng-hide="currentUser" ui-sref-active="disabled">
     <a role="menuitem" tabindex="-1" href="" ui-sref="login">
       <span class="fa fa-sign-in"></span>
-      Log in
+      Sign in
     </a>
   </li>
 

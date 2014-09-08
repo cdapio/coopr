@@ -1,26 +1,23 @@
 <div class="page-header">
 
-  <div class="pull-right" role="navigation">
-    <div class="btn-group">
+  <div class="btn-group btn-group-xs coopr-subnav" role="navigation">
 
-      <a class="btn btn-default btn-xs" ui-sref=".list" ng-class="{'active': $state.includes('*.list')}">
-        <span class="fa fa-list"></span>
-      </a>
+    <a class="btn btn-default" ui-sref=".list" ng-class="{'active': $state.includes('*.list')}">
+      <span class="fa fa-list"></span>
+    </a>
 
-      <div class="btn-group">
-        <a class="btn btn-default btn-xs dropdown-toggle" bs-dropdown="dropdown" data-placement="bottom-right" ng-class="{'disabled': !subnavList.length}">
-          {{$state.current.data.ddLabel | uppercase}}
-          <span class="caret"></span>
-        </a>
-      </div>
-
-      <a class="btn btn-default btn-xs" ui-sref=".create" ng-class="{'active': $state.includes('*.create')}">
-        <span class="fa fa-files-o"></span>
-        CREATE
+    <div class="btn-group btn-group-xs">
+      <a class="btn btn-default dropdown-toggle" bs-dropdown="dropdown" data-placement="bottom-right" ng-class="{'disabled': !subnavList.length}">
+        {{$state.current.data.ddLabel | uppercase}}
+        <span class="caret"></span>
       </a>
     </div>
-  </div>
 
+    <a class="btn btn-default" ui-sref=".create" ng-class="{'active': $state.includes('*.create')}">
+      <span class="fa fa-files-o"></span>
+      CREATE
+    </a>
+  </div>
 
   <h2>
     {{$state.current.data.title || $state.current.name}}

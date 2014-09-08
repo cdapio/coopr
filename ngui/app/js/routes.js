@@ -20,7 +20,8 @@ angular.module(PKG.name)
 
       .state('home', {
         url: '/',
-        templateUrl: '/partials/home.html'
+        templateUrl: '/partials/home.html',
+        controller: 'HomeCtrl'
       })
 
       .state('404', {

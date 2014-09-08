@@ -53,6 +53,11 @@ main.container {
   }
 }
 
+@media (max-width: @screen-xs-max) {
+  .form-control {
+    margin-bottom: 1px;
+  }
+}
 
 .form-control.ng-dirty.ng-invalid {
   border-color: #a94442;
@@ -64,9 +69,32 @@ main.container {
 }
 
 
+.jumbotron {
+  margin-top: 1em;
+}
+
+
 .coopr-list-striped {
   > li:nth-child(odd) {
     background-color: @table-bg-accent;
+  }
+}
+
+
+.coopr-subnav {
+  float: right;
+  margin-top: 10px;
+}
+
+.coopr-ticker {
+  p {
+    font-weight: bold;
+    text-align: center;
+    em {
+      display: block;
+      font-style: normal;
+      font-size: 200%;
+    }
   }
 }
 
