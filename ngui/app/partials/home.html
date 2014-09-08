@@ -57,4 +57,13 @@
     </div>
   </div>
 
+  <p ng-show="timestamp"><small>
+    Data last updated 
+    <a href="" ng-click="refresh()" 
+      am-time-ago="timestamp" 
+      bs-tooltip="(timestamp | amDateFormat:'H:mm:ss') + ' [click to refresh]'"
+      data-placement="right"></a>.
+    </small>
+  </p>
+
 </div>

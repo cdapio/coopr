@@ -31,6 +31,7 @@ angular
     ]).name,
 
     'angular-loading-bar',
+    'angularMoment',
     'ngAnimate',
     'ngSanitize',
     'ui.router'

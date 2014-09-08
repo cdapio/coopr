@@ -12,6 +12,7 @@
     "ngstorage": "~0.3.0",
     "angular-loading-bar": "~0.5.0",
     "font-awesome": "~4.2.0",
-    "es5-shim": "~4.0.3"
+    "es5-shim": "~4.0.3",
+    "angular-moment": "~0.8.2"
   }
 }
