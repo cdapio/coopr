@@ -26,16 +26,16 @@
             <table class="table table-striped tablesorter spl-panel-table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Description</th>
+                  <th class="col-name">Name</th>
+                  <th class="col-description">Description</th>
                   <th class="no-sort garbage"></th>
                 </tr>
               </thead>
               <tbody>
                 {% for entry in hardwaretypes %}
                   <tr>
-                    <td><a href="/hardwaretypes/hardwaretype/{{entry.name}}">{{ entry.name }}</a></td>
-                    <td>{{ entry.description }}</td>
+                    <td class="col-name"><a href="/hardwaretypes/hardwaretype/{{entry.name}}">{{ entry.name }}</a></td>
+                    <td class="col-description">{{ entry.description }}</td>
                     <td class="garbage">
                       <form role="form" method="POST" action="/hardwaretypes/delete/{{entry.name}}" class="delete-form">
                         <input type="hidden" value="{{entry.name}}" name="name" />
