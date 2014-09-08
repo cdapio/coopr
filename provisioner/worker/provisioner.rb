@@ -128,36 +128,37 @@ def delegate_task(task, pluginmanager)
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForProvider(providerName))
     object = clazz.new(@plugin_env, task)
     object.set_environment if object.respond_to? :set_environment
-    result = object.runTask
+    cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'providertypes', providerName)
+    Dir.chdir(cwd) do
+      result = object.runTask
+    end
   when 'install', 'configure', 'initialize', 'start', 'stop', 'remove'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
     object = clazz.new(@plugin_env, task)
     object.set_environment if object.respond_to? :set_environment
-    result = object.runTask
+    cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'automatortypes', automatorName)
+    Dir.chdir(cwd) do
+      result = object.runTask
+    end
   when 'bootstrap'
     combinedresult = {}
     classes = []
     if task['config'].key? 'automators' and !task['config']['automators'].empty?
-      # server has specified which bootstrap handlers need to run
+      # server must specify which bootstrap handlers need to run
       log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
       task['config']['automators'].each do |automator|
-        classes.push(pluginmanager.getHandlerActionObjectForAutomator(automator))
+        clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automator))
+        object = clazz.new(@plugin_env, task)
+        object.set_environment if object.respond_to? :set_environment
+        cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'automatortypes', automator)
+        Dir.chdir(cwd) do
+          result = object.runTask
+        end
+        combinedresult.merge!(result)
       end
     else
-      # default to running all registered bootstrap handlers
-      classes = pluginmanager.getAllHandlerActionObjectsForAutomators
-      log.debug "Task #{task_id} running bootstrap handlers: #{classes}"
+      log.warn "No automators specified to bootstrap"
     end
-    fail 'No bootstrappers configured' if classes.empty?
-
-    classes.each do |klass|
-      klass = Object.const_get(klass)
-      object = klass.new(@plugin_env, task)
-      object.set_environment if object.respond_to? :set_environment
-      result = object.runTask
-      combinedresult.merge!(result)
-    end
-
     result = combinedresult
   else
     log.error "Unhandled task of type #{task['taskName']}"
