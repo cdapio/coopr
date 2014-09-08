@@ -15,6 +15,6 @@
  */
 
 /**
- * Loom queue tests.
+ * Queue tests.
  */
 package com.continuuity.loom.common.queue.internal;

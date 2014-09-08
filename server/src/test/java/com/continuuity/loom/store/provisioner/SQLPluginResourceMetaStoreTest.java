@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.store.provisioner;
 
+import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.conf.guice.ConfigurationModule;
@@ -31,9 +32,7 @@ public class SQLPluginResourceMetaStoreTest extends PluginResourceMetaStoreTest 
 
   @BeforeClass
   public static void setupTestClass() throws Exception {
-    Configuration conf = Configuration.create();
-    conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
-    conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+    Configuration conf = BaseTest.createTestConf();
     Injector injector = Guice.createInjector(
       new ConfigurationModule(conf),
       new TestStoreModule()

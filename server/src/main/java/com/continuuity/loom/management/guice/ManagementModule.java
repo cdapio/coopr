@@ -1,6 +1,6 @@
 package com.continuuity.loom.management.guice;
 
-import com.continuuity.loom.management.LoomStats;
+import com.continuuity.loom.management.ServerStats;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 
@@ -11,6 +11,6 @@ public class ManagementModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(LoomStats.class).in(Scopes.SINGLETON);
+    bind(ServerStats.class).in(Scopes.SINGLETON);
   }
 }

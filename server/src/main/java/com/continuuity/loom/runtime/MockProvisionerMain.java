@@ -44,8 +44,8 @@ public final class MockProvisionerMain extends DaemonMain {
   public void init(String[] args) {
     Options options = new Options();
     options.addOption("i", "id", true, "Id for the provisioner. Defaults to 'dummy'");
-    options.addOption("h", "host", true, "Loom server to connect to. Defaults to 'localhost'");
-    options.addOption("p", "port", true, "Loom server port to connect to. Defaults to 55054");
+    options.addOption("h", "host", true, "Server to connect to. Defaults to 'localhost'");
+    options.addOption("p", "port", true, "Server port to connect to. Defaults to 55054");
     options.addOption("c", "capacity", true, "total worker capacity for the provisioner. Defaults to 10");
     options.addOption("f", "frequency", true,
                       "milliseconds for workers to wait between taking tasks. Defaults to 1000");

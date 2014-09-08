@@ -129,7 +129,7 @@ public class NodeService {
    * @param clusterId Id of the cluster the node is a part of.
    * @param nodeNum Number of the node in the cluster. Must be unique across the cluster.
    * @param dnsSuffix DNS suffix to use.
-   * @return Unique hostname (at least across Loom managed nodes).
+   * @return Unique hostname (at least across system managed nodes).
    */
   public static String createHostname(String clusterName, String clusterId, int nodeNum, String dnsSuffix) {
     String actualSuffix = (dnsSuffix == null || dnsSuffix.isEmpty()) ? "local" : dnsSuffix;

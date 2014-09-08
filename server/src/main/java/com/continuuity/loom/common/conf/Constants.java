@@ -20,7 +20,7 @@ import com.continuuity.loom.scheduler.callback.HttpPostClusterCallback;
 import com.google.common.base.Joiner;
 
 /**
- * Constants used by Loom.
+ * Constants used by the system.
  */
 public class Constants {
 
@@ -90,7 +90,7 @@ public class Constants {
    * {@link HttpPostClusterCallback} config settings.
    */
   public static final class HttpCallback {
-    private static final String prefix = "loom.callback.http.";
+    private static final String prefix = "server.callback.http.";
 
     public static final String START_URL = prefix + "start.url";
     public static final String SUCCESS_URL = prefix + "success.url";

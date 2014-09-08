@@ -20,7 +20,7 @@ import com.continuuity.loom.common.conf.Constants;
 import com.continuuity.loom.common.queue.Element;
 import com.continuuity.loom.common.queue.QueueGroup;
 import com.continuuity.loom.common.zookeeper.IdService;
-import com.continuuity.loom.management.LoomStats;
+import com.continuuity.loom.management.ServerStats;
 import com.continuuity.loom.scheduler.Actions;
 import com.continuuity.loom.scheduler.ClusterAction;
 import com.continuuity.loom.scheduler.callback.CallbackData;
@@ -48,7 +48,7 @@ public class TaskService {
   private final ClusterStore clusterStore;
   private final CredentialStore credentialStore;
   private final Actions actions = Actions.getInstance();
-  private final LoomStats loomStats;
+  private final ServerStats serverStats;
   private final IdService idService;
   private final Gson gson;
   private final QueueGroup callbackQueues;
@@ -56,13 +56,13 @@ public class TaskService {
   @Inject
   private TaskService(ClusterStoreService clusterStoreService,
                       CredentialStore credentialStore,
-                      LoomStats loomStats,
+                      ServerStats serverStats,
                       @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
                       IdService idService,
                       Gson gson) {
     this.clusterStore = clusterStoreService.getSystemView();
     this.credentialStore = credentialStore;
-    this.loomStats = loomStats;
+    this.serverStats = serverStats;
     this.idService = idService;
     this.gson = gson;
     this.callbackQueues = callbackQueues;
@@ -151,7 +151,7 @@ public class TaskService {
     }
     clusterStore.writeClusterJob(job);
 
-    loomStats.getFailedClusterStats().incrementStat(job.getClusterAction());
+    serverStats.getFailedClusterStats().incrementStat(job.getClusterAction());
     callbackQueues.add(cluster.getAccount().getTenantId(),
                        new Element(gson.toJson(new CallbackData(CallbackData.Type.FAILURE, cluster, job))));
   }
@@ -232,7 +232,7 @@ public class TaskService {
     }
     clusterStore.writeCluster(cluster);
 
-    loomStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
+    serverStats.getSuccessfulClusterStats().incrementStat(job.getClusterAction());
     if (job.getClusterAction() == ClusterAction.CLUSTER_DELETE) {
       wipeSensitiveFields(cluster);
     }
@@ -253,7 +253,7 @@ public class TaskService {
     clusterStore.writeClusterTask(clusterTask);
 
     // Update stats
-    loomStats.getProvisionerStats().incrementStat(clusterTask.getTaskName());
+    serverStats.getProvisionerStats().incrementStat(clusterTask.getTaskName());
   }
 
   /**
@@ -271,7 +271,7 @@ public class TaskService {
     clusterStore.writeClusterTask(clusterTask);
 
     // Update stats
-    loomStats.getDroppedProvisionerStats().incrementStat(clusterTask.getTaskName());
+    serverStats.getDroppedProvisionerStats().incrementStat(clusterTask.getTaskName());
   }
 
   /**
@@ -289,7 +289,7 @@ public class TaskService {
     clusterStore.writeClusterTask(clusterTask);
 
     // Update stats
-    loomStats.getFailedProvisionerStats().incrementStat(clusterTask.getTaskName());
+    serverStats.getFailedProvisionerStats().incrementStat(clusterTask.getTaskName());
   }
 
   /**
@@ -307,7 +307,7 @@ public class TaskService {
     clusterStore.writeClusterTask(clusterTask);
 
     // update stats
-    loomStats.getSuccessfulProvisionerStats().incrementStat(clusterTask.getTaskName());
+    serverStats.getSuccessfulProvisionerStats().incrementStat(clusterTask.getTaskName());
   }
 
   private void wipeSensitiveFields(Cluster cluster) throws IOException {
