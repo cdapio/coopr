@@ -1,7 +1,7 @@
 var module = angular.module(PKG.name+'.filters');
 
 
-module.filter('myCapitalizeFilter', function () {
+module.filter('myCapitalizeFilter', function myCapitalizeFilter () {
 
   return function(input) {
     input = input ? input.toLowerCase() : '';
