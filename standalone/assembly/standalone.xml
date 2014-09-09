@@ -37,6 +37,10 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/../server/bin</directory>
+            <outputDirectory>/server/bin</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/../standalone/bin</directory>
             <outputDirectory>/bin</outputDirectory>
         </fileSet>
