@@ -22,14 +22,19 @@ require 'net/scp'
 class ChefSoloAutomator < Automator
   attr_accessor :credentials, :cookbooks_path, :cookbooks_tar, :remote_cache_dir
 
+  # class vars
+   @@remote_cache_dir = "/var/cache/loom"
+   @@remote_chef_dir = "/var/chef"
+
   def initialize(env, task)
     super(env, task)
     work_dir = @env[:work_dir]
     tenant = @env[:tenant]
     @chef_primitives_path = %W( #{work_dir} #{tenant} automatortypes chef-solo ).join('/')
-    @remote_cache_dir = "/var/cache/loom"
-    @remote_chef_dir = "/var/chef"
-  end
+#    @@remote_cache_dir = "/var/cache/loom"
+#    @@remote_chef_dir = "/var/chef"
+ end
+
 
   # create local tarballs of the cookbooks, roles, data_bags, etc to be scp'd to remote machine
   def generate_chef_primitive_tar(chef_primitive)
@@ -142,12 +147,12 @@ class ChefSoloAutomator < Automator
 
         ssh_exec!(ssh, "type chef-solo", "Chef install validation")
 
-        ssh_exec!(ssh, "#{sudo} mkdir -p #{@remote_cache_dir}", "Create remote cache dir")
+        ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_cache_dir}", "Create remote cache dir")
 
-        ssh_exec!(ssh, "#{sudo} mkdir -p #{@remote_chef_dir}", "Create remote Chef dir")
+        ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_chef_dir}", "Create remote Chef dir")
 
-        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@remote_cache_dir}", "Changing cache dir owner to #{sshauth['user']}")
-        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@remote_chef_dir}", "Changing Chef dir owner to #{sshauth['user']}")
+        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@@remote_cache_dir}", "Changing cache dir owner to #{sshauth['user']}")
+        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@@remote_chef_dir}", "Changing Chef dir owner to #{sshauth['user']}")
       end
     rescue Net::SSH::AuthenticationFailed => e
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -179,9 +184,9 @@ class ChefSoloAutomator < Automator
 
     # upload tarballs to target machine
     %w[cookbooks data_bags roles].each do |chef_primitive|
-      log.debug "Uploading #{chef_primitive} from #{@chef_primitives_path}/#{chef_primitive}.tar.gz to #{ipaddress}:#{@remote_cache_dir}/#{chef_primitive}.tar.gz"
+      log.debug "Uploading #{chef_primitive} from #{@chef_primitives_path}/#{chef_primitive}.tar.gz to #{ipaddress}:#{@@remote_cache_dir}/#{chef_primitive}.tar.gz"
       begin
-        Net::SCP.upload!(ipaddress, sshauth['user'], "#{@chef_primitives_path}/#{chef_primitive}.tar.gz", "#{@remote_cache_dir}/#{chef_primitive}.tar.gz", :ssh =>
+        Net::SCP.upload!(ipaddress, sshauth['user'], "#{@chef_primitives_path}/#{chef_primitive}.tar.gz", "#{@@remote_cache_dir}/#{chef_primitive}.tar.gz", :ssh =>
             @credentials)
       rescue Net::SSH::AuthenticationFailed => e
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -193,7 +198,7 @@ class ChefSoloAutomator < Automator
     %w[cookbooks data_bags roles].each do |chef_primitive|
       begin
         Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
-          ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/#{chef_primitive}.tar.gz -C #{@remote_chef_dir}", "Extracting remote #{@remote_cache_dir}/#{chef_primitive}.tar.gz")
+          ssh_exec!(ssh, "tar xf #{@@remote_cache_dir}/#{chef_primitive}.tar.gz -C #{@@remote_chef_dir}", "Extracting remote #{@@remote_cache_dir}/#{chef_primitive}.tar.gz")
         end
       rescue Net::SSH::AuthenticationFailed => e
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -237,7 +242,7 @@ class ChefSoloAutomator < Automator
       # scp task.json to remote
       log.debug "Copying json attributes to remote"
       begin
-        Net::SCP.upload!(ipaddress, sshauth['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
+        Net::SCP.upload!(ipaddress, sshauth['user'], tmpjson.path, "#{@@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
           @credentials)
       rescue Net::SSH::AuthenticationFailed
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -252,7 +257,7 @@ class ChefSoloAutomator < Automator
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
 
-        ssh_exec!(ssh, "#{sudo} chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'", "Running Chef-solo")
+        ssh_exec!(ssh, "#{sudo} chef-solo -j #{@@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'", "Running Chef-solo")
       end
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
