@@ -56,12 +56,6 @@ var ADMINS = {
     password: 'admin'
   }
 };
-var USERS = {
-  'read': {
-    username: 'read',
-    password: 'readonly'
-  }
-};
 
 var DEFAULT_API_KEY = '123456789abcdef';
 
@@ -604,7 +598,7 @@ site.app.get('/tenants', function (req, res) {
       activeTab: 'tenants',
       authenticated: user,
       env: env,
-      skin: site.getSkin(req)  
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -636,7 +630,7 @@ site.app.get('/tenants/tenant/:name', function (req, res) {
       activeTab: 'tenants',
       authenticated: user,
       env: env,
-      skin: site.getSkin(req)  
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -1475,11 +1469,6 @@ site.app.post('/login', function (req, res) {
   var user = req.body.username;
   var password = req.body.password;
   if (user === 'admin' && password != ADMINS.admin.password) {
-    res.redirect('/login');
-    return;
-  }
-
-  if (user === 'readonly' && password !== USERS.read.password) {
     res.redirect('/login');
     return;
   }
