@@ -25,10 +25,10 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
       })
       ['catch'](function (err) {
         $alert({
-          title:'import error!', 
-          content:err, 
-          type:'danger', 
-          duration:3 
+          title: 'import error!', 
+          content: err, 
+          type: 'danger', 
+          duration: 3 
         });
       });
   };
@@ -51,7 +51,7 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
     myApi.Export.query(function (result) {
       var b = new Blob([ angular.toJson(result) ], { type : 'application/json' });
       modalScope.bloburl = window.URL.createObjectURL( b );
-      modalScope.filesize = Math.ceil(b.size/1024) + 'kb';
+      modalScope.filesize = Math.ceil(b.size/1024) + 'KB';
     });
   };
 

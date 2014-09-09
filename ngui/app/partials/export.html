@@ -8,7 +8,8 @@
       <span class="fa fa-download"></span>
     </a>
   </p>
-  <tt ng-show="bloburl">
-    <code>{{filename}}</code> {{filesize}}
-  </tt>
+  <p ng-show="bloburl">
+    <code>{{filename}}</code>
+    <small>{{filesize}}</small>
+  </p>
 </div>
