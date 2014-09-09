@@ -30,6 +30,7 @@ require_relative 'cli'
 require_relative 'logging'
 require_relative 'config'
 require_relative 'constants'
+require_relative 'worker_launcher'
 
 module Loom
   # top-level class for provisioner
@@ -254,10 +255,14 @@ module Loom
       end
     end
 
-    # this is temporary until provisioner process manages worker data
     def register_plugins
-      # launch a single worker with register flag
-      exec("#{File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])} #{File.dirname(__FILE__)}/../../../worker/provisioner.rb --work-dir #{@config.get(PROVISIONER_WORK_DIR)} --uri #{@server_uri} --register")
+      worker_launcher = WorkerLauncher.new(@config)
+      worker_launcher.provisioner = @provisioner_id
+      worker_launcher.name = "plugin-registration-worker"
+      worker_launcher.register = true
+      worker_cmd = worker_launcher.cmd
+      log.debug "launching worker to register plugins: #{worker_cmd}"
+      exec(worker_cmd)
     end
 
     def unregister_from_server
