@@ -4,18 +4,23 @@ var module = angular.module(PKG.name+'.controllers');
 module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi, CrudListBase) {
   CrudListBase.apply($scope);
 
-  var filterFilter = $filter('filter'),
-      notTerminated = { status: '!terminated' };
+  var filterFilter = $filter('filter');
 
-  $scope.clusterFilter = notTerminated;
+  $scope.clusterFilter = null;
 
   $scope.$watchCollection('list', function (list) {
     if (!list.$promise || list.$resolved) {
-      if(filterFilter(list, notTerminated).length == 0) {
-        // there are no active clusters, so we dont need to filter nor show button
-        $scope.clusterFilter = null;
+
+      if (list.length) {
+
+        var terminatedCount = filterFilter(list, { status: 'terminated' }).length;
+        if(terminatedCount && terminatedCount!==list.length) {
+          // we have both active inactive clusters, so filter and show button
+          $scope.clusterFilter = { status: '!terminated' };
+        }
+
+        updatePending();
       }
-      else updatePending();
     }
   });
 

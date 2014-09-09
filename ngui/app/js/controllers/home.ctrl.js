@@ -13,7 +13,7 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
     myFileReader.get()
       .then(
         function (reader) {
-          $modal({title:'TODO', content:reader.result, show:true, placement:'center'});
+          $modal({title:'TODO', content:reader.result, placement:'center', show:true});
         },
         function (err) {
           $alert({title:'import error!', content:err, type:'danger', duration:3 });
@@ -22,7 +22,7 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
   };
 
   $scope.doExport = function () {
-    $modal({title: 'TODO', content: 'Not implemented yet', show: true});
+    $modal({title: 'TODO', content: 'Not implemented yet', placement:'center', show: true});
   };
 
 

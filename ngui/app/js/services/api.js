@@ -19,7 +19,8 @@ module.factory('myApi', function(
     myApi_provisioners,
     myApi_services,
     myApi_templates,
-    myApi_tenants
+    myApi_tenants,
+    myApi_importexport
   ){
 
   return angular.extend({}, 
@@ -30,7 +31,8 @@ module.factory('myApi', function(
     myApi_provisioners,
     myApi_services,
     myApi_templates,
-    myApi_tenants
+    myApi_tenants,
+    myApi_importexport
   );
 
 });
