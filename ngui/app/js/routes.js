@@ -200,12 +200,6 @@ angular.module(PKG.name)
   })
   .run(function ($rootScope, $state, $alert, $timeout, myAuth, MYAUTH_EVENT, MYAUTH_ROLE) {
 
-    if(!myAuth.currentUser) {
-      $timeout(function() {
-        $state.go('login');        
-      });
-    }
-
     $rootScope.$on(MYAUTH_EVENT.loginSuccess, function () {
       $alert({title:'Welcome!', content:'Your tenant is "'+myAuth.currentUser.tenant+'".', type:'success', duration:3});
       $state.go(myAuth.currentUser.hasRole(MYAUTH_ROLE.admin) ? 'home' : 'clusters.list');

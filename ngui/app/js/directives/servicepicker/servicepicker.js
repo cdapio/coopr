@@ -7,8 +7,12 @@ module.directive('myServicePicker', function myServicePickerDirective () {
 
     scope: {
       model: '=',
-      available: '=',
-      readonly: '@'
+      available: '='
+    },
+
+    link: function(scope, element, attrs) {
+      scope.allowadd = angular.isArray(scope.available);
+      scope.allowrm = !!attrs.allowrm && attrs.allowrm!=='false';
     },
 
     controller: function ($scope) {

@@ -40,6 +40,7 @@
     </div>
     <div class="col-xs-9">
       {{model.createTime | date:'short'}}
+      <small am-time-ago="model.createTime"></small>
     </div>
   </div></li>
 
@@ -48,7 +49,13 @@
       <label>Expiry time</label>
     </div>
     <div class="col-xs-9">
-      {{model.expireTime ? (model.expireTime | date:'short') : 'never'}}
+      <div ng-show="model.expireTime">
+        {{model.expireTime | date:'short'}}
+        <small am-time-ago="model.expireTime"></small>
+      </div>
+      <div ng-hide="model.expireTime">
+        <em>never</em>
+      </div>
     </div>
   </div></li>
 
@@ -57,23 +64,28 @@
       <label>Action</label>
     </div>
     <div class="col-xs-9">
-      <em>{{model.progress.action}}</em>
-      <my-status-label data-value="model.progress.actionstatus" />
+      <code>{{model.progress.action}}</code>
+      <my-status-label data-value="model.progress.actionstatus"></my-status-label>
+      <small ng-show="model.message">
+        <br><br><mark>{{model.message}}</mark>
+      </small>
     </div>
   </div></li>
 
-  <li ng-show="model.status!='terminated'"><div class="row">
+  <li ng-if="model.status!='terminated'"><div class="row">
     <div class="col-xs-3">
       <label>Progress</label>
     </div>
     <div class="col-xs-9">
-      <my-progress data-type="bar" 
-          data-add-cls="{{{
-            'pending': 'warning',
-            'running': 'warning'
-          }[model.status]}}"
-          data-value="model.progress.stepscompleted"
-          data-max="model.progress.stepstotal" />
+      <my-progress 
+        data-type="bar" 
+        data-add-cls="{{{
+          'pending': 'warning',
+          'running': 'warning'
+        }[model.status]}}"
+        data-value="model.progress.stepscompleted"
+        data-max="model.progress.stepstotal"
+      ></my-progress>
     </div>
   </div></li>
 
@@ -82,7 +94,7 @@
       <label>Provider</label>
     </div>
     <div class="col-xs-9">
-      <em>{{model.provider.name}}</em> ({{model.provider.description}})
+      {{model.provider.description || model.provider.name}}
     </div>
   </div></li>
 
@@ -91,7 +103,7 @@
       <label>Template</label>
     </div>
     <div class="col-xs-9">
-      <em>{{model.clusterTemplate.name}}</em> ({{model.clusterTemplate.description}})
+      {{model.clusterTemplate.description || model.clusterTemplate.name}}
     </div>
   </div></li>
 
@@ -100,7 +112,9 @@
       <label>Services</label>
     </div>
     <div class="col-xs-9">
-      <my-service-picker data-model="model.services" data-readonly="true" />
+      <my-service-picker 
+        data-model="model.services"
+      ></my-service-picker>
     </div>
   </div></li>
 </ul>

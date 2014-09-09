@@ -4,12 +4,12 @@
       <a class="btn btn-xs btn-default disabled">
         {{svc}}
       </a>
-      <a class="btn btn-xs btn-default" ng-click="rmService(svc)" ng-if="svc!=='base' && !readonly">
+      <a class="btn btn-xs btn-default" ng-click="rmService(svc)" ng-if="svc!=='base' && allowrm">
         <span class="fa fa-minus"></span>
       </a>
     </div>
   </li>
-  <li ng-hide="readonly">
+  <li ng-show="allowadd">
     <a class="btn btn-xs btn-warning" 
       ng-disabled="!dropdown.length"
       bs-dropdown="dropdown">
