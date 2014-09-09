@@ -8,7 +8,8 @@ LOOM_API_KEY=${LOOM_API_KEY:-1234567890abcdef}
 LOOM_TENANT=${LOOM_TENANT:-superadmin}
 SHELL_DIR=${LOOM_HOME}/provisioner/worker/plugins/automators/shell_automator
 
-LOOM_RUBY=${LOOM_RUBY:-ruby}
+LOOM_RUBY=${LOOM_RUBY:-"${LOOM_HOME}/provisioner/embedded/bin/ruby"}
+test -x ${LOOM_RUBY} || LOOM_RUBY="ruby"
 DATA_UPLOADER="${LOOM_RUBY} ${LOOM_HOME}/provisioner/bin/data-uploader.rb"
 
 SCRIPTS_DIR=${SHELL_DIR}/scripts
