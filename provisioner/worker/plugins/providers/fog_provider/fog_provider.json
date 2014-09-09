@@ -129,7 +129,7 @@
             "format": "file",
             "permissions": "0400"
         },
-        "ssh_private_keys": {
+        "ssh_keys": {
             "format": "file",
             "permissions": "0400"
         }
@@ -150,24 +150,24 @@
           "google_p12_key_name": {
             "label": "P12 key name",
             "type": "text",
-            "tip": "Name of the P12 key that has been uploaded"
+            "tip": "Name of the P12 key resource uploaded to the server"
           },
           "google_ssh_key_name": {
             "label": "ssh private key name",
             "type": "text",
-            "tip": "Name of the SSH key that has been uploaded"
+            "tip": "Name of the SSH key resource uploaded to the server"
           },
           "google_ssh_username": {
             "label": "ssh username",
             "type": "text",
-            "tip": "SSH username to use. Must match private key file, and have sudo permissions"
+            "tip": "SSH username to use. Must correspond to the google_ssh_key_name provided, and have sudo permissions"
           },
           "google_data_disk_size_gb": {
             "label": "Data disk size in GB",
             "type": "text",
             "default": 10,
             "override": true,
-            "tip": "Size of the persistent disk to be created and mounted to /data"
+            "tip": "Size of the persistent data disk to be created and mounted"
           },
           "zone_name": {
             "label": "Zone",
