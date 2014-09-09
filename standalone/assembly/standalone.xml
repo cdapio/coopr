@@ -29,14 +29,6 @@
             <outputDirectory>/licenses</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../bin</directory>
-            <outputDirectory>/bin</outputDirectory>
-            <includes>
-                <include>loom-*.sh</include>
-                <include>data-uploader*</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>${project.basedir}/../server/bin</directory>
             <outputDirectory>/server/bin</outputDirectory>
         </fileSet>
