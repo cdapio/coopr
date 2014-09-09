@@ -83,7 +83,7 @@ public class ClustersTest extends GenericTest {
   @Test
   public void test_05_testClustersSelected() {
     assertEquals("Clusters menu item is not selected",
-                 "active nav-item last", TEST_UTIL.getHTMLClasses("#nav-clusters-container"));
+                 "active nav-item", TEST_UTIL.getHTMLClasses("#nav-clusters-container"));
   }
 
   @Test
