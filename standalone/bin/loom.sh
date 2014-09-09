@@ -258,9 +258,9 @@ function provisioner () {
     fi
     if [ "x${LOOM_USE_DUMMY_PROVISIONER}" == "xtrue" ]
     then
-        $LOOM_HOME/bin/dummy-provisioner.sh $1
+        $LOOM_HOME/server/bin/dummy-provisioner.sh $1
     else
-        $LOOM_HOME/bin/provisioner.sh $1
+        $LOOM_HOME/provisioner/bin/provisioner.sh $1
     fi
 }
 
@@ -271,8 +271,8 @@ function greeting () {
 
 case "$1" in
   start)
-    $LOOM_HOME/bin/server.sh start && \
-    $LOOM_HOME/bin/ui.sh start && \
+    $LOOM_HOME/server/bin/server.sh start && \
+    $LOOM_HOME/ui/bin/ui.sh start && \
     load_defaults && \
     provisioner start && \
     request_superadmin_workers && \
@@ -281,22 +281,22 @@ case "$1" in
 
   stop)
     provisioner stop
-    $LOOM_HOME/bin/server.sh stop
-    $LOOM_HOME/bin/ui.sh stop
+    $LOOM_HOME/server/bin/server.sh stop
+    $LOOM_HOME/ui/bin/ui.sh stop
   ;;
 
   restart)
     provisioner stop
-    $LOOM_HOME/bin/ui.sh stop
-    $LOOM_HOME/bin/server.sh stop
-    $LOOM_HOME/bin/server.sh start
-    $LOOM_HOME/bin/ui.sh start
+    $LOOM_HOME/ui/bin/ui.sh stop
+    $LOOM_HOME/server/bin/server.sh stop
+    $LOOM_HOME/server/bin/server.sh start
+    $LOOM_HOME/ui/bin/ui.sh start
     provisioner start
   ;;
 
   status)
-    $LOOM_HOME/bin/server.sh status
-    $LOOM_HOME/bin/ui.sh status
+    $LOOM_HOME/server/bin/server.sh status
+    $LOOM_HOME/server/bin/ui.sh status
     provisioner status
   ;;
 
