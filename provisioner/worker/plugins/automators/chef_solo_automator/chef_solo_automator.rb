@@ -23,9 +23,9 @@ class ChefSoloAutomator < Automator
   attr_accessor :credentials, :cookbooks_path, :cookbooks_tar, :remote_cache_dir
 
   # class vars
-   @@chef_primitives = [ 'cookbooks', 'data_bags', 'roles' ]
-   @@remote_cache_dir = '/var/cache/loom'
-   @@remote_chef_dir = '/var/chef'
+  @@chef_primitives = [ 'cookbooks', 'data_bags', 'roles' ]
+  @@remote_cache_dir = '/var/cache/loom'
+  @@remote_chef_dir = '/var/chef'
 
   # create local tarballs of the cookbooks, roles, data_bags, etc to be scp'd to remote machine
   def generate_chef_primitive_tar(chef_primitive)
@@ -43,14 +43,12 @@ class ChefSoloAutomator < Automator
     # rubocop:disable GuardClause
     if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
       log.debug "Generating #{chef_primitive_tar} from #{chef_primitive_path}"
-      #`tar -cLzf "#{chef_primitive_tar}.new" -C "#{@chef_primitives_path}" #{chef_primitive}`
       `tar -cLzf "#{chef_primitive_tar}.new" #{chef_primitive}`
       `mv "#{chef_primitive_tar}.new" "#{chef_primitive_tar}"`
       log.debug "Generation complete: #{chef_primitive_tar}"
     end
     # rubocop:enable GuardClause
   end
-
 
   def set_credentials(sshauth)
     @credentials = Hash.new
@@ -201,19 +199,7 @@ class ChefSoloAutomator < Automator
       rescue Net::SSH::AuthenticationFailed => e
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
-
     end
-
-#    # extract tarballs on remote machine to /var/chef
-#    %w[cookbooks data_bags roles].each do |chef_primitive|
-#      begin
-#        Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
-#          ssh_exec!(ssh, "tar xf #{@@remote_cache_dir}/#{chef_primitive}.tar.gz -C #{@@remote_chef_dir}", "Extracting remote #{@@remote_cache_dir}/#{chef_primitive}.tar.gz")
-#        end
-#      rescue Net::SSH::AuthenticationFailed => e
-#        raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
-#      end
-#    end
 
     @result['status'] = 0
 
