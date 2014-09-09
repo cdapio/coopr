@@ -8,7 +8,8 @@ LOOM_API_KEY=${LOOM_API_KEY:-1234567890abcdef}
 LOOM_TENANT=${LOOM_TENANT:-superadmin}
 CHEF_SOLO_DIR=${LOOM_HOME}/provisioner/worker/plugins/automators/chef_solo_automator/chef_solo_automator
 
-LOOM_RUBY=${LOOM_RUBY:-ruby}
+LOOM_RUBY=${LOOM_RUBY:-"${LOOM_HOME}/provisioner/embedded/bin/ruby"}
+test -x ${LOOM_RUBY} || LOOM_RUBY="ruby"
 DATA_UPLOADER="${LOOM_RUBY} ${LOOM_HOME}/provisioner/bin/data-uploader.rb"
 
 COOKBOOKS_DIR=${CHEF_SOLO_DIR}/cookbooks
