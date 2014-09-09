@@ -30,7 +30,7 @@ require_relative 'cli'
 require_relative 'logging'
 require_relative 'config'
 require_relative 'constants'
-require_relative 'worker_launcher'
+require_relative 'workerlauncher'
 
 module Loom
   # top-level class for provisioner
