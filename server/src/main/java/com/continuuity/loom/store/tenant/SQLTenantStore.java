@@ -88,11 +88,6 @@ public class SQLTenantStore extends AbstractIdleService implements TenantStore {
     if (superadminTenant == null) {
       writeTenant(Tenant.DEFAULT_SUPERADMIN);
     }
-
-    Tenant readonlyTenant = getTenantByName(Constants.READONLY_TENANT);
-    if (readonlyTenant == null) {
-      writeTenant(Tenant.DEFAULT_READONLY);
-    }
   }
 
   @Override

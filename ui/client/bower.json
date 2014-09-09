@@ -3,7 +3,7 @@
   "description": "Continuuity Loom UI",
   "version": "0.0.1",
   "homepage": "https://github.com/continuuity/loom",
-  "license": "GPLv2",
+  "license": "Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0",
   "private": true,
   "dependencies": {
     "angular": "1.2.x",
