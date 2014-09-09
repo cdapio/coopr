@@ -73,25 +73,25 @@ if loom_uri.nil? && !options[:file]
   exit(1)
 end
 
-unless(options[:work_dir])
-  puts "--work-dir option must be specified"
+unless options[:work_dir]
+  puts '--work-dir option must be specified'
   exit(1)
 end
 
-unless (options[:tenant] || options[:register])
-  puts "Either --tenant or --register options must be specified"
+unless options[:tenant] || options[:register]
+  puts 'Either --tenant or --register options must be specified'
   exit(1)
 end
 
-if(loom_uri.nil? && options[:register])
-  puts "--register option requires the --uri [server uri] option"
+if loom_uri.nil? && options[:register]
+  puts '--register option requires the --uri [server uri] option'
   exit(1)
 end
 
 include Logging
 log_file = nil
 if options[:log_directory] && options[:name]
-  log_file = [ options[:log_directory], options[:name] ].join('/') + '.log'
+  log_file = [options[:log_directory], options[:name]].join('/') + '.log'
 elsif options[:log_directory]
   log_file = "#{options[:log_directory]}/worker-default.log"
 end
@@ -109,7 +109,7 @@ if pluginmanager.providermap.empty? or pluginmanager.automatormap.empty?
 end
 
 # the environment passed to plugins
-@plugin_env = options 
+@plugin_env = options
 
 def delegate_task(task, pluginmanager)
   providerName = nil # rubocop:disable UselessAssignment
@@ -159,7 +159,7 @@ def delegate_task(task, pluginmanager)
         combinedresult.merge!(result)
       end
     else
-      log.warn "No automators specified to bootstrap"
+      log.warn 'No automators specified to bootstrap'
     end
     result = combinedresult
   else
@@ -172,12 +172,12 @@ end
 # register plugins with the server if --register flag passed
 if options[:register]
   pluginmanager.register_plugins(loom_uri)
-  if (pluginmanager.load_errors?)
-    log.error "There was at least one provisioner plugin load failure"
+  if pluginmanager.load_errors?
+    log.error 'There was at least one provisioner plugin load failure'
     exit(1)
   end
-  if (pluginmanager.register_errors?)
-    log.error "There was at least one provisioner plugin register failure"
+  if pluginmanager.register_errors?
+    log.error 'There was at least one provisioner plugin register failure'
     exit(1)
   end
   exit(0)
@@ -199,7 +199,7 @@ if options[:file]
     sigterm.dont_interupt {
       result = delegate_task(task, pluginmanager)
     }
-  rescue Exception => e
+  rescue => e
     log.error "Caught exception when running task from file #{options[:file]}"
 
     result = {} if result.nil? == true
@@ -264,7 +264,7 @@ else
         result['provisionerId'] = options[:provisioner]
         result['tenantId'] = options[:tenant]
 
-        log.debug "Task <#{task["taskId"]}> completed, updating results <#{result}>"
+        log.debug "Task <#{task['taskId']}> completed, updating results <#{result}>"
         begin
           response = RestClient.post "#{loom_uri}/v2/tasks/finish", result.to_json
         rescue => e
@@ -286,7 +286,7 @@ else
           result['stdout'] = e.inspect
           result['stderr'] = "#{e.inspect}\n#{e.backtrace.join("\n")}"
         end
-        log.error "Task <#{task["taskId"]}> failed, updating results <#{result}>"
+        log.error "Task <#{task['taskId']}> failed, updating results <#{result}>"
         begin
           response = RestClient.post "#{loom_uri}/v2/tasks/finish", result.to_json
         rescue => e
