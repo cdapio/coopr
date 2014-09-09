@@ -23,7 +23,7 @@ class ChefSoloAutomator < Automator
   attr_accessor :credentials, :cookbooks_path, :cookbooks_tar, :remote_cache_dir
 
   # class vars
-  @@chef_primitives = [ 'cookbooks', 'data_bags', 'roles' ]
+  @@chef_primitives = %w(cookbooks data_bags roles)
   @@remote_cache_dir = '/var/cache/loom'
   @@remote_chef_dir = '/var/chef'
 
