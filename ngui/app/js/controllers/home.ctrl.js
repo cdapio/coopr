@@ -3,23 +3,27 @@ var module = angular.module(PKG.name+'.controllers');
 
 module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
 
+  var filterFilter = $filter('filter');
+
+
   if(myAuth.isAuthenticated()) {
-    refresh();
+    getData();
   }
 
-  $scope.refresh = refresh;
+  $scope.doRefresh = getData;
+
 
   $scope.doImport = function() {
     myFileReader.get()
-      .then(
-        function (reader) {
-          $modal({title:'TODO', content:reader.result, placement:'center', show:true});
-        },
-        function (err) {
-          $alert({title:'import error!', content:err, type:'danger', duration:3 });
-        }
-      );
+      .then(function (reader) {
+        $modal({title:'TODO', content: reader.result, placement:'center', show:true});
+      })
+      ['catch'](function (err) {
+        $alert({title:'import error!', content:err, type:'danger', duration:3 });
+      });
   };
+
+
 
   $scope.doExport = function () {
     $modal({title: 'TODO', content: 'Not implemented yet', placement:'center', show: true});
@@ -27,9 +31,8 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
 
 
 
-  var filterFilter = $filter('filter');
 
-  function refresh () {
+  function getData () {
     myApi.Cluster.query(function (list) {
 
       var active = filterFilter(list, {status:'active'});

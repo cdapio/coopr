@@ -40,6 +40,7 @@ main.container {
 }
 
 .modal {
+
   &.center {
     .modal-dialog {
       position: fixed;
@@ -53,7 +54,8 @@ main.container {
   }
 
   .modal-body {
-    overflow-y: scroll;
+    max-height: 400px;
+    overflow: scroll;
   }
 }
 
