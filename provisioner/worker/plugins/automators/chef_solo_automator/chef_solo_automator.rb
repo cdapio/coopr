@@ -32,6 +32,9 @@ class ChefSoloAutomator < Automator
     chef_primitive_path = "#{chef_primitive}"
     chef_primitive_tar = "#{chef_primitive}.tar.gz"
 
+    # if no resources of this type are synced, dont do anything
+    return unless File.directory?(chef_primitive_path)
+
     # limit tarball regeneration to once per 10min
     # rubocop:disable GuardClause
     if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
@@ -175,6 +178,11 @@ class ChefSoloAutomator < Automator
 
     # upload tarballs to target machine
     %w[cookbooks data_bags roles].each do |chef_primitive|
+      unless File.exists?("#{chef_primitive}.tar.gz")
+        log.warn "No #{chef_primitive} available to copy to remote"
+        next
+      end
+
       log.debug "Uploading #{chef_primitive} from #{chef_primitive}.tar.gz to #{ipaddress}:#{@@remote_cache_dir}/#{chef_primitive}.tar.gz"
       begin
         Net::SCP.upload!(ipaddress, sshauth['user'], "#{chef_primitive}.tar.gz", "#{@@remote_cache_dir}/#{chef_primitive}.tar.gz", :ssh =>
@@ -183,10 +191,8 @@ class ChefSoloAutomator < Automator
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
       log.debug "Upload complete"
-    end
 
-    # extract tarballs on remote machine to /var/chef
-    %w[cookbooks data_bags roles].each do |chef_primitive|
+      # extract tarballs on remote machine to /var/chef
       begin
         Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
           ssh_exec!(ssh, "tar xf #{@@remote_cache_dir}/#{chef_primitive}.tar.gz -C #{@@remote_chef_dir}", "Extracting remote #{@@remote_cache_dir}/#{chef_primitive}.tar.gz")
@@ -194,7 +200,19 @@ class ChefSoloAutomator < Automator
       rescue Net::SSH::AuthenticationFailed => e
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
+
     end
+
+#    # extract tarballs on remote machine to /var/chef
+#    %w[cookbooks data_bags roles].each do |chef_primitive|
+#      begin
+#        Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
+#          ssh_exec!(ssh, "tar xf #{@@remote_cache_dir}/#{chef_primitive}.tar.gz -C #{@@remote_chef_dir}", "Extracting remote #{@@remote_cache_dir}/#{chef_primitive}.tar.gz")
+#        end
+#      rescue Net::SSH::AuthenticationFailed => e
+#        raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
+#      end
+#    end
 
     @result['status'] = 0
 
