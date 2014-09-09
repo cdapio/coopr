@@ -21,6 +21,7 @@ require 'optparse'
 require 'rest_client'
 require 'socket'
 require 'logger'
+require 'fileutils'
 
 require_relative 'utils.rb'
 require_relative 'pluginmanager.rb'
@@ -111,6 +112,14 @@ end
 # the environment passed to plugins
 @plugin_env = options
 
+def _run_plugin(clazz, env, cwd, task)
+  object = clazz.new(env, task)
+  FileUtils.mkdir_p(cwd)
+  Dir.chdir(cwd) do
+    result = object.runTask
+  end
+end
+
 def delegate_task(task, pluginmanager)
   providerName = nil # rubocop:disable UselessAssignment
   automatorName = nil # rubocop:disable UselessAssignment
@@ -131,18 +140,12 @@ def delegate_task(task, pluginmanager)
   case taskName.downcase
   when 'create', 'confirm', 'delete'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForProvider(providerName))
-    object = clazz.new(@plugin_env, task)
     cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'providertypes', providerName)
-    Dir.chdir(cwd) do
-      result = object.runTask
-    end
+    result = _run_plugin(clazz, @plugin_env, cwd, task)
   when 'install', 'configure', 'initialize', 'start', 'stop', 'remove'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
-    object = clazz.new(@plugin_env, task)
     cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'automatortypes', automatorName)
-    Dir.chdir(cwd) do
-      result = object.runTask
-    end
+    result = _run_plugin(clazz, @plugin_env, cwd, task)
   when 'bootstrap'
     combinedresult = {}
     classes = []
@@ -151,11 +154,8 @@ def delegate_task(task, pluginmanager)
       log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
       task['config']['automators'].each do |automator|
         clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automator))
-        object = clazz.new(@plugin_env, task)
         cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'automatortypes', automator)
-        Dir.chdir(cwd) do
-          result = object.runTask
-        end
+        result = _run_plugin(clazz, @plugin_env, cwd, task)
         combinedresult.merge!(result)
       end
     else
