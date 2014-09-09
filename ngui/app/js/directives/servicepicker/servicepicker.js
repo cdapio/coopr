@@ -11,8 +11,9 @@ module.directive('myServicePicker', function myServicePickerDirective () {
     },
 
     link: function(scope, element, attrs) {
-      scope.allowadd = angular.isArray(scope.available);
-      scope.allowrm = !!attrs.allowrm && attrs.allowrm!=='false';
+      scope.allowAdd = angular.isArray(scope.available); // can we add?
+      scope.allowRm = !!attrs.allowRm && attrs.allowRm!=='false'; // can we delete?
+      scope.allowMngmt = !!attrs.allowMngmt && attrs.allowMngmt!=='false'; // can we manage?
     },
 
     controller: function ($scope) {
@@ -23,29 +24,67 @@ module.directive('myServicePicker', function myServicePickerDirective () {
         });
       };
 
-      $scope.pushService = function (name) {
+      $scope.addService = function (name) {
         $scope.model.push(name);
-        remapDropdown($scope.available, $scope.model);
       };
 
-      function remapDropdown (available, avoidable) {
-        $scope.dropdown = (available||[]).reduce(function (out, svc) {
+      $scope.manageService = function (name) {
+        alert('Not yet implemented');
+      };
+
+      function remapAddables (available, avoidable) {
+        $scope.addsvcDropdown = (available||[]).reduce(function (out, svc) {
           if((avoidable||[]).indexOf(svc.name)===-1) {
             out.push({
               text: svc.name,
-              click: 'pushService("'+svc.name+'")'
+              click: 'addService("'+svc.name+'")'
             });
           }
           return out;
         }, []);
       }
 
-      $scope.$watch('model', function(newVal) {
-        remapDropdown($scope.available, newVal);
+      function remapActionables (visible) {
+        $scope.actionDropdowns = (visible||[]).reduce(function (out, name) {
+          var dd = [];
+
+          if($scope.allowMngmt) {
+            dd.push({
+              text: '<span class="fa fa-fw fa-play"></span>&nbsp;&nbsp;Start',
+              click: 'manageService("start", "'+name+'")'
+            });
+            dd.push({
+              text: '<span class="fa fa-fw fa-stop"></span>&nbsp;&nbsp;Stop',
+              click: 'manageService("stop", "'+name+'")'
+            });
+            dd.push({
+              text: '<span class="fa fa-fw fa-undo"></span>&nbsp;&nbsp;Restart',
+              click: 'manageService("restart", "'+name+'")'
+            });
+            if($scope.allowRm) {
+              dd.push({divider:true});
+            }
+          }
+
+          if($scope.allowRm) {
+            dd.push({
+              text: '<span class="fa fa-fw fa-remove"></span>&nbsp;&nbsp;Remove',
+              click: 'rmService("'+name+'")'
+            });
+          }
+
+          out[name] = dd;
+          return out;
+        }, {});
+      }
+
+      $scope.$watchCollection('model', function(newVal) {
+        remapAddables($scope.available, newVal);
+        remapActionables(newVal);
       });
 
-      $scope.$watch('available', function(newVal) {
-        remapDropdown(newVal, $scope.model);
+      $scope.$watchCollection('available', function(newVal) {
+        remapAddables(newVal, $scope.model);
       });
 
     }

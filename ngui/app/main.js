@@ -50,6 +50,16 @@ angular
 
 
   .config(function ($httpProvider) {
+
+    $httpProvider.interceptors.push(function () {
+      return {
+        request: function(config) {
+          config.timeout = 3000; // 3 seconds default
+          return config;
+        }
+      };
+    });
+
     var delay = window.location.search.match(/delay=(\d+)/);
     if(delay) {
       delay = parseInt(delay[1], 10);
@@ -66,7 +76,6 @@ angular
         };
       });
     }
-
   })
 
 
@@ -87,8 +96,13 @@ angular
     cfpLoadingBarProvider.includeSpinner = false;
   })
 
-  .run(function ($rootScope, $alert, MYAPI_EVENT){
+  .run(function ($rootScope, $alert, MYAPI_EVENT) {
     $rootScope.$on(MYAPI_EVENT.error, function (event, rejection) {
-      $alert({title:'API error '+rejection.status, content:rejection.data, type:'danger', duration:3});
+      $alert({
+        title: 'API error '+rejection.status, 
+        content: rejection.data || 'could not connect to the server', 
+        type: 'danger', 
+        duration: 3
+      });
     });
   });
