@@ -522,7 +522,7 @@ site.app.get('/profile', function (req, res) {
 });
 
 site.app.post('/setskin', function (req, res) {
-  var user = site.checkAuth(req, res, false);
+  var user = site.checkAuth(req, res);
   var myCookie = {};
   for (item in req.cookies) {
     if (item === site.COOKIE_NAME) {
@@ -530,14 +530,19 @@ site.app.post('/setskin', function (req, res) {
     }
   }
   var packageBody = {
-    id: user,
+    id: user.id,
     skin: req.body.skin,
     mods: {}
   }
   var options = {
-    uri: BOX_ADDR + '/profiles/' + user,
+    uri: BOX_ADDR + '/profile',
     method: 'PUT',
-    json: packageBody
+    json: packageBody,
+    headers: {
+      'X-Loom-UserID': user.id,
+      'X-Loom-TenantID': user.tenant,
+      'X-Loom-ApiKey': DEFAULT_API_KEY
+    }
   };
   request(options, function (err, response, body) {
     if(!err) {
@@ -1379,7 +1384,7 @@ site.app.post('/login', function (req, res) {
   var selectedSkin = site.DEFAULT_SKIN;
   var tenant = req.body.tenant;
   var options = {
-    url: BOX_ADDR + '/profiles/' + user,
+    url: BOX_ADDR + '/profile',
     method: 'GET',
     headers: {
       'X-Loom-UserID': user,
@@ -1393,21 +1398,21 @@ site.app.post('/login', function (req, res) {
         var profile = JSON.parse(body);
         selectedSkin = profile.skin;
       } catch (err) {
-        site.logger.info('Improper JSON for profiles call ' + body);
+        site.logger.info('Improper JSON for profile call ' + body);
       }
-      var permissionLevel = site.determinePermissionLevel(user, password);
-      res.cookie(site.COOKIE_NAME, { 
-        user: user,
-        tenant: tenant,
-        permission: permissionLevel,
-        skin: selectedSkin
-      });
-      var authenticated = true;
-      if (permissionLevel === 'admin') {
-        res.redirect('/');
-      } else {
-        res.redirect('/user');
-      }
+    }
+    var permissionLevel = site.determinePermissionLevel(user, password);
+    res.cookie(site.COOKIE_NAME, {
+      user: user,
+      tenant: tenant,
+      permission: permissionLevel,
+      skin: selectedSkin
+    });
+    var authenticated = true;
+    if (permissionLevel === 'admin') {
+      res.redirect('/');
+    } else {
+      res.redirect('/user');
     }
   });
 });
