@@ -39,8 +39,8 @@ chown -R loom:loom /var/run/loom
 # drop permissions to loom user and run service script
 
 if [[ $UID -eq 0 ]]; then
-    su loom -c "cd /opt/loom/server/bin; exec ./loom-server.sh $*"
+    su loom -c "cd /opt/loom/server/bin; exec ./server.sh $*"
 else
-    cd /opt/loom/server/bin; exec ./loom-server.sh $*
+    cd /opt/loom/server/bin; exec ./server.sh $*
 fi
 
