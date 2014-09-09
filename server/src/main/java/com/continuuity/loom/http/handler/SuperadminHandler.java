@@ -18,6 +18,7 @@ package com.continuuity.loom.http.handler;
 import com.continuuity.http.HttpResponder;
 import com.continuuity.loom.account.Account;
 import com.continuuity.loom.common.conf.Constants;
+import com.continuuity.loom.http.request.TenantWriteRequest;
 import com.continuuity.loom.provisioner.CapacityException;
 import com.continuuity.loom.provisioner.Provisioner;
 import com.continuuity.loom.provisioner.QuotaException;
@@ -143,35 +144,23 @@ public class SuperadminHandler extends AbstractAuthHandler {
       return;
     }
 
-    TenantSpecification requestedFields;
-    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    try {
-      requestedFields = gson.fromJson(reader, TenantSpecification.class);
-    } catch (IllegalArgumentException e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
-      return;
-    } catch (Exception e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input");
-      return;
-    } finally {
-      try {
-        reader.close();
-      } catch (IOException e) {
-        LOG.warn("Exception while closing request reader", e);
-      }
-    }
-    if (requestedFields == null) {
+    TenantWriteRequest tenantWriteRequest = getEntityFromRequest(request, responder, TenantWriteRequest.class);
+    if (tenantWriteRequest == null) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input");
       return;
     }
 
     try {
-      String name = requestedFields.getName();
+      TenantSpecification tenantSpecification = tenantWriteRequest.getTenant();
+      String name = tenantSpecification.getName();
       if (tenantProvisionerService.getTenantSpecification(name) != null) {
         responder.sendError(HttpResponseStatus.CONFLICT, "Tenant " + name + " already exists.");
         return;
       }
-      tenantProvisionerService.writeTenantSpecification(requestedFields);
+      String tenantId = tenantProvisionerService.writeTenantSpecification(tenantSpecification);
+      if (tenantWriteRequest.isBootstrap()) {
+        tenantProvisionerService.bootstrapTenant(tenantId);
+      }
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (IOException e) {
       LOG.error("Exception adding tenant.", e);
@@ -181,7 +170,11 @@ public class SuperadminHandler extends AbstractAuthHandler {
       responder.sendError(HttpResponseStatus.CONFLICT, "Not enough capacity to add tenant.");
     } catch (QuotaException e) {
       // should not happen
+      LOG.error("Quota exception while adding tenant during new tenant request {}.", tenantWriteRequest, e);
       responder.sendError(HttpResponseStatus.CONFLICT, e.getMessage());
+    } catch (IllegalAccessException e) {
+      LOG.error("Illegal access while bootstrapping during new tenant request {}.", tenantWriteRequest, e);
+      responder.sendError(HttpResponseStatus.FORBIDDEN, "Illegal access while bootstrapping tenant.");
     }
   }
 
@@ -204,24 +197,13 @@ public class SuperadminHandler extends AbstractAuthHandler {
       return;
     }
 
-    TenantSpecification tenantSpecification = null;
-    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
-    try {
-      tenantSpecification = gson.fromJson(reader, TenantSpecification.class);
-    } catch (IllegalArgumentException e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input: " + e.getMessage());
-      return;
-    } catch (Exception e) {
+    TenantWriteRequest tenantWriteRequest = getEntityFromRequest(request, responder, TenantWriteRequest.class);
+    if (tenantWriteRequest == null) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "invalid input");
       return;
-    } finally {
-      try {
-        reader.close();
-      } catch (IOException e) {
-        LOG.warn("Exception while closing request reader", e);
-      }
     }
 
+    TenantSpecification tenantSpecification = tenantWriteRequest.getTenant();
     if (tenantSpecification.getName() == null || !tenantSpecification.getName().equals(tenantName)) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "tenant name in body does not match name in path.");
       return;

@@ -162,7 +162,6 @@ In addition to the standard REST endpoints, a few RPC functions are available to
 
 RPC
 ---
-  * :ref:`Bootstrapping a Tenant <rpc-bootstrap>`
   * :ref:`Getting Properties of Nodes in a Cluster <rpc-properties>`
 
 About REST (REpresentational State Transfer)
