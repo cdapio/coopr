@@ -312,15 +312,11 @@ class FogProviderGoogle < Provider
     unless @google_client_email =~ /.*gserviceaccount.com$/
       errors << 'Invalid service account email address. It must be in the gserviceaccount.com domain'
     end
-    if @google_ssh_key_name.nil? || @google_p12_key_name.nil?
-      errors << "Fields 'P12 key name' and 'ssh private key name' must be defined'"
-    else
-      ssh_key = File.join(@@ssh_key_dir, @google_ssh_key_name)
-      p12_key = File.join(@@p12_key_dir, @google_p12_key_name)
-      [ssh_key, p12_key].each do |key|
-        next if File.readable?(key)
-        errors << "Cannot read named key from resource directory: #{key}. Please ensure you have uploaded a key via the UI or API"
-      end
+    ssh_key = File.join(@@ssh_key_dir, @google_ssh_key_name)
+    p12_key = File.join(@@p12_key_dir, @google_p12_key_name)
+    [ssh_key, p12_key].each do |key|
+      next if File.readable?(key)
+      errors << "Cannot read named key from resource directory: #{key}. Please ensure you have uploaded a key via the UI or API"
     end
     fail 'Credential validation failed!' if errors.each { |e| log.error(e) }.any?
   end
