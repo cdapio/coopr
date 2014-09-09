@@ -23,8 +23,9 @@ class ChefSoloAutomator < Automator
   attr_accessor :credentials, :cookbooks_path, :cookbooks_tar, :remote_cache_dir
 
   # class vars
-   @@remote_cache_dir = "/var/cache/loom"
-   @@remote_chef_dir = "/var/chef"
+   @@chef_primitives = [ 'cookbooks', 'data_bags', 'roles' ]
+   @@remote_cache_dir = '/var/cache/loom'
+   @@remote_chef_dir = '/var/chef'
 
   # create local tarballs of the cookbooks, roles, data_bags, etc to be scp'd to remote machine
   def generate_chef_primitive_tar(chef_primitive)
@@ -33,7 +34,10 @@ class ChefSoloAutomator < Automator
     chef_primitive_tar = "#{chef_primitive}.tar.gz"
 
     # if no resources of this type are synced, dont do anything
-    return unless File.directory?(chef_primitive_path)
+    unless File.directory?(chef_primitive_path)
+      log.warn "No resources of type #{chef_primitive_path} are synced, skipping tarball generation"
+      return
+    end
 
     # limit tarball regeneration to once per 10min
     # rubocop:disable GuardClause
@@ -117,7 +121,7 @@ class ChefSoloAutomator < Automator
 
     set_credentials(sshauth)
 
-    %w[cookbooks data_bags roles].each do |chef_primitive|
+    @@chef_primitives.each do |chef_primitive|
       generate_chef_primitive_tar(chef_primitive)
     end
 
@@ -177,11 +181,8 @@ class ChefSoloAutomator < Automator
     end
 
     # upload tarballs to target machine
-    %w[cookbooks data_bags roles].each do |chef_primitive|
-      unless File.exists?("#{chef_primitive}.tar.gz")
-        log.warn "No #{chef_primitive} available to copy to remote"
-        next
-      end
+    @@chef_primitives.each do |chef_primitive|
+      next unless File.exists?("#{chef_primitive}.tar.gz")
 
       log.debug "Uploading #{chef_primitive} from #{chef_primitive}.tar.gz to #{ipaddress}:#{@@remote_cache_dir}/#{chef_primitive}.tar.gz"
       begin
