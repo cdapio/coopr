@@ -2,6 +2,7 @@
   <p>
     <a class="btn btn-lg btn-primary" 
       download="{{filename}}"
+      ng-click="$hide()"
       ng-disabled="!bloburl" 
       ng-href="{{bloburl}}">
       download 

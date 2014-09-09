@@ -16,7 +16,7 @@
   <div class="page-header">
 
     <div class="pull-right">
-      <div class="btn-group btn-group-xs">
+      <div class="btn-group btn-group-sm">
         <a class="btn btn-default" href="" ng-click="doImport()">
           <span class="fa fa-arrow-down"></span> Import
         </a>
@@ -63,9 +63,8 @@
     Data last updated 
     <a href="" ng-click="doRefresh()" 
       am-time-ago="timestamp" 
-      bs-tooltip="(timestamp | amDateFormat:'H:mm:ss') + ' [click to refresh]'"
-      data-placement="right"></a>
-    </small>
-  </p>
+      bs-tooltip="(timestamp | amDateFormat:'H:mm:ss') + ' (click to refresh)'"
+    ></a>.
+  </small></p>
 
 </div>
