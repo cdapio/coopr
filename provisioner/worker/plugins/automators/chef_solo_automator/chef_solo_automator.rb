@@ -26,27 +26,18 @@ class ChefSoloAutomator < Automator
    @@remote_cache_dir = "/var/cache/loom"
    @@remote_chef_dir = "/var/chef"
 
-  def initialize(env, task)
-    super(env, task)
-    work_dir = @env[:work_dir]
-    tenant = @env[:tenant]
-    @chef_primitives_path = %W( #{work_dir} #{tenant} automatortypes chef-solo ).join('/')
-#    @@remote_cache_dir = "/var/cache/loom"
-#    @@remote_chef_dir = "/var/chef"
- end
-
-
   # create local tarballs of the cookbooks, roles, data_bags, etc to be scp'd to remote machine
   def generate_chef_primitive_tar(chef_primitive)
 
-    chef_primitive_path = "#{@chef_primitives_path}/#{chef_primitive}"
-    chef_primitive_tar = "#{@chef_primitives_path}/#{chef_primitive}.tar.gz"
+    chef_primitive_path = "#{chef_primitive}"
+    chef_primitive_tar = "#{chef_primitive}.tar.gz"
 
     # limit tarball regeneration to once per 10min
     # rubocop:disable GuardClause
     if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
       log.debug "Generating #{chef_primitive_tar} from #{chef_primitive_path}"
-      `tar -cLzf "#{chef_primitive_tar}.new" -C "#{@chef_primitives_path}" #{chef_primitive}`
+      #`tar -cLzf "#{chef_primitive_tar}.new" -C "#{@chef_primitives_path}" #{chef_primitive}`
+      `tar -cLzf "#{chef_primitive_tar}.new" #{chef_primitive}`
       `mv "#{chef_primitive_tar}.new" "#{chef_primitive_tar}"`
       log.debug "Generation complete: #{chef_primitive_tar}"
     end
@@ -184,9 +175,9 @@ class ChefSoloAutomator < Automator
 
     # upload tarballs to target machine
     %w[cookbooks data_bags roles].each do |chef_primitive|
-      log.debug "Uploading #{chef_primitive} from #{@chef_primitives_path}/#{chef_primitive}.tar.gz to #{ipaddress}:#{@@remote_cache_dir}/#{chef_primitive}.tar.gz"
+      log.debug "Uploading #{chef_primitive} from #{chef_primitive}.tar.gz to #{ipaddress}:#{@@remote_cache_dir}/#{chef_primitive}.tar.gz"
       begin
-        Net::SCP.upload!(ipaddress, sshauth['user'], "#{@chef_primitives_path}/#{chef_primitive}.tar.gz", "#{@@remote_cache_dir}/#{chef_primitive}.tar.gz", :ssh =>
+        Net::SCP.upload!(ipaddress, sshauth['user'], "#{chef_primitive}.tar.gz", "#{@@remote_cache_dir}/#{chef_primitive}.tar.gz", :ssh =>
             @credentials)
       rescue Net::SSH::AuthenticationFailed => e
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
