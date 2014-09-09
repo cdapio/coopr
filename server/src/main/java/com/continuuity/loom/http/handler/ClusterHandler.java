@@ -100,7 +100,7 @@ public class ClusterHandler extends AbstractAuthHandler {
   /**
    * Get all clusters visible to the user. Clients can include a status filter as an http param. The key is 'status'
    * and the value is a comma separated list of statuses. Clusters returned must be in one of the statuses given. If
-   * not status param is given, clusters with any status will be returned. Valid values to include in a status filter
+   * no status param is given, clusters with any status will be returned. Valid values to include in a status filter
    * are any one of {@link Cluster.Status}.
    *
    * @param request Request for clusters.
@@ -814,7 +814,7 @@ public class ClusterHandler extends AbstractAuthHandler {
         try {
           filter.add(Cluster.Status.valueOf(status.toUpperCase()));
         } catch (IllegalArgumentException e) {
-          LOG.info("Unknown cluster status " + status + " requested.");
+          LOG.info("Unknown cluster status {} requested.", status);
         }
       }
     }
