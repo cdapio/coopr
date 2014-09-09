@@ -16,17 +16,43 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
   $scope.doImport = function() {
     myFileReader.get()
       .then(function (reader) {
-        $modal({title:'TODO', content: reader.result, placement:'center', show:true});
+        $modal({
+          title: 'TODO',
+          content: reader.result, 
+          placement: 'center', 
+          show: true
+        });
       })
       ['catch'](function (err) {
-        $alert({title:'import error!', content:err, type:'danger', duration:3 });
+        $alert({
+          title:'import error!', 
+          content:err, 
+          type:'danger', 
+          duration:3 
+        });
       });
   };
 
 
 
   $scope.doExport = function () {
-    $modal({title: 'TODO', content: 'Not implemented yet', placement:'center', show: true});
+    var modalScope = $scope.$new();
+
+    modalScope.filename = 'export.json';
+
+    $modal({
+      scope: modalScope,
+      title: 'JSON export', 
+      contentTemplate: '/partials/export.html', 
+      placement: 'center', 
+      show: true
+    });
+
+    myApi.Export.query(function (result) {
+      var b = new Blob([ angular.toJson(result) ], { type : 'application/json' });
+      modalScope.bloburl = window.URL.createObjectURL( b );
+      modalScope.filesize = Math.ceil(b.size/1024) + 'kb';
+    });
   };
 
 
@@ -46,6 +72,7 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
       $scope.timestamp = new Date();
     });
   }
+
 
   function countNodes (list) {
     return list.reduce(function (memo, cluster) {

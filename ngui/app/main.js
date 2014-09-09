@@ -77,6 +77,12 @@ angular
     });
   })
 
+  .config(function ($compileProvider) {
+    $compileProvider.aHrefSanitizationWhitelist(
+      /^\s*(https?|ftp|mailto|tel|file|blob):/
+    );
+  })
+
   .config(function (cfpLoadingBarProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
   })
