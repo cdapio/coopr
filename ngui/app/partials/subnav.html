@@ -1,21 +1,20 @@
 <div class="page-header">
 
-  <div class="btn-group btn-group-xs coopr-subnav" role="navigation">
-
-    <a class="btn btn-default" ui-sref=".list" ng-class="{'active': $state.includes('*.list')}">
-      <span class="fa fa-list"></span>
-    </a>
-
-    <div class="btn-group btn-group-xs">
-      <a class="btn btn-default dropdown-toggle" bs-dropdown="dropdown" data-placement="bottom-right" ng-class="{'disabled': !subnavList.length}">
-        {{$state.current.data.ddLabel | uppercase}}
-        <span class="caret"></span>
+  <div class="pull-right" role="navigation">
+    <div class="btn-group btn-group-sm">
+      <a class="btn btn-default" ui-sref=".list" ng-class="{'active': $state.includes('*.list')}">
+        <span class="fa fa-list"></span>
       </a>
+      <div class="btn-group btn-group-sm">
+        <a class="btn btn-default dropdown-toggle" bs-dropdown="dropdown" data-placement="bottom-right" ng-class="{'disabled': !subnavList.length}">
+          {{$state.current.data.ddLabel | uppercase}}
+          <span class="caret"></span>
+        </a>
+      </div>
     </div>
-
-    <a class="btn btn-default" ui-sref=".create" ng-class="{'active': $state.includes('*.create')}">
+    <a class="btn btn-primary btn-sm" ui-sref=".create" ng-class="{'active disabled': $state.includes('*.create')}">
       <span class="fa fa-files-o"></span>
-      CREATE
+      Create
     </a>
   </div>
 

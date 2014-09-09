@@ -13,18 +13,16 @@
       <td width="1">{{item.description}}</td>
 
       <td width="10" class="text-right">
-        <div class="btn-group btn-group-xs">
-          <a ui-sref="^.edit({name: item.name})"
-            class="btn btn-default">
-              <span class="fa fa-edit"></span>
-              Edit
-          </a>
-          <a href="" ng-click="myConfirm()" my-confirmable="doDelete(item)" 
-            class="btn btn-danger">
-              <span class="fa fa-trash"></span>
-              Delete
-          </a>
-        </div>
+        <a ui-sref="^.edit({name: item.name})"
+          class="btn btn-default btn-xs">
+            <span class="fa fa-edit"></span>
+            Edit
+        </a>
+        <a href="" ng-click="myConfirm()" my-confirmable="doDelete(item)" 
+          class="btn btn-danger btn-xs">
+            <span class="fa fa-trash"></span>
+            <span class="sr-only">Delete</span>
+        </a>
       </td>
 
     </tr>

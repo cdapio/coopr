@@ -6,14 +6,14 @@
       <label>Name</label>
     </div>
     <div class="col-xs-9">
-      <div class="btn-group btn-group-xs pull-right" ng-show="model.status!='terminated'">
+      <div class="pull-right" ng-show="model.status!='terminated'">
         <a ui-sref="^.edit({id: model.id})"
-          class="btn btn-primary">
+          class="btn btn-primary btn-xs">
             <span class="fa fa-edit"></span>
             Reconfigure
         </a>
         <a href="" ng-click="myConfirm()" my-confirmable="doDelete(model)" 
-          class="btn btn-danger">
+          class="btn btn-danger btn-xs">
             <span class="fa fa-trash"></span>
             Delete
         </a>
