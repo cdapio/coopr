@@ -9,7 +9,7 @@ LOOM_TENANT=${LOOM_TENANT:-superadmin}
 CHEF_SOLO_DIR=${LOOM_HOME}/provisioner/worker/plugins/automators/chef_solo_automator/chef_solo_automator
 
 LOOM_RUBY=${LOOM_RUBY:-ruby}
-DATA_UPLOADER="${LOOM_RUBY} ${LOOM_HOME}/bin/data-uploader.rb"
+DATA_UPLOADER="${LOOM_RUBY} ${LOOM_HOME}/provisioner/bin/data-uploader.rb"
 
 COOKBOOKS_DIR=${CHEF_SOLO_DIR}/cookbooks
 ROLES_DIR=${CHEF_SOLO_DIR}/roles

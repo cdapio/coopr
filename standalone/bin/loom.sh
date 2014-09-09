@@ -72,9 +72,9 @@ export LOOM_PROVISIONER_PLUGIN_DIR=$LOOM_HOME/provisioner/worker/plugins
 export LOOM_LOG_DIR=$LOOM_HOME/logs
 export LOOM_DATA_DIR=$LOOM_HOME/data
 
-# Add Continuuity Loom embedded bin PATH, if it exists
-if [ -d /opt/loom/embedded/bin ] ; then
-    export PATH=/opt/loom/embedded/bin:${PATH}
+# Add embedded bin PATH, if it exists
+if [ -d ${LOOM_HOME}/embedded/bin ] ; then
+    export PATH=${LOOM_HOME}/embedded/bin:${PATH}
 fi
 
 # Create log dir
@@ -218,8 +218,8 @@ function wait_for_server () {
     done
 
     if [ $RETRIES -gt 60 ]; then
-        die "ERROR: Server did not successfully start" 
-    fi 
+        die "ERROR: Server did not successfully start"
+    fi
 }
 
 function wait_for_plugin_registration () {
@@ -256,11 +256,11 @@ function provisioner () {
         echo "Waiting for server to start before running provisioner..."
         wait_for_server
     fi
-    if [ "x${LOOM_USE_DUMMY_PROVISIONER}" == "xtrue" ] 
+    if [ "x${LOOM_USE_DUMMY_PROVISIONER}" == "xtrue" ]
     then
-        $LOOM_HOME/bin/loom-dummy-provisioner.sh $1 
+        $LOOM_HOME/bin/dummy-provisioner.sh $1
     else
-        $LOOM_HOME/bin/loom-provisioner.sh $1
+        $LOOM_HOME/bin/provisioner.sh $1
     fi
 }
 
@@ -271,8 +271,8 @@ function greeting () {
 
 case "$1" in
   start)
-    $LOOM_HOME/bin/loom-server.sh start && \
-    $LOOM_HOME/bin/loom-ui.sh start && \
+    $LOOM_HOME/bin/server.sh start && \
+    $LOOM_HOME/bin/ui.sh start && \
     load_defaults && \
     provisioner start && \
     request_superadmin_workers && \
@@ -281,22 +281,22 @@ case "$1" in
 
   stop)
     provisioner stop
-    $LOOM_HOME/bin/loom-server.sh stop
-    $LOOM_HOME/bin/loom-ui.sh stop
+    $LOOM_HOME/bin/server.sh stop
+    $LOOM_HOME/bin/ui.sh stop
   ;;
 
   restart)
     provisioner stop
-    $LOOM_HOME/bin/loom-ui.sh stop
-    $LOOM_HOME/bin/loom-server.sh stop
-    $LOOM_HOME/bin/loom-server.sh start
-    $LOOM_HOME/bin/loom-ui.sh start
+    $LOOM_HOME/bin/ui.sh stop
+    $LOOM_HOME/bin/server.sh stop
+    $LOOM_HOME/bin/server.sh start
+    $LOOM_HOME/bin/ui.sh start
     provisioner start
   ;;
 
   status)
-    $LOOM_HOME/bin/loom-server.sh status
-    $LOOM_HOME/bin/loom-ui.sh status
+    $LOOM_HOME/bin/server.sh status
+    $LOOM_HOME/bin/ui.sh status
     provisioner status
   ;;
 
