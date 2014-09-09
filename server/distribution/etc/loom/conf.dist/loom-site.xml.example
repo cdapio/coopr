@@ -26,7 +26,7 @@
   <property>
     <name>server.host</name>
     <value>123.456.0.1</value>
-    <description>Specifies the loom host to bind to</description>
+    <description>Specifies the host the server should bind to</description>
   </property>
   <property>
     <name>server.jdbc.driver</name>

@@ -19,6 +19,7 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.LowercaseEnumTypeAdapterFactory;
 import com.continuuity.loom.codec.json.current.AddServicesRequestCodec;
+import com.continuuity.loom.codec.json.current.TenantWriteRequestCodec;
 import com.continuuity.loom.codec.json.current.AdministrationCodec;
 import com.continuuity.loom.codec.json.current.AutomatorTypeCodec;
 import com.continuuity.loom.codec.json.current.ClusterCodec;
@@ -58,6 +59,7 @@ import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceUpgradeCodec;
 import com.continuuity.loom.http.request.AddServicesRequest;
+import com.continuuity.loom.http.request.TenantWriteRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.ClusterCreateRequest;
 import com.continuuity.loom.http.request.FinishTaskRequest;
@@ -172,6 +174,7 @@ public class CodecModules {
       .registerTypeAdapter(TaskConfig.class, new TaskConfigCodec())
       .registerTypeAdapter(Tenant.class, new TenantCodec())
       .registerTypeAdapter(TenantSpecification.class, new TenantSpecificationCodec())
+      .registerTypeAdapter(TenantWriteRequest.class, new TenantWriteRequestCodec())
       .registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
       .enableComplexMapKeySerialization();
   }

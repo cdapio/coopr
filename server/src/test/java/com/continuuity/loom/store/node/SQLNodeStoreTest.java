@@ -15,6 +15,7 @@
  */
 package com.continuuity.loom.store.node;
 
+import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
@@ -37,11 +38,7 @@ public class SQLNodeStoreTest extends NodeStoreTest {
 
   @BeforeClass
   public static void setupSQLNodeStoreTest() throws SQLException {
-    Configuration sqlConf = Configuration.create();
-    sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
-    sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
-    sqlConf.setLong(Constants.ID_START_NUM, 1);
-    sqlConf.setLong(Constants.ID_INCREMENT_BY, 1);
+    Configuration sqlConf = BaseTest.createTestConf();
     Injector injector = Guice.createInjector(new ConfigurationModule(sqlConf),
                                              new TestStoreModule(),
                                              new CodecModules().getModule());

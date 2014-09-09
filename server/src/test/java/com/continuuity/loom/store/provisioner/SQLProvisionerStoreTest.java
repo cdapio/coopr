@@ -1,5 +1,6 @@
 package com.continuuity.loom.store.provisioner;
 
+import com.continuuity.loom.BaseTest;
 import com.continuuity.loom.codec.json.guice.CodecModules;
 import com.continuuity.loom.common.conf.Configuration;
 import com.continuuity.loom.common.conf.Constants;
@@ -17,9 +18,7 @@ public class SQLProvisionerStoreTest extends ProvisionerStoreTest {
 
   @BeforeClass
   public static void setupTestClass() throws Exception {
-    Configuration sqlConf = Configuration.create();
-    sqlConf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
-    sqlConf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:loom;create=true");
+    Configuration sqlConf = BaseTest.createTestConf();
     Injector injector = Guice.createInjector(
       new ConfigurationModule(sqlConf),
       new TestStoreModule(),

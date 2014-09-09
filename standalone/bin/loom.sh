@@ -206,7 +206,7 @@ function request_superadmin_workers () {
       --header "Content-Type:application/json" \
       --header "X-Loom-UserID:${LOOM_API_USER}" \
       --header "X-Loom-TenantID:${LOOM_TENANT}" \
-      --connect-timeout 5 --data "{\"workers\":${LOOM_NUM_WORKERS}, \"name\":\"superadmin\"}" \
+      --connect-timeout 5 --data "{ \"tenant\":{\"workers\":${LOOM_NUM_WORKERS}, \"name\":\"superadmin\"} }" \
       http://localhost:55054/v2/tenants/superadmin
 }
 

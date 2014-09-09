@@ -59,7 +59,7 @@ public class HandlerServer extends AbstractIdleService {
   @Override
   protected void startUp() throws Exception {
     httpService.startAndWait();
-    LOG.info("Loom started successfully on {}", httpService.getBindAddress());
+    LOG.info("Started successfully on {}", httpService.getBindAddress());
   }
 
   @Override

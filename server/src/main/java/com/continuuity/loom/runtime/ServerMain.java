@@ -25,7 +25,7 @@ import com.continuuity.loom.common.zookeeper.IdService;
 import com.continuuity.loom.common.zookeeper.guice.ZookeeperModule;
 import com.continuuity.loom.http.HandlerServer;
 import com.continuuity.loom.http.guice.HttpModule;
-import com.continuuity.loom.management.LoomStats;
+import com.continuuity.loom.management.ServerStats;
 import com.continuuity.loom.management.guice.ManagementModule;
 import com.continuuity.loom.provisioner.guice.ProvisionerModule;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
@@ -58,7 +58,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Loom server.
+ * Main class that starts up all services.
  */
 public final class ServerMain extends DaemonMain {
   private static final Logger LOG = LoggerFactory.getLogger(ServerMain.class);
@@ -106,7 +106,7 @@ public final class ServerMain extends DaemonMain {
 
   @Override
   public void start() {
-    LOG.info("Starting Loom...");
+    LOG.info("Starting server...");
     // if no zk quorum is given, use the in memory zk server
     if (inMemoryZKServer != null) {
       inMemoryZKServer.startAndWait();
@@ -156,17 +156,17 @@ public final class ServerMain extends DaemonMain {
       resourceService.startAndWait();
 
       // Register MBean
-      LoomStats loomStats = injector.getInstance(LoomStats.class);
+      ServerStats serverStats = injector.getInstance(ServerStats.class);
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      ObjectName name = new ObjectName("com.continuuity.loom:type=LoomStats");
-      mbs.registerMBean(loomStats, name);
+      ObjectName name = new ObjectName("com.continuuity.loom:type=ServerStats");
+      mbs.registerMBean(serverStats, name);
     } catch (Exception e) {
       LOG.error("Exception starting up.", e);
       System.exit(-1);
     }
     handlerServer = injector.getInstance(HandlerServer.class);
     handlerServer.startAndWait();
-    LOG.info("Loom service started on {}", handlerServer.getBindAddress());
+    LOG.info("Handler service started on {}", handlerServer.getBindAddress());
 
     scheduler = injector.getInstance(Scheduler.class);
     scheduler.startAndWait();
@@ -178,7 +178,7 @@ public final class ServerMain extends DaemonMain {
    */
   @Override
   public void stop() {
-    LOG.info("Stopping Loom...");
+    LOG.info("Stopping server...");
 
     if (scheduler != null) {
       scheduler.stopAndWait();

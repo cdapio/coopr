@@ -26,7 +26,7 @@
     <property>
         <name>server.host</name>
         <value>localhost</value>
-        <description>Specifies the host to bind to</description>
+        <description>Specifies the address to bind to</description>
     </property>
 
     <property>

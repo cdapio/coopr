@@ -16,9 +16,9 @@
 package com.continuuity.loom.management;
 
 /**
- * MXBean for Loom Stats.
+ * MXBean for Server Stats.
  */
-public interface LoomStatsMXBean {
+public interface ServerStatsMXBean {
   long getQueueLength();
 
   ProvisionerStats getProvisionerStats();
