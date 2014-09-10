@@ -107,7 +107,12 @@ class FogProviderJoyent < Provider
           # Check for /dev/vdb
           begin
             vdb = true
+            # confirm /dev/vdb exists
             ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
+            # confirm it is not already mounted
+            #   ubuntu: we remount from /mnt to /data
+            #   centos: vdb1 already mounted at /data
+            ssh_exec!(ssh, 'if grep "vdb.* /data" /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
           rescue
             vdb = false
           end
