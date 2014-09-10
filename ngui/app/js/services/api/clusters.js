@@ -43,20 +43,20 @@ module.factory('myApi_clusters', function($resource, MYAPI_PREFIX){
       { id: '@id' }
     ),
 
-    ClusterService: $resource(MYAPI_PREFIX + 'clusters/:clusterId/services/:id',
-      { id: '@id' },
+    ClusterService: $resource(MYAPI_PREFIX + 'clusters/:clusterId/services/:name',
+      { name: '@name' },
       { 
         start: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:clusterId/services/stop'
+          url: MYAPI_PREFIX + 'clusters/:clusterId/services/:name/start'
         },
         stop: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:clusterId/services/:id/stop'
+          url: MYAPI_PREFIX + 'clusters/:clusterId/services/:name/stop'
         },
         restart: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:clusterId/services/:id/restart'
+          url: MYAPI_PREFIX + 'clusters/:clusterId/services/:name/restart'
         }
       }
     )

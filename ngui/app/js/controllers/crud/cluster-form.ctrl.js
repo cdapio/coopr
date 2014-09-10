@@ -56,7 +56,7 @@ module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocu
 
       $scope.availableServices = allServices.filter(function (item) {
         return chosen.compatibility.services.indexOf(item.name)>=0;
-      }).map(function(item) { return item.name; }); // FIXME: servicepicker directive expects array of names, cannot use description
+      });
 
       // set the template defaults on the model
       angular.extend($scope.model, chosen.defaults);

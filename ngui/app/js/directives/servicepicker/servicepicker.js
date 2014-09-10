@@ -6,20 +6,17 @@ module.directive('myServicePicker', function myServicePickerDirective () {
     templateUrl: 'servicepicker/servicepicker.tpl',
 
     scope: {
-      model: '=',
-      available: '='
+      model: '=', // will be an array of strings
+      available: '=', // what's on offer = an array of objects
+      clusterId: '=', // id to use in management dropdown
+      allowRm: '=' // allow removal boolean
     },
 
-    link: function(scope, element, attrs) {
-      scope.allowRm = !!attrs.allowRm && attrs.allowRm!=='false'; // can we delete?
-      scope.allowMngmt = !!attrs.allowMngmt && attrs.allowMngmt!=='false'; // can we manage?
-    },
+    controller: function ($scope, myApi) {
 
-    controller: function ($scope) {
-
-      $scope.rmService = function (name) {
-        $scope.model = $scope.model.filter(function (svc) {
-          return svc !== name;
+      $scope.rmService = function (what) {
+        $scope.model = $scope.model.filter(function (name) {
+          return name !== what;
         });
       };
 
@@ -27,16 +24,18 @@ module.directive('myServicePicker', function myServicePickerDirective () {
         $scope.model.push(name);
       };
 
-      $scope.manageService = function (name) {
-        alert('Not yet implemented');
+      $scope.manageService = function (action, name) {
+        myApi.ClusterService[action]( {clusterId: $scope.clusterId}, {name: name}, function () {
+          console.log("manageService", action, name, arguments); // FIXME - broadcast?
+        });
       };
 
       function remapAddables (available, avoidable) {
         $scope.addsvcDropdown = (available||[]).reduce(function (out, svc) {
-          if((avoidable||[]).indexOf(svc)===-1) {
+          if((avoidable||[]).indexOf(svc.name)===-1) {
             out.push({
-              text: svc,
-              click: 'addService("'+svc+'")'
+              text: svc.name,
+              click: 'addService("'+svc.name+'")'
             });
           }
           return out;
@@ -44,35 +43,40 @@ module.directive('myServicePicker', function myServicePickerDirective () {
       }
 
       function remapActionables (visible) {
-        $scope.actionDropdowns = (visible||[]).reduce(function (out, svc) {
-          var dd = [];
+        $scope.actionDropdowns = (visible||[]).reduce(function (out, name) {
+          if(name !== 'base') { // "base" cannot be removed nor managed, so it gets no dropdown
 
-          if($scope.allowMngmt) {
-            dd.push({
-              text: '<span class="fa fa-fw fa-play"></span> Start',
-              click: 'manageService("start", "'+svc+'")'
-            });
-            dd.push({
-              text: '<span class="fa fa-fw fa-stop"></span> Stop',
-              click: 'manageService("stop", "'+svc+'")'
-            });
-            dd.push({
-              text: '<span class="fa fa-fw fa-undo"></span> Restart',
-              click: 'manageService("restart", "'+svc+'")'
-            });
-            if($scope.allowRm) {
-              dd.push({divider:true});
+            var dd = [];
+
+            if($scope.clusterId) { // "management mode"
+              dd.push({
+                text: '<span class="fa fa-fw fa-play"></span> Start',
+                click: 'manageService("start", "'+name+'")'
+              });
+              dd.push({
+                text: '<span class="fa fa-fw fa-stop"></span> Stop',
+                click: 'manageService("stop", "'+name+'")'
+              });
+              dd.push({
+                text: '<span class="fa fa-fw fa-undo"></span> Restart',
+                click: 'manageService("restart", "'+name+'")'
+              });
+
+              if($scope.allowRm) {
+                dd.push({ divider: true });
+              }
             }
-          }
 
-          if($scope.allowRm) {
-            dd.push({
-              text: '<span class="fa fa-fw fa-remove"></span>&nbsp;&nbsp;Remove',
-              click: 'rmService("'+svc+'")'
-            });
-          }
+            if($scope.allowRm) {
+              dd.push({
+                text: '<span class="fa fa-fw fa-remove"></span> Remove',
+                click: 'rmService("'+name+'")'
+              });            
+            }
 
-          out[svc] = dd;
+            out[name] = dd;
+
+          }
           return out;
         }, {});
       }

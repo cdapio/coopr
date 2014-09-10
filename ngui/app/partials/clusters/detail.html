@@ -107,14 +107,14 @@
     </div>
   </div></li>
 
-  <li><div class="row">
+  <li ng-if="model.status=='active'"><div class="row">
     <div class="col-xs-3">
       <label>Services</label>
     </div>
     <div class="col-xs-9">
       <my-service-picker 
         data-model="model.services"
-        data-allow-mngmt="true"
+        data-cluster-id="model.id"
       ></my-service-picker>
     </div>
   </div>
@@ -125,16 +125,14 @@
         <my-service-picker 
           data-model="additionalServices"
           data-available="availableServices"
-          data-allow-rm="true"
+          data-allow-rm="'true'"
         ></my-service-picker>
       </p>
-
       <p ng-show="additionalServices.length">
         <a class="btn btn-primary" href="" ng-click="doSubmitServices(additionalServices)">
           <span class="fa fa-save"></span> submit additional services
         </a>
       </p>
-
     </div>
   </div></li>
 

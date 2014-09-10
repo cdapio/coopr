@@ -24,9 +24,11 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
     }
   });
 
+  var timeoutPromise;
+
   function updatePending() {
     if(filterFilter($scope.list, {status:'pending'}).length) {
-      $timeout(function () {
+      timeoutPromise = $timeout(function () {
 
         myApi.Cluster.query(function (list) {
           // $scope.list = list works, but then we lose the animation of progress bars
@@ -48,6 +50,10 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
       1000);
     }
   }
+
+  $scope.$on('$destroy', function () {
+    $timeout.cancel(timeoutPromise);
+  });
 
 });
 

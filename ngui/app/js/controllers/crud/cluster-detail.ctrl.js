@@ -20,18 +20,24 @@ module.controller('ClusterDetailCtrl', function ($scope, CrudFormBase, $state, m
     $scope.model.$get();
   };
 
+  var timeoutPromise;
+
   $scope.$watchCollection('model', function (data) {
     if(!data.$resolved) { return; }
 
-    $scope.availableServices = data.clusterTemplate.compatibility.services.filter(function(svc) {
-      return data.services.indexOf(svc)===-1; // filter out services that are already installed
-    });
+    $scope.availableServices = data.clusterTemplate.compatibility.services.filter(function(name) {
+      return data.services.indexOf(name)===-1; // filter out services that are already installed
+    }).map(function(name) { return {name:name}; }); // mimic myApi.Service.query()
 
     $scope.additionalServices = [];
 
     if(data.status === 'pending') {
-      $timeout(update, 1000);
+      timeoutPromise = $timeout(update, 1000);
     }
+  });
+
+  $scope.$on('$destroy', function () {
+    $timeout.cancel(timeoutPromise);
   });
 
   $scope.doSubmitServices = function (arrSvcs) {
