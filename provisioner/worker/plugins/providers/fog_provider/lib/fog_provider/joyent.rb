@@ -21,6 +21,9 @@ require_relative 'utils'
 class FogProviderJoyent < Provider
   include FogProvider
 
+  # plugin defined resources
+  @@ssh_key_dir = 'ssh_keys'
+
   def create(inputmap)
     flavor = inputmap['flavor']
     image = inputmap['image']
@@ -45,7 +48,8 @@ class FogProviderJoyent < Provider
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
-      @result['result']['ssh-auth']['identityfile'] = @joyent_keyfile unless @joyent_keyfile.nil?
+      #@result['result']['ssh-auth']['identityfile'] = @joyent_keyfile unless @joyent_keyfile.nil?
+      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @joyent_keyfile_name) unless @joyent_keyfile_name.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
@@ -177,7 +181,7 @@ class FogProviderJoyent < Provider
     log.debug "- joyent_username #{@joyent_username}"
     log.debug "- joyent_password #{@joyent_password}" if @joyent_password
     log.debug "- joyent_keyname #{@joyent_keyname}"
-    log.debug "- joyent_keyfile #{@joyent_keyfile}"
+    log.debug "- joyent_keyfile #{File.join(@@ssh_key_dir, @joyent_keyfile_name)}"
     log.debug "- joyent_api_url #{@joyent_api_url}"
     log.debug "- joyent_version #{@joyent_version}"
 
@@ -189,7 +193,7 @@ class FogProviderJoyent < Provider
         joyent_username: @joyent_username,
         joyent_password: @joyent_password,
         joyent_keyname: @joyent_keyname,
-        joyent_keyfile: @joyent_keyfile,
+        joyent_keyfile: File.join(@@ssh_key_dir, @joyent_keyfile_name),
         joyent_url: @joyent_api_url,
         joyent_version: @joyent_version
       )

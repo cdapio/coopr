@@ -214,6 +214,12 @@
   "joyent": {
     "name": "joyent",
     "classname": "FogProviderJoyent",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
@@ -232,10 +238,10 @@
             "type": "text",
             "tip": "Your Joyent SSH public key name"
           },
-          "joyent_keyfile": {
-            "label": "Key file",
+          "joyent_keyfile_name": {
+            "label": "Key file resource name",
             "type": "text",
-            "tip": "Full path and file name to your Joyent SSH private key"
+            "tip": "Name of the SSH private key resource uploaded to the server"
           },
           "joyent_version": {
             "label": "API version",
@@ -261,7 +267,7 @@
         },
         "required": [
           [ "joyent_username", "joyent_password" ],
-          [ "joyent_username", "joyent_keyname", "joyent_keyfile" ]
+          [ "joyent_username", "joyent_keyname", "joyent_keyfile_name" ]
         ]
       }
     }
