@@ -331,6 +331,32 @@ class FogProviderAWS < Provider
     server_def[:subnet_id] = @subnet_id if vpc_mode?
     server_def[:tenancy] = 'dedicated' if vpc_mode? && @dedicated_instance
     server_def[:associate_public_ip] = 'true' if vpc_mode? && @associate_public_ip
+
+    # Handle EBS-backed volume sizes
+    if ami.root_device_type == 'ebs'
+      ami_map = ami.block_device_mapping.first
+      ebs_size =
+        begin
+          if @aws_ebs_size
+            Integer(@aws_ebs_size).to_s
+          else
+            ami_map['volumeSize'].to_s
+          end
+        end
+      delete_term =
+        if @aws_ebs_delete_on_term
+          ami_map['deleteOnTermination']
+        else
+          'false'
+        end
+      server_def[:block_device_mapping] =
+        [{
+          'DeviceName' => ami_map['deviceName'],
+          'Ebs.VolumeSize' => ebs_size,
+          'Ebs.DeleteOnTermination' => delete_term
+        }]
+    end
+
     server_def
   end
 
