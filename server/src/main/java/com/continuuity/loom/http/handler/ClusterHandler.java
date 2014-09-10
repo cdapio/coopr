@@ -100,7 +100,7 @@ public class ClusterHandler extends AbstractAuthHandler {
   /**
    * Get all clusters visible to the user. Clients can include a status filter as an http param. The key is 'status'
    * and the value is a comma separated list of statuses. Clusters returned must be in one of the statuses given. If
-   * no status param is given, clusters with any status will be returned. Valid values to include in a status filter
+   * no status param is given, all clusters will be returned. Valid values to include in a status filter
    * are any one of {@link Cluster.Status}.
    *
    * @param request Request for clusters.
@@ -807,7 +807,8 @@ public class ClusterHandler extends AbstractAuthHandler {
   private Set<Cluster.Status> getStatusFilter(HttpRequest request) {
     Set<Cluster.Status> filter = Sets.newHashSet();
     Map<String, List<String>> queryParams = new QueryStringDecoder(request.getUri()).getParameters();
-    if (queryParams.containsKey("status")) {
+    List<String> statusParams = queryParams.get("status");
+    if (statusParams != null && !statusParams.isEmpty()) {
       String statusStr = queryParams.get("status").get(0);
       String[] statuses = statusStr.split(",");
       for (String status: statuses) {
