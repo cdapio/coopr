@@ -274,6 +274,11 @@ public class SQLClusterStore implements ClusterStore {
   }
 
   @Override
+  public List<ClusterSummary> getAllClusterSummaries(Set<Cluster.Status> states) throws IOException {
+    return systemView.getAllClusterSummaries(states);
+  }
+
+  @Override
   public List<Cluster> getNonTerminatedClusters() throws IOException {
     return systemView.getNonTerminatedClusters();
   }

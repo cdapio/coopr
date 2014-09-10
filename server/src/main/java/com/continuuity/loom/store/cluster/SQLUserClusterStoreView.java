@@ -9,6 +9,7 @@ import com.continuuity.loom.store.DBQueryExecutor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
  * The cluster store as viewed by a tenant user. A tenant user can read, write, and delete any cluster
@@ -119,6 +120,18 @@ public class SQLUserClusterStoreView extends BaseSQLClusterStoreView {
         "AND C.tenant_id=? AND C.owner_id=? ORDER BY C.create_time DESC");
     statement.setString(1, tenantId);
     statement.setString(2, userId);
+    return statement;
+  }
+
+  @Override
+  PreparedStatement getSelectAllClusterJobsStatement(Connection conn, Set<Cluster.Status> states) throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "SELECT C.cluster, J.job FROM clusters C, jobs J WHERE C.latest_job_num=J.job_num AND C.id=J.cluster_id " +
+        "AND C.tenant_id=? AND C.owner_id=? AND C.status IN " + DBHelper.createInString(states.size()) +
+        "ORDER BY C.create_time DESC");
+    statement.setString(1, tenantId);
+    statement.setString(2, userId);
+    setInClause(statement, states, 3);
     return statement;
   }
 

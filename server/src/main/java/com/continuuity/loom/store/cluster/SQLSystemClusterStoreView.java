@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
  * The cluster store as viewed by the system. The system can do anything to any object.
@@ -93,6 +94,15 @@ public class SQLSystemClusterStoreView extends BaseSQLClusterStoreView {
     PreparedStatement statement = conn.prepareStatement(
       "SELECT C.cluster, J.job FROM clusters C, jobs J " +
         "WHERE C.latest_job_num=J.job_num AND C.id=J.cluster_id ORDER BY C.create_time DESC");
+    return statement;
+  }
+
+  @Override
+  PreparedStatement getSelectAllClusterJobsStatement(Connection conn, Set<Cluster.Status> states) throws SQLException {
+    PreparedStatement statement = conn.prepareStatement(
+      "SELECT C.cluster, J.job FROM clusters C, jobs J WHERE C.latest_job_num=J.job_num AND C.id=J.cluster_id " +
+        "AND C.status IN " + DBHelper.createInString(states.size()) + " ORDER BY C.create_time DESC");
+    setInClause(statement, states, 1);
     return statement;
   }
 
