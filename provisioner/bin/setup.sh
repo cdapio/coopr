@@ -44,7 +44,7 @@ wait_for_plugin_registration || exit 1
 __skriptz=$(ls -1 ${LOOM_HOME}/provisioner/worker/plugins/*/*/load-bundled-data.sh 2>&1)
 if [ "${__skriptz}" != "" ] ; then
   for __i in ${__skriptz} ; do
-    echo "__i=${__i}"
+    ${__i}
     __ret=$?
     [[ ${__ret} -ne 0 ]] && exit 1
   done
@@ -54,7 +54,7 @@ else
 fi
 
 # Request sync
-echo curl --silent --request POST \
+curl --silent --request POST \
   --header "Content-Type:application/json" \
   --header "X-Loom-UserID:${LOOM_API_USER}" \
   --header "X-Loom-ApiKey:${LOOM_API_KEY}" \
