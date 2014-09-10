@@ -8,7 +8,6 @@ module.controller('SubnavCtrl', function ($scope, $state, myApi) {
 
   function fetchSubnavList () {
     $scope.subnavList = myApi[modelName].query(function (list) {
-      console.log('[fetchSubnavList]', list.length, path);
       $scope.dropdown = list
         .filter(function (item) {
           switch (modelName) {

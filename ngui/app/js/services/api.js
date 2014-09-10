@@ -38,7 +38,7 @@ module.factory('myApi', function(
 });
 
 module.config(function ($httpProvider) {
-  $httpProvider.interceptors.push(function ($q, $timeout, $rootScope, myAuth, MYAPI_PREFIX, MYAPI_EVENT) {
+  $httpProvider.interceptors.push(function ($q, $timeout, $rootScope, $log, myAuth, MYAPI_PREFIX, MYAPI_EVENT) {
     var isApi = function(url) {
       return url.indexOf(MYAPI_PREFIX) === 0;
     };
@@ -53,6 +53,7 @@ module.config(function ($httpProvider) {
             'X-Loom-UserID': u.username,
             'X-Loom-TenantID': u.tenant
           } : {});
+          $log.log('[myApi]', config.method, config.url.substr(MYAPI_PREFIX.length));
         }
         return config;
       },

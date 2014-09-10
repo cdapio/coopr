@@ -1,7 +1,7 @@
 var module = angular.module(PKG.name+'.services');
 
 
-module.service('myFileReader', function myFileReaderService ($q, $document, $window) {
+module.service('myFileReader', function myFileReaderService ($q, $document, $window, $log) {
 
   var input = angular.element('<input type="file" class="sr-only" />');
   $document.find('body').append(input);
@@ -12,7 +12,7 @@ module.service('myFileReader', function myFileReaderService ($q, $document, $win
     var val = input[0].files;
     if(val && val.length && deferred) {
       var reader, file = val[0];
-      console.log('[myFileReader]', file);
+      $log.log('[myFileReader]', file);
       if(file.size > 1048576) { // 1mb max
         return deferred.reject(file.name + " is too big");
       }

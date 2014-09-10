@@ -39,7 +39,6 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
               if(update && update.length) {
                 cluster.status = update[0].status;
                 cluster.progress = update[0].progress;
-                console.log('[updatePending]', cluster.progress);
               }
             }
           });
