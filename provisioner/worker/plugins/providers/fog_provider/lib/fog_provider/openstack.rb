@@ -153,13 +153,6 @@ class FogProviderOpenstack < Provider
   # Shared definitions (borrowed from knife-openstack gem, Apache 2.0 license)
 
   def connection
-    log.debug 'Connection options for Openstack:'
-    log.debug "- openstack_username #{@openstack_username}"
-    log.debug "- openstack_password #{@openstack_password}"
-    log.debug "- openstack_tenant #{@openstack_tenant}"
-    log.debug "- openstack_auth_url #{@openstack_auth_url}"
-    log.debug "- openstack_ssl_verify_peer #{@openstack_ssl_verify_peer}"
-
     # Create connection
     # rubocop:disable UselessAssignment
     @connection ||= begin

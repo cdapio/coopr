@@ -166,12 +166,6 @@ class FogProviderRackspace < Provider
   # Shared definitions (borrowed from knife-rackspace gem, Apache 2.0 license)
 
   def connection
-    log.debug 'Connection options for Rackspace:'
-    log.debug "- rackspace_api_key #{@rackspace_api_key}"
-    log.debug "- rackspace_username #{@rackspace_username}"
-    log.debug "- rackspace_region #{@rackspace_region}"
-    log.debug "- rackspace_auth_url #{auth_endpoint}"
-
     # Create connection
     # rubocop:disable UselessAssignment
     @connection ||= begin
