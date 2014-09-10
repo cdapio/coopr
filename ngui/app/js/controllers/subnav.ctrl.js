@@ -12,7 +12,7 @@ module.controller('SubnavCtrl', function ($scope, $state, myApi) {
         .filter(function (item) {
           switch (modelName) {
             case 'Cluster':
-              return item.status!='terminated';
+              return item.status!=='terminated';
             default:
               return true;
           }

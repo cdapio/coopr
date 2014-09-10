@@ -14,7 +14,7 @@ module.service('myFileReader', function myFileReaderService ($q, $document, $win
       var reader, file = val[0];
       $log.log('[myFileReader]', file);
       if(file.size > 1048576) { // 1mb max
-        return deferred.reject(file.name + " is too big");
+        return deferred.reject(file.name + ' is too big');
       }
       reader = new $window.FileReader();
       reader.onload = function () {
@@ -30,7 +30,7 @@ module.service('myFileReader', function myFileReaderService ($q, $document, $win
     deferred = $q.defer();
 
     if(!$window.FileReader) {
-      deferred.reject("FileReader not available");
+      deferred.reject('FileReader not available');
     }
     else { // trigger the file picker
       input.val(null);

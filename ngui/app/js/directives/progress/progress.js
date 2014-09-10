@@ -29,6 +29,7 @@ module.directive('myProgress', function myProgressDirective () {
             if(add) {
               switch (attrs.type) {
                 case 'bar':
+                /* falls through */
                 default:
                   cls['progress-bar-'+add] = true;
                   break;

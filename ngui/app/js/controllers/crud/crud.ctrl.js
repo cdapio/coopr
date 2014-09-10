@@ -25,7 +25,7 @@ module.factory('CrudListBase', function CrudListBaseFactory() {
       });
     };
 
-  }
+  };
 });
 
 

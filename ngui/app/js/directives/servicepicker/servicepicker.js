@@ -6,9 +6,9 @@ module.directive('myServicePicker', function myServicePickerDirective () {
     templateUrl: 'servicepicker/servicepicker.tpl',
 
     scope: {
-      model: '=', // will be an array of strings
-      available: '=', // what's on offer = an array of objects
-      clusterId: '=', // id to use in management dropdown
+      model: '=', // an array of names
+      available: '=', // an array of objects with name & description keys
+      clusterId: '=', // id to use for management dropdown
       allowRm: '=' // allow removal boolean
     },
 
@@ -26,7 +26,7 @@ module.directive('myServicePicker', function myServicePickerDirective () {
 
       $scope.manageService = function (action, name) {
         myApi.ClusterService[action]( {clusterId: $scope.clusterId}, {name: name}, function () {
-          console.log("manageService", action, name, arguments); // FIXME - broadcast?
+          console.log('manageService', action, name, arguments); // FIXME - broadcast?
         });
       };
 

@@ -14,11 +14,11 @@ module.controller('ClusterDetailCtrl', function ($scope, CrudFormBase, $state, m
 
   function failure () {
     $state.go('404');
-  };
+  }
 
   function update () {
     $scope.model.$get();
-  };
+  }
 
   var timeoutPromise;
 
@@ -27,7 +27,7 @@ module.controller('ClusterDetailCtrl', function ($scope, CrudFormBase, $state, m
 
     $scope.availableServices = data.clusterTemplate.compatibility.services.filter(function(name) {
       return data.services.indexOf(name)===-1; // filter out services that are already installed
-    }).map(function(name) { return {name:name}; }); // mimic myApi.Service.query()
+    }).map(function(name) { return { name: name, description: null }; }); // mimic myApi.Service.query()
 
     $scope.additionalServices = [];
 
