@@ -1,3 +1,4 @@
+<div class="table-responsive">
 <table class="table table-striped" my-sortable>
   <thead>
     <tr ng-class="{'sort-enabled': list.length>1}">
@@ -28,7 +29,7 @@
     </tr>
   </tbody>
 </table>
-
+</div>
 
 <div ng-hide="(list.$promise && !list.$resolved) || list.length" class="well text-center">
   <p>Empty list!</p>

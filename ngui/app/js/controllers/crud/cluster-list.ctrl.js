@@ -1,10 +1,15 @@
 var module = angular.module(PKG.name+'.controllers');
 
 
-module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi, CrudListBase) {
+module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
   CrudListBase.apply($scope);
 
-  var filterFilter = $filter('filter');
+  var timeoutPromise,
+      filterFilter = $filter('filter'),
+      oneHourAgo = moment().hours(-1),
+      notTerminatedPredicate = function (item) { 
+        return item.status!=='terminated' || moment(item.createTime)<oneHourAgo;
+      };
 
   $scope.clusterFilter = null;
 
@@ -12,21 +17,24 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
     if (!list.$promise || list.$resolved) {
 
       if (list.length) {
-
-        var terminatedCount = filterFilter(list, { status: 'terminated' }).length;
-        if(terminatedCount && terminatedCount!==list.length) {
-          // we have both active inactive clusters, so filter and show button
-          $scope.clusterFilter = { status: '!terminated' };
-        }
-
+        setPredicate();
         updatePending();
       }
     }
   });
 
-  var timeoutPromise;
+  function setPredicate () {
+    var notTerminatedCount = filterFilter($scope.list, notTerminatedPredicate).length,
+        terminatedCount = $scope.list.length - notTerminatedCount;
+    if(terminatedCount && notTerminatedCount) {
+      $scope.clusterPredicate = notTerminatedPredicate; // enables the filtering
+    }
+    else {
+      $scope.clusterPredicate = null; // hide the button and do not filter
+    }
+  }
 
-  function updatePending() {
+  function updatePending () {
     if(filterFilter($scope.list, {status:'pending'}).length) {
       timeoutPromise = $timeout(function () {
 
@@ -42,6 +50,7 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
               }
             }
           });
+          setPredicate();
           updatePending();
         });
 
