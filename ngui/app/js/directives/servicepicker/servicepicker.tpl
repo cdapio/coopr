@@ -1,6 +1,6 @@
 <ul class="list-inline">
   <li ng-repeat="svc in model">
-    <div class="btn-group btn-group-xs">
+    <div class="btn-group btn-group-xs dropdown">
       <a class="btn btn-default disabled">
         {{svc}}
       </a>
