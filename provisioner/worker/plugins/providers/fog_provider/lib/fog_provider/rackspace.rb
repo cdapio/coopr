@@ -21,6 +21,9 @@ require_relative 'utils'
 class FogProviderRackspace < Provider
   include FogProvider
 
+  # plugin defined resources
+  @@ssh_key_dir = 'keyfiles'
+
   def create(inputmap)
     flavor = inputmap['flavor']
     image = inputmap['image']
@@ -51,7 +54,7 @@ class FogProviderRackspace < Provider
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
-      @result['result']['ssh-auth']['identityfile'] = @rackspace_keyfile unless @rackspace_keyfile.nil?
+      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @rackspace_keyfile_name) unless @rackspace_keyfile_name.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderRackspace.create:' + e.inspect)

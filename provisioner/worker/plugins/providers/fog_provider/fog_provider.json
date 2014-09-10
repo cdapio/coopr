@@ -348,6 +348,12 @@
   "rackspace": {
     "name": "rackspace",
     "classname": "FogProviderRackspace",
+    "resourceTypes": {
+        "keyfiles": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
@@ -386,14 +392,14 @@
             "tip": "Wait for RackConnect"
           },
           "rackspace_keyname": {
-            "label": "Rackspace SSH Keypair",
+            "label": "Rackspace SSH public key name",
             "type": "text",
-            "tip": "Your Rackspace SSH key name"
+            "tip": "Your Rackspace SSH public key name as defined in the Rackspace portal"
           },
-          "rackspace_keyfile": {
-            "label": "Key file",
+          "rackspace_keyfile_name": {
+            "label": "SSH private key resource name",
             "type": "text",
-            "tip": "Path to your Rackspace SSH private key file"
+            "tip": "Name of the SSH private key resource uploaded to the server"
           }
         },
         "required": [
