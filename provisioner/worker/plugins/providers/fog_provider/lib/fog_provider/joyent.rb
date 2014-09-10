@@ -48,7 +48,6 @@ class FogProviderJoyent < Provider
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
-      #@result['result']['ssh-auth']['identityfile'] = @joyent_keyfile unless @joyent_keyfile.nil?
       @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @joyent_keyfile_name) unless @joyent_keyfile_name.nil?
       @result['status'] = 0
     rescue => e
