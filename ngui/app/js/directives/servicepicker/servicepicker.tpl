@@ -9,10 +9,11 @@
       </a>
     </div>
   </li>
-  <li ng-show="allowAdd">
+  <li ng-show="available.length">
     <a class="btn btn-xs btn-warning" 
       ng-disabled="!addsvcDropdown.length"
-      bs-dropdown="addsvcDropdown">
+      bs-dropdown="addsvcDropdown"
+      data-placement="top-left">
         <span class="fa fa-plus"></span>
         add service
     </a>

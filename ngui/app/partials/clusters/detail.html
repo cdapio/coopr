@@ -117,5 +117,25 @@
         data-allow-mngmt="true"
       ></my-service-picker>
     </div>
+  </div>
+  <div class="row" ng-show="availableServices.length">
+    <div class="col-xs-9 col-xs-offset-3">
+      <hr>
+      <p>
+        <my-service-picker 
+          data-model="additionalServices"
+          data-available="availableServices"
+          data-allow-rm="true"
+        ></my-service-picker>
+      </p>
+
+      <p ng-show="additionalServices.length">
+        <a class="btn btn-primary" href="" ng-click="doSubmitServices(additionalServices)">
+          <span class="fa fa-save"></span> submit additional services
+        </a>
+      </p>
+
+    </div>
   </div></li>
+
 </ul>

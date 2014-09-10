@@ -11,7 +11,6 @@ module.directive('myServicePicker', function myServicePickerDirective () {
     },
 
     link: function(scope, element, attrs) {
-      scope.allowAdd = angular.isArray(scope.available); // can we add?
       scope.allowRm = !!attrs.allowRm && attrs.allowRm!=='false'; // can we delete?
       scope.allowMngmt = !!attrs.allowMngmt && attrs.allowMngmt!=='false'; // can we manage?
     },
@@ -34,10 +33,10 @@ module.directive('myServicePicker', function myServicePickerDirective () {
 
       function remapAddables (available, avoidable) {
         $scope.addsvcDropdown = (available||[]).reduce(function (out, svc) {
-          if((avoidable||[]).indexOf(svc.name)===-1) {
+          if((avoidable||[]).indexOf(svc)===-1) {
             out.push({
-              text: svc.name,
-              click: 'addService("'+svc.name+'")'
+              text: svc,
+              click: 'addService("'+svc+'")'
             });
           }
           return out;
@@ -45,21 +44,21 @@ module.directive('myServicePicker', function myServicePickerDirective () {
       }
 
       function remapActionables (visible) {
-        $scope.actionDropdowns = (visible||[]).reduce(function (out, name) {
+        $scope.actionDropdowns = (visible||[]).reduce(function (out, svc) {
           var dd = [];
 
           if($scope.allowMngmt) {
             dd.push({
-              text: '<span class="fa fa-fw fa-play"></span>&nbsp;&nbsp;Start',
-              click: 'manageService("start", "'+name+'")'
+              text: '<span class="fa fa-fw fa-play"></span> Start',
+              click: 'manageService("start", "'+svc+'")'
             });
             dd.push({
-              text: '<span class="fa fa-fw fa-stop"></span>&nbsp;&nbsp;Stop',
-              click: 'manageService("stop", "'+name+'")'
+              text: '<span class="fa fa-fw fa-stop"></span> Stop',
+              click: 'manageService("stop", "'+svc+'")'
             });
             dd.push({
-              text: '<span class="fa fa-fw fa-undo"></span>&nbsp;&nbsp;Restart',
-              click: 'manageService("restart", "'+name+'")'
+              text: '<span class="fa fa-fw fa-undo"></span> Restart',
+              click: 'manageService("restart", "'+svc+'")'
             });
             if($scope.allowRm) {
               dd.push({divider:true});
@@ -69,11 +68,11 @@ module.directive('myServicePicker', function myServicePickerDirective () {
           if($scope.allowRm) {
             dd.push({
               text: '<span class="fa fa-fw fa-remove"></span>&nbsp;&nbsp;Remove',
-              click: 'rmService("'+name+'")'
+              click: 'rmService("'+svc+'")'
             });
           }
 
-          out[name] = dd;
+          out[svc] = dd;
           return out;
         }, {});
       }
