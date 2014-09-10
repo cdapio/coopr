@@ -22,7 +22,7 @@ class FogProviderJoyent < Provider
   include FogProvider
 
   # plugin defined resources
-  @@ssh_key_dir = 'ssh_keys'
+  @@ssh_key_dir = 'keyfiles'
 
   def create(inputmap)
     flavor = inputmap['flavor']
