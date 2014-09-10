@@ -124,6 +124,16 @@
   "google": {
     "name": "google",
     "classname": "FogProviderGoogle",
+    "resourceTypes": {
+        "p12_keys": {
+            "format": "file",
+            "permissions": "0400"
+        },
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
@@ -137,27 +147,27 @@
             "type": "text",
             "tip": "Service account email address, should be of the form 123456789@developer.gserviceaccount.com"
           },
-          "google_key_location": {
-            "label": "P12 key location",
+          "google_p12_key_name": {
+            "label": "P12 key name",
             "type": "text",
-            "tip": "Path to your P12 key, as downloaded from Google encrypted with their default passphrase (notasecret)"
+            "tip": "Name of the P12 key resource uploaded to the server"
           },
-          "google_ssh_keyfile": {
-            "label": "ssh private key file",
+          "google_ssh_key_name": {
+            "label": "ssh private key name",
             "type": "text",
-            "tip": "Full path and file name to your Google SSH private key"
+            "tip": "Name of the SSH key resource uploaded to the server"
           },
           "google_ssh_username": {
             "label": "ssh username",
             "type": "text",
-            "tip": "SSH username to use. Must match private key file, and have sudo permissions"
+            "tip": "SSH username to use. Must correspond to the google_ssh_key_name provided, and have sudo permissions"
           },
           "google_data_disk_size_gb": {
             "label": "Data disk size in GB",
             "type": "text",
             "default": 10,
             "override": true,
-            "tip": "Size of the persistent disk to be created and mounted to /data"
+            "tip": "Size of the persistent data disk to be created and mounted"
           },
           "zone_name": {
             "label": "Zone",
@@ -181,9 +191,9 @@
           [
             "google_project",
             "google_client_email",
-            "google_key_location",
-            "zone_name",
-            "google_ssh_keyfile"
+            "google_p12_key_name",
+            "google_ssh_key_name",
+            "zone_name"
           ]
         ]
       },

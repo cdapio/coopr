@@ -23,12 +23,21 @@ public interface ClusterStoreView {
   List<Cluster> getAllClusters() throws IOException;
 
   /**
-   * Get an immutable list of a summary of all clusters in the store.
+   * Get an immutable list of summaries of all clusters in the store.
    *
    * @return Immutable list of summaries of all clusters.
-   * @throws IOException if there was a problem getting the clusters.
+   * @throws IOException if there was a problem getting the cluster summaries.
    */
   List<ClusterSummary> getAllClusterSummaries() throws IOException;
+
+  /**
+   * Get an immutable list of summaries of all clusters in the store that are in one of the given cluster states.
+   *
+   * @param states returned clusters must be in one of these states.
+   * @return Immutable list of summaries of all clusters in the store that are in one of the given cluster states.
+   * @throws IOException if there was a problem getting the cluster summaries.
+   */
+  List<ClusterSummary> getAllClusterSummaries(Set<Cluster.Status> states) throws IOException;
 
   /**
    * Get an immutable list of all clusters in the store that are not in the terminated state.

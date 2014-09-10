@@ -81,6 +81,18 @@
               </div>
             </div>
 
+{% if !tenant %}
+            <div class="form-group">
+              <label class="col-sm-2 control-label">Bootstrap</label>
+              <div class="col-sm-9">
+                <label class="checkbox">
+                  <input type="checkbox" ng-model="bootstrap" />
+                  Check to copy everything over from superadmin
+                </label>
+              </div>
+            </div>
+{% endif %}
+
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-8">
                   <button type="submit" class="btn-spl btn-info">Submit</button>

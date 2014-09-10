@@ -11,10 +11,17 @@ import com.continuuity.loom.common.zookeeper.lib.ZKInterProcessReentrantLock;
 import com.continuuity.loom.provisioner.plugin.ResourceCollection;
 import com.continuuity.loom.provisioner.plugin.ResourceService;
 import com.continuuity.loom.scheduler.task.MissingEntityException;
+import com.continuuity.loom.spec.HardwareType;
+import com.continuuity.loom.spec.ImageType;
+import com.continuuity.loom.spec.Provider;
 import com.continuuity.loom.spec.Tenant;
 import com.continuuity.loom.spec.TenantSpecification;
+import com.continuuity.loom.spec.service.Service;
+import com.continuuity.loom.spec.template.ClusterTemplate;
 import com.continuuity.loom.store.cluster.ClusterStoreService;
 import com.continuuity.loom.store.cluster.ClusterStoreView;
+import com.continuuity.loom.store.entity.EntityStoreService;
+import com.continuuity.loom.store.entity.EntityStoreView;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
 import com.google.common.collect.Lists;
@@ -22,6 +29,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +54,7 @@ public class TenantProvisionerService {
   private final ProvisionerRequestService provisionerRequestService;
   private final ClusterStoreService clusterStoreService;
   private final ResourceService resourceService;
+  private final EntityStoreService entityStoreService;
 
   @Inject
   private TenantProvisionerService(ProvisionerStore provisionerStore,
@@ -55,6 +64,7 @@ public class TenantProvisionerService {
                                    ClusterStoreService clusterStoreService,
                                    ProvisionerRequestService provisionerRequestService,
                                    ResourceService resourceService,
+                                   EntityStoreService entityStoreService,
                                    Configuration conf) {
     this.provisionerStore = provisionerStore;
     this.tenantStore = tenantStore;
@@ -62,6 +72,7 @@ public class TenantProvisionerService {
     this.provisionerRequestService = provisionerRequestService;
     this.clusterStoreService = clusterStoreService;
     this.resourceService = resourceService;
+    this.entityStoreService = entityStoreService;
     // a single lock is used across all tenants and provisioners. This is so that a request modifies worker assignments
     // across multiple provisioners does not conflict with requests that modify worker capacity. For example, if a
     // tenant is added the same time a tenant is deleted, we don't want to be modifying the same provisioner at the
@@ -122,14 +133,16 @@ public class TenantProvisionerService {
   }
 
   /**
-   * Write the tenant to the store and balance the tenant workers across provisioners.
+   * Write the tenant to the store and balance the tenant workers across provisioners. Returns the id of the tenant
+   * that was written.
    *
    * @param tenantSpecification Tenant to write
    * @throws IOException if there was an exception persisting the tenant
    * @throws CapacityException if there is not enough capacity to support all tenant workers
    * @throws QuotaException if a tenant quota would be violated by the change
+   * @return Id of the written tenant
    */
-  public void writeTenantSpecification(TenantSpecification tenantSpecification)
+  public String writeTenantSpecification(TenantSpecification tenantSpecification)
     throws IOException, CapacityException, QuotaException {
     tenantLock.acquire();
     try {
@@ -152,6 +165,7 @@ public class TenantProvisionerService {
 
       balanceQueue.add(new Element(id));
       tenantStore.writeTenant(updatedTenant);
+      return id;
     } finally {
       tenantLock.release();
     }
@@ -400,6 +414,18 @@ public class TenantProvisionerService {
     } finally {
       tenantLock.release();
     }
+  }
+
+  public void bootstrapTenant(String tenantId) throws IOException, IllegalAccessException {
+    Account account = new Account(Constants.ADMIN_USER, tenantId);
+
+    LOG.debug("Bootstrapping entities");
+    entityStoreService.copyEntities(Account.SUPERADMIN, account);
+    // bootstrap plugin resources
+    LOG.debug("Bootstrapping plugin resources");
+    resourceService.bootstrapResources(account);
+    LOG.debug("Syncing plugin resources");
+    syncResources(account);
   }
 
   // TODO: abstract out to support different types of balancing policies

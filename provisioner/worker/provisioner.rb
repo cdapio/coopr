@@ -21,6 +21,7 @@ require 'optparse'
 require 'rest_client'
 require 'socket'
 require 'logger'
+require 'fileutils'
 
 require_relative 'utils.rb'
 require_relative 'pluginmanager.rb'
@@ -73,20 +74,25 @@ if loom_uri.nil? && !options[:file]
   exit(1)
 end
 
-unless(options[:work_dir])
-  puts "--work-dir option must be specified"
+unless options[:work_dir]
+  puts '--work-dir option must be specified'
   exit(1)
 end
 
-if(loom_uri.nil? && options[:register])
-  puts "--register option requires the --uri [server uri] option"
+unless options[:tenant] || options[:register]
+  puts 'Either --tenant or --register options must be specified'
+  exit(1)
+end
+
+if loom_uri.nil? && options[:register]
+  puts '--register option requires the --uri [server uri] option'
   exit(1)
 end
 
 include Logging
 log_file = nil
 if options[:log_directory] && options[:name]
-  log_file = [ options[:log_directory], options[:name] ].join('/') + '.log'
+  log_file = [options[:log_directory], options[:name]].join('/') + '.log'
 elsif options[:log_directory]
   log_file = "#{options[:log_directory]}/worker-default.log"
 end
@@ -104,7 +110,15 @@ if pluginmanager.providermap.empty? or pluginmanager.automatormap.empty?
 end
 
 # the environment passed to plugins
-@plugin_env = options 
+@plugin_env = options
+
+def _run_plugin(clazz, env, cwd, task)
+  object = clazz.new(env, task)
+  FileUtils.mkdir_p(cwd)
+  Dir.chdir(cwd) do
+    result = object.runTask
+  end
+end
 
 def delegate_task(task, pluginmanager)
   providerName = nil # rubocop:disable UselessAssignment
@@ -126,35 +140,27 @@ def delegate_task(task, pluginmanager)
   case taskName.downcase
   when 'create', 'confirm', 'delete'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForProvider(providerName))
-    object = clazz.new(@plugin_env, task)
-    result = object.runTask
+    cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'providertypes', providerName)
+    result = _run_plugin(clazz, @plugin_env, cwd, task)
   when 'install', 'configure', 'initialize', 'start', 'stop', 'remove'
     clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automatorName))
-    object = clazz.new(@plugin_env, task)
-    result = object.runTask
+    cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'automatortypes', automatorName)
+    result = _run_plugin(clazz, @plugin_env, cwd, task)
   when 'bootstrap'
     combinedresult = {}
     classes = []
     if task['config'].key? 'automators' and !task['config']['automators'].empty?
-      # server has specified which bootstrap handlers need to run
+      # server must specify which bootstrap handlers need to run
       log.debug "Task #{task_id} running specified bootstrap handlers: #{task['config']['automators']}"
       task['config']['automators'].each do |automator|
-        classes.push(pluginmanager.getHandlerActionObjectForAutomator(automator))
+        clazz = Object.const_get(pluginmanager.getHandlerActionObjectForAutomator(automator))
+        cwd = File.join(@plugin_env[:work_dir], @plugin_env[:tenant], 'automatortypes', automator)
+        result = _run_plugin(clazz, @plugin_env, cwd, task)
+        combinedresult.merge!(result)
       end
     else
-      # default to running all registered bootstrap handlers
-      classes = pluginmanager.getAllHandlerActionObjectsForAutomators
-      log.debug "Task #{task_id} running bootstrap handlers: #{classes}"
+      log.warn 'No automators specified to bootstrap'
     end
-    fail 'No bootstrappers configured' if classes.empty?
-
-    classes.each do |klass|
-      klass = Object.const_get(klass)
-      object = klass.new(@plugin_env, task)
-      result = object.runTask
-      combinedresult.merge!(result)
-    end
-
     result = combinedresult
   else
     log.error "Unhandled task of type #{task['taskName']}"
@@ -166,12 +172,12 @@ end
 # register plugins with the server if --register flag passed
 if options[:register]
   pluginmanager.register_plugins(loom_uri)
-  if (pluginmanager.load_errors?)
-    log.error "There was at least one provisioner plugin load failure"
+  if pluginmanager.load_errors?
+    log.error 'There was at least one provisioner plugin load failure'
     exit(1)
   end
-  if (pluginmanager.register_errors?)
-    log.error "There was at least one provisioner plugin register failure"
+  if pluginmanager.register_errors?
+    log.error 'There was at least one provisioner plugin register failure'
     exit(1)
   end
   exit(0)
@@ -193,7 +199,7 @@ if options[:file]
     sigterm.dont_interupt {
       result = delegate_task(task, pluginmanager)
     }
-  rescue Exception => e
+  rescue => e
     log.error "Caught exception when running task from file #{options[:file]}"
 
     result = {} if result.nil? == true
@@ -258,7 +264,7 @@ else
         result['provisionerId'] = options[:provisioner]
         result['tenantId'] = options[:tenant]
 
-        log.debug "Task <#{task["taskId"]}> completed, updating results <#{result}>"
+        log.debug "Task <#{task['taskId']}> completed, updating results <#{result}>"
         begin
           response = RestClient.post "#{loom_uri}/v2/tasks/finish", result.to_json
         rescue => e
@@ -280,7 +286,7 @@ else
           result['stdout'] = e.inspect
           result['stderr'] = "#{e.inspect}\n#{e.backtrace.join("\n")}"
         end
-        log.error "Task <#{task["taskId"]}> failed, updating results <#{result}>"
+        log.error "Task <#{task['taskId']}> failed, updating results <#{result}>"
         begin
           response = RestClient.post "#{loom_uri}/v2/tasks/finish", result.to_json
         rescue => e

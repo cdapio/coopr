@@ -22,32 +22,33 @@ require 'net/scp'
 class ChefSoloAutomator < Automator
   attr_accessor :credentials, :cookbooks_path, :cookbooks_tar, :remote_cache_dir
 
-  def initialize(env, task)
-    super(env, task)
-    work_dir = @env[:work_dir]
-    tenant = @env[:tenant]
-    @chef_primitives_path = %W( #{work_dir} #{tenant} automatortypes chef-solo ).join('/')
-    @remote_cache_dir = "/var/cache/loom"
-    @remote_chef_dir = "/var/chef"
-  end
+  # class vars
+  @@chef_primitives = %w(cookbooks data_bags roles)
+  @@remote_cache_dir = '/var/cache/loom'
+  @@remote_chef_dir = '/var/chef'
 
   # create local tarballs of the cookbooks, roles, data_bags, etc to be scp'd to remote machine
   def generate_chef_primitive_tar(chef_primitive)
 
-    chef_primitive_path = "#{@chef_primitives_path}/#{chef_primitive}"
-    chef_primitive_tar = "#{@chef_primitives_path}/#{chef_primitive}.tar.gz"
+    chef_primitive_path = "#{chef_primitive}"
+    chef_primitive_tar = "#{chef_primitive}.tar.gz"
+
+    # if no resources of this type are synced, dont do anything
+    unless File.directory?(chef_primitive_path)
+      log.warn "No resources of type #{chef_primitive_path} are synced, skipping tarball generation"
+      return
+    end
 
     # limit tarball regeneration to once per 10min
     # rubocop:disable GuardClause
     if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
       log.debug "Generating #{chef_primitive_tar} from #{chef_primitive_path}"
-      `tar -cLzf "#{chef_primitive_tar}.new" -C "#{@chef_primitives_path}" #{chef_primitive}`
+      `tar -cLzf "#{chef_primitive_tar}.new" #{chef_primitive}`
       `mv "#{chef_primitive_tar}.new" "#{chef_primitive_tar}"`
       log.debug "Generation complete: #{chef_primitive_tar}"
     end
     # rubocop:enable GuardClause
   end
-
 
   def set_credentials(sshauth)
     @credentials = Hash.new
@@ -118,7 +119,7 @@ class ChefSoloAutomator < Automator
 
     set_credentials(sshauth)
 
-    %w[cookbooks data_bags roles].each do |chef_primitive|
+    @@chef_primitives.each do |chef_primitive|
       generate_chef_primitive_tar(chef_primitive)
     end
 
@@ -142,12 +143,12 @@ class ChefSoloAutomator < Automator
 
         ssh_exec!(ssh, "type chef-solo", "Chef install validation")
 
-        ssh_exec!(ssh, "#{sudo} mkdir -p #{@remote_cache_dir}", "Create remote cache dir")
+        ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_cache_dir}", "Create remote cache dir")
 
-        ssh_exec!(ssh, "#{sudo} mkdir -p #{@remote_chef_dir}", "Create remote Chef dir")
+        ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_chef_dir}", "Create remote Chef dir")
 
-        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@remote_cache_dir}", "Changing cache dir owner to #{sshauth['user']}")
-        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@remote_chef_dir}", "Changing Chef dir owner to #{sshauth['user']}")
+        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@@remote_cache_dir}", "Changing cache dir owner to #{sshauth['user']}")
+        ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@@remote_chef_dir}", "Changing Chef dir owner to #{sshauth['user']}")
       end
     rescue Net::SSH::AuthenticationFailed => e
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -178,22 +179,22 @@ class ChefSoloAutomator < Automator
     end
 
     # upload tarballs to target machine
-    %w[cookbooks data_bags roles].each do |chef_primitive|
-      log.debug "Uploading #{chef_primitive} from #{@chef_primitives_path}/#{chef_primitive}.tar.gz to #{ipaddress}:#{@remote_cache_dir}/#{chef_primitive}.tar.gz"
+    @@chef_primitives.each do |chef_primitive|
+      next unless File.exists?("#{chef_primitive}.tar.gz")
+
+      log.debug "Uploading #{chef_primitive} from #{chef_primitive}.tar.gz to #{ipaddress}:#{@@remote_cache_dir}/#{chef_primitive}.tar.gz"
       begin
-        Net::SCP.upload!(ipaddress, sshauth['user'], "#{@chef_primitives_path}/#{chef_primitive}.tar.gz", "#{@remote_cache_dir}/#{chef_primitive}.tar.gz", :ssh =>
+        Net::SCP.upload!(ipaddress, sshauth['user'], "#{chef_primitive}.tar.gz", "#{@@remote_cache_dir}/#{chef_primitive}.tar.gz", :ssh =>
             @credentials)
       rescue Net::SSH::AuthenticationFailed => e
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
       log.debug "Upload complete"
-    end
 
-    # extract tarballs on remote machine to /var/chef
-    %w[cookbooks data_bags roles].each do |chef_primitive|
+      # extract tarballs on remote machine to /var/chef
       begin
         Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
-          ssh_exec!(ssh, "tar xf #{@remote_cache_dir}/#{chef_primitive}.tar.gz -C #{@remote_chef_dir}", "Extracting remote #{@remote_cache_dir}/#{chef_primitive}.tar.gz")
+          ssh_exec!(ssh, "tar xf #{@@remote_cache_dir}/#{chef_primitive}.tar.gz -C #{@@remote_chef_dir}", "Extracting remote #{@@remote_cache_dir}/#{chef_primitive}.tar.gz")
         end
       rescue Net::SSH::AuthenticationFailed => e
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -237,7 +238,7 @@ class ChefSoloAutomator < Automator
       # scp task.json to remote
       log.debug "Copying json attributes to remote"
       begin
-        Net::SCP.upload!(ipaddress, sshauth['user'], tmpjson.path, "#{@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
+        Net::SCP.upload!(ipaddress, sshauth['user'], tmpjson.path, "#{@@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
           @credentials)
       rescue Net::SSH::AuthenticationFailed
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
@@ -252,7 +253,7 @@ class ChefSoloAutomator < Automator
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
 
-        ssh_exec!(ssh, "#{sudo} chef-solo -j #{@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'", "Running Chef-solo")
+        ssh_exec!(ssh, "#{sudo} chef-solo -j #{@@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'", "Running Chef-solo")
       end
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace

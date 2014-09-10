@@ -617,7 +617,7 @@ site.app.post('/tenants/create', function (req, res) {
 site.app.post('/tenants/update', function (req, res) {
   var user = site.checkAuth(req, res, true, 'superadmin');
   var options = {
-    uri: BOX_ADDR + '/tenants/' + req.body.name,
+    uri: BOX_ADDR + '/tenants/' + req.body.tenant.name,
     method: 'PUT',
     json: req.body
   };
