@@ -6,7 +6,7 @@
     "api_user": "",
     "api_password": "",
     "ssh_keypair": "aws-us-west-1",
-    "ssh_key_resource": "/opt/loom/provisioner/worker/plugins/providers/fog_provider/aws-us-west-1.pem",
+    "ssh_key_resource": "",
     "aws_region": "us-west-1"
   }
 }

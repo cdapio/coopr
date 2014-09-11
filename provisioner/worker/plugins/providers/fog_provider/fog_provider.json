@@ -5,6 +5,12 @@
   "aws" : {
     "name": "aws",
     "classname": "FogProviderAWS",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
@@ -25,16 +31,16 @@
             "tip": "Full path and file name to AWS credential file as used by AWS command line tools"
           },
           "ssh_keypair": {
-            "label": "Key name",
+            "label": "Key Pair Name",
             "type": "text",
             "override": true,
-            "tip": "Your AWS SSH public key name"
+            "tip": "Your AWS EC2 key pair name"
           },
           "ssh_key_resource": {
-            "label": "Key file",
+            "label": "SSH Key Resource Name",
             "type": "text",
             "override": true,
-            "tip": "Full path and file name to your AWS SSH private key"
+            "tip": "Name of the SSH private key resource uploaded to the server"
           },
           "aws_region": {
             "label": "AWS Region",
