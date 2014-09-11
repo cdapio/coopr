@@ -2,10 +2,10 @@
   "name": "coopr-ngui",
   "private": true,
   "dependencies": {
-    "angular": "1.2.23",
-    "angular-sanitize": "~1.2.23",
-    "angular-mocks": "~1.2.23",
-    "angular-resource": "~1.2.23",
+    "angular": "1.2.24",
+    "angular-sanitize": "~1.2.24",
+    "angular-mocks": "~1.2.24",
+    "angular-resource": "~1.2.24",
     "bootstrap": "~3.2.0",
 
     "angular-strap": "~2.1.0",

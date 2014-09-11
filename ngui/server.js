@@ -5,15 +5,7 @@ var port = process.env.COOPR_UI_PORT || 8080,
 require('http-server')
   .createServer({
     root: __dirname + '/dist',
-    logFn: function (req) {
-      console.log(
-        '\n%s %s\n\x1B[1m%s\x1B[22m \x1B[36m%s\x1B[39m',
-        httpLabel,
-        (new Date).toUTCString(),
-        req.method,
-        req.url
-      );
-    }
+    logFn: mkLog(httpLabel)
   })
   .listen(port, '0.0.0.0', function () {
     console.log(httpLabel+' listening on port %s', port);
@@ -28,17 +20,18 @@ require('cors-anywhere')
   .listen(8081, '0.0.0.0', function() {
     console.log(corsLabel+' listening on port 8081');
   })
-  .proxy
-    .on('start', function (res) {
-      var location = res.corsAnywhereRequestState.location;
-      console.log(
-        '\n%s %s\n\x1B[1m%s\x1B[22m %s\x1B[36m%s\x1B[39m',
-        corsLabel,
-        (new Date).toUTCString(),
-        res.method, 
-        (location.isHttps ? 'https://' : 'http://') + location.host,
-        location.pathAndQueryString || '/'
-      );
-    });
+  .on('request', mkLog(corsLabel));
 
+
+function mkLog(label) {
+  return function (req) {
+    console.log(
+      '\n%s %s\n\x1B[1m%s\x1B[22m \x1B[36m%s\x1B[39m',
+      label,
+      (new Date).toUTCString(),
+      req.method,
+      req.url
+    );
+  }
+}
 
