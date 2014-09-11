@@ -5,9 +5,9 @@
   "provisioner": {
     "google_project": "",
     "google_client_email": "",
-    "google_p12_key_name": "",
-    "google_ssh_key_name": "",
-    "google_ssh_username": "",
+    "api_key_resource": "",
+    "ssh_key_resource": "",
+    "ssh_username": "",
     "google_data_disk_size_gb": "",
     "zone_name": "us-central1-a"
   }
