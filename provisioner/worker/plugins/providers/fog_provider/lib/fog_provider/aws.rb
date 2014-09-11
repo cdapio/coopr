@@ -362,7 +362,7 @@ class FogProviderAWS < Provider
         end
       delete_term =
         if @aws_ebs_delete_on_term
-          ami_map['deleteOnTermination']
+          'true'
         else
           'false'
         end
