@@ -214,28 +214,34 @@
   "joyent": {
     "name": "joyent",
     "classname": "FogProviderJoyent",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
-          "joyent_username": {
-            "label": "User",
+          "api_user": {
+            "label": "CloudAPI Username",
             "type": "text",
             "tip": "Your Joyent CloudAPI user name"
           },
-          "joyent_password": {
-            "label": "Password",
+          "api_password": {
+            "label": "CloudAPI Password",
             "type": "password",
             "tip": "Your Joyent CloudAPI password"
           },
-          "joyent_keyname" : {
-            "label": "Key name",
+          "ssh_keypair" : {
+            "label": "Key Name",
             "type": "text",
-            "tip": "Your Joyent SSH public key name"
+            "tip": "Your Joyent SSH Key Name"
           },
-          "joyent_keyfile": {
-            "label": "Key file",
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
             "type": "text",
-            "tip": "Full path and file name to your Joyent SSH private key"
+            "tip": "Name of the SSH private key resource uploaded to the server"
           },
           "joyent_version": {
             "label": "API version",
@@ -260,8 +266,8 @@
           }
         },
         "required": [
-          [ "joyent_username", "joyent_password" ],
-          [ "joyent_username", "joyent_keyname", "joyent_keyfile" ]
+          [ "api_user", "api_password" ],
+          [ "api_user", "ssh_keypair", "ssh_key_resource" ]
         ]
       }
     }
