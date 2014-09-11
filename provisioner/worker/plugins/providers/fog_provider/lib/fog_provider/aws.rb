@@ -48,7 +48,7 @@ class FogProviderAWS < Provider
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
-      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
+      @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, @@ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderAWS.create:' + e.inspect)
