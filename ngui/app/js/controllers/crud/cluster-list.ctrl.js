@@ -7,32 +7,25 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment
   var timeoutPromise,
       filterFilter = $filter('filter'),
       oneHourAgo = moment().hours(-1),
-      notTerminatedPredicate = function (item) { 
-        return item.status!=='terminated' || moment(item.createTime)<oneHourAgo;
+      activePredicate = function (item) { 
+        // any cluster created recently is considered "active" for display purposes
+        return (moment(item.createTime)>oneHourAgo) || (item.status!=='terminated');
       };
 
   $scope.clusterFilter = null;
 
   $scope.$watchCollection('list', function (list) {
-    if (!list.$promise || list.$resolved) {
+    if (list.length) {
 
-      if (list.length) {
-        setPredicate();
-        updatePending();
-      }
+      var activeCount = filterFilter(list, activePredicate).length,
+          filteredCount = list.length - activeCount;
+      // show the button and filter only if there are both visible and filterable items
+      $scope.clusterPredicate = (activeCount && filteredCount) ? activePredicate : null;
+
+      updatePending();
     }
   });
 
-  function setPredicate () {
-    var notTerminatedCount = filterFilter($scope.list, notTerminatedPredicate).length,
-        terminatedCount = $scope.list.length - notTerminatedCount;
-    if(terminatedCount && notTerminatedCount) {
-      $scope.clusterPredicate = notTerminatedPredicate; // enables the filtering
-    }
-    else {
-      $scope.clusterPredicate = null; // hide the button and do not filter
-    }
-  }
 
   function updatePending () {
     if(filterFilter($scope.list, {status:'pending'}).length) {
@@ -50,7 +43,7 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment
               }
             }
           });
-          setPredicate();
+
           updatePending();
         });
 
