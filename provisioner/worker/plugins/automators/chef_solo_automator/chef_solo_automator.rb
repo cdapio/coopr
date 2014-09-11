@@ -43,7 +43,7 @@ class ChefSoloAutomator < Automator
     # rubocop:disable GuardClause
     if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
       log.debug "Generating #{chef_primitive_tar} from #{chef_primitive_path}"
-      `tar -cLzf "#{chef_primitive_tar}.new" #{chef_primitive}`
+      `tar -chzf "#{chef_primitive_tar}.new" #{chef_primitive}`
       `mv "#{chef_primitive_tar}.new" "#{chef_primitive_tar}"`
       log.debug "Generation complete: #{chef_primitive_tar}"
     end

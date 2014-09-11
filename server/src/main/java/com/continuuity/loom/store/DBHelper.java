@@ -16,6 +16,7 @@
 package com.continuuity.loom.store;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
 import java.sql.Connection;
@@ -99,8 +100,33 @@ public final class DBHelper {
     }
   }
 
-  // mysql will error if you give it a timestamp of 0...
+  /**
+   * Get a {@link Timestamp} for the given timestamp in milliseconds. Returns null if the timestamp is less than 1,
+   * as some databases will error if you try and use a timestamp of 0.
+   *
+   * @param ts timestamp to convert
+   * @return A timestamp corresponding to the given input, or null if the input is invalid.
+   */
   public static Timestamp getTimestamp(long ts) {
     return ts > 0 ? new Timestamp(ts) : null;
+  }
+
+  /**
+   * Create a string for an IN clause in a sql query given the number of arguments that will be in the list.
+   *
+   * @param numArgs number of arguments in the IN clause
+   * @return String representing the parameterized IN clause for a sql query.
+   */
+  public static String createInString(int numArgs) {
+    if (numArgs < 1) {
+      return "";
+    }
+    StringBuilder builder = new StringBuilder();
+    builder.append("(");
+    for (int i = 0; i < numArgs - 1; i++) {
+      builder.append("?,");
+    }
+    builder.append("?)");
+    return builder.toString();
   }
 }

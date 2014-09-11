@@ -25,21 +25,19 @@ import com.continuuity.loom.store.DBHelper;
 import com.continuuity.loom.store.DBPut;
 import com.continuuity.loom.store.DBQueryExecutor;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Base abstract class for {@link ClusterStoreView} using a SQL database as the persistent store.
+ * TODO: find a way to consolidate common code in subclasses.
  */
 public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
   private final DBConnectionPool dbConnectionPool;
@@ -69,6 +67,9 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
 
   abstract PreparedStatement getSelectAllClusterJobsStatement(Connection conn) throws SQLException;
 
+  abstract PreparedStatement getSelectAllClusterJobsStatement(
+    Connection conn, Set<Cluster.Status> states) throws SQLException;
+
   abstract PreparedStatement getSelectClusterNodesStatement(Connection conn, long id) throws SQLException;
 
   @Override
@@ -96,6 +97,28 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
       Connection conn = dbConnectionPool.getConnection();
       try {
         PreparedStatement statement = getSelectAllClusterJobsStatement(conn);
+        try {
+          return getSummaries(statement);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      throw new IOException("Exception getting all clusters");
+    }
+  }
+
+  @Override
+  public List<ClusterSummary> getAllClusterSummaries(Set<Cluster.Status> states) throws IOException {
+    if (states == null || states.isEmpty()) {
+      return getAllClusterSummaries();
+    }
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        PreparedStatement statement = getSelectAllClusterJobsStatement(conn, states);
         try {
           return getSummaries(statement);
         } finally {
@@ -302,6 +325,15 @@ public abstract class BaseSQLClusterStoreView implements ClusterStoreView {
     @Override
     public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
       return getInsertClusterStatement(conn, clusterId, cluster, clusterBytes);
+    }
+  }
+
+  protected void setInClause(PreparedStatement statement, Set<Cluster.Status> states, int startIndex)
+    throws SQLException {
+    int i = startIndex;
+    for (Cluster.Status state : states) {
+      statement.setString(i, state.name());
+      i++;
     }
   }
 }

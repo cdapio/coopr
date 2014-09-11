@@ -123,6 +123,30 @@ with the entity name as the value. The services field is a JSON Array of the nam
 The progress field contains the progress of the last job performed on the cluster, or the progress of the job
 currently being performed on the cluster. It contains an action, actionstatus, stepstotal, and stepscompleted.
 
+The call may optionally contain a status http parameter which will filter the clusters to only include clusters
+that match the given status. The value for the status parameter is a comma separated list of cluster statuses,
+where a status is one of ``pending``, ``active``, ``incomplete``, ``inconsistent``, or ``terminated``. A cluster
+is pending if there is currently an action being performed on the cluster. For example, a cluster that is in
+the process of being created will be in the pending state. A cluster is active if it has been created and the
+last action performed on it was successful. For example, a cluster will transition from pending to active active
+it is successfully created. A cluster is incomplete if creation failed part way through the job. A cluster is 
+inconsistent if the cluster was successfully created in the past, but some subsequent action on the cluster
+failed. For example, if the a cluster reconfigure is attempted but fails, the cluster will be inconsistent.
+A cluster is terminated if it was successfully deleted. Any state besides terminated indicates that there are 
+live nodes associated with the cluster. 
+
+HTTP Parameters
+^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Parameter
+     - Description
+   * - status
+     - comma separated list of statuses. Returned clusters must have a status that matches one of the stasuses in the list. Possible statuses are 'pending', 'active', 'incomplete', 'inconsistent', and 'terminated'.
+
 HTTP Responses
 ^^^^^^^^^^^^^^
 
@@ -146,7 +170,7 @@ Example
  $ curl -H 'X-Loom-UserID:<userid>'
         -H 'X-Loom-TenantID:<tenantid>'
         -H 'X-Loom-ApiKey:<apikey>'
-        http://<loom-server>:<loom-port>/<version>/loom/clusters
+        http://<loom-server>:<loom-port>/<version>/loom/clusters?status=pending,active
  $ [
        {
            "id":"00000079",
