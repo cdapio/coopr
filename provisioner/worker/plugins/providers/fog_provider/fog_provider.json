@@ -5,15 +5,21 @@
   "aws" : {
     "name": "aws",
     "classname": "FogProviderAWS",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
-          "aws_access_key": {
+          "api_user": {
             "label": "Access Key ID",
             "type": "text",
             "tip": "AWS Access Key ID"
           },
-          "aws_secret_key": {
+          "api_password": {
             "label": "Secret Access Key",
             "type": "password",
             "tip": "AWS Secret Access Key"
@@ -24,17 +30,17 @@
             "override": true,
             "tip": "Full path and file name to AWS credential file as used by AWS command line tools"
           },
-          "aws_keyname": {
-            "label": "Key name",
+          "ssh_keypair": {
+            "label": "Key Pair Name",
             "type": "text",
             "override": true,
-            "tip": "Your AWS SSH public key name"
+            "tip": "Your AWS EC2 key pair name"
           },
-          "aws_keyfile": {
-            "label": "Key file",
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
             "type": "text",
             "override": true,
-            "tip": "Full path and file name to your AWS SSH private key"
+            "tip": "Name of the SSH private key resource uploaded to the server"
           },
           "aws_region": {
             "label": "AWS Region",
@@ -56,16 +62,16 @@
         },
         "required": [
           [
-            "aws_access_key",
-            "aws_secret_key",
-            "aws_keyname",
-            "aws_keyfile",
+            "api_user",
+            "api_password",
+            "ssh_keypair",
+            "ssh_key_resource",
             "aws_region"
           ],
           [
             "aws_credential_file",
-            "aws_keyname",
-            "aws_keyfile",
+            "ssh_keypair",
+            "ssh_key_resource",
             "aws_region"
           ]
         ]
