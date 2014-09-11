@@ -24,7 +24,7 @@ class FogProviderGoogle < Provider
   include FogProvider
 
   # plugin defined resources
-  @@p12_key_dir = 'p12_keys'
+  @@p12_key_dir = 'api_keys'
   @@ssh_key_dir = 'ssh_keys'
 
   def create(inputmap)
@@ -68,10 +68,10 @@ class FogProviderGoogle < Provider
       # return the unique providerid we used
       @result['result']['providerid'] = @providerid
       # set ssh user
-      ssh_user =
-        if @google_ssh_username.to_s != ''
+      sshuser =
+        if @ssh_user.to_s != ''
           # prefer custom plugin field
-          @google_ssh_username
+          @ssh_user
         elsif @task['config']['sshuser'].to_s != ''
           # default to ssh-user as defined by image
           @task['config']['ssh_user']
@@ -79,8 +79,8 @@ class FogProviderGoogle < Provider
           # default to root
           'root'
         end
-      @result['result']['ssh-auth']['user'] = ssh_user
-      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @google_ssh_key_name)
+      @result['result']['ssh-auth']['user'] = sshuser
+      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @ssh_key_resource)
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
@@ -281,7 +281,7 @@ class FogProviderGoogle < Provider
   def connection
     # Create connection
     # rubocop:disable UselessAssignment
-    p12_key = File.join(@@p12_key_dir, @google_p12_key_name)
+    p12_key = File.join(@@p12_key_dir, @api_key_resource)
     @connection ||= begin
       connection = Fog::Compute.new(
         provider: 'google',
@@ -328,8 +328,8 @@ class FogProviderGoogle < Provider
     unless @google_client_email =~ /.*gserviceaccount.com$/
       errors << 'Invalid service account email address. It must be in the gserviceaccount.com domain'
     end
-    ssh_key = File.join(@@ssh_key_dir, @google_ssh_key_name)
-    p12_key = File.join(@@p12_key_dir, @google_p12_key_name)
+    ssh_key = File.join(@@ssh_key_dir, @ssh_key_resource)
+    p12_key = File.join(@@p12_key_dir, @api_key_resource)
     [ssh_key, p12_key].each do |key|
       next if File.readable?(key)
       errors << "Cannot read named key from resource directory: #{key}. Please ensure you have uploaded a key via the UI or API"

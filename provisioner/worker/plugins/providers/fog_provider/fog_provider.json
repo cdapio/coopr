@@ -125,7 +125,7 @@
     "name": "google",
     "classname": "FogProviderGoogle",
     "resourceTypes": {
-        "p12_keys": {
+        "api_keys": {
             "format": "file",
             "permissions": "0400"
         },
@@ -147,20 +147,20 @@
             "type": "text",
             "tip": "Service account email address, should be of the form 123456789@developer.gserviceaccount.com"
           },
-          "google_p12_key_name": {
-            "label": "P12 key name",
+          "api_key_resource": {
+            "label": "API Key Resource Name",
             "type": "text",
             "tip": "Name of the P12 key resource uploaded to the server"
           },
-          "google_ssh_key_name": {
-            "label": "ssh private key name",
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
             "type": "text",
             "tip": "Name of the SSH key resource uploaded to the server"
           },
-          "google_ssh_username": {
-            "label": "ssh username",
+          "ssh_user": {
+            "label": "SSH Username",
             "type": "text",
-            "tip": "SSH username to use. Must correspond to the google_ssh_key_name provided, and have sudo permissions"
+            "tip": "SSH username. A corresponding key must be configured in the portal"
           },
           "google_data_disk_size_gb": {
             "label": "Data disk size in GB",
@@ -191,8 +191,8 @@
           [
             "google_project",
             "google_client_email",
-            "google_p12_key_name",
-            "google_ssh_key_name",
+            "api_key_resource",
+            "ssh_key_resource",
             "zone_name"
           ]
         ]
