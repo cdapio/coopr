@@ -70,6 +70,7 @@ gulp.task('js:lib', function() {
       './bower_components/angular-strap/dist/modules/alert.tpl.js',
       './bower_components/angular-strap/dist/modules/popover.js',
       './bower_components/angular-strap/dist/modules/popover.tpl.js',
+      './bower_components/angular-strap/dist/modules/collapse.js',
 
       './bower_components/moment/moment.js',
       './bower_components/angular-moment/angular-moment.js',

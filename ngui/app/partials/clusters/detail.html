@@ -137,3 +137,63 @@
   </div></li>
 
 </ul>
+
+
+<div ng-show="serviceSets">
+  <hr />
+  <h4>Service Sets</h4>
+
+  <ol class="list-unstyled panel-group" bs-collapse>
+    <li class="panel panel-default" ng-repeat="set in serviceSets">
+
+      <div class="panel-heading">
+        <div class="panel-title row">
+          <div class="col-xs-3">
+            <a href="" bs-collapse-toggle>
+              <span class="label label-success" 
+                  ng-bind="set.nodes.length"></span>
+              <small>
+                <ng-pluralize count="set.nodes.length"
+                    when="{'one': 'node', 'other': 'nodes'}">
+                </ng-pluralize>
+                <ng-pluralize count="set.services.length"
+                    when="{'one': 'with one service', 'other': 'with {} services'}">
+                </ng-pluralize>
+                <span ng-show="set.nodes.length>1">each</span>
+              </small>
+            </a>
+          </div>
+          <div class="col-xs-9">
+            <my-service-picker 
+              data-model="set.services"
+            ></my-service-picker>
+          </div>
+        </div>
+      </div>
+      <div class="panel-collapse" bs-collapse-target>
+        <div class="panel-body table-responsive">
+
+          <table class="table table-striped" my-sortable>
+            <thead>
+              <tr ng-class="{'sort-enabled': set.nodes.length>1}">
+                <th>id</th>
+                <th data-predicate="properties.hostname">hostname</th>
+                <th data-predicate="properties.ipaddresses.access_v4">IP address</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="item in set.nodes">
+                <td>{{item.id}}</td>
+                <td>{{item.properties.hostname}}</td>
+                <td>{{item.properties.ipaddresses.access_v4}}</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
+    </li>
+  </ol>
+
+</div>
