@@ -1,5 +1,5 @@
 <ul class="list-inline">
-  <li ng-repeat="name in model">
+  <li ng-repeat="name in model" class="am-flip-x">
     <div class="btn-group btn-group-xs dropdown">
       <a class="btn btn-default disabled">
         {{name}}
