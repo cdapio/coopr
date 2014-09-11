@@ -137,7 +137,7 @@ class FogProviderAWS < Provider
           ssh_exec!(ssh, "#{sudo} hostname #{hostname}", "Setting hostname to #{hostname}")
           # Setting up disks
           log.debug 'Starting disk configuration'
-          if ami.root_device_type == 'ebs'
+          if server.root_device_type == 'ebs'
             log.debug 'EBS-backed instance detected...'
             begin
               extfs = true
