@@ -22,8 +22,8 @@ die ( ) {
   exit 1
 }
 
-APP_NAME="loom-dummy-provisioner"
-PID_DIR=${PID_DIR:-/var/run/loom}
+APP_NAME="coopr-dummy-provisioner"
+PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
 check_before_start() {
@@ -40,18 +40,18 @@ check_before_start() {
 }
 
 start ( ) {
-  cd "${LOOM_HOME}"
+  cd "${COOPR_HOME}"
   check_before_start
 
-  echo "Starting Loom Dummy Provisioner ..."
-  nohup nice -1 java -cp server/lib/*:server/conf com.continuuity.loom.runtime.MockProvisionerMain  >> ${LOOM_LOG_DIR}/${APP_NAME}${p}.log 2>&1 &
+  echo "Starting Dummy Provisioner ..."
+  nohup nice -1 java -cp server/lib/*:server/conf co.cask.coopr.MockProvisionerMain  >> ${COOPR_LOG_DIR}/${APP_NAME}${p}.log 2>&1 &
   pid="${PID_DIR}/${APP_NAME}${p}.pid"
   echo $! > $pid
 }
 
 stop ( ) {
   local failed=0
-  echo "Stopping Loom Dummy Provisioner ..."
+  echo "Stopping Dummy Provisioner ..."
   pid="${PID_DIR}/${APP_NAME}${p}.pid"
   if [ -f "${pid}" ] ; then
     echo -n "  Stopping provisioner ${p} ..."
@@ -106,7 +106,7 @@ status() {
     failed=1
   fi
   if [ ${failed} -eq 0 ] ; then
-    echo "Loom Provisioner up and running"
+    echo "Dummy Provisioner up and running"
   elif [ ${failed} -eq 3 ] ; then
     echo "At least one provisioner failed"
   fi

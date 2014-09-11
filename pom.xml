@@ -21,8 +21,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.continuuity</groupId>
-    <artifactId>loom-parent</artifactId>
+    <groupId>co.cask</groupId>
+    <artifactId>coopr-parent</artifactId>
     <packaging>pom</packaging>
     <version>0.9.8-SNAPSHOT</version>
     <name>Cask Coopr</name>
