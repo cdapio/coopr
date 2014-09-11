@@ -522,7 +522,7 @@ site.app.get('/profile', function (req, res) {
 });
 
 site.app.post('/setskin', function (req, res) {
-  var user = site.checkAuth(req, res);
+  var user = site.checkAuth(req, res, false);
   var myCookie = {};
   for (item in req.cookies) {
     if (item === site.COOKIE_NAME) {
@@ -530,19 +530,14 @@ site.app.post('/setskin', function (req, res) {
     }
   }
   var packageBody = {
-    id: user.id,
+    id: user,
     skin: req.body.skin,
     mods: {}
   }
   var options = {
-    uri: BOX_ADDR + '/profile',
+    uri: BOX_ADDR + '/profiles/' + user,
     method: 'PUT',
-    json: packageBody,
-    headers: {
-      'X-Loom-UserID': user.id,
-      'X-Loom-TenantID': user.tenant,
-      'X-Loom-ApiKey': DEFAULT_API_KEY
-    }
+    json: packageBody
   };
   request(options, function (err, response, body) {
     if(!err) {
@@ -1384,7 +1379,7 @@ site.app.post('/login', function (req, res) {
   var selectedSkin = site.DEFAULT_SKIN;
   var tenant = req.body.tenant;
   var options = {
-    url: BOX_ADDR + '/profile',
+    url: BOX_ADDR + '/profiles/' + user,
     method: 'GET',
     headers: {
       'X-Loom-UserID': user,
@@ -1398,21 +1393,21 @@ site.app.post('/login', function (req, res) {
         var profile = JSON.parse(body);
         selectedSkin = profile.skin;
       } catch (err) {
-        site.logger.info('Improper JSON for profile call ' + body);
+        site.logger.info('Improper JSON for profiles call ' + body);
       }
-    }
-    var permissionLevel = site.determinePermissionLevel(user, password);
-    res.cookie(site.COOKIE_NAME, {
-      user: user,
-      tenant: tenant,
-      permission: permissionLevel,
-      skin: selectedSkin
-    });
-    var authenticated = true;
-    if (permissionLevel === 'admin') {
-      res.redirect('/');
-    } else {
-      res.redirect('/user');
+      var permissionLevel = site.determinePermissionLevel(user, password);
+      res.cookie(site.COOKIE_NAME, { 
+        user: user,
+        tenant: tenant,
+        permission: permissionLevel,
+        skin: selectedSkin
+      });
+      var authenticated = true;
+      if (permissionLevel === 'admin') {
+        res.redirect('/');
+      } else {
+        res.redirect('/user');
+      }
     }
   });
 });
