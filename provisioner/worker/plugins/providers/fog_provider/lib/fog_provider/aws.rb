@@ -148,7 +148,7 @@ class FogProviderAWS < Provider
             if extfs
               log.debug 'File-system is EXT3/EXT4'
               # resize2fs is safe to execute
-              ssh_exec!(ssh, 'test -x /sbin/resize2fs && #{sudo} /sbin/resize2fs /dev/xvde', 'Resizing filesystem')
+              ssh_exec!(ssh, "test -x /sbin/resize2fs && #{sudo} /sbin/resize2fs /dev/xvde", 'Resizing filesystem')
             end
           else
             log.debug 'Instance store detected...'
