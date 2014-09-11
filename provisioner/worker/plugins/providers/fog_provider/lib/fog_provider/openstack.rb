@@ -22,7 +22,10 @@ class FogProviderOpenstack < Provider
   include FogProvider
 
   # plugin defined resources
-  @@ssh_key_dir = 'ssh_keys'
+  @ssh_key_dir = 'ssh_keys'
+  class << self
+    attr_accessor :ssh_key_dir
+  end
 
   def create(inputmap)
     flavor = inputmap['flavor']
@@ -50,7 +53,7 @@ class FogProviderOpenstack < Provider
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
-      @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, @@ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
+      @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderOpenstack.create:' + e.inspect)

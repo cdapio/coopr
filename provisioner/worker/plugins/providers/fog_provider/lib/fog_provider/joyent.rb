@@ -22,7 +22,10 @@ class FogProviderJoyent < Provider
   include FogProvider
 
   # plugin defined resources
-  @@ssh_key_dir = 'ssh_keys'
+  @ssh_key_dir = 'ssh_keys'
+  class << self
+    attr_accessor :ssh_key_dir
+  end
 
   def create(inputmap)
     flavor = inputmap['flavor']
@@ -48,7 +51,7 @@ class FogProviderJoyent < Provider
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
-      @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, @@ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
+      @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
@@ -184,7 +187,7 @@ class FogProviderJoyent < Provider
         joyent_username: @api_user,
         joyent_password: @api_password,
         joyent_keyname: @ssh_keypair,
-        joyent_keyfile: File.join(@@ssh_key_dir, @ssh_key_resource),
+        joyent_keyfile: File.join(self.class.ssh_key_dir, @ssh_key_resource),
         joyent_url: @joyent_api_url,
         joyent_version: @joyent_version
       )
