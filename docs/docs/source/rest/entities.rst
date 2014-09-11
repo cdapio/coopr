@@ -56,9 +56,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/export
    {
      "providers":[ ... ],
@@ -101,9 +101,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{ 
               "providers":[...],
               "imagetypes":[...],

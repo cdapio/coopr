@@ -98,9 +98,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Coopr-UserID:admin'
-        -H 'X-Coopr-TenantID:superadmin'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{
                 "tenant": {
                     "name":"my-company", 
@@ -144,9 +144,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Coopr-UserID:admin'
-        -H 'X-Coopr-TenantID:superadmin'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants/my-company
  $ { "name":"my-company", "workers":10, "maxClusters":20, "maxNodes":100 }
 
@@ -185,9 +185,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Coopr-UserID:admin'
-        -H 'X-Coopr-TenantID:superadmin'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants/my-company
 
 .. _tenants-modify:
@@ -254,9 +254,9 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT
-        -H 'X-Coopr-UserID:admin'
-        -H 'X-Coopr-TenantID:superadmin'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{ 
                 "tenant": {
                     "name":"my-company", 
@@ -267,9 +267,9 @@ Example
             }'  
         http://<server>:<port>/<version>/tenants/my-company
  $ curl -X GET 
-        -H 'X-Coopr-UserID:admin'
-        -H 'X-Coopr-TenantID:superadmin'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants/my-company
  $ { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 }
 
@@ -305,9 +305,9 @@ Example
 .. code-block:: bash
 
  $ curl -X GET 
-        -H 'X-Coopr-UserID:admin'
-        -H 'X-Coopr-TenantID:superadmin'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin'
+        -H 'Coopr-TenantID:superadmin'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/tenants
  $ [
      { "name":"my-company", "workers":20, "maxClusters":20, "maxNodes":100 },

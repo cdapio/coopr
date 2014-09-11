@@ -83,9 +83,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{"name":"example", "providertype":"openstack", "description": "Example"}' 
         http://<server>:<port>/<version>/providers
 
@@ -119,9 +119,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/providers/example
  $ {"name":"example","description":"Example","providertype":"openstack","provisioner":{}}
 
@@ -157,9 +157,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/providers/example
 
 .. _provider-modify:
@@ -215,14 +215,14 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{"name": "example", "description": "Updated example", "providertype":"openstack"}'  
         http://<server>:<port>/<version>/providers/example
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/providers/example
  $ {"name":"example","description":"Updated example","providertype":"openstack","provisioner":{}}
 
@@ -258,8 +258,8 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/providers
 

@@ -79,9 +79,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST 
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{"name":"small.example", "description":"Example 1 vCPU, 1 GB RAM, 30+ GB Disk", "providermap": {"openstack": {"flavor":"m1.small"}}}' 
         http://<server>:<port>/<version>/imagetypes
 
@@ -115,9 +115,9 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/imagetypes/small.example
  $ {"name":"small.example","description":"Example 1 vCPU, 1 GB RAM, 30+ GB Disk","providermap":{"openstack":{"flavor":"m1.small"}}}
 
@@ -153,9 +153,9 @@ Example
 .. code-block:: bash
 
  $ curl -X DELETE
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/imagetypes/example
 
 .. _image-modify:
@@ -210,15 +210,15 @@ Example
 .. code-block:: bash
 
  $ curl -X PUT
-        -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{"name":"small.example", "description":"New Example 1 vCPU, 1 GB RAM, 30+ GB Disk", 
              "providermap": {"openstack": {"flavor":"m1.small"},"aws":{"flavor":"aws.small"}}}' 
         http://<server>:<port>/<version>/imagetypes/small.example
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/imagetypes/small.example
  $ {"name":"small.example","description":"New Example 1 vCPU, 1 GB RAM, 30+ GB Disk",
      "providermap":{"openstack":{"flavor":"m1.small"},"aws":{"flavor":"aws.small"}}}
@@ -251,8 +251,8 @@ Example
 ^^^^^^^^
 .. code-block:: bash
 
- $ curl -H 'X-Coopr-UserID:admin' 
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+ $ curl -H 'Coopr-UserID:admin' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/imagetypes
 

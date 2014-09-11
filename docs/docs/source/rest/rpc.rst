@@ -82,9 +82,9 @@ Example
 .. code-block:: bash
 
  $ curl -X POST
-        -H 'X-Coopr-UserID:<userid>'
-        -H 'X-Coopr-TenantID:<tenantid>'
-        -H 'X-Coopr-ApiKey:<apikey>'
+        -H 'Coopr-UserID:<userid>'
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
         -d '{ 
                 "clusterId":"00000051",
                 "properties":["hostname", "ipaddress"],

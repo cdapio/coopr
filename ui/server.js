@@ -192,9 +192,9 @@ site.getEntity = function (path, user) {
       url: BOX_ADDR + path,
       method: 'GET',
       headers: {
-        'X-Loom-UserID': user && user.id,
-        'X-Loom-TenantID': user && user.tenant,
-        'X-Loom-ApiKey': DEFAULT_API_KEY
+        'Coopr-UserID': user && user.id,
+        'Coopr-TenantID': user && user.tenant,
+        'Coopr-ApiKey': DEFAULT_API_KEY
       }
     };
     request(options, function (err, response, body) {
@@ -225,9 +225,9 @@ site.getEntity = function (path, user) {
  */
 site.sendRequestAndHandleResponse = function (options, user, res) {
   options['headers'] = {
-    'X-Loom-UserID': user.id,
-    'X-Loom-TenantID': user.tenant,
-    'X-Loom-ApiKey': DEFAULT_API_KEY
+    'Coopr-UserID': user.id,
+    'Coopr-TenantID': user.tenant,
+    'Coopr-ApiKey': DEFAULT_API_KEY
   };
   request(options, this.getGenericResponseHandler(res, options.method));
 };
@@ -428,9 +428,9 @@ site.app.post('/import', function (req, res) {
             url: BOX_ADDR + '/import',
             method: 'POST',
             headers: {
-              'X-Loom-UserID': user.id,
-              'X-Loom-TenantID': user.tenant,
-              'X-Loom-ApiKey': DEFAULT_API_KEY
+              'Coopr-UserID': user.id,
+              'Coopr-TenantID': user.tenant,
+              'Coopr-ApiKey': DEFAULT_API_KEY
             },
             json: config
           };
@@ -457,9 +457,9 @@ site.app.get('/export', function (req, res) {
     url: BOX_ADDR + '/export',
     method: 'GET',
     headers: {
-      'X-Loom-UserID': user.id,
-      'X-Loom-TenantID': user.tenant,
-      'X-Loom-ApiKey': DEFAULT_API_KEY
+      'Coopr-UserID': user.id,
+      'Coopr-TenantID': user.tenant,
+      'Coopr-ApiKey': DEFAULT_API_KEY
     }
   };
   request(options, function (err, response, body) {
@@ -1382,9 +1382,9 @@ site.app.post('/login', function (req, res) {
     url: BOX_ADDR + '/profiles/' + user,
     method: 'GET',
     headers: {
-      'X-Loom-UserID': user,
-      'X-Loom-TenantID': tenant,
-      'X-Loom-ApiKey': DEFAULT_API_KEY
+      'Coopr-UserID': user,
+      'Coopr-TenantID': tenant,
+      'Coopr-ApiKey': DEFAULT_API_KEY
     }
   };
   request(options, function (err, response, body) {

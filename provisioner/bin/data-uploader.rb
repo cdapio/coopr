@@ -78,7 +78,7 @@ module Loom
       attr_accessor :options
       def initialize(options)
         @options = options
-        @headers = { :'X-Loom-UserID' => options[:user], :'X-Loom-TenantID' => options[:tenant] }
+        @headers = { :'Coopr-UserID' => options[:user], :'Coopr-TenantID' => options[:tenant] }
       end
 
       def validate
