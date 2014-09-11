@@ -275,6 +275,12 @@
   "openstack": {
     "name": "openstack",
     "classname": "FogProviderOpenstack",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": { 
       "admin": {
         "fields": {
