@@ -160,3 +160,10 @@ CREATE TABLE IF NOT EXISTS pluginMeta (
     delete_time TIMESTAMP NULL,
     PRIMARY KEY (tenant_id, plugin_type, plugin_name, resource_type, name, version)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS users (
+    user_id VARCHAR(255),
+    tenant_id VARCHAR(64),
+    profile MEDIUMBLOB,
+    PRIMARY KEY (tenant_id, user_id)
+) ENGINE = InnoDB;

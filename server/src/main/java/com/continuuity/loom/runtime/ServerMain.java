@@ -36,6 +36,7 @@ import com.continuuity.loom.store.entity.EntityStoreService;
 import com.continuuity.loom.store.guice.StoreModule;
 import com.continuuity.loom.store.provisioner.ProvisionerStore;
 import com.continuuity.loom.store.tenant.TenantStore;
+import com.continuuity.loom.store.user.UserStore;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
@@ -78,6 +79,7 @@ public final class ServerMain extends DaemonMain {
   private ProvisionerStore provisionerStore;
   private IdService idService;
   private TenantStore tenantStore;
+  private UserStore userStore;
 
   public static void main(final String[] args) throws Exception {
     new ServerMain().doMain(args);
@@ -154,6 +156,8 @@ public final class ServerMain extends DaemonMain {
       provisionerStore.startAndWait();
       resourceService = injector.getInstance(ResourceService.class);
       resourceService.startAndWait();
+      userStore = injector.getInstance(UserStore.class);
+      userStore.startAndWait();
 
       // Register MBean
       ServerStats serverStats = injector.getInstance(ServerStats.class);
@@ -200,7 +204,7 @@ public final class ServerMain extends DaemonMain {
       }
     }
 
-    stopAll(handlerServer, resourceService, provisionerStore, tenantStore, clusterStoreService,
+    stopAll(handlerServer, userStore, resourceService, provisionerStore, tenantStore, clusterStoreService,
             entityStoreService, idService, zkClientService, inMemoryZKServer);
   }
 

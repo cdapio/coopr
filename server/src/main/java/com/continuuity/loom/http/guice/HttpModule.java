@@ -25,6 +25,7 @@ import com.continuuity.loom.http.handler.RPCHandler;
 import com.continuuity.loom.http.handler.StatusHandler;
 import com.continuuity.loom.http.handler.SuperadminHandler;
 import com.continuuity.loom.http.handler.TaskHandler;
+import com.continuuity.loom.http.handler.UserHandler;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 
@@ -46,5 +47,6 @@ public class HttpModule extends AbstractModule {
     handlerBinder.addBinding().to(SuperadminHandler.class);
     handlerBinder.addBinding().to(ProvisionerHandler.class);
     handlerBinder.addBinding().to(PluginHandler.class);
+    handlerBinder.addBinding().to(UserHandler.class);
   }
 }

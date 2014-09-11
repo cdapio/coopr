@@ -13,6 +13,8 @@ import com.continuuity.loom.store.provisioner.SQLPluginMetaStoreService;
 import com.continuuity.loom.store.provisioner.SQLProvisionerStore;
 import com.continuuity.loom.store.tenant.SQLTenantStore;
 import com.continuuity.loom.store.tenant.TenantStore;
+import com.continuuity.loom.store.user.SQLUserStore;
+import com.continuuity.loom.store.user.UserStore;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 
@@ -36,11 +38,13 @@ public abstract class AbstractStoreModule extends AbstractModule {
     bind(TenantStore.class).to(SQLTenantStore.class).in(Scopes.SINGLETON);
     bind(ProvisionerStore.class).to(SQLProvisionerStore.class).in(Scopes.SINGLETON);
     bind(PluginMetaStoreService.class).to(SQLPluginMetaStoreService.class).in(Scopes.SINGLETON);
+    bind(UserStore.class).to(SQLUserStore.class).in(Scopes.SINGLETON);
     bind(DBConnectionPool.class).in(Scopes.SINGLETON);
     bind(SQLClusterStoreService.class).in(Scopes.SINGLETON);
     bind(SQLEntityStoreService.class).in(Scopes.SINGLETON);
     bind(SQLTenantStore.class).in(Scopes.SINGLETON);
     bind(SQLProvisionerStore.class).in(Scopes.SINGLETON);
     bind(SQLPluginMetaStoreService.class).in(Scopes.SINGLETON);
+    bind(SQLUserStore.class).in(Scopes.SINGLETON);
   }
 }

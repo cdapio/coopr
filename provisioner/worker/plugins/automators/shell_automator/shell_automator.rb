@@ -52,7 +52,7 @@ class ShellAutomator < Automator
   def generate_tar(file, path)
     return if File.exist?(file) && ((Time.now - File.stat(file).mtime).to_i < 600)
     log.debug "Generating #{file} from #{path}"
-    `tar -cLzf "#{file}.new" -C "#{File.dirname(path)}" #{File.basename(path)}`
+    `tar -chzf "#{file}.new" -C "#{File.dirname(path)}" #{File.basename(path)}`
     `mv "#{file}.new" "#{file}"`
     log.debug "Generation complete: #{file}"
   end
