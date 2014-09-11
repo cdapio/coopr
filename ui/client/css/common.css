@@ -158,13 +158,6 @@
   float: left;
 }
 
-/**
- * Tablesorter overrides for all skins.
- */
-table.tablesorter thead tr .header {
-  background-image: url('/static/img/v2-assets/dark/icon_dropdown.png');
-  background-position: 22% 20px;
-}
 
 /**************************************************************************************************/
 
