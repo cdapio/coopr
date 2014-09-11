@@ -293,15 +293,21 @@
   "openstack": {
     "name": "openstack",
     "classname": "FogProviderOpenstack",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": { 
       "admin": {
         "fields": {
-          "openstack_username": {
-            "label": "User",
+          "api_user": {
+            "label": "Username",
             "type": "text",
             "tip": "Your Openstack user name"
           },
-          "openstack_password": {
+          "api_password": {
             "label": "Password",
             "type": "password",
             "tip": "Your Openstack password"
@@ -317,15 +323,15 @@
             "default": "http://EXAMPLE.DOMAIN.COM:5000/v2.0/tokens",
             "tip": "Your Openstack Keystone API URL"
           },
-          "openstack_keyname": {
+          "ssh_keypair": {
             "label": "Key name",
             "type": "text",
             "tip": "Your Openstack SSH public key name"
           },
-          "openstack_keyfile": {
-            "label": "Key file",
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
             "type": "text",
-            "tip": "Path to your Openstack SSH private key file"
+            "tip": "Name of the SSH private key resource uploaded to the server"
           },
           "openstack_ssl_verify_peer": {
             "label": "Verify SSL peers",
@@ -335,12 +341,12 @@
         },
         "required": [
           [
-            "openstack_username",
-            "openstack_password",
+            "api_user",
+            "api_password",
             "openstack_tenant",
             "openstack_auth_url",
-            "openstack_keyname",
-            "openstack_keyfile"
+            "ssh_keypair",
+            "ssh_key_resource"
           ]
         ]
       },

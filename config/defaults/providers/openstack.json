@@ -3,11 +3,11 @@
   "description": "Openstack Private Cloud",
   "providertype": "openstack",
   "provisioner": {
-    "openstack_username": "USERNAME",
-    "openstack_password": "PASSWORD",
+    "api_user": "USERNAME",
+    "api_password": "PASSWORD",
     "openstack_tenant": "TENANT",
     "openstack_auth_url": "http://NAME.DOMAIN.COM:5000/v2.0/tokens",
-    "openstack_keyname": "TENANT_KEY",
-    "openstack_keyfile": "/opt/loom/provisioner/worker/plugins/providers/fog_provider/TENANT_KEY.pem"
+    "ssh_keypair": "TENANT_KEY",
+    "ssh_key_resource": ""
   }
 }
