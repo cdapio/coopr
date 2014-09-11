@@ -3,7 +3,7 @@
   "description": "Openstack Private Cloud",
   "providertype": "openstack",
   "provisioner": {
-    "api_username": "USERNAME",
+    "api_user": "USERNAME",
     "api_password": "PASSWORD",
     "openstack_tenant": "TENANT",
     "openstack_auth_url": "http://NAME.DOMAIN.COM:5000/v2.0/tokens",
