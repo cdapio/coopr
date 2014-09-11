@@ -36,15 +36,15 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }" 
         }
       }
     }

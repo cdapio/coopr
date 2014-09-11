@@ -33,15 +33,15 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_mapreduce_historyserver],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-mapreduce-historyserver\": \"start\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_mapreduce_historyserver],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-mapreduce-historyserver\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_mapreduce_historyserver],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-mapreduce-historyserver\": \"stop\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_mapreduce_historyserver],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-mapreduce-historyserver\": \"stop\" } } } }" 
         }
       }
     }

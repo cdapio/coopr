@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 # to use, run:
-# mysql -u $user -p -h $hostname $dbname < loom-create-tables-mysql.sql
+# mysql -u $user -p -h $hostname $dbname < create-tables-mysql.sql
 
 CREATE TABLE IF NOT EXISTS clusters (
     id BIGINT,

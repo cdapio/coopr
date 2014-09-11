@@ -36,15 +36,15 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }" 
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }" 
         }
       }
     }

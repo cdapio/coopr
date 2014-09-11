@@ -24,13 +24,13 @@ usage() {
 }
 
 get_service_bin() {
-  [[ ${LOOM_SERVICE_BIN} ]] && return
+  [[ ${COOPR_SERVICE_BIN} ]] && return
   if [[ -x /sbin/service ]] ; then
-    LOOM_SERVICE_BIN="/sbin/service "
+    COOPR_SERVICE_BIN="/sbin/service "
   elif [[ -x /usr/sbin/service ]] ; then
-    LOOM_SERVICE_BIN="/usr/sbin/service "
+    COOPR_SERVICE_BIN="/usr/sbin/service "
   else
-    LOOM_SERVICE_BIN="/etc/init.d/"
+    COOPR_SERVICE_BIN="/etc/init.d/"
   fi
 }
 
@@ -44,4 +44,4 @@ fi
 
 get_service_bin
 
-${LOOM_SERVICE_BIN}${SERVICE_NAME} ${ACTION}
+${COOPR_SERVICE_BIN}${SERVICE_NAME} ${ACTION}

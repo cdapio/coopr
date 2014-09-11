@@ -15,10 +15,10 @@
 # limitations under the License.
 #
 
-LOOM_SERVER_URI=${LOOM_SERVER_URI:-http://localhost:55054}
-LOOM_LOG_DIR=${LOOM_LOG_DIR:-/var/log/loom}
-LOOM_UI_PORT=${LOOM_UI_PORT:-8100}
-LOOM_HOME=${LOOM_HOME:-/opt/loom} ; export LOOM_HOME
+COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
+COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
+COOPR_UI_PORT=${COOPR_UI_PORT:-8100}
+COOPR_HOME=${COOPR_HOME:-/opt/coopr} ; export COOPR_HOME
 
 die ( ) {
   echo
@@ -28,12 +28,12 @@ die ( ) {
 }
 
 # Specifies UI Path
-UI_PATH=${UI_PATH:-${LOOM_HOME}/ui}
+UI_PATH=${UI_PATH:-${COOPR_HOME}/ui}
 ENVIRONMENT=${ENVIRONMENT:-production}
 
-LOOM_NODE=${LOOM_NODE:-"${LOOM_HOME}/ui/embedded/bin/node"}
-APP_NAME="loom-ui"
-PID_DIR=${PID_DIR:-/var/run/loom}
+COOPR_NODE=${COOPR_NODE:-"${COOPR_HOME}/ui/embedded/bin/node"}
+APP_NAME="coopr-ui"
+PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
 check_before_start() {
@@ -52,15 +52,15 @@ start ( ) {
   cd ${UI_PATH}
   check_before_start
 
-  echo "Starting Loom UI ..."
-  nohup nice -1 ${LOOM_NODE} ${UI_PATH}/server.js --env=${ENVIRONMENT} \
-    --loomhost=${LOOM_SERVER_URI} --port=${LOOM_UI_PORT} \
-    >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
+  echo "Starting UI ..."
+  nohup nice -1 ${COOPR_NODE} ${UI_PATH}/server.js --env=${ENVIRONMENT} \
+    --cooprhost=${COOPR_SERVER_URI} --port=${COOPR_UI_PORT} \
+    >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
   echo $! > "${pid}"
 }
 
 stop ( ) {
-  echo -n "Stopping Loom UI ..."
+  echo -n "Stopping UI ..."
   if [ -f "${pid}" ] ; then
     pidToKill=`cat $pid`
     # kill -0 == see if the PID exists

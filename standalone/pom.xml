@@ -21,13 +21,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>loom-standalone</artifactId>
+    <artifactId>coopr-standalone</artifactId>
     <packaging>pom</packaging>
-    <name>Continuuity Loom Standalone</name>
+    <name>Coopr Standalone</name>
 
     <parent>
-        <groupId>com.continuuity</groupId>
-        <artifactId>loom-parent</artifactId>
+        <groupId>co.cask</groupId>
+        <artifactId>coopr-parent</artifactId>
         <version>0.9.8-SNAPSHOT</version>
     </parent>
 
@@ -55,7 +55,7 @@
                     <descriptors>
                         <descriptor>assembly/standalone.xml</descriptor>
                     </descriptors>
-                    <finalName>loom-${project.version}</finalName>
+                    <finalName>coopr-${project.version}</finalName>
                 </configuration>
             </plugin> 
         </plugins>

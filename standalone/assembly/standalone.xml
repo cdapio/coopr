@@ -4,7 +4,7 @@
     <formats>
         <format>zip</format>
     </formats>
-    <baseDirectory>loom-${project.version}-standalone</baseDirectory>
+    <baseDirectory>coopr-${project.version}-standalone</baseDirectory>
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/../provisioner</directory>

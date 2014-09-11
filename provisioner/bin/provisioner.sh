@@ -15,11 +15,11 @@
 # limitations under the License.
 #
 
-LOOM_SERVER_URI=${LOOM_SERVER_URI:-http://localhost:55054}
-LOOM_LOG_DIR=${LOOM_LOG_DIR:-/var/log/loom}
-LOOM_LOG_LEVEL=${LOOM_LOG_LEVEL:-info}
-LOOM_HOME=${LOOM_HOME:-/opt/loom} ; export LOOM_HOME
-PROVISIONER_SITE_CONF=${PROVISIONER_SITE_CONF:-/etc/loom/conf/provisioner-site.xml}
+COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
+COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
+COOPR_LOG_LEVEL=${COOPR_LOG_LEVEL:-info}
+COOPR_HOME=${COOPR_HOME:-/opt/coopr} ; export COOPR_HOME
+PROVISIONER_SITE_CONF=${PROVISIONER_SITE_CONF:-/etc/coopr/conf/provisioner-site.xml}
 
 die ( ) {
   echo
@@ -28,15 +28,15 @@ die ( ) {
   exit 1
 }
 
-PROVISIONER_PATH="${LOOM_HOME}/provisioner/master"
+PROVISIONER_PATH="${COOPR_HOME}/provisioner/master"
 PROVISIONER_CONF_OPT=""
 if [ -f ${PROVISIONER_SITE_CONF} ] ; then
   PROVISIONER_CONF_OPT="--config ${PROVISIONER_SITE_CONF}"
 fi
 
-APP_NAME="loom-provisioner"
-LOOM_RUBY=${LOOM_RUBY:-"${LOOM_HOME}/provisioner/embedded/bin/ruby"}
-PID_DIR=${PID_DIR:-/var/run/loom}
+APP_NAME="coopr-provisioner"
+COOPR_RUBY=${COOPR_RUBY:-"${COOPR_HOME}/provisioner/embedded/bin/ruby"}
+PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
 check_before_start() {
@@ -53,26 +53,26 @@ check_before_start() {
 }
 
 start ( ) {
-  cd "${LOOM_HOME}"
+  cd "${COOPR_HOME}"
   check_before_start
 
   # multi-provisioner
-  echo "Starting Loom Provisioner ..."
-  nohup nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner ${PROVISIONER_CONF_OPT} \
-    >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 &
+  echo "Starting Provisioner ..."
+  nohup nice -1 ${COOPR_RUBY} ${PROVISIONER_PATH}/bin/provisioner ${PROVISIONER_CONF_OPT} \
+    >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 &
   pid="${PID_DIR}/${APP_NAME}${p}.pid"
   echo $! > $pid
 }
 
 register ( ) {
   echo "Registering provisioner plugins with configured server"
-  nice -1 ${LOOM_RUBY} ${PROVISIONER_PATH}/bin/provisioner ${PROVISIONER_CONF_OPT} --register \
-    >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 &
+  nice -1 ${COOPR_RUBY} ${PROVISIONER_PATH}/bin/provisioner ${PROVISIONER_CONF_OPT} --register \
+    >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 &
 }
 
 stop ( ) {
   local failed=0
-  echo -n "Stopping Loom Provisioner ..."
+  echo -n "Stopping Provisioner ..."
   pid="${PID_DIR}/${APP_NAME}.pid"
   if [ -f "${pid}" ] ; then
     pidToKill=`cat $pid`

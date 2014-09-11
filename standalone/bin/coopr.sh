@@ -2,27 +2,27 @@
 
 ##############################################################################
 ##
-##  Loom Standalone start up script for *NIX and Mac
+##  Coopr Standalone start up script for *NIX and Mac
 ##
 ##############################################################################
 
 # Server environment
-# Add default JVM options here. You can also use JAVA_OPTS and LOOM_JAVA_OPTS to pass JVM options to this script.
-export LOOM_JAVA_OPTS="-XX:+UseConcMarkSweepGC -Dderby.stream.error.field=DerbyUtil.DEV_NULL"
+# Add default JVM options here. You can also use JAVA_OPTS and COOPR_JAVA_OPTS to pass JVM options to this script.
+export COOPR_JAVA_OPTS="-XX:+UseConcMarkSweepGC -Dderby.stream.error.field=DerbyUtil.DEV_NULL"
 
 # UI environment
 export ENVIRONMENT=local
-export LOOM_NODE=${LOOM_NODE:-node}
+export COOPR_NODE=${COOPR_NODE:-node}
 
 # Provisioner environment
-export LOOM_RUBY=${LOOM_RUBY:-ruby}
-export LOOM_USE_DUMMY_PROVISIONER=${LOOM_USE_DUMMY_PROVISIONER:-false}
-export LOOM_API_USER=${LOOM_API_USER:-admin}
-export LOOM_TENANT=${LOOM_TENANT:-superadmin}
-export LOOM_NUM_WORKERS=${LOOM_NUM_WORKERS:-5}
+export COOPR_RUBY=${COOPR_RUBY:-ruby}
+export COOPR_USE_DUMMY_PROVISIONER=${COOPR_USE_DUMMY_PROVISIONER:-false}
+export COOPR_API_USER=${COOPR_API_USER:-admin}
+export COOPR_TENANT=${COOPR_TENANT:-superadmin}
+export COOPR_NUM_WORKERS=${COOPR_NUM_WORKERS:-5}
 
 
-APP_NAME="loom-standalone"
+APP_NAME="coopr-standalone"
 APP_BASE_NAME=`basename "$0"`
 
 function program_is_installed {
@@ -63,28 +63,28 @@ cd "`dirname \"$PRG\"`/.." >&-
 APP_HOME="`pwd -P`"
 
 export PID_DIR=/var/tmp
-export LOOM_HOME=$APP_HOME
-export LOOM_SERVER_HOME=$APP_HOME/server
-export LOOM_SERVER_CONF=$LOOM_HOME/server/conf/
-export LOOM_PROVISIONER_CONF=$LOOM_HOME/provisioner/master/conf
-export PROVISIONER_SITE_CONF=$LOOM_PROVISIONER_CONF/provisioner-site.xml
-export LOOM_PROVISIONER_PLUGIN_DIR=$LOOM_HOME/provisioner/worker/plugins
-export LOOM_LOG_DIR=$LOOM_HOME/logs
-export LOOM_DATA_DIR=$LOOM_HOME/data
+export COOPR_HOME=$APP_HOME
+export COOPR_SERVER_HOME=$APP_HOME/server
+export COOPR_SERVER_CONF=$COOPR_HOME/server/conf/
+export COOPR_PROVISIONER_CONF=$COOPR_HOME/provisioner/master/conf
+export PROVISIONER_SITE_CONF=$COOPR_PROVISIONER_CONF/provisioner-site.xml
+export COOPR_PROVISIONER_PLUGIN_DIR=$COOPR_HOME/provisioner/worker/plugins
+export COOPR_LOG_DIR=$COOPR_HOME/logs
+export COOPR_DATA_DIR=$COOPR_HOME/data
 
 # Add embedded bin PATH, if it exists
-if [ -d ${LOOM_HOME}/embedded/bin ] ; then
-    export PATH=${LOOM_HOME}/embedded/bin:${PATH}
+if [ -d ${COOPR_HOME}/embedded/bin ] ; then
+    export PATH=${COOPR_HOME}/embedded/bin:${PATH}
 fi
 
 # Create log dir
-mkdir -p $LOOM_LOG_DIR || die "Could not create dir $LOOM_LOG_DIR: $!"
+mkdir -p $COOPR_LOG_DIR || die "Could not create dir $COOPR_LOG_DIR: $!"
 
 # Create data dir
-mkdir -p $LOOM_DATA_DIR || die "Could not create dir $LOOM_DATA_DIR: $!"
-SED_LOOM_DATA_DIR=`echo $LOOM_DATA_DIR | sed 's:/:\\\/:g'`
-sed -i.old "s/LOOM_DATA_DIR/$SED_LOOM_DATA_DIR/g" $LOOM_SERVER_CONF/loom-site.xml
-sed -i.old "s/LOOM_DATA_DIR/$SED_LOOM_DATA_DIR/g" $LOOM_PROVISIONER_CONF/provisioner-site.xml
+mkdir -p $COOPR_DATA_DIR || die "Could not create dir $COOPR_DATA_DIR: $!"
+SED_COOPR_DATA_DIR=`echo $COOPR_DATA_DIR | sed 's:/:\\\/:g'`
+sed -i.old "s/COOPR_DATA_DIR/$SED_COOPR_DATA_DIR/g" $COOPR_SERVER_CONF/coopr-site.xml
+sed -i.old "s/COOPR_DATA_DIR/$SED_COOPR_DATA_DIR/g" $COOPR_PROVISIONER_CONF/provisioner-site.xml
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
@@ -151,13 +151,13 @@ fi
 # Load default configuration
 function load_defaults () {
     shift;
-    if [ ! -f $LOOM_DATA_DIR/.load_defaults ]; then
+    if [ ! -f $COOPR_DATA_DIR/.load_defaults ]; then
         echo "Waiting for server to start before loading default configuration..."
         wait_for_server
 
         echo "Loading default configuration..."
-        $LOOM_HOME/server/config/defaults/load-defaults.sh && \
-        touch $LOOM_DATA_DIR/.load_defaults
+        $COOPR_HOME/server/config/defaults/load-defaults.sh && \
+        touch $COOPR_DATA_DIR/.load_defaults
 
         # register the default plugins with the server
         provisioner register
@@ -176,10 +176,10 @@ function stage_default_data () {
     echo "Waiting for plugins to be registered..."
     wait_for_plugin_registration
 
-    cd ${LOOM_PROVISIONER_PLUGIN_DIR}
+    cd ${COOPR_PROVISIONER_PLUGIN_DIR}
     echo "Loading initial data..."
     for script in $(ls -1 */*/load-bundled-data.sh) ; do
-      cd ${LOOM_PROVISIONER_PLUGIN_DIR}
+      cd ${COOPR_PROVISIONER_PLUGIN_DIR}
       . ${script}
     done
 }
@@ -187,26 +187,26 @@ function stage_default_data () {
 function sync_default_data () {
     echo "Syncing initial data..."
     curl --silent --request POST \
-      --header "Coopr-UserID:${LOOM_API_USER}" \
-      --header "Coopr-TenantID:${LOOM_TENANT}" \
+      --header "Coopr-UserID:${COOPR_API_USER}" \
+      --header "Coopr-TenantID:${COOPR_TENANT}" \
       --connect-timeout 5 \
       http://localhost:55054/v2/plugins/sync
 }
 
 function request_superadmin_workers () {
 
-    if [ "x${LOOM_USE_DUMMY_PROVISIONER}" != "xtrue" ]; then
+    if [ "x${COOPR_USE_DUMMY_PROVISIONER}" != "xtrue" ]; then
         wait_for_provisioner
     else
         sleep 5
     fi
 
-    echo "Requesting ${LOOM_NUM_WORKERS} workers for default tenant..."
+    echo "Requesting ${COOPR_NUM_WORKERS} workers for default tenant..."
     curl --silent --request PUT \
       --header "Content-Type:application/json" \
-      --header "Coopr-UserID:${LOOM_API_USER}" \
-      --header "Coopr-TenantID:${LOOM_TENANT}" \
-      --connect-timeout 5 --data "{ \"tenant\":{\"workers\":${LOOM_NUM_WORKERS}, \"name\":\"superadmin\"} }" \
+      --header "Coopr-UserID:${COOPR_API_USER}" \
+      --header "Coopr-TenantID:${COOPR_TENANT}" \
+      --connect-timeout 5 --data "{ \"tenant\":{\"workers\":${COOPR_NUM_WORKERS}, \"name\":\"superadmin\"} }" \
       http://localhost:55054/v2/tenants/superadmin
 }
 
@@ -226,8 +226,8 @@ function wait_for_plugin_registration () {
     RETRIES=0
     until [[ $(curl --silent --request GET \
                  --output /dev/null --write-out "%{http_code}" \
-                 --header "Coopr-UserID:${LOOM_API_USER}" \
-                 --header "Coopr-TenantID:${LOOM_TENANT}" \
+                 --header "Coopr-UserID:${COOPR_API_USER}" \
+                 --header "Coopr-TenantID:${COOPR_TENANT}" \
                  http://localhost:55054/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
         sleep 2
         ((RETRIES++))
@@ -256,11 +256,11 @@ function provisioner () {
         echo "Waiting for server to start before running provisioner..."
         wait_for_server
     fi
-    if [ "x${LOOM_USE_DUMMY_PROVISIONER}" == "xtrue" ]
+    if [ "x${COOPR_USE_DUMMY_PROVISIONER}" == "xtrue" ]
     then
-        $LOOM_HOME/server/bin/dummy-provisioner.sh $1
+        $COOPR_HOME/server/bin/dummy-provisioner.sh $1
     else
-        $LOOM_HOME/provisioner/bin/provisioner.sh $1
+        $COOPR_HOME/provisioner/bin/provisioner.sh $1
     fi
 }
 
@@ -271,8 +271,8 @@ function greeting () {
 
 case "$1" in
   start)
-    $LOOM_HOME/server/bin/server.sh start && \
-    $LOOM_HOME/ui/bin/ui.sh start && \
+    $COOPR_HOME/server/bin/server.sh start && \
+    $COOPR_HOME/ui/bin/ui.sh start && \
     load_defaults && \
     provisioner start && \
     request_superadmin_workers && \
@@ -281,22 +281,22 @@ case "$1" in
 
   stop)
     provisioner stop
-    $LOOM_HOME/server/bin/server.sh stop
-    $LOOM_HOME/ui/bin/ui.sh stop
+    $COOPR_HOME/server/bin/server.sh stop
+    $COOPR_HOME/ui/bin/ui.sh stop
   ;;
 
   restart)
     provisioner stop
-    $LOOM_HOME/ui/bin/ui.sh stop
-    $LOOM_HOME/server/bin/server.sh stop
-    $LOOM_HOME/server/bin/server.sh start
-    $LOOM_HOME/ui/bin/ui.sh start
+    $COOPR_HOME/ui/bin/ui.sh stop
+    $COOPR_HOME/server/bin/server.sh stop
+    $COOPR_HOME/server/bin/server.sh start
+    $COOPR_HOME/ui/bin/ui.sh start
     provisioner start
   ;;
 
   status)
-    $LOOM_HOME/server/bin/server.sh status
-    $LOOM_HOME/server/bin/ui.sh status
+    $COOPR_HOME/server/bin/server.sh status
+    $COOPR_HOME/server/bin/ui.sh status
     provisioner status
   ;;
 

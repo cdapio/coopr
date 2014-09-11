@@ -44,7 +44,7 @@ start ( ) {
   check_before_start
 
   echo "Starting Dummy Provisioner ..."
-  nohup nice -1 java -cp server/lib/*:server/conf co.cask.coopr.MockProvisionerMain  >> ${COOPR_LOG_DIR}/${APP_NAME}${p}.log 2>&1 &
+  nohup nice -1 java -cp server/lib/*:server/conf co.cask.coopr.runtime.MockProvisionerMain  >> ${COOPR_LOG_DIR}/${APP_NAME}${p}.log 2>&1 &
   pid="${PID_DIR}/${APP_NAME}${p}.pid"
   echo $! > $pid
 }

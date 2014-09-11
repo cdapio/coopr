@@ -31,13 +31,13 @@ require 'zlib'
 options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: #{$PROGRAM_NAME} [options] <action> <local-path> <remote-target>"
-  opts.on('-u', '--uri URI', 'Server URI, defaults to ENV[\'LOOM_SERVER_URI\'] else "http://localhost:55054"') do |u|
+  opts.on('-u', '--uri URI', 'Server URI, defaults to ENV[\'COOPR_SERVER_URI\'] else "http://localhost:55054"') do |u|
     options[:uri] = u
   end
-  opts.on('-t', '--tenant TENANT', 'Tenant, defaults to ENV[\'LOOM_TENANT\'] else "superadmin"') do |t|
+  opts.on('-t', '--tenant TENANT', 'Tenant, defaults to ENV[\'COOPR_TENANT\'] else "superadmin"') do |t|
     options[:tenant] = t
   end
-  opts.on('-U', '--user USER', 'User, defaults to ENV[\'LOOM_API_USER\'] else "admin"') do |u|
+  opts.on('-U', '--user USER', 'User, defaults to ENV[\'COOPR_API_USER\'] else "admin"') do |u|
     options[:user] = u
   end
   opts.on('-q', '--quiet', 'Suppress all non-error output') do
@@ -58,13 +58,13 @@ OptionParser.new do |opts|
   opts.separator ''
 end.parse!(ARGV)
 
-server_uri = options[:uri] || ENV['LOOM_SERVER_URI'] || 'http://localhost:55054'
+server_uri = options[:uri] || ENV['COOPR_SERVER_URI'] || 'http://localhost:55054'
 options[:uri] = server_uri
 
-tenant = options[:tenant] || ENV['LOOM_TENANT'] || 'superadmin'
+tenant = options[:tenant] || ENV['COOPR_TENANT'] || 'superadmin'
 options[:tenant] = tenant
 
-user = options[:user] || ENV['LOOM_API_USER'] || 'admin'
+user = options[:user] || ENV['COOPR_API_USER'] || 'admin'
 options[:user] = user
 
 options[:action] = ARGV.shift

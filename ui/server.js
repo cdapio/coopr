@@ -32,7 +32,7 @@ var express = require('express'),
  */
 var env = argv.env || 'production';
 var PORT = argv.port || 8100;
-var CLIENT_ADDR = argv.loomhost || 'http://127.0.0.1:55054';
+var CLIENT_ADDR = argv.cooprhost || 'http://127.0.0.1:55054';
 var BOX_ADDR = CLIENT_ADDR + '/v2';
 var CLIENT_DIR = env === 'production' ? 'client-built' : 'client';
 
@@ -79,7 +79,7 @@ site.LOG_LEVEL = 'INFO';
 /**
  * Attach logger to site.
  */
-site.logger = log4js.getLogger('Loom');
+site.logger = log4js.getLogger('Coopr');
 site.logger.setLevel(site.LOG_LEVEL);
 
 /*
@@ -99,9 +99,9 @@ site.TEMPLATE_DIR = __dirname + '/templates';
 site.HOME_MAX_ITEMS = 5;
 
 /**
- * Cookie name for continuuity loom.
+ * Cookie name for coopr.
  */
-site.COOKIE_NAME = 'continuuity-loom-session';
+site.COOKIE_NAME = 'cask-coopr-session';
 
 /**
  * App framework.
@@ -367,7 +367,7 @@ site.getSkin = function (req) {
 };
 
 /**
- * Pipes all frontend calls through to the loom server and returns responses. Expects path to come
+ * Pipes all frontend calls through to the server and returns responses. Expects path to come
  * in the form of query string after /v2 ex:
  * /v2/providers => /pipeApiCall?path=/providers
  * /v2/providers/rackspace => /pipeApiCall?path=/providers/rackspace
