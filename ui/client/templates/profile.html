@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
+          <ul class="nav navbar-nav navbar-global">
             {% if authenticated.id === 'admin' %}
             {% include "partials/left-menu.html" %}
             {% else %}
@@ -66,36 +66,6 @@
               <label class="col-sm-2 control-label">Username</label>
               <div class="col-sm-8">
                 <input type="text" class="form-control" id="username" placeholder="username" value="{{authenticated.id}}" disabled/>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="skin" class="col-sm-2 control-label">Select skin</label>
-              <div class="col-sm-8">
-                <div class="row">
-                  <div class="col-sm-4 skin-container">
-                    <a href="/static/img/v2-assets/light_skin.png">
-                      <img class="img-responsive" src="/static/img/v2-assets/light_skin.png" />
-                    </a>
-                    <label for="skin"><input type="radio" name="skin" value="light" {% if skin == "light" %} checked {% endif %}/>     Light</label>
-                  </div>
-                  <div class="col-sm-4 skin-container">
-                    <a href="/static/img/v2-assets/dark_skin.png">
-                      <img class="img-responsive" src="/static/img/v2-assets/dark_skin.png" />
-                    </a>
-                    <label for="skin"><input type="radio" name="skin" value="dark" {% if skin == "dark" %} checked {% endif %}/>     Dark</label>
-                  </div>
-                  <div class="col-sm-4 skin-container">
-                    <a href="/static/img/v2-assets/dark_skin.png">
-                      <img class="img-responsive" src="/static/img/v2-assets/dark_skin.png" />
-                    </a>
-                    <label for="skin"><input type="radio" name="skin" value="coopr" {% if skin == "coopr" %} checked {% endif %}/>     Coopr</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="col-sm-offset-2 col-sm-8">
-                <button type="submit" class="btn-spl btn-info">Submit</button>
               </div>
             </div>
           </form>

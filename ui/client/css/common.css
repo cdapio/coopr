@@ -172,14 +172,14 @@ body #nav .login-dropdown li a span {
   margin-left: 15px;
 }
 
-@media screen and (max-width: 1230px) {
-  body #nav ul.navbar-nav li.nav-item {
-    padding-right: 10px;
-    padding-left: 10px;
+@media screen and (max-width: 1270px) {
+  body #nav #logo {
+    margin-left: 0;
+    margin-right: 0;
   }
 }
-@media screen and (max-width: 910px) {
-  body #nav ul.navbar-nav li.nav-item {
+@media screen and (max-width: 1055px) {
+  body #nav ul.navbar-global {
     display: none;
   }
 }

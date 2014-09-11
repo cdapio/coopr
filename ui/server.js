@@ -109,12 +109,16 @@ site.COOKIE_NAME = 'continuuity-loom-session';
 site.app = express();
 
 /**
- * Temporary skins related data. Each server instance maintains a record of users
- * and their selected skins.
+ * There is only one skin now. deal with it.
  */
-site.AVAILABLE_SKINS = 'coopr';
+site.AVAILABLE_SKINS = ['coopr'];
 site.DEFAULT_SKIN = 'coopr';
 site.skins = {};
+
+site.getSkin = function (req) {
+  return site.DEFAULT_SKIN;
+};
+
 
 /**
  * Configure static files server.
@@ -353,18 +357,6 @@ site.parseClusterData = function (clusters) {
   };
 };
 
-/**
- * Get skin by username.
- * @param  {String} username.
- * @return {String} skin name.
- */
-site.getSkin = function (req) {
-  var selectedSkin = site.DEFAULT_SKIN;
-  if (site.COOKIE_NAME in req.cookies && 'skin' in req.cookies[site.COOKIE_NAME]){
-    selectedSkin = req.cookies[site.COOKIE_NAME].skin;
-  }
-  return selectedSkin;
-};
 
 /**
  * Pipes all frontend calls through to the loom server and returns responses. Expects path to come
@@ -1376,40 +1368,22 @@ site.app.post('/login', function (req, res) {
     res.redirect('/login');
     return;
   }
-  var selectedSkin = site.DEFAULT_SKIN;
+
   var tenant = req.body.tenant;
-  var options = {
-    url: BOX_ADDR + '/profiles/' + user,
-    method: 'GET',
-    headers: {
-      'X-Loom-UserID': user,
-      'X-Loom-TenantID': tenant,
-      'X-Loom-ApiKey': DEFAULT_API_KEY
-    }
-  };
-  request(options, function (err, response, body) {
-    if (body) {
-      try {
-        var profile = JSON.parse(body);
-        selectedSkin = profile.skin;
-      } catch (err) {
-        site.logger.info('Improper JSON for profiles call ' + body);
-      }
-      var permissionLevel = site.determinePermissionLevel(user, password);
-      res.cookie(site.COOKIE_NAME, {
-        user: user,
-        tenant: tenant,
-        permission: permissionLevel,
-        skin: selectedSkin
-      });
-      var authenticated = true;
-      if (permissionLevel === 'admin') {
-        res.redirect('/');
-      } else {
-        res.redirect('/user');
-      }
-    }
+  var permissionLevel = site.determinePermissionLevel(user, password);
+
+  res.cookie(site.COOKIE_NAME, {
+    user: user,
+    tenant: tenant,
+    permission: permissionLevel
   });
+
+  if (permissionLevel === 'admin') {
+    res.redirect('/');
+  } else {
+    res.redirect('/user');
+  }
+
 });
 
 /**
