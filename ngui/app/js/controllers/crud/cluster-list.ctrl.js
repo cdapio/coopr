@@ -1,18 +1,17 @@
 var module = angular.module(PKG.name+'.controllers');
 
 
-module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
+module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi, CrudListBase) {
   CrudListBase.apply($scope);
 
   var timeoutPromise,
       filterFilter = $filter('filter'),
-      oneHourAgo = moment().hours(-1),
+      tenMinutesAgo = moment().minutes(-10),
       activePredicate = function (item) { 
         // any cluster created recently is considered "active" for display purposes
-        return (moment(item.createTime)>oneHourAgo) || (item.status!=='terminated');
+        return (moment(item.createTime)>tenMinutesAgo) || (item.status!=='terminated');
       };
 
-  $scope.clusterFilter = null;
 
   $scope.$watchCollection('list', function (list) {
     if (list.length) {
@@ -20,7 +19,7 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment
       var activeCount = filterFilter(list, activePredicate).length,
           filteredCount = list.length - activeCount;
       // show the button and filter only if there are both visible and filterable items
-      $scope.clusterPredicate = (activeCount && filteredCount) ? activePredicate : null;
+      $scope.listFilterExp = (activeCount && filteredCount) ? activePredicate : null;
 
       updatePending();
     }

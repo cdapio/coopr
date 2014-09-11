@@ -11,7 +11,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="item in list | filter:clusterPredicate | orderBy:sortable.predicate:sortable.reverse">
+    <tr ng-repeat="item in list | filter:listFilterExp | orderBy:sortable.predicate:sortable.reverse">
 
       <td><a ui-sref="^.detail({id: item.id})">{{item.name}}</a></td>
 
@@ -65,8 +65,8 @@
 </div>
 
 
-<div class="text-center" ng-show="clusterPredicate">
-  <button class="btn btn-default btn-sm" ng-click="clusterPredicate=null">
+<div class="text-center" ng-show="listFilterExp">
+  <button class="btn btn-default btn-sm" ng-click="listFilterExp=null">
     show all inactive
   </button>
 </div>
