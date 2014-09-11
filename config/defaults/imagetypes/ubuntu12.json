@@ -15,7 +15,7 @@
       "sshuser": "ubuntu"
     },
     "joyent": {
-      "image": "286b0dc0-d09e-43f2-976a-bb1880ebdb6c",
+      "image": "e28711b3-7f9c-47a7-be7f-ce07e9a99394",
       "sshuser": "ubuntu"
     },
     "rackspace": {
