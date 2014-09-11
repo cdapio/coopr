@@ -157,16 +157,16 @@ class FogProviderAWS < Provider
               xvda = true
               xvdb = false
               xvdc = false
-              ssh_exec!(ssh, 'test -e /dev/xvda2 && echo yes', 'Checking for /dev/xvda2')
+              ssh_exec!(ssh, 'test -e /dev/xvda2', 'Checking for /dev/xvda2')
             rescue
               xvda = false
               begin
                 xvdb = true
-                ssh_exec!(ssh, 'test -e /dev/xvdb && echo yes', 'Checking for /dev/xvdb')
+                ssh_exec!(ssh, 'test -e /dev/xvdb', 'Checking for /dev/xvdb')
                 # Do we have /dev/xvdc, too?
                 begin
                   xvdc = true
-                  ssh_exec!(ssh, 'test -e /dev/xvdc && echo yes', 'Checking for /dev/xvdc')
+                  ssh_exec!(ssh, 'test -e /dev/xvdc', 'Checking for /dev/xvdc')
                 rescue
                   xvdc = false
                 end
