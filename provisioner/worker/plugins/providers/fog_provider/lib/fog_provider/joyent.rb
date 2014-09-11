@@ -176,14 +176,6 @@ class FogProviderJoyent < Provider
   # Shared definitions (borrowed from knife-joyent gem, Apache 2.0 license)
 
   def connection
-    log.debug 'Connection options for Joyent:'
-    log.debug "- joyent_username #{@api_user}"
-    log.debug "- joyent_password #{@api_password}" if @api_password
-    log.debug "- joyent_keyname #{@ssh_keypair}"
-    log.debug "- joyent_keyfile #{File.join(@@ssh_key_dir, @ssh_key_resource)}"
-    log.debug "- joyent_api_url #{@joyent_api_url}"
-    log.debug "- joyent_version #{@joyent_version}"
-
     # Create connection
     # rubocop:disable UselessAssignment
     @connection ||= begin

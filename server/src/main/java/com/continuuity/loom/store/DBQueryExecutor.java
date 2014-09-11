@@ -254,6 +254,9 @@ public final class DBQueryExecutor {
    * @throws SQLException
    */
   public <T> T deserializeBlob(Blob blob, Class<T> clazz) throws SQLException {
+    if (blob == null) {
+      return null;
+    }
     Reader reader = new InputStreamReader(blob.getBinaryStream(), Charsets.UTF_8);
     T object;
     try {
