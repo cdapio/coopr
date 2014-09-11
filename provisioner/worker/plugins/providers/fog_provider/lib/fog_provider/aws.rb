@@ -249,11 +249,6 @@ class FogProviderAWS < Provider
   # Shared definitions (borrowed from knife-ec2 gem, Apache 2.0 license)
 
   def connection
-    log.debug 'Connection options for AWS:'
-    log.debug "- aws_access_key_id #{@aws_access_key}"
-    log.debug "- aws_secret_access_key #{@aws_secret_key}"
-    log.debug "- aws_region #{@aws_region}"
-
     # Create connection
     # rubocop:disable UselessAssignment
     @connection ||= begin
