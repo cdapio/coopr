@@ -80,7 +80,7 @@ class FogProviderGoogle < Provider
           'root'
         end
       @result['result']['ssh-auth']['user'] = sshuser
-      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @ssh_key_resource)
+      @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, @@ssh_key_dir, @ssh_key_resource)
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
