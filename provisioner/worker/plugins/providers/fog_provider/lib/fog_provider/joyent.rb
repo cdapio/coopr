@@ -21,6 +21,9 @@ require_relative 'utils'
 class FogProviderJoyent < Provider
   include FogProvider
 
+  # plugin defined resources
+  @@ssh_key_dir = 'ssh_keys'
+
   def create(inputmap)
     flavor = inputmap['flavor']
     image = inputmap['image']
@@ -39,13 +42,13 @@ class FogProviderJoyent < Provider
           package: flavor,
           dataset: image,
           name: hostname,
-          key_name: @joyent_keyname
+          key_name: @ssh_keypair
         )
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
-      @result['result']['ssh-auth']['identityfile'] = @joyent_keyfile unless @joyent_keyfile.nil?
+      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
@@ -107,7 +110,12 @@ class FogProviderJoyent < Provider
           # Check for /dev/vdb
           begin
             vdb = true
+            # confirm /dev/vdb exists
             ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
+            # confirm it is not already mounted
+            #   ubuntu: we remount from /mnt to /data
+            #   centos: vdb1 already mounted at /data
+            ssh_exec!(ssh, 'if grep "vdb.* /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
           rescue
             vdb = false
           end
@@ -173,10 +181,10 @@ class FogProviderJoyent < Provider
     @connection ||= begin
       connection = Fog::Compute.new(
         provider: 'Joyent',
-        joyent_username: @joyent_username,
-        joyent_password: @joyent_password,
-        joyent_keyname: @joyent_keyname,
-        joyent_keyfile: @joyent_keyfile,
+        joyent_username: @api_user,
+        joyent_password: @api_password,
+        joyent_keyname: @ssh_keypair,
+        joyent_keyfile: File.join(@@ssh_key_dir, @ssh_key_resource),
         joyent_url: @joyent_api_url,
         joyent_version: @joyent_version
       )

@@ -5,15 +5,21 @@
   "aws" : {
     "name": "aws",
     "classname": "FogProviderAWS",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
-          "aws_access_key": {
+          "api_user": {
             "label": "Access Key ID",
             "type": "text",
             "tip": "AWS Access Key ID"
           },
-          "aws_secret_key": {
+          "api_password": {
             "label": "Secret Access Key",
             "type": "password",
             "tip": "AWS Secret Access Key"
@@ -24,17 +30,17 @@
             "override": true,
             "tip": "Full path and file name to AWS credential file as used by AWS command line tools"
           },
-          "aws_keyname": {
-            "label": "Key name",
+          "ssh_keypair": {
+            "label": "Key Pair Name",
             "type": "text",
             "override": true,
-            "tip": "Your AWS SSH public key name"
+            "tip": "Your AWS EC2 key pair name"
           },
-          "aws_keyfile": {
-            "label": "Key file",
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
             "type": "text",
             "override": true,
-            "tip": "Full path and file name to your AWS SSH private key"
+            "tip": "Name of the SSH private key resource uploaded to the server"
           },
           "aws_region": {
             "label": "AWS Region",
@@ -56,16 +62,16 @@
         },
         "required": [
           [
-            "aws_access_key",
-            "aws_secret_key",
-            "aws_keyname",
-            "aws_keyfile",
+            "api_user",
+            "api_password",
+            "ssh_keypair",
+            "ssh_key_resource",
             "aws_region"
           ],
           [
             "aws_credential_file",
-            "aws_keyname",
-            "aws_keyfile",
+            "ssh_keypair",
+            "ssh_key_resource",
             "aws_region"
           ]
         ]
@@ -125,7 +131,7 @@
     "name": "google",
     "classname": "FogProviderGoogle",
     "resourceTypes": {
-        "p12_keys": {
+        "api_keys": {
             "format": "file",
             "permissions": "0400"
         },
@@ -147,20 +153,20 @@
             "type": "text",
             "tip": "Service account email address, should be of the form 123456789@developer.gserviceaccount.com"
           },
-          "google_p12_key_name": {
-            "label": "P12 key name",
+          "api_key_resource": {
+            "label": "API Key Resource Name",
             "type": "text",
             "tip": "Name of the P12 key resource uploaded to the server"
           },
-          "google_ssh_key_name": {
-            "label": "ssh private key name",
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
             "type": "text",
             "tip": "Name of the SSH key resource uploaded to the server"
           },
-          "google_ssh_username": {
-            "label": "ssh username",
+          "ssh_user": {
+            "label": "SSH Username",
             "type": "text",
-            "tip": "SSH username to use. Must correspond to the google_ssh_key_name provided, and have sudo permissions"
+            "tip": "SSH username. A corresponding key must be configured in the portal"
           },
           "google_data_disk_size_gb": {
             "label": "Data disk size in GB",
@@ -191,8 +197,8 @@
           [
             "google_project",
             "google_client_email",
-            "google_p12_key_name",
-            "google_ssh_key_name",
+            "api_key_resource",
+            "ssh_key_resource",
             "zone_name"
           ]
         ]
@@ -214,28 +220,34 @@
   "joyent": {
     "name": "joyent",
     "classname": "FogProviderJoyent",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
-          "joyent_username": {
-            "label": "User",
+          "api_user": {
+            "label": "CloudAPI Username",
             "type": "text",
             "tip": "Your Joyent CloudAPI user name"
           },
-          "joyent_password": {
-            "label": "Password",
+          "api_password": {
+            "label": "CloudAPI Password",
             "type": "password",
             "tip": "Your Joyent CloudAPI password"
           },
-          "joyent_keyname" : {
-            "label": "Key name",
+          "ssh_keypair" : {
+            "label": "Key Name",
             "type": "text",
-            "tip": "Your Joyent SSH public key name"
+            "tip": "Your Joyent SSH Key Name"
           },
-          "joyent_keyfile": {
-            "label": "Key file",
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
             "type": "text",
-            "tip": "Full path and file name to your Joyent SSH private key"
+            "tip": "Name of the SSH private key resource uploaded to the server"
           },
           "joyent_version": {
             "label": "API version",
@@ -260,8 +272,8 @@
           }
         },
         "required": [
-          [ "joyent_username", "joyent_password" ],
-          [ "joyent_username", "joyent_keyname", "joyent_keyfile" ]
+          [ "api_user", "api_password" ],
+          [ "api_user", "ssh_keypair", "ssh_key_resource" ]
         ]
       }
     }
@@ -348,15 +360,21 @@
   "rackspace": {
     "name": "rackspace",
     "classname": "FogProviderRackspace",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
     "parameters": {
       "admin": {
         "fields": {
-          "rackspace_username": {
-            "label": "User",
+          "api_user": {
+            "label": "Username",
             "type": "text",
             "tip": "Your Rackspace user name"
           },
-          "rackspace_api_key": {
+          "api_password": {
             "label": "API key",
             "type": "password",
             "tip": "Your Rackspace API key"
@@ -372,8 +390,8 @@
         },
         "required": [
           [
-            "rackspace_username",
-            "rackspace_api_key",
+            "api_user",
+            "api_password",
             "rackspace_region"
           ]
         ]
@@ -385,15 +403,15 @@
             "type": "checkbox",
             "tip": "Wait for RackConnect"
           },
-          "rackspace_keyname": {
-            "label": "Rackspace SSH Keypair",
+          "ssh_keypair": {
+            "label": "Key Name",
             "type": "text",
             "tip": "Your Rackspace SSH key name"
           },
-          "rackspace_keyfile": {
-            "label": "Key file",
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
             "type": "text",
-            "tip": "Path to your Rackspace SSH private key file"
+            "tip": "Name of the SSH private key resource uploaded to the server"
           }
         },
         "required": [

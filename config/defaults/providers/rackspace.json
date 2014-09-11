@@ -3,8 +3,8 @@
   "description": "Rackspace Public Cloud",
   "providertype": "rackspace",
   "provisioner": {
-    "rackspace_username": "USERNAME",
-    "rackspace_api_key": "API_KEY",
+    "api_user": "USERNAME",
+    "api_password": "API_KEY",
     "rackspace_region": "dfw"
   }
 }

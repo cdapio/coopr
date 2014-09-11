@@ -36,6 +36,7 @@ Unreleased
 - Added 'icon' field to admin entities ( Issues: #371 #431 )
 - Added additional info in get clusters API ( Issues: #401 #430 )
 - UI: fix when a provider type has no admin fields ( Issues: #409 )
+- Provisioner setup script ( Issues: #521 )
 
 As of version 0.9.8, the name of the product was changed to "Coopr".
 
