@@ -22,7 +22,7 @@ class FogProviderJoyent < Provider
   include FogProvider
 
   # plugin defined resources
-  @@ssh_key_dir = 'keyfiles'
+  @@ssh_key_dir = 'ssh_keys'
 
   def create(inputmap)
     flavor = inputmap['flavor']
@@ -42,13 +42,13 @@ class FogProviderJoyent < Provider
           package: flavor,
           dataset: image,
           name: hostname,
-          key_name: @joyent_keyname
+          key_name: @ssh_keypair
         )
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
-      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @joyent_keyfile_name) unless @joyent_keyfile_name.nil?
+      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
@@ -177,10 +177,10 @@ class FogProviderJoyent < Provider
 
   def connection
     log.debug 'Connection options for Joyent:'
-    log.debug "- joyent_username #{@joyent_username}"
-    log.debug "- joyent_password #{@joyent_password}" if @joyent_password
-    log.debug "- joyent_keyname #{@joyent_keyname}"
-    log.debug "- joyent_keyfile #{File.join(@@ssh_key_dir, @joyent_keyfile_name)}"
+    log.debug "- joyent_username #{@api_user}"
+    log.debug "- joyent_password #{@api_password}" if @api_password
+    log.debug "- joyent_keyname #{@ssh_keypair}"
+    log.debug "- joyent_keyfile #{File.join(@@ssh_key_dir, @ssh_key_resource)}"
     log.debug "- joyent_api_url #{@joyent_api_url}"
     log.debug "- joyent_version #{@joyent_version}"
 
@@ -189,10 +189,10 @@ class FogProviderJoyent < Provider
     @connection ||= begin
       connection = Fog::Compute.new(
         provider: 'Joyent',
-        joyent_username: @joyent_username,
-        joyent_password: @joyent_password,
-        joyent_keyname: @joyent_keyname,
-        joyent_keyfile: File.join(@@ssh_key_dir, @joyent_keyfile_name),
+        joyent_username: @api_user,
+        joyent_password: @api_password,
+        joyent_keyname: @ssh_keypair,
+        joyent_keyfile: File.join(@@ssh_key_dir, @ssh_key_resource),
         joyent_url: @joyent_api_url,
         joyent_version: @joyent_version
       )

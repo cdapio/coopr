@@ -3,10 +3,10 @@
   "description": "Joyent Compute Service",
   "providertype": "joyent",
   "provisioner": {
-    "joyent_username": "USERNAME",
-    "joyent_keyname": "KEYNAME",
+    "api_user": "USERNAME",
+    "ssh_keypair": "",
     "joyent_api_url": "https://us-sw-1.api.joyentcloud.com/",
-    "joyent_keyfile_name": "",
+    "ssh_key_resource": "",
     "joyent_version": "~7.0"
   }
 }
