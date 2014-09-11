@@ -45,7 +45,7 @@ class FogProviderAWS < Provider
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
-      @result['result']['ssh-auth']['identityfile'] = @aws_keyfile unless @aws_keyfile.nil?
+      @result['result']['ssh-auth']['identityfile'] = @ssh_key_resource unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderAWS.create:' + e.inspect)
@@ -254,8 +254,8 @@ class FogProviderAWS < Provider
     @connection ||= begin
       connection = Fog::Compute.new(
         provider: 'AWS',
-        aws_access_key_id: @aws_access_key,
-        aws_secret_access_key: @aws_secret_key,
+        aws_access_key_id: @api_user,
+        aws_secret_access_key: @api_password,
         region: @aws_region
       )
     end
@@ -270,11 +270,11 @@ class FogProviderAWS < Provider
     name || ''
   end
 
-  def validate!(keys = [@aws_access_key, @aws_secret_key])
+  def validate!(keys = [@api_user, @api_password])
     errors = []
     # Check for credential file and load it
     unless @aws_credential_file.nil?
-      unless (keys & [@aws_access_key, @aws_secret_key]).empty?
+      unless (keys & [@api_user, @api_password]).empty?
         errors << 'Either provide a credentials file or the access key and secret keys but not both.'
       end
       # File format:
@@ -317,7 +317,7 @@ class FogProviderAWS < Provider
       image_id: @image,
       groups: @security_groups,
       security_group_ids: @security_group_ids,
-      key_name: @aws_keyname,
+      key_name: @ssh_keypair,
       availability_zone: @availability_zone,
       placement_group: @placement_group,
       iam_instance_profile_name: @iam_instance_profile

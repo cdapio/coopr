@@ -8,12 +8,12 @@
     "parameters": {
       "admin": {
         "fields": {
-          "aws_access_key": {
+          "api_user": {
             "label": "Access Key ID",
             "type": "text",
             "tip": "AWS Access Key ID"
           },
-          "aws_secret_key": {
+          "api_password": {
             "label": "Secret Access Key",
             "type": "password",
             "tip": "AWS Secret Access Key"
@@ -24,13 +24,13 @@
             "override": true,
             "tip": "Full path and file name to AWS credential file as used by AWS command line tools"
           },
-          "aws_keyname": {
+          "ssh_keypair": {
             "label": "Key name",
             "type": "text",
             "override": true,
             "tip": "Your AWS SSH public key name"
           },
-          "aws_keyfile": {
+          "ssh_key_resource": {
             "label": "Key file",
             "type": "text",
             "override": true,
@@ -56,16 +56,16 @@
         },
         "required": [
           [
-            "aws_access_key",
-            "aws_secret_key",
-            "aws_keyname",
-            "aws_keyfile",
+            "api_user",
+            "api_password",
+            "ssh_keypair",
+            "ssh_key_resource",
             "aws_region"
           ],
           [
             "aws_credential_file",
-            "aws_keyname",
-            "aws_keyfile",
+            "ssh_keypair",
+            "ssh_key_resource",
             "aws_region"
           ]
         ]
