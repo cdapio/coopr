@@ -1,6 +1,6 @@
 {
   "name": "test-service",
-  "description": "Test loom service",
+  "description": "Test coopr service",
   "dependencies": {
     "provides":["sample-service-name"], 
     "conflicts":["hadoop-hdfs-namenode", "hadoop-hdfs-datanode"],
@@ -30,15 +30,15 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[apache2::default],recipe[loom_service_runner::default]",
-          "json_attributes": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }" 
+          "run_list": "recipe[apache2::default],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "shell",
         "fields": {
-          "script": "recipe[apache2::default],recipe[loom_service_runner::default]",
-          "args": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }" 
+          "script": "recipe[apache2::default],recipe[coopr_service_runner::default]",
+          "args": "{\"coopr\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }" 
         }
       }
     }

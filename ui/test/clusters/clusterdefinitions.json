@@ -227,15 +227,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -277,15 +277,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -311,7 +311,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -352,15 +352,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -523,15 +523,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -575,15 +575,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "initialize": {
@@ -639,15 +639,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-master\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-master\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-master\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_master],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -673,7 +673,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -726,15 +726,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }",
-                                    "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }",
+                                    "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }",
-                                    "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }",
+                                    "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -780,15 +780,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-namenode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_namenode],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1023,15 +1023,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1073,15 +1073,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1107,7 +1107,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -1148,15 +1148,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1314,15 +1314,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1364,15 +1364,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1398,7 +1398,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -1439,15 +1439,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1605,15 +1605,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-nodemanager\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_nodemanager],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1655,15 +1655,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-regionserver\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hbase-regionserver\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hbase_regionserver],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1689,7 +1689,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -1730,15 +1730,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -1874,16 +1874,16 @@
         }
     },
     "clusterTemplate": {
-        "name": "loom-prod",
-        "description": "production loom template",
+        "name": "coopr-prod",
+        "description": "production coopr template",
         "defaults": {
             "services": [
                 "base",
                 "zookeeper-server",
                 "mysql-server",
-                "loom-provisioner",
-                "loom-server",
-                "loom-ui"
+                "coopr-provisioner",
+                "coopr-server",
+                "coopr-ui"
             ],
             "provider": "rackspace",
             "hardwaretype": "medium",
@@ -1901,14 +1901,14 @@
                         "syncLimit": "2"
                     }
                 },
-                "loom-server": {
-                    "loom-server": {
+                "coopr-server": {
+                    "coopr-server": {
                         "zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%",
-                        "loom.host": "%ip.service.loom-server%",
-                        "loom.jdbc.driver": "com.mysql.jdbc.Driver",
-                        "loom.jdbc.connection.string": "jdbc:mysql://%ip.service.mysql-server%:3306/loom?useLegacyDatetimeCode=false",
-                        "loom.db.user": "loom",
-                        "loom.db.password": "12345"
+                        "coopr.host": "%ip.service.coopr-server%",
+                        "coopr.jdbc.driver": "com.mysql.jdbc.Driver",
+                        "coopr.jdbc.connection.string": "jdbc:mysql://%ip.service.mysql-server%:3306/coopr?useLegacyDatetimeCode=false",
+                        "coopr.db.user": "coopr",
+                        "coopr.db.password": "12345"
                     }
                 },
                 "mysql": {
@@ -1932,9 +1932,9 @@
                 "mysql-server",
                 "zookeeper-server",
                 "haproxy",
-                "loom-provisioner",
-                "loom-server",
-                "loom-ui"
+                "coopr-provisioner",
+                "coopr-server",
+                "coopr-ui"
             ]
         },
         "constraints": {
@@ -1946,40 +1946,40 @@
                         "zookeeper-server"
                     ],
                     [
-                        "loom-provisioner",
-                        "loom-server"
+                        "coopr-provisioner",
+                        "coopr-server"
                     ],
                     [
-                        "loom-ui",
-                        "loom-server"
+                        "coopr-ui",
+                        "coopr-server"
                     ],
                     [
-                        "loom-ui",
-                        "loom-provisioner"
-                    ],
-                    [
-                        "mysql-server",
-                        "loom-server"
+                        "coopr-ui",
+                        "coopr-provisioner"
                     ],
                     [
                         "mysql-server",
-                        "loom-provisioner"
+                        "coopr-server"
                     ],
                     [
                         "mysql-server",
-                        "loom-ui"
+                        "coopr-provisioner"
+                    ],
+                    [
+                        "mysql-server",
+                        "coopr-ui"
                     ],
                     [
                         "zookeeper-server",
-                        "loom-provisioner"
+                        "coopr-provisioner"
                     ],
                     [
                         "zookeeper-server",
-                        "loom-server"
+                        "coopr-server"
                     ],
                     [
                         "zookeeper-server",
-                        "loom-ui"
+                        "coopr-ui"
                     ]
                 ]
             },
@@ -2004,7 +2004,7 @@
                         "stepSize": 1
                     }
                 },
-                "loom-ui": {
+                "coopr-ui": {
                     "hardwaretypes": [
                         "small"
                     ],
@@ -2014,7 +2014,7 @@
                         "stepSize": 1
                     }
                 },
-                "loom-server": {
+                "coopr-server": {
                     "hardwaretypes": [
                         "medium"
                     ],
@@ -2024,7 +2024,7 @@
                         "stepSize": 1
                     }
                 },
-                "loom-provisioner": {
+                "coopr-provisioner": {
                     "hardwaretypes": [
                         "medium",
                         "small"
@@ -2049,9 +2049,9 @@
         "base",
         "zookeeper-server",
         "mysql-server",
-        "loom-provisioner",
-        "loom-server",
-        "loom-ui"
+        "coopr-provisioner",
+        "coopr-server",
+        "coopr-ui"
     ],
     "ownerId": "admin",
     "status": "active",
@@ -2068,14 +2068,14 @@
                 "syncLimit": "2"
             }
         },
-        "loom-server": {
-            "loom-server": {
+        "coopr-server": {
+            "coopr-server": {
                 "zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%",
-                "loom.host": "%ip.service.loom-server%",
-                "loom.jdbc.driver": "com.mysql.jdbc.Driver",
-                "loom.jdbc.connection.string": "jdbc:mysql://%ip.service.mysql-server%:3306/loom?useLegacyDatetimeCode=false",
-                "loom.db.user": "loom",
-                "loom.db.password": "12345"
+                "coopr.host": "%ip.service.coopr-server%",
+                "coopr.jdbc.driver": "com.mysql.jdbc.Driver",
+                "coopr.jdbc.connection.string": "jdbc:mysql://%ip.service.mysql-server%:3306/coopr?useLegacyDatetimeCode=false",
+                "coopr.db.user": "coopr",
+                "coopr.db.password": "12345"
             }
         },
         "mysql": {
@@ -2084,15 +2084,15 @@
             "server_repl_password": "12345"
         }
     },
-    "name": "loom-prod",
+    "name": "coopr-prod",
     "nodes": [
         {
             "id": "06f8ca02-7223-43cc-b653-2601f4ac02ca",
             "clusterId": "00000138",
             "services": [
                 {
-                    "name": "loom-provisioner",
-                    "description": "loom provisioners",
+                    "name": "coopr-provisioner",
+                    "description": "coopr provisioners",
                     "dependencies": {
                         "provides": [],
                         "conflicts": [],
@@ -2102,7 +2102,7 @@
                         },
                         "runtime": {
                             "requires": [
-                                "loom-server"
+                                "coopr-server"
                             ],
                             "uses": []
                         }
@@ -2139,7 +2139,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -2150,7 +2150,7 @@
                 "nodenum": "1000",
                 "hardwaretype": "medium",
                 "flavor": "5",
-                "hostname": "loom-prod138-1000.local",
+                "hostname": "coopr-prod138-1000.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
                 "ipaddresses": {
@@ -2194,7 +2194,7 @@
                     "status": "complete"
                 },
                 {
-                    "service": "loom-provisioner",
+                    "service": "coopr-provisioner",
                     "action": "CONFIGURE",
                     "submitTime": 1392064686245,
                     "statusTime": 1392064691163,
@@ -2207,8 +2207,8 @@
             "clusterId": "00000138",
             "services": [
                 {
-                    "name": "loom-ui",
-                    "description": "loom ui",
+                    "name": "coopr-ui",
+                    "description": "coopr ui",
                     "dependencies": {
                         "provides": [],
                         "conflicts": [],
@@ -2218,7 +2218,7 @@
                         },
                         "runtime": {
                             "requires": [
-                                "loom-server"
+                                "coopr-server"
                             ],
                             "uses": []
                         }
@@ -2255,7 +2255,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -2266,7 +2266,7 @@
                 "nodenum": "1005",
                 "hardwaretype": "small",
                 "flavor": "3",
-                "hostname": "loom-prod138-1005.local",
+                "hostname": "coopr-prod138-1005.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
                 "ipaddresses": {
@@ -2310,7 +2310,7 @@
                     "status": "complete"
                 },
                 {
-                    "service": "loom-ui",
+                    "service": "coopr-ui",
                     "action": "CONFIGURE",
                     "submitTime": 1392064697899,
                     "statusTime": 1392064700631,
@@ -2342,15 +2342,15 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
                     }
                 },
                 {
-                    "name": "loom-server",
-                    "description": "Loom server",
+                    "name": "coopr-server",
+                    "description": "Coopr server",
                     "dependencies": {
                         "provides": [],
                         "conflicts": [],
@@ -2382,7 +2382,7 @@
                 "nodenum": "1003",
                 "hardwaretype": "medium",
                 "flavor": "5",
-                "hostname": "loom-prod138-1003.local",
+                "hostname": "coopr-prod138-1003.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
                 "ipaddresses": {
@@ -2426,7 +2426,7 @@
                     "status": "complete"
                 },
                 {
-                    "service": "loom-server",
+                    "service": "coopr-server",
                     "action": "CONFIGURE",
                     "submitTime": 1392064697574,
                     "statusTime": 1392064701318,
@@ -2439,8 +2439,8 @@
             "clusterId": "00000138",
             "services": [
                 {
-                    "name": "loom-provisioner",
-                    "description": "loom provisioners",
+                    "name": "coopr-provisioner",
+                    "description": "coopr provisioners",
                     "dependencies": {
                         "provides": [],
                         "conflicts": [],
@@ -2450,7 +2450,7 @@
                         },
                         "runtime": {
                             "requires": [
-                                "loom-server"
+                                "coopr-server"
                             ],
                             "uses": []
                         }
@@ -2487,7 +2487,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -2498,7 +2498,7 @@
                 "nodenum": "1001",
                 "hardwaretype": "medium",
                 "flavor": "5",
-                "hostname": "loom-prod138-1001.local",
+                "hostname": "coopr-prod138-1001.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
                 "ipaddresses": {
@@ -2535,7 +2535,7 @@
                     "status": "complete"
                 },
                 {
-                    "service": "loom-provisioner",
+                    "service": "coopr-provisioner",
                     "action": "CONFIGURE",
                     "submitTime": 1392064638018,
                     "statusTime": 1392064643448,
@@ -2594,15 +2594,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -2628,7 +2628,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -2639,7 +2639,7 @@
                 "nodenum": "1008",
                 "hardwaretype": "small",
                 "flavor": "3",
-                "hostname": "loom-prod138-1008.local",
+                "hostname": "coopr-prod138-1008.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
                 "ipaddresses": {
@@ -2756,15 +2756,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -2790,7 +2790,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -2801,7 +2801,7 @@
                 "nodenum": "1007",
                 "hardwaretype": "small",
                 "flavor": "3",
-                "hostname": "loom-prod138-1007.local",
+                "hostname": "coopr-prod138-1007.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
                 "ipaddresses": {
@@ -2898,7 +2898,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -2938,15 +2938,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }",
-                                    "script": "recipe[mysql::server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"mysql\": \"start\" } } } }",
+                                    "script": "recipe[mysql::server],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }",
-                                    "script": "recipe[mysql::server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"mysql\": \"stop\" } } } }",
+                                    "script": "recipe[mysql::server],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -2957,7 +2957,7 @@
                 "nodenum": "1004",
                 "hardwaretype": "medium",
                 "flavor": "5",
-                "hostname": "loom-prod138-1004.local",
+                "hostname": "coopr-prod138-1004.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
                 "ipaddresses": {
@@ -3028,8 +3028,8 @@
             "clusterId": "00000138",
             "services": [
                 {
-                    "name": "loom-provisioner",
-                    "description": "loom provisioners",
+                    "name": "coopr-provisioner",
+                    "description": "coopr provisioners",
                     "dependencies": {
                         "provides": [],
                         "conflicts": [],
@@ -3039,7 +3039,7 @@
                         },
                         "runtime": {
                             "requires": [
-                                "loom-server"
+                                "coopr-server"
                             ],
                             "uses": []
                         }
@@ -3076,7 +3076,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -3087,7 +3087,7 @@
                 "nodenum": "1002",
                 "hardwaretype": "medium",
                 "flavor": "5",
-                "hostname": "loom-prod138-1002.local",
+                "hostname": "coopr-prod138-1002.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
                 "ipaddresses": {
@@ -3131,7 +3131,7 @@
                     "status": "complete"
                 },
                 {
-                    "service": "loom-provisioner",
+                    "service": "coopr-provisioner",
                     "action": "CONFIGURE",
                     "submitTime": 1392064698209,
                     "statusTime": 1392064702019,
@@ -3183,15 +3183,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"zookeeper-server\": \"start\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
-                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"zookeeper-server\": \"stop\" } } } }",
+                                    "script": "recipe[hadoop_wrapper::default],recipe[hadoop::zookeeper_server],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -3217,7 +3217,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -3228,7 +3228,7 @@
                 "nodenum": "1006",
                 "hardwaretype": "small",
                 "flavor": "3",
-                "hostname": "loom-prod138-1006.local",
+                "hostname": "coopr-prod138-1006.local",
                 "image": "f70ed7c7-b42e-4d77-83d8-40fa29825b85",
                 "imagetype": "centos6",
                 "ipaddresses": {
@@ -3447,7 +3447,7 @@
                             "configure": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "script": "recipe[loom_base::default]"
+                                    "script": "recipe[coopr_base::default]"
                                 }
                             }
                         }
@@ -3487,15 +3487,15 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }",
-                                    "script": "recipe[apache2::default],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"apache2\": \"start\" } } } }",
+                                    "script": "recipe[apache2::default],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"loom\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }",
-                                    "script": "recipe[apache2::default],recipe[loom_service_runner::default]"
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"apache2\": \"stop\" } } } }",
+                                    "script": "recipe[apache2::default],recipe[coopr_service_runner::default]"
                                 }
                             }
                         }
@@ -3600,7 +3600,7 @@
                     "submitTime": 1392054326984,
                     "statusTime": 1392054349348,
                     "status": "failed",
-                    "stderr": "root\n/var/lib/gems/1.9.1/gems/net-ssh-2.7.0/lib/net/ssh.rb:215:in `start'\n/var/lib/gems/1.9.1/gems/net-scp-1.1.2/lib/net/scp.rb:197:in `start'\n/var/lib/gems/1.9.1/gems/net-scp-1.1.2/lib/net/scp.rb:221:in `upload!'\n/opt/loom/provisioner/daemon/plugins/automators/chef_automator/chef_automator.rb:149:in `runchef'\n/opt/loom/provisioner/daemon/plugins/automators/chef_automator/chef_automator.rb:183:in `install'\n/opt/loom/provisioner/daemon/automator.rb:26:in `runTask'\n/opt/loom/provisioner/daemon/provisioner.rb:74:in `delegate_task'\n/opt/loom/provisioner/daemon/provisioner.rb:153:in `block in <main>'\n/opt/loom/provisioner/daemon/provisioner.rb:129:in `loop'\n/opt/loom/provisioner/daemon/provisioner.rb:129:in `<main>'",
+                    "stderr": "root\n/var/lib/gems/1.9.1/gems/net-ssh-2.7.0/lib/net/ssh.rb:215:in `start'\n/var/lib/gems/1.9.1/gems/net-scp-1.1.2/lib/net/scp.rb:197:in `start'\n/var/lib/gems/1.9.1/gems/net-scp-1.1.2/lib/net/scp.rb:221:in `upload!'\n/opt/coopr/provisioner/daemon/plugins/automators/chef_automator/chef_automator.rb:149:in `runchef'\n/opt/coopr/provisioner/daemon/plugins/automators/chef_automator/chef_automator.rb:183:in `install'\n/opt/coopr/provisioner/daemon/automator.rb:26:in `runTask'\n/opt/coopr/provisioner/daemon/provisioner.rb:74:in `delegate_task'\n/opt/coopr/provisioner/daemon/provisioner.rb:153:in `block in <main>'\n/opt/coopr/provisioner/daemon/provisioner.rb:129:in `loop'\n/opt/coopr/provisioner/daemon/provisioner.rb:129:in `<main>'",
                     "stdout": "root"
                 },
                 {

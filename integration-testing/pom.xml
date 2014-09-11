@@ -23,10 +23,10 @@
 
     <artifactId>integration-testing</artifactId>
     <packaging>jar</packaging>
-    <name>Loom UI testing</name>
+    <name>UI testing</name>
     <parent>
-        <groupId>com.continuuity</groupId>
-        <artifactId>loom-parent</artifactId>
+        <groupId>co.cask</groupId>
+        <artifactId>coopr-parent</artifactId>
         <version>0.9.8-SNAPSHOT</version>
     </parent>
 
@@ -50,8 +50,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.continuuity</groupId>
-            <artifactId>loom</artifactId>
+            <groupId>co.cask</groupId>
+            <artifactId>coopr</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

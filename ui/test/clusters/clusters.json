@@ -22,10 +22,10 @@
   },
   "00000138": {
     "id": "00000138",
-    "name": "loom-prod",
+    "name": "coopr-prod",
     "createTime": 1392064239597,
     "clusterTemplate": {
-      "name": "loom-prod"
+      "name": "coopr-prod"
     },
     "provider": {
       "name": "aws"

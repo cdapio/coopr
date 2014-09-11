@@ -1,6 +1,6 @@
-# Selenium web testing for Loom
+# Selenium web testing for the UI
 
-Runs with the test environment of loom UI.
+Runs with the test environment of UI.
 
 ### Dependencies:
    * Nodejs: http://nodejs.org/
