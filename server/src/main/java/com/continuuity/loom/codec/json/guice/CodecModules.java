@@ -19,6 +19,7 @@ import com.continuuity.loom.cluster.Cluster;
 import com.continuuity.loom.cluster.Node;
 import com.continuuity.loom.codec.json.LowercaseEnumTypeAdapterFactory;
 import com.continuuity.loom.codec.json.current.AddServicesRequestCodec;
+import com.continuuity.loom.codec.json.current.ClusterOperationRequestCodec;
 import com.continuuity.loom.codec.json.current.TenantWriteRequestCodec;
 import com.continuuity.loom.codec.json.current.AdministrationCodec;
 import com.continuuity.loom.codec.json.current.AutomatorTypeCodec;
@@ -59,6 +60,7 @@ import com.continuuity.loom.codec.json.upgrade.ProviderUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceActionUpgradeCodec;
 import com.continuuity.loom.codec.json.upgrade.ServiceUpgradeCodec;
 import com.continuuity.loom.http.request.AddServicesRequest;
+import com.continuuity.loom.http.request.ClusterOperationRequest;
 import com.continuuity.loom.http.request.TenantWriteRequest;
 import com.continuuity.loom.http.request.ClusterConfigureRequest;
 import com.continuuity.loom.http.request.ClusterCreateRequest;
@@ -148,6 +150,7 @@ public class CodecModules {
       .registerTypeAdapter(ClusterConfigureRequest.class, new ClusterConfigureRequestCodec())
       .registerTypeAdapter(ClusterCreateRequest.class, new ClusterCreateRequestCodec())
       .registerTypeAdapter(ClusterDefaults.class, new ClusterDefaultsCodec())
+      .registerTypeAdapter(ClusterOperationRequest.class, new ClusterOperationRequestCodec())
       .registerTypeAdapter(ClusterTemplate.class, new ClusterTemplateCodec())
       .registerTypeAdapter(Constraints.class, new ConstraintsCodec())
       .registerTypeAdapter(FieldSchema.class, new FieldSchemaCodec())
