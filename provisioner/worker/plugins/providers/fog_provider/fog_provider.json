@@ -69,6 +69,8 @@
           "aws_ebs_delete_on_term": {
             "label": "EBS delete on termination",
             "type": "checkbox",
+            "override": true,
+            "default": true,
             "tip": "Delete EBS volumes on termination"
           }
         },
