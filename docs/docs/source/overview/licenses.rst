@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,16 +22,16 @@
 Licenses
 =======================
 
-Loom Server
-===========
-The Loom Server uses and depends on the following licenses:
+Coopr Server
+============
+The Coopr Server uses and depends on the following licenses:
 
 .. list-table::
    :header-rows: 1
 
    * - Software Dependency
      - License
-   * - Continuuity Http
+   * - Cask Http
      - Apache License, Version 2.0
    * - Apache Twill
      - Apache License, Version 2.0
@@ -107,9 +107,9 @@ The Loom Server uses and depends on the following licenses:
    * - MySQL Connector
      - GPL
  
-Loom Provisioner
-================
-The Loom Provisioner uses and depends on the following licenses:
+Coopr Provisioner
+=================
+The Coopr Provisioner uses and depends on the following licenses:
 
 .. list-table::
    :header-rows: 1
@@ -237,9 +237,9 @@ The Loom Provisioner uses and depends on the following licenses:
    * - yajl-ruby
      - MIT
  
-Loom UI
-=======
-The Loom UI uses and depends on the following licenses:
+Coopr UI
+========
+The Coopr UI uses and depends on the following licenses:
 
 .. list-table::
    :header-rows: 1

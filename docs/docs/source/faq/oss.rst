@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2014, Continuuity, Inc.
+   Copyright © 2012-2014 Cask Data, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,18 +24,21 @@
 Licensing and Open Source 
 ============================
 
-What type of license is Continuuity Loom open sourced under?
+What type of license is Coopr open sourced under?
 -------------------------------------------------------------
-Continuuity Loom is licensed under an `Apache 2.0 license <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
+Coopr is licensed under an `Apache 2.0 license <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
 
 How can I contribute?
 ---------------------
-Are you interested in making Loom better? Our development model is a simple pull-based model with a consensus building phase, similar to the Apache's voting process. If you want to help make Loom better, by adding new features, fixing bugs, or even suggesting improvements to something that's already there, here's how you can contribute:
+Are you interested in making Coopr better? Our development model is a simple pull-based
+model with a consensus building phase, similar to the Apache's voting process. If you want
+to help make Coopr better, by adding new features, fixing bugs, or even suggesting
+improvements to something that's already there, here's how you can contribute:
 
- * Fork loom into your own GitHub repository
+ * Fork coopr into your own GitHub repository
  * Create a topic branch with an appropriate name
  * Work on your favorite feature to your content
- * Once you are satisifed, create a pull request by going to the continuuity/loom project.
+ * Once you are satisifed, create a pull request by going to the caskco/coopr project.
  * Address all the review comments
- * Once addressed, the changes will be committed to the continuuity/loom repo.
+ * Once addressed, the changes will be committed to the caskco/coopr repo.
 
