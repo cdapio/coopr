@@ -466,7 +466,7 @@ public class Entities {
       );
     public static final ClusterTemplate REACTOR2 =
       new ClusterTemplate(
-        "reactor", "Hadoop cluster without high-availability and with Continuuity Reactor",
+        "reactor", "Hadoop cluster without high-availability reactor",
         new ClusterDefaults(
           ImmutableSet.<String>of("firewall", "hosts", "hadoop-hdfs-datanode", "hadoop-hdfs-namenode",
                                   "hadoop-yarn-nodemanager", "hadoop-yarn-resourcemanager", "zookeeper-server",
