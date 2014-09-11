@@ -14,9 +14,19 @@
 
 {% block content %}
   <div ng-app="CreateProviderApp">
-    <div id="content-body">
+    <div id="content-body" class="page-edit-provider">
       <div id="title">
-        <div class="pull-right">
+        <div class="pull-left">
+          <h3>{% if provider %} Edit provider: {{provider.name}} {% else %}Create a provider{% endif %}</h3>
+        </div>
+        <div class="pull-right" ng-controller="DeleteProviderCtrl">
+          <input type="hidden" id="inputName" value="{{provider.name}}" />
+          {% if provider %}
+          <form role="form" method="POST" action="/providers/delete/{{provider.name}}" class="provider-delete-form" ng-submit="submitDeletion($event)">
+            <input type="hidden" value="{{entry.name}}" name="name" />
+            <button type="submit" class="btn-spl btn-delete"></button>
+          </form>
+          {% endif %}
           <div id="global">
             {% include "providers/topmenu.html" %}
           </div>
@@ -27,24 +37,12 @@
       <div id="panels">
 
         <div class="panel spl-panel" style="clear: both;">
-          <div class="panel-head spl-panel-head clearfix">
-            <input type="hidden" id="inputName" value="{{provider.name}}" />
-            <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if provider %} Edit provider: {{provider.name}} {% else %}Create a provider{% endif %}</h4>
-              <div class="pull-right" ng-controller="DeleteProviderCtrl">
-                {% if provider %}
-                <form role="form" method="POST" action="/providers/delete/{{provider.name}}" class="provider-delete-form" ng-submit="submitDeletion($event)">
-                  <input type="hidden" value="{{entry.name}}" name="name" />
-                  <button type="submit" class="btn-spl btn-delete"></button>
-                </form>
-                {% endif %}
-              </div>
-            </div>
-          </div>
+
           <div class="panel-body spl-panel-body">
             <div ng-view></div>
           </div>
         </div>
-      </div>  
+      </div>
     </div>
   </div>
 {% endblock %}

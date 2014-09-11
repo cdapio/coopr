@@ -26,17 +26,17 @@
               <table class="table table-striped tablesorter spl-panel-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th class="no-sort"></th>
+                    <th class="col-name">Name</th>
+                    <th class="col-description">Description</th>
+                    <th class="no-sort garbage"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for entry in clustertemplates %}
                     <tr>
-                      <td><a href="/clustertemplates/clustertemplate/{{entry.name}}">{{ entry.name }}</a></td>
-                      <td>{{ entry.description }}</td>
-                    <td>
+                      <td class="col-name"><a href="/clustertemplates/clustertemplate/{{entry.name}}">{{ entry.name }}</a></td>
+                      <td class="col-description">{{ entry.description }}</td>
+                    <td class="garbage">
                       <form role="form" method="POST" action="/clustertemplates/delete/{{entry.name}}" class="delete-form">
                         <input type="hidden" value="{{entry.name}}" name="name" />
                         <button type="submit" class="btn-spl btn-delete"></button>
@@ -45,7 +45,7 @@
                     </tr>
                   {% endfor %}
                 </tbody>
-                
+
               </table>
               {% else %}
                 <p>You haven't configured any cluster templates.</p>

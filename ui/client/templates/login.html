@@ -21,16 +21,6 @@
             </div>
           </div>
           <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-              {% if authenticated.id === 'admin' %}
-              {% include "partials/left-menu.html" %}
-              {% else %}
-              <li id="nav-clusters-container" class="{% if activeTab == 'clusters' %}active{% endif %} nav-item last">
-                <a class="nav-icon nav-clusters" href="/user/clusters"></a>
-                <a class="nav-link" id="nav-clusters" href="/user/clusters">Clusters</a>
-              </li>
-              {% endif %}
-            </ul>
 
             <ul class="nav navbar-nav navbar-right">
               <li class="dropdown">

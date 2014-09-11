@@ -7,9 +7,18 @@
 {% endblock %}
 
 {% block content %}
-    <div id="content-body">
+    <div id="content-body" class="page-create-image-type">
       <div id="title">
+        <div class="pull-left">
+          <h3>{% if imagetype %} Edit image type: {{imagetype.name}} {% else %}Create a image type{% endif %}</h3>
+        </div>
         <div class="pull-right">
+          {% if imagetype %}
+          <form role="form" method="POST" action="/imagetypes/delete/{{imagetype.name}}" class="imagetype-delete-form">
+            <input type="hidden" value="{{imagetype.name}}" name="name" />
+            <button type="submit" class="btn-spl btn-delete"></button>
+          </form>
+          {% endif %}
           <div id="global">
             {% include "imagetypes/topmenu.html" %}
           </div>
@@ -20,18 +29,6 @@
       <div id="panels">
 
         <div class="panel spl-panel" style="clear: both;">
-          <div class="panel-head spl-panel-head clearfix">
-            <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if imagetype %} Edit image type: {{imagetype.name}} {% else %}Create a image type{% endif %}</h4>
-            <div class="pull-right">
-              {% if imagetype %}
-              <form role="form" method="POST" action="/imagetypes/delete/{{imagetype.name}}" class="imagetype-delete-form">
-                <input type="hidden" value="{{imagetype.name}}" name="name" />
-                <button type="submit" class="btn-spl btn-delete"></button>
-              </form>
-              {% endif %}
-            </div>
-            </div>
-          </div>
 
           <div class="panel-body spl-panel-body">
             <form class="form-horizontal" role="form" id="create-imagetype-form" action="{% if imagetype %}/imagetypes/update{% else %}/imagetypes/create{% endif %}">
@@ -69,7 +66,7 @@
                     <div class="col-sm-2">
                       <input type="text" class="form-control" name="inputSshuser" placeholder="SSH User" value="{{item.sshuser}}">
                     </div>
-                  </div>                    
+                  </div>
                   {% endfor %}
                 {% else %}
                   <div class="provider-entry">
@@ -103,7 +100,7 @@
             </form>
           </div>
         </div>
-        
+
       </div>
     </div>
 <script data-main="/static/js/createimagetype" src="/static/third_party/require.js"></script>

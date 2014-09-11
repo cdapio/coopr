@@ -1,26 +1,22 @@
 <div id="panels">
   <div class="panel spl-panel" style="clear: both;">
-    <div class="panel-head spl-panel-head">
-      <div class="panel-title spl-panel-title">
-        <h4>Live clusters ({{ activeClusters }})</h4>
-      </div>
-    </div>
+
     <div class="panel-body spl-panel-body" id="active-clusters">
       {% if clusters and clusters.length %}
         <table class="table table-striped tablesorter spl-panel-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th class="col-name">Name</th>
               {% if authenticated.id === 'admin' %}
-              <th>User</th>
+              <th class="col-user">User</th>
               {% endif %}
-              <th>Id</th>
-              <th>Create Time</th>
-              <th>Template</th>
-              <th>Nodes</th>
-              <th>Progress</th>
+              <th class="col-id">Id</th>
+              <th class="col-created">Create Time</th>
+              <th class="col-template">Template</th>
+              <th class="col-nodes">Nodes</th>
+              <th class="cluster-step">Progress</th>
               <th class="no-sort"></th>
-              <th>Status</th>
+              <th class="cluster-status">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -49,7 +45,7 @@
               {% endif %}
             {% endfor %}
           </tbody>
-          
+
         </table>
         {% else %}
           <p>You haven't configured any clusters.</p>
@@ -58,27 +54,27 @@
   </div>
   {% if deletedClusters %}
   <div class="panel spl-panel" style="clear: both;">
-    <div class="panel-head spl-panel-head">
+    <div class="panel-head spl-panel-head full-width">
       <div class="smallmargin-nodes-showhide left-float toggle-delete-cluster"></div>
       <div class="panel-title delete-cluster-header">
-        <h4>Inactive clusters ({{ deletedClusters }})</h4>
+        <h3>Inactive clusters ({{ deletedClusters }})</h3>
       </div>
     </div>
     <div class="panel-body spl-panel-body" id="deleted-clusters">
         <table class="table table-striped tablesorter spl-panel-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th class="col-name">Name</th>
               {% if authenticated.id === 'admin' %}
-              <th>User</th>
+              <th class="col-user">User</th>
               {% endif %}
-              <th>Id</th>
-              <th>Create Time</th>
-              <th>Template</th>
-              <th>Nodes</th>
-              <th>Progress</th>
+              <th class="col-id">Id</th>
+              <th class="col-created">Create Time</th>
+              <th class="col-template">Template</th>
+              <th class="col-nodes">Nodes</th>
+              <th class="cluster-step">Progress</th>
               <th class="no-sort"></th>
-              <th>Status</th>
+              <th class="cluster-status">Status</th>
             </tr>
           </thead>
           <tbody>

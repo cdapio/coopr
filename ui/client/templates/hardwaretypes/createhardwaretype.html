@@ -7,9 +7,18 @@
 {% endblock %}
 
 {% block content %}
-    <div id="content-body">
+    <div id="content-body" class="page-create-hardware-type">
       <div id="title">
+        <div class="pull-left">
+          <h3>{% if hardwaretype %} Edit hardware type: {{hardwaretype.name}} {% else %}Create a hardware type{% endif %}</h3>
+        </div>
         <div class="pull-right">
+          {% if hardwaretype %}
+          <form role="form" method="POST" action="/hardwaretypes/delete/{{hardwaretype.name}}" class="hardwaretype-delete-form">
+            <input type="hidden" value="{{entry.name}}" name="name" />
+            <button type="submit" class="btn-spl btn-delete"></button>
+          </form>
+          {% endif %}
           <div id="global">
             {% include "hardwaretypes/topmenu.html" %}
           </div>
@@ -20,18 +29,6 @@
       <div id="panels">
 
         <div class="panel spl-panel" style="clear: both;">
-          <div class="panel-head spl-panel-head clearfix">
-            <div class="panel-title spl-panel-title"><h4 class="pull-left">{% if hardwaretype %} Edit hardware type: {{hardwaretype.name}} {% else %}Create a hardware type{% endif %}</h4>
-            <div class="pull-right">
-              {% if hardwaretype %}
-              <form role="form" method="POST" action="/hardwaretypes/delete/{{hardwaretype.name}}" class="hardwaretype-delete-form">
-                <input type="hidden" value="{{entry.name}}" name="name" />
-                <button type="submit" class="btn-spl btn-delete"></button>
-              </form>
-              {% endif %}
-            </div>
-            </div>
-          </div>
 
           <div class="panel-body spl-panel-body">
             <form class="form-horizontal" role="form" id="create-hardwaretype-form" action="{% if hardwaretype %}/hardwaretypes/update{% else %}/hardwaretypes/create{% endif %}">
@@ -66,7 +63,7 @@
                     <div class="col-sm-4">
                       <input type="text" class="form-control" name="inputFlavor" placeholder="Flavor" value="{{item.flavor}}">
                     </div>
-                  </div>                    
+                  </div>
                   {% endfor %}
                 {% else %}
                   <div class="provider-entry">
@@ -97,7 +94,7 @@
             </form>
           </div>
         </div>
-        
+
       </div>
     </div>
 <script data-main="/static/js/createhardwaretype" src="/static/third_party/require.js"></script>
