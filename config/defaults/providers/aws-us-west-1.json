@@ -5,7 +5,7 @@
   "provisioner": {
     "api_user": "",
     "api_password": "",
-    "ssh_keypair": "aws-us-west-1",
+    "ssh_keypair": "",
     "ssh_key_resource": "",
     "aws_region": "us-west-1"
   }
