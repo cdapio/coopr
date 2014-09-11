@@ -22,7 +22,7 @@ class FogProviderRackspace < Provider
   include FogProvider
 
   # plugin defined resources
-  @@ssh_key_dir = 'keyfiles'
+  @@ssh_key_dir = 'ssh_keys'
 
   def create(inputmap)
     flavor = inputmap['flavor']
@@ -46,7 +46,7 @@ class FogProviderRackspace < Provider
           metadata: @rackspace_metadata,
           disk_config: @rackspace_disk_config || 'AUTO',
           personality: files,
-          key_name: @rackspace_keyname
+          key_name: @ssh_keypair
         )
         server.persisted? || server.save
       end
@@ -54,7 +54,7 @@ class FogProviderRackspace < Provider
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
-      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @rackspace_keyfile_name) unless @rackspace_keyfile_name.nil?
+      @result['result']['ssh-auth']['identityfile'] = File.join(@@ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderRackspace.create:' + e.inspect)
@@ -175,8 +175,8 @@ class FogProviderRackspace < Provider
       connection = Fog::Compute.new(
         provider: 'Rackspace',
         version: 'v2',
-        rackspace_username: @rackspace_username,
-        rackspace_api_key: @rackspace_api_key,
+        rackspace_username: @api_user,
+        rackspace_api_key: @api_password,
         rackspace_region: @rackspace_region,
         rackspace_auth_url: auth_endpoint
       )

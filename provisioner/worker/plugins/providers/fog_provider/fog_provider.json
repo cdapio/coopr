@@ -349,7 +349,7 @@
     "name": "rackspace",
     "classname": "FogProviderRackspace",
     "resourceTypes": {
-        "keyfiles": {
+        "ssh_keys": {
             "format": "file",
             "permissions": "0400"
         }
@@ -357,12 +357,12 @@
     "parameters": {
       "admin": {
         "fields": {
-          "rackspace_username": {
-            "label": "User",
+          "api_user": {
+            "label": "Username",
             "type": "text",
             "tip": "Your Rackspace user name"
           },
-          "rackspace_api_key": {
+          "api_password": {
             "label": "API key",
             "type": "password",
             "tip": "Your Rackspace API key"
@@ -378,8 +378,8 @@
         },
         "required": [
           [
-            "rackspace_username",
-            "rackspace_api_key",
+            "api_user",
+            "api_password",
             "rackspace_region"
           ]
         ]
@@ -391,13 +391,13 @@
             "type": "checkbox",
             "tip": "Wait for RackConnect"
           },
-          "rackspace_keyname": {
-            "label": "Rackspace SSH public key name",
+          "ssh_keypair": {
+            "label": "Key Name",
             "type": "text",
-            "tip": "Your Rackspace SSH public key name as defined in the Rackspace portal"
+            "tip": "Your Rackspace SSH key name"
           },
-          "rackspace_keyfile_name": {
-            "label": "SSH private key resource name",
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
             "type": "text",
             "tip": "Name of the SSH private key resource uploaded to the server"
           }
