@@ -182,7 +182,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="item in set.nodes">
+              <tr ng-repeat="item in set.nodes | orderBy:sortable.predicate:sortable.reverse">
                 <td>{{item.id}}</td>
                 <td>{{item.properties.hostname}}</td>
                 <td>{{item.properties.ipaddresses.access_v4}}</td>
