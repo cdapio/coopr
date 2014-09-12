@@ -81,7 +81,18 @@ class FogProviderOpenstack < Provider
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
-      bootstrap_ip = ip_address(server, 'public')
+      # associate public ip if requested
+      if @floating_ip
+        addresses = connection.addresses
+        free_floating = addresses.find_index {|a| a.fixed_ip.nil?}
+        fail "No available floating IP found" if free_floating.nil?
+        floating_address = addresses[free_floating].ip
+        server.associate_address(floating_address)
+        # a bit of a hack, but server.reload takes a long time
+        (server.addresses['public'] ||= []) << {"version"=>4,"addr"=>floating_address}
+      end
+
+      bootstrap_ip = primary_public_ip_address(server.addresses)
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
         fail 'No IP address available for bootstrapping.'
@@ -92,10 +103,12 @@ class FogProviderOpenstack < Provider
       wait_for_sshd(bootstrap_ip, 22)
       log.debug "Server #{server.name} sshd is up"
 
+      bind_ip = primary_private_ip_address(server.addresses) || bootstrap_ip
+
       # Process results
       @result['ipaddresses'] = {
         'access_v4' => bootstrap_ip,
-        'bind_v4' => bootstrap_ip
+        'bind_v4' => bind_ip
       }
       # Additional checks
       set_credentials(@task['config']['ssh-auth'])
@@ -185,4 +198,17 @@ class FogProviderOpenstack < Provider
     address = ip_addresses.select { |ip| ip['version'] == 4 }.first
     address ? address['addr'] : ''
   end
+
+  def primary_private_ip_address(addresses)
+    if addresses['private']
+      return addresses['private'].last['addr']
+    end
+  end
+
+  def primary_public_ip_address(addresses)
+    if addresses['public']
+      return addresses['public'].last['addr']
+    end
+  end
+
 end
