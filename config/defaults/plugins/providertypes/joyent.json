@@ -6,15 +6,11 @@
       "fields": {
         "api_password": {
           "label": "CloudAPI Password",
-          "override": false,
-          "sensitive": false,
           "tip": "Your Joyent CloudAPI password",
           "type": "password"
         },
         "api_user": {
           "label": "CloudAPI Username",
-          "override": false,
-          "sensitive": false,
           "tip": "Your Joyent CloudAPI user name",
           "type": "text"
         },
@@ -30,29 +26,22 @@
             "https://eu-ams-1.api.joyentcloud.com"
           ],
           "override": true,
-          "sensitive": false,
           "tip": "Joyent Region",
           "type": "select"
         },
         "joyent_version": {
           "default": "~7.0",
           "label": "API version",
-          "override": false,
-          "sensitive": false,
           "tip": "CloudAPI version (~7.0 default)",
           "type": "text"
         },
         "ssh_key_resource": {
           "label": "SSH Key Resource Name",
-          "override": false,
-          "sensitive": false,
           "tip": "Name of the SSH private key resource uploaded to the server",
           "type": "text"
         },
         "ssh_keypair": {
           "label": "Key Name",
-          "override": false,
-          "sensitive": false,
           "tip": "Your Joyent SSH Key Name",
           "type": "text"
         }

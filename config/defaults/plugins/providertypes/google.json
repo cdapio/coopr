@@ -6,15 +6,11 @@
       "fields": {
         "api_key_resource": {
           "label": "API Key Resource Name",
-          "override": false,
-          "sensitive": false,
           "tip": "Name of the P12 key resource uploaded to the server",
           "type": "text"
         },
         "google_client_email": {
           "label": "Service account email address",
-          "override": false,
-          "sensitive": false,
           "tip": "Service account email address, should be of the form 123456789@developer.gserviceaccount.com",
           "type": "text"
         },
@@ -22,28 +18,21 @@
           "default": "10",
           "label": "Data disk size in GB",
           "override": true,
-          "sensitive": false,
           "tip": "Size of the persistent data disk to be created and mounted",
           "type": "text"
         },
         "google_project": {
           "label": "Project ID",
-          "override": false,
-          "sensitive": false,
           "tip": "Google Project ID",
           "type": "text"
         },
         "ssh_key_resource": {
           "label": "SSH Key Resource Name",
-          "override": false,
-          "sensitive": false,
           "tip": "Name of the SSH key resource uploaded to the server",
           "type": "text"
         },
         "ssh_user": {
           "label": "SSH Username",
-          "override": false,
-          "sensitive": false,
           "tip": "SSH username. A corresponding key must be configured in the portal",
           "type": "text"
         },
@@ -61,7 +50,6 @@
             "us-central1-f"
           ],
           "override": true,
-          "sensitive": false,
           "tip": "Zone",
           "type": "select"
         }
@@ -80,8 +68,6 @@
       "fields": {
         "network": {
           "label": "Network",
-          "override": false,
-          "sensitive": false,
           "tip": "Google custom network",
           "type": "text"
         }
