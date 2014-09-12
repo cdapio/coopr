@@ -176,9 +176,9 @@
           <table class="table table-striped" my-sortable>
             <thead>
               <tr ng-class="{'sort-enabled': set.nodes.length>1}">
-                <th>id</th>
                 <th data-predicate="properties.hostname">hostname</th>
                 <th data-predicate="properties.ipaddresses.access_v4">IP address</th>
+                <th colspan="2">id</th>
               </tr>
             </thead>
             <tbody>
@@ -186,6 +186,13 @@
                 <td>{{item.id}}</td>
                 <td>{{item.properties.hostname}}</td>
                 <td>{{item.properties.ipaddresses.access_v4}}</td>
+                <td width="10" class="text-right">
+                  <a href="" ng-click="doActionsModal(item.id)"
+                    class="btn btn-default btn-xs">
+                      <span class="fa fa-gears"></span>
+                      Show Actions
+                  </a>
+                </td>
               </tr>
             </tbody>
           </table>

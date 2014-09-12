@@ -1,29 +1,73 @@
 angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl', 
-  function ($scope, CrudFormBase, $state, myApi, $timeout) {
+  function ($scope, CrudFormBase, $state, $modal, myApi, $timeout) {
     CrudFormBase.apply($scope);
+
+
 
     if($state.params.id) {
       $scope.model = myApi.Cluster.get( {id:$state.params.id});
-      $scope.model.$promise.catch(failure);
+      $scope.model.$promise
+        .then(function () {
+          if($state.is('clusters.detail.node')) {
+            doActionsModal($state.params.nodeId);
+          }
+        })
+        ['catch'](failure);
     }
     else {
       failure();
     }
 
+
+
+
     function failure () {
       $state.go('404');
     }
+
+
+
 
     function update () {
       $scope.model.$get();
     }
 
+
+
+
+
+    function doActionsModal (nodeId) {
+      $state.go('clusters.detail.node', {nodeId: nodeId});
+
+      var modalScope = $scope.$new(true);
+
+      modalScope.node = $scope.model.nodes.filter( function(node) {
+        return node.id === nodeId;
+      })[0];
+
+      modalScope.$on('modal.hide', function () {
+        $state.go('^');
+      });
+
+      $modal({
+        title: 'Node Actions',
+        contentTemplate: '/partials/clusters/detail-node.html', 
+        placement: 'center',
+        scope: modalScope,
+        show: true
+      });
+    }
+
+    $scope.doActionsModal = doActionsModal;
+
+
+
+
+
     var timeoutPromise;
 
     $scope.$watchCollection('model', function (data) {
       if(!data.$resolved) { return; }
-
-      console.log(data);
 
       $scope.availableServices = data.clusterTemplate.compatibility.services.filter(function(name) {
         return data.services.indexOf(name)===-1; // filter out services that are already installed
@@ -57,6 +101,7 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
     $scope.$on('$destroy', function () {
       $timeout.cancel(timeoutPromise);
     });
+
 
     $scope.doSubmitServices = function (arrSvcs) {
       myApi.ClusterService.save( {clusterId: $scope.model.id}, { services: arrSvcs }, update);
