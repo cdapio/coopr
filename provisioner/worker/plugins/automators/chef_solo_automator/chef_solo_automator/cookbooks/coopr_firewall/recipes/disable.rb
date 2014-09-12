@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: loom_firewall
+# Cookbook Name:: coopr_firewall
 # Recipe:: disable
 #
-# Copyright © 2013 Cask Data, Inc.
+# Copyright © 2013-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

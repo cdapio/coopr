@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: loom_firewall
+# Cookbook Name:: coopr_firewall
 # Recipe:: default
 #
-# Copyright © 2013 Cask Data, Inc.
+# Copyright © 2013-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-if node.key?('loom_firewall')
-  include_recipe 'loom_firewall::iptables'
+if node.key?('coopr_firewall')
+  include_recipe 'coopr_firewall::iptables'
 else
-  include_recipe 'loom_firewall::disable'
+  include_recipe 'coopr_firewall::disable'
 end
