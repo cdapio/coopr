@@ -1,5 +1,8 @@
-var module = angular.module(PKG.name+'.services');
+/**
+ * A service that provides helper functions for use throught the app.
+ */
 
+var module = angular.module(PKG.name+'.services');
 
 module.value('myHelpers', {
 

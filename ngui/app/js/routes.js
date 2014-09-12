@@ -1,10 +1,13 @@
+/**
+ * Declares routes and redirects for App.
+ */
+
 angular.module(PKG.name)
   .config(function ($stateProvider, $urlRouterProvider, MYAUTH_ROLE) {
 
-    /////////////////////////////
-    // Redirects and Otherwise //
-    /////////////////////////////
-
+    /**
+     * Redirects and otherwise.
+     */
     $urlRouterProvider
       .when('/signin', '/login')
       .otherwise(function($injector, $location){
@@ -12,10 +15,11 @@ angular.module(PKG.name)
       });
 
 
-    //////////////////////////
-    // State Configurations //
-    //////////////////////////
+    
 
+    /**
+     * State configurations.
+     */
     $stateProvider
 
       .state('home', {
@@ -35,10 +39,9 @@ angular.module(PKG.name)
       })
 
 
-      /*
-        /#/clusters/...
+      /**
+       * /#/clusters
        */
-
       .state(abstractSubnav('Cluster', {
         authorizedRoles: MYAUTH_ROLE.all
       }))
@@ -48,10 +51,9 @@ angular.module(PKG.name)
         .state(crud('Cluster', 'create', 'ClusterFormCtrl', { title: 'Create a cluster' })) 
 
 
-      /*
-        /#/templates/...
+      /**
+       * /#/templates
        */
-
       .state(abstractSubnav('Template', {
         title: 'Catalog',
         ddLabel: 'Cluster Templates',
@@ -63,10 +65,9 @@ angular.module(PKG.name)
 
 
 
-      /*
-        /#/providers/...
+      /**
+       * /#/providers
        */
-
       .state(abstractSubnav('Provider', {
         authorizedRoles: MYAUTH_ROLE.admin
       }))
@@ -75,10 +76,9 @@ angular.module(PKG.name)
         .state(crud('Provider', 'create')) 
 
 
-      /*
-        /#/hardwaretypes/...
+      /**
+       * /#/hardwaretypes
        */
-
       .state(abstractSubnav('HardwareType', {
         title: 'Hardware',
         ddLabel: 'Hardware Types',
@@ -90,10 +90,9 @@ angular.module(PKG.name)
 
 
 
-      /*
-        /#/imagetypes/...
+      /**
+       * /#/imagetypes
        */
-
       .state(abstractSubnav('ImageType', {
         title: 'Images',
         ddLabel: 'Image Types',
@@ -105,8 +104,8 @@ angular.module(PKG.name)
 
 
 
-      /*
-        /#/services/...
+      /**
+       * /#/services
        */
       .state(abstractSubnav('Service', {
         authorizedRoles: MYAUTH_ROLE.admin
@@ -116,8 +115,8 @@ angular.module(PKG.name)
         .state(crud('Service', 'create')) 
 
 
-      /*
-        /#/tenants/...
+      /**
+       * /#/tenants
        */
       .state(abstractSubnav('Tenant', {
         authorizedRoles: MYAUTH_ROLE.superadmin
@@ -131,10 +130,10 @@ angular.module(PKG.name)
 
 
     /**
-     * create an abstract state object by assuming defaults
-     * @param  {String} name capitalized name of the model eg 'Cluster'
-     * @param  {Object} data optional overrides
-     * @return {Object}      state object
+     * Create an abstract state object by assuming defaults.
+     * @param  {String} name capitalized name of the model eg 'Cluster'.
+     * @param  {Object} data optional overrides.
+     * @return {Object} state object.
      */
     function abstractSubnav (name, data) {
       var plural = name + 's',
@@ -155,12 +154,12 @@ angular.module(PKG.name)
 
 
     /**
-     * create a CRUD state object by assuming defaults
-     * @param  {String} name capitalized name of the model eg 'Cluster'
-     * @param  {String} action eg 'edit' or 'list'
-     * @param  {String} ctrl controller to use eg 'CrudEditCtrl'
-     * @param  {Object} data optional overrides
-     * @return {Object}      state object
+     * Create a CRUD state object by assuming defaults.
+     * @param  {String} name capitalized name of the model eg 'Cluster'.
+     * @param  {String} action eg 'edit' or 'list'.
+     * @param  {String} ctrl controller to use eg 'CrudEditCtrl'.
+     * @param  {Object} data optional overrides.
+     * @return {Object} state object.
      */
     function crud (name, action, ctrl, data) {
       var path = name.toLowerCase() + 's',
@@ -230,9 +229,7 @@ angular.module(PKG.name)
       }
     );
 
-  })
-
-  ;
+  });
 
 
 

@@ -1,3 +1,7 @@
+/**
+ * [TODO] Add some description.
+ */
+
 var module = angular.module(PKG.name+'.services');
 
 module.factory('myApi_provisioners', function($resource, MYAPI_PREFIX){

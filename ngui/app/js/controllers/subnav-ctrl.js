@@ -1,12 +1,15 @@
-var module = angular.module(PKG.name+'.controllers');
+/**
+ * Controller for subnav.
+ */
 
+var module = angular.module(PKG.name+'.controllers');
 
 module.controller('SubnavCtrl', function ($scope, $state, myApi) {
 
   var path = $state.current.name.split('.')[0],
       modelName = $state.current.data.modelName;
-
-  function fetchSubnavList () {
+  
+  $scope.fetchSubnavList = function () {
     $scope.subnavList = myApi[modelName].query(function (list) {
       $scope.dropdown = list
         .filter(function (item) {
@@ -26,8 +29,6 @@ module.controller('SubnavCtrl', function ($scope, $state, myApi) {
     });
   }
 
-  $scope.fetchSubnavList = fetchSubnavList;
-
-  fetchSubnavList();
+  $scope.fetchSubnavList();
 
 });

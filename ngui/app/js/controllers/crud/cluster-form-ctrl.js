@@ -1,5 +1,8 @@
-var module = angular.module(PKG.name+'.controllers');
+/**
+ * Cluster form controller. [TODO]
+ */
 
+var module = angular.module(PKG.name+'.controllers');
 
 module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
   var id = $state.params.id;
@@ -117,15 +120,11 @@ module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocu
       .catch(function () {
         $state.go('404');
       });
-
-
-
   }
 
 
-
-  /*
-  updating a cluster means reconfiguring it, so we cannot use CrudFormBase
+  /**
+   * Updating a cluster means reconfiguring it, so we cannot use CrudFormBase.
    */
   $scope.doSubmit = function (model){
     $scope.submitting = true;

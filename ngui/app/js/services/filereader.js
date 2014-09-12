@@ -1,5 +1,7 @@
+/**
+ * File reader services used for checking and reading uploaded files.
+ */
 var module = angular.module(PKG.name+'.services');
-
 
 module.service('myFileReader', function myFileReaderService ($q, $document, $window, $log) {
 
@@ -40,7 +42,5 @@ module.service('myFileReader', function myFileReaderService ($q, $document, $win
 
     return deferred.promise.then(callback || angular.identity);
   };
-
-
 
 });

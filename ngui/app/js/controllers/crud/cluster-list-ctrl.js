@@ -1,7 +1,11 @@
+/**
+ * Cluster detail controller. [TODO]
+ */
+
 var module = angular.module(PKG.name+'.controllers');
 
-
 module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi, CrudListBase) {
+  // Why do this?
   CrudListBase.apply($scope);
 
   var timeoutPromise,
@@ -25,6 +29,9 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
     }
   });
 
+  $scope.$on('$destroy', function () {
+    $timeout.cancel(timeoutPromise);
+  });
 
   function updatePending () {
     if(filterFilter($scope.list, {status:'pending'}).length) {
@@ -50,11 +57,6 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
       1000);
     }
   }
-
-  $scope.$on('$destroy', function () {
-    $timeout.cancel(timeoutPromise);
-  });
-
 });
 
 

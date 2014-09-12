@@ -1,15 +1,13 @@
+/**
+ * API service module.
+ */
+
 var module = angular.module(PKG.name+'.services');
 
 module.factory('MYAPI_PREFIX', function($location){
   return $location.protocol() + '://' + $location.host() + 
                 ':8081/0.0.0.0:55054/v2/';
 });
-
-
-module.constant('MYAPI_EVENT', {
-  error: 'myapi-error'
-});
-
 
 module.factory('myApi', function(
     myApi_clusters,
@@ -37,8 +35,14 @@ module.factory('myApi', function(
 
 });
 
+/**
+ * TODO Add comment with what this is supposed to do.
+ * @param  {[type]} $httpProvider [description]
+ * @return {[type]}               [description]
+ */
 module.config(function ($httpProvider) {
-  $httpProvider.interceptors.push(function ($q, $timeout, $rootScope, $log, myAuth, MYAPI_PREFIX, MYAPI_EVENT) {
+  $httpProvider.interceptors.push(
+    function ($q, $timeout, $rootScope, $log, myAuth, MYAPI_PREFIX, MYAPI_EVENT) {
     var isApi = function(url) {
       return url.indexOf(MYAPI_PREFIX) === 0;
     };
