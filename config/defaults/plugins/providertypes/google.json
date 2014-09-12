@@ -4,29 +4,36 @@
   "parameters": {
     "admin": {
       "fields": {
-        "client_email": {
+        "api_key_resource": {
+          "label": "API Key Resource Name",
+          "tip": "Name of the P12 key resource uploaded to the server",
+          "type": "text"
+        },
+        "google_client_email": {
           "label": "Service account email address",
           "tip": "Service account email address, should be of the form 123456789@developer.gserviceaccount.com",
           "type": "text"
         },
-        "key_location": {
-          "label": "P12 key location",
-          "tip": "Path to your P12 key, as downloaded from GCE encrypted with their default passphrase (notasecret)",
+        "google_data_disk_size_gb": {
+          "default": "10",
+          "label": "Data disk size in GB",
+          "override": true,
+          "tip": "Size of the persistent data disk to be created and mounted",
           "type": "text"
         },
-        "project_id": {
+        "google_project": {
           "label": "Project ID",
-          "tip": "GCE Project ID",
+          "tip": "Google Project ID",
           "type": "text"
         },
-        "ssh_keyfile": {
-          "label": "ssh private key file",
-          "tip": "Full path and file name to your GCE SSH private key",
+        "ssh_key_resource": {
+          "label": "SSH Key Resource Name",
+          "tip": "Name of the SSH key resource uploaded to the server",
           "type": "text"
         },
-        "ssh_username": {
-          "label": "ssh username",
-          "tip": "SSH username to use. Must match private key file, and have sudo permissions",
+        "ssh_user": {
+          "label": "SSH Username",
+          "tip": "SSH username. A corresponding key must be configured in the portal",
           "type": "text"
         },
         "zone_name": {
@@ -49,25 +56,19 @@
       },
       "required": [
         [
-          "project_id",
-          "client_email",
-          "key_location",
-          "zone_name",
-          "ssh_keyfile"
+          "google_project",
+          "google_client_email",
+          "api_key_resource",
+          "ssh_key_resource",
+          "zone_name"
         ]
       ]
     },
     "user": {
       "fields": {
-        "data_disk_size_gb": {
-          "default": "10",
-          "label": "Data disk size in GB",
-          "tip": "Size of the persistent disk to be created and mounted to /data",
-          "type": "text"
-        },
         "network": {
           "label": "Network",
-          "tip": "GCE custom network",
+          "tip": "Google custom network",
           "type": "text"
         }
       },
@@ -76,5 +77,14 @@
       ]
     }
   },
-  "resourceTypes": {}
+  "resourceTypes": {
+    "api_keys": {
+      "format": "file",
+      "permissions": "0400"
+    },
+    "ssh_keys": {
+      "format": "file",
+      "permissions": "0400"
+    }
+  }
 }
