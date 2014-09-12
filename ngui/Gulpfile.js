@@ -164,7 +164,14 @@ gulp.task('js:minify', ['js'], function() {
     .pipe(plug.size({showFiles:true, gzip:true, total:false}));
 });
 
-gulp.task('minify', ['js:minify']);
+gulp.task('css:minify', ['css'], function() {
+  return gulp.src('./dist/bundle/*.css')
+    .pipe(plug.minifyCss({keepBreaks:true}))
+    .pipe(gulp.dest('./dist/bundle'))
+    .pipe(plug.size({showFiles:true, gzip:true, total:false}));
+});
+
+gulp.task('minify', ['js:minify', 'css:minify']);
 
 gulp.task('lib', ['js:lib', 'css:lib']);
 gulp.task('app', ['js:app', 'css:app']);
