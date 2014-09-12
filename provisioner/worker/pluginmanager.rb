@@ -123,13 +123,13 @@ class PluginManager
         @register_errors.push("Response code #{resp.code}, #{resp.to_str} when trying to register #{name}")
       end
     rescue => e
-      log.error "Caught exception registering plugins to loom server #{uri}"
+      log.error "Caught exception registering plugins to coopr server #{uri}"
       log.error e.message
       log.error e.backtrace.inspect
-      @register_errors.push("Caught exception registering plugins to loom server #{uri}")
+      @register_errors.push("Caught exception registering plugins to coopr server #{uri}")
     end
   rescue => e
-    log.error "Caught exception registering plugins to loom server #{uri}"
+    log.error "Caught exception registering plugins to coopr server #{uri}"
     log.error e.message
     log.error e.backtrace.inspect
   end

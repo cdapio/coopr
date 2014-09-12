@@ -32,7 +32,7 @@ require_relative 'config'
 require_relative 'constants'
 require_relative 'workerlauncher'
 
-module Loom
+module Coopr
   # top-level class for provisioner
   class Provisioner
     include Logging
@@ -72,7 +72,7 @@ module Loom
       # daemonize
       daemonize if config.get(PROVISIONER_DAEMONIZE)
 
-      pg = Loom::Provisioner.new(options, config)
+      pg = Coopr::Provisioner.new(options, config)
       if options[:register]
         pg.register_plugins
       else
@@ -199,11 +199,11 @@ module Loom
                 log.warn "Response code #{resp.code} when sending heartbeat, re-registering provisioner"
                 register_with_server
               else
-                log.warn "Response code #{resp.code}, #{resp.to_str} when sending heartbeat to loom server #{uri}"
+                log.warn "Response code #{resp.code}, #{resp.to_str} when sending heartbeat to coopr server #{uri}"
               end
             end
           rescue => e
-            log.error "Caught exception sending heartbeat to loom server #{uri}: #{e.message}"
+            log.error "Caught exception sending heartbeat to coopr server #{uri}: #{e.message}"
           end
           sleep 10
         }
@@ -248,7 +248,7 @@ module Loom
           # announce provisioner is ready
           @status = 'OK'
         else
-          log.warn "Response code #{resp.code}, #{resp.to_str} when registering with loom server #{uri}"
+          log.warn "Response code #{resp.code}, #{resp.to_str} when registering with coopr server #{uri}"
         end
       rescue => e
         log.error "Caught exception when registering with server #{uri}: #{e.message}"
@@ -273,10 +273,10 @@ module Loom
         if(resp.code == 200)
           log.info "Successfully unregistered"
         else
-          log.warn "Response code #{resp.code}, #{resp.to_str} when unregistering with loom server #{uri}"
+          log.warn "Response code #{resp.code}, #{resp.to_str} when unregistering with coopr server #{uri}"
         end
       rescue => e
-        log.error "Caught exception when unregistering with loom server #{uri}: #{e.message}"
+        log.error "Caught exception when unregistering with coopr server #{uri}: #{e.message}"
       end
     end
 

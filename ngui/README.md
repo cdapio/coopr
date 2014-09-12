@@ -5,7 +5,7 @@ Coopr Angular UI
 
 `npm install && bower install`
 
-`LOOM_USE_DUMMY_PROVISIONER=true ../standalone/target/.../bin/loom.sh start`
+`COOPR_USE_DUMMY_PROVISIONER=true ../standalone/target/.../bin/coopr.sh start`
 
 and then, each in their own tab:
 
@@ -19,7 +19,7 @@ and then, each in their own tab:
 
 * in dev mode, UI runs on port `8080` and connects to livereload on port `35729`
 * cors-anywhere always runs on port `8081`
-* loom server is expected to be running on port `55054`
+* coopr server is expected to be running on port `55054`
 
 ### for testing:
 

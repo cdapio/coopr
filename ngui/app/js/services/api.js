@@ -50,8 +50,8 @@ module.config(function ($httpProvider) {
           angular.extend(config.headers, {
             'X-Requested-With': angular.version.codeName
           }, u ? {
-            'X-Loom-UserID': u.username,
-            'X-Loom-TenantID': u.tenant
+            'Coopr-UserID': u.username,
+            'Coopr-TenantID': u.tenant
           } : {});
           $log.log('[myApi]', config.method, config.url.substr(MYAPI_PREFIX.length));
         }

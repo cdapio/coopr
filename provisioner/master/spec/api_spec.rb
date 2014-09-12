@@ -23,10 +23,10 @@ require File.expand_path '../../lib/provisioner/provisioner.rb', __FILE__
 describe 'Sinatra API' do
   include Rack::Test::Methods
   def app
-    Loom::Provisioner::Api
+    Coopr::Provisioner::Api
   end
 
-  Loom::Provisioner::Api.set :provisioner, Loom::Provisioner.new({}, Loom::Config.new({}))
+  Coopr::Provisioner::Api.set :provisioner, Coopr::Provisioner.new({}, Coopr::Config.new({}))
 
   it 'should serve status endpoint' do
     get '/status'

@@ -1,4 +1,4 @@
-/var/log/loom/loom-provisioner*.log {
+/var/log/coopr/coopr-provisioner*.log {
     rotate 7
     daily
     missingok

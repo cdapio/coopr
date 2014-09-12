@@ -25,7 +25,7 @@ require 'fileutils'
 require 'rubygems/package'
 require 'zlib'
 
-module Loom
+module Coopr 
   # class which manages data resources locally on the provisioner. can sync from server, and activate
   class ResourceManager
     include Logging

@@ -71,7 +71,7 @@ options[:action] = ARGV.shift
 options[:path] = ARGV.shift
 options[:target] = ARGV.shift
 
-module Loom
+module Coopr 
   module DataUploader
     # class representing the resource to be uploaded
     class Resource
@@ -287,7 +287,7 @@ end
 
 # main block
 begin
-  ldr = Loom::DataUploader::Resource.new(options)
+  ldr = Coopr::DataUploader::Resource.new(options)
   ldr.validate
 
   case ldr.options[:action]

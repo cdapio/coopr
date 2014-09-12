@@ -16,11 +16,11 @@
 #
 #
 # chkconfig: 2345 96 15
-# description: Starts and stops the loom-provisioner service
+# description: Starts and stops the coopr-provisioner service
 # 
 ### BEGIN INIT INFO
-# Provides:          loom-provisioner
-# Short-Description: Loom provisioner
+# Provides:          coopr-provisioner
+# Short-Description: Coopr provisioner
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Required-Start:    $network
@@ -29,18 +29,18 @@
 # Should-Stop:
 ### END INIT INFO
 
-# source /etc/default/loom-provisioner
-[ -f /etc/default/loom-provisioner ] && source /etc/default/loom-provisioner
+# source /etc/default/coopr-provisioner
+[ -f /etc/default/coopr-provisioner ] && source /etc/default/coopr-provisioner
 
-# create pid dir owned by loom user
-mkdir -p /var/run/loom
-chown -R loom:loom /var/run/loom
+# create pid dir owned by coopr user
+mkdir -p /var/run/coopr
+chown -R coopr:coopr /var/run/coopr
 
-# drop permissions to loom user and run service script
+# drop permissions to coopr user and run service script
 
 if [[ $UID -eq 0 ]]; then
-    su loom -c "cd /opt/loom/provisioner/bin; exec ./provisioner.sh $*"
+    su coopr -c "cd /opt/coopr/provisioner/bin; exec ./provisioner.sh $*"
 else
-    cd /opt/loom/provisioner/bin; exec ./provisioner.sh $*
+    cd /opt/coopr/provisioner/bin; exec ./provisioner.sh $*
 fi
 

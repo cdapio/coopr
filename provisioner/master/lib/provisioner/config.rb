@@ -17,7 +17,7 @@
 
 require 'rexml/document'
 
-module Loom
+module Coopr 
   # class which reads and stores configuration settings from a property file
   class Config
     attr_reader :properties, :default_file, :descriptions

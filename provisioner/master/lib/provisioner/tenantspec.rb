@@ -19,7 +19,7 @@
 require_relative 'resourcespec'
 
 # simple specification for a tenant
-module Loom
+module Coopr 
   class TenantSpec
     attr_accessor :id, :workers, :resourcespec, :plugins
 

@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-module Loom
+module Coopr 
   # simple specification for a tenant's required resources
   class ResourceSpec
     attr_accessor :resources, :resource_formats, :resource_permissions

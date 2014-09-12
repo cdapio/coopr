@@ -15,6 +15,6 @@
 # limitations under the License.
 #
 
-module Loom
+module Coopr 
   # provisioner master process which manages tenants and worker processes
 end
