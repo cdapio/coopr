@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-# to use this script, define a Loom service as follows:
+# to use this script, define a service as follows:
 #  type: shell
 #  script: json_substitution_example.sh
 #  data: taskId config/automators [any additional keys from cluster configuration]
@@ -24,14 +24,14 @@ echo "--- example json parsing ---"
 
 if [ $# -gt 0 ]; then
   for key in "$@" ; do
-    value=`loom_lookup_key $key 2>&1`
+    value=`coopr_lookup_key $key 2>&1`
     if [ $? -eq 0 ]; then
       echo "json lookup: $key --> $value"
     fi
   done
 else
   echo "no arguments passed, defaulting to taskId"
-  value=`loom_lookup_key taskId 2>&1`
+  value=`coopr_lookup_key taskId 2>&1`
   if [ $? -eq 0 ]; then
     echo "json lookup: task --> $value"
   fi

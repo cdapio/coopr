@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-output=`loom_lookup_key $1 2>&1`
+output=`coopr_lookup_key $1 2>&1`
 
 if [ $? -eq 0 ]; then
   if [ "x$2" != "x" ]; then

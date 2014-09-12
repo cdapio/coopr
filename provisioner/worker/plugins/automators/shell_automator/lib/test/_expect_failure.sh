@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-output=`loom_lookup_key $1 2>&1`
+output=`coopr_lookup_key $1 2>&1`
 
 if [ $? -ne 0 ]; then
   echo "SUCCESS: expected failure: ${output}"

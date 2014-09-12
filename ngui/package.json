@@ -4,7 +4,7 @@
   "description": "Front-end for Coopr",
   "repository": {
     "type": "git",
-    "url": "http://github.com/continuuity/loom.git"
+    "url": "http://github.com/caskco/coopr.git"
   },
   "scripts": {
     "start": "node ./server.js",

@@ -26,7 +26,7 @@ _scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # function to lookup keys in the given task json using https://github.com/rcrowley/json.sh
 # issues:
 #   - spaces in keys may break things
-loom_lookup_key () {
+coopr_lookup_key () {
   local _key=$1
   local _matches=`$_scriptdir/bin/json.sh <$TASKJSON | awk -v key=${_key} '{ if ($1 ~ key) print }'`
   local _nummatches=`echo "${_matches}" | wc -l`

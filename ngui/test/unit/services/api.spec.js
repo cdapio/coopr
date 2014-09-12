@@ -60,9 +60,9 @@ describe('service', function() {
         $httpBackend.flush();
       });
 
-      it('should send X-Loom headers when logged in', function() {
+      it('should send Coopr headers when logged in', function() {
         $httpBackend.expectGET(/v2\/clusters$/, function(headers) {
-          return headers['X-Loom-UserID'] === 'test';
+          return headers['Coopr-UserID'] === 'test';
         }).respond(201, '');
 
         myAuth.currentUser = {username:'test'};
