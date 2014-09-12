@@ -21,7 +21,7 @@
 
 if node['coopr']['node'].has_key?('services')
   node['coopr']['node']['services'].each do |k, v|
-    if resources(service: k)
+  #  if resources(service: k)
       log "service-#{v}-#{k}" do
         message "Service: #{k}, action: #{v}"
       end
@@ -30,6 +30,6 @@ if node['coopr']['node'].has_key?('services')
           resources("service[#{k}]").run_action(v.to_sym)
         end # block
       end # ruby_block
-    end # if
+  #  end # if
   end # each
 end # if
