@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: loom_firewall
-# Recipe:: disable
+# Cookbook Name:: coopr_base
+# Recipe:: default
 #
-# Copyright © 2013 Cask Data, Inc.
+# Copyright © 2013-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,10 +17,15 @@
 # limitations under the License.
 #
 
-# Currently, we simply disable the firewall on RHEL
+# This forces an apt-get update on Ubuntu/Debian
 case node['platform_family']
-when 'rhel'
-  service 'iptables' do
-    action [ :disable, :stop ]
-  end
+when 'debian'
+  include_recipe "apt::default"
 end
+
+# We always run our hosts and firewall cookbooks
+include_recipe "coopr_firewall::default"
+include_recipe "coopr_hosts::default"
+
+# ensure user ulimits are enabled 
+include_recipe "ulimit::default"

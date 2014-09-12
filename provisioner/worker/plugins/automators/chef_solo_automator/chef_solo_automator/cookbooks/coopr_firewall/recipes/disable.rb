@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: loom_firewall
-# Recipe:: default
+# Cookbook Name:: coopr_firewall
+# Recipe:: disable
 #
-# Copyright © 2013 Cask Data, Inc.
+# Copyright © 2013-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 # limitations under the License.
 #
 
-if node.key?('loom_firewall')
-  include_recipe 'loom_firewall::iptables'
-else
-  include_recipe 'loom_firewall::disable'
+# Currently, we simply disable the firewall on RHEL
+case node['platform_family']
+when 'rhel'
+  service 'iptables' do
+    action [ :disable, :stop ]
+  end
 end

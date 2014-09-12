@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: loom_base
+# Cookbook Name:: coopr_firewall
 # Recipe:: default
 #
-# Copyright © 2013 Cask Data, Inc.
+# Copyright © 2013-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,15 +17,8 @@
 # limitations under the License.
 #
 
-# This forces an apt-get update on Ubuntu/Debian
-case node['platform_family']
-when 'debian'
-  include_recipe "apt::default"
+if node.key?('coopr_firewall')
+  include_recipe 'coopr_firewall::iptables'
+else
+  include_recipe 'coopr_firewall::disable'
 end
-
-# We always run our hosts and firewall cookbooks
-include_recipe "loom_firewall::default"
-include_recipe "loom_hosts::default"
-
-# ensure user ulimits are enabled 
-include_recipe "ulimit::default"
