@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: loom_service_runner
+# Cookbook Name:: coopr_service_manager
 # Recipe:: default
 #
 # Copyright © 2013-2014 Cask Data, Inc.
@@ -19,8 +19,8 @@
 
 # We run through all of the services listed, and start/stop them, if a service resource exists
 
-if node['loom']['node'].has_key?('services')
-  node['loom']['node']['services'].each do |k, v|
+if node['coopr']['node'].has_key?('services')
+  node['coopr']['node']['services'].each do |k, v|
     if resources(service: k)
       log "service-#{v}-#{k}" do
         message "Service: #{k}, action: #{v}"
