@@ -1,83 +1,105 @@
 {
-  "description": "",
-  "name": "openstack",
-  "parameters": {
-    "admin": {
-      "fields": {
-        "openstack_keyfile": {
-          "label": "Key file",
-          "override": false,
-          "tip": "Path to your Openstack SSH private key file",
-          "type": "text"
+    "description": "",
+    "name": "openstack",
+    "parameters": {
+        "admin": {
+            "fields": {
+                "api_password": {
+                    "label": "Password",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Your Openstack password",
+                    "type": "password"
+                },
+                "api_user": {
+                    "label": "Username",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Your Openstack user name",
+                    "type": "text"
+                },
+                "openstack_auth_url": {
+                    "default": "http://EXAMPLE.DOMAIN.COM:5000/v2.0/tokens",
+                    "label": "Auth URL",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Your Openstack Keystone API URL",
+                    "type": "text"
+                },
+                "openstack_ssl_verify_peer": {
+                    "label": "Verify SSL peers",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Verify peer SSL certificates",
+                    "type": "checkbox"
+                },
+                "openstack_tenant": {
+                    "label": "Tenant",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Your Openstack tenant",
+                    "type": "text"
+                },
+                "ssh_key_resource": {
+                    "label": "SSH Key Resource Name",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Name of the SSH private key resource uploaded to the server",
+                    "type": "text"
+                },
+                "ssh_keypair": {
+                    "label": "Key name",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Your Openstack SSH public key name",
+                    "type": "text"
+                }
+            },
+            "required": [
+                [
+                    "api_user",
+                    "api_password",
+                    "openstack_tenant",
+                    "openstack_auth_url",
+                    "ssh_keypair",
+                    "ssh_key_resource"
+                ]
+            ]
         },
-        "openstack_auth_url": {
-          "default": "http://EXAMPLE.DOMAIN.COM:5000/v2.0/tokens",
-          "label": "Auth URL",
-          "override": false,
-          "tip": "Your Openstack Keystone API URL",
-          "type": "text"
-        },
-        "openstack_password": {
-          "label": "Password",
-          "override": false,
-          "tip": "Your Openstack password",
-          "type": "password"
-        },
-        "openstack_keyname": {
-          "label": "Key name",
-          "override": false,
-          "tip": "Your Openstack SSH public key name",
-          "type": "text"
-        },
-        "openstack_tenant": {
-          "label": "Tenant",
-          "override": false,
-          "tip": "Your Openstack tenant",
-          "type": "text"
-        },
-        "openstack_username": {
-          "label": "User",
-          "override": false,
-          "tip": "Your Openstack user name",
-          "type": "text"
+        "user": {
+            "fields": {
+                "availability_zone": {
+                    "label": "Availability Zone",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Openstack Availability Zone",
+                    "type": "text"
+                },
+                "floating_ip": {
+                    "label": "Floating IP",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Request a floating IP address for each node",
+                    "type": "checkbox"
+                },
+                "security_groups": {
+                    "default": "default",
+                    "label": "Security Group",
+                    "override": false,
+                    "sensitive": false,
+                    "tip": "Openstack security groups (comma separated)",
+                    "type": "text"
+                }
+            },
+            "required": [
+                []
+            ]
         }
-      },
-      "required": [
-        [
-          "openstack_username",
-          "openstack_password",
-          "openstack_tenant",
-          "openstack_auth_url",
-          "openstack_keyname",
-          "openstack_keyfile"
-        ]
-      ]
     },
-    "user": {
-      "fields": {
-        "availability_zone": {
-          "label": "Availability Zone",
-          "override": false,
-          "tip": "Openstack Availability Zone",
-          "type": "text"
-        },
-        "floating_ip": {
-          "label": "Floating IP",
-          "override": false,
-          "tip": "Request a floating IP address for each node",
-          "type": "checkbox"
-        },
-        "security_groups": {
-          "default": "default",
-          "label": "Security Group",
-          "override": false,
-          "tip": "Openstack security groups (comma separated)",
-          "type": "text"
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
         }
-      },
-      "required": [
-        []
-      ]
     }
-  }
 }
