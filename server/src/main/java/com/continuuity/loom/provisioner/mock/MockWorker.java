@@ -179,7 +179,7 @@ public class MockWorker extends AbstractScheduledService {
         JsonObject sshAuth = new JsonObject();
         sshAuth.addProperty("user", "root");
         sshAuth.addProperty("password", RandomStringUtils.randomAlphanumeric(8));
-        body.add("ssh-auth", sshAuth);
+        result.add("ssh-auth", sshAuth);
       }
       body.add("result", result);
 
