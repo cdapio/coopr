@@ -168,6 +168,8 @@ function load_defaults () {
         # sync the initial data to the provisioner
         sync_default_data
 
+        # add some workers to the superadmin tenant
+        request_superadmin_workers
     fi
     return 0;
 }
@@ -273,9 +275,8 @@ case "$1" in
   start)
     $COOPR_HOME/server/bin/server.sh start && \
     $COOPR_HOME/ui/bin/ui.sh start && \
-    load_defaults && \
     provisioner start && \
-    request_superadmin_workers && \
+    load_defaults && \
     greeting
   ;;
 
