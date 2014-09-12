@@ -21,6 +21,12 @@ require_relative 'utils'
 class FogProviderOpenstack < Provider
   include FogProvider
 
+  # plugin defined resources
+  @ssh_key_dir = 'ssh_keys'
+  class << self
+    attr_accessor :ssh_key_dir
+  end
+
   def create(inputmap)
     flavor = inputmap['flavor']
     image = inputmap['image']
@@ -40,14 +46,14 @@ class FogProviderOpenstack < Provider
           image_ref: image,
           name: hostname,
           security_groups: @security_groups,
-          key_name: @openstack_keyname
+          key_name: @ssh_keypair
         )
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
-      @result['result']['ssh-auth']['identityfile'] = @openstack_keyfile unless @openstack_keyfile.nil?
+      @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderOpenstack.create:' + e.inspect)
@@ -159,9 +165,9 @@ class FogProviderOpenstack < Provider
       connection = Fog::Compute.new(
         provider: 'OpenStack',
         openstack_auth_url: @openstack_auth_url,
-        openstack_username: @openstack_username,
+        openstack_username: @api_user,
         openstack_tenant: @openstack_tenant,
-        openstack_api_key: @openstack_password,
+        openstack_api_key: @api_password,
         connection_options: {
           ssl_verify_peer: @openstack_ssl_verify_peer
         }

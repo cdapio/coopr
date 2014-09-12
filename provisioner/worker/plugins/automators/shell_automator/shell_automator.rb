@@ -146,12 +146,12 @@ class ShellAutomator < Automator
         log.debug "Checking for scp installation"
         begin
           ssh_exec!(ssh, "which scp", "Checking for scp")
-        rescue CommandExecutionException
+        rescue CommandExecutionError
           log.warn "scp not found, attempting to install openssh-client"
           scp_install_cmd = "#{sudo} yum -qy install openssh-clients"
           begin
             ssh_exec!(ssh, "which yum", "Checking for yum")
-          rescue CommandExecutionException
+          rescue CommandExecutionError
             scp_install_cmd = "#{sudo} apt-get -qy install openssh-client"
           end
           ssh_exec!(ssh, scp_install_cmd, "installing openssh-client via #{scp_install_cmd}")
