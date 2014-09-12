@@ -1,0 +1,72 @@
+<div class="table-responsive">
+<table class="table table-striped" my-sortable>
+  <thead>
+    <tr ng-class="{'sort-enabled': list.length>1}">
+      <th>name</th>
+      <th>owner</th>
+      <th data-predicate="createTime" data-predicate-default="reverse">creation time</th>
+      <th data-predicate="clusterTemplate.name">template</th>
+      <th data-predicate="numNodes"># of nodes</th>
+      <th colspan="3">status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="item in list | filter:listFilterExp | orderBy:sortable.predicate:sortable.reverse">
+
+      <td><a ui-sref="^.detail({id: item.id})">{{item.name}}</a></td>
+
+      <td>{{item.ownerId}}</td>
+
+      <td>{{item.createTime | date:'short'}}</td>
+
+      <td>{{item.clusterTemplate.name}}</td>
+
+      <td>{{item.numNodes}}</td>
+
+      <td>
+        <my-status-label 
+          data-value="item.status" 
+          data-display="{
+            'pending': item.progress.actionstatus
+          }"
+        ></my-status-label>
+      </td>
+      <td>
+        <my-progress data-type="bar"
+          data-add-cls="{{{
+            'pending': 'warning',
+            'running': 'warning',
+            'terminated': 'danger'
+          }[item.status]}}"
+          data-value="item.progress.stepscompleted" 
+          data-max="item.progress.stepstotal"
+        ></my-progress>
+      </td>
+
+      <td class="text-right">
+        <a ui-sref="^.detail({id: item.id})"
+          class="btn btn-default btn-xs">
+            Details
+        </a>
+      </td>
+
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div ng-hide="(list.$promise && !list.$resolved) || list.length" class="well text-center">
+
+  <p>You don't have any clusters!</p>
+  <p><a class="btn btn-primary" role="button" ui-sref="clusters.create">
+    Create a cluster
+  </a></p>
+
+</div>
+
+
+<div class="text-center am-fade-and-slide-top" ng-show="listFilterExp">
+  <button class="btn btn-default btn-sm" ng-click="listFilterExp=null">
+    show all inactive
+  </button>
+</div>
