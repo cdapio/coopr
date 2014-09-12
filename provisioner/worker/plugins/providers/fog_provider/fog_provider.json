@@ -58,6 +58,20 @@
             "default": "us-east-1",
             "override": false,
             "tip": "AWS Region"
+          },
+          "aws_ebs_size": {
+            "label": "EBS size",
+            "type": "text",
+            "default": 10,
+            "override": true,
+            "tip": "Size of EBS volume in GB, for EBS-backed instances"
+          },
+          "aws_ebs_delete_on_term": {
+            "label": "EBS delete on termination",
+            "type": "checkbox",
+            "override": true,
+            "default": true,
+            "tip": "Delete EBS volumes on termination"
           }
         },
         "required": [

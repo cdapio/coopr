@@ -139,72 +139,89 @@ class FogProviderAWS < Provider
           ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
           ssh_exec!(ssh, "#{sudo} hostname #{hostname}", "Setting hostname to #{hostname}")
           # Setting up disks
-          begin
-            # m1.small uses /dev/xvda2 for data
-            xvda = true
-            xvdb = false
-            xvdc = false
-            ssh_exec!(ssh, 'test -e /dev/xvda2 && echo yes', 'Checking for /dev/xvda2')
-          rescue
-            xvda = false
+          log.debug 'Starting disk configuration'
+          if server.root_device_type == 'ebs'
+            log.debug 'EBS-backed instance detected...'
             begin
-              xvdb = true
-              ssh_exec!(ssh, 'test -e /dev/xvdb && echo yes', 'Checking for /dev/xvdb')
-              # Do we have /dev/xvdc, too?
-              begin
-                xvdc = true
-                ssh_exec!(ssh, 'test -e /dev/xvdc && echo yes', 'Checking for /dev/xvdc')
-              rescue
-                xvdc = false
-              end
+              extfs = true
+              ssh_exec!(ssh, "mount | grep xvde | awk '{print $5}' | grep -e 'ext[3-4]'", 'Checking filesystem')
             rescue
-              xvdb = false
+              extfs = false
             end
-          end
-
-          log.debug 'Found the following:'
-          log.debug "- xvda = #{xvda}"
-          log.debug "- xvdb = #{xvdb}"
-          log.debug "- xvdc = #{xvdc}"
-
-          # Now, do the right thing
-          if xvdc
-            # Check for APT
-            begin
-              apt = true
-              ssh_exec!(ssh, 'which apt-get', 'Checking for apt-get')
-            rescue
-              apt = false
+            if extfs
+              log.debug 'File-system is EXT3/EXT4'
+              # resize2fs is safe to execute
+              ssh_exec!(ssh, "test -x /sbin/resize2fs && #{sudo} /sbin/resize2fs /dev/xvde", 'Resizing filesystem')
             end
-            # Install mdadm
-            if apt
-              ssh_exec!(ssh, "#{sudo} apt-get update", 'Running apt-get update')
-              # Setup nullmailer
-              ssh_exec!(ssh, "echo 'nullmailer shared/mailname string localhost' | #{sudo} debconf-set-selections && echo 'nullmailer nullmailer/relayhost string localhost' | #{sudo} debconf-set-selections", 'Configuring nullmailer')
-              ssh_exec!(ssh, "#{sudo} apt-get install nullmailer -y", 'Installing nullmailer')
-              ssh_exec!(ssh, "#{sudo} apt-get install mdadm -y", 'Installing mdadm')
-            else
-              ssh_exec!(ssh, "#{sudo} yum install mdadm -y", 'Installing mdadm')
-            end
-            ssh_exec!(ssh, "mount | grep ^/dev/xvdb 2>&1 >/dev/null && #{sudo} umount /dev/xvdb || true", 'Unmounting /dev/xvdb')
-            # Setup RAID
-            log.debug 'Setting up RAID0'
-            ssh_exec!(ssh, "echo yes | #{sudo} mdadm --create /dev/md0 --level=0 --raid-devices=$(ls -1 /dev/xvd[b-z] | wc -l) $(ls -1 /dev/xvd[b-z])", 'Creating /dev/md0 RAID0 array')
-            if apt
-              ssh_exec!(ssh, "#{sudo} su - -c 'mdadm --detail --scan >> /etc/mdadm/mdadm.conf'", 'Write /etc/mdadm/mdadm.conf')
-            else
-              ssh_exec!(ssh, "#{sudo} su - -c 'mdadm --detail --scan >> /etc/mdadm.conf'", 'Write /etc/mdadm.conf')
-            end
-            ssh_exec!(ssh, "#{sudo} sed -i -e 's:xvdb:md0:' /etc/fstab", 'Update /etc/fstab for md0')
-            ssh_exec!(ssh, "#{sudo} /sbin/mkfs.ext4 /dev/md0 && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/md0 /data", 'Mounting /dev/md0 as /data')
-          elsif xvdb
-            ssh_exec!(ssh, "mount | grep ^/dev/xvdb 2>&1 >/dev/null && #{sudo} umount /dev/xvdb && #{sudo} /sbin/mkfs.ext4 /dev/xvdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/xvdb /data", 'Mounting /dev/xvdb as /data')
-          elsif xvda
-            ssh_exec!(ssh, "mount | grep ^/dev/xvda2 2>&1 >/dev/null && #{sudo} umount /dev/xvda2 && #{sudo} /sbin/mkfs.ext4 /dev/xvda2 && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/xvda2 /data", 'Mounting /dev/xvda2 as /data')
           else
-            log.debug 'No additional instance store disks detected'
+            log.debug 'Instance store detected...'
+            begin
+              # m1.small uses /dev/xvda2 for data
+              xvda = true
+              xvdb = false
+              xvdc = false
+              ssh_exec!(ssh, 'test -e /dev/xvda2', 'Checking for /dev/xvda2')
+            rescue
+              xvda = false
+              begin
+                xvdb = true
+                ssh_exec!(ssh, 'test -e /dev/xvdb', 'Checking for /dev/xvdb')
+                # Do we have /dev/xvdc, too?
+                begin
+                  xvdc = true
+                  ssh_exec!(ssh, 'test -e /dev/xvdc', 'Checking for /dev/xvdc')
+                rescue
+                  xvdc = false
+                end
+              rescue
+                xvdb = false
+              end
+            end
+
+            log.debug 'Found the following:'
+            log.debug "- xvda = #{xvda}"
+            log.debug "- xvdb = #{xvdb}"
+            log.debug "- xvdc = #{xvdc}"
+
+            # Now, do the right thing
+            if xvdc
+              # Check for APT
+              begin
+                apt = true
+                ssh_exec!(ssh, 'which apt-get', 'Checking for apt-get')
+              rescue
+                apt = false
+              end
+              # Install mdadm
+              if apt
+                ssh_exec!(ssh, "#{sudo} apt-get update", 'Running apt-get update')
+                # Setup nullmailer
+                ssh_exec!(ssh, "echo 'nullmailer shared/mailname string localhost' | #{sudo} debconf-set-selections && echo 'nullmailer nullmailer/relayhost string localhost' | #{sudo} debconf-set-selections", 'Configuring nullmailer')
+                ssh_exec!(ssh, "#{sudo} apt-get install nullmailer -y", 'Installing nullmailer')
+                ssh_exec!(ssh, "#{sudo} apt-get install mdadm -y", 'Installing mdadm')
+              else
+                ssh_exec!(ssh, "#{sudo} yum install mdadm -y", 'Installing mdadm')
+              end
+              ssh_exec!(ssh, "mount | grep ^/dev/xvdb 2>&1 >/dev/null && #{sudo} umount /dev/xvdb || true", 'Unmounting /dev/xvdb')
+              # Setup RAID
+              log.debug 'Setting up RAID0'
+              ssh_exec!(ssh, "echo yes | #{sudo} mdadm --create /dev/md0 --level=0 --raid-devices=$(ls -1 /dev/xvd[b-z] | wc -l) $(ls -1 /dev/xvd[b-z])", 'Creating /dev/md0 RAID0 array')
+              if apt
+                ssh_exec!(ssh, "#{sudo} su - -c 'mdadm --detail --scan >> /etc/mdadm/mdadm.conf'", 'Write /etc/mdadm/mdadm.conf')
+              else
+                ssh_exec!(ssh, "#{sudo} su - -c 'mdadm --detail --scan >> /etc/mdadm.conf'", 'Write /etc/mdadm.conf')
+              end
+              ssh_exec!(ssh, "#{sudo} sed -i -e 's:xvdb:md0:' /etc/fstab", 'Update /etc/fstab for md0')
+              ssh_exec!(ssh, "#{sudo} /sbin/mkfs.ext4 /dev/md0 && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/md0 /data", 'Mounting /dev/md0 as /data')
+            elsif xvdb
+              ssh_exec!(ssh, "mount | grep ^/dev/xvdb 2>&1 >/dev/null && #{sudo} umount /dev/xvdb && #{sudo} /sbin/mkfs.ext4 /dev/xvdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/xvdb /data", 'Mounting /dev/xvdb as /data')
+            elsif xvda
+              ssh_exec!(ssh, "mount | grep ^/dev/xvda2 2>&1 >/dev/null && #{sudo} umount /dev/xvda2 && #{sudo} /sbin/mkfs.ext4 /dev/xvda2 && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/xvda2 /data", 'Mounting /dev/xvda2 as /data')
+            else
+              log.debug 'No additional instance store disks detected'
+            end
+            ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
           end
-          ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
         end
       end
       # Return 0
@@ -334,6 +351,32 @@ class FogProviderAWS < Provider
     server_def[:subnet_id] = @subnet_id if vpc_mode?
     server_def[:tenancy] = 'dedicated' if vpc_mode? && @dedicated_instance
     server_def[:associate_public_ip] = 'true' if vpc_mode? && @associate_public_ip
+
+    # Handle EBS-backed volume sizes
+    if ami.root_device_type == 'ebs'
+      ami_map = ami.block_device_mapping.first
+      ebs_size =
+        begin
+          if @aws_ebs_size
+            Integer(@aws_ebs_size).to_s
+          else
+            ami_map['volumeSize'].to_s
+          end
+        end
+      delete_term =
+        if @aws_ebs_delete_on_term
+          'true'
+        else
+          'false'
+        end
+      server_def[:block_device_mapping] =
+        [{
+          'DeviceName' => ami_map['deviceName'],
+          'Ebs.VolumeSize' => ebs_size,
+          'Ebs.DeleteOnTermination' => delete_term
+        }]
+    end
+
     server_def
   end
 
