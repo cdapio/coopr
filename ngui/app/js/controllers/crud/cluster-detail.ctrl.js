@@ -69,9 +69,11 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
     $scope.$watchCollection('model', function (data) {
       if(!data.$resolved) { return; }
 
-      $scope.availableServices = data.clusterTemplate.compatibility.services.filter(function(name) {
-        return data.services.indexOf(name)===-1; // filter out services that are already installed
-      }).map(function(name) { return { name: name }; }); // mimic myApi.Service.query()
+      $scope.availableServices = data.clusterTemplate.compatibility.services
+        .filter(function(name) {
+          return data.services.indexOf(name)===-1; // filter out services that are already installed
+        })
+        .map(function(name) { return { name: name }; }); // mimic myApi.Service.query()
 
       $scope.additionalServices = [];
 
@@ -82,8 +84,8 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
 
       $scope.serviceSets = data.nodes.reduce(function (memo, node) {
         var services = node.services.map( function (one) {
-          return one.name;
-        }).sort(),
+                         return one.name;
+                       }).sort(),
             svcStr = services.join('_');
 
         if(!memo[svcStr]) {
