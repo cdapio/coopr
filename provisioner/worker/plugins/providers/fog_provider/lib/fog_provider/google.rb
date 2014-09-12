@@ -108,6 +108,8 @@ class FogProviderGoogle < Provider
       # Confirm server
       log.debug "Invoking server confirm for id: #{providerid}"
       server = connection.servers.get(providerid)
+      # If quota exceeded, the previous create call does not fail, but server will be nil here.
+      fail "Unable to retrieve server information for #{providerid}. Please check that you have not reached your quotas" if server.nil?
       # Wait until the server is ready
       fail "Server #{server.name} is in ERROR state" if server.state == 'ERROR'
       log.debug "Waiting for server to come up: #{providerid}"
