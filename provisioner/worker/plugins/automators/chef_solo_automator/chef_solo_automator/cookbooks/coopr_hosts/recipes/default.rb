@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: loom_hosts
+# Cookbook Name:: coopr_hosts
 # Recipe:: default
 #
 # Copyright © 2013-2014 Cask Data, Inc.
@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-node['loom']['cluster']['nodes'].each do |n, v|
+node['coopr']['cluster']['nodes'].each do |n, v|
   short_host = v.hostname.split('.').first
   next unless v.key?('ipaddresses') && v['ipaddresses'].key?('access_v4')
   hostsfile_entry v['ipaddresses']['access_v4'] do
