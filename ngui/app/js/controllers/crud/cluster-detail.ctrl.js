@@ -45,12 +45,14 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
         return node.id === nodeId;
       })[0];
 
+      console.log(modalScope.node.actions);
+
       modalScope.$on('modal.hide', function () {
         $state.go('^');
       });
 
       $modal({
-        title: 'Node Actions',
+        title: nodeId,
         contentTemplate: '/partials/clusters/detail-node.html', 
         placement: 'center',
         scope: modalScope,

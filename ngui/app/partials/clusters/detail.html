@@ -30,7 +30,7 @@
       <label>Status</label>
     </div>
     <div class="col-xs-9">
-      <my-status-label data-value="model.status" />
+      <my-status-label data-value="model.status"></my-status-label>
     </div>
   </div></li>
 
@@ -139,7 +139,7 @@
 </ul>
 
 
-<div ng-show="serviceSets">
+<div ng-show="model.nodes.length">
   <hr />
   <h4>Service Sets</h4>
 
@@ -171,31 +171,37 @@
         </div>
       </div>
       <div class="panel-collapse" bs-collapse-target>
-        <div class="panel-body table-responsive">
+        <div class="panel-body">
 
-          <table class="table table-striped" my-sortable>
-            <thead>
-              <tr ng-class="{'sort-enabled': set.nodes.length>1}">
-                <th data-predicate="properties.hostname">hostname</th>
-                <th data-predicate="properties.ipaddresses.access_v4">IP address</th>
-                <th colspan="2">id</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="item in set.nodes | orderBy:sortable.predicate:sortable.reverse">
-                <td>{{item.id}}</td>
-                <td>{{item.properties.hostname}}</td>
-                <td>{{item.properties.ipaddresses.access_v4}}</td>
-                <td width="10" class="text-right">
-                  <a href="" ng-click="doActionsModal(item.id)"
-                    class="btn btn-default btn-xs">
-                      <span class="fa fa-gears"></span>
-                      Show Actions
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="table table-striped" my-sortable>
+              <thead>
+                <tr ng-class="{'sort-enabled': set.nodes.length>1}">
+                  <th data-predicate="properties.hostname">hostname</th>
+                  <th data-predicate="properties.ipaddresses.access_v4">IP address</th>
+                  <th data-predicate="provisionerResults['ssh-auth'].user">username</th>
+                  <th data-predicate="provisionerResults['ssh-auth'].password">password</th>
+                  <th colspan="2">id</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in set.nodes | orderBy:sortable.predicate:sortable.reverse">
+                  <td>{{item.properties.hostname}}</td>
+                  <td>{{item.properties.ipaddresses.access_v4}}</td>
+                  <td>{{item.provisionerResults['ssh-auth'].user}}</td>
+                  <td>{{item.provisionerResults['ssh-auth'].password}}</td>
+                  <td>{{item.id}}</td>
+                  <td width="10" class="text-right">
+                    <a href="" ng-click="doActionsModal(item.id)"
+                      class="btn btn-default btn-xs">
+                        <span class="fa fa-gears"></span>
+                        Show Actions
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
         </div>
       </div>
