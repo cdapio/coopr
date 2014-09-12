@@ -30,5 +30,5 @@ It contains step by step instructions for creating a Hadoop cluster with differe
 
 Known Issues
 ============
-GCE does not offer an ubuntu image, so the Google provider included here will only work
-with CentOS image types.
+GCE does not offer an ubuntu image, so the Google provider included here has no corresponding
+ubuntu image type. If you require one, you will have to add your own.
