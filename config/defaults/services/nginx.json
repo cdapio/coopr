@@ -30,14 +30,14 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[nginx::default],recipe[coopr_service_runner::default]",
+          "run_list": "recipe[nginx::default],recipe[coopr_service_manager::default]",
           "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"nginx\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[nginx::default],recipe[coopr_service_runner::default]",
+          "run_list": "recipe[nginx::default],recipe[coopr_service_manager::default]",
           "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"nginx\": \"stop\" } } } }" 
         }
       }

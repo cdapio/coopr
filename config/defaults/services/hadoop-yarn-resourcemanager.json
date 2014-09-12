@@ -36,14 +36,14 @@
       "start": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[coopr_service_runner::default]",
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[coopr_service_manager::default]",
           "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"start\" } } } }" 
         }
       },
       "stop": {
         "type": "chef-solo",
         "fields": {
-          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[coopr_service_runner::default]",
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_yarn_resourcemanager],recipe[coopr_service_manager::default]",
           "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-yarn-resourcemanager\": \"stop\" } } } }" 
         }
       }
