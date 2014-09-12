@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: loom_base
+# Cookbook Name:: coopr_base
 # Recipe:: default
 #
-# Copyright © 2013 Cask Data, Inc.
+# Copyright © 2013-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ when 'debian'
 end
 
 # We always run our hosts and firewall cookbooks
-include_recipe "loom_firewall::default"
-include_recipe "loom_hosts::default"
+include_recipe "coopr_firewall::default"
+include_recipe "coopr_hosts::default"
 
 # ensure user ulimits are enabled 
 include_recipe "ulimit::default"
