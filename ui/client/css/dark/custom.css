@@ -259,19 +259,17 @@ a:visited {
   color: #333;
 }
 #logo {
-  background-image: url(/static/img/v2-assets/logo.png);
+  background-image: url(/static/img/coopr_logo.png);
   background-repeat: no-repeat;
-  width: 210px;
-  height: 38px;
-  padding: 0 0px 0px;
+  background-position: left center;
+  width: 125px;
+  height: 70px;
   display: block;
-  margin: 0;
-  margin-top: 15px;
   margin-right: 100px;
 }
 #nav {
   height: 100px;
-  background: #121E39;
+  background: #333948;
 }
 #product-name {
   display: block;
@@ -364,7 +362,7 @@ table.tablesorter thead tr .headerSortUp {
   border-radius: 5px;
 }
 #nav ul li {
-  background: #121E39;
+  background: #333948;
 }
 .dropdown-menu {
   margin: 0;
@@ -655,6 +653,10 @@ a strong {
   background-image: url('/static/img/v2-assets/icon_catalog.png');
   background-repeat: no-repeat;
 }
+.nav-tenants {
+  background-image: url('/static/img/v2-assets/icon_tenant.png');
+  background-repeat: no-repeat;
+}
 .auth-group {
   display: none;
 }
@@ -883,6 +885,9 @@ a strong {
   background: #575F74;
   color: #c0cddd;
 }
+.spl-panel-table > tbody > tr > td span {
+  color: #c0cddd;
+}
 .spl-panel-table > tbody > tr > td a {
   color: #c0cddd;
 }
@@ -1002,4 +1007,7 @@ h5 {
 }
 .btn-service-restart:hover {
   background: url('/static/img/v2-assets/icon_refresh_active.png');
+}
+ul.tenants-tickers li > div {
+  background-color: #3E495D;
 }
