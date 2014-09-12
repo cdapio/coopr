@@ -158,7 +158,7 @@ gulp.task('clean', function() {
 
 
 gulp.task('js:minify', ['js'], function() {
-  return gulp.src('./dist/bundle/*.js')
+  return gulp.src('./dist/bundle/{app,lib}.js')
     .pipe(plug.uglify())
     .pipe(gulp.dest('./dist/bundle'))
     .pipe(plug.size({showFiles:true, gzip:true, total:false}));
