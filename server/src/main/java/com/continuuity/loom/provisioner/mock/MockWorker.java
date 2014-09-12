@@ -176,6 +176,10 @@ public class MockWorker extends AbstractScheduledService {
         body.add("ipaddresses", ips);
         LOG.debug("adding ips {}.", ips);
         body.addProperty("hostname", "host-" + randomIP() + ".local");
+        JsonObject sshAuth = new JsonObject();
+        sshAuth.addProperty("user", "root");
+        sshAuth.addProperty("password", RandomStringUtils.randomAlphanumeric(8));
+        body.add("ssh-auth", sshAuth);
       }
       body.add("result", result);
 
