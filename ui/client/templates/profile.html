@@ -73,16 +73,14 @@
               <div class="col-sm-8">
                 <div class="row">
                   <div class="col-sm-4 skin-container">
-                    <a href="/static/img/v2-assets/light_skin.png">
+                    <label>
                       <img class="img-responsive" src="/static/img/v2-assets/light_skin.png" />
-                    </a>
-                    <label for="skin"><input type="radio" name="skin" value="light" {% if skin == "light" %} checked {% endif %}/>     Light</label>
+                      <input type="radio" name="skin" value="light" {% if skin == "light" %} checked {% endif %}/>     Light</label>
                   </div>
                   <div class="col-sm-4 skin-container">
-                    <a href="/static/img/v2-assets/dark_skin.png">
+                    <label>
                       <img class="img-responsive" src="/static/img/v2-assets/dark_skin.png" />
-                    </a>
-                    <label for="skin"><input type="radio" name="skin" value="dark" {% if skin == "dark" %} checked {% endif %}/>     Dark</label>
+                      <input type="radio" name="skin" value="dark" {% if skin == "dark" %} checked {% endif %}/>     Dark</label>
                   </div>
                 </div>
               </div>
