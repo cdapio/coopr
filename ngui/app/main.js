@@ -42,7 +42,8 @@ angular
     'angularMoment',
     'ngAnimate',
     'ngSanitize',
-    'ui.router'
+    'ui.router',
+    'ck.ui.jsoneditor'
   ])
 
   .run(function ($rootScope, $state, $stateParams) {

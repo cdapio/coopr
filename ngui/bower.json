@@ -14,6 +14,7 @@
     "angular-loading-bar": "~0.5.0",
     "font-awesome": "~4.2.0",
     "es5-shim": "~4.0.3",
-    "angular-moment": "~0.8.2"
+    "angular-moment": "~0.8.2",
+    "ck-jsoneditor": "https://github.com/continuuity/spikes/blob/develop/frontend-shared-components/ck-jsoneditor.zip"
   }
 }

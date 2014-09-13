@@ -38,5 +38,7 @@ module.value('myHelpers', {
     }
     return total * 1000;
   }
+
+
 });
 
