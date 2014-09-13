@@ -45,3 +45,6 @@ for f in $(ls -1 {*.rb,*.json} 2>/dev/null) ; do
   [[ ${ret} -ne 0 ]] && failed="${failed} ${f}"
 done
 [[ ${failed} ]] && echo "Failed to load role: ${failed}" && exit 1
+
+# We reached the end! Rejoice!
+exit 0

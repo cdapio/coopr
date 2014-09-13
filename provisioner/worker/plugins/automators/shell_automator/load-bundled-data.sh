@@ -34,3 +34,6 @@ for d in $(ls -p -1 | grep "/$" | sed "s,/$,,") ; do
   [[ ${ret} -ne 0 ]] && failed="${failed} ${d}"
 done
 [[ ${failed} ]] && echo "Failed to load data_bag: ${failed}" && exit 1
+
+# We reached the end! Rejoice!
+exit 0
