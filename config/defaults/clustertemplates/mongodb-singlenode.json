@@ -14,7 +14,9 @@
         "config": {
           "bind_ip": "%ip.bind_v4.service.mongodb-single%",
           "dbpath": "/data/mongodb"
-        }
+        },
+        "default_init_name": "mongodb",
+        "instance_name": "mongodb"
       }
     }
   },
