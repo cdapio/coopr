@@ -17,7 +17,7 @@ gulp.task('css:lib', ['fonts'], function() {
       './bower_components/angular-loading-bar/build/loading-bar.min.css',
       './bower_components/angular-motion/dist/angular-motion.min.css',
       './bower_components/font-awesome/css/font-awesome.min.css',
-      './bower_components/ck-jsoneditor/jsoneditor.css'
+      './bower_components/ck-components/frontend-shared-components/ck-jsoneditor/jsoneditor.css'
     ])
     .pipe(plumber())
     .pipe(plug.if('*.less', plug.less()))
@@ -78,7 +78,7 @@ gulp.task('js:lib', function() {
 
       './bower_components/ngstorage/ngStorage.js',
       './bower_components/angular-loading-bar/build/loading-bar.js',
-      './bower_components/ck-jsoneditor/jsoneditor.js'
+      './bower_components/ck-components/frontend-shared-components/ck-jsoneditor/jsoneditor.js'
 
     ])
     .pipe(plug.concat('lib.js'))

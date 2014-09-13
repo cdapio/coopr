@@ -15,6 +15,6 @@
     "font-awesome": "~4.2.0",
     "es5-shim": "~4.0.3",
     "angular-moment": "~0.8.2",
-    "ck-jsoneditor": "https://github.com/continuuity/spikes/blob/develop/frontend-shared-components/ck-jsoneditor.zip"
+    "ck-components": "git@github.com:continuuity/spikes.git"
   }
 }
