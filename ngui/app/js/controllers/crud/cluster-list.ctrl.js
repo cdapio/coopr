@@ -6,20 +6,25 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, myApi,
 
   var timeoutPromise,
       filterFilter = $filter('filter'),
-      tenMinutesAgo = moment().minutes(-10),
-      activePredicate = function (item) { 
-        // any cluster created recently is considered "active" for display purposes
-        return (moment(item.createTime)>tenMinutesAgo) || (item.status!=='terminated');
-      };
+      tenMinutesAgo = moment().minutes(-10);
 
+  $scope.isActive = function (item) { 
+    // any cluster created recently is considered "active" for display purposes
+    return (moment(item.createTime)>tenMinutesAgo) || (item.status!=='terminated');
+  };
 
   $scope.$watchCollection('list', function (list) {
     if (list.length) {
 
-      var activeCount = filterFilter(list, activePredicate).length,
+      var activeCount = filterFilter(list, $scope.isActive).length,
           filteredCount = list.length - activeCount;
-      // show the button and filter only if there are both visible and filterable items
-      $scope.listFilterExp = (activeCount && filteredCount) ? activePredicate : null;
+
+      // show the toggle only if there are both visible and filterable items.
+      $scope.togglerVisible = (activeCount && filteredCount);
+
+      if(!activeCount) { // if there are no active items, don't filter.
+        $scope.filterIsOff = true;
+      }
 
       updatePending();
     }

@@ -11,7 +11,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="item in list | filter:listFilterExp | orderBy:sortable.predicate:sortable.reverse">
+    <tr ng-repeat="item in list | filter:(filterIsOff?null:isActive) | orderBy:sortable.predicate:sortable.reverse">
 
       <td><a ui-sref="^.detail({id: item.id})">{{item.name}}</a></td>
 
@@ -65,13 +65,12 @@
 </div>
 
 
-<div class="checkbox text-center">
-  <label>
-    <input type="checkbox" />
-    show all inactive
-  </label>
-</div>
-
-  <button class="btn btn-default btn-sm" ng-click="">
-    show all inactive
+<div class="text-center am-fade-and-slide-top" ng-show="togglerVisible">
+  <hr />
+  <button class="btn btn-default btn-xs" 
+      ng-model="filterIsOff"
+      bs-checkbox>
+    <span class="fa fa-ellipsis-v fa-fw"></span>
+    show all clusters
   </button>
+</div>
