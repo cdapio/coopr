@@ -138,14 +138,12 @@
 
 </ul>
 
-
 <div ng-show="model.nodes.length">
   <hr />
   <h4>Service Sets</h4>
 
   <ol class="list-unstyled panel-group" bs-collapse>
     <li class="panel panel-default" ng-repeat="set in serviceSets">
-
       <div class="panel-heading">
         <div class="panel-title row">
           <div class="col-xs-3">
@@ -179,21 +177,30 @@
                 <tr ng-class="{'sort-enabled': set.nodes.length>1}">
                   <th data-predicate="properties.hostname">hostname</th>
                   <th data-predicate="properties.ipaddresses.access_v4">IP address</th>
-                  <th data-predicate="provisionerResults['ssh-auth'].user">username</th>
-                  <th data-predicate="provisionerResults['ssh-auth'].password">password</th>
-                  <th colspan="2">id</th>
+                  <th data-predicate="provisionerResults['ssh-auth'].user" colspan="3">
+                    credentials
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr ng-repeat="item in set.nodes | orderBy:sortable.predicate:sortable.reverse">
-                  <td>{{item.properties.hostname}}</td>
-                  <td>{{item.properties.ipaddresses.access_v4}}</td>
-                  <td>{{item.provisionerResults['ssh-auth'].user}}</td>
-                  <td>{{item.provisionerResults['ssh-auth'].password}}</td>
-                  <td>{{item.id}}</td>
+                  <td>
+                    <tt>{{item.properties.hostname}}</tt>
+                  </td>
+                  <td>
+                    <small>{{item.properties.ipaddresses.access_v4}}</small>
+                  </td>
+                  <td width="10">
+                    <code>{{item.provisionerResults['ssh-auth'].user}}</code>
+                  </td>
+                  <td width="150">
+                    <my-password 
+                      data-value="item.provisionerResults['ssh-auth'].password"
+                    ></my-password>
+                  </td>
                   <td width="10" class="text-right">
                     <a href="" ng-click="doActionsModal(item.id)"
-                      class="btn btn-default btn-xs">
+                      class="btn btn-default btn-sm">
                         <span class="fa fa-gears"></span>
                         Show Actions
                     </a>
