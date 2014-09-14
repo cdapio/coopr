@@ -9,8 +9,6 @@ module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocu
   $scope.showAdvanced = false;
   $scope.showConfig = !!id;
 
-  $scope.leaseDuration = myHelpers.parseMilliseconds(0);
-
   var allHardware  = myApi.HardwareType.query(),
       allImages = myApi.ImageType.query(),
       allServices = myApi.Service.query();
@@ -58,20 +56,20 @@ module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocu
         return chosen.compatibility.services.indexOf(item.name)>=0;
       });
 
+
+      var ld = chosen.administration.leaseduration;
+      $scope.leaseDuration = myHelpers.parseMilliseconds(ld.initial);
+      $scope.leaseMaxMs = ld.max;
+
       // set the template defaults on the model
       angular.extend($scope.model, chosen.defaults);
     }); 
 
 
     $scope.$watch('model.provider', function (name) {
-      var chosen = $scope.availableProviders.filter(function (p) {
+      $scope.chosenProvider = $scope.availableProviders.filter(function (p) {
         return p.name === name;
       })[0];
-
-      console.log('chosen provider', chosen);
-
-      $scope.chosenProvider = chosen;
-
     }); 
 
   });
@@ -83,7 +81,20 @@ module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocu
     creating a new cluster
      */
     $scope.$watchCollection('leaseDuration', function (timeObj) {
-      $scope.model.initialLeaseDuration = myHelpers.concatMilliseconds(timeObj);
+      if(timeObj) {
+        var ms = myHelpers.concatMilliseconds(timeObj),
+            max = $scope.chosenTemplate.administration.leaseduration.initial;
+
+        if(!max || (ms <= max)) {
+          $scope.leaseMaxReached = false;
+          $scope.model.initialLeaseDuration = ms;
+        }
+        else {
+          $scope.leaseMaxReached = max;
+          $scope.model.initialLeaseDuration = max;
+        }
+
+      }
     }); 
 
 

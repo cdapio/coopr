@@ -2,7 +2,9 @@
   <label for="inputLeaseDays" class="col-xs-2 control-label">Lease duration</label>
   <div class="col-xs-10 col-sm-8 col-md-6">
 
-    <fieldset class="row" ng-disabled="model.id">
+    <fieldset class="row" ng-disabled="model.id" ng-class="{
+      'has-error': leaseMaxReached
+    }">
       <div class="col-xs-4">
         <div class="input-group">
           <label for="inputLeaseDays" class="input-group-addon">Days</label>
@@ -31,6 +33,11 @@
         </div>
       </div>
     </fieldset>
+
+    <p class="help-block" ng-show="leaseMaxReached">
+      Initial lease maximum is
+      <strong>{{leaseMaxReached | amDurationFormat}}</strong>
+    </p>
 
   </div>
 </div>
