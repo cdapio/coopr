@@ -1,5 +1,5 @@
 angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl', 
-  function ($scope, CrudFormBase, $state, $modal, myApi, $timeout) {
+  function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, myApi, $timeout) {
     CrudFormBase.apply($scope);
 
 
@@ -17,51 +17,6 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
     else {
       failure();
     }
-
-
-
-
-    function failure () {
-      $state.go('404');
-    }
-
-
-
-
-    function update () {
-      $scope.model.$get();
-    }
-
-
-
-
-
-    function doActionsModal (nodeId) {
-      $state.go('clusters.detail.node', {nodeId: nodeId});
-
-      var modalScope = $scope.$new(true);
-
-      modalScope.node = $scope.model.nodes.filter( function(node) {
-        return node.id === nodeId;
-      })[0];
-
-      console.log(modalScope.node.actions);
-
-      modalScope.$on('modal.hide', function () {
-        $state.go('^');
-      });
-
-      $modal({
-        title: nodeId,
-        contentTemplate: '/partials/clusters/detail-node.html', 
-        placement: 'center',
-        scope: modalScope,
-        show: true
-      });
-    }
-
-    $scope.doActionsModal = doActionsModal;
-
 
 
 
@@ -107,9 +62,55 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
     });
 
 
+    $scope.$on(MYSERVICEPICKER_EVENT.manage, update);
+
+
+
     $scope.doSubmitServices = function (arrSvcs) {
       myApi.ClusterService.save( {clusterId: $scope.model.id}, { services: arrSvcs }, update);
     };
+
+
+
+    $scope.doActionsModal = doActionsModal;
+
+
+
+    function doActionsModal (nodeId) {
+      $state.go('clusters.detail.node', {nodeId: nodeId});
+
+      var modalScope = $scope.$new(true);
+
+      modalScope.node = $scope.model.nodes.filter( function(node) {
+        return node.id === nodeId;
+      })[0];
+
+      console.log(modalScope.node.actions);
+
+      modalScope.$on('modal.hide', function () {
+        $state.go('^');
+      });
+
+      $modal({
+        title: nodeId,
+        contentTemplate: '/partials/clusters/detail-node.html', 
+        placement: 'center',
+        scope: modalScope,
+        show: true
+      });
+    }
+
+
+    function failure () {
+      $state.go('404');
+    }
+
+
+
+
+    function update () {
+      $scope.model.$get();
+    }
 
   }
 );
