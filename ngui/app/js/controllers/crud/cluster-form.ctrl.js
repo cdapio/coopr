@@ -57,9 +57,9 @@ module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocu
       });
 
 
-      var ld = chosen.administration.leaseduration;
-      $scope.leaseDuration = myHelpers.parseMilliseconds(ld.initial);
-      $scope.leaseMaxMs = ld.max;
+      $scope.leaseDuration = myHelpers.parseMilliseconds(
+        chosen.administration.leaseduration.initial
+      );
 
       // set the template defaults on the model
       angular.extend($scope.model, chosen.defaults);
