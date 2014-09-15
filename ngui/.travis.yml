@@ -9,6 +9,4 @@ before_install:
   - "npm run build"
 
 script:
-  - "npm run jshint"
-  - "npm run test-single-run"
-  - "npm run protractor"
+  - "npm run travis"

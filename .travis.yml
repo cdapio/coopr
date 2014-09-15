@@ -32,8 +32,4 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
 
 script:
-  - "cd ngui && npm run build"
-  # - "npm run jshint"
-  - "npm run test-single-run"
-  # - "npm run protractor"
-  - "cd .. && mvn test"
+  - "mvn test && cd ngui && npm run travis"

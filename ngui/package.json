@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node ./server.js",
     "build": "npm install && ./node_modules/bower/bin/bower install && node ./node_modules/gulp/bin/gulp.js build",
-    "jshint": "node ./node_modules/gulp/bin/gulp.js jshint",
+    "travis": "node ./node_modules/gulp/bin/gulp.js jshint && npm run test-single-run && npm run protractor",
     "test": "./node_modules/karma/bin/karma start test/karma.conf.js",
     "test-single-run": "./node_modules/karma/bin/karma start test/karma.conf.js --no-auto-watch --single-run",
     "update-webdriver": "webdriver-manager update",
