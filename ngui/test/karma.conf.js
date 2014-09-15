@@ -1,5 +1,5 @@
 module.exports = function(config){
-  config.set({
+  var it = {
 
     basePath : '../',
 
@@ -23,7 +23,20 @@ module.exports = function(config){
             'karma-jasmine'
             ],
 
+    customLaunchers: {
+      Chrome_travis_ci: {
+        base: 'Chrome',
+        flags: ['--no-sandbox']
+      }
+    },
+
     reporters: ['progress']
 
-  });
+  };
+
+  if(process.env.TRAVIS){
+    configuration.browsers = ['Chrome_travis_ci'];
+  }
+
+  config.set(it);
 };

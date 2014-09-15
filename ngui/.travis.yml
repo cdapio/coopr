@@ -6,10 +6,9 @@ node_js:
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
-  - "cd ngui && npm run build"
+  - "npm run build"
 
 script:
-  - "cd ngui"
   - "npm run jshint"
   - "npm run test-single-run"
   - "npm run protractor"
