@@ -22,6 +22,7 @@ import com.google.common.base.Throwables;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 public final class MockProvisionerMain extends DaemonMain {
   private static final Logger LOG = LoggerFactory.getLogger(MockProvisionerMain.class);
   private MockProvisionerService mockProvisionerService;
+  private Options options;
 
   public static void main(final String[] args) throws Exception {
     new MockProvisionerMain().doMain(args);
@@ -42,32 +44,29 @@ public final class MockProvisionerMain extends DaemonMain {
 
   @Override
   public void init(String[] args) {
-    Options options = new Options();
-    options.addOption("i", "id", true, "Id for the provisioner. Defaults to 'dummy'");
-    options.addOption("h", "host", true, "Server to connect to. Defaults to 'localhost'");
-    options.addOption("p", "port", true, "Server port to connect to. Defaults to 55054");
-    options.addOption("c", "capacity", true, "total worker capacity for the provisioner. Defaults to 10");
-    options.addOption("f", "frequency", true,
-                      "milliseconds for workers to wait between taking tasks. Defaults to 1000");
-    options.addOption("d", "duration", true,
-                      "milliseconds a task should take to complete. Defaults to 1000");
-
     try {
+      setOptions();
       CommandLineParser parser = new BasicParser();
       CommandLine cmd = parser.parse(options, args);
+      if (cmd.hasOption('h')) {
+        printHelp();
+        System.exit(0);
+      }
       String id = cmd.hasOption('i') ? cmd.getOptionValue('i') : "dummy";
-      String host = cmd.hasOption('h') ? cmd.getOptionValue('h') : "localhost";
+      String host = cmd.hasOption('s') ? cmd.getOptionValue('s') : "localhost";
       int port = cmd.hasOption('p') ? Integer.valueOf(cmd.getOptionValue('p')) : 55054;
       int capacity = cmd.hasOption('c') ? Integer.valueOf(cmd.getOptionValue('c')) : 10;
-      long msBetweenTasks = cmd.hasOption('f') ? Long.valueOf(cmd.getOptionValue('f')) : 1000;
+      long msBetweenTasks = cmd.hasOption('r') ? Long.valueOf(cmd.getOptionValue('r')) : 1000;
       long taskMs = cmd.hasOption('d') ? Long.valueOf(cmd.getOptionValue('d')) : 1000;
+      int failureRate = cmd.hasOption('f') ? Integer.valueOf(cmd.getOptionValue('f')) : 0;
       String serverUrl = "http://" + host + ":" + port + Constants.API_BASE;
-      LOG.info("id = {}, capacity = {}, server url = {}, task frequency = {}, task duration = {}",
-               id, capacity, serverUrl, msBetweenTasks, taskMs);
+      LOG.info("id = {}, capacity = {}, server url = {}, task frequency = {}, task duration = {}, failure rate = {}",
+               id, capacity, serverUrl, msBetweenTasks, taskMs, failureRate);
 
-      mockProvisionerService = new MockProvisionerService(id, serverUrl, capacity, taskMs, msBetweenTasks);
+      mockProvisionerService = new MockProvisionerService(id, serverUrl, capacity, taskMs, msBetweenTasks, failureRate);
     } catch (ParseException e) {
-      Throwables.propagate(e);
+      printHelp();
+      System.exit(0);
     }
   }
 
@@ -83,9 +82,11 @@ public final class MockProvisionerMain extends DaemonMain {
    */
   @Override
   public void stop() {
-    LOG.info("stopping mock provisioner...");
-    mockProvisionerService.stopAndWait();
-    LOG.info("mock provisioner stopped.");
+    if (mockProvisionerService != null) {
+      LOG.info("stopping mock provisioner...");
+      mockProvisionerService.stopAndWait();
+      LOG.info("mock provisioner stopped.");
+    }
   }
 
   /**
@@ -93,5 +94,25 @@ public final class MockProvisionerMain extends DaemonMain {
    */
   @Override
   public void destroy() {
+  }
+
+  private void setOptions() {
+    options = new Options();
+    options.addOption("h", "help", false, "Display help information.");
+    options.addOption("i", "id", true, "Id for the provisioner. Defaults to 'dummy'");
+    options.addOption("s", "server", true, "Server to connect to. Defaults to 'localhost'");
+    options.addOption("p", "port", true, "Server port to connect to. Defaults to 55054");
+    options.addOption("c", "capacity", true, "total worker capacity for the provisioner. Defaults to 10");
+    options.addOption("r", "rate", true,
+                      "milliseconds for workers to wait between taking tasks. Defaults to 1000");
+    options.addOption("d", "duration", true,
+                      "milliseconds a task should take to complete. Defaults to 1000");
+    options.addOption("f", "failure", true,
+                      "percentage of time a task should be failed by the mock worker (0 - 100). Defaults to 0");
+  }
+
+  private void printHelp() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp("java -cp <path-to-jar>.jar com.continuuity.loom.runtime.MockProvisionerMain", options);
   }
 }

@@ -57,7 +57,8 @@ public class MockProvisionerService extends AbstractScheduledService {
   private final HttpDelete deregisterRequest;
   private final MockProvisionerWorkerService workerService;
 
-  public MockProvisionerService(String id, String serverUrl, int totalCapacity, long taskMs, long msBetweenTasks) {
+  public MockProvisionerService(String id, String serverUrl, int totalCapacity, long taskMs,
+                                long msBetweenTasks, int failureRate) {
     this.id = id;
     this.totalCapacity = totalCapacity;
 
@@ -75,7 +76,8 @@ public class MockProvisionerService extends AbstractScheduledService {
     this.heartbeatRequest = new HttpPost(serverUrl + "/provisioners/" + id + "/heartbeat");
     this.registerRequest = new HttpPut(serverUrl + "/provisioners/" + id);
     this.deregisterRequest = new HttpDelete(serverUrl + "/provisioners/" + id);
-    this.workerService = new MockProvisionerWorkerService(id, serverUrl, totalCapacity, taskMs, msBetweenTasks);
+    this.workerService =
+      new MockProvisionerWorkerService(id, serverUrl, totalCapacity, taskMs, msBetweenTasks, failureRate);
   }
 
   @Override

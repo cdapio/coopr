@@ -181,8 +181,7 @@ function stage_default_data () {
     cd ${LOOM_PROVISIONER_PLUGIN_DIR}
     echo "Loading initial data..."
     for script in $(ls -1 */*/load-bundled-data.sh) ; do
-      cd ${LOOM_PROVISIONER_PLUGIN_DIR}
-      . ${script}
+      ${LOOM_PROVISIONER_PLUGIN_DIR}/${script}
     done
 }
 
@@ -260,7 +259,7 @@ function provisioner () {
     fi
     if [ "x${LOOM_USE_DUMMY_PROVISIONER}" == "xtrue" ]
     then
-        $LOOM_HOME/server/bin/dummy-provisioner.sh $1
+        $LOOM_HOME/server/bin/dummy-provisioner.sh $@
     else
         $LOOM_HOME/provisioner/bin/provisioner.sh $1
     fi
@@ -275,7 +274,7 @@ case "$1" in
   start)
     $LOOM_HOME/server/bin/server.sh start && \
     $LOOM_HOME/ui/bin/ui.sh start && \
-    provisioner start && \
+    provisioner $@ && \
     load_defaults && \
     greeting
   ;;

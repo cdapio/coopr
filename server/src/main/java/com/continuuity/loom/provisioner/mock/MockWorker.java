@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 public class MockWorker extends AbstractScheduledService {
   private static final Gson GSON = new Gson();
   private static final Logger LOG = LoggerFactory.getLogger(MockWorker.class);
+  private static final Random RANDOM = new Random();
   private final String provisionerId;
   private final String workerId;
   private final String tenantId;
@@ -52,18 +54,20 @@ public class MockWorker extends AbstractScheduledService {
   private final HttpPost takeRequest;
   private final long taskMs;
   private final long msBetweenTasks;
+  private final int failureRate;
   private final ScheduledExecutorService executorService;
   private final HttpContext httpContext;
 
   public MockWorker(String provisionerId, String workerId, String tenantId, String serverUrl,
                     ScheduledExecutorService executorService, long taskMs, long msBetweenTasks,
-                    CloseableHttpClient httpClient) {
+                    int failureRate, CloseableHttpClient httpClient) {
     this.provisionerId = provisionerId;
     this.workerId = workerId;
     this.tenantId = tenantId;
     this.executorService = executorService;
     this.taskMs = taskMs;
     this.msBetweenTasks = msBetweenTasks;
+    this.failureRate = failureRate;
     this.finishRequest = new HttpPost(String.format(serverUrl + "/tasks/finish"));
     this.takeRequest = new HttpPost(serverUrl + "/tasks/take");
     this.httpClient = httpClient;
@@ -160,28 +164,14 @@ public class MockWorker extends AbstractScheduledService {
   private void finishTask(String taskId, ProvisionerAction action) throws IOException {
     LOG.debug("finishing task {}, which is a {} action.", taskId, action);
     try {
-      JsonObject body = new JsonObject();
-      body.addProperty("provisionerId", provisionerId);
-      body.addProperty("workerId", provisionerId + "." + workerId);
-      body.addProperty("taskId", taskId);
-      body.addProperty("tenantId", tenantId);
-      body.addProperty("status", "0");
-      // include some random field in the result
-      JsonObject result = new JsonObject();
-      result.addProperty(RandomStringUtils.randomAlphanumeric(4), RandomStringUtils.randomAlphanumeric(8));
-      if (action == ProvisionerAction.CONFIRM) {
-        JsonObject ips = new JsonObject();
-        ips.addProperty("access_v4", randomIP());
-        ips.addProperty("bind_v4", randomIP());
-        body.add("ipaddresses", ips);
-        LOG.debug("adding ips {}.", ips);
-        body.addProperty("hostname", "host-" + randomIP() + ".local");
-        JsonObject sshAuth = new JsonObject();
-        sshAuth.addProperty("user", "root");
-        sshAuth.addProperty("password", RandomStringUtils.randomAlphanumeric(8));
-        result.add("ssh-auth", sshAuth);
+      JsonObject body;
+      // generate random num from 0-99
+      int num = RANDOM.nextInt(100);
+      if (failureRate > num) {
+        body = failureBody(taskId);
+      } else {
+        body = successBody(taskId, action);
       }
-      body.add("result", result);
 
       finishRequest.setEntity(new StringEntity(GSON.toJson(body)));
       CloseableHttpResponse response = httpClient.execute(finishRequest, httpContext);
@@ -199,6 +189,44 @@ public class MockWorker extends AbstractScheduledService {
     } finally {
       finishRequest.reset();
     }
+  }
+
+  private JsonObject failureBody(String taskId) {
+    JsonObject body = new JsonObject();
+    body.addProperty("provisionerId", provisionerId);
+    body.addProperty("workerId", provisionerId + "." + workerId);
+    body.addProperty("taskId", taskId);
+    body.addProperty("tenantId", tenantId);
+    body.addProperty("status", "1");
+    body.addProperty("stdout", RandomStringUtils.randomAscii(2048));
+    body.addProperty("stderr", "");
+    return body;
+  }
+
+  private JsonObject successBody(String taskId, ProvisionerAction action) {
+    JsonObject body = new JsonObject();
+    body.addProperty("provisionerId", provisionerId);
+    body.addProperty("workerId", provisionerId + "." + workerId);
+    body.addProperty("taskId", taskId);
+    body.addProperty("tenantId", tenantId);
+    body.addProperty("status", "0");
+    // include some random field in the result
+    JsonObject result = new JsonObject();
+    result.addProperty(RandomStringUtils.randomAlphanumeric(4), RandomStringUtils.randomAlphanumeric(8));
+    if (action == ProvisionerAction.CONFIRM) {
+      JsonObject ips = new JsonObject();
+      ips.addProperty("access_v4", randomIP());
+      ips.addProperty("bind_v4", randomIP());
+      body.add("ipaddresses", ips);
+      LOG.debug("adding ips {}.", ips);
+      body.addProperty("hostname", "host-" + randomIP() + ".local");
+      JsonObject sshAuth = new JsonObject();
+      sshAuth.addProperty("user", "root");
+      sshAuth.addProperty("password", RandomStringUtils.randomAlphanumeric(8));
+      result.add("ssh-auth", sshAuth);
+    }
+    body.add("result", result);
+    return body;
   }
 
   private String getResponseString(CloseableHttpResponse response) throws IOException {
