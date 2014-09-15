@@ -1,4 +1,4 @@
-/var/log/loom/loom-ngui*.log {
+/var/log/loom/coopr-ngui*.log {
     rotate 7
     daily
     missingok
