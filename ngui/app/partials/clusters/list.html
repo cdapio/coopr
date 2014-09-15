@@ -3,7 +3,7 @@
   <thead>
     <tr ng-class="{'sort-enabled': list.length>1}">
       <th>name</th>
-      <th>owner</th>
+      <th ng-show="currentUser.hasRole('admin')">owner</th>
       <th data-predicate="createTime" data-predicate-default="reverse">creation time</th>
       <th data-predicate="clusterTemplate.name">template</th>
       <th data-predicate="numNodes"># of nodes</th>
@@ -15,11 +15,11 @@
 
       <td><a ui-sref="^.detail({id: item.id})">{{item.name}}</a></td>
 
-      <td>{{item.ownerId}}</td>
+      <td ng-show="currentUser.hasRole('admin')">{{item.ownerId}}</td>
 
-      <td>{{item.createTime | date:'short'}}</td>
+      <td><small am-time-ago="item.createTime"></small></td>
 
-      <td>{{item.clusterTemplate.name}}</td>
+      <td><small>{{item.clusterTemplate.name}}</small></td>
 
       <td>{{item.numNodes}}</td>
 

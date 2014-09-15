@@ -63,12 +63,17 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
 
       // figure out the max value for lease extension
       var ld = data.clusterTemplate.administration.leaseduration,
-          ever = moment(data.createTime).add(ld.max, 'ms'),
-          step = ld.step ? moment().add(ld.step, 'ms') : ever;
-
-      $scope.leaseMaxMs = moment.min(ever, step).valueOf() - Date.now();
-
-
+          maxDate = moment(data.createTime);
+      if(ld.max) {
+        maxDate.add(ld.max, 'ms');
+      }
+      else {
+        maxDate.add(100, 'days');
+      }
+      if(ld.step) {
+        maxDate = moment.min(maxDate, moment().add(ld.step, 'ms'));
+      }
+      $scope.leaseMaxMs = maxDate.valueOf() - Date.now();
     });
 
 
