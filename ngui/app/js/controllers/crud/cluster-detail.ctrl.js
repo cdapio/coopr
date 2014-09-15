@@ -85,9 +85,11 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
       $scope.leaseExtendHumanized = moment.duration(ms, 'ms').humanize();
     });
 
-    $scope.doLeaseExtend = function () {
-      $scope.leaseExtendMs = 0;
-      alert('it doesnt work yet');
+    $scope.doLeaseExtend = function () {      
+      myApi.Cluster.save({id: $scope.model.id}, {expireTime: $scope.leaseExtendDate.valueOf() }, function () {
+        $scope.leaseExtendMs = 0;
+        update();
+      });
     }
 
 
