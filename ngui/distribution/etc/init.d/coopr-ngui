@@ -16,11 +16,11 @@
 #
 #
 # chkconfig: 2345 96 15
-# description: Starts and stops the loom-ngui service
+# description: Starts and stops the coopr-ngui service
 # 
 ### BEGIN INIT INFO
-# Provides:          loom-ngui
-# Short-Description: Loom NGUI
+# Provides:          coopr-ngui
+# Short-Description: Coopr NGUI
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Required-Start:    $network
@@ -29,18 +29,18 @@
 # Should-Stop:
 ### END INIT INFO
 
-# source /etc/default/loom-ngui
-[ -f /etc/default/loom-ngui ] && source /etc/default/loom-ngui
+# source /etc/default/coopr-ngui
+[ -f /etc/default/coopr-ngui ] && source /etc/default/coopr-ngui
 
-# create pid dir owned by loom user
-mkdir -p /var/run/loom
-chown -R loom:loom /var/run/loom
+# create pid dir owned by coopr user
+mkdir -p /var/run/coopr
+chown -R coopr:coopr /var/run/coopr
 
-# drop permissions to loom user and run service script
+# drop permissions to coopr user and run service script
 
 if [[ $UID -eq 0 ]]; then
-    su loom -c "cd /opt/loom/ngui/bin; exec ./ngui.sh $*"
+    su coopr -c "cd /opt/coopr/ngui/bin; exec ./ngui.sh $*"
 else
-    cd /opt/loom/ngui/bin; exec ./ngui.sh $*
+    cd /opt/coopr/ngui/bin; exec ./ngui.sh $*
 fi
 
