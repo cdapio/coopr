@@ -13,6 +13,9 @@ export COOPR_JAVA_OPTS="-XX:+UseConcMarkSweepGC -Dderby.stream.error.field=Derby
 # UI environment
 export ENVIRONMENT=local
 export COOPR_NODE=${COOPR_NODE:-node}
+export COOPR_NPM=${COOPR_NPM:-npm}
+export COOPR_USE_NGUI=${COOPR_USE_NGUI:-false}
+export COOPR_DISABLE_UI=${COOPR_DISABLE_UI:-false}
 
 # Provisioner environment
 export COOPR_RUBY=${COOPR_RUBY:-ruby}
@@ -181,8 +184,7 @@ function stage_default_data () {
     cd ${COOPR_PROVISIONER_PLUGIN_DIR}
     echo "Loading initial data..."
     for script in $(ls -1 */*/load-bundled-data.sh) ; do
-      cd ${COOPR_PROVISIONER_PLUGIN_DIR}
-      . ${script}
+      ${COOPR_PROVISIONER_PLUGIN_DIR}/${script}
     done
 }
 
@@ -260,9 +262,23 @@ function provisioner () {
     fi
     if [ "x${COOPR_USE_DUMMY_PROVISIONER}" == "xtrue" ]
     then
-        $COOPR_HOME/server/bin/dummy-provisioner.sh $1
+        $COOPR_HOME/server/bin/dummy-provisioner.sh $@
     else
         $COOPR_HOME/provisioner/bin/provisioner.sh $1
+    fi
+}
+
+function ui () {
+    if [ "x${COOPR_DISABLE_UI}" == "xtrue" ]
+    then
+        echo "UI disabled... skipping..."
+        return 0
+    fi
+    if [ "x${COOPR_USE_NGUI}" == "xtrue" ]
+    then
+        $COOPR_HOME/ngui/bin/ngui.sh $1
+    else
+        $COOPR_HOME/ui/bin/ui.sh $1
     fi
 }
 
@@ -274,7 +290,7 @@ function greeting () {
 case "$1" in
   start)
     $COOPR_HOME/server/bin/server.sh start && \
-    $COOPR_HOME/ui/bin/ui.sh start && \
+    ui start && \
     provisioner start && \
     load_defaults && \
     greeting
@@ -283,21 +299,21 @@ case "$1" in
   stop)
     provisioner stop
     $COOPR_HOME/server/bin/server.sh stop
-    $COOPR_HOME/ui/bin/ui.sh stop
+    ui stop
   ;;
 
   restart)
     provisioner stop
-    $COOPR_HOME/ui/bin/ui.sh stop
+    ui stop
     $COOPR_HOME/server/bin/server.sh stop
     $COOPR_HOME/server/bin/server.sh start
-    $COOPR_HOME/ui/bin/ui.sh start
+    ui start
     provisioner start
   ;;
 
   status)
     $COOPR_HOME/server/bin/server.sh status
-    $COOPR_HOME/server/bin/ui.sh status
+    ui status
     provisioner status
   ;;
 
