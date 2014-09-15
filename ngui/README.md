@@ -3,6 +3,8 @@ Coopr Angular UI
 
 ### for development:
 
+Assuming you have `bower` installed globally...
+
 `npm install && bower install`
 
 `LOOM_USE_DUMMY_PROVISIONER=true ../standalone/target/.../bin/loom.sh start`
@@ -23,6 +25,8 @@ and then, each in their own tab:
 
 ### for testing:
 
+`npm run build` ( == `npm install && bower install && gulp build`)
+
 `npm run protractor` (end-to-end tests)
 
 `npm run test-single-run` (unit tests)
@@ -33,14 +37,12 @@ protractor spins up a server on port `9090`
 
 first make a clean build into `./dist` folder:
 
-`npm install && bower install`
+`npm run build` ( == `npm install && bower install && gulp build`)
 
-`gulp clean`
-
-`gulp build minify`
+`gulp minify`
 
 then to run the server, possibly on a different host:
 
-`npm install --production`
+`npm install --production` ( will skip devDependencies which are not needed for prod)
 
 `COOPR_UI_PORT=8100 npm start` (http-server + cors-anywhere)

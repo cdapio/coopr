@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node ./server.js",
 
-    "pretravis": "npm install && ./node_modules/bower/bin/bower install && node ./node_modules/gulp/bin/gulp.js build",
+    "build": "npm install && ./node_modules/bower/bin/bower install && node ./node_modules/gulp/bin/gulp.js build",
+    "pretravis": "npm run build",
     "travis": "node ./node_modules/gulp/bin/gulp.js jshint && npm run test-single-run",
 
     "test": "node ./node_modules/karma/bin/karma start test/karma.conf.js",    
