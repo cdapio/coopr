@@ -13,6 +13,8 @@ export LOOM_JAVA_OPTS="-XX:+UseConcMarkSweepGC -Dderby.stream.error.field=DerbyU
 # UI environment
 export ENVIRONMENT=local
 export LOOM_NODE=${LOOM_NODE:-node}
+export LOOM_NPM=${LOOM_NPM:-npm}
+export LOOM_USE_NGUI=${LOOM_USE_NGUI:-false}
 
 # Provisioner environment
 export LOOM_RUBY=${LOOM_RUBY:-ruby}
@@ -266,6 +268,15 @@ function provisioner () {
     fi
 }
 
+function ui () {
+    if [ "x${LOOM_USE_NGUI}" == "xtrue" ]
+    then
+        $LOOM_HOME/ngui/bin/ngui.sh $1
+    else
+        $LOOM_HOME/ui/bin/ui.sh $1
+    fi
+}
+
 function greeting () {
     echo
     echo "Go to http://localhost:8100. Have fun creating clusters!"
@@ -274,7 +285,7 @@ function greeting () {
 case "$1" in
   start)
     $LOOM_HOME/server/bin/server.sh start && \
-    $LOOM_HOME/ui/bin/ui.sh start && \
+    ui start && \
     provisioner start && \
     load_defaults && \
     greeting
@@ -283,21 +294,21 @@ case "$1" in
   stop)
     provisioner stop
     $LOOM_HOME/server/bin/server.sh stop
-    $LOOM_HOME/ui/bin/ui.sh stop
+    ui stop
   ;;
 
   restart)
     provisioner stop
-    $LOOM_HOME/ui/bin/ui.sh stop
+    ui stop
     $LOOM_HOME/server/bin/server.sh stop
     $LOOM_HOME/server/bin/server.sh start
-    $LOOM_HOME/ui/bin/ui.sh start
+    ui start
     provisioner start
   ;;
 
   status)
     $LOOM_HOME/server/bin/server.sh status
-    $LOOM_HOME/server/bin/ui.sh status
+    ui status
     provisioner status
   ;;
 
