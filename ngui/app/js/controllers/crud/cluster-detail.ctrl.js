@@ -88,11 +88,20 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
     });
 
     $scope.doLeaseExtend = function () {      
-      myApi.Cluster.save({id: $scope.model.id}, {expireTime: $scope.leaseExtendDate.valueOf() }, function () {
-        $alert({title:'Lease extended until:', content: moment($scope.leaseExtendDate).format('LLL'), type:'success', duration:3});
-        $scope.leaseExtendMs = 0;
-        update();
-      });
+      myApi.Cluster.save(
+        { id: $scope.model.id }, 
+        { expireTime: $scope.leaseExtendDate.valueOf() }, 
+        function () {
+          $alert({
+            title: 'Lease extended until:', 
+            content: moment($scope.leaseExtendDate).format('LLL'), 
+            type: 'success', 
+            duration: 3
+          });
+          $scope.leaseExtendMs = 0;
+          update();
+        }
+      );
     };
 
 
@@ -102,7 +111,11 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
 
 
     $scope.doSubmitServices = function (arrSvcs) {
-      myApi.ClusterService.save( {clusterId: $scope.model.id}, { services: arrSvcs }, update);
+      myApi.ClusterService.save( 
+        { clusterId: $scope.model.id }, 
+        { services: arrSvcs }, 
+        update
+      );
     };
 
 
