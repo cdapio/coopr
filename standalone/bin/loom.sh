@@ -15,6 +15,7 @@ export ENVIRONMENT=local
 export LOOM_NODE=${LOOM_NODE:-node}
 export LOOM_NPM=${LOOM_NPM:-npm}
 export LOOM_USE_NGUI=${LOOM_USE_NGUI:-false}
+export LOOM_DISABLE_UI=${LOOM_DISABLE_UI:-false}
 
 # Provisioner environment
 export LOOM_RUBY=${LOOM_RUBY:-ruby}
@@ -269,6 +270,11 @@ function provisioner () {
 }
 
 function ui () {
+    if [ "x${LOOM_DISABLE_UI}" == "xtrue" ]
+    then
+        echo "UI disabled... skipping..."
+        return 0
+    fi
     if [ "x${LOOM_USE_NGUI}" == "xtrue" ]
     then
         $LOOM_HOME/ngui/bin/ngui.sh $1
