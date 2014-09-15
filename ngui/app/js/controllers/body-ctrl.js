@@ -1,10 +1,11 @@
+/**
+ * Controller for body. [TODO]
+ */
 var module = angular.module(PKG.name+'.controllers');
-
 
 module.controller('BodyCtrl', function ($scope, myTheme, MYTHEME_EVENT) {
 
   var activeThemeClass = myTheme.getClassName();
-
 
   $scope.$on(MYTHEME_EVENT.changed, function (event, newClassName) {
     if(!event.defaultPrevented) {
@@ -31,8 +32,6 @@ module.controller('BodyCtrl', function ($scope, myTheme, MYTHEME_EVENT) {
 
     $scope.bodyClass = classes.join(' ');
   });
-
-
 
   console.timeEnd(PKG.name);
 });

@@ -1,28 +1,10 @@
-var module = angular.module(PKG.name+'.services');
-
-/*
-  inspired by https://medium.com/opinionated-angularjs/
-    techniques-for-authentication-in-angularjs-applications-7bbf0346acec
+/**
+ * Auth services for app.
+ * Inspired by https://medium.com/opinionated-angularjs/
+ * techniques-for-authentication-in-angularjs-applications-7bbf0346acec
  */
 
-module.constant('MYAUTH_EVENT', {
-  loginSuccess: 'myauth-login-success',
-  loginFailed: 'myauth-login-failed',
-  logoutSuccess: 'myauth-logout-success',
-  sessionTimeout: 'myauth-session-timeout',
-  notAuthenticated: 'myauth-not-authenticated',
-  notAuthorized: 'myauth-not-authorized'
-});
-
-
-module.constant('MYAUTH_ROLE', {
-  all: '*',
-  superadmin: 'superadmin',
-  admin: 'admin'
-});
-
-
-
+var module = angular.module(PKG.name+'.services');
 
 module.run(function ($rootScope, myAuth, MYAUTH_EVENT, MYAUTH_ROLE) {
   $rootScope.currentUser = myAuth.currentUser;
@@ -44,20 +26,15 @@ module.run(function ($rootScope, myAuth, MYAUTH_EVENT, MYAUTH_ROLE) {
 });
 
 
-
-
-
-
-
 module.service('myAuth', function myAuthService (MYAUTH_EVENT, MyAuthUser, myAuthPromise, $rootScope, $sessionStorage, $localStorage) {
 
   /**
-   * currentUser is initially revived with data in storage (or null)
+   * CurrentUser is initially revived with data in storage (or null).
    */
   this.currentUser = MyAuthUser.revive($sessionStorage.currentUser);
 
   /**
-   * private method to sync the user everywhere
+   * Private method to sync the user everywhere.
    */
   var persist = angular.bind(this, function (u) {
     this.currentUser = u;
@@ -66,7 +43,7 @@ module.service('myAuth', function myAuthService (MYAUTH_EVENT, MyAuthUser, myAut
   });
 
   /**
-   * remembered
+   * Remembers the current user.
    * @return {object} credentials
    */
   this.remembered = function () {
@@ -77,7 +54,6 @@ module.service('myAuth', function myAuthService (MYAUTH_EVENT, MyAuthUser, myAut
   };
 
   /**
-   * login
    * @param  {object} credentials
    * @return {promise} resolved on sucessful login
    */
@@ -95,16 +71,13 @@ module.service('myAuth', function myAuthService (MYAUTH_EVENT, MyAuthUser, myAut
     );
   };
 
-  /**
-   * logout
-   */
   this.logout = function () {
     persist(null);
     $rootScope.$broadcast(MYAUTH_EVENT.logoutSuccess);
   };
 
   /**
-   * is there someone here?
+   * Is the user authenticated.
    * @return {Boolean}
    */
   this.isAuthenticated = function () {
@@ -112,9 +85,6 @@ module.service('myAuth', function myAuthService (MYAUTH_EVENT, MyAuthUser, myAut
   };
 
 });
-
-
-
 
 
 module.factory('myAuthPromise', function myAuthPromiseFactory (MYAUTH_ROLE, $timeout, $q) {
@@ -142,14 +112,10 @@ module.factory('myAuthPromise', function myAuthPromiseFactory (MYAUTH_ROLE, $tim
 });
 
 
-
-
-
-
 module.factory('MyAuthUser', function MyAuthUserFactory (MYAUTH_ROLE) {
 
   /**
-   * Constructor for currentUser data
+   * Constructor for currentUser data.
    * @param {object} user data
    */
   function User(data) {
@@ -168,7 +134,7 @@ module.factory('MyAuthUser', function MyAuthUserFactory (MYAUTH_ROLE) {
   }
 
   /**
-   * attempts to make a User from data
+   * Attempts to make a User from data.
    * @param  {Object} stored data
    * @return {User|null}
    */
@@ -177,7 +143,7 @@ module.factory('MyAuthUser', function MyAuthUserFactory (MYAUTH_ROLE) {
   };
 
   /**
-   * do i haz one of given roles? 
+   * Do i haz one of given roles?
    * @param  {String|Array} authorizedRoles
    * @return {Boolean}
    */

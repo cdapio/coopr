@@ -1,14 +1,18 @@
+/**
+ * [TODO] Add some description.
+ */
+
 var module = angular.module(PKG.name+'.directives');
 
 module.directive('myNavbar', function myNavbarDirective ($dropdown, myAuth, myTheme) {
   return {
     restrict: 'A',
-    templateUrl: 'navbar/navbar.tpl',
+    templateUrl: 'navbar/navbar.html',
 
     link: function (scope, element, attrs) {
 
       $dropdown(angular.element(element[0].querySelector('a.dropdown-toggle')), {
-        template: 'navbar/dropdown.tpl',
+        template: 'navbar/dropdown.html',
         animation: 'am-flip-x',
         placement: 'bottom-right',
         scope: scope

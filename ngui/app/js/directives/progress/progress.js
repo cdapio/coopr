@@ -1,10 +1,14 @@
+/**
+ * [TODO] Add some description.
+ */
+
 var module = angular.module(PKG.name+'.directives');
 
 module.directive('myProgress', function myProgressDirective () {
   return {
     restrict: 'E',
     templateUrl: function(element, attrs) {
-      return 'progress/'+ (attrs.type||'bar') +'.tpl';
+      return 'progress/'+ (attrs.type||'bar') +'.html';
     },
     replace: true,
     scope: {
@@ -37,7 +41,6 @@ module.directive('myProgress', function myProgressDirective () {
             }
           });
         }
-
 
         scope.cls = cls;
       });

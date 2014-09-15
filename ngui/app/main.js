@@ -1,11 +1,18 @@
+/**
+ * Main configuration file for Angular js app.
+ */
+
 console.time(PKG.name);
 
 angular
   .module(PKG.name, [
-
+    
+    angular.module(PKG.name+'.constants', []).name,
+    
     angular.module(PKG.name+'.services', [
       'ngResource',
-      'ngStorage'
+      'ngStorage',
+      PKG.name+'.constants'
     ]).name,
 
     angular.module(PKG.name+'.filters', [
@@ -35,7 +42,8 @@ angular
     'angularMoment',
     'ngAnimate',
     'ngSanitize',
-    'ui.router'
+    'ui.router',
+    'ck.ui.jsoneditor'
   ])
 
   .run(function ($rootScope, $state, $stateParams) {
@@ -49,7 +57,11 @@ angular
 
 
 
-
+  /**
+   * [TODO] explain what this is doing
+   * @param  {[type]} $alertProvider [description]
+   * @return {[type]}                [description]
+   */
   .config(function ($httpProvider) {
 
     $httpProvider.interceptors.push(function () {
@@ -60,7 +72,7 @@ angular
         }
       };
     });
-
+    
     var delay = window.location.search.match(/delay=(\d+)/);
     if(delay) {
       delay = parseInt(delay[1], 10);
@@ -79,7 +91,11 @@ angular
     }
   })
 
-
+  /**
+   * [TODO] explain what this is doing
+   * @param  {[type]} $alertProvider [description]
+   * @return {[type]}                [description]
+   */
   .config(function ($alertProvider) {
     angular.extend($alertProvider.defaults, {
       animation: 'am-fade-and-scale',
@@ -87,16 +103,31 @@ angular
     });
   })
 
+  /**
+   * [TODO] explain what this is doing
+   * @param  {[type]} $alertProvider [description]
+   * @return {[type]}                [description]
+   */
   .config(function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|tel|file|blob):/
     );
   })
 
+  /**
+   * [TODO] explain what this is doing
+   * @param  {[type]} $alertProvider [description]
+   * @return {[type]}                [description]
+   */
   .config(function (cfpLoadingBarProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
   })
 
+  /**
+   * [TODO] explain what this is doing
+   * @param  {[type]} $alertProvider [description]
+   * @return {[type]}                [description]
+   */
   .run(function ($rootScope, $alert, MYAPI_EVENT) {
     $rootScope.$on(MYAPI_EVENT.error, function (event, rejection) {
       $alert({

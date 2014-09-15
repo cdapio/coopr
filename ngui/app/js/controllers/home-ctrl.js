@@ -1,17 +1,18 @@
+/**
+ * Controller for home page. [TODO].
+ */
 var module = angular.module(PKG.name+'.controllers');
 
-
-module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
+module.controller('HomeCtrl', 
+  function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
 
   var filterFilter = $filter('filter');
-
 
   if(myAuth.isAuthenticated()) {
     getData();
   }
 
   $scope.doRefresh = getData;
-
 
   $scope.doImport = function() {
     myFileReader.get()
@@ -32,7 +33,6 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
         });
       });
   };
-
 
 
   $scope.doExport = function () {
@@ -56,8 +56,6 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
   };
 
 
-
-
   function getData () {
     myApi.Cluster.query(function (list) {
 
@@ -79,7 +77,6 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
       return memo + cluster.numNodes;
     }, 0);
   }
-
 
 });
 

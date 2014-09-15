@@ -1,5 +1,12 @@
+/**
+ * Cluster detail controller. [TODO]
+ */
+
 angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl', 
   function ($scope, CrudFormBase, $state, myApi, $timeout) {
+    /**
+     * TODO: why do this?
+     */
     CrudFormBase.apply($scope);
 
     if($state.params.id) {
@@ -10,20 +17,10 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
       failure();
     }
 
-    function failure () {
-      $state.go('404');
-    }
-
-    function update () {
-      $scope.model.$get();
-    }
-
     var timeoutPromise;
 
     $scope.$watchCollection('model', function (data) {
       if(!data.$resolved) { return; }
-
-      console.log(data);
 
       $scope.availableServices = data.clusterTemplate.compatibility.services.filter(function(name) {
         return data.services.indexOf(name)===-1; // filter out services that are already installed
@@ -61,6 +58,14 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
     $scope.doSubmitServices = function (arrSvcs) {
       myApi.ClusterService.save( {clusterId: $scope.model.id}, { services: arrSvcs }, update);
     };
+
+    function failure () {
+      $state.go('404');
+    }
+
+    function update () {
+      $scope.model.$get();
+    }
 
   }
 );

@@ -1,9 +1,12 @@
+/**
+ * Controller for login page.
+ */
 var module = angular.module(PKG.name+'.controllers');
 
-module.controller('LoginCtrl', function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT, myFocusManager) {
+module.controller('LoginCtrl', 
+  function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT, myFocusManager) {
 
   $scope.credentials = myAuth.remembered();
-
   $scope.submitting = false;
 
   $scope.doLogin = function (c) {

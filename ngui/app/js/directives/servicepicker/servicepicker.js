@@ -1,9 +1,13 @@
+/**
+ * [TODO] Add some description.
+ */
+
 var module = angular.module(PKG.name+'.directives');
 
 module.directive('myServicePicker', function myServicePickerDirective () {
   return {
     restrict: 'E',
-    templateUrl: 'servicepicker/servicepicker.tpl',
+    templateUrl: 'servicepicker/servicepicker.html',
 
     scope: {
       model: '=', // an array of names

@@ -1,3 +1,7 @@
+/**
+ * [TODO] Add some description.
+ */
+
 var module = angular.module(PKG.name+'.directives');
 
 module.directive('myConfirmable', function myConfirmableDirective ($window, $modal) {

@@ -1,7 +1,10 @@
+/**
+ * CRUD controller. [TODO]
+ */
 var module = angular.module(PKG.name+'.controllers');
 
 /**
- * a constructor implementing a generic list controller
+ * A constructor implementing a generic list controller.
  */
 module.factory('CrudListBase', function CrudListBaseFactory() {
   return function CrudListBase () {
@@ -29,19 +32,17 @@ module.factory('CrudListBase', function CrudListBaseFactory() {
 });
 
 
-
 /**
- * generic list controller
+ * Generic list controller.
  */
 module.controller('CrudListCtrl', function ($scope, CrudListBase) {
   CrudListBase.apply($scope);
 });
 
 
-
-
 /**
- * a constructor implementing $scope by the controllers that follow
+ * A constructor implementing $scope by the controllers that follow. 
+ * [TODO: Should be removed and put in a separate file]
  */
 module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
   return function CrudFormBase () {
@@ -81,7 +82,7 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
 
 
 /**
- * a controller to edit an existing model
+ * A controller to edit an existing model. [TODO: Make separate file]
  */
 module.controller('CrudEditCtrl', function ($scope, $state, myApi, CrudFormBase) {
   CrudFormBase.apply($scope);
@@ -100,7 +101,7 @@ module.controller('CrudEditCtrl', function ($scope, $state, myApi, CrudFormBase)
 
 
 /**
- * a controller to create a new model
+ * A controller to create an existing model. [TODO: Make separate file].
  */
 module.controller('CrudCreateCtrl', function ($scope, $state, myApi, CrudFormBase) {
   CrudFormBase.apply($scope);
