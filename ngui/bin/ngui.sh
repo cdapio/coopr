@@ -15,10 +15,10 @@
 # limitations under the License.
 #
 
-LOOM_SERVER_URI=${LOOM_SERVER_URI:-http://localhost:55054}
-LOOM_LOG_DIR=${LOOM_LOG_DIR:-/var/log/loom}
+COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
+COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
 COOPR_UI_PORT=${COOPR_UI_PORT:-8100}
-LOOM_HOME=${LOOM_HOME:-/opt/loom} ; export LOOM_HOME
+COOPR_HOME=${COOPR_HOME:-/opt/coopr} ; export COOPR_HOME
 
 die ( ) {
   echo
@@ -28,13 +28,13 @@ die ( ) {
 }
 
 # Specifies UI Path
-UI_PATH=${UI_PATH:-${LOOM_HOME}/ngui}
+UI_PATH=${UI_PATH:-${COOPR_HOME}/ngui}
 ENVIRONMENT=${ENVIRONMENT:-production}
 
-LOOM_NODE=${LOOM_NODE:-"${LOOM_HOME}/ui/embedded/bin/node"}
-LOOM_NPM=${LOOM_NPM:-"${LOOM_HOME}/ui/embedded/bin/npm"}
-APP_NAME="loom-ngui"
-PID_DIR=${PID_DIR:-/var/run/loom}
+COOPR_NODE=${COOPR_NODE:-"${COOPR_HOME}/ui/embedded/bin/node"}
+COOPR_NPM=${COOPR_NPM:-"${COOPR_HOME}/ui/embedded/bin/npm"}
+APP_NAME="coopr-ngui"
+PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
 check_before_start() {
@@ -53,16 +53,16 @@ start ( ) {
   cd ${UI_PATH}
   check_before_start
 
-  echo "Starting Loom NGUI ..."
+  echo "Starting Coopr NGUI ..."
 
   export COOPR_UI_PORT
-  nohup nice -1 ${LOOM_NPM} start \
-    >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
+  nohup nice -1 ${COOPR_NPM} start \
+    >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
   echo $! > "${pid}"
 }
 
 stop ( ) {
-  echo -n "Stopping Loom NGUI ..."
+  echo -n "Stopping Coopr NGUI ..."
   if [ -f "${pid}" ] ; then
     pidToKill=`cat $pid`
     # kill -0 == see if the PID exists
