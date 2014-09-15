@@ -47,6 +47,7 @@ public class MockProvisionerWorkerService extends AbstractScheduledService {
   private final String serverUrl;
   private final long taskMs;
   private final long msBetweenTasks;
+  private final int failureRate;
   private final CloseableHttpClient httpClient;
   private int counter;
 
@@ -60,13 +61,15 @@ public class MockProvisionerWorkerService extends AbstractScheduledService {
    * @param capacity Maximum number of workers that can be running at any given time
    * @param taskMs Time that workers should wait before finishing a task
    * @param msBetweenTasks Time workers should wait between finishing a task and taking another task
+   * @param failureRate Percentage of the time that a worker should decide to fail the task it was given. 0 to 100.
    */
   public MockProvisionerWorkerService(String provisionerId, String serverUrl,
-                                      int capacity, long taskMs, long msBetweenTasks) {
+                                      int capacity, long taskMs, long msBetweenTasks, int failureRate) {
     this.provisionerId = provisionerId;
     this.serverUrl = serverUrl;
     this.taskMs = taskMs;
     this.msBetweenTasks = msBetweenTasks;
+    this.failureRate = failureRate;
     this.workerExecutorService = Executors.newScheduledThreadPool(
       capacity,
       Threads.createDaemonThreadFactory("mock-worker-%d"));
@@ -129,7 +132,7 @@ public class MockProvisionerWorkerService extends AbstractScheduledService {
     for (int i = 0; i < numToAdd; i++) {
       MockWorker worker =
         new MockWorker(provisionerId, String.valueOf(counter), tenantId, serverUrl,
-                       workerExecutorService, taskMs, msBetweenTasks, httpClient);
+                       workerExecutorService, taskMs, msBetweenTasks, failureRate, httpClient);
       worker.startAndWait();
       tenantWorkers.put(tenantId, worker);
       counter++;
