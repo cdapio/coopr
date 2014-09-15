@@ -1,5 +1,5 @@
 angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl', 
-  function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, myApi, $timeout, moment) {
+  function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, myApi, $timeout, moment) {
     CrudFormBase.apply($scope);
 
 
@@ -29,6 +29,8 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
 
     $scope.$watchCollection('model', function (data) {
       if(!data.$resolved) { return; }
+
+      console.log(data);
 
       $scope.availableServices = data.clusterTemplate.compatibility.services
         .filter(function(name) {
@@ -87,6 +89,7 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
 
     $scope.doLeaseExtend = function () {      
       myApi.Cluster.save({id: $scope.model.id}, {expireTime: $scope.leaseExtendDate.valueOf() }, function () {
+        $alert({title:'Lease extended until:', content: moment($scope.leaseExtendDate).format('LLL'), type:'success', duration:3});
         $scope.leaseExtendMs = 0;
         update();
       });

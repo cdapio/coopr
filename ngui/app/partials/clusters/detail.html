@@ -1,4 +1,4 @@
-<ul class="list-unstyled coopr-list-striped">
+<ul class="list-unstyled coopr-list-striped" ng-show="model">
 
 
   <li><div class="row">
@@ -19,9 +19,21 @@
         </a>
       </div>
 
-      <strong>
+      <strong class="lead">
         {{model.name}}
       </strong>
+      <small class="text-muted">
+        created
+        <span class="text-info"
+          am-time-ago="model.createTime"
+          bs-tooltip="model.createTime | amDateFormat:'LLL'"
+        ></span>
+        by 
+        <span class="text-info"
+          bs-tooltip="model.account.userId + '/' + model.account.tenantId"
+          ng-bind="model.account.userId"
+        ></span>
+      </small>
     </div>
   </div></li>
 
@@ -31,16 +43,6 @@
     </div>
     <div class="col-xs-9">
       <my-status-label data-value="model.status"></my-status-label>
-    </div>
-  </div></li>
-
-  <li><div class="row">
-    <div class="col-xs-3">
-      <label>Creation time</label>
-    </div>
-    <div class="col-xs-9">
-      {{model.createTime | date:'short'}}
-      <small am-time-ago="model.createTime"></small>
     </div>
   </div></li>
 
