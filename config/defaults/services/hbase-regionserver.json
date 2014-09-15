@@ -4,7 +4,7 @@
   "dependencies": {
     "conflicts": [],
     "install": {
-      "requires": [ "base" ],
+      "requires": [ "base", "zookeeper-server" ],
       "uses": [ "kerberos-client" ]
     },
     "provides": [],
