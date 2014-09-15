@@ -9,6 +9,7 @@ before_install:
   - "cd ngui && npm run build"
 
 script:
-  - "cd ngui && npm run jshint"
-  - "cd ngui && npm run test-single-run"
-  - "cd ngui && npm run protractor"
+  - "cd ngui"
+  - "npm run jshint"
+  - "npm run test-single-run"
+  - "npm run protractor"
