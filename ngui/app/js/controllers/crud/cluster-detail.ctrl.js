@@ -30,8 +30,6 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
     $scope.$watchCollection('model', function (data) {
       if(!data.$resolved) { return; }
 
-      console.log(data);
-
       $scope.availableServices = data.clusterTemplate.compatibility.services
         .filter(function(name) {
           return data.services.indexOf(name)===-1; // filter out services that are already installed
