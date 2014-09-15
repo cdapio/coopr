@@ -29,8 +29,10 @@ branches:
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
+  - "cd ngui && npm run build"
 
 script:
+  - "cd ngui && npm run jshint"
   - "cd ngui && npm run test-single-run"
   - "cd ngui && npm run protractor"
   # - "mvn test"

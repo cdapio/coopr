@@ -8,10 +8,10 @@
   },
   "scripts": {
     "start": "node ./server.js",
-    "pretest": "npm install && ./node_modules/bower/bin/bower install && node ./node_modules/gulp/bin/gulp.js build",
+    "build": "npm install && ./node_modules/bower/bin/bower install && node ./node_modules/gulp/bin/gulp.js build",
+    "jshint": "node ./node_modules/gulp/bin/gulp.js jshint",
     "test": "./node_modules/karma/bin/karma start test/karma.conf.js",
-    "test-single-run": "npm run pretest && ./node_modules/karma/bin/karma start test/karma.conf.js --no-auto-watch --single-run",
-    "preupdate-webdriver": "npm run pretest",
+    "test-single-run": "./node_modules/karma/bin/karma start test/karma.conf.js --no-auto-watch --single-run",
     "update-webdriver": "webdriver-manager update",
     "preprotractor": "http-server -p 9090 ./dist & npm run update-webdriver",
     "protractor": "protractor test/protractor-conf.js || true",
