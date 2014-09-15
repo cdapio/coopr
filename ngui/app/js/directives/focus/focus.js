@@ -11,9 +11,14 @@ module.directive('myFocus', function myFocusDirective ($timeout, myFocusManager)
         // console.log('[myFocus] watching', newVal);
 
         var cleanup = myFocusManager.is.$watch(newVal, function (o) {
-          if(o && (o.focus || o.select)) {
+          if(o) {
             $timeout(function() {
-              element[0][o.focus?'focus':'select']();
+              if(o.focus) {
+                element[0].focus();
+              }
+              else if(o.select) {
+                element[0].select();
+              }
             });
           }
         });
