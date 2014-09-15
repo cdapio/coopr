@@ -33,3 +33,4 @@ before_install:
 
 script:
   - "cd ngui && npm run travis"
+  - "cd .. && mvn test"
