@@ -8,7 +8,7 @@ module.directive('myFocus', function myFocusDirective ($timeout, myFocusManager)
     link: function (scope, element, attrs) {
 
       attrs.$observe('myFocus', function (newVal) {
-        console.log('[myFocus] watching', newVal);
+        // console.log('[myFocus] watching', newVal);
 
         var cleanup = myFocusManager.is.$watch(newVal, function (o) {
           if(o && (o.focus || o.select)) {
@@ -18,7 +18,10 @@ module.directive('myFocus', function myFocusDirective ($timeout, myFocusManager)
           }
         });
 
-        scope.$on('$destroy', cleanup);
+        scope.$on('$destroy', function() {
+          // console.log('[myFocus] cleanup', newVal);
+          cleanup();
+        });
       });
 
     }

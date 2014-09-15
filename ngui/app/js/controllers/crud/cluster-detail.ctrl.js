@@ -1,5 +1,5 @@
 angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl', 
-  function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, myApi, $timeout) {
+  function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, myApi, $timeout, moment) {
     CrudFormBase.apply($scope);
 
 
@@ -7,7 +7,7 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
     if($state.params.id) {
       $scope.model = myApi.Cluster.get( {id:$state.params.id});
       $scope.model.$promise
-        .then(function () {
+        .then(function (model) {
           if($state.is('clusters.detail.node')) {
             doActionsModal($state.params.nodeId);
           }
@@ -19,9 +19,13 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
     }
 
 
-
-
     var timeoutPromise;
+
+
+    $scope.$on('$destroy', function () {
+      $timeout.cancel(timeoutPromise);
+    });
+
 
     $scope.$watchCollection('model', function (data) {
       if(!data.$resolved) { return; }
@@ -55,11 +59,32 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
 
         return memo;
       }, {});
+
+
+      // figure out the max value for lease extension
+      var ld = data.clusterTemplate.administration.leaseduration,
+          ever = moment(data.createTime).add(ld.max, 'ms'),
+          step = ld.step ? moment().add(ld.step, 'ms') : ever;
+
+      $scope.leaseMaxMs = moment.min(ever, step).valueOf() - Date.now();
+
+
     });
 
-    $scope.$on('$destroy', function () {
-      $timeout.cancel(timeoutPromise);
+
+    $scope.leaseExtendMs = 0;
+
+    $scope.$watch('leaseExtendMs', function (ms) {
+      ms = parseInt(ms, 10); // work around input[type=range] ng-model being a string
+      $scope.leaseExtendDate = moment($scope.model.expireTime).add(ms, 'ms').toDate();
+      $scope.leaseExtendHumanized = moment.duration(ms, 'ms').humanize();
     });
+
+    $scope.doLeaseExtend = function () {
+      $scope.leaseExtendMs = 0;
+      alert('it doesnt work yet');
+    }
+
 
 
     $scope.$on(MYSERVICEPICKER_EVENT.manage, update);

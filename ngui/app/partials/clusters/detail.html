@@ -49,9 +49,39 @@
       <label>Expiry time</label>
     </div>
     <div class="col-xs-9">
-      <div ng-show="model.expireTime">
-        {{model.expireTime | date:'short'}}
-        <small am-time-ago="model.expireTime"></small>
+      <div class="row" ng-show="model.expireTime">
+        <div class="col-xs-9">
+          <p>
+            <span ng-hide="leaseExtendMs">
+              {{model.expireTime | date:'short'}}
+              <small am-time-ago="model.expireTime"></small>
+            </span>
+
+            <span ng-show="leaseExtendMs">
+              <em class="pull-right text-muted">
+                + {{leaseExtendHumanized}}
+              </em>
+              {{leaseExtendDate | date:'short'}}
+              <small am-time-ago="leaseExtendDate"></small>
+            </span>
+            &nbsp;
+          </p>
+          <p>
+            <input type="range" 
+              min="0"
+              step="60000"
+              max="{{leaseMaxMs}}"
+              ng-model="leaseExtendMs" />
+          </p>
+        </div>
+        <div class="col-xs-3">
+          <p ng-show="leaseExtendMs" class="am-fade-and-slide-top">
+            <a class="btn btn-primary btn-block" href="" 
+                ng-click="doLeaseExtend()">
+              <span class="fa fa-clock-o"></span> extend lease
+            </a>
+          </p>
+        </div>
       </div>
       <div ng-hide="model.expireTime">
         <em>never</em>
@@ -59,9 +89,10 @@
     </div>
   </div></li>
 
+
   <li><div class="row">
     <div class="col-xs-3">
-      <label>Action</label>
+      <label>Last Action</label>
     </div>
     <div class="col-xs-9">
       <code>{{model.progress.action}}</code>
