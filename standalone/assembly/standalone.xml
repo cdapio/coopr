@@ -14,6 +14,10 @@
                 </excludes>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/../ngui</directory>
+            <outputDirectory>/ngui</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/../ui</directory>
             <outputDirectory>/ui</outputDirectory>
         </fileSet>
