@@ -19,7 +19,7 @@
 #
 # Arguments are: chef_server_url [run_list]
 
-SCRIPT_DIR="/var/cache/loom/scripts"
+SCRIPT_DIR="."
 CHEF_DIR="/etc/chef"
 
 CHEF_SERVER_URL=${1}
