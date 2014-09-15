@@ -1,5 +1,5 @@
 module.exports = function(config){
-  var it = {
+  var karma = {
 
     basePath : '../',
 
@@ -35,8 +35,8 @@ module.exports = function(config){
   };
 
   if(process.env.TRAVIS){
-    it.browsers = ['Chrome_travis_ci'];
+    karma.browsers = ['Chrome_travis_ci'];
   }
 
-  config.set(it);
+  config.set(karma);
 };
