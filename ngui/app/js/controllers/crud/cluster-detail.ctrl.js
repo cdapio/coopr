@@ -90,7 +90,7 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
         $scope.leaseExtendMs = 0;
         update();
       });
-    }
+    };
 
 
 
@@ -116,8 +116,6 @@ angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl',
       modalScope.node = $scope.model.nodes.filter( function(node) {
         return node.id === nodeId;
       })[0];
-
-      console.log(modalScope.node.actions);
 
       modalScope.$on('modal.hide', function () {
         $state.go('^');

@@ -109,8 +109,6 @@ module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocu
     myApi.Cluster.get( {id:id}).$promise
       .then(function (data) {
         // what we "get" doesnt look at all like what we will "put"
-        console.log('reconfiguring cluster', data);
-
         // but we still need a populated model for display purposes
         angular.extend($scope.model, {
           name: data.name,
