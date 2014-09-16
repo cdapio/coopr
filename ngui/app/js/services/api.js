@@ -1,10 +1,10 @@
 var module = angular.module(PKG.name+'.services');
 
 module.factory('MYAPI_PREFIX', function($location, MY_CONFIG){
-  return $location.protocol() + '://' 
-            + $location.host() + ':' + MY_CONFIG.COOPR_CORS_PORT
-            + MY_CONFIG.COOPR_SERVER_URI.replace(/^(https?:\/\/)/i, '/') 
-            + '/v2/';
+  return $location.protocol() + '://' +
+            $location.host() + ':' + MY_CONFIG.COOPR_CORS_PORT +
+            MY_CONFIG.COOPR_SERVER_URI.replace(/^(https?:\/\/)/i, '/') + 
+            '/v2/';
 });
 
 
