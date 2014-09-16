@@ -3,9 +3,6 @@ console.time(PKG.name);
 angular
   .module(PKG.name, [
 
-    angular.module(PKG.name+'.config', [
-    ]).name,
-
     angular.module(PKG.name+'.services', [
       PKG.name+'.config',
       'ngResource',
@@ -114,16 +111,25 @@ angular
   });
 
 /**
- * Fetch config, then bootstrap the app
+ * Config is already defined in test env,
+ * in all other cases we must fetch the config
  */
-angular.injector(['ng']).get('$http').get('/config.json').then(
-  function (response) {
-    angular.module(PKG.name+'.config').constant("MY_CONFIG", response.data);
+try {
+  angular.injector([PKG.name+'.config']) && start();
+}
+catch(e) {
+  angular.injector(['ng']).get('$http').get('/config.json')
+    .then(function (response) {
+      angular.module(PKG.name+'.config', [])
+        .constant("MY_CONFIG", response.data);
+    })
+    .then(start);
+}
 
-    angular.element(document).ready( function () {
-      angular.bootstrap(document, [PKG.name]);
-    });
-     
-  }
-);
+
+function start () {
+  angular.element(document).ready( function () {
+    angular.bootstrap(document, [PKG.name]);
+  });
+}
 

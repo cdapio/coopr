@@ -31,8 +31,6 @@ var color = {
 
 console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 
-var auth = require('basic-auth');
-
 /**
  * HTTP server
  */
@@ -41,17 +39,6 @@ require('http-server')
     root: __dirname + '/dist',
     before: [
       httpLogger,
-      function (req, res) {
-        var credentials = auth(req);
-        if (!credentials || credentials.name !== 'foo') {
-          res.writeHead(401, {
-            'WWW-Authenticate': 'Basic realm="foo"'
-          });
-          res.end()
-        } else {
-          res.emit('next');
-        }
-      },
       function (req, res) {
         if(req.url !== '/config.json') {
           // all other paths are passed to ecstatic

@@ -50,7 +50,7 @@ module.factory('myApi', function(
 
 });
 
-module.config(function ($httpProvider, MYAPI_EVENT, MY_CONFIG) {
+module.config(function ($httpProvider, MYAPI_EVENT) {
   $httpProvider.interceptors.push(function ($q, $timeout, $rootScope, $log, myAuth, myApiPrefix) {
     var isApi = function(url) {
       return url.indexOf(myApiPrefix) === 0;
