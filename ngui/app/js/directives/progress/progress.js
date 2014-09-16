@@ -20,7 +20,7 @@ module.directive('myProgress', function myProgressDirective () {
         scope.percent = Math.floor((newVal / max) * 100);
 
         var cls = {
-          'active progress-bar-striped': (newVal < max),
+          'active': (newVal < max),
           'progress-bar': true
         };
 

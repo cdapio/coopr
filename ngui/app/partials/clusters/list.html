@@ -34,8 +34,9 @@
       <td>
         <my-progress data-type="bar"
           data-add-cls="{{{
-            'pending': 'warning',
-            'running': 'warning',
+            'active': 'info',
+            'pending': 'success striped',
+            'incomplete': 'danger',
             'terminated': 'danger'
           }[item.status]}}"
           data-value="item.progress.stepscompleted" 

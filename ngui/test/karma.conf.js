@@ -5,6 +5,7 @@ module.exports = function(config){
 
     files : [
       'dist/bundle/lib.js',
+      'test/config.js',
       'dist/bundle/app.js',
       'dist/bundle/tpl.js',
       'bower_components/angular-mocks/angular-mocks.js',
