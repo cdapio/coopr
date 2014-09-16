@@ -3,11 +3,19 @@ Coopr Angular UI
 
 ### for development:
 
-`npm install && bower install`
+`cd standalone`
 
-`LOOM_USE_DUMMY_PROVISIONER=true ../standalone/target/.../bin/loom.sh start`
+`mvn clean package assembly:single`
 
-and then, each in their own tab:
+`open target` and unzip the _SNAPSHOT-standalone_ file
+
+`LOOM_USE_DUMMY_PROVISIONER=true LOOM_DISABLE_UI=true target/(...)/bin/loom.sh start -f 50`
+
+`cd ../ngui`
+
+`npm install && bower install` (assumes you have `bower` installed globally)
+
+then, each in their own tab:
 
 `gulp watch` (autobuild + livereload)
 
@@ -18,7 +26,7 @@ and then, each in their own tab:
 `open http://localhost:8080`
 
 * in dev mode, UI runs on port `8080` and connects to livereload on port `35729`
-* cors-anywhere always runs on port `8081`
+* cors-anywhere runs on port `8081`
 * loom server is expected to be running on port `55054`
 
 ### for testing:
@@ -33,6 +41,8 @@ protractor spins up a server on port `9090`
 
 first make a clean build into `./dist` folder:
 
+`cd ngui`
+
 `npm install && bower install`
 
 `gulp clean`
@@ -41,6 +51,13 @@ first make a clean build into `./dist` folder:
 
 then to run the server, possibly on a different host:
 
+`cd ngui`
+
 `npm install --production`
 
-`COOPR_UI_PORT=8100 npm start` (http-server + cors-anywhere)
+`export COOPR_UI_PORT=8100`
+
+`export COOPR_SERVER_URI=http://hostname:port`
+
+`npm start` or `node server.js`
+
