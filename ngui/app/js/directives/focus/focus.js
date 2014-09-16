@@ -7,15 +7,28 @@ module.directive('myFocus', function myFocusDirective ($timeout, myFocusManager)
 
     link: function (scope, element, attrs) {
 
-      var cleanup = myFocusManager.is.$watch(attrs.myFocus, function (o) {
-        if(o && (o.focus || o.select)) {
-          $timeout(function() {
-            element[0][o.focus?'focus':'select']();
-          });
-        }
+      attrs.$observe('myFocus', function (newVal) {
+        // console.log('[myFocus] watching', newVal);
+
+        var cleanup = myFocusManager.is.$watch(newVal, function (o) {
+          if(o) {
+            $timeout(function() {
+              if(o.focus) {
+                element[0].focus();
+              }
+              else if(o.select) {
+                element[0].select();
+              }
+            });
+          }
+        });
+
+        scope.$on('$destroy', function() {
+          // console.log('[myFocus] cleanup', newVal);
+          cleanup();
+        });
       });
 
-      scope.$on('$destroy', cleanup);
     }
   };
 });
