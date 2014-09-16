@@ -31,6 +31,10 @@ then, each in their own tab:
 
 ### for testing:
 
+`cd ngui`
+
+`npm run build` ( == `npm install && bower install && gulp build`)
+
 `npm run protractor` (end-to-end tests)
 
 `npm run test-single-run` (unit tests)
@@ -39,21 +43,19 @@ protractor spins up a server on port `9090`
 
 ### for production:
 
-first make a clean build into `./dist` folder:
+`cd ngui`
+
+`npm run build` ( == `npm install && bower install && gulp build`)
+
+`gulp minify`
+
+the above generates the `ngui/dist/` folder, which contains all static assets.
+
+now to run the server, possibly on a different host:
 
 `cd ngui`
 
-`npm install && bower install`
-
-`gulp clean`
-
-`gulp build minify`
-
-then to run the server, possibly on a different host:
-
-`cd ngui`
-
-`npm install --production`
+`npm install --production` (will skip devDependencies)
 
 `export COOPR_UI_PORT=8100`
 
