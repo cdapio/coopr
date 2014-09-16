@@ -115,7 +115,7 @@ angular
  * in all other cases we must fetch the config before bootstraping
  */
 try {
-  if(angular.injector([PKG.name+'.config'])) {
+  if(angular.injector([PKG.name+'.config'])) { // will throw if undefined
     start();
   }
 }
