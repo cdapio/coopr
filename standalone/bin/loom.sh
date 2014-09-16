@@ -173,8 +173,9 @@ function load_defaults () {
 
         # add some workers to the superadmin tenant
         request_superadmin_workers
+    else
+        return 0
     fi
-    return 0;
 }
 
 function stage_default_data () {
