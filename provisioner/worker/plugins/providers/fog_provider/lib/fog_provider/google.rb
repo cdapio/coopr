@@ -39,6 +39,9 @@ class FogProviderGoogle < Provider
     @providerid = @hostname.split('.').first
     fields = inputmap['fields']
     begin
+      # set the provider id in the response
+      @result['result']['providerid'] = @providerid
+
       # set instance variables from our fields
       fields.each do |k, v|
         instance_variable_set('@' + k, v)
@@ -67,9 +70,6 @@ class FogProviderGoogle < Provider
       # create the VM
       connection.servers.create(create_server_def)
 
-      # Process results
-      # return the unique providerid we used
-      @result['result']['providerid'] = @providerid
       # set ssh user
       sshuser =
         if @ssh_user.to_s != ''
