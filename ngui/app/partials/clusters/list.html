@@ -3,7 +3,7 @@
   <thead>
     <tr ng-class="{'sort-enabled': list.length>1}">
       <th>name</th>
-      <th>owner</th>
+      <th ng-show="currentUser.hasRole('admin')">owner</th>
       <th data-predicate="createTime" data-predicate-default="reverse">creation time</th>
       <th data-predicate="clusterTemplate.name">template</th>
       <th data-predicate="numNodes"># of nodes</th>
@@ -11,15 +11,15 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="item in list | filter:listFilterExp | orderBy:sortable.predicate:sortable.reverse">
+    <tr ng-repeat="item in list | filter:(filterIsOff?null:isActive) | orderBy:sortable.predicate:sortable.reverse">
 
       <td><a ui-sref="^.detail({id: item.id})">{{item.name}}</a></td>
 
-      <td>{{item.ownerId}}</td>
+      <td ng-show="currentUser.hasRole('admin')">{{item.ownerId}}</td>
 
-      <td>{{item.createTime | date:'short'}}</td>
+      <td><small am-time-ago="item.createTime"></small></td>
 
-      <td>{{item.clusterTemplate.name}}</td>
+      <td><small>{{item.clusterTemplate.name}}</small></td>
 
       <td>{{item.numNodes}}</td>
 
@@ -65,8 +65,12 @@
 </div>
 
 
-<div class="text-center am-fade-and-slide-top" ng-show="listFilterExp">
-  <button class="btn btn-default btn-sm" ng-click="listFilterExp=null">
-    show all inactive
+<div class="text-center am-fade-and-slide-top" ng-show="togglerVisible">
+  <hr />
+  <button type="button" class="btn btn-default btn-xs" 
+      ng-model="filterIsOff"
+      bs-checkbox>
+    <span class="fa fa-ellipsis-v fa-fw"></span>
+    show all clusters
   </button>
 </div>

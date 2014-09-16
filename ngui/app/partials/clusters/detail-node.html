@@ -1,0 +1,36 @@
+<table class="table table-striped" my-sortable>
+  <thead>
+    <tr ng-class="{'sort-enabled': node.actions.length>1}">
+      <th>action</th>
+      <th>service</th>
+      <th data-predicate="submitTime" data-predicate-default="reverse">time</th>
+      <th>duration</th>
+      <th>status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="item in node.actions | orderBy:sortable.predicate:sortable.reverse">
+
+      <td>{{item.action}}</td>
+      <td>{{item.service}}</td>
+      <td>{{item.submitTime | amDateFormat:'lll'}}</td>
+      <td>{{item.statusTime - item.submitTime | amDurationFormat}}</td>
+
+      <td ng-if="item.status!=='failed'">
+        <my-status-label data-value="item.status"></my-status-label>
+      </td>
+
+      <td ng-if="item.status==='failed'">
+        <span data-content="item.stdout" 
+              data-title="Log message" 
+              data-trigger="hover" 
+              data-container="body" 
+              bs-popover>
+          <my-status-label data-value="item.status"></my-status-label>
+        </span>
+      </td>
+
+    </tr>
+  </tbody>
+</table>
+
