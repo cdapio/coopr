@@ -317,6 +317,21 @@ class FogProviderGoogle < Provider
     args[:size_gb] = size_gb
     args[:zone_name] = zone_name
     args[:source_image] = source_image unless source_image.nil?
+
+    # check if a disks already exists (retry scenario)
+    disk = connection.disks.get(name)
+    unless disk.nil?
+      # disk of requested name exists already
+      existing_size_gb = disk.size_gb
+      existing_zone_name = disk.zone_name.split('/').last rescue nil
+      existing_source_image = disk.source_image.split('/').last rescue nil
+      if size_gb == existing_size_gb && zone_name == existing_zone_name && source_image == existing_source_image
+        log.debug "using pre-exising disk for #{name}, it must not be attached already"
+        return disk.name
+      else
+        fail "disk #{disk.name} already exists with different specifications"
+      end
+    end
     disk = connection.disks.create(args)
     disk.name
   end
