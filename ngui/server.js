@@ -5,7 +5,7 @@ var pkg = require('./package.json'),
     corsLabel = '\x1B[40m\x1B[35mcors-anywhere\x1B[39m\x1B[49m',
     httpLogger = mkLog(httpLabel);
 
-console.log('\n\x1B[7m'+pkg.name + '\x1B[27m v' + pkg.version + ' starting up...');
+console.log('\x1B[7m' + pkg.name + '\x1B[27m v' + pkg.version + ' starting up...');
 
 /**
  * HTTP server
@@ -26,7 +26,7 @@ require('http-server')
       });
       res.end('angular.module("' + pkg.name + '.config", [])'
         + '.constant("MY_CONFIG", ' + JSON.stringify({
-          COOPR_SERVER_URI: process.env.COOPR_SERVER_URI || 'http://localhost:55054',
+          COOPR_SERVER_URI: process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054',
           COOPR_CORS_PORT: corsPort,
           COOPR_UI_PORT: uiPort
         }) +');');
