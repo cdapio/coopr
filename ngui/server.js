@@ -1,6 +1,6 @@
 /**
  * Spins up two web servers
- *   - http-server sends the static assets in dist and handles the /config.js endpoint
+ *   - http-server sends the static assets in dist and handles the /config.json endpoint
  *   - cors-proxy adds the necessary headers for xdomain access to the REST API
  */
 
@@ -31,6 +31,8 @@ var color = {
 
 console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 
+var auth = require('basic-auth');
+
 /**
  * HTTP server
  */
@@ -40,16 +42,26 @@ require('http-server')
     before: [
       httpLogger,
       function (req, res) {
-        if(req.url !== '/config.js') {
+        var credentials = auth(req);
+        if (!credentials || credentials.name !== 'foo') {
+          res.writeHead(401, {
+            'WWW-Authenticate': 'Basic realm="foo"'
+          });
+          res.end()
+        } else {
+          res.emit('next');
+        }
+      },
+      function (req, res) {
+        if(req.url !== '/config.json') {
           // all other paths are passed to ecstatic
           return res.emit('next');
         }
         res.writeHead(200, { 
-          'Content-Type': 'application/javascript',
+          'Content-Type': 'application/json',
           'Cache-Control': 'no-store, must-revalidate'
         });
-        res.end('angular.module("' + pkg.name + '.config", [])'
-          + '.constant("MY_CONFIG", ' + configStr +');'); 
+        res.end(configStr); 
       }
     ]
   })

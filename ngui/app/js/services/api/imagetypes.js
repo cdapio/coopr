@@ -1,10 +1,10 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApi_imagetypes', function($resource, MYAPI_PREFIX){
+module.factory('myApi_imagetypes', function($resource, myApiPrefix){
 
   return {
 
-    ImageType: $resource(MYAPI_PREFIX + 'imagetypes/:name',
+    ImageType: $resource(myApiPrefix + 'imagetypes/:name',
       { name: '@name' },
       { 
         update: {

@@ -3,6 +3,9 @@ console.time(PKG.name);
 angular
   .module(PKG.name, [
 
+    angular.module(PKG.name+'.config', [
+    ]).name,
+
     angular.module(PKG.name+'.services', [
       PKG.name+'.config',
       'ngResource',
@@ -109,3 +112,18 @@ angular
       });
     });
   });
+
+/**
+ * Fetch config, then bootstrap the app
+ */
+angular.injector(['ng']).get('$http').get('/config.json').then(
+  function (response) {
+    angular.module(PKG.name+'.config').constant("MY_CONFIG", response.data);
+
+    angular.element(document).ready( function () {
+      angular.bootstrap(document, [PKG.name]);
+    });
+     
+  }
+);
+

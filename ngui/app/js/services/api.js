@@ -1,6 +1,6 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('MYAPI_PREFIX', function($location, MY_CONFIG){
+module.factory('myApiPrefix', function ($location, MY_CONFIG) {
 
   // to work with CORS proxy, we expect that the URI will include a port
   //  ... first we need to remove the protocol from the URI 
@@ -13,7 +13,7 @@ module.factory('MYAPI_PREFIX', function($location, MY_CONFIG){
 
        http :// host.foo.com : 8081 / otherhost.foo.com:55054/v2/
   */
-  return  $location.protocol() + '://' + $location.host() + 
+  return $location.protocol() + '://' + $location.host() + 
             ':' + MY_CONFIG.COOPR_CORS_PORT + '/' + restPath;
             
 });
@@ -50,10 +50,10 @@ module.factory('myApi', function(
 
 });
 
-module.config(function ($httpProvider) {
-  $httpProvider.interceptors.push(function ($q, $timeout, $rootScope, $log, myAuth, MYAPI_PREFIX, MYAPI_EVENT) {
+module.config(function ($httpProvider, MYAPI_EVENT, MY_CONFIG) {
+  $httpProvider.interceptors.push(function ($q, $timeout, $rootScope, $log, myAuth, myApiPrefix) {
     var isApi = function(url) {
-      return url.indexOf(MYAPI_PREFIX) === 0;
+      return url.indexOf(myApiPrefix) === 0;
     };
 
     return {
@@ -66,7 +66,7 @@ module.config(function ($httpProvider) {
             'X-Loom-UserID': u.username,
             'X-Loom-TenantID': u.tenant
           } : {});
-          $log.log('[myApi]', config.method, config.url.substr(MYAPI_PREFIX.length));
+          $log.log('[myApi]', config.method, config.url.substr(myApiPrefix.length));
         }
         return config;
       },
