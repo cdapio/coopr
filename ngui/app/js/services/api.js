@@ -1,6 +1,7 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('MYAPI_PREFIX', function($location){
+module.factory('MYAPI_PREFIX', function($location, MY_CONFIG){
+  console.log(MY_CONFIG);
   return $location.protocol() + '://' + $location.host() + 
                 ':8081/0.0.0.0:55054/v2/';
 });
