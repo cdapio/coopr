@@ -1,10 +1,21 @@
 var module = angular.module(PKG.name+'.services');
 
 module.factory('MYAPI_PREFIX', function($location, MY_CONFIG){
-  return $location.protocol() + '://' +
-            $location.host() + ':' + MY_CONFIG.COOPR_CORS_PORT +
-            MY_CONFIG.COOPR_SERVER_URI.replace(/^(https?:\/\/)/i, '/') + 
-            '/v2/';
+
+  // to work with CORS proxy, we expect that the URI will include a port
+  //  ... first we need to remove the protocol from the URI 
+  var restPath = MY_CONFIG.COOPR_SERVER_URI.replace(/^(https?:\/\/)?/i, '');
+  if(restPath.substr(-1)!=='/') {
+    restPath += '/'; // then we ensure it ends with a slash
+  }
+
+  /* end result should look something like:
+
+       http :// host.foo.com : 8081 / otherhost.foo.com:55054/v2/
+  */
+  return  $location.protocol() + '://' + $location.host() + 
+            ':' + MY_CONFIG.COOPR_CORS_PORT + '/' + restPath;
+            
 });
 
 

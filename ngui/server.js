@@ -12,7 +12,7 @@ var pkg = require('./package.json'),
     configStr = JSON.stringify({
       // the following will be available in angular via the "MY_CONFIG" injectable
 
-      COOPR_SERVER_URI: process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054',
+      COOPR_SERVER_URI: process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054/v2/',
       COOPR_CORS_PORT: COOPR_CORS_PORT,
       COOPR_UI_PORT: COOPR_UI_PORT
 
