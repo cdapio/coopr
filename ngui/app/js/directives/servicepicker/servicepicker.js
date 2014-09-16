@@ -1,6 +1,10 @@
 var module = angular.module(PKG.name+'.directives');
 
-module.directive('myServicePicker', function myServicePickerDirective () {
+module.constant('MYSERVICEPICKER_EVENT', {
+  manage: 'myservicepicker-manage'
+});
+
+module.directive('myServicePicker', function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
   return {
     restrict: 'E',
     templateUrl: 'servicepicker/servicepicker.tpl',
@@ -26,7 +30,7 @@ module.directive('myServicePicker', function myServicePickerDirective () {
 
       $scope.manageService = function (action, name) {
         myApi.ClusterService[action]( {clusterId: $scope.clusterId}, {name: name}, function () {
-          console.log('manageService', action, name, arguments); // FIXME - broadcast?
+          $scope.$parent.$emit(MYSERVICEPICKER_EVENT.manage, action, name);
         });
       };
 

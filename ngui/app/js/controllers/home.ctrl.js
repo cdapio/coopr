@@ -13,15 +13,18 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
   $scope.doRefresh = getData;
 
 
-  $scope.doImport = function() {
+  $scope.doImport = function () {
     myFileReader.get()
       .then(function (reader) {
-        $modal({
-          title: 'TODO',
-          content: reader.result, 
-          placement: 'center', 
-          show: true
+        return myApi.Import.save(angular.fromJson(reader.result));
+      })
+      .then(function (result) {
+        $alert({
+          title: 'Import complete!', 
+          type: 'success', 
+          duration: 3 
         });
+        getData();
       })
       ['catch'](function (err) {
         $alert({

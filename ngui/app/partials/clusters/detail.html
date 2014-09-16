@@ -1,4 +1,4 @@
-<ul class="list-unstyled coopr-list-striped">
+<ul class="list-unstyled coopr-list-striped" ng-show="model">
 
 
   <li><div class="row">
@@ -19,9 +19,21 @@
         </a>
       </div>
 
-      <strong>
+      <strong class="lead">
         {{model.name}}
       </strong>
+      <small class="text-muted">
+        created
+        <span class="text-info"
+          am-time-ago="model.createTime"
+          bs-tooltip="model.createTime | amDateFormat:'LLL'"
+        ></span>
+        by 
+        <span class="text-info"
+          bs-tooltip="model.account.userId + '/' + model.account.tenantId"
+          ng-bind="model.account.userId"
+        ></span>
+      </small>
     </div>
   </div></li>
 
@@ -30,17 +42,7 @@
       <label>Status</label>
     </div>
     <div class="col-xs-9">
-      <my-status-label data-value="model.status" />
-    </div>
-  </div></li>
-
-  <li><div class="row">
-    <div class="col-xs-3">
-      <label>Creation time</label>
-    </div>
-    <div class="col-xs-9">
-      {{model.createTime | date:'short'}}
-      <small am-time-ago="model.createTime"></small>
+      <my-status-label data-value="model.status"></my-status-label>
     </div>
   </div></li>
 
@@ -49,9 +51,39 @@
       <label>Expiry time</label>
     </div>
     <div class="col-xs-9">
-      <div ng-show="model.expireTime">
-        {{model.expireTime | date:'short'}}
-        <small am-time-ago="model.expireTime"></small>
+      <div class="row" ng-show="model.expireTime">
+        <div class="col-xs-9">
+          <p>
+            <span ng-hide="leaseExtendMs">
+              {{model.expireTime | date:'short'}}
+              <small am-time-ago="model.expireTime"></small>
+            </span>
+
+            <span ng-show="leaseExtendMs">
+              <em class="pull-right text-muted">
+                + {{leaseExtendHumanized}}
+              </em>
+              {{leaseExtendDate | date:'short'}}
+              <small am-time-ago="leaseExtendDate"></small>
+            </span>
+            &nbsp;
+          </p>
+          <p>
+            <input type="range" 
+              min="0"
+              step="60000"
+              max="{{leaseMaxMs}}"
+              ng-model="leaseExtendMs" />
+          </p>
+        </div>
+        <div class="col-xs-3">
+          <p ng-show="leaseExtendMs" class="am-fade-and-slide-bottom">
+            <a class="btn btn-primary btn-block" href="" 
+                ng-click="doLeaseExtend()">
+              <span class="fa fa-clock-o"></span> extend lease
+            </a>
+          </p>
+        </div>
       </div>
       <div ng-hide="model.expireTime">
         <em>never</em>
@@ -59,9 +91,10 @@
     </div>
   </div></li>
 
+
   <li><div class="row">
     <div class="col-xs-3">
-      <label>Action</label>
+      <label>Last Action</label>
     </div>
     <div class="col-xs-9">
       <code>{{model.progress.action}}</code>
@@ -107,7 +140,7 @@
     </div>
   </div></li>
 
-  <li ng-if="model.status=='active'"><div class="row">
+  <li ng-if="model.status!='terminated'"><div class="row">
     <div class="col-xs-3">
       <label>Services</label>
     </div>
@@ -138,14 +171,12 @@
 
 </ul>
 
-
-<div ng-show="serviceSets">
+<div ng-show="model.nodes.length">
   <hr />
   <h4>Service Sets</h4>
 
   <ol class="list-unstyled panel-group" bs-collapse>
     <li class="panel panel-default" ng-repeat="set in serviceSets">
-
       <div class="panel-heading">
         <div class="panel-title row">
           <div class="col-xs-3">
@@ -171,24 +202,46 @@
         </div>
       </div>
       <div class="panel-collapse" bs-collapse-target>
-        <div class="panel-body table-responsive">
+        <div class="panel-body">
 
-          <table class="table table-striped" my-sortable>
-            <thead>
-              <tr ng-class="{'sort-enabled': set.nodes.length>1}">
-                <th>id</th>
-                <th data-predicate="properties.hostname">hostname</th>
-                <th data-predicate="properties.ipaddresses.access_v4">IP address</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="item in set.nodes">
-                <td>{{item.id}}</td>
-                <td>{{item.properties.hostname}}</td>
-                <td>{{item.properties.ipaddresses.access_v4}}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="table table-striped" my-sortable>
+              <thead>
+                <tr ng-class="{'sort-enabled': set.nodes.length>1}">
+                  <th data-predicate="properties.hostname">hostname</th>
+                  <th data-predicate="properties.ipaddresses.access_v4">IP address</th>
+                  <th data-predicate="provisionerResults['ssh-auth'].user" colspan="3">
+                    credentials
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in set.nodes | orderBy:sortable.predicate:sortable.reverse">
+                  <td>
+                    <tt>{{item.properties.hostname}}</tt>
+                  </td>
+                  <td>
+                    <small>{{item.properties.ipaddresses.access_v4}}</small>
+                  </td>
+                  <td width="10">
+                    <code>{{item.provisionerResults['ssh-auth'].user}}</code>
+                  </td>
+                  <td width="150">
+                    <my-password 
+                      data-value="item.provisionerResults['ssh-auth'].password"
+                    ></my-password>
+                  </td>
+                  <td class="text-right">
+                    <a href="" ng-click="doActionsModal(item.id)"
+                      class="btn btn-default btn-sm">
+                        <span class="fa fa-gears"></span>
+                        Show Actions
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
         </div>
       </div>
