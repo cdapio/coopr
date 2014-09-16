@@ -15,5 +15,6 @@ end
 group :test do
   gem 'rack-test', '~> 0.6'
   gem 'rspec', '~> 3.0'
+  gem 'rubocop', '~> 0.24'
   gem 'simplecov', '~> 0.7.1', :require => false
 end
