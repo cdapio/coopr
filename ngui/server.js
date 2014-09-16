@@ -13,19 +13,23 @@ var pkg = require('./package.json'),
       // the following will be available in angular via the "MY_CONFIG" injectable
 
       COOPR_SERVER_URI: process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054/v2/',
-      COOPR_CORS_PORT: COOPR_CORS_PORT,
-      COOPR_UI_PORT: COOPR_UI_PORT
+      COOPR_CORS_PORT: COOPR_CORS_PORT
 
     });
 
 
-var hilite = function (v) { return '\x1B[7m' + v + '\x1B[27m'; },
-    httpLabel = '\x1B[40m\x1B[32mhttp-server\x1B[39m\x1B[49m',
-    corsLabel = '\x1B[40m\x1B[35mcors-proxy\x1B[39m\x1B[49m',
+var color = {
+      hilite: function (v) { return '\x1B[7m' + v + '\x1B[27m'; },
+      green: function (v) { return '\x1B[40m\x1B[32m' + v + '\x1B[39m\x1B[49m'; },
+      pink: function (v) { return '\x1B[40m\x1B[35m' + v + '\x1B[39m\x1B[49m'; }
+    },
+    httpLabel = color.green('http-server'),
+    corsLabel = color.pink('cors-proxy'),
     httpLogger = morgan(httpLabel+' :method :url', {immediate: true}),
-    corsLogger = morgan(corsLabel+' :req[X-Loom-UserID]/:req[X-Loom-TenantID] :method :url '+hilite(':status'));
+    corsLogger = morgan(corsLabel+' :req[X-Loom-UserID]/:req[X-Loom-TenantID]' + 
+                                  ' :method :url '+color.hilite(':status'));
 
-console.log(hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
+console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 
 /**
  * HTTP server
