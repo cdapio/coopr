@@ -4,6 +4,7 @@ angular
   .module(PKG.name, [
 
     angular.module(PKG.name+'.services', [
+      PKG.name+'.config',
       'ngResource',
       'ngStorage'
     ]).name,

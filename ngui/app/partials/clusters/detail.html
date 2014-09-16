@@ -113,8 +113,9 @@
       <my-progress 
         data-type="bar" 
         data-add-cls="{{{
-          'pending': 'warning',
-          'running': 'warning'
+          'active': 'info',
+          'pending': 'success striped',
+          'incomplete': 'danger'
         }[model.status]}}"
         data-value="model.progress.stepscompleted"
         data-max="model.progress.stepstotal"
