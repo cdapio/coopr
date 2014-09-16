@@ -112,16 +112,18 @@ angular
 
 /**
  * Config is already defined in test env,
- * in all other cases we must fetch the config
+ * in all other cases we must fetch the config before bootstraping
  */
 try {
-  angular.injector([PKG.name+'.config']) && start();
+  if(angular.injector([PKG.name+'.config'])) {
+    start();
+  }
 }
 catch(e) {
   angular.injector(['ng']).get('$http').get('/config.json')
     .then(function (response) {
       angular.module(PKG.name+'.config', [])
-        .constant("MY_CONFIG", response.data);
+        .constant('MY_CONFIG', response.data);
     })
     .then(start);
 }

@@ -50,7 +50,7 @@ module.factory('myApi', function(
 
 });
 
-module.config(function ($httpProvider, MYAPI_EVENT) {
+module.config(function ($httpProvider, MYAPI_EVENT, MY_CONFIG) {
   $httpProvider.interceptors.push(function ($q, $timeout, $rootScope, $log, myAuth, myApiPrefix) {
     var isApi = function(url) {
       return url.indexOf(myApiPrefix) === 0;
@@ -59,13 +59,24 @@ module.config(function ($httpProvider, MYAPI_EVENT) {
     return {
      'request': function(config) {
         if(isApi(config.url)) {
-          var u = myAuth.currentUser;
+
           angular.extend(config.headers, {
             'X-Requested-With': angular.version.codeName
-          }, u ? {
-            'X-Loom-UserID': u.username,
-            'X-Loom-TenantID': u.tenant
-          } : {});
+          });
+
+          if(myAuth.currentUser) {
+            angular.extend(config.headers, {
+              'X-Loom-UserID': myAuth.currentUser.username,
+              'X-Loom-TenantID': myAuth.currentUser.tenant
+            });
+          }
+
+          if(MY_CONFIG.authorization) {
+            angular.extend(config.headers, {
+              'Authorization': MY_CONFIG.authorization
+            });
+          }
+
           $log.log('[myApi]', config.method, config.url.substr(myApiPrefix.length));
         }
         return config;
