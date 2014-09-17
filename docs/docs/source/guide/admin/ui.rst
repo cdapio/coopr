@@ -33,7 +33,7 @@ Login as an Administrator
 
 The Admin UI can be accessed at ``http://<coopr-host>:<coopr-ui-port>/``. Login using the admin credentials to access the administrator interface.
 
-.. figure:: /guide/quickstart/quickstart-screenshot-1.png
+.. figure:: /_images/admin/ui/login.png
     :align: center
     :width: 800px
     :alt: Admin login screen
@@ -46,7 +46,7 @@ An administrator is redirected to the overview screen after log in. This home pa
 elements that have already been defined. (However, upon logging for the first time, this page will be empty).
 Clicking on the name of each element allows an administrator to enter its management page, where they can examine the element in detail and modify its configuration.
 
-.. figure:: overview-screenshot-1.png
+.. figure:: /_images/admin/ui/overview.png
     :align: center
     :width: 800px
     :alt: Administrator overview screen
@@ -70,29 +70,29 @@ The Catalog Home Screen
 The Catalog screen lists the existing templates that the administrator has created. The page also provides a way
 to delete, view, and edit each template.
 
-Clicking on a template name will take you to the 'Edit template' page, where you can view or edit template details.
-
-.. figure:: catalog-screenshot-1.png
+.. figure:: /_images/admin/ui/catalog.png
     :align: center
     :width: 800px
     :alt: Catalog home screen
     :figclass: align-center
 
+Clicking on a template name will take you to the 'Edit template' page, where you can view or edit template details.
+
 Creating a Template
 ^^^^^^^^^^^^^^^^^^^
 
-To create a new **Template**, click on the 'Create' button on the top-right the screen. This action will display the Templates' creation page.
+To create a new template, click on the 'Create' button on the top-right the screen. This action will display the Templates' creation page.
 In addition to specifying a name and description for the template, the initialization screen allows you to set parameters
 for the 'Lease Duration'. This field allows an administrator to specify the initial and maximum lease durations to be applied
 to clusters created using this template, as well as a step size for use when extending a cluster lease.
 
-.. figure:: catalog-screenshot-2.png
+.. figure:: /_images/admin/ui/template_create_general.png
     :align: center
     :width: 800px
     :alt: Template creation - general
     :figclass: align-center
 
-The **Compatibility** tab defines sets of services, hardware types, and image types that are allowed for use in a cluster.
+The Compatibility tab defines sets of services, hardware types, and image types that are allowed for use in a cluster.
 Services not in the list specified in this section cannot be placed on the cluster.
 Coopr will not automatically pull in service dependencies, so the full set of compatible services must be defined.
 Hardware types not in the list specified in this section cannot be used in the cluster. Similarly, image types 
@@ -100,24 +100,18 @@ not in the list specified in this section cannot to be used in the cluster.
 Services, hardware types, and image types can all be added by selecting an element from the drop down menu and clicking the 
 button next to the box. To remove an element, press the '-' next to the element you want removed. 
 
-.. figure:: catalog-screenshot-3.png
+.. figure:: /_images/admin/ui/template_create_compatibility.png
     :align: center
     :width: 800px
     :alt: Template creation - compatibility
     :figclass: align-center
 
-The **Defaults** tab screen defines the default services and provider, and optionally a cluster wide image type
+The Defaults tab screen defines the default services and provider, and optionally a cluster wide image type
 or hardware type, to use when a cluster is initially created. The provider, hardware type, and image type can be
 selected from the drop down menu among those defined in their corresponding sections. The 'Config' field allows
 the admin to specify cluster configuration as JSON-formatted input.  Generally, all service configuration settings
 should go in this section. Configuration is consumed as is, except for some macros which allow you to reference 
 other nodes in the cluster (for more information, see :doc:`Macros </guide/admin/macros>`).
-
-.. figure:: catalog-screenshot-4.png
-    :align: center
-    :width: 800px
-    :alt: Template creation - default services
-    :figclass: align-center
 
 Multiple services can be placed on a cluster by default. Select a service from the drop down menu and click
 'Add service' to add. To remove a service, press the '-' next to the service you want removed.
@@ -125,13 +119,14 @@ Everything in this section can be overwritten by the user during cluster creatio
 only advanced users will want to do so. (In future releases, we'll have more granular access control capabilities so
 that novice users may not change default configurations.)
 
-.. figure:: catalog-screenshot-11.png
+.. figure:: /_images/admin/ui/template_create_defaults.png
     :align: center
     :width: 800px
-    :alt: Template creation - defaults
+    :alt: Template creation - default services
     :figclass: align-center
 
-The **Constraints** tab allows the administrator to set rules for the sets of services that are installed on a cluster.
+The Constraints tab allows the administrator to set rules for the sets of services that are installed on a cluster.
+The most basic type of constraint are size constraints, which set a minimum and maximum number of nodes for the cluster.
 A 'Must coexist' constraint is used to specify services that must be placed together on the same node. For example, in a Hadoop
 cluster, you generally want datanodes, regionservers, and nodemanagers to all be placed together, so
 you would put all 3 services in the same 'Must coexist' constraint. The 'Must coexist' constraints are not transitive. 
@@ -152,7 +147,7 @@ service A, service B, and service C 'Can't coexist,' service A and service B can
 supported, this can be confusing, so the best practice is to keep 'Can't coexist' constraints binary. Anything not mentioned
 in the must or can't coexist constraints are allowed.
 
-.. figure:: catalog-screenshot-5.png
+.. figure:: /_images/admin/ui/template_create_constraints_empty.png
     :align: center
     :width: 800px
     :alt: Template creation - constraints
@@ -162,7 +157,7 @@ To create a constraint, click on either 'Add must co-exist group' or 'Add can't 
 service you want to add to the group and select 'Add Service'. Services can be removed from the group by pressing the
 '-' next to the name of the service. Once all the required services are added, select 'Add Group'.
 
-.. figure:: catalog-screenshot-6.png
+.. figure:: /_images/admin/ui/template_create_constraints_mustco.png
     :align: center
     :width: 800px
     :alt: Template creation - constraints - add must coexists
@@ -170,7 +165,7 @@ service you want to add to the group and select 'Add Service'. Services can be r
 
 |
 
-.. figure:: catalog-screenshot-7.png
+.. figure:: /_images/admin/ui/template_create_constraints_cantco.png
     :align: center
     :width: 800px
     :alt: Template creation - constraints - add can't coexist
@@ -186,15 +181,7 @@ service can go on a node with any type of hardware. Similarly, a service constra
 that it is allowed to be placed on an instance. Any node with that service must use one of the image types in the array. If
 nothing is given, the service can go on a node with any type of image.
 
-.. figure:: catalog-screenshot-8.png
-    :align: center
-    :width: 800px
-    :alt: Template creation - constraints - add service constraint
-    :figclass: align-center
-
-|
-
-.. figure:: catalog-screenshot-9.png
+.. figure:: /_images/admin/ui/template_create_constraints_service.png
     :align: center
     :width: 800px
     :alt: Template creation - constraints - add service constraint
@@ -210,7 +197,7 @@ A user can view/edit a template by clicking on the template's name on the Home s
 The edit template page provides a similar interface to the 'Create a template' screen. Current settings for the
 template can be modified and deleted accordingly.
 
-.. figure:: catalog-screenshot-10.png
+.. figure:: /_images/admin/ui/template_edit.png
     :align: center
     :width: 800px
     :alt: Template management
@@ -233,14 +220,14 @@ The Providers Home Screen
 The Providers home screen lists the existing providers currently supported by the administrators. The page also
 provides a way to delete, view, and edit each provider.
 
-Clicking on a provider's name will take you to the 'Edit provider' page for viewing provider details and
-editing provider configurations.
-
-.. figure:: providers-screenshot-1.png
+.. figure:: /_images/admin/ui/providers.png
     :align: center
     :width: 800px
     :alt: Providers home screen
     :figclass: align-center
+
+Clicking on a provider's name will take you to the 'Edit provider' page for viewing provider details and
+editing provider configurations.
 
 Creating a Provider
 ^^^^^^^^^^^^^^^^^^^
@@ -248,7 +235,7 @@ Creating a Provider
 Click on the 'Create' button on the top-right of the screen to go to the Providers creation
 page. On this page, administrators can configure the Name, Description, and Provider type of the service.
 
-.. figure:: providers-screenshot-2.png
+.. figure:: /_images/admin/ui/provider_create.png
     :align: center
     :width: 800px
     :alt: Create a provider
@@ -257,7 +244,7 @@ page. On this page, administrators can configure the Name, Description, and Prov
 When selecting a Provider type, additional parameters will appear on a provider specific screen, where an administrator can
 manage its credentials and include any other information needed.
 
-.. figure:: providers-screenshot-3.png
+.. figure:: /_images/admin/ui/provider_create_example.png
     :align: center
     :width: 800px
     :alt: Create a provider
@@ -276,7 +263,7 @@ A user can view/edit a provider by clicking on the provider's name on the Home s
 The provider edit page renders a similar interface to the 'Create a provider' screen. Current settings for the
 provider can be modified and deleted accordingly.
 
-.. figure:: providers-screenshot-4.png
+.. figure:: /_images/admin/ui/provider_edit.png
     :align: center
     :width: 800px
     :alt: Managing providers
@@ -300,7 +287,7 @@ also provides operations to delete and view/edit each hardware type.
 Clicking on an item's name will take you to the 'Edit hardware type' page for viewing hardware type details
 and for editing its configurations.
 
-.. figure:: hardware-screenshot-1.png
+.. figure:: /_images/admin/ui/hardwaretypes.png
     :align: center
     :width: 800px
     :alt: Hardware type home screen
@@ -316,12 +303,11 @@ On this page, administrators can configure the Name, Description, and how the ha
 The 'Providers' section define how the hardware setting maps to the identifiers used on each of the cloud infrastructure providers. 
 Note that hardware settings on the provider side are specified using virtual hardware templates called flavors.
 
-.. figure:: hardware-screenshot-2.png
+.. figure:: /_images/admin/ui/hardwaretype_create.png
     :align: center
     :width: 800px
     :alt: Creating a hardware type
     :figclass: align-center
-
 
 Values specified in 'Providers' must map to a valid flavor on the corresponding provider. Below is a list of flavor
 identifier codes commonly used by providers.
@@ -333,8 +319,6 @@ identifier codes commonly used by providers.
         `Rackspace <http://docs.rackspace.com/servers/api/v2/cs-releasenotes/content/supported_flavors.html>`_
 
         `Joyent <http://serverbear.com/9798/joyent>`_
-
-
 
 As these codes are subject to change, please ensure the values reflect correctly with the provider's system.
 
@@ -349,7 +333,7 @@ A user can view/edit a hardware type by clicking on the hardware type's name on 
 The edit hardware type page provides a similar interface to the 'Create a hardware type' screen. Current
 settings for the hardware type can be modified and deleted accordingly.
 
-.. figure:: hardware-screenshot-3.png
+.. figure:: /_images/admin/ui/hardwaretype_edit.png
     :align: center
     :width: 800px
     :alt: Managing hardware types
@@ -371,7 +355,7 @@ operations on each image type.
 Clicking on an item's name will take you to the 'Edit image type' page for viewing more image type details and
 editing its configurations.
 
-.. figure:: images-screenshot-1.png
+.. figure:: /_images/admin/ui/imagetypes.png
     :align: center
     :width: 800px
     :alt: Image types home screen
@@ -388,7 +372,7 @@ Image settings are specified by a unique ID code on different providers. Values 
 'Providers' must map to a valid image on the corresponding provider. As the list may change over time,
 the most current list of IDs for images should be queried directly from the provider.
 
-.. figure:: images-screenshot-2.png
+.. figure:: /_images/admin/ui/imagetype_create.png
     :align: center
     :width: 800px
     :alt: Creating an image type
@@ -405,7 +389,7 @@ An administrator can view/edit an image type by clicking on the image type's nam
 The edit image type page provides a similar interface to the 'Create an image type' screen. Current settings for the
 image type can be modified and deleted accordingly.
 
-.. figure:: images-screenshot-3.png
+.. figure:: /_images/admin/ui/imagetype_edit.png
     :align: center
     :width: 800px
     :alt: Managing an image type
@@ -427,7 +411,7 @@ delete and view/edit operations for each service.
 Clicking on an item's name will take you to the 'Edit service' page for viewing more service details and
 editing its configurations.
 
-.. figure:: services-screenshot-1.png
+.. figure:: /_images/admin/ui/services.png
     :align: center
     :width: 800px
     :alt: Services home screen
@@ -447,7 +431,7 @@ cannot be placed onto a cluster without also placing the services it requires. T
 ordering of service actions while performing cluster operations. It is easiest to understand the different
 types of dependencies by going through example. In this example we have a service called "myapp-2.0".
 
-.. figure:: service-dependencies-screenshot.png
+.. figure:: /_images/admin/ui/service_create_dependencies.png
     :align: center
     :width: 800px
     :alt: Service Dependencies
@@ -503,7 +487,7 @@ you enter the run_list and json_attributes in their respective fields.  These fi
 vary depending on which automator type is selected. Chef-solo and shell automator types are included by default.
 To add another action, click on 'Add,' and an additional section will be added below. Follow the same steps.
 
-.. figure:: service-automator-details-screenshot.png
+.. figure:: /_images/admin/ui/service_create_actions.png
     :align: center
     :width: 800px
     :alt: Service Automator Details
@@ -520,7 +504,7 @@ An administrator can view/edit a provider by clicking on the service's name on t
 The edit service page provides a similar interface to the 'Create a service' screen. Current
 settings for the service can be modified and deleted accordingly.
 
-.. figure:: services-screenshot-3.png
+.. figure:: /_images/admin/ui/service_edit.png
     :align: center
     :width: 800px
     :alt: Managing services
@@ -535,7 +519,7 @@ The management page is virtually identical to that of the :doc:`User Home Screen
 difference between the two pages is that the administrator's page shows all clusters across all users, while a user's
 page shows only clusters they own.
 
-.. figure:: clusters-screenshot-1.png
+.. figure:: /_images/admin/ui/clusters.png
     :align: center
     :width: 800px
     :alt: Cluster management home screen

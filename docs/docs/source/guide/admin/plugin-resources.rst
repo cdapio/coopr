@@ -95,3 +95,29 @@ Syncing Resources
 Syncing resources will make all staged resources active and all recalled resources inactive. Any active resources will stay active,
 and any inactive resources will stay inactive. Any tasks that were already running when the sync began will continue to run with
 the old resources. However, all new tasks are guaranteed to use the new active set of resources.
+
+Tools
+=====
+
+There is also a resource upload tool provided in the provisioner package. You can use it to create an archive from a directory on 
+your local filesystem and upload it to the server. You can see usage information by running: 
+
+.. code-block:: bash
+
+ $ /opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb -h
+ Usage: /opt/coopr/provisioner/bin/data-uploader.rb [options] <action> <local-path> <remote-target>
+    -u, --uri URI                    Server URI, defaults to ENV['COOPR_SERVER_URI'] else "http://localhost:55054"
+    -t, --tenant TENANT              Tenant, defaults to ENV['COOPR_TENANT'] else "superadmin"
+    -U, --user USER                  User, defaults to ENV['COOPR_API_USER'] else "admin"
+    -q, --quiet                      Suppress all non-error output
+
+ Required Arguments:
+         <action>: one of upload, stage, or sync:
+                     upload: uploads a single resource to the server
+                     stage: uploads and stages a single resource to the server
+                     sync: uploads and stages a single resource, then executes a sync on all staged resources
+         <local-path>: path to the local copy of the resource to upload
+         <remote-target>: api path defining the resource
+
+ Example:
+  /opt/coopr/provisioner/bin/data-uploader.rb -u http://localhost:55054 -t superadmin -U admin sync ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop

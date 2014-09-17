@@ -26,6 +26,8 @@ RPC
 
 In addition to the standard REST endpoints, a few RPC functions are available.
 
+.. _rpc-properties:
+
 Get Properties of Nodes in a Cluster
 ====================================
 

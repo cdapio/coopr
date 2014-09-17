@@ -21,6 +21,7 @@ Super Admin Guide
    :maxdepth: 2
 
    overview
+   installation/index
    server-config
    tenants
    callbacks

@@ -44,6 +44,8 @@ Several concepts central to cluster configuration are definable in Coopr. These 
 
 * **Image types** - Basic disk images installed on the nodes of a cluster.
 
+* **Plugin Resources** - Admin provided resources that can be used by plugins. For example, the chef-solo plugin can use cookbooks uploaded by the admin, and the AWS plugin can use ssh keys upload by the admin.
+
 * **Services** - Bundled software services that can be placed on a cluster.
 
 * **Cluster Template** - Blueprint describing show hardware, images, and services should be laid out to form a cluster.

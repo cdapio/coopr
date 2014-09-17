@@ -40,8 +40,11 @@ specific service. The basic macros available are:
 ::
 
   %host.service.<service name>%
+  %host.self%
   %ip.service.<service name>%
   %ip.<ip type>.service.<service name>%
+  %ip.self%
+  %ip.<ip type>.self%
   %num.service.<service name>%
   %cluster.owner%
 
@@ -53,6 +56,10 @@ which is either 'access_v4' or 'bind_v4'. The 'access_v4' IP address is the addr
 to connect to the node from the outside world, whereas 'bind_v4' is the address services on the node should bind to. 
 In most cases, configuration will use the bind_v4 address, so if no IP address type is given, the bind_v4 address
 will be used.
+
+The '%host.self%' macro will be replaced with the hostname of the node where the task is being executed. Similarly,
+the '%ip.<ip type>.self%' and '%ip.self%' macros will be replaced with the corresponding ip address of the the node
+where the task is being executed.
 
 Basic Macro Instances
 =====================
@@ -117,8 +124,7 @@ When configuring the HBase master, we need to specify a Zookeeper quorum and nam
 In this case, we want to end up with:
 ::
 
-  hbase.zookeeper.quorum":"hadoop-dev-1002.local:2181,
-    hadoop-dev-1003.local:2181,hadoop-dev-1004.local:2181/namespace
+  hbase.zookeeper.quorum":"hadoop-dev-1002.local:2181,hadoop-dev-1003.local:2181,hadoop-dev-1004.local:2181/namespace
 
 This can be achieved with the ``join`` and ``map`` macro:
 ::

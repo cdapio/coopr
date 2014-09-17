@@ -21,7 +21,6 @@ Administration Guide
    :maxdepth: 2
 
    overview
-   ../installation/index
    ui
    macros
    plugin-resources

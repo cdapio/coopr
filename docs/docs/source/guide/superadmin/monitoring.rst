@@ -194,5 +194,5 @@ Log Output
 ==========
 By default, the log files in Coopr are written to ``/var/log/coopr``. The output directory can be configured using the
 ``COOPR_LOG_DIR`` environment variable for each of the Coopr services (for more information, see
-:doc:`Installation Guide </guide/installation/index>`).
+:doc:`Installation Guide </guide/superadmin/installation/index>`).
 

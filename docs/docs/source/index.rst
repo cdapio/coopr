@@ -51,7 +51,6 @@ Contents
    /overview/security
    /faq/index
    /overview/release-notes
-   /overview/upgrade-guide
    /overview/glossary
    /javadocs/index
 
@@ -65,7 +64,7 @@ Indices and tables
    :hidden:
 
    /guide/admin/admin-links
-   /guide/installation/openstack-config
+   /guide/superadmin/installation/openstack-config
    /guide/recommended-deployment
    /includes/footer
    /misc/jboss-automator-script

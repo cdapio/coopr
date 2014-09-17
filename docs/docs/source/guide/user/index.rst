@@ -35,7 +35,7 @@ by the user, such as current clusters, clusters under construction, and deleted 
 are shown separately in this interface. Clicking on each of these items launches a separate screen with individual cluster 
 description and detailed cluster information.
 
-.. figure:: user-screenshot-1.png
+.. figure:: /_images/user/clusters.png
     :align: center
     :width: 800px
     :alt: User home screen
@@ -51,7 +51,7 @@ number of nodes to allocate to the cluster.
 For more information on how administrators can set templates for provisioning a cluster, see the :doc:`Administration
 Guide </guide/admin/index>`).
 
-.. figure:: user-screenshot-2.png
+.. figure:: /_images/user/cluster_create.png
     :align: center
     :width: 800px
     :alt: Cluster creation screen
@@ -69,7 +69,7 @@ to specify additional custom configurations in a JSON-formatted input (for more 
 in days, hours and minutes, that they want to lease the cluster for.  Services to place on the cluster can also be 
 modified from this screen.
 
-.. figure:: user-screenshot-3.png
+.. figure:: /_images/user/cluster_create_advanced.png
     :align: center
     :width: 800px
     :alt: Cluster creation screen - advanced settings
@@ -86,7 +86,7 @@ to create the cluster, the infrastructure provider, and the list of services ins
 
 To abort a cluster that is currently being created, click on 'Abort' next to the progress bar on this screen.
 
-.. figure:: user-screenshot-4.png
+.. figure:: /_images/user/cluster_description.png
     :align: center
     :width: 800px
     :alt: Cluster description screen
@@ -96,7 +96,7 @@ Examining and Accessing the Cluster
 ===================================
 On the cluster description screen, nodes are grouped together by the set of services that are available on them.
 
-.. figure:: user-screenshot-5.png
+.. figure:: /_images/user/user-screenshot-5.png
     :align: center
     :width: 800px
     :alt: Cluster description screen
@@ -108,7 +108,7 @@ also show authentication credentials for accessing the nodes, through a service 
 
 To view the actions that have been performed on a particular node, click on the 'Show actions' button.
 
-.. figure:: user-screenshot-6.png
+.. figure:: /_images/user/user-screenshot-6.png
     :align: center
     :width: 800px
     :alt: Show actions
@@ -128,7 +128,7 @@ Reconfiguring Services
 Services can be reconfigured by clicking on the 'Reconfigure' button on the top right of the cluster description page.
 Clicking on the button brings you to the reconfigure page. 
 
-.. figure:: user-reconfigure-screenshot-1.png
+.. figure:: /_images/user/user-reconfigure-screenshot-1.png
     :align: center
     :width: 800px
     :alt: Reconfigure cluster
@@ -140,7 +140,7 @@ desired. There is also a restart toggle at the bottom of the page. If restart is
 after they are reconfigured. If it is off, all service will be reconfigured, but they will not be restarted. You may have to 
 restart them yourself in order for the changes to take place.  
 
-.. figure:: user-reconfigure-screenshot-2.png
+.. figure:: /_images/user/user-reconfigure-screenshot-2.png
     :align: center
     :width: 800px
     :alt: Reconfigure cluster
@@ -161,7 +161,7 @@ that at this time, the system does not track or monitor the status of services. 
 and stopping of dependent services may occur. Services can only be started, stopped, or restarted if they are 
 in an active state. 
 
-.. figure:: user-service-actions-screenshot.png
+.. figure:: /_images/user/user-service-actions-screenshot.png
     :align: center
     :width: 800px
     :alt: Service actions
@@ -174,7 +174,7 @@ services in the template's compatibility list that are not already on the cluste
 click on the 'Add' button and select a service from the drop down menu. Multiple services can be added at once.
 After selecting all the services to add, click on the 'Submit' button.
 
-.. figure:: user-add-services-screenshot.png
+.. figure:: /_images/user/user-add-services-screenshot.png
     :align: center
     :width: 800px
     :alt: Adding services
@@ -190,7 +190,7 @@ button brings you to a page where you can edit your profile. For the time being,
 change the skin of your UI. In the future, skins will be more customizable and additional settings will be available
 to edit. 
 
-.. figure:: user-profile-screenshot.png
+.. figure:: /_images/user/profile.png
     :align: center
     :width: 800px
     :alt: User Profile

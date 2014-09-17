@@ -86,6 +86,31 @@ pooling.  The query will change based on which database you are using.
     </property>
   </configuration>
 
+Plugin Resource Store
+^^^^^^^^^^^^^^^^^^^^^
+By default, the server stores plugin resources on the local file system. If you are running multiple servers for
+HA, you must either configure the server to write the resources to some shared filesystem like NFS, or you must
+supply your own distributed file store. To set the location that plugin resources are written to, add the following
+setting to your config. 
+::
+
+    <property>
+      <name>server.plugin.store.localfilestore.data.dir</name>
+      <value>/shared/path</value>
+      <description>base path where plugin resources will be written to</description>
+    </property>
+
+If you are using an alternate distributed file store, you must provide a class that implements the ``PluginStore`` interface.
+See the :doc:`javadocs </javadocs/index>` for more information about the interface. Once you have implemented the interface,
+you must build a jar and include it in the lib directory for the server, and edit the following config setting in your config.
+::
+
+    <property>
+      <name>server.plugin.store.class</name>
+      <value>fully qualified cla/shared/path</value>
+      <description>fully qualified class name that implements your plugin store</description>
+    </property>
+
 Callbacks
 ^^^^^^^^^
 The Server can be configured to run callbacks before any cluster operation begins, after an
@@ -176,7 +201,7 @@ A full list of available configuration settings and their default values are giv
      - "coopr"
      - Database user.
    * - server.db.password
-     - null
+     -  
      - Database password.
    * - server.solver.num.threads
      - 20
@@ -262,3 +287,9 @@ A full list of available configuration settings and their default values are giv
    * - server.metrics.queue.cache.seconds
      - 10
      - Seconds to cache queue metrics in memory before recalculating. Queue metrics require walking through the queue and are therefore expensive to compute.
+   * - server.plugin.store.class
+     - co.cask.coopr.store.provisioner.LocalFilePluginStore
+     - class to use to store plugin resources
+   * - server.plugin.store.localfilestore.data.dir
+     - /var/coopr/data/plugins/resources
+     - data directory to store plugin resources when using the local file plugin store

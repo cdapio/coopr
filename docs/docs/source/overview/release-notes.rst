@@ -67,7 +67,3 @@ Change List
   * Add service list to node properties ( Issues: #172 #177 )
   * Upgrade script ( Issues: #195 )
 
-Upgrade procedure from Release 0.9.6 to 0.9.7
----------------------------------------------
-This release changes the services JSON format. In order to upgrade from 0.9.6 to 0.9.7 please following the procedure defined :doc:`here </overview/upgrade-guide>`.
-

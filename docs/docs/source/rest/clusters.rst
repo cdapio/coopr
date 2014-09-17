@@ -1041,3 +1041,49 @@ Example
         -H 'Coopr-ApiKey:<apikey>'
         -X POST
         http://<server>:<port>/<version>/clusters/<cluster-id>/clustertemplate/sync
+
+.. _cluster-extend-lease:
+
+Extend the Lease on a Cluster
+=============================
+A cluster may have a lease attached to it if the template specified a lease, or if the user specified
+a lease at cluster creation time. Depending on the lease settings, a user may be allowed to extend
+the lease on the cluster. To extend a cluster's lease, make a POST HTTP request to URI:
+::
+
+ /clusters/{cluster-id}
+
+The POST body must be a JSON Object with an 'expireTime' key whose value is the new desired expiration
+timestamp in milliseconds. If there is a lease step specified in the template, the new timestamp cannot
+be greater than the current expire time plus the lease step. If there is a max lease specified in the
+template, the new timestamp cannot be greater than the create time plus the max lease.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+   :widths: 15 10
+   :header-rows: 1
+
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 400 (BAD REQUEST)
+     - If the request is malformed, or the new expire time is not allowed.
+   * - 401 (UNAUTHORIZED)
+     - If the user is unauthorized to make this request.
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'Coopr-UserID:<user-id>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
+        -X POST
+        -d '{
+               "expireTime": 1234567890
+           }'
+        http://<server>:<port>/<version>/clusters/<cluster-id>

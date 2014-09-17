@@ -155,6 +155,7 @@ Clusters
   * :ref:`Start Services on a Cluster <cluster-start-services>`
   * :ref:`Restart Services on a Cluster <cluster-restart-services>`
   * :ref:`Sync Cluster Template to Current Version <cluster-sync-template>`
+  * :ref:`Extend the Lease on a Cluster <cluster-extend-lease>`
 
 RPC Calls
 =========
