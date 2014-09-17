@@ -126,7 +126,7 @@ angular.module(PKG.name)
       .state(abstractSubnav('Tenant', {
         authorizedRoles: MYAUTH_ROLE.superadmin
       }))
-        .state(crud('Tenant', 'list', 'CrudListCtrl'))
+        .state(crud('Tenant', 'list', 'TenantListCtrl'))
         .state(crud('Tenant', 'edit', 'CrudEditCtrl'))
         .state(crud('Tenant', 'create', 'CrudCreateCtrl')) 
 

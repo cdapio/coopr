@@ -11,7 +11,9 @@ module.factory('myApi_tenants', function($resource, myApiPrefix){
           method: 'PUT'
         }
       }
-    )
+    ),
+
+    Metric: $resource(myApiPrefix + 'metrics/:type')
 
   };
 
