@@ -113,6 +113,6 @@ public final class MockProvisionerMain extends DaemonMain {
 
   private void printHelp() {
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("java -cp <path-to-jar>.jar com.continuuity.loom.runtime.MockProvisionerMain", options);
+    formatter.printHelp("java -cp <path-to-jar>.jar co.cask.coopr.runtime.MockProvisionerMain", options);
   }
 }

@@ -26,7 +26,7 @@ var color = {
     httpLabel = color.green('http-server'),
     corsLabel = color.pink('cors-proxy'),
     httpLogger = morgan(httpLabel+' :method :url', {immediate: true}),
-    corsLogger = morgan(corsLabel+' :req[X-Loom-UserID]/:req[X-Loom-TenantID]' + 
+    corsLogger = morgan(corsLabel+' :req[Coopr-UserID]/:req[Coopr-TenantID]' + 
                                   ' :method :url '+color.hilite(':status'));
 
 console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');

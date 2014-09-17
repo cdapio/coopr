@@ -284,7 +284,7 @@ function ui () {
 }
 
 function greeting () {
-    [ "x${LOOM_DISABLE_UI}" == "xtrue" ] && return 0
+    [ "x${COOPR_DISABLE_UI}" == "xtrue" ] && return 0
     echo
     echo "Go to http://localhost:8100. Have fun creating clusters!"
 }

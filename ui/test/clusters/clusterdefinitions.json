@@ -15,7 +15,7 @@
     },
     "clusterTemplate": {
         "name": "reactor-distributed",
-        "description": "Hadoop cluster without high-availability and Continuuity Reactor",
+        "description": "Hadoop cluster without high-availability and Cask DAP (CDAP)",
         "defaults": {
             "services": [
                 "base",
@@ -681,7 +681,7 @@
                 },
                 {
                     "name": "reactor",
-                    "description": "Continuuity Reactor",
+                    "description": "Cask DAP (CDAP)",
                     "dependencies": {
                         "provides": [],
                         "conflicts": [],
@@ -726,14 +726,14 @@
                             "start": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"start\", \"continuuity-opex\": \"start\", \"continuuity-gateway\": \"start\", \"continuuity-gateway-yarn\": \"start\", \"continuuity-router\": \"start\", \"continuuity-kafka-server\": \"start\", \"continuuity-log-saver\": \"start\", \"continuuity-metrics-processor\": \"start\", \"continuuity-web-app\": \"start\" } } } }",
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"cask-app-fabric\": \"start\", \"cask-opex\": \"start\", \"cask-gateway\": \"start\", \"cask-gateway-yarn\": \"start\", \"cask-router\": \"start\", \"cask-kafka-server\": \"start\", \"cask-log-saver\": \"start\", \"cask-metrics-processor\": \"start\", \"cask-web-app\": \"start\" } } } }",
                                     "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[coopr_service_runner::default]"
                                 }
                             },
                             "stop": {
                                 "type": "chef-solo",
                                 "fields": {
-                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"continuuity-app-fabric\": \"stop\", \"continuuity-opex\": \"stop\", \"continuuity-gateway\": \"stop\", \"continuuity-gateway-yarn\": \"stop\", \"continuuity-router\": \"stop\", \"continuuity-kafka-server\": \"stop\", \"continuuity-log-saver\": \"stop\", \"continuuity-metrics-processor\": \"stop\", \"continuuity-web-app\": \"stop\" } } } }",
+                                    "data": "{\"coopr\": { \"node\": { \"services\": { \"cask-app-fabric\": \"stop\", \"cask-opex\": \"stop\", \"cask-gateway\": \"stop\", \"cask-gateway-yarn\": \"stop\", \"cask-router\": \"stop\", \"cask-kafka-server\": \"stop\", \"cask-log-saver\": \"stop\", \"cask-metrics-processor\": \"stop\", \"cask-web-app\": \"stop\" } } } }",
                                     "script": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[coopr_service_runner::default]"
                                 }
                             }

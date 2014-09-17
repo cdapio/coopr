@@ -1,6 +1,6 @@
 {
   "name": "reactor-singlenode",
-  "description": "Continuuity Reactor with Hadoop stack on a single node",
+  "description": "Cask DAP with Hadoop stack on a single node",
   "defaults": {
     "services": [
       "firewall",

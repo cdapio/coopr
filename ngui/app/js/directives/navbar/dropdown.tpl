@@ -1,7 +1,7 @@
 <ul class="dropdown-menu dropdown-menu-right" role="menu" style="left:auto">
 
   <li role="presentation">
-    <a role="menuitem" tabindex="-1" href="http://continuuity.com/docs/loom/current/en/" target="_blank">
+    <a role="menuitem" tabindex="-1" href="http://docs.cask.co/coopr/current/" target="_blank">
       <span class="fa fa-book"></span>
       Documentation
     </a>
