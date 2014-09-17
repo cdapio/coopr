@@ -20,8 +20,7 @@ module.factory('myApi_provisioners', function($resource, myApiPrefix){
               free: data.reduce(function(memo, provisioner) {
                       return memo + provisioner.capacityFree;
                     }, 0)
-            }
-
+            };
           }
         }
       }
