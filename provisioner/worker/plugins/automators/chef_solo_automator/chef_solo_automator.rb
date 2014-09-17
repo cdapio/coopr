@@ -98,6 +98,7 @@ class ChefSoloAutomator < Automator
     # include the hostname and clusterId
     servicedata['loom']['hostname'] = @task['config']['hostname']
     servicedata['loom']['clusterId'] = @task['clusterId']
+    servicedata['loom']['ipaddresses'] = @task['config']['ipaddresses']
 
     # we also need to merge cluster config top-level
     servicedata.merge!(clusterdata)
