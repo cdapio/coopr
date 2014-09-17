@@ -6,9 +6,46 @@
       <input id="inputTenantName" type="text" name="name" class="form-control" 
         placeholder="Name" 
         my-focus="inputTenantName"
-        ng-disabled="model.$resolved"
+        ng-disabled="editing"
         ng-pattern="/^\w+$/"
         ng-model="model.name" required/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="inputWorkers" class="col-xs-2 control-label">Settings</label>
+    <div class="col-xs-10">
+
+      <fieldset class="row">
+        <div class="col-xs-4">
+          <div class="input-group">
+            <label for="inputWorkers" class="input-group-addon">Workers</label>
+            <input id="inputWorkers" class="form-control" type="number" 
+              ng-model="model.workers"
+              ng-pattern="/^\d+$/"
+              min="0" max="2147483647" required/>
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div class="input-group">
+            <label for="inputMaxClusters"class="input-group-addon">Max Clusters</label>
+            <input id="inputMaxClusters" class="form-control" type="number" 
+              ng-model="model.maxClusters"
+              ng-pattern="/^\d+$/"
+              min="0" max="2147483647" required/>
+          </div>
+        </div>
+        <div class="col-xs-4">
+          <div class="input-group">
+            <label for="inputMaxNodes" class="input-group-addon">Max Nodes</label>
+            <input id="inputMaxNodes" class="form-control" type="number" 
+              ng-model="model.maxNodes"
+              ng-pattern="/^\d+$/"
+              min="0" max="2147483647" required/>
+          </div>
+        </div>
+      </fieldset>
+
     </div>
   </div>
 
@@ -17,8 +54,8 @@
       <button type="submit" class="btn btn-primary" 
         ng-disabled="submitting || tenantForm.$invalid">
         <span class="fa fa-save"></span>
-        <span ng-show="model.$resolved">Update</span>
-        <span ng-hide="model.$resolved">Create</span>
+        <span ng-show="editing">Update</span>
+        <span ng-hide="editing">Create</span>
       </button>
     </div>
   </div>
