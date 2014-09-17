@@ -10,7 +10,7 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment
 
   $scope.isActive = function (item) { 
     // any cluster created recently is considered "active" for display purposes
-    return (moment(item.createTime)>tenMinutesAgo) || (item.status!=='terminated');
+    return (moment(item.createTime)>tenMinutesAgo) || ['terminated','incomplete'].indexOf(item.status)===-1;
   };
 
   $scope.$watchCollection('list', function (list) {
