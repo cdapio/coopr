@@ -14,13 +14,17 @@ var pkg = require('./package.json'),
       hilite: function (v) { return '\x1B[7m' + v + '\x1B[27m'; },
       green: function (v) { return '\x1B[40m\x1B[32m' + v + '\x1B[39m\x1B[49m'; },
       pink: function (v) { return '\x1B[40m\x1B[35m' + v + '\x1B[39m\x1B[49m'; }
-    },
+    };
 
-    httpLabel = color.green('http-server'),
+
+var httpLabel = color.green('http-server'),
     corsLabel = color.pink('cors-proxy'),
-    httpLogger = morgan(httpLabel+' :method :url', {immediate: true}),
-    corsLogger = morgan(corsLabel+' :req[X-Loom-UserID]/:req[X-Loom-TenantID]' + 
-                                  ' :method :url '+color.hilite(':status'));
+    httpLogger = morgan(httpLabel+' :method :url', {
+      immediate: true
+    }),
+    corsLogger = morgan(corsLabel+' :method :url '+color.hilite(':status'), {
+      skip: function(req, res) { return req.method === 'OPTIONS' }
+    });
 
 console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 
