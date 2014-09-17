@@ -1,6 +1,6 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApiPrefix', function ($location, MY_CONFIG) {
+module.factory('myApiPrefix', function myApiPrefixFactory ($location, MY_CONFIG) {
 
   // to work with CORS proxy, we expect that the URI will include a port
   //  ... first we need to remove the protocol from the URI 
