@@ -1,7 +1,5 @@
-var module = angular.module(PKG.name+'.controllers');
-
-
-module.controller('SubnavCtrl', function ($scope, $state, myApi) {
+angular.module(PKG.name+'.controllers').controller('SubnavCtrl', 
+function ($scope, $state, myApi) {
 
   var path = $state.current.name.split('.')[0],
       modelName = $state.current.data.modelName;
