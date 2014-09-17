@@ -1,7 +1,5 @@
-var module = angular.module(PKG.name+'.controllers');
-
-
-module.controller('BodyCtrl', function ($scope, myTheme, MYTHEME_EVENT) {
+angular.module(PKG.name+'.controllers').controller('BodyCtrl', 
+function ($scope, myTheme, MYTHEME_EVENT) {
 
   var activeThemeClass = myTheme.getClassName();
 

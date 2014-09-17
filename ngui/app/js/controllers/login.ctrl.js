@@ -1,6 +1,5 @@
-var module = angular.module(PKG.name+'.controllers');
-
-module.controller('LoginCtrl', function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT, myFocusManager) {
+angular.module(PKG.name+'.controllers').controller('LoginCtrl', 
+function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT, myFocusManager) {
 
   $scope.credentials = myAuth.remembered();
 
