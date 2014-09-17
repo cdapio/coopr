@@ -17,12 +17,14 @@ var pkg = require('./package.json'),
     };
 
 
+morgan.token('loomcred', function(req, res){ 
+  return color.pink(req.headers['x-loom-userid'] + '/' + req.headers['x-loom-tenantid']); 
+});
+
 var httpLabel = color.green('http-server'),
     corsLabel = color.pink('cors-proxy'),
-    httpLogger = morgan(httpLabel+' :method :url', {
-      immediate: true
-    }),
-    corsLogger = morgan(corsLabel+' :method :url '+color.hilite(':status'), {
+    httpLogger = morgan(httpLabel+' :method :url', {immediate: true}),
+    corsLogger = morgan(corsLabel+' :method :url :loomcred :status', {
       skip: function(req, res) { return req.method === 'OPTIONS' }
     });
 
