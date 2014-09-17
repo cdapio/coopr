@@ -7,8 +7,19 @@ module.factory('myApi_tenants', function($resource, myApiPrefix){
     Tenant: $resource(myApiPrefix + 'tenants/:name',
       { name: '@name' },
       { 
+        save: {
+          method: 'POST',
+          url: myApiPrefix + 'tenants',
+          params: {name: null},
+          transformRequest: function (data) {
+            return angular.toJson({tenant: data});
+          }
+        },
         update: {
-          method: 'PUT'
+          method: 'PUT',
+          transformRequest: function (data) {
+            return angular.toJson({tenant: data});
+          }
         }
       }
     ),

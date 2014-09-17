@@ -92,7 +92,7 @@ module.controller('CrudEditCtrl', function ($scope, $state, myApi, CrudFormBase)
   if(data) {
     $scope.model = myApi[data.modelName].get($state.params);
     $scope.model.$promise['catch'](failure);
-    $scope.isEditing = true;
+    $scope.editing = true;
   }
   else {
     failure();

@@ -6,7 +6,7 @@
       <input id="inputTenantName" type="text" name="name" class="form-control" 
         placeholder="Name" 
         my-focus="inputTenantName"
-        ng-readonly="isEditing"
+        ng-readonly="editing"
         ng-pattern="/^\w+$/"
         ng-model="model.name" required/>
     </div>
@@ -50,17 +50,24 @@
   </div>
 
   <div class="form-group">
+    <label for="inputTenantDescription" class="col-xs-2 control-label">Description</label>
+    <div class="col-xs-10">
+      <textarea id="inputTenantDescription" class="form-control" name="config" rows="4"
+        ng-model="model.description"
+        ></textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
     <div class="col-xs-10 col-xs-offset-2">
       <button type="submit" class="btn btn-primary" 
         ng-disabled="submitting || tenantForm.$invalid">
         <span class="fa fa-save"></span>
-        <span ng-show="isEditing">Update</span>
-        <span ng-hide="isEditing">Create</span>
+        <span ng-show="editing">Update</span>
+        <span ng-hide="editing">Create</span>
       </button>
     </div>
   </div>
 
 </form>
-
-<pre>{{model | json}}</pre>
 
