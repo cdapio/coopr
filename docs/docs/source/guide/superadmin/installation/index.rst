@@ -242,23 +242,28 @@ If you are setting up a MySQL database from scratch you can run the following on
 .. parsed-literal::
   $ mysql -u root -p -e 'create database coopr;'
   $ mysql -u root -p -e 'grant all privileges on coopr.* to "coopr"@"<coopr-server>" identified by "<password>";'
-  $ mysql -u coopr -p coopr < /opt/coopr/server/config/sql/coopr-create-tables-mysql.sql
+  $ mysql -u coopr -p coopr < /opt/coopr/server/config/sql/create-tables-mysql.sql
   $ mysql -u coopr -p coopr -e 'show tables;'
-  +------------------+
-  | Tables_in_coopr   |
-  +------------------+
-  | automatorTypes   |
-  | clusterTemplates |
-  | clusters         |
-  | hardwareTypes    |
-  | imageTypes       |
-  | jobs             |
-  | nodes            |
-  | providerTypes    |
-  | providers        |
-  | services         |
-  | tasks            |
-  +------------------+
+ +--------------------+
+ | Tables_in_coopr    |
+ +--------------------+
+ | automatorTypes     |
+ | clusterTemplates   |
+ | clusters           |
+ | hardwareTypes      |
+ | imageTypes         |
+ | jobs               |
+ | nodes              |
+ | pluginMeta         |
+ | providerTypes      |
+ | providers          |
+ | provisionerWorkers |
+ | provisioners       |
+ | services           |
+ | tasks              |
+ | tenants            |
+ | users              |
+ +--------------------+
 
 where coopr.sql is the example schema file at ``/opt/coopr/server/config/sql``, and where passwords are replaced and entered as needed.
 
@@ -309,9 +314,6 @@ The Provisioner environmental variables can be set at ``/etc/default/coopr-provi
    * - Variable
      - Default
      - Description
-   * - ``COOPR_NUM_WORKERS``
-     - 5
-     - The number of provisioner workers spawned
    * - ``COOPR_LOG_DIR``
      - /var/log/coopr
      - Path for the log directory
