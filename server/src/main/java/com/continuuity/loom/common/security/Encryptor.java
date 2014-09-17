@@ -18,9 +18,8 @@ package com.continuuity.loom.common.security;
 import com.google.common.base.Charsets;
 import org.apache.commons.codec.binary.Base64;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
+import java.security.GeneralSecurityException;
 
 /**
  * Transforms plaintext to and from ciphertext, also providing utilities to encode/decode ciphertext in Base64 so the
@@ -38,10 +37,9 @@ public class Encryptor {
    *
    * @param input string to encrypt and base64 encode
    * @return encrypted and encoded input
-   * @throws BadPaddingException if there is a padding exception during encryption
-   * @throws IllegalBlockSizeException if there is a block size exception during encryption
+   * @throws GeneralSecurityException if there was an exception encrypting
    */
-  public byte[] encryptAndEncodeString(String input) throws BadPaddingException, IllegalBlockSizeException {
+  public byte[] encryptAndEncodeString(String input) throws GeneralSecurityException {
     Cipher cipher = cipherProvider.createInitializedCipher(Cipher.ENCRYPT_MODE);
     byte[] ciphertext = cipher.doFinal(input.getBytes(Charsets.UTF_8));
     return Base64.encodeBase64(ciphertext);
@@ -53,10 +51,9 @@ public class Encryptor {
    *
    * @param input bytes to decode and decrypt
    * @return decoded and decrypted input
-   * @throws BadPaddingException if there is a padding exception during decryption
-   * @throws IllegalBlockSizeException if there is a block size exception during decryption
+   * @throws GeneralSecurityException if there was an exception decoding
    */
-  public String decodeAndDecryptString(byte[] input) throws BadPaddingException, IllegalBlockSizeException {
+  public String decodeAndDecryptString(byte[] input) throws GeneralSecurityException {
     byte[] ciphertext = Base64.decodeBase64(input);
     Cipher cipher = cipherProvider.createInitializedCipher(Cipher.DECRYPT_MODE);
     byte[] plaintext = cipher.doFinal(ciphertext);

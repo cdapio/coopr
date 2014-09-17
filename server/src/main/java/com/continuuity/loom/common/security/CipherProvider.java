@@ -14,21 +14,17 @@ package com.continuuity.loom.common.security;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
@@ -39,13 +35,12 @@ public class CipherProvider {
   private final Key key;
   private final AlgorithmParameterSpec parameterSpec;
 
-  private CipherProvider(String transformation, Key key)
-    throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+  private CipherProvider(String transformation, Key key) throws GeneralSecurityException {
     this(transformation, key, null);
   }
 
   private CipherProvider(String transformation, Key key, AlgorithmParameterSpec parameterSpec)
-    throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
+    throws GeneralSecurityException {
     Preconditions.checkArgument(transformation != null, "A transformation must be specified.");
     Preconditions.checkArgument(key != null, "A key must be specified.");
     this.transformation = transformation;
@@ -60,23 +55,16 @@ public class CipherProvider {
    *
    * @param mode mode to initialize the cipher to
    * @return initialized cipher
+   * @throws GeneralSecurityException if there was an exception creating and initializing the cipher.
    */
-  public Cipher createInitializedCipher(int mode) {
-    try {
-      return createAndInitializeCipher(mode);
-    } catch (NoSuchPaddingException e) {
-      // should never happen
-      throw Throwables.propagate(e);
-    } catch (NoSuchAlgorithmException e) {
-      // should never happen
-      throw Throwables.propagate(e);
-    } catch (InvalidAlgorithmParameterException e) {
-      // should never happen
-      throw Throwables.propagate(e);
-    } catch (InvalidKeyException e) {
-      // should never happen
-      throw Throwables.propagate(e);
+  public Cipher createInitializedCipher(int mode) throws GeneralSecurityException {
+    Cipher cipher = Cipher.getInstance(transformation);
+    if (parameterSpec != null) {
+      cipher.init(mode, key, parameterSpec);
+    } else {
+      cipher.init(mode, key);
     }
+    return cipher;
   }
 
   /**
@@ -158,17 +146,6 @@ public class CipherProvider {
       KeyStore keyStore = KeyHelper.getKeyStore(keystorePath, keystoreType, keystorePassword);
       return KeyHelper.getKeyFromKeyStore(keyStore, keyAlias, keyPassword);
     }
-  }
-
-  private Cipher createAndInitializeCipher(int mode) throws NoSuchPaddingException, NoSuchAlgorithmException,
-    InvalidAlgorithmParameterException, InvalidKeyException {
-    Cipher cipher = Cipher.getInstance(transformation);
-    if (parameterSpec != null) {
-      cipher.init(mode, key, parameterSpec);
-    } else {
-      cipher.init(mode, key);
-    }
-    return cipher;
   }
 
 }
