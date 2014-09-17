@@ -32,5 +32,5 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
 
 script:
-  - "cd ngui && npm run travis"
-  - "cd .. && mvn test"
+  - "cd ngui && npm run travis && cd .. && mvn test"
+
