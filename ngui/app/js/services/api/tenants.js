@@ -1,10 +1,10 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApi_tenants', function($resource, MYAPI_PREFIX){
+module.factory('myApi_tenants', function($resource, myApiPrefix){
 
   return {
 
-    Tenant: $resource(MYAPI_PREFIX + 'tenants/:name',
+    Tenant: $resource(myApiPrefix + 'tenants/:name',
       { name: '@name' },
       { 
         update: {
