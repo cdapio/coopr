@@ -100,32 +100,23 @@ class FogProviderJoyent < Provider
       set_credentials(@task['config']['ssh-auth'])
       # Validate connectivity
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
-        # Backwards-compatibility... ssh_exec! takes 2 arguments prior to 0.9.8
-        ssho = method(:ssh_exec!)
-        if ssho.arity == 2
-          log.debug 'Validating external connectivity and DNS resolution via ping'
-          ssh_exec!(ssh, 'ping -c1 www.opscode.com')
-          log.debug 'Temporarily setting hostname'
-          ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}")
-        else
-          ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
-          ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
-          # Check for /dev/vdb
-          begin
-            vdb = true
-            # confirm /dev/vdb exists
-            ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
-            # confirm it is not already mounted
-            #   ubuntu: we remount from /mnt to /data
-            #   centos: vdb1 already mounted at /data
-            ssh_exec!(ssh, 'if grep "vdb.* /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
-          rescue
-            vdb = false
-          end
-          if vdb
-            ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
-            ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
-          end
+        ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+        ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
+        # Check for /dev/vdb
+        begin
+          vdb = true
+          # confirm /dev/vdb exists
+          ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
+          # confirm it is not already mounted
+          #   ubuntu: we remount from /mnt to /data
+          #   centos: vdb1 already mounted at /data
+          ssh_exec!(ssh, 'if grep "vdb.* /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
+        rescue
+          vdb = false
+        end
+        if vdb
+          ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
+          ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
         end
       end
       # Return 0

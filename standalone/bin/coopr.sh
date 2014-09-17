@@ -173,8 +173,9 @@ function load_defaults () {
 
         # add some workers to the superadmin tenant
         request_superadmin_workers
+    else
+        return 0
     fi
-    return 0;
 }
 
 function stage_default_data () {
@@ -283,6 +284,7 @@ function ui () {
 }
 
 function greeting () {
+    [ "x${LOOM_DISABLE_UI}" == "xtrue" ] && return 0
     echo
     echo "Go to http://localhost:8100. Have fun creating clusters!"
 }

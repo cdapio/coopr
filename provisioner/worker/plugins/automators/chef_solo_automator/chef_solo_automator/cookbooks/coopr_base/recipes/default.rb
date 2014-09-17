@@ -20,7 +20,9 @@
 # This forces an apt-get update on Ubuntu/Debian
 case node['platform_family']
 when 'debian'
-  include_recipe "apt::default"
+  include_recipe 'apt::default'
+when 'rhel'
+  include_recipe 'yum-epel::default' if node['base']['use_epel'].to_s == 'true'
 end
 
 # We always run our hosts and firewall cookbooks
@@ -28,4 +30,4 @@ include_recipe "coopr_firewall::default"
 include_recipe "coopr_hosts::default"
 
 # ensure user ulimits are enabled 
-include_recipe "ulimit::default"
+include_recipe 'ulimit::default'
