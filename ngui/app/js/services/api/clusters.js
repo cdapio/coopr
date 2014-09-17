@@ -1,36 +1,36 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApi_clusters', function($resource, MYAPI_PREFIX){
+module.factory('myApi_clusters', function($resource, myApiPrefix){
 
   return {
 
-    Cluster: $resource(MYAPI_PREFIX + 'clusters/:id',
+    Cluster: $resource(myApiPrefix + 'clusters/:id',
       { id: '@id' },
       { 
         getStatus: {
           method: 'GET',
-          url: MYAPI_PREFIX + 'clusters/:id/status'
+          url: myApiPrefix + 'clusters/:id/status'
         },
         startAllServices: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:id/services/start'
+          url: myApiPrefix + 'clusters/:id/services/start'
         },
         stopAllServices: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:id/services/stop'
+          url: myApiPrefix + 'clusters/:id/services/stop'
         },
         restartAllServices: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:id/services/restart'
+          url: myApiPrefix + 'clusters/:id/services/restart'
         },
         syncTemplate: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:id/clustertemplate/sync'
+          url: myApiPrefix + 'clusters/:id/clustertemplate/sync'
         }
       }
     ),
 
-    ClusterConfig: $resource(MYAPI_PREFIX + 'clusters/:clusterId/config',
+    ClusterConfig: $resource(myApiPrefix + 'clusters/:clusterId/config',
       {},
       {
         update: {
@@ -39,24 +39,24 @@ module.factory('myApi_clusters', function($resource, MYAPI_PREFIX){
       }
     ),
 
-    ClusterActionPlan: $resource(MYAPI_PREFIX + 'clusters/:clusterId/plans/:id',
+    ClusterActionPlan: $resource(myApiPrefix + 'clusters/:clusterId/plans/:id',
       { id: '@id' }
     ),
 
-    ClusterService: $resource(MYAPI_PREFIX + 'clusters/:clusterId/services/:name',
+    ClusterService: $resource(myApiPrefix + 'clusters/:clusterId/services/:name',
       { name: '@name' },
       { 
         start: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:clusterId/services/:name/start'
+          url: myApiPrefix + 'clusters/:clusterId/services/:name/start'
         },
         stop: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:clusterId/services/:name/stop'
+          url: myApiPrefix + 'clusters/:clusterId/services/:name/stop'
         },
         restart: {
           method: 'POST',
-          url: MYAPI_PREFIX + 'clusters/:clusterId/services/:name/restart'
+          url: myApiPrefix + 'clusters/:clusterId/services/:name/restart'
         }
       }
     )

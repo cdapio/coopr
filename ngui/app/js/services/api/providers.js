@@ -1,10 +1,10 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApi_providers', function($resource, MYAPI_PREFIX){
+module.factory('myApi_providers', function($resource, myApiPrefix){
 
   return {
 
-    Provider: $resource(MYAPI_PREFIX + 'providers/:name',
+    Provider: $resource(myApiPrefix + 'providers/:name',
       { name: '@name' },
       { 
         update: {
@@ -13,7 +13,7 @@ module.factory('myApi_providers', function($resource, MYAPI_PREFIX){
       }
     ),
 
-    ProviderType: $resource(MYAPI_PREFIX + 'plugins/providertypes/:type')
+    ProviderType: $resource(myApiPrefix + 'plugins/providertypes/:type')
 
   };
 

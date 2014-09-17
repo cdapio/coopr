@@ -1,10 +1,10 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApi_provisioners', function($resource, MYAPI_PREFIX){
+module.factory('myApi_provisioners', function($resource, myApiPrefix){
 
   return {
 
-    Provisioner: $resource(MYAPI_PREFIX + 'provisioners/:id',
+    Provisioner: $resource(myApiPrefix + 'provisioners/:id',
       { id: '@id' },
       {}
     )

@@ -109,3 +109,29 @@ angular
       });
     });
   });
+
+/**
+ * Config is already defined in test env,
+ * in all other cases we must fetch the config before bootstraping
+ */
+try {
+  if(angular.injector([PKG.name+'.config'])) { // will throw if undefined
+    start();
+  }
+}
+catch(e) {
+  angular.injector(['ng']).get('$http').get('/config.json')
+    .then(function (response) {
+      angular.module(PKG.name+'.config', [])
+        .constant('MY_CONFIG', response.data);
+    })
+    .then(start);
+}
+
+
+function start () {
+  angular.element(document).ready( function () {
+    angular.bootstrap(document, [PKG.name]);
+  });
+}
+

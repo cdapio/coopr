@@ -1,9 +1,9 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApi_templates', function($resource, MYAPI_PREFIX){
+module.factory('myApi_templates', function($resource, myApiPrefix){
 
   return {
-    Template: $resource(MYAPI_PREFIX + 'clustertemplates/:name',
+    Template: $resource(myApiPrefix + 'clustertemplates/:name',
       { name: '@name' },
       { 
         update: {
