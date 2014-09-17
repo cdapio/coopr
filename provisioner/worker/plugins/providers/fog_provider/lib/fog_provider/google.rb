@@ -39,6 +39,9 @@ class FogProviderGoogle < Provider
     @providerid = @hostname.split('.').first
     fields = inputmap['fields']
     begin
+      # set the provider id in the response
+      @result['result']['providerid'] = @providerid
+
       # set instance variables from our fields
       fields.each do |k, v|
         instance_variable_set('@' + k, v)
@@ -56,10 +59,10 @@ class FogProviderGoogle < Provider
       @disks = [disk]
 
       # handle additional data disk
-      if fields['google_data_disk_size_gb']
+      if fields['google_data_disk_size_gb'] && fields['google_data_disk_size_gb'].to_i > 0
         data_disk_name = "#{@providerid}-data"
         log.debug "Creating data disk: #{data_disk_name} of size #{fields['google_data_disk_size_gb']}"
-        create_disk(data_disk_name, fields['google_data_disk_size_gb'], @zone_name, nil)
+        create_disk(data_disk_name, fields['google_data_disk_size_gb'].to_i, @zone_name, nil)
         data_disk = confirm_disk(data_disk_name)
         @disks.push(data_disk)
       end
@@ -67,9 +70,6 @@ class FogProviderGoogle < Provider
       # create the VM
       connection.servers.create(create_server_def)
 
-      # Process results
-      # return the unique providerid we used
-      @result['result']['providerid'] = @providerid
       # set ssh user
       sshuser =
         if @ssh_user.to_s != ''
@@ -317,6 +317,21 @@ class FogProviderGoogle < Provider
     args[:size_gb] = size_gb
     args[:zone_name] = zone_name
     args[:source_image] = source_image unless source_image.nil?
+
+    # check if a disks already exists (retry scenario)
+    disk = connection.disks.get(name)
+    unless disk.nil?
+      # disk of requested name exists already
+      existing_size_gb = disk.size_gb
+      existing_zone_name = disk.zone_name.nil? ? nil : disk.zone_name.split('/').last
+      existing_source_image = disk.source_image.nil? ? nil : disk.source_image.split('/').last
+      if size_gb == existing_size_gb && zone_name == existing_zone_name && source_image == existing_source_image
+        log.debug "Using pre-exising disk for #{name}, it must not be attached already"
+        return disk.name
+      else
+        fail "Disk #{disk.name} already exists with different specifications"
+      end
+    end
     disk = connection.disks.create(args)
     disk.name
   end
