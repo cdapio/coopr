@@ -2,12 +2,11 @@
   "name": "coopr-ngui",
   "private": true,
   "dependencies": {
-    "angular": "1.2.24",
-    "angular-sanitize": "~1.2.24",
-    "angular-mocks": "~1.2.24",
-    "angular-resource": "~1.2.24",
+    "angular": "~1.2.25",
+    "angular-sanitize": "~1.2.25",
+    "angular-mocks": "~1.2.25",
+    "angular-resource": "~1.2.25",
     "bootstrap": "~3.2.0",
-
     "angular-strap": "~2.1.0",
     "angular-ui-router": "~0.2.10",
     "ngstorage": "~0.3.0",
@@ -15,5 +14,8 @@
     "font-awesome": "~4.2.0",
     "es5-shim": "~4.0.3",
     "angular-moment": "~0.8.2"
+  },
+  "resolutions": {
+    "angular": "1.2.25"
   }
 }
