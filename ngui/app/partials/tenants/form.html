@@ -6,7 +6,7 @@
       <input id="inputTenantName" type="text" name="name" class="form-control" 
         placeholder="Name" 
         my-focus="inputTenantName"
-        ng-disabled="editing"
+        ng-readonly="isEditing"
         ng-pattern="/^\w+$/"
         ng-model="model.name" required/>
     </div>
@@ -54,8 +54,8 @@
       <button type="submit" class="btn btn-primary" 
         ng-disabled="submitting || tenantForm.$invalid">
         <span class="fa fa-save"></span>
-        <span ng-show="editing">Update</span>
-        <span ng-hide="editing">Create</span>
+        <span ng-show="isEditing">Update</span>
+        <span ng-hide="isEditing">Create</span>
       </button>
     </div>
   </div>
