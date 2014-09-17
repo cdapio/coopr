@@ -4,11 +4,12 @@ describe('service', function() {
   beforeEach(module('coopr-ngui.services'));
 
   describe('myApi', function() {
-    var myApi, myAuth, $rootScope, $httpBackend;
+    var myApi, myAuth, MY_CONFIG, $rootScope, $httpBackend;
 
     beforeEach(inject(function($injector) {
       myApi = $injector.get('myApi');
       myAuth = $injector.get('myAuth');
+      MY_CONFIG = $injector.get('MY_CONFIG');
       $rootScope = $injector.get('$rootScope');
       $httpBackend = $injector.get('$httpBackend');
     }));
@@ -49,6 +50,15 @@ describe('service', function() {
         item.$get();
         $httpBackend.flush();
         expect(item.foo).toEqual('bar');
+      });
+
+      it('should send Authorization header', function() {
+        $httpBackend.expectGET(/v2\/clusters$/, function(headers) {
+          return headers['Authorization'] === MY_CONFIG.authorization;
+        }).respond(201, '');
+
+        myApi.Cluster.query();
+        $httpBackend.flush();
       });
 
       it('should send X-Requested-With header', function() {
