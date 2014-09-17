@@ -1,7 +1,6 @@
-var module = angular.module(PKG.name+'.controllers');
+angular.module(PKG.name+'.controllers').controller('ClusterListCtrl', 
+function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
 
-
-module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
   CrudListBase.apply($scope);
 
   var timeoutPromise,
@@ -61,6 +60,3 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment
   });
 
 });
-
-
-

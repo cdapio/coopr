@@ -127,8 +127,8 @@ angular.module(PKG.name)
         authorizedRoles: MYAUTH_ROLE.superadmin
       }))
         .state(crud('Tenant', 'list', 'CrudListCtrl'))
-        .state(crud('Tenant', 'edit'))
-        .state(crud('Tenant', 'create')) 
+        .state(crud('Tenant', 'edit', 'CrudEditCtrl'))
+        .state(crud('Tenant', 'create', 'CrudCreateCtrl')) 
 
 
       ;
