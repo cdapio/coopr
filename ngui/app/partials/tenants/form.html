@@ -23,7 +23,7 @@
             <input id="inputWorkers" class="form-control" type="number" 
               ng-model="model.workers"
               ng-pattern="/^\d+$/"
-              min="0" max="2147483647" required/>
+              min="0" max="{{maxWorkers}}" required/>
           </div>
         </div>
         <div class="col-xs-4">

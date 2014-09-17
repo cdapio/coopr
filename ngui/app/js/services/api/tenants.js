@@ -24,7 +24,25 @@ module.factory('myApi_tenants', function($resource, myApiPrefix){
       }
     ),
 
-    Metric: $resource(myApiPrefix + 'metrics/:type')
+    Metric: $resource(myApiPrefix + 'metrics/:type',
+      { },
+      {
+        getTaskQueue: {
+          method: 'GET',
+          params: {type: 'queues'},
+          transformResponse: function (data) {
+            data = angular.fromJson(data);
+            var tasks = { queued: 0, inProgress: 0 };
+            angular.forEach(data, function (val) {
+              tasks.queued += (val.queued || 0);
+              tasks.inProgress += (val.inProgress || 0);
+            });
+            return tasks;
+          }
+        }
+
+      }
+    )
 
   };
 
