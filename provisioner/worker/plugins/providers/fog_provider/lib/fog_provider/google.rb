@@ -62,7 +62,7 @@ class FogProviderGoogle < Provider
       if fields['google_data_disk_size_gb'] && fields['google_data_disk_size'].to_i > 0
         data_disk_name = "#{@providerid}-data"
         log.debug "Creating data disk: #{data_disk_name} of size #{fields['google_data_disk_size_gb']}"
-        create_disk(data_disk_name, fields['google_data_disk_size_gb'], @zone_name, nil)
+        create_disk(data_disk_name, fields['google_data_disk_size_gb'].to_i, @zone_name, nil)
         data_disk = confirm_disk(data_disk_name)
         @disks.push(data_disk)
       end
