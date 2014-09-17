@@ -25,7 +25,8 @@ var express = require('express'),
     request = require('request'),
     async = require('async'),
     argv = require('optimist').argv,
-    nock = require('nock');
+    nock = require('nock'),
+    extend = require('util')._extend;
 
 /**
  * Set environment vars.
@@ -55,6 +56,7 @@ var ADMINS = {
     password: 'admin'
   }
 };
+
 var DEFAULT_API_KEY = '123456789abcdef';
 
 /*
@@ -115,6 +117,27 @@ site.app = express();
 site.AVAILABLE_SKINS = ['dark', 'light'];
 site.DEFAULT_SKIN = 'dark';
 site.skins = {};
+
+fs.readFile("server.json", "utf8", function(err, data) {
+  if (err) {
+    throw err;
+  }
+
+  site.conf = JSON.parse(data);
+});
+
+fs.exists("server-site.json", function(exists) {
+  if (exists) {
+
+    fs.readFile("server-site.json", "utf8", function(err, data) {
+      if (err) {
+        throw err;
+      }
+
+      site.conf = extend(site.conf, JSON.parse(data));
+    });
+  }
+});
 
 /**
  * Configure static files server.
@@ -200,7 +223,7 @@ site.getEntity = function (path, user) {
     request(options, function (err, response, body) {
       if (err) {
         callback('Error: ' + JSON.stringify(err));
-        return;  
+        return;
       } else {
         if (body) {
           try {
@@ -319,7 +342,7 @@ site.determinePermissionLevel = function (username, password) {
 };
 
 /**
- * Replaces date 
+ * Replaces date
  * @param  {[type]} timestamp [description]
  * @return {[type]}           [description]
  */
@@ -350,6 +373,22 @@ site.parseClusterData = function (clusters) {
     activeClusters: activeClusters,
     deletedClusters: deletedClusters,
     clusters: clusters
+  };
+};
+
+site.parseNodeData = function(nodeData) {
+  var activeNodes = 0, deletedNodes = 0;
+  var nodes = nodeData.map(function(node) {
+    if (node.createTime) {
+      node.createTime = site.formatDate(node.createTime);
+    }
+    activeNodes++;
+    return node;
+  });
+  return {
+    activeNodes: activeNodes,
+    deletedNodes: deletedNodes,
+    nodes: nodes
   };
 };
 
@@ -417,7 +456,7 @@ site.app.post('/import', function (req, res) {
           context.activeNodes = activeNodes;
           context.totalClusters = totalClusters;
           var config;
-          try {  
+          try {
             config = JSON.parse(data);
           } catch (err) {
             context.err = "JSON parse error.";
@@ -559,7 +598,7 @@ site.app.get('/tenants', function (req, res) {
       activeTab: 'tenants',
       authenticated: user,
       env: env,
-      skin: site.getSkin(req)  
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -591,7 +630,7 @@ site.app.get('/tenants/tenant/:name', function (req, res) {
       activeTab: 'tenants',
       authenticated: user,
       env: env,
-      skin: site.getSkin(req)  
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -647,7 +686,7 @@ site.app.get('/clustertemplates', function (req, res) {
       activeTab: 'clustertemplates',
       authenticated: user,
       env: env,
-      skin: site.getSkin(req)  
+      skin: site.getSkin(req)
     };
     if (err) {
       context.err = err;
@@ -1351,6 +1390,63 @@ site.app.get('/user/clusters/status/:id', function (req, res) {
   site.sendRequestAndHandleResponse(options, user, res);
 });
 
+site.app.get('/user/nodes/:id', function(req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/nodes/' + req.params.id,
+    method: 'GET'
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.get('/nodes/columns', function(req, res) {
+  res.json(site.conf.pages.nodes.columns);
+});
+
+site.app.get('/user/nodes', function(req, res) {
+  var user = site.checkAuth(req, res);
+  async.parallel([
+    site.getEntity('/nodes', user) ], function(err, results) {
+    var context = {
+      activeTab: 'nodes',
+      authenticated: user,
+      env: env,
+      skin: site.getSkin(req)
+    };
+    if (err) {
+      context.err = err;
+    } else {
+      var nodeData = site.parseNodeData(results[0]);
+      context.activeNodes = nodeData.activeNodes;
+//      context.deletedNodes = nodeData['deletedNodes'];
+      context.nodes = nodeData.nodes;
+    }
+    res.render('nodes/nodes.html', context);
+  });
+});
+
+site.app.get('/admin/nodes', function(req, res) {
+  var user = site.checkAuth(req, res, true);
+  async.parallel([
+    site.getEntity('/nodes', user) ], function(err, results) {
+    var context = {
+      activeTab: 'nodes',
+      authenticated: user,
+      env: env,
+      skin: site.getSkin(req)
+    };
+    if (err) {
+      context.err = err;
+    } else {
+      var nodeData = site.parseNodeData(results[0]);
+      context.activeNodes = nodeData.activeNodes;
+      //      context.deletedNodes = nodeData['deletedNodes'];
+      context.nodes = nodeData.nodes;
+    }
+    res.render('nodes/nodes.html', context);
+  });
+});
+
 /**
  * Login/logout routes. Post does the logging in and sets mock auth via a cookie.
  * !This is not a real auth system and can be easily duped, replace completely when appropriate.
@@ -1376,6 +1472,7 @@ site.app.post('/login', function (req, res) {
     res.redirect('/login');
     return;
   }
+
   var selectedSkin = site.DEFAULT_SKIN;
   var tenant = req.body.tenant;
   var options = {
@@ -1396,7 +1493,7 @@ site.app.post('/login', function (req, res) {
         site.logger.info('Improper JSON for profiles call ' + body);
       }
       var permissionLevel = site.determinePermissionLevel(user, password);
-      res.cookie(site.COOKIE_NAME, { 
+      res.cookie(site.COOKIE_NAME, {
         user: user,
         tenant: tenant,
         permission: permissionLevel,

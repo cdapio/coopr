@@ -1,0 +1,48 @@
+<div ng-controller="NodeViewCtrl">
+  <div class="row">
+    <div class="col-md-2">
+      <input id=inputGlobalSearch" type="text" class="form-control" placeholder="Search" ng-model="inputGlobalSearch" ng-show="!globalFilterVisibleState"/>
+      Filtered: [{totalShowingRows}] / [{rows.length}]
+    </div>
+    <div class="col-md-2 pull-right">
+      <select class="form-control" ng-model="selectedTopLevelFilter" ng-options="filterName for filterName in topLevelFilters">
+        <option value="">All [{topLevelFilterName | uncamel | capitalize}]s</option>
+      </select>
+    </div>
+  </div>
+  <table ng-table="tableParams" show-filter="false" class="table table-striped table-condensed ng-table-rowselected">
+    <thead>
+    <tr>
+      <th width="30" style="text-align: left" header="'ng-table/headers/checkbox.html'">
+        <input type="checkbox" ng-model="checkboxes.checked" id="select_all" name="filter-checkbox"/>
+      </th>
+      <th ng-repeat="column in columns" ng-show="column.visible"
+          class="text-center sortable" ng-class="{
+                    'sort-asc': tableParams.isSortBy(column.field, 'asc'),
+                    'sort-desc': tableParams.isSortBy(column.field, 'desc')
+                  }"
+          ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
+        <div>[{column.title | uncamel | capitalize}]</div>
+      </th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="row in $data"
+        ng-class="{'active': checkboxes.items[row.id]}">
+      <td width="30" style="text-align: left">
+        <input type="checkbox" ng-model="checkboxes.items[row.id]"/>
+      </td>
+      <td ng-repeat="column in columns"
+          ng-show="column.visible"
+          ng-click="checkboxes.items[row.id] = !checkboxes.items[row.id];"
+          sortable="column.field">
+        [{row[column.field]}]
+      </td>
+      <td>
+        <button class="btn btn-sm btn-default" ng-click="openModal($index)">Details</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

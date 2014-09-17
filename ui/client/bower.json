@@ -1,0 +1,27 @@
+{
+  "name": "Loom Web UI",
+  "description": "Continuuity Loom UI",
+  "version": "0.0.1",
+  "homepage": "https://github.com/continuuity/loom",
+  "license": "Apache License, Version 2.0, http://www.apache.org/licenses/LICENSE-2.0",
+  "private": true,
+  "dependencies": {
+    "angular": "1.2.x",
+    "angular-mocks": "~1.2.x",
+    "angular-sanitize": null,
+    "angular-bootstrap": "~0.11.0",
+    "ng-table": "^0.3.3",
+    "bootstrap": "~3.2.0",
+    "angular-route": "~1.2.x",
+    "angular-resource": "~1.2.x",
+    "jquery": "1.9.1",
+    "angular-animate": "~1.2.22",
+    "tablesorter": null,
+    "bootbox": "4.2.0",
+    "jquery-textrange": "1.3.1",
+    "less": "1.7.4",
+    "modernizr": null,
+    "requirejs": null,
+    "underscore": "1.6.0"
+  }
+}

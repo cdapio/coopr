@@ -26,6 +26,7 @@
         <link rel="stylesheet" href="/static/css/main.css">
         <link rel="stylesheet" type="text/css" href="/static/css/{{skin}}/custom_tablesorter.css">
         <link rel="stylesheet" href="/static/third_party/bootstrap_3/css/bootstrap.min.css">
+        {% block headcss %}{% endblock %}
         {% if env == 'production' %}
             <link rel="stylesheet" type="text/css" href="/static/css/{{skin}}/custom.css">
         {% else %}
@@ -176,7 +177,7 @@
                         </tr>
                       {% endfor %}
                     </tbody>
-                    
+
                   </table>
                   {% else %}
                     <p>You haven't configured any clustertemplates.</p>

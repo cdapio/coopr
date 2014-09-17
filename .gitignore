@@ -18,6 +18,9 @@ target/
 Gemfile.lock
 .bundle/*
 
+# Bower
+/ui/client/bower_components/
+
 # Coverage reports
 coverage
 

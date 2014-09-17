@@ -1,0 +1,20 @@
+{% extends "user/index.html" %}
+{% block headcss %}
+<link rel="stylesheet" href="/static/bower_components/ng-table/ng-table.css"/>
+{% endblock %}
+{% block headscript %}
+<script src="/static/bower_components/angular/angular.js" type="text/javascript"></script>
+<script src="/static/bower_components/angular-sanitize/angular-sanitize.min.js" type="text/javascript"></script>
+<script src="/static/bower_components/ng-table/ng-table.js" type="text/javascript"></script>
+<script src="/static/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="/static/js/user/nodes.js" type="text/javascript"></script>
+{% endblock %}
+{% block content %}
+<div ng-app="nodeview">
+  <div id="content-body">
+    {% include "user/nodes/nodes-panel.html" %}
+  </div>
+  <script data-main="/static/js/user/nodes" src="/static/bower_components/requirejs/require.js"></script>
+</div>
+{% endblock %}
+
