@@ -1,0 +1,18 @@
+<form name="templateForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
+
+
+
+  <div class="form-group">
+    <div class="col-xs-10 col-xs-offset-2">
+      <button type="submit" class="btn btn-primary" 
+        ng-disabled="submitting || templateForm.$invalid">
+        <span class="fa fa-save"></span>
+        <span ng-show="editing">Update</span>
+        <span ng-hide="editing">Create</span>
+      </button>
+    </div>
+  </div>
+
+</form>
+
+<pre>{{model | json}}</pre>
