@@ -377,14 +377,14 @@ The very first time you install Coopr, you will need to perform some data initia
 register the provisioner plugins, and the plugin resources included with Coopr
 ::
 
- $ sudo -u coopr COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/provisioner/bin/setup.sh
+ $ sudo COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/provisioner/bin/setup.sh
 
 Coopr provides a set of useful default templates that covers most supported use cases. For new users and administrators of Coopr, we
 recommend installing these defaults as a starting point for template definition. These defaults are required for running
 the example in the :doc:`Quick Start Guide </guide/quickstart/index>`, and are included in the server package. To load these templates, run:
 ::
 
- $ sudo -u coopr COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/server/config/defaults/load-defaults.sh
+ $ sudo COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/server/config/defaults/load-defaults.sh
 
 If you have not configured the server port, it defaults to 55054.
 
