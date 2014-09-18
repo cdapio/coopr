@@ -73,7 +73,7 @@ angular.module(PKG.name)
         authorizedRoles: MYAUTH_ROLE.admin
       }))
         .state(crud('Provider', 'list', 'CrudListCtrl'))
-        .state(crud('Provider', 'edit'))
+        .state(crud('Provider', 'edit', 'ProviderFormCtrl'))
         .state(crud('Provider', 'create')) 
 
 
