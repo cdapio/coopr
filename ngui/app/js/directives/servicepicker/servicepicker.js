@@ -1,5 +1,9 @@
 /**
  * myServicePicker
+ *
+ * similar to myThingPicker, but with extra stuff specifically for services
+ *
+ * share the style and template with myThingPicker
  */
 
 var module = angular.module(PKG.name+'.directives');
@@ -12,7 +16,8 @@ module.directive('myServicePicker',
 function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
   return {
     restrict: 'E',
-    templateUrl: 'servicepicker/servicepicker.html',
+    templateUrl: 'thingpicker/thingpicker.html',
+    replace: true,
 
     scope: {
       model: '=', // an array of names
@@ -22,6 +27,8 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
     },
 
     controller: function ($scope, myApi) {
+
+      $scope.thingName = "service";
 
       $scope.rmService = function (what) {
         $scope.model = $scope.model.filter(function (name) {
@@ -50,7 +57,7 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
 
 
       function remapAddables (available, avoidable) {
-        $scope.addsvcDropdown = (available||[]).reduce(function (out, svc) {
+        $scope.addDropdown = (available||[]).reduce(function (out, svc) {
           if((avoidable||[]).indexOf(svc.name)===-1) {
             out.push({
               text: svc.name,
