@@ -1,6 +1,18 @@
-var module = angular.module(PKG.name+'.directives');
+/**
+ * myFocus
+ *
+ * add the my-focus attribute to elements that you will want to trigger focus/select on
+ *  then in the controller, use myFocusManager to trigger the DOM event
+ *
+ * in template:
+ * <input type="text" my-focus="aNameForTheField" />
+ *
+ * in controller, inject myFocusManager, then:
+ * myFocusManager.focus('aNameForTheField');
+ */
 
-module.directive('myFocus', function myFocusDirective ($timeout, myFocusManager) {
+angular.module(PKG.name+'.directives').directive('myFocus',
+function myFocusDirective ($timeout, myFocusManager) {
   return {
 
     restrict: 'A',

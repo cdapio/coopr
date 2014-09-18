@@ -1,9 +1,12 @@
-var module = angular.module(PKG.name+'.directives');
+/**
+ * myProviderFields
+ */
 
-module.directive('myProviderFields', function myProviderFieldsDirective () {
+angular.module(PKG.name+'.directives').directive('myProviderFields', 
+function myProviderFieldsDirective () {
   return {
     restrict: 'E',
-    templateUrl: 'providerfields/providerfields.tpl',
+    templateUrl: 'providerfields/providerfields.html',
     scope: {
       model: '=',
       provider: '='

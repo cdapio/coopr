@@ -1,7 +1,10 @@
-var module = angular.module(PKG.name+'.filters');
+/**
+ * myTitleFilter
+ * intended for use in the <title> tag.
+ */
 
-
-module.filter('myTitleFilter', function myTitleFilter () {
+angular.module(PKG.name+'.filters').filter('myTitleFilter', 
+function myTitleFilter () {
 
   return function(state) {
     var title = state.data && state.data.title;

@@ -115,7 +115,7 @@ gulp.task('tpl', function() {
   return merge(
 
     gulp.src([
-      './app/js/directives/**/*.tpl'
+      './app/js/directives/**/*.html'
     ])
       .pipe(plug.angularTemplatecache({
         module: pkg.name + '.directives'
@@ -137,7 +137,7 @@ gulp.task('tpl', function() {
 
 
 gulp.task('html', function() {
-  return gulp.src('./app/**/*.html')
+  return gulp.src(['./app/*.html', './app/partials/**/*'])
     .pipe(gulp.dest('./dist'));
 });
 
@@ -192,8 +192,8 @@ gulp.task('watch', ['build'], function() {
 
   gulp.watch('./app/**/*.js', ['js:app']);
   gulp.watch('./app/**/*.{less,css}', ['css:app']);
-  gulp.watch(['./app/js/directives/**/*.tpl', './app/partials/home.html'], ['tpl']);
-  gulp.watch('./app/**/*.html', ['html']);
+  gulp.watch(['./app/js/directives/**/*.html', './app/partials/home.html'], ['tpl']);
+  gulp.watch(['./app/*.html', './app/partials/**/*'], ['html']);
   gulp.watch('./app/img/**/*', ['img']);
 
 });

@@ -1,3 +1,7 @@
+/**
+ * SubnavCtrl
+ */
+
 angular.module(PKG.name+'.controllers').controller('SubnavCtrl', 
 function ($scope, $state, myApi) {
 

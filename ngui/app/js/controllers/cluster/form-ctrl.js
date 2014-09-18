@@ -1,3 +1,8 @@
+/**
+ * ClusterFormCtrl
+ * handles both "edit" and "create" views
+ */
+
 angular.module(PKG.name+'.controllers').controller('ClusterFormCtrl', 
 function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
 

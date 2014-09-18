@@ -1,3 +1,8 @@
+/**
+ * TenantFormCtrl
+ * handles both "edit" and "create" views
+ */
+
 angular.module(PKG.name+'.controllers').controller('TenantFormCtrl', 
 function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
   CrudFormBase.apply($scope);

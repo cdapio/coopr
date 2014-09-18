@@ -1,9 +1,16 @@
-var module = angular.module(PKG.name+'.directives');
+/**
+ * myPassword
+ *
+ * implements "click2show" behavior
+ *
+ * <my-password data-value="password"></my-password>
+ */
 
-module.directive('myPassword', function myPasswordDirective (myFocusManager) {
+angular.module(PKG.name+'.directives').directive('myPassword', 
+function myPasswordDirective (myFocusManager) {
   return {
     restrict: 'E',
-    templateUrl: 'password/click2show.tpl',
+    templateUrl: 'password/click2show.html',
     replace: true,
     scope: {
       value: '='

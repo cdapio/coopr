@@ -1,3 +1,7 @@
+/**
+ * HomeCtrl
+ */
+
 angular.module(PKG.name+'.controllers').controller('HomeCtrl', 
 function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
 

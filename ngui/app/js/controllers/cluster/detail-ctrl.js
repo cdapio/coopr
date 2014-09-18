@@ -1,3 +1,7 @@
+/**
+ * ClusterDetailCtrl
+ */
+
 angular.module(PKG.name+'.controllers').controller('ClusterDetailCtrl', 
 function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, myApi, $timeout, moment) {
 

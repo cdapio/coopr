@@ -1,13 +1,18 @@
+/**
+ * myServicePicker
+ */
+
 var module = angular.module(PKG.name+'.directives');
 
 module.constant('MYSERVICEPICKER_EVENT', {
   manage: 'myservicepicker-manage'
 });
 
-module.directive('myServicePicker', function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
+module.directive('myServicePicker', 
+function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
   return {
     restrict: 'E',
-    templateUrl: 'servicepicker/servicepicker.tpl',
+    templateUrl: 'servicepicker/servicepicker.html',
 
     scope: {
       model: '=', // an array of names

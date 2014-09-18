@@ -1,10 +1,13 @@
-// adapted from https://gist.github.com/maxbates/11002270
-
-/*
-example usage: <textarea my-json-edit="myObject" rows="8" class="form-control"></textarea>
+/**
+ * myJsonEdit
+ *
+ * adapted from https://gist.github.com/maxbates/11002270
+ *
+ * <textarea my-json-edit="myObject" rows="8" class="form-control"></textarea>
  */
 
-angular.module(PKG.name+'.directives').directive('myJsonEdit', function () {
+angular.module(PKG.name+'.directives').directive('myJsonEdit', 
+function myJsonEditDirective () {
   return {
     restrict: 'A',
     require: 'ngModel',

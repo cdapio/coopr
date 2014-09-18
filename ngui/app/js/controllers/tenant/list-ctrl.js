@@ -1,3 +1,7 @@
+/**
+ * TenantListCtrl
+ */
+
 angular.module(PKG.name+'.controllers').controller('TenantListCtrl', 
 function ($scope, $timeout, $q, myApi, CrudListBase) {
   CrudListBase.apply($scope);

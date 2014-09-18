@@ -1,6 +1,22 @@
-var module = angular.module(PKG.name+'.directives');
+/**
+ * mySortable
+ * makes a <table> sortable
+ *
+ * adds "sortable.predicate" and "sortable.reverse" to the scope
+ *
+ * <table my-sortable>
+ *  <thead>
+ *    <tr ng-class="{'sort-enabled': list.length>1}">
+ *      <th data-predicate="createTime" data-predicate-default="reverse">creation time</th>
+ *    </tr>
+ *  </thead>
+ *  <tbody>
+ *   <tr ng-repeat="item in list | orderBy:sortable.predicate:sortable.reverse">
+ *    <td>...
+ */
 
-module.directive('mySortable', function mySortableDirective ($log) {
+angular.module(PKG.name+'.directives').directive('mySortable',
+function mySortableDirective ($log) {
 
   function getPredicate(node) {
     return node.attr('data-predicate') || node.text();
