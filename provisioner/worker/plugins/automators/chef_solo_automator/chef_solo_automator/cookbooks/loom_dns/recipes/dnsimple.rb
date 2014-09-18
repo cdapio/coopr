@@ -21,14 +21,17 @@
   include_recipe recipe
 end
 
-if node['loom_dns']['dnsimple']['use_databag']
-  bag = node['loom_dns']['dnsimple']['databag_name']
-  item = node['loom_dns']['dnsimple']['databag_item']
-  dnsimple = data_bag_item(bag, item)
-elsif node['dnsimple']['username'] && node['dnsimple']['password']
+# Get credentials
+if node['dnsimple']['username'] && node['dnsimple']['password']
   dnsimple = node['dnsimple']
 else
-  Chef::Application.fatal!('You must specify either a data bag or username/password!')
+  begin
+    bag = node['loom_dns']['dnsimple']['databag_name']
+    item = node['loom_dns']['dnsimple']['databag_item']
+    dnsimple = data_bag_item(bag, item)
+  rescue
+    Chef::Application.fatal!('You must specify either a data bag or username/password!')
+  end
 end
 
 # Setup some variables
