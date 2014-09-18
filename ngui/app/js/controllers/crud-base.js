@@ -41,10 +41,13 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
   return function CrudFormBase () {
     var $state = $injector.get('$state'),
         myApi = $injector.get('myApi'),
+        editing = !$state.includes('*.create'),
         scope = this;
 
+    scope.editing = editing;
+
     scope.doSubmit = function (model) {
-      doThenList(model, $state.includes('*.create') ? '$save' : '$update');
+      doThenList(model, editing ? '$update' : '$save');
     };
 
     scope.doDelete = function (model) {

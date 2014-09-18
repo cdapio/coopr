@@ -60,8 +60,8 @@ angular.module(PKG.name)
         authorizedRoles: MYAUTH_ROLE.admin
       }))
         .state(crud('Template', 'list', 'CrudListCtrl'))
-        .state(crud('Template', 'edit'))
-        .state(crud('Template', 'create')) 
+        .state(crud('Template', 'edit', 'TemplateFormCtrl'))
+        .state(crud('Template', 'create', 'TemplateFormCtrl')) 
 
 
 
