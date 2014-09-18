@@ -30,6 +30,7 @@ angular
       'mgcrea.ngStrap.dropdown',
       'mgcrea.ngStrap.collapse',
       'mgcrea.ngStrap.button',
+      'mgcrea.ngStrap.tab',
       'mgcrea.ngStrap.modal'
     ]).name,
 

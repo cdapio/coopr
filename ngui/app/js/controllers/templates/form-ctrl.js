@@ -16,4 +16,5 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
   }
 
 
+  
 });

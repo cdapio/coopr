@@ -61,6 +61,8 @@ gulp.task('js:lib', function() {
 
       './bower_components/angular-strap/dist/modules/dimensions.js',
       './bower_components/angular-strap/dist/modules/button.js',
+      './bower_components/angular-strap/dist/modules/tab.js',
+      './bower_components/angular-strap/dist/modules/tab.tpl.js',
       './bower_components/angular-strap/dist/modules/tooltip.js',
       './bower_components/angular-strap/dist/modules/tooltip.tpl.js',
       './bower_components/angular-strap/dist/modules/dropdown.js',
