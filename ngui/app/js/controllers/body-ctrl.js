@@ -1,3 +1,9 @@
+/**
+ * BodyCtrl
+ * attached to the <body> tag, mostly responsible for 
+ *  setting the className based events from $state and myTheme
+ */
+
 angular.module(PKG.name+'.controllers').controller('BodyCtrl', 
 function ($scope, myTheme, MYTHEME_EVENT) {
 
