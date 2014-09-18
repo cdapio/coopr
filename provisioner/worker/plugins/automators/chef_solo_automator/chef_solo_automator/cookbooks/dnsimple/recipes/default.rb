@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: loom_base
+# Cookbook Name:: dnsimple
 # Recipe:: default
 #
-# Copyright 2013, Continuuity, Inc.
+# Copyright 2014, Aetrion LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,18 +17,19 @@
 # limitations under the License.
 #
 
-# This forces an apt-get update on Ubuntu/Debian
-case node['platform_family']
-when 'debian'
-  include_recipe 'apt::default'
-when 'rhel'
-  include_recipe 'yum-epel::default' if node['base']['use_epel'].to_s == 'true'
+include_recipe 'build-essential'
+
+value_for_platform_family(
+  'debian' => ['libxml2-dev', 'libxslt1-dev'],
+  'rhel' => ['libxml2-devel', 'libxslt-devel'],
+).each do |pkg|
+  r = package( pkg ) { action :nothing }
+  r.run_action( :install )
 end
 
-# We always run our dns, firewall, and hosts cookbooks
-%w(dns firewall hosts).each do |cb|
-  include_recipe "loom_#{cb}::default"
+chef_gem 'fog' do
+  version node['dnsimple']['fog_version']
+  action :install
 end
 
-# ensure user ulimits are enabled 
-include_recipe 'ulimit::default'
+require 'fog'
