@@ -93,6 +93,11 @@ span.text-info[bs-tooltip] {
 
 fieldset.tab-pane {
   padding-top: 1em;
+
+  &.am-fade.active-add {
+    // cf http://mgcrea.github.io/angular-strap/##tabs-usage
+    animation-name: fadeIn;
+  }
 }
 
 body div.progress {
