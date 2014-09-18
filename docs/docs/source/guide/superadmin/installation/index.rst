@@ -265,24 +265,23 @@ If you are setting up a MySQL database from scratch you can run the following on
  | users              |
  +--------------------+
 
-where coopr.sql is the example schema file at ``/opt/coopr/server/config/sql``, and where passwords are replaced and entered as needed.
+where passwords are replaced and entered as needed.
 
-Coopr Server Configuration
---------------------------
+Configuration
+=============
 
-Coopr Server settings can be changed under the ``/etc/coopr/conf/coopr-site.xml`` configuration file. For a list of
-available configurations, see the :doc:`Server Configuration </guide/superadmin/server-config>` page.
+Server
+------
 
+Site Config
+^^^^^^^^^^^
+Coopr Server settings can be changed under the ``/etc/coopr/conf/coopr-site.xml`` configuration file.
+You will likely want to add configuration settings for zookeeper, your database, and server host. There is also
+an example configuration file you can examine at ``/etc/coopr/conf/coopr-site.xml.example``.
+For a list of available configurations, see the :doc:`Server Configuration </guide/superadmin/server-config>` page. 
 
-.. _setting-environmental-variables:
-
-Setting Environmental Variables
-===============================
-
-Several environmental variables can be set in Coopr Provisioner and Coopr UI.
-
-Coopr Server
-------------
+Environment
+^^^^^^^^^^^
 The Server environmental variables can be set at ``/etc/default/coopr-server``. The configurable variables are as below:
 
 .. list-table::
@@ -304,8 +303,17 @@ The Server environmental variables can be set at ``/etc/default/coopr-server``. 
      - -XX:+UseConcMarkSweepGC -XX:+UseParNewGC
      - java options to use when running the Coopr Server
 
-Coopr Provisioner
------------------
+Provisioner
+-----------
+
+Site Config
+^^^^^^^^^^^
+Coopr Provisioner settings can be changed under the ``/etc/coopr/conf/provisioner-site.xml`` configuration file.
+You will likely want to add configuration settings for the server uri the provisioner should connect to.
+For a list of available configurations, see the :doc:`Provisioner Configuration </guide/superadmin/provisioner-config>` page.
+
+Environment
+^^^^^^^^^^^
 The Provisioner environmental variables can be set at ``/etc/default/coopr-provisioner``. The configurable variables are as below:
 
 .. list-table::
@@ -317,17 +325,19 @@ The Provisioner environmental variables can be set at ``/etc/default/coopr-provi
    * - ``COOPR_LOG_DIR``
      - /var/log/coopr
      - Path for the log directory
-   * - ``COOPR_SERVER_URI``
-     - http://localhost:55054
-     - The URI for Coopr Server
    * - ``COOPR_LOG_LEVEL``
      - info
      - Logging level
+   * - ``PROVISIONER_SITE_CONF``
+     - /etc/coopr/conf/provisioner-site.xml
+     - Location of site config
 
+UI
+--
 
-Coopr UI
---------
-The UI environmental variables can be set at ``/etc/default/coopr-ui``. The configurable variables are as below:
+Environment
+^^^^^^^^^^^
+The UI environment variables can be set at ``/etc/default/coopr-ui``. The configurable variables are as below:
 
 .. list-table::
    :header-rows: 1
@@ -361,16 +371,22 @@ for a Coopr Provisioner, you can use:
 
 .. _loading_defaults:
 
-Loading Default Templates
-=========================
+Initial Setup
+=============
+The very first time you install Coopr, you will need to perform some data initialization. The first thing you must do is
+register the provisioner plugins, and the plugin resources included with Coopr
+::
+
+ $ sudo -u coopr COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/provisioner/bin/setup.sh
 
 Coopr provides a set of useful default templates that covers most supported use cases. For new users and administrators of Coopr, we
 recommend installing these defaults as a starting point for template definition. These defaults are required for running
-the example in the :doc:`Quick Start Guide </guide/quickstart/index>`. To load these templates, run:
+the example in the :doc:`Quick Start Guide </guide/quickstart/index>`, and are included in the server package. To load these templates, run:
 ::
 
-  $ export COOPR_SERVER_URI=http://<coopr-server>:<coopr-port>
-  $ /opt/coopr/server/config/defaults/load-defaults.sh
+ $ sudo -u coopr COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/server/config/defaults/load-defaults.sh
+
+If you have not configured the server port, it defaults to 55054.
 
 .. note::
     Setting the ``COOPR_SERVER_URI`` environment variable is only required if you have configured the Coopr Server to

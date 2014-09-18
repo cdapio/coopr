@@ -24,7 +24,6 @@
 Server Configuration
 ====================
 
-.. include:: /guide/admin/admin-links.rst
 
 Configuring the server
 ----------------------
