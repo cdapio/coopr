@@ -190,6 +190,8 @@ Plugin type is automatortypes or providertypes, plugin name is the name of the p
 is one of the resource types defined in the plugin specification. The resource name is the name of 
 the resource. The POST body contains the binary contents of the resource.
 
+.. note:: If you are uploading an archive, the top level directory of your unpacked archive must be named exactly the same as your resource name. For example, if you are uploading an archive of a directory named 'mycookbook', you *must* name your resource 'mycookbook' in order for it to be used correctly. This issue will be fixed in the next release.
+
 HTTP Responses
 ^^^^^^^^^^^^^^
 
