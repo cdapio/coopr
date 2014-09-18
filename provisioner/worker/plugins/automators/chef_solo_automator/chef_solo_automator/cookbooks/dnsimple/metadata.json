@@ -1,0 +1,38 @@
+{
+  "name": "dnsimple",
+  "description": "Installs/Configures dnsimple",
+  "long_description": "## Description\n\nA Light-weight Resource and Provider (LWRP) supporting\nautomatic DNS configuration via DNSimple's API.\n\n## Changes\n\n[![Build Status](https://travis-ci.org/aetrion/chef-dnsimple.png?branch=master)](https://travis-ci.org/aetrion/chef-dnsimple)\n\n* Add [Test Kitchen](http://kitchen.ci)\n* Change method of disabling Excon's peer verification.\n* Convert README to markdown so it is displayed nice on Community\n  site.\n* Add default action `:create` for `dnsimple_record`.\n* Set values that `type` can be equal to in `dnsimple_record` resource.\n\n## Requirements\n\nA DNSimple account at http://dnsimple.com\n\n## Attributes\n\nAll attributes are `nil`, or `false` by default.\n\n- `node[:dnsimple][:username]`: Your DNSimple login username.\n- `node[:dnsimple][:password]`: Your DNSimple login password.\n- `node[:dnsimple][:domain]`: The domain that this node should use.\n- `node[:dnsimple][:test]`: Unused at this time.\n\n## Resources/Providers\n\ndnsimple\\_record\n----------------\n\nManage a DNS resource record through the DNSimple API. This LWRP uses\nthe [fog Ruby library](http://rubygems.org/gems/fog) to connect and\nuse the API.\n\n### Actions:\n\n    | Action    | Description          | Default |\n    |-----------|----------------------|---------|\n    | *create*  | Create the record.   | Yes     |\n    | *destroy* | Destroy the record.  |         |\n\n### Parameter Attributes:\n\nThe type of record can be one of the following: A, CNAME, ALIAS, MX,\nSPF, URL, TXT, NS, SRV, NAPTR, PTR, AAA, SSHFP, or HFINO.\n\n    | Parameter  | Description                | Default |\n    |------------|----------------------------|---------|\n    | *domain*   | Domain to manage           |         |\n    | *name*     | _Name_: Name of the record |         |\n    | *type*     | Type of DNS record         |         |\n    | *content*  | String content of record   |         |\n    | *ttl*      | Time to live.              | 3600    |\n    | *priority* | Priorty of update          |         |\n    | *username* | DNSimple username          |         |\n    | *password* | DNSimple password          |         |\n    | *test*     | Unused at this time        | false   |\n\n### Examples\n\n    dnsimple_record \"create an A record\" do\n      name     \"test\"\n      content  \"16.8.4.2\"\n      type     \"A\"\n      domain   node[:dnsimple][:domain]\n      username node[:dnsimple][:username]\n      password node[:dnsimple][:password]\n      action   :create\n    end\n\n    dnsimple_record \"create a CNAME record for a Google Apps site calendar\" do\n      name     \"calendar\"\n      content  \"ghs.google.com\"\n      type     \"CNAME\"\n      domain   node[:dnsimple][:domain]\n      username node[:dnsimple][:username]\n      password node[:dnsimple][:password]\n      action   :create\n    end\n\n## Usage\n\nAdd the the `dnsimple` recipe to a node's run list, or with\n`include_recipe` to install the [fog](http://rubygems.org/gems/fog)\ngem, which is used to interact with the DNSimple API. See\nexamples of the LWRP usage above.\n\n## License and Author\n\n* Author:: [Darrin Eden](https://github.com/dje)\n* Author:: [Joshua Timberman](https://github.com/jtimberman)\n* Author:: [Jose Luis Salas](https://github.com/josacar)\n\nCopyright:: 2014 Aetrion LLC\n\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n    http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n",
+  "maintainer": "DNSimple",
+  "maintainer_email": "ops@dnsimple.com",
+  "license": "Apache 2.0",
+  "platforms": {
+    "amazon": ">= 0.0.0",
+    "centos": ">= 0.0.0",
+    "debian": ">= 0.0.0",
+    "fedora": ">= 0.0.0",
+    "redhat": ">= 0.0.0",
+    "rhel": ">= 0.0.0",
+    "ubuntu": ">= 0.0.0"
+  },
+  "dependencies": {
+    "build-essential": "~> 1.4.2"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+    "dnsimple": "Installs fog gem to use w/ the dnsimple_record"
+  },
+  "version": "1.0.0"
+}
