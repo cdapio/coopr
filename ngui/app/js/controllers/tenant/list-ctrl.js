@@ -14,6 +14,8 @@ function ($scope, $timeout, $q, myApi, CrudListBase) {
 
   updateTicker();
 
+  /* ----------------------------------------------------------------------- */
+
   function updateTicker() {
     $q.all({
       tasks: myApi.Metric.getTaskQueue().$promise,

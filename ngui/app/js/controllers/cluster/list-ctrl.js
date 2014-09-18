@@ -33,6 +33,11 @@ function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
     }
   });
 
+  $scope.$on('$destroy', function () {
+    $timeout.cancel(timeoutPromise);
+  });
+
+  /* ----------------------------------------------------------------------- */
 
   function updatePending () {
     if(filterFilter($scope.list, {status:'pending'}).length) {
@@ -58,9 +63,5 @@ function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
       1000);
     }
   }
-
-  $scope.$on('$destroy', function () {
-    $timeout.cancel(timeoutPromise);
-  });
 
 });

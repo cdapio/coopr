@@ -39,6 +39,16 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
         });
       };
 
+      $scope.$watchCollection('model', function(newVal) {
+        remapAddables($scope.available, newVal);
+        remapActionables(newVal);
+      });
+
+      $scope.$watchCollection('available', function(newVal) {
+        remapAddables(newVal, $scope.model);
+      });
+
+
       function remapAddables (available, avoidable) {
         $scope.addsvcDropdown = (available||[]).reduce(function (out, svc) {
           if((avoidable||[]).indexOf(svc.name)===-1) {
@@ -90,14 +100,6 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
         }, {});
       }
 
-      $scope.$watchCollection('model', function(newVal) {
-        remapAddables($scope.available, newVal);
-        remapActionables(newVal);
-      });
-
-      $scope.$watchCollection('available', function(newVal) {
-        remapAddables(newVal, $scope.model);
-      });
 
     }
   };

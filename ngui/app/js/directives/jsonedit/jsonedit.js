@@ -18,6 +18,29 @@ function myJsonEditDirective () {
     },
     link: function (scope, element, attrs, ngModelCtrl) {
 
+      //init
+      setEditing(scope.model);
+
+      //check for changes going out
+      scope.$watch('jsonEditing', function (newval, oldval) {
+        if (newval !== oldval) {
+          if (isValidJson(newval)) {
+            setValid();
+            updateModel(newval);
+          } else {
+            setInvalid();
+          }
+        }
+      }, true);
+
+      //check for changes coming in
+      scope.$watch('model', function (newval, oldval) {
+        if (newval !== oldval) {
+          setEditing(newval);
+        }
+      }, true);
+
+
       function setEditing (value) {
         scope.jsonEditing = angular.copy(json2string(value));
       }
@@ -58,28 +81,6 @@ function myJsonEditDirective () {
         }
         return flag;
       }
-
-      //init
-      setEditing(scope.model);
-
-      //check for changes going out
-      scope.$watch('jsonEditing', function (newval, oldval) {
-        if (newval !== oldval) {
-          if (isValidJson(newval)) {
-            setValid();
-            updateModel(newval);
-          } else {
-            setInvalid();
-          }
-        }
-      }, true);
-
-      //check for changes coming in
-      scope.$watch('model', function (newval, oldval) {
-        if (newval !== oldval) {
-          setEditing(newval);
-        }
-      }, true);
 
     }
   };

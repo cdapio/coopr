@@ -125,6 +125,8 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
   $scope.doActionsModal = doActionsModal;
 
 
+  /* ----------------------------------------------------------------------- */
+
 
   function doActionsModal (nodeId) {
     $state.go('clusters.detail.node', {nodeId: nodeId});
@@ -152,8 +154,6 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
   function failure () {
     $state.go('404');
   }
-
-
 
 
   function update () {

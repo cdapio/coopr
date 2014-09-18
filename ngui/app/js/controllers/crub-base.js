@@ -43,6 +43,16 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
         myApi = $injector.get('myApi'),
         scope = this;
 
+    scope.doSubmit = function (model) {
+      doThenList(model, $state.includes('*.create') ? '$save' : '$update');
+    };
+
+    scope.doDelete = function (model) {
+      doThenList(model, '$delete');
+    };
+
+    /* ----------------------------------------------------------------------- */
+  
     function doThenList(model, method) {
       scope.submitting = true;
 
@@ -61,13 +71,6 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
         });
     }
 
-    scope.doSubmit = function (model) {
-      doThenList(model, $state.includes('*.create') ? '$save' : '$update');
-    };
-
-    scope.doDelete = function (model) {
-      doThenList(model, '$delete');
-    };
 
   };
 });

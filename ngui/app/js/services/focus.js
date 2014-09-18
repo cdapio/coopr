@@ -8,16 +8,16 @@
 angular.module(PKG.name+'.services').service('myFocusManager', 
 function myFocusManagerService ($rootScope, $log) {
 
-  var _last = null;
+  var last = null;
 
   this.is = $rootScope.$new(true);
 
-  function _set (k, v) {
+  function set (k, v) {
     $log.log('[myFocusManager]', v, k);
-    this.is[_last] = false;
+    this.is[last] = false;
     this.is[k] = {};
     this.is[k][v] = Date.now();
-    _last = k;
+    last = k;
   }
 
   /**
@@ -25,7 +25,7 @@ function myFocusManagerService ($rootScope, $log) {
    * @param  {String} k  
    */
   this.focus = function(k) {
-    _set.call(this, k, 'focus');
+    set.call(this, k, 'focus');
   };
 
   /**
@@ -33,7 +33,7 @@ function myFocusManagerService ($rootScope, $log) {
    * @param  {String} k  
    */
   this.select = function(k) {
-    _set.call(this, k, 'select');
+    set.call(this, k, 'select');
   };
 
 });

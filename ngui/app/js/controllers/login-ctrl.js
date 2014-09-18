@@ -32,6 +32,8 @@ function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT,
 
   $scope.$on(MYAUTH_EVENT.loginFailed, focusLoginField);
 
+  /* ----------------------------------------------------------------------- */
+
   function focusLoginField() {
     $timeout(function() {
       myFocusManager.select($scope.credentials.username ? 'password' : 'username');

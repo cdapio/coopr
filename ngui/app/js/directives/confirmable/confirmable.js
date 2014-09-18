@@ -14,10 +14,6 @@ function myConfirmableDirective ($window, $modal) {
     restrict: 'A',
     link: function (scope, element, attrs) {
 
-      function confirmed() {
-        scope.$eval(attrs.myConfirmable);
-      }
-
       scope.myConfirm = function () {
 
         // TODO: replace with a nice modal
@@ -27,6 +23,10 @@ function myConfirmableDirective ($window, $modal) {
         }
 
       };
+
+      function confirmed() {
+        scope.$eval(attrs.myConfirmable);
+      }
 
     }
   };

@@ -18,10 +18,6 @@
 angular.module(PKG.name+'.directives').directive('mySortable',
 function mySortableDirective ($log) {
 
-  function getPredicate(node) {
-    return node.attr('data-predicate') || node.text();
-  }
-
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
@@ -73,4 +69,9 @@ function mySortableDirective ($log) {
 
     }
   };
+
+  function getPredicate(node) {
+    return node.attr('data-predicate') || node.text();
+  }
+
 });

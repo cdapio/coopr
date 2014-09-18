@@ -61,7 +61,7 @@ function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
   };
 
 
-
+  /* ----------------------------------------------------------------------- */
 
   function getData () {
     myApi.Cluster.query(function (list) {
