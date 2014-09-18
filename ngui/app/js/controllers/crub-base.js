@@ -1,7 +1,10 @@
 var module = angular.module(PKG.name+'.controllers');
 
+
+
 /**
- * a constructor implementing a generic list controller
+ * CrudListBase
+ * a base to be extended by list controllers
  */
 module.factory('CrudListBase', function CrudListBaseFactory() {
   return function CrudListBase () {
@@ -31,17 +34,8 @@ module.factory('CrudListBase', function CrudListBaseFactory() {
 
 
 /**
- * generic list controller
- */
-module.controller('CrudListCtrl', function ($scope, CrudListBase) {
-  CrudListBase.apply($scope);
-});
-
-
-
-
-/**
- * a constructor implementing $scope by the controllers that follow
+ * CrudFormBase
+ * a base to be extended by CrudEditCtrl and CrudCreateCtrl
  */
 module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
   return function CrudFormBase () {
@@ -49,6 +43,16 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
         myApi = $injector.get('myApi'),
         scope = this;
 
+    scope.doSubmit = function (model) {
+      doThenList(model, $state.includes('*.create') ? '$save' : '$update');
+    };
+
+    scope.doDelete = function (model) {
+      doThenList(model, '$delete');
+    };
+
+    /* ----------------------------------------------------------------------- */
+  
     function doThenList(model, method) {
       scope.submitting = true;
 
@@ -67,46 +71,7 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
         });
     }
 
-    scope.doSubmit = function (model) {
-      doThenList(model, $state.includes('*.create') ? '$save' : '$update');
-    };
-
-    scope.doDelete = function (model) {
-      doThenList(model, '$delete');
-    };
 
   };
 });
 
-
-
-/**
- * a controller to edit an existing model
- */
-module.controller('CrudEditCtrl', function ($scope, $state, myApi, CrudFormBase) {
-  CrudFormBase.apply($scope);
-
-  var data = $state.current.data,
-      failure = function () { $state.go('404'); };
-
-  if(data) {
-    $scope.model = myApi[data.modelName].get($state.params);
-    $scope.model.$promise.catch(failure);
-  }
-  else {
-    failure();
-  }
-});
-
-
-/**
- * a controller to create a new model
- */
-module.controller('CrudCreateCtrl', function ($scope, $state, myApi, CrudFormBase) {
-  CrudFormBase.apply($scope);
-
-  var data = $state.current.data;
-  if(data) {
-    $scope.model = new myApi[data.modelName]();
-  }
-});

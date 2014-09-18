@@ -1,38 +1,39 @@
-var module = angular.module(PKG.name+'.services');
-
 /**
- * watched by the myFocus directive, myFocusManager can be called 
+ * myFocusManager
+ * watched by the myFocus directive, this service can be called 
  *  from a controller to trigger focus() events, presumably on form inputs
+ * @return {Object}  with "focus" and "select" methods
  */
 
-module.service('myFocusManager', function myFocusManagerService ($rootScope, $log) {
+angular.module(PKG.name+'.services').service('myFocusManager', 
+function myFocusManagerService ($rootScope, $log) {
 
-  var _last = null;
+  var last = null;
 
   this.is = $rootScope.$new(true);
 
-  function _set (k, v) {
+  function set (k, v) {
     $log.log('[myFocusManager]', v, k);
-    this.is[_last] = false;
+    this.is[last] = false;
     this.is[k] = {};
     this.is[k][v] = Date.now();
-    _last = k;
+    last = k;
   }
 
   /**
    * triggers focus() on element with my-focus = k
-   * @param  {string} k  
+   * @param  {String} k  
    */
   this.focus = function(k) {
-    _set.call(this, k, 'focus');
+    set.call(this, k, 'focus');
   };
 
   /**
    * triggers select() on element with my-focus = k
-   * @param  {string} k  
+   * @param  {String} k  
    */
   this.select = function(k) {
-    _set.call(this, k, 'select');
+    set.call(this, k, 'select');
   };
 
 });

@@ -1,13 +1,18 @@
+/**
+ * myServicePicker
+ */
+
 var module = angular.module(PKG.name+'.directives');
 
 module.constant('MYSERVICEPICKER_EVENT', {
   manage: 'myservicepicker-manage'
 });
 
-module.directive('myServicePicker', function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
+module.directive('myServicePicker', 
+function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
   return {
     restrict: 'E',
-    templateUrl: 'servicepicker/servicepicker.tpl',
+    templateUrl: 'servicepicker/servicepicker.html',
 
     scope: {
       model: '=', // an array of names
@@ -33,6 +38,16 @@ module.directive('myServicePicker', function myServicePickerDirective (MYSERVICE
           $scope.$parent.$emit(MYSERVICEPICKER_EVENT.manage, action, name);
         });
       };
+
+      $scope.$watchCollection('model', function(newVal) {
+        remapAddables($scope.available, newVal);
+        remapActionables(newVal);
+      });
+
+      $scope.$watchCollection('available', function(newVal) {
+        remapAddables(newVal, $scope.model);
+      });
+
 
       function remapAddables (available, avoidable) {
         $scope.addsvcDropdown = (available||[]).reduce(function (out, svc) {
@@ -85,14 +100,6 @@ module.directive('myServicePicker', function myServicePickerDirective (MYSERVICE
         }, {});
       }
 
-      $scope.$watchCollection('model', function(newVal) {
-        remapAddables($scope.available, newVal);
-        remapActionables(newVal);
-      });
-
-      $scope.$watchCollection('available', function(newVal) {
-        remapAddables(newVal, $scope.model);
-      });
 
     }
   };

@@ -1,7 +1,11 @@
-var module = angular.module(PKG.name+'.controllers');
+/**
+ * ClusterFormCtrl
+ * handles both "edit" and "create" views
+ */
 
+angular.module(PKG.name+'.controllers').controller('ClusterFormCtrl', 
+function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
 
-module.controller('ClusterFormCtrl', function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
   var id = $state.params.id;
 
   $scope.model = new myApi.Cluster({id:id, clusterTemplate:'base', numMachines:1});

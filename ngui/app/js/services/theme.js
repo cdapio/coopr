@@ -1,3 +1,7 @@
+/**
+ * myTheme
+ */
+
 var module = angular.module(PKG.name+'.services');
 
 module.constant('MYTHEME_NAMES', [
@@ -9,7 +13,8 @@ module.constant('MYTHEME_EVENT', {
   changed: 'mytheme-changed'
 });
 
-module.service('myTheme', function myThemeService ($localStorage, $rootScope, MYTHEME_NAMES, MYTHEME_EVENT) {
+module.service('myTheme', 
+function myThemeService ($localStorage, $rootScope, MYTHEME_NAMES, MYTHEME_EVENT) {
 
   this.current = $localStorage.theme || MYTHEME_NAMES[0];
 

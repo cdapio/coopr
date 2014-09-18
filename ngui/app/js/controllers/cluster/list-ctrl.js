@@ -1,7 +1,10 @@
-var module = angular.module(PKG.name+'.controllers');
+/**
+ * ClusterListCtrl
+ */
 
+angular.module(PKG.name+'.controllers').controller('ClusterListCtrl', 
+function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
 
-module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
   CrudListBase.apply($scope);
 
   var timeoutPromise,
@@ -10,7 +13,7 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment
 
   $scope.isActive = function (item) { 
     // any cluster created recently is considered "active" for display purposes
-    return (moment(item.createTime)>tenMinutesAgo) || (item.status!=='terminated');
+    return (moment(item.createTime)>tenMinutesAgo) || ['terminated','incomplete'].indexOf(item.status)===-1;
   };
 
   $scope.$watchCollection('list', function (list) {
@@ -30,6 +33,11 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment
     }
   });
 
+  $scope.$on('$destroy', function () {
+    $timeout.cancel(timeoutPromise);
+  });
+
+  /* ----------------------------------------------------------------------- */
 
   function updatePending () {
     if(filterFilter($scope.list, {status:'pending'}).length) {
@@ -56,11 +64,4 @@ module.controller('ClusterListCtrl', function ($scope, $filter, $timeout, moment
     }
   }
 
-  $scope.$on('$destroy', function () {
-    $timeout.cancel(timeoutPromise);
-  });
-
 });
-
-
-

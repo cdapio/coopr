@@ -1,7 +1,9 @@
-var module = angular.module(PKG.name+'.controllers');
+/**
+ * HomeCtrl
+ */
 
-
-module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
+angular.module(PKG.name+'.controllers').controller('HomeCtrl', 
+function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
 
   var filterFilter = $filter('filter');
 
@@ -59,7 +61,7 @@ module.controller('HomeCtrl', function ($scope, $filter, $modal, $alert, myAuth,
   };
 
 
-
+  /* ----------------------------------------------------------------------- */
 
   function getData () {
     myApi.Cluster.query(function (list) {

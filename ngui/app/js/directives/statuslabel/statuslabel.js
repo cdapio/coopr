@@ -1,9 +1,23 @@
-var module = angular.module(PKG.name+'.directives');
+/**
+ * myStatusLabel
+ *
+ *  if item.status==='pending' show item.progress.actionstatus
+ *  else show item.status
+ *
+ *  <my-status-label 
+ *       data-value="item.status" 
+ *       data-display="{
+ *         'pending': item.progress.actionstatus
+ *       }"
+ *     ></my-status-label>
+ *
+ */
 
-module.directive('myStatusLabel', function myStatusLabelDirective () {
+angular.module(PKG.name+'.directives').directive('myStatusLabel', 
+function myStatusLabelDirective () {
   return {
     restrict: 'E',
-    templateUrl: 'statuslabel/statuslabel.tpl',
+    templateUrl: 'statuslabel/statuslabel.html',
     replace: true,
     scope: {
       status: '=value',

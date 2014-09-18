@@ -1,10 +1,9 @@
 angular.module(PKG.name)
   .config(function ($stateProvider, $urlRouterProvider, MYAUTH_ROLE) {
 
-    /////////////////////////////
-    // Redirects and Otherwise //
-    /////////////////////////////
-
+    /**
+     * Redirects and Otherwise
+     */
     $urlRouterProvider
       .when('/signin', '/login')
       .otherwise(function($injector, $location){
@@ -12,10 +11,9 @@ angular.module(PKG.name)
       });
 
 
-    //////////////////////////
-    // State Configurations //
-    //////////////////////////
-
+    /**
+     * State Configurations
+     */
     $stateProvider
 
       .state('home', {
@@ -126,9 +124,9 @@ angular.module(PKG.name)
       .state(abstractSubnav('Tenant', {
         authorizedRoles: MYAUTH_ROLE.superadmin
       }))
-        .state(crud('Tenant', 'list', 'CrudListCtrl'))
-        .state(crud('Tenant', 'edit'))
-        .state(crud('Tenant', 'create')) 
+        .state(crud('Tenant', 'list', 'TenantListCtrl'))
+        .state(crud('Tenant', 'edit', 'TenantFormCtrl'))
+        .state(crud('Tenant', 'create', 'TenantFormCtrl')) 
 
 
       ;
@@ -237,6 +235,4 @@ angular.module(PKG.name)
   })
 
   ;
-
-
 
