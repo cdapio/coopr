@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: loom_dns
+# Cookbook Name:: coopr_dns
 # Recipe:: dnsimple
 #
 # Copyright (C) 2013-2014 Continuuity, Inc.
@@ -26,8 +26,8 @@ if node['dnsimple']['username'] && node['dnsimple']['password']
   dnsimple = node['dnsimple']
 else
   begin
-    bag = node['loom_dns']['dnsimple']['databag_name']
-    item = node['loom_dns']['dnsimple']['databag_item']
+    bag = node['coopr_dns']['dnsimple']['databag_name']
+    item = node['coopr_dns']['dnsimple']['databag_item']
     dnsimple = data_bag_item(bag, item)
   rescue
     Chef::Application.fatal!('You must specify either a data bag or username/password!')
@@ -35,15 +35,15 @@ else
 end
 
 # Setup some variables
-fqdn = node['loom']['hostname'] ? node['loom']['hostname'] : node['fqdn']
+fqdn = node['coopr']['hostname'] ? node['coopr']['hostname'] : node['fqdn']
 hostname = fqdn.split('.').first
 subdomain = fqdn.split('.', 2).last
-access_v4 = node['loom']['ipaddresses']['access_v4'] ? node['loom']['ipaddresses']['access_v4'] : node['ipaddress']
+access_v4 = node['coopr']['ipaddresses']['access_v4'] ? node['coopr']['ipaddresses']['access_v4'] : node['ipaddress']
 
 # Do not register "private" domains
 case subdomain
 when 'local', 'novalocal', 'internal'
-  subdomain = node['loom_dns']['default_domain'] ? node['loom_dns']['default_domain'] : 'local'
+  subdomain = node['coopr_dns']['default_domain'] ? node['coopr_dns']['default_domain'] : 'local'
 end
 
 # Create DNS entries for access_v4
@@ -53,6 +53,6 @@ dnsimple_record hostname do
   username dnsimple['username']
   password dnsimple['password']
   domain subdomain
-  ttl node['loom_dns']['default_ttl']
+  ttl node['coopr_dns']['default_ttl']
   not_if { subdomain = 'local' }
 end

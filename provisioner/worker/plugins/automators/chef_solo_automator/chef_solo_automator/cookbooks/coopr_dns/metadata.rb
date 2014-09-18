@@ -1,4 +1,4 @@
-name             'loom_dns'
+name             'coopr_dns'
 maintainer       'Continuuity'
 maintainer_email 'ops@continuuity.com'
 license          'All rights reserved'

@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: loom_dns
+# Cookbook Name:: coopr_dns
 # Recipe:: default
 #
 # Copyright (C) 2013-2014 Continuuity, Inc.
@@ -17,8 +17,8 @@
 # limitations under the License.
 #
 
-unless node['loom_dns']['provider'].nil?
-  include_recipe "loom_dns::#{node['loom_dns']['provider']}"
+unless node['coopr_dns']['provider'].nil?
+  include_recipe "coopr_dns::#{node['coopr_dns']['provider']}"
 else
   Chef::Log.warn('No DNS provider configured, skipping DNS registration')
 end
