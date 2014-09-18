@@ -57,7 +57,7 @@ with a minimum speed of 2 GHz
      - 256 MB per provisioner worker; for example, with 10 workers, 2.5 GB minimum
    * - Database (ex: MySQL)
      - RAM
-     - 2 GB minimum, 4 GB recommended
+     - 1 GB minimum, 2 GB recommended
    * - 
      - Disk
      - Disk usage increases as Coopr usage increases; suggested minimum of 50GB
