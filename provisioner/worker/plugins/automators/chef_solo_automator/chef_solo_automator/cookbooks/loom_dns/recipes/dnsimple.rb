@@ -26,8 +26,7 @@ if node['loom_dns']['dnsimple']['use_databag']
   item = node['loom_dns']['dnsimple']['databag_item']
   dnsimple = data_bag_item(bag, item)
 elsif node['dnsimple']['username'] && node['dnsimple']['password']
-  dnsimple['username'] = node['dnsimple']['username']
-  dnsimple['password'] = node['dnsimple']['password']
+  dnsimple = node['dnsimple']
 else
   Chef::Application.fatal!('You must specify either a data bag or username/password!')
 end
