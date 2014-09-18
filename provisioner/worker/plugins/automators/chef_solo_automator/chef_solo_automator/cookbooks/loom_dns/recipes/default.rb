@@ -19,4 +19,6 @@
 
 unless node['loom_dns']['provider'].nil?
   include_recipe "loom_dns::#{node['loom_dns']['provider']}"
+else
+  Chef::Log.warn('No DNS provider configured, skipping DNS registration')
 end
