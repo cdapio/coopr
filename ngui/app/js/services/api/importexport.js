@@ -1,6 +1,5 @@
-var module = angular.module(PKG.name+'.services');
-
-module.factory('myApi_importexport', function($resource, myApiPrefix){
+angular.module(PKG.name+'.services').factory('myApi_importexport', 
+function ($resource, myApiPrefix) {
 
   return {
 

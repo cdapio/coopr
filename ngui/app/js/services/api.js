@@ -1,3 +1,9 @@
+/**
+ * myApi
+ * wraps all calls to the REST API
+ * @return {Object} with one property xxxx per myApi_xxxx file 
+ */
+
 var module = angular.module(PKG.name+'.services');
 
 module.factory('myApiPrefix', function myApiPrefixFactory ($location, MY_CONFIG) {
