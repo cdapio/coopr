@@ -1,6 +1,6 @@
 {
-  "name": "standard-xxlarge",
-  "description": "Standard server - XXLarge 30GB",
+  "name": "standard-2xlarge",
+  "description": "Standard server - 2XLarge 30GB",
   "providermap": {
     "google": {
       "flavor": "n1-standard-8",

@@ -10,10 +10,16 @@ first you need a server
 * `open target` and unzip the _SNAPSHOT-standalone_ file
 * `COOPR_USE_DUMMY_PROVISIONER=true COOPR_DISABLE_UI=true target/(...)/bin/coopr.sh start -f 50`
 
-once that is running, to work on the frontend:
+## once that is running, to work on the frontend:
+
+Global dependencies:
+
+* `npm install -g bower gulp`
+
+Local dependencies:
 
 * `cd ../ngui`
-* `npm install && bower install` (assumes you have `bower` installed globally)
+* `npm install && bower install`
 
 then, each in their own tab:
 

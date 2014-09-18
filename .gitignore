@@ -1,3 +1,4 @@
+npm-debug.log
 .vagrant
 Berksfile.lock
 *~
@@ -59,3 +60,4 @@ chefignore
 /.profile
 /.ssh
 /.viminfo
+

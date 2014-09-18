@@ -1,7 +1,7 @@
-var module = angular.module(PKG.name+'.services');
-
-
-module.value('myHelpers', {
+/**
+ * various utility functions
+ */
+angular.module(PKG.name+'.services').value('myHelpers', {
 
   /**
    * Parses milliseconds and converts to days, hours and minutes.

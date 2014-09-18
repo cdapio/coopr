@@ -1,10 +1,20 @@
-var module = angular.module(PKG.name+'.directives');
+/**
+ * myProgress
+ *
+ *  <my-progress 
+ *      data-type="bar"
+ *      data-add-cls="success striped"
+ *      data-value="model.progress.stepscompleted"
+ *      data-max="model.progress.stepstotal"
+ *    ></my-progress>
+ */
 
-module.directive('myProgress', function myProgressDirective () {
+angular.module(PKG.name+'.directives').directive('myProgress', 
+function myProgressDirective () {
   return {
     restrict: 'E',
     templateUrl: function(element, attrs) {
-      return 'progress/'+ (attrs.type||'bar') +'.tpl';
+      return 'progress/'+ (attrs.type||'bar') +'.html';
     },
     replace: true,
     scope: {

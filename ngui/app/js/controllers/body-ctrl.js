@@ -1,7 +1,11 @@
-var module = angular.module(PKG.name+'.controllers');
+/**
+ * BodyCtrl
+ * attached to the <body> tag, mostly responsible for 
+ *  setting the className based events from $state and myTheme
+ */
 
-
-module.controller('BodyCtrl', function ($scope, myTheme, MYTHEME_EVENT) {
+angular.module(PKG.name+'.controllers').controller('BodyCtrl', 
+function ($scope, myTheme, MYTHEME_EVENT) {
 
   var activeThemeClass = myTheme.getClassName();
 

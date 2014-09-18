@@ -1,10 +1,13 @@
-// adapted from https://gist.github.com/maxbates/11002270
-
-/*
-example usage: <textarea my-json-edit="myObject" rows="8" class="form-control"></textarea>
+/**
+ * myJsonEdit
+ *
+ * adapted from https://gist.github.com/maxbates/11002270
+ *
+ * <textarea my-json-edit="myObject" rows="8" class="form-control"></textarea>
  */
 
-angular.module(PKG.name+'.directives').directive('myJsonEdit', function () {
+angular.module(PKG.name+'.directives').directive('myJsonEdit', 
+function myJsonEditDirective () {
   return {
     restrict: 'A',
     require: 'ngModel',
@@ -14,6 +17,29 @@ angular.module(PKG.name+'.directives').directive('myJsonEdit', function () {
       model: '=myJsonEdit'
     },
     link: function (scope, element, attrs, ngModelCtrl) {
+
+      //init
+      setEditing(scope.model);
+
+      //check for changes going out
+      scope.$watch('jsonEditing', function (newval, oldval) {
+        if (newval !== oldval) {
+          if (isValidJson(newval)) {
+            setValid();
+            updateModel(newval);
+          } else {
+            setInvalid();
+          }
+        }
+      }, true);
+
+      //check for changes coming in
+      scope.$watch('model', function (newval, oldval) {
+        if (newval !== oldval) {
+          setEditing(newval);
+        }
+      }, true);
+
 
       function setEditing (value) {
         scope.jsonEditing = angular.copy(json2string(value));
@@ -55,28 +81,6 @@ angular.module(PKG.name+'.directives').directive('myJsonEdit', function () {
         }
         return flag;
       }
-
-      //init
-      setEditing(scope.model);
-
-      //check for changes going out
-      scope.$watch('jsonEditing', function (newval, oldval) {
-        if (newval !== oldval) {
-          if (isValidJson(newval)) {
-            setValid();
-            updateModel(newval);
-          } else {
-            setInvalid();
-          }
-        }
-      }, true);
-
-      //check for changes coming in
-      scope.$watch('model', function (newval, oldval) {
-        if (newval !== oldval) {
-          setEditing(newval);
-        }
-      }, true);
 
     }
   };

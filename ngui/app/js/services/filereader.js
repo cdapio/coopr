@@ -1,7 +1,11 @@
-var module = angular.module(PKG.name+'.services');
+/**
+ * myFileReader
+ * Prompt for a local file and read it as text
+ * @return {Object}  an object with a "get" method
+ */
 
-
-module.service('myFileReader', function myFileReaderService ($q, $document, $window, $log) {
+angular.module(PKG.name+'.services').service('myFileReader', 
+function myFileReaderService ($q, $document, $window, $log) {
 
   var input = angular.element('<input type="file" class="sr-only" />');
   $document.find('body').append(input);
@@ -26,6 +30,11 @@ module.service('myFileReader', function myFileReaderService ($q, $document, $win
     }
   });
 
+  /**
+   * trigger a filepicker
+   * @param  {Function} callback optional callback
+   * @return {Promise}  resolved with the content of file
+   */
   this.get = function (callback) {
     deferred = $q.defer();
 

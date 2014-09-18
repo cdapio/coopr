@@ -25,9 +25,10 @@ when 'rhel'
   include_recipe 'yum-epel::default' if node['base']['use_epel'].to_s == 'true'
 end
 
-# We always run our hosts and firewall cookbooks
-include_recipe "coopr_firewall::default"
-include_recipe "coopr_hosts::default"
+# We always run our dns, firewall, and hosts cookbooks
+%w(dns firewall hosts).each do |cb|
+  include_recipe "coopr_#{cb}::default"
+end
 
 # ensure user ulimits are enabled 
 include_recipe 'ulimit::default'
