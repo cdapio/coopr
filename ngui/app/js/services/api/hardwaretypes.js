@@ -1,10 +1,10 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApi_hardwaretypes', function($resource, MYAPI_PREFIX){
+module.factory('myApi_hardwaretypes', function($resource, myApiPrefix){
 
   return {
 
-    HardwareType: $resource(MYAPI_PREFIX + 'hardwaretypes/:name',
+    HardwareType: $resource(myApiPrefix + 'hardwaretypes/:name',
       { name: '@name' },
       { 
         update: {

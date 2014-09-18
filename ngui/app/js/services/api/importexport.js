@@ -1,12 +1,12 @@
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApi_importexport', function($resource, MYAPI_PREFIX){
+module.factory('myApi_importexport', function($resource, myApiPrefix){
 
   return {
 
-    Import: $resource(MYAPI_PREFIX + 'import'),
+    Import: $resource(myApiPrefix + 'import'),
 
-    Export: $resource(MYAPI_PREFIX + 'export', 
+    Export: $resource(myApiPrefix + 'export', 
       { }, 
       {
         query: {

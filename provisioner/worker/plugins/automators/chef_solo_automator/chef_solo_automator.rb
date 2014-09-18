@@ -95,8 +95,10 @@ class ChefSoloAutomator < Automator
     servicedata['coopr']['cluster'] = clusterdata
     servicedata['coopr']['services'] = node_services_data
 
-    # include the clusterId
+    # include additional node attributes not present in the cluster config
+    servicedata['coopr']['hostname'] = @task['config']['hostname']
     servicedata['coopr']['clusterId'] = @task['clusterId']
+    servicedata['coopr']['ipaddresses'] = @task['config']['ipaddresses']
 
     # we also need to merge cluster config top-level
     servicedata.merge!(clusterdata)
