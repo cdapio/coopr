@@ -1,27 +1,34 @@
 <form name="templateForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
 
+  <div ng-model="tabs.activeTab" bs-tabs>
 
-  <div bs-tabs>
-    <div title="Tab1" bs-pane>
-      tab1
-    </div>
-    <div title="Tab2" bs-pane>
-      tab2
-    </div>
-    <div title="Tab3" bs-pane>
-      tab3
-    </div>
-  </div>
+    <fieldset title="{{tab.title}}" ng-repeat="tab in tabs" bs-pane>
 
-  <div class="form-group">
-    <div class="col-xs-10 col-xs-offset-2">
-      <button type="submit" class="btn btn-primary" 
-        ng-disabled="submitting || templateForm.$invalid">
-        <span class="fa fa-save"></span>
-        <span ng-show="editing">Update</span>
-        <span ng-hide="editing">Create</span>
-      </button>
-    </div>
+      <div ng-include="tab.partial"></div>
+
+      <div class="form-group">
+        <div class="col-xs-10 col-xs-offset-2">
+
+          <button type="button" class="btn btn-default" 
+            ng-hide="$last"
+            ng-click="nextTab()">
+              Next
+              <span class="fa fa-long-arrow-right"></span>
+          </button>
+
+          <button type="submit" class="btn btn-primary" 
+            ng-show="$last"
+            ng-disabled="submitting || templateForm.$invalid">
+              <span class="fa fa-save"></span>
+              <span ng-show="editing">Update</span>
+              <span ng-hide="editing">Create</span>
+          </button>
+
+        </div>
+      </div>
+
+    </fieldset>
+
   </div>
 
 </form>
