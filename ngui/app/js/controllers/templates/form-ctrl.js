@@ -16,10 +16,10 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
   }
 
   $scope.tabs = [
-    {title: 'General',        partial: 'general.html'},
-    {title: 'Compatibility',  partial: 'compatibility.html'},
-    {title: 'Defaults',       partial: 'defaults.html'},
-    {title: 'Constraints',    partial: 'constraints.html'},
+    {title: 'General',        partial: 'form-tabs/general.html'},
+    {title: 'Compatibility',  partial: 'form-tabs/compatibility.html'},
+    {title: 'Defaults',       partial: 'form-tabs/defaults.html'},
+    {title: 'Constraints',    partial: 'form-tabs/constraints.html'},
   ];
   $scope.tabs.activeTab = 0;
 
