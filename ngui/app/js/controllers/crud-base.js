@@ -54,7 +54,6 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
       doThenList(model, '$delete');
     };
 
-    console.log($state);
     /* ----------------------------------------------------------------------- */
   
     function doThenList(model, method) {
