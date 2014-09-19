@@ -18,6 +18,7 @@
       "install": {
         "type": "chef-solo",
         "fields": {
+          "json_attributes": "{\"apt\":{\"compile_time_update\":\"true\"}}",
           "run_list": "recipe[loom_base::default]"
         }
       },
