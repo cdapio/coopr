@@ -17,17 +17,16 @@
       ng-model="model[name]"
       ng-disabled="overrideenabled && !fieldData.override"
       ng-required="required[name]" />
-    
-    <button id="field-{{$index}}" type="button" 
-      class="btn btn-default" 
-      ng-model="model[name]" 
-      data-html="1"
-      ng-options="region as region for region in fieldData.options" 
-      ng-if="fieldData.type === 'select'" 
+
+    <select id="field-{{$index}}" 
+      class="form-control"
+      title="{{fieldData.tip}}"
+      ng-model="model[name]"
+      ng-options="region as region for region in fieldData.options"
+      ng-if="fieldData.type === 'select'"
       ng-required="required[name]"
-      ng-disabled="overrideenabled && !fieldData.override"
-      bs-select><span class="caret"></span>
-    </button>
+      ng-disabled="overrideenabled && !fieldData.override">
+    </select>
   
   </div>
 </div>

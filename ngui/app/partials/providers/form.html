@@ -23,9 +23,15 @@
 
   <div class="form-group">
     <label for="inputproviderDescription" class="col-xs-2 control-label">Provider type</label>
-    <div class="col-xs-10">
-      <button type="button" class="btn btn-default" ng-model="model.providertype" data-html="1" ng-options="pType.name as pType.name for pType in providerTypes" ng-disabled="editing" bs-select><span class="caret"></span>
-      </button>
+    <div class="col-xs-6">
+      <select id="field-{{$index}}" 
+        class="form-control"
+        title="{{fieldData.tip}}"
+        ng-model="model.providertype"
+        ng-options="pType.name as pType.name for pType in providerTypes"
+        ng-required="required[name]"
+        ng-disabled="editing">
+      </select>
     </div>
   </div>
 
