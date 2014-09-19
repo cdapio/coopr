@@ -32,8 +32,6 @@ function myJsontoformfieldsDirective () {
     templateUrl: 'jsontoformfields/jsontoformfields.html',
     link: function (scope, element, attrs) {
 
-      scope.bindProvided = false;
-
       scope.$watch('fieldsconfig', function (newVal, oldVal) {
 
         if (!angular.equals(newVal, oldVal)) {
@@ -51,17 +49,8 @@ function myJsontoformfieldsDirective () {
       });
 
       scope.$watch('model', function (newVal, oldVal) {
-        if (!scope.bindProvided && !angular.equals(newVal, oldVal) && newVal) {  
-          scope.bindProvided = true;  
-        }
-        setDefaults();
-      });
-
-      scope.$watchCollection(['model', 'fieldsconfig'], function (newValues, oldValues) {
-        if (!angular.equals(newValues, oldValues)) {
-          setRequired(newValues[0]);
-        }
-      });
+        setRequired(newVal);
+      }, true);
 
       function setDefaults () {        
         if (!scope.fieldsconfig || !scope.model) {
@@ -75,21 +64,36 @@ function myJsontoformfieldsDirective () {
       }
 
       function setRequired (newVal) {
+        if (!scope.fieldsconfig || !scope.model) {
+          return;
+        }
+        
         var out = {};
-
         angular.forEach(newVal, function (val, key) {
           if(val && !out[key]) {
             angular.forEach(scope.fieldsconfig.required, function (set) {
               if(set.indexOf(key)>=0) {
-                angular.forEach(set, function (want) {
-                  out[want] = true;
-                });
+                out = transformRequired(set);
               }
             });
           }
         });
 
-        scope.required = out;
+        scope.required = Object.keys(out).length ? out 
+          : transformRequired(scope.fieldsconfig.required[0]);
+      }
+
+      /**
+       * Transforms required fields array into an object for template.
+       * @param  {Array} requiredFields.
+       * @return {Object} required {<fieldname>:true}
+       */
+      function transformRequired(requiredFields) {
+        var required = {};
+        angular.forEach(requiredFields, function (item) {
+          required[item] = true;
+        });
+        return required;
       }
 
     }
