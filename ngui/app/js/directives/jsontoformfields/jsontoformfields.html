@@ -1,4 +1,4 @@
- <div class="form-group" ng-repeat="(name,fieldData) in fieldsjson.fields">
+ <div class="form-group" ng-repeat="(name,fieldData) in fieldsconfig.fields">
   
   <label class="col-xs-2 control-label">{{fieldData.label}}</label>
   
@@ -6,7 +6,7 @@
 
     <input type="checkbox" id="field-{{$index}}" 
       title="{{fieldData.tip}}"
-      ng-model="bindobject[name]"
+      ng-model="model[name]"
       ng-if="fieldData.type=='checkbox'" 
       ng-required="required[name]"/>
 
@@ -14,12 +14,12 @@
       type="{{fieldData.type}}" 
       placeholder="{{fieldData.tip}}" 
       ng-if="fieldData.type === 'text' || fieldData.type == 'password'" 
-      ng-model="bindobject[name]" 
+      ng-model="model[name]" 
       ng-required="required[name]" />
     
     <button id="field-{{$index}}" type="button" 
       class="btn btn-default" 
-      ng-model="bindobject[name]" 
+      ng-model="model[name]" 
       data-html="1" 
       ng-options="region as region for region in fieldData.options" 
       ng-if="fieldData.type === 'select'" 
