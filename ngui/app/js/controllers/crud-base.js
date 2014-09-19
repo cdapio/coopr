@@ -41,7 +41,7 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
   return function CrudFormBase () {
     var $state = $injector.get('$state'),
         myApi = $injector.get('myApi'),
-        editing = !($state.includes('**.create') || $state.includes('**.create.**')),
+        editing = !$state.current.name.match(/\.create/),
         scope = this;
 
     scope.editing = editing;
@@ -54,6 +54,7 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
       doThenList(model, '$delete');
     };
 
+    console.log($state);
     /* ----------------------------------------------------------------------- */
   
     function doThenList(model, method) {
@@ -67,7 +68,7 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
       model[method]()
         .then(function () {
           scope.fetchSubnavList();
-          $state.go('^.list');
+          $state.go($state.current.name.split('.')[0] + '.list');
         })
         .finally(function () {
           scope.submitting = false;
