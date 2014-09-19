@@ -3,7 +3,7 @@
  *
  * This takes json of this format and converts them into form fields bound to a provided object.
  * !! This directive modifies model passed to it from the parent.
- *
+ * @param {Object|String} fieldsconfig configuration for fields.
  * Expected json:
  * fields: {
  *   <fieldname>: {
@@ -16,8 +16,11 @@
  * required: []
  *   [<fieldname>, <fieldname>]
  * }
+ * @param {Object} model Model to attach field values to.
+ * @param {Booelan} overrideenabled Determines whether only override-able form fields should be
+ * enabled.                                
  *
- * <div my-jsontoformfields fieldsconfig="json" model="model.fields"/>
+ * <div my-jsontoformfields fieldsconfig="json" model="model.fields" overrideenabled="false"/>
  */
 
 angular.module(PKG.name+'.directives').directive('myJsontoformfields', 
