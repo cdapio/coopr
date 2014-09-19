@@ -73,6 +73,7 @@ public class ClusterServiceTest extends BaseTest {
     EntityStoreView entityStoreView = entityStoreService.getView(new Account(Constants.ADMIN_USER, tenant.getId()));
     providerType = new ProviderType(
       "providertype",
+      null,
       "some description",
       ImmutableMap.of(
         ParameterType.ADMIN, new ParametersSpecification(
