@@ -40,7 +40,7 @@ function myThingPickerDirective () {
 
       function remapAddables (available, avoidable) {
         $scope.addDropdown = (available||[]).reduce(function (out, thing) {
-          var name = svc.name || svc; // in case available is an array of strings
+          var name = thing.name || thing; // in case available is an array of strings
           if((avoidable||[]).indexOf(name)===-1) {
             out.push({
               text: name,

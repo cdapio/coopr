@@ -96,12 +96,22 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
   /*
     when compatibility changes, ensure defaults are not still set to incompatible options
    */
-  angular.forEach(['hardwaretype', 'imagetype'], function (one) {
+  angular.forEach(['hardwaretype', 'imagetype', 'service'], function (one) {
     $scope.$watchCollection('model.compatibility.'+one+'s', function (newVal) {
       var d = $scope.model.defaults;
-      if(d && newVal.indexOf(d[one])===-1) {
-        d[one] = null;
+      if(d) {
+        if(one === 'service') {
+          d.services = d.services.filter(function (svc) {
+            return newVal.indexOf(svc)!==-1;
+          });
+        }
+        else {
+          if(newVal.indexOf(d[one])<0) {
+            d[one] = null;
+          }
+        }
       }
+
     });
   });
 
