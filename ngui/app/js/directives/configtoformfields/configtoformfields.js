@@ -1,10 +1,10 @@
 /**
- * jsontoformfields directive.
+ * Configtoformfields directive.
  *
- * This takes json of this format and converts them into form fields bound to a provided object.
+ * This takes a config and converts fields into form fields bound to a provided object.
  * !! This directive modifies model passed to it from the parent.
  * @param {Object|String} fieldsconfig configuration for fields.
- * Expected json:
+ * Expected config:
  * fields: {
  *   <fieldname>: {
  *     label: string,
@@ -20,11 +20,11 @@
  * @param {Booelan} overrideenabled Determines whether only override-able form fields should be
  * enabled.                                
  *
- * <div my-jsontoformfields fieldsconfig="json" model="model.fields" overrideenabled="false"/>
+ * <div my-configtoformfields fieldsconfig="json" model="model.fields" overrideenabled="false"/>
  */
 
-angular.module(PKG.name+'.directives').directive('myJsontoformfields', 
-function myJsontoformfieldsDirective () {
+angular.module(PKG.name+'.directives').directive('myConfigtoformfields', 
+function myConfigtoformfieldsDirective ($log) {
   return {
     restrict: 'AE',
     replace: true,
@@ -33,7 +33,7 @@ function myJsontoformfieldsDirective () {
       model: '=',
       overrideenabled: '='
     },
-    templateUrl: 'jsontoformfields/jsontoformfields.html',
+    templateUrl: 'configtoformfields/configtoformfields.html',
     link: function (scope, element, attrs) {
 
       scope.$watch('fieldsconfig', function (newVal, oldVal) {
@@ -46,9 +46,9 @@ function myJsontoformfieldsDirective () {
             }
 
             if (!scope.fieldsconfig.hasOwnProperty('fields')) {
-              throw Error('fields not declared in json for fieldsconfig');
+              $log.error('fields not declared in json for fieldsconfig');
             }
-            
+
           }
 
           setDefaults();

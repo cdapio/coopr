@@ -21,7 +21,7 @@
     <button id="field-{{$index}}" type="button" 
       class="btn btn-default" 
       ng-model="model[name]" 
-      data-html="1" 
+      data-html="1"
       ng-options="region as region for region in fieldData.options" 
       ng-if="fieldData.type === 'select'" 
       ng-required="required[name]"
