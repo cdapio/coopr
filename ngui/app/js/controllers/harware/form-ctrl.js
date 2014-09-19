@@ -10,14 +10,13 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
       .then(function() {
         $scope.providerMapShadow  = [];
         $scope.providerMapShadow .push({
-          flavor: "",
+          flavor: '',
           name: $scope.allProviders[0].name
         });
-        debugger;
       });
     $scope.addProviderHandlerOnCreate = function(event) {
       $scope.providerMapShadow .push({
-        flavor: "",
+        flavor: '',
         name: $scope.allProviders[0].name
       });
       event.preventDefault();
@@ -34,19 +33,19 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
           return {
             name: key,
             flavor: $scope.model.providermap[key].flavor,
-            disable: "true"
+            disable: 'true'
           };
         });
       })
       ['catch'](function() {
-        $state.go("404");
+        $state.go('404');
       });
       $scope.addProviderHandlerOnEdit = function(event) {
         $scope.providerMapShadowNew  = $scope.providerMapShadowNew || [];
         $scope.providerMapShadowNew.push({
-          flavor: "",
+          flavor: '',
           name: $scope.allProviders[0].name,
-          disable: "false"
+          disable: 'false'
         });
         event.preventDefault();
       };
@@ -82,5 +81,5 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
       .finally(function () {
         $scope.submitting = false;
       });
-  }
+  };
 });
