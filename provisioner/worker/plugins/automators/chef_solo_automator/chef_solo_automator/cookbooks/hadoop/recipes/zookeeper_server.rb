@@ -24,26 +24,31 @@ package 'zookeeper-server' do
   action :install
 end
 
+# HDP 2.0.11.0 (maybe others) doesn't create zookeeper group
+group 'zookeeper' do
+  action :create
+end
+
 zookeeper_conf_dir = "/etc/zookeeper/#{node['zookeeper']['conf_dir']}"
 
 # Setup zoo.cfg
-if node['zookeeper'].key? 'zoocfg'
+if node['zookeeper'].key?('zoocfg')
 
   # We need to create a data directory, if it exists
   zookeeper_data_dir =
-    if node['zookeeper']['zoocfg'].key? 'dataDir'
+    if node['zookeeper']['zoocfg'].key?('dataDir')
       node['zookeeper']['zoocfg']['dataDir']
     else
       '/var/lib/zookeeper'
     end
   zookeeper_log_dir =
-    if node['zookeeper']['zoocfg'].key? 'dataLogDir'
+    if node['zookeeper']['zoocfg'].key?('dataLogDir')
       node['zookeeper']['zoocfg']['dataLogDir']
     else
       '/var/lib/zookeeper'
     end
   zookeeper_client_port =
-    if node['zookeeper']['zoocfg'].key? 'clientPort'
+    if node['zookeeper']['zoocfg'].key?('clientPort')
       node['zookeeper']['zoocfg']['clientPort']
     else
       '2181'
@@ -56,7 +61,7 @@ if node['zookeeper'].key? 'zoocfg'
 
   directory zookeeper_data_dir do
     owner 'zookeeper'
-    group 'zookeeper'
+    group 'hadoop'
     mode '0755'
     recursive true
     action :create
@@ -65,11 +70,11 @@ if node['zookeeper'].key? 'zoocfg'
   unless zookeeper_log_dir == zookeeper_data_dir
     directory zookeeper_log_dir do
       owner 'zookeeper'
-      group 'zookeeper'
+      group 'hadoop'
       mode '0755'
       recursive true
       action :create
-      only_if { node['zookeeper']['zoocfg'].key? 'dataLogDir' }
+      only_if { node['zookeeper']['zoocfg'].key?('dataLogDir') }
     end
   end
 
@@ -106,21 +111,21 @@ if node['zookeeper'].key? 'zoocfg'
 end # End zoo.cfg
 
 # Setup zookeeper-env.sh
-if node['zookeeper'].key? 'zookeeper_env'
+if node['zookeeper'].key?('zookeeper_env')
   my_vars = { :options => node['zookeeper']['zookeeper_env'] }
 
   template "#{zookeeper_conf_dir}/zookeeper-env.sh" do
     source 'generic-env.sh.erb'
     mode '0755'
-    owner 'zookeeper'
-    group 'zookeeper'
+    owner 'root'
+    group 'root'
     action :create
     variables my_vars
   end
 end # End zookeeper-env.sh
 
 # Setup log4j.properties
-if node['zookeeper'].key? 'log4j'
+if node['zookeeper'].key?('log4j')
   my_vars = { :properties => node['zookeeper']['log4j'] }
 
   template "#{zookeeper_conf_dir}/log4j.properties" do

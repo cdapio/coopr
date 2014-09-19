@@ -192,6 +192,9 @@ proxy_username=<%= @config.proxy_username %>
 <% if @config.recent %>
 recent=<%= @config.recent %>
 <% end %>
+<% if @config.releasever %>
+releasever=<%= @config.releasever %>
+<% end %>
 <% if @config.repo_gpgcheck %>
 repo_gpgcheck=<%= @config.repo_gpgcheck %>
 <% end %>
@@ -219,7 +222,7 @@ sslclientcert=<%= @config.sslclientcert %>
 <% if @config.sslclientkey %>
 sslclientkey=<%= @config.sslclientkey %>
 <% end %>
-<% if @config.sslverify %>
+<% unless @config.sslverify.nil? %>
 sslverify=<%= @config.sslverify %>
 <% end %>
 <% if @config.syslog_device %>
@@ -246,3 +249,18 @@ tsflags=<%= @config.tsflags %>
 <% if @config.username %>
 username=<%= @config.username %>
 <% end %>
+<% if @config.options -%>
+<%   @config.options.each do |key, value| -%>
+<%= key %>=<%= 
+       case value
+       when Array
+         value.join("\n       ")
+       when TrueClass
+         '1'
+       when FalseClass
+         '0'
+       else
+         value
+       end %>
+<%   end -%>
+<% end -%>
