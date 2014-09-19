@@ -17,7 +17,7 @@
  *   [<fieldname>, <fieldname>]
  * }
  *
- * <div my-jsontoformfields fieldsjson="json" bindobject="model.fields"/>
+ * <div my-jsontoformfields fieldsconfig="json" bindobject="model.fields"/>
  */
 
 angular.module(PKG.name+'.directives').directive('myJsontoformfields', 
@@ -26,7 +26,7 @@ function myJsontoformfieldsDirective () {
     restrict: 'AE',
     replace: true,
     scope: {
-      fieldsjson: '=',
+      fieldsconfig: '=',
       bindobject: '='
     },
     templateUrl: 'jsontoformfields/jsontoformfields.html',
@@ -34,15 +34,15 @@ function myJsontoformfieldsDirective () {
 
       scope.bindProvided = false;
 
-      scope.$watch('fieldsjson', function (newVal, oldVal) {
+      scope.$watch('fieldsconfig', function (newVal, oldVal) {
 
         if (!angular.equals(newVal, oldVal)) {
-          if (scope.fieldsjson && typeof scope.fieldsjson !== 'object') {
-            scope.fieldsjson = angular.fromJson(scope.fieldsjson);
+          if (scope.fieldsconfig && typeof scope.fieldsconfig !== 'object') {
+            scope.fieldsconfig = angular.fromJson(scope.fieldsconfig);
           }
 
-          if (!scope.fieldsjson.hasOwnProperty('fields')) {
-            throw Error('fields not declared in json for fieldsjson');
+          if (!scope.fieldsconfig.hasOwnProperty('fields')) {
+            throw Error('fields not declared in json for fieldsconfig');
           }
 
           setDefaults();
@@ -57,17 +57,17 @@ function myJsontoformfieldsDirective () {
         setDefaults();
       });
 
-      scope.$watchCollection(['bindobject', 'fieldsjson'], function (newValues, oldValues) {
+      scope.$watchCollection(['bindobject', 'fieldsconfig'], function (newValues, oldValues) {
         if (!angular.equals(newValues, oldValues)) {
           setRequired(newValues[0]);
         }
       });
 
       function setDefaults () {        
-        if (!scope.fieldsjson || !scope.bindobject) {
+        if (!scope.fieldsconfig || !scope.bindobject) {
           return;
         }
-        angular.forEach(scope.fieldsjson.fields, function (field, key) {
+        angular.forEach(scope.fieldsconfig.fields, function (field, key) {
           if (field.hasOwnProperty('default') && !scope.bindobject[key]) {
             scope.bindobject[key] = field.default;
           }
@@ -79,7 +79,7 @@ function myJsontoformfieldsDirective () {
 
         angular.forEach(newVal, function (val, key) {
           if(val && !out[key]) {
-            angular.forEach(scope.fieldsjson.required, function (set) {
+            angular.forEach(scope.fieldsconfig.required, function (set) {
               if(set.indexOf(key)>=0) {
                 angular.forEach(set, function (want) {
                   out[want] = true;

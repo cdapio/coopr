@@ -15,10 +15,9 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
 
   var allHardware  = myApi.HardwareType.query(),
       allImages = myApi.ImageType.query(),
-      allServices = myApi.Service.query();
+      allServices = myApi.Service.query(),
+      availableProviderTypes = myApi.ProviderType.query();
 
-
-  $scope.availableProviderTypes = myApi.ProviderType.query();
   $scope.availableTemplates = myApi.Template.query();
   $scope.availableProviders = myApi.Provider.query();
   $scope.chosenProvider = {};
@@ -31,7 +30,7 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
     allHardware.$promise,
     allImages.$promise,
     allServices.$promise,
-    $scope.availableProviderTypes.$promise,
+    availableProviderTypes.$promise,
     $scope.availableProviders.$promise,
     $scope.availableTemplates.$promise
   ]).then(function () {
@@ -79,11 +78,9 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
         return p.name === name;
       })[0];
 
-      $scope.availableProviderTypes.forEach(function (type) {
-        if (type.name === $scope.chosenProvider.providertype) {
-          $scope.chosenProviderFields = type;
-        }
-      });
+      $scope.chosenProviderFields = availableProviderTypes.filter(function (type) {
+        return type.name === $scope.chosenProvider.providertype;
+      })[0];
     }); 
 
   });
