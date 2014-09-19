@@ -69,7 +69,7 @@
     <select id="inputProvider" name="provider" class="form-control"
       ng-disabled="model.id"
       ng-model="model.provider"
-      ng-options="prvdr.providertype as prvdr.description for prvdr in availableProviders" required>
+      ng-options="prvdr.name as prvdr.description for prvdr in availableProviders" required>
     </select>
   </div>
 

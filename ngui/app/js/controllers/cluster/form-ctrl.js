@@ -80,7 +80,7 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
       })[0];
 
       $scope.availableProviderTypes.forEach(function (type) {
-        if (type.name === name) {
+        if (type.name === $scope.chosenProvider.providertype) {
           $scope.chosenProviderFields = type;
         }
       });
