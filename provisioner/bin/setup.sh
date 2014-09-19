@@ -22,7 +22,7 @@ function wait_for_plugin_registration () {
     --output /dev/null --write-out "%{http_code}" \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
-    ${COOPR_SERVER_URI}/v2/plugins/automatortypes 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
+    ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
     sleep 2
     ((RETRIES++))
   done

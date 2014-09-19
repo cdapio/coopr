@@ -27,9 +27,10 @@ import java.util.Map;
  */
 public class AutomatorType extends AbstractPluginSpecification {
 
-  public AutomatorType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
+  public AutomatorType(String name, String icon, String description,
+                       Map<ParameterType, ParametersSpecification> parameters,
                        Map<String, ResourceTypeSpecification> resourceTypes) {
-    super(name, description, parameters, resourceTypes);
+    super(name, icon, description, parameters, resourceTypes);
   }
 
   /**
