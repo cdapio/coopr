@@ -1,7 +1,7 @@
 #
 # Author:: Marius Ducea (marius@promethost.com)
 # Cookbook Name:: nodejs
-# Recipe:: npm
+# Recipe:: source
 #
 # Copyright 2010-2012, Promet Solutions
 #
@@ -18,11 +18,25 @@
 # limitations under the License.
 #
 
-case node['nodejs']['npm']['install_method']
-when 'embedded'
-  include_recipe 'nodejs::nodejs'
-when 'source'
-  include_recipe 'nodejs::npm_from_source'
-else
-  Chef::Log.error('No install method found for npm')
+Chef::Resource::User.send(:include, NodeJs::Helper)
+
+include_recipe 'build-essential'
+
+case node['platform_family']
+when 'rhel', 'fedora'
+  package 'openssl-devel'
+when 'debian'
+  package 'libssl-dev'
+end
+
+version = "v#{node['nodejs']['version']}/"
+filename = "node-v#{node['nodejs']['version']}.tar.gz"
+nodejs_src_url = node['nodejs']['source']['url'] || ::URI.join(node['nodejs']['prefix_url'], version, filename).to_s
+
+ark 'nodejs-source' do
+  url nodejs_src_url
+  version node['nodejs']['version']
+  checksum node['nodejs']['source']['checksum']
+  make_opts ["-j #{node['nodejs']['make_threads']}"]
+  action :install_with_make
 end
