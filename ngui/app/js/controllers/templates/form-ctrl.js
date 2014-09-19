@@ -21,6 +21,11 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
       imagetypes: [],
       hardwaretypes: []
     };
+    $scope.model.defaults = {
+      config: {}
+    };
+
+
     promise = $q.when($scope.model);
   }
 
@@ -82,6 +87,22 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
   $scope.availableHardware = myApi.HardwareType.query();
   $scope.availableImages = myApi.ImageType.query();
 
+  /*
+    and the defaults section
+   */
+  $scope.availableProviders = myApi.Provider.query();
+
+  /*
+    when compatibility changes, ensure defaults are not still set to incompatible options
+   */
+  angular.forEach(['hardwaretype', 'imagetype'], function (one) {
+    $scope.$watchCollection('model.compatibility.'+one+'s', function (newVal) {
+      var d = $scope.model.defaults;
+      if(d && newVal.indexOf(d[one])===-1) {
+        d[one] = null;
+      }
+    });
+  });
 
 
 });
