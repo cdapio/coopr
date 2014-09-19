@@ -447,5 +447,4 @@ if defined?(ChefSpec)
   def create_windows_shortcut(resource_name)
     ChefSpec::Matchers::ResourceMatcher.new(:windows_shortcut, :create, resource_name)
   end
-
 end
