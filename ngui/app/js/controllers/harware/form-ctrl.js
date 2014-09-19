@@ -8,15 +8,15 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
     $scope.model = new myApi.HardwareType();
     $scope.allProviders.$promise
       .then(function() {
-        $scope.providermapShadow = [];
-        $scope.providermapShadow.push({
+        $scope.providerMapShadow  = [];
+        $scope.providerMapShadow .push({
           flavor: "",
           name: $scope.allProviders[0].name
         });
         debugger;
       });
     $scope.addProviderHandlerOnCreate = function(event) {
-      $scope.providermapShadow.push({
+      $scope.providerMapShadow .push({
         flavor: "",
         name: $scope.allProviders[0].name
       });
@@ -29,7 +29,7 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
     $scope.model.$promise
       .then(function () {
         window.a = $scope.model;
-        $scope.providermapShadow = Object.keys($scope.model.providermap || {})
+        $scope.providerMapShadow = Object.keys($scope.model.providermap || {})
         .map(function(key) {
           return {
             name: key,
@@ -42,8 +42,8 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
         $state.go("404");
       });
       $scope.addProviderHandlerOnEdit = function(event) {
-        $scope.providermapShadowNew = $scope.providermapShadowNew || [];
-        $scope.providermapShadowNew.push({
+        $scope.providerMapShadowNew  = $scope.providerMapShadowNew || [];
+        $scope.providerMapShadowNew.push({
           flavor: "",
           name: $scope.allProviders[0].name,
           disable: "false"
@@ -55,7 +55,7 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
 
   $scope.doSubmit = function(model) {
     var promise,
-        providerArr = $scope.providermapShadow;
+        providerArr = $scope.providerMapShadow;
     $scope.model.providermap = {};
     angular.forEach(providerArr, function(item) {
       $scope.model.providermap[item.name] = {
@@ -66,7 +66,7 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
     if (!$scope.editing) {
       promise = model.$save();
     } else {
-      angular.forEach($scope.providermapShadowNew, function(item) {
+      angular.forEach($scope.providerMapShadowNew, function(item) {
         $scope.model.providermap[item.name] = {
           flavor: item.flavor
         };
