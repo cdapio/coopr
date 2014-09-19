@@ -2,7 +2,7 @@
 
   <div ng-model="tabs.activeTab" bs-tabs>
 
-    <fieldset title="{{tab.title}}" ng-repeat="tab in tabs" bs-pane>
+    <fieldset data-title="{{tab.title}}" ng-repeat="tab in tabs" bs-pane>
 
       <div ng-include="'/partials/templates/'+tab.partial"></div>
 

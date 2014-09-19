@@ -61,9 +61,13 @@ angular.module(PKG.name)
       }))
         .state(crud('Template', 'list', 'CrudListCtrl'))
         .state(crud('Template', 'edit', 'TemplateFormCtrl'))
+          .state('templates.edit.tab', {
+            url: '/tab/:tab'
+          }) 
         .state(crud('Template', 'create', 'TemplateFormCtrl')) 
-
-
+          .state('templates.create.tab', {
+            url: '/tab/:tab'
+          }) 
 
       /*
         /#/providers/...

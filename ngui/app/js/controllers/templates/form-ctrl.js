@@ -19,18 +19,43 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
     promise = $q.when($scope.model);
   }
 
+
+
+  /*
+    tabs
+   */
   $scope.tabs = [
     {title: 'General',        partial: 'form-tabs/general.html'},
     {title: 'Compatibility',  partial: 'form-tabs/compatibility.html'},
     {title: 'Defaults',       partial: 'form-tabs/defaults.html'},
     {title: 'Constraints',    partial: 'form-tabs/constraints.html'},
   ];
-  $scope.tabs.activeTab = 0;
 
   $scope.nextTab = function () {
     $scope.tabs.activeTab = Math.min($scope.tabs.activeTab+1, $scope.tabs.length);
   }
 
+  if(!$state.includes('**.tab')) {
+    $state.go('.tab', {tab:0});
+  }
+
+  $scope.$on('$stateChangeSuccess', function (event, state) {
+    var tab = parseInt($state.params.tab, 10) || 0;
+    if((tab<0 || tab>$scope.tabs.length)) {
+      tab = 0;
+    }
+    $scope.tabs.activeTab = tab;
+  });
+
+  $scope.$watch('tabs.activeTab', function (newVal) {
+    $state.go('^.tab', {tab:newVal});
+  });
+
+
+
+  /*
+    leaseDuration
+   */
   $scope.leaseDuration = {};
 
   promise.then(function (model) {
@@ -43,9 +68,18 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
         model.administration.leaseduration[type] = myHelpers.concatMilliseconds(newVal);
       });
     });
-
-
   });
+
+
+
+
+  /*
+    available*
+   */
+  $scope.availableServices = myApi.Service.query();
+  $scope.availableHardware = myApi.HardwareType.query();
+  $scope.availableImages = myApi.ImageType.query();
+
 
 
 });

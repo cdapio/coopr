@@ -1,1 +1,34 @@
-<p>Pickled you probably haven't heard of them food truck, gastropub synth bitters disrupt butcher YOLO mustache PBR Brooklyn beard wolf brunch. Put a bird on it +1 wolf aesthetic 90's farm-to-table normcore, High Life hella quinoa food truck mustache jean shorts fixie. Tofu actually Williamsburg PBR&amp;B, seitan cliche drinking vinegar tote bag direct trade pork belly. Pickled twee fixie put a bird on it Helvetica you probably haven't heard of them. Tumblr viral Carles freegan Truffaut skateboard semiotics, gentrify post-ironic XOXO scenester. Freegan Williamsburg swag, street art Odd Future tousled cred chia biodiesel Godard Pitchfork. Jean shorts typewriter vinyl ugh stumptown flexitarian mixtape swag tattooed, pug Pitchfork.</p>
+<div class="form-group">
+  <label class="col-xs-2 control-label">Services</label>
+  <div class="col-xs-10">
+    <my-service-picker
+      data-model="model.compatibility.services"
+      data-allow-rm="true"
+      data-available="availableServices"
+    ></my-service-picker>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">Hardware Types</label>
+  <div class="col-xs-10">
+    <my-thing-picker
+      data-model="model.compatibility.hardwaretypes"
+      data-allow-rm="true"
+      data-available="availableHardware"
+      data-thing-name="Hardware Type"
+    ></my-thing-picker>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">Image Types</label>
+  <div class="col-xs-10">
+    <my-thing-picker
+      data-model="model.compatibility.imagetypes"
+      data-allow-rm="true"
+      data-available="availableImages"
+      data-thing-name="Image Type"
+    ></my-thing-picker>
+  </div>
+</div>
