@@ -32,24 +32,21 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
   ];
 
   $scope.nextTab = function () {
-    $scope.tabs.activeTab = Math.min($scope.tabs.activeTab+1, $scope.tabs.length);
+    $scope.tabs.activeTab++;
   }
 
-  if(!$state.includes('**.tab')) {
-    $state.go('.tab', {tab:0});
-  }
+  $scope.$watch('tabs.activeTab', function (newVal) {
+    $state.go($state.includes('**.tab') ? $state.current : '.tab', {tab:newVal});
+  });
 
   $scope.$on('$stateChangeSuccess', function (event, state) {
     var tab = parseInt($state.params.tab, 10) || 0;
-    if((tab<0 || tab>$scope.tabs.length)) {
+    if((tab<0 || tab>=$scope.tabs.length)) {
       tab = 0;
     }
     $scope.tabs.activeTab = tab;
   });
 
-  $scope.$watch('tabs.activeTab', function (newVal) {
-    $state.go('^.tab', {tab:newVal});
-  });
 
 
 
@@ -74,7 +71,7 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
 
 
   /*
-    available*
+    available resources for the compatibility section
    */
   $scope.availableServices = myApi.Service.query();
   $scope.availableHardware = myApi.HardwareType.query();

@@ -6,10 +6,12 @@
 
       <div ng-include="'/partials/templates/'+tab.partial"></div>
 
+      <hr />
+
       <div class="form-group">
         <div class="col-xs-10 col-xs-offset-2">
 
-          <button type="button" class="btn btn-default" 
+          <button type="button" class="btn btn-sm btn-default pull-right" 
             ng-hide="$last"
             ng-click="nextTab()">
               Next

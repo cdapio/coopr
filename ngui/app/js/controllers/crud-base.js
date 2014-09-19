@@ -41,7 +41,7 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
   return function CrudFormBase () {
     var $state = $injector.get('$state'),
         myApi = $injector.get('myApi'),
-        editing = !$state.includes('*.create'),
+        editing = !($state.includes('**.create') || $state.includes('**.create.**')),
         scope = this;
 
     scope.editing = editing;
