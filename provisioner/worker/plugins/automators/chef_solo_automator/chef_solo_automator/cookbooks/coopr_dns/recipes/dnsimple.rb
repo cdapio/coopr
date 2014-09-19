@@ -54,5 +54,5 @@ dnsimple_record hostname do
   password dnsimple['password']
   domain subdomain
   ttl node['coopr_dns']['default_ttl']
-  not_if { subdomain = 'local' }
+  not_if { subdomain == 'local' }
 end
