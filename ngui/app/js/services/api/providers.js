@@ -10,9 +10,7 @@ function ($resource, myApiPrefix) {
           method: 'PUT'
         }
       }
-    ),
-
-    ProviderType: $resource(myApiPrefix + 'plugins/providertypes/:type')
+    )
 
   };
 

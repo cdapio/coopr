@@ -69,7 +69,7 @@
     <select id="inputProvider" name="provider" class="form-control"
       ng-disabled="model.id"
       ng-model="model.provider"
-      ng-options="prvdr.name as prvdr.description for prvdr in availableProviders" required>
+      ng-options="prvdr.providertype as prvdr.description for prvdr in availableProviders" required>
     </select>
   </div>
 
@@ -87,11 +87,10 @@
 <div class="form-group">
   <label class="col-xs-2 control-label">Provider fields</label>
   <fieldset class="col-xs-10" ng-disabled="model.id">
-
-    <my-provider-fields 
-      data-model="model.providerFields"
-      data-provider="chosenProvider"
-    ></my-provider-fields>
+    <my-jsontoformfields 
+      bindobject="model.providerFields"
+      fieldsjson="chosenProviderFields.parameters.user"
+    ></my-jsontoformfields>
 
   </fieldset>
 </div>

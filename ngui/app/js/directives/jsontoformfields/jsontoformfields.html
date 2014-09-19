@@ -1,0 +1,31 @@
+ <div class="form-group" ng-repeat="(name,fieldData) in fieldsjson.fields">
+  
+  <label class="col-xs-2 control-label">{{fieldData.label}}</label>
+  
+  <div class="col-xs-10">
+
+    <input type="checkbox" id="field-{{$index}}" 
+      title="{{fieldData.tip}}"
+      ng-model="bindobject[name]"
+      ng-if="fieldData.type=='checkbox'" 
+      ng-required="required[name]"/>
+
+    <input class="form-control" id="field-{{$index}}" 
+      type="{{fieldData.type}}" 
+      placeholder="{{fieldData.tip}}" 
+      ng-if="fieldData.type === 'text' || fieldData.type == 'password'" 
+      ng-model="bindobject[name]" 
+      ng-required="required[name]" />
+    
+    <button id="field-{{$index}}" type="button" 
+      class="btn btn-default" 
+      ng-model="bindobject[name]" 
+      data-html="1" 
+      ng-options="region as region for region in fieldData.options" 
+      ng-if="fieldData.type === 'select'" 
+      ng-required="required[name]" 
+      bs-select><span class="caret"></span>
+    </button>
+  
+  </div>
+</div>

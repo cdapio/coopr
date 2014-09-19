@@ -74,7 +74,7 @@ angular.module(PKG.name)
       }))
         .state(crud('Provider', 'list', 'CrudListCtrl'))
         .state(crud('Provider', 'edit', 'ProviderFormCtrl'))
-        .state(crud('Provider', 'create')) 
+        .state(crud('Provider', 'create', 'ProviderFormCtrl')) 
 
 
       /*

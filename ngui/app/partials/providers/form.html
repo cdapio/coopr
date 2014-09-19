@@ -3,11 +3,11 @@
   <div class="form-group">
     <label for="inputproviderName" class="col-xs-2 control-label">Name</label>
     <div class="col-xs-10">
-      <input id="inputproviderName" type="text" name="name" class="form-control" 
+      <input id="inputProviderName" type="text" name="name" class="form-control" 
         placeholder="Name" 
-        my-focus="inputproviderName"
+        my-focus="inputProviderName"
         ng-readonly="editing"
-        ng-pattern="/^\w+$/"
+        ng-pattern="/^[\w\.\-]+$/"
         ng-model="model.name" required/>
     </div>
   </div>
@@ -20,6 +20,16 @@
         ></textarea>
     </div>
   </div>
+
+  <div class="form-group">
+    <label for="inputproviderDescription" class="col-xs-2 control-label">Provider type</label>
+    <div class="col-xs-10">
+      <button type="button" class="btn btn-default" ng-model="model.providertype" data-html="1" ng-options="pType.name as pType.name for pType in providerTypes" ng-disabled="editing" bs-select><span class="caret"></span>
+      </button>
+    </div>
+  </div>
+
+  <my-jsontoformfields fieldsjson="selectedProvider.parameters.admin" bindobject="model.provisioner"></my-jsontoformfields>
 
   <div class="form-group">
     <div class="col-xs-10 col-xs-offset-2">

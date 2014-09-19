@@ -17,17 +17,21 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
       allImages = myApi.ImageType.query(),
       allServices = myApi.Service.query();
 
+
+  $scope.availableProviderTypes = myApi.ProviderType.query();
   $scope.availableTemplates = myApi.Template.query();
   $scope.availableProviders = myApi.Provider.query();
   $scope.chosenProvider = {};
   $scope.availableHardware = [];
   $scope.availableImages = [];
   $scope.availableServices = [];
+  $scope.chosenProviderFields = [];
 
   $q.all([
     allHardware.$promise,
     allImages.$promise,
     allServices.$promise,
+    $scope.availableProviderTypes.$promise,
     $scope.availableProviders.$promise,
     $scope.availableTemplates.$promise
   ]).then(function () {
@@ -74,6 +78,12 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
       $scope.chosenProvider = $scope.availableProviders.filter(function (p) {
         return p.name === name;
       })[0];
+
+      $scope.availableProviderTypes.forEach(function (type) {
+        if (type.name === name) {
+          $scope.chosenProviderFields = type;
+        }
+      });
     }); 
 
   });
