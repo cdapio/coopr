@@ -16,6 +16,11 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
   }
   else {
     $scope.model = new myApi.Template();
+    $scope.model.compatibility = {
+      services: ['base'],
+      imagetypes: [],
+      hardwaretypes: []
+    };
     promise = $q.when($scope.model);
   }
 
