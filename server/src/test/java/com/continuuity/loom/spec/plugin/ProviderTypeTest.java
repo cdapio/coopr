@@ -35,6 +35,7 @@ public class ProviderTypeTest extends BaseTest {
   public void testGroupFields() {
     ProviderType providerType = new ProviderType(
       "providertype",
+      null,
       "some description",
       ImmutableMap.of(
         ParameterType.ADMIN, new ParametersSpecification(
@@ -102,6 +103,7 @@ public class ProviderTypeTest extends BaseTest {
     // 3 user fields u1, u2, u3. All are optional.
     ProviderType providerType = new ProviderType(
       "name",
+      null,
       "desc",
       ImmutableMap.of(
         ParameterType.ADMIN, new ParametersSpecification(

@@ -28,9 +28,10 @@ import java.util.Map;
 public class ProviderType extends AbstractPluginSpecification {
   private static final Logger LOG = LoggerFactory.getLogger(ProviderType.class);
 
-  public ProviderType(String name, String description, Map<ParameterType, ParametersSpecification> parameters,
+  public ProviderType(String name, String icon, String description,
+                      Map<ParameterType, ParametersSpecification> parameters,
                       Map<String, ResourceTypeSpecification> resourceTypes) {
-    super(name, description, parameters, resourceTypes);
+    super(name, icon, description, parameters, resourceTypes);
   }
 
   /**

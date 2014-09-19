@@ -64,7 +64,7 @@ public class Entities {
 
   public static class ProviderTypeExample {
     public static final ProviderType JOYENT =
-      new ProviderType("joyent", "joyent provider type", ImmutableMap.<ParameterType, ParametersSpecification>of(
+      new ProviderType("joyent", null, "joyent provider type", ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -104,7 +104,8 @@ public class Entities {
       )
     );
     public static final ProviderType RACKSPACE =
-      new ProviderType("rackspace", "rackspace provider type", ImmutableMap.<ParameterType, ParametersSpecification>of(
+      new ProviderType(
+        "rackspace", null, "rackspace provider type", ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -130,7 +131,7 @@ public class Entities {
         ImmutableMap.<String, ResourceTypeSpecification>of()
       );
     public static final ProviderType USER_RACKSPACE =
-      new ProviderType("user-rackspace", "description", ImmutableMap.<ParameterType, ParametersSpecification>of(
+      new ProviderType("user-rackspace", null, "description", ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.USER,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -158,7 +159,7 @@ public class Entities {
 
   public static class AutomatorTypeExample {
     public static final AutomatorType SHELL =
-      new AutomatorType("shell", "shell automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
+      new AutomatorType("shell", null, "shell automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -186,7 +187,7 @@ public class Entities {
         )
       );
     public static final AutomatorType CHEF =
-      new AutomatorType("chef-solo", "chef automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
+      new AutomatorType("chef-solo", null, "chef automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -215,7 +216,7 @@ public class Entities {
         )
       );
     public static final AutomatorType PUPPET =
-      new AutomatorType("puppet", "puppet automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
+      new AutomatorType("puppet", null, "puppet automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(

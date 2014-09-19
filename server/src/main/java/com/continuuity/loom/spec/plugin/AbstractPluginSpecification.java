@@ -17,6 +17,7 @@
 package com.continuuity.loom.spec.plugin;
 
 import com.continuuity.loom.spec.NamedEntity;
+import com.continuuity.loom.spec.NamedIconEntity;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 
@@ -26,15 +27,15 @@ import java.util.Set;
 /**
  * Plugin specification, including what parameters are supported and required and what types of resources are supported.
  */
-public abstract class AbstractPluginSpecification extends NamedEntity {
+public abstract class AbstractPluginSpecification extends NamedIconEntity {
   private final String description;
   private final Map<String, ResourceTypeSpecification> resourceTypes;
   protected final Map<ParameterType, ParametersSpecification> parameters;
 
-  public AbstractPluginSpecification(String name, String description,
+  public AbstractPluginSpecification(String name, String icon, String description,
                                      Map<ParameterType, ParametersSpecification> parameters,
                                      Map<String, ResourceTypeSpecification> resourceTypes) {
-    super(name);
+    super(name, icon);
     this.description = description == null ? "" : description;
     this.parameters = parameters == null ?
       ImmutableMap.<ParameterType, ParametersSpecification>of() : ImmutableMap.copyOf(parameters);

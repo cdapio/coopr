@@ -41,12 +41,13 @@ public class ProviderTypeCodec implements JsonDeserializer<ProviderType> {
     JsonObject jsonObj = json.getAsJsonObject();
 
     String name = context.deserialize(jsonObj.get("name"), String.class);
+    String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
     Map<ParameterType, ParametersSpecification> parameters = context.deserialize(
       jsonObj.get("parameters"), new TypeToken<Map<ParameterType, ParametersSpecification>>() {}.getType());
     Map<String, ResourceTypeSpecification> resourceTypes = context.deserialize(
       jsonObj.get("resourceTypes"), new TypeToken<Map<String, ResourceTypeSpecification>>() {}.getType());
 
-    return new ProviderType(name, description, parameters, resourceTypes);
+    return new ProviderType(name, icon, description, parameters, resourceTypes);
   }
 }
