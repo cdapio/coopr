@@ -8,6 +8,11 @@ function ($resource, myApiPrefix) {
       { 
         update: {
           method: 'PUT'
+        },
+        save: {
+          method: 'POST',
+          url: myApiPrefix + 'hardwaretypes',
+          params: {name: null}
         }
       }
     )
