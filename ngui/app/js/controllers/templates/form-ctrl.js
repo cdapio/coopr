@@ -22,7 +22,8 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
       hardwaretypes: []
     };
     $scope.model.defaults = {
-      config: {}
+      config: {},
+      services: ['base']
     };
 
 

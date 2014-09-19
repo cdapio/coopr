@@ -21,7 +21,7 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
 
     scope: {
       model: '=', // an array of names
-      available: '=', // an array of objects with name & description keys
+      available: '=', // an array of strings, or of objects with name & description keys
       clusterId: '=', // id to use for management dropdown
       allowRm: '=' // allow removal boolean
     },
@@ -58,10 +58,11 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
 
       function remapAddables (available, avoidable) {
         $scope.addDropdown = (available||[]).reduce(function (out, svc) {
-          if((avoidable||[]).indexOf(svc.name)===-1) {
+          var name = svc.name || svc; // in case available is an array of strings
+          if((avoidable||[]).indexOf(name)===-1) {
             out.push({
-              text: svc.name,
-              click: 'addService("'+svc.name+'")'
+              text: name,
+              click: 'addService("'+name+'")'
             });
           }
           return out;

@@ -12,6 +12,7 @@
         <div class="col-xs-10 col-xs-offset-2">
 
           <button type="button" class="btn btn-sm btn-default pull-right" 
+            ng-disabled="templateForm.$invalid"
             ng-hide="$last"
             ng-click="nextTab()">
               Next

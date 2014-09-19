@@ -11,7 +11,7 @@ function myThingPickerDirective () {
 
     scope: {
       model: '=', // an array of names
-      available: '=', // an array of objects with name & description keys
+      available: '=', // an array of strings, or of objects with name & description keys
       allowRm: '=', // allow removal boolean
       thingName: '@'
     },
@@ -40,10 +40,11 @@ function myThingPickerDirective () {
 
       function remapAddables (available, avoidable) {
         $scope.addDropdown = (available||[]).reduce(function (out, thing) {
-          if((avoidable||[]).indexOf(thing.name)===-1) {
+          var name = svc.name || svc; // in case available is an array of strings
+          if((avoidable||[]).indexOf(name)===-1) {
             out.push({
-              text: thing.name,
-              click: 'addThing("'+thing.name+'")'
+              text: name,
+              click: 'addThing("'+name+'")'
             });
           }
           return out;
