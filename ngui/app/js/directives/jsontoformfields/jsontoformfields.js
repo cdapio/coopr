@@ -27,7 +27,8 @@ function myJsontoformfieldsDirective () {
     replace: true,
     scope: {
       fieldsconfig: '=',
-      model: '='
+      model: '=',
+      overrideenabled: '='
     },
     templateUrl: 'jsontoformfields/jsontoformfields.html',
     link: function (scope, element, attrs) {
@@ -35,12 +36,16 @@ function myJsontoformfieldsDirective () {
       scope.$watch('fieldsconfig', function (newVal, oldVal) {
 
         if (!angular.equals(newVal, oldVal)) {
-          if (scope.fieldsconfig && typeof scope.fieldsconfig !== 'object') {
-            scope.fieldsconfig = angular.fromJson(scope.fieldsconfig);
-          }
+          if (scope.fieldsconfig) {
 
-          if (!scope.fieldsconfig.hasOwnProperty('fields')) {
-            throw Error('fields not declared in json for fieldsconfig');
+            if (typeof scope.fieldsconfig !== 'object') {
+              scope.fieldsconfig = angular.fromJson(scope.fieldsconfig);  
+            }
+
+            if (!scope.fieldsconfig.hasOwnProperty('fields')) {
+              throw Error('fields not declared in json for fieldsconfig');
+            }
+            
           }
 
           setDefaults();
