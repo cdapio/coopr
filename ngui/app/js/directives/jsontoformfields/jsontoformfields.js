@@ -2,7 +2,7 @@
  * jsontoformfields directive.
  *
  * This takes json of this format and converts them into form fields bound to a provided object.
- * !! This directive modifies bindobject passed to it from the parent.
+ * !! This directive modifies model passed to it from the parent.
  *
  * Expected json:
  * fields: {
@@ -17,7 +17,7 @@
  *   [<fieldname>, <fieldname>]
  * }
  *
- * <div my-jsontoformfields fieldsconfig="json" bindobject="model.fields"/>
+ * <div my-jsontoformfields fieldsconfig="json" model="model.fields"/>
  */
 
 angular.module(PKG.name+'.directives').directive('myJsontoformfields', 
@@ -27,7 +27,7 @@ function myJsontoformfieldsDirective () {
     replace: true,
     scope: {
       fieldsconfig: '=',
-      bindobject: '='
+      model: '='
     },
     templateUrl: 'jsontoformfields/jsontoformfields.html',
     link: function (scope, element, attrs) {
@@ -50,26 +50,26 @@ function myJsontoformfieldsDirective () {
 
       });
 
-      scope.$watch('bindobject', function (newVal, oldVal) {
+      scope.$watch('model', function (newVal, oldVal) {
         if (!scope.bindProvided && !angular.equals(newVal, oldVal) && newVal) {  
           scope.bindProvided = true;  
         }
         setDefaults();
       });
 
-      scope.$watchCollection(['bindobject', 'fieldsconfig'], function (newValues, oldValues) {
+      scope.$watchCollection(['model', 'fieldsconfig'], function (newValues, oldValues) {
         if (!angular.equals(newValues, oldValues)) {
           setRequired(newValues[0]);
         }
       });
 
       function setDefaults () {        
-        if (!scope.fieldsconfig || !scope.bindobject) {
+        if (!scope.fieldsconfig || !scope.model) {
           return;
         }
         angular.forEach(scope.fieldsconfig.fields, function (field, key) {
-          if (field.hasOwnProperty('default') && !scope.bindobject[key]) {
-            scope.bindobject[key] = field.default;
+          if (field.hasOwnProperty('default') && !scope.model[key]) {
+            scope.model[key] = field.default;
           }
         });
       }
