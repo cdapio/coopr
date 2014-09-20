@@ -16,17 +16,23 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
   }
   else {
     $scope.model = new myApi.Template();
-    $scope.model.compatibility = {
-      services: ['base'],
-      imagetypes: [],
-      hardwaretypes: []
-    };
-    $scope.model.defaults = {
-      config: {},
-      services: ['base']
-    };
-
-
+    angular.extend($scope.model, {
+      compatibility: {
+        services: ['base'],
+        imagetypes: [],
+        hardwaretypes: []
+      },
+      defaults: {
+        config: {},
+        services: ['base']
+      },
+      constraints: {
+        layout: {
+          mustcoexist: [],
+          cantcoexist: []          
+        }
+      }
+    });
     promise = $q.when($scope.model);
   }
 
@@ -69,11 +75,11 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
   promise.then(function (model) {
     model.administration = model.administration || {leaseduration:{}};
 
-    angular.forEach(['initial', 'max', 'step'], function (type) {
-      $scope.leaseDuration[type] = myHelpers.parseMilliseconds( model.administration.leaseduration[type] || 0 );
+    angular.forEach(['initial', 'max', 'step'], function (one) {
+      $scope.leaseDuration[one] = myHelpers.parseMilliseconds( model.administration.leaseduration[one] || 0 );
 
-      $scope.$watchCollection('leaseDuration.'+type, function (newVal) {
-        model.administration.leaseduration[type] = myHelpers.concatMilliseconds(newVal);
+      $scope.$watchCollection('leaseDuration.'+one, function (newVal) {
+        model.administration.leaseduration[one] = myHelpers.concatMilliseconds(newVal);
       });
     });
   });
@@ -114,6 +120,15 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
 
     });
   });
+
+
+
+
+
+  /*
+    constraints section
+   */
+
 
 
 });
