@@ -46,13 +46,18 @@ when 'local', 'novalocal', 'internal'
   subdomain = node['loom_dns']['default_domain'] ? node['loom_dns']['default_domain'] : 'local'
 end
 
-# Create DNS entries for access_v4
-dnsimple_record hostname do
-  content access_v4
-  type 'A'
-  username dnsimple['username']
-  password dnsimple['password']
-  domain subdomain
-  ttl node['loom_dns']['default_ttl']
-  not_if { subdomain == 'local' }
+# Only register whitelisted subdomains if they are set
+subdomain_whitelist = node['loom_dns']['subdomain_whitelist']
+
+if subdomain_whitelist.nil? || subdomain_whitelist.include?(subdomain)
+  # Create DNS entries for access_v4
+  dnsimple_record hostname do
+    content access_v4
+    type 'A'
+    username dnsimple['username']
+    password dnsimple['password']
+    domain subdomain
+    ttl node['loom_dns']['default_ttl']
+    not_if { subdomain == 'local' }
+  end
 end
