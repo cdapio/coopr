@@ -2,6 +2,10 @@
 
 Continuuity Loom is cluster management software that manages clusters on public, private clouds. Clusters created with Continuuity Loom utilize templates of any hardware and software stack, from simple standalone LAMP-stack servers and traditional application servers like JBoss, to full Apache Hadoop clusters comprised of thousands of nodes. Clusters can be deployed across many cloud providers (Rackspace, Joyent, and OpenStack) while utilizing common SCM tools (Chef and scripts).
 
+## Build Status
+|(BuildStatus)|
+
+
 ## Releases
 
    * [Codename: Vela, Theme: Extensibility, 0.9.7](http://www.continuuity.com/docs/loom/0.9.7/en/overview/release-notes.html)
@@ -40,3 +44,5 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 <strong>Note: </strong>Continuuity Loom is a different product than <a href="http://www.revelytix.com/?q=content/loom">Revelytix’s Loom.</a>
 
+.. |(BuildStatus)| image:: http://builds.cask.co/plugins/servlet/buildStatusImage/COOP-DBT
+   :target: http://builds.cask.co/browse/COOP
