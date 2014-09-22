@@ -55,12 +55,12 @@ public class ProviderUpgradeCodec extends AbstractCodec<Provider> {
     String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
     String providerType = context.deserialize(jsonObj.get("providertype"), String.class);
-    Map<String, String> provisionerFields = deserializeProvisionerFields(jsonObj, context);
+    Map<String, Object> provisionerFields = deserializeProvisionerFields(jsonObj, context);
 
     return new Provider(name, icon, description, providerType, provisionerFields);
   }
 
-  private Map<String, String> deserializeProvisionerFields(JsonObject jsonObj, JsonDeserializationContext context) {
+  private Map<String, Object> deserializeProvisionerFields(JsonObject jsonObj, JsonDeserializationContext context) {
     if (!jsonObj.has("provisioner")) {
       return Maps.newHashMap();
     }
@@ -73,6 +73,6 @@ public class ProviderUpgradeCodec extends AbstractCodec<Provider> {
         fields = authElement.getAsJsonObject();
       }
     }
-    return context.deserialize(fields, new TypeToken<Map<String, String>>() {}.getType());
+    return context.deserialize(fields, new TypeToken<Map<String, Object>>() {}.getType());
   }
 }

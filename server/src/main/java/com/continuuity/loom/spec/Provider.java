@@ -29,20 +29,20 @@ import java.util.Map;
 public final class Provider extends NamedIconEntity {
   private final String description;
   private final String providerType;
-  private final Map<String, String> provisionerFields;
+  private final Map<String, Object> provisionerFields;
 
   public Provider(String name, String logolink, String description,
-                  String providerType, Map<String, String> provisionerFields) {
+                  String providerType, Map<String, Object> provisionerFields) {
     super(name, logolink);
     Preconditions.checkArgument(providerType != null, "invalid provider type.");
     this.description = description;
     this.providerType = providerType;
     this.provisionerFields = provisionerFields == null ?
-      Maps.<String, String>newHashMap() : Maps.newHashMap(provisionerFields);
+      Maps.<String, Object>newHashMap() : Maps.newHashMap(provisionerFields);
   }
 
   public Provider(String name, String description,
-                  String providerType, Map<String, String> provisionerFields) {
+                  String providerType, Map<String, Object> provisionerFields) {
     this(name, null, description, providerType, provisionerFields);
   }
 
@@ -70,7 +70,7 @@ public final class Provider extends NamedIconEntity {
    *
    * @return Fields needed to provision machines from this provider.
    */
-  public Map<String, String> getProvisionerFields() {
+  public Map<String, Object> getProvisionerFields() {
     return provisionerFields;
   }
 
