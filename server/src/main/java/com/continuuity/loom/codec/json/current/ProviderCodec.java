@@ -54,8 +54,8 @@ public class ProviderCodec extends AbstractCodec<Provider> {
     String icon = context.deserialize(jsonObj.get("icon"), String.class);
     String description = context.deserialize(jsonObj.get("description"), String.class);
     String providerType = context.deserialize(jsonObj.get("providertype"), String.class);
-    Map<String, String> provisionerFields = context.deserialize(jsonObj.get("provisioner"),
-                                                                new TypeToken<Map<String, String>>() {}.getType());
+    Map<String, Object> provisionerFields = context.deserialize(jsonObj.get("provisioner"),
+                                                                new TypeToken<Map<String, Object>>() {}.getType());
 
     return new Provider(name, icon, description, providerType, provisionerFields);
   }
