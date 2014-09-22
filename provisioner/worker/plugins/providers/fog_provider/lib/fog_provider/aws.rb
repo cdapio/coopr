@@ -343,6 +343,8 @@ class FogProviderAWS < Provider
     server_def[:tenancy] = 'dedicated' if vpc_mode? && @dedicated_instance
     server_def[:associate_public_ip] = 'true' if vpc_mode? && @associate_public_ip
 
+    fail 'Invalid AMI specified' if ami.nil?
+
     # Handle EBS-backed volume sizes
     if ami.root_device_type == 'ebs'
       ami_map = ami.block_device_mapping.first
