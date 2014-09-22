@@ -101,7 +101,7 @@ public class ClusterHandler extends AbstractAuthHandler {
    * Get all clusters visible to the user. Clients can include a status filter as an http param. The key is 'status'
    * and the value is a comma separated list of statuses. Clusters returned must be in one of the statuses given. If
    * no status param is given, all clusters will be returned. Valid values to include in a status filter
-   * are any one of {@link com.continuuity.loom.cluster.Cluster.Status}.
+   * are any one of {@link co.cask.coopr.cluster.Cluster.Status}.
    *
    * @param request Request for clusters.
    * @param responder Responder for sending the response.
