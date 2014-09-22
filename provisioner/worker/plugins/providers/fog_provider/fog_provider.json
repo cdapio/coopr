@@ -24,12 +24,6 @@
             "type": "password",
             "tip": "AWS Secret Access Key"
           },
-          "aws_credential_file": {
-            "label": "AWS Credential file",
-            "type": "text",
-            "override": true,
-            "tip": "Full path and file name to AWS credential file as used by AWS command line tools"
-          },
           "ssh_keypair": {
             "label": "Key Pair Name",
             "type": "text",
@@ -78,12 +72,6 @@
           [
             "api_user",
             "api_password",
-            "ssh_keypair",
-            "ssh_key_resource",
-            "aws_region"
-          ],
-          [
-            "aws_credential_file",
             "ssh_keypair",
             "ssh_key_resource",
             "aws_region"
