@@ -50,7 +50,7 @@ Contents
    /rest/index
    /overview/security
    /faq/index
-   /overview/release-notes
+   /release-notes/index
    /overview/glossary
    /javadocs/index
 
