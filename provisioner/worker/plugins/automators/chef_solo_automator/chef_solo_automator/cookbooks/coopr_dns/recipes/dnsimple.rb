@@ -44,6 +44,9 @@ access_v4 = node['coopr']['ipaddresses']['access_v4'] ? node['coopr']['ipaddress
 case subdomain
 when 'local', 'novalocal', 'internal'
   subdomain = node['coopr_dns']['default_domain'] ? node['coopr_dns']['default_domain'] : 'local'
+else
+  # Do not register provider-based domains
+  subdomain = 'provider' if subdomain =~ /amazonaws.com$/
 end
 
 # Only register whitelisted subdomains if they are set
@@ -58,6 +61,6 @@ if subdomain_whitelist.nil? || subdomain_whitelist.include?(subdomain)
     password dnsimple['password']
     domain subdomain
     ttl node['coopr_dns']['default_ttl']
-    not_if { subdomain == 'local' }
+    not_if { subdomain == 'local' || subdomain == 'provider' }
   end
 end
