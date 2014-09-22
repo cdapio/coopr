@@ -15,29 +15,18 @@
  */
 package co.cask.coopr.scheduler.callback;
 
-import com.continuuity.http.AbstractHttpHandler;
-import com.continuuity.http.HttpResponder;
-import com.google.common.base.Charsets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import org.jboss.netty.buffer.ChannelBufferInputStream;
+import co.cask.http.AbstractHttpHandler;
+import co.cask.http.HttpResponder;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
 /**
  *
  */
 public class DummyHandler extends AbstractHttpHandler {
-  private static final Logger LOG  = LoggerFactory.getLogger(DummyHandler.class);
-  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   private int startCount = 0;
   private int successCount = 0;
   private int failureCount = 0;

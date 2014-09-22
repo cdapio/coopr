@@ -15,7 +15,6 @@
  */
 package co.cask.coopr.http.handler;
 
-import com.continuuity.http.HttpResponder;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.common.conf.Constants;
@@ -23,6 +22,7 @@ import co.cask.coopr.scheduler.task.NodeService;
 import co.cask.coopr.store.node.NodeStore;
 import co.cask.coopr.store.node.NodeStoreService;
 import co.cask.coopr.store.tenant.TenantStore;
+import co.cask.http.HttpResponder;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;

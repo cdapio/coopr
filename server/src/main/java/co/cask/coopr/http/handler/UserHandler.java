@@ -15,26 +15,15 @@
  */
 package co.cask.coopr.http.handler;
 
-import com.continuuity.http.HttpResponder;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.http.HttpHelper;
-import co.cask.coopr.http.request.TenantWriteRequest;
-import co.cask.coopr.provisioner.CapacityException;
-import co.cask.coopr.provisioner.Provisioner;
-import co.cask.coopr.provisioner.QuotaException;
-import co.cask.coopr.provisioner.TenantProvisionerService;
-import co.cask.coopr.spec.TenantSpecification;
-import co.cask.coopr.spec.plugin.AutomatorType;
-import co.cask.coopr.spec.plugin.ProviderType;
-import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.coopr.store.user.UserStore;
-import com.google.common.base.Charsets;
+import co.cask.http.HttpResponder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
-import org.jboss.netty.buffer.ChannelBufferInputStream;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
@@ -42,14 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.lang.reflect.Type;
 import java.util.Map;
 
 /**

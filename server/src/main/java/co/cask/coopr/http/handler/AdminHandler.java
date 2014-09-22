@@ -15,7 +15,6 @@
  */
 package co.cask.coopr.http.handler;
 
-import com.continuuity.http.HttpResponder;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.QueueMetrics;
@@ -30,6 +29,7 @@ import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.entity.EntityStoreView;
 import co.cask.coopr.store.tenant.TenantStore;
+import co.cask.http.HttpResponder;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;

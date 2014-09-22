@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.provisioner.mock;
 
-import com.continuuity.http.NettyHttpService;
+import co.cask.http.NettyHttpService;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;

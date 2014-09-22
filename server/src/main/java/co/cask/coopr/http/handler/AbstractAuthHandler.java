@@ -15,12 +15,12 @@
  */
 package co.cask.coopr.http.handler;
 
-import com.continuuity.http.AbstractHttpHandler;
-import com.continuuity.http.HttpResponder;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.spec.Tenant;
 import co.cask.coopr.store.tenant.TenantStore;
+import co.cask.http.AbstractHttpHandler;
+import co.cask.http.HttpResponder;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 

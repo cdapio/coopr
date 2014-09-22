@@ -15,9 +15,9 @@
  */
 package co.cask.coopr.provisioner.mock;
 
-import com.continuuity.http.AbstractHttpHandler;
-import com.continuuity.http.HttpResponder;
 import co.cask.coopr.common.conf.Constants;
+import co.cask.http.AbstractHttpHandler;
+import co.cask.http.HttpResponder;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

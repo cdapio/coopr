@@ -15,8 +15,6 @@
  */
 package co.cask.coopr.http.handler;
 
-import com.continuuity.http.BodyConsumer;
-import com.continuuity.http.HttpResponder;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.provisioner.TenantProvisionerService;
@@ -29,6 +27,8 @@ import co.cask.coopr.scheduler.task.MissingEntityException;
 import co.cask.coopr.spec.plugin.AbstractPluginSpecification;
 import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.tenant.TenantStore;
+import co.cask.http.BodyConsumer;
+import co.cask.http.HttpResponder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;

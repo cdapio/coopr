@@ -15,14 +15,14 @@
  */
 package co.cask.coopr.http.handler;
 
-import com.continuuity.http.AbstractHttpHandler;
-import com.continuuity.http.HttpResponder;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.http.HttpHelper;
 import co.cask.coopr.http.request.FinishTaskRequest;
 import co.cask.coopr.http.request.TakeTaskRequest;
 import co.cask.coopr.scheduler.task.MissingEntityException;
 import co.cask.coopr.scheduler.task.TaskQueueService;
+import co.cask.http.AbstractHttpHandler;
+import co.cask.http.HttpResponder;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.jboss.netty.handler.codec.http.HttpRequest;

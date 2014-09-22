@@ -1,10 +1,10 @@
 package co.cask.coopr.provisioner;
 
-import com.continuuity.http.AbstractHttpHandler;
-import com.continuuity.http.HttpResponder;
-import com.continuuity.http.NettyHttpService;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.scheduler.callback.DummyService;
+import co.cask.http.AbstractHttpHandler;
+import co.cask.http.HttpResponder;
+import co.cask.http.NettyHttpService;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;

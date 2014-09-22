@@ -15,10 +15,10 @@
  */
 package co.cask.coopr.http;
 
-import com.continuuity.http.HttpHandler;
-import com.continuuity.http.NettyHttpService;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
+import co.cask.http.HttpHandler;
+import co.cask.http.NettyHttpService;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;

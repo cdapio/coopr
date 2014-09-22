@@ -15,7 +15,6 @@
  */
 package co.cask.coopr.http.handler;
 
-import com.continuuity.http.HttpResponder;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.ClusterJobProgress;
@@ -42,6 +41,7 @@ import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterStoreView;
 import co.cask.coopr.store.tenant.TenantStore;
+import co.cask.http.HttpResponder;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;

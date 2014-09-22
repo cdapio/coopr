@@ -43,9 +43,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.continuuity</groupId>
-            <artifactId>http</artifactId>
-            <version>0.2.0</version>
+            <groupId>co.cask.http</groupId>
+            <artifactId>netty-http</artifactId>
+            <version>0.4.0</version>
         </dependency>
 
         <dependency>

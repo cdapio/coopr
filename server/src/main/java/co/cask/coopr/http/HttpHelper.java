@@ -1,6 +1,6 @@
 package co.cask.coopr.http;
 
-import com.continuuity.http.HttpResponder;
+import co.cask.http.HttpResponder;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import org.jboss.netty.buffer.ChannelBufferInputStream;

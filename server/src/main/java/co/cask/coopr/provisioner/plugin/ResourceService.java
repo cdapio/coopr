@@ -15,8 +15,6 @@
  */
 package co.cask.coopr.provisioner.plugin;
 
-import com.continuuity.http.BodyConsumer;
-import com.continuuity.http.HttpResponder;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.utils.ImmutablePair;
@@ -31,6 +29,8 @@ import co.cask.coopr.store.entity.EntityStoreView;
 import co.cask.coopr.store.provisioner.PluginMetaStoreService;
 import co.cask.coopr.store.provisioner.PluginResourceTypeView;
 import co.cask.coopr.store.provisioner.PluginStore;
+import co.cask.http.BodyConsumer;
+import co.cask.http.HttpResponder;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.AbstractIdleService;

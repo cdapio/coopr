@@ -15,7 +15,6 @@
  */
 package co.cask.coopr.http.guice;
 
-import com.continuuity.http.HttpHandler;
 import co.cask.coopr.http.handler.AdminHandler;
 import co.cask.coopr.http.handler.ClusterHandler;
 import co.cask.coopr.http.handler.NodeHandler;
@@ -26,6 +25,7 @@ import co.cask.coopr.http.handler.StatusHandler;
 import co.cask.coopr.http.handler.SuperadminHandler;
 import co.cask.coopr.http.handler.TaskHandler;
 import co.cask.coopr.http.handler.UserHandler;
+import co.cask.http.HttpHandler;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 

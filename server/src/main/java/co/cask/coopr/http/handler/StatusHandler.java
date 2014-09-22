@@ -15,8 +15,8 @@
  */
 package co.cask.coopr.http.handler;
 
-import com.continuuity.http.AbstractHttpHandler;
-import com.continuuity.http.HttpResponder;
+import co.cask.http.AbstractHttpHandler;
+import co.cask.http.HttpResponder;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
@@ -26,7 +26,7 @@ import javax.ws.rs.Path;
 /**
  * Serves status URL.
  */
-public class StatusHandler extends AbstractHttpHandler{
+public class StatusHandler extends AbstractHttpHandler {
 
   /**
    * Returns the status of the server, which just returns OK if it is handling requests. Used as a healthcheck.
