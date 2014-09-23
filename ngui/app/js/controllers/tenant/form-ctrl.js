@@ -8,7 +8,6 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
   CrudFormBase.apply($scope);
 
   var promise;
-
   if($state.includes('*.create')) {
     $scope.model = new myApi.Tenant();
     promise = $q.when($scope.model);
