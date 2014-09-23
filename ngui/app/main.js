@@ -27,6 +27,7 @@ angular
       'mgcrea.ngStrap.alert',
       'mgcrea.ngStrap.tooltip',
       'mgcrea.ngStrap.popover',
+      'mgcrea.ngStrap.select',
       'mgcrea.ngStrap.dropdown',
       'mgcrea.ngStrap.collapse',
       'mgcrea.ngStrap.button',
