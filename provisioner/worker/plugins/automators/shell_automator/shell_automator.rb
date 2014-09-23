@@ -17,6 +17,8 @@
 #
 
 require 'net/scp'
+require 'base64'
+require 'fileutils'
 
 class ShellAutomator < Automator
   attr_accessor :credentials, :scripts_dir, :scripts_tar, :remote_cache_dir
@@ -69,10 +71,22 @@ class ShellAutomator < Automator
     end
   end
 
+  def decode_string_to_file(string, outfile)
+    FileUtils.mkdir_p(File.dirname(outfile))
+    File.open(outfile, 'wb') { |f| f.write(Base64.decode64(string)) }
+  end
+
   def runshell(inputmap)
     sshauth = inputmap['sshauth']
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
+
+    # Write credentials
+    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
+    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
+      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
+      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
+    end
 
     raise "required parameter \"script\" not found in input: #{fields}" if fields['script'].nil?
     shellscript = fields['script']
@@ -126,6 +140,13 @@ class ShellAutomator < Automator
   def bootstrap(inputmap)
     sshauth = inputmap['sshauth']
     ipaddress = inputmap['ipaddress']
+
+    # Write credentials
+    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
+    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
+      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
+      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
+    end
 
     # do we need sudo bash?
     sudo = 'sudo' unless sshauth['user'] == 'root'
