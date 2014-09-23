@@ -193,14 +193,10 @@ class FogProviderOpenstack < Provider
   end
 
   def primary_private_ip_address(addresses)
-    if addresses['private']
-      return addresses['private'].last['addr']
-    end
+    return addresses['private'].last['addr'] if addresses['private']
   end
 
   def primary_public_ip_address(addresses)
-    if addresses['public']
-      return addresses['public'].last['addr']
-    end
+    return addresses['public'].last['addr'] if addresses['public']
   end
 end
