@@ -84,12 +84,12 @@ class FogProviderOpenstack < Provider
       # associate public ip if requested
       if @floating_ip
         addresses = connection.addresses
-        free_floating = addresses.find_index {|a| a.fixed_ip.nil?}
-        fail "No available floating IP found" if free_floating.nil?
+        free_floating = addresses.find_index { |a| a.fixed_ip.nil? }
+        fail 'No available floating IP found' if free_floating.nil?
         floating_address = addresses[free_floating].ip
         server.associate_address(floating_address)
         # a bit of a hack, but server.reload takes a long time
-        (server.addresses['public'] ||= []) << {"version"=>4,"addr"=>floating_address}
+        (server.addresses['public'] ||= []) << { 'version' => 4, 'addr' => floating_address }
       end
 
       bootstrap_ip = primary_public_ip_address(server.addresses)
@@ -193,15 +193,10 @@ class FogProviderOpenstack < Provider
   end
 
   def primary_private_ip_address(addresses)
-    if addresses['private']
-      return addresses['private'].last['addr']
-    end
+    return addresses['private'].last['addr'] if addresses['private']
   end
 
   def primary_public_ip_address(addresses)
-    if addresses['public']
-      return addresses['public'].last['addr']
-    end
+    return addresses['public'].last['addr'] if addresses['public']
   end
-
 end
