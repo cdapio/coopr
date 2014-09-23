@@ -7,60 +7,60 @@
     <baseDirectory>coopr-${project.version}-standalone</baseDirectory>
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}/../provisioner</directory>
+            <directory>${project.basedir}/../coopr-provisioner</directory>
             <outputDirectory>/provisioner</outputDirectory>
-                <excludes>
-                    <exclude>**/provisioner-site.xml</exclude>
-                </excludes>
+            <excludes>
+                <exclude>**/provisioner-site.xml</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../ngui</directory>
+            <directory>${project.basedir}/../coopr-ngui</directory>
             <outputDirectory>/ngui</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../ui</directory>
+            <directory>${project.basedir}/../coopr-ui</directory>
             <outputDirectory>/ui</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../server/target</directory>
+            <directory>${project.basedir}/../coopr-server/target</directory>
             <outputDirectory>/server/lib</outputDirectory>
             <includes>
                 <include>*-jar-with-dependencies.jar</include>
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../docs/licenses</directory>
+            <directory>${project.basedir}/../coopr-docs/licenses</directory>
             <outputDirectory>/licenses</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../server/bin</directory>
+            <directory>${project.basedir}/../coopr-server/bin</directory>
             <outputDirectory>/server/bin</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../standalone/bin</directory>
+            <directory>${project.basedir}/bin</directory>
             <outputDirectory>/bin</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../standalone/server/conf</directory>
+            <directory>${project.basedir}/server/conf</directory>
             <outputDirectory>/server/conf</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../config/defaults</directory>
+            <directory>${project.basedir}/../coopr-config/defaults</directory>
             <outputDirectory>/server/config/defaults</outputDirectory>
         </fileSet>
     </fileSets>
-        <files>
-            <file>
-                <source>${project.basedir}/../standalone/provisioner/master/conf/provisioner-site.xml</source>
-                <outputDirectory>/provisioner/master/conf</outputDirectory>
-            </file>
-            <file>
-                <source>${project.basedir}/../standalone/README.md</source>
-                <outputDirectory>/</outputDirectory>
-            </file>
-            <file>
-                <source>${project.basedir}/../LICENSE</source>
-                <outputDirectory>/</outputDirectory>
-            </file>
-        </files>
+    <files>
+        <file>
+            <source>${project.basedir}/provisioner/master/conf/provisioner-site.xml</source>
+            <outputDirectory>/provisioner/master/conf</outputDirectory>
+        </file>
+        <file>
+            <source>${project.basedir}/README.md</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>${project.basedir}/../LICENSE</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+    </files>
 </assembly>
