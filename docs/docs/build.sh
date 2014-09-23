@@ -16,7 +16,7 @@ SOURCE="source"
 BUILD="build"
 BUILD_PDF="build-pdf"
 HTML="html"
-API="coopr-server"
+API="server"
 APIDOCS="apidocs"
 JAVADOCS="javadocs"
 LICENSES="licenses"
@@ -53,12 +53,11 @@ function usage() {
   echo "Usage: $SCRIPT < option > [source]"
   echo ""
   echo "  Options (select one)"
-  echo "    clean         Clean docs"
-  echo ""
   echo "    build         Clean build of javadocs and HTML docs, copy javadocs and PDFs into place, zip results"
   echo ""
   echo "    docs          Clean build of docs"
-  echo "    javadocs      Clean build of javadocs"
+  echo "    javadocs      Clean build of javadocs (api module only) for SDK and website"
+  echo "    javadocs-full Clean build of javadocs for all modules"
   echo "    rest-pdf      Clean build of REST PDF"
   echo "    zip           Zips docs into $ZIP"
   echo ""
@@ -81,12 +80,17 @@ function build_docs() {
   sphinx-build -b html -d build/doctrees source build/html
 }
 
-function build_javadocs() {
+function build_javadocs_full() {
+  cd $PROJECT_PATH
+  mvn clean site -DskipTests
+}
+
+function build_javadocs_sdk() {
   cd $PROJECT_PATH/$API
   mvn clean javadoc:javadoc -DskipTests
 }
 
-function copy_javadocs() {
+function copy_javadocs_sdk() {
   cd $BUILD_PATH/$HTML
   rm -rf $JAVADOCS
   cp -r $SDK_JAVADOCS .
@@ -107,8 +111,8 @@ function make_zip() {
 
 function build() {
   build_docs
-  build_javadocs
-  copy_javadocs
+  build_javadocs_sdk
+  copy_javadocs_sdk
   copy_license_pdfs
   make_zip
 }
@@ -179,13 +183,13 @@ if [ $# -lt 1 ]; then
 fi
 
 case "$1" in
-  clean )             clean; exit 1;;
   build )             build; exit 1;;
   docs )              build_docs; exit 1;;
   build-standalone )  build_standalone; exit 1;;
   copy-javadocs )     copy_javadocs_sdk; exit 1;;
   copy-license-pdfs ) copy_license_pdfs; exit 1;;
-  javadocs )          build_javadocs; exit 1;;
+  javadocs )          build_javadocs_sdk; exit 1;;
+  javadocs-full )     build_javadocs_full; exit 1;;
   depends )           build_dependencies; exit 1;;
   rest-pdf )          build_rest_pdf; exit 1;;
   sdk )               build_sdk; exit 1;;

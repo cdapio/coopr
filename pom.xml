@@ -28,8 +28,8 @@
     <name>Cask Coopr</name>
 
     <modules>
-        <module>coopr-server</module>
-        <module>coopr-integration-testing</module>
+        <module>server</module>
+        <module>integration-testing</module>
     </modules>
 
     <properties>

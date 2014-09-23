@@ -32,7 +32,7 @@
     </parent>
 
     <modules>
-        <module>../coopr-server</module>
+        <module>../server</module>
     </modules>
 
     <repositories>
