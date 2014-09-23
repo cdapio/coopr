@@ -20,5 +20,5 @@
 :doc:`Administration Guide </guide/admin/index>` |
 :doc:`User Guide </guide/user/index>` |
 :doc:`Web Services </rest/index>` |
-:doc:`Release Notes </overview/release-notes>` |
+:doc:`Release Notes </release-notes/index>` |
 :doc:`FAQ </faq/index>`

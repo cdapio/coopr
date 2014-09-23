@@ -103,6 +103,8 @@ function copy_license_pdfs() {
 }
 
 function make_zip() {
+  version
+  ZIP_FILE_NAME="$PRODUCT-docs-$PRODUCT_VERSION.zip"
   cd $SCRIPT_PATH/$BUILD
   zip -r $ZIP_FILE_NAME $HTML/*
 }
@@ -141,7 +143,10 @@ function build_dependencies() {
 
 function version() {
   cd $PRODUCT_PATH
-  PRODUCT_VERSION=`mvn help:evaluate -o -Dexpression=project.version | grep -v '^\['`
+#  PRODUCT_VERSION=`mvn help:evaluate -o -Dexpression=project.version | grep -v '^\['`
+  PRODUCT_VERSION=`grep "<version>" pom.xml`
+  PRODUCT_VERSION=${PRODUCT_VERSION#*<version>}
+  PRODUCT_VERSION=${PRODUCT_VERSION%%</version>*}
   IFS=/ read -a branch <<< "`git rev-parse --abbrev-ref HEAD`"
   GIT_BRANCH="${branch[1]}"
 }
