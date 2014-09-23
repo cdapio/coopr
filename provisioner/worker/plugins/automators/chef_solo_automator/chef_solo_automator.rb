@@ -125,7 +125,7 @@ class ChefSoloAutomator < Automator
 
     # Write credentials
     @ssh_keyfile = @task['provider']['provisioner']['ssh_keyfile']
-    unless @ssh_keyfile.nil?
+    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
       log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
       decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
     end
@@ -230,7 +230,7 @@ class ChefSoloAutomator < Automator
 
     # Write credentials
     @ssh_keyfile = @task['provider']['provisioner']['ssh_keyfile']
-    unless @ssh_keyfile.nil?
+    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
       log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
       decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
     end
