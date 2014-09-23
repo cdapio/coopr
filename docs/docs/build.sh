@@ -21,8 +21,8 @@ APIDOCS="apidocs"
 JAVADOCS="javadocs"
 LICENSES="licenses"
 LICENSES_PDF="licenses-pdf"
-PRODUCT="coopr"
-PRODUCT_CAPS="Coopr"
+PROJECT="coopr"
+PROJECT_CAPS="Coopr"
 
 SCRIPT_PATH=`pwd`
 
@@ -36,20 +36,20 @@ REST_SOURCE="$SOURCE_PATH/rest.rst"
 REST_PDF="$SCRIPT_PATH/$BUILD_PDF/rest.pdf"
 
 if [ "x$2" == "x" ]; then
-  PRODUCT_PATH="$SCRIPT_PATH/../../"
+  PROJECT_PATH="$SCRIPT_PATH/../../"
 else
-  PRODUCT_PATH="$2"
+  PROJECT_PATH="$2"
 fi
-PRODUCT_JAVADOCS="$PRODUCT_PATH/target/site/apidocs"
-SDK_JAVADOCS="$PRODUCT_PATH/$API/target/site/$APIDOCS"
+PROJECT_JAVADOCS="$PROJECT_PATH/target/site/apidocs"
+SDK_JAVADOCS="$PROJECT_PATH/$API/target/site/$APIDOCS"
 
 ZIP_FILE_NAME=$HTML
 ZIP="$ZIP_FILE_NAME.zip"
 
 function usage() {
-  cd $PRODUCT_PATH
-  PRODUCT_PATH=`pwd`
-  echo "Build script for '$PRODUCT_CAPS' docs"
+  cd $PROJECT_PATH
+  PROJECT_PATH=`pwd`
+  echo "Build script for '$PROJECT_CAPS' docs"
   echo "Usage: $SCRIPT < option > [source]"
   echo ""
   echo "  Options (select one)"
@@ -64,7 +64,7 @@ function usage() {
   echo "    depends       Build Site listing dependencies"
   echo "    sdk           Build SDK"
   echo "  with"
-  echo "    source        Path to $PRODUCT source for javadocs, if not $PRODUCT_PATH"
+  echo "    source        Path to $PROJECT source for javadocs, if not $PROJECT_PATH"
   echo " "
   exit 1
 }
@@ -81,12 +81,12 @@ function build_docs() {
 }
 
 function build_javadocs_full() {
-  cd $PRODUCT_PATH
+  cd $PROJECT_PATH
   mvn clean site -DskipTests
 }
 
 function build_javadocs_sdk() {
-  cd $PRODUCT_PATH/$API
+  cd $PROJECT_PATH/$API
   mvn clean javadoc:javadoc -DskipTests
 }
 
@@ -104,7 +104,7 @@ function copy_license_pdfs() {
 
 function make_zip() {
   version
-  ZIP_FILE_NAME="$PRODUCT-docs-$PRODUCT_VERSION.zip"
+  ZIP_FILE_NAME="$PROJECT-docs-$PROJECT_VERSION.zip"
   cd $SCRIPT_PATH/$BUILD
   zip -r $ZIP_FILE_NAME $HTML/*
 }
@@ -126,7 +126,7 @@ function build_rest_pdf() {
 }
 
 function build_standalone() {
-  cd $PRODUCT_PATH
+  cd $PROJECT_PATH
   mvn clean package assembly:single -DskipTests
 #   mvn clean package -DskipTests -P examples && mvn package -pl singlenode -am -DskipTests -P dist,release
 }
@@ -137,24 +137,24 @@ function build_sdk() {
 }
 
 function build_dependencies() {
-  cd $PRODUCT_PATH
+  cd $PROJECT_PATH
   mvn clean package site -am -Pjavadocs -DskipTests
 }
 
 function version() {
-  cd $PRODUCT_PATH
-#  PRODUCT_VERSION=`mvn help:evaluate -o -Dexpression=project.version | grep -v '^\['`
-  PRODUCT_VERSION=`grep "<version>" pom.xml`
-  PRODUCT_VERSION=${PRODUCT_VERSION#*<version>}
-  PRODUCT_VERSION=${PRODUCT_VERSION%%</version>*}
+  cd $PROJECT_PATH
+#  PROJECT_VERSION=`mvn help:evaluate -o -Dexpression=project.version | grep -v '^\['`
+  PROJECT_VERSION=`grep "<version>" pom.xml`
+  PROJECT_VERSION=${PROJECT_VERSION#*<version>}
+  PROJECT_VERSION=${PROJECT_VERSION%%</version>*}
   IFS=/ read -a branch <<< "`git rev-parse --abbrev-ref HEAD`"
   GIT_BRANCH="${branch[1]}"
 }
 
 function print_version() {
   version
-  echo "PRODUCT_PATH: $PRODUCT_PATH"
-  echo "PRODUCT_VERSION: $PRODUCT_VERSION"
+  echo "PROJECT_PATH: $PROJECT_PATH"
+  echo "PROJECT_VERSION: $PROJECT_VERSION"
   echo "GIT_BRANCH: $GIT_BRANCH"
 }
 
