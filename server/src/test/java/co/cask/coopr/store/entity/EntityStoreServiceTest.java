@@ -582,7 +582,7 @@ public abstract class EntityStoreServiceTest {
 
   protected Provider createProvider(String name, String description, String type, String... mapKeyVals) {
     Preconditions.checkArgument(mapKeyVals.length % 2 == 0, "each key must have a corresponding value");
-    Map<String, String> authMap = Maps.newHashMap();
+    Map<String, Object> authMap = Maps.newHashMap();
     for (int i = 0; i < mapKeyVals.length; i += 2) {
       authMap.put(mapKeyVals[i], mapKeyVals[i+1]);
     }

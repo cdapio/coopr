@@ -93,7 +93,7 @@ public class ClusterServiceTest extends BaseTest {
     );
     entityStoreService.getView(Account.SUPERADMIN).writeProviderType(providerType);
     provider = new Provider("provider", "description", providerType.getName(),
-                            ImmutableMap.of("region", "iad", "url", "http://abc.com/api"));
+                            ImmutableMap.<String, Object>of("region", "iad", "url", "http://abc.com/api"));
     entityStoreView.writeProvider(provider);
     entityStoreView.writeHardwareType(hardwareType);
     entityStoreView.writeImageType(imageType);
@@ -209,7 +209,7 @@ public class ClusterServiceTest extends BaseTest {
     );
     // nonsensitive fields should be everything currently in the provider plus the nonsensitive user fields
     // given in the request
-    Map<String, String> expectedNonsensitiveFields = Maps.newHashMap(provider.getProvisionerFields());
+    Map<String, Object> expectedNonsensitiveFields = Maps.newHashMap(provider.getProvisionerFields());
     expectedNonsensitiveFields.put("keyname", "somename");
     Assert.assertEquals(expectedNonsensitiveFields, cluster.getProvider().getProvisionerFields());
     Assert.assertEquals(expectedSensitiveFields, credentialStore.get(account.getTenantId(), cluster.getId()));
@@ -237,7 +237,7 @@ public class ClusterServiceTest extends BaseTest {
     clusterService.requestClusterReconfigure(cluster.getId(), account, configureRequest);
 
     // nonsensitive fields should be everything currently in the provider before we get the updated cluster
-    Map<String, String> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
+    Map<String, Object> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
     // get the updated cluster
     cluster = clusterStore.getCluster(cluster.getId());
     // key and url are both sensitive fields
@@ -281,7 +281,7 @@ public class ClusterServiceTest extends BaseTest {
   // test that sensitive user fields were added to the credential store
   private void testSensitiveFieldsAdded(Cluster cluster, Map<String, String> sensitiveFields) throws Exception {
     // nonsensitive fields should be everything currently in the provider before we get the updated cluster
-    Map<String, String> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
+    Map<String, Object> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
     // get the updated cluster
     cluster = clusterStore.getCluster(cluster.getId());
     // nonsensitive fields should be everything currently in the provider plus the nonsensitive user fields
@@ -302,7 +302,7 @@ public class ClusterServiceTest extends BaseTest {
     clusterService.requestAddServices(cluster.getId(), account, addServicesRequest);
 
     // nonsensitive fields should be everything currently in the provider before we get the updated cluster
-    Map<String, String> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
+    Map<String, Object> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
     // get the updated cluster
     cluster = clusterStore.getCluster(cluster.getId());
     // nonsensitive fields should be everything currently in the provider plus the nonsensitive user fields
@@ -331,7 +331,7 @@ public class ClusterServiceTest extends BaseTest {
     // not exist because it is a sensitive field and was thus never persisted.
     // create a provider that already has the 'keyname' user field specified.
     Provider provider1 = new Provider("provider", "description", providerType.getName(),
-                                      ImmutableMap.of(
+                                      ImmutableMap.<String, Object>of(
                                         "region", "iad",
                                         "url", "http://abc.com/api",
                                         "keyname", "mykey"));

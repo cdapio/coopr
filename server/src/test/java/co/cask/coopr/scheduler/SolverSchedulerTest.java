@@ -186,7 +186,7 @@ public class SolverSchedulerTest extends BaseTest {
 
     EntityStoreView adminView = entityStoreService.getView(account);
     // create providers
-    provider = new Provider("joyent", "joyent provider", Entities.JOYENT, ImmutableMap.<String, String>of());
+    provider = new Provider("joyent", "joyent provider", Entities.JOYENT, ImmutableMap.<String, Object>of());
     adminView.writeProvider(provider);
     // create hardware types
     adminView.writeHardwareType(

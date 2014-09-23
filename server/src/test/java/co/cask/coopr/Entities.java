@@ -248,7 +248,7 @@ public class Entities {
   public static class ProviderExample {
     public static final Provider JOYENT =
       new Provider("joyent", "Joyent Compute Service", Entities.JOYENT,
-                   ImmutableMap.<String, String>of(
+                   ImmutableMap.<String, Object>of(
                      "joyent_username", "EXAMPLE_USERNAME",
                      "joyent_keyname", "EXAMPLE_KEYNAME",
                      "joyent_keyfile", "/path/to/example.key",
@@ -256,9 +256,10 @@ public class Entities {
                    ));
     public static final Provider RACKSPACE =
       new Provider("rackspace", "Rackspace Public Cloud", Entities.RACKSPACE,
-                   ImmutableMap.<String, String>of(
+                   ImmutableMap.<String, Object>of(
                      "rackspace_username", "EXAMPLE_USERNAME",
-                     "rackspace_api_key", "EXAMPLE_API_KEY"));
+                     "rackspace_api_key", "EXAMPLE_API_KEY",
+                     "some_boolean", true));
   }
 
   public static class HardwareTypeExample {
