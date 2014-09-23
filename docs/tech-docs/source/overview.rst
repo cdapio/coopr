@@ -44,23 +44,55 @@ success or failure of its given task.  An architectural overview is shown in the
 We now give an overview of each component before going into their details.
 
 Server
-======
-The Coopr server performs several separate, but related roles.  The first role is to interact with administrators to define providers,
-hardware, images, services, and templates that can be used for cluster management purposes. These definitions are persistently 
-stored, as illustrated in the figure by the Admin APIs box and Store. The second role is to create plans to perform cluster management
-operations. Users make cluster management operation requests through the User APIs, which are then sent to the Solver and Planner to 
-transform the cluster level operation into a plan of node level tasks.
-The final role is to interact with provisioners to coordinate the execution of those node level tasks.  In the figure, this role 
-is performed through the Provisioner APIs box, Task Queue, and Janitor. 
+===========
+The Server is responsible for managing tenants, clusters, and provisioner resources. It exposes web services for adding and
+managing providers, services, and cluster templates for use by users. With these services, users can create and manage
+clusters simply by specifying a template and cluster size. The service solves for a valid cluster layout, then creates and
+coordinates an execution plan to carry out cluster operations. Additionally, provisioner resources can be managed through
+the server, giving provisioners access to new resources as your services evolve.
+
+Solver
+------
+The solver is responsible for taking an existing cluster layout, the template associated with the cluster,
+user specified properties, and finding a valid cluster layout that satisfies all input. For example, when a user
+makes a request to create a cluster, the solver will take the template specified in the request plus any additional
+arguments such as the size of the cluster, and solve for a cluster layout that satisfies all the constraints included
+in the template and the arguments included in the cluster create request. The output of the solver is either an error
+indicating no valid layout could be found, or a new cluster layout.
+
+Planner
+-------
+The planner is responsible for taking an old cluster layout, a new cluster layout, and creating a plan that will take
+the cluster from the old layout to the new layout. For example, during a cluster create operation, the planner takes
+the nonexistant old layout, the new layout, and creates a plan to create the cluster that involves creating the nodes,
+installing, configuring, initializing, and starting cluster services. The planner will take into account service
+dependencies when creating the plan. It will also place tasks onto a queue for provisioner workers to take and execute,
+as well as manage progression, retries, and rollbacks of planned tasks as they are successfully or unsuccessfully executed.
+
+Persistent Stores
+-----------------
+The server stores data for all tenants in a persistent store. Most data, such as providers, hardware types,
+image types, services, cluster templates, and cluster information, are stored in a database. However, plugin resources
+are stored in a special provisioner data store because of their potentially unbounded size. The default implementation of this
+store writes to the local filesystem the server is running on. There is an interface that you can implement if you want to
+use another persistent storage backend. You may want to do this if you are running multiple servers and do not want to use
+some network file system such as NFS.
+
+Janitor
+-------
+The janitor is responsible for timing out and retrying tasks if they have been in progress for too long. The janitor is also
+responsible for auto-deleting clusters that have an expired lease.
 
 Provisioner
-===========
-Provisioners are responsible for taking tasks from the server, executing the task, and reporting back to the server whether or not the 
-task was successfully performed. Provisioners perform tasks by using the provider or automator plugin specified in the task.  Provider plugins
-are used to allocate, delete, and manage machines using different infrastructure providers such as OpenStack, Rackspace, Amazon Web Services, 
-Google App Engine, and Joyent. Automator plugins are responsible for implementing the various services defined on a cluster.  For example, a 
-Chef automator plugin could be used to invoke Chef recipes that install, configure, initialize, start or stop your application.  Various plugins may be 
-implemented to support desired technologies, such as a Puppet plugin, or even shell commands.  
-Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Coopr's architecture
-simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent
-tasks.
+================
+Provisioners are responsible for executing tasks planned by the Server, such as the creation of nodes, installation of services,
+and configuration of services. Each provisioner manages workers that take tasks from the Server, reporting back the tasks' status
+after execution completes. Additionally, the provisioner syncs resources on request from the Server, allowing administrators to
+manage what configuration and code should be used to perform various node and service actions.
+
+Provisioners support a pluggable architecture for integrating different infrastructure providers (e.g. OpenStack, Rackspace, Amazon Web Services, Google App Engine, and Joyent)
+and automators (e.g. Chef, Puppet, Shell scripts). Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Coopr's architecture simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent tasks to render scalability.
+
+Provisioners spin up worker processes to execute the actual tasks that must be performed. Each worker will only execute tasks for
+a single tenant and will not execute tasks for other tenants even if it is idle. The server is responsible for telling provisioners
+how many workers it should run as well as the tenant those workers are working for.

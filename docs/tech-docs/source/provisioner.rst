@@ -9,12 +9,22 @@
 Provisioner
 ===========
 
-The Provisioner is the worker daemon of Coopr.  At a high level, it simply performs tasks given to it by the Server.  These are the tasks necessary to orchestrate cluster operations and may include provisioning nodes from cloud providers, installing/configuring software, or running custom commands.  Each instance of the provisioner polls for the next task in the queue, and handles it to completion.  A plugin framework is utilized to handle any task for extensibility.  The provisioners are lightweight and stateless, therefore many can be run in parallel.
+The Provisioner is responsible for managing workers that perform tasks given to it by the Server.
+These are the tasks necessary to orchestrate cluster operations and may include provisioning nodes from cloud providers,
+installing/configuring software, or running custom commands.  Each worker polls for the next task in
+the queue, and handles it to completion. A plugin framework is utilized to handle any task for extensibility.  
+The provisioner workers are lightweight and stateless, therefore many can be run in parallel.
 
-Operational Model
-=================
+Upon startup, the provisioner will register itself to the server, telling the server the capacity it has and the host and port
+it is running on. With this information, the server may decide to assign workers to the provisioner for one or more tenants.
+Every so often, the provisioner sends a heartbeat to the server that lets the server know it is still alive, and also communicates
+how many workers are currently running on the provisioner. The provisioner also communicates with the server to pull plugin resources
+that may be needed by workers to complete their tasks.
 
-At a high-level, the provisioner is responsible for the following:
+Workers
+========
+
+At a high-level, each provisioner worker is responsible for the following:
   * polling the Server for tasks
   * executing the received task by invoking the appropriate task handler plugin
   * reporting back the results of the operation, including success/failure and any appropriate metadata needed.
@@ -40,8 +50,6 @@ The following diagram illustrates how this is implemented by the Provisioner:
 In the diagram above, the Provisioner first recieves a CREATE task that instructs it to request a node from a specific provider.  The task contains the all the necessary provider-specific options (truncated in the diagram for brevity).  The provisioner then executes the node create request through the provider API and receives the new node's provider ID as a result.  Since this provider ID will be critical for future operations against this node, it must report it back to the Server.  It does so by populating a "result" key-value hash in the task result JSON.  The Server will preserve these key-values in a "config" hash on all subsequent tasks for this node.  In the diagram, the subsequent "CONFIRM" task is given the provider-id for the node, and similarly it reports back the IP address obtained from the provider in this step.  The third task shown now includes all metadata discovered thus far about the node in the request: the provider-id and the ipaddress.  In this way, Coopr is building up a persistent payload of metadata about a node which can be used by any subsequent task.
 
 In addition to this payload of key-value pairs, Coopr also automatically provides additional metadata regarding cluster layout.  For example, once the nodes of a cluster are established, Server will include a "nodes" hash in the task JSON which contains the hostnames and IP addresses of every node in the cluster.  This can be readily used by any task requiring cluster information, for example configuring software on a node which needs a list of all peer nodes in the cluster.
-
-
 
 Plugin Framework
 ================
