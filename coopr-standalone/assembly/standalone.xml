@@ -37,16 +37,16 @@
             <outputDirectory>/server/bin</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}/../coopr-server/config/defaults</directory>
+            <outputDirectory>/server/config/defaults</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/bin</directory>
             <outputDirectory>/bin</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/server/conf</directory>
             <outputDirectory>/server/conf</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/../coopr-config/defaults</directory>
-            <outputDirectory>/server/config/defaults</outputDirectory>
         </fileSet>
     </fileSets>
     <files>
