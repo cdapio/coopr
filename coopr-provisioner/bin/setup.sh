@@ -63,3 +63,4 @@ curl --silent --request POST \
   ${COOPR_SERVER_URI}/v2/plugins/sync
 __ret=$?
 [[ ${__ret} -ne 0 ]] && exit 1
+exit 0
