@@ -20,6 +20,8 @@
 # Add some build pre-requisites
 include_recipe 'build-essential'
 
+package 'zlib-devel' if node['platform_family'] == 'rhel'
+
 # Install PHP modules, from a list
 if node['php'].key?('modules')
   node['php']['modules'].each do |m|
