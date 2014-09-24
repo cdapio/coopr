@@ -9,11 +9,11 @@ contribute:
  * Fork Coopr into your own GitHub repository
  * Create a topic branch with an appropriate name
  * Work on your favorite feature to your content
- * Once you are satisifed, create a pull request by going to the caskco/coopr project.
+ * Once you are satisifed, create a pull request by going to the caskdata/coopr project.
  * Address all the review comments
- * Once addressed, the changes will be committed to the caskco/coopr repo.
+ * Once addressed, the changes will be committed to the caskdata/coopr repo.
 
-Bugs and suggestions should be made by filing a [GitHub Issue](https://github.com/caskco/coopr/issues)
+Bugs and suggestions should be made by filing a [GitHub Issue](https://github.com/caskdata/coopr/issues)
 against this repository.
 
 ## License

@@ -1,6 +1,6 @@
 name             'coopr_dns'
-maintainer       'Continuuity'
-maintainer_email 'ops@continuuity.com'
+maintainer       'Cask'
+maintainer_email 'ops@cask.co'
 license          'All rights reserved'
 description      'Installs/Configures DNS'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))

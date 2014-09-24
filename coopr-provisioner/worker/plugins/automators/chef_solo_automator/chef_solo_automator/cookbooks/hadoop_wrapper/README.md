@@ -2,7 +2,7 @@
 
 # Description
 
-This cookbook is a wrapper cookbook for the [Hadoop cookbook](https://github.com/continuuity/hadoop_cookbook).  It is a part of [Coopr](https://github.com/caskco/coopr), which is a general purpose tool that can spin up several types of clusters including Hadoop.  This cookbook provides several initialization recipes for Hadoop components.  It does not actually start any of the hadoop services.  This can be done by wrapping the service resources in the underlying [Hadoop cookbook](https://github.com/continuuity/hadoop_cookbook), for example:
+This cookbook is a wrapper cookbook for the [Hadoop cookbook](https://github.com/continuuity/hadoop_cookbook).  It is a part of [Coopr](https://github.com/caskdata/coopr), which is a general purpose tool that can spin up several types of clusters including Hadoop.  This cookbook provides several initialization recipes for Hadoop components.  It does not actually start any of the hadoop services.  This can be done by wrapping the service resources in the underlying [Hadoop cookbook](https://github.com/continuuity/hadoop_cookbook), for example:
 ```ruby
     ruby_block "start namenode" do
       block do

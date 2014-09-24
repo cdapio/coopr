@@ -20,9 +20,9 @@ while utilizing common SCM tools (Chef and scripts).
 ## Documentation
 
 To learn more about Coopr, here are the resources available:
-   * [Introduction](http://caskco.github.io/coopr/) to Coopr
+   * [Introduction](http://caskdata.github.io/coopr/) to Coopr
    * Coopr [User Guide](http://docs.cask.co/coopr/current/en/index.html)
-   * [Technical Document](http://caskco.github.io/coopr/tech-docs/index.html) describing internals of Coopr
+   * [Technical Document](http://caskdata.github.io/coopr/tech-docs/index.html) describing internals of Coopr
    * Release Documentation
       * [Documentation 0.9.8](http://docs.cask.co/coopr/0.9.8/en/index.html)
 
@@ -36,11 +36,11 @@ suggesting improvements to something that's already there, here's how you can co
  * Fork Coopr into your own GitHub repository
  * Create a topic branch with an appropriate name
  * Work on your favorite feature to your content
- * Once you are satisifed, create a pull request by going to the caskco/coopr project.
+ * Once you are satisifed, create a pull request by going to the caskdata/coopr project.
  * Address all the review comments
- * Once addressed, the changes will be committed to the caskco/coopr repository.
+ * Once addressed, the changes will be committed to the caskdata/coopr repository.
 
-Bugs and suggestions should be made by filing a [GitHub Issue](https://github.com/caskco/coopr/issues) against this repository.
+Bugs and suggestions should be made by filing a [GitHub Issue](https://github.com/caskdata/coopr/issues) against this repository.
 
 ## License
 
