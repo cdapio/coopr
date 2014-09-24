@@ -56,7 +56,7 @@ start ( ) {
   echo "Starting Loom NGUI ..."
 
   export COOPR_UI_PORT
-  nohup nice -1 ${LOOM_NPM} start \
+  nohup nice -1 ${LOOM_NODE} ${UI_PATH}/server.js \
     >> ${LOOM_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
   echo $! > "${pid}"
 }
