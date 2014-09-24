@@ -76,7 +76,7 @@ public class SuiteOrder {
   @BeforeClass
   public static void setUpClass() throws Exception {
     ProcessBuilder builder = new ProcessBuilder();
-    builder.directory(new File("../ui"));
+    builder.directory(new File("../coopr-ui"));
     builder.command("/bin/sh","-c","node server.js --env=test --port=" + Constants.PORT);
 
     builder.redirectErrorStream(true);

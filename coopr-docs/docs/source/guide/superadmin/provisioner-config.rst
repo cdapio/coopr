@@ -34,6 +34,7 @@ Example
 ^^^^^^^^
 Shown below is an example configuration with settings that you are most likely to change.
 ::
+
   <configuration>
     <property>
       <name>provisioner.capacity</name>

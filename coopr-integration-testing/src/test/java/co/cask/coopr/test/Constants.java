@@ -53,12 +53,12 @@ public class Constants {
   public static final String USER_CLUSTERS = ROOT_URL + "/user/clusters";
 
   // Canonical paths for test examples
-  public static final String PARENT_PATH = new File(System.getProperty("user.dir")).getParent();
-  public static final String IMAGETYPES_PATH = PARENT_PATH + "/ui/test/imagetypes";
-  public static final String HARDWARETYPES_PATH = PARENT_PATH + "/ui/test/hardwaretypes";
-  public static final String PROVIDERS_PATH = PARENT_PATH + "/ui/test/providers";
-  public static final String SERVICES_PATH = PARENT_PATH + "/ui/test/services";
-  public static final String CLUSTERTEMPLATE_PATH = PARENT_PATH + "/ui/test/clustertemplates";
+  public static final String PARENT_PATH = new File(System.getProperty("user.dir")).getParent() + "/coopr-ui";
+  public static final String IMAGETYPES_PATH = PARENT_PATH + "/test/imagetypes";
+  public static final String HARDWARETYPES_PATH = PARENT_PATH + "/test/hardwaretypes";
+  public static final String PROVIDERS_PATH = PARENT_PATH + "/test/providers";
+  public static final String SERVICES_PATH = PARENT_PATH + "/test/services";
+  public static final String CLUSTERTEMPLATE_PATH = PARENT_PATH + "/test/clustertemplates";
 
   // Location properties in /
   public static final String CLUSTERTEMPLATE_TABLE = ".clustertemplates-table";
@@ -91,9 +91,9 @@ public class Constants {
                                                         "Providers", "Hardware", "Images", "Services");
 
   // Fixture properties
-  public static final String CLUSTERS_FILE_NAME = PARENT_PATH + "/ui/test/clusters/clusters.json";
-  public static final String CLUSTERDEF_FILE_NAME = PARENT_PATH + "/ui/test/clusters/clusterdefinitions.json";
-  public static final String CLUSTER_CREATE_FILE_NAME = PARENT_PATH + "/ui/test/clusters/createcluster.json";
+  public static final String CLUSTERS_FILE_NAME = PARENT_PATH + "/test/clusters/clusters.json";
+  public static final String CLUSTERDEF_FILE_NAME = PARENT_PATH + "/test/clusters/clusterdefinitions.json";
+  public static final String CLUSTER_CREATE_FILE_NAME = PARENT_PATH + "/test/clusters/createcluster.json";
 
   public static final String ACTION_TABLE_CLASSNAME = ".node-actions-table";
   public static final ImmutableSet<String> PROVIDERS_SET = ImmutableSet.of(
