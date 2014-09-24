@@ -374,7 +374,8 @@ for a Coopr Provisioner, you can use:
 Initial Setup
 =============
 The very first time you install Coopr, you will need to perform some data initialization. The first thing you must do is
-register the provisioner plugins, and the plugin resources included with Coopr
+register the provisioner plugins, and the plugin resources included with Coopr. If you have not configured the server
+port, it defaults to 55054.
 ::
 
  $ sudo COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/provisioner/bin/setup.sh
@@ -385,12 +386,6 @@ the example in the :doc:`Quick Start Guide </guide/quickstart/index>`, and are i
 ::
 
  $ sudo COOPR_SERVER_URI=http://<coopr-server>:<coopr-port> /opt/coopr/server/config/defaults/load-defaults.sh
-
-If you have not configured the server port, it defaults to 55054.
-
-.. note::
-    Setting the ``COOPR_SERVER_URI`` environment variable is only required if you have configured the Coopr Server to
-    bind to an address other than localhost.
 
 .. _logs:
 
