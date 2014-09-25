@@ -25,7 +25,7 @@ In this setup, Coopr runs in active mode in all datacenters (Hot-Hot). In case o
 A couple of things need to be considered when configuring Coopr to run across multiple datacenters for HA-
 
 * As discussed in the previous section, all components of Coopr, except for database, either deal with local data or are stateless. The most important part of the HA setup is to share the data across datacenters in a consistent manner. HA configuration setup for multi-datacenter mostly depends on how the database is setup as discussed in the next sections.
-* Since Coopr Servers across all datacenters run in Hot-Hot mode, we have to make sure that they do not conflict while creating cluster IDs. The ID space needs to be partitioned amongst the Coopr Servers. This can be done using ``server.ids.start.num`` and ``server.ids.increment.by`` server config parameters. For more information on the config parameters see :doc:`Server Configuration </guide/superadmin/server-config>` section. Also note that Coopr Servers in a datacenter can share the same ID space.
+* Since Coopr Servers across all datacenters run in Hot-Hot mode, we have to make sure that they do not conflict while creating cluster IDs. The ID space needs to be partitioned amongst the Coopr Servers. This can be done using ``server.ids.start.num`` and ``server.ids.increment.by`` server config parameters. For more information on the config parameters see :doc:`Server Configuration </installation/server-config>` section. Also note that Coopr Servers in a datacenter can share the same ID space.
 
 
 

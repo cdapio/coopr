@@ -110,6 +110,8 @@ you must build a jar and include it in the lib directory for the server, and edi
       <description>fully qualified class name that implements your plugin store</description>
     </property>
 
+For more details about plugin resources, see the :doc:`Plugin Resources Guide </guide/admin/plugin-resources>`.
+
 Callbacks
 ^^^^^^^^^
 The Server can be configured to run callbacks before any cluster operation begins, after an

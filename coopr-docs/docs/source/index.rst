@@ -42,9 +42,9 @@ Contents
 
    /overview/index
    /guide/quickstart/index
-   /installation/index
    /overview/features
    /overview/architecture
+   /installation/index
    /guide/superadmin/index
    /guide/admin/index
    /guide/user/index

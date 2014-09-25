@@ -286,7 +286,7 @@ Site Config
 Coopr Server settings can be changed under the ``/etc/coopr/conf/coopr-site.xml`` configuration file.
 You will likely want to add configuration settings for zookeeper, your database, and server host. There is also
 an example configuration file you can examine at ``/etc/coopr/conf/coopr-site.xml.example``.
-For a list of available configurations, see the :doc:`Server Configuration </guide/superadmin/server-config>` page. 
+For a list of available configurations, see the :doc:`Server Configuration </installation/server-config>` page. 
 
 Environment
 ^^^^^^^^^^^
@@ -318,7 +318,7 @@ Site Config
 ^^^^^^^^^^^
 Coopr Provisioner settings can be changed under the ``/etc/coopr/conf/provisioner-site.xml`` configuration file.
 You will likely want to add configuration settings for the server uri the provisioner should connect to.
-For a list of available configurations, see the :doc:`Provisioner Configuration </guide/superadmin/provisioner-config>` page.
+For a list of available configurations, see the :doc:`Provisioner Configuration </installation/provisioner-config>` page.
 
 Environment
 ^^^^^^^^^^^

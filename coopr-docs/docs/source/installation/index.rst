@@ -31,5 +31,6 @@ to experiment with, you can choose to use Coopr Standalone, Coopr in a VM, or Co
   :maxdepth: 2
 
   packages
+  server-config
+  provisioner-config
   standalone
-

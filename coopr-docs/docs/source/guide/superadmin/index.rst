@@ -21,7 +21,6 @@ Super Admin Guide
    :maxdepth: 2
 
    overview
-   server-config
    tenants
    callbacks
    plugins
