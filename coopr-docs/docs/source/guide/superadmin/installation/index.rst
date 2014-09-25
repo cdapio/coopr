@@ -155,24 +155,24 @@ To install each of the Coopr components locally from a Debian package:
 Installing from Repository
 ==========================
 
-Access to the Cask private repository is required for package installation.
+RPM using Yum
+-------------
+Download the Cask Yum repo definition file::
 
-Yum
----
-To add the Cask Yum repository, add the following content to the file ``/etc/yum.repos.d/cask.repo``:
-::
+  sudo curl -o /etc/yum.repos.d/cask.repo http://repository.cask.co/downloads/centos/6/x86_64/cask.repo
+
+This will create the file ``/etc/yum.repos.d/cask.repo`` with::
 
   [cask]
-  name=Coopr Releases
-  baseurl=https://<username>:<password>@repository.continuuity.com/content/repositories/coopr
+  name=Cask Packages
+  baseurl=http://repository.cask.co/centos/6/x86_64/releases
   enabled=1
-  protect=0
-  gpgcheck=0
-  metadata_expire=30s
-  autorefresh=1
-  type=rpm-md
+  gpgcheck=1
 
-.. note:: Username and password are URL encoded. Please request login credentials from Cask support.
+
+Add the Cask Public GPG Key to your repository::
+
+  sudo rpm --import http://repository.cask.co/centos/6/x86_64/releases/pubkey.gpg
 
 Instructions for installing each of the Coopr components are as below:
 ::
@@ -181,12 +181,20 @@ Instructions for installing each of the Coopr components are as below:
   $ sudo yum install coopr-provisioner
   $ sudo yum install coopr-ui
 
-Debian
-------
-To add the Cask Debian repository, add the following content to the file ``/etc/apt/sources.list.d/cask.list``:
-::
+Debian using APT
+----------------
+Download the Cask Apt repo definition file::
 
-  deb     [arch=amd64] https://<username>:<password>@repository.continuuity.com/content/sites/apt-coopr precise release
+  sudo curl -o /etc/apt/sources.list.d/cask.list http://repository.cask.co/downloads/ubuntu/precise/amd64/cask.list
+
+This will create the file ``/etc/apt/sources.list.d/cask.list`` with::
+
+  deb [ arch=amd64 ] http://repository.cask.co/ubuntu/precise/amd64/releases precise releases
+
+
+Add the Cask Public GPG Key to your repository::
+
+  curl -s http://repository.cask.co/ubuntu/precise/amd64/releases/pubkey.gpg | sudo apt-key add -
 
 Instructions for installing each of the Coopr components are as below:
 ::

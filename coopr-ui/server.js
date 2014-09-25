@@ -132,7 +132,7 @@ site.app.use(function (req, res, next) {
   site.configureTemplating(site.TEMPLATE_DIR);
 
   if (req.query.landing) {
-    res.cookie('continuuity-landing', req.query.landing,
+    res.cookie('cask-landing', req.query.landing,
       { maxAge: 900000, httpOnly: false });
   }
 
