@@ -16,9 +16,9 @@
       "hive-metastore",
       "cdap"
     ],
-    "provider": "google",
+    "provider": "rackspace",
     "hardwaretype": "standard-large",
-    "imagetype": "centos6",
+    "imagetype": "ubuntu12",
     "config": {
       "hadoop": {
         "core_site": {

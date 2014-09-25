@@ -16,9 +16,9 @@
       "hive-metastore-database",
       "hive-metastore"
     ],
-    "provider": "google",
+    "provider": "rackspace",
     "hardwaretype": "standard-xlarge",
-    "imagetype": "centos6",
+    "imagetype": "ubuntu12",
     "config": {
       "hadoop": {
         "core_site": {
