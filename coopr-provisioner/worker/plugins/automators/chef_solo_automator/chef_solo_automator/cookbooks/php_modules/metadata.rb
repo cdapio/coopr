@@ -1,6 +1,6 @@
 name             'php_modules'
-maintainer       'Continuuity'
-maintainer_email 'ops@continuuity.com'
+maintainer       'Cask Data, Inc'
+maintainer_email 'ops@cask.co'
 license          'Apache 2.0'
 description      'Installs PHP modules using the php_pear LWRP'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))

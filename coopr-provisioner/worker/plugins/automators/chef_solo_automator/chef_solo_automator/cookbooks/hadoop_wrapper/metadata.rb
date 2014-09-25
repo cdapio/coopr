@@ -1,6 +1,6 @@
 name             'hadoop_wrapper'
-maintainer       'Continuuity'
-maintainer_email 'ops@continuuity.com'
+maintainer       'Cask Data, Inc'
+maintainer_email 'ops@cask.co'
 license          'All rights reserved'
 description      'Hadoop wrapper'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))

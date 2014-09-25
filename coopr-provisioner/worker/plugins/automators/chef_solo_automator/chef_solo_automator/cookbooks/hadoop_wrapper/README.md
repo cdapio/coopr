@@ -2,7 +2,7 @@
 
 # Description
 
-This cookbook is a wrapper cookbook for the [Hadoop cookbook](https://github.com/continuuity/hadoop_cookbook).  It is a part of [Coopr](https://github.com/caskdata/coopr), which is a general purpose tool that can spin up several types of clusters including Hadoop.  This cookbook provides several initialization recipes for Hadoop components.  It does not actually start any of the hadoop services.  This can be done by wrapping the service resources in the underlying [Hadoop cookbook](https://github.com/continuuity/hadoop_cookbook), for example:
+This cookbook is a wrapper cookbook for the [Hadoop cookbook](https://github.com/caskdata/hadoop_cookbook).  It is a part of [Coopr](https://github.com/caskdata/coopr), which is a general purpose tool that can spin up several types of clusters including Hadoop.  This cookbook provides several initialization recipes for Hadoop components.  It does not actually start any of the hadoop services.  This can be done by wrapping the service resources in the underlying [Hadoop cookbook](https://github.com/caskdata/hadoop_cookbook), for example:
 ```ruby
     ruby_block "start namenode" do
       block do
@@ -10,7 +10,7 @@ This cookbook is a wrapper cookbook for the [Hadoop cookbook](https://github.com
       end 
 ```
 
-Additional information can be found in the [Hadoop cookbook wiki](https://github.com/continuuity/hadoop_cookbook/wiki/Wrapping-this-cookbook).
+Additional information can be found in the [Hadoop cookbook wiki](https://github.com/caskdata/hadoop_cookbook/wiki/Wrapping-this-cookbook).
 
 
 # Requirements
@@ -26,7 +26,7 @@ apt
 yum
 java
 hadoop
-krb5_utils (from https://github.com/continuuity/krb5_utils_cookbook)
+krb5_utils (from https://github.com/caskdata/krb5_utils_cookbook)
 
 # Attributes
 
