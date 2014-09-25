@@ -15,16 +15,16 @@ while utilizing common SCM tools (Chef and scripts).
 
 ## Releases
 
-   * [Codename: Centaurus, Theme: multi-tenancy, 0.9.8](http://docs.cask.co/coopr/0.9.8/en/overview/release-notes.html)
+   * [Codename: Centaurus, Theme: multi-tenancy, 0.9.8](http://docs.cask.co/coopr/0.9.8/en/release-notes/index.html)
 
 ## Documentation
 
 To learn more about Coopr, here are the resources available:
    * [Introduction](http://caskdata.github.io/coopr/) to Coopr
    * Coopr [User Guide](http://docs.cask.co/coopr/current/en/index.html)
-   * [Technical Document](http://caskdata.github.io/coopr/tech-docs/index.html) describing internals of Coopr
+   * [Technical Document](http://docs.cask.co/coopr/current/en/implementation.html) describing internals of Coopr
    * Release Documentation
-      * [Documentation 0.9.8](http://docs.cask.co/coopr/0.9.8/en/index.html)
+      * [Documentation 0.9.8](http://docs.cask.co/coopr/0.9.8/en/release-notes/index.html)
 
 ## Contributing to Coopr
 
