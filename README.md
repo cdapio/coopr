@@ -1,4 +1,4 @@
-![Coopr Logo](docs/docs/source/_images/coopr_logo_fullcolor.png)
+![Coopr Logo](coopr-docs/docs/source/_images/coopr_logo_fullcolor.png)
 
 ## [Coopr](http://cask.co): Modern Cluster Management
 
