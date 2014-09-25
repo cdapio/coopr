@@ -1,0 +1,52 @@
+{
+  "name": "kerberos-master",
+  "description": "Configures Kerberos v5 Administration server and KDC",
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [ "base", "kerberos-client" ],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [],
+      "uses": []
+    }
+  },
+  "provisioner": {
+    "actions": {
+      "install": {
+        "type":"chef-solo",
+        "fields": {
+          "run_list": "recipe[krb5::kadmin]"
+        }
+      },
+      "configure": {
+        "type":"chef-solo",
+        "fields": {
+          "run_list": "recipe[krb5::kadmin]"
+        }
+      },
+      "initialize": {
+        "type":"chef-solo",
+        "fields": {
+          "run_list": "recipe[krb5::kadmin_init]"
+        }
+      },
+      "start": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[krb5::kadmin_service],recipe[krb5::kdc_service],recipe[coopr_service_manager::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"krb5-admin-server\": \"start\", \"krb5-kdc\": \"start\" } } } }"
+        }
+      },
+      "stop": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[krb5::kadmin_service],recipe[krb5::kdc_service],recipe[coopr_service_manager::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"krb5-admin-server\": \"stop\", \"krb5-kdc\": \"stop\" } } } }"
+        }
+      }
+    }
+  }
+}
