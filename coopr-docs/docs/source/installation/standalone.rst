@@ -41,29 +41,11 @@ follow the instructions in the :ref:`Quickstart Guide <quickstart-getting-starte
 
 Virtual Machine
 ---------------
-You can also run Coopr in a virtual machine that you can download `here <http://cask.co/downloads>`_. You will need either Oracle VirtualBox or
+You can also run Coopr in a virtual machine that you can `download here <http://repository.cask.co/downloads/co/cask/coopr/coopr-standalone-vm/0.9.8/coopr-standalone-vm-0.9.8.ova>`_. You will need virtualization software like Oracle VirtualBox or
 VMWare player in order to run the VM. Once you have downloaded the image, import it using VirtualBox or VMWare Player. 
 The VM has been set up with 4GB RAM and 10GB disk. No password is required to enter the machine. However, should you need to perform an administrative
 operation, the coopr admin password is coopr.
 Coopr has already been installed and configured in the virtual machine and will start up automatically when the machine start.
 On start up a browser will also start with the Coopr UI loaded at http://localhost:8100. At this point you can
 follow the instructions in the :ref:`Quickstart Guide <quickstart-getting-started>` to try provisioning a cluster. 
-
-Docker
-------
-You can also run Coopr in a Docker container. You will need to download and install Docker in order to do this.
-Once installed, follow the instructions below to enter your container and start up Coopr::
-
- $ boot2docker start
- $ docker pull caskdata/coopr-standalone
- $ docker run -t -i -p 8100:8100 caskdata/coopr-standalone
- $ /etc/init.d/coopr-server start
- $ /etc/init.d/coopr-provisioner start
- $ /etc/init.d/coopr-ui start
-
-At this point you can start your brower and go to http://<ip>:8100, where the ip is found by running::
-
- $ boot2docker ip
- 
-At this point you can follow the instructions in the :ref:`Quickstart Guide <quickstart-getting-started>` to try provisioning a cluster. 
 
