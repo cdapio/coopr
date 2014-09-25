@@ -16,7 +16,7 @@ while utilizing common SCM tools (Chef and scripts).
 
 ## Getting Started
 
-You can build a standalone version of Coopr that will run on your machine. It requires Java 6 or Java 7, Ruby 
+You can build a standalone version of Coopr that will run on your machine. It requires Java 6 or Java 7 to run the server, Node v0.10.26 or higher for the UI, and Ruby 1.9.0p0 or higher for the provisioner.
 
    * `git clone https://github.com/caskdata/coopr.git`
    * `cd coopr/coopr-standalone`
