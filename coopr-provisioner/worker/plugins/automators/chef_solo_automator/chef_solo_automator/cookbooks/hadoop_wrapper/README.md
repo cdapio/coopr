@@ -8,6 +8,7 @@ This cookbook is a wrapper cookbook for the [Hadoop cookbook](https://github.com
       block do
         resources("hadoop-hdfs-namenode").run_action(:start)
       end 
+    end
 ```
 
 Additional information can be found in the [Hadoop cookbook wiki](https://github.com/caskdata/hadoop_cookbook/wiki/Wrapping-this-cookbook).
@@ -22,11 +23,11 @@ Additional information can be found in the [Hadoop cookbook wiki](https://github
 
 # Cookbook Dependencies
 
-apt
-yum
-java
-hadoop
-krb5_utils (from https://github.com/caskdata/krb5_utils_cookbook)
+* apt
+* yum
+* java
+* hadoop
+* krb5_utils (from https://github.com/caskdata/krb5_utils_cookbook)
 
 # Attributes
 
