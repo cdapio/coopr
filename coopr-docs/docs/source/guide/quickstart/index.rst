@@ -104,10 +104,10 @@ provider(s) you are using.
 
 Amazon Web Services (AWS)
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-The Amazon providers require a secret access key, an id for that key, an AWS region, an ssh key and ssh key name. 
-The access key and id come from your AWS account, and the ssh key given is the key that will be used to ssh onto nodes
-created with the provider. Enter your secret access key into the ``Secret Access Key`` field, and the id for that key in 
-the ``Access Key ID`` field. Enter the name of your ssh key into the ``Key Pair Name`` field.
+The Amazon providers require a lot of fields. Of these many fields, ``Secret Access Key``, ``Access Key ID``,
+``AWS Region``, ``Key Pair Name``, and ``SSH Key Resource Name`` must be set. Once those are set, you must provide
+either the ``Security Groups`` field if your account does not use VPC, or the ``Security Groups IDs`` and ``Subnet ID``
+fields if your account uses VPC. The rest of the fields are optional.
 
 .. figure:: /_images/quickstart/providers_aws.png
     :align: center
