@@ -19,7 +19,6 @@ import co.cask.coopr.account.Account;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;

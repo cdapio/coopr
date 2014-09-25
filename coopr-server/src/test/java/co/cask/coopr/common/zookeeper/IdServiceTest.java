@@ -15,7 +15,6 @@
  */
 package co.cask.coopr.common.zookeeper;
 
-import co.cask.coopr.common.zookeeper.IdService;
 import com.google.common.base.Throwables;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
 import org.apache.twill.zookeeper.ZKClientService;

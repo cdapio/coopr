@@ -18,7 +18,6 @@ package co.cask.coopr.common.queue;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 

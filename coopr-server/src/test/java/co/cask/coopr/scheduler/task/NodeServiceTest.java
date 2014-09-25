@@ -16,10 +16,10 @@
 package co.cask.coopr.scheduler.task;
 
 import co.cask.coopr.TestHelper;
-import co.cask.coopr.http.ServiceTestBase;
-import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.common.conf.Constants;
+import co.cask.coopr.http.ServiceTestBase;
+import co.cask.coopr.spec.service.Service;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;

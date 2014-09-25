@@ -16,9 +16,6 @@
 package co.cask.coopr.macro;
 
 import co.cask.coopr.account.Account;
-import co.cask.coopr.spec.ProvisionerAction;
-import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.cluster.NodeProperties;
@@ -28,6 +25,9 @@ import co.cask.coopr.macro.eval.HostServiceEvaluator;
 import co.cask.coopr.macro.eval.IPSelfEvaluator;
 import co.cask.coopr.macro.eval.IPServiceEvaluator;
 import co.cask.coopr.macro.eval.ServiceInstanceEvaluator;
+import co.cask.coopr.spec.ProvisionerAction;
+import co.cask.coopr.spec.service.Service;
+import co.cask.coopr.spec.service.ServiceAction;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;

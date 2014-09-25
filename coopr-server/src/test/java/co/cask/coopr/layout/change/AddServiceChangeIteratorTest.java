@@ -15,11 +15,11 @@
  */
 package co.cask.coopr.layout.change;
 
+import co.cask.coopr.layout.ClusterLayout;
+import co.cask.coopr.layout.NodeLayout;
 import co.cask.coopr.spec.template.Constraints;
 import co.cask.coopr.spec.template.LayoutConstraint;
 import co.cask.coopr.spec.template.ServiceConstraint;
-import co.cask.coopr.layout.ClusterLayout;
-import co.cask.coopr.layout.NodeLayout;
 import co.cask.coopr.spec.template.SizeConstraint;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;

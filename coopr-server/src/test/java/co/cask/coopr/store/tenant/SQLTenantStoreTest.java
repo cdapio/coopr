@@ -18,7 +18,6 @@ package co.cask.coopr.store.tenant;
 import co.cask.coopr.BaseTest;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.common.conf.Configuration;
-import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.conf.guice.ConfigurationModule;
 import co.cask.coopr.store.DBHelper;
 import co.cask.coopr.store.guice.TestStoreModule;

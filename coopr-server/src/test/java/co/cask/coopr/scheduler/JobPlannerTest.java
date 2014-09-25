@@ -16,11 +16,6 @@
 package co.cask.coopr.scheduler;
 
 import co.cask.coopr.TestHelper;
-import co.cask.coopr.spec.ProvisionerAction;
-import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
-import co.cask.coopr.spec.service.ServiceDependencies;
-import co.cask.coopr.spec.service.ServiceStageDependencies;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.cluster.NodeProperties;
 import co.cask.coopr.scheduler.dag.TaskDag;
@@ -29,6 +24,11 @@ import co.cask.coopr.scheduler.task.ClusterJob;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.scheduler.task.TaskId;
+import co.cask.coopr.spec.ProvisionerAction;
+import co.cask.coopr.spec.service.Service;
+import co.cask.coopr.spec.service.ServiceAction;
+import co.cask.coopr.spec.service.ServiceDependencies;
+import co.cask.coopr.spec.service.ServiceStageDependencies;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;

@@ -17,12 +17,12 @@
 package co.cask.coopr.scheduler.task;
 
 import co.cask.coopr.BaseTest;
-import co.cask.coopr.spec.Tenant;
-import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueGroup;
 import co.cask.coopr.common.queue.QueueMetrics;
+import co.cask.coopr.spec.Tenant;
+import co.cask.coopr.spec.TenantSpecification;
 import com.google.common.collect.Maps;
 import com.google.inject.Key;
 import com.google.inject.name.Names;

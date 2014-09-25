@@ -5,9 +5,7 @@ import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.store.DBConnectionPool;
 import co.cask.coopr.store.DBHelper;
 import co.cask.coopr.store.DBQueryExecutor;
-import com.google.gson.Gson;
 
-import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

@@ -17,9 +17,8 @@ package co.cask.coopr.store.cluster;
 
 import co.cask.coopr.Entities;
 import co.cask.coopr.account.Account;
-import co.cask.coopr.cluster.ClusterSummary;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.cluster.Cluster;
+import co.cask.coopr.cluster.ClusterSummary;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.scheduler.ClusterAction;
@@ -27,6 +26,7 @@ import co.cask.coopr.scheduler.task.ClusterJob;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.scheduler.task.TaskId;
+import co.cask.coopr.spec.ProvisionerAction;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.junit.Assert;

@@ -16,17 +16,17 @@
 package co.cask.coopr.http;
 
 import co.cask.coopr.Entities;
-import co.cask.coopr.http.handler.AdminHandler;
-import co.cask.coopr.spec.template.ClusterTemplate;
-import co.cask.coopr.spec.HardwareType;
-import co.cask.coopr.spec.ImageType;
-import co.cask.coopr.spec.Provider;
-import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.Tenant;
-import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueMetrics;
+import co.cask.coopr.http.handler.AdminHandler;
+import co.cask.coopr.spec.HardwareType;
+import co.cask.coopr.spec.ImageType;
+import co.cask.coopr.spec.Provider;
+import co.cask.coopr.spec.Tenant;
+import co.cask.coopr.spec.TenantSpecification;
+import co.cask.coopr.spec.service.Service;
+import co.cask.coopr.spec.template.ClusterTemplate;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;

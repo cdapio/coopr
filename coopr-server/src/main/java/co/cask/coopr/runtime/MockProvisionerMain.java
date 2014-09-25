@@ -18,7 +18,6 @@ package co.cask.coopr.runtime;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.daemon.DaemonMain;
 import co.cask.coopr.provisioner.mock.MockProvisionerService;
-import com.google.common.base.Throwables;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

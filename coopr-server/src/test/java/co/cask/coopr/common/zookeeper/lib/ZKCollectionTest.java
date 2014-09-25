@@ -17,16 +17,9 @@ package co.cask.coopr.common.zookeeper.lib;
 
 import co.cask.coopr.common.zookeeper.BaseZKTest;
 import com.google.common.collect.Lists;
-import org.apache.twill.internal.zookeeper.InMemoryZKServer;
-import org.apache.twill.zookeeper.ZKClientService;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

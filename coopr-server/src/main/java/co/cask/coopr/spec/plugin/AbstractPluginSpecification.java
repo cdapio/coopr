@@ -16,7 +16,6 @@
 
 package co.cask.coopr.spec.plugin;
 
-import co.cask.coopr.spec.NamedEntity;
 import co.cask.coopr.spec.NamedIconEntity;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;

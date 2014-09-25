@@ -21,8 +21,6 @@ import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.guice.ConfigurationModule;
 import co.cask.coopr.store.DBHelper;
 import co.cask.coopr.store.guice.TestStoreModule;
-import co.cask.coopr.store.tenant.SQLTenantStore;
-import co.cask.coopr.store.tenant.TenantStoreTest;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.junit.AfterClass;

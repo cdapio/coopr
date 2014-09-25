@@ -17,11 +17,9 @@ package co.cask.coopr.http;
 
 import co.cask.coopr.Entities;
 import co.cask.coopr.TestHelper;
-import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.cluster.NodeProperties;
-import co.cask.coopr.provisioner.plugin.ResourceType;
 import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.service.ServiceAction;
@@ -34,7 +32,6 @@ import co.cask.coopr.store.entity.SQLEntityStoreService;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.CharStreams;
 import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
@@ -46,7 +43,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.util.Set;
 

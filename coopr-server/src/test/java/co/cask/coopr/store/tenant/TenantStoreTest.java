@@ -15,9 +15,9 @@
  */
 package co.cask.coopr.store.tenant;
 
+import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.spec.Tenant;
 import co.cask.coopr.spec.TenantSpecification;
-import co.cask.coopr.common.conf.Constants;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -15,8 +15,6 @@
  */
 package co.cask.coopr.spec.plugin;
 
-import co.cask.coopr.spec.plugin.ResourceTypeFormat;
-import co.cask.coopr.spec.plugin.ResourceTypeSpecification;
 import org.junit.Test;
 
 /**

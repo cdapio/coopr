@@ -16,19 +16,19 @@
 package co.cask.coopr.layout;
 
 import co.cask.coopr.Entities;
-import co.cask.coopr.spec.template.Administration;
-import co.cask.coopr.spec.template.ClusterDefaults;
-import co.cask.coopr.spec.template.ClusterTemplate;
-import co.cask.coopr.spec.template.Compatibilities;
-import co.cask.coopr.spec.template.Constraints;
+import co.cask.coopr.cluster.Cluster;
+import co.cask.coopr.cluster.Node;
+import co.cask.coopr.http.request.ClusterCreateRequest;
 import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.spec.service.ServiceDependencies;
 import co.cask.coopr.spec.service.ServiceStageDependencies;
-import co.cask.coopr.cluster.Cluster;
-import co.cask.coopr.cluster.Node;
-import co.cask.coopr.http.request.ClusterCreateRequest;
+import co.cask.coopr.spec.template.Administration;
+import co.cask.coopr.spec.template.ClusterDefaults;
+import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.spec.template.Compatibilities;
+import co.cask.coopr.spec.template.Constraints;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;

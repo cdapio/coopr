@@ -5,7 +5,6 @@ import co.cask.coopr.store.DBConnectionPool;
 import co.cask.coopr.store.DBHelper;
 import co.cask.coopr.store.DBQueryExecutor;
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -16,25 +16,14 @@
 package co.cask.coopr.common.zookeeper.lib;
 
 import co.cask.coopr.common.zookeeper.BaseZKTest;
-import co.cask.coopr.common.zookeeper.IdService;
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.SettableFuture;
-import org.apache.twill.internal.zookeeper.InMemoryZKServer;
-import org.apache.twill.zookeeper.ZKClientService;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class ZKInterProcessReentrantLockTest extends BaseZKTest {
 

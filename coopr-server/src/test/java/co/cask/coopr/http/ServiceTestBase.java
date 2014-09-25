@@ -17,13 +17,13 @@ package co.cask.coopr.http;
 
 import co.cask.coopr.BaseTest;
 import co.cask.coopr.account.Account;
-import co.cask.coopr.spec.Tenant;
-import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.QueueGroup;
 import co.cask.coopr.common.queue.internal.ElementsTrackingQueue;
 import co.cask.coopr.provisioner.Provisioner;
 import co.cask.coopr.provisioner.TenantProvisionerService;
+import co.cask.coopr.spec.Tenant;
+import co.cask.coopr.spec.TenantSpecification;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;

@@ -15,9 +15,9 @@
  */
 package co.cask.coopr.http;
 
-import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.cluster.NodeProperties;
+import co.cask.coopr.spec.service.Service;
 import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;

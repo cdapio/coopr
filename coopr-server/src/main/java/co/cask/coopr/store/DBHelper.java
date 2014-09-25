@@ -16,7 +16,6 @@
 package co.cask.coopr.store;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
 import java.sql.Connection;

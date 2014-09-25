@@ -17,11 +17,7 @@ package co.cask.coopr.common.zookeeper.lib;
 
 import co.cask.coopr.common.zookeeper.BaseZKTest;
 import com.google.common.base.Preconditions;
-import org.apache.twill.internal.zookeeper.InMemoryZKServer;
-import org.apache.twill.zookeeper.ZKClientService;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
