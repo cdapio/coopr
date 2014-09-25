@@ -41,7 +41,7 @@ follow the instructions in the :ref:`Quickstart Guide <quickstart-getting-starte
 
 Virtual Machine
 ---------------
-You can also run Coopr in a virtual machine that you can download `here <http://repository.cask.co/downloads/co/cask/coopr/coopr-standalone-vm/0.9.8/coopr-standalone-vm-0.9.8.ova>`_. You will need either Oracle VirtualBox or
+You can also run Coopr in a virtual machine that you can `download here <http://repository.cask.co/downloads/co/cask/coopr/coopr-standalone-vm/0.9.8/coopr-standalone-vm-0.9.8.ova>`_. You will need virtualization software like Oracle VirtualBox or
 VMWare player in order to run the VM. Once you have downloaded the image, import it using VirtualBox or VMWare Player. 
 The VM has been set up with 4GB RAM and 10GB disk. No password is required to enter the machine. However, should you need to perform an administrative
 operation, the coopr admin password is coopr.
