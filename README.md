@@ -17,7 +17,7 @@ while utilizing common SCM tools (Chef and scripts).
 ## Documentation
 
 To learn more about Coopr, here are the resources available:
-   * [Introduction](http://caskdata.github.io/coopr/) to Coopr
+   * [Introduction](http://coopr.io) to Coopr
    * Coopr [User Guide](http://docs.cask.co/coopr/current/en/index.html)
    * [Technical Document](http://docs.cask.co/coopr/current/en/implementation.html) describing internals of Coopr
    * Release Documentation
@@ -37,7 +37,7 @@ suggesting improvements to something that's already there, here's how you can co
  * Address all the review comments
  * Once addressed, the changes will be committed to the caskdata/coopr repository.
 
-Bugs and suggestions should be made by filing a [GitHub Issue](https://github.com/caskdata/coopr/issues) against this repository.
+Bugs and suggestions should be made by filing a Jira at https://issues.cask.co/browse/COOPR.
 
 ## License
 
