@@ -9,9 +9,6 @@ servers like JBoss, to full Apache Hadoop clusters comprised of thousands of nod
 Clusters can be deployed across many cloud providers (Rackspace, Joyent, and OpenStack)
 while utilizing common SCM tools (Chef and scripts).
 
-## Build Status
-![Cask OSS Build](http://builds.cask.co/plugins/servlet/buildStatusImage/COOP-DBT)
-
 
 ## Releases
 
