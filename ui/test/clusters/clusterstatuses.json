@@ -1,5 +1,0 @@
-{
-  "00000135": {"clusterid":"00000135","stepstotal":1,"stepscompleted":1,"status":"TERMINATED","actionstatus":"COMPLETE","action":"CLUSTER_DELETE"},
-  "00000138": {"clusterid":"00000138","stepstotal":65,"stepscompleted":65,"status":"ACTIVE","actionstatus":"COMPLETE","action":"CLUSTER_CREATE"},
-  "00000139": {"clusterid":"00000139","stepstotal":81,"stepscompleted":81,"status":"ACTIVE","actionstatus":"COMPLETE","action":"CLUSTER_CREATE"}
-}

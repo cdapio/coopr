@@ -1,8 +1,0 @@
-#!/bin/bash
-#
-# Perform necessary loom-ui setup steps
-# before package is installed.
-#
-
-getent group loom >/dev/null || groupadd -r loom
-getent passwd loom >/dev/null || /usr/sbin/useradd --comment "Loom User" --shell /bin/bash -M -r -g loom --home /var/run/loom loom

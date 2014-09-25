@@ -1,2 +1,0 @@
-distribute_setup
-sphinxcontrib
