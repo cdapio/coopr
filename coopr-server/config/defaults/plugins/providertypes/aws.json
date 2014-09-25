@@ -1,6 +1,6 @@
 {
-  "description": "",
   "name": "aws",
+  "description": "",
   "parameters": {
     "admin": {
       "fields": {
@@ -14,10 +14,31 @@
           "tip": "AWS Access Key ID",
           "type": "text"
         },
-        "aws_credential_file": {
-          "label": "AWS Credential file",
+        "associate_public_ip": {
+          "default": "true",
+          "label": "Associate public IP (VPC only)",
           "override": true,
-          "tip": "Full path and file name to AWS credential file as used by AWS command line tools",
+          "tip": "Associate public IP (VPC only)",
+          "type": "checkbox"
+        },
+        "availability_zone": {
+          "label": "Availability Zone",
+          "override": true,
+          "tip": "AWS Availability Zone",
+          "type": "text"
+        },
+        "aws_ebs_delete_on_term": {
+          "default": "true",
+          "label": "EBS delete on termination",
+          "override": true,
+          "tip": "Delete EBS volumes on termination",
+          "type": "checkbox"
+        },
+        "aws_ebs_size": {
+          "default": "10",
+          "label": "EBS size",
+          "override": true,
+          "tip": "Size of EBS volume in GB, for EBS-backed instances",
           "type": "text"
         },
         "aws_region": {
@@ -36,6 +57,37 @@
           "tip": "AWS Region",
           "type": "select"
         },
+        "dedicated_instance": {
+          "label": "Use Dedicated instances (VPC only)",
+          "override": true,
+          "tip": "Launch as dedicated instances (VPC only)",
+          "type": "checkbox"
+        },
+        "iam_instance_profile": {
+          "label": "IAM instance profile",
+          "override": true,
+          "tip": "IAM instance profile to apply to cluster",
+          "type": "text"
+        },
+        "placement_group": {
+          "label": "Placement group",
+          "override": true,
+          "tip": "Placement group to place cluster instances",
+          "type": "text"
+        },
+        "security_group_ids": {
+          "label": "Security Group IDs (VPC only)",
+          "override": true,
+          "tip": "AWS security group IDs (required for VPC)",
+          "type": "text"
+        },
+        "security_groups": {
+          "default": "default",
+          "label": "Security Groups",
+          "override": true,
+          "tip": "AWS security group (non-VPC)",
+          "type": "text"
+        },
         "ssh_key_resource": {
           "label": "SSH Key Resource Name",
           "override": true,
@@ -47,6 +99,12 @@
           "override": true,
           "tip": "Your AWS EC2 key pair name",
           "type": "text"
+        },
+        "subnet_id": {
+          "label": "Subnet ID (VPC only)",
+          "override": true,
+          "tip": "Enable VPC and use this subnet ID",
+          "type": "text"
         }
       },
       "required": [
@@ -55,65 +113,15 @@
           "api_password",
           "ssh_keypair",
           "ssh_key_resource",
-          "aws_region"
-        ],
-        [
-          "aws_credential_file",
-          "ssh_keypair",
-          "ssh_key_resource",
-          "aws_region"
-        ]
-      ]
-    },
-    "user": {
-      "fields": {
-        "associate_public_ip": {
-          "label": "Associate public IP (VPC only)",
-          "tip": "Associate public IP (VPC only)",
-          "type": "checkbox"
-        },
-        "availability_zone": {
-          "label": "Availability Zone",
-          "tip": "AWS Availability Zone",
-          "type": "text"
-        },
-        "dedicated_instance": {
-          "label": "Use Dedicated instances (VPC only)",
-          "tip": "Launch as dedicated instances (VPC only)",
-          "type": "checkbox"
-        },
-        "iam_instance_profile": {
-          "label": "IAM instance profile",
-          "tip": "IAM instance profile to apply to cluster",
-          "type": "text"
-        },
-        "placement_group": {
-          "label": "Placement group",
-          "tip": "Placement group to place cluster instances",
-          "type": "text"
-        },
-        "security_group_ids": {
-          "label": "Security Group IDs (VPC only)",
-          "tip": "AWS security group IDs (required for VPC)",
-          "type": "text"
-        },
-        "security_groups": {
-          "default": "default",
-          "label": "Security Groups",
-          "tip": "AWS security group (non-VPC)",
-          "type": "text"
-        },
-        "subnet_id": {
-          "label": "Subnet ID (VPC only)",
-          "tip": "Enable VPC and use this subnet ID",
-          "type": "text"
-        }
-      },
-      "required": [
-        [
+          "aws_region",
           "security_groups"
         ],
         [
+          "api_user",
+          "api_password",
+          "ssh_keypair",
+          "ssh_key_resource",
+          "aws_region",
           "security_group_ids",
           "subnet_id"
         ]
