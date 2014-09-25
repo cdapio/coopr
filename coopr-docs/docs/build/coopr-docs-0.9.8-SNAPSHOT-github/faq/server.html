@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Coopr Server &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="faq-toplevel"></span><div class="section" id="coopr-server">
+<span id="index-0"></span><h1>Coopr Server<a class="headerlink" href="#coopr-server" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-many-concurrent-provisioning-jobs-can-coopr-handle">
+<h2>How many concurrent provisioning jobs can Coopr handle?<a class="headerlink" href="#how-many-concurrent-provisioning-jobs-can-coopr-handle" title="Permalink to this headline">¶</a></h2>
+<p>Coopr Server is built upon Netty. It&#8217;s highly asynchronous. We have tested it to handle tens of thousands of concurrent requests.
+However, we believe that there is lot of room for improvement. We are committed on improving its performance in the future releases.</p>
+</div>
+<div class="section" id="can-i-scale-up-or-scale-down-a-cluster">
+<h2>Can I scale-up or scale-down a cluster?<a class="headerlink" href="#can-i-scale-up-or-scale-down-a-cluster" title="Permalink to this headline">¶</a></h2>
+<p>Currently not but it is planned for a future release.</p>
+</div>
+<div class="section" id="do-i-have-the-ability-to-import-and-export-configurations-from-one-cluster-to-another">
+<h2>Do I have the ability to import and export configurations from one cluster to another?<a class="headerlink" href="#do-i-have-the-ability-to-import-and-export-configurations-from-one-cluster-to-another" title="Permalink to this headline">¶</a></h2>
+<p>Yes, you can import and export the meta data of cluster templates. Please refer to the web service
+section <a class="reference internal" href="../rest/index.html"><em>here</em></a> for more information.</p>
+</div>
+<div class="section" id="where-are-the-configurations-of-cluster-template-and-it-s-metadata-stored">
+<h2>Where are the configurations of cluster template and it&#8217;s metadata stored?<a class="headerlink" href="#where-are-the-configurations-of-cluster-template-and-it-s-metadata-stored" title="Permalink to this headline">¶</a></h2>
+<p>Cluster templates and their associated metadata are stored in a database.</p>
+</div>
+<div class="section" id="how-do-i-setup-a-database-for-coopr-to-use">
+<h2>How do I setup a database for Coopr to use?<a class="headerlink" href="#how-do-i-setup-a-database-for-coopr-to-use" title="Permalink to this headline">¶</a></h2>
+<p>Coopr Server persists runtime information of provisioned clusters in a relational database.
+If you are running Coopr Server in the default mode, it&#8217;s using the embedded Derby DB for storing all
+the runtime metadata. We don&#8217;t recommend running an embedded derby DB in production.
+Coopr Server can be configured to connect to standard relational database like MySQL or PostgreSQL
+by simple configurations specified in coopr.xml.</p>
+<p>Following are the configuration required for enabling Coopr Server to connect to external relational database:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">...</span>
+<span class="o">&lt;</span><span class="n">property</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">server</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">driver</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="n">com</span><span class="o">.</span><span class="na">mysql</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">Driver</span><span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span><span class="n">specifies</span> <span class="n">db</span> <span class="n">driver</span><span class="o">&lt;/</span><span class="n">description</span><span class="o">&gt;</span>
+ <span class="o">&lt;/</span><span class="n">property</span><span class="o">&gt;</span>
+ <span class="o">&lt;</span><span class="n">property</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">server</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">connection</span><span class="o">.</span><span class="na">string</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="nl">jdbc:mysql:</span><span class="c1">//127.0.0.1:3306/coopr?useLegacyDatetimeCode=false&lt;/value&gt;</span>
+   <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span><span class="n">specifies</span> <span class="n">how</span> <span class="n">to</span> <span class="n">connect</span> <span class="n">to</span> <span class="n">mysql</span><span class="o">&lt;/</span><span class="n">description</span><span class="o">&gt;</span>
+ <span class="o">&lt;/</span><span class="n">property</span><span class="o">&gt;</span>
+ <span class="o">&lt;</span><span class="n">property</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">server</span><span class="o">.</span><span class="na">db</span><span class="o">.</span><span class="na">user</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="n">coopr</span><span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span><span class="n">mysql</span> <span class="n">user</span><span class="o">&lt;/</span><span class="n">description</span><span class="o">&gt;</span>
+ <span class="o">&lt;/</span><span class="n">property</span><span class="o">&gt;</span>
+ <span class="o">&lt;</span><span class="n">property</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">server</span><span class="o">.</span><span class="na">db</span><span class="o">.</span><span class="na">password</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span><span class="n">coopring</span><span class="o">&lt;/</span><span class="n">value</span><span class="o">&gt;</span>
+   <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span><span class="n">mysql</span> <span class="n">user</span> <span class="n">password</span><span class="o">&lt;/</span><span class="n">description</span><span class="o">&gt;</span>
+ <span class="o">&lt;/</span><span class="n">property</span><span class="o">&gt;</span>
+ <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="is-node-pooling-supported">
+<h2>Is node pooling supported?<a class="headerlink" href="#is-node-pooling-supported" title="Permalink to this headline">¶</a></h2>
+<p>Currently not but it is planned for a future release.</p>
+</div>
+<div class="section" id="what-is-node-pooling">
+<h2>What is node pooling?<a class="headerlink" href="#what-is-node-pooling" title="Permalink to this headline">¶</a></h2>
+<p>Node pooling is an advanced feature that allows the clusters to be provisioned instantaneously from a pool
+of pre-provisioned nodes. Pre-provisioning includes creation and installation of software components.
+Steps for configuring the cluster and its node are done once the user has requested a cluster to be materialized.
+Administrators will have the ability to enable this feature on a template by template basis.
+Node pooling increases the overall experience of the user for provisioning clusters.</p>
+</div>
+<div class="section" id="can-i-run-multiple-servers-concurrently-for-ha">
+<h2>Can I run multiple servers concurrently for HA?<a class="headerlink" href="#can-i-run-multiple-servers-concurrently-for-ha" title="Permalink to this headline">¶</a></h2>
+<p>Yes, servers can be configured with the same zookeeper quorum. Both servers will respond to REST calls. Internally,
+leader election is used so that only one server is performing task coordination and solving cluster layouts.
+Multiple clusters of servers can also be run concurrently if properly configured to ensure that ids across clusters
+will not conflict. Please see the BCP documentation <a class="reference internal" href="../guide/bcp/index.html"><em>here</em></a> for more details.</p>
+</div>
+<div class="section" id="can-i-look-at-the-plan-before-the-cluster-is-being-provisioned">
+<h2>Can I look at the plan before the cluster is being provisioned?<a class="headerlink" href="#can-i-look-at-the-plan-before-the-cluster-is-being-provisioned" title="Permalink to this headline">¶</a></h2>
+<p>Currently, we don&#8217;t have the ability inspect the plan and cluster layout before
+the cluster provisioning is initiated. Cluster layout and plan of execution are
+available once the provisioning cycle has been initiated.</p>
+</div>
+<div class="section" id="is-there-a-way-to-plugin-my-own-planner-or-layout-solver">
+<h2>Is there a way to plugin my own planner or layout solver?<a class="headerlink" href="#is-there-a-way-to-plugin-my-own-planner-or-layout-solver" title="Permalink to this headline">¶</a></h2>
+<p>Unfortunately, it is not available in this release. The next release will support the ability to plugin your
+very own layout solver.</p>
+</div>
+<div class="section" id="is-there-anyway-to-inspect-the-plan-for-cluster-being-provisioned">
+<h2>Is there anyway to inspect the plan for cluster being provisioned?<a class="headerlink" href="#is-there-anyway-to-inspect-the-plan-for-cluster-being-provisioned" title="Permalink to this headline">¶</a></h2>
+<p>There is web service endpoint for retrieving the plan for the cluster being provisioned. The plan includes actions
+that are executed on the node. Actions are divided into stages. An action in each stage can be executed in parallel.
+Coopr Server implements a distributed barrier at each stage ensuring that the planned stage actions are all completed
+before proceeding to the next stage. This ensures the actions are executed in the right dependency order.</p>
+<p>Following is an example web service call along with the output returned from the Coopr Server provisioning a web server
+on a single node:</p>
+<div class="highlight-java"><div class="highlight"><pre>$ curl -H &#39;Coopr-UserID:&lt;user id&gt;&#39; http://&lt;server&gt;:&lt;port&gt;/v2/clusters/&lt;cluster-id&gt;/plans
+$ [{
+      &quot;action&quot;: &quot;SOLVE_LAYOUT&quot;,
+      &quot;clusterId&quot;: &quot;00000071&quot;,
+      &quot;currentStage&quot;: 0,
+      &quot;id&quot;: &quot;00000071-001&quot;,
+      &quot;stages&quot;: []
+  },{
+      &quot;action&quot;: &quot;CLUSTER_CREATE&quot;,
+      &quot;clusterId&quot;: &quot;00000071&quot;,
+      &quot;currentStage&quot;: 7,
+      &quot;id&quot;: &quot;00000071-002&quot;,
+      &quot;stages&quot;: [
+          [
+              {
+                  &quot;id&quot;: &quot;00000071-002-001&quot;,
+                  &quot;nodeId&quot;: &quot;17f87422-56d5-4591-9461-5ea02e5d4c42&quot;,
+                  &quot;service&quot;: &quot;&quot;,
+                  &quot;taskName&quot;: &quot;CREATE&quot;
+              }
+          ],
+          [
+              {
+                  &quot;id&quot;: &quot;00000071-002-002&quot;,
+                  &quot;nodeId&quot;: &quot;17f87422-56d5-4591-9461-5ea02e5d4c42&quot;,
+                  &quot;service&quot;: &quot;&quot;,
+                  &quot;taskName&quot;: &quot;CONFIRM&quot;
+              }
+          ],
+          [
+              {
+                  &quot;id&quot;: &quot;00000071-002-003&quot;,
+                  &quot;nodeId&quot;: &quot;17f87422-56d5-4591-9461-5ea02e5d4c42&quot;,
+                  &quot;service&quot;: &quot;&quot;,
+                  &quot;taskName&quot;: &quot;BOOTSTRAP&quot;
+              }
+          ],
+          [
+              {
+                  &quot;id&quot;: &quot;00000071-002-004&quot;,
+                  &quot;nodeId&quot;: &quot;17f87422-56d5-4591-9461-5ea02e5d4c42&quot;,
+                  &quot;service&quot;: &quot;apache-httpd&quot;,
+                  &quot;taskName&quot;: &quot;INSTALL&quot;
+              }
+          ],
+          [
+              {
+                  &quot;id&quot;: &quot;00000071-002-005&quot;,
+                  &quot;nodeId&quot;: &quot;17f87422-56d5-4591-9461-5ea02e5d4c42&quot;,
+                  &quot;service&quot;: &quot;firewall&quot;,
+                  &quot;taskName&quot;: &quot;CONFIGURE&quot;
+              }
+          ],
+          [
+              {
+                  &quot;id&quot;: &quot;00000071-002-007&quot;,
+                  &quot;nodeId&quot;: &quot;17f87422-56d5-4591-9461-5ea02e5d4c42&quot;,
+                  &quot;service&quot;: &quot;hosts&quot;,
+                  &quot;taskName&quot;: &quot;CONFIGURE&quot;
+              }
+          ],
+          [
+              {
+                  &quot;id&quot;: &quot;00000071-002-006&quot;,
+                  &quot;nodeId&quot;: &quot;17f87422-56d5-4591-9461-5ea02e5d4c42&quot;,
+                  &quot;service&quot;: &quot;apache-httpd&quot;,
+                  &quot;taskName&quot;: &quot;CONFIGURE&quot;
+              }
+          ],
+          [
+              {
+                  &quot;id&quot;: &quot;00000071-002-008&quot;,
+                  &quot;nodeId&quot;: &quot;17f87422-56d5-4591-9461-5ea02e5d4c42&quot;,
+                  &quot;service&quot;: &quot;apache-httpd&quot;,
+                  &quot;taskName&quot;: &quot;START&quot;
+              }
+          ]
+      ]
+  },
+]
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

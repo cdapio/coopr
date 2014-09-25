@@ -1,0 +1,760 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>REST API: Provisioner Plugins &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="rest-api-provisioner-plugins">
+<span id="index-0"></span><h1>REST API: Provisioner Plugins<a class="headerlink" href="#rest-api-provisioner-plugins" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="index.html"><em>REST Overview</em></a> |
+<a class="reference internal" href="tenants.html"><em>Tenants</em></a> |
+<a class="reference internal" href="provisioners.html"><em>Provisioners</em></a> |
+<a class="reference internal" href="provider.html"><em>Providers</em></a> |
+<a class="reference internal" href="hardware.html"><em>Hardware Types</em></a> |
+<a class="reference internal" href="image.html"><em>Image Types</em></a> |
+<a class="reference internal" href="services.html"><em>Services</em></a> |
+<a class="reference internal" href="templates.html"><em>Cluster Template</em></a> |
+<a class="reference internal" href="entities.html"><em>Importing &amp; Exporting</em></a> |
+<a class="reference internal" href="clusters.html"><em>Clusters</em></a> |
+<a class="reference internal" href=""><em>Plugins</em></a> |
+<a class="reference internal" href="metrics.html"><em>Metrics</em></a></p>
+<p>Using the admin REST API, you can upload and manage plugin resources.
+Each tenant admin can upload resources that plugins can use, such as chef cookbooks
+or shell scripts. There are two types of plugins: automator and provider. Automator
+plugins are responsible for performing service operations, such as installing or
+starting a service on a node. Provider plugins are responsible for node operations
+such as creating and deleting a node through a cloud provider like Openstack.</p>
+<p>Plugin specifications are defined by the author of the plugin, and are registered with
+the server once upon installation of the plugin.</p>
+<div class="section" id="retrieve-a-plugin-specification">
+<span id="plugin-spec-all-list"></span><h2>Retrieve a plugin specification<a class="headerlink" href="#retrieve-a-plugin-specification" title="Permalink to this headline">¶</a></h2>
+<p>To retrieve the specification for a specific plugin, make a HTTP GET request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">name</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>Plugin type is either automatortypes or providertypes. The plugin name and specification
+is defined by the plugin author. For example, one of the automator plugins that comes
+with the system is the chef-solo plugin.</p>
+<div class="section" id="http-responses">
+<h3>HTTP Responses<a class="headerlink" href="#http-responses" title="Permalink to this headline">¶</a></h3>
+<p>The response is a JSON Object with <tt class="docutils literal"><span class="pre">name</span></tt>, <tt class="docutils literal"><span class="pre">description</span></tt>, <tt class="docutils literal"><span class="pre">resourcetypes</span></tt>, and <tt class="docutils literal"><span class="pre">parameters</span></tt> as keys.
+The name is unique within the plugin type and tenant.</p>
+<p>Parameters define what fields the plugin needs to
+perform actions and whether the parameters should come from the admin or user. For provider plugins, admin
+parameters are given when creating a provider of the given provider type. For example, when creating
+an openstack provider, the admin may need to supply an API url. For provider plugins, user parameters
+are given when a cluster is being created. For automator plugins, admin fields are given when creating or
+editing services. For example, when defining how a service should be started with the chef-solo plugin, the
+admin must provide a run_list parameter.</p>
+<p>Resource types define what types of resources the plugin can use. For example, the chef-solo plugin can use
+cookbooks, databags, and roles. Each resource type specifies the type of file the resource is, which must be
+either file or archive. Resources of each type can be uploaded and managed through the resource APIs.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successfully created</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD_REQUEST)</td>
+<td>Bad request, server is unable to process the request because it is ill-formed.</td>
+</tr>
+<tr class="row-even"><td>404 (NOT_FOUND)</td>
+<td>No plugin type specification was found.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/automatortypes/chef-solo
+<span class="nv">$ </span><span class="o">{</span>
+      <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;chef-solo&quot;</span>,
+      <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;&quot;</span>,
+      <span class="s2">&quot;resourcetypes&quot;</span>: <span class="o">{</span>
+          <span class="s2">&quot;cookbooks&quot;</span> : <span class="o">{</span>
+              <span class="s2">&quot;filetype&quot;</span>: <span class="s2">&quot;archive&quot;</span>
+          <span class="o">}</span>,
+          <span class="s2">&quot;databags&quot;</span>: <span class="o">{</span>
+              <span class="s2">&quot;filetype&quot;</span>: <span class="s2">&quot;archive&quot;</span>
+          <span class="o">}</span>,
+          <span class="s2">&quot;roles&quot;</span>: <span class="o">{</span>
+              <span class="s2">&quot;filetype&quot;</span>: <span class="s2">&quot;archive&quot;</span>
+          <span class="o">}</span>
+      <span class="o">}</span>,
+      <span class="s2">&quot;parameters&quot;</span>: <span class="o">{</span>
+          <span class="s2">&quot;admin&quot;</span>: <span class="o">{</span>
+              <span class="s2">&quot;fields&quot;</span>: <span class="o">{</span>
+                  <span class="s2">&quot;json_attributes&quot;</span>: <span class="o">{</span>
+                      <span class="s2">&quot;label&quot;</span>: <span class="s2">&quot;JSON attributes&quot;</span>,
+                      <span class="s2">&quot;override&quot;</span>: <span class="nb">false</span>,
+                      <span class="s2">&quot;tip&quot;</span>: <span class="s2">&quot;Custom JSON data for this chef-solo run&quot;</span>,
+                      <span class="s2">&quot;type&quot;</span>: <span class="s2">&quot;text&quot;</span>
+                  <span class="o">}</span>,
+                  <span class="s2">&quot;run_list&quot;</span>: <span class="o">{</span>
+                      <span class="s2">&quot;label&quot;</span>: <span class="s2">&quot;run-list&quot;</span>,
+                      <span class="s2">&quot;override&quot;</span>: <span class="nb">false</span>,
+                      <span class="s2">&quot;tip&quot;</span>: <span class="s2">&quot;The chef-solo run-list for this action&quot;</span>,
+                      <span class="s2">&quot;type&quot;</span>: <span class="s2">&quot;text&quot;</span>
+                  <span class="o">}</span>
+              <span class="o">}</span>,
+              <span class="s2">&quot;required&quot;</span>: <span class="o">[</span>
+                  <span class="o">[</span> <span class="s2">&quot;run_list&quot;</span> <span class="o">]</span>
+              <span class="o">]</span>
+          <span class="o">}</span>
+      <span class="o">}</span>
+  <span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="retrieve-all-plugin-specifications">
+<span id="plugin-spec-retrieve"></span><h2>Retrieve all plugin specifications<a class="headerlink" href="#retrieve-all-plugin-specifications" title="Permalink to this headline">¶</a></h2>
+<p>To retrieve all specifications of a given plugin type, make a GET HTTP request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">type</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>Plugin type is either automatortypes or providertypes.</p>
+<div class="section" id="id1">
+<h3>HTTP Responses<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The response is a JSON Array of plugin specifications. If no plugins are present, an empty array is returned.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD_REQUEST)</td>
+<td>Bad request, server is unable to process the request because it is ill-formed.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id2">
+<h3>Example<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/automatortypes
+<span class="nv">$ </span><span class="o">[</span>
+      <span class="o">{</span>
+          <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;chef-solo&quot;</span>,
+          <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;chef solo plugin&quot;</span>,
+          <span class="s2">&quot;resourcetypes&quot;</span>: <span class="o">{</span> ... <span class="o">}</span>,
+          <span class="s2">&quot;parameters&quot;</span>: <span class="o">{</span> ... <span class="o">}</span>
+      <span class="o">}</span>,
+      <span class="o">{</span>
+          <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;shell&quot;</span>,
+          <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;shell plugin&quot;</span>,
+          <span class="s2">&quot;resourcetypes&quot;</span>: <span class="o">{</span> ... <span class="o">}</span>,
+          <span class="s2">&quot;parameters&quot;</span>: <span class="o">{</span> ... <span class="o">}</span>
+      <span class="o">}</span>,
+      ...
+  <span class="o">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="add-a-plugin-resource">
+<span id="plugin-resource-create"></span><h2>Add a plugin resource<a class="headerlink" href="#add-a-plugin-resource" title="Permalink to this headline">¶</a></h2>
+<p>To add a plugin resource, make a HTTP POST request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">name</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">name</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type
+is one of the resource types defined in the plugin specification. The resource name is the name of
+the resource. The POST body contains the binary contents of the resource.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you are uploading an archive, the top level directory of your unpacked archive must be named exactly the same as your resource name. For example, if you are uploading an archive of a directory named &#8216;mycookbook&#8217;, you <em>must</em> name your resource &#8216;mycookbook&#8217; in order for it to be used correctly. This issue will be fixed in the next release.</p>
+</div>
+<div class="section" id="id3">
+<h3>HTTP Responses<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Metadata for the resource is returned in the response body. The response is a JSON Object that contains the resource
+name, version, and status. The status will be one of &#8220;inactive&#8221;, &#8220;active&#8221;, &#8220;staged&#8221;, or &#8220;recalled&#8221;. An inactive resource
+is one that has been added to the system, but which is not in use by provisioners. An active resource is one that is
+current in use by provisioners. A staged resource is one that is not currently in use by provisioners, but which will be
+pushed to and used by provisioners after the next sync call. A recalled resource is one that is currently in use by
+provisioners, but which will be removed from use after the next sync call.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>If update was successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource in the request is invalid</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id4">
+<h3>Example<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X POST
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       --data-binary @&lt;hadoop-cookbook-file&gt;
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/automatortypes/chef-solo/cookbooks/hadoop
+<span class="nv">$ </span><span class="o">{</span>
+      <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;hadoop&quot;</span>,
+      <span class="s2">&quot;version&quot;</span>: 1,
+      <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;inactive&quot;</span>
+  <span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="list-all-resource-metadata-of-a-specific-type">
+<span id="plugin-resourcetype-all-list"></span><h2>List all resource metadata of a specific type<a class="headerlink" href="#list-all-resource-metadata-of-a-specific-type" title="Permalink to this headline">¶</a></h2>
+<p>Tenant admins can fetch a map of the metadata of all resources of a specific type by making a
+HTTP GET request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">name</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">type</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type
+is one of the resource types defined in the plugin specification. Results can also be filtered to only
+include metadata of resources in a particular state.</p>
+<div class="section" id="http-parameters">
+<h3>HTTP Parameters<a class="headerlink" href="#http-parameters" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>status</td>
+<td>filter results to only contain resources in the given status. Must be one of &#8220;active&#8221;, &#8220;inactive&#8221;, &#8220;staged&#8221;, or &#8220;recalled&#8221;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id5">
+<h3>HTTP Responses<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>The response is a JSON Object whose keys are resource names, and whose values are JSON Arrays of resource metadata.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource uri is specified incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id6">
+<h3>Example<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X GET
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/automatortypes/chef-solo/cookbooks
+<span class="nv">$ </span><span class="o">{</span>
+      <span class="s2">&quot;reactor&quot;</span>: <span class="o">[</span>
+          <span class="o">{</span>
+              <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;reactor&quot;</span>,
+              <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;active&quot;</span>,
+              <span class="s2">&quot;version&quot;</span>: 6
+          <span class="o">}</span>,
+          <span class="o">{</span>
+              <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;reactor&quot;</span>,
+              <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;inactive&quot;</span>,
+              <span class="s2">&quot;version&quot;</span>: 3
+          <span class="o">}</span>,
+          <span class="o">{</span>
+              <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;reactor&quot;</span>,
+              <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;inactive&quot;</span>,
+              <span class="s2">&quot;version&quot;</span>: 1
+          <span class="o">}</span>,
+          <span class="o">{</span>
+              <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;reactor&quot;</span>,
+              <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;inactive&quot;</span>,
+              <span class="s2">&quot;version&quot;</span>: 4
+          <span class="o">}</span>
+      <span class="o">]</span>,
+      ...
+  <span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="plugin-resource-all-list">
+<span id="id7"></span><h2>List all resource metadata of a specific type<a class="headerlink" href="#plugin-resource-all-list" title="Permalink to this headline">¶</a></h2>
+<p>Tenant admins can fetch a list of the metadata for all versions of a specific resource
+by making a HTTP GET request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">name</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">name</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type
+is one of the resource types defined in the plugin specification. Resource name is the name of the resource.
+Results can also be filtered to only include metadata of resources in a particular state.</p>
+<div class="section" id="id8">
+<h3>HTTP Parameters<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>status</td>
+<td>filter results to only contain resources in the given status. Must be one of &#8220;active&#8221;, &#8220;inactive&#8221;, &#8220;staged&#8221;, or &#8220;recalled&#8221;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id9">
+<h3>HTTP Responses<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<p>The response is a JSON Array of the metadata for all versions of the given resource, optionally filtered by status.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource uri is specified incorrectly.</td>
+</tr>
+<tr class="row-even"><td>404 (NOT FOUND)</td>
+<td>The resource was not found.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id10">
+<h3>Example<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X GET
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/automatortypes/chef-solo/reactor
+<span class="nv">$ </span><span class="o">[</span>
+      <span class="o">{</span>
+          <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;reactor&quot;</span>,
+          <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;active&quot;</span>,
+          <span class="s2">&quot;version&quot;</span>: 6
+      <span class="o">}</span>,
+      <span class="o">{</span>
+          <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;reactor&quot;</span>,
+          <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;inactive&quot;</span>,
+          <span class="s2">&quot;version&quot;</span>: 3
+      <span class="o">}</span>,
+      <span class="o">{</span>
+          <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;reactor&quot;</span>,
+          <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;inactive&quot;</span>,
+          <span class="s2">&quot;version&quot;</span>: 1
+      <span class="o">}</span>,
+      <span class="o">{</span>
+          <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;reactor&quot;</span>,
+          <span class="s2">&quot;status&quot;</span>: <span class="s2">&quot;inactive&quot;</span>,
+          <span class="s2">&quot;version&quot;</span>: 4
+      <span class="o">}</span>
+  <span class="o">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="delete-all-versions-of-a-resource">
+<span id="plugin-resource-delete"></span><h2>Delete all versions of a resource<a class="headerlink" href="#delete-all-versions-of-a-resource" title="Permalink to this headline">¶</a></h2>
+<p>Tenant admins can delete all versions of a resource by making a HTTP DELETE request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">name</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">name</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type
+is one of the resource types defined in the plugin specification. Resource name is the name of the resource.
+All versions of the resource must be inactive for this operation to be allowed.</p>
+<div class="section" id="id11">
+<h3>HTTP Responses<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource uri is specified incorrectly.</td>
+</tr>
+<tr class="row-even"><td>409 (CONFLICT)</td>
+<td>If at least one resource version is not inactive.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id12">
+<h3>Example<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X DELETE
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/automatortypes/chef-solo/reactor
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="delete-a-specific-version-of-a-resource">
+<span id="plugin-resource-delete-version"></span><h2>Delete a specific version of a resource<a class="headerlink" href="#delete-a-specific-version-of-a-resource" title="Permalink to this headline">¶</a></h2>
+<p>Tenant admins can delete a specific version of a resource by making a HTTP DELETE request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">name</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">name</span><span class="o">}/</span><span class="n">versions</span><span class="o">/{</span><span class="n">version</span><span class="o">}</span>
+</pre></div>
+</div>
+<p>Plugin type is automatortypes or providertypes, plugin name is the name of the plugin, and resource type
+is one of the resource types defined in the plugin specification. Resource name is the name of the resource
+and version is the version of the resource. The resource version must be inactive for the delete to be allowed.</p>
+<div class="section" id="id13">
+<h3>HTTP Responses<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource uri is specified incorrectly.</td>
+</tr>
+<tr class="row-even"><td>409 (CONFLICT)</td>
+<td>If at least one resource version is not inactive.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id14">
+<h3>Example<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X DELETE
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/automatortypes/chef-solo/reactor/versions/1
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="stage-a-specific-version-of-a-resource">
+<span id="plugin-resource-stage"></span><h2>Stage a specific version of a resource<a class="headerlink" href="#stage-a-specific-version-of-a-resource" title="Permalink to this headline">¶</a></h2>
+<p>Tenant admins can stage a specific version of a resource by making a HTTP POST request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">name</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">name</span><span class="o">}/</span><span class="n">versions</span><span class="o">/{</span><span class="n">version</span><span class="o">}/</span><span class="n">stage</span>
+</pre></div>
+</div>
+<p>Staging a resource will make it so that the next sync call will push the resource version to the provisioners.
+Staging an active or staged resource will not do anything. Staging a recalled resource will put it back in the active
+state.</p>
+<div class="section" id="id15">
+<h3>HTTP Responses<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource uri is specified incorrectly.</td>
+</tr>
+<tr class="row-even"><td>404 (NOT FOUND)</td>
+<td>The resource was not found.</td>
+</tr>
+<tr class="row-odd"><td>409 (CONFLICT)</td>
+<td>If at least one resource version is not inactive.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id16">
+<h3>Example<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X POST
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/automatortypes/chef-solo/reactor/versions/4/stage
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="recall-a-specific-version-of-a-resource">
+<span id="plugin-resource-recall"></span><h2>Recall a specific version of a resource<a class="headerlink" href="#recall-a-specific-version-of-a-resource" title="Permalink to this headline">¶</a></h2>
+<p>Tenant admins can recall a specific version of a resource by making a HTTP POST request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">plugin</span><span class="o">-</span><span class="n">name</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">type</span><span class="o">}/{</span><span class="n">resource</span><span class="o">-</span><span class="n">name</span><span class="o">}/</span><span class="n">versions</span><span class="o">/{</span><span class="n">version</span><span class="o">}/</span><span class="n">recall</span>
+</pre></div>
+</div>
+<p>Recalling a resource will make it so that the next sync call will remove that resource version from use.
+Recalling an inactive or recalled resource version will have no effect. Recalling a staged resource puts it
+back in the inactive state and recalling an active resource puts it in the recalled state.</p>
+<div class="section" id="id17">
+<h3>HTTP Responses<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource uri is specified incorrectly.</td>
+</tr>
+<tr class="row-even"><td>404 (NOT FOUND)</td>
+<td>The resource was not found.</td>
+</tr>
+<tr class="row-odd"><td>409 (CONFLICT)</td>
+<td>If at least one resource version is not inactive.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id18">
+<h3>Example<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X POST
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/automatortypes/chef-solo/reactor/versions/4/recall
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="sync-plugins">
+<span id="plugin-sync"></span><h2>Sync plugins<a class="headerlink" href="#sync-plugins" title="Permalink to this headline">¶</a></h2>
+<p>Tenant admins can sync plugin resources to provisioners by making a HTTP POST request to URI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">plugins</span><span class="o">/</span><span class="n">sync</span>
+</pre></div>
+</div>
+<p>Syncing will push all staged resources to the provisioners, making them available for use. Syncing will
+also remove all recalled resources from use, making them unavailable for use.</p>
+<div class="section" id="id19">
+<h3>HTTP Responses<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Status Code</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200 (OK)</td>
+<td>Successful</td>
+</tr>
+<tr class="row-odd"><td>400 (BAD REQUEST)</td>
+<td>If the resource uri is specified incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id20">
+<h3>Example<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>curl -X POST
+       -H <span class="s1">&#39;Coopr-UserID:admin&#39;</span>
+       -H <span class="s1">&#39;Coopr-TenantID:&lt;tenantid&gt;&#39;</span>
+       -H <span class="s1">&#39;Coopr-ApiKey:&lt;apikey&gt;&#39;</span>
+       http://&lt;server&gt;:&lt;port&gt;/&lt;version&gt;/plugins/sync
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

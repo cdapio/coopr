@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Coopr 0.9.8 Beta Documentation &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="#" />
+    <link rel="next" title="Overview" href="overview/index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="overview/index.html" title="Overview"
+             accesskey="N">Next</a> |</li>
+        <li><a href="#">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="coopr-release-documentation">
+<h1>Coopr 0.9.8 Beta Documentation<a class="headerlink" href="#coopr-release-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Coopr is a software system that enables end users to provision clusters based on templates and settings defined by
+administrators. Coopr exposes simple interfaces to administrators and allows easy customization of the properties of provisioned
+clusters, including software services, hardware configurations and infrastructure providers.</p>
+<p>This documentation provides information about Coopr, its operational management capabilities, and its functionality available for both end users and
+administrators. This document presumes you have some familiarity with the SQL databases, Zookeeper, the REST protocol and the Ruby programming language.</p>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="sidebar">
+<p class="first sidebar-title">Coopr Support</p>
+<p class="last">Thanks for downloading Coopr Beta. We
+would love to help you get started with this product.
+We would also love to hear about how
+we can make this product better. Contact <a class="reference external" href="mailto:coopr-dev&#37;&#52;&#48;googlegroups&#46;com">coopr-dev<span>&#64;</span>googlegroups<span>&#46;</span>com</a>
+and tell us what you think.</p>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview/index.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/index.html#history-of-coopr">History of Coopr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/index.html#coopr-in-production">Coopr in Production</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide/quickstart/index.html">Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guide/quickstart/index.html#installing-coopr">Installing Coopr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/quickstart/index.html#getting-started">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/quickstart/index.html#adding-workers">Adding Workers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/quickstart/index.html#configuring-a-provider">Configuring a Provider</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/quickstart/index.html#provisioning-your-first-cluster">Provisioning your First Cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/quickstart/index.html#accessing-the-cluster">Accessing the Cluster</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview/features.html">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/features.html#core-features">Core Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/features.html#other-features">Other Features</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview/architecture.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/architecture.html#server">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/architecture.html#provisioner">Provisioner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/architecture.html#web-ui">Web UI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation/index.html">Installation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation/packages.html">Coopr Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation/server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation/provisioner-config.html">Provisioner Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation/standalone.html">Coopr Sandboxes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide/superadmin/index.html">Super Admin Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guide/superadmin/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/superadmin/tenants.html">Tenant Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/superadmin/callbacks.html">Cluster Callbacks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/superadmin/plugins.html">Provisioner Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/superadmin/monitoring.html">Monitoring and Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/bcp/index.html">Business Continuity Plan (BCP)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide/admin/index.html">Administration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guide/admin/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/admin/ui.html">Administration User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/admin/macros.html">Macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/admin/plugin-resources.html">Plugin Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide/user/index.html">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guide/user/index.html#the-user-home-screen">The User Home Screen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/user/index.html#provisioning-a-new-cluster">Provisioning a new Cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/user/index.html#the-cluster-description-screen">The Cluster Description Screen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/user/index.html#examining-and-accessing-the-cluster">Examining and Accessing the Cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/user/index.html#user-profile">User Profile</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rest/index.html">Web Services</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rest/index.html#base-url">Base URL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rest/index.html#super-admin-apis">Super admin APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rest/index.html#administration-apis">Administration APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rest/index.html#user-apis">User APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rest/index.html#rpc-calls">RPC Calls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rest/index.html#about-rest-representational-state-transfer">About REST (REpresentational State Transfer)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview/security.html">Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/security.html#communication-channels">Communication Channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/security.html#data-stores">Data Stores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/security.html#coopr-components">Coopr Components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">Under the Hood</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#solver">Solver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#provisioner">Provisioner</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq/index.html">FAQs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/index.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/index.html#coopr-server">Coopr Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/index.html#coopr-provisioner">Coopr Provisioner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/index.html#coopr-administration">Coopr Administration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/index.html#security">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/index.html#licensing-and-open-source">Licensing and Open Source</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes/index.html">Release Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="release-notes/release-0.9.8.html">0.9.8 Release Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release-notes/release-0.9.7.html">0.9.7 Release Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadocs/index.html">Javadocs</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="#">Table of Contents</a></h3>
+<nav>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="overview/index.html"
+                        title="Next Chapter">Overview</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="overview/index.html" title="Overview"
+             >Next</a> |</li>
+        <li><a href="#">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

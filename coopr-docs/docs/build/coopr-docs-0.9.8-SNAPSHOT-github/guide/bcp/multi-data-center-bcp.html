@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Multi-Datacenter High Availability &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../../index.html" />
+    <link rel="up" title="Business Continuity Plan (BCP)" href="index.html" />
+    <link rel="next" title="Hot-Hot : Synchronous Database Cluster" href="option1/index.html" />
+    <link rel="prev" title="Datacenter High Availability" href="data-center-bcp.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="option1/index.html" title="Hot-Hot : Synchronous Database Cluster"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="data-center-bcp.html" title="Datacenter High Availability"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="../superadmin/index.html" >Super Admin Guide</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Business Continuity Plan (BCP)</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="multi-datacenter-high-availability">
+<h1>Multi-Datacenter High Availability<a class="headerlink" href="#multi-datacenter-high-availability" title="Permalink to this headline">¶</a></h1>
+<p>When running across multiple datacenters, Coopr can be configured to be resilient to datacenter failures. This document describes the recommended configuration
+for setting up Coopr for HA across multiple datacenters. Together with <a class="reference internal" href="data-center-bcp.html"><em>Datacenter High Availability</em></a>, this setup provides for a comprehensive plan for Coopr HA.</p>
+<p>In this setup, Coopr runs in active mode in all datacenters (Hot-Hot). In case of a datacenter failure, traffic from the failed datacenter will be automatically routed to other datacenters by the load balancer. This ensures that service is not affected on a datacenter failure.</p>
+<p>A couple of things need to be considered when configuring Coopr to run across multiple datacenters for HA-</p>
+<ul class="simple">
+<li>As discussed in the previous section, all components of Coopr, except for database, either deal with local data or are stateless. The most important part of the HA setup is to share the data across datacenters in a consistent manner. HA configuration setup for multi-datacenter mostly depends on how the database is setup as discussed in the next sections.</li>
+<li>Since Coopr Servers across all datacenters run in Hot-Hot mode, we have to make sure that they do not conflict while creating cluster IDs. The ID space needs to be partitioned amongst the Coopr Servers. This can be done using <tt class="docutils literal"><span class="pre">server.ids.start.num</span></tt> and <tt class="docutils literal"><span class="pre">server.ids.increment.by</span></tt> server config parameters. For more information on the config parameters see <a class="reference internal" href="../../installation/server-config.html"><em>Server Configuration</em></a> section. Also note that Coopr Servers in a datacenter can share the same ID space.</li>
+</ul>
+<p>We discuss two possible multi-datacenter HA configurations for Coopr in the next sections.
+Note that the second option - HA with Custom Replication, is still work in progress.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="option1/index.html">Hot-Hot : Synchronous Database Cluster</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="option1/index.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="option1/index.html#failover">Failover</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="option4/index.html">Hot-Hot : With Custom Replication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="option4/index.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="option4/index.html#failover">Failover</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../superadmin/index.html">Super Admin Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../superadmin/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../superadmin/tenants.html">Tenant Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../superadmin/callbacks.html">Cluster Callbacks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../superadmin/plugins.html">Provisioner Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../superadmin/monitoring.html">Monitoring and Metrics</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Business Continuity Plan (BCP)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="data-center-bcp.html">Datacenter High Availability</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">Multi-Datacenter High Availability</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="option1/index.html">Hot-Hot : Synchronous Database Cluster</a></li>
+<li class="toctree-l4"><a class="reference internal" href="option4/index.html">Hot-Hot : With Custom Replication</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="data-center-bcp.html"
+                        title="Previous Chapter">Datacenter High Availability</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="option1/index.html"
+                        title="Next Chapter">Hot-Hot : Synchronous Database Cluster</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="option1/index.html" title="Hot-Hot : Synchronous Database Cluster"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="data-center-bcp.html" title="Datacenter High Availability"
+             >Previous</a> |</li>
+        <li><a href="../../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="../superadmin/index.html" >Super Admin Guide</a> &raquo;</li>
+          <li><a href="index.html" >Business Continuity Plan (BCP)</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

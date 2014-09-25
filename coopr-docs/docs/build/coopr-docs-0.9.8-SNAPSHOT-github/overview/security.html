@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Security &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" />
+    <link rel="next" title="Under the Hood" href="../implementation.html" />
+    <link rel="prev" title="Web Services" href="../rest/index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="../implementation.html" title="Under the Hood"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="../rest/index.html" title="Web Services"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="plugin-reference"></span><div class="section" id="security">
+<span id="index-0"></span><h1>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h1>
+<p>At Cask Data, we take security very seriously and invest a lot of time to make sure we
+secure communication between different aspects of any system that we build.
+Coopr beta release does not include a lot of much needed security features, but upcoming
+releases of Coopr will make it secure and more reliable for provisioning
+clusters. This document describes how we are planning to secure different aspects of
+Coopr.</p>
+<div class="align-center figure align-right">
+<a class="reference internal image-reference" href="../_images/security-diagram.png"><img alt="Coopr architecture and security" src="../_images/security-diagram.png" style="width: 800px;" /></a>
+</div>
+<div class="section" id="communication-channels">
+<h2>Communication Channels<a class="headerlink" href="#communication-channels" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>1 - Browser to Coopr UI (Node.js)</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Uses TLS/SSL.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>2 - User REST APIs</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Uses TLS/SSL.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>3 - Coopr Server to Database</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Uses TLS/SSL.</li>
+<li>We recommend firewalling databases</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>4 - Coopr Server to Zookeeper.</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Uses SASL.</li>
+<li>We recommend firewalling Zookeeper.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>5 - Coopr Server to Provisioners</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Uses mutual authentication with TLS/SSL.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>6 - Provisioners to Providers</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Provider specific security settings.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>7 - Provisioners to Nodes</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>All communication is pushed from provisioner to nodes with SSH.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>8 - Intra-Node</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>We recommend firewalling nodes to limit cross cluster communication.</li>
+<li>Configurable firewall support included out of the box through a firewall service.
+Different clusters can be configured differently through configuration changes when a
+cluster is requested.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</div>
+<div class="section" id="data-stores">
+<h2>Data Stores<a class="headerlink" href="#data-stores" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Zookeeper</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Kerberos support.</li>
+<li>ACLs set on znodes so only coopr user can read/write.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Database</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Setup permissions so only coopr user from Coopr server hosts can read/write from the database.</li>
+<li>Encryption of sensitive data.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</div>
+<div class="section" id="coopr-components">
+<h2>Coopr Components<a class="headerlink" href="#coopr-components" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Coopr Server</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Database password encryption in configuration file.</li>
+<li>Integration with external user management systems like LDAP.</li>
+<li>User REST APIs require a user ID in the headers, used for authentication and authorization.</li>
+<li>User REST APIs use group level ACLs on Coopr resources (providers, templates, clusters, etc) to authorize actions.</li>
+<li>ACLs modifiable by admin or users with grant level access on Coopr resources.</li>
+<li>All cluster tasks are persistently stored to support audit logging of full details of all user actions and resource allocations.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Coopr Provisioner</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>Encryption of provider credentials.</li>
+<li>Shell provisioners only allowed to run pre-defined set of scripts and not arbitrary commands.</li>
+<li>Provisioner REST APIs require mutual authentication with TLS/SSL to ensure only valid provisioners can take tasks from the server.</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>Coopr UI</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>XSS protection.</li>
+<li>CSRF protection.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#communication-channels">Communication Channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-stores">Data Stores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coopr-components">Coopr Components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="../rest/index.html"
+                        title="Previous Chapter">Web Services</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="../implementation.html"
+                        title="Next Chapter">Under the Hood</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="../implementation.html" title="Under the Hood"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="../rest/index.html" title="Web Services"
+             >Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

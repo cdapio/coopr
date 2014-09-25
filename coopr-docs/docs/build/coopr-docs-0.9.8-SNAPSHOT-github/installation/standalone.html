@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Coopr Sandboxes &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" />
+    <link rel="up" title="Installation Guide" href="index.html" />
+    <link rel="next" title="Super Admin Guide" href="../guide/superadmin/index.html" />
+    <link rel="prev" title="Provisioner Configuration" href="provisioner-config.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="../guide/superadmin/index.html" title="Super Admin Guide"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="provisioner-config.html" title="Provisioner Configuration"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Installation Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="coopr-sandboxes">
+<span id="index-0"></span><h1>Coopr Sandboxes<a class="headerlink" href="#coopr-sandboxes" title="Permalink to this headline">¶</a></h1>
+<p>For convenience, we have provided several ways to run Coopr on your laptop for experimentation. It is not recommended to run Coopr
+in any of these modes for anything other than experimentation.</p>
+<div class="section" id="standalone">
+<h2>Standalone<a class="headerlink" href="#standalone" title="Permalink to this headline">¶</a></h2>
+<p>Standalone Coopr is a version of Coopr that can run on your Mac. It requires Java 6 or Java 7 to run the server, Node v0.10.26 or higher
+for the UI, and Ruby 1.9.0p0 or higher for the provisioner. The server runs an embedded Derby database and an in-process zookeeper instance,
+removing the need to setup a database or zookeeper instance. It is not recommended to run Coopr in this mode for anything other
+than experimentation.</p>
+<p><a class="reference external" href="http://repository.cask.co/downloads/co/cask/coopr/coopr-standalone/0.9.8/coopr-standalone-0.9.8.zip">Download</a> the standalone zip.
+After downloading it, unzip it and follow the instructions in the README.md file to install the required ruby gems for the provisioner.
+After that, you can start and initialize Coopr standalone by running:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">bin</span><span class="o">/</span><span class="n">coopr</span><span class="o">.</span><span class="na">sh</span> <span class="n">start</span>
+</pre></div>
+</div>
+<p>This should start up the server, provisioner, and UI, as well as initialize the server with some default templates. At this point you can
+follow the instructions in the <a class="reference internal" href="../guide/quickstart/index.html#quickstart-getting-started"><em>Quickstart Guide</em></a> to try provisioning a cluster.</p>
+</div>
+<div class="section" id="virtual-machine">
+<h2>Virtual Machine<a class="headerlink" href="#virtual-machine" title="Permalink to this headline">¶</a></h2>
+<p>You can also run Coopr in a virtual machine that you can download <a class="reference external" href="http://cask.co/downloads">here</a>. You will need either Oracle VirtualBox or
+VMWare player in order to run the VM. Once you have downloaded the image, import it using VirtualBox or VMWare Player.
+The VM has been set up with 4GB RAM and 10GB disk. No password is required to enter the machine. However, should you need to perform an administrative
+operation, the coopr admin password is coopr.
+Coopr has already been installed and configured in the virtual machine and will start up automatically when the machine start.
+On start up a browser will also start with the Coopr UI loaded at <a class="reference external" href="http://localhost:8100">http://localhost:8100</a>. At this point you can
+follow the instructions in the <a class="reference internal" href="../guide/quickstart/index.html#quickstart-getting-started"><em>Quickstart Guide</em></a> to try provisioning a cluster.</p>
+</div>
+<div class="section" id="docker">
+<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
+<p>You can also run Coopr in a Docker container. You will need to download and install Docker in order to do this.
+Once installed, follow the instructions below to enter your container and start up Coopr:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">boot2docker</span> <span class="n">start</span>
+<span class="n">$</span> <span class="n">docker</span> <span class="n">pull</span> <span class="n">caskdata</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">standalone</span>
+<span class="n">$</span> <span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">p</span> <span class="mi">8100</span><span class="o">:</span><span class="mi">8100</span> <span class="n">caskdata</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">standalone</span>
+<span class="n">$</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">server</span> <span class="n">start</span>
+<span class="n">$</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="n">start</span>
+<span class="n">$</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">ui</span> <span class="n">start</span>
+</pre></div>
+</div>
+<p>At this point you can start your brower and go to <a class="reference external" href="http:/">http:/</a>/&lt;ip&gt;:8100, where the ip is found by running:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">boot2docker</span> <span class="n">ip</span>
+</pre></div>
+</div>
+<p>At this point you can follow the instructions in the <a class="reference internal" href="../guide/quickstart/index.html#quickstart-getting-started"><em>Quickstart Guide</em></a> to try provisioning a cluster.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Installation Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="packages.html">Coopr Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioner-config.html">Provisioner Configuration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Coopr Sandboxes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#standalone">Standalone</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtual-machine">Virtual Machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#docker">Docker</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="provisioner-config.html"
+                        title="Previous Chapter">Provisioner Configuration</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="../guide/superadmin/index.html"
+                        title="Next Chapter">Super Admin Guide</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="../guide/superadmin/index.html" title="Super Admin Guide"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="provisioner-config.html" title="Provisioner Configuration"
+             >Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" >Installation Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

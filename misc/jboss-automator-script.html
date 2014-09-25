@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>JBoss Application Server &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" />
+    <link rel="next" title="Design Goals" href="../overview/design-goals.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="../includes/footer.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="../overview/design-goals.html" title="Design Goals"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="../includes/footer.html" title="&lt;no title&gt;"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="jboss-application-server">
+<h1>JBoss Application Server<a class="headerlink" href="#jboss-application-server" title="Permalink to this headline">¶</a></h1>
+<p>This document describes how to install and configure JBoss Application Server (AS) and template with Coopr in less than 10 minutes.
+JBoss AS is an open source Java Application Server. For more information please visit the <a class="reference external" href="http://www.jboss.org/jbossas">JBoss AS site</a></p>
+<div class="section" id="prerequisite">
+<h2>Prerequisite<a class="headerlink" href="#prerequisite" title="Permalink to this headline">¶</a></h2>
+<p>Before getting started, export the following helper variables according to your specific environment:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">export</span> <span class="n">REMOTE_COOPR_PLUGINS</span><span class="o">=</span><span class="s">&quot;http://tools.cask.co/downloads/coopr/plugins&quot;</span>
+<span class="n">$</span> <span class="n">export</span> <span class="n">COOPR_SHELL_AUTOMATORS</span><span class="o">=</span><span class="s">&quot;/opt/coopr/provisioner/daemon/plugins/automators/shell_automator&quot;</span>
+<span class="n">$</span> <span class="n">export</span> <span class="n">COOPR_SERVER_HOST</span><span class="o">=&lt;</span><span class="n">coopr</span><span class="o">-</span><span class="n">server</span><span class="o">&gt;</span>
+<span class="n">$</span> <span class="n">export</span> <span class="n">COOPR_SERVER_PORT</span><span class="o">=&lt;</span><span class="n">coopr</span><span class="o">-</span><span class="n">port</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="download-and-install-coopr-jboss-automator-scripts">
+<h2>Download and Install Coopr JBoss Automator Scripts<a class="headerlink" href="#download-and-install-coopr-jboss-automator-scripts" title="Permalink to this headline">¶</a></h2>
+<p>The JBoss Automator Scripts bundle contains a shell script plugin to install and configure JBoss AS on a node within a cluster. It also contains and configures a &#8216;HelloWorld&#8217; application.</p>
+<p>On every Coopr provisioner node, download and install the JBoss bundle into the Coopr shell automators directory:</p>
+<div class="highlight-java"><div class="highlight"><pre>$ curl -o /tmp/jboss-automator-scripts-0.1.0.tgz  \
+   $REMOTE_COOPR_PLUGINS/jboss-automator-scripts-0.1.0.tgz
+$ sudo tar xvf /tmp/jboss-automator-scripts-0.1.0.tgz -C $COOPR_SHELL_AUTOMATORS/scripts
+</pre></div>
+</div>
+</div>
+<div class="section" id="verify-installation">
+<h2>Verify Installation<a class="headerlink" href="#verify-installation" title="Permalink to this headline">¶</a></h2>
+<p>After the JBoss bundle is installed, you should see the following directory structure:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">coopr</span><span class="o">/</span><span class="n">provisioner</span><span class="o">/</span><span class="n">daemon</span><span class="o">/</span><span class="n">plugins</span><span class="o">/</span><span class="n">automators</span><span class="o">/</span><span class="n">shell_automator</span><span class="o">/</span><span class="n">scripts$</span> <span class="n">ls</span> <span class="o">-</span><span class="n">tlr</span>
+<span class="n">total</span> <span class="mi">24</span>
+<span class="o">-</span><span class="n">rwxrwxr</span><span class="o">-</span><span class="n">x</span> <span class="mi">1</span> <span class="n">coopr</span> <span class="n">coopr</span>  <span class="mi">629</span> <span class="n">Feb</span> <span class="mi">14</span> <span class="mi">22</span><span class="o">:</span><span class="mi">15</span> <span class="n">coopr_service_runner</span><span class="o">.</span><span class="na">sh</span>
+<span class="o">-</span><span class="n">rwxrwxr</span><span class="o">-</span><span class="n">x</span> <span class="mi">1</span> <span class="n">coopr</span> <span class="n">coopr</span>  <span class="mi">962</span> <span class="n">Feb</span> <span class="mi">27</span> <span class="mi">01</span><span class="o">:</span><span class="mi">40</span> <span class="n">chef_client_bootstrap</span><span class="o">.</span><span class="na">sh</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span> <span class="mi">2</span> <span class="n">coopr</span> <span class="n">coopr</span> <span class="mi">4096</span> <span class="n">Mar</span>  <span class="mi">8</span> <span class="mi">09</span><span class="o">:</span><span class="mi">20</span> <span class="n">jboss</span><span class="o">-</span><span class="n">apps</span>          <span class="o">[</span><span class="n">Directory</span> <span class="n">of</span> <span class="n">Apps</span><span class="o">]</span>
+<span class="o">-</span><span class="n">rwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span> <span class="mi">1</span> <span class="n">coopr</span> <span class="n">coopr</span> <span class="mi">8010</span> <span class="n">Mar</span>  <span class="mi">8</span> <span class="mi">10</span><span class="o">:</span><span class="mi">38</span> <span class="n">jboss</span><span class="o">-</span><span class="n">installer</span>     <span class="o">[</span><span class="n">Installer</span><span class="o">]</span>
+<span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">coopr</span><span class="o">/</span><span class="n">provisioner</span><span class="o">/</span><span class="n">daemon</span><span class="o">/</span><span class="n">plugins</span><span class="o">/</span><span class="n">automators</span><span class="o">/</span><span class="n">shell_automator</span><span class="o">/</span><span class="n">scripts$</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">More JBoss applications can be added to the &#8216;jboss-apps&#8217; directory and will be installed into the &#8216;$JBOSS_HOME/standalone/deployments&#8217; directory by default.</p>
+</div>
+</div>
+<div class="section" id="configure-oracle-java-7-service-in-coopr">
+<h2>Configure Oracle Java 7 Service in Coopr<a class="headerlink" href="#configure-oracle-java-7-service-in-coopr" title="Permalink to this headline">¶</a></h2>
+<p>JBoss AS requires Oracle Java 7. The following will add a service to Coopr for installing and configuring Java:</p>
+<div class="highlight-java"><div class="highlight"><pre>$ curl -o /tmp/oracle-java-7 $REMOTE_COOPR_PLUGINS/jboss/services/oracle-java-7
+$ curl -X POST -H &quot;Coopr-UserId:admin&quot;\
+    -d @/tmp/oracle-java-7 http://$COOPR_SERVER:$COOPR_PORT/v1/coopr/services
+</pre></div>
+</div>
+</div>
+<div class="section" id="configure-jboss-as-service-in-coopr">
+<h2>Configure JBoss AS Service in Coopr<a class="headerlink" href="#configure-jboss-as-service-in-coopr" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have installed the scripts and dependent services, we must configure the JBoss AS service within Coopr and then define a cluster template to enable Coopr provisioning of JBoss AS clusters.
+This configuration can be achieved using either the Coopr Admin UI or Webservices.</p>
+<p>The following adds service &#8216;jboss&#8217; to the service list.</p>
+<div class="highlight-java"><div class="highlight"><pre>$ curl -o /tmp/jboss $REMOTE_COOPR_PLUGINS/jboss/services/jboss
+$ curl -X POST -H &quot;Coopr-UserId:admin&quot;\
+    -d @/tmp/jboss http://$COOPR_SERVER:$COOPR_PORT/v1/coopr/services
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-jboss-as-cluster-template-in-coopr">
+<h2>Create JBoss AS Cluster Template in Coopr<a class="headerlink" href="#create-jboss-as-cluster-template-in-coopr" title="Permalink to this headline">¶</a></h2>
+<p>Once the &#8216;jboss&#8217; service has been added to Coopr, you are ready to create a cluster template or even add this service to an existing cluster template.
+The easiest way to get started running JBoss AS is to use the Webservices to add a new JBoss cluster template to Coopr.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Cluster template details</p>
+<p class="last">Requires Java 7 and Ubuntu Image (jboss-installer has only been tested on Ubuntu).
+After you have executed the following command, please make sure to update the provider for
+&#8216;jboss-application-server&#8217; to appropriate one.</p>
+</div>
+<p>Use the following command to create the &#8216;jboss-application-server&#8217; cluster template:</p>
+<div class="highlight-java"><div class="highlight"><pre>$ curl -o /tmp/jboss-application-server \
+    $REMOTE_COOPR_PLUGINS/jboss/templates/jboss-application-server
+$ curl -X POST -H &quot;Coopr-UserId:admin&quot;\
+    -d @/tmp/jboss-application-server http://$COOPR_SERVER:$COOPR_PORT/v1/coopr/clustertemplates
+</pre></div>
+</div>
+</div>
+<div class="section" id="provision-an-instance-of-jboss-application-cluster-with-coopr">
+<h2>Provision an instance of &#8216;jboss-application-cluster&#8217; with Coopr<a class="headerlink" href="#provision-an-instance-of-jboss-application-cluster-with-coopr" title="Permalink to this headline">¶</a></h2>
+<p>Once the cluster template has been created, you are now ready to create a cluster. Please
+follow the cluster creation procedure from the main Coopr documentation. You can either choose
+a singlenode or multi-node JBoss AS cluster. Once the cluster has been successfully provisioned
+you can verify the installations by visiting <a class="reference external" href="http:/">http:/</a>/&lt;host-id&gt;:8080 or can also check the default
+helloworld application by visiting <a class="reference external" href="http:/">http:/</a>/&lt;host-id&gt;:8080/helloworld/hi.jsp.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="../includes/footer.html"
+                        title="Previous Chapter">&lt;no title&gt;</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="../overview/design-goals.html"
+                        title="Next Chapter">Design Goals</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="../overview/design-goals.html" title="Design Goals"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="../includes/footer.html" title="&lt;no title&gt;"
+             >Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

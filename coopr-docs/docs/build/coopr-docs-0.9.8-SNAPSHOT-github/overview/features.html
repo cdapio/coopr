@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Features &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" />
+    <link rel="next" title="Architecture" href="architecture.html" />
+    <link rel="prev" title="Quick Start Guide" href="../guide/quickstart/index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="architecture.html" title="Architecture"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="../guide/quickstart/index.html" title="Quick Start Guide"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="overview-features"></span><div class="section" id="features">
+<span id="index-0"></span><span id="id1"></span><h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+<p>Coopr provides a core set of complementary features to provision and monitor clusters. Collectively, they
+make large scale deployment manageable.</p>
+<div class="section" id="core-features">
+<h2>Core Features<a class="headerlink" href="#core-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Simple on-demand cluster provisioning</li>
+<li>Automatic placement and management of services during cluster creation based on constraint based templates and desired cluster size</li>
+<li>Seamless integration with OpenStack and IaaS providers</li>
+<li>Pluggable automation platform (e.g. Chef, Puppet)</li>
+<li>Scalability to hundreds of clusters</li>
+<li>Modular configuration and service management</li>
+<li>Admin UI to create and manage configuration, and for user to customize and create clusters.</li>
+<li>Fully driven by REST APIs</li>
+</ul>
+</div>
+<div class="section" id="other-features">
+<h2>Other Features<a class="headerlink" href="#other-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Pre-defined templates for clusters (e.g. Hadoop, LAMP)</li>
+<li>Works out of the box with in-memory zookeeper and embedded DB</li>
+<li>Uses chef-solo as SCM engine, and hence not dependent on a Chef server</li>
+<li>Push model for provisioning and installation, and therefore can provision clusters outside firewall</li>
+<li>One-click import and export of Coopr catalogs and associated entities</li>
+<li>Status updates during cluster creation in UI</li>
+<li>User defined configuration for cluster creation</li>
+<li>Centralized dashboard to view and manage multiple clusters</li>
+</ul>
+<div class="section" id="reduced-it-overhead">
+<h3>Reduced IT Overhead<a class="headerlink" href="#reduced-it-overhead" title="Permalink to this headline">¶</a></h3>
+<p>In many organizations, developers submit requests to access a Hadoop cluster
+in order to run a MapReduce job. With Coopr, the IT department sets up a
+catalog of clusters that can be provisioned directly by developers. Developers
+can allocate or destroy a cluster right from their workstation.
+Instant access to IT resources reduces wait time and increases productivity.
+Coopr provides a centralized dashboard to view and manage multiple clusters.</p>
+</div>
+<div class="section" id="private-and-public-clouds">
+<h3>Private and Public Clouds<a class="headerlink" href="#private-and-public-clouds" title="Permalink to this headline">¶</a></h3>
+<p>Coopr works and integrates with any IaaS provider in the public cloud including OpenStack for behind-the-firewall cluster provisioning and management.</p>
+</div>
+<div class="section" id="extensibility">
+<h3>Extensibility<a class="headerlink" href="#extensibility" title="Permalink to this headline">¶</a></h3>
+<p>Coopr simplifies the installation and configuration of any software stack,
+including Hadoop. It ensures that all installations are verified before they
+are made available. Administrators are able to create custom cluster types ranging from Hadoop and LAMP
+to Solr search clusters. Most importantly, using the open source automation platform Chef, you can
+manage any Big Data application; many Chef recipes are readily available, and as an
+administrator or developer, you can develop your own.</p>
+</div>
+<div class="section" id="rest-apis-and-a-rich-ui">
+<h3>REST APIs and a Rich UI<a class="headerlink" href="#rest-apis-and-a-rich-ui" title="Permalink to this headline">¶</a></h3>
+<p>Integrate with existing tools and workflows via the Coopr REST API. Coopr also
+provides a simple and intuitive UI that allows users to create and manage clusters.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#core-features">Core Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-features">Other Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#reduced-it-overhead">Reduced IT Overhead</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#private-and-public-clouds">Private and Public Clouds</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extensibility">Extensibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rest-apis-and-a-rich-ui">REST APIs and a Rich UI</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="../guide/quickstart/index.html"
+                        title="Previous Chapter">Quick Start Guide</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="architecture.html"
+                        title="Next Chapter">Architecture</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="architecture.html" title="Architecture"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="../guide/quickstart/index.html" title="Quick Start Guide"
+             >Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

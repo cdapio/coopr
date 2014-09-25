@@ -1,0 +1,611 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Provisioner Plugins &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../../index.html" />
+    <link rel="up" title="Super Admin Guide" href="index.html" />
+    <link rel="next" title="Chef Solo Automator Plugin" href="chef-solo-automator-plugin.html" />
+    <link rel="prev" title="Cluster Callbacks" href="callbacks.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="chef-solo-automator-plugin.html" title="Chef Solo Automator Plugin"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="callbacks.html" title="Cluster Callbacks"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Super Admin Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="plugin-reference"></span><div class="section" id="provisioner-plugins">
+<span id="index-0"></span><h1>Provisioner Plugins<a class="headerlink" href="#provisioner-plugins" title="Permalink to this headline">¶</a></h1>
+<p>The Coopr provisioner allows you to create custom plugins for allocating machines on your providers or to custom
+implement your services. This document provides the necessary information to build a custom plugin for Coopr.</p>
+<div class="section" id="types-of-plugins">
+<h2>Types of Plugins<a class="headerlink" href="#types-of-plugins" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="provider-plugins">
+<h3>Provider plugins<a class="headerlink" href="#provider-plugins" title="Permalink to this headline">¶</a></h3>
+<p>Provider plugins interact with various provider APIs to allocate machines. As such, they must be able to request machines,
+confirm/validate when they are ready, and delete machines. Provider plugins are also responsible for returning the ssh credentials
+to be used in subsequent tasks.</p>
+</div>
+<div class="section" id="automator-plugins">
+<h3>Automator plugins<a class="headerlink" href="#automator-plugins" title="Permalink to this headline">¶</a></h3>
+<p>Automator plugins are responsible for implementing the various services defined on a cluster. For example, a Chef
+automator plugin could be used to invoke Chef recipes that install, configure, start or stop your application. Alternatively,
+you may choose to implement with a Puppet plugin, or even Shell commands.</p>
+</div>
+</div>
+<div class="section" id="task-types">
+<h2>Task Types<a class="headerlink" href="#task-types" title="Permalink to this headline">¶</a></h2>
+<p>In order to build plugins for Coopr, it is first necessary to understand the tasks each plugin will be responsible for
+executing. To bring up a cluster, Coopr issues the following tasks:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Task name</th>
+<th class="head">Description</th>
+<th class="head">Possible return values</th>
+<th class="head">Handled by plugin</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>CREATE</td>
+<td>sends a request to the provider to initiate the provisioning of a machine. Typically, it should return as soon as the request is made</td>
+<td>status, provider-id, root password</td>
+<td>Provider</td>
+</tr>
+<tr class="row-odd"><td>CONFIRM</td>
+<td>polls/waits for the machine to be ready and does any required provider-specific validation/preparation</td>
+<td>status, routable ip address</td>
+<td>Provider</td>
+</tr>
+<tr class="row-even"><td>DELETE</td>
+<td>sends a request to the provider to destroy a machine</td>
+<td>status</td>
+<td>Provider</td>
+</tr>
+<tr class="row-odd"><td>BOOTSTRAP</td>
+<td>plugin can perform any operation it needs to carry out further tasks, for example, copy Chef cookbooks to the machine. This operation should be idempotent and safe to run together with multiple plugins</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-even"><td>INSTALL</td>
+<td>run the specified install service action</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-odd"><td>CONFIGURE</td>
+<td>run the specified configure service action</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-even"><td>INITIALIZE</td>
+<td>run the specified initialize service action</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-odd"><td>START</td>
+<td>run the specified start service action</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-even"><td>STOP</td>
+<td>run the specified stop service action</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+<tr class="row-odd"><td>REMOVE</td>
+<td>run the specified remove service action</td>
+<td>status</td>
+<td>Automator</td>
+</tr>
+</tbody>
+</table>
+<p>Note that status is the only required return value, since it indicates success or failure. For information such
+as the IP address, any task can write an arbitrary key-value pair which will then be included in subsequent
+requests. This allows for different providers to have different values.</p>
+</div>
+<div class="section" id="writing-a-plugin">
+<h2>Writing a Plugin<a class="headerlink" href="#writing-a-plugin" title="Permalink to this headline">¶</a></h2>
+<p>Currently, a plugin must be written in Ruby and extend from the Coopr base plugin classes.</p>
+<div class="section" id="writing-a-provider-plugin">
+<h3>Writing a Provider plugin<a class="headerlink" href="#writing-a-provider-plugin" title="Permalink to this headline">¶</a></h3>
+<p>A provider plugin must extend from the base <tt class="docutils literal"><span class="pre">Provider</span></tt> class and implement three methods: <tt class="docutils literal"><span class="pre">create</span></tt>, <tt class="docutils literal"><span class="pre">confirm</span></tt>, and <tt class="docutils literal"><span class="pre">delete</span></tt>.  Each of these methods are called with a hash of key-value pairs. This hash is pre-populated with useful attributes such as <tt class="docutils literal"><span class="pre">hostname</span></tt> or <tt class="docutils literal"><span class="pre">providerid</span></tt>.  The <tt class="docutils literal"><span class="pre">fields</span></tt> attribute will always be present and contains a hash of the custom fields that are defined by each plugin (more on this below).  Note that your implementation can also refer to the <tt class="docutils literal"><span class="pre">&#64;task</span></tt> instance variable, which contains the entire
+input for this task.</p>
+<p>Below is a skeleton for a provider plugin:</p>
+<div class="highlight-java"><div class="highlight"><pre>#!/usr/bin/env ruby
+
+class MyProvider &lt; Provider
+
+  def create(inputmap)
+    flavor = inputmap[&#39;flavor&#39;]
+    image = inputmap[&#39;image&#39;]
+    hostname = inputmap[&#39;hostname&#39;]
+    fields = inputmap[&#39;fields&#39;]
+    #
+    # implement requesting a machine from provider
+    #
+    @result[&#39;status&#39;] = 0
+    @result[&#39;result&#39;][&#39;foo&#39;] = &quot;bar&quot;
+  end
+
+  def confirm(inputmap)
+    providerid = inputmap[&#39;providerid&#39;]
+    fields = inputmap[&#39;fields&#39;]
+    #
+    # implement confirmation/validation of this machine from provider
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def delete(inputmap)
+    providerid = inputmap[&#39;providerid&#39;]
+    fields = inputmap[&#39;fields&#39;]
+    #
+    # implement deletion of machine from provider
+    #
+    @result[&#39;status&#39;] = 0
+  end
+</pre></div>
+</div>
+<p>When the task is complete, your implementation should simply write the results back to the <tt class="docutils literal"><span class="pre">&#64;result</span></tt> instance variable.
+The only required return value is <tt class="docutils literal"><span class="pre">status</span></tt>, where <tt class="docutils literal"><span class="pre">'status':</span> <span class="pre">0</span></tt> represents success and any other value returned
+represents failure. A raised exception will also result in failure.</p>
+<p>Additionally, your provider plugin will likely need to return information such as a machine&#8217;s ID, SSH credentials and
+public IP, so that it can be used in subsequent tasks. For these cases, simply write the results as key-value pairs underneath
+the line <tt class="docutils literal"><span class="pre">&#64;result['result']['key']</span> <span class="pre">=</span> <span class="pre">'value'</span></tt>. Subsequent tasks will then contain this information in <tt class="docutils literal"><span class="pre">config</span></tt>, for
+example <tt class="docutils literal"><span class="pre">&#64;task['config']['key']</span> <span class="pre">=</span> <span class="pre">'value'</span></tt>. By convention, most plugins should reuse the following fields:</p>
+<div class="highlight-java"><div class="highlight"><pre>@result[&#39;result&#39;][&#39;providerid&#39;]
+@result[&#39;result&#39;][&#39;ssh-auth&#39;][&#39;user&#39;]
+@result[&#39;result&#39;][&#39;ssh-auth&#39;][&#39;password&#39;]
+@result[&#39;result&#39;][&#39;ipaddress&#39;]
+</pre></div>
+</div>
+</div>
+<div class="section" id="writing-an-automator-plugin">
+<h3>Writing an Automator plugin<a class="headerlink" href="#writing-an-automator-plugin" title="Permalink to this headline">¶</a></h3>
+<p>An automator plugin must extend from the base <tt class="docutils literal"><span class="pre">Automator</span></tt> class and implement seven methods: <tt class="docutils literal"><span class="pre">bootstrap</span></tt>, <tt class="docutils literal"><span class="pre">install</span></tt>, <tt class="docutils literal"><span class="pre">configure</span></tt>, <tt class="docutils literal"><span class="pre">init</span></tt>, <tt class="docutils literal"><span class="pre">start</span></tt>, <tt class="docutils literal"><span class="pre">stop</span></tt>, and <tt class="docutils literal"><span class="pre">remove</span></tt>. Each of these methods are called with a hash of key-value pairs.  This hash is pre-populated with useful attributes such as <tt class="docutils literal"><span class="pre">hostname</span></tt>, <tt class="docutils literal"><span class="pre">ipaddress</span></tt>, and a hash of ssh credentials.  Additionally, the <tt class="docutils literal"><span class="pre">fields</span></tt> attribute will contain a hash of the custom fields that are defined by each plugin (more on this below).  Note that your implementation can also refer to the <tt class="docutils literal"><span class="pre">&#64;task</span></tt> instance variable, which contains the entire input for this task.</p>
+<p>Below is a skeleton for an automator plugin:</p>
+<div class="highlight-java"><div class="highlight"><pre>#!/usr/bin/env ruby
+
+class MyAutomator &lt; Automator
+
+  def bootstrap(inputmap)
+    ssh_auth_hash = inputmap[&#39;sshauth&#39;]
+    hostname = inputmap[&#39;hostname&#39;]
+    ipaddress = inputmap[&#39;ipaddress&#39;]
+    #
+    # implement any preparation work required by this plugin (copy cookbooks, etc.)
+    # this should be idempotent and unintrusive to any other registered plugins
+    @result[&#39;status&#39;] = 0
+  end
+
+  def install(inputmap)
+    ssh_auth_hash = inputmap[&#39;sshauth&#39;]
+    hostname = inputmap[&#39;hostname&#39;]
+    ipaddress = inputmap[&#39;ipaddress&#39;]
+    fields = inputmap[&#39;fields&#39;]
+    #
+    # implement installing a service as specified by the custom fields in inputmap[&#39;fields&#39;]
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def configure(inputmap)
+    ssh_auth_hash = inputmap[&#39;sshauth&#39;]
+    hostname = inputmap[&#39;hostname&#39;]
+    ipaddress = inputmap[&#39;ipaddress&#39;]
+    fields = inputmap[&#39;fields&#39;]
+    #
+    # implement configuring a service as specified by the custom fields in inputmap[&#39;fields&#39;]
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def init(inputmap)
+    ssh_auth_hash = inputmap[&#39;sshauth&#39;]
+    hostname = inputmap[&#39;hostname&#39;]
+    ipaddress = inputmap[&#39;ipaddress&#39;]
+    fields = inputmap[&#39;fields&#39;]
+    #
+    # implement initializing a service as specified by the custom fields in inputmap[&#39;fields&#39;]
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def start(inputmap)
+    ssh_auth_hash = inputmap[&#39;sshauth&#39;]
+    hostname = inputmap[&#39;hostname&#39;]
+    ipaddress = inputmap[&#39;ipaddress&#39;]
+    fields = inputmap[&#39;fields&#39;]
+    #
+    # implement starting a service as specified by the custom fields in inputmap[&#39;fields&#39;]
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def stop(inputmap)
+    ssh_auth_hash = inputmap[&#39;sshauth&#39;]
+    hostname = inputmap[&#39;hostname&#39;]
+    ipaddress = inputmap[&#39;ipaddress&#39;]
+    fields = inputmap[&#39;fields&#39;]
+    #
+    # implement stopping a service as specified by the custom fields in inputmap[&#39;fields&#39;]
+    #
+    @result[&#39;status&#39;] = 0
+  end
+
+  def remove(inputmap)
+    ssh_auth_hash = inputmap[&#39;sshauth&#39;]
+    hostname = inputmap[&#39;hostname&#39;]
+    ipaddress = inputmap[&#39;ipaddress&#39;]
+    fields = inputmap[&#39;fields&#39;]
+    #
+    # implement removing a service as specified by the custom fields in inputmap[&#39;fields&#39;]
+    #
+    @result[&#39;status&#39;] = 0
+  end
+</pre></div>
+</div>
+<p>Note that the bootstrap step is unique in that it is not tied to a service. Since services on the same cluster may be implemented with different automator plugins, the bootstrap task will run the bootstrap implementations for all automator plugins used by any service on the cluster.  The bootstrap task may also be run multiple times throughout the cluster lifecycle.  Therefore, bootstrap implementations should be idempotent and not interfere with one another.</p>
+</div>
+<div class="section" id="logging-and-capturing-output">
+<h3>Logging and Capturing Output<a class="headerlink" href="#logging-and-capturing-output" title="Permalink to this headline">¶</a></h3>
+<p>During execution, a plugin can write to the provisioner&#8217;s instance of the Ruby standard logger using the &#8216;log&#8217; method:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">log</span><span class="o">.</span><span class="na">debug</span> <span class="s">&quot;my message&quot;</span>
+<span class="n">log</span><span class="o">.</span><span class="na">info</span> <span class="s">&quot;my message&quot;</span>
+<span class="n">log</span><span class="o">.</span><span class="na">warn</span> <span class="s">&quot;my warning message&quot;</span>
+<span class="n">log</span><span class="o">.</span><span class="na">error</span> <span class="s">&quot;my error message&quot;</span>
+</pre></div>
+</div>
+<p>Additionally, each task can return strings representing <tt class="docutils literal"><span class="pre">stdout</span></tt> and <tt class="docutils literal"><span class="pre">stderr</span></tt> to be displayed on the Coopr UI. Simply return the values:</p>
+<div class="highlight-java"><div class="highlight"><pre>@result[&#39;stdout&#39;] = &quot;my captured stdout message&quot;
+@result[&#39;stderr&#39;] = &quot;my captured stderr message&quot;
+</pre></div>
+</div>
+</div>
+<div class="section" id="defining-your-plugin">
+<h3>Defining Your Plugin<a class="headerlink" href="#defining-your-plugin" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Coopr plugins are required to provide a JSON file which defines the plugin, including the following:</dt>
+<dd><ul class="first last simple">
+<li>plugin name</li>
+<li>named providertypes and automatortypes</li>
+<li>the class name for each providertype and automatortype</li>
+<li>any custom fields required by each providertype and automatortype</li>
+<li>types of resources the plugin can use to perform tasks</li>
+</ul>
+</dd>
+</dl>
+<p>Custom fields allow a plugin to announce the fields that it requires.  For example a Rackspace provider plugin may require a username and password while the Joyent provider plugin can require either a password or a key.  Likewise, the Chef Automator plugin requires a run-list and JSON attributes, while the Shell Automator plugin requires a command and arguments.</p>
+<p>Plugin resources specify files or archives that can be used by plugins to perform tasks.  For example, the Chef Automator plugin uses cookbooks, data bags, and roles, while the Shell Automator plugin uses scripts and archives. Administrators can then upload and manage resources as needed.  For example, an administrator may want to add support for a new service without having to update the plugin. To do so, the administrator can make a cookbook that manages the service, upload it, then sync it so it becomes available for plugins to use.</p>
+<p>For example, consider the JSON definition file for the Rackspace provider plugin:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">{</span>
+    <span class="s">&quot;name&quot;</span><span class="o">:</span> <span class="s">&quot;rackspace&quot;</span><span class="o">,</span>
+    <span class="s">&quot;description&quot;</span><span class="o">:</span> <span class="s">&quot;Rackspace Public Cloud provider&quot;</span><span class="o">,</span>
+    <span class="s">&quot;providertypes&quot;</span><span class="o">:</span> <span class="o">[</span>
+        <span class="s">&quot;rackspace&quot;</span>
+    <span class="o">],</span>
+    <span class="s">&quot;rackspace&quot;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&quot;name&quot;</span><span class="o">:</span> <span class="s">&quot;rackspace&quot;</span><span class="o">,</span>
+        <span class="s">&quot;classname&quot;</span><span class="o">:</span> <span class="s">&quot;RackspaceProvider&quot;</span><span class="o">,</span>
+        <span class="s">&quot;parameters&quot;</span><span class="o">:</span> <span class="o">{</span>
+            <span class="s">&quot;admin&quot;</span><span class="o">:</span> <span class="o">{</span>
+                <span class="s">&quot;fields&quot;</span><span class="o">:</span> <span class="o">{</span>
+                    <span class="s">&quot;rackspace_username&quot;</span><span class="o">:</span> <span class="o">{</span>
+                        <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;User&quot;</span><span class="o">,</span>
+                        <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;text&quot;</span><span class="o">,</span>
+                        <span class="s">&quot;tip&quot;</span><span class="o">:</span> <span class="s">&quot;Your Rackspace user name&quot;</span>
+                    <span class="o">},</span>
+                    <span class="s">&quot;rackspace_api_key&quot;</span><span class="o">:</span> <span class="o">{</span>
+                        <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;APIkey&quot;</span><span class="o">,</span>
+                        <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;password&quot;</span><span class="o">,</span>
+                        <span class="s">&quot;tip&quot;</span><span class="o">:</span> <span class="s">&quot;Your Rackspace API key&quot;</span>
+                    <span class="o">},</span>
+                    <span class="s">&quot;rackspace_region&quot;</span><span class="o">:</span> <span class="o">{</span>
+                        <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;Region&quot;</span><span class="o">,</span>
+                        <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;select&quot;</span><span class="o">,</span>
+                        <span class="s">&quot;options&quot;</span><span class="o">:</span> <span class="o">[</span>
+                            <span class="s">&quot;dfw&quot;</span><span class="o">,</span>
+                            <span class="s">&quot;ord&quot;</span><span class="o">,</span>
+                            <span class="s">&quot;lon&quot;</span><span class="o">,</span>
+                            <span class="s">&quot;syd&quot;</span>
+                        <span class="o">],</span>
+                        <span class="s">&quot;default&quot;</span><span class="o">:</span> <span class="s">&quot;dfw&quot;</span><span class="o">,</span>
+                        <span class="s">&quot;override&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="o">,</span>
+                        <span class="s">&quot;tip&quot;</span><span class="o">:</span> <span class="s">&quot;Rackspace region (DFW default)&quot;</span>
+                    <span class="o">}</span>
+                <span class="o">},</span>
+                <span class="s">&quot;required&quot;</span><span class="o">:</span> <span class="o">[</span>
+                    <span class="o">[</span>
+                        <span class="s">&quot;rackspace_username&quot;</span><span class="o">,</span>
+                        <span class="s">&quot;rackspace_api_key&quot;</span><span class="o">,</span>
+                        <span class="s">&quot;rackspace_region&quot;</span>
+                    <span class="o">]</span>
+                <span class="o">]</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>This JSON defines a single plugin which contains a single providertype named &#8220;rackspace&#8221;.  The implementing ruby class for this &#8220;rackspace&#8221; providertype is &#8220;RackspaceProvider&#8221;.  Additionally, it defines three custom fields which can be set by a Coopr administrator: &#8220;rackspace_username&#8221;, &#8220;rackspace_api_key&#8221;, and &#8220;rackspace_region&#8221;.  In this example, they are defined within an &#8220;admin&#8221; block, which indicates these fields can be set only by a Coopr administrator.  Alternatively, defining fields within a &#8220;user&#8221; block indicates a Coopr user can set them when creating a cluster.  Each field has additional elements to specify behavior and describe how the field should be presented to the user on the Coopr UI:</dt>
+<dd><ul class="first last simple">
+<li>field name: will be used as the key in the hash sent to the provisioner plugin.</li>
+<li><tt class="docutils literal"><span class="pre">label</span></tt>: the user-friendly label presented in the Coopr UI.</li>
+<li><tt class="docutils literal"><span class="pre">type</span></tt>: any of the HTTP input field types such as <tt class="docutils literal"><span class="pre">text</span></tt> or <tt class="docutils literal"><span class="pre">password</span></tt>, or &#8220;select&#8221; for a drop-down menu.</li>
+<li><tt class="docutils literal"><span class="pre">tip</span></tt>: the text hint displayed as the value before the user enters anything</li>
+<li><tt class="docutils literal"><span class="pre">options</span></tt>: (specific to type &#8220;select&#8221;), the drop-down menu options</li>
+<li><tt class="docutils literal"><span class="pre">default</span></tt>: (specific to type &#8220;select&#8221;), the default option.</li>
+<li><tt class="docutils literal"><span class="pre">override</span></tt>: specifies whether or not a field defined in an admin block can be overridden by the user during cluster creation.  default: false</li>
+</ul>
+</dd>
+</dl>
+<p>Note that a single plugin may contain multiple providertypes and automatortypes.  The top-level <tt class="docutils literal"><span class="pre">providertypes</span></tt> and <tt class="docutils literal"><span class="pre">automatortypes</span></tt> arrays should list them all, then each will have a corresponding JSON element where the classname and custom fields are defined.</p>
+</div>
+<div class="section" id="loading-your-plugin">
+<h3>Loading Your Plugin<a class="headerlink" href="#loading-your-plugin" title="Permalink to this headline">¶</a></h3>
+<p>When the provisioner starts up, it will scan its directories looking for JSON definition files.  In order for your plugin to be loaded, it needs to adhere to the following directory structure.</p>
+<p>Below is an example directory structure:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$COOPR_HOME</span><span class="o">/</span>
+    <span class="n">provisioner</span><span class="o">/</span>
+        <span class="n">daemon</span><span class="o">/</span>
+            <span class="n">plugins</span><span class="o">/</span>
+                <span class="n">providers</span><span class="o">/</span>
+                    <span class="n">my_provider</span><span class="o">/</span>
+                        <span class="n">my_provider</span><span class="o">.</span><span class="na">json</span>
+                        <span class="n">my_provider</span><span class="o">.</span><span class="na">rb</span>
+                        <span class="o">[</span><span class="n">any</span> <span class="n">additional</span> <span class="n">data</span> <span class="n">or</span> <span class="n">lib</span> <span class="n">directories</span><span class="o">]</span>
+                <span class="n">automators</span><span class="o">/</span>
+                    <span class="n">my</span><span class="o">-</span><span class="n">automator</span><span class="o">/</span>
+                        <span class="n">my_provider</span><span class="o">.</span><span class="na">json</span>
+                        <span class="n">my_provider</span><span class="o">.</span><span class="na">rb</span>
+                        <span class="o">[</span><span class="n">any</span> <span class="n">additional</span> <span class="n">data</span> <span class="n">or</span> <span class="n">lib</span> <span class="n">directories</span><span class="o">]</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>When writing a custom plugin, please consider the following:</dt>
+<dd><ul class="first last simple">
+<li>Plugin loading errors are not fatal.  The provisioner will load the remaining plugins and will poll for tasks as long as it has at least one provider and one automator loaded.  Please check the provisioner logs for any reported errors loading plugins.</li>
+<li>Currently the same set of plugins must be installed on all running provisioners, since any given provisioner can receive any task.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="registering-your-plugin">
+<h3>Registering Your Plugin<a class="headerlink" href="#registering-your-plugin" title="Permalink to this headline">¶</a></h3>
+<p>The Coopr Server needs to be aware of the installed provisioner plugins and their collective list of providertypes and automatortypes.  This can currently be done by starting a provisioner with the <tt class="docutils literal"><span class="pre">--register</span></tt> argument.  For example:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$COOPR_HOME</span><span class="o">/</span><span class="n">provisioner</span><span class="o">/</span><span class="n">daemon</span><span class="o">/</span><span class="n">provisioner</span><span class="o">.</span><span class="na">rb</span> <span class="o">--</span><span class="n">register</span> <span class="o">--</span><span class="n">uri</span> <span class="nl">http:</span><span class="c1">//mycooprserver:55054</span>
+</pre></div>
+</div>
+<p>The above command will start a provisioner which will load its plugins as usual, then register all providertypes and automatortypes using the Coopr Server&#8217;s API.  After registering each providertype or automatortype, it will exit.</p>
+<p>When running the Coopr standalone distribution, this command is run automatically during initial startup.</p>
+</div>
+</div>
+<div class="section" id="included-plugins">
+<h2>Included Plugins<a class="headerlink" href="#included-plugins" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chef-solo-automator-plugin.html">Chef Solo Automator Plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shell-automator-plugin.html">Shell Automator Plugin</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="resource-types">
+<h2>Resource types<a class="headerlink" href="#resource-types" title="Permalink to this headline">¶</a></h2>
+<p>Resource types are defined by plugins and are useful when you want to let administrators provide data for your plugin to use.
+For example, the Chef Automator plugin defines 3 types of resources:
+cookbooks, databags, and roles. Several cookbooks are included out of the box, but the plugin resource system allows administrators to
+add and manage any number of cookbooks, enabling support of any service desired. Similarly, plugin resources can be used on the
+provider plugin side to upload and manage tenant specific data, such as user keys or credentials. More details about how
+plugin resources are managed by tenant administrators can be seen on the <a class="reference internal" href="../admin/plugin-resources.html"><em>Plugin Resources Guide</em></a></p>
+<div class="section" id="defining-resource-types">
+<h3>Defining Resource Types<a class="headerlink" href="#defining-resource-types" title="Permalink to this headline">¶</a></h3>
+<p>Resource types are defined by plugins. A resource type is simply some plugin specific name for data the plugin can use, along with
+a data format of the resource. Supported formats are &#8216;file&#8217; and &#8216;archive&#8217;. Resource types of the &#8216;archive&#8217; format are zips or tarballs
+of that will be expanded by provisioners before use. It is expected that the top level of the archive is a folder of the same name as
+the name of the resource. For example, the Chef Automator plugin defines a &#8216;cookbooks&#8217; resource type that uses the &#8216;archive&#8217; format. This
+means that if a cookbook named &#8216;my-service&#8217; is uploaded, it is expected that the top level directory of the archive is named &#8216;my-service&#8217;.</p>
+<p>Below is an example of the section of the plugin specification detailing the three resource types the Chef Automator supports:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="s">&quot;resourceTypes&quot;</span><span class="o">:</span> <span class="o">{</span>
+      <span class="s">&quot;cookbooks&quot;</span><span class="o">:</span> <span class="o">{</span>
+          <span class="s">&quot;format&quot;</span><span class="o">:</span> <span class="s">&quot;archive&quot;</span>
+      <span class="o">},</span>
+      <span class="s">&quot;data_bags&quot;</span><span class="o">:</span> <span class="o">{</span>
+          <span class="s">&quot;format&quot;</span><span class="o">:</span> <span class="s">&quot;archive&quot;</span>
+      <span class="o">},</span>
+      <span class="s">&quot;roles&quot;</span><span class="o">:</span> <span class="o">{</span>
+          <span class="s">&quot;format&quot;</span><span class="o">:</span> <span class="s">&quot;file&quot;</span>
+      <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plugin-resource-storage">
+<h3>Plugin Resource Storage<a class="headerlink" href="#plugin-resource-storage" title="Permalink to this headline">¶</a></h3>
+<p>By default, plugin resources uploaded to the Server are simply stored as local files.  If you are running multiple servers for HA
+purposes, you will have to configure the servers to write to a distributed system such as NFS so that all servers have access
+to the resources. This can be achieved by configuring the <tt class="docutils literal"><span class="pre">server.plugin.store.localfilestore.data.dir</span></tt> setting in the server
+config. If you wish to use a different system for persistently storing the plugin resources, you can implement the <tt class="docutils literal"><span class="pre">PluginStore</span></tt>
+interface, add your jar to the lib directory for the server, and change the <tt class="docutils literal"><span class="pre">server.plugin.store.class</span></tt> setting to be the
+fully qualified class name of your implementation. The interface provides methods for getting input and output streams for reading
+and writing plugin resources. This allows you to swap in any persistent storage implementation needed. You can see more details
+about the interface and default <tt class="docutils literal"><span class="pre">LocalFilePluginStore</span></tt> class by viewing the <a class="reference internal" href="../../javadocs/index.html"><em>javadocs</em></a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Super Admin Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tenants.html">Tenant Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html">Cluster Callbacks</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Provisioner Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#types-of-plugins">Types of Plugins</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#provider-plugins">Provider plugins</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#automator-plugins">Automator plugins</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#task-types">Task Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#writing-a-plugin">Writing a Plugin</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#writing-a-provider-plugin">Writing a Provider plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#writing-an-automator-plugin">Writing an Automator plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logging-and-capturing-output">Logging and Capturing Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#defining-your-plugin">Defining Your Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#loading-your-plugin">Loading Your Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#registering-your-plugin">Registering Your Plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#included-plugins">Included Plugins</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="chef-solo-automator-plugin.html">Chef Solo Automator Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shell-automator-plugin.html">Shell Automator Plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#resource-types">Resource types</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#defining-resource-types">Defining Resource Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#plugin-resource-storage">Plugin Resource Storage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="monitoring.html">Monitoring and Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../bcp/index.html">Business Continuity Plan (BCP)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="callbacks.html"
+                        title="Previous Chapter">Cluster Callbacks</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="chef-solo-automator-plugin.html"
+                        title="Next Chapter">Chef Solo Automator Plugin</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="chef-solo-automator-plugin.html" title="Chef Solo Automator Plugin"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="callbacks.html" title="Cluster Callbacks"
+             >Previous</a> |</li>
+        <li><a href="../../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" >Super Admin Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

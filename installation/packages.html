@@ -1,0 +1,662 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Coopr Installation &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" />
+    <link rel="up" title="Installation Guide" href="index.html" />
+    <link rel="next" title="Server Configuration" href="server-config.html" />
+    <link rel="prev" title="Installation Guide" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="server-config.html" title="Server Configuration"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Installation Guide"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Installation Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="guide-installation-toplevel"></span><div class="section" id="coopr-installation">
+<span id="index-0"></span><h1>Coopr Installation<a class="headerlink" href="#coopr-installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This document will guide you through the process of installing Coopr
+on your own cluster with the official installation image.</p>
+</div>
+<div class="section" id="system-requirements">
+<h2>System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="hardware-requirements">
+<span id="minimum-hardware"></span><h3>Hardware Requirements<a class="headerlink" href="#hardware-requirements" title="Permalink to this headline">¶</a></h3>
+<p>Systems hosting the Coopr components must meet these hardware specifications, in addition to having CPUs
+with a minimum speed of 2 GHz</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Component</th>
+<th class="head">Hardware Component</th>
+<th class="head">Specifications</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Coopr UI</td>
+<td>RAM</td>
+<td>512MB minimum, 1 GB recommended</td>
+</tr>
+<tr class="row-odd"><td>Coopr Server</td>
+<td>RAM</td>
+<td>1 GB minimum, 3 GB recommended</td>
+</tr>
+<tr class="row-even"><td>Coopr Provisioners</td>
+<td>RAM</td>
+<td>256 MB per provisioner worker; for example, with 10 workers, 2.5 GB minimum</td>
+</tr>
+<tr class="row-odd"><td>Database (ex: MySQL)</td>
+<td>RAM</td>
+<td>1 GB minimum, 2 GB recommended</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td>Disk</td>
+<td>Disk usage increases as Coopr usage increases; suggested minimum of 50GB</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="supported-operating-systems">
+<span id="id1"></span><h3>Supported Operating Systems<a class="headerlink" href="#supported-operating-systems" title="Permalink to this headline">¶</a></h3>
+<p>Coopr has been tested against these platforms:</p>
+<blockquote>
+<div><ul class="simple">
+<li>CentOS 6.4</li>
+<li>Ubuntu 12.04</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="supported-databases">
+<h3>Supported Databases<a class="headerlink" href="#supported-databases" title="Permalink to this headline">¶</a></h3>
+<p>Coopr supports any database with a jdbc driver that supports standard SQL queries. It has been tested with these databases:</p>
+<blockquote>
+<div><ul class="simple">
+<li>(Default) Derby</li>
+<li>MySQL version 5.1 or above</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="supported-zookeeper-versions">
+<h3>Supported Zookeeper Versions<a class="headerlink" href="#supported-zookeeper-versions" title="Permalink to this headline">¶</a></h3>
+<p>Coopr has been tested with these versions of Zookeeper:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Apache Zookeeper version 3.4 or above</li>
+<li>CDH4 or CDH5 Zookeeper</li>
+<li>HDP1 or HDP2 Zookeeper</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="supported-openstack-versions">
+<h3>Supported OpenStack Versions<a class="headerlink" href="#supported-openstack-versions" title="Permalink to this headline">¶</a></h3>
+<p>Coopr has been extensively tested on Havana, but it also supports Grizzly out of the box.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click here for more information on how <a class="reference internal" href="openstack-config.html"><em>Openstack should be configured</em></a> currently to support provisioning with Coopr. Several limitations that exist will be eliminated in future releases of Coopr.</p>
+</div>
+</div>
+<div class="section" id="supported-internet-protocols">
+<h3>Supported Internet Protocols<a class="headerlink" href="#supported-internet-protocols" title="Permalink to this headline">¶</a></h3>
+<p>Coopr requires IPv4. IPv6 is currently not supported.</p>
+</div>
+<div class="section" id="supported-browsers">
+<h3>Supported Browsers<a class="headerlink" href="#supported-browsers" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Mozilla Firefox version 26 or above</li>
+<li>Google Chrome version 31 or above</li>
+<li>Safari version 5.1 or above</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="supported-node-js-versions">
+<h3>Supported Node.js Versions<a class="headerlink" href="#supported-node-js-versions" title="Permalink to this headline">¶</a></h3>
+<p>Coopr supports Node.js version 0.10.26 or above.</p>
+</div>
+</div>
+<div class="section" id="software-prerequisites">
+<span id="prerequisites"></span><h2>Software Prerequisites<a class="headerlink" href="#software-prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>Coopr requires Java™. JDK or JRE version 6 or 7 must be installed in your environment. Coopr is certified with Oracle JDK 6.0_31, Oracle JDK 7.0_51 and OpenJDK 6b27-1.12.6.</p>
+<div class="section" id="linux">
+<h3>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://www.java.com/en/download/manual.jsp">Click here</a> to download the Java Runtime for Linux and Solaris. Following installation, please set the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable.</p>
+</div>
+<div class="section" id="mac-os">
+<h3>Mac OS<a class="headerlink" href="#mac-os" title="Permalink to this headline">¶</a></h3>
+<p>On Mac OS X, the JVM is bundled with the operating system. Following installation, please set the <tt class="docutils literal"><span class="pre">JAVA_HOME</span></tt> environment variable.</p>
+</div>
+</div>
+<div class="section" id="installing-from-file">
+<span id="installation-file"></span><h2>Installing from File<a class="headerlink" href="#installing-from-file" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Installation of Coopr packages creates a user with the username &#8216;coopr&#8217;. If the user &#8216;coopr&#8217; already exists on the system, then that user account will be used to run all Coopr services. The username can also be externally created using LDAP.</p>
+</div>
+<div class="section" id="yum">
+<h3>Yum<a class="headerlink" href="#yum" title="Permalink to this headline">¶</a></h3>
+<p>To install each of the Coopr components locally from a Yum package:</p>
+<pre class="literal-block">
+$ sudo yum localinstall coopr-server-0.9.8.el6.x86_64.rpm
+$ sudo yum localinstall coopr-provisioner-0.9.8.el6.x86_64.rpm
+$ sudo yum localinstall coopr-ui-0.9.8.el6.x86_64.rpm
+</pre>
+</div>
+<div class="section" id="debian">
+<h3>Debian<a class="headerlink" href="#debian" title="Permalink to this headline">¶</a></h3>
+<p>To install each of the Coopr components locally from a Debian package:</p>
+<pre class="literal-block">
+$ sudo dpkg -i coopr-server_0.9.8.ubuntu.12.04_amd64.deb
+$ sudo dpkg -i coopr-provisioner_0.9.8.ubuntu.12.04_amd64.deb
+$ sudo dpkg -i coopr-ui_0.9.8.ubuntu.12.04_amd64.deb
+</pre>
+</div>
+</div>
+<div class="section" id="installing-from-repository">
+<span id="installation-repository"></span><h2>Installing from Repository<a class="headerlink" href="#installing-from-repository" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="rpm-using-yum">
+<h3>RPM using Yum<a class="headerlink" href="#rpm-using-yum" title="Permalink to this headline">¶</a></h3>
+<p>Download the Cask Yum repo definition file:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">sudo</span> <span class="n">curl</span> <span class="o">-</span><span class="n">o</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">yum</span><span class="o">.</span><span class="na">repos</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">cask</span><span class="o">.</span><span class="na">repo</span> <span class="nl">http:</span><span class="c1">//repository.cask.co/downloads/centos/6/x86_64/cask.repo</span>
+</pre></div>
+</div>
+<p>This will create the file <tt class="docutils literal"><span class="pre">/etc/yum.repos.d/cask.repo</span></tt> with:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">[</span><span class="n">cask</span><span class="o">]</span>
+<span class="n">name</span><span class="o">=</span><span class="n">Cask</span> <span class="n">Packages</span>
+<span class="n">baseurl</span><span class="o">=</span><span class="nl">http:</span><span class="c1">//repository.cask.co/centos/6/x86_64/releases</span>
+<span class="n">enabled</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">gpgcheck</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Add the Cask Public GPG Key to your repository:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">sudo</span> <span class="n">rpm</span> <span class="o">--</span><span class="kn">import</span> <span class="nn">http</span><span class="o">:</span><span class="c1">//repository.cask.co/centos/6/x86_64/releases/pubkey.gpg</span>
+</pre></div>
+</div>
+<p>Instructions for installing each of the Coopr components are as below:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">coopr</span><span class="o">-</span><span class="n">server</span>
+<span class="n">$</span> <span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span>
+<span class="n">$</span> <span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">coopr</span><span class="o">-</span><span class="n">ui</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="debian-using-apt">
+<h3>Debian using APT<a class="headerlink" href="#debian-using-apt" title="Permalink to this headline">¶</a></h3>
+<p>Download the Cask Apt repo definition file:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">sudo</span> <span class="n">curl</span> <span class="o">-</span><span class="n">o</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">apt</span><span class="o">/</span><span class="n">sources</span><span class="o">.</span><span class="na">list</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">cask</span><span class="o">.</span><span class="na">list</span> <span class="nl">http:</span><span class="c1">//repository.cask.co/downloads/ubuntu/precise/amd64/cask.list</span>
+</pre></div>
+</div>
+<p>This will create the file <tt class="docutils literal"><span class="pre">/etc/apt/sources.list.d/cask.list</span></tt> with:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">deb</span> <span class="o">[</span> <span class="n">arch</span><span class="o">=</span><span class="n">amd64</span> <span class="o">]</span> <span class="nl">http:</span><span class="c1">//repository.cask.co/ubuntu/precise/amd64/releases precise releases</span>
+</pre></div>
+</div>
+<p>Add the Cask Public GPG Key to your repository:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">curl</span> <span class="o">-</span><span class="n">s</span> <span class="nl">http:</span><span class="c1">//repository.cask.co/ubuntu/precise/amd64/releases/pubkey.gpg | sudo apt-key add -</span>
+</pre></div>
+</div>
+<p>Instructions for installing each of the Coopr components are as below:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
+<span class="n">$</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">coopr</span><span class="o">-</span><span class="n">server</span>
+<span class="n">$</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span>
+<span class="n">$</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">coopr</span><span class="o">-</span><span class="n">ui</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="update-alternatives">
+<h3>Update-Alternatives<a class="headerlink" href="#update-alternatives" title="Permalink to this headline">¶</a></h3>
+<p>Coopr packages by default use the <tt class="docutils literal"><span class="pre">alternatives</span></tt> system to initialize a configuration directory which will not be overwritten on subsequent package upgrades.  This directory is <tt class="docutils literal"><span class="pre">/etc/coopr/conf.coopr/</span></tt> and is pointed to by the symlink <tt class="docutils literal"><span class="pre">/etc/coopr/conf/</span></tt>.  The <tt class="docutils literal"><span class="pre">/etc/coopr/conf.dist/</span></tt> directory is owned by the Coopr packages and should not be customized.  To doublecheck that <tt class="docutils literal"><span class="pre">/etc/coopr/conf.coopr/</span></tt> is the active configuration, simply run:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span>  <span class="n">update</span><span class="o">-</span><span class="n">alternatives</span> <span class="o">--</span><span class="n">display</span> <span class="n">coopr</span><span class="o">-</span><span class="n">conf</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="database-configuration">
+<h3>Database Configuration<a class="headerlink" href="#database-configuration" title="Permalink to this headline">¶</a></h3>
+<p>By default, Coopr uses an embedded Derby database. However, you can optionally choose to enable remote database for Coopr Server.
+Additional steps are required to configure this setting.</p>
+<div class="section" id="sample-mysql-setup">
+<h4>Sample MySQL setup<a class="headerlink" href="#sample-mysql-setup" title="Permalink to this headline">¶</a></h4>
+<p><strong>Download and add the database connector JAR</strong></p>
+<p>Execute the following command on the Coopr Server machine:</p>
+<p>For RHEL/CentOS/Oracle Linux:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">mysql</span><span class="o">-</span><span class="n">connector</span><span class="o">-</span><span class="n">java</span><span class="o">*</span>
+</pre></div>
+</div>
+<p>For Ubuntu:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libmysql</span><span class="o">-</span><span class="n">java</span><span class="o">*</span>
+</pre></div>
+</div>
+<p>After the install, the MySQL JAR is placed in <tt class="docutils literal"><span class="pre">/usr/share/java/</span></tt>. Copy the installed JAR files to the
+<tt class="docutils literal"><span class="pre">/opt/coopr/server/lib/</span></tt> directory on your Coopr Server machine. Verify that the JAR file has appropriate permissions.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>After installing the MySQL connector, the Java version may change.  Make sure you are using Java 1.6 or 1.7 from Oracle.  You may need to run <tt class="docutils literal"><span class="pre">update-alternatives</span> <span class="pre">--config</span> <span class="pre">java</span></tt> to do this.</li>
+<li>The minimum required version of MySQL connector is 5.1.6.</li>
+<li>You can also download MySQL JDBC driver JAR (mysql-connector-java) from <a class="reference external" href="http://dev.mysql.com/downloads/connector/j">MySQL website</a>.</li>
+</ul>
+</div>
+<p><strong>Setup database</strong></p>
+<p>You will need to set up an account and a database in MySQL. An example schema file (for MySQL) for this can be found at
+<tt class="docutils literal"><span class="pre">/opt/coopr/server/config/sql</span></tt>.</p>
+<p>If you are setting up a MySQL database from scratch you can run the following on your mysql machine to complete the database setup:</p>
+<div class="highlight-java"><div class="highlight"><pre> $ mysql -u root -p -e &#39;create database coopr;&#39;
+ $ mysql -u root -p -e &#39;grant all privileges on coopr.* to &quot;coopr&quot;@&quot;&lt;coopr-server&gt;&quot; identified by &quot;&lt;password&gt;&quot;;&#39;
+ $ mysql -u coopr -p coopr &lt; /opt/coopr/server/config/sql/create-tables-mysql.sql
+ $ mysql -u coopr -p coopr -e &#39;show tables;&#39;
++--------------------+
+| Tables_in_coopr    |
++--------------------+
+| automatorTypes     |
+| clusterTemplates   |
+| clusters           |
+| hardwareTypes      |
+| imageTypes         |
+| jobs               |
+| nodes              |
+| pluginMeta         |
+| providerTypes      |
+| providers          |
+| provisionerWorkers |
+| provisioners       |
+| services           |
+| tasks              |
+| tenants            |
+| users              |
++--------------------+
+</pre></div>
+</div>
+<p>where passwords are replaced and entered as needed.</p>
+</div>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="server">
+<h3>Server<a class="headerlink" href="#server" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="site-config">
+<h4>Site Config<a class="headerlink" href="#site-config" title="Permalink to this headline">¶</a></h4>
+<p>Coopr Server settings can be changed under the <tt class="docutils literal"><span class="pre">/etc/coopr/conf/coopr-site.xml</span></tt> configuration file.
+You will likely want to add configuration settings for zookeeper, your database, and server host. There is also
+an example configuration file you can examine at <tt class="docutils literal"><span class="pre">/etc/coopr/conf/coopr-site.xml.example</span></tt>.
+For a list of available configurations, see the <a class="reference internal" href="server-config.html"><em>Server Configuration</em></a> page.</p>
+</div>
+<div class="section" id="environment">
+<h4>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h4>
+<p>The Server environmental variables can be set at <tt class="docutils literal"><span class="pre">/etc/default/coopr-server</span></tt>. The configurable variables are as below:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Variable</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></tt></td>
+<td>/var/log/coopr</td>
+<td>Path for the log directory</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_JMX_OPTS</span></tt></td>
+<td>&nbsp;</td>
+<td>JMX options for monitoring the Coopr Server</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_GC_OPTS</span></tt></td>
+<td>&nbsp;</td>
+<td>java garbage collection options to use when running the Coopr Server</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_JAVA_OPTS</span></tt></td>
+<td>-XX:+UseConcMarkSweepGC -XX:+UseParNewGC</td>
+<td>java options to use when running the Coopr Server</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="provisioner">
+<h3>Provisioner<a class="headerlink" href="#provisioner" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h4>Site Config<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>Coopr Provisioner settings can be changed under the <tt class="docutils literal"><span class="pre">/etc/coopr/conf/provisioner-site.xml</span></tt> configuration file.
+You will likely want to add configuration settings for the server uri the provisioner should connect to.
+For a list of available configurations, see the <a class="reference internal" href="provisioner-config.html"><em>Provisioner Configuration</em></a> page.</p>
+</div>
+<div class="section" id="id3">
+<h4>Environment<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>The Provisioner environmental variables can be set at <tt class="docutils literal"><span class="pre">/etc/default/coopr-provisioner</span></tt>. The configurable variables are as below:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Variable</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></tt></td>
+<td>/var/log/coopr</td>
+<td>Path for the log directory</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_LOG_LEVEL</span></tt></td>
+<td>info</td>
+<td>Logging level</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">PROVISIONER_SITE_CONF</span></tt></td>
+<td>/etc/coopr/conf/provisioner-site.xml</td>
+<td>Location of site config</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="ui">
+<h3>UI<a class="headerlink" href="#ui" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h4>Environment<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>The UI environment variables can be set at <tt class="docutils literal"><span class="pre">/etc/default/coopr-ui</span></tt>. The configurable variables are as below:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Variable</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></tt></td>
+<td>/var/log/coopr</td>
+<td>Path for the log directory</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COOPR_SERVER_URI</span></tt></td>
+<td><a class="reference external" href="http://localhost:55054">http://localhost:55054</a></td>
+<td>The URI for Coopr Server</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COOPR_UI_PORT</span></tt></td>
+<td>8100</td>
+<td>The port number that hosts the UI</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="starting-and-stopping-coopr-services">
+<span id="starting-stopping"></span><h2>Starting and Stopping Coopr Services<a class="headerlink" href="#starting-and-stopping-coopr-services" title="Permalink to this headline">¶</a></h2>
+<p>By default, Coopr&#8217;s installation RPMs and PKGs do not configure auto start of the services in the <tt class="docutils literal"><span class="pre">init.d</span></tt>. We leave
+that privilege to the administrator. For each Coopr component and its related service (such as the Server, Provisioner, and UI),
+there is a launch script, which you may use to execute a desired operation. For example, to start, stop, or check status
+for a Coopr Provisioner, you can use:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">sudo</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">server</span> <span class="n">start</span><span class="o">|</span><span class="n">stop</span>
+<span class="n">$</span> <span class="n">sudo</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="n">start</span><span class="o">|</span><span class="n">stop</span><span class="o">|</span><span class="n">status</span>
+<span class="n">$</span> <span class="n">sudo</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">ui</span> <span class="n">start</span><span class="o">|</span><span class="n">stop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="initial-setup">
+<span id="loading-defaults"></span><h2>Initial Setup<a class="headerlink" href="#initial-setup" title="Permalink to this headline">¶</a></h2>
+<p>The very first time you install Coopr, you will need to perform some data initialization. The first thing you must do is
+register the provisioner plugins, and the plugin resources included with Coopr. If you have not configured the server
+port, it defaults to 55054.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">sudo</span> <span class="n">COOPR_SERVER_URI</span><span class="o">=</span><span class="nl">http:</span><span class="c1">//&lt;coopr-server&gt;:&lt;coopr-port&gt; /opt/coopr/provisioner/bin/setup.sh</span>
+</pre></div>
+</div>
+<p>Coopr provides a set of useful default templates that covers most supported use cases. For new users and administrators of Coopr, we
+recommend installing these defaults as a starting point for template definition. These defaults are required for running
+the example in the <a class="reference internal" href="../guide/quickstart/index.html"><em>Quick Start Guide</em></a>, and are included in the server package. To load these templates, run:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">sudo</span> <span class="n">COOPR_SERVER_URI</span><span class="o">=</span><span class="nl">http:</span><span class="c1">//&lt;coopr-server&gt;:&lt;coopr-port&gt; /opt/coopr/server/config/defaults/load-defaults.sh</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="log-management">
+<span id="logs"></span><h2>Log Management<a class="headerlink" href="#log-management" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="location">
+<h3>Location<a class="headerlink" href="#location" title="Permalink to this headline">¶</a></h3>
+<p>By default, Coopr logs are located at <tt class="docutils literal"><span class="pre">/var/log/coopr</span></tt>.  This can be changed by editing the corresponding <tt class="docutils literal"><span class="pre">/etc/default/coopr-server</span></tt>,
+<tt class="docutils literal"><span class="pre">/etc/default/coopr-ui</span></tt>, or <tt class="docutils literal"><span class="pre">/etc/default/coopr-provisioner</span></tt> file.</p>
+</div>
+<div class="section" id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<p>Log options for the server, such as log level, can be changed by editing the <tt class="docutils literal"><span class="pre">/etc/coopr/conf/logback.xml</span></tt> file.  Log level for
+the provisioner can be changed by editing the <tt class="docutils literal"><span class="pre">/etc/default/coopr-provisioner</span></tt> file.</p>
+</div>
+<div class="section" id="rotation">
+<h3>Rotation<a class="headerlink" href="#rotation" title="Permalink to this headline">¶</a></h3>
+<p>Coopr depends on the external Linux utility logrotate to rotate its logs. Coopr
+packages contain logrotate configurations in <tt class="docutils literal"><span class="pre">/etc/logrotate.d</span></tt> but it does not perform the rotations itself.
+Please ensure logrotate is enabled on your Coopr hosts.</p>
+</div>
+</div>
+<div class="section" id="common-installation-issues">
+<span id="common-issues"></span><h2>Common Installation Issues<a class="headerlink" href="#common-installation-issues" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">A common issue is installing Coopr on machines that have Open JDK installed rather than Oracle JDK.</p>
+</li>
+<li><p class="first">If you see JDBC exceptions in the Coopr Server log like:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">Caused</span> <span class="nl">by:</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">AbstractMethodError</span><span class="o">:</span> <span class="n">com</span><span class="o">.</span><span class="na">mysql</span><span class="o">.</span><span class="na">jdbc</span><span class="o">.</span><span class="na">PreparedStatement</span><span class="o">.</span><span class="na">setBlob</span><span class="o">(</span><span class="n">ILjava</span><span class="o">/</span><span class="n">io</span><span class="o">/</span><span class="n">InputStream</span><span class="o">;)</span>
+</pre></div>
+</div>
+<p>it means your JDBC connector version is too old.  Upgrade to a newer version to solve the problem.</p>
+</li>
+<li><p class="first">If you are running your mysql server on the same machine as the Coopr Server and are seeing connection issues in the Coopr Server logs, you may need to explicitly grant access to &#8220;coopr&#8221;&#64;&#8221;localhost&#8221; instead of relying on the wildcard.</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Installation Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Coopr Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#system-requirements">System Requirements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hardware-requirements">Hardware Requirements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-operating-systems">Supported Operating Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-databases">Supported Databases</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-zookeeper-versions">Supported Zookeeper Versions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-openstack-versions">Supported OpenStack Versions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-internet-protocols">Supported Internet Protocols</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-browsers">Supported Browsers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supported-node-js-versions">Supported Node.js Versions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#software-prerequisites">Software Prerequisites</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#linux">Linux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mac-os">Mac OS</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-from-file">Installing from File</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#yum">Yum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debian">Debian</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-from-repository">Installing from Repository</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rpm-using-yum">RPM using Yum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debian-using-apt">Debian using APT</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#update-alternatives">Update-Alternatives</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#database-configuration">Database Configuration</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#sample-mysql-setup">Sample MySQL setup</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#server">Server</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#site-config">Site Config</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#environment">Environment</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#provisioner">Provisioner</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#id2">Site Config</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#id3">Environment</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#ui">UI</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#id4">Environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#starting-and-stopping-coopr-services">Starting and Stopping Coopr Services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#initial-setup">Initial Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#log-management">Log Management</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#location">Location</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#options">Options</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rotation">Rotation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#common-installation-issues">Common Installation Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server-config.html">Server Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioner-config.html">Provisioner Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="standalone.html">Coopr Sandboxes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="Previous Chapter">Installation Guide</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="server-config.html"
+                        title="Next Chapter">Server Configuration</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="server-config.html" title="Server Configuration"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Installation Guide"
+             >Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" >Installation Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

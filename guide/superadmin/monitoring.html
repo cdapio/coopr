@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Monitoring and Metrics &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../../index.html" />
+    <link rel="up" title="Super Admin Guide" href="index.html" />
+    <link rel="next" title="Business Continuity Plan (BCP)" href="../bcp/index.html" />
+    <link rel="prev" title="Shell Automator Plugin" href="shell-automator-plugin.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="../bcp/index.html" title="Business Continuity Plan (BCP)"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="shell-automator-plugin.html" title="Shell Automator Plugin"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Super Admin Guide</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="guide-admin-monitoring"></span><div class="section" id="monitoring-and-metrics">
+<span id="index-0"></span><h1>Monitoring and Metrics<a class="headerlink" href="#monitoring-and-metrics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This section outlines the tools that Coopr provides to enable an administrator to monitor the system. Since the
+output from these tools and checks are easily parseable and since the output is written to standard out, writing a simple
+parsing script and integrating with Nagios are relatively easy.</p>
+</div>
+<div class="section" id="process-monitoring">
+<h2>Process Monitoring<a class="headerlink" href="#process-monitoring" title="Permalink to this headline">¶</a></h2>
+<p>Coopr provides HTTP endpoints to check for the status of the running processes.</p>
+<div class="section" id="coopr-server">
+<h3>Coopr Server<a class="headerlink" href="#coopr-server" title="Permalink to this headline">¶</a></h3>
+<p>The Coopr Server runs as a Java process. Similar to the UI, we recommend a standard http monitoring check on the
+<tt class="docutils literal"><span class="pre">/status</span></tt> endpoint</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="nl">http:</span><span class="c1">//&lt;coopr-host&gt;:&lt;coopr-server-port&gt;/status</span>
+</pre></div>
+</div>
+<p>The server should respond with &#8220;OK&#8221; and HTTP return code 200.</p>
+</div>
+<div class="section" id="coopr-provisioner">
+<h3>Coopr Provisioner<a class="headerlink" href="#coopr-provisioner" title="Permalink to this headline">¶</a></h3>
+<p>The Coopr provisioner runs as an individual Ruby process on each provisioner. We recommend any standard process presence check. The Coopr init script itself can be used:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="n">status</span>
+</pre></div>
+</div>
+<p>This will display brief status for all configured provisioner process, and return non-zero if any one of them is not running.
+Alternatively, any standard process presence monitoring can check for the process:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">coopr</span><span class="o">/</span><span class="n">provisioner</span><span class="o">/</span><span class="n">embedded</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">ruby</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">coopr</span><span class="o">/</span><span class="n">provisioner</span><span class="o">/</span><span class="n">daemon</span><span class="o">/</span><span class="n">provisioner</span><span class="o">.</span><span class="na">rb</span>
+</pre></div>
+</div>
+<p>An example of the output from the above run is:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="n">status</span>
+ <span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="mi">1</span> <span class="n">running</span> <span class="n">as</span> <span class="n">process</span> <span class="mi">2436</span>
+ <span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="mi">2</span> <span class="n">running</span> <span class="n">as</span> <span class="n">process</span> <span class="mi">2437</span>
+ <span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="mi">3</span> <span class="n">running</span> <span class="n">as</span> <span class="n">process</span> <span class="mi">2438</span>
+ <span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="mi">4</span> <span class="n">is</span> <span class="n">not</span> <span class="n">running</span>
+ <span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="mi">5</span> <span class="n">pidfile</span> <span class="n">exists</span><span class="o">,</span> <span class="n">but</span> <span class="n">process</span> <span class="n">does</span> <span class="n">not</span> <span class="n">appear</span> <span class="n">to</span> <span class="n">be</span> <span class="n">running</span>
+ <span class="n">At</span> <span class="n">least</span> <span class="n">one</span> <span class="n">provisioner</span> <span class="n">failed</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="coopr-ui">
+<h3>Coopr UI<a class="headerlink" href="#coopr-ui" title="Permalink to this headline">¶</a></h3>
+<p>The UI runs as a Node.js process. We recommend a standard http monitoring check on the /status endpoint of the Coopr UI:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="nl">http:</span><span class="c1">//&lt;coopr-host&gt;:&lt;coopr-ui-port&gt;/status</span>
+</pre></div>
+</div>
+<p>The UI should respond with &#8220;OK&#8221; and HTTP return code 200.</p>
+</div>
+</div>
+<div class="section" id="provisioning-metrics">
+<h2>Provisioning Metrics<a class="headerlink" href="#provisioning-metrics" title="Permalink to this headline">¶</a></h2>
+<p>Coopr provides a number of cluster provisioning metrics through the use of
+<a class="reference external" href="http://docs.oracle.com/javase/7/docs/technotes/guides/jmx/">Java Management Extensions (JMX)</a>.</p>
+<p>By default, JMX support is disabled. To enable JMX, the administrator will need to uncomment out the following line in
+<tt class="docutils literal"><span class="pre">/etc/default/coopr-server</span></tt> and can customize any of the options:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="n">export</span> <span class="n">COOPR_JAVA_OPTS</span><span class="o">=</span><span class="s">&quot;-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010</span>
+<span class="s">            -Dcom.sun.management.jmxremote.local.only=false</span>
+<span class="s">            -Dcom.sun.management.jmxremote.authenticate=false</span>
+<span class="s">            -Dcom.sun.management.jmxremote.ssl=false&quot;</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The code shown above has no enabling of authentication and security. An administrator will have to customize these
+settings according to their needs. For more information on how to setup secure monitoring in JMX, see
+<a class="reference external" href="http://docs.oracle.com/javase/7/docs/technotes/guides/management/agent.html">this page</a>.</p>
+</div>
+<div class="section" id="available-metrics">
+<h3>Available Metrics<a class="headerlink" href="#available-metrics" title="Permalink to this headline">¶</a></h3>
+<p>The following is a list of top-level metrics available through the Coopr JMX extension:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="14%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Metric</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>QueueLength</td>
+<td>Long</td>
+<td>The current length of the queue</td>
+</tr>
+<tr class="row-odd"><td>ProvisionerStats</td>
+<td>CompositeData</td>
+<td>The number of provisioner actions that were dispatched</td>
+</tr>
+<tr class="row-even"><td>FailedProvisionerStats</td>
+<td>CompositeData</td>
+<td>The number of provisioner actions that failed</td>
+</tr>
+<tr class="row-odd"><td>SuccessfulProvisionerStats</td>
+<td>CompositeData</td>
+<td>The number of provisioner actions that were successful</td>
+</tr>
+<tr class="row-even"><td>ClusterStats</td>
+<td>CompositeData</td>
+<td>The number of cluster actions that were received</td>
+</tr>
+<tr class="row-odd"><td>FailedClusterStats</td>
+<td>CompositeData</td>
+<td>The number of cluster actions that failed</td>
+</tr>
+<tr class="row-even"><td>SuccessfulClusterStats</td>
+<td>CompositeData</td>
+<td>The number of cluster actions that were successful</td>
+</tr>
+</tbody>
+</table>
+<p>The provisioner and cluster metrics return a CompositeData object that contains multiple values, and are further
+described below.</p>
+<div class="section" id="provisioner-metrics">
+<h4>Provisioner Metrics<a class="headerlink" href="#provisioner-metrics" title="Permalink to this headline">¶</a></h4>
+<p>Below is a description of the metrics found in provisioner metrics, namely <tt class="docutils literal"><span class="pre">ProvisionerStats</span></tt>,
+<tt class="docutils literal"><span class="pre">FailedProvisionerStats</span></tt> and <tt class="docutils literal"><span class="pre">SuccessfulProvisionerStats</span></tt>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Metric</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>bootstrap</td>
+<td>Number of plugin specific preparation tasks for provisioning</td>
+</tr>
+<tr class="row-odd"><td>confirm</td>
+<td>Number of confirmations after completing provider-specific validation/preparation</td>
+</tr>
+<tr class="row-even"><td>create</td>
+<td>Number of requests sent to a provider to initiate provisioning of a machine</td>
+</tr>
+<tr class="row-odd"><td>delete</td>
+<td>Number of requests sent to a provider to delete a machine</td>
+</tr>
+<tr class="row-even"><td>install</td>
+<td>Number of requested actions to install services</td>
+</tr>
+<tr class="row-odd"><td>configure</td>
+<td>Number of requested actions to configure services</td>
+</tr>
+<tr class="row-even"><td>initialize</td>
+<td>Number of requested actions to initialize services</td>
+</tr>
+<tr class="row-odd"><td>remove</td>
+<td>Number of requested actions to remove services</td>
+</tr>
+<tr class="row-even"><td>start</td>
+<td>Number of requested actions to start services</td>
+</tr>
+<tr class="row-odd"><td>stop</td>
+<td>Number of requested actions to stop services</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cluster-metrics">
+<h4>Cluster Metrics<a class="headerlink" href="#cluster-metrics" title="Permalink to this headline">¶</a></h4>
+<p>Below is a description of the metrics found in cluster metrics, namely
+<tt class="docutils literal"><span class="pre">ClusterStats</span></tt>, <tt class="docutils literal"><span class="pre">FailedClusterStats</span></tt> and <tt class="docutils literal"><span class="pre">SuccessfulClusterStats</span></tt>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Metric</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>create</td>
+<td>Number of requests to create a cluster</td>
+</tr>
+<tr class="row-odd"><td>delete</td>
+<td>Number of requests to delete a cluster</td>
+</tr>
+<tr class="row-even"><td>solve</td>
+<td>Number of layout solving requests</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="log-output">
+<h2>Log Output<a class="headerlink" href="#log-output" title="Permalink to this headline">¶</a></h2>
+<p>By default, the log files in Coopr are written to <tt class="docutils literal"><span class="pre">/var/log/coopr</span></tt>. The output directory can be configured using the
+<tt class="docutils literal"><span class="pre">COOPR_LOG_DIR</span></tt> environment variable for each of the Coopr services (for more information, see
+<a class="reference internal" href="../../installation/index.html"><em>Installation Guide</em></a>).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Super Admin Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tenants.html">Tenant Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="callbacks.html">Cluster Callbacks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html">Provisioner Plugins</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Monitoring and Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#process-monitoring">Process Monitoring</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#coopr-server">Coopr Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#coopr-provisioner">Coopr Provisioner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#coopr-ui">Coopr UI</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#provisioning-metrics">Provisioning Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#available-metrics">Available Metrics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#provisioner-metrics">Provisioner Metrics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#cluster-metrics">Cluster Metrics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#log-output">Log Output</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../bcp/index.html">Business Continuity Plan (BCP)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="shell-automator-plugin.html"
+                        title="Previous Chapter">Shell Automator Plugin</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="../bcp/index.html"
+                        title="Next Chapter">Business Continuity Plan (BCP)</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="../bcp/index.html" title="Business Continuity Plan (BCP)"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="shell-automator-plugin.html" title="Shell Automator Plugin"
+             >Previous</a> |</li>
+        <li><a href="../../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" >Super Admin Guide</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

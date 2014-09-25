@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>General &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="faq-toplevel"></span><div class="section" id="general">
+<span id="index-0"></span><h1>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-are-the-differences-between-coopr-and-ambari-savanna">
+<h2>What are the differences between Coopr and Ambari/Savanna?<a class="headerlink" href="#what-are-the-differences-between-coopr-and-ambari-savanna" title="Permalink to this headline">¶</a></h2>
+<p>From the <a class="reference external" href="http://ambari.apache.org/">Apache Ambari</a> site:</p>
+<blockquote class="epigraph">
+<div>&#8220;The Apache Ambari project is aimed at making Hadoop management simpler by developing software for provisioning, managing, and monitoring Apache Hadoop clusters. Ambari provides an intuitive, easy-to-use Hadoop management web UI backed by its RESTful APIs.&#8221;</div></blockquote>
+<p>From the <a class="reference external" href="https://savanna.readthedocs.org/en/latest/">Savanna</a> site:</p>
+<blockquote class="epigraph">
+<div>&#8220;Savanna project aims to provide users with simple means to provision a Hadoop cluster at OpenStack by specifying several parameters like Hadoop version, cluster topology, nodes hardware details...&#8221;</div></blockquote>
+<p>Even though Coopr may seem similar to Apache Ambari and Savanna in some aspects, it is vastly different in terms of functionality and system capabilities.</p>
+<div class="align-center figure">
+<a class="reference internal image-reference" href="../_images/coopr-ambari-comparision.png"><img alt="Coopr Ambari Comparision" src="../_images/coopr-ambari-comparision.png" style="width: 800px;" /></a>
+</div>
+<p>The graph above depicts Coopr&#8217;s management capabilities on the horizontal scale, and the table below differentiates the high level features absent in Apache Ambari and Savanna:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="15%" />
+<col width="23%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Feature</th>
+<th class="head">Coopr</th>
+<th class="head">Ambari/Savanna</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Multi Cluster support</td>
+<td>Y</td>
+<td>N</td>
+<td>Ambari/Savanna offers limited support in the backend, and Ambari limits to single cluster in the frontend.</td>
+</tr>
+<tr class="row-odd"><td>Private or Public Cloud support</td>
+<td>Y</td>
+<td>N</td>
+<td>No provisioning capability in Ambari. Savanna supports provisioning, but both are limited only to Hadoop clusters.</td>
+</tr>
+<tr class="row-even"><td>Support for other OS</td>
+<td>Y</td>
+<td>N</td>
+<td>Only supports RHEL and SuSE. More information <a class="reference external" href="https://issues.apache.org/jira/browse/AMBARI-1241">AMBARI-1241</a> and <a class="reference external" href="https://issues.apache.org/jira/browse/AMBARI-660">AMBARI-660</a></td>
+</tr>
+<tr class="row-odd"><td>Support any distribution of Hadoop</td>
+<td>Y</td>
+<td>N</td>
+<td>Ambari only supports HDP, <a class="reference external" href="https://issues.apache.org/jira/browse/AMBARI-3524">AMBARI-3524</a></td>
+</tr>
+<tr class="row-even"><td>Support for any automation system</td>
+<td>Y</td>
+<td>N</td>
+<td>Ambari only supports Puppet. Coopr can support any automation framework through <a class="reference internal" href="../guide/superadmin/plugins.html"><em>Provisioner Plugins</em></a></td>
+</tr>
+<tr class="row-odd"><td>Cluster template support</td>
+<td>Y</td>
+<td>Y/N</td>
+<td>Ambari supports blueprints after the cluster is available for further management. Unlike Coopr, it does not use templates to create clusters. Savanna, on the other hand, does support, but it requires node groups to be explicitly defined for placing services on each node group. Coopr offers a built-in logic for solving the service placement through a layout planner.</td>
+</tr>
+<tr class="row-even"><td>Consistency Guarantees</td>
+<td>Y</td>
+<td>N</td>
+<td>Ambari does not guarantee consistency in case of failures during provisioning. In contrast, Coopr layout planner DAG executioner ensures consistency by transacting operations on the cluster.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="does-coopr-work-with-ambari">
+<h2>Does Coopr work with Ambari?<a class="headerlink" href="#does-coopr-work-with-ambari" title="Permalink to this headline">¶</a></h2>
+<p>Currently there is no integration with Ambari. There are plans to add a feature for Coopr to export templates that are compatible with Apache Ambari blueprints. When this compatibility feature is
+completed in Ambari, you may be able to work with these templates. Please refer to <a class="reference external" href="https://issues.apache.org/jira/browse/AMBARI-1783">AMBARI-1783</a> for more information.</p>
+</div>
+<div class="section" id="what-are-the-differences-between-coopr-and-amazon-emr">
+<h2>What are the differences between Coopr and Amazon EMR?<a class="headerlink" href="#what-are-the-differences-between-coopr-and-amazon-emr" title="Permalink to this headline">¶</a></h2>
+<p>Amazon EMR provides a subset of Hadoop services (such as Hive, Pig, HBase, and MapReduce) and manages
+jobs and workflows on top of those services. Coopr, on the other hand, is a software agnostic, generic system for
+creating clusters of any layout and of any type. Being software agnostic and a provisioning tool, Coopr has no direct support
+for managing jobs on clusters, as its focus is on cluster creation and management, not jobs and workflow management.</p>
+</div>
+<div class="section" id="will-coopr-support-docker-based-clusters">
+<h2>Will Coopr support <a class="reference external" href="http://docker.io">docker</a> based clusters?<a class="headerlink" href="#will-coopr-support-docker-based-clusters" title="Permalink to this headline">¶</a></h2>
+<p>We believe in the potential of docker based clusters. In the future releases, we plan to support Docker based clusters.</p>
+</div>
+<div class="section" id="does-coopr-support-bare-metal">
+<h2>Does Coopr support bare metal?<a class="headerlink" href="#does-coopr-support-bare-metal" title="Permalink to this headline">¶</a></h2>
+<p>Not at the moment, but there are plans to add resource pools in a future release. With resource pools, Coopr would manage
+pre-existing machines instead of creating them from scratch each time a new node is needed. Resource pools would also
+introduce the ability to manage bare metal.</p>
+</div>
+<div class="section" id="what-providers-are-supported-by-coopr">
+<h2>What providers are supported by Coopr?<a class="headerlink" href="#what-providers-are-supported-by-coopr" title="Permalink to this headline">¶</a></h2>
+<p>Out of the box, Coopr supports Rackspace, Joyent, Openstack (fog compatible). Plugins
+for EC2, HP Cloud, Cloudstack, Azure, BlueBox, GCE, CloudFoundry, and Terremark are planned. Contributions here
+are welcome and encouraged!</p>
+</div>
+<div class="section" id="does-coopr-make-it-easy-for-me-to-migrate-from-one-cloud-to-another">
+<h2>Does Coopr make it easy for me to migrate from one cloud to another?<a class="headerlink" href="#does-coopr-make-it-easy-for-me-to-migrate-from-one-cloud-to-another" title="Permalink to this headline">¶</a></h2>
+<p>Absolutely. When we originally built Coopr at  Cask Data, the main goal was to make it a seamless process to migrate from
+one cloud to another.</p>
+</div>
+<div class="section" id="can-coopr-work-on-my-laptop">
+<h2>Can Coopr work on my laptop?<a class="headerlink" href="#can-coopr-work-on-my-laptop" title="Permalink to this headline">¶</a></h2>
+<p>Coopr has been tested on OSX Mavericks. There are plans to add Windows support in a future release, but until then
+Windows users will have to use the usual workarounds, such as using Cygwin.</p>
+</div>
+<div class="section" id="how-long-has-coopr-been-used-in-a-production-environment-and-where-is-it-being-used">
+<h2>How long has Coopr been used in a production environment and where is it being used?<a class="headerlink" href="#how-long-has-coopr-been-used-in-a-production-environment-and-where-is-it-being-used" title="Permalink to this headline">¶</a></h2>
+<p>A previous version of Coopr has been running in production at Cask Data since Feb 2012.</p>
+</div>
+<div class="section" id="is-coopr-designed-only-for-provisioning-compute-and-storage">
+<h2>Is Coopr designed only for provisioning compute and storage?<a class="headerlink" href="#is-coopr-designed-only-for-provisioning-compute-and-storage" title="Permalink to this headline">¶</a></h2>
+<p>Coopr is a generic provisioning coordination system, and it can be used for provisioning more than
+just compute and storage. Though Coopr has not yet been tested, the architecture supports provisioning
+and configuring of other resources. Please refer to the <a class="reference internal" href="../guide/superadmin/plugins.html"><em>Provisioner Plugins</em></a> page
+for more details on how to write plugins for provisioners to support Providers and Automators that can provision and
+configure different resources.</p>
+</div>
+<div class="section" id="what-is-the-recommended-setup-for-coopr-in-terms-of-hardware-and-configuration">
+<h2>What is the recommended setup for Coopr in terms of hardware and configuration?<a class="headerlink" href="#what-is-the-recommended-setup-for-coopr-in-terms-of-hardware-and-configuration" title="Permalink to this headline">¶</a></h2>
+<p>We recommend the following <a class="reference internal" href="../guide/recommended-deployment.html"><em>deployment configuration</em></a> for a production environment that includes
+HA for persistence store, multiple nodes for Zookeeper, and HA proxy for traffic distribution across UIs and provisioners.</p>
+</div>
+<div class="section" id="does-coopr-support-monitoring-and-alerting-of-services-deployed">
+<h2>Does Coopr support monitoring and alerting of services deployed?<a class="headerlink" href="#does-coopr-support-monitoring-and-alerting-of-services-deployed" title="Permalink to this headline">¶</a></h2>
+<p>Currently, it does not; however, another system within Cask named Mensa (a monitoring and alerting system) is being integrated
+into Coopr to support monitoring and alerting.</p>
+</div>
+<div class="section" id="does-coopr-support-metering">
+<h2>Does Coopr support metering?<a class="headerlink" href="#does-coopr-support-metering" title="Permalink to this headline">¶</a></h2>
+<p>For each account, and the templates from which it provisions resources, Coopr internally keeps track of clusters, resources, and services. This information
+will be exposed through the administration interface in the next release.</p>
+</div>
+<div class="section" id="i-use-puppet-will-i-be-able-to-use-puppet-with-coopr">
+<h2>I use puppet. Will I be able to use puppet with Coopr?<a class="headerlink" href="#i-use-puppet-will-i-be-able-to-use-puppet-with-coopr" title="Permalink to this headline">¶</a></h2>
+<p>Yes. Coopr is a smart orchestration layer with open support for integrating any automation framework. You can use your puppet modules
+to configure clusters. Please refer to the <a class="reference internal" href="../guide/admin/index.html"><em>Administration Guide</em></a> for more details on how to integrate.</p>
+</div>
+<div class="section" id="can-coopr-support-approval-workflows-or-the-ability-to-pause-provisioning-for-approval">
+<h2>Can Coopr support approval workflows or the ability to pause provisioning for approval?<a class="headerlink" href="#can-coopr-support-approval-workflows-or-the-ability-to-pause-provisioning-for-approval" title="Permalink to this headline">¶</a></h2>
+<p>The current version of Coopr does not support it, but it will be very easy to add a cluster provisioning state for approval or pausing.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

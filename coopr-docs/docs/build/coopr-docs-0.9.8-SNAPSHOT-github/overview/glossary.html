@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>Glossary &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" />
+    <link rel="next" title="Javadocs" href="../javadocs/index.html" />
+    <link rel="prev" title="0.9.7 Release Notes" href="../release-notes/release-0.9.7.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="../javadocs/index.html" title="Javadocs"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="../release-notes/release-0.9.7.html" title="0.9.7 Release Notes"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="glossary"></span><div class="section" id="index-0">
+<span id="id1"></span><h1>Glossary<a class="headerlink" href="#index-0" title="Permalink to this headline">¶</a></h1>
+<dl class="glossary docutils">
+<dt id="term-administrator">Administrator</dt>
+<dd>An administrator of a tenant defines the various configuration elements for creating clusters in Coopr.
+These include settings such as the provider to host the cluster, the hardware configuration of the nodes,
+the base disk image of nodes, the software services installed on the cluster, and the duration of lease
+on the clusters. These settings are all tied together via templates that can be used by Coopr
+users to create clusters. In addition, an administrator can monitor, manage and delete the clusters
+created across all users.</dd>
+<dt id="term-catalog">Catalog</dt>
+<dd>A catalog is a list containing the templates created by the administrator. All templates in the catalog are
+available to users for cluster creation. The catalog can be accessed through the Admin UI or
+through calls to the REST API. For a  user, the catalog is displayed under &#8216;Template&#8217; when creating
+a new cluster.</dd>
+<dt id="term-chef">Chef</dt>
+<dd>Chef is an automation platform that transforms infrastructure configurations into code. It is used to simplify
+server maintenance and creation tasks, and is especially useful for repeatability in server configurations.</dd>
+<dt id="term-cluster">Cluster</dt>
+<dd>A cluster is a group of machines, each of which uses some hardware, image, and at least one service.
+It is created by end users from a template.</dd>
+<dt id="term-constraints">Constraints</dt>
+<dd>Cluster templates contain constraints that describe how services, hardware, and images should
+come together during cluster creation. Service constraints can limit what hardware and image
+a service can be placed on a cluster, as well as limit the maximum or minimum instances of that service across the
+entire cluster. Layout constraints can force certain service groups to always coexist on the
+same node, and can force certain service groups to never coexist on the same node. Constraints
+are local to a cluster template, and can differ across templates.</dd>
+<dt id="term-expiry-time">Expiry Time</dt>
+<dd>The expiry time of a cluster indicates the time at which the cluster will be automatically
+deleted.</dd>
+<dt id="term-hardware">Hardware</dt>
+<dd>Hardware in Coopr refers to a type of machine, either physical or in the cloud, that a Provider can provide.</dd>
+<dt id="term-image">Image</dt>
+<dd>An Image in Coopr refers to some type of base image that a Provider can provide. Any software
+that the image may contain is not managed by Coopr. Its main use is to specify the OS on a machine.</dd>
+<dt id="term-lease-time">Lease Time</dt>
+<dd>A lease time is an optional cluster setting that specifies the amount of time a cluster can run for
+before being automatically deleted.</dd>
+<dt id="term-plugin-resource">Plugin Resource</dt>
+<dd>A plugin resource is an archive or file that can be used by installed plugins during task execution. For example,
+the chef-solo automator plugin contains several cookbook resources that define how different services
+should be installed, configured, started, stopped, etc. As another example, the google provider plugin uses ssh key
+resources to configure nodes created by the provider. Administrators may add, edit, delete, and roll back their own
+versions of their own resources.</dd>
+<dt id="term-provider">Provider</dt>
+<dd>A provider is responsible for providing a machine. Examples include an Openstack instance,
+Rackspace, and Amazon EC2.</dd>
+<dt id="term-provisioner">Provisioner</dt>
+<dd>The provisioner is a component of Coopr that performs cluster management tasks.
+It performs all the actual tasks, including communicating with different
+providers to request machines, installing services, and configuring services.</dd>
+<dt id="term-server">Server</dt>
+<dd>The Coopr Server is a component of Coopr that stores admin defined providers, hardware types,
+image types, services, and cluster templates. Coopr server takes cluster action requests, such
+as requests to create or delete a cluster. It also manages the tasks each node need to run,
+as well as the order of tasks to complete the actions.</dd>
+<dt id="term-service">Service</dt>
+<dd>A service in Coopr is a piece of software that can be made available on a cluster. It defines at least one
+provisioner action that will occur during cluster creation and management. Provisioner actions fall
+into one of the following types: install, configure, initialize, start, stop, and remove.</dd>
+<dt id="term-solver">Solver</dt>
+<dd>The solver is the component in Coopr Server that takes a cluster template and a cluster request,
+and determines the services to place on each node, based on their image and hardware type. The solver
+also performs similar tasks when a cluster is scaled up or down.</dd>
+<dt id="term-superadmin">Superadmin</dt>
+<dd>The superadmin is the system administrator for all of Coopr. A superadmin is able to create, manage, and
+delete tenants. The superadmin is also the tenant administrator for its own superadmin tenant.</dd>
+<dt id="term-template">Template</dt>
+<dd>A cluster template is a blueprint describing how clusters should be laid out. It defines services,
+hardware types, and images types that can be used to create a cluster, as well as default values
+for lease times, services, hardware, image, and provider to be used with the cluster. In addition,
+a set of constraints is specified to determine how many nodes should have different services, and
+what services can and cannot exist together on the same node.</dd>
+<dt id="term-tenant">Tenant</dt>
+<dd>A tenant comprises administrators, users, providers, image types, hardware types, services, cluster templates,
+and cluster information. Each tenant is self contained and isolated from other tenants. Tenants are not aware
+of the existance of other tenants. Each tenant is also assigned a specific number of provisioner workers that
+are responsible for executing tasks to carry out cluster operations that take place in the tenant.</dd>
+<dt id="term-user">User</dt>
+<dd>A user of Coopr can create clusters through Coopr within the permitted configurations set
+by the Administrator, as specified through the templates in the catalog.</dd>
+<dt id="term-zookeeper">Zookeeper</dt>
+<dd>ZooKeeper is a centralized service for maintaining metadata, naming, providing distributed synchronization,
+and providing group services. ZooKeeper provides a distributed system that allows decisions to be made by
+quorum.</dd>
+</dl>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/index.html">Release Notes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="../release-notes/release-0.9.7.html"
+                        title="Previous Chapter">0.9.7 Release Notes</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="../javadocs/index.html"
+                        title="Next Chapter">Javadocs</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="../javadocs/index.html" title="Javadocs"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="../release-notes/release-0.9.7.html" title="0.9.7 Release Notes"
+             >Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>

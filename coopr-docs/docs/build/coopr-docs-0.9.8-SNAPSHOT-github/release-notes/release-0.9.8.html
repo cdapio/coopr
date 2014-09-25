@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-55081520-3']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    <title>0.9.8 Release Notes &mdash; Coopr 0.9.8 Beta Documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cdap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.8 Beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="top" title="Coopr 0.9.8 Beta Documentation" href="../index.html" />
+    <link rel="up" title="Release Notes" href="index.html" />
+    <link rel="next" title="0.9.7 Release Notes" href="release-0.9.7.html" />
+    <link rel="prev" title="Release Notes" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">Index</a></li>
+        <li class="right" >
+          <a href="release-0.9.7.html" title="0.9.7 Release Notes"
+             accesskey="N">Next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Release Notes"
+             accesskey="P">Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Release Notes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="overview-release-notes"></span><div class="section" id="release-notes">
+<span id="index-0"></span><h1>0.9.8 Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
+<p id="id1">Welcome to the Coopr 0.9.8 release. Release notes with links to issue details can be seen from the github project at <a class="reference external" href="https://github.com/caskdata/coopr/releases">https://github.com/caskdata/coopr/releases</a>.</p>
+<div class="section" id="release-theme-multi-tenancy">
+<h2>Release Theme : Multi-Tenancy<a class="headerlink" href="#release-theme-multi-tenancy" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="release-highlights">
+<h2>Release Highlights<a class="headerlink" href="#release-highlights" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Project renamed to Coopr (Cluster Oriented Operations and Provisioning of Resources)</li>
+<li>Multi-Tenancy added, with each tenant having its own admin, users, and data</li>
+<li>Dynamic worker assignment, giving superadmins the ability to add or reduce provisioner workers on demand</li>
+<li>Plugin resource system introduced, giving tenant admins the ablity to add and manage their own resources like their own Chef cookbooks</li>
+<li>Provider plugins for Amazon Web Services and Google Compute added</li>
+<li>Additional cookbooks provided out of the box, including support for MongoDB, simple DNS, and Kerberos</li>
+<li>Multiple bug fixes</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="change-list">
+<h2>Change List<a class="headerlink" href="#change-list" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>AWS provider support ( Issues: #22 #322 )</li>
+<li>MongoDB support for clusters ( Issues: #43 #130 )</li>
+<li>Cluster size constraint ( Issues: #76 #418 )</li>
+<li>Remove &#8216;ALL RIGHTS RESERVED&#8217; footer ( Issues: #123 #340 )</li>
+<li>Ruby testing with rspec/rubocop ( Issues: #128 #132 #133 )</li>
+<li>Nginx support for clusters ( Issues: #131 #323 )</li>
+<li>Sensu monitoring support ( Issues: #167 )</li>
+<li>Update &#8216;IP&#8217; header on cluster page ( Issues: #204 #341 )</li>
+<li>Configuration settings renamed ( Issues: #213 )</li>
+<li>Ability to sync an active cluster&#8217;s template to its current version ( Issues: #214 )</li>
+<li>Cluster owner macro ( Issues: #221 )</li>
+<li>Firewall updates ( Issues: #226 #227 )</li>
+<li>Memcached support for clusters ( Issues: #237 )</li>
+<li>Multi Tenancy ( Issues: #239, #253, #277, #284, #292, #325, #326 )</li>
+<li>Upgrade script ( Issues: #258 )</li>
+<li>Fix Joyent server delete ( Issues: #272 )</li>
+<li>Google Compute provider support ( Issues: #273 #474 )</li>
+<li>Provisioner Multi Tenancy ( Issues: #290 #296 )</li>
+<li>Updated provider plugin using fog ( Issues: #288 #310 )</li>
+<li>Queue Metrics ( Issues: #301 )</li>
+<li>Settable max for clusters and nodes in a tenant ( Issues: #302 )</li>
+<li>Bootstrap a tenant ( Issues: #304 )</li>
+<li>Larger HW: xlarge, xxlarge ( Issues: #312 #346 )</li>
+<li>SSH hangs on some providers ( Issues: #313 #351 )</li>
+<li>Allow non-root users for SSH ( Issues: #314 #320 )</li>
+<li>PHP module support ( Issues: #317 )</li>
+<li>Support for multiple IP addresses ( Issues: #343 #347 )</li>
+<li>Standalone build updates for multitenancy ( Issues #349 )</li>
+<li>UI: Add &#8216;sshuser&#8217; field to imagetypes ( Issues: #366 )</li>
+<li>Added &#8216;icon&#8217; field to admin entities ( Issues: #371 #431 )</li>
+<li>Added additional info in get clusters API ( Issues: #401 #430 )</li>
+<li>UI: fix when a provider type has no admin fields ( Issues: #409 )</li>
+<li>Provisioner setup script ( Issues: #521 )</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--
+  ~ Copyright 2014 Cask Data, Inc.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  ~ use this file except in compliance with the License. You may obtain a copy of
+  ~ the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  ~ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<nav>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/quickstart/index.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/index.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/superadmin/index.html">Super Admin Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/admin/index.html">Administration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guide/user/index.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rest/index.html">Web Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation.html">Under the Hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">FAQs</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Release Notes</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">0.9.8 Release Notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#release-theme-multi-tenancy">Release Theme : Multi-Tenancy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#release-highlights">Release Highlights</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#change-list">Change List</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release-0.9.7.html">0.9.7 Release Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../javadocs/index.html">Javadocs</a></li>
+</ul>
+
+</nav>
+  <h4>Previous Topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="Previous Chapter">Release Notes</a></p>
+  <h4>Next Topic</h4>
+  <p class="topless"><a href="release-0.9.7.html"
+                        title="Next Chapter">0.9.7 Release Notes</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick Search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >Index</a></li>
+        <li class="right" >
+          <a href="release-0.9.7.html" title="0.9.7 Release Notes"
+             >Next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Release Notes"
+             >Previous</a> |</li>
+        <li><a href="../index.html">Coopr 0.9.8 Beta Documentation</a> &raquo;</li>
+          <li><a href="index.html" >Release Notes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        Copyright &copy; 2014 Cask Data, Inc.
+    </div>
+  </body>
+</html>
