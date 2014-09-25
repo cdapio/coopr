@@ -1,6 +1,5 @@
 npm-debug.log
 .vagrant
-Berksfile.lock
 *~
 *#
 .#*
@@ -16,7 +15,6 @@ build/
 target/
 
 # Bundler
-Gemfile.lock
 .bundle/*
 
 # Coverage reports
@@ -44,11 +42,6 @@ coverage
 
 # Chef client validator
 /coopr-provisioner/worker/plugins/automators/shell_automator/scripts/validation.pem
-
-# Chef testing files
-Berksfile
-Vagrantfile
-chefignore
 
 # Environment
 /.bash*
