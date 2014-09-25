@@ -25,7 +25,7 @@ Installation Guide
 This guide describes how to get Coopr up and running and initialized with some defaults templates.
 If you wish to really run Coopr for use by multiple users, you will want to install from packages
 with an actual database and zookeeper instance. If you just want to get an instance up and running
-to experiment with, you can choose to use Coopr Standalone, Coopr in a VM, or Coopr in Docker.
+to experiment with, you can choose to use Coopr Standalone, or Coopr in a VM.
 
 .. toctree::
   :maxdepth: 2
