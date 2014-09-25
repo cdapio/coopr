@@ -1,0 +1,234 @@
+{
+  "name": "cdap-distributed",
+  "description": "Cask Data Application Platform (CDAP) on a Hadoop cluster",
+  "defaults": {
+    "services": [
+      "base",
+      "hadoop-hdfs-namenode",
+      "hadoop-hdfs-datanode",
+      "hadoop-yarn-resourcemanager",
+      "hadoop-yarn-nodemanager",
+      "zookeeper-server",
+      "hbase-master",
+      "hbase-regionserver",
+      "mysql-server",
+      "hive-metastore-database",
+      "hive-metastore",
+      "cdap"
+    ],
+    "provider": "google",
+    "hardwaretype": "standard-large",
+    "imagetype": "centos6",
+    "config": {
+      "hadoop": {
+        "core_site": {
+          "fs.defaultFS": "hdfs://%host.service.hadoop-hdfs-namenode%",
+          "io.file.buffer.size": "131072",
+          "hadoop.tmp.dir": "/data/hadoop"
+        },
+        "hdfs_site": {
+          "dfs.datanode.max.transfer.threads": "4096",
+          "dfs.replication": "2",
+          "dfs.blocksize": "134217728",
+          "dfs.namenode.handler.count": "30",
+          "dfs.datanode.handler.count": "8",
+          "dfs.datanode.du.reserved": "1073741824",
+          "dfs.namenode.rpc-bind-host": "%ip.bind_v4.self%",
+          "dfs.namenode.servicerpc-bind-host": "%ip.bind_v4.self%",
+          "dfs.namenode.datanode.registration.ip-hostname-check": "false"
+        },
+        "mapred_site": {
+          "mapreduce.framework.name": "yarn",
+          "mapreduce.map.java.opts": "-Xmx384m",
+          "mapreduce.reduce.java.opts": "-Xmx384m",
+          "mapreduce.job.maps": "3",
+          "mapreduce.job.reduces": "3",
+          "mapreduce.task.io.sort.factor": "25",
+          "mapreduce.task.io.sort.mb": "250"
+        },
+        "yarn": {
+          "memory_percent": "75"
+        },
+        "yarn_site": {
+          "yarn.resourcemanager.hostname": "%host.service.hadoop-yarn-resourcemanager%",
+          "yarn.resourcemanager.scheduler.address": "%host.service.hadoop-yarn-resourcemanager%:8030",
+          "yarn.resourcemanager.resource-tracker.address": "%host.service.hadoop-yarn-resourcemanager%:8031",
+          "yarn.resourcemanager.address": "%host.service.hadoop-yarn-resourcemanager%:8032",
+          "yarn.resourcemanager.admin.address": "%host.service.hadoop-yarn-resourcemanager%:8033"
+        }
+      },
+      "hbase": {
+        "hbase_site": {
+          "hbase.rootdir": "hdfs://%host.service.hadoop-hdfs-namenode%/hbase",
+          "hbase.cluster.distributed": "true",
+          "hbase.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$:2181'),',')%",
+          "hbase.regionserver.handler.count": "100",
+          "zookeeper.session.timeout": "60000"
+        }
+      },
+      "hive": {
+        "hive_site": {
+          "javax.jdo.option.ConnectionURL": "jdbc:mysql://%host.service.mysql-server%:3306/hive?createDatabaseIfNotExist=true",
+          "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
+          "javax.jdo.option.ConnectionUserName": "dbuser",
+          "javax.jdo.option.ConnectionPassword": "dbuserpassword",
+          "hive.metastore.uris": "%join(map(host.service.hive-metastore,'thrift://$:9083'),',')%",
+          "hive.zookeeper.quorum": "%join(map(host.service.zookeeper-server,'$'),',')%",
+          "hive.support.concurrency": "true"
+        }
+      },
+      "mysql": {
+        "server_debian_password": "somedefaultpassword",
+        "server_root_password": "somedefaultpassword",
+        "server_repl_password": "somedefaultpassword",
+        "data_dir": "/data/mysql",
+        "server": {
+          "directories": {
+            "log_dir": "/data/mysql"
+          }
+        },
+        "bind_address": "%ip.bind_v4.service.mysql-server%"
+      },
+      "cdap": {
+        "cdap_site": {
+          "kerberos.auth.enabled": "false",
+          "log.saver.run.memory.megs": "512",
+          "gateway.memory.mb": "512",
+          "dataset.executor.container.memory.mb": "512",
+          "explore.executor.container.memory.mb": "1024",
+          "explore.enabled": "true"
+        }
+      },
+      "zookeeper": {
+        "zoocfg": {
+          "maxClientCnxns": "100",
+          "tickTime": "2000",
+          "initLimit": "10",
+          "syncLimit": "2"
+        }
+      }
+    }
+  },
+  "compatibility": {
+    "hardwaretypes": [
+      "standard-large",
+      "standard-xlarge",
+      "standard-xxlarge"
+    ],
+    "imagetypes": [
+      "centos6",
+      "ubuntu12"
+    ],
+    "services": [
+      "base",
+      "hadoop-hdfs-namenode",
+      "hadoop-hdfs-datanode",
+      "hadoop-yarn-resourcemanager",
+      "hadoop-yarn-nodemanager",
+      "hadoop-mapreduce-historyserver",
+      "zookeeper-server",
+      "hbase-master",
+      "hbase-regionserver",
+      "cdap",
+      "mysql-server",
+      "hive-metastore-database",
+      "hive-metastore",
+      "hive-server2"
+    ]
+  },
+  "constraints": {
+    "size": {
+      "min": "3",
+      "max": "100"
+    },
+    "layout": {
+      "mustcoexist": [
+        [
+          "hadoop-hdfs-datanode",
+          "hadoop-yarn-nodemanager",
+          "hbase-regionserver"
+        ],
+        [
+          "hadoop-hdfs-namenode",
+          "hadoop-yarn-resourcemanager",
+          "hadoop-mapreduce-historyserver",
+          "hbase-master",
+          "mysql-server",
+          "zookeeper-server",
+          "cdap",
+          "mysql-server",
+          "hive-metastore",
+          "hive-metastore-database"
+        ]
+      ],
+      "cantcoexist": [
+        [
+          "hadoop-hdfs-namenode",
+          "hadoop-hdfs-datanode"
+        ],
+        [
+          "hadoop-hdfs-datanode",
+          "cdap"
+        ],
+        [
+          "hadoop-yarn-resourcemanager",
+          "hadoop-yarn-nodemanager"
+        ],
+        [
+          "hive-server2",
+          "cdap"
+        ]
+      ]
+    },
+    "services": {
+      "hadoop-hdfs-namenode": {
+        "quantities": {
+          "min": 1,
+          "max": 1
+        }
+      },
+      "hadoop-yarn-resourcemanager": {
+        "quantities": {
+          "min": 1,
+          "max": 1
+        }
+      },
+      "hadoop-mapreduce-historyserver": {
+        "quantities": {
+          "min": 1,
+          "max": 1
+        }
+      },
+      "zookeeper-server": {
+        "quantities": {
+          "min": 1,
+          "max": 1
+        }
+      },
+      "hbase-master": {
+        "quantities": {
+          "min": 1,
+          "max": 1
+        }
+      },
+      "cdap": {
+        "quantities": {
+          "min": 1,
+          "max": 1
+        }
+      },
+      "mysql-server": {
+        "quantities": {
+          "min": 1,
+          "max": 1
+        }
+      },
+      "hadoop-hdfs-datanode": {
+        "quantities": {
+          "min": 2,
+          "max": 99
+        }
+      }
+    }
+  }
+}
