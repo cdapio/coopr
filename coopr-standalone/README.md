@@ -5,6 +5,10 @@ Node v0.10.26 or higher
 Ruby 1.9.0p0 or higher
 XCode Command Line Developer Tools (Mac only)
 
+Build
+=====
+mvn clean package assembly:single -DskipTests
+
 Install
 ======
 sudo gem install fog --version 1.21.0
