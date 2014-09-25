@@ -15,7 +15,7 @@
           "type": "text"
         },
         "associate_public_ip": {
-          "default": "true",
+          "default": true,
           "label": "Associate public IP (VPC only)",
           "override": true,
           "tip": "Associate public IP (VPC only)",
@@ -28,7 +28,7 @@
           "type": "text"
         },
         "aws_ebs_delete_on_term": {
-          "default": "true",
+          "default": true,
           "label": "EBS delete on termination",
           "override": true,
           "tip": "Delete EBS volumes on termination",
