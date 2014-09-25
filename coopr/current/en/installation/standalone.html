@@ -84,31 +84,13 @@ follow the instructions in the <a class="reference internal" href="../guide/quic
 </div>
 <div class="section" id="virtual-machine">
 <h2>Virtual Machine<a class="headerlink" href="#virtual-machine" title="Permalink to this headline">¶</a></h2>
-<p>You can also run Coopr in a virtual machine that you can download <a class="reference external" href="http://cask.co/downloads">here</a>. You will need either Oracle VirtualBox or
+<p>You can also run Coopr in a virtual machine that you can <a class="reference external" href="http://repository.cask.co/downloads/co/cask/coopr/coopr-standalone-vm/0.9.8/coopr-standalone-vm-0.9.8.ova">download here</a>. You will need virtualization software like Oracle VirtualBox or
 VMWare player in order to run the VM. Once you have downloaded the image, import it using VirtualBox or VMWare Player.
 The VM has been set up with 4GB RAM and 10GB disk. No password is required to enter the machine. However, should you need to perform an administrative
 operation, the coopr admin password is coopr.
 Coopr has already been installed and configured in the virtual machine and will start up automatically when the machine start.
 On start up a browser will also start with the Coopr UI loaded at <a class="reference external" href="http://localhost:8100">http://localhost:8100</a>. At this point you can
 follow the instructions in the <a class="reference internal" href="../guide/quickstart/index.html#quickstart-getting-started"><em>Quickstart Guide</em></a> to try provisioning a cluster.</p>
-</div>
-<div class="section" id="docker">
-<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
-<p>You can also run Coopr in a Docker container. You will need to download and install Docker in order to do this.
-Once installed, follow the instructions below to enter your container and start up Coopr:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">boot2docker</span> <span class="n">start</span>
-<span class="n">$</span> <span class="n">docker</span> <span class="n">pull</span> <span class="n">caskdata</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">standalone</span>
-<span class="n">$</span> <span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">p</span> <span class="mi">8100</span><span class="o">:</span><span class="mi">8100</span> <span class="n">caskdata</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">standalone</span>
-<span class="n">$</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">server</span> <span class="n">start</span>
-<span class="n">$</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">provisioner</span> <span class="n">start</span>
-<span class="n">$</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">coopr</span><span class="o">-</span><span class="n">ui</span> <span class="n">start</span>
-</pre></div>
-</div>
-<p>At this point you can start your brower and go to <a class="reference external" href="http:/">http:/</a>/&lt;ip&gt;:8100, where the ip is found by running:</p>
-<div class="highlight-java"><div class="highlight"><pre><span class="n">$</span> <span class="n">boot2docker</span> <span class="n">ip</span>
-</pre></div>
-</div>
-<p>At this point you can follow the instructions in the <a class="reference internal" href="../guide/quickstart/index.html#quickstart-getting-started"><em>Quickstart Guide</em></a> to try provisioning a cluster.</p>
 </div>
 </div>
 
@@ -147,7 +129,6 @@ Once installed, follow the instructions below to enter your container and start 
 <li class="toctree-l2 current"><a class="current reference internal" href="">Coopr Sandboxes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#standalone">Standalone</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#virtual-machine">Virtual Machine</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#docker">Docker</a></li>
 </ul>
 </li>
 </ul>
