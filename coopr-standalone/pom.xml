@@ -35,13 +35,6 @@
         <module>../coopr-server</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <id>continuuity-public</id>
-            <url>https://repository.continuuity.com/content/groups/public</url>
-        </repository>
-    </repositories>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

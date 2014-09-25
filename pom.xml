@@ -37,17 +37,6 @@
         <surefire.redirectTestOutputToFile>true</surefire.redirectTestOutputToFile>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>nexus</id>
-            <url>https://repository.continuuity.com/content/groups/public</url>
-        </repository>
-        <repository>
-            <id>releases</id>
-            <url>https://repository.continuuity.com/content/repositories/releases/</url>
-        </repository>
-    </repositories>
-
     <scm>
         <connection>scm:git:git://github.com/caskdata/coopr.git</connection>
         <url>scm:git:git://github.com/caskdata/coopr.git</url>
@@ -56,9 +45,13 @@
 
     <distributionManagement>
         <repository>
-            <id>continuuity-release</id>
-            <url>https://repository.continuuity.com/content/repositories/releases-public/</url>
+            <id>sonatype.release</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
+        <snapshotRepository>
+            <id>sonatype.snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <build>

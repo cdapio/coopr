@@ -31,81 +31,42 @@ The Coopr Server uses and depends on the following licenses:
 
    * - Software Dependency
      - License
-   * - Cask Http
+   * - Apache Commons
+     - Apache License, Version 2.0
+   * - Apache Derby
+     - Apache License, Version 2.0
+   * - Apache HttpComponents
+     - Apache License, Version 2.0
+   * - Apache Tomcat
      - Apache License, Version 2.0
    * - Apache Twill
      - Apache License, Version 2.0
-   * - SLF4J
-     - MIT license
-   * - Apache Derby
-     - Apache License, Version 2.0
-   * - Google Guava Libraries
-     - Apache License, Version 2.0
-   * - JUnit
-     - Eclipse Public License - v 1.0
-   * - Google Guice
-     - Apache License, Version 2.0
    * - Apache Zookeeper
      - Apache License, Version 2.0
-   * - jline
-     - BSD
-   * - logback
-     - Dual-licensed under the EPL v1.0 and the LGPL 2.1
-   * - jQuery
-     - MIT license
-   * - Apache Hadoop
-     - Apache License, Version 2.0
-   * - Apache Log4j
-     - Apache License, Version 2.0
-   * - AOP Alliance
-     - Public Domain
-   * - Google Protocol Buffers
-     - New BSD License
-   * - Apache Commons
-     - Apache License, Version 2.0
-   * - Jersey
-     - Dual-licensed under the CDDL + GPLv2 with classpath exception
-   * - Hamcrest
-     - New BSD License
-   * - Grizzly
-     - COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.1. 
-       The GNU General Public License (GPL) Version 2, June 1991
-   * - Jettison
-     - Apache License, Version 2.0
-   * - JAXB
-     - CDDL v1.1 and GPL v2.
-   * - Jackson
-     - Apache License, Version 2.0 OR LGPL 2.1
-   * - Apache MINA
+   * - Cask netty-http
      - Apache License, Version 2.0
    * - Google Gson
      - Apache License, Version 2.0
+   * - Google Guava Libraries
+     - Apache License, Version 2.0
+   * - Google Guice
+     - Apache License, Version 2.0
+   * - Hamcrest
+     - New BSD License
+   * - Jackson
+     - Apache License, Version 2.0 OR LGPL 2.1
+   * - jline
+     - BSD
+   * - JUnit
+     - Eclipse Public License - v 1.0
+   * - logback
+     - Dual-licensed under the EPL v1.0 and the LGPL 2.1
    * - Netty
      - Apache License, Version 2.0
-   * - Snappy
-     - New BSD License
-   * - Xerial Snappy for Java
-     - Apache License, Version 2.0
-   * - ASM
-     - See the license `here <http://asm.ow2.org/license.html>`_.
-   * - Apache Avro
-     - Apache License, Version 2.0
-   * - ParaNamer
-     - BSD
-   * - Jetty
-     - Dual licensed under Apache License, Version 2.0 + Eclipse Public License 1.0
-   * - Apache Velocity
-     - Apache License, Version 2.0
-   * - Apache Flume
-     - Apache License, Version 2.0
-   * - Joda
-     - Apache License, Version 2.0
-   * - Apache Thrift
-     - Apache License, Version 2.0
-   * - Yammer Metrics
-     - Apache License, Version 2.0
-   * - MySQL Connector
-     - GPL
+   * - SLF4J
+     - MIT license
+   * - spymemcached
+     - MIT License
  
 Coopr Provisioner
 =================
@@ -246,39 +207,39 @@ The Coopr UI uses and depends on the following licenses:
 
    * - Software Dependency
      - License
-   * - jQuery
-     - MIT
-   * - normalize
-     - See `this page <https://github.com/necolas/normalize.css/blob/master/LICENSE.md>`_.
-   * - tablesorter
-     - GPL
-   * - bootstrap
-     - MIT
-   * - LESS
-     - Apache
-   * - modernizr
-     - MIT
-   * - bootbox
-     - MIT
    * - angular
-     - MIT
-   * - requirejs
      - MIT
    * - async
      - MIT
+   * - bootbox
+     - MIT
+   * - bootstrap
+     - MIT
    * - consolidate
+     - MIT
+   * - express
+     - MIT
+   * - jQuery
+     - MIT
+   * - LESS
+     - Apache
+   * - log4js
+     - Apache 2.0
+   * - modernizr
      - MIT
    * - nock
      - MIT
+   * - normalize
+     - See `this page <https://github.com/necolas/normalize.css/blob/master/LICENSE.md>`_.
+   * - optimist
+     - MIT/X11
    * - phantomjs
-     - Apache 2.0
-   * - express
-     - MIT
-   * - log4js
      - Apache 2.0
    * - request
      - Apache 2.0
+   * - requirejs
+     - MIT
    * - swig
      - MIT
-   * - optimist
-     - MIT/X11
+   * - tablesorter
+     - GPL
