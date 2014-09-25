@@ -29,11 +29,11 @@ public class FieldSchema {
   private final String type;
   private final String tip;
   private final Set<String> options;
-  private final String defaultValue;
+  private final Object defaultValue;
   private final boolean override;
   private final boolean sensitive;
 
-  private FieldSchema(String label, String type, String tip, Set<String> options, String defaultValue,
+  private FieldSchema(String label, String type, String tip, Set<String> options, Object defaultValue,
                       Boolean override, Boolean sensitive) {
     Preconditions.checkArgument(type != null, "Field type must be specified.");
     Preconditions.checkArgument(label != null && !label.isEmpty(), "Field label must be specified.");
@@ -87,7 +87,7 @@ public class FieldSchema {
    *
    * @return Default value for the field that should be used. Null if not applicable.
    */
-  public String getDefaultValue() {
+  public Object getDefaultValue() {
     return defaultValue;
   }
 
@@ -127,7 +127,7 @@ public class FieldSchema {
     private String type;
     private String tip;
     private Set<String> options;
-    private String defaultValue;
+    private Object defaultValue;
     private Boolean override;
     private Boolean sensitive;
 
@@ -151,7 +151,7 @@ public class FieldSchema {
       return this;
     }
 
-    public Builder setDefaultValue(String defaultValue) {
+    public Builder setDefaultValue(Object defaultValue) {
       this.defaultValue = defaultValue;
       return this;
     }
