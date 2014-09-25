@@ -56,7 +56,7 @@ start ( ) {
   echo "Starting Coopr NGUI ..."
 
   export COOPR_UI_PORT
-  nohup nice -1 ${COOPR_NPM} start \
+  nohup nice -1 ${COOPR_NODE} ${UI_PATH}/server.js \
     >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
   echo $! > "${pid}"
 }

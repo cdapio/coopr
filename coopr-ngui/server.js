@@ -47,10 +47,12 @@ require('http-server')
           'Content-Type': 'application/json',
           'Cache-Control': 'no-store, must-revalidate'
         });
+        var cooprServerURI = process.env.COOPR_SERVER_URI || 'http://localhost:55044';
+        cooprServerURI += '/v2/';
         res.end(JSON.stringify({
           // the following will be available in angular via the "MY_CONFIG" injectable
 
-          COOPR_SERVER_URI: process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054/v2/',
+          COOPR_SERVER_URI: cooprServerURI,
           COOPR_CORS_PORT: COOPR_CORS_PORT,
           authorization: req.headers.authorization
 
