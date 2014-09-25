@@ -3,27 +3,26 @@
   
   <div class="col-xs-10">
 
-    <input type="checkbox" id="field-{{$index}}" 
+    <input ng-if="fieldData.type=='checkbox'"
+      type="checkbox"
       title="{{fieldData.tip}}"
       ng-model="model[name]"
-      ng-if="fieldData.type=='checkbox'"
       ng-disabled="overrideenabled && !fieldData.override"
       ng-required="required[name]"/>
 
-    <input class="form-control" id="field-{{$index}}" 
+    <input ng-if="fieldData.type === 'text' || fieldData.type == 'password'" 
+      class="form-control"
       type="{{fieldData.type}}" 
       placeholder="{{fieldData.tip}}" 
-      ng-if="fieldData.type === 'text' || fieldData.type == 'password'" 
       ng-model="model[name]"
       ng-disabled="overrideenabled && !fieldData.override"
       ng-required="required[name]" />
 
-    <select id="field-{{$index}}" 
+    <select ng-if="fieldData.type === 'select'"
       class="form-control"
       title="{{fieldData.tip}}"
       ng-model="model[name]"
-      ng-options="region as region for region in fieldData.options"
-      ng-if="fieldData.type === 'select'"
+      ng-options="option as option for option in fieldData.options"
       ng-required="required[name]"
       ng-disabled="overrideenabled && !fieldData.override">
     </select>
