@@ -30,7 +30,7 @@ run with redundancies on multiple machines. Each machine running Coopr can have 
 
 * One coopr-ui process
 * One coopr-server process
-* Multiple coopr-provisioner processes (See config COOPR_NUM_WORKERS in :doc:`installation guide </guide/superadmin/installation/index>`)
+* Multiple coopr-provisioner processes (See config COOPR_NUM_WORKERS in :doc:`installation guide </installation/index>`)
 * One ZooKeeper process
 * One database process
 

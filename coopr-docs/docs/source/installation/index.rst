@@ -13,17 +13,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-=======================
-Super Admin Guide
-=======================
+.. _guide_installation_toplevel:
+
+.. index::
+   single: Installation Guide
+
+==================
+Installation Guide
+==================
+
+This guide describes how to get Coopr up and running and initialized with some defaults templates.
+If you wish to really run Coopr for use by multiple users, you will want to install from packages
+with an actual database and zookeeper instance. If you just want to get an instance up and running
+to experiment with, you can choose to use Coopr Standalone, Coopr in a VM, or Coopr in Docker.
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 2
 
-   overview
-   server-config
-   tenants
-   callbacks
-   plugins
-   monitoring
-   ../bcp/index
+  packages
+  standalone
+

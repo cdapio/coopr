@@ -28,8 +28,10 @@ using one of the preset templates.
 Installing Coopr
 ===========================
 
-Please follow the steps found in the :doc:`Installation Guide </guide/superadmin/installation/index>`. Once successfully installed,
+Please follow the steps found in the :doc:`Installation Guide </installation/index>`. Once successfully installed,
 start all the relevant Coopr components: the server, provisioners, and UI.
+
+.. _quickstart-getting-started:
 
 Getting Started
 ===============
@@ -221,7 +223,7 @@ you would enter 'joyentuser'.
 OpenStack
 ^^^^^^^^^
 The OpenStack provider has been tested on Havana, but also supports Grizzly out of the box. OpenStack support has 
-some limitations that are described :doc:`here </guide/superadmin/installation/openstack-config>`.
+some limitations that are described :doc:`here </installation/openstack-config>`.
 Several of these limitations will be eliminated in future releases of Coopr.
 The first step is to configure the openstack provider to use your credentials. 
 OpenStack requires a password, username, auth url, tenant, ssh key, and ssh key name. Enter the correct value for

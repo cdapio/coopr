@@ -16,10 +16,10 @@
 .. _guide_installation_toplevel:
 
 .. index::
-   single: Installation Guide
+   single: Coopr Installation
 
 ==================
-Installation Guide
+Coopr Installation
 ==================
 
 

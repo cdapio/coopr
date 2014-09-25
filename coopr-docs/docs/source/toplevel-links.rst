@@ -16,7 +16,7 @@
 :doc:`Overview </index>` |
 :doc:`Features </overview/features>` |
 :doc:`Architecture </overview/architecture>` |
-:doc:`Installation Guide </guide/superadmin/installation/index>` |
+:doc:`Installation Guide </installation/index>` |
 :doc:`Administration Guide </guide/admin/index>` |
 :doc:`User Guide </guide/user/index>` |
 :doc:`Web Services </rest/index>` |
