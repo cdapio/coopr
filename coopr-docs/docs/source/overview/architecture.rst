@@ -23,7 +23,6 @@ Architecture
 
 .. _architecture:
 .. figure:: /_images/Coopr-Architecture.png
-    :width: 800px
     :align: center
     :alt: Coopr Architecture
     :figclass: align-center

@@ -49,6 +49,7 @@ Contents
    /guide/user/index
    /rest/index
    /overview/security
+   /implementation
    /faq/index
    /release-notes/index
    /overview/glossary
