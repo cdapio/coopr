@@ -100,7 +100,6 @@ gulp.task('js:app', function() {
        header: '\n(function (PKG){ /* ${filename} */\n',
        footer: '\n})('+PKG+');\n'
     }))
-    .pipe(plug.size({showFiles:true}))
     .pipe(plug.concat('app.js'))
     .pipe(gulp.dest('./dist/bundle'));
 });
