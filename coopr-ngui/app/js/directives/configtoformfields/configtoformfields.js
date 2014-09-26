@@ -13,96 +13,67 @@
  *     type: string
  *   }
  * },
- * required: []
- *   [<fieldname>, <fieldname>]
+ * required: [
+ *     [<fieldname>, <fieldname>]
+ *   ]
  * }
  * @param {Object} model Model to attach field values to.
- * @param {Booelan} overrideenabled Determines whether only override-able form fields should be
+ * @param {Booelan} allowOverride Determines whether only override-able form fields should be
  * enabled.                                
  *
- * <div my-configtoformfields fieldsconfig="json" model="model.fields" overrideenabled="false"/>
+ * <div my-configtoformfields 
+ *       data-config="json" 
+ *       data-model="whatever" 
+ *       data-allow-override="true"
+ *  />
  */
 
 angular.module(PKG.name+'.directives').directive('myConfigtoformfields', 
-function myConfigtoformfieldsDirective ($log) {
+function myConfigtoformfieldsDirective () {
   return {
     restrict: 'AE',
-    replace: true,
+    replace: false,
+
     scope: {
-      fieldsconfig: '=',
-      model: '=',
-      overrideenabled: '='
+      config: '=',
+      model: '='
     },
+
     templateUrl: 'configtoformfields/configtoformfields.html',
+
     link: function (scope, element, attrs) {
 
-      scope.$watch('fieldsconfig', function (newVal, oldVal) {
+      scope.allowOverride = attrs.allowOverride && attrs.allowOverride!=='false';
 
-        if (!angular.equals(newVal, oldVal)) {
-          if (scope.fieldsconfig) {
-
-            if (typeof scope.fieldsconfig !== 'object') {
-              scope.fieldsconfig = angular.fromJson(scope.fieldsconfig);  
-            }
-
-            if (!scope.fieldsconfig.hasOwnProperty('fields')) {
-              $log.error('fields not declared in json for fieldsconfig');
-            }
-
-          }
-
-          setDefaults();
+      scope.$watch('config', function(newVal, oldVal) {
+        if(!scope.model) {
+          return;
         }
 
-      });
+        if(oldVal) { // remove model values
+          angular.forEach(oldVal.fields, function (field, key) {
+            delete scope.model[key];
+          });          
+        }
 
-      scope.$watch('model', function (newVal, oldVal) {
-        setRequired(newVal);
+        if(newVal) { // set default values
+          angular.forEach(newVal.fields, function (field, key) {
+            if (field.hasOwnProperty('default') && !scope.model[key]) {
+              scope.model[key] = field.default;
+            }
+          });
+        }
+
+        // set required fields
+        scope.required = (newVal.required || []).reduce(function (memo, arr) {
+          // could be an array of strings, or an array of arrays of strings.
+          angular.forEach(angular.isArray(arr) ? arr : [arr], function (field) {
+            memo[field] = true;
+          });
+          return memo;
+        }, {});
+
       }, true);
-
-      function setDefaults () {        
-        if (!scope.fieldsconfig || !scope.model) {
-          return;
-        }
-        angular.forEach(scope.fieldsconfig.fields, function (field, key) {
-          if (field.hasOwnProperty('default') && !scope.model[key]) {
-            scope.model[key] = field.default;
-          }
-        });
-      }
-
-      function setRequired (newVal) {
-        if (!scope.fieldsconfig || !scope.model) {
-          return;
-        }
-        
-        var out = {};
-        angular.forEach(newVal, function (val, key) {
-          if(val && !out[key]) {
-            angular.forEach(scope.fieldsconfig.required, function (set) {
-              if(set.indexOf(key)>=0) {
-                out = transformRequired(set);
-              }
-            });
-          }
-        });
-
-        scope.required = Object.keys(out).length ? out 
-          : transformRequired(scope.fieldsconfig.required[0]);
-      }
-
-      /**
-       * Transforms required fields array into an object for template.
-       * @param  {Array} requiredFields.
-       * @return {Object} required {<fieldname>:true}
-       */
-      function transformRequired(requiredFields) {
-        var required = {};
-        angular.forEach(requiredFields, function (item) {
-          required[item] = true;
-        });
-        return required;
-      }
 
     }
   };
