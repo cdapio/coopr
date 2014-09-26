@@ -14,14 +14,25 @@ while utilizing common SCM tools (Chef and scripts).
 
    * [Codename: Centaurus, Theme: multi-tenancy, 0.9.8](http://docs.cask.co/coopr/0.9.8/en/release-notes/index.html)
 
+## Getting Started
+
+You can build a standalone version of Coopr that will run on your machine. It requires Java 6 or Java 7 to run the server, Node v0.10.26 or higher for the UI, and Ruby 1.9.0p0 or higher for the provisioner.
+
+   * `git clone https://github.com/caskdata/coopr.git`
+   * `cd coopr/coopr-standalone`
+   * `mvn clean package assembly:single -DskipTests`
+
+The build places a zip of the standalone version of Coopr into the target directory. Unzip it and follow the instructions in the README.md file to start up Coopr on your own machine. It comes pre-packaged with templates for CDAP, Hadoop, LAMP, and MongoDB. In order to create an actual cluster, you will need an account with a supported provider (AWS, Google, Rackspace, Openstack, or Joyent), and perform a couple steps to setup up Coopr to use the right credentials to integrate with your provider. Follow the [Quickstart Guide](http://docs.coopr.io/coopr/current/en/guide/quickstart/index.html#getting-started), which steps through an example of adding workers to your tenant, configuring a provider, and creating a Hadoop cluster.
+
 ## Documentation
 
 To learn more about Coopr, here are the resources available:
-   * [Introduction](http://coopr.io) to Coopr
-   * Coopr [User Guide](http://docs.cask.co/coopr/current/en/index.html)
-   * [Technical Document](http://docs.cask.co/coopr/current/en/implementation.html) describing internals of Coopr
+   * [User Guide](http://docs.coopr.io/coopr/current/en/index.html) - How to install and setup Coopr, as well as how administrators and users can use Coopr
+   * [Technical Document](http://docs.coopr.io/coopr/current/en/implementation.html) - How it works
+   * [REST Endpoints](http://docs.coopr.io/coopr/current/en/rest/index.html) - REST APIs for managing your Coopr instance
+   * [Javadocs](http://docs.coopr.io/coopr/current/en/javadocs/index.html) - Server javadocs
    * Release Documentation
-      * [Documentation 0.9.8](http://docs.cask.co/coopr/0.9.8/en/release-notes/index.html)
+      * [Documentation 0.9.8](http://docs.coopr.io/coopr/current/en/release-notes/index.html)
 
 ## Contributing to Coopr
 
