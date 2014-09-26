@@ -42,14 +42,6 @@ coverage
 
 # Chef client validator
 /coopr-provisioner/worker/plugins/automators/shell_automator/scripts/validation.pem
-<<<<<<< HEAD
-
-# Chef testing files
-Berksfile
-Vagrantfile
-chefignore
-=======
->>>>>>> develop
 
 # Environment
 /.bash*
