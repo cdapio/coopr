@@ -1,0 +1,111 @@
+<div class="form-group">
+  <label for="inputLeaseDays" class="col-xs-2 control-label">Lease duration</label>
+  <div class="col-xs-10 col-sm-8 col-md-6">
+
+    <fieldset class="row" ng-disabled="model.id" ng-class="{
+      'has-error': leaseMaxReached
+    }">
+      <div class="col-xs-4">
+        <div class="input-group">
+          <label for="inputLeaseDays" class="input-group-addon">Days</label>
+          <input id="inputLeaseDays" class="form-control" type="number" 
+            ng-model="leaseDuration.days"
+            ng-pattern="/^\d+$/"
+            min="0" required/>
+        </div>
+      </div>
+      <div class="col-xs-4">
+        <div class="input-group">
+          <label for="inputLeaseHours"class="input-group-addon">Hours</label>
+          <input id="inputLeaseHours" class="form-control" type="number" 
+            ng-model="leaseDuration.hours"
+            ng-pattern="/^\d+$/"
+            min="0" max="23" required/>
+        </div>
+      </div>
+      <div class="col-xs-4">
+        <div class="input-group">
+          <label for="inputLeaseMinutes" class="input-group-addon">Minutes</label>
+          <input id="inputLeaseMinutes" class="form-control" type="number" 
+            ng-model="leaseDuration.minutes"
+            ng-pattern="/^\d+$/"
+            min="0" max="59" required/>
+        </div>
+      </div>
+    </fieldset>
+
+    <p class="help-block" ng-show="leaseMaxReached">
+      Initial lease maximum is
+      <strong>{{leaseMaxReached | amDurationFormat}}</strong>.
+    </p>
+
+  </div>
+</div>
+
+
+<div class="form-group">
+  <label for="inputClusterDnsSuffix" class="col-xs-2 control-label">DNS suffix</label>
+  <div class="col-xs-5">
+    <input id="inputClusterDnsSuffix" type="text" name="dnsSuffix" class="form-control" 
+      placeholder="DNS suffix"
+      ng-disabled="model.id"
+      ng-model="model.dnsSuffix"/>
+  </div>
+
+  <label for="inputHardwareType" class="col-xs-2 control-label">Hardware type</label>
+  <div class="col-xs-3">
+    <select id="inputHardwareType" name="hardwaretype" class="form-control"
+      ng-disabled="model.id"
+      ng-model="model.hardwaretype"
+      ng-options="hrdwr.name as hrdwr.name for hrdwr in availableHardware" required>
+    </select>
+  </div>
+
+</div>
+
+<div class="form-group">
+  <label for="inputProvider" class="col-xs-2 control-label">Provider</label>
+  <div class="col-xs-5">
+    <select id="inputProvider" name="provider" class="form-control"
+      ng-disabled="model.id"
+      ng-model="model.provider"
+      ng-options="prvdr.name as prvdr.description for prvdr in availableProviders" required>
+    </select>
+  </div>
+
+  <label for="inputImageType" class="col-xs-2 control-label">Image type</label>
+  <div class="col-xs-3">
+    <select id="inputImageType" name="imagetype" class="form-control"
+      ng-disabled="model.id"
+      ng-model="model.imagetype"
+      ng-options="img.name as img.name for img in availableImages" required>
+    </select>
+  </div>
+
+</div>
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">Provider fields</label>
+  <fieldset class="col-xs-10" ng-disabled="model.id">
+
+    <my-provider-fields 
+      data-model="model.providerFields"
+      data-provider="chosenProvider"
+    ></my-provider-fields>
+
+  </fieldset>
+</div>
+
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">Services</label>
+  <div class="col-xs-10">
+
+    <my-service-picker
+      data-model="model.services"
+      data-allow-rm="!model.id"
+      data-available="model.id ? null : availableServices"
+    ></my-service-picker>
+
+  </div>
+</div>

@@ -1,0 +1,68 @@
+{
+  "description": "",
+  "name": "joyent",
+  "parameters": {
+    "admin": {
+      "fields": {
+        "api_password": {
+          "label": "CloudAPI Password",
+          "tip": "Your Joyent CloudAPI password",
+          "type": "password"
+        },
+        "api_user": {
+          "label": "CloudAPI Username",
+          "tip": "Your Joyent CloudAPI user name",
+          "type": "text"
+        },
+        "joyent_api_url": {
+          "default": "https://us-east-1.api.joyentcloud.com",
+          "label": "Region",
+          "options": [
+            "https://us-east-1.api.joyentcloud.com",
+            "https://us-east-2.api.joyentcloud.com",
+            "https://us-east-3.api.joyentcloud.com",
+            "https://us-sw-1.api.joyentcloud.com",
+            "https://us-west-1.api.joyentcloud.com",
+            "https://eu-ams-1.api.joyentcloud.com"
+          ],
+          "override": true,
+          "tip": "Joyent Region",
+          "type": "select"
+        },
+        "joyent_version": {
+          "default": "~7.0",
+          "label": "API version",
+          "tip": "CloudAPI version (~7.0 default)",
+          "type": "text"
+        },
+        "ssh_key_resource": {
+          "label": "SSH Key Resource Name",
+          "tip": "Name of the SSH private key resource uploaded to the server",
+          "type": "text"
+        },
+        "ssh_keypair": {
+          "label": "Key Name",
+          "tip": "Your Joyent SSH Key Name",
+          "type": "text"
+        }
+      },
+      "required": [
+        [
+          "api_user",
+          "api_password"
+        ],
+        [
+          "api_user",
+          "ssh_keypair",
+          "ssh_key_resource"
+        ]
+      ]
+    }
+  },
+  "resourceTypes": {
+    "ssh_keys": {
+      "format": "file",
+      "permissions": "0400"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "name": "hive-metastore",
+  "description": "Hive Metastore",
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [
+        "base"
+      ],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [
+        "hadoop-hdfs-namenode",
+        "hadoop-hdfs-datanode",
+        "hadoop-yarn-resourcemanager",
+        "hadoop-yarn-nodemanager"
+      ],
+      "uses": [
+        "mysql-server",
+        "hive-metastore-database"
+      ]
+    }
+  },
+  "provisioner": {
+    "actions": {
+      "configure": {
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive]"
+        },
+        "type": "chef-solo"
+      },
+      "initialize": {
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::hive_init],recipe[hadoop_wrapper::hive_metastore_init]"
+        },
+        "type": "chef-solo"
+      },
+      "install": {
+        "fields": {
+          "run_list": "recipe[hadoop::hive_metastore]"
+        },
+        "type": "chef-solo"
+      },
+      "start": {
+        "fields": {
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hive-metastore\": \"start\" } } } }",
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive_metastore],recipe[coopr_service_manager::default]"
+        },
+        "type": "chef-solo"
+      },
+      "stop": {
+        "fields": {
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hive-metastore\": \"stop\" } } } }",
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hive_metastore],recipe[coopr_service_manager::default]"
+        },
+        "type": "chef-solo"
+      }
+    }
+  }
+}

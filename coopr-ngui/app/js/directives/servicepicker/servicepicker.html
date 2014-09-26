@@ -1,0 +1,26 @@
+<ul class="list-inline">
+  <li ng-repeat="name in model" class="am-flip-x">
+    <div class="btn-group btn-group-xs dropdown">
+      <a class="btn btn-default disabled">
+        {{name}}
+      </a>
+      <a class="btn btn-default dropdown-toggle" 
+          ng-if="actionDropdowns[name]" 
+          bs-dropdown="actionDropdowns[name]" 
+          data-html="true"
+      >
+        <span class="caret"></span>
+      </a>
+    </div>
+  </li>
+  <li ng-show="available.length">
+    <a class="btn btn-xs btn-warning" 
+        ng-disabled="!addsvcDropdown.length"
+        bs-dropdown="addsvcDropdown"
+        data-placement="top"
+    >
+      <span class="fa fa-plus"></span>
+      add service
+    </a>
+  </li>
+</ul>

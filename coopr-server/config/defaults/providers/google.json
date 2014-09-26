@@ -1,0 +1,14 @@
+{
+  "name": "google",
+  "description": "Google Compute Engine",
+  "providertype": "google",
+  "provisioner": {
+    "google_project": "",
+    "google_client_email": "",
+    "api_key_resource": "",
+    "ssh_key_resource": "",
+    "ssh_user": "",
+    "google_data_disk_size_gb": "",
+    "zone_name": "us-central1-a"
+  }
+}

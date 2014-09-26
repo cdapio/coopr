@@ -1,0 +1,54 @@
+{
+  "name": "reactor",
+  "description": "Cask DAP (CDAP)",
+  "dependencies": {
+    "runtime": {
+      "requires": [
+        "hosts",
+        "hadoop-hdfs-namenode",
+        "hadoop-hdfs-datanode",
+        "hadoop-yarn-resourcemanager",
+        "hadoop-yarn-nodemanager",
+        "hbase-master",
+        "hbase-regionserver",
+        "zookeeper-server"
+      ]
+    }
+  },
+  "provisioner": {
+    "actions": {
+      "install": {
+        "type":"chef-solo",
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack]"
+        }
+      },
+      "configure": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::config]"
+        }
+      },
+      "initialize": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::init]"
+        }
+      },
+      "start": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"cask-app-fabric\": \"start\", \"cask-opex\": \"start\", \"cask-gateway\": \"start\", \"cask-gateway-yarn\": \"start\", \"cask-router\": \"start\", \"cask-kafka-server\": \"start\", \"cask-log-saver\": \"start\", \"cask-metrics-processor\": \"start\", \"cask-web-app\": \"start\" } } } }" 
+        }
+      },
+      "stop": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[reactor_wrapper::default],recipe[reactor::fullstack],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"cask-app-fabric\": \"stop\", \"cask-opex\": \"stop\", \"cask-gateway\": \"stop\", \"cask-gateway-yarn\": \"stop\", \"cask-router\": \"stop\", \"cask-kafka-server\": \"stop\", \"cask-log-saver\": \"stop\", \"cask-metrics-processor\": \"stop\", \"cask-web-app\": \"stop\" } } } }" 
+        }
+      }
+    }
+  }
+}

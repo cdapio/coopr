@@ -1,0 +1,42 @@
+{
+  "name": "hadoop-hdfs-datanode",
+  "description": "Hadoop HDFS DataNode",
+  "dependencies": {
+    "runtime": {
+      "requires": [
+        "base",
+        "hadoop-hdfs-namenode"
+      ]
+    }
+  },
+  "provisioner": {
+    "actions": {
+      "install": {
+        "type":"chef-solo",
+        "fields": {
+          "run_list": "recipe[hadoop::hadoop_hdfs_datanode]"
+        }
+      },
+      "configure": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::default]"
+        }
+      },
+      "start": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"start\" } } } }" 
+        }
+      },
+      "stop": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[hadoop_wrapper::default],recipe[hadoop::hadoop_hdfs_datanode],recipe[coopr_service_runner::default]",
+          "json_attributes": "{\"coopr\": { \"node\": { \"services\": { \"hadoop-hdfs-datanode\": \"stop\" } } } }" 
+        }
+      }
+    }
+  }
+}

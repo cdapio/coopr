@@ -25,3 +25,12 @@ branches:
     - /^feature\/.*$/
     - /^hotfix\/.*$/
     - /^release\/.*$/
+
+before_install:
+  - "export CHROME_BIN=chromium-browser"
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
+script:
+  - "cd coopr-ngui && npm run travis && cd .. && mvn test"
+

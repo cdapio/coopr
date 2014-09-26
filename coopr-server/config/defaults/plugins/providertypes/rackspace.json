@@ -1,0 +1,70 @@
+{
+  "description": "",
+  "name": "rackspace",
+  "parameters": {
+    "admin": {
+      "fields": {
+        "api_password": {
+          "label": "API key",
+          "tip": "Your Rackspace API key",
+          "type": "password"
+        },
+        "api_user": {
+          "label": "Username",
+          "tip": "Your Rackspace user name",
+          "type": "text"
+        },
+        "rackspace_region": {
+          "default": "dfw",
+          "label": "Region",
+          "options": [
+            "dfw",
+            "ord",
+            "iad",
+            "lon",
+            "syd",
+            "hkg"
+          ],
+          "override": true,
+          "tip": "Rackspace region",
+          "type": "select"
+        }
+      },
+      "required": [
+        [
+          "api_user",
+          "api_password",
+          "rackspace_region"
+        ]
+      ]
+    },
+    "user": {
+      "fields": {
+        "rackconnect_wait": {
+          "label": "RackConnect Wait",
+          "tip": "Wait for RackConnect",
+          "type": "checkbox"
+        },
+        "ssh_key_resource": {
+          "label": "SSH Key Resource Name",
+          "tip": "Name of the SSH private key resource uploaded to the server",
+          "type": "text"
+        },
+        "ssh_keypair": {
+          "label": "Key Name",
+          "tip": "Your Rackspace SSH key name",
+          "type": "text"
+        }
+      },
+      "required": [
+        []
+      ]
+    }
+  },
+  "resourceTypes": {
+    "ssh_keys": {
+      "format": "file",
+      "permissions": "0400"
+    }
+  }
+}

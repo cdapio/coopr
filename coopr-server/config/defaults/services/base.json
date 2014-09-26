@@ -1,0 +1,32 @@
+{
+  "name": "base",
+  "description": "Base services, such as host management and firewall",
+  "dependencies": {
+    "conflicts": [],
+    "install": {
+      "requires": [],
+      "uses": []
+    },
+    "provides": [],
+    "runtime": {
+      "requires": [],
+      "uses": []
+    }
+  },
+  "provisioner": {
+    "actions": {
+      "install": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[coopr_base::default]"
+        }
+      },
+      "configure": {
+        "type": "chef-solo",
+        "fields": {
+          "run_list": "recipe[coopr_base::default]"
+        }
+      }
+    }
+  }
+}
