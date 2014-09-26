@@ -2,8 +2,8 @@
 # Cookbook Name:: krb5
 # Attributes:: default
 #
-# Copyright © 2012, Eric G. Wolfe
-# Copyright © 2013, Gerald L. Hevener Jr., M.S.
+# Copyright © 2012 Eric G. Wolfe
+# Copyright © 2013 Gerald L. Hevener Jr., M.S.
 # Copyright © 2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,7 +49,7 @@ else
 end
 
 default['krb5']['default_logging'] = 'FILE:/var/log/krb5libs.log'
-default['krb5']['default_realm'] = node['domain']
+default['krb5']['default_realm'] = node['domain'].upcase
 default['krb5']['realms'] = [node['domain']]
 default['krb5']['default_realm_kdcs'] = []
 default['krb5']['lookup_kdc'] = 'true'
@@ -58,11 +58,11 @@ default['krb5']['renew_lifetime'] = '24h'
 default['krb5']['forwardable'] = 'true'
 
 default_realm =
-  if node['krb5']['default_realm']
-    node['krb5']['default_realm'].upcase
-  elsif node['krb5'].key?('krb5_conf') && node['krb5']['krb5_conf'].key?('libdefaults') &&
+  if node['krb5'].key?('krb5_conf') && node['krb5']['krb5_conf'].key?('libdefaults') &&
     node['krb5']['krb5_conf']['libdefaults'].key?('default_realm')
     node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase
+  elsif node['krb5']['default_realm']
+    node['krb5']['default_realm'].upcase
   else
     'LOCAL'
   end

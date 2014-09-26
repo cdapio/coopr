@@ -1,6 +1,5 @@
 npm-debug.log
 .vagrant
-Berksfile.lock
 *~
 *#
 .#*
@@ -16,7 +15,6 @@ build/
 target/
 
 # Bundler
-Gemfile.lock
 .bundle/*
 
 # Coverage reports
@@ -28,28 +26,22 @@ coverage
 *.iml
 .idea/
 
-/server/target/
-/server/build/
-/server/derby.log
-/ui/client-built/
-/web-app/client-built/
-/ui/build/
+/coopr-server/target/
+/coopr-server/build/
+/coopr-ui/client-built/
+/coopr-web-app/client-built/
+/coopr-ui/build/
 /build
 /integration-testing/target
 .gradle
-/server/derby*
+/coopr-server/derby*
 
 # Cookbooks tarball
-/provisioner/daemon/plugins/automators/chef_automator/chef_automator/*.tar.gz
-/provisioner/daemon/plugins/automators/shell_automator/*.tar.gz
+/coopr-provisioner/worker/plugins/automators/chef_automator/chef_automator/*.tar.gz
+/coopr-provisioner/worker/plugins/automators/shell_automator/*.tar.gz
 
 # Chef client validator
-/provisioner/daemon/plugins/automators/shell_automator/scripts/validation.pem
-
-# Chef testing files
-Berksfile
-Vagrantfile
-chefignore
+/coopr-provisioner/worker/plugins/automators/shell_automator/scripts/validation.pem
 
 # Environment
 /.bash*
