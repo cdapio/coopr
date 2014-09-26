@@ -2,8 +2,8 @@
 # Cookbook Name:: krb5
 # Recipe:: default
 #
-# Copyright © 2012, Eric G. Wolfe
-# Copyright © 2013, Gerald L. Hevener Jr., M.S.
+# Copyright © 2012 Eric G. Wolfe
+# Copyright © 2013 Gerald L. Hevener Jr., M.S.
 # Copyright © 2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
