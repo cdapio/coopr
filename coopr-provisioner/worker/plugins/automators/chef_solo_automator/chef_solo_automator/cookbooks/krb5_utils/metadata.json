@@ -1,0 +1,45 @@
+{
+  "name": "krb5_utils",
+  "description": "Set of utility resources which can be used to setup Kerberos",
+  "long_description": "# krb5_utils cookbook\n\n[![Cookbook Version](http://img.shields.io/cookbook/v/krb5_utils.svg)](https://supermarket.getchef.com/cookbooks/krb5_utils)\n[![Build Status](http://img.shields.io/travis/caskdata/krb5_utils_cookbook.svg)](http://travis-ci.org/caskdata/krb5_utils_cookbook)\n\n# Requirements\n\nThis cookbook requires the `krb5` cookbook, version `1.0.4` or greater.\n\n# Usage\n\nThis cookbook is intended for use in creating secure Hadoop clusters. As such, it will add the HTTP service\nprincipal to all other service principals. This can be disabled by setting `krb5_utils['add_http_principal']` to `false`.\n\n# Attributes\n\n* `krb5_utils['admin_principal']` - Initial administrator principal, created on KDC. Default `admin/admin`\n* `krb5_utils['admin_password']` - Password for `krb5_utils['admin_principal']`. Default `password`\n* `krb5_utils['keytabs_dir']` - On-disk location for storing keytab files. Default `/etc/security/keytabs`\n* `krb5_utils['krb5_service_keytabs']` - Hash of service keytabs to create. Default `{}`\n* `krb5_utils['krb5_user_keytabs']` - Hash of user keytabs to create, in the same format as `krb5_utils['krb5_service_keytabs']`. Default `{}`\n\nHash format:\n```ruby\n{ 'HTTP' => { 'owner' => 'hdfs', 'group' => 'hadoop', 'mode' => '0640' } }\n```\n\n# License\n\nCopyright © 2014 Cask Data, Inc.\n\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n    http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n",
+  "maintainer": "Cask Data, Inc.",
+  "maintainer_email": "ops@cask.co",
+  "license": "Apache License, Version 2.0",
+  "platforms": {
+    "amazon": ">= 0.0.0",
+    "centos": ">= 0.0.0",
+    "debian": ">= 0.0.0",
+    "redhat": ">= 0.0.0",
+    "scientific": ">= 0.0.0",
+    "ubuntu": ">= 0.0.0"
+  },
+  "dependencies": {
+    "krb5": ">= 1.0.4",
+    "yum-epel": ">= 0.0.0"
+  },
+  "recommendations": {
+
+  },
+  "suggestions": {
+
+  },
+  "conflicting": {
+
+  },
+  "providing": {
+
+  },
+  "replacing": {
+
+  },
+  "attributes": {
+
+  },
+  "groupings": {
+
+  },
+  "recipes": {
+
+  },
+  "version": "0.1.2"
+}
