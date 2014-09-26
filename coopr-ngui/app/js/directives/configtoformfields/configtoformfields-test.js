@@ -13,6 +13,8 @@ describe('directive myConfigtoformfields', function() {
   it('without a config it renders nothing', function() {
     var el = $compile('<my-configtoformfields />')(scope);
     scope.$digest();
+
+    expect(el.find('label').length).toEqual(0);
   });
 
   it('should watch the provided config and set the model', function() {
