@@ -1,7 +1,7 @@
 /*global module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 
 describe('myProgress', function() {
-  beforeEach(module('coopr-ngui.directives'));
+  beforeEach(module(PKG.name + '.directives'));
 
   var $compile, scope;
   beforeEach(inject(function(_$compile_, $rootScope){
