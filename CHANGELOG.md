@@ -2,7 +2,10 @@ Coopr CHANGELOG
 ===============
 
 Unreleased
-----------
+-----------
+
+v0.9.8 (09/26/14)
+-----------------
 - AWS provider support ( Issues: #22 #322 )
 - MongoDB support for clusters ( Issues: #43 #130 )
 - Cluster size constraint ( Issues: #76 #418 )
