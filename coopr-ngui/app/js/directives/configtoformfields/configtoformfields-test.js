@@ -22,7 +22,7 @@ describe('directive myConfigtoformfields', function() {
           label: 'foo label',
           override: true,
           tip: 'this is a tip',
-          type: 'checkbox',
+          type: 'text',
           default: 'whatever'
         }
       }
@@ -37,8 +37,9 @@ describe('directive myConfigtoformfields', function() {
     expect(el.find('label').length).toEqual(1);
     expect(el.find('label').text()).toEqual(config.fields.foo.label);
 
-    expect(el.find('input').attr('title')).toEqual(config.fields.foo.tip);
     expect(el.find('input').attr('required')).toBeFalsy();
+
+    expect(el.find('input').attr('placeholder')).toEqual(config.fields.foo.tip);
     expect(el.find('input').attr('disabled')).toBeFalsy();
 
     expect(scope.model.foo).toEqual(config.fields.foo.default);
@@ -48,7 +49,7 @@ describe('directive myConfigtoformfields', function() {
       scope.config.fields.foo.override = false;
     });
 
-    expect(el.find('input').attr('title')).toEqual(scope.config.fields.foo.tip);
+    expect(el.find('input').attr('placeholder')).toEqual(scope.config.fields.foo.tip);
     expect(el.find('input').attr('disabled')).toBeTruthy();
 
   });

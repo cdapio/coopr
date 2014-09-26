@@ -3,20 +3,22 @@
   
   <div class="col-xs-10">
 
-    <input ng-if="fieldData.type=='checkbox'"
-      type="checkbox"
-      title="{{fieldData.tip}}"
-      ng-model="model[name]"
-      ng-disabled="allowOverride && !fieldData.override"
-      ng-required="required[name]"/>
+    <div class="checkbox" ng-if="fieldData.type === 'checkbox'">
+      <input type="checkbox"
+        title="{{fieldData.tip}}"
+        ng-model="model[name]"
+        ng-disabled="allowOverride && !fieldData.override"
+      />
+    </div>
 
-    <input ng-if="fieldData.type === 'text' || fieldData.type == 'password'" 
+    <input ng-if="fieldData.type === 'text' || fieldData.type === 'password'" 
       class="form-control"
       type="{{fieldData.type}}" 
       placeholder="{{fieldData.tip}}" 
       ng-model="model[name]"
       ng-disabled="allowOverride && !fieldData.override"
-      ng-required="required[name]" />
+      ng-required="required[name]"
+    />
 
     <select ng-if="fieldData.type === 'select'"
       class="form-control"
