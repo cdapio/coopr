@@ -9,7 +9,7 @@ module.exports = function(config){
       'dist/bundle/app.js',
       'dist/bundle/tpl.js',
       'bower_components/angular-mocks/angular-mocks.js',
-      'app/js/**/*.spec.js',
+      'app/js/**/*-test.js',
       'test/unit/**/*.js'
     ],
 

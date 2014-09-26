@@ -1,4 +1,4 @@
-'use strict';
+/*global module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 
 describe('myProgress', function() {
   beforeEach(module('coopr-ngui.directives'));

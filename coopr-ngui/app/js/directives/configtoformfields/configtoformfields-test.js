@@ -1,4 +1,4 @@
-'use strict';
+/*global module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 
 describe('directive myConfigtoformfields', function() {
   beforeEach(module('coopr-ngui.directives'));
@@ -44,7 +44,7 @@ describe('directive myConfigtoformfields', function() {
     expect(scope.model.foo).toEqual(config.fields.foo.default);
 
     scope.$apply(function () {
-      scope.config.fields.foo.tip = "new tip";
+      scope.config.fields.foo.tip = 'new tip';
       scope.config.fields.foo.override = false;
     });
 

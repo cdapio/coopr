@@ -2,7 +2,7 @@
 
 describe('directive tests', function() {
 
-  it('moved to *.spec.js files inside each directive directory', function() {
+  it('moved to *-test.js files inside each directive directory', function() {
     expect(true).toBeTruthy();
   });
 
