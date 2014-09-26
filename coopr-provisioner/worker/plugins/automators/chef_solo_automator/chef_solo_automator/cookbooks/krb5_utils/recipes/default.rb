@@ -47,13 +47,17 @@ keytab_dir = node['krb5_utils']['keytabs_dir']
   node['krb5_utils'][kt].each do |name, opts|
     case kt
     when 'krb5_service_keytabs'
-      http_principal = "HTTP/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
-      principal = "#{name}/#{node['fqdn']}@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
+      if node['krb5_utils']['add_http_principal']
+        http_principal = "HTTP/#{node['fqdn']}@#{node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase}"
+      else
+        http_principal = ''
+      end
+      principal = "#{name}/#{node['fqdn']}@#{node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase}"
       keytab_file = "#{name}.service.keytab"
       randkey = '-randkey'
     when 'krb5_user_keytabs'
       http_principal = ''
-      principal = "#{name}@#{node['krb5']['krb5_conf']['realms']['default_realm'].upcase}"
+      principal = "#{name}@#{node['krb5']['krb5_conf']['libdefaults']['default_realm'].upcase}"
       keytab_file = "#{name}.keytab"
       randkey = '-norandkey'
     end
