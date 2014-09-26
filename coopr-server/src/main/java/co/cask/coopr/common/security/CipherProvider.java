@@ -1,6 +1,5 @@
-package co.cask.coopr.common.security;
 /*
- * Copyright 2012-2014, Continuuity, Inc.
+ * Copyright © 2014 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +13,8 @@ package co.cask.coopr.common.security;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package co.cask.coopr.common.security;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.codec.DecoderException;
