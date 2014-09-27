@@ -60,9 +60,14 @@ angular.module(PKG.name)
         authorizedRoles: MYAUTH_ROLE.admin
       }))
         .state(crud('Template', 'list', 'CrudListCtrl'))
-        .state(crud('Template', 'edit'))
-        .state(crud('Template', 'create')) 
-
+        .state(crud('Template', 'edit', 'TemplateFormCtrl'))
+          .state('templates.edit.tab', {
+            url: '/tab/:tab'
+          }) 
+        .state(crud('Template', 'create', 'TemplateFormCtrl')) 
+          .state('templates.create.tab', {
+            url: '/tab/:tab'
+          }) 
 
 
       /*

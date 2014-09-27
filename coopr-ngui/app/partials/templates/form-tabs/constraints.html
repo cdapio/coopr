@@ -1,0 +1,67 @@
+<div class="form-group">
+  <label for="inputTemplateSizeMin" class="col-xs-2 control-label">
+    Size
+  </label>
+  <div class="col-xs-3">
+    <div class="input-group">
+      <label for="inputTemplateSizeMin" class="input-group-addon">
+        Minimum
+      </label>
+      <input id="inputTemplateSizeMin" class="form-control" type="number" 
+        ng-model="model.constraints.size.min"
+        ng-pattern="/^\d+$/"
+        min="0" max="{{model.constraints.size.max}}" required/>
+    </div>
+  </div>
+  <div class="col-xs-3">
+    <div class="input-group">
+      <label for="inputTemplateSizeMax"class="input-group-addon">
+        Maximum
+      </label>
+      <input id="inputTemplateSizeMax" class="form-control" type="number" 
+        ng-model="model.constraints.size.max"
+        ng-pattern="/^\d+$/"
+        min="{{model.constraints.size.min}}" max="2147483647" required/>
+    </div>
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="inputTemplateMustCoexist" class="col-xs-2 control-label">
+    Must co-exist
+  </label>
+  <div class="col-xs-10">
+
+    <div ng-repeat="group in model.constraints.layout.mustcoexist" class="clearfix">
+
+      <p class="pull-left form-control-static">
+        <a href="" class="btn btn-danger btn-xs" 
+          ng-click="model.constraints.layout.mustcoexist.splice($index, 1)"
+        >
+          <span class="fa fa-trash"></span>
+          Remove group
+        </a>
+      </p>
+
+      <my-service-picker
+        data-model="group"
+        data-allow-rm="true"
+        data-available="model.compatibility.services"
+      ></my-service-picker>
+
+    </div>
+
+    <p>
+      <a href="" class="btn btn-info btn-xs" 
+        ng-click="model.constraints.layout.mustcoexist.push([])"
+      >
+        <span class="fa fa-plus"></span>
+        Add group
+      </a>
+    </p>
+
+  </div>
+</div>
+
+
+
