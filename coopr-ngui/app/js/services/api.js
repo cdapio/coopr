@@ -14,6 +14,7 @@ module.factory('myApiPrefix', function myApiPrefixFactory ($location, MY_CONFIG)
   if(restPath.substr(-1)!=='/') {
     restPath += '/'; // then we ensure it ends with a slash
   }
+  restPath += 'v2/'; // and add the version
 
   /* end result should look something like:
 
