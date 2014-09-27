@@ -80,7 +80,7 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
 
 
 
-  if(angular.isUndefined(id)) {
+  if(!$scope.editing) {
     /*
     creating a new cluster
      */
