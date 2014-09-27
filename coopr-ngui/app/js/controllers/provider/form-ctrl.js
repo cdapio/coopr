@@ -12,9 +12,8 @@ function ($scope, $state, $q, myApi, CrudFormBase) {
   /* type {Object} */
   $scope.selectedProvider = {};
 
-  if(!$state.includes('*.create')) {
+  if($scope.editing) {
 
-    $scope.editing = true;
     $scope.model = myApi.Provider.get($state.params);
     $scope.model.$promise['catch'](function () { $state.go('404'); });
 
