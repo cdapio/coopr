@@ -9,7 +9,14 @@
       <hr />
 
       <div class="form-group">
-        <div class="col-xs-10 col-xs-offset-2">
+        <div class="col-xs-2 text-right">
+          <p class="form-control-static">
+            <a href="" ng-click="debugJson.visible = true" ng-hide="debugJson.visible">
+              <small>preview json <span class="fa fa-toggle-right fa-fw"></span></small>
+            </a>
+          </p>
+        </div>
+        <div class="col-xs-10">
 
           <button type="button" class="btn btn-sm btn-default pull-right" 
             ng-disabled="templateForm.$invalid"
@@ -36,4 +43,4 @@
 
 </form>
 
-<pre>{{model | json}}</pre>
+<pre ng-show="debugJson.visible" class="am-fade-and-slide-top">{{model | json}}</pre>

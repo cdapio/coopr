@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('TemplateFormCtrl', 
-function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
+function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -37,6 +37,11 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
   }
 
 
+  $scope.debugJson = {
+    visible: false
+  };
+
+
 
   /*
     tabs
@@ -50,6 +55,7 @@ function ($scope, $state, myApi, $q, myHelpers, CrudFormBase) {
 
   $scope.nextTab = function () {
     $scope.tabs.activeTab++;
+    $window.scrollTo(0,0);
   }
 
   $scope.$watch('tabs.activeTab', function (newVal) {
