@@ -37,8 +37,11 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
   }
 
 
+  /*
+    collapsible side panel
+   */
   $scope.debugJson = {
-    visible: false
+    visible: !$scope.editing
   };
 
 
@@ -135,6 +138,12 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
     constraints section
    */
 
+  $scope.rmServiceConstraint = function (key) {
+    delete $scope.model.constraints.services[key];
+  }
 
+  $scope.addServiceConstraint = function () {
+    alert('it doesnt work yet');
+  }
 
 });

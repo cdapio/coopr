@@ -28,6 +28,7 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
 
     controller: function ($scope, myApi) {
 
+      $scope.listInline = true;
       $scope.thingName = "service";
 
       $scope.rmService = function (what) {
@@ -37,6 +38,9 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
       };
 
       $scope.addService = function (name) {
+        if(!angular.isArray($scope.model)) {
+          $scope.model = [];
+        }
         $scope.model.push(name);
       };
 

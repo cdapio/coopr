@@ -1,3 +1,10 @@
+<div class="row">
+  <div class="col-xs-4 am-fade-and-slide-left" ng-show="debugJson.visible">
+    <pre>{{model | json}}</pre>
+  </div>
+  <div ng-class="{'col-xs-8': debugJson.visible}">
+
+
 <form name="templateForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
 
   <div ng-model="tabs.activeTab" bs-tabs>
@@ -9,10 +16,15 @@
       <hr />
 
       <div class="form-group">
-        <div class="col-xs-2 text-right">
-          <p class="form-control-static">
-            <a href="" ng-click="debugJson.visible = true" ng-hide="debugJson.visible">
-              <small>preview json <span class="fa fa-toggle-right fa-fw"></span></small>
+        <div class="col-xs-2">
+          <p class="form-control-static" ng-hide="debugJson.visible">
+            <a href="" ng-click="debugJson.visible = !debugJson.visible">
+              <small>
+                <span class="fa fa-fw" ng-class="{
+                  'fa-toggle-left': !debugJson.visible,
+                  'fa-toggle-down': debugJson.visible
+                }"></span>json preview
+              </small>
             </a>
           </p>
         </div>
@@ -43,4 +55,7 @@
 
 </form>
 
-<pre ng-show="debugJson.visible" class="am-fade-and-slide-top">{{model | json}}</pre>
+
+
+  </div>
+</div>

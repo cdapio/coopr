@@ -40,6 +40,7 @@ module.factory('CrudListBase', function CrudListBaseFactory() {
 module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
   return function CrudFormBase () {
     var $state = $injector.get('$state'),
+        $alert = $injector.get('$alert'),
         myApi = $injector.get('myApi'),
         editing = !$state.current.name.match(/\.create/),
         scope = this;
@@ -68,6 +69,14 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
         .then(function () {
           scope.fetchSubnavList();
           $state.go($state.current.name.split('.')[0] + '.list');
+
+          $alert({
+            title: $state.current.data.modelName, 
+            content: method.substring(1) + ' succeeded!', 
+            type: 'success', 
+            duration: 3
+          });
+
         })
         .finally(function () {
           scope.submitting = false;

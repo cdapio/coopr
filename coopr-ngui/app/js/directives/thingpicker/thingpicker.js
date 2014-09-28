@@ -13,6 +13,7 @@ function myThingPickerDirective () {
       model: '=', // an array of names
       available: '=', // an array of strings, or of objects with name & description keys
       allowRm: '=', // allow removal boolean
+      listInline: '@',
       thingName: '@'
     },
 
@@ -25,6 +26,9 @@ function myThingPickerDirective () {
       };
 
       $scope.addThing = function (thing) {
+        if(!angular.isArray($scope.model)) {
+          $scope.model = [];
+        }
         $scope.model.push(thing);
       };
 
