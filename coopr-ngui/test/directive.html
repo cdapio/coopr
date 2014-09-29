@@ -18,7 +18,6 @@
   </header>
 
   <div class="container">
-
     <hr />
 
     <section
@@ -26,32 +25,50 @@
     >
       <h6>thing picker</h6>
 
+      <div class="row">
+        <div class="col-xs-9">
+
       <my-thing-picker
         data-model="thingPicker.model"
         data-available="thingPicker.avail"
         data-allow-rm="true"
       ></my-thing-picker>
 
-    </section>
+        </div>
+        <div class="col-xs-3">
+          <pre>{{thingPicker.model | json}}</pre>
+        </div>
+      </div>
 
+
+    </section>
     <hr />
 
     <section>
       <h6>password</h6>
 
       <my-password value="'supers3cr3t'"></my-password>
-    </section>
 
+    </section>
     <hr />
 
     <section ng-init="doublerange = {}">
       <h6>doublerange</h6>
+
+      <div class="row">
+        <div class="col-xs-9">
 
       <my-doublerange
         data-model="doublerange"
         data-min="0"
         data-max="100"
       ></my-doublerange>
+
+        </div>
+        <div class="col-xs-3">
+          <pre>{{doublerange | json}}</pre>
+        </div>
+      </div>
 
     </section>
 
