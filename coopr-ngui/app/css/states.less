@@ -1,0 +1,63 @@
+@import "./variables.less";
+@import "../../bower_components/bootstrap/less/mixins.less";
+
+/**
+ * per-state styles
+ */
+
+body.state-clusters-detail {
+  .coopr-list-striped > li {
+    padding: 1em;
+  }
+
+  .modal table {
+    margin: 0;
+    font-size: 10px;
+  }
+
+  .panel {
+
+    .panel-heading a:hover {
+      text-decoration: none;
+      small {
+        text-decoration: underline;
+      }
+    }
+
+    .panel-body {
+      padding: 0;
+
+      .table-responsive {
+        table {
+          margin: 0;
+        }
+        @media (max-width: @screen-xs-max) {
+          border: none;
+        }
+      }
+    }
+  }
+
+
+
+}
+
+
+body.state-clusters-list {
+  td > div.progress {
+    min-width: 100px;
+  }
+}
+
+
+body.state-templates {
+  table.coopr-service-constraints {
+    .my-thing-picker {
+      width: 140px;
+      a.disabled {
+        max-width: 105px;
+        overflow: hidden;
+      }
+    }
+  }
+}

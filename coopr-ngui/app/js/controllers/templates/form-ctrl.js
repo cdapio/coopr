@@ -30,7 +30,8 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
         layout: {
           mustcoexist: [],
           cantcoexist: []          
-        }
+        },
+        services: {}
       }
     });
     promise = $q.when($scope.model);
@@ -140,10 +141,52 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
 
   $scope.rmServiceConstraint = function (key) {
     delete $scope.model.constraints.services[key];
+  };
+
+  $scope.showServiceConstraintTable = function () {
+    return !!getConstrainedServices().length;
+  };
+
+  $scope.doAddServiceConstraint = function (key) {
+    $scope.model.constraints.services[key] = {
+      quantities: {},
+      imagetypes: [],
+      hardwaretypes: [],
+    };
+  };
+
+
+  $scope.addServiceConstraintDd = [];
+
+  $scope.$watchCollection('model.constraints.services', rebuildServiceConstraintDd);
+  $scope.$watchCollection('model.compatibility.services', rebuildServiceConstraintDd);
+
+
+
+
+  function getConstrainedServices() {
+    try {
+      return Object.keys($scope.model.constraints.services);
+    } catch(e) {
+      return [];
+    }
   }
 
-  $scope.addServiceConstraint = function () {
-    alert('it doesnt work yet');
+
+  function rebuildServiceConstraintDd() {
+    if(!$scope.model.compatibility) { return; }
+    var constrained = getConstrainedServices();
+    $scope.addSvcConstraintDd = $scope.model.compatibility.services
+      .filter(function(svc) {
+        return constrained.indexOf(svc)===-1;
+      })
+      .map(function (svc) {
+        return {
+          text: svc,
+          click: 'doAddServiceConstraint("'+svc+'")'
+        };
+      });
   }
 
 });
+

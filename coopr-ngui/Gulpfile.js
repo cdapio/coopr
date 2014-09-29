@@ -36,7 +36,8 @@ gulp.task('css:app', function() {
   return gulp.src([
       './app/js/directives/**/*.{less,css}',
       './app/css/themes/*.less',
-      './app/css/common.less'
+      './app/css/common.less',
+      './app/css/states.less'
     ])
     .pipe(plumber())
     .pipe(plug.if('*.less', plug.less()))

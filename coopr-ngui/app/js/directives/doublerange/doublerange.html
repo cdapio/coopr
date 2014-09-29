@@ -1,36 +1,40 @@
 <div class="my-doublerange">
 
-  <div class="row">
-    <div class="col-xs-6">
-      <small>min:</small>
-    </div>
-    <div class="col-xs-6" ng-class="{'text-right': html5}">
-      <small>max:</small>
-    </div>
-  </div>
-
   <div class="{{ html5 ? 'html5ranges' : 'row' }}">
     <div class="{{ html5 ? 'pull-left range' : 'col-xs-6' }}">
-      <input type="{{ html5 ? 'range' : 'number' }}"
-        title="Minimum" 
-        step="1"
-        ng-pattern="/^-?\d+$/"
-        min="{{ getConstraint('min', 'min') }}"
-        max="{{ getConstraint('max', 'min') }}"
-        ng-class="{ 'form-control input-sm': !html5 }" 
-        ng-model="range.min"
-      />
+      <span ng-class="{'input-group input-group-sm': !html5}">
+        <span class="{{ html5 ? 'sr-only' : 'input-group-addon' }}">
+          Min:
+        </span>
+
+        <input type="{{ html5 ? 'range' : 'number' }}"
+          step="1"
+          ng-pattern="/^-?\d+$/"
+          min="{{ getConstraint('min', 'min') }}"
+          max="{{ getConstraint('max', 'min') }}"
+          ng-class="{ 'form-control': !html5 }" 
+          ng-model="range.min"
+        />
+
+      </span>
     </div>
     <div class="{{ html5 ? 'pull-right range' : 'col-xs-6' }}">
-      <input type="{{ html5 ? 'range' : 'number' }}" 
-        title="Maximum"
-        step="1"
-        ng-pattern="/^-?\d+$/"
-        min="{{ getConstraint('min', 'max') }}"
-        max="{{ getConstraint('max', 'max') }}"
-        ng-class="{ 'form-control input-sm': !html5 }" 
-        ng-model="range.max"
-      />
+      <span ng-class="{'input-group input-group-sm': !html5}">
+        <span class="{{ html5 ? 'sr-only' : 'input-group-addon' }}">
+          Max:
+        </span>
+
+        <input type="{{ html5 ? 'range' : 'number' }}" 
+          step="1"
+          ng-pattern="/^-?\d+$/"
+          min="{{ getConstraint('min', 'max') }}"
+          max="{{ getConstraint('max', 'max') }}"
+          ng-class="{ 'form-control': !html5 }" 
+          ng-model="range.max"
+        />
+
+      </span>
+
     </div>
   </div>
 
@@ -39,8 +43,10 @@
       <span class="label label-info" 
         ng-bind="model.min"
       ></span>
+      <small>min</small>
     </div>
     <div class="col-xs-6 text-right">
+      <small>max</small>
       <span class="label label-info" 
         ng-bind="model.max"
       ></span>
