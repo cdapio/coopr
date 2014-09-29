@@ -2,27 +2,12 @@
   <label for="inputTemplateSizeMin" class="col-xs-2 control-label">
     Size
   </label>
-  <div class="col-xs-3">
-    <div class="input-group">
-      <label for="inputTemplateSizeMin" class="input-group-addon">
-        Minimum
-      </label>
-      <input id="inputTemplateSizeMin" class="form-control" type="number" 
-        ng-model="model.constraints.size.min"
-        ng-pattern="/^\d+$/"
-        min="0" max="{{model.constraints.size.max}}" required/>
-    </div>
-  </div>
-  <div class="col-xs-3">
-    <div class="input-group">
-      <label for="inputTemplateSizeMax"class="input-group-addon">
-        Maximum
-      </label>
-      <input id="inputTemplateSizeMax" class="form-control" type="number" 
-        ng-model="model.constraints.size.max"
-        ng-pattern="/^\d+$/"
-        min="{{model.constraints.size.min}}" max="2147483647" required/>
-    </div>
+  <div class="col-xs-10">
+
+    <my-doublerange
+      data-model="model.constraints.size"
+    ></my-doublerange>
+
   </div>
 </div>
 
@@ -153,7 +138,9 @@
             </td>
 
             <td>
-              <code>{{item.quantities | json}}</code>
+              <my-doublerange
+                data-model="item.quantities"
+              ></my-doublerange>
             </td>
 
             <td width="1" class="text-right">

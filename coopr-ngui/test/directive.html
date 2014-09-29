@@ -26,7 +26,7 @@
       <h6>thing picker</h6>
 
       <div class="row">
-        <div class="col-xs-9">
+        <div class="col-sm-9">
 
       <my-thing-picker
         data-model="thingPicker.model"
@@ -35,7 +35,7 @@
       ></my-thing-picker>
 
         </div>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <pre>{{thingPicker.model | json}}</pre>
         </div>
       </div>
@@ -52,23 +52,23 @@
     </section>
     <hr />
 
-    <section ng-init="doublerange = {}">
+    <section ng-init="doublerange = {max:10}">
       <h6>doublerange</h6>
 
       <div class="row">
-        <div class="col-xs-9">
+        <div class="col-sm-9">
 
-      <my-doublerange
-        data-model="doublerange"
-        data-min="0"
-        data-max="100"
-      ></my-doublerange>
+          <my-doublerange
+            data-model="doublerange"
+            data-html5="true"
+          ></my-doublerange>
 
         </div>
-        <div class="col-xs-3">
+        <div class="col-sm-3">
           <pre>{{doublerange | json}}</pre>
         </div>
       </div>
+
 
     </section>
 
