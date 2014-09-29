@@ -1,0 +1,37 @@
+<div class="my-doublerange">
+
+  <div class="row">
+    <div class="col-xs-6">
+      <small>min:</small> {{model.min}}
+    </div>
+    <div class="col-xs-6 text-right">
+      <small>max:</small> {{model.max}}
+    </div>
+  </div>
+
+  <div class="ranges">
+    <input type="range"
+      class="pull-left" 
+      min="{{getConstraint('min', 'min')}}"
+      max="{{getConstraint('max', 'min')}}"
+      ng-model="range.min"
+    />
+    <input type="range" 
+      class="" 
+      min="{{getConstraint('min', 'max')}}"
+      max="{{getConstraint('max', 'max')}}"
+      ng-model="range.max"
+    />
+  </div>
+
+  <div class="clearfix text-muted">
+    <small class="pull-left">
+{{getConstraint('min', 'min')}}-{{getConstraint('max', 'min')}}
+    </small>
+    <small class="pull-right">
+{{getConstraint('min', 'max')}}-{{getConstraint('max', 'max')}}
+    </small>
+  </div>
+
+  <pre>{{model | json}}</pre>
+</div>
