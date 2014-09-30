@@ -12,7 +12,7 @@
       "image": "ami-b158c981"
     },
     "google": {
-      "image": "centos-6-v20140718"
+      "image": "centos-6-v20140926"
     },
     "joyent": {
       "image": "bf67d2fc-2ed1-11e4-a6ef-a7df3cdba7e9"
