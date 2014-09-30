@@ -47,7 +47,6 @@ class FogProviderRackspace < Provider
           name: hostname,
           config_drive: @rackspace_config_drive || false,
           metadata: @rackspace_metadata,
-          disk_config: @rackspace_disk_config || 'AUTO',
           personality: files,
           key_name: @ssh_keypair
         )
