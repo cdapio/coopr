@@ -40,23 +40,39 @@ require('http-server')
     before: [
       httpLogger,
       function (req, res) {
-        if(req.url !== '/config.json') {
+        var reqUrl = req.url.match(/^\/config\.(js.*)/);
+
+        if(!reqUrl) {
           // all other paths are passed to ecstatic
           return res.emit('next');
         }
-        res.writeHead(200, { 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store, must-revalidate'
-        });
 
-        res.end(JSON.stringify({
+        var data = JSON.stringify({
           // the following will be available in angular via the "MY_CONFIG" injectable
 
           COOPR_SERVER_URI: COOPR_SERVER_URI,
           COOPR_CORS_PORT: COOPR_CORS_PORT,
           authorization: req.headers.authorization
 
-        }));
+        });
+
+        var contentType;
+
+        if(reqUrl[1] === 'json') {
+          contentType = 'application/json';
+        }
+        else { // want JS
+          contentType = 'text/javascript';
+          data = 'angular.module("'+pkg.name+'.config", [])' + 
+                    '.constant("MY_CONFIG",'+data+');';
+        }
+
+        res.writeHead(200, { 
+          'Content-Type': contentType,
+          'Cache-Control': 'no-store, must-revalidate'
+        });
+
+        res.end(data);
       }
     ]
   })

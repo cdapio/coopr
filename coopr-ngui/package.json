@@ -17,9 +17,9 @@
     "test-single-run": "node ./node_modules/karma/bin/karma start test/karma-conf.js --no-auto-watch --single-run",
 
     "update-webdriver": "webdriver-manager update",
-    "preprotractor": "http-server -p 9090 ./dist & npm run update-webdriver",
+    "preprotractor": "node ./server.js --protractor & npm run update-webdriver",
     "protractor": "protractor test/protractor-conf.js || true",
-    "postprotractor": "pkill -fn \"http-server -p 9090\" && true"
+    "postprotractor": "pkill -fn \"node ./server.js --protractor\" && true"
   },
   "devDependencies": {
     "bower": "^1.3.10",
