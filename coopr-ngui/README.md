@@ -5,7 +5,7 @@ Coopr Angular UI
 
 first you need a server
 
-* `cd standalone`
+* `cd coopr-standalone`
 * `mvn clean package assembly:single`
 * `open target` and unzip the _SNAPSHOT-standalone_ file
 * `COOPR_USE_DUMMY_PROVISIONER=true COOPR_DISABLE_UI=true target/(...)/bin/coopr.sh start -f 50`
@@ -34,24 +34,22 @@ then, each in their own tab:
 
 ### for testing:
 
-* `cd ngui`
+* `cd coopr-ngui`
 * `npm run build` ( == `npm install && bower install && gulp build`)
 * `npm run test-single-run` (unit tests)
 * `npm run protractor` (end-to-end tests)
 
-protractor spins up a server on port `9090`
-
 ### for production:
 
-generate a minified build of static assets, in the `ngui/dist/` folder
+generate a minified build of static assets, in the `coopr-ngui/dist/` folder
 
-* `cd ngui`
+* `cd coopr-ngui`
 * `npm run build` ( == `npm install && bower install && gulp build`)
 * `gulp minify`
 
 now to run the server, possibly on a different host:
 
-* `cd ngui`
+* `cd coopr-ngui`
 * `npm install --production` (will skip devDependencies)
 * `export COOPR_UI_PORT=8100`
 * `export COOPR_CORS_PORT=8101`
