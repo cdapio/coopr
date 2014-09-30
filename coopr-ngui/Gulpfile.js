@@ -91,7 +91,8 @@ gulp.task('js:app', function() {
     v: pkg.version
   });
   return gulp.src([
-      './app/**/*.js'
+      './app/**/*.js',
+      '!./app/**/*-test.js'
     ])
     .pipe(plumber())
     .pipe(plug.ngAnnotate())
