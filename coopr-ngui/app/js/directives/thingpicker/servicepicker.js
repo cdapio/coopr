@@ -29,7 +29,7 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
     controller: function ($scope, myApi) {
 
       $scope.listInline = true;
-      $scope.thingName = "service";
+      $scope.thingName = 'service';
 
       $scope.rmService = function (what) {
         $scope.model = $scope.model.filter(function (name) {

@@ -60,7 +60,7 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
   $scope.nextTab = function () {
     $scope.tabs.activeTab++;
     $window.scrollTo(0,0);
-  }
+  };
 
   $scope.$watch('tabs.activeTab', function (newVal) {
     $state.go($state.includes('**.tab') ? $state.current : '.tab', {tab:newVal});

@@ -23,7 +23,7 @@ function myDoublerangeDirective ($log) {
       // the max value for the max slider in html5 mode
       scope.maxThreshold = parseInt(attrs.maxThreshold, 10) || 100;
 
-      scope.maxout; // bool or null
+      scope.maxout = null; // bool or null
       scope.$watch('maxout', function (newVal) {
         if(newVal) {
           var max = parseInt(scope.inputMax, 10);
