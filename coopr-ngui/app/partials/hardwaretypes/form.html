@@ -24,7 +24,6 @@
         <label class="col-xs-2 control-label">Providers</label>
         <div class="col-xs-10" ng-hide="editing">
             <drop-down-text-combo
-                    class="hardware-create-section"
                     ng-repeat="(pkey, pvalue) in providerMapShadow"
                     text-value="pvalue.flavor"
                     drop-down-value="pvalue.name"
@@ -32,7 +31,7 @@
                     drop-down-disable="false">
 
             </drop-down-text-combo>
-            <div class="col-xs-4 hardware-create-section" >
+            <div class="col-xs-4" >
                 <button ng-hide="editing"
                         class="btn btn-default"
                         ng-click="addProviderHandlerOnCreate($event)">
@@ -43,7 +42,6 @@
         <div class="col-xs-10" ng-show="editing">
 
             <drop-down-text-combo
-                    class="hardware-create-section"
                     ng-repeat="(pkey, pvalue) in providerMapShadow"
                     text-value="pvalue.flavor"
                     drop-down-value="pvalue.name"
@@ -52,19 +50,20 @@
 
             </drop-down-text-combo>
             <drop-down-text-combo
-                    class="hardware-create-section"
                     ng-repeat="(pkey, pvalue) in providerMapShadowNew"
                     text-value="pvalue.flavor"
                     drop-down-value="pvalue.name"
                     drop-down-options="allProviders"
                     drop-down-disable="false"
                     ></drop-down-text-combo>
-            <div class="col-xs-4 hardware-create-section" >
-                <button ng-show="editing"
-                        class="btn btn-default"
-                        ng-click="addProviderHandlerOnEdit($event)">
-                    + Providers
-                </button>
+            <div class="row">
+              <div class="col-xs-6" >
+                  <button ng-show="editing"
+                          class="btn btn-default hardware-create-section"
+                          ng-click="addProviderHandlerOnEdit($event)">
+                      + Providers
+                  </button>
+              </div>
             </div>
         </div>
     </div>
