@@ -200,7 +200,7 @@ gulp.task('watch', ['build'], function() {
   gulp.watch('./dist/**/*')
     .on('change', plug.livereload.changed);
 
-  gulp.watch('./app/**/*.js', ['js:app']);
+  gulp.watch(['./app/**/*.js', '!./app/**/*-test.js'], ['js:app']);
   gulp.watch('./app/**/*.{less,css}', ['css:app']);
   gulp.watch(['./app/js/directives/**/*.html', './app/partials/home.html'], ['tpl']);
   gulp.watch('./app/**/*.html', ['html']);

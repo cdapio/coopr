@@ -37,7 +37,7 @@ describe('directive myConfigtoformfields', function() {
     scope.$digest();
 
     expect(el.find('label').length).toEqual(1);
-    expect(el.find('label').text()).toEqual(config.fields.foo.label);
+    expect(el.find('label').text()).toMatch(config.fields.foo.label);
 
     expect(el.find('input').attr('required')).toBeFalsy();
 
@@ -66,7 +66,7 @@ describe('directive myConfigtoformfields', function() {
           type: 'text'
         }
       },
-      required: ['bar']
+      required: [['bar']]
     };
 
     scope.config = config; 
@@ -78,21 +78,24 @@ describe('directive myConfigtoformfields', function() {
     expect(el.find('input').attr('required')).toBeFalsy();
 
     scope.$apply(function () {
-      scope.config.required = ['foo'];
+      scope.config.required = [['foo', 'bar'], ['baz']];
+    });
+    expect(el.find('input').attr('required')).toBeFalsy();
+
+    scope.$apply(function () {
+      scope.model.foo = 'hello';
     });
     expect(el.find('input').attr('required')).toBeTruthy();
-
 
     scope.$apply(function () {
       scope.config.required = [];
     });
     expect(el.find('input').attr('required')).toBeFalsy();
 
-
     scope.$apply(function () {
-      scope.config.required = [['foo', 'bar'], ['baz']];
+      scope.model.foo = 'hello again';
     });
-    expect(el.find('input').attr('required')).toBeTruthy();
+    expect(el.find('input').attr('required')).toBeFalsy();
   });
 
 
