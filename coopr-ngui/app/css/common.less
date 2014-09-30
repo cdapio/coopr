@@ -59,6 +59,10 @@ main.container {
   }
 }
 
+fieldset.row {
+  margin-bottom: 1px;
+}
+
 @media (max-width: @screen-xs-max) {
   .form-control {
     margin-bottom: 1px;
@@ -83,6 +87,18 @@ span.text-info[bs-tooltip] {
   margin-top: 1em;
 }
 
+.nav-tabs > li > a {
+  cursor: pointer;
+}
+
+fieldset.tab-pane {
+  padding-top: 1em;
+
+  &.am-fade.active-add {
+    // cf http://mgcrea.github.io/angular-strap/##tabs-usage
+    animation-name: fadeIn;
+  }
+}
 
 body div.progress {
   margin: 1px; /* by default they have just margin-bottom: 20px */
@@ -120,51 +136,14 @@ body div.progress {
 }
 
 
-/**
- * per-state styles
- */
 
-body.state-clusters-detail {
-  .coopr-list-striped > li {
-    padding: 1em;
-  }
-
-  .modal table {
-    margin: 0;
-    font-size: 10px;
-  }
-
-  .panel {
-
-    .panel-heading a:hover {
-      text-decoration: none;
-      small {
-        text-decoration: underline;
-      }
-    }
-
-    .panel-body {
-      padding: 0;
-
-      .table-responsive {
-        table {
-          margin: 0;
-        }
-        @media (max-width: @screen-xs-max) {
-          border: none;
-        }
-      }
-    }
-  }
-
-
-
+.coopr-constraint-group {
+  .clearfix();
+  border: 1px solid @gray-lighter;
+  padding: 6px 9px 1px;
+  margin-bottom: 2px;
 }
 
 
-body.state-clusters-list {
-  td > div.progress {
-    min-width: 100px;
-  }
-}
+
 

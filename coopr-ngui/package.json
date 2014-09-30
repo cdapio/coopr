@@ -13,8 +13,8 @@
     "pretravis": "npm run build",
     "travis": "node ./node_modules/gulp/bin/gulp.js jshint && npm run test-single-run",
 
-    "test": "node ./node_modules/karma/bin/karma start test/karma.conf.js",    
-    "test-single-run": "node ./node_modules/karma/bin/karma start test/karma.conf.js --no-auto-watch --single-run",
+    "test": "node ./node_modules/karma/bin/karma start test/karma-conf.js",    
+    "test-single-run": "node ./node_modules/karma/bin/karma start test/karma-conf.js --no-auto-watch --single-run",
 
     "update-webdriver": "webdriver-manager update",
     "preprotractor": "http-server -p 9090 ./dist & npm run update-webdriver",

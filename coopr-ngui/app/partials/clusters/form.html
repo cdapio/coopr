@@ -7,7 +7,8 @@
         placeholder="Name" 
         my-focus="inputClusterName"
         ng-disabled="model.id"
-        ng-pattern="/^\w+$/"
+        ng-pattern="/^[\w\.\-]+$/"
+        maxlength="255"
         ng-model="model.name" required/>
     </div>
   </div>
@@ -69,3 +70,4 @@
 
 </form>
 
+<pre>{{model | json}}</pre>

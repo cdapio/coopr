@@ -9,6 +9,7 @@ var pkg = require('./package.json'),
 
     COOPR_UI_PORT = parseInt(process.env.COOPR_UI_PORT || 8080, 10),
     COOPR_CORS_PORT = parseInt(process.env.COOPR_CORS_PORT || 8081, 10),
+    COOPR_SERVER_URI = process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054',
 
     color = {
       hilite: function (v) { return '\x1B[7m' + v + '\x1B[27m'; },
@@ -47,12 +48,11 @@ require('http-server')
           'Content-Type': 'application/json',
           'Cache-Control': 'no-store, must-revalidate'
         });
-        var cooprServerURI = process.env.COOPR_SERVER_URI || 'http://localhost:55044';
-        cooprServerURI += '/v2/';
+
         res.end(JSON.stringify({
           // the following will be available in angular via the "MY_CONFIG" injectable
 
-          COOPR_SERVER_URI: cooprServerURI,
+          COOPR_SERVER_URI: COOPR_SERVER_URI,
           COOPR_CORS_PORT: COOPR_CORS_PORT,
           authorization: req.headers.authorization
 

@@ -36,7 +36,8 @@ gulp.task('css:app', function() {
   return gulp.src([
       './app/js/directives/**/*.{less,css}',
       './app/css/themes/*.less',
-      './app/css/common.less'
+      './app/css/common.less',
+      './app/css/states.less'
     ])
     .pipe(plumber())
     .pipe(plug.if('*.less', plug.less()))
@@ -61,6 +62,8 @@ gulp.task('js:lib', function() {
 
       './bower_components/angular-strap/dist/modules/dimensions.js',
       './bower_components/angular-strap/dist/modules/button.js',
+      './bower_components/angular-strap/dist/modules/tab.js',
+      './bower_components/angular-strap/dist/modules/tab.tpl.js',
       './bower_components/angular-strap/dist/modules/tooltip.js',
       './bower_components/angular-strap/dist/modules/tooltip.tpl.js',
       './bower_components/angular-strap/dist/modules/dropdown.js',
@@ -91,7 +94,8 @@ gulp.task('js:app', function() {
     v: pkg.version
   });
   return gulp.src([
-      './app/**/*.js'
+      './app/**/*.js',
+      '!./app/**/*-test.js'
     ])
     .pipe(plumber())
     .pipe(plug.ngAnnotate())
@@ -196,7 +200,7 @@ gulp.task('watch', ['build'], function() {
   gulp.watch('./dist/**/*')
     .on('change', plug.livereload.changed);
 
-  gulp.watch('./app/**/*.js', ['js:app']);
+  gulp.watch(['./app/**/*.js', '!./app/**/*-test.js'], ['js:app']);
   gulp.watch('./app/**/*.{less,css}', ['css:app']);
   gulp.watch(['./app/js/directives/**/*.html', './app/partials/home.html'], ['tpl']);
   gulp.watch('./app/**/*.html', ['html']);

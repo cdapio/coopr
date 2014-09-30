@@ -8,19 +8,16 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
   CrudFormBase.apply($scope);
 
   var promise;
-  if($state.includes('*.create')) {
+  if($scope.editing) {
+    $scope.model = myApi.Tenant.get($state.params);
+    promise = $scope.model.$promise;
+  }
+  else {
     $scope.model = new myApi.Tenant();
     promise = $q.when($scope.model);
     $scope.model.maxClusters = 0;
     $scope.model.maxNodes = 0;
   }
-  else {
-    $scope.editing = true;
-    $scope.model = myApi.Tenant.get($state.params);
-    promise = $scope.model.$promise;
-  }
-
-  promise['catch'](function () { $state.go('404'); });
 
   $q.all({
     workers: myApi.Provisioner.getWorkerCapacity().$promise,
@@ -41,6 +38,7 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
       });
     }
 
-  });
+  })
+  ['catch'](function () { $state.go('404'); });
 
 });

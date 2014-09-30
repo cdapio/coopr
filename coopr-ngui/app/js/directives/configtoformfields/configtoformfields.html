@@ -1,0 +1,38 @@
+ <div class="form-group" ng-repeat="(name,fieldData) in config.fields">
+
+  <label class="col-xs-2 control-label">
+    {{fieldData.label}}
+  </label>
+  
+  <div class="col-xs-10">
+
+    <div class="checkbox" ng-if="fieldData.type === 'checkbox'">
+      <label>
+        <input type="checkbox"
+          ng-model="model[name]"
+          ng-disabled="allowOverride && !fieldData.override"
+        />
+        {{fieldData.tip}}
+      </label>
+    </div>
+
+    <input ng-if="fieldData.type === 'text' || fieldData.type === 'password'" 
+      class="form-control"
+      type="{{fieldData.type}}" 
+      placeholder="{{fieldData.tip}}" 
+      ng-model="model[name]"
+      ng-disabled="allowOverride && !fieldData.override"
+      ng-required="required[name]"
+    />
+
+    <select ng-if="fieldData.type === 'select'"
+      class="form-control"
+      title="{{fieldData.tip}}"
+      ng-model="model[name]"
+      ng-options="option as option for option in fieldData.options"
+      ng-required="required[name]"
+      ng-disabled="allowOverride && !fieldData.override">
+    </select>
+  
+  </div>
+</div>
