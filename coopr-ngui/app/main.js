@@ -112,7 +112,7 @@ angular
   });
 
 /**
- * Config is already defined in test env,
+ * Config is already defined in unit-test environment,
  * in all other cases we must fetch the config before bootstraping
  */
 try {

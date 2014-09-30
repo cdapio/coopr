@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-strict-di ng-app>
+<html lang="en" ng-strict-di>
 <head>
     <title ng-bind="$state.current | myTitleFilter">Coopr</title>
 
@@ -27,7 +27,7 @@
 
     <footer>
       <div class="container">
-        <p class="text-muted">
+        <p class="text-muted" ng-cloak>
           <small><strong>State:</strong> {{$state.current.name}} <tt>{{$state.params | json}}</tt></small>
           <span class="pull-right">&copy; 2014 Cask Data, Inc.</span>
         </p>
