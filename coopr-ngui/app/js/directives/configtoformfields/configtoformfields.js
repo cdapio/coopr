@@ -50,28 +50,31 @@ function myConfigtoformfieldsDirective () {
           return;
         }
 
-        if(oldVal) { // remove model values
+        if(oldVal) { 
+          // remove model values
           angular.forEach(oldVal.fields, function (field, key) {
             delete scope.model[key];
           });          
         }
 
-        if(newVal) { // set default values
+        if(newVal) {
+          // set default values
           angular.forEach(newVal.fields, function (field, key) {
             if (field.hasOwnProperty('default') && !scope.model[key]) {
               scope.model[key] = field.default;
             }
           });
-        }
 
-        // set required fields
-        scope.required = (newVal.required || []).reduce(function (memo, arr) {
-          // could be an array of strings, or an array of arrays of strings.
-          angular.forEach(angular.isArray(arr) ? arr : [arr], function (field) {
-            memo[field] = true;
-          });
-          return memo;
-        }, {});
+
+          // set required fields
+          scope.required = (newVal.required || []).reduce(function (memo, arr) {
+            // could be an array of strings, or an array of arrays of strings.
+            angular.forEach(angular.isArray(arr) ? arr : [arr], function (field) {
+              memo[field] = true;
+            });
+            return memo;
+          }, {});
+        }
 
       }, true);
 
