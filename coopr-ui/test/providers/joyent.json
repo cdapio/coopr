@@ -1,0 +1,12 @@
+{
+  "name": "joyent",
+  "description": "Joyent Compute Service",
+  "providertype": "joyent",
+  "provisioner": {
+    "joyent_username": "EXAMPLE_USERNAME",
+    "joyent_keyname": "EXAMPLE_KEYNAME",
+    "joyent_api_url": "https://us-west-1.api.joyentcloud.com",
+    "joyent_keyfile": "/opt/coopr/provisioner/worker/plugins/providers/joyent_provider/id_rsa_joyent",
+    "joyent_version": "~7.0"
+  }
+}

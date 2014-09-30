@@ -1,8 +1,11 @@
-Continuuity Loom CHANGELOG
-==========================
+Coopr CHANGELOG
+===============
 
 Unreleased
-----------
+-----------
+
+v0.9.8 (09/26/14)
+-----------------
 - AWS provider support ( Issues: #22 #322 )
 - MongoDB support for clusters ( Issues: #43 #130 )
 - Cluster size constraint ( Issues: #76 #418 )
@@ -14,10 +17,9 @@ Unreleased
 - Configuration settings renamed ( Issues: #213 )
 - Ability to sync an active cluster's template to its current version ( Issues: #214 )
 - Cluster owner macro ( Issues: #221 )
-- Loom Firewall updates ( Issues: #226 #227 )
+- Firewall updates ( Issues: #226 #227 )
 - Memcached support for clusters ( Issues: #237 )
 - Multi Tenancy ( Issues: #239, #253, #277, #284, #292, #325, #326 )
-- Include automator and provider types in export and import ( Issues: #246 )
 - Upgrade script ( Issues: #258 )
 - Fix Joyent server delete ( Issues: #272 )
 - Google Compute provider support ( Issues: #273 #474 )
@@ -37,6 +39,8 @@ Unreleased
 - Added additional info in get clusters API ( Issues: #401 #430 )
 - UI: fix when a provider type has no admin fields ( Issues: #409 )
 - Provisioner setup script ( Issues: #521 )
+
+As of version 0.9.8, the name of the product was changed to "Coopr".
 
 v0.9.7 (May 27, 2014)
 ---------------------

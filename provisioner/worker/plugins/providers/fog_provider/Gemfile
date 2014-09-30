@@ -1,5 +1,0 @@
-source 'https://rubygems.org'
-
-gem 'fog', '~> 1.21.0'
-gem 'net/ssh'
-gem 'google-api-client', '~> 0.6', '>= 0.6.2'
