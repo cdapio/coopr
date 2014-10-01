@@ -133,15 +133,24 @@ fields if your account uses VPC. The rest of the fields are optional.</p>
 before it can be used by workers. Coopr will take care of distributing the key to workers that need it. A UI for managing
 resources is coming in the next release. Until then, you must use the REST API directly (see
 <a class="reference internal" href="../../rest/plugins.html"><em>Plugin Resource API</em></a>), or use the data upload tool included in the provisioner package.</p>
-<p>For this example, enter &#8216;ec2&#8217; into the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>.
-To upload a key located at &#8216;/keys/aws/id_rsa&#8217; as a resource named &#8216;ec2&#8217;:</p>
+<p>For example, assume your ssh key is located at &#8216;/keys/aws/id_rsa&#8217; and you want to upload it as a resource named &#8216;ec2&#8217;.
+Enter &#8216;ec2&#8217; into the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>, then upload the resource.
+If you are using Coopr Standalone, run the following command from the unzipped standalone directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/aws/id_rsa providertypes/aws/ssh_keys/ec2 -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/aws/ssh_keys/ec2, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/aws/ssh_keys/ec2/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>If you have installed Coopr from packages or are running it using the VM image:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb sync /keys/aws/id_rsa providertypes/aws/ssh_keys/ec2 -u http://&lt;server&gt;:&lt;port&gt;
 upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/aws/ssh_keys/ec2, version: 1
 stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/aws/ssh_keys/ec2/versions/1/stage
 sync successful
 </pre></div>
 </div>
-<p>This will upload your key to the server, then sync it to make it available for use. After this you may
+<p>The port to use is the server port, which defaults to 55054 if you have not set it in your server configuration.
+This will upload your key to the server, then sync it to make it available for use. After this you may
 use this key in any aws provider by referring to it as &#8216;ec2&#8217;. Similarly, you may upload other keys you may want to use.
 For example, you could upload the another key and name it &#8216;ec2-east-1&#8217;. Then in the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field,
 you would enter &#8216;ec2-east-1&#8217;.</p>
@@ -159,9 +168,21 @@ a ssh key to ssh onto nodes, a ssh username for that key, and a zone. Enter the 
 be uploaded to the Coopr server before it can be used by workers.
 A UI for managing resources is coming in the next release. Until then, you must use the REST API directly (see
 <a class="reference internal" href="../../rest/plugins.html"><em>Plugin Resource API</em></a>), or use the data upload tool included in the provisioner package.</p>
-<p>For this example, enter &#8216;gce&#8217; in the <tt class="docutils literal"><span class="pre">API</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field and &#8216;coopr&#8217; in the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field.
+<p>For example, assume your google api key is located at &#8216;/keys/gce/gce.p12&#8217; and your ssh key is located at &#8216;/keys/gce/id_rsa&#8217;.
+Enter &#8216;gce&#8217; in the <tt class="docutils literal"><span class="pre">API</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field and &#8216;coopr&#8217; in the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field.
 We must then upload your api key and name it &#8216;gce&#8217;, and upload your ssh key and name it &#8216;coopr&#8217;.
-If your google api key is located at &#8216;/keys/gce/gce.p12&#8217; and your ssh key is located at &#8216;/keys/gce/id_rsa&#8217;:</p>
+If you are using Coopr Standalone, run the following commands from the unzipped standalone directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/gce/gce.p12 providertypes/google/api_keys/gce -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/api_keys/gce, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/api_keys/gce/versions/1/stage
+sync successful
+<span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/gce/id_rsa providertypes/google/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/ssh_keys/coopr, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/ssh_keys/coopr/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>If you have installed Coopr from packages or are running it using the VM image:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb sync /keys/gce/gce.p12 providertypes/google/api_keys/gce -u http://&lt;server&gt;:&lt;port&gt;
 upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/api_keys/gce, version: 1
 stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/google/api_keys/gce/versions/1/stage
@@ -172,7 +193,8 @@ stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v
 sync successful
 </pre></div>
 </div>
-<p>This will upload your api and ssh keys to the server, then sync them to make them available to use. After this you may
+<p>The port to use is the server port, which defaults to 55054 if you have not set it in your server configuration.
+This will upload your api and ssh keys to the server, then sync them to make them available to use. After this you may
 use these keys in any other google provider you manage. Similarly, you may upload other keys you may want to use.</p>
 <p>Once you are finished, click &#8216;Submit&#8217; to save your changes.</p>
 </div>
@@ -196,15 +218,24 @@ except for the <tt class="docutils literal"><span class="pre">SSH</span> <span c
 before it can be used by workers. Coopr will take care of distributing the key to workers that need it. A UI for managing
 resources is coming in the next release. Until then, you must use the REST API directly (see
 <a class="reference internal" href="../../rest/plugins.html"><em>Plugin Resource API</em></a>), or use the data upload tool included in the provisioner package.</p>
-<p>For this example, enter &#8216;coopr&#8217; into the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>.
-To upload a key located at &#8216;/keys/joyent/id_rsa&#8217; as a resource named &#8216;coopr&#8217;:</p>
+<p>For example, assume your key is located at &#8216;/keys/joyent/id_rsa&#8217; and you want to add it as a resource named &#8216;coopr&#8217;.
+Enter &#8216;coopr&#8217; into the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>, then upload the resource.
+If you are using Coopr Standalone, run the following command from the unzipped standalone directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/joyent/id_rsa providertypes/joyent/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/joyent/ssh_keys/coopr, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/joyent/ssh_keys/coopr/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>If you have installed Coopr from packages or are running it using the VM image:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb sync /keys/joyent/id_rsa providertypes/joyent/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
 upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/joyent/ssh_keys/coopr, version: 1
 stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/joyent/ssh_keys/coopr/versions/1/stage
 sync successful
 </pre></div>
 </div>
-<p>This will upload your key to the server, then sync it to make it available for use. After this you may
+<p>The port to use is the server port, which defaults to 55054 if you have not set it in your server configuration.
+This will upload your key to the server, then sync it to make it available for use. After this you may
 use this key in any joyent provider by referring to it as &#8216;coopr&#8217;. Similarly, you may upload other keys you may want to use.
 For example, you could upload the another key and name it &#8216;joyentuser&#8217;. Then in the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field,
 you would enter &#8216;joyentuser&#8217;.</p>
@@ -224,15 +255,24 @@ every field, except for the <tt class="docutils literal"><span class="pre">SSH</
 before it can be used by workers. Coopr will take care of distributing the key to workers that need it. A UI for managing
 resources is coming in the next release. Until then, you must use the REST API directly (see
 <a class="reference internal" href="../../rest/plugins.html"><em>Plugin Resource API</em></a>), or use the data upload tool included in the provisioner package.</p>
-<p>For this example, enter &#8216;coopr&#8217; into the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>.
-To upload a key located at &#8216;/keys/openstack/id_rsa&#8217; as a resource named &#8216;coopr&#8217;:</p>
+<p>For example, assume your key is located at &#8216;/keys/openstack/id_rsa&#8217; and you want to upload it as a resource named &#8216;coopr&#8217;.
+Enter &#8216;coopr&#8217; into the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt>, then upload the resource.
+If you are using Coopr Standalone, run the following command from the unzipped standalone directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>ruby provisioner/bin/data-uploader.rb sync /keys/openstack/id_rsa providertypes/openstack/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
+upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/openstack/ssh_keys/coopr, version: 1
+stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/openstack/ssh_keys/coopr/versions/1/stage
+sync successful
+</pre></div>
+</div>
+<p>If you have installed Coopr from packages or are running it using the VM image:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb sync /keys/openstack/id_rsa providertypes/openstack/ssh_keys/coopr -u http://&lt;server&gt;:&lt;port&gt;
 upload successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/openstack/ssh_keys/coopr, version: 1
 stage successful <span class="k">for </span>http://&lt;server&gt;:&lt;port&gt;/v2/plugins/providertypes/openstack/ssh_keys/coopr/versions/1/stage
 sync successful
 </pre></div>
 </div>
-<p>This will upload your key to the server, then sync it to make it available for use. After this you may
+<p>The port to use is the server port, which defaults to 55054 if you have not set it in your server configuration.
+This will upload your key to the server, then sync it to make it available for use. After this you may
 use this key in any openstack provider by referring to it as &#8216;coopr&#8217;. Similarly, you may upload other keys you may want to use.
 For example, you could upload another key and name it &#8216;havana&#8217;. Then in the <tt class="docutils literal"><span class="pre">SSH</span> <span class="pre">Key</span> <span class="pre">Resource</span> <span class="pre">Name</span></tt> field,
 you would enter &#8216;havana&#8217;. Once you are finished, click &#8216;Submit&#8217; to save your changes.</p>
