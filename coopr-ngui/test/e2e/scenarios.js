@@ -3,12 +3,26 @@
 
 describe('redirects', function() {
 
-  it('should go to homepage when navigated to /#/whatever', function() {
+  it('should show a 404 when navigatin to /#/whatever', function() {
     browser.get('/#/whatever');
-    expect(browser.getLocationAbsUrl()).toMatch("/#/");
 
-    expect(false).toBe(true);
+    expect(
+      browser.getLocationAbsUrl()
+    ).toMatch(/\/#\/whatever$/);
+
+    expect(
+      element(by.css('main .jumbotron')).getText()
+    ).toMatch("Page not found");
+
   });
 
+  it('should go to login when navigated to /#/signin', function() {
+    browser.get('/#/signin');
+
+    expect(
+      browser.getLocationAbsUrl()
+    ).toMatch(/\/#\/login$/);
+
+  });
 });
 
