@@ -58,5 +58,9 @@ describe("Test for drop-down-text-combo", function() {
     expect(scope.dropDownValue).toEqual("sola");
     expect(element.find("select").val()).toEqual("2");
   });
+  it("should populate the text value properly", function() {
+    expect(element.find("input").val()).toEqual("test1");
+  });
 
+  // Needs to add error handling while no data is provided.
 });
