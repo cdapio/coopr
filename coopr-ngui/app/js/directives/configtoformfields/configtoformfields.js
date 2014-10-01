@@ -71,17 +71,19 @@ function myConfigtoformfieldsDirective () {
       scope.$watchCollection('model', function setRequired (newVal) {
         var out = {};
 
-        angular.forEach(newVal, function (val, key) {
-          if(val && !out[key]) {
-            angular.forEach(scope.config.required, function (set) {
-              if(set.indexOf(key)>=0) {
-                angular.forEach(set, function (want) {
-                  out[want] = true;
-                });
-              }
-            });
-          }
-        });
+        if(scope.config) {
+          angular.forEach(newVal, function (val, key) {
+            if(val && !out[key]) {
+              angular.forEach(scope.config.required, function (set) {
+                if(set.indexOf(key)>=0) {
+                  angular.forEach(set, function (want) {
+                    out[want] = true;
+                  });
+                }
+              });
+            }
+          });
+        }
 
         scope.required = out;
       });
