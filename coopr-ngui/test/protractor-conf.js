@@ -1,4 +1,4 @@
-exports.config = {
+var config = {
   allScriptsTimeout: 11000,
 
   specs: [
@@ -21,3 +21,14 @@ exports.config = {
     browser.driver.manage().window().maximize();
   }
 };
+
+if (process.env.TRAVIS) {
+  config.sauceUser = process.env.SAUCE_USERNAME;
+  config.sauceKey = process.env.SAUCE_ACCESS_KEY;
+  config.capabilities['tunnel-identifier'] = process.env.TRAVIS_JOB_NUMBER;
+  config.capabilities['build'] = process.env.TRAVIS_BUILD_NUMBER;
+  config.capabilities['name'] = "coopr-ngui";
+}
+
+
+module.exports = config;
