@@ -1,16 +1,17 @@
+/*global module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 describe("Test for drop-down-text-combo", function() {
-  beforeEach(module(PKG.name + '.directives'));
+  beforeEach(module(PKG.name + ".directives"));
 
   var $compile, scope, element;
   beforeEach(inject(function($rootScope, $compile){
     element = angular.element(
-      '<drop-down-text-combo ' +
-            'text-value="textValue" ' +
-            'drop-down-value="dropDownValue" ' +
-            'drop-down-options="dropDownOptions" ' +
-            'drop-down-disable="isDropDownDisabled" ' +
-            '> '+
-        '</drop-down-text-combo>');
+      "<drop-down-text-combo " +
+            "text-value='textValue' " +
+            "drop-down-value='dropDownValue' " +
+            "drop-down-options='dropDownOptions' " +
+            "drop-down-disable='isDropDownDisabled' " +
+            "> "+
+        "</drop-down-text-combo>");
     scope = $rootScope.$new();
 
     scope.textValue = "test1";
@@ -53,7 +54,7 @@ describe("Test for drop-down-text-combo", function() {
       description: "horima"
     });
 
-    element.find("select").controller('ngModel').$setViewValue("sola");
+    element.find("select").controller("ngModel").$setViewValue("sola");
     scope.$digest();
     expect(scope.dropDownValue).toEqual("sola");
     expect(element.find("select").val()).toEqual("2");
@@ -73,7 +74,7 @@ describe("Test for drop-down-text-combo", function() {
     });
     scope.dropDownValue = "hola";
     scope.isDropDownDisabled = "true";
-    element.find("select").controller('ngModel').$setViewValue("sola");
+    element.find("select").controller("ngModel").$setViewValue("sola");
     scope.$digest();
     expect(scope.dropDownValue).toNotEqual("sola");
     expect(element.find("select").val()).toNotEqual("2");

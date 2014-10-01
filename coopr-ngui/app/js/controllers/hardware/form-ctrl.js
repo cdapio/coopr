@@ -27,7 +27,6 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
     $scope.model = myApi.HardwareType.get($state.params);
     $scope.model.$promise
       .then(function () {
-        window.a = $scope.model;
         $scope.providerMapShadow = Object.keys($scope.model.providermap || {})
         .map(function(key) {
           return {
