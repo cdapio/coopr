@@ -40,8 +40,8 @@ before_install:
 
 before_script:
   - "cd coopr-ngui && npm run build"
-  - "cd coopr-ngui && npm start > /dev/null &"
-  - "sleep 1" # give server time to start
+  - "npm start > /dev/null &"
+  - "cd .. && sleep 1" # give server time to start
 
 script:
   - "cd coopr-ngui && npm run travis && cd .. && mvn test"
