@@ -77,7 +77,14 @@ Required Parameters
 HTTP Responses
 ^^^^^^^^^^^^^^
 
-The server will respond with the id of the cluster added.
+The server will respond with the id of the cluster added. If there are required provider fields missing from
+the request, the server will respond with a JSON Object describing the missing fields. The response will
+contain a ``missingFields`` key which will be an array of JSON Objects containing the missing field as the
+key and the schema of the field as the value. It is an array of objects because there can be multiple sets
+of required fields. For example, it is possible that a provider may require both field1 and field2, or it may
+require field3 and field4. If only field2 is given in the request, then either field1 is missing, or both field3
+and field4 are missing.
+
 
 .. list-table:: 
    :widths: 15 10 
@@ -88,7 +95,7 @@ The server will respond with the id of the cluster added.
    * - 200 (OK)
      - Successfully created
    * - 400 (BAD_REQUEST)
-     - Bad request.  Missing name, clusterTemplate, or numMachines in the request body.
+     - Bad request.  Missing name, clusterTemplate, numMachines, or required providerFields in the request body.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 409 (CONFLICT)
@@ -105,6 +112,32 @@ Example
         -d '{ "name":"hadoop-dev", "description":"my hadoop dev cluster", "numMachines":"5", "clusterTemplate":"hadoop.example" }'
         http://<server>:<port>/<version>/clusters
  $ { "id":"00000079" }
+ $ curl -X POST 
+        -H 'Coopr-UserID:<userid>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
+        -d '{ "name":"hadoop-dev2", "numMachines":"5", "clusterTemplate":"hadoop.example", "provider":"rackspace" }'
+        http://<server>:<port>/<version>/clusters
+ $ { "id":"00000079" }
+   {
+       "missingFields": [
+           {
+               "api_password": {
+                   "label": "API key",
+                   "override": false,
+                   "sensitive": true,
+                   "tip": "Your API key",
+                   "type": "password"
+               },
+               "ssh_key": {
+                   "label": "SSH key",
+                   "override": false,
+                   "sensitive": true,
+                   "tip": "Your ssh key",
+               }
+           }
+       ]
+   }
 
 .. _cluster-retrieve-all:
 
@@ -299,10 +332,22 @@ To delete a cluster, make a DELETE HTTP request to URI:
 
  /clusters/{id}
 
-This resource request represents an individual cluster for deletion.
+This resource request represents an individual cluster for deletion. If the provider used to create the cluster
+uses sensitive fields, it is possible the sensitive fields were lost at some point and need to be given again.
+To do this, the request must contain a JSON Object as its body, with ``providerFields`` as a key, and a JSON
+Object as its value. The object should contain key-value entries for fields required by the provider.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
+
+If the provider used to create the cluster uses sensitive fields, it is possible the sensitive fields were lost
+at some point and need to be given again in the request. If they are not given, the server will respond with a
+400 and a JSON Object describing the missing fields. The response will
+contain a ``missingFields`` key which will be an array of JSON Objects containing the missing field as the
+key and the schema of the field as the value. It is an array of objects because there can be multiple sets
+of required fields. For example, it is possible that a provider may require both field1 and field2, or it may
+require field3 and field4. If only field2 is given in the request, then either field1 is missing, or both field3
+and field4 are missing.
 
 .. list-table::
    :widths: 15 10
@@ -312,6 +357,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - If delete was successful
+   * - 400 (BAD REQUEST)
+     - If there are provider fields missing from the request or the request body is malformed.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 404 (NOT FOUND)
@@ -328,6 +375,30 @@ Example
         -H 'Coopr-TenantID:<tenantid>'
         -H 'Coopr-ApiKey:<apikey>'
         http://<server>:<port>/<version>/clusters/00000079
+ $ curl -X DELETE
+        -H 'Coopr-UserID:<userid>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
+        http://<server>:<port>/<version>/clusters/00000083
+ $ {
+       "missingFields": [
+           {
+               "api_password": {
+                   "label": "API key",
+                   "override": false,
+                   "sensitive": true,
+                   "tip": "Your API key",
+                   "type": "password"
+               },
+               "ssh_key": {
+                   "label": "SSH key",
+                   "override": false,
+                   "sensitive": true,
+                   "tip": "Your ssh key",
+               }
+           }
+       ]
+   }
 
 .. _cluster-status:
 
