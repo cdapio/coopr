@@ -1,25 +1,25 @@
 {
   "name": "ubuntu12",
-  "description": "Ubuntu 12.04 LTS",
+  "description": "Ubuntu 12.04 LTS (Precise Pangolin)",
   "providermap": {
     "aws-us-east-1": {
-      "image": "ami-4287562a",
+      "image": "ami-ecda6c84",
       "sshuser": "ubuntu"
     },
     "aws-us-west-1": {
-      "image": "ami-33797476",
+      "image": "ami-115c5754",
       "sshuser": "ubuntu"
     },
     "aws-us-west-2": {
-      "image": "ami-23582213",
+      "image": "ami-ad42009d",
       "sshuser": "ubuntu"
     },
     "joyent": {
-      "image": "e28711b3-7f9c-47a7-be7f-ce07e9a99394",
+      "image": "01a24b88-f957-4f9d-9946-fbd21b0612bf",
       "sshuser": "ubuntu"
     },
     "rackspace": {
-      "image": "ffa476b1-9b14-46bd-99a8-862d1d94eb7a"
+      "image": "4a97964e-9787-4af8-a05c-287d81104d49"
     }
   }
 }
