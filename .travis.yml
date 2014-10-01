@@ -19,11 +19,12 @@ language: java
 jdk:
   - oraclejdk7
 
-# saucelabs credentials
 env:
   global:
     - secure: DHoIe2FobpAM/4ZKZX3acpBN/UPQn1FK+OJG87IuvCJ2xQbXMOimIL5l52/PgEbea9wQC+qxOaXhFkDS0SMq+AWw0Haa+b0xUG+D9SdRsMfipBmhHowKNAxRkVp1DE563cibpUv03DbS+XWL1xWv0xrc+ooPKdzZm2jWwAlW1AI=
     - secure: DIURQkS/L8U3TTXTtmhhDLdNJAfB2NqUMb6+K5EYwFS/C37tNPTl1ip23j/KC4PRboJtFNgVqQFo9ErsYY7xk6md6+JCB6Tl/4CzSvtZ6Z9xVssFPdKA6dOryelG6beckGoxfWxSw4zIcx2aODVIkMLR+/86Y+9XJ6pJbkfeGEo=
+addons:
+  sauce_connect: true
 
 branches:
   only:
