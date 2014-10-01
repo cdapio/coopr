@@ -9,7 +9,7 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
     $scope.allProviders.$promise
       .then(function() {
         $scope.providerMapShadow  = [];
-        $scope.providerMapShadow .push({
+        $scope.providerMapShadow.push({
           flavor: '',
           name: $scope.allProviders[0].name
         });
