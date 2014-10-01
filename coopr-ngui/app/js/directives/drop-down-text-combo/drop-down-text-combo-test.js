@@ -61,6 +61,21 @@ describe("Test for drop-down-text-combo", function() {
   it("should populate the text value properly", function() {
     expect(element.find("input").val()).toEqual("test1");
   });
+  it("should not change when disabled", function() {
+    scope.dropDownOptions.push({
+      name: "sola",
+      description: "dorima"
+    });
 
-  // Needs to add error handling while no data is provided.
+    scope.dropDownOptions.push({
+      name: "hola",
+      description: "horima"
+    });
+    scope.dropDownValue = "hola";
+    scope.isDropDownDisabled = "true";
+    element.find("select").controller('ngModel').$setViewValue("sola");
+    scope.$digest();
+    expect(scope.dropDownValue).toNotEqual("sola");
+    expect(element.find("select").val()).toNotEqual("2");
+  });
 });
