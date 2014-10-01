@@ -92,8 +92,8 @@ angular.module(PKG.name)
         authorizedRoles: MYAUTH_ROLE.admin
       }))
         .state(crud('HardwareType', 'list', 'CrudListCtrl'))
-        .state(crud('HardwareType', 'edit'))
-        .state(crud('HardwareType', 'create')) 
+        .state(crud('HardwareType', 'edit', 'HardwareFormCtrl'))
+        .state(crud('HardwareType', 'create', 'HardwareFormCtrl'))
 
 
 
