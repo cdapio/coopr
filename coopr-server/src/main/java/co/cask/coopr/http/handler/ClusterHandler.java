@@ -25,8 +25,8 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.http.request.AddServicesRequest;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
 import co.cask.coopr.http.request.ClusterCreateRequest;
-import co.cask.coopr.http.request.ClusterOperationRequest;
 import co.cask.coopr.http.request.ClusterStatusResponse;
+import co.cask.coopr.http.request.ProviderOperationRequest;
 import co.cask.coopr.layout.InvalidClusterException;
 import co.cask.coopr.provisioner.QuotaException;
 import co.cask.coopr.scheduler.ClusterAction;
@@ -37,12 +37,14 @@ import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.scheduler.task.MissingClusterException;
 import co.cask.coopr.scheduler.task.MissingEntityException;
 import co.cask.coopr.scheduler.task.TaskId;
+import co.cask.coopr.spec.plugin.FieldSchema;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterStoreView;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.http.HttpResponder;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -287,10 +289,18 @@ public class ClusterHandler extends AbstractAuthHandler {
         return;
       }
 
-      String id = clusterService.requestClusterCreate(clusterCreateRequest, account);
-      JsonObject response = new JsonObject();
-      response.addProperty("id", id);
-      responder.sendJson(HttpResponseStatus.OK, response);
+      Cluster cluster = clusterService.createEmptyCluster(clusterCreateRequest, account);
+      List<Map<String, FieldSchema>> missingFields =
+        clusterService.addAndValidateProviderFields(clusterCreateRequest, cluster);
+      // this means we're missing required fields
+      if (!missingFields.isEmpty()) {
+        // nested structure means we have to provide a type
+        responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", missingFields),
+                           new TypeToken<Map<String, List<Map<String, FieldSchema>>>>() {}.getType());
+      } else {
+        clusterService.requestClusterSolve(cluster, clusterCreateRequest, account);
+        responder.sendJson(HttpResponseStatus.OK, ImmutableMap.of("id", cluster.getId()));
+      }
     } catch (IllegalAccessException e) {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "User not authorized to create cluster.");
     } catch (IllegalArgumentException e) {
@@ -330,10 +340,10 @@ public class ClusterHandler extends AbstractAuthHandler {
       return;
     }
 
-    ClusterOperationRequest deleteRequest;
+    ProviderOperationRequest deleteRequest;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      deleteRequest = gson.fromJson(reader, ClusterOperationRequest.class);
+      deleteRequest = gson.fromJson(reader, ProviderOperationRequest.class);
     } catch (Exception e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body.");
       return;
@@ -360,8 +370,17 @@ public class ClusterHandler extends AbstractAuthHandler {
         responder.sendError(HttpResponseStatus.CONFLICT, message);
         return;
       }
-      clusterService.requestClusterDelete(clusterId, account, deleteRequest);
-      responder.sendStatus(HttpResponseStatus.OK);
+      List<Map<String, FieldSchema>> missingFields =
+        clusterService.addAndValidateProviderFields(deleteRequest, cluster);
+      // this means we're missing required fields
+      if (!missingFields.isEmpty()) {
+        // nested structure means we have to provide a type
+        responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", missingFields),
+                           new TypeToken<Map<String, List<Map<String, FieldSchema>>>>() {}.getType());
+      } else {
+        clusterService.requestClusterDelete(cluster, account);
+        responder.sendStatus(HttpResponseStatus.OK);
+      }
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error deleting cluster.");
     } catch (IllegalAccessException e) {
@@ -747,17 +766,8 @@ public class ClusterHandler extends AbstractAuthHandler {
       return;
     }
 
-    ClusterOperationRequest operationRequest;
-    Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
-      operationRequest = gson.fromJson(reader, ClusterOperationRequest.class);
-    } catch (Exception e) {
-      responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid request body.");
-      return;
-    }
-
-    try {
-      clusterService.requestServiceRuntimeAction(clusterId, account, action, service, operationRequest);
+      clusterService.requestServiceRuntimeAction(clusterId, account, action, service);
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (MissingEntityException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());

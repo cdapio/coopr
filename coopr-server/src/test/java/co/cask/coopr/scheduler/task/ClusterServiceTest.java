@@ -6,12 +6,10 @@ import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.http.request.AddServicesRequest;
-import co.cask.coopr.http.request.ClusterConfigureRequest;
 import co.cask.coopr.http.request.ClusterCreateRequest;
-import co.cask.coopr.http.request.ClusterOperationRequest;
+import co.cask.coopr.http.request.ProviderOperationRequest;
 import co.cask.coopr.provisioner.Provisioner;
 import co.cask.coopr.provisioner.TenantProvisionerService;
-import co.cask.coopr.scheduler.ClusterAction;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
@@ -28,16 +26,17 @@ import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Compatibilities;
 import co.cask.coopr.spec.template.Constraints;
 import co.cask.coopr.store.entity.EntityStoreView;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -141,8 +140,8 @@ public class ClusterServiceTest extends BaseTest {
       .setNumMachines(1)
       .setProviderFields(providerFields)
       .build();
-    String clusterId = clusterService.requestClusterCreate(createRequest, account);
-    Cluster cluster = clusterStore.getCluster(clusterId);
+    Cluster cluster = clusterService.createEmptyCluster(createRequest, account);
+    clusterService.addAndValidateProviderFields(createRequest, cluster);
     Assert.assertEquals(basicTemplate, cluster.getClusterTemplate());
     Assert.assertEquals(account, cluster.getAccount());
     Assert.assertEquals(name, cluster.getName());
@@ -154,13 +153,13 @@ public class ClusterServiceTest extends BaseTest {
       "key", "keycontents",
       "url", "internal.net/api"
     );
-    Map<String, String> expectedNonsensitiveFields = ImmutableMap.of(
+    Map<String, Object> expectedNonsensitiveFields = ImmutableMap.<String, Object>of(
       "keyname", "myname",
       "region", "dfw",
       "url", "http://abc.com/api"
     );
     Assert.assertEquals(expectedNonsensitiveFields, cluster.getProvider().getProvisionerFields());
-    Assert.assertEquals(expectedSensitiveFields, credentialStore.get(account.getTenantId(), clusterId));
+    Assert.assertEquals(expectedSensitiveFields, credentialStore.get(account.getTenantId(), cluster.getId()));
   }
 
   @Test(expected = MissingEntityException.class)
@@ -174,7 +173,8 @@ public class ClusterServiceTest extends BaseTest {
       .setNumMachines(1)
       .setProviderFields(providerFields)
       .build();
-    clusterService.requestClusterCreate(createRequest, account);
+    Cluster cluster = clusterService.createEmptyCluster(createRequest, account);
+    clusterService.addAndValidateProviderFields(createRequest, cluster);
   }
 
   @Test(expected = MissingEntityException.class)
@@ -187,32 +187,7 @@ public class ClusterServiceTest extends BaseTest {
       .setNumMachines(1)
       .setProviderFields(providerFields)
       .build();
-    clusterService.requestClusterCreate(createRequest, account);
-  }
-
-  @Test
-  public void testClusterConfigure() throws Exception {
-    Cluster cluster = createActiveCluster();
-
-    Map<String, String> providerFields = Maps.newHashMap();
-    providerFields.put("keyname", "somename");
-    providerFields.put("key", "somecontents");
-    providerFields.put("url", "internal.net/api");
-    ClusterConfigureRequest configureRequest = new ClusterConfigureRequest(providerFields, new JsonObject(), false);
-    clusterService.requestClusterReconfigure(cluster.getId(), account, configureRequest);
-
-    cluster = clusterStore.getCluster(cluster.getId());
-    // key and url are both sensitive fields
-    Map<String, String> expectedSensitiveFields = ImmutableMap.of(
-      "key", "somecontents",
-      "url", "internal.net/api"
-    );
-    // nonsensitive fields should be everything currently in the provider plus the nonsensitive user fields
-    // given in the request
-    Map<String, Object> expectedNonsensitiveFields = Maps.newHashMap(provider.getProvisionerFields());
-    expectedNonsensitiveFields.put("keyname", "somename");
-    Assert.assertEquals(expectedNonsensitiveFields, cluster.getProvider().getProvisionerFields());
-    Assert.assertEquals(expectedSensitiveFields, credentialStore.get(account.getTenantId(), cluster.getId()));
+    clusterService.createEmptyCluster(createRequest, account);
   }
 
   @Test
@@ -221,20 +196,17 @@ public class ClusterServiceTest extends BaseTest {
 
     // the "key" user field is required. Should throw an except if its not set.
     Map<String, String> providerFields = Maps.newHashMap();
-    ClusterConfigureRequest configureRequest = new ClusterConfigureRequest(providerFields, new JsonObject(), false);
-    boolean failed = false;
-    try {
-      clusterService.requestClusterReconfigure(cluster.getId(), account, configureRequest);
-    } catch (IllegalArgumentException e) {
-      // this is expected
-      failed = true;
-    }
-    Assert.assertTrue(failed);
+    ProviderOperationRequest request = new ProviderOperationRequest(providerFields);
+    List<Map<String, FieldSchema>> missingFields = clusterService.addAndValidateProviderFields(request, cluster);
+    Assert.assertEquals(
+      ImmutableList.of(ImmutableMap.of(
+        "key", providerType.getParametersSpecification(ParameterType.USER).getFields().get("key"))),
+      missingFields);
 
     // now try with required user field set
     providerFields.put("key", "keycontents");
-    configureRequest = new ClusterConfigureRequest(providerFields, new JsonObject(), false);
-    clusterService.requestClusterReconfigure(cluster.getId(), account, configureRequest);
+    request = new ProviderOperationRequest(providerFields);
+    clusterService.addAndValidateProviderFields(request, cluster);
 
     // nonsensitive fields should be everything currently in the provider before we get the updated cluster
     Map<String, Object> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
@@ -252,59 +224,13 @@ public class ClusterServiceTest extends BaseTest {
   public void testSensitiveUserFields() throws Exception {
     Map<String, String> sensitiveFields = Maps.newHashMap();
     sensitiveFields.put("key", "keycontents");
-    AddServicesRequest addRequest = new AddServicesRequest(sensitiveFields, ImmutableSet.of(service2.getName()));
-    ClusterOperationRequest opRequest = new ClusterOperationRequest(sensitiveFields);
+    ProviderOperationRequest request = new ProviderOperationRequest(sensitiveFields);
 
     Cluster cluster = createActiveCluster();
-    clusterService.requestAddServices(cluster.getId(), account, addRequest);
-    testSensitiveFieldsAdded(cluster, sensitiveFields);
-    clusterStore.deleteCluster(cluster.getId());
-
-    cluster = createActiveCluster();
-    clusterService.requestClusterDelete(cluster.getId(), account, opRequest);
-    testSensitiveFieldsAdded(cluster, sensitiveFields);
-    clusterStore.deleteCluster(cluster.getId());
-
-    cluster = createActiveCluster();
-    clusterService.requestServiceRuntimeAction(cluster.getId(), account, ClusterAction.RESTART_SERVICES,
-                                               service1.getName(), opRequest);
-    testSensitiveFieldsAdded(cluster, sensitiveFields);
-    clusterStore.deleteCluster(cluster.getId());
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testMissingRequestThrowsException() throws Exception {
-    Cluster cluster = createActiveCluster();
-    clusterService.requestClusterDelete(cluster.getId(), cluster.getAccount(), null);
-  }
-
-  // test that sensitive user fields were added to the credential store
-  private void testSensitiveFieldsAdded(Cluster cluster, Map<String, String> sensitiveFields) throws Exception {
     // nonsensitive fields should be everything currently in the provider before we get the updated cluster
     Map<String, Object> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
-    // get the updated cluster
-    cluster = clusterStore.getCluster(cluster.getId());
-    // nonsensitive fields should be everything currently in the provider plus the nonsensitive user fields
-    // given in the request
-    Assert.assertEquals(expectedNonsensitiveFields, cluster.getProvider().getProvisionerFields());
-    Assert.assertEquals(sensitiveFields, credentialStore.get(account.getTenantId(), cluster.getId()));
-    credentialStore.wipe();
-  }
+    clusterService.addAndValidateProviderFields(request, cluster);
 
-  @Test
-  public void testAddServices() throws Exception {
-    Cluster cluster = createActiveCluster();
-    // add required sensitive user field
-    Map<String, String> sensitiveFields = Maps.newHashMap();
-    sensitiveFields.put("key", "keycontents");
-    AddServicesRequest addServicesRequest =
-      new AddServicesRequest(sensitiveFields, ImmutableSet.of(service2.getName()));
-    clusterService.requestAddServices(cluster.getId(), account, addServicesRequest);
-
-    // nonsensitive fields should be everything currently in the provider before we get the updated cluster
-    Map<String, Object> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
-    // get the updated cluster
-    cluster = clusterStore.getCluster(cluster.getId());
     // nonsensitive fields should be everything currently in the provider plus the nonsensitive user fields
     // given in the request
     Assert.assertEquals(expectedNonsensitiveFields, cluster.getProvider().getProvisionerFields());
@@ -321,8 +247,8 @@ public class ClusterServiceTest extends BaseTest {
 
     // request doesn't contain the required key field, but it should be picked up from the credential store
     // so this should go through without throwing an exception.
-    AddServicesRequest addServicesRequest = new AddServicesRequest(null, ImmutableSet.of(service2.getName()));
-    clusterService.requestAddServices(cluster.getId(), account, addServicesRequest);
+    ProviderOperationRequest request = new ProviderOperationRequest(null);
+    clusterService.addAndValidateProviderFields(request, cluster);
   }
 
   private Cluster createActiveCluster() throws IOException, IllegalAccessException {

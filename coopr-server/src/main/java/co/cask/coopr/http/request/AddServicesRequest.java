@@ -17,23 +17,20 @@ package co.cask.coopr.http.request;
 
 import com.google.common.base.Preconditions;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Request for add services to a cluster.
  */
-public class AddServicesRequest extends ClusterOperationRequest {
+public class AddServicesRequest {
   private final Set<String> services;
 
   /**
    * Create a request to add services to a cluster.
    *
-   * @param providerFields provider fields given by the user.
    * @param services Services to add to the cluster.
    */
-  public AddServicesRequest(Map<String, String> providerFields, Set<String> services) {
-    super(providerFields);
+  public AddServicesRequest(Set<String> services) {
     Preconditions.checkArgument(services != null && !services.isEmpty(), "Services to add must be specified.");
     this.services = services;
   }

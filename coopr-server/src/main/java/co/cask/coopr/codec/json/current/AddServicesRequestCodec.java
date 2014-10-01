@@ -24,7 +24,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -37,10 +36,8 @@ public class AddServicesRequestCodec implements JsonDeserializer<AddServicesRequ
   public AddServicesRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
-    Map<String, String> providerFields = context.deserialize(jsonObj.get("providerFields"),
-                                                             new TypeToken<Map<String, String>>() {}.getType());
     Set<String> services = context.deserialize(jsonObj.get("services"), new TypeToken<Set<String>>() {}.getType());
 
-    return new AddServicesRequest(providerFields, services);
+    return new AddServicesRequest(services);
   }
 }

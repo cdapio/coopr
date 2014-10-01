@@ -21,13 +21,13 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 /**
- * Request to perform some cluster operation. These requests may include provider fields for things like
- * credentials that may be needed to access cluster nodes, or things of that nature.
+ * Request to perform some cluster operation that needs to communicate with a provider. These requests may include
+ * provider fields for things like credentials that may be needed to access cluster nodes, or things of that nature.
  */
-public class ClusterOperationRequest {
+public class ProviderOperationRequest {
   private final Map<String, String> providerFields;
 
-  public ClusterOperationRequest(Map<String, String> providerFields) {
+  public ProviderOperationRequest(Map<String, String> providerFields) {
     this.providerFields = providerFields == null ?
       ImmutableMap.<String, String>of() : ImmutableMap.copyOf(providerFields);
   }
@@ -50,7 +50,7 @@ public class ClusterOperationRequest {
       return false;
     }
 
-    ClusterOperationRequest that = (ClusterOperationRequest) o;
+    ProviderOperationRequest that = (ProviderOperationRequest) o;
 
     return Objects.equal(providerFields, that.providerFields);
   }

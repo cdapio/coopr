@@ -21,10 +21,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.Map;
 
 /**
  * Codec for deserializing a {@link co.cask.coopr.http.request.ClusterConfigureRequest},
@@ -36,11 +34,9 @@ public class ClusterConfigureRequestCodec implements JsonDeserializer<ClusterCon
   public ClusterConfigureRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
-    Map<String, String> providerFields =
-      context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, String>>() {}.getType());
     Boolean restart = context.deserialize(jsonObj.get("restart"), Boolean.class);
     JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
 
-    return new ClusterConfigureRequest(providerFields, config, restart);
+    return new ClusterConfigureRequest(config, restart);
   }
 }
