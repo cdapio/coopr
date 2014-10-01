@@ -1,5 +1,9 @@
 /**
  * myServicePicker
+ *
+ * similar to myThingPicker, but with extra stuff specifically for services
+ *
+ * share the style and template with myThingPicker
  */
 
 var module = angular.module(PKG.name+'.directives');
@@ -12,16 +16,20 @@ module.directive('myServicePicker',
 function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
   return {
     restrict: 'E',
-    templateUrl: 'servicepicker/servicepicker.html',
+    templateUrl: 'thingpicker/thingpicker.html',
+    replace: true,
 
     scope: {
       model: '=', // an array of names
-      available: '=', // an array of objects with name & description keys
+      available: '=', // an array of strings, or of objects with name & description keys
       clusterId: '=', // id to use for management dropdown
       allowRm: '=' // allow removal boolean
     },
 
     controller: function ($scope, myApi) {
+
+      $scope.listInline = true;
+      $scope.thingName = 'service';
 
       $scope.rmService = function (what) {
         $scope.model = $scope.model.filter(function (name) {
@@ -30,6 +38,9 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
       };
 
       $scope.addService = function (name) {
+        if(!angular.isArray($scope.model)) {
+          $scope.model = [];
+        }
         $scope.model.push(name);
       };
 
@@ -50,11 +61,12 @@ function myServicePickerDirective (MYSERVICEPICKER_EVENT) {
 
 
       function remapAddables (available, avoidable) {
-        $scope.addsvcDropdown = (available||[]).reduce(function (out, svc) {
-          if((avoidable||[]).indexOf(svc.name)===-1) {
+        $scope.addDropdown = (available||[]).reduce(function (out, svc) {
+          var name = svc.name || svc; // in case available is an array of strings
+          if((avoidable||[]).indexOf(name)===-1) {
             out.push({
-              text: svc.name,
-              click: 'addService("'+svc.name+'")'
+              text: name,
+              click: 'addService("'+name+'")'
             });
           }
           return out;

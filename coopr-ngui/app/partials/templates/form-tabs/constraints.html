@@ -1,0 +1,173 @@
+<div class="form-group">
+  <label for="inputTemplateSizeMin" class="col-xs-2 control-label">
+    Size
+  </label>
+  <div class="col-xs-10">
+
+    <my-doublerange
+      data-model="model.constraints.size"
+      data-min="1"
+      data-html5="true"
+    ></my-doublerange>
+
+  </div>
+</div>
+
+<hr />
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">
+    Must co-exist
+  </label>
+  <div class="col-xs-10">
+
+    <div ng-repeat="group in model.constraints.layout.mustcoexist" class="coopr-constraint-group am-fade-and-slide-right">
+
+      <p class="pull-right form-control-static">
+        <a href="" class="btn btn-danger btn-xs" 
+          ng-click="model.constraints.layout.mustcoexist.splice($index, 1)"
+        >
+          <span class="fa fa-trash"></span>
+          <span class="sr-only">remove group</span>
+        </a>
+      </p>
+
+      <my-service-picker
+        data-model="group"
+        data-allow-rm="true"
+        data-available="model.compatibility.services"
+      ></my-service-picker>
+
+    </div>
+
+    <p class="form-control-static">
+      <a href="" class="btn btn-info btn-xs" 
+        ng-click="model.constraints.layout.mustcoexist.push([])"
+      >
+        <span class="fa fa-plus"></span>
+        add <em>must co-exist</em> group
+      </a>
+    </p>
+
+  </div>
+</div>
+
+<hr />
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">
+    Can't co-exist
+  </label>
+  <div class="col-xs-10">
+
+    <div ng-repeat="group in model.constraints.layout.cantcoexist" class="coopr-constraint-group am-fade-and-slide-right">
+
+      <p class="pull-right form-control-static">
+        <a href="" class="btn btn-danger btn-xs" 
+          ng-click="model.constraints.layout.cantcoexist.splice($index, 1)"
+        >
+          <span class="fa fa-trash"></span>
+          <span class="sr-only">remove group</span>
+        </a>
+      </p>
+
+      <my-service-picker
+        data-model="group"
+        data-allow-rm="true"
+        data-available="model.compatibility.services"
+      ></my-service-picker>
+
+    </div>
+
+    <p class="form-control-static">
+      <a href="" class="btn btn-info btn-xs" 
+        ng-click="model.constraints.layout.cantcoexist.push([])"
+      >
+        <span class="fa fa-plus"></span>
+        add <em>can't co-exist</em> group
+      </a>
+    </p>
+
+  </div>
+</div>
+
+
+
+<hr />
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">
+    Service Constraints
+  </label>
+  <div class="col-xs-10">
+
+
+    <div class="table-responsive" ng-show="showServiceConstraintTable()">
+      <table class="coopr-service-constraints table">
+        <thead>
+          <tr>
+            <th>service</th>
+            <th>hardware</th>
+            <th>image</th>
+            <th>quantities</th>
+            <th>remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="(name,item) in model.constraints.services">
+
+            <td>
+              <p class="form-control-static">
+                <small class="text-nowrap">{{name}}</small>
+              </p>
+            </td>
+
+            <td>
+              <my-thing-picker
+                data-model="item.hardwaretypes"
+                data-allow-rm="true"
+                data-available="model.compatibility.hardwaretypes"
+                data-thing-name="Hardware Type"
+              ></my-thing-picker>
+            </td>
+
+            <td>
+              <my-thing-picker
+                data-model="item.imagetypes"
+                data-allow-rm="true"
+                data-available="model.compatibility.imagetypes"
+                data-thing-name="Image Type"
+              ></my-thing-picker>
+            </td>
+
+            <td>
+              <my-doublerange
+                data-model="item.quantities"
+              ></my-doublerange>
+            </td>
+
+            <td width="1" class="text-right">
+              <a href="" ng-click="rmServiceConstraint(name)" 
+                class="btn btn-danger btn-xs">
+                  <span class="fa fa-trash"></span>
+                  <span class="sr-only">remove Constraint</span>
+              </a>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="form-control-static">
+      <a href="" class="btn btn-info btn-xs"
+        ng-disabled="!addSvcConstraintDd.length"
+        bs-dropdown="addSvcConstraintDd" 
+      >
+        <span class="fa fa-plus"></span>
+        add service constraint
+      </a>
+    </p>
+
+  </div>
+</div>

@@ -1,14 +1,19 @@
  <div class="form-group" ng-repeat="(name,fieldData) in config.fields">
-  <label class="col-xs-2 control-label">{{fieldData.label}}</label>
+
+  <label class="col-xs-2 control-label">
+    {{fieldData.label}}
+  </label>
   
   <div class="col-xs-10">
 
     <div class="checkbox" ng-if="fieldData.type === 'checkbox'">
-      <input type="checkbox"
-        title="{{fieldData.tip}}"
-        ng-model="model[name]"
-        ng-disabled="allowOverride && !fieldData.override"
-      />
+      <label>
+        <input type="checkbox"
+          ng-model="model[name]"
+          ng-disabled="allowOverride && !fieldData.override"
+        />
+        {{fieldData.tip}}
+      </label>
     </div>
 
     <input ng-if="fieldData.type === 'text' || fieldData.type === 'password'" 

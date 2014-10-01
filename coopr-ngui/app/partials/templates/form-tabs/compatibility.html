@@ -1,0 +1,46 @@
+<div class="form-group">
+  <label class="col-xs-2 control-label">
+    Services
+  </label>
+  <div class="col-xs-10">
+    <my-service-picker
+      data-model="model.compatibility.services"
+      data-allow-rm="true"
+      data-available="availableServices"
+    ></my-service-picker>
+  </div>
+</div>
+
+<hr />
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">
+    Hardware types
+  </label>
+  <div class="col-xs-10">
+    <my-thing-picker
+      data-model="model.compatibility.hardwaretypes"
+      data-allow-rm="true"
+      data-available="availableHardware"
+      data-thing-name="Hardware Type"
+      data-list-inline="true"
+    ></my-thing-picker>
+  </div>
+</div>
+
+<hr />
+
+<div class="form-group">
+  <label class="col-xs-2 control-label">
+    Image types
+  </label>
+  <div class="col-xs-10">
+    <my-thing-picker
+      data-model="model.compatibility.imagetypes"
+      data-allow-rm="true"
+      data-available="availableImages"
+      data-thing-name="Image Type"
+      data-list-inline="true"
+    ></my-thing-picker>
+  </div>
+</div>

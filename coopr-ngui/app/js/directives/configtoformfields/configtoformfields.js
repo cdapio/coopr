@@ -45,18 +45,20 @@ function myConfigtoformfieldsDirective () {
 
       scope.allowOverride = attrs.allowOverride && attrs.allowOverride!=='false';
 
-      scope.$watch('config', function(newVal, oldVal) {
+      scope.$watch('config', function (newVal, oldVal) {
         if(!scope.model) {
           return;
         }
 
-        if(oldVal) { // remove model values
+        if(oldVal) { 
+          // remove model values
           angular.forEach(oldVal.fields, function (field, key) {
             delete scope.model[key];
           });          
         }
 
-        if(newVal) { // set default values
+        if(newVal) {
+          // set default values
           angular.forEach(newVal.fields, function (field, key) {
             if (field.hasOwnProperty('default') && !scope.model[key]) {
               scope.model[key] = field.default;
@@ -64,17 +66,25 @@ function myConfigtoformfieldsDirective () {
           });
         }
 
-        // set required fields
-        scope.required = (newVal.required || []).reduce(function (memo, arr) {
-          // could be an array of strings, or an array of arrays of strings.
-          angular.forEach(angular.isArray(arr) ? arr : [arr], function (field) {
-            memo[field] = true;
-          });
-          return memo;
-        }, {});
-
       }, true);
 
+      scope.$watchCollection('model', function setRequired (newVal) {
+        var out = {};
+
+        angular.forEach(newVal, function (val, key) {
+          if(val && !out[key]) {
+            angular.forEach(scope.config.required, function (set) {
+              if(set.indexOf(key)>=0) {
+                angular.forEach(set, function (want) {
+                  out[want] = true;
+                });
+              }
+            });
+          }
+        });
+
+        scope.required = out;
+      });
     }
   };
 

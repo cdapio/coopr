@@ -7,7 +7,8 @@
         placeholder="Name" 
         my-focus="inputTenantName"
         ng-readonly="editing"
-        ng-pattern="/^\w+$/"
+        ng-pattern="/^[\w\.\-]+$/"
+        maxlength="255"
         ng-model="model.name" required/>
     </div>
   </div>
