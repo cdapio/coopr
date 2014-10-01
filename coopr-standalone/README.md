@@ -20,7 +20,7 @@
 Login at http://localhost:8100 with tenant 'superadmin', username 'admin', and password 'admin'
 
 ## Stop
-bin/coopr.sh stop
+   * bin/coopr.sh stop
 
 ## Create a cluster
 Once Cask Coopr is running, follow the instructions in the quickstart guide at 
