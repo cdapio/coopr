@@ -39,7 +39,7 @@ angular.module(PKG.name+".directives")
           $scope.dropDownList.$promise.then(buildDropDown);
         }
 
-        $scope.$watch("model", buildDropDown);
+        $scope.$watchCollection("model", buildDropDown);
 
         $scope.rmProvider = function (pName) {
           delete $scope.model[pName];
