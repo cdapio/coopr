@@ -3,7 +3,7 @@ angular.module(PKG.name+".directives")
     return {
       restrict: "E",
       scope: {
-        model: "=ngModel",
+        model: "=",
         dropDownList: "=",
         textFields: "="
       },

@@ -9,7 +9,7 @@ describe("Unit tests for drop-down-combo-text directive", function(myApi) {
     scope = $rootScope.$new();
     element = angular.element(
       "<drop-down-text-combo " +
-            "ng-model=\"model\"" +
+            "data-model=\"model\"" +
             "drop-down-list=\"dropDownList\"" +
             "text-fields = \"textFields\"" +
             "> "+
