@@ -19,6 +19,7 @@ import co.cask.coopr.cluster.Node;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.scheduler.ClusterAction;
+import co.cask.coopr.store.cluster.ClusterStoreService;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
@@ -57,8 +58,10 @@ public class HttpPostClusterCallback implements ClusterCallback {
   private Set<ClusterAction> successTriggerActions;
   private Set<ClusterAction> failureTriggerActions;
   private HttpClient httpClient;
+  private ClusterStoreService clusterStoreService;
 
-  public void initialize(Configuration conf) {
+  public void initialize(Configuration conf, ClusterStoreService clusterStoreService) {
+    this.clusterStoreService = clusterStoreService;
     this.onStartUrl = conf.get(Constants.HttpCallback.START_URL);
     this.onSuccessUrl = conf.get(Constants.HttpCallback.SUCCESS_URL);
     this.onFailureUrl = conf.get(Constants.HttpCallback.FAILURE_URL);
@@ -111,46 +114,47 @@ public class HttpPostClusterCallback implements ClusterCallback {
     return actions;
   }
 
-  public boolean onStart(CallbackData data, CallbackContext context) {
+  public boolean onStart(CallbackData data) {
     ClusterAction jobAction = data.getJob().getClusterAction();
     if (startTriggerActions.contains(jobAction)) {
       if (onStartUrl != null) {
         LOG.debug("sending request to {} before performing {} on cluster {}",
                   onStartUrl, jobAction, data.getCluster().getId());
-        sendPost(onStartUrl, data, context);
+        sendPost(onStartUrl, data);
       }
     }
     return true;
   }
 
-  public void onSuccess(CallbackData data, CallbackContext context) {
+  public void onSuccess(CallbackData data) {
     ClusterAction jobAction = data.getJob().getClusterAction();
     if (successTriggerActions.contains(data.getJob().getClusterAction())) {
       if (onSuccessUrl != null) {
         LOG.debug("{} completed successfully on cluster {}, sending request to {}",
                   jobAction, data.getCluster().getId(), onSuccessUrl);
-        sendPost(onSuccessUrl, data, context);
+        sendPost(onSuccessUrl, data);
       }
     }
   }
 
   @Override
-  public void onFailure(CallbackData data, CallbackContext context) {
+  public void onFailure(CallbackData data) {
     ClusterAction jobAction = data.getJob().getClusterAction();
     if (failureTriggerActions.contains(data.getJob().getClusterAction())) {
       if (onFailureUrl != null) {
         LOG.debug("{} failed on cluster {}, sending request to {}",
                   jobAction, data.getCluster().getId(), onFailureUrl);
-        sendPost(onFailureUrl, data, context);
+        sendPost(onFailureUrl, data);
       }
     }
   }
 
-  private void sendPost(String url, CallbackData data, CallbackContext context) {
+  private void sendPost(String url, CallbackData data) {
     HttpPost post = new HttpPost(url);
     Set<Node> nodes;
     try {
-      nodes = context.getClusterStoreView().getClusterNodes(data.getCluster().getId());
+      nodes = clusterStoreService.getView(data.getCluster().getAccount())
+        .getClusterNodes(data.getCluster().getId());
     } catch (Exception e) {
       LOG.error("Unable to fetch nodes for cluster {}, not sending post request.", data.getCluster().getId());
       return;

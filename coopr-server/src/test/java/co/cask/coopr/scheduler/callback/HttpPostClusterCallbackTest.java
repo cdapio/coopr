@@ -34,15 +34,14 @@ public class HttpPostClusterCallbackTest extends BaseTest {
     conf.set(Constants.HttpCallback.SUCCESS_URL, base + "/success/endpoint");
     conf.set(Constants.HttpCallback.FAILURE_URL, base + "/failure/endpoint");
 
-    callback.initialize(conf);
+    callback.initialize(conf, clusterStoreService);
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CREATE);
     CallbackData data = new CallbackData(CallbackData.Type.START, cluster, job);
-    CallbackContext context = new CallbackContext(clusterStoreService, userStore, cluster.getAccount());
 
-    callback.onStart(data, context);
-    callback.onSuccess(data, context);
-    callback.onSuccess(data, context);
-    callback.onFailure(data, context);
+    callback.onStart(data);
+    callback.onSuccess(data);
+    callback.onSuccess(data);
+    callback.onFailure(data);
     Assert.assertEquals(handler.getStartCount(), 1);
     Assert.assertEquals(handler.getFailureCount(), 1);
     Assert.assertEquals(handler.getSuccessCount(), 2);
@@ -57,19 +56,18 @@ public class HttpPostClusterCallbackTest extends BaseTest {
     conf.set(Constants.HttpCallback.START_URL, base + "/start/endpoint");
     conf.set(Constants.HttpCallback.START_TRIGGERS, ClusterAction.CLUSTER_CONFIGURE.name());
 
-    callback.initialize(conf);
+    callback.initialize(conf, clusterStoreService);
 
     // should not get triggered
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CREATE);
     CallbackData data = new CallbackData(CallbackData.Type.START, cluster, job);
-    CallbackContext context = new CallbackContext(clusterStoreService, userStore, cluster.getAccount());
-    callback.onStart(data, context);
+    callback.onStart(data);
     Assert.assertEquals(0, handler.getStartCount());
 
     // should get triggered
     job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CONFIGURE);
     data = new CallbackData(CallbackData.Type.START, cluster, job);
-    callback.onStart(data, context);
+    callback.onStart(data);
     Assert.assertEquals(1, handler.getStartCount());
   }
 
@@ -80,12 +78,11 @@ public class HttpPostClusterCallbackTest extends BaseTest {
     conf = Configuration.create();
     conf.set(Constants.HttpCallback.START_URL, "malformed-url");
 
-    callback.initialize(conf);
+    callback.initialize(conf, clusterStoreService);
     ClusterJob job = new ClusterJob(new JobId(cluster.getId(), 1), ClusterAction.CLUSTER_CREATE);
     CallbackData data = new CallbackData(CallbackData.Type.START, cluster, job);
-    CallbackContext context = new CallbackContext(clusterStoreService, userStore, cluster.getAccount());
 
-    Assert.assertTrue(callback.onStart(data, context));
+    Assert.assertTrue(callback.onStart(data));
   }
 
   @Before
