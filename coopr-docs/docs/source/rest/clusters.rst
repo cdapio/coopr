@@ -64,7 +64,7 @@ Required Parameters
    * - provider 
      - Optional provider to use to create nodes. Overrides default in the given cluster template.
    * - providerFields
-     - JSON Object containing key-values to be used by the provider plugin when provisioning nodes.
+     - JSON Object containing key-values to be used by the provider plugin when provisioning nodes. See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
    * - services 
      - Optional array of services to place on the cluster.  Overrides default in the given cluster template.  Must be a subset of compatible services specified in cluster template.
    * - initialLeaseDuration
@@ -112,33 +112,6 @@ Example
         -d '{ "name":"hadoop-dev", "description":"my hadoop dev cluster", "numMachines":"5", "clusterTemplate":"hadoop.example" }'
         http://<server>:<port>/<version>/clusters
  $ { "id":"00000079" }
- $ curl -X POST 
-        -H 'Coopr-UserID:<userid>' 
-        -H 'Coopr-TenantID:<tenantid>'
-        -H 'Coopr-ApiKey:<apikey>'
-        -d '{ "name":"hadoop-dev2", "numMachines":"5", "clusterTemplate":"hadoop.example", "provider":"rackspace" }'
-        http://<server>:<port>/<version>/clusters
- $ { "id":"00000079" }
-   {
-       "missingFields": [
-           {
-               "api_password": {
-                   "label": "API key",
-                   "override": false,
-                   "sensitive": true,
-                   "tip": "Your API key",
-                   "type": "password"
-               },
-               "ssh_key": {
-                   "label": "SSH key",
-                   "override": false,
-                   "sensitive": true,
-                   "tip": "Your ssh key",
-                   "type": "file"
-               }
-           }
-       ]
-   }
 
 .. _cluster-retrieve-all:
 
@@ -338,17 +311,11 @@ uses sensitive fields, it is possible the sensitive fields were lost at some poi
 To do this, the request must contain a JSON Object as its body, with ``providerFields`` as a key, and a JSON
 Object as its value. The object should contain key-value entries for fields required by the provider.
 
+The request may require a JSON Object as its body if the provider used to create the cluster requires it.
+See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
+
 HTTP Responses
 ^^^^^^^^^^^^^^
-
-If the provider used to create the cluster uses sensitive fields, it is possible the sensitive fields were lost
-at some point and need to be given again in the request. If they are not given, the server will respond with a
-400 and a JSON Object describing the missing fields. The response will
-contain a ``missingFields`` key which will be an array of JSON Objects containing the missing field as the
-key and the schema of the field as the value. It is an array of objects because there can be multiple sets
-of required fields. For example, it is possible that a provider may require both field1 and field2, or it may
-require field3 and field4. If only field2 is given in the request, then either field1 is missing, or both field3
-and field4 are missing.
 
 .. list-table::
    :widths: 15 10
@@ -396,7 +363,7 @@ Example
                    "override": false,
                    "sensitive": true,
                    "tip": "Your ssh key",
-		   "type": "file"
+                   "type": "file"
                }
            }
        ]
@@ -658,6 +625,9 @@ request is made, status calls can be made to check on the status of the cluster 
 If the configure operation fails, the cluster is placed in an inconsistent state where the cluster
 can be configured again or deleted.
 
+The request body may require a ``providerFields`` entry if the provider used to create the cluster requires it.
+See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
+
 HTTP Responses
 ^^^^^^^^^^^^^^
 .. list-table::
@@ -669,7 +639,7 @@ HTTP Responses
    * - 200 (OK)
      - Successful
    * - 400 (BAD REQUEST)
-     - If the request body is specified incorrectly.
+     - If the request body is malformed, or if required provider fields are missing.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 404 (NOT FOUND)
@@ -771,6 +741,9 @@ of services to add to the cluster. The services must be compatible with the clus
 used to create the cluster. After the request is made, status calls can be made to check on
 the status of the add services cluster operation.
 
+The request body may require a ``providerFields`` entry if the provider used to create the cluster requires it.
+See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
+
 HTTP Responses
 ^^^^^^^^^^^^^^
 .. list-table::
@@ -782,8 +755,8 @@ HTTP Responses
    * - 200 (OK)
      - Successful
    * - 400 (BAD REQUEST)
-     - If the request is specified incorrectly, or if the services to add are incompatible
-       or the cluster is missing services they require.
+     - If the request is malformed, or if the services to add are incompatible,
+       or the cluster is missing services they require, or if required provider fields are missing.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 404 (NOT FOUND)
@@ -811,11 +784,14 @@ To stop all services on a cluster, make a POST HTTP request to URI:
 
  /clusters/{cluster-id}/services/stop
 
-There is no POST body expected. The ordering of service stops is based on the dependencies
+The ordering of service stops is based on the dependencies
 defined for the services. If service A requires service B, service A will be stopped before
 service B. After the request is made, a status call can be made to check on the status of 
 the service stop operation. A cluster must be in the ACTIVE state in order for the stop
 operation to be allowed.
+
+The request may require a JSON Object as its body if the provider used to create the cluster requires it.
+See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -827,6 +803,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - Successful
+   * - 400 (BAD REQUEST)
+     - If the request body is malformed or if there are missing provider fields.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 404 (NOT FOUND)
@@ -853,12 +831,15 @@ To stop a specific service on a cluster, make a POST HTTP request to URI:
 
  /clusters/{cluster-id}/services/{service-id}/stop
 
-There is no POST body expected. If there are services that depend on the service being stopped,
+If there are services that depend on the service being stopped,
 those services will be stopped first. For example, if service A depends on service B, and 
 service B is being stopped, service A will automatically be stopped before service B is stopped.
 After the request is made, a status call can be made to check on the status of 
 the service start operation. A cluster must be in the ACTIVE state in order for the stop
 operation to be allowed.
+
+The request may require a JSON Object as its body if the provider used to create the cluster requires it.
+See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -870,6 +851,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - Successful
+   * - 400 (BAD REQUEST)
+     - If the request body is malformed or if there are missing provider fields.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 404 (NOT FOUND)
@@ -896,11 +879,14 @@ To start all services on a cluster, make a POST HTTP request to URI:
 
  /clusters/{cluster-id}/services/start
 
-There is no POST body expected. The ordering of service starts is based on the dependencies
+The ordering of service starts is based on the dependencies
 defined for the services. If service A requires service B, service B will be started before
 service A. After the request is made, a status call can be made to check on the status of 
 the service stop operation. A cluster must be in the ACTIVE state in order for the start
 operation to be allowed.
+
+The request may require a JSON Object as its body if the provider used to create the cluster requires it.
+See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -912,6 +898,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - Successful
+   * - 400 (BAD REQUEST)
+     - If the request body is malformed or if there are missing provider fields.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 404 (NOT FOUND)
@@ -938,12 +926,15 @@ To start a specific service on a cluster, make a POST HTTP request to URI:
 
  /clusters/{cluster-id}/services/{service-id}/start
 
-There is no POST body expected. If the service being started depends on any other services,
+If the service being started depends on any other services,
 those services will be started first. For example, if service A depends on service B, and 
 service A is being started, service B will automatically be started before service A is started.
 After the request is made, a status call can be made to check on the status of 
 the service start operation. A cluster must be in the ACTIVE state in order for the start
 operation to be allowed.
+
+The request may require a JSON Object as its body if the provider used to create the cluster requires it.
+See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -955,6 +946,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - Successful
+   * - 400 (BAD REQUEST)
+     - If the request body is malformed or if there are missing provider fields.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 404 (NOT FOUND)
@@ -981,13 +974,16 @@ To restart all services on a cluster, make a POST HTTP request to URI:
 
  /clusters/{cluster-id}/services/restart
 
-There is no POST body expected. The ordering of service starts and stops is based on the 
+The ordering of service starts and stops is based on the 
 dependencies defined for the services. If service A requires service B, service A will be 
 stopped before service B is stopped. Service B will be started after it has been stopped,
 and finally service A will be started after service B has been started.
 After the request is made, a status call can be made to check on the status of 
 the service restart operation. A cluster must be in the ACTIVE state in order for the restart
 operation to be allowed.
+
+The request may require a request body if the provider used to create the cluster requires it.
+See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -999,6 +995,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - Successful
+   * - 400 (BAD REQUEST)
+     - If the request body is malformed or if there are missing provider fields.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 404 (NOT FOUND)
@@ -1026,7 +1024,7 @@ To restart a specific service on a cluster, make a POST HTTP request to URI:
 
  /clusters/{cluster-id}/services/{service-id}/restart
 
-There is no POST body expected. If there are services that depend on the service being
+If there are services that depend on the service being
 restarted, they will be restarted as well. The ordering of service starts and stops is based on the 
 dependencies defined for the services. If service A requires service B, service A will be 
 stopped before service B is stopped. Service B will be started after it has been stopped,
@@ -1034,6 +1032,9 @@ and finally service A will be started after service B has been started.
 After the request is made, a status call can be made to check on the status of 
 the service restart operation. A cluster must be in the ACTIVE state in order for the restart
 operation to be allowed.
+
+The request may require a JSON Object as its body if the provider used to create the cluster requires it.
+See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
 
 HTTP Responses
 ^^^^^^^^^^^^^^
@@ -1045,6 +1046,8 @@ HTTP Responses
      - Description
    * - 200 (OK)
      - Successful
+   * - 400 (BAD REQUEST)
+     - If the request body is malformed or if there are missing provider fields.
    * - 401 (UNAUTHORIZED)
      - If the user is unauthorized to make this request.
    * - 404 (NOT FOUND)
@@ -1160,3 +1163,78 @@ Example
                "expireTime": 1234567890
            }'
         http://<server>:<port>/<version>/clusters/<cluster-id>
+
+
+.. _cluster-provider-fields:
+
+Provider Fields in Cluster Requests
+===================================
+
+Requests to perform cluster operations can include in their request body a ``providerFields`` entry.
+The value is a JSON Object containing key-value pairs of fields a provider may use when performing tasks.
+Usually, these fields are supplied when creating a cluster and are stored for the lifetime of the cluster.
+However, providers can specify that certain fields are sensitive. Sensitive fields usually contain private
+information such as ssh or api keys or passwords. Sensitive fields may not survive the
+lifetime of the cluster, as it is possible to configure them to auto-delete after some amount of time,
+or the system administrator may decide to wipe them manually. If a sensitive field is deleted before a
+cluster is deleted, subsequent cluster operations may require those fields to be included in the request again.
+For example, if an ssh key was deleted, it must be provided again to allow provisioner workers to ssh onto
+cluster nodes in order to execute tasks. Cluster create, delete, and configure requests may include
+provider fields. Service add, stop, start, and restart requests may also include provider fields.  
+
+If there are some required provider fields missing, the relevant API will return a 400 error code along with
+a JSON Object describing the fields that are missing. The response will
+contain a ``missingFields`` key which will be an array of JSON Objects containing the missing field as the
+key and the schema of the field as the value. It is an array of objects because there can be multiple sets
+of required fields. For example, it is possible that a provider may require both field1 and field2, or it may
+require field3 and field4. If only field2 is given in the request, then either field1 is missing, or both field3
+and field4 are missing.
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -X DELETE 
+        -H 'Coopr-UserID:<userid>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
+        http://<server>:<port>/<version>/clusters/00000083
+   {
+       "missingFields": [
+           {
+               "api_password": {
+                   "label": "API key",
+                   "override": false,
+                   "sensitive": true,
+                   "tip": "Your API key",
+                   "type": "password"
+               },
+               "ssh_key": {
+                   "label": "SSH key",
+                   "override": false,
+                   "sensitive": true,
+                   "tip": "Your ssh key",
+                   "type": "file"
+               }
+           }
+       ]
+   }
+
+In the above example, the cluster delete failed because the api password and ssh key fields were deleted at some point. 
+In order to delete the cluster, the client must re-supply those fields.
+
+.. code-block:: bash
+
+ $ curl -X DELETE 
+        -H 'Coopr-UserID:<userid>' 
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
+        -d '{
+               "providerFields":{
+                   "api_password": "password",
+                   "ssh_key": "keycontents"
+               }
+           }'
+        http://<server>:<port>/<version>/clusters/00000083
+
+
