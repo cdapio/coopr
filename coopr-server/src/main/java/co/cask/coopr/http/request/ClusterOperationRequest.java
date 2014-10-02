@@ -21,8 +21,8 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 /**
- * Request to perform some cluster operation. These requests may include provider fields for things like
- * credentials that may be needed to access cluster nodes, or things of that nature.
+ * Request to perform some cluster operation that needs to communicate with a provider. These requests may include
+ * provider fields for things like credentials that may be needed to access cluster nodes, or things of that nature.
  */
 public class ClusterOperationRequest {
   private final Map<String, String> providerFields;

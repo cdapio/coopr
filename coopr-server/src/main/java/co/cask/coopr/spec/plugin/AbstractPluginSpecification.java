@@ -18,8 +18,12 @@ package co.cask.coopr.spec.plugin;
 
 import co.cask.coopr.spec.NamedIconEntity;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -82,25 +86,41 @@ public abstract class AbstractPluginSpecification extends NamedIconEntity {
   }
 
   /**
-   * Check that the given type of fields contain all required fields.
+   * Get an immutable list of missing required fields for the given parameter type from the given input set of fields.
+   * Elements in the list are maps from field name to the schema for that field. Returns an empty list if required
+   * fields are present. For example, if the required fields are one of [ [f1, f2, f3], [f3, f4, f5] ], and the input
+   * fields are [f1, f5], then the result will be a list of maps, with each map containing the name of the missing
+   * field and the value the schema of that missing field. In this example it would be
+   * [ {f2:{schema}, f3:{schema}}, {f3:{schema}, f4:{schema}} ] . This is because
+   * f2 and f3 are missing from the [f1, f2, f3] set and f3 and f4 are missing from the [f3, f4, f5] set.
    *
    * @param parameterType Type of fields to check.
    * @param fields Fields to check.
-   * @return True if the given fields contain all required fields, false if not.
+   * @return Immutable set of unmodifiable sets of required fields missing from the given input fields.
    */
-  public boolean requiredFieldsExist(ParameterType parameterType, Set<String> fields) {
-    Set<Set<String>> requiredSets = getParametersSpecification(parameterType).getRequiredFields();
-    // if nothing required is specified, anything is ok
+  public List<Map<String, FieldSchema>> getMissingFields(ParameterType parameterType, Set<String> fields) {
+    ParametersSpecification parametersSpecification = getParametersSpecification(parameterType);
+    Set<Set<String>> requiredSets = parametersSpecification.getRequiredFields();
+    ImmutableList.Builder<Map<String, FieldSchema>> missingFields = ImmutableList.builder();
     if (requiredSets == null || requiredSets.isEmpty()) {
-      return true;
+      return ImmutableList.of();
     }
-    // required fields is a set of sets. As long as the fields contains all of one of these required sets, we're good.
-    for (Set<String> requiredSet : getParametersSpecification(parameterType).getRequiredFields()) {
-      if (fields.containsAll(requiredSet)) {
-        return true;
+
+    Map<String, FieldSchema> fieldSchemas = parametersSpecification.getFields();
+    for (Set<String> requiredSet : requiredSets) {
+      Set<String> missingFieldNames = Sets.difference(requiredSet, fields);
+      // all required fields are present, return an empty set,
+      if (missingFieldNames.isEmpty()) {
+        return ImmutableList.of();
       }
+      ImmutableMap.Builder mapBuilder = ImmutableMap.builder();
+      for (String missingFieldName : missingFieldNames) {
+        // required fields are guaranteed to have a schema due to validation done when defining the fields.
+        mapBuilder.put(missingFieldName, fieldSchemas.get(missingFieldName));
+      }
+      missingFields.add(mapBuilder.build());
     }
-    return false;
+    return missingFields.build();
   }
 
   @Override

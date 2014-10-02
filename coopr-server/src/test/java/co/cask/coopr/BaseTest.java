@@ -43,6 +43,7 @@ import co.cask.coopr.store.provisioner.SQLProvisionerStore;
 import co.cask.coopr.store.tenant.SQLTenantStore;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.coopr.store.user.SQLUserStore;
+import co.cask.coopr.store.user.UserStore;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
@@ -82,6 +83,7 @@ public class BaseTest {
   protected static ResourceService resourceService;
   protected static ClusterStore clusterStore;
   protected static TenantStore tenantStore;
+  protected static UserStore userStore;
   protected static ProvisionerStore provisionerStore;
   protected static MemoryPluginStore pluginStore;
   protected static Configuration conf;
@@ -168,6 +170,7 @@ public class BaseTest {
     credentialStore = injector.getInstance(CredentialStore.class);
     sqlUserStore = injector.getInstance(SQLUserStore.class);
     sqlUserStore.startAndWait();
+    userStore = sqlUserStore;
   }
 
   @AfterClass

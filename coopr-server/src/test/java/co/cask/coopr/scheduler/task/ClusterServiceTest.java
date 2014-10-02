@@ -4,6 +4,8 @@ import co.cask.coopr.BaseTest;
 import co.cask.coopr.Entities;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Cluster;
+import co.cask.coopr.cluster.ClusterService;
+import co.cask.coopr.cluster.MissingFieldsException;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.http.request.AddServicesRequest;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
@@ -225,7 +227,7 @@ public class ClusterServiceTest extends BaseTest {
     boolean failed = false;
     try {
       clusterService.requestClusterReconfigure(cluster.getId(), account, configureRequest);
-    } catch (IllegalArgumentException e) {
+    } catch (MissingFieldsException e) {
       // this is expected
       failed = true;
     }
@@ -272,7 +274,7 @@ public class ClusterServiceTest extends BaseTest {
     clusterStore.deleteCluster(cluster.getId());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = MissingFieldsException.class)
   public void testMissingRequestThrowsException() throws Exception {
     Cluster cluster = createActiveCluster();
     clusterService.requestClusterDelete(cluster.getId(), cluster.getAccount(), null);
