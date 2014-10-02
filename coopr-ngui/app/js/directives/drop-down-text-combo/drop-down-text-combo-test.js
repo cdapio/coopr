@@ -51,7 +51,6 @@ describe("Unit tests for drop-down-combo-text directive", function(myApi) {
     scope.model.field3 = {
       flavor: "field3"
     };
-    compile(element)(scope);
     scope.$digest();
     expect(element.isolateScope().dropDownValues.length).toBe(0);
   });
@@ -59,7 +58,6 @@ describe("Unit tests for drop-down-combo-text directive", function(myApi) {
   it("should work with deletion in model", function() {
     delete scope.model.field3;
     delete scope.model.something;
-    compile(element)(scope);
     scope.$digest();
     expect(element.isolateScope().dropDownValues.length).toBe(2);
   });
