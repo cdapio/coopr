@@ -8,7 +8,6 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
   CrudFormBase.apply($scope);
 
   var promise;
-
   if($scope.editing) {
     $scope.model = myApi.Tenant.get($state.params);
     promise = $scope.model.$promise;
