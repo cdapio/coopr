@@ -1,4 +1,4 @@
-<form name="hardwareForm" class="form-horizontal hardwareTypeForm" role="form" ng-submit="doSubmit(model)" novalidate>
+<form name="hardwareForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
 
     <div class="form-group">
         <label for="inputHardwareName" class="col-xs-2 control-label">Name</label>
@@ -20,53 +20,44 @@
         </div>
     </div>
 
-    <div class="form-group list-of-providers">
+    <div class="form-group">
         <label class="col-xs-2 control-label">Providers</label>
-        <div class="col-xs-10" ng-hide="editing">
-            <drop-down-text-combo
-                    ng-repeat="(pkey, pvalue) in providerMapShadow"
-                    text-value="pvalue.flavor"
-                    drop-down-value="pvalue.name"
-                    drop-down-options="allProviders"
-                    drop-down-disable="false">
+        <div class="col-xs-10">
 
-            </drop-down-text-combo>
-            <div class="col-xs-4" >
-                <button ng-hide="editing"
-                        class="btn btn-default"
-                        ng-click="addProviderHandlerOnCreate($event)">
-                    + Providers
-                </button>
+          <fieldset class="row" ng-repeat="(key, value) in model.providermap">
+            <div class="col-xs-5">
+              <input type="text" value="{{key}}" class="form-control" readonly />
             </div>
-        </div>
-        <div class="col-xs-10" ng-show="editing">
-
-            <drop-down-text-combo
-                    ng-repeat="(pkey, pvalue) in providerMapShadow"
-                    text-value="pvalue.flavor"
-                    drop-down-value="pvalue.name"
-                    drop-down-options="allProviders"
-                    drop-down-disable="true">
-
-            </drop-down-text-combo>
-            <drop-down-text-combo
-                    ng-repeat="(pkey, pvalue) in providerMapShadowNew"
-                    text-value="pvalue.flavor"
-                    drop-down-value="pvalue.name"
-                    drop-down-options="allProviders"
-                    drop-down-disable="false"
-                    ></drop-down-text-combo>
-            <div class="row">
-              <div class="col-xs-6" >
-                  <button ng-show="editing"
-                          class="btn btn-default hardware-create-section"
-                          ng-click="addProviderHandlerOnEdit($event)">
-                      + Providers
-                  </button>
-              </div>
+            <div class="col-xs-6">
+              <input type="text" ng-model="value.flavor" class="form-control" />
             </div>
+            <div class="col-xs-1">
+              <p class="form-control-static">
+                <a href="" class="btn btn-danger btn-xs"
+                  ng-click="rmProvider(key)"
+                >
+                  <span class="fa fa-trash"></span>
+                  <span class="sr-only">remove provider</span>
+                </a>
+              </p>
+            </div>
+
+          </fieldset>
+
+          <p class="form-control-static">
+            <a href="" class="btn btn-info btn-xs"
+              bs-dropdown="providersDropDown"
+              ng-disabled="!providersDropDown.length"
+            >
+              <span class="fa fa-plus"></span>
+              Add Provider
+            </a>
+          </p>
+
         </div>
+
     </div>
+
     <div class="form-group">
         <label class="col-xs-2"></label>
         <div class="col-xs-10">
@@ -80,3 +71,7 @@
     </div>
 
 </form>
+
+
+
+<pre>{{model | json}}</pre>
