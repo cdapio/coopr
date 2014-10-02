@@ -44,6 +44,7 @@ import co.cask.coopr.store.cluster.ClusterStoreView;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.http.HttpResponder;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -306,7 +307,7 @@ public class ClusterHandler extends AbstractAuthHandler {
     } catch (InvalidClusterException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
     } catch (MissingFieldsException e) {
-      responder.sendJson(HttpResponseStatus.BAD_REQUEST, e.getMissingFields());
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     } finally {
       try {
         reader.close();
@@ -374,7 +375,7 @@ public class ClusterHandler extends AbstractAuthHandler {
     } catch (MissingEntityException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
     } catch (MissingFieldsException e) {
-      responder.sendJson(HttpResponseStatus.BAD_REQUEST, e.getMissingFields());
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     }
   }
 
@@ -572,7 +573,7 @@ public class ClusterHandler extends AbstractAuthHandler {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Internal error while requesting cluster reconfigure");
     } catch (MissingFieldsException e) {
-      responder.sendJson(HttpResponseStatus.BAD_REQUEST, e.getMissingFields());
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     }
   }
 
@@ -622,7 +623,7 @@ public class ClusterHandler extends AbstractAuthHandler {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Internal error while requesting service action.");
     } catch (MissingFieldsException e) {
-      responder.sendJson(HttpResponseStatus.BAD_REQUEST, e.getMissingFields());
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     }
   }
 
@@ -783,7 +784,7 @@ public class ClusterHandler extends AbstractAuthHandler {
       LOG.error("Exception performing service action for cluster {}", clusterId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal error performing service action");
     } catch (MissingFieldsException e) {
-      responder.sendJson(HttpResponseStatus.BAD_REQUEST, e.getMissingFields());
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     }
   }
 
