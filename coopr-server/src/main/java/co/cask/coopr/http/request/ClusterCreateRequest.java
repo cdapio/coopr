@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Request to create a cluster, containing values for optional cluster settings.
  */
-public class ClusterCreateRequest extends ProviderOperationRequest {
+public class ClusterCreateRequest extends ClusterOperationRequest {
   private final String name;
   private final String description;
   private final String clusterTemplate;

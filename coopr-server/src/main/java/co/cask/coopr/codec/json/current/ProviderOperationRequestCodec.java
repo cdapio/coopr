@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.http.request.ProviderOperationRequest;
+import co.cask.coopr.http.request.ClusterOperationRequest;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -27,18 +27,18 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
- * Codec for deserializing a {@link co.cask.coopr.http.request.ProviderOperationRequest}, used so some validation
+ * Codec for deserializing a {@link co.cask.coopr.http.request.ClusterOperationRequest}, used so some validation
  * is done on required fields.
  */
-public class ProviderOperationRequestCodec implements JsonDeserializer<ProviderOperationRequest> {
+public class ProviderOperationRequestCodec implements JsonDeserializer<ClusterOperationRequest> {
 
   @Override
-  public ProviderOperationRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
+  public ClusterOperationRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
     Map<String, String> providerFields =
       context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, String>>() {}.getType());
-    return new ProviderOperationRequest(providerFields);
+    return new ClusterOperationRequest(providerFields);
   }
 }

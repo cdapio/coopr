@@ -134,6 +134,7 @@ Example
                    "override": false,
                    "sensitive": true,
                    "tip": "Your ssh key",
+                   "type": "file"
                }
            }
        ]
@@ -395,6 +396,7 @@ Example
                    "override": false,
                    "sensitive": true,
                    "tip": "Your ssh key",
+		   "type": "file"
                }
            }
        ]

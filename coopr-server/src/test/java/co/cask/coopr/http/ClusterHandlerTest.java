@@ -1472,7 +1472,7 @@ public class ClusterHandlerTest extends ServiceTestBase {
       .setClusterTemplate(Entities.ClusterTemplateExample.HDFS)
       .build();
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    String requestStr = gson.toJson(new ClusterConfigureRequest(new JsonObject(), false));
+    String requestStr = gson.toJson(new ClusterConfigureRequest(null, new JsonObject(), false));
 
     assertResponseStatus(doPut("/clusters/" + cluster.getId() + "/config", "{}", USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
@@ -1500,7 +1500,7 @@ public class ClusterHandlerTest extends ServiceTestBase {
       .build();
     cluster.setStatus(Cluster.Status.INCONSISTENT);
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    String requestStr = gson.toJson(new ClusterConfigureRequest(new JsonObject(), false));
+    String requestStr = gson.toJson(new ClusterConfigureRequest(null, new JsonObject(), false));
 
     assertResponseStatus(doPut("/clusters/" + cluster.getId() + "/config", requestStr, USER1_HEADERS),
                          HttpResponseStatus.OK);
@@ -1529,7 +1529,7 @@ public class ClusterHandlerTest extends ServiceTestBase {
 
     JsonObject newConfig = new JsonObject();
     newConfig.addProperty("key2", "val2");
-    ClusterConfigureRequest configRequest = new ClusterConfigureRequest(newConfig, false);
+    ClusterConfigureRequest configRequest = new ClusterConfigureRequest(null, newConfig, false);
     assertResponseStatus(doPut("/clusters/123/config", gson.toJson(configRequest), USER1_HEADERS),
                          HttpResponseStatus.OK);
 
@@ -1661,11 +1661,11 @@ public class ClusterHandlerTest extends ServiceTestBase {
       .build();
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
     // can't add nodemanager without resourcemanager
-    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("nodemanager"));
+    AddServicesRequest body = new AddServicesRequest(null, ImmutableSet.of("nodemanager"));
     assertResponseStatus(doPost("/clusters/123/services", gson.toJson(body), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
     // can't add nonexistant service
-    body = new AddServicesRequest(ImmutableSet.of("fakeservice"));
+    body = new AddServicesRequest(null, ImmutableSet.of("fakeservice"));
     assertResponseStatus(doPost("/clusters/123/services", gson.toJson(body), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
@@ -1681,7 +1681,7 @@ public class ClusterHandlerTest extends ServiceTestBase {
       .setStatus(Cluster.Status.ACTIVE)
       .build();
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
-    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
+    AddServicesRequest body = new AddServicesRequest(null, ImmutableSet.of("resourcemanager", "nodemanager"));
     assertResponseStatus(doPost("/clusters/1123/services", gson.toJson(body), USER1_HEADERS),
                          HttpResponseStatus.NOT_FOUND);
     assertResponseStatus(doPost("/clusters/123/services", gson.toJson(body), USER2_HEADERS),
@@ -1699,7 +1699,7 @@ public class ClusterHandlerTest extends ServiceTestBase {
       .build();
     Set<Cluster.Status> badStatuses = ImmutableSet.of(
       Cluster.Status.INCOMPLETE, Cluster.Status.PENDING, Cluster.Status.TERMINATED, Cluster.Status.INCONSISTENT);
-    AddServicesRequest body = new AddServicesRequest(ImmutableSet.of("resourcemanager", "nodemanager"));
+    AddServicesRequest body = new AddServicesRequest(null, ImmutableSet.of("resourcemanager", "nodemanager"));
     for (Cluster.Status status : badStatuses) {
       cluster.setStatus(status);
       clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);

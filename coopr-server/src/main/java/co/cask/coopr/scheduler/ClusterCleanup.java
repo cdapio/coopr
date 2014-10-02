@@ -22,8 +22,8 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueGroup;
 import co.cask.coopr.common.queue.QueuedElement;
-import co.cask.coopr.http.request.ProviderOperationRequest;
-import co.cask.coopr.scheduler.task.ClusterService;
+import co.cask.coopr.cluster.ClusterService;
+import co.cask.coopr.http.request.ClusterOperationRequest;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.scheduler.task.NodeService;
 import co.cask.coopr.scheduler.task.TaskId;
@@ -171,7 +171,7 @@ public class ClusterCleanup implements Runnable {
         // mod check done here instead of db to avoid full table scan.
         if (Long.valueOf(cluster.getId()) % incrementBy == myMod) {
           LOG.debug("Deleting cluster {} with expire time {}", cluster.getId(), cluster.getExpireTime());
-          clusterService.requestClusterDelete(cluster, cluster.getAccount());
+          clusterService.requestClusterDelete(cluster.getId(), cluster.getAccount(), new ClusterOperationRequest(null));
         }
       }
     } catch (Throwable e) {
