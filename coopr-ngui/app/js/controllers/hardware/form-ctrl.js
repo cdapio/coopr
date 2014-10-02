@@ -39,7 +39,7 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
 
   $scope.rmProvider = function(pName) {
     delete $scope.model.providermap[pName];
-  }
+  };
 
   $scope.addProvider = function (pName) {
     if(!$scope.model) { return; }
