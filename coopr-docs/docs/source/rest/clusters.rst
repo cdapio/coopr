@@ -77,13 +77,9 @@ Required Parameters
 HTTP Responses
 ^^^^^^^^^^^^^^
 
-The server will respond with the id of the cluster added. If there are required provider fields missing from
-the request, the server will respond with a JSON Object describing the missing fields. The response will
-contain a ``missingFields`` key which will be an array of JSON Objects containing the missing field as the
-key and the schema of the field as the value. It is an array of objects because there can be multiple sets
-of required fields. For example, it is possible that a provider may require both field1 and field2, or it may
-require field3 and field4. If only field2 is given in the request, then either field1 is missing, or both field3
-and field4 are missing.
+The server will respond with the id of the cluster added if the create request was successful. If there were
+required fields missing in the request, it will respond with details about the missing fields. See the section on
+:ref:`Provider Fields <cluster-provider-fields>` for more information. 
 
 
 .. list-table:: 
@@ -306,10 +302,7 @@ To delete a cluster, make a DELETE HTTP request to URI:
 
  /clusters/{id}
 
-This resource request represents an individual cluster for deletion. If the provider used to create the cluster
-uses sensitive fields, it is possible the sensitive fields were lost at some point and need to be given again.
-To do this, the request must contain a JSON Object as its body, with ``providerFields`` as a key, and a JSON
-Object as its value. The object should contain key-value entries for fields required by the provider.
+This resource request represents an individual cluster for deletion.
 
 The request may require a JSON Object as its body if the provider used to create the cluster requires it.
 See the section on :ref:`Provider Fields <cluster-provider-fields>` for more information.
