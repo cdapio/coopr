@@ -3,7 +3,10 @@ function ($scope, $state, myApi, CrudFormBase) {
   CrudFormBase.apply($scope);
 
   $scope.allProviders = myApi.Provider.query();
-  $scope.textFields = ['flavor'];
+  $scope.textFields = [{
+    name: 'flavor',
+    placeholder: 'flavor'
+  }];
   if($scope.editing) {
     $scope.model = myApi.HardwareType.get($state.params);
     $scope.model.$promise['catch'](function () { $state.go('404'); });

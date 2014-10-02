@@ -4,10 +4,11 @@
     <input type="text" value="{{key}}" class="form-control" readonly />
   </div>
   <div class="col-xs-5">
-    <div ng-repeat="fields in textFields">
+    <div ng-repeat="field in textFields">
       <input type="text"
-              ng-model="value[fields]"
-              placeholder="{{fields}}"
+              ng-model="value[field.name]"
+              name="{{field.name}}"
+              placeholder="{{field.placeholder}}"
               class="form-control" />
     </div>
   </div>

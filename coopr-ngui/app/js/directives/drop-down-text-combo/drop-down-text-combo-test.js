@@ -10,8 +10,8 @@ describe("Unit tests for drop-down-combo-text directive", function(myApi) {
     element = angular.element(
       "<drop-down-text-combo " +
             "data-model=\"model\"" +
-            "drop-down-list=\"dropDownList\"" +
-            "text-fields = \"textFields\"" +
+            "data-drop-down-list=\"dropDownList\"" +
+            "data-text-fields = \"textFields\"" +
             "> "+
         "</drop-down-text-combo>");
     scope = $rootScope.$new();
@@ -23,7 +23,10 @@ describe("Unit tests for drop-down-combo-text directive", function(myApi) {
         "flavor": "value"
       }
     };
-    scope.textFields = ["text1"];
+    scope.textFields = [{
+      name: "text1",
+      placeholder: "somerandomplaceholder"
+    }];
     scope.dropDownList = [
       {
         name: "something",
@@ -60,5 +63,16 @@ describe("Unit tests for drop-down-combo-text directive", function(myApi) {
     delete scope.model.something;
     scope.$digest();
     expect(element.isolateScope().dropDownValues.length).toBe(2);
+  });
+
+  it("should have valid placeholder for text field", function() {
+    // Want to query an element inside angular's unit test?
+    // Well, no you cannot have it easy.
+    // Struggle like galileo who tried proving earth is not at the center of the solar system.
+    expect(
+      angular.element(
+        element[0].querySelector("input[name=text1]")
+      ).attr("placeholder")
+    ).toEqual("somerandomplaceholder");
   });
 });
