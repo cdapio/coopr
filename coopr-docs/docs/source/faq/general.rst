@@ -149,9 +149,9 @@ Does Coopr support metering?
 For each account, and the templates from which it provisions resources, Coopr internally keeps track of clusters, resources, and services. This information
 will be exposed through the administration interface in the next release.
 
-I use puppet. Will I be able to use puppet with Coopr?
+I use Puppet. Will I be able to use Puppet with Coopr?
 ------------------------------------------------------------------
-Yes. Coopr is a smart orchestration layer with open support for integrating any automation framework. You can use your puppet modules
+Yes. Coopr is a smart orchestration layer with open support for integrating any automation framework. You can use your Puppet modules
 to configure clusters. Please refer to the :doc:`Administration Guide </guide/admin/index>` for more details on how to integrate.
 
 Can Coopr support approval workflows or the ability to pause provisioning for approval?
