@@ -119,7 +119,7 @@ one cloud to another.
 
 Can Coopr work on my laptop?
 ----------------------------------------
-Coopr has been tested on OSX Mavericks. There are plans to add Windows support in a future release, but until then
+Coopr has been tested on OS X Mavericks and Linux. There are plans to add Windows support in a future release, but until then
 Windows users will have to use the usual workarounds, such as using Cygwin.
 
 How long has Coopr been used in a production environment and where is it being used?
