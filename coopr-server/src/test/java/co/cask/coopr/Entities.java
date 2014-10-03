@@ -365,145 +365,143 @@ public class Entities {
       clusterConf.add("hbase", hbase);
     }
 
-    public static final ClusterTemplate HDFS =
-      new ClusterTemplate(
-        "hdfs", "Hdfs cluster",
-        new ClusterDefaults(
-          ImmutableSet.<String>of(
+    public static final ClusterTemplate HDFS = ClusterTemplate.builder()
+      .setName("hdfs")
+      .setDescription("Hdfs cluster")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices(
             ServiceExample.HOSTS.getName(),
             ServiceExample.NAMENODE.getName(),
-            ServiceExample.DATANODE.getName()
-          ),
-          "joyent",
-          null, null, null, null
-        ),
-        new Compatibilities(null, null, ImmutableSet.<String>of(
-          ServiceExample.HOSTS.getName(),
+            ServiceExample.DATANODE.getName())
+          .setProvider("joyent").build())
+      .setCompatibilities(Compatibilities.builder().setServices(
+        ServiceExample.HOSTS.getName(),
+        ServiceExample.NAMENODE.getName(),
+        ServiceExample.DATANODE.getName()).build())
+      .setConstraints(new Constraints(
+        ImmutableMap.<String, ServiceConstraint>of(
           ServiceExample.NAMENODE.getName(),
-          ServiceExample.DATANODE.getName()
-        )),
-        new Constraints(
-          ImmutableMap.<String, ServiceConstraint>of(
-            ServiceExample.NAMENODE.getName(),
-            new ServiceConstraint(
-              ImmutableSet.<String>of("large"),
-              ImmutableSet.<String>of("centos6", "ubuntu12"),
-              1, 1)
-          ),
-          new LayoutConstraint(
-            null,
-            ImmutableSet.<Set<String>>of(
-              ImmutableSet.<String>of("namenode", "datanode")
-            )
-          ),
-          SizeConstraint.EMPTY
+          new ServiceConstraint(
+            ImmutableSet.<String>of("large"),
+            ImmutableSet.<String>of("centos6", "ubuntu12"),
+            1, 1)
         ),
-        null
-      );
-    public static final ClusterTemplate REACTOR =
-      new ClusterTemplate(
-        "hadoop-reactor", "Hadoop cluster with reactor",
-        new ClusterDefaults(
-          ImmutableSet.<String>of("hosts", "namenode", "datanode", "resourcemanager", "nodemanager",
-                                  "hbasemaster", "regionserver", "zookeeper", "reactor"),
-          "joyent",
-          null, null, null, null
+        new LayoutConstraint(
+          null,
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.<String>of("namenode", "datanode")
+          )
         ),
-        new Compatibilities(null, null,
-                            ImmutableSet.<String>of("hosts", "namenode", "datanode", "resourcemanager", "nodemanager",
-                                                    "hbasemaster", "regionserver", "zookeeper", "reactor")),
-        new Constraints(
-          ImmutableMap.<String, ServiceConstraint>of(
-            "namenode",
-            new ServiceConstraint(
-              ImmutableSet.<String>of("large"),
-              ImmutableSet.<String>of("centos6", "ubuntu12"),
-              1, 1)
-          ),
-          new LayoutConstraint(
-            null,
-            ImmutableSet.<Set<String>>of(
-              ImmutableSet.<String>of("namenode", "datanode")
-            )
-          ),
-          SizeConstraint.EMPTY
+        SizeConstraint.EMPTY)).build();
+    public static final ClusterTemplate REACTOR = ClusterTemplate.builder()
+      .setName("hadoop-reactor")
+      .setDescription("Hadoop cluster with reactor")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices("hosts", "namenode", "datanode", "resourcemanager", "nodemanager",
+                       "hbasemaster", "regionserver", "zookeeper", "reactor")
+          .setProvider("joyent").build())
+      .setCompatibilities(
+        Compatibilities.builder().setServices(
+          "hosts", "namenode", "datanode", "resourcemanager", "nodemanager",
+          "hbasemaster", "regionserver", "zookeeper", "reactor").build())
+      .setConstraints(new Constraints(
+        ImmutableMap.<String, ServiceConstraint>of(
+          "namenode",
+          new ServiceConstraint(
+            ImmutableSet.<String>of("large"),
+            ImmutableSet.<String>of("centos6", "ubuntu12"),
+            1, 1)
         ),
-        new Administration(new LeaseDuration(10000, 900000, 1000))
-      );
-    public static final ClusterTemplate HADOOP_DISTRIBUTED =
-      new ClusterTemplate(
-        "hadoop-distributed", "Hadoop cluster without high-availability",
-        new ClusterDefaults(
-          ImmutableSet.<String>of("firewall", "hosts", "datanode", "namenode", "nodemanager", "resourcemanager"),
-          "rackspace", "medium", "ubuntu12", null, null),
-        new Compatibilities(ImmutableSet.<String>of("small", "medium", "large"),
-                            ImmutableSet.<String>of("centos6", "ubuntu12"),
-                            ImmutableSet.<String>of("firewall", "hosts", "namenode", "secondarynamenode", "datanode",
-                                                    "resourcemanager", "nodemanager", "zookeeper", "hbasemaster",
-                                                    "regionserver", "hive-metastore", "mysql-server", "reactor")),
-        new Constraints(
-          ImmutableMap.<String, ServiceConstraint>of(
-            "namenode", new ServiceConstraint(null, null, 1, 1),
-            "resourcemanager", new ServiceConstraint(null, null, 1, 1),
-            "zookeeper", new ServiceConstraint(null, null, 1, 1),
-            "hbasemaster", new ServiceConstraint(null, null, null, 1),
-            "reactor", new ServiceConstraint(null, null, null, 1)
-          ),
-          new LayoutConstraint(
-            ImmutableSet.<Set<String>>of(
-              ImmutableSet.<String>of("datanode", "nodemanager", "regionserver")
-            ),
-            ImmutableSet.<Set<String>>of(
-              ImmutableSet.<String>of("namenode", "secondarynamenode"),
-              ImmutableSet.<String>of("resourcemanager", "nodemanager"),
-              ImmutableSet.<String>of("namenode", "datanode"),
-              ImmutableSet.<String>of("datanode", "mysql-server"),
-              ImmutableSet.<String>of("datanode", "reactor"),
-              ImmutableSet.<String>of("hbasemaster", "regionserver")
-            )
-          ),
-          SizeConstraint.EMPTY
+        new LayoutConstraint(
+          null,
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.<String>of("namenode", "datanode")
+          )
         ),
-        new Administration(new LeaseDuration(0, 0, 0))
-      );
-    public static final ClusterTemplate REACTOR2 =
-      new ClusterTemplate(
-        "reactor", "Hadoop cluster without high-availability reactor",
-        new ClusterDefaults(
-          ImmutableSet.<String>of("firewall", "hosts", "hadoop-hdfs-datanode", "hadoop-hdfs-namenode",
-                                  "hadoop-yarn-nodemanager", "hadoop-yarn-resourcemanager", "zookeeper-server",
-                                  "hbase-master", "hbase-regionserver", "reactor"),
-          "rackspace", "medium", "ubuntu12", null, null),
-        new Compatibilities(ImmutableSet.<String>of("small", "medium", "large"),
-                            ImmutableSet.<String>of("centos6", "ubuntu12"),
-                            ImmutableSet.<String>of("firewall", "hosts", "hadoop-hdfs-datanode", "hadoop-hdfs-namenode",
-                                                    "hadoop-yarn-nodemanager", "hadoop-yarn-resourcemanager",
-                                                    "zookeeper-server", "hbase-master", "hbase-regionserver",
-                                                    "hive-metastore", "mysql-server", "reactor")),
-        new Constraints(
-          ImmutableMap.<String, ServiceConstraint>of(
-            "hadoop-hdfs-namenode", new ServiceConstraint(null, null, 1, 1),
-            "hadoop-yarn-resourcemanager", new ServiceConstraint(null, null, 1, 1),
-            "zookeeper-server", new ServiceConstraint(null, null, 1, 1),
-            "hbase-master", new ServiceConstraint(null, null, null, 1),
-            "reactor", new ServiceConstraint(null, null, null, 1)
-          ),
-          new LayoutConstraint(
-            ImmutableSet.<Set<String>>of(
-              ImmutableSet.<String>of("hadoop-hdfs-datanode", "hadoop-yarn-nodemanager", "hbase-regionserver")
-            ),
-            ImmutableSet.<Set<String>>of(
-              ImmutableSet.<String>of("hadoop-hdfs-namenode", "hadoop-hdfs-secondarynamenode"),
-              ImmutableSet.<String>of("hadoop-yarn-resourcemanager", "hadoop-yarn-nodemanager"),
-              ImmutableSet.<String>of("hadoop-hdfs-namenode", "hadoop-hdfs-datanode"),
-              ImmutableSet.<String>of("hadoop-hdfs-datanode", "mysql-server"),
-              ImmutableSet.<String>of("hbase-master", "hbase-regionserver")
-            )
-          ),
-          SizeConstraint.EMPTY
+        SizeConstraint.EMPTY))
+      .setAdministration(new Administration(new LeaseDuration(10000, 900000, 1000))).build();
+    public static final ClusterTemplate HADOOP_DISTRIBUTED = ClusterTemplate.builder()
+      .setName("hadoop-distributed")
+      .setDescription("Hadoop cluster without high-availability")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices("firewall", "hosts", "datanode", "namenode", "nodemanager", "resourcemanager")
+          .setProvider("rackspace")
+          .setHardwaretype("medium")
+          .setImagetype("ubuntu12")
+          .build())
+      .setCompatibilities(
+        Compatibilities.builder()
+          .setHardwaretypes("small", "medium", "large")
+          .setImagetypes("centos6", "ubuntu12")
+          .setServices("firewall", "hosts", "namenode", "secondarynamenode", "datanode",
+                       "resourcemanager", "nodemanager", "zookeeper", "hbasemaster",
+                       "regionserver", "hive-metastore", "mysql-server", "reactor").build())
+      .setConstraints(new Constraints(
+        ImmutableMap.<String, ServiceConstraint>of(
+          "namenode", new ServiceConstraint(null, null, 1, 1),
+          "resourcemanager", new ServiceConstraint(null, null, 1, 1),
+          "zookeeper", new ServiceConstraint(null, null, 1, 1),
+          "hbasemaster", new ServiceConstraint(null, null, null, 1),
+          "reactor", new ServiceConstraint(null, null, null, 1)
         ),
-        new Administration(new LeaseDuration(0, 0, 0))
-      );
+        new LayoutConstraint(
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.<String>of("datanode", "nodemanager", "regionserver")
+          ),
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.<String>of("namenode", "secondarynamenode"),
+            ImmutableSet.<String>of("resourcemanager", "nodemanager"),
+            ImmutableSet.<String>of("namenode", "datanode"),
+            ImmutableSet.<String>of("datanode", "mysql-server"),
+            ImmutableSet.<String>of("datanode", "reactor"),
+            ImmutableSet.<String>of("hbasemaster", "regionserver")
+          )
+        ),
+        SizeConstraint.EMPTY))
+      .setAdministration(new Administration(new LeaseDuration(0, 0, 0))).build();
+    public static final ClusterTemplate REACTOR2 = ClusterTemplate.builder()
+      .setName("reactor")
+      .setDescription("Hadoop cluster without high-availability and with Continuuity Reactor")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices("firewall", "hosts", "hadoop-hdfs-datanode", "hadoop-hdfs-namenode",
+                       "hadoop-yarn-nodemanager", "hadoop-yarn-resourcemanager",
+                       "zookeeper-server", "hbase-master", "hbase-regionserver", "reactor")
+          .setProvider("rackspace")
+          .setHardwaretype("medium")
+          .setImagetype("ubuntu12").build())
+      .setCompatibilities(
+        Compatibilities.builder()
+          .setHardwaretypes("small", "medium", "large")
+          .setImagetypes("centos6", "ubuntu12")
+          .setServices("firewall", "hosts", "hadoop-hdfs-datanode", "hadoop-hdfs-namenode",
+                       "hadoop-yarn-nodemanager", "hadoop-yarn-resourcemanager",
+                       "zookeeper-server", "hbase-master", "hbase-regionserver",
+                       "hive-metastore", "mysql-server", "reactor").build())
+      .setConstraints(new Constraints(
+        ImmutableMap.<String, ServiceConstraint>of(
+          "hadoop-hdfs-namenode", new ServiceConstraint(null, null, 1, 1),
+          "hadoop-yarn-resourcemanager", new ServiceConstraint(null, null, 1, 1),
+          "zookeeper-server", new ServiceConstraint(null, null, 1, 1),
+          "hbase-master", new ServiceConstraint(null, null, null, 1),
+          "reactor", new ServiceConstraint(null, null, null, 1)
+        ),
+        new LayoutConstraint(
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.<String>of("hadoop-hdfs-datanode", "hadoop-yarn-nodemanager", "hbase-regionserver")
+          ),
+          ImmutableSet.<Set<String>>of(
+            ImmutableSet.<String>of("hadoop-hdfs-namenode", "hadoop-hdfs-secondarynamenode"),
+            ImmutableSet.<String>of("hadoop-yarn-resourcemanager", "hadoop-yarn-nodemanager"),
+            ImmutableSet.<String>of("hadoop-hdfs-namenode", "hadoop-hdfs-datanode"),
+            ImmutableSet.<String>of("hadoop-hdfs-datanode", "mysql-server"),
+            ImmutableSet.<String>of("hbase-master", "hbase-regionserver")
+          )
+        ),
+        SizeConstraint.EMPTY)).build();
   }
 
   public static class ClusterExample {
@@ -549,7 +547,6 @@ public class Entities {
     private static String clusterId = "2";
     private static final String baseMockHostName = ".test.chi.intsm.net";
     public static Node NODE1 = createNode(node1, clusterId);
-    public static Node NODE2 = createNode(node2, clusterId);
     public static Node NODE1_UPDATED = createNode(
       node1,
       clusterId,
