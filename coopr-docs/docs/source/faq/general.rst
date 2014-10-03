@@ -95,30 +95,31 @@ jobs and workflows on top of those services. Coopr, on the other hand, is a soft
 creating clusters of any layout and of any type. Being software agnostic and a provisioning tool, Coopr has no direct support
 for managing jobs on clusters, as its focus is on cluster creation and management, not jobs and workflow management.
 
-Will Coopr support `docker <http://docker.io>`_ based clusters?
+Will Coopr support Docker based clusters?
 ---------------------------------------------------------------------------
-We believe in the potential of docker based clusters. In the future releases, we plan to support Docker based clusters.
+We believe in the potential of `Docker <http://docker.io>`_ based clusters. In the future releases, we plan to support Docker based clusters.
 
 Does Coopr support bare metal?
 ------------------------------------------
 Not at the moment, but there are plans to add resource pools in a future release. With resource pools, Coopr would manage
 pre-existing machines instead of creating them from scratch each time a new node is needed. Resource pools would also
-introduce the ability to manage bare metal.
+introduce the ability to manage bare metal. Enterprise users with existing hardware procurements systems can write a provisioner
+plugin to interface with their existing systems.
 
 What providers are supported by Coopr?
 -------------------------------------------------
-Out of the box, Coopr supports Rackspace, Joyent, Openstack (fog compatible). Plugins
-for EC2, HP Cloud, Cloudstack, Azure, BlueBox, GCE, CloudFoundry, and Terremark are planned. Contributions here
-are welcome and encouraged!
+Out of the box, Coopr supports Amazon Web Services (EC2), Google Compute Engine, Joyent, OpenStack (and compatible), and Rackspace.
+Plugins for HP Cloud, Cloudstack, BlueBox, CloudFoundry, Digital Ocean, IBM SoftLayer, and Terremark are planned. Contributions
+here are welcome and encouraged!
 
 Does Coopr make it easy for me to migrate from one cloud to another?
 --------------------------------------------------------------------------------
-Absolutely. When we originally built Coopr at  Cask Data, the main goal was to make it a seamless process to migrate from
+Absolutely. When we originally built Coopr at Cask Data, the main goal was to make it a seamless process to migrate from
 one cloud to another.
 
 Can Coopr work on my laptop?
 ----------------------------------------
-Coopr has been tested on OSX Mavericks. There are plans to add Windows support in a future release, but until then
+Coopr has been tested on OS X Mavericks and Linux. There are plans to add Windows support in a future release, but until then
 Windows users will have to use the usual workarounds, such as using Cygwin.
 
 How long has Coopr been used in a production environment and where is it being used?
@@ -136,7 +137,7 @@ configure different resources.
 What is the recommended setup for Coopr in terms of hardware and configuration?
 -------------------------------------------------------------------------------------------
 We recommend the following :doc:`deployment configuration </guide/recommended-deployment>` for a production environment that includes
-HA for persistence store, multiple nodes for Zookeeper, and HA proxy for traffic distribution across UIs and provisioners.
+HA for persistent store, multiple nodes for Zookeeper, and HAProxy for traffic distribution across UIs and servers.
 
 Does Coopr support monitoring and alerting of services deployed?
 ---------------------------------------------------------------------------
@@ -148,9 +149,9 @@ Does Coopr support metering?
 For each account, and the templates from which it provisions resources, Coopr internally keeps track of clusters, resources, and services. This information
 will be exposed through the administration interface in the next release.
 
-I use puppet. Will I be able to use puppet with Coopr?
+I use Puppet. Will I be able to use Puppet with Coopr?
 ------------------------------------------------------------------
-Yes. Coopr is a smart orchestration layer with open support for integrating any automation framework. You can use your puppet modules
+Yes. Coopr is a smart orchestration layer with open support for integrating any automation framework. You can use your Puppet modules
 to configure clusters. Please refer to the :doc:`Administration Guide </guide/admin/index>` for more details on how to integrate.
 
 Can Coopr support approval workflows or the ability to pause provisioning for approval?
