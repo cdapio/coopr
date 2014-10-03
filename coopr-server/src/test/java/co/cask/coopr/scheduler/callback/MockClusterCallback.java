@@ -44,22 +44,22 @@ public class MockClusterCallback implements ClusterCallback {
   }
 
   @Override
-  public void initialize(Configuration conf, ClusterStoreService clusterStore) {
+  public void initialize(Configuration conf) {
   }
 
   @Override
-  public boolean onStart(CallbackData data) {
+  public boolean onStart(CallbackData data, CallbackContext context) {
     receivedCallbacks.add(data);
     return returnOnStart;
   }
 
   @Override
-  public void onSuccess(CallbackData data) {
+  public void onSuccess(CallbackData data, CallbackContext context) {
     receivedCallbacks.add(data);
   }
 
   @Override
-  public void onFailure(CallbackData data) {
+  public void onFailure(CallbackData data, CallbackContext context) {
     receivedCallbacks.add(data);
   }
 }

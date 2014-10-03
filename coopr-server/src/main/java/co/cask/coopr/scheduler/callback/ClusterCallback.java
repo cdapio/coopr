@@ -28,9 +28,8 @@ public interface ClusterCallback {
    * Initialize the cluster callback. Guaranteed to be called exactly once before any other methods are called.
    *
    * @param conf Server configuration.
-   * @param clusterStoreService Service for accessing the cluster store.
    */
-  void initialize(Configuration conf, ClusterStoreService clusterStoreService);
+  void initialize(Configuration conf);
 
   /**
    * Execute some method before a cluster job starts, returning whether or not the job can proceed or whether it should
@@ -39,19 +38,19 @@ public interface ClusterCallback {
    * @param data Data available to use while executing callback.
    * @return True if it is ok to proceed with the operation, false if not.
    */
-  boolean onStart(CallbackData data);
+  boolean onStart(CallbackData data, CallbackContext context);
 
   /**
    * Execute some method after a cluster completes successfully.
    *
    * @param data Data available to use while executing callback.
    */
-  void onSuccess(CallbackData data);
+  void onSuccess(CallbackData data, CallbackContext context);
 
   /**
    * Execute some method after a cluster job fails.
    *
    * @param data Data available to use while executing callback.
    */
-  void onFailure(CallbackData data);
+  void onFailure(CallbackData data, CallbackContext context);
 }
