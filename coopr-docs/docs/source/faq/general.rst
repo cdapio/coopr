@@ -137,7 +137,7 @@ configure different resources.
 What is the recommended setup for Coopr in terms of hardware and configuration?
 -------------------------------------------------------------------------------------------
 We recommend the following :doc:`deployment configuration </guide/recommended-deployment>` for a production environment that includes
-HA for persistence store, multiple nodes for Zookeeper, and HA proxy for traffic distribution across UIs and provisioners.
+HA for persistent store, multiple nodes for Zookeeper, and HAProxy for traffic distribution across UIs and servers.
 
 Does Coopr support monitoring and alerting of services deployed?
 ---------------------------------------------------------------------------
