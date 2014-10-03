@@ -114,8 +114,9 @@ status() {
 }
 
 restart() {
+  shift
   stop
-  start
+  start $@
 }
 
 case ${1} in
@@ -130,7 +131,7 @@ case ${1} in
     ${1}
     ;;
   restart)
-    ${1}
+    ${1} $@
     ;;
   register)
     # no-op for dummy, assume they are loaded already
