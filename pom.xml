@@ -51,9 +51,9 @@
     <developers>
         <developer>
             <name>Cask Data</name>
-            <email>cask-dev@googlegroups.com</email>
+            <email>coopr-dev@googlegroups.com</email>
             <organization>Cask Data, Inc.</organization>
-            <organizationUrl>http://www.coopr.io</organizationUrl>
+            <organizationUrl>http://coopr.io</organizationUrl>
         </developer>
     </developers>
 
