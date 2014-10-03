@@ -16,6 +16,7 @@
 package co.cask.coopr.codec.json.current;
 
 import co.cask.coopr.codec.json.AbstractCodec;
+import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
@@ -26,8 +27,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.Set;
 
 /**
  * Codec for serializing/deserializing a {@link ClusterTemplate}.
@@ -43,8 +46,9 @@ public class ClusterTemplateCodec extends AbstractCodec<ClusterTemplate> {
     jsonObj.add("description", context.serialize(clusterTemplate.getDescription()));
     jsonObj.add("defaults", context.serialize(clusterTemplate.getClusterDefaults()));
     jsonObj.add("compatibility", context.serialize(clusterTemplate.getCompatibilities()));
-    jsonObj.add("constraints", context.serialize(clusterTemplate.getConstraints(), Constraints.class));
-    jsonObj.add("administration", context.serialize(clusterTemplate.getAdministration(), Administration.class));
+    jsonObj.add("constraints", context.serialize(clusterTemplate.getConstraints()));
+    jsonObj.add("administration", context.serialize(clusterTemplate.getAdministration()));
+    jsonObj.add("links", context.serialize(clusterTemplate.getLinks()));
 
     return jsonObj;
   }
@@ -62,6 +66,7 @@ public class ClusterTemplateCodec extends AbstractCodec<ClusterTemplate> {
       .setCompatibilities(context.<Compatibilities>deserialize(jsonObj.get("compatibility"), Compatibilities.class))
       .setConstraints(context.<Constraints>deserialize(jsonObj.get("constraints"), Constraints.class))
       .setAdministration(context.<Administration>deserialize(jsonObj.get("administration"), Administration.class))
+      .setLinks(context.<Set<Link>>deserialize(jsonObj.get("links"), new TypeToken<Set<Link>>() {}.getType()))
       .build();
   }
 }

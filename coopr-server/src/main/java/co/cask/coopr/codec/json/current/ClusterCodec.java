@@ -17,6 +17,7 @@ package co.cask.coopr.codec.json.current;
 
 import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Cluster;
+import co.cask.coopr.codec.json.AbstractCodec;
 import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import com.google.common.reflect.TypeToken;
@@ -25,14 +26,15 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Codec for serializing/deserializing a {@link Cluster}. Used for backwards compatibility.
+ * Codec for serializing/deserializing a {@link Cluster}. Used to make sure required fields are present.
  */
-public class ClusterCodec implements JsonDeserializer<Cluster> {
+public class ClusterCodec extends AbstractCodec<Cluster> {
 
   @Override
   public Cluster deserialize(JsonElement json, Type type, JsonDeserializationContext context)
@@ -54,5 +56,31 @@ public class ClusterCodec implements JsonDeserializer<Cluster> {
       .setStatus(context.<Cluster.Status>deserialize(jsonObj.get("status"), Cluster.Status.class))
       .setConfig(context.<JsonObject>deserialize(jsonObj.get("config"), JsonObject.class))
       .build();
+  }
+
+  @Override
+  public JsonElement serialize(Cluster src, Type typeOfSrc, JsonSerializationContext context) {
+    return serializeCluster(src, context);
+  }
+
+  public static JsonObject serializeCluster(Cluster cluster, JsonSerializationContext context) {
+
+    JsonObject jsonObj = new JsonObject();
+
+    jsonObj.add("id", context.serialize(cluster.getId()));
+    jsonObj.add("name", context.serialize(cluster.getName()));
+    jsonObj.add("description", context.serialize(cluster.getDescription()));
+    jsonObj.add("account", context.serialize(cluster.getAccount()));
+    jsonObj.add("createTime", context.serialize(cluster.getCreateTime()));
+    jsonObj.add("expireTime", context.serialize(cluster.getExpireTime()));
+    jsonObj.add("provider", context.serialize(cluster.getProvider()));
+    jsonObj.add("clusterTemplate", context.serialize(cluster.getClusterTemplate()));
+    jsonObj.add("nodes", context.serialize(cluster.getNodeIDs()));
+    jsonObj.add("services", context.serialize(cluster.getServices()));
+    jsonObj.add("latestJobId", context.serialize(cluster.getLatestJobId()));
+    jsonObj.add("status", context.serialize(cluster.getStatus()));
+    jsonObj.add("config", context.serialize(cluster.getConfig()));
+
+    return jsonObj;
   }
 }

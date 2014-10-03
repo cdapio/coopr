@@ -16,6 +16,7 @@
 package co.cask.coopr.codec.json.current;
 
 import co.cask.coopr.codec.json.AbstractCodec;
+import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.service.ServiceAction;
@@ -30,6 +31,7 @@ import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Codec for serializing/deserializing a {@link Service}.
@@ -47,6 +49,7 @@ public class ServiceCodec extends AbstractCodec<Service> {
     JsonObject provisioner = new JsonObject();
     provisioner.add("actions", context.serialize(service.getProvisionerActions()));
     jsonObj.add("provisioner", provisioner);
+    jsonObj.add("links", context.serialize(service.getLinks()));
 
     return jsonObj;
   }
@@ -65,8 +68,9 @@ public class ServiceCodec extends AbstractCodec<Service> {
     Map<ProvisionerAction, ServiceAction> actions = Collections.emptyMap();
     if (provisioner != null) {
       actions = context.deserialize(provisioner.get("actions"),
-                                   new TypeToken<Map<ProvisionerAction, ServiceAction>>(){}.getType());
+                                    new TypeToken<Map<ProvisionerAction, ServiceAction>>() {}.getType());
     }
+    Set<Link> links = context.deserialize(jsonObj.get("links"), new TypeToken<Set<Link>>() {}.getType());
 
     return Service.builder()
       .setName(name)
@@ -74,6 +78,7 @@ public class ServiceCodec extends AbstractCodec<Service> {
       .setDescription(description)
       .setDependencies(dependencies)
       .setProvisionerActions(actions)
+      .setLinks(links)
       .build();
   }
 }

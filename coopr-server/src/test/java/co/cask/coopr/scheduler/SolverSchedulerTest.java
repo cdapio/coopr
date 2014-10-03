@@ -100,7 +100,7 @@ public class SolverSchedulerTest extends BaseTest {
     Assert.assertEquals("my cluster", solvedCluster.getDescription());
     // check the node counts are as expected
     Multiset<Set<String>> serviceSetCounts = HashMultiset.create();
-    for (String nodeId : solvedCluster.getNodes()) {
+    for (String nodeId : solvedCluster.getNodeIDs()) {
       Node node = clusterStore.getNode(nodeId);
       Set<String> serviceNames = Sets.newHashSet(Iterables.transform(node.getServices(),
                                                                      new Function<Service, String>() {
