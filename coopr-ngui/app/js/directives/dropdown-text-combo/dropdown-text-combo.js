@@ -1,26 +1,28 @@
 angular.module(PKG.name+".directives")
-  .directive("dropDownTextCombo", function dropDownTextComboDirective() {
+  .directive("myDropdownTextCombo", function myDropdownTextComboDirective() {
     return {
       restrict: "E",
       scope: {
         model: "=",
-        dropDownList: "=",
-        textFields: "="
+        dropdownList: "=",
+        textFields: "=",
+        assetLabel: "@"
       },
-      templateUrl: "drop-down-text-combo/drop-down-text-combo.html",
+      templateUrl: "dropdown-text-combo/dropdown-text-combo.html",
       link: function ($scope) {
-        $scope.dropDownValues = [];
-        function buildDropDown () {
-          //dropDownList doesn't always needs to be a $resource object with a promise.
+        $scope.dropdownValues = [];
+
+        function buildDropdown () {
+          //dropdownList doesn't always needs to be a $resource object with a promise.
           if(
               (
-                $scope.dropDownList.$promise &&
-                  !$scope.dropDownList.$resolved
+                $scope.dropdownList.$promise &&
+                  !$scope.dropdownList.$resolved
               )||
               !$scope.model) {
             return;
           }
-          $scope.dropDownValues = $scope.dropDownList
+          $scope.dropdownValues = $scope.dropdownList
             .filter(function (item) {
               var isValid = Object.keys($scope.model)
                                   .indexOf(item.name) === -1;
@@ -34,14 +36,14 @@ angular.module(PKG.name+".directives")
             });
         }
 
-        //dropDownList doesn't always needs to be a $resource object with a promise.
-        if ($scope.dropDownList.$promise) {
-          $scope.dropDownList.$promise.then(buildDropDown);
+        //dropdownList doesn't always needs to be a $resource object with a promise.
+        if ($scope.dropdownList.$promise) {
+          $scope.dropdownList.$promise.then(buildDropdown);
         }
 
-        $scope.$watchCollection("model", buildDropDown);
+        $scope.$watchCollection("model", buildDropdown);
 
-        $scope.rmProvider = function (pName) {
+        $scope.rmAsset = function (pName) {
           delete $scope.model[pName];
         };
 

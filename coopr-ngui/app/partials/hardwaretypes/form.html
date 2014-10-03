@@ -23,13 +23,14 @@
     <div class="form-group">
         <label class="col-xs-2 control-label">Providers</label>
         <div class="col-xs-10">
-          <drop-down-text-combo
-              data-model="model.providermap"
-              data-drop-down-list="allProviders"
-              data-text-fields = "textFields"
-              >
 
-          </drop-down-text-combo>
+          <my-dropdown-text-combo
+              data-model="model.providermap"
+              data-dropdown-list="allProviders"
+              data-text-fields="textFields"
+              data-asset-label="Provider"
+          ></my-dropdown-text-combo>
+
         </div>
     </div>
 
