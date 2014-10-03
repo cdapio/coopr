@@ -15,6 +15,9 @@
 # limitations under the License.
 #
 
+COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
+COOPR_HOME=${COOPR_HOME:-/opt/coopr} ; export COOPR_HOME
+
 die ( ) {
   echo
   echo "$*"
