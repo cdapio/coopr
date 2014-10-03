@@ -17,14 +17,9 @@
 
 package co.cask.coopr.client.model;
 
-import com.google.gson.JsonObject;
-
 /**
- * The cluster config info class.
+ * The interface for info classes with json content.
  */
-public class ClusterConfigInfo extends AbstractJsonInfo {
-
-  public ClusterConfigInfo(JsonObject json) {
-    super(json);
-  }
+public interface JsonInfo {
+  String getJsonAsString();
 }

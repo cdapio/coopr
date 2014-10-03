@@ -20,11 +20,17 @@ package co.cask.coopr.client.model;
 import com.google.gson.JsonObject;
 
 /**
- * The cluster config info class.
+ * Abstract info class with json content.
  */
-public class ClusterConfigInfo extends AbstractJsonInfo {
+public class AbstractJsonInfo implements JsonInfo {
+  private final JsonObject json;
 
-  public ClusterConfigInfo(JsonObject json) {
-    super(json);
+  public AbstractJsonInfo(JsonObject json) {
+    this.json = json;
+  }
+
+  @Override
+  public String getJsonAsString() {
+    return json.getAsString();
   }
 }

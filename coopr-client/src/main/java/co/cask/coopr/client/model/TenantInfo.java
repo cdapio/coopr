@@ -17,21 +17,14 @@
 
 package co.cask.coopr.client.model;
 
+import com.google.gson.JsonObject;
+
 /**
  * The tenant info class.
  */
-public class TenantInfo {
-  private String tenantInfo;
+public class TenantInfo extends AbstractJsonInfo {
 
-  public TenantInfo(String tenantInfo) {
-    this.tenantInfo = tenantInfo;
-  }
-
-  public String getTenantInfo() {
-    return tenantInfo;
-  }
-
-  public void setTenantInfo(String tenantInfo) {
-    this.tenantInfo = tenantInfo;
+  public TenantInfo(JsonObject json) {
+    super(json);
   }
 }

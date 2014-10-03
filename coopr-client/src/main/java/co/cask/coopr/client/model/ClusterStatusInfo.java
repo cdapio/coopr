@@ -17,21 +17,14 @@
 
 package co.cask.coopr.client.model;
 
+import com.google.gson.JsonObject;
+
 /**
  * The cluster status info class.
  */
-public class ClusterStatusInfo {
-  private String jsonStatusInfo;
+public class ClusterStatusInfo extends AbstractJsonInfo {
 
-  public ClusterStatusInfo(String jsonStatusInfo) {
-    this.jsonStatusInfo = jsonStatusInfo;
-  }
-
-  public String getJsonStatusInfo() {
-    return jsonStatusInfo;
-  }
-
-  public void setJsonStatusInfo(String jsonStatusInfo) {
-    this.jsonStatusInfo = jsonStatusInfo;
+  public ClusterStatusInfo(JsonObject json) {
+    super(json);
   }
 }
