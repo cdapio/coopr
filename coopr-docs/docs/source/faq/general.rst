@@ -113,7 +113,7 @@ are welcome and encouraged!
 
 Does Coopr make it easy for me to migrate from one cloud to another?
 --------------------------------------------------------------------------------
-Absolutely. When we originally built Coopr at  Cask Data, the main goal was to make it a seamless process to migrate from
+Absolutely. When we originally built Coopr at Cask Data, the main goal was to make it a seamless process to migrate from
 one cloud to another.
 
 Can Coopr work on my laptop?
