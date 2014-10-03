@@ -13,7 +13,7 @@ public class ClusterConfigureRequest extends ClusterOperationRequest {
   private final boolean restart;
   private final JsonObject config;
 
-  public ClusterConfigureRequest(Map<String, String> providerFields, JsonObject config, Boolean restart) {
+  public ClusterConfigureRequest(Map<String, Object> providerFields, JsonObject config, Boolean restart) {
     super(providerFields);
     Preconditions.checkArgument(config != null, "config must be specified");
     this.restart = restart == null ? true : restart;

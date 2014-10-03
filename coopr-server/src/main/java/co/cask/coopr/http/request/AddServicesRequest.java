@@ -32,7 +32,7 @@ public class AddServicesRequest extends ClusterOperationRequest {
    * @param providerFields provider fields given by the user.
    * @param services Services to add to the cluster.
    */
-  public AddServicesRequest(Map<String, String> providerFields, Set<String> services) {
+  public AddServicesRequest(Map<String, Object> providerFields, Set<String> services) {
     super(providerFields);
     Preconditions.checkArgument(services != null && !services.isEmpty(), "Services to add must be specified.");
     this.services = services;

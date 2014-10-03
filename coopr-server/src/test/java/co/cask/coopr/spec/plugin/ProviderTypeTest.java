@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,7 +85,7 @@ public class ProviderTypeTest extends BaseTest {
     );
     Map<String, String> expectedSensitive = ImmutableMap.of("key", "keycontents", "url", "abc.com/api");
     Map<String, String> expectedNonsensitive = ImmutableMap.of("keyname", "dev", "region", "iad");
-    Map<String, String> input = Maps.newHashMap();
+    Map<String, Object> input = Maps.newHashMap();
     input.putAll(expectedSensitive);
     input.putAll(expectedNonsensitive);
     // should get ignored, not an overridable admin field

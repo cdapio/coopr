@@ -79,7 +79,7 @@ public final class Provider extends NamedIconEntity {
    *
    * @param fields Fields to add to the provisioner fields.
   */
-  public void addFields(Map<String, String> fields) {
+  public void addFields(Map<String, Object> fields) {
     if (fields != null) {
       provisionerFields.putAll(fields);
     }

@@ -66,6 +66,18 @@ public class Constants {
   public static final String PROVISIONER_REQUEST_MS_BETWEEN_RETRIES = "server.provisioner.request.ms.between.retries";
   public static final String PROVISIONER_REQUEST_SOCKET_TIMEOUT_MS = "server.provisioner.request.socket.timeout.ms";
 
+  public static final class CredentialStore {
+    private static final String prefix = "server.credential.store.";
+    public static final String ENCRYPT_ENABLED = prefix + "encrypt.enabled";
+    public static final String ENCRYPT_TRANSFORMATION = prefix + "encrypt.transformation";
+    public static final String ENCRYPT_IV_HEX = prefix + "encrypt.iv.hex";
+    public static final String KEYSTORE_PATH = prefix + "encrypt.keystore.path";
+    public static final String KEYSTORE_TYPE = prefix + "encrypt.keystore.type";
+    public static final String KEYSTORE_PASSWORD = prefix + "encrypt.keystore.password";
+    public static final String KEY_ALIAS = prefix + "encrypt.key.alias";
+    public static final String KEY_PASSWORD = prefix + "encrypt.key.password";
+  }
+
   /**
    * Config settings for the memcached credential store.
    */
@@ -77,13 +89,6 @@ public class Constants {
     public static final int DEFAULT_TTL = 0;
     public static final String TIMEOUT = prefix + "timeout.seconds";
     public static final int DEFAULT_TIMEOUT = 20;
-    public static final String ENCRYPT_TRANSFORMATION = prefix + "encrypt.transformation";
-    public static final String ENCRYPT_IV_HEX = prefix + "encrypt.iv.hex";
-    public static final String KEYSTORE_PATH = prefix + "encrypt.keystore.path";
-    public static final String KEYSTORE_TYPE = prefix + "encrypt.keystore.type";
-    public static final String KEYSTORE_PASSWORD = prefix + "encrypt.keystore.password";
-    public static final String KEY_ALIAS = prefix + "encrypt.key.alias";
-    public static final String KEY_PASSWORD = prefix + "encrypt.key.password";
   }
 
   /**

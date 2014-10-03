@@ -580,8 +580,8 @@ public class ClusterService {
     Provider provider = cluster.getProvider();
     Account account = cluster.getAccount();
     String clusterId = cluster.getId();
-    Map<String, String> providerFields = request == null ?
-      Maps.<String, String>newHashMap() : request.getProviderFields();
+    Map<String, Object> providerFields = request == null ?
+      Maps.<String, Object>newHashMap() : request.getProviderFields();
 
     // make sure the provider type for the provider exists.
     // Will need this to add any provider fields given in the request
@@ -595,7 +595,7 @@ public class ClusterService {
     // if there are no fields in the request, they may be in the credential store
     if (providerFields.isEmpty()) {
       try {
-        Map<String, String> existingSensitiveFields = credentialStore.get(account.getTenantId(), clusterId);
+        Map<String, Object> existingSensitiveFields = credentialStore.get(account.getTenantId(), clusterId);
         if (existingSensitiveFields != null) {
           providerFields = existingSensitiveFields;
         }
@@ -614,14 +614,14 @@ public class ClusterService {
     PluginFields pluginFields = providerType.groupFields(providerFields);
     // take sensitive fields out and write them to the credential store
     // this will overwrite anything that's already there
-    Map<String, String> sensitiveFields = pluginFields.getSensitive();
+    Map<String, Object> sensitiveFields = pluginFields.getSensitive();
     if (!sensitiveFields.isEmpty()) {
       LOG.trace("writing fields {} to credential store for account {} and cluster {}.",
                 sensitiveFields.keySet(), account, clusterId);
       credentialStore.set(account.getTenantId(), clusterId, sensitiveFields);
     }
     // add non sensitive fields to the provider
-    Map<String, String> nonSensitiveFields = pluginFields.getNonsensitive();
+    Map<String, Object> nonSensitiveFields = pluginFields.getNonsensitive();
     if (!nonSensitiveFields.isEmpty()) {
       provider.addFields(nonSensitiveFields);
     }
