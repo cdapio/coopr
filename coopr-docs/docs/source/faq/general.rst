@@ -103,7 +103,8 @@ Does Coopr support bare metal?
 ------------------------------------------
 Not at the moment, but there are plans to add resource pools in a future release. With resource pools, Coopr would manage
 pre-existing machines instead of creating them from scratch each time a new node is needed. Resource pools would also
-introduce the ability to manage bare metal.
+introduce the ability to manage bare metal. Enterprise users with existing hardware procurements systems can write a provisioner
+plugin to interface with their existing systems.
 
 What providers are supported by Coopr?
 -------------------------------------------------
