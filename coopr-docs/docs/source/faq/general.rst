@@ -95,9 +95,9 @@ jobs and workflows on top of those services. Coopr, on the other hand, is a soft
 creating clusters of any layout and of any type. Being software agnostic and a provisioning tool, Coopr has no direct support
 for managing jobs on clusters, as its focus is on cluster creation and management, not jobs and workflow management.
 
-Will Coopr support `docker <http://docker.io>`_ based clusters?
+Will Coopr support Docker based clusters?
 ---------------------------------------------------------------------------
-We believe in the potential of docker based clusters. In the future releases, we plan to support Docker based clusters.
+We believe in the potential of `Docker <http://docker.io>`_ based clusters. In the future releases, we plan to support Docker based clusters.
 
 Does Coopr support bare metal?
 ------------------------------------------
