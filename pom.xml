@@ -36,6 +36,27 @@
         <surefire.redirectTestOutputToFile>true</surefire.redirectTestOutputToFile>
     </properties>
 
+    <organization>
+        <name>Cask Data, Inc.</name>
+        <url>http://cask.co</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Cask Data</name>
+            <email>cask-dev@googlegroups.com</email>
+            <organization>Cask Data, Inc.</organization>
+            <organizationUrl>http://www.coopr.io</organizationUrl>
+        </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:git://github.com/caskdata/coopr.git</connection>
         <url>scm:git:git://github.com/caskdata/coopr.git</url>
