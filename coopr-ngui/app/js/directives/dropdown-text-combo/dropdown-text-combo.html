@@ -1,0 +1,36 @@
+
+<fieldset class="row" ng-repeat="(key, value) in model">
+  <div class="col-xs-5">
+    <input type="text" value="{{key}}" class="form-control" readonly />
+  </div>
+  <div class="col-xs-5">
+    <div ng-repeat="field in textFields">
+      <input type="text"
+              ng-model="value[field.name]"
+              name="{{field.name}}"
+              placeholder="{{field.placeholder || field.name}}"
+              class="form-control" />
+    </div>
+  </div>
+  <div class="col-xs-2">
+    <p class="form-control-static">
+      <a href="" class="btn btn-danger btn-xs"
+        ng-click="rmAsset(key)"
+      >
+        <span class="fa fa-trash"></span>
+        <span class="sr-only">remove provider</span>
+      </a>
+    </p>
+  </div>
+
+</fieldset>
+
+<p class="form-control-static">
+  <a href="" class="btn btn-info btn-xs"
+    bs-dropdown="dropdownValues"
+    ng-disabled="!dropdownValues.length"
+  >
+    <span class="fa fa-plus"></span>
+    Add {{assetLabel}}
+  </a>
+</p>

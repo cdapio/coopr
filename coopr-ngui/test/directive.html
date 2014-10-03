@@ -21,6 +21,32 @@
     <hr />
 
     <section
+      ng-init="providermap = {}; allProviders = [{name: 'provider1'}, {name: 'provider2'}]; textFields=[{name: 'field1', placeholder: ''}];"
+    >
+      <h6>Dropdown text combo</h6>
+
+      <div class="row">
+        <div class="col-sm-9">
+
+      <my-dropdown-text-combo
+          data-model="providermap"
+          data-dropdown-list="allProviders"
+          data-text-fields="textFields"
+          data-asset-label="Provider"
+      ></my-dropdown-text-combo>
+
+        </div>
+        <div class="col-sm-3">
+          <pre>{{providermap | json}}</pre>
+        </div>
+      </div>
+
+
+    </section>
+    <hr />
+
+
+    <section
       ng-init="thingPicker = {model:[], avail:['foo', 'bar', 'baz']}"
     >
       <h6>thing picker</h6>
@@ -82,7 +108,7 @@
     angular.element(document).ready( function () {
       setTimeout(function(){
         angular.bootstrap(document, [
-          PKG.name+'.directives', 
+          PKG.name+'.directives',
           'ngSanitize',
           'ngAnimate'
         ]);
