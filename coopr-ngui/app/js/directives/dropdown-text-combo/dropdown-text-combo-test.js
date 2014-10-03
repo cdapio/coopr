@@ -1,4 +1,4 @@
-/*global module, expect, inject, describe, it, before, beforeEach, after, afterEach */
+/*global module, expect, inject, describe, it, before, beforeEach, after, afterEach, $*/
 
 describe("Unit tests for my-dropdown-combo-text directive", function(myApi) {
   beforeEach(module(PKG.name + ".directives"));
@@ -70,7 +70,8 @@ describe("Unit tests for my-dropdown-combo-text directive", function(myApi) {
 
   it("should have valid placeholder for text field", function() {
     expect(
-      element[0].querySelector("input[name=text1]").getAttribute("placeholder")
+      $(element).find("input[name=text1]").attr("placeholder")
+      //element[0].querySelector("input[name=text1]").getAttribute("placeholder")
     ).toEqual("somerandomplaceholder");
   });
 });
