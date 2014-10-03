@@ -69,11 +69,8 @@ describe("Unit tests for my-dropdown-combo-text directive", function(myApi) {
   });
 
   it("should have valid placeholder for text field", function() {
-    // Want to query an element inside angular's unit test?
-    // Well, no you cannot have it easy.
-    // Struggle like galileo who tried proving earth is not at the center of the solar system.
     expect(
-      element[0].querySelector("input[name=text1]").getAttribute('placeholder')
+      element[0].querySelector("input[name=text1]").getAttribute("placeholder")
     ).toEqual("somerandomplaceholder");
   });
 });
