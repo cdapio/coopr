@@ -18,6 +18,7 @@ package co.cask.coopr.store.credential;
 import com.google.common.base.Objects;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.AbstractIdleService;
 
 import java.util.Collections;
 import java.util.Map;
@@ -26,18 +27,18 @@ import java.util.Map;
  * Credential store that stores sensitive data in memory in the server process. Only viable if there is a single
  * server, as data will not be available across multiple servers.
  */
-public class InProcessCredentialStore implements CredentialStore {
-  private final Cache<CredentialKey, Map<String, String>> cache = CacheBuilder.newBuilder().build();
+public class InProcessCredentialStore extends AbstractIdleService implements CredentialStore {
+  private final Cache<CredentialKey, Map<String, Object>> cache = CacheBuilder.newBuilder().build();
 
   @Override
-  public void set(String tenantId, String clusterId, Map<String, String> fields) {
+  public void set(String tenantId, String clusterId, Map<String, Object> fields) {
     cache.put(new CredentialKey(tenantId, clusterId), fields);
   }
 
   @Override
-  public Map<String, String> get(String tenantId, String clusterId) {
-    Map<String, String> result = cache.getIfPresent(new CredentialKey(tenantId, clusterId));
-    return result == null ? Collections.<String, String>emptyMap() : result;
+  public Map<String, Object> get(String tenantId, String clusterId) {
+    Map<String, Object> result = cache.getIfPresent(new CredentialKey(tenantId, clusterId));
+    return result == null ? Collections.<String, Object>emptyMap() : result;
   }
 
   @Override
@@ -48,6 +49,16 @@ public class InProcessCredentialStore implements CredentialStore {
   @Override
   public void wipe() {
     cache.invalidateAll();
+  }
+
+  @Override
+  protected void startUp() throws Exception {
+    // No-op
+  }
+
+  @Override
+  protected void shutDown() throws Exception {
+    // No-op
   }
 
   private class CredentialKey {

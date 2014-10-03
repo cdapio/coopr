@@ -51,8 +51,8 @@ public class ClusterCreateRequestCodec implements JsonDeserializer<ClusterCreate
       .setConfig(context.<JsonObject>deserialize(jsonObj.get("config"), JsonObject.class))
       .setServiceNames(context.<Set<String>>deserialize(jsonObj.get("services"),
                                                         new TypeToken<Set<String>>() {}.getType()))
-      .setProviderFields(context.<Map<String, String>>deserialize(jsonObj.get("providerFields"),
-                                                                  new TypeToken<Map<String, String>>() {}.getType()))
+      .setProviderFields(context.<Map<String, Object>>deserialize(jsonObj.get("providerFields"),
+                                                                  new TypeToken<Map<String, Object>>() {}.getType()))
       .build();
   }
 }

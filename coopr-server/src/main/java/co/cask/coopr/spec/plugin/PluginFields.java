@@ -25,10 +25,10 @@ import java.util.Map;
  * or not, but may include other groups in the future.
  */
 public class PluginFields {
-  private final Map<String, String> sensitive;
-  private final Map<String, String> nonsensitive;
+  private final Map<String, Object> sensitive;
+  private final Map<String, Object> nonsensitive;
 
-  private PluginFields(ImmutableMap<String, String> sensitive, ImmutableMap<String, String> nonsensitive) {
+  private PluginFields(ImmutableMap<String, Object> sensitive, ImmutableMap<String, Object> nonsensitive) {
     this.sensitive = sensitive;
     this.nonsensitive = nonsensitive;
   }
@@ -38,7 +38,7 @@ public class PluginFields {
    *
    * @return Immutable map of sensitive field keys to values
    */
-  public Map<String, String> getSensitive() {
+  public Map<String, Object> getSensitive() {
     return sensitive;
   }
 
@@ -48,7 +48,7 @@ public class PluginFields {
    *
    * @return Immutable map of nonsensitive field keys to values
    */
-  public Map<String, String> getNonsensitive() {
+  public Map<String, Object> getNonsensitive() {
     return nonsensitive;
   }
 
@@ -65,15 +65,15 @@ public class PluginFields {
    * Builder for creating plugin fields.
    */
   public static class Builder {
-    private ImmutableMap.Builder sensitive = ImmutableMap.builder();
-    private ImmutableMap.Builder nonsensitive = ImmutableMap.builder();
+    private ImmutableMap.Builder<String, Object> sensitive = ImmutableMap.builder();
+    private ImmutableMap.Builder<String, Object> nonsensitive = ImmutableMap.builder();
 
-    public Builder putSensitive(String key, String val) {
+    public Builder putSensitive(String key, Object val) {
       this.sensitive.put(key, val);
       return this;
     }
 
-    public Builder putNonsensitive(String key, String val) {
+    public Builder putNonsensitive(String key, Object val) {
       this.nonsensitive.put(key, val);
       return this;
     }

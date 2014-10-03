@@ -30,15 +30,15 @@ import java.util.Map;
  * Codec for deserializing a {@link co.cask.coopr.http.request.ClusterOperationRequest}, used so some validation
  * is done on required fields.
  */
-public class ProviderOperationRequestCodec implements JsonDeserializer<ClusterOperationRequest> {
+public class ClusterOperationRequestCodec implements JsonDeserializer<ClusterOperationRequest> {
 
   @Override
   public ClusterOperationRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    Map<String, String> providerFields =
-      context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, String>>() {}.getType());
+    Map<String, Object> providerFields =
+      context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, Object>>() {}.getType());
     return new ClusterOperationRequest(providerFields);
   }
 }

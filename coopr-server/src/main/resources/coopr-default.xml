@@ -145,7 +145,12 @@
 
     <property>
         <name>server.credential.store.class</name>
-        <value>co.cask.coopr.store.credential.InProcessCredentialStore</value>
+        <value>co.cask.coopr.store.credential.SQLCredentialStore</value>
+    </property>
+
+    <property>
+        <name>server.credential.store.encrypt.enabled</name>
+        <value>false</value>
     </property>
 
     <property>

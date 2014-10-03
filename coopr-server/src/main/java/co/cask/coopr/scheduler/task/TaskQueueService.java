@@ -174,7 +174,7 @@ public class TaskQueueService {
           TaskConfig taskConfig = taskObject.getConfig();
           // fetch any sensitive fields and add them to the provider
           String clusterId = clusterJob.getClusterId();
-          Map<String, String> sensitiveFields = credentialStore.get(tenantId, clusterId);
+          Map<String, Object> sensitiveFields = credentialStore.get(tenantId, clusterId);
           taskConfig.getProvider().addFields(sensitiveFields);
           taskJson = gson.toJson(taskObject);
           startNodeAction(clusterTask);

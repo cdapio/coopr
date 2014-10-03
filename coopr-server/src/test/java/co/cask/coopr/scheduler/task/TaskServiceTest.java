@@ -37,7 +37,7 @@ public class TaskServiceTest extends BaseTest {
       .build();
 
     // write credentials
-    Map<String, String> sensitiveFields = Maps.newHashMap();
+    Map<String, Object> sensitiveFields = Maps.newHashMap();
     sensitiveFields.put("key", "keycontents");
     credentialStore.set(account.getTenantId(), clusterId, sensitiveFields);
     long jobNum = 1;

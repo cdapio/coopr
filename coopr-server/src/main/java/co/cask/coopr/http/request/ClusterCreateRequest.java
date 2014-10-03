@@ -39,7 +39,7 @@ public class ClusterCreateRequest extends ClusterOperationRequest {
   private final JsonObject config;
 
   private ClusterCreateRequest(String name, String description, String clusterTemplate,
-                               int numMachines, String provider, Map<String, String> providerFields,
+                               int numMachines, String provider, Map<String, Object> providerFields,
                                Set<String> services, String hardwareType, String imageType, Long initialLeaseDuration,
                                String dnsSuffix, JsonObject config) {
     super(providerFields);
@@ -189,7 +189,7 @@ public class ClusterCreateRequest extends ClusterOperationRequest {
     private Long initialLeaseDuration;
     private String dnsSuffix;
     private JsonObject config;
-    private Map<String, String> providerFields;
+    private Map<String, Object> providerFields;
 
     public Builder setName(String name) {
       this.name = name;
@@ -246,7 +246,7 @@ public class ClusterCreateRequest extends ClusterOperationRequest {
       return this;
     }
 
-    public Builder setProviderFields(Map<String, String> providerFields) {
+    public Builder setProviderFields(Map<String, Object> providerFields) {
       this.providerFields = providerFields;
       return this;
     }

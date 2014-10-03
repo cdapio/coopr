@@ -40,14 +40,14 @@ public class ProviderType extends AbstractPluginSpecification {
    * @param input Mapping of field name to value.
    * @return {@link PluginFields} containing fields grouped by type.
    */
-  public PluginFields groupFields(Map<String, String> input) {
+  public PluginFields groupFields(Map<String, Object> input) {
     PluginFields.Builder builder = PluginFields.builder();
     Map<String, FieldSchema> adminFields = getParametersSpecification(ParameterType.ADMIN).getFields();
     Map<String, FieldSchema> userFields = getParametersSpecification(ParameterType.USER).getFields();
 
-    for (Map.Entry<String, String> entry : input.entrySet()) {
+    for (Map.Entry<String, Object> entry : input.entrySet()) {
       String field = entry.getKey();
-      String fieldVal = entry.getValue();
+      Object fieldVal = entry.getValue();
 
       // see if this is an overridable admin field
       FieldSchema fieldSchema = adminFields.get(field);
