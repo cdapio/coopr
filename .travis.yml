@@ -1,5 +1,5 @@
 #
-# Copyright 2014 Continuuity, Inc.
+# Copyright © 2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
@@ -41,7 +41,10 @@ before_install:
 before_script:
   - "cd coopr-ngui && npm run build"
   - "npm start > /dev/null &"
-  - "cd .. && sleep 1" # give server time to start
+  - "cd coopr-server && mvn clean package assembly:single -DskipTests"
+  - "java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain >/dev/null 2>&1 &"
+  - "java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain >/dev/null 2>&1 &"
+  - "cd .. && sleep 5" # give server time to start
 
 script:
   - "cd coopr-ngui && npm run travis && cd .. && mvn test"
