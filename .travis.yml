@@ -41,7 +41,7 @@ before_install:
 before_script:
   - "cd coopr-ngui && npm run build"
   - "npm start > /dev/null &"
-  - "cd coopr-server && mvn clean package assembly:single -DskipTests"
+  - "cd ../coopr-server && mvn clean package assembly:single -DskipTests"
   - "java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain >/dev/null 2>&1 &"
   - "java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain >/dev/null 2>&1 &"
   - "cd .. && sleep 5" # give server time to start
