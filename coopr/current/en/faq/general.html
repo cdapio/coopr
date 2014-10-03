@@ -134,29 +134,30 @@ creating clusters of any layout and of any type. Being software agnostic and a p
 for managing jobs on clusters, as its focus is on cluster creation and management, not jobs and workflow management.</p>
 </div>
 <div class="section" id="will-coopr-support-docker-based-clusters">
-<h2>Will Coopr support <a class="reference external" href="http://docker.io">docker</a> based clusters?<a class="headerlink" href="#will-coopr-support-docker-based-clusters" title="Permalink to this headline">¶</a></h2>
-<p>We believe in the potential of docker based clusters. In the future releases, we plan to support Docker based clusters.</p>
+<h2>Will Coopr support Docker based clusters?<a class="headerlink" href="#will-coopr-support-docker-based-clusters" title="Permalink to this headline">¶</a></h2>
+<p>We believe in the potential of <a class="reference external" href="http://docker.io">Docker</a> based clusters. In the future releases, we plan to support Docker based clusters.</p>
 </div>
 <div class="section" id="does-coopr-support-bare-metal">
 <h2>Does Coopr support bare metal?<a class="headerlink" href="#does-coopr-support-bare-metal" title="Permalink to this headline">¶</a></h2>
 <p>Not at the moment, but there are plans to add resource pools in a future release. With resource pools, Coopr would manage
 pre-existing machines instead of creating them from scratch each time a new node is needed. Resource pools would also
-introduce the ability to manage bare metal.</p>
+introduce the ability to manage bare metal. Enterprise users with existing hardware procurements systems can write a provisioner
+plugin to interface with their existing systems.</p>
 </div>
 <div class="section" id="what-providers-are-supported-by-coopr">
 <h2>What providers are supported by Coopr?<a class="headerlink" href="#what-providers-are-supported-by-coopr" title="Permalink to this headline">¶</a></h2>
-<p>Out of the box, Coopr supports Rackspace, Joyent, Openstack (fog compatible). Plugins
-for EC2, HP Cloud, Cloudstack, Azure, BlueBox, GCE, CloudFoundry, and Terremark are planned. Contributions here
-are welcome and encouraged!</p>
+<p>Out of the box, Coopr supports Amazon Web Services (EC2), Google Compute Engine, Joyent, OpenStack (and compatible), and Rackspace.
+Plugins for HP Cloud, Cloudstack, BlueBox, CloudFoundry, Digital Ocean, IBM SoftLayer, and Terremark are planned. Contributions
+here are welcome and encouraged!</p>
 </div>
 <div class="section" id="does-coopr-make-it-easy-for-me-to-migrate-from-one-cloud-to-another">
 <h2>Does Coopr make it easy for me to migrate from one cloud to another?<a class="headerlink" href="#does-coopr-make-it-easy-for-me-to-migrate-from-one-cloud-to-another" title="Permalink to this headline">¶</a></h2>
-<p>Absolutely. When we originally built Coopr at  Cask Data, the main goal was to make it a seamless process to migrate from
+<p>Absolutely. When we originally built Coopr at Cask Data, the main goal was to make it a seamless process to migrate from
 one cloud to another.</p>
 </div>
 <div class="section" id="can-coopr-work-on-my-laptop">
 <h2>Can Coopr work on my laptop?<a class="headerlink" href="#can-coopr-work-on-my-laptop" title="Permalink to this headline">¶</a></h2>
-<p>Coopr has been tested on OSX Mavericks. There are plans to add Windows support in a future release, but until then
+<p>Coopr has been tested on OS X Mavericks and Linux. There are plans to add Windows support in a future release, but until then
 Windows users will have to use the usual workarounds, such as using Cygwin.</p>
 </div>
 <div class="section" id="how-long-has-coopr-been-used-in-a-production-environment-and-where-is-it-being-used">
@@ -174,7 +175,7 @@ configure different resources.</p>
 <div class="section" id="what-is-the-recommended-setup-for-coopr-in-terms-of-hardware-and-configuration">
 <h2>What is the recommended setup for Coopr in terms of hardware and configuration?<a class="headerlink" href="#what-is-the-recommended-setup-for-coopr-in-terms-of-hardware-and-configuration" title="Permalink to this headline">¶</a></h2>
 <p>We recommend the following <a class="reference internal" href="../guide/recommended-deployment.html"><em>deployment configuration</em></a> for a production environment that includes
-HA for persistence store, multiple nodes for Zookeeper, and HA proxy for traffic distribution across UIs and provisioners.</p>
+HA for persistent store, multiple nodes for Zookeeper, and HAProxy for traffic distribution across UIs and servers.</p>
 </div>
 <div class="section" id="does-coopr-support-monitoring-and-alerting-of-services-deployed">
 <h2>Does Coopr support monitoring and alerting of services deployed?<a class="headerlink" href="#does-coopr-support-monitoring-and-alerting-of-services-deployed" title="Permalink to this headline">¶</a></h2>
@@ -187,8 +188,8 @@ into Coopr to support monitoring and alerting.</p>
 will be exposed through the administration interface in the next release.</p>
 </div>
 <div class="section" id="i-use-puppet-will-i-be-able-to-use-puppet-with-coopr">
-<h2>I use puppet. Will I be able to use puppet with Coopr?<a class="headerlink" href="#i-use-puppet-will-i-be-able-to-use-puppet-with-coopr" title="Permalink to this headline">¶</a></h2>
-<p>Yes. Coopr is a smart orchestration layer with open support for integrating any automation framework. You can use your puppet modules
+<h2>I use Puppet. Will I be able to use Puppet with Coopr?<a class="headerlink" href="#i-use-puppet-will-i-be-able-to-use-puppet-with-coopr" title="Permalink to this headline">¶</a></h2>
+<p>Yes. Coopr is a smart orchestration layer with open support for integrating any automation framework. You can use your Puppet modules
 to configure clusters. Please refer to the <a class="reference internal" href="../guide/admin/index.html"><em>Administration Guide</em></a> for more details on how to integrate.</p>
 </div>
 <div class="section" id="can-coopr-support-approval-workflows-or-the-ability-to-pause-provisioning-for-approval">
