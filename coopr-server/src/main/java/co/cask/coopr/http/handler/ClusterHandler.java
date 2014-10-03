@@ -18,7 +18,9 @@ package co.cask.coopr.http.handler;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.ClusterJobProgress;
+import co.cask.coopr.cluster.ClusterService;
 import co.cask.coopr.cluster.ClusterSummary;
+import co.cask.coopr.cluster.MissingFieldsException;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
@@ -31,7 +33,6 @@ import co.cask.coopr.layout.InvalidClusterException;
 import co.cask.coopr.provisioner.QuotaException;
 import co.cask.coopr.scheduler.ClusterAction;
 import co.cask.coopr.scheduler.task.ClusterJob;
-import co.cask.coopr.scheduler.task.ClusterService;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.scheduler.task.MissingClusterException;
@@ -43,6 +44,7 @@ import co.cask.coopr.store.cluster.ClusterStoreView;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.http.HttpResponder;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -304,6 +306,8 @@ public class ClusterHandler extends AbstractAuthHandler {
       responder.sendError(HttpResponseStatus.CONFLICT, e.getMessage());
     } catch (InvalidClusterException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
+    } catch (MissingFieldsException e) {
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     } finally {
       try {
         reader.close();
@@ -370,6 +374,8 @@ public class ClusterHandler extends AbstractAuthHandler {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, e.getMessage());
     } catch (MissingEntityException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, e.getMessage());
+    } catch (MissingFieldsException e) {
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     }
   }
 
@@ -438,6 +444,8 @@ public class ClusterHandler extends AbstractAuthHandler {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "User does not have permission to change cluster parameter.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception changing cluster parameter.");
+    } catch (MissingClusterException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "Cluster " + clusterId + " not found.");
     }
   }
 
@@ -564,6 +572,8 @@ public class ClusterHandler extends AbstractAuthHandler {
       LOG.error("Exception requesting reconfigure on cluster {}.", clusterId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Internal error while requesting cluster reconfigure");
+    } catch (MissingFieldsException e) {
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     }
   }
 
@@ -612,6 +622,8 @@ public class ClusterHandler extends AbstractAuthHandler {
       LOG.error("Exception requesting to add services to cluster {}.", clusterId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                           "Internal error while requesting service action.");
+    } catch (MissingFieldsException e) {
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     }
   }
 
@@ -771,6 +783,8 @@ public class ClusterHandler extends AbstractAuthHandler {
     } catch (IOException e) {
       LOG.error("Exception performing service action for cluster {}", clusterId, e);
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Internal error performing service action");
+    } catch (MissingFieldsException e) {
+      responder.sendJson(HttpResponseStatus.BAD_REQUEST, ImmutableMap.of("missingFields", e.getMissingFields()));
     }
   }
 

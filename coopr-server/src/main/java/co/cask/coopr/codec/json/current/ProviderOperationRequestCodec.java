@@ -30,7 +30,7 @@ import java.util.Map;
  * Codec for deserializing a {@link co.cask.coopr.http.request.ClusterOperationRequest}, used so some validation
  * is done on required fields.
  */
-public class ClusterOperationRequestCodec implements JsonDeserializer<ClusterOperationRequest> {
+public class ProviderOperationRequestCodec implements JsonDeserializer<ClusterOperationRequest> {
 
   @Override
   public ClusterOperationRequest deserialize(JsonElement json, Type type, JsonDeserializationContext context)
