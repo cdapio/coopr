@@ -289,28 +289,32 @@ function greeting () {
     echo "Go to http://localhost:8100. Have fun creating clusters!"
 }
 
-case "$1" in
-  start)
+function stop () {
+    provisioner stop
+    $COOPR_HOME/server/bin/server.sh stop
+    ui stop
+}
+
+function start () {
     $COOPR_HOME/server/bin/server.sh start && \
     ui start && \
     provisioner start && \
     load_defaults && \
     greeting
+}
+
+case "$1" in
+  start)
+    start
   ;;
 
   stop)
-    provisioner stop
-    $COOPR_HOME/server/bin/server.sh stop
-    ui stop
+    stop
   ;;
 
   restart)
-    provisioner stop
-    ui stop
-    $COOPR_HOME/server/bin/server.sh stop
-    $COOPR_HOME/server/bin/server.sh start
-    ui start
-    provisioner start
+    stop
+    start
   ;;
 
   status)
