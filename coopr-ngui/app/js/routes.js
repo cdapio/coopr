@@ -42,11 +42,11 @@ angular.module(PKG.name)
       }))
         .state(crud('Cluster', 'list', 'ClusterListCtrl'))
         .state(crud('Cluster', 'edit', 'ClusterFormCtrl', { title: 'Reconfigure cluster' }))
-        .state(crud('Cluster', 'create', 'ClusterFormCtrl', { title: 'Create a cluster' })) 
+        .state(crud('Cluster', 'create', 'ClusterFormCtrl', { title: 'Create a cluster' }))
         .state(crud('Cluster', 'detail', 'ClusterDetailCtrl'))
           .state('clusters.detail.node', {
             url: '/node/:nodeId'
-          }) 
+          })
 
 
 
@@ -63,11 +63,11 @@ angular.module(PKG.name)
         .state(crud('Template', 'edit', 'TemplateFormCtrl'))
           .state('templates.edit.tab', {
             url: '/tab/:tab'
-          }) 
-        .state(crud('Template', 'create', 'TemplateFormCtrl')) 
+          })
+        .state(crud('Template', 'create', 'TemplateFormCtrl'))
           .state('templates.create.tab', {
             url: '/tab/:tab'
-          }) 
+          })
 
 
       /*
@@ -79,7 +79,7 @@ angular.module(PKG.name)
       }))
         .state(crud('Provider', 'list', 'CrudListCtrl'))
         .state(crud('Provider', 'edit', 'ProviderFormCtrl'))
-        .state(crud('Provider', 'create', 'ProviderFormCtrl')) 
+        .state(crud('Provider', 'create', 'ProviderFormCtrl'))
 
 
       /*
@@ -107,8 +107,8 @@ angular.module(PKG.name)
         authorizedRoles: MYAUTH_ROLE.admin
       }))
         .state(crud('ImageType', 'list', 'CrudListCtrl'))
-        .state(crud('ImageType', 'edit'))
-        .state(crud('ImageType', 'create')) 
+        .state(crud('ImageType', 'edit', 'ImageFormCtrl'))
+        .state(crud('ImageType', 'create', 'ImageFormCtrl')) 
 
 
 
@@ -120,7 +120,7 @@ angular.module(PKG.name)
       }))
         .state(crud('Service', 'list', 'CrudListCtrl'))
         .state(crud('Service', 'edit'))
-        .state(crud('Service', 'create')) 
+        .state(crud('Service', 'create'))
 
 
       /*
@@ -131,7 +131,7 @@ angular.module(PKG.name)
       }))
         .state(crud('Tenant', 'list', 'TenantListCtrl'))
         .state(crud('Tenant', 'edit', 'TenantFormCtrl'))
-        .state(crud('Tenant', 'create', 'TenantFormCtrl')) 
+        .state(crud('Tenant', 'create', 'TenantFormCtrl'))
 
 
       ;
@@ -226,7 +226,7 @@ angular.module(PKG.name)
         MYAUTH_EVENT.loginFailed,
         MYAUTH_EVENT.sessionTimeout,
         MYAUTH_EVENT.notAuthenticated
-      ], 
+      ],
       function (v) {
         $rootScope.$on(v, function (event) {
           $alert({title:event.name, type:'danger', duration:3});
@@ -240,4 +240,3 @@ angular.module(PKG.name)
   })
 
   ;
-

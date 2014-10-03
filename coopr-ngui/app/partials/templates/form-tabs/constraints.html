@@ -21,10 +21,10 @@
   </label>
   <div class="col-xs-10">
 
-    <div ng-repeat="group in model.constraints.layout.mustcoexist" class="coopr-constraint-group am-fade-and-slide-right">
+    <div ng-repeat="group in model.constraints.layout.mustcoexist" class="coopr-control-group am-fade-and-slide-right">
 
-      <p class="pull-right form-control-static">
-        <a href="" class="btn btn-danger btn-xs" 
+      <p class="remove">
+        <a href="" class="btn btn-danger btn-xs"
           ng-click="model.constraints.layout.mustcoexist.splice($index, 1)"
         >
           <span class="fa fa-trash"></span>
@@ -41,7 +41,7 @@
     </div>
 
     <p class="form-control-static">
-      <a href="" class="btn btn-info btn-xs" 
+      <a href="" class="btn btn-info btn-xs"
         ng-click="model.constraints.layout.mustcoexist.push([])"
       >
         <span class="fa fa-plus"></span>
@@ -60,10 +60,10 @@
   </label>
   <div class="col-xs-10">
 
-    <div ng-repeat="group in model.constraints.layout.cantcoexist" class="coopr-constraint-group am-fade-and-slide-right">
+    <div ng-repeat="group in model.constraints.layout.cantcoexist" class="coopr-control-group am-fade-and-slide-right">
 
-      <p class="pull-right form-control-static">
-        <a href="" class="btn btn-danger btn-xs" 
+      <p class="remove">
+        <a href="" class="btn btn-danger btn-xs"
           ng-click="model.constraints.layout.cantcoexist.splice($index, 1)"
         >
           <span class="fa fa-trash"></span>
@@ -80,7 +80,7 @@
     </div>
 
     <p class="form-control-static">
-      <a href="" class="btn btn-info btn-xs" 
+      <a href="" class="btn btn-info btn-xs"
         ng-click="model.constraints.layout.cantcoexist.push([])"
       >
         <span class="fa fa-plus"></span>
@@ -147,7 +147,7 @@
             </td>
 
             <td width="1" class="text-right">
-              <a href="" ng-click="rmServiceConstraint(name)" 
+              <a href="" ng-click="rmServiceConstraint(name)"
                 class="btn btn-danger btn-xs">
                   <span class="fa fa-trash"></span>
                   <span class="sr-only">remove Constraint</span>
@@ -162,7 +162,7 @@
     <p class="form-control-static">
       <a href="" class="btn btn-info btn-xs"
         ng-disabled="!addSvcConstraintDd.length"
-        bs-dropdown="addSvcConstraintDd" 
+        bs-dropdown="addSvcConstraintDd"
       >
         <span class="fa fa-plus"></span>
         add service constraint
