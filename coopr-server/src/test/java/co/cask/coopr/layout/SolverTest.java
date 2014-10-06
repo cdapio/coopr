@@ -19,9 +19,7 @@ import co.cask.coopr.Entities;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.http.request.ClusterCreateRequest;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.spec.service.ServiceDependencies;
 import co.cask.coopr.spec.service.ServiceStageDependencies;
 import co.cask.coopr.spec.template.ClusterDefaults;
@@ -39,7 +37,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,20 +72,14 @@ public class SolverTest extends BaseSolverTest {
                             .setConfig(Entities.ClusterTemplateExample.clusterConf).build())
       .setCompatibilities(Compatibilities.builder().setServices("myapp-1", "myapp-2").build())
       .build();
-    Service myapp1 = new Service("myapp-1",
-                                 "my app v1",
-                                 new ServiceDependencies(
-                                   ImmutableSet.<String>of("myapp"),
-                                   ImmutableSet.<String>of("myapp-2"),
-                                   null, null),
-                                 ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    Service myapp2 = new Service("myapp-2",
-                                 "my app v2",
-                                 new ServiceDependencies(
-                                   ImmutableSet.<String>of("myapp"),
-                                   ImmutableSet.<String>of("myapp-1"),
-                                   null, null),
-                                 ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service myapp1 = Service.builder()
+      .setName("myapp-1")
+      .setDependencies(ServiceDependencies.builder().setProvides("myapp").setConflicts("myapp-2").build())
+      .build();
+    Service myapp2 = Service.builder()
+      .setName("myapp-2")
+      .setDependencies(ServiceDependencies.builder().setProvides("myapp").setConflicts("myapp-1").build())
+      .build();
     entityStoreService.getView(account).writeService(myapp1);
     entityStoreService.getView(account).writeService(myapp2);
     Cluster cluster = getBaseBuilder()
@@ -109,36 +100,23 @@ public class SolverTest extends BaseSolverTest {
                             .setConfig(Entities.ClusterTemplateExample.clusterConf).build())
       .setCompatibilities(Compatibilities.builder().setServices("service1", "service2", "service3").build())
       .build();
-    Service service1 = new Service("service1",
-                                   "my service1",
-                                   ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES,
-                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service service1 = Service.builder().setName("service1").build();
     // service2 uses service 1 at install time
-    Service service2 = new Service("service2",
-                                   "my service2",
-                                   new ServiceDependencies(
-                                     null,
-                                     null,
-                                     new ServiceStageDependencies(
-                                       ImmutableSet.<String>of(),
-                                       ImmutableSet.<String>of("service1")
-                                     ),
-                                     null
-                                   ),
-                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service service2 = Service.builder()
+      .setName("service2")
+      .setDependencies(
+        ServiceDependencies.builder()
+          .setInstallDependencies(new ServiceStageDependencies(null, ImmutableSet.<String>of("service1")))
+          .build())
+      .build();
     // service 3 uses service 1 at runtime
-    Service service3 = new Service("service3",
-                                   "my service3",
-                                   new ServiceDependencies(
-                                     null,
-                                     null,
-                                     null,
-                                     new ServiceStageDependencies(
-                                       ImmutableSet.<String>of(),
-                                       ImmutableSet.<String>of("service1")
-                                     )
-                                   ),
-                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service service3 = Service.builder()
+      .setName("service3")
+      .setDependencies(
+        ServiceDependencies.builder()
+          .setRuntimeDependencies(new ServiceStageDependencies(null, ImmutableSet.<String>of("service1")))
+          .build())
+      .build();
     entityStoreService.getView(account).writeService(service1);
     entityStoreService.getView(account).writeService(service2);
     entityStoreService.getView(account).writeService(service3);
@@ -322,8 +300,7 @@ public class SolverTest extends BaseSolverTest {
       ImmutableSet.of("firewall", "hosts", "namenode", "datanode", "nodemanager", "resourcemanager");
     Map<String, Service> serviceMap = Maps.newHashMap();
     for (String service : services) {
-      serviceMap.put(service, new Service(service, "", Collections.<String>emptySet(),
-                                          Collections.<ProvisionerAction, ServiceAction>emptyMap()));
+      serviceMap.put(service, Service.builder().setName(service).build());
     }
 
     Map<String, Node> nodes = Solver.solveConstraints("1", template, "name", 3,
@@ -360,8 +337,7 @@ public class SolverTest extends BaseSolverTest {
     Set<String> services = reactorTemplate2.getClusterDefaults().getServices();
     Map<String, Service> serviceMap = Maps.newHashMap();
     for (String serviceName : services) {
-      serviceMap.put(serviceName, new Service(serviceName, "", ImmutableSet.<String>of(),
-                                              ImmutableMap.<ProvisionerAction, ServiceAction>of()));
+      serviceMap.put(serviceName, Service.builder().setName(serviceName).build());
     }
     Map<String, Node> nodes = Solver.solveConstraints("1", reactorTemplate2, "name", 200,
                                                       hwmap, imgmap, services, serviceMap, null);

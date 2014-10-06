@@ -297,58 +297,63 @@ public class Entities {
   }
 
   public static class ServiceExample {
-    public static final Service HOSTS =
-      new Service("hosts-1.0", "Manages /etc/hosts",
-                  new ServiceDependencies(
-                    ImmutableSet.<String>of("hosts"),
-                    ImmutableSet.<String>of("hosts-1.1", "hosts-1.2"),
-                    new ServiceStageDependencies(ImmutableSet.<String>of(), ImmutableSet.<String>of("base")),
-                    new ServiceStageDependencies(ImmutableSet.<String>of(), ImmutableSet.<String>of("base"))
-                  ),
-                  ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                    ProvisionerAction.CONFIGURE,
-                    new ServiceAction("chef-solo", TestHelper.actionMapOf("recipe[coopr_hosts::default]", null))
-                  ));
-    public static final Service NAMENODE =
-      new Service("namenode", "Hadoop HDFS NameNode",
-                  ImmutableSet.<String>of("hosts"),
-                  ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                    ProvisionerAction.INSTALL,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[hadoop::hadoop_hdfs_namenode]", null)),
-                    ProvisionerAction.INITIALIZE,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]", null)),
-                    ProvisionerAction.CONFIGURE,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[hadoop::default]", null)),
-                    ProvisionerAction.START,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[coopr_service_runner::default]", "start data")),
-                    ProvisionerAction.STOP,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[coopr_service_runner::default]", "stop data"))
-                  ));
-    public static final Service DATANODE =
-      new Service("datanode", "Hadoop HDFS DataNode",
-                  ImmutableSet.<String>of("hosts", "namenode"),
-                  ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                    ProvisionerAction.INSTALL,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[hadoop::hadoop_hdfs_datanode]", null)),
-                    ProvisionerAction.INITIALIZE,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[hadoop_wrapper::hadoop_hdfs_datanode_init]", null)),
-                    ProvisionerAction.CONFIGURE,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[hadoop::default]", null)),
-                    ProvisionerAction.START,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[coopr_service_runner::default]", "start data")),
-                    ProvisionerAction.STOP,
-                    new ServiceAction("chef-solo",
-                                      TestHelper.actionMapOf("recipe[coopr_service_runner::default]", "stop data"))
-                  ));
+    public static final Service HOSTS = Service.builder()
+      .setName("hosts-1.0")
+      .setDescription("Manages /etc/hosts")
+      .setDependencies(ServiceDependencies.builder()
+        .setProvides("hosts")
+        .setConflicts("hosts-1.1", "hosts-1.2")
+        .setInstallDependencies(new ServiceStageDependencies(null, ImmutableSet.<String>of("base")))
+        .setRuntimeDependencies(new ServiceStageDependencies(null, ImmutableSet.<String>of("base")))
+        .build())
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.CONFIGURE,
+        new ServiceAction("chef-solo", TestHelper.actionMapOf("recipe[coopr_hosts::default]", null))
+      ))
+      .build();
+    public static final Service NAMENODE = Service.builder()
+      .setName("namenode")
+      .setDescription("Hadoop HDFS NameNode")
+      .setDependencies(ServiceDependencies.runtimeRequires("hosts"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[hadoop::hadoop_hdfs_namenode]", null)),
+        ProvisionerAction.INITIALIZE,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[hadoop_wrapper::hadoop_hdfs_namenode_init]", null)),
+        ProvisionerAction.CONFIGURE,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[hadoop::default]", null)),
+        ProvisionerAction.START,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[coopr_service_runner::default]", "start data")),
+        ProvisionerAction.STOP,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[coopr_service_runner::default]", "stop data"))))
+      .build();
+    public static final Service DATANODE = Service.builder()
+      .setName("datanode")
+      .setDescription("Hadoop HDFS DataNode")
+      .setDependencies(ServiceDependencies.runtimeRequires("hosts", "namenode"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[hadoop::hadoop_hdfs_datanode]", null)),
+        ProvisionerAction.INITIALIZE,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[hadoop_wrapper::hadoop_hdfs_datanode_init]", null)),
+        ProvisionerAction.CONFIGURE,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[hadoop::default]", null)),
+        ProvisionerAction.START,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[coopr_service_runner::default]", "start data")),
+        ProvisionerAction.STOP,
+        new ServiceAction("chef-solo",
+                          TestHelper.actionMapOf("recipe[coopr_service_runner::default]", "stop data"))
+      ))
+      .build();
   }
 
   public static class ClusterTemplateExample {
