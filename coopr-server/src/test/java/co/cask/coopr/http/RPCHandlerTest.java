@@ -20,9 +20,7 @@ import co.cask.coopr.TestHelper;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.cluster.NodeProperties;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
@@ -30,7 +28,6 @@ import co.cask.coopr.spec.template.Compatibilities;
 import co.cask.coopr.spec.template.LeaseDuration;
 import co.cask.coopr.store.entity.SQLEntityStoreService;
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
@@ -116,12 +113,9 @@ public class RPCHandlerTest extends ServiceTestBase {
   @Test
   public void testGetNodeProperties() throws Exception {
     // setup data, 4 node cluster
-    Service svcA =
-      new Service("svcA", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    Service svcB =
-      new Service("svcB", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    Service svcC =
-      new Service("svcC", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service svcA = Service.builder().setName("svcA").build();
+    Service svcB = Service.builder().setName("svcB").build();
+    Service svcC = Service.builder().setName("svcC").build();
 
     Node nodeA = new Node("nodeA", "123", ImmutableSet.of(svcA),
                           NodeProperties.builder()

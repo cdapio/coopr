@@ -42,9 +42,7 @@ import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.scheduler.task.SchedulableTask;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
@@ -80,7 +78,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1017,14 +1014,14 @@ public class ClusterHandlerTest extends ServiceTestBase {
       "node1",
       new Node("node1", "123",
                ImmutableSet.<Service>of(
-                 new Service("s1", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of()),
-                 new Service("s2", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of())),
+                 Service.builder().setName("s1").build(),
+                 Service.builder().setName("s2").build()),
                NodeProperties.builder().setHostname("node1-host").addIPAddress("access_v4", "node1-ip").build()),
       "node2",
       new Node("node2", "123",
                ImmutableSet.<Service>of(
-                 new Service("s2", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of()),
-                 new Service("s3", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of())),
+                 Service.builder().setName("s2").build(),
+                 Service.builder().setName("s3").build()),
                NodeProperties.builder().setHostname("node2-host").addIPAddress("access_v4", "node2-ip").build()));
     Cluster cluster = Cluster.builder()
       .setID("123")
@@ -1848,9 +1845,7 @@ public class ClusterHandlerTest extends ServiceTestBase {
     );
     // create services
     for (String serviceName : services) {
-      adminView.writeService(new Service(
-        serviceName, serviceName + " description", Collections.<String>emptySet(),
-        Collections.<ProvisionerAction, ServiceAction>emptyMap()));
+      adminView.writeService(Service.builder().setName(serviceName).build());
     }
     adminView.writeClusterTemplate(reactorTemplate);
     adminView.writeClusterTemplate(smallTemplate);

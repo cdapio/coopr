@@ -29,9 +29,7 @@ import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Compatibilities;
@@ -215,8 +213,7 @@ public class SolverSchedulerTest extends BaseTest {
     );
     // create services
     for (String serviceName : services) {
-      adminView.writeService(new Service(serviceName, serviceName + " description", ImmutableSet.<String>of(),
-                                           ImmutableMap.<ProvisionerAction, ServiceAction>of()));
+      adminView.writeService(Service.builder().setName(serviceName).build());
     }
     adminView.writeClusterTemplate(reactorTemplate);
   }

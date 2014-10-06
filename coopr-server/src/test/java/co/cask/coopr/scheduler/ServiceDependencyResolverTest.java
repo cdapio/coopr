@@ -25,13 +25,27 @@ public class ServiceDependencyResolverTest {
 
   @Test
   public void testMinimizeDependencies() {
-    Map<ProvisionerAction, ServiceAction> emptyActions = ImmutableMap.of();
-    Service base =  new Service("base", "", ImmutableSet.<String>of(), emptyActions);
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of("base"), emptyActions);
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("base", "s1"), emptyActions);
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("base", "s1", "s2"), emptyActions);
-    Service s4 =  new Service("s4", "", ImmutableSet.<String>of("base"), emptyActions);
-    Service s5 =  new Service("s5", "", ImmutableSet.<String>of("base", "s1", "s2", "s3", "s4"), emptyActions);
+    Service base =  Service.builder().setName("base").build();
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setDependencies(ServiceDependencies.runtimeRequires("base"))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("base", "s1"))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("base", "s1", "s2"))
+      .build();
+    Service s4 = Service.builder()
+      .setName("s4")
+      .setDependencies(ServiceDependencies.runtimeRequires("base"))
+      .build();
+    Service s5 = Service.builder()
+      .setName("s5")
+      .setDependencies(ServiceDependencies.runtimeRequires("base", "s1", "s2", "s3", "s4"))
+      .build();
     Map<String, Service> serviceMap = Maps.newHashMap();
     serviceMap.put(base.getName(), base);
     serviceMap.put(s1.getName(), s1);
@@ -54,28 +68,28 @@ public class ServiceDependencyResolverTest {
 
   @Test
   public void testMinimizeDependenciesWithProvides() {
-    Map<ProvisionerAction, ServiceAction> emptyActions = ImmutableMap.of();
-    Service base =  new Service("base", "", ImmutableSet.<String>of(), emptyActions);
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of("base"), emptyActions);
-    Service s2v1 =  new Service("s2-v1", "",
-                                new ServiceDependencies(
-                                  ImmutableSet.<String>of("s2"),
-                                  null, null,
-                                  new ServiceStageDependencies(
-                                    ImmutableSet.<String>of("base", "s1"),
-                                    null
-                                  )
-                                ), emptyActions);
-    Service s2v2 =  new Service("s2-v2", "",
-                                new ServiceDependencies(
-                                  ImmutableSet.<String>of("s2"),
-                                  null, null,
-                                  new ServiceStageDependencies(
-                                    ImmutableSet.<String>of("base", "s1"),
-                                    null
-                                  )
-                                ), emptyActions);
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("base", "s1", "s2"), emptyActions);
+    Service base =  Service.builder().setName("base").build();
+    Service s1 =  Service.builder().setName("s1").setDependencies(ServiceDependencies.runtimeRequires("base")).build();
+    Service s2v1 = Service.builder()
+      .setName("s2-v1")
+      .setDependencies(
+        ServiceDependencies.builder()
+          .setProvides("s2")
+          .setRuntimeDependencies(new ServiceStageDependencies(ImmutableSet.<String>of("base", "s1"), null))
+          .build())
+      .build();
+    Service s2v2 = Service.builder()
+      .setName("s2-v2")
+      .setDependencies(
+        ServiceDependencies.builder()
+          .setProvides("s2")
+          .setRuntimeDependencies(new ServiceStageDependencies(ImmutableSet.<String>of("base", "s1"), null))
+          .build())
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("base", "s1", "s2"))
+      .build();
     Map<String, Service> serviceMap = Maps.newHashMap();
     serviceMap.put(base.getName(), base);
     serviceMap.put(s1.getName(), s1);
@@ -140,31 +154,45 @@ public class ServiceDependencyResolverTest {
   public void testClusterRuntimeDependencies() {
     ServiceAction sAction = new ServiceAction("shell", TestHelper.actionMapOf(null, null));
     // s1 has initialize and start
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INITIALIZE, sAction,
-                                ProvisionerAction.START, sAction));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INITIALIZE, sAction,
+        ProvisionerAction.START, sAction))
+      .build();
     // s2 has configure and initialize
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, sAction,
-                                ProvisionerAction.INITIALIZE, sAction));
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.CONFIGURE, sAction,
+        ProvisionerAction.INITIALIZE, sAction))
+      .build();
     // s3 has start
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, sAction));
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(ProvisionerAction.START, sAction))
+      .build();
     // s4 has initialize and start
-    Service s4 =  new Service("s4", "", ImmutableSet.<String>of("s2", "s3", "s6"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INITIALIZE, sAction,
-                                ProvisionerAction.START, sAction));
-    Service s5 =  new Service("s5", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INITIALIZE, sAction,
-                                ProvisionerAction.START, sAction));
-    Service s6 =  new Service("s6", "", ImmutableSet.<String>of("s5"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INITIALIZE, sAction));
+    Service s4 = Service.builder()
+      .setName("s4")
+      .setDependencies(ServiceDependencies.runtimeRequires("s2", "s3", "s6"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INITIALIZE, sAction,
+        ProvisionerAction.START, sAction))
+      .build();
+    Service s5 = Service.builder()
+      .setName("s5")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INITIALIZE, sAction,
+        ProvisionerAction.START, sAction))
+      .build();
+    Service s6 = Service.builder()
+      .setName("s6")
+      .setDependencies(ServiceDependencies.runtimeRequires("s5"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(ProvisionerAction.INITIALIZE, sAction))
+      .build();
 
     Map<String, Service> serviceMap = Maps.newHashMap();
     serviceMap.put(s1.getName(), s1);
@@ -213,49 +241,36 @@ public class ServiceDependencyResolverTest {
   public void testClusterInstallDependencies() {
     ServiceAction sAction = new ServiceAction("shell", TestHelper.actionMapOf(null, null));
     Map<ProvisionerAction, ServiceAction> installActions = ImmutableMap.of(ProvisionerAction.INSTALL, sAction);
-    Map<ProvisionerAction, ServiceAction> emptyActions = ImmutableMap.of();
-    Service s1 =  new Service(
-      "s1", "", new ServiceDependencies(null,
-                                        null,
-                                        new ServiceStageDependencies(
-                                          ImmutableSet.<String>of(),
-                                          ImmutableSet.<String>of()),
-                                        null), installActions);
-    Service s2 =  new Service(
-      "s2", "", new ServiceDependencies(null,
-                                        null,
-                                        new ServiceStageDependencies(
-                                          ImmutableSet.<String>of("s1"),
-                                          ImmutableSet.<String>of()),
-                                        null), emptyActions);
-    Service s3 =  new Service(
-      "s3", "", new ServiceDependencies(null,
-                                        null,
-                                        new ServiceStageDependencies(
-                                          ImmutableSet.<String>of("s1"),
-                                          ImmutableSet.<String>of()),
-                                        null), installActions);
-    Service s4 =  new Service(
-      "s4", "", new ServiceDependencies(null,
-                                        null,
-                                        new ServiceStageDependencies(
-                                          ImmutableSet.<String>of("s2", "s3", "s6"),
-                                          ImmutableSet.<String>of()),
-                                        null), installActions);
-    Service s5 =  new Service(
-      "s5", "", new ServiceDependencies(null,
-                                        null,
-                                        new ServiceStageDependencies(
-                                          ImmutableSet.<String>of(),
-                                          ImmutableSet.<String>of()),
-                                        null), installActions);
-    Service s6 =  new Service(
-      "s6", "", new ServiceDependencies(null,
-                                        null,
-                                        new ServiceStageDependencies(
-                                          ImmutableSet.<String>of("s5"),
-                                          ImmutableSet.<String>of()),
-                                        null), emptyActions);
+    Service s1 = Service.builder().setName("s1").setProvisionerActions(installActions).build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.builder().setInstallDependencies(
+        new ServiceStageDependencies(ImmutableSet.<String>of("s1"), null)).build())
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(
+        ServiceDependencies.builder().setInstallDependencies(
+          new ServiceStageDependencies(ImmutableSet.<String>of("s1"), null)).build())
+      .setProvisionerActions(installActions)
+      .build();
+    Service s4 = Service.builder()
+      .setName("s4")
+      .setDependencies(
+        ServiceDependencies.builder().setInstallDependencies(
+          new ServiceStageDependencies(ImmutableSet.<String>of("s2", "s3", "s6"), null)).build())
+      .setProvisionerActions(installActions)
+      .build();
+    Service s5 = Service.builder()
+      .setName("s5")
+      .setProvisionerActions(installActions)
+      .build();
+    Service s6 = Service.builder()
+      .setName("s6")
+      .setDependencies(
+        ServiceDependencies.builder().setInstallDependencies(
+          new ServiceStageDependencies(ImmutableSet.<String>of("s5"), null)).build())
+      .build();
 
     Map<String, Service> serviceMap = Maps.newHashMap();
     serviceMap.put(s1.getName(), s1);
@@ -289,20 +304,14 @@ public class ServiceDependencyResolverTest {
   public void testServiceUsesDependency() {
     ServiceAction sAction = new ServiceAction("shell", TestHelper.actionMapOf(null, null));
     Map<ProvisionerAction, ServiceAction> installActions = ImmutableMap.of(ProvisionerAction.INSTALL, sAction);
-    Service s1 =  new Service(
-      "s1", "", new ServiceDependencies(null,
-                                        null,
-                                        new ServiceStageDependencies(
-                                          ImmutableSet.<String>of(),
-                                          ImmutableSet.<String>of()),
-                                        null), installActions);
-    Service s2 =  new Service(
-      "s2", "", new ServiceDependencies(null,
-                                        null,
-                                        new ServiceStageDependencies(
-                                          ImmutableSet.<String>of(),
-                                          ImmutableSet.<String>of("s1", "s3")),
-                                        null), installActions);
+    Service s1 = Service.builder().setName("s1").setProvisionerActions(installActions).build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(
+        ServiceDependencies.builder().setInstallDependencies(
+          new ServiceStageDependencies(null, ImmutableSet.<String>of("s1", "s3"))).build())
+      .setProvisionerActions(installActions)
+      .build();
 
     Map<String, Service> serviceMap = Maps.newHashMap();
     serviceMap.put(s1.getName(), s1);

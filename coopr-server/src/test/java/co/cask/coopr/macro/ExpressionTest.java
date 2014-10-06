@@ -25,10 +25,7 @@ import co.cask.coopr.macro.eval.HostServiceEvaluator;
 import co.cask.coopr.macro.eval.IPSelfEvaluator;
 import co.cask.coopr.macro.eval.IPServiceEvaluator;
 import co.cask.coopr.macro.eval.ServiceInstanceEvaluator;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.junit.Assert;
@@ -47,12 +44,9 @@ public class ExpressionTest {
   static Node node2;
 
   static {
-    Service svc1 = new Service("svc1", "service 1", ImmutableSet.<String>of(),
-                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    Service svc2 = new Service("svc2", "service 2", ImmutableSet.<String>of(),
-                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    Service svc3 = new Service("svc3", "service 3", ImmutableSet.<String>of(),
-                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service svc1 = Service.builder().setName("svc1").build();
+    Service svc2 = Service.builder().setName("svc2").build();
+    Service svc3 = Service.builder().setName("svc3").build();
     Node foo = new Node("foo", "1", ImmutableSet.of(svc1, svc2),
                         NodeProperties.builder()
                           .setHostname("oof")

@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class ServiceStageDependencies {
   public static final ServiceStageDependencies EMPTY_SERVICE_STAGE_DEPENDENCIES =
-    new ServiceStageDependencies(null, null);
+    new ServiceStageDependencies(ImmutableSet.<String>of(), ImmutableSet.<String>of());
   private final Set<String> requires;
   private final Set<String> uses;
   private Set<String> dependencies;
@@ -33,8 +33,8 @@ public class ServiceStageDependencies {
    * @param uses Set of services this service uses.
    */
   public ServiceStageDependencies(Set<String> requires, Set<String> uses) {
-    this.requires = requires == null ? ImmutableSet.<String>of() : requires;
-    this.uses = uses == null ? ImmutableSet.<String>of() : uses;
+    this.requires = requires == null ? ImmutableSet.<String>of() : ImmutableSet.copyOf(requires);
+    this.uses = uses == null ? ImmutableSet.<String>of() : ImmutableSet.copyOf(uses);
     this.dependencies = Sets.union(this.requires, this.uses);
   }
 
