@@ -15,6 +15,6 @@
  */
 
 /**
- * The Coopr Client API implementation.
+ * The Coopr REST Client API.
  */
 package co.cask.coopr.client;

@@ -14,7 +14,17 @@
  * limitations under the License.
  */
 
-/**
- * Transport entities,
- */
+
 package co.cask.coopr.client.model;
+
+import com.google.gson.JsonObject;
+
+/**
+ * Class contains the automator type info.
+ */
+public class AutomatorTypeInfo extends AbstractJsonInfo {
+
+  public AutomatorTypeInfo(JsonObject json) {
+    super(json);
+  }
+}

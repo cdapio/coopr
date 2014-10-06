@@ -29,7 +29,7 @@
 
     <modules>
         <module>coopr-server</module>
-        <module>coopr-client</module>
+        <module>coopr-rest-client</module>
     </modules>
 
     <properties>
