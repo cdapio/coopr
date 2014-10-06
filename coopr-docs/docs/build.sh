@@ -128,7 +128,11 @@ function make_zip_html() {
 function make_zip() {
 # This creates a zip that unpacks to the same name
   version
-  ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$1"
+  if [ "x$1" == "x" ]; then
+    ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION"
+  else
+    ZIP_DIR_NAME="$PROJECT-docs-$PROJECT_VERSION-$1"
+  fi
   cd $SCRIPT_PATH/$BUILD
   mv $HTML $ZIP_DIR_NAME
   zip -r $ZIP_DIR_NAME.zip $ZIP_DIR_NAME/*
