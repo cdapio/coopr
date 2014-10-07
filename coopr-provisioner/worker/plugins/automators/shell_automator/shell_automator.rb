@@ -23,6 +23,12 @@ require 'fileutils'
 class ShellAutomator < Automator
   attr_accessor :credentials, :scripts_dir, :scripts_tar, :remote_cache_dir
 
+  # plugin defined resources
+  @ssh_key_dir = 'ssh_keys'
+  class << self
+    attr_accessor :ssh_key_dir
+  end
+
   def initialize(env, task)
     super(env, task)
     work_dir = @env[:work_dir]
@@ -57,6 +63,15 @@ class ShellAutomator < Automator
     `tar -chzf "#{file}.new" -C "#{File.dirname(path)}" #{File.basename(path)}`
     `mv "#{file}.new" "#{file}"`
     log.debug "Generation complete: #{file}"
+  end
+
+  def write_ssh_file
+    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
+    unless @ssh_keyfile.nil?
+      @task['config']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @task['taskId'])
+      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
+      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
+    end
   end
 
   def set_credentials(sshauth)
@@ -95,6 +110,7 @@ class ShellAutomator < Automator
     # do we need sudo bash?
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
+    write_ssh_file
     set_credentials(sshauth)
 
     jsondata = JSON.generate(task)
@@ -151,6 +167,7 @@ class ShellAutomator < Automator
     # do we need sudo bash?
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
+    write_ssh_file
     set_credentials(sshauth)
 
     # generate the local tarballs for resources and for our own wrapper libs
