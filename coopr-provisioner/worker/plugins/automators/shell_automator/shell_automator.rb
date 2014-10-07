@@ -86,9 +86,9 @@ class ShellAutomator < Automator
     end
   end
 
-  def decode_string_to_file(string, outfile)
+  def decode_string_to_file(string, outfile, mode = 0600)
     FileUtils.mkdir_p(File.dirname(outfile))
-    File.open(outfile, 'wb') { |f| f.write(Base64.decode64(string)) }
+    File.open(outfile, 'wb', mode) { |f| f.write(Base64.decode64(string)) }
   end
 
   def runshell(inputmap)
