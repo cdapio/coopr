@@ -5,10 +5,10 @@
     </div>
     <div class="col-xs-7">
       <div ng-repeat="field in textFields" class="form-group">
-        <label class="col-sm-3 control-label">
-          {{field.placeholder || (field.name | myCapitalizeFilter)}}:
-        </label>
-        <div class="col-sm-9">
+        <div class="col-sm-2 control-label">
+          <small>{{field.placeholder || (field.name | myCapitalizeFilter)}}:</small>
+        </div>
+        <div class="col-sm-10">
           <input type="text"
                   ng-model="value[field.name]"
                   name="{{field.name}}"
