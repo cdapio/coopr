@@ -142,6 +142,7 @@ class ChefSoloAutomator < Automator
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
     write_ssh_file
+    @ssh_file = @task['config']['ssh-auth']['identityfile'] unless @ssh_keyfile.nil?
     set_credentials(sshauth)
 
     @@chef_primitives.each do |chef_primitive|
@@ -230,19 +231,14 @@ class ChefSoloAutomator < Automator
 
     log.debug "ChefSoloAutomator bootstrap completed successfully: #{@result}"
     @result
+  ensure
+    File.delete(@ssh_file) if File.exist?(@ssh_file)
   end
 
   def runchef(inputmap)
     sshauth = inputmap['sshauth']
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
-
-    # Write credentials
-    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
-    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
-      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
-      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
-    end
 
     raise "required parameter \"run_list\" not found in input: #{fields}" if fields['run_list'].nil?
     # run_list as specified by user
@@ -260,6 +256,7 @@ class ChefSoloAutomator < Automator
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
     write_ssh_file
+    @ssh_file = @task['config']['ssh-auth']['identityfile'] unless @ssh_keyfile.nil?
     set_credentials(sshauth)
 
     begin
@@ -295,6 +292,8 @@ class ChefSoloAutomator < Automator
     @result['status'] = 0
     log.debug "Chef-solo run completed successfully for task #{@task['taskId']}: #{@result}"
     @result
+  ensure
+    File.delete(@ssh_file) if File.exist?(@ssh_file)
   end
 
   def install(inputmap)
