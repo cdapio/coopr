@@ -40,12 +40,14 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
 
       $scope.chosenTemplate = chosen;
 
+      console.log(chosen);
+
       $scope.model.numMachines = Math.min(
         Math.max(
           $scope.model.numMachines,
-          chosen.constraints.size.min
+          chosen.constraints ? chosen.constraints.size.min : 1
         ), 
-        chosen.constraints.size.max
+        chosen.constraints ? chosen.constraints.size.max : Infinity
       );
 
       $scope.availableHardware = allHardware.filter(function (item) {
