@@ -41,11 +41,17 @@ before_install:
 before_script:
   - "cd coopr-ngui && npm run build"
   - "npm start > /dev/null &"
-  - "cd ../coopr-server && mvn clean package assembly:single -DskipTests"
-  - "java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain >/dev/null 2>&1 &"
-  - "java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain >/dev/null 2>&1 &"
+  - "test ${TRAVIS_SECURE_ENV_VARS} && cd ../coopr-server"
+  - "test ${TRAVIS_SECURE_ENV_VARS} && mvn clean package assembly:single -DskipTests"
+  - "test ${TRAVIS_SECURE_ENV_VARS} && java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain >/dev/null 2>&1 &"
+  - "test ${TRAVIS_SECURE_ENV_VARS} && java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain >/dev/null 2>&1 &"
   - "cd .. && sleep 5" # give server time to start
 
 script:
-  - "cd coopr-ngui && npm run travis && cd .. && mvn test"
+  - "cd coopr-ngui"
+  - "node ./node_modules/gulp/bin/gulp.js jshint"
+  - "npm run test-single-run"
+  - "test ${TRAVIS_SECURE_ENV_VARS} && npm run protractor"
+  - "cd .."
+  - "mvn test"
 

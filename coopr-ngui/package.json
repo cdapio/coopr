@@ -11,9 +11,6 @@
 
     "build": "npm install && ./node_modules/bower/bin/bower install && node ./node_modules/gulp/bin/gulp.js build",
 
-    "pretravis": "node ./node_modules/gulp/bin/gulp.js jshint",
-    "travis": "npm run test-single-run && npm run protractor",
-
     "test": "node ./node_modules/karma/bin/karma start test/karma-conf.js",    
     "test-single-run": "node ./node_modules/karma/bin/karma start test/karma-conf.js --no-auto-watch --single-run",
 
