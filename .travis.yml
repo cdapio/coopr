@@ -34,24 +34,24 @@ branches:
     - /^release\/.*$/
 
 before_install:
-  - "export CHROME_BIN=chromium-browser"
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+  - 'export CHROME_BIN=chromium-browser'
+  - 'export DISPLAY=:99.0'
+  - 'sh -e /etc/init.d/xvfb start'
 
 before_script:
-  - "cd coopr-ngui && npm run build"
-  - "npm start > /dev/null &"
-  - "test ${DOES_NOT_EXIST} && cd ../coopr-server"
-  - "test ${DOES_NOT_EXIST} && mvn clean package assembly:single -DskipTests"
-  - "test ${DOES_NOT_EXIST} && java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain >/dev/null 2>&1 &"
-  - "test ${DOES_NOT_EXIST} && java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain >/dev/null 2>&1 &"
-  - "cd .. && sleep 5" # give server time to start
+  - 'cd coopr-ngui && npm run build'
+  - 'npm start > /dev/null &'
+  - 'if [ -n "$SAUCE_USERNAM" ]; then cd ../coopr-server; fi'
+  - 'if [ -n "$SAUCE_USERNAM" ]; then mvn clean package assembly:single -DskipTests; fi'
+  - 'if [ -n "$SAUCE_USERNAM" ]; then java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain >/dev/null 2>&1 &; fi'
+  - 'if [ -n "$SAUCE_USERNAM" ]; then java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain >/dev/null 2>&1 &; fi'
+  - 'cd .. && sleep 5' # give server time to start
 
 script:
-  - "cd coopr-ngui"
-  - "node ./node_modules/gulp/bin/gulp.js jshint"
-  - "npm run test-single-run"
-  - "test ${DOES_NOT_EXIST} && npm run protractor"
-  - "cd .."
-  - "mvn test"
+  - 'cd coopr-ngui'
+  - 'node ./node_modules/gulp/bin/gulp.js jshint'
+  - 'npm run test-single-run'
+  - 'if [ -n "$SAUCE_USERNAM" ]; then npm run protractor; fi'
+  - 'cd ..'
+  - 'mvn test'
 
