@@ -16,6 +16,7 @@
 
 package co.cask.coopr.spec.template;
 
+import co.cask.coopr.common.utils.StringUtils;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
@@ -39,6 +40,8 @@ public class ClusterDefaults {
                           String imagetype, String dnsSuffix, JsonObject config) {
     Preconditions.checkArgument(services != null && !services.isEmpty(), "default services must be specified");
     Preconditions.checkArgument(provider != null, "default provider must be specified");
+    Preconditions.checkArgument(dnsSuffix == null || StringUtils.isValidDNSSuffix(dnsSuffix),
+                                dnsSuffix + " is an invalid DNS suffix.");
     this.services = services;
     this.provider = provider;
     this.hardwaretype = hardwaretype;

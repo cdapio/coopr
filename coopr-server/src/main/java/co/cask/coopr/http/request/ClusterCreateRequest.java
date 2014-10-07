@@ -15,6 +15,7 @@
  */
 package co.cask.coopr.http.request;
 
+import co.cask.coopr.common.utils.StringUtils;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
@@ -39,7 +40,7 @@ public class ClusterCreateRequest extends ClusterOperationRequest {
   private final JsonObject config;
 
   private ClusterCreateRequest(String name, String description, String clusterTemplate,
-                               int numMachines, String provider, Map<String, Object> providerFields,
+                               Integer numMachines, String provider, Map<String, Object> providerFields,
                                Set<String> services, String hardwareType, String imageType, Long initialLeaseDuration,
                                String dnsSuffix, JsonObject config) {
     super(providerFields);
@@ -47,7 +48,9 @@ public class ClusterCreateRequest extends ClusterOperationRequest {
     Preconditions.checkArgument(name != null && !name.isEmpty(), "cluster name must be specified");
     Preconditions.checkArgument(clusterTemplate != null && !clusterTemplate.isEmpty(),
                                 "cluster template must be specified");
-    Preconditions.checkArgument(numMachines > 0, "cluster size must be greater than 0");
+    Preconditions.checkArgument(numMachines != null && numMachines > 0, "cluster size must be greater than 0");
+    Preconditions.checkArgument(dnsSuffix == null || StringUtils.isValidDNSSuffix(dnsSuffix),
+                                dnsSuffix + " is an invalid DNS suffix.");
     this.name = name;
     this.description = description == null ? "" : description;
     this.clusterTemplate = clusterTemplate;

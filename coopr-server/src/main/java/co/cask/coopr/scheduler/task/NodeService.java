@@ -123,7 +123,8 @@ public class NodeService {
   /**
    * Creates a unique hostname from the cluster name, cluster id, and node number. Hostnames are of the format
    * <clustername><clusterid>-<nodenum>.<dnsSuffix>, with underscores and dots replaced by dashes, and with whole
-   * hostname trimmed to 255 characters if it would otherwise have been too long.
+   * hostname trimmed to 255 characters if it would otherwise have been too long, and the first label trimmed to
+   * 63 characters if it would otherwise have been too long.
    *
    * @param clusterName Name of the cluster the node is a part of.
    * @param clusterId Id of the cluster the node is a part of.
@@ -138,18 +139,20 @@ public class NodeService {
     }
 
     long clusterIdNum = Long.parseLong(clusterId);
-    String cleaned = clusterName.replace("_", "-");
-    cleaned = cleaned.replace(".", "-");
-    StringBuilder postfixBuilder = new StringBuilder();
-    postfixBuilder.append(clusterIdNum);
-    postfixBuilder.append("-");
-    postfixBuilder.append(nodeNum);
-    postfixBuilder.append(".");
-    postfixBuilder.append(actualSuffix);
-    String postfix = postfixBuilder.toString();
-    if (cleaned.length() + postfix.length() > 255) {
-      cleaned = cleaned.substring(0, 255 - postfix.length());
+    // this is something like 53-1000 is it's cluster 53 and node 1000. We want to append this to the cluster name
+    // to get the first label of the hostname.
+    // ex: name53-1000
+    String labelSuffix = clusterIdNum + "-" + nodeNum;
+    // the label must be from 1 to 63 (inclusive) characters in length. If the name is too long, chop off the end
+    String labelPrefix = clusterName;
+    if (labelPrefix.length() + labelSuffix.length() > 63) {
+      labelPrefix = labelPrefix.substring(0, 63 - labelSuffix.length());
     }
-    return cleaned + postfix;
+    // cannot have . or _ in the first label of the hostname
+    labelPrefix = labelPrefix.replace("_", "-");
+    labelPrefix = labelPrefix.replace(".", "-");
+    // hostnames are case insensitive, so lets just lowercase for consistency since that is what is normal
+    labelPrefix = labelPrefix.toLowerCase();
+    return labelPrefix + labelSuffix + "." + actualSuffix;
   }
 }
