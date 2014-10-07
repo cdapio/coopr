@@ -96,13 +96,6 @@ class ShellAutomator < Automator
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
 
-    # Write credentials
-    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
-    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
-      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
-      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
-    end
-
     raise "required parameter \"script\" not found in input: #{fields}" if fields['script'].nil?
     shellscript = fields['script']
     shellargs = fields['args']
@@ -111,6 +104,7 @@ class ShellAutomator < Automator
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
     write_ssh_file
+    @ssh_file = @task['config']['ssh-auth']['identityfile'] unless @ssh_keyfile.nil?
     set_credentials(sshauth)
 
     jsondata = JSON.generate(task)
@@ -151,23 +145,19 @@ class ShellAutomator < Automator
     @result['status'] = 0
     log.debug "Result of shell command: #{@result}"
     @result
+  ensure
+    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
   end
 
   def bootstrap(inputmap)
     sshauth = inputmap['sshauth']
     ipaddress = inputmap['ipaddress']
 
-    # Write credentials
-    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
-    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
-      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
-      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
-    end
-
     # do we need sudo bash?
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
     write_ssh_file
+    @ssh_file = @task['config']['ssh-auth']['identityfile'] unless @ssh_keyfile.nil?
     set_credentials(sshauth)
 
     # generate the local tarballs for resources and for our own wrapper libs
@@ -252,6 +242,8 @@ class ShellAutomator < Automator
 
     @result['status'] = 0
     log.debug "ShellAutomator bootstrap completed successfully: #{@result}"
+  ensure
+    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
   end
 
   def install(inputmap)
