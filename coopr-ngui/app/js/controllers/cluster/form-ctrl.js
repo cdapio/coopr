@@ -40,8 +40,6 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
 
       $scope.chosenTemplate = chosen;
 
-      console.log(chosen);
-
       $scope.model.numMachines = Math.min(
         Math.max(
           $scope.model.numMachines,
