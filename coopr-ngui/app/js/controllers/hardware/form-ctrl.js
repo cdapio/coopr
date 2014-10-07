@@ -5,7 +5,7 @@ function ($scope, $state, myApi, CrudFormBase) {
   $scope.allProviders = myApi.Provider.query();
   $scope.textFields = [{
     name: 'flavor',
-    placeholder: 'flavor'
+    placeholder: 'Flavor'
   }];
   if($scope.editing) {
     $scope.model = myApi.HardwareType.get($state.params);

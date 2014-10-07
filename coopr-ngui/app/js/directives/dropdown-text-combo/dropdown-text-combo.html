@@ -4,12 +4,17 @@
       <input type="text" value="{{key}}" class="form-control" readonly />
     </div>
     <div class="col-xs-7">
-      <div ng-repeat="field in textFields">
-        <input type="text"
-                ng-model="value[field.name]"
-                name="{{field.name}}"
-                placeholder="{{field.placeholder || field.name}}"
-                class="form-control" />
+      <div ng-repeat="field in textFields" class="form-group">
+        <label class="col-sm-3 control-label">
+          {{field.placeholder || (field.name | myCapitalizeFilter)}}:
+        </label>
+        <div class="col-sm-9">
+          <input type="text"
+                  ng-model="value[field.name]"
+                  name="{{field.name}}"
+                  placeholder="{{field.placeholder || field.name}}"
+                  class="form-control" />
+        </div>
       </div>
     </div>
   </div>
