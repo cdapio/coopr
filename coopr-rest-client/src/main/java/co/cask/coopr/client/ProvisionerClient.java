@@ -17,7 +17,7 @@
 
 package co.cask.coopr.client;
 
-import co.cask.coopr.client.model.ProvisionerInfo;
+import co.cask.coopr.provisioner.Provisioner;
 
 import java.util.List;
 
@@ -29,15 +29,15 @@ public interface ProvisionerClient {
   /**
    * Retrieves the list of all provisioners registered with the server.
    *
-   * @return List of {@link co.cask.coopr.client.model.ProvisionerInfo} objects
+   * @return List of {@link co.cask.coopr.provisioner.Provisioner} objects
    */
-  List<ProvisionerInfo> getAllProvisioners();
+  List<Provisioner> getAllProvisioners();
 
   /**
    * Retrieves a specific provisioner by its id.
    *
    * @param provisionerId String value of the provisioner id.
-   * @return {@link co.cask.coopr.client.model.ProvisionerInfo} object
+   * @return {@link co.cask.coopr.provisioner.Provisioner} object
    */
-  ProvisionerInfo getProvisioner(String provisionerId);
+  Provisioner getProvisioner(String provisionerId);
 }

@@ -17,11 +17,11 @@
 
 package co.cask.coopr.client;
 
-import co.cask.coopr.client.model.ClusterConfigInfo;
-import co.cask.coopr.client.model.ClusterInfo;
-import co.cask.coopr.client.model.ClusterStatusInfo;
+import co.cask.coopr.cluster.ClusterSummary;
 import co.cask.coopr.http.request.AddServicesRequest;
 import co.cask.coopr.http.request.ClusterCreateRequest;
+import co.cask.coopr.http.request.ClusterStatusResponse;
+import com.google.gson.JsonObject;
 
 import java.util.List;
 import java.util.Set;
@@ -33,18 +33,19 @@ public interface ClusterClient {
 
   /**
    * Provides a summary of details about all clusters visible to a user.
+   * If there are no visible clusters, returns empty list.
    *
-   * @return list of {@link co.cask.coopr.client.model.ClusterInfo} objects
+   * @return list of {@link co.cask.coopr.cluster.ClusterSummary} objects
    */
-  List<ClusterInfo> getClusters();
+  List<ClusterSummary> getClusters();
 
   /**
    * Provides full details about a cluster by id.
    *
    * @param clusterId String value of a cluster id
-   * @return {@link co.cask.coopr.client.model.ClusterInfo} object
+   * @return {@link com.google.gson.JsonObject} object
    */
-  ClusterInfo getCluster(String clusterId);
+  JsonObject getCluster(String clusterId);
 
   /**
    * Deletes specified cluster by id.
@@ -65,17 +66,17 @@ public interface ClusterClient {
    * Retrieves the status of a cluster by id.
    *
    * @param clusterId String value of a cluster id
-   * @return {@link co.cask.coopr.client.model.ClusterStatusInfo} object
+   * @return {@link co.cask.coopr.http.request.ClusterStatusResponse} object
    */
-  ClusterStatusInfo getClusterStatus(String clusterId);
+  ClusterStatusResponse getClusterStatus(String clusterId);
 
   /**
    * Retrieves the configuration of a cluster by id.
    *
    * @param clusterId String value of a cluster id
-   * @return {@link co.cask.coopr.client.model.ClusterConfigInfo} object
+   * @return {@link com.google.gson.JsonObject} object
    */
-  ClusterConfigInfo getClusterConfig(String clusterId);
+  JsonObject getClusterConfig(String clusterId);
 
   /**
    * Retrieves the names of services placed on the cluster by id.

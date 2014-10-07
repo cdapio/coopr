@@ -17,7 +17,7 @@
 
 package co.cask.coopr.client;
 
-import co.cask.coopr.client.model.TenantInfo;
+import co.cask.coopr.spec.TenantSpecification;
 
 import java.util.List;
 
@@ -27,19 +27,19 @@ import java.util.List;
 public interface TenantClient {
 
   /**
-   * Returns the comprehensive set of tenants within the system.
+   * Returns the comprehensive set of tenants within the system. If no tenants exist, returns an empty list.
    *
-   * @return List of {@link co.cask.coopr.client.model.TenantInfo} objects
+   * @return List of {@link co.cask.coopr.spec.TenantSpecification} objects
    */
-  List<TenantInfo> getTenants();
+  List<TenantSpecification> getTenants();
 
   /**
    * Retrieves details about a tenant by the name.
    *
    * @param tenantName String value of the tenant name
-   * @return {@link co.cask.coopr.client.model.TenantInfo} object
+   * @return {@link co.cask.coopr.spec.TenantSpecification} object
    */
-  TenantInfo getTenant(String tenantName);
+  TenantSpecification getTenant(String tenantName);
 
   /**
    * Deletes the tenant by the specified name

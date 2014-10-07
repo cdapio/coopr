@@ -17,9 +17,10 @@
 
 package co.cask.coopr.client;
 
-import co.cask.coopr.client.model.AutomatorTypeInfo;
-import co.cask.coopr.client.model.ProviderTypeInfo;
-import co.cask.coopr.client.model.ResourceMetaInfo;
+import co.cask.coopr.provisioner.plugin.ResourceMeta;
+import co.cask.coopr.provisioner.plugin.ResourceStatus;
+import co.cask.coopr.spec.plugin.AutomatorType;
+import co.cask.coopr.spec.plugin.ProviderType;
 
 import java.util.List;
 import java.util.Map;
@@ -31,32 +32,32 @@ import java.util.Set;
 public interface PluginClient {
 
   /**
-   * Retrieves all automator types readable by the user.
+   * Retrieves all automator types readable by the user. If no automator types exist, returns an empty list.
    *
-   * @return List of {@link co.cask.coopr.client.model.AutomatorTypeInfo} objects
+   * @return List of {@link co.cask.coopr.spec.plugin.AutomatorType} objects
    */
-  List<AutomatorTypeInfo> getAllAutomatorTypes();
+  List<AutomatorType> getAllAutomatorTypes();
 
   /**
    * Retrieves a specific automator type if readable by the user.
    *
-   * @return {@link co.cask.coopr.client.model.AutomatorTypeInfo} object
+   * @return {@link co.cask.coopr.spec.plugin.AutomatorType} object
    */
-  AutomatorTypeInfo getAutomatorType(String id);
+  AutomatorType getAutomatorType(String id);
 
   /**
-   * Retrieves all provider types readable by the user.
+   * Retrieves all provider types readable by the user. If no provider types exist, returns an empty list.
    *
-   * @return List of {@link co.cask.coopr.client.model.ProviderTypeInfo} objects
+   * @return List of {@link co.cask.coopr.spec.plugin.ProviderType} objects
    */
-  List<ProviderTypeInfo> getAllProviderTypes();
+  List<ProviderType> getAllProviderTypes();
 
   /**
    * Retrieves a specific provider type if readable by the user.
    *
-   * @return {@link co.cask.coopr.client.model.ProviderTypeInfo} object
+   * @return {@link co.cask.coopr.spec.plugin.ProviderType} object
    */
-  ProviderTypeInfo getProviderType(String id);
+  ProviderType getProviderType(String id);
 
   /**
    * Retrieves a list of all versions of the given resource of the given type for the given automator type.
@@ -65,10 +66,11 @@ public interface PluginClient {
    *
    * @param id Id of the automator type that has the resources
    * @param resourceType Type of resource to get
-   * @param status Status of the resources to get. If null, resources of any status are returned
+   * @param status Status of the resources to get {@link co.cask.coopr.provisioner.plugin.ResourceStatus}.
+   *               Or null, for resources of any status are returned
    * @return Immutable map of resource name to resource metadata
    */
-  Map<String, Set<ResourceMetaInfo>> getAutomatorTypeResources(String id, String resourceType, String status);
+  Map<String, Set<ResourceMeta>> getAutomatorTypeResources(String id, String resourceType, ResourceStatus status);
 
   /**
    * Retrieves a mapping of all resources of the given type for the given provider type.
@@ -77,10 +79,11 @@ public interface PluginClient {
    *
    * @param id Id of the provider type that has the resources
    * @param resourceType Type of resource to get
-   * @param status Status of the resources to get. If null, resources of any status are returned
+   * @param status Status of the resources to get {@link co.cask.coopr.provisioner.plugin.ResourceStatus}.
+   *               Or null, for resources of any status are returned
    * @return Immutable map of resource name to resource metadata
    */
-  Map<String, Set<ResourceMetaInfo>> getProviderTypeResources(String id, String resourceType, String status);
+  Map<String, Set<ResourceMeta>> getProviderTypeResources(String id, String resourceType, ResourceStatus status);
 
   /**
    * Stage a particular resource version, which means that version of the resource will get pushed to provisioners
@@ -91,7 +94,7 @@ public interface PluginClient {
    * @param resourceName Name of the resource to stage
    * @param version Version of the resource to stage
    */
-  void stageAutomatorTypeModule(String id, String resourceType, String resourceName, String version);
+  void stageAutomatorTypeResource(String id, String resourceType, String resourceName, String version);
 
   /**
    * Stage a particular resource version, which means that version of the resource will get pushed to provisioners
@@ -102,7 +105,7 @@ public interface PluginClient {
    * @param resourceName Name of the resource to stage
    * @param version Version of the resource to stage
    */
-  void stageProviderTypeModule(String id, String resourceType, String resourceName, String version);
+  void stageProviderTypeResource(String id, String resourceType, String resourceName, String version);
 
   /**
    * Recall a particular resource version, which means that version of the resource will get removed from provisioners
@@ -113,7 +116,7 @@ public interface PluginClient {
    * @param resourceName Name of the resource to recall
    * @param version Version of the resource to recall
    */
-  void recallAutomatorTypeModule(String id, String resourceType, String resourceName, String version);
+  void recallAutomatorTypeResource(String id, String resourceType, String resourceName, String version);
 
   /**
    * Recall a particular resource version, which means that version of the resource will get removed from provisioners
@@ -124,7 +127,7 @@ public interface PluginClient {
    * @param resourceName Name of the resource to recall
    * @param version Version of the resource to recall
    */
-  void recallProviderTypeModule(String id, String resourceType, String resourceName, String version);
+  void recallProviderTypeResource(String id, String resourceType, String resourceName, String version);
 
   /**
    * Delete a specific version of the given resource.
