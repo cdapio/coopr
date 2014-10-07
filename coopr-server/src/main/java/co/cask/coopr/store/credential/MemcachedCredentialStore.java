@@ -17,11 +17,7 @@ package co.cask.coopr.store.credential;
 
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
-import co.cask.coopr.common.security.CipherProvider;
-import co.cask.coopr.common.security.Encryptor;
 import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
@@ -32,26 +28,23 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Memcached backed implementation of {@link CredentialStore}. Will store values
+ * Memcached backed implementation of {@link CredentialStore}. Will store values in memcache.
  */
-public class MemcachedCredentialStore implements CredentialStore {
+public class MemcachedCredentialStore extends EncryptedCredentialStore {
   private static final Logger LOG  = LoggerFactory.getLogger(MemcachedCredentialStore.class);
-  private static final Gson GSON = new Gson();
   private final MemcachedClient client;
   private final int ttlSeconds;
   private final int timeoutSeconds;
-  private final Encryptor encryptor;
 
   @Inject
   private MemcachedCredentialStore(Configuration conf) throws IOException, GeneralSecurityException,
     DecoderException {
+    super(conf);
     String addresses = conf.get(Constants.MemcachedCredentialStore.ADDRESSES);
     Preconditions.checkArgument(addresses != null && !addresses.isEmpty(),
                                 Constants.MemcachedCredentialStore.ADDRESSES + " must be specified.");
@@ -66,23 +59,11 @@ public class MemcachedCredentialStore implements CredentialStore {
     this.ttlSeconds = ttlSeconds;
     this.timeoutSeconds = conf.getInt(Constants.MemcachedCredentialStore.TIMEOUT,
                                       Constants.MemcachedCredentialStore.DEFAULT_TIMEOUT);
-
-    CipherProvider cipherProvider = CipherProvider.builder()
-      .setTransformation(conf.get(Constants.MemcachedCredentialStore.ENCRYPT_TRANSFORMATION))
-      .setIVHex(conf.get(Constants.MemcachedCredentialStore.ENCRYPT_IV_HEX))
-      .setKeystorePath(conf.get(Constants.MemcachedCredentialStore.KEYSTORE_PATH))
-      .setKeystorePassword(conf.get(Constants.MemcachedCredentialStore.KEYSTORE_PASSWORD))
-      .setKeystoreType(conf.get(Constants.MemcachedCredentialStore.KEYSTORE_TYPE))
-      .setKeyAlias(conf.get(Constants.MemcachedCredentialStore.KEY_ALIAS))
-      .setKeyPassword(conf.get(Constants.MemcachedCredentialStore.KEY_PASSWORD))
-      .build();
-    this.encryptor = new Encryptor(cipherProvider);
   }
 
   @Override
-  public void set(String tenantId, String clusterId, Map<String, String> fields) throws IOException {
+  void setValue(String tenantId, String clusterId, byte[] val) throws IOException {
     try {
-      byte[] val = encryptor.encryptAndEncodeString(GSON.toJson(fields));
       OperationFuture<Boolean> future = client.set(getKey(tenantId, clusterId), ttlSeconds, val);
       if (!future.get(timeoutSeconds, TimeUnit.SECONDS)) {
         throw new IOException("Unable to set credentials");
@@ -95,19 +76,12 @@ public class MemcachedCredentialStore implements CredentialStore {
   }
 
   @Override
-  public Map<String, String> get(String tenantId, String clusterId) throws IOException {
+  byte[] getValue(String tenantId, String clusterId) throws IOException {
     // to prevent continuous retries if the memcache server is down
     // Try to get a value, for up to 5 seconds, and cancel if it doesn't return
-    Map<String, String> result = Collections.emptyMap();
     Future<Object> f = client.asyncGet(getKey(tenantId, clusterId));
     try {
-      byte[] resultBytes = (byte[]) f.get(timeoutSeconds, TimeUnit.SECONDS);
-      // if there are no values, return an empty map.
-      if (resultBytes == null) {
-        return result;
-      }
-      String resultStr = encryptor.decodeAndDecryptString(resultBytes);
-      return GSON.fromJson(resultStr, new TypeToken<Map<String, String>>() {}.getType());
+      return (byte[]) f.get(timeoutSeconds, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
       LOG.error("Timed out after {} seconds getting credentials for tenant {} and cluster {} from memcache.",
                 timeoutSeconds, tenantId, clusterId, e);
@@ -134,5 +108,15 @@ public class MemcachedCredentialStore implements CredentialStore {
   private String getKey(String tenantId, String clusterId) {
     // tenant is a UUID so concatenating like this is guaranteed to be unique.
     return tenantId + "." + clusterId;
+  }
+
+  @Override
+  protected void startUp() throws Exception {
+    // No-op
+  }
+
+  @Override
+  protected void shutDown() throws Exception {
+    // No-op
   }
 }

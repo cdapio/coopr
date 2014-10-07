@@ -87,20 +87,28 @@ public class JobPlannerTest {
 
   @Test
   public void testCreateTaskDag() {
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION));
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION));
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1", "s2"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3),
@@ -166,20 +174,28 @@ public class JobPlannerTest {
 
   @Test
   public void testPlannerObeysNodesToPlanSet() {
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION));
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION));
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1", "s2"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3),
@@ -254,27 +270,35 @@ public class JobPlannerTest {
 
   @Test
   public void testAddServicesPlan() {
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1", "s2"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1),
@@ -359,63 +383,39 @@ public class JobPlannerTest {
 
   @Test
   public void testAddServicesDoesNotInstallDependentServices() {
-    Service s1 =  new Service("s1", "",
-                              new ServiceDependencies(
-                                ImmutableSet.<String>of(),
-                                ImmutableSet.<String>of(),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of()
-                                ),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of()
-                                )
-                              ),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s2 =  new Service("s2", "",
-                              new ServiceDependencies(
-                                ImmutableSet.<String>of(),
-                                ImmutableSet.<String>of(),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of("s1"),
-                                  ImmutableSet.<String>of()
-                                ),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of()
-                                )
-                              ),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s3 =  new Service("s3", "",
-                              new ServiceDependencies(
-                                ImmutableSet.<String>of(),
-                                ImmutableSet.<String>of(),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of("s2", "s1")
-                                ),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of()
-                                )
-                              ),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(
+        ServiceDependencies.builder().setInstallDependencies(
+          new ServiceStageDependencies(ImmutableSet.<String>of("s1"), null)).build())
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(
+        ServiceDependencies.builder().setInstallDependencies(
+          new ServiceStageDependencies(null, ImmutableSet.<String>of("s2", "s1"))).build())
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1, s2, s3),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
 
@@ -443,63 +443,42 @@ public class JobPlannerTest {
 
   @Test
   public void test1NodeDependencyOrdering() {
-    Service s1 =  new Service("s1", "",
-                              new ServiceDependencies(
-                                ImmutableSet.<String>of(),
-                                ImmutableSet.<String>of(),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of()
-                                ),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of()
-                                )
-                              ),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s2 =  new Service("s2", "",
-                              new ServiceDependencies(
-                                ImmutableSet.<String>of(),
-                                ImmutableSet.<String>of(),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of("s1"),
-                                  ImmutableSet.<String>of()
-                                ),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of()
-                                )
-                              ),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s3 =  new Service("s3", "",
-                              new ServiceDependencies(
-                                ImmutableSet.<String>of(),
-                                ImmutableSet.<String>of(),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of("s2", "s1")
-                                ),
-                                new ServiceStageDependencies(
-                                  ImmutableSet.<String>of(),
-                                  ImmutableSet.<String>of("s1", "s2")
-                                )
-                              ),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.INITIALIZE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
+
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(
+        ServiceDependencies.builder().setInstallDependencies(
+          new ServiceStageDependencies(ImmutableSet.<String>of("s1"), null)).build())
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(
+        ServiceDependencies.builder()
+          .setInstallDependencies(new ServiceStageDependencies(null, ImmutableSet.<String>of("s2", "s1")))
+          .setRuntimeDependencies(new ServiceStageDependencies(null, ImmutableSet.<String>of("s1", "s2")))
+          .build())
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.INITIALIZE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1, s2, s3),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
 
@@ -573,15 +552,23 @@ public class JobPlannerTest {
 
   @Test
   public void testConfigureTaskDag() {
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION));
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION));
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.CONFIGURE, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1", "s2"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.CONFIGURE, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3),
@@ -606,21 +593,29 @@ public class JobPlannerTest {
 
   @Test
   public void testConfigureWithRestartTaskDag() {
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.INSTALL, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.CONFIGURE, CHEF_ACTION,
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1", "s2"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.CONFIGURE, CHEF_ACTION,
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3),
@@ -680,18 +675,26 @@ public class JobPlannerTest {
 
   @Test
   public void testStopServiceTaskDag() {
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1", "s2"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3),
@@ -743,18 +746,26 @@ public class JobPlannerTest {
 
   @Test
   public void testStartServiceTaskDag() {
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1", "s2"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3),
@@ -808,18 +819,26 @@ public class JobPlannerTest {
 
   @Test
   public void testRestartServiceTaskDag() {
-    Service s1 =  new Service("s1", "", ImmutableSet.<String>of(),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s2 =  new Service("s2", "", ImmutableSet.<String>of("s1"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
-    Service s3 =  new Service("s3", "", ImmutableSet.<String>of("s1", "s2"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                                ProvisionerAction.START, CHEF_ACTION,
-                                ProvisionerAction.STOP, CHEF_ACTION));
+    Service s1 = Service.builder()
+      .setName("s1")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s2 = Service.builder()
+      .setName("s2")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
+    Service s3 = Service.builder()
+      .setName("s3")
+      .setDependencies(ServiceDependencies.runtimeRequires("s1", "s2"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.START, CHEF_ACTION,
+        ProvisionerAction.STOP, CHEF_ACTION))
+      .build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1, s2, s3),
@@ -882,7 +901,7 @@ public class JobPlannerTest {
 
   @Test
   public void testNoEdgeNodesInDag() {
-    Service s1 = new Service("s1", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service s1 = Service.builder().setName("s1").build();
     Node node1 = new Node("node1", "1", ImmutableSet.<Service>of(s1),
                           NodeProperties.builder().setHostname("host1").addIPAddress("access_v4", "ip1").build());
     Node node2 = new Node("node2", "1", ImmutableSet.<Service>of(s1),

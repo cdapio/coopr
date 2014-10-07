@@ -22,10 +22,8 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
-import co.cask.coopr.spec.template.Administration;
+import co.cask.coopr.spec.service.ServiceDependencies;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Compatibilities;
@@ -66,12 +64,16 @@ public class BaseSolverTest extends BaseTest {
 
     Set<String> services = ImmutableSet.of("namenode", "datanode", "resourcemanager", "nodemanager",
                                            "hbasemaster", "regionserver", "zookeeper", "reactor");
-    reactorTemplate = new ClusterTemplate(
-      "reactor-medium",
-      "medium reactor cluster template",
-      new ClusterDefaults(services, "joyent", null, null, null, Entities.ClusterTemplateExample.clusterConf),
-      new Compatibilities(null, null, services),
-      new Constraints(
+    reactorTemplate = ClusterTemplate.builder()
+      .setName("reactor-medium")
+      .setDescription("medium reactor cluster template")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setServices(services)
+          .setProvider("joyent")
+          .setConfig(Entities.ClusterTemplateExample.clusterConf).build())
+      .setCompatibilities(Compatibilities.builder().setServices(services).build())
+      .setConstraints(new Constraints(
         ImmutableMap.<String, ServiceConstraint>of(
           "namenode",
           new ServiceConstraint(
@@ -104,9 +106,7 @@ public class BaseSolverTest extends BaseTest {
           )
         ),
         SizeConstraint.EMPTY
-      ),
-      Administration.EMPTY_ADMINISTRATION
-    );
+      )).build();
     reactorTemplate2 = Entities.ClusterTemplateExample.REACTOR2;
 
     EntityStoreView adminView = entityStoreService.getView(account);
@@ -160,23 +160,33 @@ public class BaseSolverTest extends BaseTest {
       )
     );
     // create services
-    namenode = new Service("namenode", "", ImmutableSet.<String>of(),
-                           ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    datanode = new Service("datanode", "", ImmutableSet.<String>of("namenode"),
-                           ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    resourcemanager = new Service("resourcemanager", "", ImmutableSet.<String>of("datanode"),
-                                  ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    nodemanager = new Service("nodemanager", "", ImmutableSet.<String>of("resourcemanager"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    hbasemaster = new Service("hbasemaster", "", ImmutableSet.<String>of("datanode"),
-                              ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    regionserver = new Service("regionserver", "", ImmutableSet.<String>of("hbasemaster"),
-                               ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    zookeeper = new Service("zookeeper", "", ImmutableSet.<String>of(),
-                            ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    reactor = new Service("reactor", "", ImmutableSet.<String>of("zookeeper", "regionserver", "nodemanager"),
-                          ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    mysql = new Service("mysql", "", ImmutableSet.<String>of(), ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    namenode = Service.builder().setName("namenode").build();
+    datanode = Service.builder()
+      .setName("datanode")
+      .setDependencies(ServiceDependencies.runtimeRequires("namenode"))
+      .build();
+    resourcemanager = Service.builder()
+      .setName("resourcemanager")
+      .setDependencies(ServiceDependencies.runtimeRequires("datanode"))
+      .build();
+    nodemanager = Service.builder()
+      .setName("nodemanager")
+      .setDependencies(ServiceDependencies.runtimeRequires("resourcemanager"))
+      .build();
+    hbasemaster = Service.builder()
+      .setName("hbasemaster")
+      .setDependencies(ServiceDependencies.runtimeRequires("datanode"))
+      .build();
+    regionserver = Service.builder()
+      .setName("regionserver")
+      .setDependencies(ServiceDependencies.runtimeRequires("hbasemaster"))
+      .build();
+    zookeeper = Service.builder().setName("zookeeper").build();
+    reactor = Service.builder()
+      .setName("reactor")
+      .setDependencies(ServiceDependencies.runtimeRequires("zookeeper", "regionserver", "nodemanager"))
+      .build();
+    mysql = Service.builder().setName("mysql").build();
     serviceMap = Maps.newHashMap();
     serviceMap.put(namenode.getName(), namenode);
     serviceMap.put(datanode.getName(), datanode);

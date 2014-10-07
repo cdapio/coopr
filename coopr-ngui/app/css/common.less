@@ -125,9 +125,20 @@ body div.progress {
 
 
 
-.coopr-constraint-group {
+.coopr-control-group {
   .clearfix();
+
+  position: relative;
+  margin-bottom: 10px;
+  margin-right: 36px;
+
+  padding: 9px 10px 5px;
   border: 1px solid @gray-lighter;
-  padding: 6px 9px 1px;
-  margin-bottom: 2px;
+
+  p.remove {
+      position: absolute;
+      right: -36px;
+      top: 0;
+  }
+
 }

@@ -15,6 +15,8 @@
  */
 package co.cask.coopr.store.credential;
 
+import com.google.common.util.concurrent.Service;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -22,7 +24,7 @@ import java.util.Map;
  * Credential store for getting, setting, and wiping sensitive information such as user credentials. Implementations
  * should not persist any data to disk. All fields are stored as a single entity for a cluster in a tenant.
  */
-public interface CredentialStore {
+public interface CredentialStore extends Service {
 
   /**
    * Set fields for the given tenant and cluster.
@@ -32,7 +34,7 @@ public interface CredentialStore {
    * @param fields Fields to set
    * @throws IOException if there was an exception setting the fields
    */
-  void set(String tenantId, String clusterId, Map<String, String> fields) throws IOException;
+  void set(String tenantId, String clusterId, Map<String, Object> fields) throws IOException;
 
   /**
    * Get the fields for the given tenant and cluster. Returns an empty map if no fields exist.
@@ -42,7 +44,7 @@ public interface CredentialStore {
    * @return fields for the tenant and cluster
    * @throws IOException if there was an exception getting the fields
    */
-  Map<String, String> get(String tenantId, String clusterId) throws IOException;
+  Map<String, Object> get(String tenantId, String clusterId) throws IOException;
 
   /**
    * Wipe out the fields for the tenant and cluster.

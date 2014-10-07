@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2014 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,29 @@
  * limitations under the License.
  */
 
+package co.cask.coopr.store.credential;
+
+import org.junit.BeforeClass;
+
 /**
- * Codecs for converting older versions of objects to their current versions.
+ *
  */
-package co.cask.coopr.codec.json.upgrade;
+public class InProcessCredentialStoreTest extends CredentialStoreTest {
+  private static InProcessCredentialStore store;
+
+  @BeforeClass
+  public static void setupClass() {
+    store = new InProcessCredentialStore();
+    store.startAndWait();
+  }
+
+  @Override
+  protected CredentialStore getRunningStore() {
+    return store;
+  }
+
+  @Override
+  protected void wipeStore() throws Exception {
+    store.wipe();
+  }
+}

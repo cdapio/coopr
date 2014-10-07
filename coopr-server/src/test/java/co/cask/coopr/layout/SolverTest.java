@@ -19,16 +19,12 @@ import co.cask.coopr.Entities;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.http.request.ClusterCreateRequest;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.spec.service.ServiceDependencies;
 import co.cask.coopr.spec.service.ServiceStageDependencies;
-import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Compatibilities;
-import co.cask.coopr.spec.template.Constraints;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMap;
@@ -37,12 +33,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,27 +64,22 @@ public class SolverTest extends BaseSolverTest {
   @Test(expected = IllegalArgumentException.class)
   public void testConflictingServicesThrowsException() throws Exception {
     Set<String> services = ImmutableSet.of("myapp-1");
-    ClusterTemplate template = new ClusterTemplate(
-      "name", "description",
-      new ClusterDefaults(services, "joyent", null, null, null, Entities.ClusterTemplateExample.clusterConf),
-      new Compatibilities(null, null, ImmutableSet.<String>of("myapp-1", "myapp-2")),
-      Constraints.EMPTY_CONSTRAINTS,
-      Administration.EMPTY_ADMINISTRATION
-    );
-    Service myapp1 = new Service("myapp-1",
-                                 "my app v1",
-                                 new ServiceDependencies(
-                                   ImmutableSet.<String>of("myapp"),
-                                   ImmutableSet.<String>of("myapp-2"),
-                                   null, null),
-                                 ImmutableMap.<ProvisionerAction, ServiceAction>of());
-    Service myapp2 = new Service("myapp-2",
-                                 "my app v2",
-                                 new ServiceDependencies(
-                                   ImmutableSet.<String>of("myapp"),
-                                   ImmutableSet.<String>of("myapp-1"),
-                                   null, null),
-                                 ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    ClusterTemplate template = ClusterTemplate.builder()
+      .setName("name")
+      .setClusterDefaults(ClusterDefaults.builder()
+                            .setServices(services)
+                            .setProvider("joyent")
+                            .setConfig(Entities.ClusterTemplateExample.clusterConf).build())
+      .setCompatibilities(Compatibilities.builder().setServices("myapp-1", "myapp-2").build())
+      .build();
+    Service myapp1 = Service.builder()
+      .setName("myapp-1")
+      .setDependencies(ServiceDependencies.builder().setProvides("myapp").setConflicts("myapp-2").build())
+      .build();
+    Service myapp2 = Service.builder()
+      .setName("myapp-2")
+      .setDependencies(ServiceDependencies.builder().setProvides("myapp").setConflicts("myapp-1").build())
+      .build();
     entityStoreService.getView(account).writeService(myapp1);
     entityStoreService.getView(account).writeService(myapp2);
     Cluster cluster = getBaseBuilder()
@@ -103,43 +92,31 @@ public class SolverTest extends BaseSolverTest {
   @Test
   public void testUsesDoesNotForceDependencyOnCluster() throws Exception {
     Set<String> services = ImmutableSet.of("service1");
-    ClusterTemplate template = new ClusterTemplate(
-      "name", "description",
-      new ClusterDefaults(services, "joyent", null, null, null, Entities.ClusterTemplateExample.clusterConf),
-      new Compatibilities(null, null, ImmutableSet.<String>of("service1", "service2", "service3")),
-      Constraints.EMPTY_CONSTRAINTS,
-      Administration.EMPTY_ADMINISTRATION
-    );
-    Service service1 = new Service("service1",
-                                   "my service1",
-                                   ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES,
-                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    ClusterTemplate template = ClusterTemplate.builder()
+      .setName("name")
+      .setClusterDefaults(ClusterDefaults.builder()
+                            .setServices(services)
+                            .setProvider("joyent")
+                            .setConfig(Entities.ClusterTemplateExample.clusterConf).build())
+      .setCompatibilities(Compatibilities.builder().setServices("service1", "service2", "service3").build())
+      .build();
+    Service service1 = Service.builder().setName("service1").build();
     // service2 uses service 1 at install time
-    Service service2 = new Service("service2",
-                                   "my service2",
-                                   new ServiceDependencies(
-                                     null,
-                                     null,
-                                     new ServiceStageDependencies(
-                                       ImmutableSet.<String>of(),
-                                       ImmutableSet.<String>of("service1")
-                                     ),
-                                     null
-                                   ),
-                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service service2 = Service.builder()
+      .setName("service2")
+      .setDependencies(
+        ServiceDependencies.builder()
+          .setInstallDependencies(new ServiceStageDependencies(null, ImmutableSet.<String>of("service1")))
+          .build())
+      .build();
     // service 3 uses service 1 at runtime
-    Service service3 = new Service("service3",
-                                   "my service3",
-                                   new ServiceDependencies(
-                                     null,
-                                     null,
-                                     null,
-                                     new ServiceStageDependencies(
-                                       ImmutableSet.<String>of(),
-                                       ImmutableSet.<String>of("service1")
-                                     )
-                                   ),
-                                   ImmutableMap.<ProvisionerAction, ServiceAction>of());
+    Service service3 = Service.builder()
+      .setName("service3")
+      .setDependencies(
+        ServiceDependencies.builder()
+          .setRuntimeDependencies(new ServiceStageDependencies(null, ImmutableSet.<String>of("service1")))
+          .build())
+      .build();
     entityStoreService.getView(account).writeService(service1);
     entityStoreService.getView(account).writeService(service2);
     entityStoreService.getView(account).writeService(service3);
@@ -226,24 +203,19 @@ public class SolverTest extends BaseSolverTest {
 
   @Test
   public void testRequiredTypes() throws Exception {
-    ClusterTemplate simpleTemplate =
-      new ClusterTemplate(
-        "simple", "description",
-        new ClusterDefaults(
-          ImmutableSet.of("namenode", "datanode"),
-          "joyent",
-          "medium",
-          "ubuntu12",
-          null,
-          new JsonObject()
-        ),
-        new Compatibilities(
-          ImmutableSet.<String>of("small", "medium", "large-mem"),
-          ImmutableSet.<String>of("centos6", "ubuntu12"),
-          ImmutableSet.<String>of("namenode", "datanode")
-        ),
-        Constraints.EMPTY_CONSTRAINTS, null
-      );
+    ClusterTemplate simpleTemplate = ClusterTemplate.builder()
+      .setName("simple")
+      .setClusterDefaults(ClusterDefaults.builder()
+                            .setServices(ImmutableSet.of("namenode", "datanode"))
+                            .setProvider("joyent")
+                            .setHardwaretype("medium")
+                            .setImagetype("ubuntu12")
+                            .build())
+      .setCompatibilities(Compatibilities.builder()
+                            .setHardwaretypes("small", "medium", "large-mem")
+                            .setImagetypes("centos6", "ubuntu12")
+                            .setServices("namenode", "datanode").build())
+      .build();
     entityStoreService.getView(account).writeClusterTemplate(simpleTemplate);
 
     // check required hardware types
@@ -328,8 +300,7 @@ public class SolverTest extends BaseSolverTest {
       ImmutableSet.of("firewall", "hosts", "namenode", "datanode", "nodemanager", "resourcemanager");
     Map<String, Service> serviceMap = Maps.newHashMap();
     for (String service : services) {
-      serviceMap.put(service, new Service(service, "", Collections.<String>emptySet(),
-                                          Collections.<ProvisionerAction, ServiceAction>emptyMap()));
+      serviceMap.put(service, Service.builder().setName(service).build());
     }
 
     Map<String, Node> nodes = Solver.solveConstraints("1", template, "name", 3,
@@ -366,8 +337,7 @@ public class SolverTest extends BaseSolverTest {
     Set<String> services = reactorTemplate2.getClusterDefaults().getServices();
     Map<String, Service> serviceMap = Maps.newHashMap();
     for (String serviceName : services) {
-      serviceMap.put(serviceName, new Service(serviceName, "", ImmutableSet.<String>of(),
-                                              ImmutableMap.<ProvisionerAction, ServiceAction>of()));
+      serviceMap.put(serviceName, Service.builder().setName(serviceName).build());
     }
     Map<String, Node> nodes = Solver.solveConstraints("1", reactorTemplate2, "name", 200,
                                                       hwmap, imgmap, services, serviceMap, null);

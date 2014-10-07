@@ -22,11 +22,13 @@ import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.GroupElement;
 import co.cask.coopr.common.queue.QueueGroup;
 import co.cask.coopr.common.queue.TrackingQueue;
+import co.cask.coopr.scheduler.callback.CallbackContext;
 import co.cask.coopr.scheduler.callback.CallbackData;
 import co.cask.coopr.scheduler.callback.ClusterCallback;
 import co.cask.coopr.scheduler.task.ClusterJob;
 import co.cask.coopr.scheduler.task.TaskService;
 import co.cask.coopr.store.cluster.ClusterStoreService;
+import co.cask.coopr.store.user.UserStore;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.gson.Gson;
@@ -47,6 +49,8 @@ public class CallbackScheduler implements Runnable {
   private final ClusterCallback clusterCallback;
   private final ListeningExecutorService executorService;
   private final TaskService taskService;
+  private final ClusterStoreService clusterStoreService;
+  private final UserStore userStore;
   private final Gson gson;
   private final QueueGroup callbackQueues;
   private final QueueGroup jobQueues;
@@ -58,6 +62,7 @@ public class CallbackScheduler implements Runnable {
                             ClusterCallback clusterCallback,
                             Configuration conf,
                             ClusterStoreService clusterStoreService,
+                            UserStore userStore,
                             Gson gson,
                             @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
                             @Named(Constants.Queue.JOB) QueueGroup jobQueues) {
@@ -65,10 +70,12 @@ public class CallbackScheduler implements Runnable {
     this.executorService = executorService;
     this.taskService = taskService;
     this.clusterCallback = clusterCallback;
-    this.clusterCallback.initialize(conf, clusterStoreService);
+    this.clusterCallback.initialize(conf);
     this.gson = gson;
     this.callbackQueues = callbackQueues;
     this.jobQueues = jobQueues;
+    this.clusterStoreService = clusterStoreService;
+    this.userStore = userStore;
   }
 
   @Override
@@ -109,26 +116,28 @@ public class CallbackScheduler implements Runnable {
     @Override
     public void run() {
       CallbackData callbackData = gson.fromJson(gElement.getElement().getValue(), CallbackData.class);
+      CallbackContext callbackContext =
+        new CallbackContext(clusterStoreService, userStore, callbackData.getCluster().getAccount());
       switch (callbackData.getType()) {
         case START:
-          onStart(callbackData);
+          onStart(callbackData, callbackContext);
           break;
         case SUCCESS:
-          clusterCallback.onSuccess(callbackData);
+          clusterCallback.onSuccess(callbackData, callbackContext);
           break;
         case FAILURE:
-          clusterCallback.onFailure(callbackData);
+          clusterCallback.onFailure(callbackData, callbackContext);
           break;
         default:
           LOG.error("Unknown callback type {}", callbackData.getType());
       }
     }
 
-    private void onStart(CallbackData callbackData) {
+    private void onStart(CallbackData callbackData, CallbackContext callbackContext) {
       ClusterJob job = callbackData.getJob();
       Cluster cluster = callbackData.getCluster();
       try {
-        if (clusterCallback.onStart(callbackData)) {
+        if (clusterCallback.onStart(callbackData, callbackContext)) {
           String jobId = callbackData.getJob().getJobId();
           jobQueues.add(gElement.getQueueName(), new Element(jobId));
           LOG.debug("added job {} to job queue", jobId);

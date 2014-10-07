@@ -23,7 +23,7 @@ import java.util.Set;
  * Instead, the admin would have to configure "yourapp" to conflict with "myapp-1.0", "myapp-1.1", and "myapp-2.0".
  */
 public class ServiceDependencies {
-  public static final ServiceDependencies EMPTY_SERVICE_DEPENDENCIES = new ServiceDependencies(null, null, null, null);
+  public static final ServiceDependencies EMPTY_SERVICE_DEPENDENCIES = new Builder().build();
   private final Set<String> provides;
   private final Set<String> conflicts;
   private final ServiceStageDependencies install;
@@ -31,12 +31,12 @@ public class ServiceDependencies {
   // for convenience, this stores a union of the install and runtime requirements. Field is not serialized.
   private final Set<String> requiredServices;
 
-  public ServiceDependencies(Set<String> provides, Set<String> conflicts, ServiceStageDependencies install,
-                             ServiceStageDependencies runtime) {
-    this.provides = provides == null ? ImmutableSet.<String>of() : provides;
-    this.conflicts = conflicts == null ? ImmutableSet.<String>of() : conflicts;
-    this.install = install == null ? ServiceStageDependencies.EMPTY_SERVICE_STAGE_DEPENDENCIES : install;
-    this.runtime = runtime == null ? ServiceStageDependencies.EMPTY_SERVICE_STAGE_DEPENDENCIES : runtime;
+  private ServiceDependencies(Set<String> provides, Set<String> conflicts, ServiceStageDependencies install,
+                              ServiceStageDependencies runtime) {
+    this.provides = provides;
+    this.conflicts = conflicts;
+    this.install = install;
+    this.runtime = runtime;
     this.requiredServices = Sets.union(this.install.getRequires(), this.runtime.getRequires());
   }
 
@@ -83,6 +83,74 @@ public class ServiceDependencies {
    */
   public Set<String> getRequiredServices() {
     return requiredServices;
+  }
+
+  /**
+   * Get a builder for creating service dependencies.
+   *
+   * @return Builder for creating service dependencies.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Create service dependencies that only have runtime required dependencies.
+   *
+   * @param runtimeDependencies Names of services that are required at runtime.
+   * @return Service dependencies with only runtime required dependencies.
+   */
+  public static ServiceDependencies runtimeRequires(String... runtimeDependencies) {
+    Set<String> provides = ImmutableSet.of();
+    Set<String> conflicts = ImmutableSet.of();
+    ServiceStageDependencies install = ServiceStageDependencies.EMPTY_SERVICE_STAGE_DEPENDENCIES;
+    ServiceStageDependencies runtime =
+      new ServiceStageDependencies(ImmutableSet.copyOf(runtimeDependencies), ImmutableSet.<String>of());
+    return new ServiceDependencies(provides, conflicts, install, runtime);
+  }
+
+  /**
+   * Builder for creating service dependencies.
+   */
+  public static class Builder {
+    private Set<String> provides = ImmutableSet.of();
+    private Set<String> conflicts = ImmutableSet.of();
+    private ServiceStageDependencies install = ServiceStageDependencies.EMPTY_SERVICE_STAGE_DEPENDENCIES;
+    private ServiceStageDependencies runtime = ServiceStageDependencies.EMPTY_SERVICE_STAGE_DEPENDENCIES;
+
+    public Builder setProvides(Set<String> provides) {
+      this.provides = ImmutableSet.copyOf(provides);
+      return this;
+    }
+
+    public Builder setProvides(String... provides) {
+      this.provides = ImmutableSet.copyOf(provides);
+      return this;
+    }
+
+    public Builder setConflicts(Set<String> conflicts) {
+      this.conflicts = ImmutableSet.copyOf(conflicts);
+      return this;
+    }
+
+    public Builder setConflicts(String... conflicts) {
+      this.conflicts = ImmutableSet.copyOf(conflicts);
+      return this;
+    }
+
+    public Builder setInstallDependencies(ServiceStageDependencies install) {
+      this.install = install == null ? ServiceStageDependencies.EMPTY_SERVICE_STAGE_DEPENDENCIES : install;
+      return this;
+    }
+
+    public Builder setRuntimeDependencies(ServiceStageDependencies runtime) {
+      this.runtime = runtime == null ? ServiceStageDependencies.EMPTY_SERVICE_STAGE_DEPENDENCIES : runtime;
+      return this;
+    }
+
+    public ServiceDependencies build() {
+      return new ServiceDependencies(provides, conflicts, install, runtime);
+    }
   }
 
   @Override

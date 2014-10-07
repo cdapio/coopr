@@ -19,9 +19,9 @@ import co.cask.coopr.spec.NamedIconEntity;
 import co.cask.coopr.spec.ProvisionerAction;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A service defines a set of services it is dependent on, as well as a mapping of
@@ -33,26 +33,12 @@ public final class Service extends NamedIconEntity {
   private final ServiceDependencies dependencies;
   private final Map<ProvisionerAction, ServiceAction> provisionerActions;
 
-  public Service(String name, String logolink, String description, ServiceDependencies dependencies,
-                 Map<ProvisionerAction, ServiceAction> provisionerActions) {
+  private Service(String name, String logolink, String description, ServiceDependencies dependencies,
+                  Map<ProvisionerAction, ServiceAction> provisionerActions) {
     super(name, logolink);
-    Preconditions.checkArgument(provisionerActions != null, "service must contain provisioner actions");
     this.description = description;
-    this.dependencies = dependencies == null ? ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES : dependencies;
+    this.dependencies = dependencies;
     this.provisionerActions = provisionerActions;
-  }
-
-  // TODO: put in a builder so we dont need multiple constructors for optional fields
-  public Service(String name, String description, ServiceDependencies dependencies,
-                 Map<ProvisionerAction, ServiceAction> provisionerActions) {
-    this(name, null, description, dependencies, provisionerActions);
-  }
-
-  public Service(String name, String description, Set<String> runtimeRequirements,
-                 Map<ProvisionerAction, ServiceAction> provisionerActions) {
-    this(name, null, description,
-         new ServiceDependencies(null, null, null, new ServiceStageDependencies(runtimeRequirements, null)),
-         provisionerActions);
   }
 
   /**
@@ -80,6 +66,55 @@ public final class Service extends NamedIconEntity {
    */
   public Map<ProvisionerAction, ServiceAction> getProvisionerActions() {
     return provisionerActions;
+  }
+
+  /**
+   * Get a builder for creating a service.
+   *
+   * @return Builder for creating a service.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for creating a service.
+   */
+  public static class Builder {
+    private String name;
+    private String icon;
+    private String description = "";
+    private ServiceDependencies dependencies = ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES;
+    private Map<ProvisionerAction, ServiceAction> provisionerActions = ImmutableMap.of();
+
+    public Builder setName(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder setIcon(String icon) {
+      this.icon = icon;
+      return this;
+    }
+
+    public Builder setDescription(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public Builder setDependencies(ServiceDependencies dependencies) {
+      this.dependencies = dependencies;
+      return this;
+    }
+
+    public Builder setProvisionerActions(Map<ProvisionerAction, ServiceAction> actions) {
+      this.provisionerActions = ImmutableMap.copyOf(actions);
+      return this;
+    }
+
+    public Service build() {
+      return new Service(name, icon, description, dependencies, provisionerActions);
+    }
   }
 
   @Override

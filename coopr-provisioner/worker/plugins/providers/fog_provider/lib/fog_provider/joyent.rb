@@ -150,7 +150,7 @@ class FogProviderJoyent < Provider
       begin
         server = connection.servers.get(providerid)
         server.destroy
-      rescue NoMethodError
+      rescue NoMethodError, Fog::Compute::Joyent::Errors::NotFound
         log.warn "Could not locate server '#{providerid}'... skipping"
       else
         sleep 30

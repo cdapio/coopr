@@ -48,13 +48,13 @@ public class CompatibilitiesCodec extends AbstractCodec<Compatibilities> {
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    Set<String> hardwaretypes = context.deserialize(jsonObj.get("hardwaretypes"),
-                                                    new TypeToken<Set<String>>() {}.getType());
-    Set<String> imagetypes = context.deserialize(jsonObj.get("imagetypes"),
-                                                    new TypeToken<Set<String>>() {}.getType());
-    Set<String> services = context.deserialize(jsonObj.get("services"),
-                                                    new TypeToken<Set<String>>() {}.getType());
-
-    return new Compatibilities(hardwaretypes, imagetypes, services);
+    return Compatibilities.builder()
+      .setHardwaretypes(context.<Set<String>>deserialize(jsonObj.get("hardwaretypes"),
+                                                         new TypeToken<Set<String>>() {}.getType()))
+      .setImagetypes(context.<Set<String>>deserialize(jsonObj.get("imagetypes"),
+                                                      new TypeToken<Set<String>>() {}.getType()))
+      .setServices(context.<Set<String>>deserialize(jsonObj.get("services"),
+                                                    new TypeToken<Set<String>>() {}.getType()))
+      .build();
   }
 }

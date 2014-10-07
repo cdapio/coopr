@@ -4,6 +4,8 @@ import co.cask.coopr.BaseTest;
 import co.cask.coopr.Entities;
 import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Cluster;
+import co.cask.coopr.cluster.ClusterService;
+import co.cask.coopr.cluster.MissingFieldsException;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.http.request.AddServicesRequest;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
@@ -22,11 +24,9 @@ import co.cask.coopr.spec.plugin.ParameterType;
 import co.cask.coopr.spec.plugin.ParametersSpecification;
 import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Compatibilities;
-import co.cask.coopr.spec.template.Constraints;
 import co.cask.coopr.store.entity.EntityStoreView;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -99,25 +99,21 @@ public class ClusterServiceTest extends BaseTest {
     entityStoreView.writeImageType(imageType);
     entityStoreView.writeService(service1);
     entityStoreView.writeService(service2);
-    basicTemplate = new ClusterTemplate(
-      "basic",
-      "description",
-      new ClusterDefaults(
-        ImmutableSet.of(service1.getName()),
-        provider.getName(),
-        hardwareType.getName(),
-        imageType.getName(),
-        null,
-        null
-      ),
-      new Compatibilities(
-        ImmutableSet.of(hardwareType.getName()),
-        ImmutableSet.of(imageType.getName()),
-        ImmutableSet.of(service1.getName(), service2.getName())
-      ),
-      Constraints.EMPTY_CONSTRAINTS,
-      Administration.EMPTY_ADMINISTRATION
-    );
+    basicTemplate = ClusterTemplate.builder()
+      .setName("basic")
+      .setClusterDefaults(
+        ClusterDefaults.builder()
+          .setProvider(provider.getName())
+          .setServices(service1.getName())
+          .setHardwaretype(hardwareType.getName())
+          .setImagetype(imageType.getName())
+          .build())
+      .setCompatibilities(
+        Compatibilities.builder()
+          .setHardwaretypes(hardwareType.getName())
+          .setImagetypes(imageType.getName())
+          .setServices(service1.getName(), service2.getName()).build())
+      .build();
     entityStoreView.writeClusterTemplate(basicTemplate);
   }
 
@@ -130,7 +126,7 @@ public class ClusterServiceTest extends BaseTest {
   @Test
   public void testValidClusterCreate() throws Exception {
     String name = "clusty";
-    Map<String, String> providerFields = Maps.newHashMap();
+    Map<String, Object> providerFields = Maps.newHashMap();
     providerFields.put("keyname", "myname");
     providerFields.put("key", "keycontents");
     providerFields.put("region", "dfw");
@@ -154,7 +150,7 @@ public class ClusterServiceTest extends BaseTest {
       "key", "keycontents",
       "url", "internal.net/api"
     );
-    Map<String, String> expectedNonsensitiveFields = ImmutableMap.of(
+    Map<String, Object> expectedNonsensitiveFields = ImmutableMap.<String, Object>of(
       "keyname", "myname",
       "region", "dfw",
       "url", "http://abc.com/api"
@@ -166,7 +162,7 @@ public class ClusterServiceTest extends BaseTest {
   @Test(expected = MissingEntityException.class)
   public void testInvalidProviderClusterCreate() throws Exception {
     String name = "clusty";
-    Map<String, String> providerFields = ImmutableMap.of("keyname", "ec2", "key", "keycontents");
+    Map<String, Object> providerFields = ImmutableMap.<String, Object>of("keyname", "ec2", "key", "keycontents");
     ClusterCreateRequest createRequest = ClusterCreateRequest.builder()
       .setName(name)
       .setClusterTemplateName(basicTemplate.getName())
@@ -180,7 +176,7 @@ public class ClusterServiceTest extends BaseTest {
   @Test(expected = MissingEntityException.class)
   public void testInvalidTemplateClusterCreate() throws Exception {
     String name = "clusty";
-    Map<String, String> providerFields = ImmutableMap.of("keyname", "ec2", "key", "keycontents");
+    Map<String, Object> providerFields = ImmutableMap.<String, Object>of("keyname", "ec2", "key", "keycontents");
     ClusterCreateRequest createRequest = ClusterCreateRequest.builder()
       .setName(name)
       .setClusterTemplateName("not" + basicTemplate.getName())
@@ -194,7 +190,7 @@ public class ClusterServiceTest extends BaseTest {
   public void testClusterConfigure() throws Exception {
     Cluster cluster = createActiveCluster();
 
-    Map<String, String> providerFields = Maps.newHashMap();
+    Map<String, Object> providerFields = Maps.newHashMap();
     providerFields.put("keyname", "somename");
     providerFields.put("key", "somecontents");
     providerFields.put("url", "internal.net/api");
@@ -220,12 +216,12 @@ public class ClusterServiceTest extends BaseTest {
     Cluster cluster = createActiveCluster();
 
     // the "key" user field is required. Should throw an except if its not set.
-    Map<String, String> providerFields = Maps.newHashMap();
+    Map<String, Object> providerFields = Maps.newHashMap();
     ClusterConfigureRequest configureRequest = new ClusterConfigureRequest(providerFields, new JsonObject(), false);
     boolean failed = false;
     try {
       clusterService.requestClusterReconfigure(cluster.getId(), account, configureRequest);
-    } catch (IllegalArgumentException e) {
+    } catch (MissingFieldsException e) {
       // this is expected
       failed = true;
     }
@@ -250,7 +246,7 @@ public class ClusterServiceTest extends BaseTest {
 
   @Test
   public void testSensitiveUserFields() throws Exception {
-    Map<String, String> sensitiveFields = Maps.newHashMap();
+    Map<String, Object> sensitiveFields = Maps.newHashMap();
     sensitiveFields.put("key", "keycontents");
     AddServicesRequest addRequest = new AddServicesRequest(sensitiveFields, ImmutableSet.of(service2.getName()));
     ClusterOperationRequest opRequest = new ClusterOperationRequest(sensitiveFields);
@@ -272,14 +268,14 @@ public class ClusterServiceTest extends BaseTest {
     clusterStore.deleteCluster(cluster.getId());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = MissingFieldsException.class)
   public void testMissingRequestThrowsException() throws Exception {
     Cluster cluster = createActiveCluster();
     clusterService.requestClusterDelete(cluster.getId(), cluster.getAccount(), null);
   }
 
   // test that sensitive user fields were added to the credential store
-  private void testSensitiveFieldsAdded(Cluster cluster, Map<String, String> sensitiveFields) throws Exception {
+  private void testSensitiveFieldsAdded(Cluster cluster, Map<String, Object> sensitiveFields) throws Exception {
     // nonsensitive fields should be everything currently in the provider before we get the updated cluster
     Map<String, Object> expectedNonsensitiveFields = cluster.getProvider().getProvisionerFields();
     // get the updated cluster
@@ -295,7 +291,7 @@ public class ClusterServiceTest extends BaseTest {
   public void testAddServices() throws Exception {
     Cluster cluster = createActiveCluster();
     // add required sensitive user field
-    Map<String, String> sensitiveFields = Maps.newHashMap();
+    Map<String, Object> sensitiveFields = Maps.newHashMap();
     sensitiveFields.put("key", "keycontents");
     AddServicesRequest addServicesRequest =
       new AddServicesRequest(sensitiveFields, ImmutableSet.of(service2.getName()));
@@ -315,7 +311,7 @@ public class ClusterServiceTest extends BaseTest {
   public void testUsesExistingCredentials() throws Exception {
     Cluster cluster = createActiveCluster();
     // add required sensitive user field
-    Map<String, String> sensitiveFields = Maps.newHashMap();
+    Map<String, Object> sensitiveFields = Maps.newHashMap();
     sensitiveFields.put("key", "keycontents");
     credentialStore.set(account.getTenantId(), cluster.getId(), sensitiveFields);
 

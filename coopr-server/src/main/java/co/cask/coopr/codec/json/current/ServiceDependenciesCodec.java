@@ -55,6 +55,11 @@ public class ServiceDependenciesCodec extends AbstractCodec<ServiceDependencies>
     ServiceStageDependencies install = context.deserialize(jsonObj.get("install"), ServiceStageDependencies.class);
     ServiceStageDependencies runtime = context.deserialize(jsonObj.get("runtime"), ServiceStageDependencies.class);
 
-    return new ServiceDependencies(provides, conflicts, install, runtime);
+    return ServiceDependencies.builder()
+      .setProvides(provides)
+      .setConflicts(conflicts)
+      .setInstallDependencies(install)
+      .setRuntimeDependencies(runtime)
+      .build();
   }
 }

@@ -23,7 +23,7 @@ import co.cask.coopr.cluster.Node;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.http.ServiceTestBase;
 import co.cask.coopr.scheduler.task.ClusterJob;
-import co.cask.coopr.scheduler.task.ClusterService;
+import co.cask.coopr.cluster.ClusterService;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.scheduler.task.NodeService;

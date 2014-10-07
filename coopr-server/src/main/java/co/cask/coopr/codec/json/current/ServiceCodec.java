@@ -68,6 +68,12 @@ public class ServiceCodec extends AbstractCodec<Service> {
                                    new TypeToken<Map<ProvisionerAction, ServiceAction>>(){}.getType());
     }
 
-    return new Service(name, icon, description, dependencies, actions);
+    return Service.builder()
+      .setName(name)
+      .setIcon(icon)
+      .setDescription(description)
+      .setDependencies(dependencies)
+      .setProvisionerActions(actions)
+      .build();
   }
 }

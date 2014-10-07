@@ -16,6 +16,7 @@
 package co.cask.coopr.spec.plugin;
 
 import co.cask.coopr.BaseTest;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -84,7 +85,7 @@ public class ProviderTypeTest extends BaseTest {
     );
     Map<String, String> expectedSensitive = ImmutableMap.of("key", "keycontents", "url", "abc.com/api");
     Map<String, String> expectedNonsensitive = ImmutableMap.of("keyname", "dev", "region", "iad");
-    Map<String, String> input = Maps.newHashMap();
+    Map<String, Object> input = Maps.newHashMap();
     input.putAll(expectedSensitive);
     input.putAll(expectedNonsensitive);
     // should get ignored, not an overridable admin field
@@ -98,7 +99,7 @@ public class ProviderTypeTest extends BaseTest {
   }
 
   @Test
-  public void testRequiredFields() throws IOException {
+  public void testGetMissingFields() throws IOException {
     // 3 admin fields a1, a2, a3. One of { a1 }, { a2, a3 }, { a1, a3 } must be present.
     // 3 user fields u1, u2, u3. All are optional.
     ProviderType providerType = new ProviderType(
@@ -128,13 +129,24 @@ public class ProviderTypeTest extends BaseTest {
       null
     );
 
-    Assert.assertTrue(providerType.requiredFieldsExist(ParameterType.ADMIN, ImmutableSet.of("a1")));
-    Assert.assertTrue(providerType.requiredFieldsExist(ParameterType.ADMIN, ImmutableSet.of("a2", "a3")));
-    Assert.assertTrue(providerType.requiredFieldsExist(ParameterType.ADMIN, ImmutableSet.of("a1", "a3")));
-    Assert.assertTrue(providerType.requiredFieldsExist(ParameterType.ADMIN, ImmutableSet.of("a1", "a2", "a3")));
-    Assert.assertFalse(providerType.requiredFieldsExist(ParameterType.ADMIN, ImmutableSet.of("a2")));
-    Assert.assertFalse(providerType.requiredFieldsExist(ParameterType.ADMIN, ImmutableSet.of("a3", "a3")));
-    Assert.assertTrue(providerType.requiredFieldsExist(ParameterType.USER, ImmutableSet.<String>of()));
-    Assert.assertTrue(providerType.requiredFieldsExist(ParameterType.USER, ImmutableSet.of("u1")));
+    Assert.assertTrue(providerType.getMissingFields(ParameterType.ADMIN, ImmutableSet.of("a1")).isEmpty());
+    Assert.assertTrue(providerType.getMissingFields(ParameterType.ADMIN, ImmutableSet.of("a2", "a3")).isEmpty());
+    Assert.assertTrue(providerType.getMissingFields(ParameterType.ADMIN, ImmutableSet.of("a1", "a3")).isEmpty());
+    Assert.assertTrue(providerType.getMissingFields(ParameterType.ADMIN, ImmutableSet.of("a1", "a2", "a3")).isEmpty());
+    Assert.assertEquals(
+      ImmutableList.of(
+        ImmutableMap.of("a1", providerType.getParametersSpecification(ParameterType.ADMIN).getFields().get("a1")),
+        ImmutableMap.of("a3", providerType.getParametersSpecification(ParameterType.ADMIN).getFields().get("a3")),
+        ImmutableMap.of("a1", providerType.getParametersSpecification(ParameterType.ADMIN).getFields().get("a1"),
+                        "a3", providerType.getParametersSpecification(ParameterType.ADMIN).getFields().get("a3"))),
+      providerType.getMissingFields(ParameterType.ADMIN, ImmutableSet.of("a2")));
+    Assert.assertEquals(
+      ImmutableList.of(
+        ImmutableMap.of("a1", providerType.getParametersSpecification(ParameterType.ADMIN).getFields().get("a1")),
+        ImmutableMap.of("a2", providerType.getParametersSpecification(ParameterType.ADMIN).getFields().get("a2")),
+        ImmutableMap.of("a1", providerType.getParametersSpecification(ParameterType.ADMIN).getFields().get("a1"))),
+      providerType.getMissingFields(ParameterType.ADMIN, ImmutableSet.of("a3", "a3")));
+    Assert.assertTrue(providerType.getMissingFields(ParameterType.USER, ImmutableSet.<String>of()).isEmpty());
+    Assert.assertTrue(providerType.getMissingFields(ParameterType.USER, ImmutableSet.of("u1")).isEmpty());
   }
 }

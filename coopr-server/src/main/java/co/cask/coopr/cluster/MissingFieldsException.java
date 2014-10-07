@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012-2014 Cask Data, Inc.
+ * Copyright © 2014 Cask Data, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package co.cask.coopr.http.request;
+package co.cask.coopr.cluster;
+
+import co.cask.coopr.spec.plugin.FieldSchema;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * Request for bootstrapping a tenant.
+ * An exception indicating there are required fields that are missing.
  */
-public class BootstrapRequest {
-  private final boolean force;
+public class MissingFieldsException extends Exception {
+  private final List<Map<String, FieldSchema>> missingFields;
 
-  public BootstrapRequest(Boolean force) {
-    this.force = force == null ? false : force;
+  public MissingFieldsException(List<Map<String, FieldSchema>> missingFields) {
+    this.missingFields = missingFields;
   }
 
-  public boolean isForced() {
-    return force;
+  public List<Map<String, FieldSchema>> getMissingFields() {
+    return missingFields;
   }
 }

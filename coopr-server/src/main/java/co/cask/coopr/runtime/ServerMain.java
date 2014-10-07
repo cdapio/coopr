@@ -32,6 +32,7 @@ import co.cask.coopr.provisioner.plugin.ResourceService;
 import co.cask.coopr.scheduler.Scheduler;
 import co.cask.coopr.scheduler.guice.SchedulerModule;
 import co.cask.coopr.store.cluster.ClusterStoreService;
+import co.cask.coopr.store.credential.CredentialStore;
 import co.cask.coopr.store.entity.EntityStoreService;
 import co.cask.coopr.store.guice.StoreModule;
 import co.cask.coopr.store.provisioner.ProvisionerStore;
@@ -80,6 +81,7 @@ public final class ServerMain extends DaemonMain {
   private IdService idService;
   private TenantStore tenantStore;
   private UserStore userStore;
+  private CredentialStore credentialStore;
 
   public static void main(final String[] args) throws Exception {
     new ServerMain().doMain(args);
@@ -158,6 +160,8 @@ public final class ServerMain extends DaemonMain {
       resourceService.startAndWait();
       userStore = injector.getInstance(UserStore.class);
       userStore.startAndWait();
+      credentialStore = injector.getInstance(CredentialStore.class);
+      credentialStore.startAndWait();
 
       // Register MBean
       ServerStats serverStats = injector.getInstance(ServerStats.class);

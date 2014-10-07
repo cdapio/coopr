@@ -27,6 +27,7 @@ import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.service.ServiceAction;
+import co.cask.coopr.spec.service.ServiceDependencies;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -387,30 +388,36 @@ public abstract class EntityStoreServiceTest {
     EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllServices().size());
 
-    Service s1 = new Service("datanode", "hadoop datanode", ImmutableSet.of("namenode"),
-                             ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                               ProvisionerAction.INSTALL,
-                               new ServiceAction("chef-solo", TestHelper.actionMapOf("install recipe", null)),
-                               ProvisionerAction.REMOVE,
-                               new ServiceAction("chef-solo", TestHelper.actionMapOf("remove recipe", "arbitrary data"))
-                             )
-    );
-    Service s2 = new Service("namenode", "hadoop namenode", ImmutableSet.of("hosts"),
-                             ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                               ProvisionerAction.INSTALL,
-                               new ServiceAction("chef-solo", TestHelper.actionMapOf("install recipe", null)),
-                               ProvisionerAction.REMOVE,
-                               new ServiceAction("chef-solo", TestHelper.actionMapOf("remove recipe", "arbitrary data")),
-                               ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef-solo", TestHelper.actionMapOf("configure recipe", null))
-                             )
-    );
-    Service s3 = new Service("hosts", "for managing /etc/hosts", ImmutableSet.<String>of(),
-                             ImmutableMap.<ProvisionerAction, ServiceAction>of(
-                               ProvisionerAction.CONFIGURE,
-                               new ServiceAction("chef-solo", TestHelper.actionMapOf("configure recipe", null))
-                             )
-    );
+    Service s1 = Service.builder()
+      .setName("datanode")
+      .setDependencies(ServiceDependencies.runtimeRequires("namenode"))
+      .setProvisionerActions(
+        ImmutableMap.<ProvisionerAction, ServiceAction>of(
+          ProvisionerAction.INSTALL,
+          new ServiceAction("chef-solo", TestHelper.actionMapOf("install recipe", null)),
+          ProvisionerAction.REMOVE,
+          new ServiceAction("chef-solo", TestHelper.actionMapOf("remove recipe", "arbitrary data"))
+        ))
+      .build();
+    Service s2 = Service.builder()
+      .setName("namenode")
+      .setDependencies(ServiceDependencies.runtimeRequires("hosts"))
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.INSTALL,
+        new ServiceAction("chef-solo", TestHelper.actionMapOf("install recipe", null)),
+        ProvisionerAction.REMOVE,
+        new ServiceAction("chef-solo", TestHelper.actionMapOf("remove recipe", "arbitrary data")),
+        ProvisionerAction.CONFIGURE,
+        new ServiceAction("chef-solo", TestHelper.actionMapOf("configure recipe", null))
+      ))
+      .build();
+    Service s3 = Service.builder()
+      .setName("hosts")
+      .setProvisionerActions(ImmutableMap.<ProvisionerAction, ServiceAction>of(
+        ProvisionerAction.CONFIGURE,
+        new ServiceAction("chef-solo", TestHelper.actionMapOf("configure recipe", null))
+      ))
+      .build();
     List<Service> services = ImmutableList.of(s1, s2, s3);
 
     for (Service service : services) {

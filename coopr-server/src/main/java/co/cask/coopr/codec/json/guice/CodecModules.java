@@ -54,11 +54,6 @@ import co.cask.coopr.codec.json.current.TaskConfigCodec;
 import co.cask.coopr.codec.json.current.TenantCodec;
 import co.cask.coopr.codec.json.current.TenantSpecificationCodec;
 import co.cask.coopr.codec.json.current.TenantWriteRequestCodec;
-import co.cask.coopr.codec.json.upgrade.ClusterUpgradeCodec;
-import co.cask.coopr.codec.json.upgrade.NodeUpgradeCodec;
-import co.cask.coopr.codec.json.upgrade.ProviderUpgradeCodec;
-import co.cask.coopr.codec.json.upgrade.ServiceActionUpgradeCodec;
-import co.cask.coopr.codec.json.upgrade.ServiceUpgradeCodec;
 import co.cask.coopr.http.request.AddServicesRequest;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
 import co.cask.coopr.http.request.ClusterCreateRequest;
@@ -112,29 +107,6 @@ public class CodecModules {
       @Override
       protected void configure() {
         bind(Gson.class).toInstance(createCurrentBuilder().create());
-      }
-    };
-  }
-
-  /**
-   * Get a module that binds gson to an object that can deserialize older versions of objects.
-   *
-   * @param tenantId Id of the tenant to add to cluster objects.
-   * @return Module for reading older versions of objects.
-   */
-  public AbstractModule getUpgradeModule(final String tenantId) {
-    return new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(Gson.class).toInstance(
-          createCurrentBuilder()
-            .registerTypeAdapter(Cluster.class, new ClusterUpgradeCodec(tenantId))
-            .registerTypeAdapter(Provider.class, new ProviderUpgradeCodec())
-            .registerTypeAdapter(Service.class, new ServiceUpgradeCodec())
-            .registerTypeAdapter(ServiceAction.class, new ServiceActionUpgradeCodec())
-            .registerTypeAdapter(Node.class, new NodeUpgradeCodec())
-            .create()
-        );
       }
     };
   }

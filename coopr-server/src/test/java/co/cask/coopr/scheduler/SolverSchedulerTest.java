@@ -29,9 +29,7 @@ import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
-import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Compatibilities;
@@ -47,7 +45,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.junit.Assert;
@@ -134,16 +131,13 @@ public class SolverSchedulerTest extends BaseTest {
 
     Set<String> services = ImmutableSet.of("namenode", "datanode", "resourcemanager", "nodemanager",
                                            "hbasemaster", "regionserver", "zookeeper", "reactor");
-    reactorTemplate = new ClusterTemplate(
-      "reactor-medium",
-      "medium reactor cluster template",
-      new ClusterDefaults(services, "joyent", null, null, null, new JsonObject()),
-      new Compatibilities(
-        ImmutableSet.<String>of("large-mem", "large-cpu", "large", "medium", "small"),
-        null,
-        null
-      ),
-      new Constraints(
+    reactorTemplate = ClusterTemplate.builder()
+      .setName("reactor-medium")
+      .setDescription("medium reactor cluster template")
+      .setClusterDefaults(ClusterDefaults.builder().setServices(services).setProvider("joyent").build())
+      .setCompatibilities(
+        Compatibilities.builder().setHardwaretypes("large-mem", "large-cpu", "large", "medium", "small").build())
+      .setConstraints(new Constraints(
         ImmutableMap.<String, ServiceConstraint>of(
           "namenode",
           new ServiceConstraint(
@@ -175,10 +169,8 @@ public class SolverSchedulerTest extends BaseTest {
             ImmutableSet.of("namenode", "reactor")
           )
         ),
-        SizeConstraint.EMPTY
-      ),
-      null
-    );
+        SizeConstraint.EMPTY))
+      .build();
 
     EntityStoreView superadminView =
       entityStoreService.getView(new Account(Constants.ADMIN_USER, Constants.SUPERADMIN_TENANT));
@@ -221,8 +213,7 @@ public class SolverSchedulerTest extends BaseTest {
     );
     // create services
     for (String serviceName : services) {
-      adminView.writeService(new Service(serviceName, serviceName + " description", ImmutableSet.<String>of(),
-                                           ImmutableMap.<ProvisionerAction, ServiceAction>of()));
+      adminView.writeService(Service.builder().setName(serviceName).build());
     }
     adminView.writeClusterTemplate(reactorTemplate);
   }

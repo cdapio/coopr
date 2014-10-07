@@ -15,7 +15,6 @@
  */
 package co.cask.coopr.layout;
 
-import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Compatibilities;
@@ -26,7 +25,6 @@ import co.cask.coopr.spec.template.SizeConstraint;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.JsonObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -217,20 +215,19 @@ public class NodeLayoutGeneratorTest extends BaseSolverTest {
   public void testNodesMustHaveServices() throws Exception {
 
     Set<String> services = ImmutableSet.of("svc1", "svc2", "svc3");
-    ClusterTemplate template = new ClusterTemplate(
-      "simple", "all services on all nodes template",
-      new ClusterDefaults(services, "joyent", null, null, null, new JsonObject()),
-      new Compatibilities(null, null, services),
-      new Constraints(
+    ClusterTemplate template = ClusterTemplate.builder()
+      .setName("simple")
+      .setDescription("all services on all nodes template")
+      .setClusterDefaults(ClusterDefaults.builder().setServices(services).setProvider("joyent").build())
+      .setCompatibilities(Compatibilities.builder().setServices(services).build())
+      .setConstraints(new Constraints(
         ImmutableMap.<String, ServiceConstraint>of("svc1", new ServiceConstraint(null, null, 1, 1)),
         new LayoutConstraint(
           ImmutableSet.<Set<String>>of(ImmutableSet.of("svc1", "svc2", "svc3")),
           ImmutableSet.<Set<String>>of()
         ),
         SizeConstraint.EMPTY
-      ),
-      Administration.EMPTY_ADMINISTRATION
-    );
+      )).build();
     List<NodeLayout> expected = ImmutableList.of(
       new NodeLayout("small", "centos6", ImmutableSet.of("svc1", "svc2", "svc3"))
     );
