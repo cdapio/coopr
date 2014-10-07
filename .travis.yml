@@ -41,17 +41,17 @@ before_install:
 before_script:
   - "cd coopr-ngui && npm run build"
   - "npm start > /dev/null &"
-  - "test ${SAUCE_USERNAME} && cd ../coopr-server"
-  - "test ${SAUCE_USERNAME} && mvn clean package assembly:single -DskipTests"
-  - "test ${SAUCE_USERNAME} && java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain >/dev/null 2>&1 &"
-  - "test ${SAUCE_USERNAME} && java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain >/dev/null 2>&1 &"
+  - "test ${DOES_NOT_EXIST} && cd ../coopr-server"
+  - "test ${DOES_NOT_EXIST} && mvn clean package assembly:single -DskipTests"
+  - "test ${DOES_NOT_EXIST} && java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain >/dev/null 2>&1 &"
+  - "test ${DOES_NOT_EXIST} && java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain >/dev/null 2>&1 &"
   - "cd .. && sleep 5" # give server time to start
 
 script:
   - "cd coopr-ngui"
   - "node ./node_modules/gulp/bin/gulp.js jshint"
   - "npm run test-single-run"
-  - "test ${SAUCE_USERNAME} && npm run protractor"
+  - "test ${DOES_NOT_EXIST} && npm run protractor"
   - "cd .."
   - "mvn test"
 
