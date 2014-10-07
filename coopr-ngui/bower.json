@@ -2,10 +2,10 @@
   "name": "coopr-ngui",
   "private": true,
   "dependencies": {
-    "angular": "~1.2.25",
-    "angular-sanitize": "~1.2.25",
-    "angular-mocks": "~1.2.25",
-    "angular-resource": "~1.2.25",
+    "angular": "~1.2.26",
+    "angular-sanitize": "~1.2.26",
+    "angular-mocks": "~1.2.26",
+    "angular-resource": "~1.2.26",
     "bootstrap": "~3.2.0",
     "angular-strap": "~2.1.1",
     "angular-ui-router": "~0.2.10",
@@ -16,6 +16,6 @@
     "angular-moment": "~0.8.2"
   },
   "resolutions": {
-    "angular": "1.2.25"
+    "angular": "1.2.26"
   }
 }
