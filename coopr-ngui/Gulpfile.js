@@ -1,6 +1,7 @@
 var gulp = require('gulp'),
     plug = require('gulp-load-plugins')(),
     pkg = require('./package.json'),
+    del = require('del'),
     merge = require('merge-stream');
 
 function plumber() {
@@ -161,9 +162,8 @@ gulp.task('jshint', ['lint']);
 gulp.task('hint', ['lint']);
 
 
-gulp.task('clean', function() {
-  return gulp.src('./dist/*', {read: false})
-    .pipe(plug.rimraf());
+gulp.task('clean', function(cb) {
+  del(['./dist/*'], cb);
 });
 
 
