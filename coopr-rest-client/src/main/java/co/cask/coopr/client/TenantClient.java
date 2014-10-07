@@ -19,6 +19,7 @@ package co.cask.coopr.client;
 
 import co.cask.coopr.spec.TenantSpecification;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,21 +31,24 @@ public interface TenantClient {
    * Returns the comprehensive set of tenants within the system. If no tenants exist, returns an empty list.
    *
    * @return List of {@link co.cask.coopr.spec.TenantSpecification} objects
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  List<TenantSpecification> getTenants();
+  List<TenantSpecification> getTenants() throws IOException;
 
   /**
    * Retrieves details about a tenant by the name.
    *
    * @param tenantName String value of the tenant name
    * @return {@link co.cask.coopr.spec.TenantSpecification} object
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  TenantSpecification getTenant(String tenantName);
+  TenantSpecification getTenant(String tenantName) throws IOException;
 
   /**
    * Deletes the tenant by the specified name
    *
    * @param tenantName String value of the tenant name
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  void deleteTenant(String tenantName);
+  void deleteTenant(String tenantName) throws IOException;
 }

@@ -19,6 +19,7 @@ package co.cask.coopr.client;
 
 import co.cask.coopr.provisioner.Provisioner;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,14 +31,16 @@ public interface ProvisionerClient {
    * Retrieves the list of all provisioners registered with the server.
    *
    * @return List of {@link co.cask.coopr.provisioner.Provisioner} objects
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  List<Provisioner> getAllProvisioners();
+  List<Provisioner> getAllProvisioners() throws IOException;
 
   /**
    * Retrieves a specific provisioner by its id.
    *
    * @param provisionerId String value of the provisioner id.
    * @return {@link co.cask.coopr.provisioner.Provisioner} object
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  Provisioner getProvisioner(String provisionerId);
+  Provisioner getProvisioner(String provisionerId) throws IOException;
 }

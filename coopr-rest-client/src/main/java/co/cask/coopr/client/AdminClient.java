@@ -23,10 +23,11 @@ import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
- * The client API for manage admin defined entities..
+ * The client API for manage admin defined entities.
  */
 public interface AdminClient {
 
@@ -34,95 +35,115 @@ public interface AdminClient {
    * Retrieves the list of all the cluster templates. If no templates exist, returns an empty list.
    *
    * @return List of {@link co.cask.coopr.spec.template.ClusterTemplate} objects
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  List<ClusterTemplate> getAllClusterTemplates();
+  List<ClusterTemplate> getAllClusterTemplates() throws IOException;
 
   /**
    * Retrieves details about a cluster template by the name.
    *
    * @return {co.cask.coopr.spec.template.ClusterTemplate} object
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  ClusterTemplate getClusterTemplate(String name);
+  ClusterTemplate getClusterTemplate(String name) throws IOException;
 
   /**
    * Deletes a cluster template by the name.
+   *
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  void deleteClusterTemplate(String name);
+  void deleteClusterTemplate(String name) throws IOException;
 
 
   /**
    * Retrieves the list of all configured providers. If no providers exist, returns an empty list.
    *
    * @return List of {@link co.cask.coopr.spec.Provider} objects
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  List<Provider> getAllProviders();
+  List<Provider> getAllProviders() throws IOException;
 
   /**
    * Retrieves details about a provider type by the name.
    *
    * @return {@link co.cask.coopr.spec.Provider} object
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  Provider getProvider(String name);
+  Provider getProvider(String name) throws IOException;
 
   /**
    * Deletes a provider type by the name.
+   *
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  void deleteProvider(String name);
+  void deleteProvider(String name) throws IOException;
 
   /**
    * Retrieves the list of all services. If no services exist, returns an empty list.
    *
    * @return List of {@link co.cask.coopr.spec.service.Service} objects
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  List<Service> getAllServices();
+  List<Service> getAllServices() throws IOException;
 
   /**
    * Retrieves details about a services by the name.
    *
    * @return {@link co.cask.coopr.spec.service.Service} object
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  Service getService(String name);
+  Service getService(String name) throws IOException;
 
   /**
    * Deletes services by the name.
+   *
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  void deleteService(String name);
+  void deleteService(String name) throws IOException;
 
   /**
    * Retrieves the list of all the hardware types. If no hardware types exist, returns an empty list.
    *
    * @return List of {@link co.cask.coopr.spec.HardwareType} objects
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  List<HardwareType> getAllHardwareTypes();
+  List<HardwareType> getAllHardwareTypes() throws IOException;
 
   /**
    * Retrieves details about a hardware type by the name.
    *
    * @return {@link co.cask.coopr.spec.HardwareType} object
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  HardwareType getHardwareType(String name);
+  HardwareType getHardwareType(String name) throws IOException;
 
   /**
    * Deletes a hardware type by the name.
+   *
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  void deleteHardwareType(String name);
+  void deleteHardwareType(String name) throws IOException;
 
   /**
    * Retrieves the list of all the image types. If no image types exist, returns an empty list.
    *
    * @return List of {@link co.cask.coopr.spec.ImageType} objects
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  List<ImageType> getAllImageTypes();
+  List<ImageType> getAllImageTypes() throws IOException;
 
   /**
    * Retrieves details about a image type by the name.
    *
    * @return {@link co.cask.coopr.spec.ImageType} object
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  ImageType getImageType(String name);
+  ImageType getImageType(String name) throws IOException;
 
   /**
    * Deletes a image type by the name.
+   *
+   * @throws IOException in case of a problem or the connection was aborted
    */
-  void deleteImageType(String name);
+  void deleteImageType(String name) throws IOException;
 }
