@@ -37,6 +37,8 @@ import java.util.Set;
  * Codec for serializing/deserializing a {@link Service}.
  */
 public class ServiceCodec extends AbstractCodec<Service> {
+  private static final Type ACTIONS_TYPE = new TypeToken<Map<ProvisionerAction, ServiceAction>>() {}.getType();
+  private static final Type LINKS_TYPE = new TypeToken<Set<Link>>() {}.getType();
 
   @Override
   public JsonElement serialize(Service service, Type type, JsonSerializationContext context) {
@@ -67,10 +69,9 @@ public class ServiceCodec extends AbstractCodec<Service> {
     JsonObject provisioner = context.deserialize(jsonObj.get("provisioner"), JsonObject.class);
     Map<ProvisionerAction, ServiceAction> actions = Collections.emptyMap();
     if (provisioner != null) {
-      actions = context.deserialize(provisioner.get("actions"),
-                                    new TypeToken<Map<ProvisionerAction, ServiceAction>>() {}.getType());
+      actions = context.deserialize(provisioner.get("actions"), ACTIONS_TYPE);
     }
-    Set<Link> links = context.deserialize(jsonObj.get("links"), new TypeToken<Set<Link>>() {}.getType());
+    Set<Link> links = context.deserialize(jsonObj.get("links"), LINKS_TYPE);
 
     return Service.builder()
       .setName(name)

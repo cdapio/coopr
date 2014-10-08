@@ -27,7 +27,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.Set;
@@ -36,6 +35,7 @@ import java.util.Set;
  * Codec for serializing/deserializing a {@link ClusterTemplate}.
  */
 public class ClusterTemplateCodec extends AbstractCodec<ClusterTemplate> {
+  private static final Type LINKS_TYPE = new com.google.common.reflect.TypeToken<Set<Link>>() {}.getType();
 
   @Override
   public JsonElement serialize(ClusterTemplate clusterTemplate, Type type, JsonSerializationContext context) {
@@ -66,7 +66,7 @@ public class ClusterTemplateCodec extends AbstractCodec<ClusterTemplate> {
       .setCompatibilities(context.<Compatibilities>deserialize(jsonObj.get("compatibility"), Compatibilities.class))
       .setConstraints(context.<Constraints>deserialize(jsonObj.get("constraints"), Constraints.class))
       .setAdministration(context.<Administration>deserialize(jsonObj.get("administration"), Administration.class))
-      .setLinks(context.<Set<Link>>deserialize(jsonObj.get("links"), new TypeToken<Set<Link>>() {}.getType()))
+      .setLinks(context.<Set<Link>>deserialize(jsonObj.get("links"), LINKS_TYPE))
       .build();
   }
 }

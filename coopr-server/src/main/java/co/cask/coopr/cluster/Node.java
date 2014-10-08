@@ -144,6 +144,16 @@ public class Node implements Comparable<Node> {
   }
 
   /**
+   * Get an immutable list of service links on the node. Unless {@link #populateLinks(Cluster, java.util.Set)} is
+   * called first, this will return null.
+   *
+   * @return Immutable list of service links on the node.
+   */
+  public List<Link> getLinks() {
+    return links;
+  }
+
+  /**
    * Add a service to the node.
    *
    * @param service Service to add to the node.
