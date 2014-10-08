@@ -34,55 +34,51 @@ public class ProviderTypeTest extends BaseTest {
 
   @Test
   public void testGroupFields() {
-    ProviderType providerType = new ProviderType(
-      "providertype",
-      null,
-      "some description",
-      ImmutableMap.of(
+    ProviderType providerType = ProviderType.builder()
+      .setParameters(ImmutableMap.of(
         ParameterType.ADMIN, new ParametersSpecification(
-          ImmutableMap.of(
-            "region",
-            FieldSchema.builder()
-              .setLabel("region")
-              .setType("text")
-              .setOverride(true)
-              .setSensitive(false)
-              .build(),
-            "account",
-            FieldSchema.builder()
-              .setLabel("account")
-              .setType("text")
-              .setOverride(false)
-              .setSensitive(false)
-              .build(),
-            "url",
-            FieldSchema.builder()
-              .setLabel("url")
-              .setType("text")
-              .setOverride(true)
-              .setSensitive(true)
-              .build()),
-          ImmutableSet.<Set<String>>of()
-        ),
-        ParameterType.USER, new ParametersSpecification(
-          ImmutableMap.of(
-            "keyname",
-            FieldSchema.builder()
-              .setLabel("keyname")
-              .setType("text")
-              .setSensitive(false)
-              .build(),
-            "key",
-            FieldSchema.builder()
-              .setLabel("key")
-              .setType("text")
-              .setSensitive(true)
-              .build()),
-          ImmutableSet.<Set<String>>of(ImmutableSet.of("keyname", "key"))
-        )
+        ImmutableMap.of(
+          "region",
+          FieldSchema.builder()
+            .setLabel("region")
+            .setType("text")
+            .setOverride(true)
+            .setSensitive(false)
+            .build(),
+          "account",
+          FieldSchema.builder()
+            .setLabel("account")
+            .setType("text")
+            .setOverride(false)
+            .setSensitive(false)
+            .build(),
+          "url",
+          FieldSchema.builder()
+            .setLabel("url")
+            .setType("text")
+            .setOverride(true)
+            .setSensitive(true)
+            .build()),
+        ImmutableSet.<Set<String>>of()
       ),
-      null
-    );
+        ParameterType.USER, new ParametersSpecification(
+        ImmutableMap.of(
+          "keyname",
+          FieldSchema.builder()
+            .setLabel("keyname")
+            .setType("text")
+            .setSensitive(false)
+            .build(),
+          "key",
+          FieldSchema.builder()
+            .setLabel("key")
+            .setType("text")
+            .setSensitive(true)
+            .build()),
+        ImmutableSet.<Set<String>>of(ImmutableSet.of("keyname", "key"))
+      )))
+      .setName("providertype")
+      .build();
     Map<String, String> expectedSensitive = ImmutableMap.of("key", "keycontents", "url", "abc.com/api");
     Map<String, String> expectedNonsensitive = ImmutableMap.of("keyname", "dev", "region", "iad");
     Map<String, Object> input = Maps.newHashMap();
@@ -102,11 +98,8 @@ public class ProviderTypeTest extends BaseTest {
   public void testGetMissingFields() throws IOException {
     // 3 admin fields a1, a2, a3. One of { a1 }, { a2, a3 }, { a1, a3 } must be present.
     // 3 user fields u1, u2, u3. All are optional.
-    ProviderType providerType = new ProviderType(
-      "name",
-      null,
-      "desc",
-      ImmutableMap.of(
+    ProviderType providerType = ProviderType.builder()
+      .setParameters(ImmutableMap.of(
         ParameterType.ADMIN, new ParametersSpecification(
         ImmutableMap.of(
           "a1", FieldSchema.builder().setLabel("field1").setType("text").build(),
@@ -125,9 +118,9 @@ public class ProviderTypeTest extends BaseTest {
           "u3", FieldSchema.builder().setLabel("field3").setType("text").build()),
         ImmutableSet.<Set<String>>of()
       )
-      ),
-      null
-    );
+      ))
+      .setName("name")
+      .build();
 
     Assert.assertTrue(providerType.getMissingFields(ParameterType.ADMIN, ImmutableSet.of("a1")).isEmpty());
     Assert.assertTrue(providerType.getMissingFields(ParameterType.ADMIN, ImmutableSet.of("a2", "a3")).isEmpty());

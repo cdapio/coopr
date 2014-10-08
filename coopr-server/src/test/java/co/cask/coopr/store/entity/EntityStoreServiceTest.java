@@ -308,21 +308,33 @@ public abstract class EntityStoreServiceTest {
     EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllHardwareTypes().size());
 
-    HardwareType hw1 = new HardwareType("hw1", "1st hw type", ImmutableMap.<String, Map<String, String>>of(
-      "joyent", ImmutableMap.of("flavor", "Medium 4GB"),
-      "openstack1", ImmutableMap.of("flavor", "5"),
-      "openstack2", ImmutableMap.of("flavor", "3")
-    ));
-    HardwareType hw2 = new HardwareType("hw2", "2nd hw type", ImmutableMap.<String, Map<String, String>>of(
-      "joyent", ImmutableMap.of("flavor", "Medium 2GB"),
-      "openstack1", ImmutableMap.of("flavor", "4"),
-      "aws", ImmutableMap.of("flavor", "12345")
-    ));
-    HardwareType hw3 = new HardwareType("hw3", "3rd hw type", ImmutableMap.<String, Map<String, String>>of(
-      "joyent", ImmutableMap.of("flavor", "Large 16GB"),
-      "openstack1", ImmutableMap.of("flavor", "8"),
-      "rackspace", ImmutableMap.of("flavor", "9")
-    ));
+    HardwareType hw1 = HardwareType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
+        "joyent", ImmutableMap.of("flavor", "Medium 4GB"),
+        "openstack1", ImmutableMap.of("flavor", "5"),
+        "openstack2", ImmutableMap.of("flavor", "3")
+      ))
+      .setName("hw1")
+      .setDescription("1st hw type")
+      .build();
+    HardwareType hw2 = HardwareType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
+        "joyent", ImmutableMap.of("flavor", "Medium 2GB"),
+        "openstack1", ImmutableMap.of("flavor", "4"),
+        "aws", ImmutableMap.of("flavor", "12345")
+      ))
+      .setName("hw2")
+      .setDescription("2nd hw type")
+      .build();
+    HardwareType hw3 = HardwareType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
+        "joyent", ImmutableMap.of("flavor", "Large 16GB"),
+        "openstack1", ImmutableMap.of("flavor", "8"),
+        "rackspace", ImmutableMap.of("flavor", "9")
+      ))
+      .setName("hw3")
+      .setDescription("3rd hw type")
+      .build();
     List<HardwareType> hardwareTypes = ImmutableList.of(hw1, hw2, hw3);
 
     for (HardwareType hardwareType : hardwareTypes) {
@@ -347,21 +359,30 @@ public abstract class EntityStoreServiceTest {
     EntityStoreView entityStore = entityStoreService.getView(tenant1Admin);
     Assert.assertEquals(0, entityStore.getAllImageTypes().size());
 
-    ImageType it1 =
-      new ImageType("centos6.4", "centos 6.4 image", ImmutableMap.<String, Map<String, String>>of(
+    ImageType it1 =ImageType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
         "joyent", ImmutableMap.of("image", "4f938eea-9df0-4112-b21f-8cc9cbbf9c71"),
         "openstack1", ImmutableMap.of("image", "325dbc5e-2b90-11e3-8a3e-bfdcb1582a8d"),
-        "openstack2", ImmutableMap.of("image", "f70ed7c7-b42e-4d77-83d8-40fa29825b85")));
-    ImageType it2 =
-      new ImageType("rhel5", "rhel 5 image", ImmutableMap.<String, Map<String, String>>of(
+        "openstack2", ImmutableMap.of("image", "f70ed7c7-b42e-4d77-83d8-40fa29825b85")))
+      .setName("centos6.4")
+      .setDescription("centos 6.4 image")
+      .build();
+    ImageType it2 =ImageType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
         "joyent", ImmutableMap.of("image", "3f938eea-9df0-4112-b21f-8cc9cbbf9c71"),
         "openstack1", ImmutableMap.of("image", "225dbc5e-2b90-11e3-8a3e-bfdcb1582a8d"),
-        "openstack2", ImmutableMap.of("image", "e70ed7c7-b42e-4d77-83d8-40fa29825b85")));
-    ImageType it3 =
-      new ImageType("ubuntu", "ubuntu image", ImmutableMap.<String, Map<String, String>>of(
+        "openstack2", ImmutableMap.of("image", "e70ed7c7-b42e-4d77-83d8-40fa29825b85")))
+      .setName("rhel5")
+      .setDescription("rhel 5 image")
+      .build();
+    ImageType it3 =ImageType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
         "joyent", ImmutableMap.of("image", "2f938eea-9df0-4112-b21f-8cc9cbbf9c71"),
         "openstack1", ImmutableMap.of("image", "125dbc5e-2b90-11e3-8a3e-bfdcb1582a8d"),
-        "openstack2", ImmutableMap.of("image", "d70ed7c7-b42e-4d77-83d8-40fa29825b85")));
+        "openstack2", ImmutableMap.of("image", "d70ed7c7-b42e-4d77-83d8-40fa29825b85")))
+      .setName("ubuntu")
+      .setDescription("ubuntu image")
+      .build();
     List<ImageType> imageTypes = ImmutableList.of(it1, it2, it3);
 
     for (ImageType imageType : imageTypes) {
@@ -593,7 +614,11 @@ public abstract class EntityStoreServiceTest {
     for (int i = 0; i < mapKeyVals.length; i += 2) {
       authMap.put(mapKeyVals[i], mapKeyVals[i+1]);
     }
-
-    return new Provider(name, description, type, authMap);
+    return Provider.builder()
+      .setProviderType(type)
+      .setProvisionerFields(authMap)
+      .setName(name)
+      .setDescription(description)
+      .build();
   }
 }

@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.codec.json.AbstractCodec;
+import co.cask.coopr.spec.BaseAdminEntity;
 import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
@@ -23,9 +23,7 @@ import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.spec.service.ServiceDependencies;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
@@ -36,34 +34,21 @@ import java.util.Set;
 /**
  * Codec for serializing/deserializing a {@link Service}.
  */
-public class ServiceCodec extends AbstractCodec<Service> {
+public class ServiceCodec extends BaseAdminEntityCodec<Service> {
   private static final Type ACTIONS_TYPE = new TypeToken<Map<ProvisionerAction, ServiceAction>>() {}.getType();
   private static final Type LINKS_TYPE = new TypeToken<Set<Link>>() {}.getType();
 
   @Override
-  public JsonElement serialize(Service service, Type type, JsonSerializationContext context) {
-    JsonObject jsonObj = new JsonObject();
-
-    jsonObj.add("name", context.serialize(service.getName()));
-    jsonObj.add("description", context.serialize(service.getDescription()));
-    jsonObj.add("icon", context.serialize(service.getIcon()));
+  protected void addChildFields(Service service, JsonObject jsonObj, JsonSerializationContext context) {
     jsonObj.add("dependencies", context.serialize(service.getDependencies()));
     JsonObject provisioner = new JsonObject();
     provisioner.add("actions", context.serialize(service.getProvisionerActions()));
     jsonObj.add("provisioner", provisioner);
     jsonObj.add("links", context.serialize(service.getLinks()));
-
-    return jsonObj;
   }
 
   @Override
-  public Service deserialize(JsonElement json, Type type, JsonDeserializationContext context)
-    throws JsonParseException {
-    JsonObject jsonObj = json.getAsJsonObject();
-
-    String name = context.deserialize(jsonObj.get("name"), String.class);
-    String description = context.deserialize(jsonObj.get("description"), String.class);
-    String icon = context.deserialize(jsonObj.get("icon"), String.class);
+  protected BaseAdminEntity.Builder<Service> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
     ServiceDependencies dependencies = context.deserialize(jsonObj.get("dependencies"), ServiceDependencies.class);
 
     JsonObject provisioner = context.deserialize(jsonObj.get("provisioner"), JsonObject.class);
@@ -74,12 +59,8 @@ public class ServiceCodec extends AbstractCodec<Service> {
     Set<Link> links = context.deserialize(jsonObj.get("links"), LINKS_TYPE);
 
     return Service.builder()
-      .setName(name)
-      .setIcon(icon)
-      .setDescription(description)
       .setDependencies(dependencies)
       .setProvisionerActions(actions)
-      .setLinks(links)
-      .build();
+      .setLinks(links);
   }
 }
