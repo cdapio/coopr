@@ -242,7 +242,7 @@ gulp.task('rev:manifest', function() {
     .pipe(gulp.dest('./dist/bundle'))  // write rev'd assets to build dir
 
     .pipe(plug.rev.manifest({path:'manifest.json'}))
-    .pipe(gulp.dest('./dist')) // write manifest
+    .pipe(gulp.dest('./dist')); // write manifest
 
 });
 gulp.task('rev', ['html:main', 'rev:manifest'], function() {
