@@ -236,7 +236,7 @@ gulp.task('minify', ['js:minify', 'css:minify']);
   rev'd assets
  */
 
-gulp.task('rev:manifest', ['js', 'css', 'tpl'], function() {
+gulp.task('rev:manifest', ['minify', 'tpl'], function() {
   return gulp.src(['./dist/bundle/{app,lib,tpl}.*'])
     .pipe(plug.rev())
     .pipe(plug.size({showFiles:true, gzip:true, total:true}))
