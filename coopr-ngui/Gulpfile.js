@@ -182,6 +182,7 @@ gulp.task('html:main', function() {
   return gulp.src('./app/*.html')
       .pipe(gulp.dest('./dist'));
 });
+
 gulp.task('html', ['html:main', 'html:partials']);
 
 
@@ -235,7 +236,7 @@ gulp.task('minify', ['js:minify', 'css:minify']);
   rev'd assets
  */
 
-gulp.task('rev:manifest', function() {
+gulp.task('rev:manifest', ['js', 'css', 'tpl'], function() {
   return gulp.src(['./dist/bundle/{app,lib,tpl}.*'])
     .pipe(plug.rev())
     .pipe(plug.size({showFiles:true, gzip:true, total:true}))
@@ -245,7 +246,7 @@ gulp.task('rev:manifest', function() {
     .pipe(gulp.dest('./dist')); // write manifest
 
 });
-gulp.task('rev', ['html:main', 'rev:manifest'], function() {
+gulp.task('rev:replace', ['html:main', 'rev:manifest'], function() {
   var rev = require('./dist/manifest.json'),
       out = gulp.src('./dist/*.html'),
       p = '/bundle/';
@@ -267,6 +268,7 @@ gulp.task('css', ['css:lib', 'css:app']);
 gulp.task('style', ['css']);
 
 gulp.task('build', ['js', 'css', 'img', 'tpl', 'html']);
+gulp.task('distribute', ['build', 'rev:replace']);
 
 gulp.task('default', ['lint', 'build']);
 
@@ -284,7 +286,7 @@ gulp.task('watch', ['build'], function() {
   gulp.watch(['./app/**/*.js', '!./app/**/*-test.js'], ['js:app']);
   gulp.watch('./app/**/*.{less,css}', ['css:app']);
   gulp.watch(['./app/js/directives/**/*.html', './app/partials/home.html'], ['tpl']);
-  gulp.watch('./app/**/*.html', ['html']);
+  gulp.watch('./app/partials/**/*.html', ['html:partials']);
   gulp.watch('./app/img/**/*', ['img']);
 
 });
