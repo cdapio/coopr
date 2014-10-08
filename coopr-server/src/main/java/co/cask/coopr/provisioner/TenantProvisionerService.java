@@ -203,7 +203,7 @@ public class TenantProvisionerService {
 
     int numNodes = additionalNodes;
     for (Cluster cluster : nonTerminatedClusters) {
-      numNodes += cluster.getNodes().size();
+      numNodes += cluster.getNodeIDs().size();
     }
     if (numNodes > tenant.getSpecification().getMaxNodes()) {
       return false;

@@ -15,13 +15,15 @@
  */
 package co.cask.coopr.spec.service;
 
+import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.NamedIconEntity;
 import co.cask.coopr.spec.ProvisionerAction;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A service defines a set of services it is dependent on, as well as a mapping of
@@ -32,13 +34,15 @@ public final class Service extends NamedIconEntity {
   private final String description;
   private final ServiceDependencies dependencies;
   private final Map<ProvisionerAction, ServiceAction> provisionerActions;
+  private final Set<Link> links;
 
   private Service(String name, String logolink, String description, ServiceDependencies dependencies,
-                  Map<ProvisionerAction, ServiceAction> provisionerActions) {
+                  Map<ProvisionerAction, ServiceAction> provisionerActions, Set<Link> links) {
     super(name, logolink);
     this.description = description;
     this.dependencies = dependencies;
     this.provisionerActions = provisionerActions;
+    this.links = links;
   }
 
   /**
@@ -69,6 +73,15 @@ public final class Service extends NamedIconEntity {
   }
 
   /**
+   * Get an immutable set of links the service wants to expose.
+   *
+   * @return Immutable set of links the service wants to expose.
+   */
+  public Set<Link> getLinks() {
+    return links;
+  }
+
+  /**
    * Get a builder for creating a service.
    *
    * @return Builder for creating a service.
@@ -86,6 +99,7 @@ public final class Service extends NamedIconEntity {
     private String description = "";
     private ServiceDependencies dependencies = ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES;
     private Map<ProvisionerAction, ServiceAction> provisionerActions = ImmutableMap.of();
+    private Set<Link> links = ImmutableSet.of();
 
     public Builder setName(String name) {
       this.name = name;
@@ -112,8 +126,13 @@ public final class Service extends NamedIconEntity {
       return this;
     }
 
+    public Builder setLinks(Set<Link> links) {
+      this.links = links == null ? ImmutableSet.<Link>of() : ImmutableSet.copyOf(links);
+      return this;
+    }
+
     public Service build() {
-      return new Service(name, icon, description, dependencies, provisionerActions);
+      return new Service(name, icon, description, dependencies, provisionerActions, links);
     }
   }
 
@@ -126,12 +145,13 @@ public final class Service extends NamedIconEntity {
     return super.equals(other) &&
       Objects.equal(description, other.description) &&
       Objects.equal(dependencies, other.dependencies) &&
-      Objects.equal(provisionerActions, other.provisionerActions);
+      Objects.equal(provisionerActions, other.provisionerActions) &&
+      Objects.equal(links, other.links);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(super.hashCode(), description, icon, dependencies, provisionerActions);
+    return Objects.hashCode(super.hashCode(), description, icon, dependencies, provisionerActions, links);
   }
 
   @Override
@@ -140,6 +160,7 @@ public final class Service extends NamedIconEntity {
       .add("description", description)
       .add("dependencies", dependencies)
       .add("provisionerActions", provisionerActions)
+      .add("links", links)
       .toString();
   }
 }

@@ -17,7 +17,7 @@ package co.cask.coopr.http.handler;
 
 import co.cask.coopr.account.Account;
 import co.cask.coopr.cluster.Cluster;
-import co.cask.coopr.cluster.ClusterJobProgress;
+import co.cask.coopr.cluster.ClusterDetails;
 import co.cask.coopr.cluster.ClusterService;
 import co.cask.coopr.cluster.ClusterSummary;
 import co.cask.coopr.cluster.MissingFieldsException;
@@ -150,21 +150,11 @@ public class ClusterHandler extends AbstractAuthHandler {
         responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
         return;
       }
-
-      JsonObject jsonObject = gson.toJsonTree(cluster).getAsJsonObject();
-
-      // Update cluster Json with node information.
       Set<Node> clusterNodes = view.getClusterNodes(clusterId);
-      jsonObject.add("nodes", gson.toJsonTree(clusterNodes));
-
-      // Add last job message if any
       ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-      if (clusterJob.getStatusMessage() != null) {
-        jsonObject.addProperty("message", clusterJob.getStatusMessage());
-      }
-      jsonObject.add("progress", gson.toJsonTree(new ClusterJobProgress(clusterJob)));
+      ClusterDetails clusterDetails = new ClusterDetails(cluster, clusterNodes, clusterJob);
 
-      responder.sendJson(HttpResponseStatus.OK, jsonObject);
+      responder.sendJson(HttpResponseStatus.OK, clusterDetails, ClusterDetails.class, gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting cluster " + clusterId);
     }

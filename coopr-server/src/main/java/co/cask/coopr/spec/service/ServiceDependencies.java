@@ -174,4 +174,14 @@ public class ServiceDependencies {
   public int hashCode() {
     return Objects.hashCode(provides, conflicts, install, runtime);
   }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("provides", provides)
+      .add("conflicts", conflicts)
+      .add("install", install)
+      .add("runtime", runtime)
+      .toString();
+  }
 }
