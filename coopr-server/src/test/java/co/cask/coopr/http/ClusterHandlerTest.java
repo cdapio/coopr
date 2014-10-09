@@ -1815,33 +1815,29 @@ public class ClusterHandlerTest extends ServiceTestBase {
     adminView.writeProvider(Entities.ProviderExample.RACKSPACE);
     // create hardware types
     adminView.writeHardwareType(
-      new HardwareType(
-        "medium",
-        "medium hardware",
-        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Medium 4GB"))
-      )
+      HardwareType.builder().setProviderMap(
+        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Medium 4GB")))
+      .setName("medium")
+      .build()
     );
     adminView.writeHardwareType(
-      new HardwareType(
-        "large-mem",
-        "hardware with a lot of memory",
-        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Large 32GB"))
-      )
+      HardwareType.builder().setProviderMap(
+        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Large 32GB")))
+        .setName("large-mem")
+        .build()
     );
     adminView.writeHardwareType(
-      new HardwareType(
-        "large-cpu",
-        "hardware with a lot of cpu",
-        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Large 16GB"))
-      )
+      HardwareType.builder().setProviderMap(
+        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("flavor", "Large 16GB")))
+        .setName("large-cpu")
+        .build()
     );
     // create image types
     adminView.writeImageType(
-      new ImageType(
-        "centos6",
-        "CentOs 6.4 image",
-        ImmutableMap.<String, Map<String, String>>of("joyent", ImmutableMap.<String, String>of("image", "joyent-hash-of-centos6.4"))
-      )
+      ImageType.builder().setProviderMap(ImmutableMap.<String, Map<String, String>>of(
+        "joyent", ImmutableMap.<String, String>of("image", "joyent-hash-of-centos6.4")))
+        .setName("centos6")
+        .build()
     );
     // create services
     for (String serviceName : services) {

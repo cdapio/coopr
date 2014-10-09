@@ -16,11 +16,10 @@
 
 package co.cask.coopr.spec.plugin;
 
-import co.cask.coopr.spec.NamedIconEntity;
+import co.cask.coopr.spec.BaseAdminEntity;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import java.util.List;
@@ -30,29 +29,18 @@ import java.util.Set;
 /**
  * Plugin specification, including what parameters are supported and required and what types of resources are supported.
  */
-public abstract class AbstractPluginSpecification extends NamedIconEntity {
-  private final String description;
+public abstract class AbstractPluginSpecification extends BaseAdminEntity {
   private final Map<String, ResourceTypeSpecification> resourceTypes;
   protected final Map<ParameterType, ParametersSpecification> parameters;
 
-  public AbstractPluginSpecification(String name, String icon, String description,
-                                     Map<ParameterType, ParametersSpecification> parameters,
-                                     Map<String, ResourceTypeSpecification> resourceTypes) {
-    super(name, icon);
-    this.description = description == null ? "" : description;
+  protected AbstractPluginSpecification(BaseAdminEntity.Builder baseBuilder,
+                                        Map<ParameterType, ParametersSpecification> parameters,
+                                        Map<String, ResourceTypeSpecification> resourceTypes) {
+    super(baseBuilder);
     this.parameters = parameters == null ?
       ImmutableMap.<ParameterType, ParametersSpecification>of() : ImmutableMap.copyOf(parameters);
     this.resourceTypes = resourceTypes == null ?
       ImmutableMap.<String, ResourceTypeSpecification>of() : ImmutableMap.copyOf(resourceTypes);
-  }
-
-  /**
-   * Get the description of the plugin.
-   *
-   * @return Description of the plugin.
-   */
-  public String getDescription() {
-    return description;
   }
 
   /**
@@ -123,6 +111,28 @@ public abstract class AbstractPluginSpecification extends NamedIconEntity {
     return missingFields.build();
   }
 
+  /**
+   * Base builder for plugin specifications.
+   *
+   * @param <T> type of plugin.
+   */
+  public abstract static class Builder<T extends AbstractPluginSpecification> extends BaseAdminEntity.Builder<T> {
+    protected Map<String, ResourceTypeSpecification> resourceTypes;
+    protected Map<ParameterType, ParametersSpecification> parameters;
+
+    public Builder<T> setResourceTypes(Map<String, ResourceTypeSpecification> resourceTypes) {
+      this.resourceTypes = resourceTypes;
+      return this;
+    }
+
+    public Builder<T> setParameters(Map<ParameterType, ParametersSpecification> parameters) {
+      this.parameters = parameters;
+      return this;
+    }
+
+    public abstract T build();
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -134,20 +144,18 @@ public abstract class AbstractPluginSpecification extends NamedIconEntity {
 
     AbstractPluginSpecification that = (AbstractPluginSpecification) o;
 
-    return Objects.equal(description, that.description) &&
-      Objects.equal(parameters, that.parameters) &&
+    return Objects.equal(parameters, that.parameters) &&
       Objects.equal(resourceTypes, that.resourceTypes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(description, parameters, resourceTypes);
+    return Objects.hashCode(parameters, resourceTypes);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("description", description)
       .add("parameters", parameters)
       .add("resourceTypes", resourceTypes)
       .toString();

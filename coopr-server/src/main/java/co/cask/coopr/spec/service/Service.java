@@ -15,8 +15,8 @@
  */
 package co.cask.coopr.spec.service;
 
+import co.cask.coopr.spec.BaseAdminEntity;
 import co.cask.coopr.spec.Link;
-import co.cask.coopr.spec.NamedIconEntity;
 import co.cask.coopr.spec.ProvisionerAction;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
@@ -30,28 +30,17 @@ import java.util.Set;
  * {@link co.cask.coopr.spec.ProvisionerAction} to {@link ServiceAction} that provisioners will need to execute
  * when performing cluster operations such as creation and deletion.
  */
-public final class Service extends NamedIconEntity {
-  private final String description;
+public final class Service extends BaseAdminEntity {
   private final ServiceDependencies dependencies;
   private final Map<ProvisionerAction, ServiceAction> provisionerActions;
   private final Set<Link> links;
 
-  private Service(String name, String logolink, String description, ServiceDependencies dependencies,
+  private Service(BaseAdminEntity.Builder baseBuilder, ServiceDependencies dependencies,
                   Map<ProvisionerAction, ServiceAction> provisionerActions, Set<Link> links) {
-    super(name, logolink);
-    this.description = description;
+    super(baseBuilder);
     this.dependencies = dependencies;
     this.provisionerActions = provisionerActions;
     this.links = links;
-  }
-
-  /**
-   * Get the description of this service.
-   *
-   * @return Description of service.
-   */
-  public String getDescription() {
-    return description;
   }
 
   /**
@@ -93,24 +82,18 @@ public final class Service extends NamedIconEntity {
   /**
    * Builder for creating a service.
    */
-  public static class Builder {
-    private String name;
-    private String icon;
-    private String description = "";
+  public static class Builder extends BaseAdminEntity.Builder<Service> {
     private ServiceDependencies dependencies = ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES;
     private Map<ProvisionerAction, ServiceAction> provisionerActions = ImmutableMap.of();
     private Set<Link> links = ImmutableSet.of();
 
+    @Override
     public Builder setName(String name) {
       this.name = name;
       return this;
     }
 
-    public Builder setIcon(String icon) {
-      this.icon = icon;
-      return this;
-    }
-
+    @Override
     public Builder setDescription(String description) {
       this.description = description;
       return this;
@@ -131,8 +114,9 @@ public final class Service extends NamedIconEntity {
       return this;
     }
 
+    @Override
     public Service build() {
-      return new Service(name, icon, description, dependencies, provisionerActions, links);
+      return new Service(this, dependencies, provisionerActions, links);
     }
   }
 
@@ -143,7 +127,6 @@ public final class Service extends NamedIconEntity {
     }
     Service other = (Service) o;
     return super.equals(other) &&
-      Objects.equal(description, other.description) &&
       Objects.equal(dependencies, other.dependencies) &&
       Objects.equal(provisionerActions, other.provisionerActions) &&
       Objects.equal(links, other.links);
@@ -151,13 +134,12 @@ public final class Service extends NamedIconEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(super.hashCode(), description, icon, dependencies, provisionerActions, links);
+    return Objects.hashCode(super.hashCode(), dependencies, provisionerActions, links);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("description", description)
       .add("dependencies", dependencies)
       .add("provisionerActions", provisionerActions)
       .add("links", links)

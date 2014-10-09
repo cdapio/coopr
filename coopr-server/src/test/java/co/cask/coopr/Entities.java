@@ -63,8 +63,8 @@ public class Entities {
   public static final Account ADMIN_ACCOUNT = new Account(Constants.ADMIN_USER, "tenant1");
 
   public static class ProviderTypeExample {
-    public static final ProviderType JOYENT =
-      new ProviderType("joyent", null, "joyent provider type", ImmutableMap.<ParameterType, ParametersSpecification>of(
+    public static final ProviderType JOYENT = ProviderType.builder().setParameters(
+      ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -98,14 +98,14 @@ public class Entities {
           )
         ),
         ParameterType.USER,
-        ParametersSpecification.EMPTY_SPECIFICATION),
-      ImmutableMap.<String, ResourceTypeSpecification>of(
+        ParametersSpecification.EMPTY_SPECIFICATION))
+      .setResourceTypes(ImmutableMap.<String, ResourceTypeSpecification>of(
         "keys", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "0400")
-      )
-    );
-    public static final ProviderType RACKSPACE =
-      new ProviderType(
-        "rackspace", null, "rackspace provider type", ImmutableMap.<ParameterType, ParametersSpecification>of(
+      ))
+      .setName("joyent")
+      .build();
+    public static final ProviderType RACKSPACE = ProviderType.builder()
+      .setParameters(ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -127,11 +127,11 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
           )
-        )),
-        ImmutableMap.<String, ResourceTypeSpecification>of()
-      );
-    public static final ProviderType USER_RACKSPACE =
-      new ProviderType("user-rackspace", null, "description", ImmutableMap.<ParameterType, ParametersSpecification>of(
+        )))
+      .setName("rackspace")
+      .build();
+    public static final ProviderType USER_RACKSPACE = ProviderType.builder()
+      .setParameters(ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.USER,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -152,14 +152,14 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("rackspace_username", "rackspace_apikey")
           )
-        )),
-        ImmutableMap.<String, ResourceTypeSpecification>of()
-      );
+        )))
+      .setName("user-rackspace")
+      .build();
   }
 
   public static class AutomatorTypeExample {
-    public static final AutomatorType SHELL =
-      new AutomatorType("shell", null, "shell automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
+    public static final AutomatorType SHELL = AutomatorType.builder()
+      .setParameters(ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -180,14 +180,15 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("script")
           )
-        )),
-        ImmutableMap.<String, ResourceTypeSpecification>of(
-          "scripts", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "755"),
-          "data", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null)
-        )
-      );
-    public static final AutomatorType CHEF =
-      new AutomatorType("chef-solo", null, "chef automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
+        )))
+      .setResourceTypes(ImmutableMap.<String, ResourceTypeSpecification>of(
+        "scripts", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "755"),
+        "data", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null)
+      ))
+      .setName("shell")
+      .build();
+    public static final AutomatorType CHEF = AutomatorType.builder()
+      .setParameters(ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -208,15 +209,17 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("recipe")
           )
-        )),
-        ImmutableMap.<String, ResourceTypeSpecification>of(
-          "cookbooks", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
-          "data_bags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
-          "roles", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "644")
-        )
-      );
-    public static final AutomatorType PUPPET =
-      new AutomatorType("puppet", null, "puppet automator", ImmutableMap.<ParameterType, ParametersSpecification>of(
+        )))
+      .setResourceTypes(ImmutableMap.<String, ResourceTypeSpecification>of(
+        "cookbooks", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
+        "data_bags", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
+        "roles", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "644")
+      ))
+      .setName("chef-solo")
+      .setDescription("chef automator")
+      .build();
+    public static final AutomatorType PUPPET = AutomatorType.builder()
+      .setParameters(ImmutableMap.<ParameterType, ParametersSpecification>of(
         ParameterType.ADMIN,
         new ParametersSpecification(
           ImmutableMap.<String, FieldSchema>of(
@@ -237,63 +240,83 @@ public class Entities {
           ImmutableSet.<Set<String>>of(
             ImmutableSet.of("manifest")
           )
-        )),
-        ImmutableMap.<String, ResourceTypeSpecification>of(
-          "modules", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
-          "manifests", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "644")
-        )
-      );
+        )))
+      .setResourceTypes(ImmutableMap.<String, ResourceTypeSpecification>of(
+        "modules", new ResourceTypeSpecification(ResourceTypeFormat.ARCHIVE, null),
+        "manifests", new ResourceTypeSpecification(ResourceTypeFormat.FILE, "644")
+      ))
+      .setName("puppet")
+      .setDescription("puppet automator")
+      .build();
   }
 
   public static class ProviderExample {
-    public static final Provider JOYENT =
-      new Provider("joyent", "Joyent Compute Service", Entities.JOYENT,
-                   ImmutableMap.<String, Object>of(
-                     "joyent_username", "EXAMPLE_USERNAME",
-                     "joyent_keyname", "EXAMPLE_KEYNAME",
-                     "joyent_keyfile", "/path/to/example.key",
-                     "joyent_version", "~7.0"
-                   ));
-    public static final Provider RACKSPACE =
-      new Provider("rackspace", "Rackspace Public Cloud", Entities.RACKSPACE,
-                   ImmutableMap.<String, Object>of(
-                     "rackspace_username", "EXAMPLE_USERNAME",
-                     "rackspace_api_key", "EXAMPLE_API_KEY",
-                     "some_boolean", true));
+    public static final Provider JOYENT = Provider.builder()
+      .setProvisionerFields(ImmutableMap.<String, Object>of(
+        "joyent_username", "EXAMPLE_USERNAME",
+        "joyent_keyname", "EXAMPLE_KEYNAME",
+        "joyent_keyfile", "/path/to/example.key",
+        "joyent_version", "~7.0"
+      ))
+      .setProviderType(Entities.JOYENT)
+      .setName("joyent")
+      .setDescription("Joyent Compute Service")
+      .build();
+    public static final Provider RACKSPACE = Provider.builder()
+      .setProvisionerFields(ImmutableMap.<String, Object>of(
+        "rackspace_username", "EXAMPLE_USERNAME",
+        "rackspace_api_key", "EXAMPLE_API_KEY",
+        "some_boolean", true))
+      .setProviderType(Entities.RACKSPACE)
+      .setName("rackspace")
+      .setDescription("Rackspace Public Cloud")
+      .build();
   }
 
   public static class HardwareTypeExample {
-    public static final HardwareType SMALL =
-      new HardwareType("small", "1 vCPU, 1 GB RAM, 30+ GB Disk",
-                       ImmutableMap.<String, Map<String, String>>of(
-                         "joyent", ImmutableMap.<String, String>of("flavor", "Small 1GB"),
-                         "rackspace", ImmutableMap.<String, String>of("flavor", "3")
-                       ));
-    public static final HardwareType MEDIUM =
-      new HardwareType("medium", "2+ vCPU, 4 GB RAM, 120+ GB Disk",
-                       ImmutableMap.<String, Map<String, String>>of(
-                         "joyent", ImmutableMap.<String, String>of("flavor", "Medium 4GB"),
-                         "rackspace", ImmutableMap.<String, String>of("flavor", "5")
-                       ));
-    public static final HardwareType LARGE =
-      new HardwareType("large", "4+ vCPU, 8 GB RAM, 240+ GB Disk",
-                       ImmutableMap.<String, Map<String, String>>of(
-                         "joyent", ImmutableMap.<String, String>of("flavor", "Large 8GB"),
-                         "rackspace", ImmutableMap.<String, String>of("flavor", "6")
-                       ));
+    public static final HardwareType SMALL = HardwareType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
+        "joyent", ImmutableMap.<String, String>of("flavor", "Small 1GB"),
+        "rackspace", ImmutableMap.<String, String>of("flavor", "3")
+      ))
+      .setName("small")
+      .setDescription("1 vCPU, 1 GB RAM, 30+ GB Disk")
+      .build();
+    public static final HardwareType MEDIUM = HardwareType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
+        "joyent", ImmutableMap.<String, String>of("flavor", "Medium 4GB"),
+        "rackspace", ImmutableMap.<String, String>of("flavor", "5")
+      ))
+      .setName("medium")
+      .setDescription("2+ vCPU, 4 GB RAM, 120+ GB Disk")
+      .build();
+    public static final HardwareType LARGE = HardwareType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
+        "joyent", ImmutableMap.<String, String>of("flavor", "Large 8GB"),
+        "rackspace", ImmutableMap.<String, String>of("flavor", "6")
+      ))
+      .setName("large")
+      .setDescription("4+ vCPU, 8 GB RAM, 240+ GB Disk")
+      .build();
   }
 
   public static class ImageTypeExample {
-    public static final ImageType CENTOS_6 =
-      new ImageType("centos6", "CentOS 6", ImmutableMap.<String, Map<String, String>>of(
+    public static final ImageType CENTOS_6 = ImageType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
         "joyent", ImmutableMap.<String, String>of("image", "325dbc5e-2b90-11e3-8a3e-bfdcb1582a8d"),
         "rackspace", ImmutableMap.<String, String>of("image", "f70ed7c7-b42e-4d77-83d8-40fa29825b85")
-      ));
-    public static final ImageType UBUNTU_12 =
-      new ImageType("ubuntu12", "Ubuntu 12.04 LTS", ImmutableMap.<String, Map<String, String>>of(
+      ))
+      .setName("centos6")
+      .setDescription("CentOS 6")
+      .build();
+    public static final ImageType UBUNTU_12 = ImageType.builder()
+      .setProviderMap(ImmutableMap.<String, Map<String, String>>of(
         "joyent", ImmutableMap.<String, String>of("image", "d2ba0f30-bbe8-11e2-a9a2-6bc116856d85"),
         "rackspace", ImmutableMap.<String, String>of("image", "d45ed9c5-d6fc-4c9d-89ea-1b3ae1c83999")
-      ));
+      ))
+      .setName("ubuntu12")
+      .setDescription("Ubuntu 12.04 LTS")
+      .build();
   }
 
   public static class ServiceExample {

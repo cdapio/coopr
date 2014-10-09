@@ -15,8 +15,8 @@
  */
 package co.cask.coopr.spec.template;
 
+import co.cask.coopr.spec.BaseAdminEntity;
 import co.cask.coopr.spec.Link;
-import co.cask.coopr.spec.NamedIconEntity;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
@@ -29,34 +29,23 @@ import java.util.Set;
  * will be used to determine which services to place on which nodes, and what hardware and images to use.  A cluster
  * template also specifies the full set of configuration key values that are needed on the cluster.
  */
-public final class ClusterTemplate extends NamedIconEntity {
-  private final String description;
+public final class ClusterTemplate extends BaseAdminEntity {
   private final ClusterDefaults clusterDefaults;
   private final Constraints constraints;
   private final Compatibilities compatibilities;
   private final Administration administration;
   private final Set<Link> links;
 
-  private ClusterTemplate(String name, String icon, String description, ClusterDefaults clusterDefaults,
+  private ClusterTemplate(BaseAdminEntity.Builder baseBuilder, ClusterDefaults clusterDefaults,
                           Compatibilities compatibilities, Constraints constraints, Administration administration,
                           Set<Link> links) {
-    super(name, icon);
+    super(baseBuilder);
     Preconditions.checkArgument(clusterDefaults != null, "cluster defaults must be specified");
     this.clusterDefaults = clusterDefaults;
-    this.description = description;
     this.constraints = constraints;
     this.compatibilities = compatibilities;
     this.administration = administration;
     this.links = links;
-  }
-
-  /**
-   * Get the description of the cluster template.
-   *
-   * @return Description of the cluster template.
-   */
-  public String getDescription() {
-    return description;
   }
 
   /**
@@ -116,26 +105,26 @@ public final class ClusterTemplate extends NamedIconEntity {
   /**
    * Builder for creating cluster templates.
    */
-  public static class Builder {
-    private String name;
-    private String icon;
-    private String description = "";
+  public static class Builder extends BaseAdminEntity.Builder<ClusterTemplate> {
     private ClusterDefaults clusterDefaults;
     private Constraints constraints = Constraints.EMPTY_CONSTRAINTS;
     private Compatibilities compatibilities = Compatibilities.EMPTY_COMPATIBILITIES;
     private Administration administration = Administration.EMPTY_ADMINISTRATION;
     private Set<Link> links = ImmutableSet.of();
 
+    @Override
     public Builder setName(String name) {
       this.name = name;
       return this;
     }
 
+    @Override
     public Builder setIcon(String icon) {
       this.icon = icon;
       return this;
     }
 
+    @Override
     public Builder setDescription(String description) {
       this.description = description;
       return this;
@@ -167,8 +156,7 @@ public final class ClusterTemplate extends NamedIconEntity {
     }
 
     public ClusterTemplate build() {
-      return new ClusterTemplate(name, icon, description, clusterDefaults,
-                                 compatibilities, constraints, administration, links);
+      return new ClusterTemplate(this, clusterDefaults, compatibilities, constraints, administration, links);
     }
   }
 
@@ -179,7 +167,6 @@ public final class ClusterTemplate extends NamedIconEntity {
     }
     ClusterTemplate other = (ClusterTemplate) o;
     return super.equals(other) &&
-      Objects.equal(description, other.description) &&
       Objects.equal(compatibilities, other.compatibilities) &&
       Objects.equal(constraints, other.constraints) &&
       Objects.equal(administration, other.administration) &&
@@ -188,13 +175,12 @@ public final class ClusterTemplate extends NamedIconEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(super.hashCode(), description, compatibilities, constraints, administration, links);
+    return Objects.hashCode(super.hashCode(), compatibilities, constraints, administration, links);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("description", description)
       .add("clusterDefaults", clusterDefaults)
       .add("constraints", constraints)
       .add("compatibilities", compatibilities)
