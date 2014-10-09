@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
  * Utility for strings.
  */
 public class StringUtils {
-  //
   private static final Pattern labelPattern = Pattern.compile("^[a-zA-Z0-9\\-]{0,62}[a-zA-Z0-9]$");
 
   /**
