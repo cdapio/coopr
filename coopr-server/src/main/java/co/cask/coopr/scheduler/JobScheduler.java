@@ -121,6 +121,7 @@ public class JobScheduler implements Runnable {
           boolean jobFailed = job.getJobStatus() == ClusterJob.Status.FAILED;
           int completedTasks = 0;
           int inProgressTasks = 0;
+          int createFailedTasks = 0;
           Set<ClusterTask> notSubmittedTasks = Sets.newHashSet();
           Set<ClusterTask> retryTasks = Sets.newHashSet();
           // TODO: avoid looking up every single task every time
@@ -140,6 +141,10 @@ public class JobScheduler implements Runnable {
               } else {
                 jobFailed = true;
               }
+              // special case: try to determine if creates failed before anything could really be created
+              if (job.getClusterAction() == ClusterAction.CLUSTER_CREATE && task.failedBeforeCreate()) {
+                ++createFailedTasks;
+              }
             } else if (task.getStatus() == ClusterTask.Status.IN_PROGRESS) {
               ++inProgressTasks;
             }
@@ -147,6 +152,7 @@ public class JobScheduler implements Runnable {
 
           // If the job has not failed continue with scheduling other tasks.
           if (!jobFailed) {
+
             Set<Node> clusterNodes = clusterStore.getClusterNodes(job.getClusterId());
             Map<String, Node> nodeMap = Maps.newHashMap();
             for (Node node : clusterNodes) {
@@ -178,8 +184,15 @@ public class JobScheduler implements Runnable {
             }
             clusterStore.writeClusterJob(job);
           } else if (inProgressTasks == 0) {
-            // Job failed and no in progress tasks remaining, update cluster status
-            taskService.failJobAndSetClusterStatus(job, cluster);
+            // special case: if all tasks were create tasks and all of them failed before they created anything,
+            // set the cluster state to 'terminated' instead of letting it go to 'incomplete'.
+            if (createFailedTasks == currentStage.size()) {
+              taskService.failJobAndTerminateCluster(job, cluster,
+                                                     "Unable to create nodes, please check your provider settings");
+            } else {
+              // Job failed and no in progress tasks remaining, update cluster status
+              taskService.failJobAndSetClusterStatus(job, cluster);
+            }
           } else {
             // Job failed but tasks are still in progress, wait for them to finish before setting cluster status
             taskService.failJob(job);
