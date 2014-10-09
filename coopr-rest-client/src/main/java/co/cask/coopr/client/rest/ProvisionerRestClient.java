@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-
 package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.provisioner.Provisioner;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,12 +30,10 @@ import java.util.List;
  *
  * TODO: Implementation
  */
-public class ProvisionerRestClient implements ProvisionerClient {
+public class ProvisionerRestClient extends RestClient implements ProvisionerClient {
 
-  private final RestClient restClient;
-
-  public ProvisionerRestClient(RestClient restClient) {
-    this.restClient = restClient;
+  public ProvisionerRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+    super(config, httpClient);
   }
 
   @Override

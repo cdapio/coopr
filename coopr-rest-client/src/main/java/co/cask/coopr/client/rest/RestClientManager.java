@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.AdminClient;
@@ -23,13 +22,24 @@ import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.client.PluginClient;
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.client.TenantClient;
+import org.apache.http.config.Registry;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * The {@link co.cask.coopr.client.ClientManager} implementation for Rest based clients.
  */
 public class RestClientManager implements ClientManager {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RestClientManager.class);
 
   private static final String DEFAULT_VERSION = "v2";
   private static final boolean DEFAULT_SSL = false;
@@ -40,13 +50,24 @@ public class RestClientManager implements ClientManager {
   private PluginClient pluginClient;
   private ProvisionerClient provisionerClient;
   private TenantClient tenantClient;
-  private final RestClient restClient;
+  private final CloseableHttpClient httpClient;
+  private final RestClientConnectionConfig connectionConfig;
+  private Registry<ConnectionSocketFactory> connectionRegistry;
 
   private RestClientManager(Builder builder) {
-    RestClientConnectionConfig connectionConfig =
+    this.connectionConfig =
       new RestClientConnectionConfig(builder.host, builder.port, builder.apiKey, builder.ssl, builder.version,
                                      builder.userId, builder.tenantId, builder.verifySSLCert);
-    this.restClient = new RestClient(connectionConfig);
+    if (!builder.verifySSLCert) {
+      try {
+        connectionRegistry = RestUtil.getRegistryWithDisabledCertCheck();
+      } catch (KeyManagementException e) {
+        LOG.error("Failed to init SSL context: {}", e);
+      } catch (NoSuchAlgorithmException e) {
+        LOG.error("Failed to get instance of SSL context: {}", e);
+      }
+    }
+    this.httpClient = HttpClients.custom().setConnectionManager(createConnectionManager()).build();
   }
 
   /**
@@ -61,48 +82,56 @@ public class RestClientManager implements ClientManager {
   }
 
   @Override
-  public AdminClient createAdminClient() {
+  public AdminClient getAdminClient() {
     if (adminClient == null) {
-      adminClient = new AdminRestClient(restClient);
+      adminClient = new AdminRestClient(connectionConfig, httpClient);
     }
     return adminClient;
   }
 
   @Override
-  public ClusterClient createClusterClient() {
+  public ClusterClient getClusterClient() {
     if (clusterClient == null) {
-      clusterClient = new ClusterRestClient(restClient);
+      clusterClient = new ClusterRestClient(connectionConfig, httpClient);
     }
     return clusterClient;
   }
 
   @Override
-  public PluginClient createPluginClient() {
+  public PluginClient getPluginClient() {
     if (pluginClient == null) {
-      pluginClient = new PluginRestClient(restClient);
+      pluginClient = new PluginRestClient(connectionConfig, httpClient);
     }
     return pluginClient;
   }
 
   @Override
-  public ProvisionerClient createProvisionerClient() {
+  public ProvisionerClient getProvisionerClient() {
     if (provisionerClient == null) {
-      provisionerClient = new ProvisionerRestClient(restClient);
+      provisionerClient = new ProvisionerRestClient(connectionConfig, httpClient);
     }
     return provisionerClient;
   }
 
   @Override
-  public TenantClient createTenantClient() {
+  public TenantClient getTenantClient() {
     if (tenantClient == null) {
-      tenantClient = new TenantRestClient(restClient);
+      tenantClient = new TenantRestClient(connectionConfig, httpClient);
     }
     return tenantClient;
   }
 
   @Override
   public void close() throws IOException {
-    restClient.close();
+    httpClient.close();
+  }
+
+  private PoolingHttpClientConnectionManager createConnectionManager() {
+    if (connectionRegistry != null) {
+      return new PoolingHttpClientConnectionManager(connectionRegistry);
+    } else {
+      return new PoolingHttpClientConnectionManager();
+    }
   }
 
   /**

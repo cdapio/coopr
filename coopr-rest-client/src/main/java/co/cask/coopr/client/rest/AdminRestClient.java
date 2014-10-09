@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.AdminClient;
@@ -23,275 +22,99 @@ import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
-import com.google.common.base.Charsets;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * The {@link co.cask.coopr.client.AdminClient} interface implementation based on the Rest requests to
  * the Coopr Rest API.
  */
-public class AdminRestClient implements AdminClient {
+public class AdminRestClient extends RestClient implements AdminClient {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AdminRestClient.class);
+  private static final String CLUSTER_TEMPLATES_URL_SUFFIX = "clustertemplates";
+  private static final String PROVIDERS_URL_SUFFIX = "providers";
+  private static final String SERVICES_URL_SUFFIX = "services";
+  private static final String HARDWARE_TYPES_URL_SUFFIX = "hardwaretypes";
+  private static final String IMAGE_TYPES_URL_SUFFIX = "imagetypes";
 
-  private static final Gson GSON = new Gson();
-
-  private final RestClient restClient;
-
-  public AdminRestClient(RestClient restClient) {
-    this.restClient = restClient;
+  public AdminRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+    super(config, httpClient);
   }
 
   @Override
   public List<ClusterTemplate> getAllClusterTemplates() throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/clustertemplates",
-                                                                                   restClient.getVersion())));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    List<ClusterTemplate> clusterTemplates;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      clusterTemplates = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                                       new TypeToken<List<ClusterTemplate>>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    if (clusterTemplates == null) {
-      clusterTemplates = Collections.emptyList();
-      LOG.debug("There was no available cluster template found.");
-    }
-    return clusterTemplates;
+    return getAll(CLUSTER_TEMPLATES_URL_SUFFIX);
   }
 
   @Override
   public ClusterTemplate getClusterTemplate(String name) throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/clustertemplates/%s",
-                                                                                   restClient.getVersion(), name)));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    ClusterTemplate clusterTemplate;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      clusterTemplate = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                                       new TypeToken<ClusterTemplate>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    return clusterTemplate;
+    return getSingle(CLUSTER_TEMPLATES_URL_SUFFIX, name);
   }
 
   @Override
   public void deleteClusterTemplate(String name) throws IOException {
-    HttpDelete deleteRequest =
-      new HttpDelete(restClient.getBaseURL().resolve(String.format("/%s/clustertemplates/%s", restClient.getVersion(),
-                                                                   name)));
-    CloseableHttpResponse httpResponse = restClient.execute(deleteRequest);
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-    } finally {
-      httpResponse.close();
-    }
+    delete(CLUSTER_TEMPLATES_URL_SUFFIX, name);
   }
 
   @Override
   public List<Provider> getAllProviders() throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/providers",
-                                                                                   restClient.getVersion())));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    List<Provider> providers;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      providers = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                                new TypeToken<List<Provider>>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    if (providers == null) {
-      providers = Collections.emptyList();
-      LOG.debug("There was no available provider found.");
-    }
-    return providers;
+    return getAll(PROVIDERS_URL_SUFFIX);
   }
 
   @Override
   public Provider getProvider(String name) throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/providers/%s",
-                                                                                   restClient.getVersion(), name)));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    Provider provider;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      provider = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                               new TypeToken<Provider>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    return provider;
+    return getSingle(PROVIDERS_URL_SUFFIX, name);
   }
 
   @Override
   public void deleteProvider(String name) throws IOException {
-    HttpDelete deleteRequest = new HttpDelete(
-      restClient.getBaseURL().resolve(String.format("/%s/providers/%s",  restClient.getVersion(), name)));
-    CloseableHttpResponse httpResponse = restClient.execute(deleteRequest);
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-    } finally {
-      httpResponse.close();
-    }
+    delete(PROVIDERS_URL_SUFFIX, name);
   }
 
   @Override
   public List<Service> getAllServices() throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/services",
-                                                                                   restClient.getVersion())));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    List<Service> services;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      services = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                                new TypeToken<List<Service>>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    if (services == null) {
-      services = Collections.emptyList();
-      LOG.debug("There was no available services found.");
-    }
-    return services;
+    return getAll(SERVICES_URL_SUFFIX);
   }
 
   @Override
   public Service getService(String name) throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/services/%s",
-                                                                                   restClient.getVersion(), name)));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    Service service;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      service = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                              new TypeToken<Service>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    return service;
+    return getSingle(SERVICES_URL_SUFFIX, name);
   }
 
   @Override
   public void deleteService(String name) throws IOException {
-    HttpDelete deleteRequest = new HttpDelete(
-      restClient.getBaseURL().resolve(String.format("/%s/services/%s", restClient.getVersion(), name)));
-    CloseableHttpResponse httpResponse = restClient.execute(deleteRequest);
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-    } finally {
-      httpResponse.close();
-    }
+    delete(SERVICES_URL_SUFFIX, name);
   }
 
   @Override
   public List<HardwareType> getAllHardwareTypes() throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/hardwaretypes",
-                                                                                   restClient.getVersion())));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    List<HardwareType> hardwareTypes;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      hardwareTypes = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                               new TypeToken<List<HardwareType>>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    if (hardwareTypes == null) {
-      hardwareTypes = Collections.emptyList();
-      LOG.debug("There was no available hardware type found.");
-    }
-    return hardwareTypes;
+    return getAll(HARDWARE_TYPES_URL_SUFFIX);
   }
 
   @Override
   public HardwareType getHardwareType(String name) throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/hardwaretypes/%s",
-                                                                                   restClient.getVersion(), name)));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    HardwareType hardwareType;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      hardwareType = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                                   new TypeToken<HardwareType>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    return hardwareType;
+    return getSingle(HARDWARE_TYPES_URL_SUFFIX, name);
   }
 
   @Override
   public void deleteHardwareType(String name) throws IOException {
-    HttpDelete deleteRequest =
-      new HttpDelete(restClient.getBaseURL().resolve(String.format("/%s/hardwaretypes/%s", restClient.getVersion(),
-                                                                   name)));
-    CloseableHttpResponse httpResponse = restClient.execute(deleteRequest);
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-    } finally {
-      httpResponse.close();
-    }
+    delete(HARDWARE_TYPES_URL_SUFFIX, name);
   }
 
   @Override
   public List<ImageType> getAllImageTypes() throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/imagetypes",
-                                                                                   restClient.getVersion())));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    List<ImageType> imageTypes;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      imageTypes = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                                    new TypeToken<List<ImageType>>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    if (imageTypes == null) {
-      imageTypes = Collections.emptyList();
-      LOG.debug("There was no available image type found.");
-    }
-    return imageTypes;
+    return getAll(IMAGE_TYPES_URL_SUFFIX);
   }
 
   @Override
   public ImageType getImageType(String name) throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/imagetypes/%s",
-                                                                                   restClient.getVersion(), name)));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    ImageType imageType;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      imageType = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                                   new TypeToken<ImageType>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    return imageType;
+    return getSingle(IMAGE_TYPES_URL_SUFFIX, name);
   }
 
   @Override
   public void deleteImageType(String name) throws IOException {
-    HttpDelete deleteRequest = new HttpDelete(
-      restClient.getBaseURL().resolve(String.format("/%s/imagetypes/%s", restClient.getVersion(), name)));
-    CloseableHttpResponse httpResponse = restClient.execute(deleteRequest);
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-    } finally {
-      httpResponse.close();
-    }
+    delete(IMAGE_TYPES_URL_SUFFIX, name);
   }
 }

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.PluginClient;
@@ -23,6 +22,7 @@ import co.cask.coopr.provisioner.plugin.ResourceStatus;
 import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,12 +35,10 @@ import java.util.Set;
  *
  * TODO: Implementation
  */
-public class PluginRestClient implements PluginClient {
+public class PluginRestClient extends RestClient implements PluginClient {
 
-  private final RestClient restClient;
-
-  public PluginRestClient(RestClient restClient) {
-    this.restClient = restClient;
+  public PluginRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+    super(config, httpClient);
   }
 
   @Override

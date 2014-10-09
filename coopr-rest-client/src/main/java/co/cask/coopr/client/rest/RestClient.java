@@ -17,23 +17,25 @@
 package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.rest.exception.HttpFailureException;
+import com.google.common.base.Charsets;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.config.Registry;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides way to execute http requests with Apache HttpClient {@link org.apache.http.client.HttpClient}.
@@ -48,35 +50,19 @@ public class RestClient {
   private static final String COOPR_TENANT_ID_HEADER_NAME = "Coopr-TenantID";
   private static final String COOPR_USER_ID_HEADER_NAME = "Coopr-UserID";
 
+  protected static final Gson GSON = new Gson();
+
   private final RestClientConnectionConfig config;
   private final URI baseUrl;
   private final String version;
   private final CloseableHttpClient httpClient;
-  private Registry<ConnectionSocketFactory> connectionRegistry;
 
-  public RestClient(RestClientConnectionConfig config) {
+  public RestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
     this.config = config;
     this.baseUrl = URI.create(String.format("%s://%s:%d", config.isSSL() ? HTTPS_PROTOCOL : HTTP_PROTOCOL,
                                             config.getHost(), config.getPort()));
     this.version = config.getVersion();
-    if (!config.isVerifySSLCert()) {
-      try {
-        connectionRegistry = RestUtil.getRegistryWithDisabledCertCheck();
-      } catch (KeyManagementException e) {
-        LOG.error("Failed to init SSL context: {}", e);
-      } catch (NoSuchAlgorithmException e) {
-        LOG.error("Failed to get instance of SSL context: {}", e);
-      }
-    }
-    this.httpClient = HttpClients.custom().setConnectionManager(createConnectionManager()).build();
-  }
-
-  private PoolingHttpClientConnectionManager createConnectionManager() {
-    if (connectionRegistry != null) {
-      return new PoolingHttpClientConnectionManager(connectionRegistry);
-    } else {
-      return new PoolingHttpClientConnectionManager();
-    }
+    this.httpClient = httpClient;
   }
 
   /**
@@ -136,13 +122,43 @@ public class RestClient {
     }
   }
 
-  /**
-   * Method for releasing unused resources.
-   *
-   * @throws IOException if an I/O error occurs
-   */
-  public void close() throws IOException {
-    httpClient.close();
+  protected <T> List<T> getAll(String urlSuffix) throws IOException {
+    HttpGet getRequest = new HttpGet(baseUrl.resolve(String.format("/%s/%s", version, urlSuffix)));
+    CloseableHttpResponse httpResponse = execute(getRequest);
+    List<T> resultList;
+    try {
+      RestClient.responseCodeAnalysis(httpResponse);
+      resultList = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
+                                    new TypeToken<List<T>>() { }.getType());
+    } finally {
+      httpResponse.close();
+    }
+    return resultList != null ? resultList : new ArrayList<T>();
+  }
+
+  protected <T> T getSingle(String urlSuffix, String name) throws IOException {
+    HttpGet getRequest = new HttpGet(baseUrl.resolve(String.format("/%s/%s/%s", version, urlSuffix, name)));
+    CloseableHttpResponse httpResponse = execute(getRequest);
+    T result;
+    try {
+      RestClient.responseCodeAnalysis(httpResponse);
+      result = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
+                             new TypeToken<T>() { }.getType());
+    } finally {
+      httpResponse.close();
+    }
+    return result;
+  }
+
+  protected void delete(String urlSuffix, String name) throws IOException {
+    HttpDelete deleteRequest = new HttpDelete(getBaseURL().resolve(String.format("/%s/%s/%s", version, urlSuffix,
+                                                                                 name)));
+    CloseableHttpResponse httpResponse = execute(deleteRequest);
+    try {
+      RestClient.responseCodeAnalysis(httpResponse);
+    } finally {
+      httpResponse.close();
+    }
   }
 
   /**

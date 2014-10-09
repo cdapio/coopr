@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-
 package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.TenantClient;
 import co.cask.coopr.spec.TenantSpecification;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,12 +30,10 @@ import java.util.List;
  *
  * TODO: Implementation
  */
-public class TenantRestClient implements TenantClient {
+public class TenantRestClient extends RestClient implements TenantClient {
 
-  private final RestClient restClient;
-
-  public TenantRestClient(RestClient restClient) {
-    this.restClient = restClient;
+  public TenantRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+    super(config, httpClient);
   }
 
   @Override

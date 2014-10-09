@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package co.cask.coopr.client;
 
 import co.cask.coopr.cluster.ClusterSummary;

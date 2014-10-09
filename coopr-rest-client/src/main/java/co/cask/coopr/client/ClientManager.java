@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package co.cask.coopr.client;
 
 import java.io.Closeable;
@@ -29,33 +28,33 @@ public interface ClientManager extends Closeable {
    *
    * @return {@link co.cask.coopr.client.AdminClient} object
    */
-  AdminClient createAdminClient();
+  AdminClient getAdminClient();
 
   /**
    * Creates the instance of the ClusterClient.
    *
    * @return {@link co.cask.coopr.client.ClusterClient} iobject
    */
-  ClusterClient createClusterClient();
+  ClusterClient getClusterClient();
 
   /**
    * Creates the instance of the PluginClient.
    *
    * @return {@link co.cask.coopr.client.PluginClient} object
    */
-  PluginClient createPluginClient();
+  PluginClient getPluginClient();
 
   /**
    * Creates the instance of the ProvisionerClient.
    *
    * @return {@link co.cask.coopr.client.ProvisionerClient} object
    */
-  ProvisionerClient createProvisionerClient();
+  ProvisionerClient getProvisionerClient();
 
   /**
    * Creates the instance of the TenantClient.
    *
    * @return {@link co.cask.coopr.client.TenantClient} object
    */
-  TenantClient createTenantClient();
+  TenantClient getTenantClient();
 }

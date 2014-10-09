@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.ClusterClient;
@@ -36,13 +35,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,45 +51,27 @@ import javax.ws.rs.core.MediaType;
  * The {@link co.cask.coopr.client.ClusterClient} interface implementation based on the Rest requests to
  * the Coopr Rest API.
  */
-public class ClusterRestClient implements ClusterClient {
+public class ClusterRestClient extends RestClient implements ClusterClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClusterRestClient.class);
 
-  private static final Gson GSON = new Gson();
   private static final String CLUSTER_ID_ATTRIBUTE_NAME = "id";
   private static final String EXPIRE_TIME_ATTRIBUTE_NAME = "expireTime";
+  private static final String CLUSTERS_URL_SUFFIX = "clusters";
 
-  private final RestClient restClient;
-
-  public ClusterRestClient(RestClient restClient) {
-    this.restClient = restClient;
+  public ClusterRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+    super(config, httpClient);
   }
 
   @Override
   public List<ClusterSummary> getClusters() throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(String.format("/%s/clusters",
-                                                                                   restClient.getVersion())));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
-    List<ClusterSummary> clusters;
-    try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      clusters = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                                       new TypeToken<List<ClusterSummary>>() { }.getType());
-    } finally {
-      httpResponse.close();
-    }
-    if (clusters == null) {
-      clusters = Collections.emptyList();
-      LOG.debug("There was no available cluster found.");
-    }
-    return clusters;
+    return getAll(CLUSTERS_URL_SUFFIX);
   }
 
   @Override
   public JsonObject getCluster(String clusterId) throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s", restClient.getVersion(), clusterId)));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
+    HttpGet getRequest = new HttpGet(getBaseURL().resolve(String.format("/%s/clusters/%s", getVersion(), clusterId)));
+    CloseableHttpResponse httpResponse = execute(getRequest);
     JsonObject clusterDetails;
     try {
       RestClient.responseCodeAnalysis(httpResponse);
@@ -110,14 +91,13 @@ public class ClusterRestClient implements ClusterClient {
   @Override
   public void deleteCluster(String clusterId, ClusterOperationRequest clusterOperationRequest) throws IOException {
     HttpDeleteWithContent deleteRequest =
-      new HttpDeleteWithContent(restClient.getBaseURL().resolve(String.format("/%s/clusters/%s",
-                                                                              restClient.getVersion(), clusterId)));
+      new HttpDeleteWithContent(getBaseURL().resolve(String.format("/%s/clusters/%s", getVersion(), clusterId)));
     if (clusterOperationRequest != null) {
       StringEntity stringEntity = new StringEntity(GSON.toJson(clusterOperationRequest), Charsets.UTF_8);
       deleteRequest.setEntity(stringEntity);
       LOG.debug("Added optional provider fields to the request body: {}.", stringEntity);
     }
-    CloseableHttpResponse httpResponse = restClient.execute(deleteRequest);
+    CloseableHttpResponse httpResponse = execute(deleteRequest);
     try {
       RestClient.responseCodeAnalysis(httpResponse);
     } finally {
@@ -127,14 +107,13 @@ public class ClusterRestClient implements ClusterClient {
 
   @Override
   public String createCluster(ClusterCreateRequest clusterCreateRequest) throws IOException {
-    HttpPost postRequest = new HttpPost(restClient.getBaseURL().resolve(String.format("/%s/clusters",
-                                                                                      restClient.getVersion())));
+    HttpPost postRequest = new HttpPost(getBaseURL().resolve(String.format("/%s/clusters", getVersion())));
     if (clusterCreateRequest != null) {
       StringEntity stringEntity = new StringEntity(GSON.toJson(clusterCreateRequest), Charsets.UTF_8);
       postRequest.setEntity(stringEntity);
       LOG.debug("Create cluster request with parameters {}.", clusterCreateRequest);
     }
-    CloseableHttpResponse httpResponse = restClient.execute(postRequest);
+    CloseableHttpResponse httpResponse = execute(postRequest);
     String newClusterId;
     try {
       RestClient.responseCodeAnalysis(httpResponse);
@@ -149,9 +128,9 @@ public class ClusterRestClient implements ClusterClient {
 
   @Override
   public ClusterStatusResponse getClusterStatus(String clusterId) throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s/status", restClient.getVersion(), clusterId)));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
+    HttpGet getRequest = new HttpGet(getBaseURL().resolve(
+      String.format("/%s/clusters/%s/status", getVersion(), clusterId)));
+    CloseableHttpResponse httpResponse = execute(getRequest);
     ClusterStatusResponse clusterStatusResponse;
     try {
       RestClient.responseCodeAnalysis(httpResponse);
@@ -165,9 +144,9 @@ public class ClusterRestClient implements ClusterClient {
 
   @Override
   public JsonObject getClusterConfig(String clusterId) throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s/config", restClient.getVersion(), clusterId)));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
+    HttpGet getRequest = new HttpGet(getBaseURL().resolve(
+      String.format("/%s/clusters/%s/config", getVersion(), clusterId)));
+    CloseableHttpResponse httpResponse = execute(getRequest);
     JsonObject clusterDetails;
     try {
       RestClient.responseCodeAnalysis(httpResponse);
@@ -181,14 +160,14 @@ public class ClusterRestClient implements ClusterClient {
 
   @Override
   public void setClusterConfig(String clusterId, ClusterConfigureRequest clusterConfigureRequest) throws IOException {
-    HttpPut putRequest = new HttpPut(restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s/config", restClient.getVersion(), clusterId)));
+    HttpPut putRequest = new HttpPut(getBaseURL().resolve(
+      String.format("/%s/clusters/%s/config", getVersion(), clusterId)));
     if (clusterConfigureRequest != null) {
       StringEntity stringEntity = new StringEntity(GSON.toJson(clusterConfigureRequest), Charsets.UTF_8);
       putRequest.setEntity(stringEntity);
       LOG.debug("Set cluster config request with additional options {}.", clusterConfigureRequest);
     }
-    CloseableHttpResponse httpResponse = restClient.execute(putRequest);
+    CloseableHttpResponse httpResponse = execute(putRequest);
     try {
       RestClient.responseCodeAnalysis(httpResponse);
     } finally {
@@ -198,9 +177,9 @@ public class ClusterRestClient implements ClusterClient {
 
   @Override
   public Set<String> getClusterServices(String clusterId) throws IOException {
-    HttpGet getRequest = new HttpGet(restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s/services", restClient.getVersion(), clusterId)));
-    CloseableHttpResponse httpResponse = restClient.execute(getRequest);
+    HttpGet getRequest = new HttpGet(getBaseURL().resolve(
+      String.format("/%s/clusters/%s/services", getVersion(), clusterId)));
+    CloseableHttpResponse httpResponse = execute(getRequest);
     Set<String> clusterServices;
     try {
       RestClient.responseCodeAnalysis(httpResponse);
@@ -215,9 +194,9 @@ public class ClusterRestClient implements ClusterClient {
   @Override
   public void syncClusterTemplate(String clusterId) throws IOException {
     HttpPost postRequest =
-      new HttpPost(restClient.getBaseURL().resolve(String.format("/%s/clusters/%s/clustertemplate/sync",
-                                                                 restClient.getVersion(), clusterId)));
-    CloseableHttpResponse httpResponse = restClient.execute(postRequest);
+      new HttpPost(getBaseURL().resolve(String.format("/%s/clusters/%s/clustertemplate/sync", getVersion(),
+                                                      clusterId)));
+    CloseableHttpResponse httpResponse = execute(postRequest);
     try {
       RestClient.responseCodeAnalysis(httpResponse);
     } finally {
@@ -227,13 +206,13 @@ public class ClusterRestClient implements ClusterClient {
 
   @Override
   public void setClusterExpireTime(String clusterId, long expireTime) throws IOException {
-    HttpPost postRequest = new HttpPost(restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s", restClient.getVersion(), clusterId)));
+    HttpPost postRequest = new HttpPost(getBaseURL().resolve(String.format("/%s/clusters/%s", getVersion(),
+                                                                           clusterId)));
     StringEntity entity = new StringEntity(GSON.toJson(ImmutableMap.of(EXPIRE_TIME_ATTRIBUTE_NAME, expireTime)));
     entity.setContentType(MediaType.APPLICATION_JSON);
     postRequest.setEntity(entity);
     LOG.debug("Set a cluster expiration timestamp to the new value {}.", expireTime);
-    CloseableHttpResponse httpResponse = restClient.execute(postRequest);
+    CloseableHttpResponse httpResponse = execute(postRequest);
     try {
       RestClient.responseCodeAnalysis(httpResponse);
     } finally {
@@ -249,8 +228,8 @@ public class ClusterRestClient implements ClusterClient {
   @Override
   public void startServiceOnCluster(String clusterId, String serviceId,
                                     ClusterOperationRequest clusterOperationRequest) throws IOException {
-    URI startURI = restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s/services/%s/start", restClient.getVersion(), clusterId, serviceId));
+    URI startURI = getBaseURL().resolve(String.format("/%s/clusters/%s/services/%s/start", getVersion(), clusterId,
+                                                      serviceId));
     serviceActionRequest(startURI, clusterOperationRequest);
   }
 
@@ -262,8 +241,8 @@ public class ClusterRestClient implements ClusterClient {
   @Override
   public void stopServiceOnCluster(String clusterId, String serviceId, ClusterOperationRequest clusterOperationRequest)
     throws IOException {
-    URI stopURL = restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s/services/%s/stop", restClient.getVersion(), clusterId, serviceId));
+    URI stopURL = getBaseURL().resolve(String.format("/%s/clusters/%s/services/%s/stop", getVersion(), clusterId,
+                                                     serviceId));
     serviceActionRequest(stopURL, clusterOperationRequest);
   }
 
@@ -275,8 +254,8 @@ public class ClusterRestClient implements ClusterClient {
   @Override
   public void restartServiceOnCluster(String clusterId, String serviceId,
                                       ClusterOperationRequest clusterOperationRequest) throws IOException {
-    URI restartURL = restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s/services/%s/restart", restClient.getVersion(), clusterId, serviceId));
+    URI restartURL = getBaseURL().resolve(String.format("/%s/clusters/%s/services/%s/restart", getVersion(), clusterId,
+                                                        serviceId));
     serviceActionRequest(restartURL, clusterOperationRequest);
   }
 
@@ -288,7 +267,7 @@ public class ClusterRestClient implements ClusterClient {
       postRequest.setEntity(stringEntity);
       LOG.debug("Added optional provider fields to the request body: {}.", stringEntity);
     }
-    CloseableHttpResponse httpResponse = restClient.execute(postRequest);
+    CloseableHttpResponse httpResponse = execute(postRequest);
     try {
       RestClient.responseCodeAnalysis(httpResponse);
     } finally {
@@ -298,14 +277,14 @@ public class ClusterRestClient implements ClusterClient {
 
   @Override
   public void addServicesOnCluster(String clusterId, AddServicesRequest addServicesRequest) throws IOException {
-    HttpPost postRequest = new HttpPost(restClient.getBaseURL().resolve(
-      String.format("/%s/clusters/%s/services", restClient.getVersion(), clusterId)));
+    HttpPost postRequest = new HttpPost(getBaseURL().resolve(
+      String.format("/%s/clusters/%s/services", getVersion(), clusterId)));
     if (addServicesRequest != null) {
       StringEntity stringEntity = new StringEntity(GSON.toJson(addServicesRequest), Charsets.UTF_8);
       postRequest.setEntity(stringEntity);
       LOG.debug("Add services on the cluster request {}.", addServicesRequest);
     }
-    CloseableHttpResponse httpResponse = restClient.execute(postRequest);
+    CloseableHttpResponse httpResponse = execute(postRequest);
     try {
       RestClient.responseCodeAnalysis(httpResponse);
     } finally {
