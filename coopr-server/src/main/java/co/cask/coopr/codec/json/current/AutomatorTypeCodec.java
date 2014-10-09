@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.spec.BaseAdminEntity;
+import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ParameterType;
 import co.cask.coopr.spec.plugin.ParametersSpecification;
@@ -32,7 +32,7 @@ import java.util.Map;
  * Codec for deserializing a {@link co.cask.coopr.spec.plugin.AutomatorType}.
  * Used so that the constructor is called to avoid null values where they do not make sense.
  */
-public class AutomatorTypeCodec extends BaseAdminEntityCodec<AutomatorType> {
+public class AutomatorTypeCodec extends AbstractBaseEntityCodec<AutomatorType> {
   private static final Type PARAMETERS_TYPE = new TypeToken<Map<ParameterType, ParametersSpecification>>() {}.getType();
   private static final Type RESOURCES_TYPE = new TypeToken<Map<String, ResourceTypeSpecification>>() {}.getType();
 
@@ -43,7 +43,7 @@ public class AutomatorTypeCodec extends BaseAdminEntityCodec<AutomatorType> {
   }
 
   @Override
-  protected BaseAdminEntity.Builder<AutomatorType> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
+  protected BaseEntity.Builder<AutomatorType> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
     return AutomatorType.builder()
       .setParameters(context.<Map<ParameterType, ParametersSpecification>>deserialize(
         jsonObj.get("parameters"), PARAMETERS_TYPE))

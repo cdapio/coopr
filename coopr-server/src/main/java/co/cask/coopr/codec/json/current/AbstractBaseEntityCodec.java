@@ -17,7 +17,7 @@
 package co.cask.coopr.codec.json.current;
 
 import co.cask.coopr.codec.json.AbstractCodec;
-import co.cask.coopr.spec.BaseAdminEntity;
+import co.cask.coopr.spec.BaseEntity;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,9 +27,9 @@ import com.google.gson.JsonSerializationContext;
 import java.lang.reflect.Type;
 
 /**
- * Base codec for serializing and deserializing a {@link BaseAdminEntity}.
+ * Base codec for serializing and deserializing a {@link co.cask.coopr.spec.BaseEntity}.
  */
-public abstract class BaseAdminEntityCodec<T extends BaseAdminEntity> extends AbstractCodec<T> {
+public abstract class AbstractBaseEntityCodec<T extends BaseEntity> extends AbstractCodec<T> {
 
   @Override
   public JsonElement serialize(T entity, Type type, JsonSerializationContext context) {
@@ -73,6 +73,6 @@ public abstract class BaseAdminEntityCodec<T extends BaseAdminEntity> extends Ab
    * @param context context for deserialization
    * @return builder initialized with child specific fields
    */
-  protected abstract BaseAdminEntity.Builder<T> getBuilder(JsonObject jsonObj, JsonDeserializationContext context);
+  protected abstract BaseEntity.Builder<T> getBuilder(JsonObject jsonObj, JsonDeserializationContext context);
 
 }

@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.spec.service;
 
-import co.cask.coopr.spec.BaseAdminEntity;
+import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.ProvisionerAction;
 import com.google.common.base.Objects;
@@ -30,12 +30,12 @@ import java.util.Set;
  * {@link co.cask.coopr.spec.ProvisionerAction} to {@link ServiceAction} that provisioners will need to execute
  * when performing cluster operations such as creation and deletion.
  */
-public final class Service extends BaseAdminEntity {
+public final class Service extends BaseEntity {
   private final ServiceDependencies dependencies;
   private final Map<ProvisionerAction, ServiceAction> provisionerActions;
   private final Set<Link> links;
 
-  private Service(BaseAdminEntity.Builder baseBuilder, ServiceDependencies dependencies,
+  private Service(BaseEntity.Builder baseBuilder, ServiceDependencies dependencies,
                   Map<ProvisionerAction, ServiceAction> provisionerActions, Set<Link> links) {
     super(baseBuilder);
     this.dependencies = dependencies;
@@ -82,7 +82,7 @@ public final class Service extends BaseAdminEntity {
   /**
    * Builder for creating a service.
    */
-  public static class Builder extends BaseAdminEntity.Builder<Service> {
+  public static class Builder extends BaseEntity.Builder<Service> {
     private ServiceDependencies dependencies = ServiceDependencies.EMPTY_SERVICE_DEPENDENCIES;
     private Map<ProvisionerAction, ServiceAction> provisionerActions = ImmutableMap.of();
     private Set<Link> links = ImmutableSet.of();
