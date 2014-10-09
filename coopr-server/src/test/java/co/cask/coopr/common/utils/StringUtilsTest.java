@@ -34,4 +34,10 @@ public class StringUtilsTest {
     Assert.assertFalse(StringUtils.isValidDNSSuffix("dev.compa)y.net"));
     Assert.assertFalse(StringUtils.isValidDNSSuffix("dev.compa/y.net"));
   }
+
+  @Test
+  public void testStripLeadingDigits() {
+    Assert.assertEquals("", StringUtils.stripLeadingDigits("1234567890"));
+    Assert.assertEquals("abc", StringUtils.stripLeadingDigits("1234567890abc"));
+  }
 }

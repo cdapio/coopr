@@ -36,7 +36,7 @@ public class NodeServiceTest extends ServiceTestBase {
   public void testCreateHostname() {
     String clusterId = "00000001";
     Assert.assertEquals("i-am-a-cluster1-1002.local",
-                        NodeService.createHostname("i.am-a_clusTer", clusterId, 1002, null));
+                        NodeService.createHostname("123i.am-a_clusTer", clusterId, 1002, null));
   }
 
   @Test

@@ -31,6 +31,22 @@ public class StringUtils {
   private static final Pattern labelPattern = Pattern.compile("^[a-zA-Z0-9\\-]{0,62}[a-zA-Z0-9]$");
 
   /**
+   * Strip all leading digits from a string. For example, "1234abc" becomes "abc". If the string is comprised
+   * entirely of digits, the empty string is returned.
+   *
+   * @param str string to strip
+   * @return string with leading digits stripped
+   */
+  public static String stripLeadingDigits(String str) {
+    for (int i = 0; i < str.length(); i++) {
+      if (!Character.isDigit(str.charAt(i))) {
+        return str.substring(i);
+      }
+    }
+    return "";
+  }
+
+  /**
    * Check if the given DNS suffix is valid by checking that each label is at least 1 and at most 63 characters
    * in length. Also check that each label has only characters, numbers, or '-', and that the entire suffix is
    * at most 255 - 63 - 1 characters, since it will be appended to a single label later on to create a hostname.

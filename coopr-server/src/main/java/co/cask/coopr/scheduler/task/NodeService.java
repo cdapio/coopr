@@ -18,6 +18,7 @@ package co.cask.coopr.scheduler.task;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
+import co.cask.coopr.common.utils.StringUtils;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import com.google.inject.Inject;
@@ -143,8 +144,10 @@ public class NodeService {
     // to get the first label of the hostname.
     // ex: name53-1000
     String labelSuffix = clusterIdNum + "-" + nodeNum;
+    // it is technically valid to have a hostname that has digits in the front, but it used to not be valid
+    // stripping leading digits to play nice with older code which may check for leading digits.
+    String labelPrefix = StringUtils.stripLeadingDigits(clusterName);
     // the label must be from 1 to 63 (inclusive) characters in length. If the name is too long, chop off the end
-    String labelPrefix = clusterName;
     if (labelPrefix.length() + labelSuffix.length() > 63) {
       labelPrefix = labelPrefix.substring(0, 63 - labelSuffix.length());
     }
