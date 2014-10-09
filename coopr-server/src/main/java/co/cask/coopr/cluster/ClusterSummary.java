@@ -39,7 +39,7 @@ public class ClusterSummary {
     this.provider = provider == null ? null : new NamedEntity(provider.getName());
     ClusterTemplate clusterTemplate = cluster.getClusterTemplate();
     this.clusterTemplate = clusterTemplate == null ? null : new NamedEntity(clusterTemplate.getName());
-    this.numNodes = cluster.getNodes().size();
+    this.numNodes = cluster.getNodeIDs().size();
     this.status = cluster.getStatus();
     this.services = ImmutableSet.copyOf(cluster.getServices());
     this.progress = new ClusterJobProgress(clusterJob);

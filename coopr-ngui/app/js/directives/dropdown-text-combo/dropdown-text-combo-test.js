@@ -68,10 +68,9 @@ describe("Unit tests for my-dropdown-combo-text directive", function(myApi) {
     expect(directiveScope.dropdownValues.length).toBe(2);
   });
 
-  it("should have valid placeholder for text field", function() {
+  it("should have valid label for text field", function() {
     expect(
-      $(element).find("input[name=text1]").attr("placeholder")
-      //element[0].querySelector("input[name=text1]").getAttribute("placeholder")
-    ).toEqual("somerandomplaceholder");
+      $(element).find("label[for='my-ddtc-something-0']").text()
+    ).toMatch("somerandomplaceholder");
   });
 });

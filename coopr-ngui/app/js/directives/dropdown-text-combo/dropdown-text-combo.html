@@ -4,17 +4,20 @@
       <input type="text" value="{{key}}" class="form-control" readonly />
     </div>
     <div class="col-xs-7">
-      <div ng-repeat="field in textFields" class="form-group">
-        <div class="col-sm-2 control-label">
-          <small>{{field.placeholder || (field.name | myCapitalizeFilter)}}:</small>
-        </div>
-        <div class="col-sm-10">
+      <div ng-repeat="field in textFields">
+
+        <div class="input-group">
+          <label for="my-ddtc-{{key}}-{{$index}}" class="input-group-addon">
+            {{field.placeholder || (field.name | myCapitalizeFilter)}}
+          </label>
           <input type="text"
+                  id="my-ddtc-{{key}}-{{$index}}"
                   ng-model="value[field.name]"
                   name="{{field.name}}"
-                  placeholder="{{field.placeholder || field.name}}"
                   class="form-control" />
+
         </div>
+
       </div>
     </div>
   </div>

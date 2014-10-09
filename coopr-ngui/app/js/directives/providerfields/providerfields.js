@@ -25,7 +25,7 @@ function myProviderFieldsDirective () {
         var fields = {},
             model = {},
             providerType = allTypes.filter(function (type) {
-              return type.name === $scope.provider.providertype;
+              return $scope.provider && type.name === $scope.provider.providertype;
             })[0];
 
         typeReqs = [];

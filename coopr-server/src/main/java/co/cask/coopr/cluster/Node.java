@@ -15,6 +15,8 @@
  */
 package co.cask.coopr.cluster;
 
+import co.cask.coopr.macro.Expander;
+import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.service.Service;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
@@ -23,6 +25,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -31,14 +35,14 @@ import java.util.Set;
 /**
  * Represents a machine in a cluster.
  */
-public final class Node implements Comparable<Node> {
-  private static final String IPADDRESS_KEY = "ipaddress";
+public class Node implements Comparable<Node> {
   private final String id;
   private final String clusterId;
   private final Set<Service> services;
   private final NodeProperties properties;
   private final List<Action> actions;
   private final JsonObject provisionerResults;
+  private List<Link> links;
 
   /**
    * Node status.
@@ -140,6 +144,16 @@ public final class Node implements Comparable<Node> {
   }
 
   /**
+   * Get an immutable list of service links on the node. Unless {@link #populateLinks(Cluster, java.util.Set)} is
+   * called first, this will return null.
+   *
+   * @return Immutable list of service links on the node.
+   */
+  public List<Link> getLinks() {
+    return links;
+  }
+
+  /**
    * Add a service to the node.
    *
    * @param service Service to add to the node.
@@ -157,6 +171,27 @@ public final class Node implements Comparable<Node> {
     for (Map.Entry<String, JsonElement> entry : results.entrySet()) {
       this.provisionerResults.add(entry.getKey(), entry.getValue());
     }
+  }
+
+  /**
+   * Get all service links on the node, combine them all, and expand any macros in them. Only useful for display
+   * purposes.
+   */
+  public void populateLinks(Cluster cluster, Set<Node> nodes) {
+    // take links from the services on this node, expand any self macros that may be there, and combine them all
+    ImmutableList.Builder<Link> linksBuilder = ImmutableList.builder();
+    for (Service service : services) {
+      for (Link link : service.getLinks()) {
+        try {
+          // The service link may have macros like %host.self% that should get expanded.
+          linksBuilder.add(new Link(link.getLabel(), Expander.expand(link.getUrl(), cluster, nodes, this)));
+        } catch (Exception e) {
+          // if we couldn't expand the macro, just use the original string
+          linksBuilder.add(link);
+        }
+      }
+    }
+    this.links = linksBuilder.build();
   }
 
   @Override

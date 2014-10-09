@@ -15,13 +15,11 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.codec.json.AbstractCodec;
+import co.cask.coopr.spec.BaseAdminEntity;
 import co.cask.coopr.spec.HardwareType;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
@@ -30,31 +28,18 @@ import java.util.Map;
 /**
  * Codec for serializing/deserializing a {@link HardwareType}.
  */
-public class HardwareTypeCodec extends AbstractCodec<HardwareType> {
+public class HardwareTypeCodec extends BaseAdminEntityCodec<HardwareType> {
+  private static final Type PROVIDERMAP_TYPE = new TypeToken<Map<String, Map<String, String>>>() {}.getType();
 
   @Override
-  public JsonElement serialize(HardwareType hardwareType, Type type, JsonSerializationContext context) {
-    JsonObject jsonObj = new JsonObject();
-
-    jsonObj.add("name", context.serialize(hardwareType.getName()));
-    jsonObj.add("icon", context.serialize(hardwareType.getIcon()));
-    jsonObj.add("description", context.serialize(hardwareType.getDescription()));
+  protected void addChildFields(HardwareType hardwareType, JsonObject jsonObj, JsonSerializationContext context) {
     jsonObj.add("providermap", context.serialize(hardwareType.getProviderMap()));
-
-    return jsonObj;
   }
 
   @Override
-  public HardwareType deserialize(JsonElement json, Type type, JsonDeserializationContext context)
-    throws JsonParseException {
-    JsonObject jsonObj = json.getAsJsonObject();
-
-    String name = context.deserialize(jsonObj.get("name"), String.class);
-    String icon = context.deserialize(jsonObj.get("icon"), String.class);
-    String description = context.deserialize(jsonObj.get("description"), String.class);
-    Map<String, Map<String, String>> providerMap =
-      context.deserialize(jsonObj.get("providermap"), new TypeToken<Map<String, Map<String, String>>>() {}.getType());
-
-    return new HardwareType(name, icon, description, providerMap);
+  protected BaseAdminEntity.Builder<HardwareType> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
+    return HardwareType.builder()
+      .setProviderMap(context.<Map<String, Map<String, String>>>deserialize(
+        jsonObj.get("providermap"), PROVIDERMAP_TYPE));
   }
 }

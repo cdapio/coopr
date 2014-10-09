@@ -23,27 +23,12 @@ import java.util.Map;
  * Image type defines different images to use on on clusters, and include information needed by provisioners to
  * provision machines from different providers.
  */
-public final class ImageType extends NamedIconEntity {
-  private final String description;
+public final class ImageType extends BaseAdminEntity {
   private final Map<String, Map<String, String>> providerMap;
 
-  public ImageType(String name, String icon, String description, Map<String, Map<String, String>> providerMap) {
-    super(name, icon);
-    this.description = description;
+  private ImageType(BaseAdminEntity.Builder baseBuilder, Map<String, Map<String, String>> providerMap) {
+    super(baseBuilder);
     this.providerMap = providerMap;
-  }
-
-  public ImageType(String name, String description, Map<String, Map<String, String>> providerMap) {
-    this(name, null, description, providerMap);
-  }
-
-  /**
-   * Get the description of this image type.
-   *
-   * @return Description of image type.
-   */
-  public String getDescription() {
-    return description;
   }
 
   /**
@@ -57,6 +42,32 @@ public final class ImageType extends NamedIconEntity {
     return providerMap;
   }
 
+  /**
+   * Get a builder for creating a image type.
+   *
+   * @return Builder for creating a image type.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for creating a image type.
+   */
+  public static class Builder extends BaseAdminEntity.Builder<ImageType> {
+    private Map<String, Map<String, String>> providerMap;
+
+    public Builder setProviderMap(Map<String, Map<String, String>> providerMap) {
+      this.providerMap = providerMap;
+      return this;
+    }
+
+    @Override
+    public ImageType build() {
+      return new ImageType(this, providerMap);
+    }
+  }
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof ImageType)) {
@@ -64,12 +75,18 @@ public final class ImageType extends NamedIconEntity {
     }
     ImageType other = (ImageType) o;
     return super.equals(other) &&
-      Objects.equal(description, other.description) &&
       providerMap.equals(other.providerMap);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(super.hashCode(), description, providerMap);
+    return Objects.hashCode(super.hashCode(), providerMap);
+  }
+
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("providerMap", providerMap)
+      .toString();
   }
 }
