@@ -110,7 +110,7 @@ class FogProviderJoyent < Provider
           # confirm it is not already mounted
           #   ubuntu: we remount from /mnt to /data
           #   centos: vdb1 already mounted at /data
-          ssh_exec!(ssh, 'if grep "vdb.* /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
+          ssh_exec!(ssh, 'if grep "vdb /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
         rescue
           vdb = false
         end
