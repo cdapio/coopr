@@ -38,10 +38,10 @@
         <label class="col-xs-2"></label>
         <div class="col-xs-10">
             <button type="submit" class="btn btn-primary"
-                ng-disabled="submitting || hardwareForm.$invalid">
+                ng-disabled="submitting || imageForm.$invalid">
             <span class="fa fa-save"></span>
-            <span ng-show="{{editing}}">Update</span>
-            <span ng-hide="{{editing}}">Create</span>
+            <span ng-show="editing">Update</span>
+            <span ng-hide="editing">Create</span>
         </button>
         </div>
     </div>

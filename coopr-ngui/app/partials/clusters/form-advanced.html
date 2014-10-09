@@ -2,7 +2,7 @@
   <label for="inputLeaseDays" class="col-xs-2 control-label">Lease duration</label>
   <div class="col-xs-10 col-sm-8 col-md-6">
 
-    <fieldset class="row" ng-disabled="model.id" ng-class="{
+    <fieldset class="row" ng-disabled="editing" ng-class="{
       'has-error': leaseMaxReached
     }">
       <div class="col-xs-4">
@@ -48,14 +48,14 @@
   <div class="col-xs-5">
     <input id="inputClusterDnsSuffix" type="text" name="dnsSuffix" class="form-control" 
       placeholder="DNS suffix"
-      ng-disabled="model.id"
+      ng-disabled="editing"
       ng-model="model.dnsSuffix"/>
   </div>
 
   <label for="inputHardwareType" class="col-xs-2 control-label">Hardware type</label>
   <div class="col-xs-3">
     <select id="inputHardwareType" name="hardwaretype" class="form-control"
-      ng-disabled="model.id"
+      ng-disabled="editing"
       ng-model="model.hardwaretype"
       ng-options="hrdwr.name as hrdwr.name for hrdwr in availableHardware" required>
     </select>
@@ -67,7 +67,7 @@
   <label for="inputProvider" class="col-xs-2 control-label">Provider</label>
   <div class="col-xs-5">
     <select id="inputProvider" name="provider" class="form-control"
-      ng-disabled="model.id"
+      ng-disabled="editing"
       ng-model="model.provider"
       ng-options="prvdr.name as prvdr.description for prvdr in availableProviders" required>
     </select>
@@ -76,7 +76,7 @@
   <label for="inputImageType" class="col-xs-2 control-label">Image type</label>
   <div class="col-xs-3">
     <select id="inputImageType" name="imagetype" class="form-control"
-      ng-disabled="model.id"
+      ng-disabled="editing"
       ng-model="model.imagetype"
       ng-options="img.name as img.name for img in availableImages" required>
     </select>
@@ -86,7 +86,7 @@
 
 <div class="form-group">
   <label class="col-xs-2 control-label">Provider fields</label>
-  <fieldset class="col-xs-10" ng-disabled="model.id">
+  <fieldset class="col-xs-10" ng-disabled="editing">
 
     <my-provider-fields 
       data-model="model.providerFields"
@@ -103,8 +103,8 @@
 
     <my-service-picker
       data-model="model.services"
-      data-allow-rm="!model.id"
-      data-available="model.id ? null : availableServices"
+      data-allow-rm="!editing"
+      data-available="editing ? null : availableServices"
     ></my-service-picker>
 
   </div>

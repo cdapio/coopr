@@ -1,5 +1,40 @@
-<code>TODO: form for services</code>
+<form name="serviceForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
+
+  <div class="form-group">
+    <label for="inputServiceName" class="col-xs-2 control-label">Name</label>
+    <div class="col-xs-10">
+      <input id="inputServiceName" type="text" name="name" class="form-control" 
+        placeholder="Name" 
+        my-focus="inputServiceName"
+        ng-disabled="editing"
+        ng-pattern="/^[\w\.\-]+$/"
+        maxlength="255"
+        ng-model="model.name" required/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="inputServiceDescription" class="col-xs-2 control-label">Description</label>
+    <div class="col-xs-10">
+      <textarea id="inputServiceDescription" 
+        class="form-control" rows="4"
+        ng-model="model.description"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-xs-10 cols-xs-offset-2">
+      <button type="submit" class="btn btn-primary" 
+        ng-disabled="submitting || serviceForm.$invalid">
+        <span class="fa fa-save"></span>
+        <span ng-show="editing">Update</span>
+        <span ng-hide="editing">Create</span>
+      </button>
+    </div>
+  </div>
+
+</form>
 
 
-<ng-include src="'/partials/json.html'"></ng-include>
-
+<pre>{{model | json}}</pre>
