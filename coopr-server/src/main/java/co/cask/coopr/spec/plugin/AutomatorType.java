@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.spec.plugin;
 
-import co.cask.coopr.spec.BaseAdminEntity;
+import co.cask.coopr.spec.BaseEntity;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class AutomatorType extends AbstractPluginSpecification {
 
-  private AutomatorType(BaseAdminEntity.Builder baseBuilder,
+  private AutomatorType(BaseEntity.Builder baseBuilder,
                         Map<ParameterType, ParametersSpecification> parameters,
                         Map<String, ResourceTypeSpecification> resourceTypes) {
     super(baseBuilder, parameters, resourceTypes);
