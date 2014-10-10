@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('ClusterFormCtrl', 
-function ($scope, $state, $q, CrudFormBase, myApi, myFocusManager, myHelpers) {
+function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHelpers) {
   CrudFormBase.apply($scope);
 
   var id = $state.params.id;
@@ -161,7 +161,7 @@ function ($scope, $state, $q, CrudFormBase, myApi, myFocusManager, myHelpers) {
         $state.go('^.list');
 
         $alert({
-          title: "Cluster", 
+          title: 'Cluster', 
           content: ($scope.editing ? 'reconfiguration' : 'creation') + ' succeeded!', 
           type: 'success', 
           duration: 3
