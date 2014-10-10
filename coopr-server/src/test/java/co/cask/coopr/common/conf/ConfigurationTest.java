@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * ConfigurationTest checks that the obtaining properties from the coopr-security.xml is working correctly.
+ * ConfigurationTest checks that obtaining properties from coopr-security.xml works correctly.
  */
 public class ConfigurationTest {
 

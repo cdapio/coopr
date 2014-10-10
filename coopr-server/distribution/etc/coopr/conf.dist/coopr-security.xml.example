@@ -21,11 +21,11 @@
   <property>
     <name>server.db.user</name>
     <value>coopr</value>
-    <description>mysql user</description>
+    <description>Database user</description>
   </property>
   <property>
     <name>server.db.password</name>
     <value>changeme</value>
-    <description>mysql user password</description>
+    <description>Database password</description>
   </property>
 </configuration>
