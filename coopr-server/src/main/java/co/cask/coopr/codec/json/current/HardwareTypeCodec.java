@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.spec.BaseAdminEntity;
+import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.HardwareType;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * Codec for serializing/deserializing a {@link HardwareType}.
  */
-public class HardwareTypeCodec extends BaseAdminEntityCodec<HardwareType> {
+public class HardwareTypeCodec extends AbstractBaseEntityCodec<HardwareType> {
   private static final Type PROVIDERMAP_TYPE = new TypeToken<Map<String, Map<String, String>>>() {}.getType();
 
   @Override
@@ -37,7 +37,7 @@ public class HardwareTypeCodec extends BaseAdminEntityCodec<HardwareType> {
   }
 
   @Override
-  protected BaseAdminEntity.Builder<HardwareType> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
+  protected BaseEntity.Builder<HardwareType> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
     return HardwareType.builder()
       .setProviderMap(context.<Map<String, Map<String, String>>>deserialize(
         jsonObj.get("providermap"), PROVIDERMAP_TYPE));

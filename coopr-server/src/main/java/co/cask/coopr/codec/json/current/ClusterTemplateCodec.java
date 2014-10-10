@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.spec.BaseAdminEntity;
+import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
@@ -32,7 +32,7 @@ import java.util.Set;
 /**
  * Codec for serializing/deserializing a {@link ClusterTemplate}.
  */
-public class ClusterTemplateCodec extends BaseAdminEntityCodec<ClusterTemplate> {
+public class ClusterTemplateCodec extends AbstractBaseEntityCodec<ClusterTemplate> {
   private static final Type LINKS_TYPE = new com.google.common.reflect.TypeToken<Set<Link>>() {}.getType();
 
   @Override
@@ -45,7 +45,7 @@ public class ClusterTemplateCodec extends BaseAdminEntityCodec<ClusterTemplate> 
   }
 
   @Override
-  protected BaseAdminEntity.Builder<ClusterTemplate> getBuilder(JsonObject jsonObj,
+  protected BaseEntity.Builder<ClusterTemplate> getBuilder(JsonObject jsonObj,
                                                                 JsonDeserializationContext context) {
     return ClusterTemplate.builder()
       .setClusterDefaults(context.<ClusterDefaults>deserialize(jsonObj.get("defaults"), ClusterDefaults.class))

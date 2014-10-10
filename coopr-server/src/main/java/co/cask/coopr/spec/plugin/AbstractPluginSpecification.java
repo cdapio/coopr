@@ -16,7 +16,7 @@
 
 package co.cask.coopr.spec.plugin;
 
-import co.cask.coopr.spec.BaseAdminEntity;
+import co.cask.coopr.spec.BaseEntity;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -29,11 +29,11 @@ import java.util.Set;
 /**
  * Plugin specification, including what parameters are supported and required and what types of resources are supported.
  */
-public abstract class AbstractPluginSpecification extends BaseAdminEntity {
+public abstract class AbstractPluginSpecification extends BaseEntity {
   private final Map<String, ResourceTypeSpecification> resourceTypes;
   protected final Map<ParameterType, ParametersSpecification> parameters;
 
-  protected AbstractPluginSpecification(BaseAdminEntity.Builder baseBuilder,
+  protected AbstractPluginSpecification(BaseEntity.Builder baseBuilder,
                                         Map<ParameterType, ParametersSpecification> parameters,
                                         Map<String, ResourceTypeSpecification> resourceTypes) {
     super(baseBuilder);
@@ -116,7 +116,7 @@ public abstract class AbstractPluginSpecification extends BaseAdminEntity {
    *
    * @param <T> type of plugin.
    */
-  public abstract static class Builder<T extends AbstractPluginSpecification> extends BaseAdminEntity.Builder<T> {
+  public abstract static class Builder<T extends AbstractPluginSpecification> extends BaseEntity.Builder<T> {
     protected Map<String, ResourceTypeSpecification> resourceTypes;
     protected Map<ParameterType, ParametersSpecification> parameters;
 

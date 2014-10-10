@@ -24,10 +24,10 @@ import java.util.Map;
  * different providers and information needed by the provisioner to create the hardware for each provider, which should
  * contain the provider specific flavor and any other information needed to create the hardware.
  */
-public final class HardwareType extends BaseAdminEntity {
+public final class HardwareType extends BaseEntity {
   private final Map<String, Map<String, String>> providerMap;
 
-  private HardwareType(BaseAdminEntity.Builder baseBuilder, Map<String, Map<String, String>> providerMap) {
+  private HardwareType(BaseEntity.Builder baseBuilder, Map<String, Map<String, String>> providerMap) {
     super(baseBuilder);
     this.providerMap = providerMap;
   }
@@ -55,7 +55,7 @@ public final class HardwareType extends BaseAdminEntity {
   /**
    * Builder for creating a hardware type.
    */
-  public static class Builder extends BaseAdminEntity.Builder<HardwareType> {
+  public static class Builder extends BaseEntity.Builder<HardwareType> {
     private Map<String, Map<String, String>> providerMap;
 
     public Builder setProviderMap(Map<String, Map<String, String>> providerMap) {
