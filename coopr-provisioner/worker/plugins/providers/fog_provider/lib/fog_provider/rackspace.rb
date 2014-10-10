@@ -58,6 +58,9 @@ class FogProviderRackspace < Provider
       @result['result']['ssh-auth']['password'] = server.password unless server.password.nil?
       @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
+    rescue Excon::Errors::Unauthorized
+      @result['status'] = 201
+      log.error('Provider credentials invalid/unauthorized')
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderRackspace.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderRackspace.create: #{e.inspect}"
