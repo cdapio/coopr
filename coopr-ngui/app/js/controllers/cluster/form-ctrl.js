@@ -1,6 +1,6 @@
 /**
  * ClusterFormCtrl
- * handles both "edit" and "create" views
+ * handles both "reconfigure" and "create" views
  */
 
 angular.module(PKG.name+'.controllers').controller('ClusterFormCtrl', 

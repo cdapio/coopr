@@ -16,24 +16,8 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
   }
   else {
     $scope.model = new myApi.Template();
-    angular.extend($scope.model, {
-      compatibility: {
-        services: ['base'],
-        imagetypes: [],
-        hardwaretypes: []
-      },
-      defaults: {
-        config: {},
-        services: ['base']
-      },
-      constraints: {
-        layout: {
-          mustcoexist: [],
-          cantcoexist: []          
-        },
-        services: {}
-      }
-    });
+    $scope.model.initialize();
+
     promise = $q.when($scope.model);
   }
 
@@ -83,8 +67,6 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
   $scope.leaseDuration = {};
 
   promise.then(function (model) {
-    model.administration = model.administration || {leaseduration:{}};
-
     angular.forEach(['initial', 'max', 'step'], function (one) {
       $scope.leaseDuration[one] = myHelpers.parseMilliseconds( model.administration.leaseduration[one] || 0 );
 

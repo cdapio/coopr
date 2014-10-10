@@ -14,9 +14,9 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
   }
   else {
     $scope.model = new myApi.Tenant();
+    $scope.model.initialize();
+
     promise = $q.when($scope.model);
-    $scope.model.maxClusters = 0;
-    $scope.model.maxNodes = 0;
   }
 
   $q.all({

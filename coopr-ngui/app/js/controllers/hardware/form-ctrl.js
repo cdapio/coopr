@@ -13,8 +13,6 @@ function ($scope, $state, myApi, CrudFormBase) {
   }
   else { // creating
     $scope.model = new myApi.HardwareType();
-    angular.extend($scope.model, {
-      providermap: {}
-    });
+    $scope.model.initialize();
   }
 });

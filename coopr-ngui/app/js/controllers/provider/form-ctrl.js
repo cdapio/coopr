@@ -20,7 +20,7 @@ function ($scope, $state, $q, myApi, CrudFormBase) {
   } else {
 
     $scope.model = new myApi.Provider();
-    $scope.model.provisioner = {};
+    $scope.model.initialize();
 
     // No need to watch if not editing becuase this field is disabled.
     $scope.$watch('model.providertype', function (newVal) {

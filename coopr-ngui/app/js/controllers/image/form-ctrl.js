@@ -16,8 +16,6 @@ function ($scope, $state, myApi, CrudFormBase) {
   }
   else { // creating
     $scope.model = new myApi.ImageType();
-    angular.extend($scope.model, {
-      providermap: {}
-    });
+    $scope.model.initialize();
   }
 });

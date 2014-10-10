@@ -1,3 +1,10 @@
+<div class="row">
+  <div class="col-xs-4 am-fade-and-slide-left" ng-show="debugJson.visible">
+    <pre>{{model | json}}</pre>
+  </div>
+  <div ng-class="{'col-xs-8': debugJson.visible}">
+
+
 <form name="serviceForm" class="form-horizontal" role="form" ng-submit="doSubmit(model)" novalidate>
 
   <div class="form-group">
@@ -24,7 +31,17 @@
   </div>
 
   <div class="form-group">
-    <div class="col-xs-10 cols-xs-offset-2">
+    <div class="col-xs-2">
+      <p class="form-control-static" ng-hide="debugJson.visible">
+        <a href="" ng-click="debugJson.visible = true">
+          <small>
+            <span class="fa fa-fw fa-toggle-left"></span>
+            json preview
+          </small>
+        </a>
+      </p>
+    </div>
+    <div class="col-xs-10">
       <button type="submit" class="btn btn-primary" 
         ng-disabled="submitting || serviceForm.$invalid">
         <span class="fa fa-save"></span>
@@ -37,4 +54,7 @@
 </form>
 
 
-<pre>{{model | json}}</pre>
+
+  </div>
+</div>
+
