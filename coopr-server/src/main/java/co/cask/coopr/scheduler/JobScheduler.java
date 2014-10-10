@@ -33,6 +33,7 @@ import co.cask.coopr.scheduler.task.SchedulableTask;
 import co.cask.coopr.scheduler.task.TaskConfig;
 import co.cask.coopr.scheduler.task.TaskId;
 import co.cask.coopr.scheduler.task.TaskService;
+import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
@@ -48,6 +49,7 @@ import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -121,10 +123,9 @@ public class JobScheduler implements Runnable {
           boolean jobFailed = job.getJobStatus() == ClusterJob.Status.FAILED;
           int completedTasks = 0;
           int inProgressTasks = 0;
-          int createFailedTasks = 0;
           Set<ClusterTask> notSubmittedTasks = Sets.newHashSet();
           Set<ClusterTask> retryTasks = Sets.newHashSet();
-          // TODO: avoid looking up every single task every time
+          // TODO: avoid looking up every single task every time, or at least do a batch lookup
           LOG.debug("Verifying task statuses for stage {} for job {}", job.getCurrentStageNumber(), jobIdStr);
           for (String taskId : currentStage) {
             ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
@@ -140,10 +141,6 @@ public class JobScheduler implements Runnable {
                 retryTasks.add(task);
               } else {
                 jobFailed = true;
-              }
-              // special case: try to determine if creates failed before anything could really be created
-              if (job.getClusterAction() == ClusterAction.CLUSTER_CREATE && task.failedBeforeCreate()) {
-                ++createFailedTasks;
               }
             } else if (task.getStatus() == ClusterTask.Status.IN_PROGRESS) {
               ++inProgressTasks;
@@ -186,9 +183,13 @@ public class JobScheduler implements Runnable {
           } else if (inProgressTasks == 0) {
             // special case: if all tasks were create tasks and all of them failed before they created anything,
             // set the cluster state to 'terminated' instead of letting it go to 'incomplete'.
-            if (createFailedTasks == currentStage.size()) {
-              taskService.failJobAndTerminateCluster(job, cluster,
-                                                     "Unable to create nodes, please check your provider settings");
+            if (job.getClusterAction() == ClusterAction.CLUSTER_CREATE && allCreateTasksFailed(job)) {
+              String message = job.getStatusMessage();
+              // job could have been aborted before any tasks were taken. Keep abort message if that was the case.
+              if (message == null || message.isEmpty()) {
+                message = "Unable to create nodes, please check your provider settings";
+              }
+              taskService.failJobAndTerminateCluster(job, cluster, message);
             } else {
               // Job failed and no in progress tasks remaining, update cluster status
               taskService.failJobAndSetClusterStatus(job, cluster);
@@ -206,6 +207,30 @@ public class JobScheduler implements Runnable {
     } catch (Throwable e) {
       LOG.error("Got exception: ", e);
     }
+  }
+
+  // check that every task that ran failed, and that every failure was a cluster create, and that every failure
+  // failed in a way where no resources were actually created (for ex, if provider settings are wrong).
+  private boolean allCreateTasksFailed(ClusterJob job) throws IOException {
+    for (Map.Entry<String, ClusterTask.Status> entry : job.getTaskStatus().entrySet()) {
+      String taskId = entry.getKey();
+      ClusterTask.Status taskStatus = entry.getValue();
+      // no task can succeed or be in progress
+      if (taskStatus == ClusterTask.Status.COMPLETE || taskStatus == ClusterTask.Status.IN_PROGRESS) {
+        return false;
+      }
+      if (taskStatus == ClusterTask.Status.FAILED) {
+        // looks up every failed task... not so great.  But it should be roughly equal to the # of nodes in the cluster.
+        ClusterTask task = clusterStore.getClusterTask(TaskId.fromString(taskId));
+        // check it is a create task
+        if (!task.failedBeforeCreate()) {
+          return false;
+        }
+      }
+    }
+    // if we get here, we only have failed, dropped, or not submitted tasks, and all the failed tasks failed before
+    // they could create anything
+    return true;
   }
 
   private void submitTasks(Set<ClusterTask> notSubmittedTasks, Cluster cluster, Map<String, Node> nodeMap,
