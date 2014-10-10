@@ -29,6 +29,12 @@ class ChefSoloAutomator < Automator
   @@remote_cache_dir = '/var/cache/coopr'
   @@remote_chef_dir = '/var/chef'
 
+  # plugin defined resources
+  @ssh_key_dir = 'ssh_keys'
+  class << self
+    attr_accessor :ssh_key_dir
+  end
+
   # create local tarballs of the cookbooks, roles, data_bags, etc to be scp'd to remote machine
   def generate_chef_primitive_tar(chef_primitive)
 
@@ -52,6 +58,15 @@ class ChefSoloAutomator < Automator
     # rubocop:enable GuardClause
   end
 
+  def write_ssh_file
+    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
+    unless @ssh_keyfile.nil?
+      @task['config']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @task['taskId'])
+      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
+      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
+    end
+  end
+
   def set_credentials(sshauth)
     @credentials = Hash.new
     @credentials[:paranoid] = false
@@ -64,9 +79,9 @@ class ChefSoloAutomator < Automator
     end
   end
 
-  def decode_string_to_file(string, outfile)
+  def decode_string_to_file(string, outfile, mode = 0600)
     FileUtils.mkdir_p(File.dirname(outfile))
-    File.open(outfile, 'wb') { |f| f.write(Base64.decode64(string)) }
+    File.open(outfile, 'wb', mode) { |f| f.write(Base64.decode64(string)) }
   end
 
   # generate the chef run json_attributes from the task metadata
@@ -123,16 +138,11 @@ class ChefSoloAutomator < Automator
     hostname = inputmap['hostname']
     ipaddress = inputmap['ipaddress']
 
-    # Write credentials
-    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
-    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
-      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
-      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
-    end
-
     # do we need sudo bash?
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
+    write_ssh_file
+    @ssh_file = @task['config']['ssh-auth']['identityfile'] unless @ssh_keyfile.nil?
     set_credentials(sshauth)
 
     @@chef_primitives.each do |chef_primitive|
@@ -221,19 +231,14 @@ class ChefSoloAutomator < Automator
 
     log.debug "ChefSoloAutomator bootstrap completed successfully: #{@result}"
     @result
+  ensure
+    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
   end
 
   def runchef(inputmap)
     sshauth = inputmap['sshauth']
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
-
-    # Write credentials
-    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
-    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
-      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
-      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
-    end
 
     raise "required parameter \"run_list\" not found in input: #{fields}" if fields['run_list'].nil?
     # run_list as specified by user
@@ -250,6 +255,8 @@ class ChefSoloAutomator < Automator
     # do we need sudo bash?
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
+    write_ssh_file
+    @ssh_file = @task['config']['ssh-auth']['identityfile'] unless @ssh_keyfile.nil?
     set_credentials(sshauth)
 
     begin
@@ -285,6 +292,8 @@ class ChefSoloAutomator < Automator
     @result['status'] = 0
     log.debug "Chef-solo run completed successfully for task #{@task['taskId']}: #{@result}"
     @result
+  ensure
+    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
   end
 
   def install(inputmap)

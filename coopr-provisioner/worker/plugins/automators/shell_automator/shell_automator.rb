@@ -23,6 +23,12 @@ require 'fileutils'
 class ShellAutomator < Automator
   attr_accessor :credentials, :scripts_dir, :scripts_tar, :remote_cache_dir
 
+  # plugin defined resources
+  @ssh_key_dir = 'ssh_keys'
+  class << self
+    attr_accessor :ssh_key_dir
+  end
+
   def initialize(env, task)
     super(env, task)
     work_dir = @env[:work_dir]
@@ -59,6 +65,15 @@ class ShellAutomator < Automator
     log.debug "Generation complete: #{file}"
   end
 
+  def write_ssh_file
+    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
+    unless @ssh_keyfile.nil?
+      @task['config']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @task['taskId'])
+      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
+      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
+    end
+  end
+
   def set_credentials(sshauth)
     @credentials = Hash.new
     @credentials[:paranoid] = false
@@ -71,22 +86,15 @@ class ShellAutomator < Automator
     end
   end
 
-  def decode_string_to_file(string, outfile)
+  def decode_string_to_file(string, outfile, mode = 0600)
     FileUtils.mkdir_p(File.dirname(outfile))
-    File.open(outfile, 'wb') { |f| f.write(Base64.decode64(string)) }
+    File.open(outfile, 'wb', mode) { |f| f.write(Base64.decode64(string)) }
   end
 
   def runshell(inputmap)
     sshauth = inputmap['sshauth']
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
-
-    # Write credentials
-    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
-    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
-      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
-      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
-    end
 
     raise "required parameter \"script\" not found in input: #{fields}" if fields['script'].nil?
     shellscript = fields['script']
@@ -95,6 +103,8 @@ class ShellAutomator < Automator
     # do we need sudo bash?
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
+    write_ssh_file
+    @ssh_file = @task['config']['ssh-auth']['identityfile'] unless @ssh_keyfile.nil?
     set_credentials(sshauth)
 
     jsondata = JSON.generate(task)
@@ -135,22 +145,19 @@ class ShellAutomator < Automator
     @result['status'] = 0
     log.debug "Result of shell command: #{@result}"
     @result
+  ensure
+    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
   end
 
   def bootstrap(inputmap)
     sshauth = inputmap['sshauth']
     ipaddress = inputmap['ipaddress']
 
-    # Write credentials
-    @ssh_keyfile = @task['config']['provider']['provisioner']['ssh_keyfile']
-    unless @ssh_keyfile.nil? || @task['config']['ssh-auth']['identityfile'].nil?
-      log.debug "Writing out @ssh_keyfile to #{@task['config']['ssh-auth']['identityfile']}"
-      decode_string_to_file(@ssh_keyfile, @task['config']['ssh-auth']['identityfile'])
-    end
-
     # do we need sudo bash?
     sudo = 'sudo' unless sshauth['user'] == 'root'
 
+    write_ssh_file
+    @ssh_file = @task['config']['ssh-auth']['identityfile'] unless @ssh_keyfile.nil?
     set_credentials(sshauth)
 
     # generate the local tarballs for resources and for our own wrapper libs
@@ -235,6 +242,8 @@ class ShellAutomator < Automator
 
     @result['status'] = 0
     log.debug "ShellAutomator bootstrap completed successfully: #{@result}"
+  ensure
+    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
   end
 
   def install(inputmap)
