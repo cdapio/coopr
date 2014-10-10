@@ -13,8 +13,21 @@ function ($resource, myApiPrefix) {
 
   Service.prototype.initialize = function() {
     angular.extend(this, {
-      provisioner: {},
-      dependencies: {}
+      dependencies: {
+        provides: [],
+        conflicts: [],
+        install: {
+          requires: ['base'],
+          uses: []
+        },
+        runtime: {
+          requires: [],
+          uses: []
+        }
+      },
+      provisioner: {
+        actions: {}
+      }
     });
   };
 
