@@ -707,7 +707,8 @@ public class ClusterHandlerTest extends ServiceTestBase {
     Assert.assertNull(task);
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
+    // no tasks were run, so the cluster should be in terminated state
+    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, ClusterJob.Status.FAILED,
                           ClusterAction.CLUSTER_CREATE, 3, 0);
 
     response = doGet("/clusters/" + clusterId, USER1_HEADERS);
@@ -762,7 +763,8 @@ public class ClusterHandlerTest extends ServiceTestBase {
 
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
+    // no tasks were taken, so cluster should be in terminated state
+    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, ClusterJob.Status.FAILED,
                           ClusterAction.CLUSTER_CREATE, 3, 0);
 
     response = doGet("/clusters/" + clusterId, USER1_HEADERS);
@@ -819,7 +821,8 @@ public class ClusterHandlerTest extends ServiceTestBase {
 
     jobScheduler.run();
 
-    assertStatusWithUser1(clusterId, Cluster.Status.INCOMPLETE, ClusterJob.Status.FAILED,
+    // no tasks were taken so cluster should move to terminated state
+    assertStatusWithUser1(clusterId, Cluster.Status.TERMINATED, ClusterJob.Status.FAILED,
                           ClusterAction.CLUSTER_CREATE, 3, 0);
 
     response = doGet("/clusters/" + clusterId, USER1_HEADERS);
