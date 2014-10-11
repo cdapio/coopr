@@ -1,0 +1,21 @@
+<div class="modal-body">
+
+    <div ng-show="onError" class="input-group has-error">
+      <div class="control-label">
+        {{popupError}}
+      </div>
+    </div>
+    <div class="input-group" ng-class="{'has-error': onError == true}">
+
+      <label for="myNewThingName" class="input-group-addon"> Name</label>
+      <input type="text"
+              id="myNewThingName"
+              ng-model="newThingName"
+              class="form-control" />
+
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="addThing(newThingName)">Add</button>
+    <button class="btn btn-warning" ng-click="closePopup()">Cancel</button>
+</div>

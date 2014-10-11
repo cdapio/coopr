@@ -2,23 +2,23 @@
  * myThingPicker
  */
 
-angular.module(PKG.name+'.directives').directive('myThingPicker', 
+angular.module(PKG.name+'.directives').directive('myThingPicker',
 function myThingPickerDirective () {
   return {
     restrict: 'E',
     templateUrl: 'thingpicker/thingpicker.html',
     replace: true,
-
     scope: {
       model: '=', // an array of names
       available: '=', // an array of strings, or of objects with name & description keys
       allowRm: '=', // allow removal boolean
       listInline: '@',
-      thingName: '@'
+      thingName: '@',
+      popupMode: '='
     },
 
-    controller: function ($scope, myApi) {
-
+    controller: function ($scope, myApi, $modal) {
+      var modalInstance;
       $scope.rmThing = function (thing) {
         $scope.model = $scope.model.filter(function (one) {
           return one !== thing;
@@ -26,6 +26,17 @@ function myThingPickerDirective () {
       };
 
       $scope.addThing = function (thing) {
+
+        if ($scope.popupMode) {
+          if (validateThing(thing)) {
+            $scope.onError = false;
+            modalInstance.destroy();
+          } else {
+            $scope.popupError = $scope.thingName + ' "' + thing+ '" ' + ' already exists!';
+            $scope.onError = true;
+            return;
+          }
+        }
         if(!angular.isArray($scope.model)) {
           $scope.model = [];
         }
@@ -41,6 +52,12 @@ function myThingPickerDirective () {
         remapAddables(newVal, $scope.model);
       });
 
+      function validateThing(thing) {
+        var isAlreadyExists = $scope.model.filter(function(existingThing) {
+          return existingThing === thing;
+        });
+        return !isAlreadyExists.length > 0;
+      }
 
       function remapAddables (available, avoidable) {
         $scope.addDropdown = (available||[]).reduce(function (out, thing) {
@@ -73,7 +90,19 @@ function myThingPickerDirective () {
         }, {});
       }
 
+      $scope.onPopupShowHandler = function() {
+        modalInstance = $modal({
+          scope: $scope,
+          title: 'Add '+ $scope.thingName,
+          contentTemplate: 'thingpicker/addThingPopup.html',
+          placement: 'center',
+          show: true
+        });
+      };
 
+      $scope.closePopup = function() {
+        modalInstance.destroy();
+      }
     }
   };
 });
