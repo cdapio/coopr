@@ -32,7 +32,11 @@ function ($resource, myApiPrefix) {
   };
 
   return {
-    Service: Service
+    Service: Service,
+
+    AutomatorType: $resource(myApiPrefix + 'plugins/automatortypes/:name',
+      { name: '@name' }
+    )
   };
 
 });

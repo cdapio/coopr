@@ -22,7 +22,9 @@ function ($resource, myApiPrefix) {
 
     Provider: Provider,
 
-    ProviderType: $resource(myApiPrefix + 'plugins/providertypes/:type')
+    ProviderType: $resource(myApiPrefix + 'plugins/providertypes/:name',
+      { name: '@name' }
+    )
 
   };
 

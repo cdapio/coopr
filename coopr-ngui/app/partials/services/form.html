@@ -30,6 +30,120 @@
     </div>
   </div>
 
+
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Conflicts
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.conflicts"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Install Requires
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.install.requires"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Install Uses
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.install.uses"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+  <hr />
+  
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Runtime Requires
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.runtime.requires"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Runtime Uses
+    </label>
+    <div class="col-xs-10">
+      <my-service-picker
+        data-model="model.dependencies.runtime.uses"
+        data-allow-rm="true"
+        data-available="availableServices"
+      ></my-service-picker>
+    </div>
+  </div>
+
+
+  <hr />
+
+
+  <div class="form-group">
+    <label class="col-xs-2 control-label">
+      Automator Details
+    </label>
+    <div class="col-xs-10">
+
+      <div ng-repeat="(category, action) in model.provisioner.actions" class="coopr-control-group am-fade-and-slide-right">
+
+        <p class="remove">
+          <a href="" class="btn btn-danger btn-xs"
+            ng-click="rmAction(category)"
+          >
+            <span class="fa fa-trash"></span>
+            <span class="sr-only">remove</span>
+          </a>
+        </p>
+
+        <h6>{{category}}</h6>
+        <pre>{{action | json}}</pre>
+
+      </div>
+
+      <p class="form-control-static">
+        <a href="" class="btn btn-info btn-xs"
+          ng-disabled="!actionDropdown.length"
+          bs-dropdown="actionDropdown"
+        >
+          <span class="fa fa-plus"></span>
+          add action
+        </a>
+      </p>
+
+    </div>
+  </div>
+
+
+  <hr />
+
+
   <div class="form-group">
     <div class="col-xs-2">
       <p class="form-control-static" ng-hide="debugJson.visible">
