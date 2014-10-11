@@ -56,7 +56,7 @@ function myThingPickerDirective () {
         var isAlreadyExists = $scope.model.filter(function(existingThing) {
           return existingThing === thing;
         });
-        return !isAlreadyExists.length > 0;
+        return isAlreadyExists.length === 0;
       }
 
       function remapAddables (available, avoidable) {
@@ -102,7 +102,7 @@ function myThingPickerDirective () {
 
       $scope.closePopup = function() {
         modalInstance.destroy();
-      }
+      };
     }
   };
 });
