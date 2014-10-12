@@ -120,7 +120,7 @@
   <div class="form-group am-fade-and-slide-right"
     ng-repeat="(category, action) in model.provisioner.actions">
 
-    <label class="col-xs-2 control-label">
+    <label class="col-xs-2 control-label" for="inputServiceAutomator-{{category}}">
       <span class="label label-default">{{category}}</span>
       <br />Automator
     </label>
@@ -140,6 +140,8 @@
         <div class="row">
           <div class="col-xs-2">
             <select class="form-control"
+              id="inputServiceAutomator-{{category}}"
+              my-focus="inputServiceAutomator_{{category}}"
               ng-model="action.type"
               ng-options="item.name as item.name for item in availableAutomators"
             ></select>

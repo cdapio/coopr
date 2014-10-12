@@ -15,8 +15,9 @@ function myFocusManagerService ($rootScope, $log) {
   function set (k, v) {
     $log.log('[myFocusManager]', v, k);
     this.is[last] = false;
-    this.is[k] = {};
-    this.is[k][v] = Date.now();
+    var o = {};
+    o[v] = Date.now();
+    this.is[k] = o;
     last = k;
   }
 

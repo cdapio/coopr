@@ -1,5 +1,5 @@
 angular.module(PKG.name+'.controllers').controller('ServiceFormCtrl',
-function ($scope, $state, $q, myApi, CrudFormBase) {
+function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
 
@@ -61,6 +61,7 @@ function ($scope, $state, $q, myApi, CrudFormBase) {
       type: $scope.availableAutomators[0].name,
       fields: {}
     };
+    myFocusManager.focus('inputServiceAutomator_'+category);
   };
 
   $scope.rmAction = function (category) {
