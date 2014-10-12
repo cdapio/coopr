@@ -7,7 +7,12 @@ function ($resource, myApiPrefix) {
     { 
       update: {
         method: 'PUT'
-      }
+      },
+      save: {
+        method: 'POST',
+        url: myApiPrefix + 'services',
+        params: {name: null}
+      }      
     }
   );
 
