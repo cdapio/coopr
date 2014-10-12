@@ -3,7 +3,7 @@
  *
  * This takes a config and converts fields into form fields bound to a provided object.
  * !! This directive modifies model passed to it from the parent.
- * @param {Object|String} fieldsconfig configuration for fields.
+ * @param {Object} fieldsconfig configuration for fields.
  * Expected config:
  * fields: {
  *   <fieldname>: {

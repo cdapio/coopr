@@ -17,7 +17,7 @@ function ($scope, $state, $q, myApi, CrudFormBase) {
     collapsible side panel
    */
   $scope.debugJson = {
-    visible: !$scope.editing
+    visible: false // !$scope.editing
   };
 
 
@@ -29,6 +29,12 @@ function ($scope, $state, $q, myApi, CrudFormBase) {
   .then(function (r) {
     $scope.availableServices = r.services.filter(function(svc) {
       return svc.name !== r.model.name;
+    });
+
+    $scope.availableAutomators = r.automators;
+    $scope.automatorConfig = {};
+    r.automators.forEach(function (a) {
+      $scope.automatorConfig[a.name] = a.parameters.admin;
     });
   });
 
@@ -49,8 +55,12 @@ function ($scope, $state, $q, myApi, CrudFormBase) {
     }
   });
 
+
   $scope.addAction = function (category) {
-    $scope.model.provisioner.actions[category] = {fixme: true};
+    $scope.model.provisioner.actions[category] = {
+      type: $scope.availableAutomators[0].name,
+      fields: {}
+    };
   };
 
   $scope.rmAction = function (category) {
