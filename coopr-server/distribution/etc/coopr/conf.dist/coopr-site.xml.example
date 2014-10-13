@@ -39,16 +39,6 @@
     <description>specifies how to connect to mysql</description>
   </property>
   <property>
-    <name>server.db.user</name>
-    <value>coopr</value>
-    <description>mysql user</description>
-  </property>
-  <property>
-    <name>server.db.password</name>
-    <value>changeme</value>
-    <description>mysql user password</description>
-  </property>
-  <property>
     <name>server.jdbc.validation.query</name>
     <value>SELECT 1</value>
     <description>Validation query used by JDBC connection pool to validate new DB connections</description>

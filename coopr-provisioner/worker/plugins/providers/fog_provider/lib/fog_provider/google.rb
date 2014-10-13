@@ -85,6 +85,10 @@ class FogProviderGoogle < Provider
       @result['result']['ssh-auth']['user'] = sshuser
       @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource)
       @result['status'] = 0
+    # We assume that no work was done when we get Unauthorized
+    rescue Excon::Errors::Unauthorized
+      @result['status'] = 201
+      log.error('Provider credentials invalid/unauthorized')
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.create: #{e.inspect}"
