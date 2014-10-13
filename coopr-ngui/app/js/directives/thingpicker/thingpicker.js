@@ -33,7 +33,7 @@ function myThingPickerDirective () {
            modalScope.newThingName = '';
            modalInstance.show();
          };
-         modalScope.$on("modal.hide", function() {
+         modalScope.$on('modal.hide', function() {
            modalScope.modalError = '';
          });
          modalScope.validateAndAddToModel = function(thing) {
