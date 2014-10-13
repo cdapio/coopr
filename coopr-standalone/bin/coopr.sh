@@ -152,15 +152,21 @@ The minimum version supported is v1.9.0p0"
 fi
 
 # Setup coopr configuration
-COOPR_SERVER_URI=http://localhost:55054
-line=`awk '/server.enable.ssl/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-site.xml`
+COOPR_PROTOCOL=http
+line=`awk '/server.ssl.enable/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-site.xml`
 line=$((line+1))
 ssl=`sed -n "${line}p" ${COOPR_SERVER_CONF}coopr-site.xml | awk -F"<|>" '{print $3}'`
-
 if [ ! -z $ssl ] && [ $ssl = "true" ]; then
-  COOPR_SERVER_URI=https://localhost:55054
+  COOPR_PROTOCOL=https
 fi
+export COOPR_SERVER_URI=$COOPR_PROTOCOL://localhost:55054
 
+line=`awk '/server.disable.certificate.check/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-site.xml`
+line=$((line+1))
+disable_cert_check=`sed -n "${line}p" ${COOPR_SERVER_CONF}coopr-site.xml | awk -F"<|>" '{print $3}'`
+if [ ! -z $disable_cert_check ] && [ $disable_cert_check = "true" ]; then
+  CURL_PARAMETER="--insecure"
+fi
 
 # Load default configuration
 function load_defaults () {
@@ -202,7 +208,7 @@ function stage_default_data () {
 
 function sync_default_data () {
     echo "Syncing initial data..."
-    curl --insecure --silent --request POST \
+    curl $CURL_PARAMETER --silent --request POST \
       --header "Coopr-UserID:${COOPR_API_USER}" \
       --header "Coopr-TenantID:${COOPR_TENANT}" \
       --connect-timeout 5 \
@@ -218,7 +224,7 @@ function request_superadmin_workers () {
     fi
 
     echo "Requesting ${COOPR_NUM_WORKERS} workers for default tenant..."
-    curl --insecure --silent --request PUT \
+    curl $CURL_PARAMETER --silent --request PUT \
       --header "Content-Type:application/json" \
       --header "Coopr-UserID:${COOPR_API_USER}" \
       --header "Coopr-TenantID:${COOPR_TENANT}" \
@@ -228,7 +234,7 @@ function request_superadmin_workers () {
 
 function wait_for_server () {
     RETRIES=0
-    until [[ $(curl --insecure $COOPR_SERVER_URI/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
+    until [[ $(curl $CURL_PARAMETER $COOPR_SERVER_URI/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
         sleep 2
         ((RETRIES++))
     done
@@ -240,13 +246,12 @@ function wait_for_server () {
 
 function wait_for_plugin_registration () {
     RETRIES=0
-    until [[ $(curl --insecure --silent --request GET \
+    until [[ $(curl $CURL_PARAMETER --silent --request GET \
                  --output /dev/null --write-out "%{http_code}" \
                  --header "Coopr-UserID:${COOPR_API_USER}" \
                  --header "Coopr-TenantID:${COOPR_TENANT}" \
                  $COOPR_SERVER_URI/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
         sleep 2
-echo "status failure"
         ((RETRIES++))
     done
 
@@ -257,7 +262,7 @@ echo "status failure"
 
 function wait_for_provisioner () {
     RETRIES=0
-    until [[ $(curl --insecure https://localhost:55056/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
+    until [[ $(curl http://localhost:55056/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
         sleep 2
         ((RETRIES++))
     done
@@ -298,31 +303,35 @@ function ui () {
 function greeting () {
     [ "x${COOPR_DISABLE_UI}" == "xtrue" ] && return 0
     echo
-    echo "Go to https://localhost:8100. Have fun creating clusters!"
+    echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
 }
 
-case "$1" in
-  start)
+function stop () {
+    provisioner stop
+    $COOPR_HOME/server/bin/server.sh stop
+    ui stop
+}
+
+function start () {
     $COOPR_HOME/server/bin/server.sh start && \
     ui start && \
     provisioner start && \
     load_defaults && \
     greeting
+}
+
+case "$1" in
+  start)
+    start
   ;;
 
   stop)
-    provisioner stop
-    $COOPR_HOME/server/bin/server.sh stop
-    ui stop
+    stop
   ;;
 
   restart)
-    provisioner stop
-    ui stop
-    $COOPR_HOME/server/bin/server.sh stop
-    $COOPR_HOME/server/bin/server.sh start
-	ui start
-    provisioner start
+    stop
+    start
   ;;
 
   status)

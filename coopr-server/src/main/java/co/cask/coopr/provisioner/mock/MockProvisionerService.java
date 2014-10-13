@@ -91,15 +91,8 @@ public class MockProvisionerService extends AbstractScheduledService {
       builder.enableSSL(keyStore, "secret", "secret");
       LOG.debug("SSL successfully enabled");
 
-      Registry<ConnectionSocketFactory> registry = null;
-      try {
-        registry = getRegistryWithDisabledCertCheck();
-      } catch (KeyManagementException e) {
-        LOG.error("Failed to init SSL context: {}", e);
-      } catch (NoSuchAlgorithmException e) {
-        LOG.error("Failed to get instance of SSL context: {}", e);
-      }
-      this.httpClient = HttpClients.custom().setConnectionManager(new BasicHttpClientConnectionManager(registry)).build();
+      this.httpClient = HttpClients.custom()
+        .setConnectionManager(new BasicHttpClientConnectionManager(getRegistry())).build();
     } else {
       this.httpClient = HttpClients.createDefault();
     }
@@ -111,7 +104,19 @@ public class MockProvisionerService extends AbstractScheduledService {
       new MockProvisionerWorkerService(id, serverUrl, totalCapacity, taskMs, msBetweenTasks, failureRate);
   }
 
-  private Registry<ConnectionSocketFactory> getRegistryWithDisabledCertCheck()
+  private static Registry<ConnectionSocketFactory> getRegistry() {
+    Registry<ConnectionSocketFactory> registry = null;
+    try {
+      registry = getRegistryWithDisabledCertCheck();
+    } catch (KeyManagementException e) {
+      LOG.error("Failed to init SSL context: {}", e);
+    } catch (NoSuchAlgorithmException e) {
+      LOG.error("Failed to get instance of SSL context: {}", e);
+    }
+    return registry;
+  }
+
+  private static Registry<ConnectionSocketFactory> getRegistryWithDisabledCertCheck()
     throws KeyManagementException, NoSuchAlgorithmException {
     SSLContext sslContext = SSLContext.getInstance("TLS");
     sslContext.init(null, new TrustManager[]{new X509TrustManager() {

@@ -58,7 +58,7 @@ public final class MockProvisionerMain extends DaemonMain {
       long msBetweenTasks = cmd.hasOption('r') ? Long.valueOf(cmd.getOptionValue('r')) : 1000;
       long taskMs = cmd.hasOption('d') ? Long.valueOf(cmd.getOptionValue('d')) : 1000;
       int failureRate = cmd.hasOption('f') ? Integer.valueOf(cmd.getOptionValue('f')) : 0;
-      boolean enableSSL = cmd.hasOption("ssl") ? true : false;
+      boolean enableSSL = cmd.hasOption("ssl");
       String serverUrl = String.format("%s://%s:%s%s" , enableSSL ? "https" : "http", host, port, Constants.API_BASE);
       LOG.info("id = {}, capacity = {}, server url = {}, task frequency = {}, task duration = {}, failure rate = {}, enable SSL = {}",
                id, capacity, serverUrl, msBetweenTasks, taskMs, failureRate, enableSSL);

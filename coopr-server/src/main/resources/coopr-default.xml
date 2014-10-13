@@ -16,7 +16,6 @@
   limitations under the License.
 -->
 <configuration>
-
     <property>
         <name>server.port</name>
         <value>55054</value>
@@ -30,7 +29,7 @@
     </property>
 
     <property>
-      <name>server.enable.ssl</name>
+      <name>server.ssl.enabled</name>
       <value>false</value>
       <description>Enable SSl</description>
     </property>

@@ -19,7 +19,7 @@ import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.http.HttpHandler;
 import co.cask.http.NettyHttpService;
-import com.google.common.io.Resources;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ import java.util.Set;
  */
 public class HandlerServer extends AbstractIdleService {
 
-  private static final Logger LOG  = LoggerFactory.getLogger(HandlerServer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HandlerServer.class);
   private final NettyHttpService httpService;
 
   @Inject
@@ -57,13 +57,9 @@ public class HandlerServer extends AbstractIdleService {
     builder.setWorkerThreadPoolSize(numWorkerThreads);
 
     if (enableSSL) {
-      File keyStore;
-      try {
-        keyStore = new File(conf.get(Constants.SSL_KEYSTORE_PATH));
-      } catch (Throwable e) {
-        throw new RuntimeException("Cannot read keystore file : "
-                                     + conf.get(Constants.SSL_KEYSTORE_PATH));
-      }
+      String keyStoreFilePath = conf.get(Constants.SSL_KEYSTORE_PATH);
+      Preconditions.checkArgument(keyStoreFilePath != null);
+      File keyStore = new File(keyStoreFilePath);
       builder.enableSSL(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD), conf.get(Constants.SSL_KEYPASSWORD));
     }
     this.httpService = builder.build();

@@ -15,11 +15,15 @@ then
   dirs="$dirs plugins/providertypes plugins/automatortypes"
 fi
 
+if [ $COOPR_SERVER_URI = "https://localhost:55054" ]; then
+  CURL_PARAMETER="--insecure"
+fi
+
 for d in ${dirs} ; do
   cd ${MAINDIR}
   [[ -d ${d} ]] && cd ${d} || continue
   for f in $(ls -1 *.json) ; do
-    curl --silent --request PUT \
+    curl $CURL_PARAMETER --silent --request PUT \
       --header "Content-Type:application/json" \
       --header "Coopr-UserID:${COOPR_API_USER}" \
       --header "Coopr-ApiKey:${COOPR_API_KEY}" \
