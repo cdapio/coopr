@@ -19,6 +19,7 @@ import co.cask.http.NettyHttpService;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
+import com.google.common.io.Resources;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -26,19 +27,33 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.twill.common.Threads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Mock provisioner that will register itself, periodically heartbeat, and deregister itself on shutdown. Also starts
@@ -58,7 +73,7 @@ public class MockProvisionerService extends AbstractScheduledService {
   private final MockProvisionerWorkerService workerService;
 
   public MockProvisionerService(String id, String serverUrl, int totalCapacity, long taskMs,
-                                long msBetweenTasks, int failureRate) {
+                                long msBetweenTasks, int failureRate, boolean enableSSL) {
     this.id = id;
     this.totalCapacity = totalCapacity;
 
@@ -70,14 +85,57 @@ public class MockProvisionerService extends AbstractScheduledService {
     builder.setExecThreadPoolSize(5);
     builder.setBossThreadPoolSize(1);
     builder.setWorkerThreadPoolSize(10);
-    this.httpService = builder.build();
 
-    this.httpClient = HttpClients.createDefault();
+    if (enableSSL) {
+      File keyStore = new File(Resources.getResource("cert.jks").getFile());
+      builder.enableSSL(keyStore, "secret", "secret");
+      LOG.debug("SSL successfully enabled");
+
+      Registry<ConnectionSocketFactory> registry = null;
+      try {
+        registry = getRegistryWithDisabledCertCheck();
+      } catch (KeyManagementException e) {
+        LOG.error("Failed to init SSL context: {}", e);
+      } catch (NoSuchAlgorithmException e) {
+        LOG.error("Failed to get instance of SSL context: {}", e);
+      }
+      this.httpClient = HttpClients.custom().setConnectionManager(new BasicHttpClientConnectionManager(registry)).build();
+    } else {
+      this.httpClient = HttpClients.createDefault();
+    }
+    this.httpService = builder.build();
     this.heartbeatRequest = new HttpPost(serverUrl + "/provisioners/" + id + "/heartbeat");
     this.registerRequest = new HttpPut(serverUrl + "/provisioners/" + id);
     this.deregisterRequest = new HttpDelete(serverUrl + "/provisioners/" + id);
     this.workerService =
       new MockProvisionerWorkerService(id, serverUrl, totalCapacity, taskMs, msBetweenTasks, failureRate);
+  }
+
+  private Registry<ConnectionSocketFactory> getRegistryWithDisabledCertCheck()
+    throws KeyManagementException, NoSuchAlgorithmException {
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    sslContext.init(null, new TrustManager[]{new X509TrustManager() {
+      @Override
+      public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+        return null;
+      }
+
+      @Override
+      public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
+        throws CertificateException {
+      }
+
+      @Override
+      public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
+        throws CertificateException {
+      }
+    }}, new SecureRandom());
+    SSLConnectionSocketFactory sf = new SSLConnectionSocketFactory(sslContext,
+                                                                   org.apache.http.conn.ssl.SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+    return RegistryBuilder
+      .<ConnectionSocketFactory>create().register("https", sf)
+      .register("http", PlainConnectionSocketFactory.getSocketFactory())
+      .build();
   }
 
   @Override

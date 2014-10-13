@@ -19,11 +19,13 @@ import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.http.HttpHandler;
 import co.cask.http.NettyHttpService;
+import com.google.common.io.Resources;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.Set;
 
@@ -41,6 +43,7 @@ public class HandlerServer extends AbstractIdleService {
     int port = conf.getInt(Constants.PORT);
     int numExecThreads = conf.getInt(Constants.NETTY_EXEC_NUM_THREADS);
     int numWorkerThreads = conf.getInt(Constants.NETTY_WORKER_NUM_THREADS);
+    boolean enableSSL = conf.getBoolean(Constants.ENABLE_SSL);
 
     NettyHttpService.Builder builder = NettyHttpService.builder();
     builder.addHttpHandlers(handlers);
@@ -53,6 +56,16 @@ public class HandlerServer extends AbstractIdleService {
     builder.setBossThreadPoolSize(1);
     builder.setWorkerThreadPoolSize(numWorkerThreads);
 
+    if (enableSSL) {
+      File keyStore;
+      try {
+        keyStore = new File(conf.get(Constants.SSL_KEYSTORE_PATH));
+      } catch (Throwable e) {
+        throw new RuntimeException("Cannot read keystore file : "
+                                     + conf.get(Constants.SSL_KEYSTORE_PATH));
+      }
+      builder.enableSSL(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD), conf.get(Constants.SSL_KEYPASSWORD));
+    }
     this.httpService = builder.build();
   }
 

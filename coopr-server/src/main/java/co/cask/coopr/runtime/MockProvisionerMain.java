@@ -58,11 +58,12 @@ public final class MockProvisionerMain extends DaemonMain {
       long msBetweenTasks = cmd.hasOption('r') ? Long.valueOf(cmd.getOptionValue('r')) : 1000;
       long taskMs = cmd.hasOption('d') ? Long.valueOf(cmd.getOptionValue('d')) : 1000;
       int failureRate = cmd.hasOption('f') ? Integer.valueOf(cmd.getOptionValue('f')) : 0;
-      String serverUrl = "http://" + host + ":" + port + Constants.API_BASE;
-      LOG.info("id = {}, capacity = {}, server url = {}, task frequency = {}, task duration = {}, failure rate = {}",
-               id, capacity, serverUrl, msBetweenTasks, taskMs, failureRate);
+      boolean enableSSL = cmd.hasOption("ssl") ? true : false;
+      String serverUrl = String.format("%s://%s:%s%s" , enableSSL ? "https" : "http", host, port, Constants.API_BASE);
+      LOG.info("id = {}, capacity = {}, server url = {}, task frequency = {}, task duration = {}, failure rate = {}, enable SSL = {}",
+               id, capacity, serverUrl, msBetweenTasks, taskMs, failureRate, enableSSL);
 
-      mockProvisionerService = new MockProvisionerService(id, serverUrl, capacity, taskMs, msBetweenTasks, failureRate);
+      mockProvisionerService = new MockProvisionerService(id, serverUrl, capacity, taskMs, msBetweenTasks, failureRate, enableSSL);
     } catch (ParseException e) {
       printHelp();
       System.exit(0);
@@ -108,6 +109,7 @@ public final class MockProvisionerMain extends DaemonMain {
                       "milliseconds a task should take to complete. Defaults to 1000");
     options.addOption("f", "failure", true,
                       "percentage of time a task should be failed by the mock worker (0 - 100). Defaults to 0");
+    options.addOption("ssl", false, "Server runs with SSL. Defaults to 'false'");
   }
 
   private void printHelp() {

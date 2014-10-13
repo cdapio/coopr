@@ -30,6 +30,12 @@
     </property>
 
     <property>
+      <name>server.enable.ssl</name>
+      <value>false</value>
+      <description>Enable SSl</description>
+    </property>
+
+    <property>
         <name>server.jdbc.driver</name>
         <value>org.apache.derby.jdbc.EmbeddedDriver</value>
         <description>specifies db driver to use</description>
