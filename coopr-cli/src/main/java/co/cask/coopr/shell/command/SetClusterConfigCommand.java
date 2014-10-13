@@ -26,11 +26,10 @@ public class SetClusterConfigCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String id = arguments.get(CLUSTER_ID_KEY);
-    CliUtil.checkArgument(id);
+    String id = CliUtil.checkArgument(arguments.get(CLUSTER_ID_KEY));
     ClusterConfigureRequest clusterConfigureRequest = CliUtil.getObjectFromJson(arguments, CLUSTER_CONFIG_KEY,
                                                                                 ClusterConfigureRequest.class);
-    clusterClient.setClusterConfig(id.substring(1, id.length() - 1), clusterConfigureRequest);
+    clusterClient.setClusterConfig(id, clusterConfigureRequest);
   }
 
   @Override

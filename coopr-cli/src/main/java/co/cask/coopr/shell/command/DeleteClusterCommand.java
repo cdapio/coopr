@@ -26,14 +26,13 @@ public class DeleteClusterCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String id = arguments.get(CLUSTER_ID_KEY);
-    CliUtil.checkArgument(id);
+    String id = CliUtil.checkArgument(arguments.get(CLUSTER_ID_KEY));
     ClusterOperationRequest clusterOperationRequest = CliUtil.getObjectFromJson(arguments, PROVIDER_FIELDS_KEY,
                                                                                 ClusterOperationRequest.class);
     if (clusterOperationRequest == null) {
-      clusterClient.deleteCluster(id.substring(1, id.length() - 1));
+      clusterClient.deleteCluster(id);
     } else {
-      clusterClient.deleteCluster(id.substring(1, id.length() - 1), clusterOperationRequest);
+      clusterClient.deleteCluster(id, clusterOperationRequest);
     }
   }
 

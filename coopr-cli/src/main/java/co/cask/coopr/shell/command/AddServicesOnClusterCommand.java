@@ -26,11 +26,10 @@ public class AddServicesOnClusterCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String id = arguments.get(CLUSTER_ID_KEY);
-    CliUtil.checkArgument(id);
+    String id = CliUtil.checkArgument(arguments.get(CLUSTER_ID_KEY));
     AddServicesRequest addServicesRequest = CliUtil.getObjectFromJson(arguments, SERVICES_KEY,
                                                                            AddServicesRequest.class);
-    clusterClient.addServicesOnCluster(id.substring(1, id.length() - 1), addServicesRequest);
+    clusterClient.addServicesOnCluster(id, addServicesRequest);
   }
 
   @Override

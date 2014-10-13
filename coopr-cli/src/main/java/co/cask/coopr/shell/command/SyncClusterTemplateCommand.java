@@ -24,9 +24,8 @@ public class SyncClusterTemplateCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String clusterId = arguments.get(CLUSTER_ID_KEY);
-    CliUtil.checkArgument(clusterId);
-    clusterClient.syncClusterTemplate(clusterId.substring(1, clusterId.length() - 1));
+    String clusterId = CliUtil.checkArgument(arguments.get(CLUSTER_ID_KEY));
+    clusterClient.syncClusterTemplate(clusterId);
   }
 
   @Override

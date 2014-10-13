@@ -34,12 +34,11 @@ public class CreateClusterCommand implements Command {
     if (builder == null) {
       builder = ClusterCreateRequest.builder();
     }
-    String name = arguments.get(NAME_KEY);
-    String template = arguments.get(TEMPLATE_KEY);
+    String name = CliUtil.checkArgument(arguments.get(NAME_KEY));
+    String template = CliUtil.checkArgument(arguments.get(TEMPLATE_KEY));
     int size = arguments.getInt(SIZE_KEY);
-    CliUtil.checkArguments(Arrays.asList(name, template));
-    builder.setName(name.substring(1, name.length() - 1));
-    builder.setClusterTemplateName(template.substring(1, template.length() - 1));
+    builder.setName(name);
+    builder.setClusterTemplateName(template);
     builder.setNumMachines(size);
     clusterClient.createCluster(builder.build());
   }

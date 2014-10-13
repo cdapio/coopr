@@ -24,9 +24,8 @@ public class DeleteImageTypeCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String name = arguments.get(NAME_KEY);
-    CliUtil.checkArgument(name);
-    adminClient.deleteImageType(name.substring(1, name.length() - 1));
+    String name = CliUtil.checkArgument(arguments.get(NAME_KEY));
+    adminClient.deleteImageType(name);
   }
 
   @Override

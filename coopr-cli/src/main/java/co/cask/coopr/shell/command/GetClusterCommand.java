@@ -24,9 +24,8 @@ public class GetClusterCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String id = arguments.get(CLUSTER_ID_KEY);
-    CliUtil.checkArgument(id);
-    printStream.print(CliUtil.getPrettyJson(clusterClient.getCluster(id.substring(1, id.length() - 1))));
+    String id = CliUtil.checkArgument(arguments.get(CLUSTER_ID_KEY));
+    printStream.print(CliUtil.getPrettyJson(clusterClient.getCluster(id)));
   }
 
   @Override

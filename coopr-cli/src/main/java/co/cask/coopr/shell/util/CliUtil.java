@@ -18,27 +18,20 @@ import java.util.List;
 public class CliUtil {
 
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+  private static final String FILE_PREFIX = "file ";
+  private static final String ARG_WRAPPER = "\"";
+  private static final String JSON_WRAPPER = "'";
 
   /**
    * Checks whether the argument is in double quotes
    *
    * @param arg the argument
    */
-  public static void checkArgument(String arg) {
-    checkArguments(Arrays.asList(arg));
-  }
-
-  /**
-   * Checks whether each argument is in double quotes
-   *
-   * @param args the arguments
-   */
-  public static void checkArguments(List<String> args) {
-    for (String arg : args) {
-      if (!(arg.startsWith("\"") && arg.endsWith("\""))) {
-        throw new IllegalArgumentException("Arguments must be contained in double quotes");
-      }
+  public static String checkArgument(String arg) {
+    if (!(arg.startsWith(ARG_WRAPPER) && arg.endsWith(ARG_WRAPPER))) {
+      throw new IllegalArgumentException("Arguments must be contained in double quotes");
     }
+    return arg.substring(1, arg.length() - 1);
   }
 
   /**
@@ -65,12 +58,12 @@ public class CliUtil {
     if (arguments.hasArgument(argKey)) {
       String arg = arguments.get(argKey);
       Gson gson = new Gson();
-      if (arg.startsWith("file ")) {
-        String argFilePath = arg.substring(5);
+      if (arg.startsWith(FILE_PREFIX)) {
+        String argFilePath = arg.substring(FILE_PREFIX.length());
         String argument = Files.toString(new File(argFilePath), Charset.forName("UTF-8"));
         return gson.fromJson(argument, type);
       } else {
-        if (!(arg.startsWith("'") && arg.endsWith("'"))) {
+        if (!(arg.startsWith(JSON_WRAPPER) && arg.endsWith(JSON_WRAPPER))) {
           throw new IllegalArgumentException("Json must be contained in single quotes");
         }
         return gson.fromJson(arg.substring(1, arg.length() - 1), type);

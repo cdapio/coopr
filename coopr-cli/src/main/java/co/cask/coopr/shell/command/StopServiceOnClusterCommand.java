@@ -27,19 +27,14 @@ public class StopServiceOnClusterCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String clusterId = arguments.get(CLUSTER_ID_KEY);
-    CliUtil.checkArgument(clusterId);
-    String serviceId = arguments.get(SERVICE_ID_KEY);
-    CliUtil.checkArgument(serviceId);
+    String clusterId = CliUtil.checkArgument(arguments.get(CLUSTER_ID_KEY));
+    String serviceId = CliUtil.checkArgument(arguments.get(SERVICE_ID_KEY));
     ClusterOperationRequest clusterOperationRequest = CliUtil.getObjectFromJson(arguments, PROVIDER_FIELDS_KEY,
                                                                                 ClusterOperationRequest.class);
     if (clusterOperationRequest == null) {
-      clusterClient.stopServiceOnCluster(clusterId.substring(1, clusterId.length() - 1),
-                                         serviceId.substring(1, serviceId.length() - 1));
+      clusterClient.stopServiceOnCluster(clusterId, serviceId);
     } else {
-      clusterClient.stopServiceOnCluster(clusterId.substring(1, clusterId.length() - 1),
-                                         serviceId.substring(1, serviceId.length() - 1),
-                                         clusterOperationRequest);
+      clusterClient.stopServiceOnCluster(clusterId, serviceId, clusterOperationRequest);
     }
   }
 
