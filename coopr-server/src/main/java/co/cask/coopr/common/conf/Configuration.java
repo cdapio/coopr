@@ -378,6 +378,7 @@ public class Configuration implements Iterable<Map.Entry<String, String>> {
     Configuration conf = new Configuration();
     conf.addResource("coopr-default.xml");
     conf.addResource("coopr-site.xml");
+    conf.addResource("coopr-security.xml");
     return conf;
   }
 
