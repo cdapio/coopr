@@ -17,7 +17,7 @@
     <a class="btn btn-xs btn-warning"
         ng-disabled="!addDropdown.length"
         bs-dropdown="addDropdown"
-        ng-hide="popupMode"
+        ng-hide="freetextMode"
         data-placement="bottom-left"
     >
       <span class="fa fa-plus"></span>
@@ -26,8 +26,8 @@
   </li>
   <li>
     <a class="btn btn-xs btn-warning"
-        ng-click="onPopupShowHandler()"
-        ng-show="popupMode"
+        ng-click="showModal()"
+        ng-show="freetextMode"
         data-placement="bottom-left"
     >
       <span class="fa fa-plus"></span>

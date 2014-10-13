@@ -14,11 +14,41 @@ function myThingPickerDirective () {
       allowRm: '=', // allow removal boolean
       listInline: '@',
       thingName: '@',
-      popupMode: '='
+      freetextMode: '@'
     },
 
     controller: function ($scope, myApi, $modal) {
-      var modalInstance;
+      var modalInstance,
+          modalScope;
+      if ($scope.freetextMode) {
+        modalScope = $scope.$new();
+        modalInstance = $modal({
+           scope: modalScope,
+           title: 'Add '+ $scope.thingName,
+           template: 'thingpicker/addThingPopup.html',
+           placement: 'center',
+           show: false
+         });
+         $scope.showModal = function() {
+           modalScope.newThingName = '';
+           modalInstance.show();
+         };
+         modalScope.$on("modal.hide", function() {
+           modalScope.modalError = '';
+         });
+         modalScope.validateAndAddToModel = function(thing) {
+           if ($scope.freetextMode) {
+             if (validateThing(thing)) {
+               $scope.addThing(thing);
+               document.querySelector('form[name=newServiceForm]').reset();
+               modalInstance.hide();
+             } else {
+                 modalScope.modalError = true;
+             }
+           }
+         };
+      }
+
       $scope.rmThing = function (thing) {
         $scope.model = $scope.model.filter(function (one) {
           return one !== thing;
@@ -26,17 +56,6 @@ function myThingPickerDirective () {
       };
 
       $scope.addThing = function (thing) {
-
-        if ($scope.popupMode) {
-          if (validateThing(thing)) {
-            $scope.onError = false;
-            modalInstance.destroy();
-          } else {
-            $scope.popupError = $scope.thingName + ' "' + thing+ '" ' + ' already exists!';
-            $scope.onError = true;
-            return;
-          }
-        }
         if(!angular.isArray($scope.model)) {
           $scope.model = [];
         }
@@ -90,19 +109,6 @@ function myThingPickerDirective () {
         }, {});
       }
 
-      $scope.onPopupShowHandler = function() {
-        modalInstance = $modal({
-          scope: $scope,
-          title: 'Add '+ $scope.thingName,
-          contentTemplate: 'thingpicker/addThingPopup.html',
-          placement: 'center',
-          show: true
-        });
-      };
-
-      $scope.closePopup = function() {
-        modalInstance.destroy();
-      };
     }
   };
 });

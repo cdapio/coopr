@@ -1,21 +1,40 @@
-<div class="modal-body">
 
-    <div ng-show="onError" class="input-group has-error">
-      <div class="control-label">
-        {{popupError}}
+<div class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="modal-title" ng-bind="title"></h4>
+      </div>
+      <div class="modal-body">
+
+        <form name="newServiceForm"
+            ng-submit="validateAndAddToModel(newThingName)"
+            class="css-form"
+            ng-class="{'has-error': newThingName.$invalid || modalError}"
+            novalidate>
+
+          <div class="form-group" >
+              <p class="help-block" ng-show="modalError">
+              {{thingName}} '{{newThingName}}' already exists!;
+              </p>
+              <div class="input-group">
+                <label for="newThingName" class="input-group-addon"> {{thingName}}</label>
+                <input type="text"
+                        name="newThingName"
+                        id="newThingName"
+                        ng-model="$parent.newThingName"
+                        class="form-control"
+                        required
+                         />
+              </div>
+          </div>
+          <button ng-disabled="newServiceForm.$invalid"
+                  type="submit"
+                  class="btn btn-primary pull-right">Add</button>
+        </form>
+
       </div>
     </div>
-    <div class="input-group" ng-class="{'has-error': onError == true}">
-
-      <label for="myNewThingName" class="input-group-addon"> Name</label>
-      <input type="text"
-              id="myNewThingName"
-              ng-model="newThingName"
-              class="form-control" />
-
-    </div>
-</div>
-<div class="modal-footer">
-    <button class="btn btn-primary" ng-click="addThing(newThingName)">Add</button>
-    <button class="btn btn-warning" ng-click="closePopup()">Cancel</button>
+  </div>
 </div>
