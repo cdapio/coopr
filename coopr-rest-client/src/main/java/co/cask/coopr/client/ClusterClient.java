@@ -16,6 +16,7 @@
 
 package co.cask.coopr.client;
 
+import co.cask.coopr.cluster.ClusterDetails;
 import co.cask.coopr.cluster.ClusterSummary;
 import co.cask.coopr.http.request.AddServicesRequest;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
@@ -26,7 +27,6 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 /**
  * The client API for manage clusters.
@@ -46,12 +46,10 @@ public interface ClusterClient {
    * Provides full details about a cluster by id.
    *
    * @param clusterId String value of a cluster id
-   * @return {@link com.google.gson.JsonObject} object
+   * @return {@link co.cask.coopr.cluster.ClusterDetails} object
    * @throws IOException in case of a problem or the connection was aborted
-   *
-   * TODO: Replace JsonObject with ClusterDetails once it will be available
    */
-  JsonObject getCluster(String clusterId) throws IOException;
+  ClusterDetails getCluster(String clusterId) throws IOException;
 
   /**
    * Deletes specified cluster by id.
@@ -113,7 +111,7 @@ public interface ClusterClient {
    * @return Set of service names
    * @throws IOException in case of a problem or the connection was aborted
    */
-  Set<String> getClusterServices(String clusterId) throws IOException;
+  List<String> getClusterServices(String clusterId) throws IOException;
 
   /**
    * Sync the cluster template of the cluster to the current version of the cluster template by the cluster id.

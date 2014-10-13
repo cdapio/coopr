@@ -37,6 +37,15 @@ public final class RestUtil {
 
   private RestUtil() { }
 
+  /**
+   * Creates and connects HTTP and HTTPS connection sockets.
+   *
+   * @return {@link org.apache.http.config.Registry} of {@link org.apache.http.conn.socket.ConnectionSocketFactory}
+   * objects, keyed by low-case string ID
+   * @throws KeyManagementException, if SSL context initialization process fails
+   * @throws NoSuchAlgorithmException, when try to get SSLContext instance, if no Provider supports a
+   * TrustManagerFactorySpi implementation for the specified protocol
+   */
   public static Registry<ConnectionSocketFactory> getRegistryWithDisabledCertCheck()
     throws KeyManagementException, NoSuchAlgorithmException {
     SSLContext sslContext = SSLContext.getInstance("SSL");
@@ -63,5 +72,4 @@ public final class RestUtil {
       .register("http", PlainConnectionSocketFactory.getSocketFactory())
       .build();
   }
-
 }

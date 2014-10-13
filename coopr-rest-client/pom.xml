@@ -13,7 +13,7 @@
   </parent>
 
   <properties>
-    <commons.lang.version>2.5</commons.lang.version>
+    <http.client.version>4.3.3</http.client.version>
   </properties>
 
   <dependencies>
@@ -23,9 +23,11 @@
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>${commons.lang.version}</version>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>${http.client.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

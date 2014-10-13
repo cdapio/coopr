@@ -22,6 +22,7 @@ import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import com.google.gson.reflect.TypeToken;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
@@ -45,12 +46,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<ClusterTemplate> getAllClusterTemplates() throws IOException {
-    return getAll(CLUSTER_TEMPLATES_URL_SUFFIX);
+    return getAll(CLUSTER_TEMPLATES_URL_SUFFIX, new TypeToken<List<ClusterTemplate>>() { });
   }
 
   @Override
   public ClusterTemplate getClusterTemplate(String name) throws IOException {
-    return getSingle(CLUSTER_TEMPLATES_URL_SUFFIX, name);
+    return getSingle(CLUSTER_TEMPLATES_URL_SUFFIX, name, new TypeToken<ClusterTemplate>() { });
   }
 
   @Override
@@ -60,12 +61,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<Provider> getAllProviders() throws IOException {
-    return getAll(PROVIDERS_URL_SUFFIX);
+    return getAll(PROVIDERS_URL_SUFFIX, new TypeToken<List<Provider>>() { });
   }
 
   @Override
   public Provider getProvider(String name) throws IOException {
-    return getSingle(PROVIDERS_URL_SUFFIX, name);
+    return getSingle(PROVIDERS_URL_SUFFIX, name, new TypeToken<Provider>() { });
   }
 
   @Override
@@ -75,12 +76,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<Service> getAllServices() throws IOException {
-    return getAll(SERVICES_URL_SUFFIX);
+    return getAll(SERVICES_URL_SUFFIX, new TypeToken<List<Service>>() { });
   }
 
   @Override
   public Service getService(String name) throws IOException {
-    return getSingle(SERVICES_URL_SUFFIX, name);
+    return getSingle(SERVICES_URL_SUFFIX, name, new TypeToken<Service>() { });
   }
 
   @Override
@@ -90,12 +91,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<HardwareType> getAllHardwareTypes() throws IOException {
-    return getAll(HARDWARE_TYPES_URL_SUFFIX);
+    return getAll(HARDWARE_TYPES_URL_SUFFIX, new TypeToken<List<HardwareType>>() { });
   }
 
   @Override
   public HardwareType getHardwareType(String name) throws IOException {
-    return getSingle(HARDWARE_TYPES_URL_SUFFIX, name);
+    return getSingle(HARDWARE_TYPES_URL_SUFFIX, name, new TypeToken<HardwareType>() { });
   }
 
   @Override
@@ -105,12 +106,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<ImageType> getAllImageTypes() throws IOException {
-    return getAll(IMAGE_TYPES_URL_SUFFIX);
+    return getAll(IMAGE_TYPES_URL_SUFFIX, new TypeToken<List<ImageType>>() { });
   }
 
   @Override
   public ImageType getImageType(String name) throws IOException {
-    return getSingle(IMAGE_TYPES_URL_SUFFIX, name);
+    return getSingle(IMAGE_TYPES_URL_SUFFIX, name, new TypeToken<ImageType>() { });
   }
 
   @Override

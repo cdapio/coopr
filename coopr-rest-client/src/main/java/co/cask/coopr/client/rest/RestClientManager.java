@@ -45,17 +45,16 @@ public class RestClientManager implements ClientManager {
   private static final boolean DEFAULT_SSL = false;
   private static final boolean DEFAULT_VERIFY_SSL_CERT = true;
 
-  private AdminClient adminClient;
-  private ClusterClient clusterClient;
-  private PluginClient pluginClient;
-  private ProvisionerClient provisionerClient;
-  private TenantClient tenantClient;
+  private final AdminClient adminClient;
+  private final ClusterClient clusterClient;
+  private final PluginClient pluginClient;
+  private final ProvisionerClient provisionerClient;
+  private final TenantClient tenantClient;
   private final CloseableHttpClient httpClient;
-  private final RestClientConnectionConfig connectionConfig;
   private Registry<ConnectionSocketFactory> connectionRegistry;
 
   private RestClientManager(Builder builder) {
-    this.connectionConfig =
+    RestClientConnectionConfig connectionConfig =
       new RestClientConnectionConfig(builder.host, builder.port, builder.apiKey, builder.ssl, builder.version,
                                      builder.userId, builder.tenantId, builder.verifySSLCert);
     if (!builder.verifySSLCert) {
@@ -68,10 +67,16 @@ public class RestClientManager implements ClientManager {
       }
     }
     this.httpClient = HttpClients.custom().setConnectionManager(createConnectionManager()).build();
+
+    this.adminClient = new AdminRestClient(connectionConfig, httpClient);
+    this.clusterClient = new ClusterRestClient(connectionConfig, httpClient);
+    this.pluginClient = new PluginRestClient(connectionConfig, httpClient);
+    this.provisionerClient = new ProvisionerRestClient(connectionConfig, httpClient);
+    this.tenantClient = new TenantRestClient(connectionConfig, httpClient);
   }
 
   /**
-   * Create builder for build RestClientManager instance.
+   * Create builder for building a RestClientManager instance.
    *
    * @param host coopr server host
    * @param port coopr server port
@@ -83,41 +88,26 @@ public class RestClientManager implements ClientManager {
 
   @Override
   public AdminClient getAdminClient() {
-    if (adminClient == null) {
-      adminClient = new AdminRestClient(connectionConfig, httpClient);
-    }
     return adminClient;
   }
 
   @Override
   public ClusterClient getClusterClient() {
-    if (clusterClient == null) {
-      clusterClient = new ClusterRestClient(connectionConfig, httpClient);
-    }
     return clusterClient;
   }
 
   @Override
   public PluginClient getPluginClient() {
-    if (pluginClient == null) {
-      pluginClient = new PluginRestClient(connectionConfig, httpClient);
-    }
     return pluginClient;
   }
 
   @Override
   public ProvisionerClient getProvisionerClient() {
-    if (provisionerClient == null) {
-      provisionerClient = new ProvisionerRestClient(connectionConfig, httpClient);
-    }
     return provisionerClient;
   }
 
   @Override
   public TenantClient getTenantClient() {
-    if (tenantClient == null) {
-      tenantClient = new TenantRestClient(connectionConfig, httpClient);
-    }
     return tenantClient;
   }
 
@@ -175,12 +165,12 @@ public class RestClientManager implements ClientManager {
       return this;
     }
 
-     public Builder userId(String userId) {
+    public Builder userId(String userId) {
       this.userId = userId;
       return this;
     }
 
-     public Builder tenantId(String tenantId) {
+    public Builder tenantId(String tenantId) {
       this.tenantId = tenantId;
       return this;
     }

@@ -19,7 +19,7 @@ package co.cask.coopr.client;
 import java.io.Closeable;
 
 /**
- * The API for manage all existing clients with a single instance.
+ * The API for managing singletons of all existing clients.
  */
 public interface ClientManager extends Closeable {
 

@@ -18,16 +18,21 @@ package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.rest.exception.HttpFailureException;
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.apache.commons.lang.StringUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,47 +59,41 @@ public class RestClient {
 
   private final RestClientConnectionConfig config;
   private final URI baseUrl;
-  private final String version;
   private final CloseableHttpClient httpClient;
+  private final Header[] authHeaders;
 
   public RestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(config.getUserId()), "User ID couldn't be null");
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(config.getTenantId()), "Tenant ID couldn't be null");
     this.config = config;
-    this.baseUrl = URI.create(String.format("%s://%s:%d", config.isSSL() ? HTTPS_PROTOCOL : HTTP_PROTOCOL,
-                                            config.getHost(), config.getPort()));
-    this.version = config.getVersion();
+    this.baseUrl = URI.create(String.format("%s://%s:%d/%s", config.isSSL() ? HTTPS_PROTOCOL : HTTP_PROTOCOL,
+                                            config.getHost(), config.getPort(), config.getVersion()));
     this.httpClient = httpClient;
+    this.authHeaders = getAuthHeaders();
   }
 
   /**
-   * Method for execute HttpRequest with authorized headers, if need.
+   * Method for executing HttpRequest with authorized headers, if needed.
    *
    * @param request {@link org.apache.http.client.methods.HttpRequestBase} initiated http request with entity, headers,
-   *                                                                      request uri and all another required
-   *                                                                      properties for successfully request
+   *                                                                      request uri and all other required properties
    * @return {@link org.apache.http.client.methods.CloseableHttpResponse} as a result of http request execution
    * @throws IOException in case of a problem or the connection was aborted
    */
-  public CloseableHttpResponse execute(HttpRequestBase request) throws IOException {
-    if (StringUtils.isNotEmpty(config.getUserId())) {
-      request.setHeader(COOPR_USER_ID_HEADER_NAME, config.getUserId());
-    }
-    if (StringUtils.isNotEmpty(config.getTenantId())) {
-      request.setHeader(COOPR_TENANT_ID_HEADER_NAME, config.getTenantId());
-    }
-    //TODO: Remove API Key if it's not used anymore
-    if (StringUtils.isNotEmpty(config.getAPIKey())) {
-      request.setHeader(COOPR_API_KEY_HEADER_NAME, config.getAPIKey());
+  protected CloseableHttpResponse execute(HttpRequestBase request) throws IOException {
+    for (Header header : authHeaders) {
+      request.addHeader(header);
     }
     LOG.debug("Execute Http Request: {}", request);
     return httpClient.execute(request);
   }
 
   /**
-   * Utility method for analysis http response status code and throw appropriate Java API Exception.
+   * Utility method for analyzing http response status code and throwing the appropriate Java API Exception.
    *
    * @param response {@link org.apache.http.HttpResponse} http response
    */
-  public static void responseCodeAnalysis(HttpResponse response) {
+  public static void analyzeResponseCode(HttpResponse response) {
     int code = response.getStatusLine().getStatusCode();
     switch (code) {
       case HttpStatus.SC_OK:
@@ -122,28 +121,34 @@ public class RestClient {
     }
   }
 
-  protected <T> List<T> getAll(String urlSuffix) throws IOException {
-    HttpGet getRequest = new HttpGet(baseUrl.resolve(String.format("/%s/%s", version, urlSuffix)));
+  protected <T> List<T> getAll(String urlSuffix, TypeToken<List<T>> typeToken) throws IOException {
+    return getAll(URI.create(String.format("%s/%s", baseUrl, urlSuffix)), typeToken);
+  }
+
+  protected <T> List<T> getAll(URI url, TypeToken<List<T>> typeToken) throws IOException {
+    HttpGet getRequest = new HttpGet(url);
     CloseableHttpResponse httpResponse = execute(getRequest);
     List<T> resultList;
     try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      resultList = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                                    new TypeToken<List<T>>() { }.getType());
+      RestClient.analyzeResponseCode(httpResponse);
+      resultList = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), typeToken.getType());
     } finally {
       httpResponse.close();
     }
     return resultList != null ? resultList : new ArrayList<T>();
   }
 
-  protected <T> T getSingle(String urlSuffix, String name) throws IOException {
-    HttpGet getRequest = new HttpGet(baseUrl.resolve(String.format("/%s/%s/%s", version, urlSuffix, name)));
+  protected <T> T getSingle(String urlSuffix, String name, TypeToken<T> typeToken) throws IOException {
+    return getSingle(URI.create(String.format("%s/%s/%s", baseUrl, urlSuffix, name)), typeToken);
+  }
+
+  protected <T> T getSingle(URI url, TypeToken<T> typeToken) throws IOException {
+    HttpGet getRequest = new HttpGet(url);
     CloseableHttpResponse httpResponse = execute(getRequest);
     T result;
     try {
-      RestClient.responseCodeAnalysis(httpResponse);
-      result = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8),
-                             new TypeToken<T>() { }.getType());
+      RestClient.analyzeResponseCode(httpResponse);
+      result = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), typeToken.getType());
     } finally {
       httpResponse.close();
     }
@@ -151,14 +156,36 @@ public class RestClient {
   }
 
   protected void delete(String urlSuffix, String name) throws IOException {
-    HttpDelete deleteRequest = new HttpDelete(getBaseURL().resolve(String.format("/%s/%s/%s", version, urlSuffix,
-                                                                                 name)));
+    HttpDelete deleteRequest = new HttpDelete(URI.create(String.format("%s/%s/%s", baseUrl, urlSuffix, name)));
     CloseableHttpResponse httpResponse = execute(deleteRequest);
     try {
-      RestClient.responseCodeAnalysis(httpResponse);
+      RestClient.analyzeResponseCode(httpResponse);
     } finally {
       httpResponse.close();
     }
+  }
+
+  protected <T> void addRequestBody(HttpEntityEnclosingRequestBase requestBase, T body) {
+    if (body != null) {
+      StringEntity stringEntity = new StringEntity(GSON.toJson(body), Charsets.UTF_8);
+      requestBase.setEntity(stringEntity);
+      LOG.debug("Added the json request body: {}.", stringEntity);
+    }
+  }
+
+  protected URI buildFullURL(String postfix) {
+    return URI.create(baseUrl + postfix);
+  }
+
+  private Header[] getAuthHeaders() {
+    Header[] authHeaders = new Header[3];
+    authHeaders[0] = new BasicHeader(COOPR_USER_ID_HEADER_NAME, config.getUserId());
+    authHeaders[1] = new BasicHeader(COOPR_TENANT_ID_HEADER_NAME, config.getTenantId());
+    //TODO: For now it is not a mandatory field
+    if (!Strings.isNullOrEmpty(config.getAPIKey())) {
+      authHeaders[2] = new BasicHeader(COOPR_API_KEY_HEADER_NAME, config.getAPIKey());
+    }
+    return authHeaders;
   }
 
   /**
@@ -166,12 +193,5 @@ public class RestClient {
    */
   public URI getBaseURL() {
     return baseUrl;
-  }
-
-  /**
-   * @return the version of Rest Service API
-   */
-  public String getVersion() {
-    return version;
   }
 }
