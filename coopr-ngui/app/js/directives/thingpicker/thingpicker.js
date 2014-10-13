@@ -30,7 +30,7 @@ function myThingPickerDirective () {
            show: false
          });
          $scope.showModal = function() {
-           modalScope.newThingName = '';
+           modalInstance.$scope.newThingName = '';
            modalInstance.show();
          };
          modalScope.$on('modal.hide', function() {
@@ -40,7 +40,7 @@ function myThingPickerDirective () {
            if ($scope.freetextMode) {
              if (validateThing(thing)) {
                $scope.addThing(thing);
-               document.querySelector('form[name=newServiceForm]').reset();
+               modalInstance.$element.find('form')[0].reset();
                modalInstance.hide();
              } else {
                  modalScope.modalError = true;
@@ -72,10 +72,8 @@ function myThingPickerDirective () {
       });
 
       function validateThing(thing) {
-        var isAlreadyExists = $scope.model.filter(function(existingThing) {
-          return existingThing === thing;
-        });
-        return isAlreadyExists.length === 0;
+        var isAlreadyExists = $scope.model.indexOf(thing);
+        return isAlreadyExists === -1;
       }
 
       function remapAddables (available, avoidable) {

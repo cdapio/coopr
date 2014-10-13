@@ -8,22 +8,21 @@
       </div>
       <div class="modal-body">
 
-        <form name="newServiceForm"
+        <form name="newThingForm"
             ng-submit="validateAndAddToModel(newThingName)"
-            class="css-form"
             ng-class="{'has-error': newThingName.$invalid || modalError}"
             novalidate>
 
           <div class="form-group" >
               <p class="help-block" ng-show="modalError">
-              {{thingName}} '{{newThingName}}' already exists!;
+              {{thingName}} '{{newThingName}}' already exists!
               </p>
               <div class="input-group">
                 <label for="newThingName" class="input-group-addon"> {{thingName}}</label>
                 <input type="text"
                         name="newThingName"
                         id="newThingName"
-                        ng-model="$parent.newThingName"
+                        ng-model="newThingName"
                         class="form-control"
                         required
                          />
