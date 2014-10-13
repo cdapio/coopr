@@ -50,7 +50,7 @@ function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
           return {
             text: category,
             click: 'addAction("'+category+'")'
-          }
+          };
         });
     }
   });
