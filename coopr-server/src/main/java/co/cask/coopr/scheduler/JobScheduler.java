@@ -116,6 +116,9 @@ public class JobScheduler implements Runnable {
           if (cluster.getStatus() != Cluster.Status.PENDING) {
             continue;
           }
+          if (job.getJobStatus() == ClusterJob.Status.PAUSED) {
+            continue;
+          }
           LOG.trace("Scheduling job {}", job);
           Set<String> currentStage = job.getCurrentStage();
 
