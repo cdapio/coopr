@@ -19,9 +19,10 @@ describe('redirects', function() {
   it('should go to login when navigated to /#/signin', function() {
     browser.get('/#/signin');
 
+    // Already signed in.
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/login$/);
+    ).toMatch(/\/#\/$/);
 
   });
 });

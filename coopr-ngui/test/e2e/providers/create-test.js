@@ -2,24 +2,6 @@
 
 describe('providers list page tests login', function () {
   var ptor = protractor.getInstance();
-  
-  it('should log in', function () {
-    browser.get('/#/login');
-    var username = element(by.name('username'));
-    var password = element(by.name('password'));
-    var tenant = element(by.name('tenant'));
-    username.clear();
-    password.clear();
-    tenant.clear();
-
-    username.sendKeys('admin');
-    password.sendKeys('admin');
-    tenant.sendKeys('superadmin');
-    element(by.css('#login-submit-button')).click();
-    expect(
-      browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/$/);
-  });
 
   describe('shows provider create page', function() {
     var formfields;
@@ -31,8 +13,6 @@ describe('providers list page tests login', function () {
       expect(
         browser.getLocationAbsUrl()
       ).toMatch(/\/#\/providers\/create$/);
-
-      expect(element(by.css('#provider-submit-button')).getText()).toBe('Create');
 
       element(by.cssContainingText('option', 'google')).click();
       formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
@@ -61,7 +41,7 @@ describe('providers list page tests login', function () {
       formfields.get(3).element(by.css('input')).sendKeys('Test project id');
       formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
       formfields.get(5).element(by.css('input')).sendKeys('Test username');
-      element(by.css('#provider-submit-button')).click();
+      element(by.partialButtonText('Create')).click();
 
       expect(
         browser.getLocationAbsUrl()
@@ -70,7 +50,7 @@ describe('providers list page tests login', function () {
       providersList = element.all(by.repeater('item in list'));
       expect(providersList.count()).toEqual(8);
       var providerText = providersList.last().getText();
-      expect(providerText).toBe('Testprovider Test description Edit\nDelete');
+      expect(providerText).toMatch('Testprovider Test description Edit\nDelete');
     });
 
 
