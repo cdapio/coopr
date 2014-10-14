@@ -14,11 +14,14 @@ function myFocusManagerService ($rootScope, $log) {
 
   function set (k, v) {
     $log.log('[myFocusManager]', v, k);
-    this.is[last] = false;
-    var o = {};
-    o[v] = Date.now();
-    this.is[k] = o;
-    last = k;
+    var o = {},
+        scope = this.is;
+    scope.$apply(function() {
+      scope[last] = false;
+      o[v] = Date.now();
+      scope[k] = o;
+      last = k;
+    });
   }
 
   /**

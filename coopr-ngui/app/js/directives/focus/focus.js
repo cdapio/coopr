@@ -36,7 +36,7 @@ function myFocusDirective ($timeout, myFocusManager) {
         });
 
         scope.$on('$destroy', function() {
-          // console.log('[myFocus] cleanup', newVal);
+          console.log('[myFocus] cleanup', newVal);
           cleanup();
         });
       });

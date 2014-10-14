@@ -17,34 +17,51 @@ function myThingPickerDirective () {
       freetextMode: '@'
     },
 
-    controller: function ($scope, myApi, $modal) {
+    controller: function ($scope, myApi, $modal, myFocusManager) {
+
       var modalInstance,
           modalScope;
+
       if ($scope.freetextMode) {
         modalScope = $scope.$new();
+        modalScope.newThing = {
+          name: ''
+        };
+
         modalInstance = $modal({
-           scope: modalScope,
-           title: 'Add '+ $scope.thingName,
-           template: 'thingpicker/addThingPopup.html',
-           placement: 'center',
-           show: false
-         });
-         $scope.showModal = function() {
-           modalInstance.$scope.newThingName = '';
-           modalInstance.show();
-         };
-         modalScope.$on('modal.hide', function() {
-           modalScope.modalError = '';
-         });
-         modalScope.validateAndAddToModel = function(thing) {
-             if (validateThing(thing)) {
-               $scope.addThing(thing);
-               modalInstance.$element.find('form')[0].reset();
-               modalInstance.hide();
-             } else {
-                 modalScope.modalError = true;
-             }
-         };
+          scope: modalScope,
+          title: 'Add '+ $scope.thingName,
+          template: 'thingpicker/freetextModal.html',
+          placement: 'center',
+          show: false
+        });
+
+        $scope.showModal = modalInstance.show;
+
+        modalScope.$watch('newThing.name', function() {
+          modalScope.modalError = false;
+        });
+
+        modalScope.$on('modal.show', function() {
+          myFocusManager.focus('inputNewThingName_'+$scope.thingName);
+        });
+
+        modalScope.$on('modal.hide', function() {
+          modalScope.newThing.name = '';
+        });
+
+        modalScope.validateAndAddToModel = function(name) {
+          if ($scope.model.indexOf(name) === -1) {
+            $scope.addThing(name);
+            modalInstance.hide();
+          } else {
+            modalScope.modalError = true;
+          }
+        };
+
+        $scope.$on('$destroy', function() {
+          modalInstance.destroy();
+        });
       }
 
       $scope.rmThing = function (thing) {
@@ -69,10 +86,6 @@ function myThingPickerDirective () {
         remapAddables(newVal, $scope.model);
       });
 
-      function validateThing(thing) {
-        var isAlreadyExists = $scope.model.indexOf(thing);
-        return isAlreadyExists === -1;
-      }
 
       function remapAddables (available, avoidable) {
         $scope.addDropdown = (available||[]).reduce(function (out, thing) {
