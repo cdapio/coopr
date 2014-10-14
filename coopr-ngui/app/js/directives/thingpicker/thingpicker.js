@@ -37,7 +37,6 @@ function myThingPickerDirective () {
            modalScope.modalError = '';
          });
          modalScope.validateAndAddToModel = function(thing) {
-           if ($scope.freetextMode) {
              if (validateThing(thing)) {
                $scope.addThing(thing);
                modalInstance.$element.find('form')[0].reset();
@@ -45,7 +44,6 @@ function myThingPickerDirective () {
              } else {
                  modalScope.modalError = true;
              }
-           }
          };
       }
 
