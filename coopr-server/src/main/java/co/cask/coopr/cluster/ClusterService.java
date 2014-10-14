@@ -376,7 +376,7 @@ public class ClusterService {
     // First read cluster without locking
     Cluster cluster = getCluster(clusterId, account);
     LOG.debug("cluster info: {}", String.valueOf(cluster));
-    if (cluster.getStatus() == Cluster.Status.TERMINATED || cluster.getStatus() != Cluster.Status.PENDING) {
+    if (cluster.getStatus() != Cluster.Status.PENDING) {
       return;
     }
 
@@ -407,7 +407,7 @@ public class ClusterService {
         throw new MissingClusterException("cluster " + clusterId + " not found.");
       }
 
-      if (cluster.getStatus() == Cluster.Status.TERMINATED || cluster.getStatus() != Cluster.Status.PENDING) {
+      if (cluster.getStatus() != Cluster.Status.PENDING) {
         return;
       }
 
@@ -439,7 +439,7 @@ public class ClusterService {
     // First read cluster without locking
     Cluster cluster = getCluster(clusterId, account);
     LOG.debug("cluster info: {}", String.valueOf(cluster));
-    if (cluster.getStatus() == Cluster.Status.TERMINATED || cluster.getStatus() != Cluster.Status.PENDING) {
+    if (cluster.getStatus() != Cluster.Status.PENDING) {
       return;
     }
 
@@ -468,7 +468,7 @@ public class ClusterService {
         throw new MissingClusterException("cluster " + clusterId + " not found.");
       }
 
-      if (cluster.getStatus() == Cluster.Status.TERMINATED || cluster.getStatus() != Cluster.Status.PENDING) {
+      if (cluster.getStatus() != Cluster.Status.PENDING) {
         return;
       }
 
