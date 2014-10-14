@@ -4,9 +4,9 @@
       <a class="btn btn-default disabled">
         {{name}}
       </a>
-      <a class="btn btn-default dropdown-toggle" 
-          ng-if="actionDropdowns[name]" 
-          bs-dropdown="actionDropdowns[name]" 
+      <a class="btn btn-default dropdown-toggle"
+          ng-if="actionDropdowns[name]"
+          bs-dropdown="actionDropdowns[name]"
           data-html="true"
       >
         <span class="caret"></span>
@@ -14,9 +14,20 @@
     </div>
   </li>
   <li ng-show="available.length">
-    <a class="btn btn-xs btn-warning" 
+    <a class="btn btn-xs btn-warning"
         ng-disabled="!addDropdown.length"
         bs-dropdown="addDropdown"
+        ng-hide="freetextMode"
+        data-placement="bottom-left"
+    >
+      <span class="fa fa-plus"></span>
+      add {{thingName}}
+    </a>
+  </li>
+  <li>
+    <a class="btn btn-xs btn-warning"
+        ng-click="showModal()"
+        ng-show="freetextMode"
         data-placement="bottom-left"
     >
       <span class="fa fa-plus"></span>

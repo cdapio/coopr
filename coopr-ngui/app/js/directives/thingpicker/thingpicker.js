@@ -2,22 +2,50 @@
  * myThingPicker
  */
 
-angular.module(PKG.name+'.directives').directive('myThingPicker', 
+angular.module(PKG.name+'.directives').directive('myThingPicker',
 function myThingPickerDirective () {
   return {
     restrict: 'E',
     templateUrl: 'thingpicker/thingpicker.html',
     replace: true,
-
     scope: {
       model: '=', // an array of names
       available: '=', // an array of strings, or of objects with name & description keys
       allowRm: '=', // allow removal boolean
       listInline: '@',
-      thingName: '@'
+      thingName: '@',
+      freetextMode: '@'
     },
 
-    controller: function ($scope, myApi) {
+    controller: function ($scope, myApi, $modal) {
+      var modalInstance,
+          modalScope;
+      if ($scope.freetextMode) {
+        modalScope = $scope.$new();
+        modalInstance = $modal({
+           scope: modalScope,
+           title: 'Add '+ $scope.thingName,
+           template: 'thingpicker/addThingPopup.html',
+           placement: 'center',
+           show: false
+         });
+         $scope.showModal = function() {
+           modalInstance.$scope.newThingName = '';
+           modalInstance.show();
+         };
+         modalScope.$on('modal.hide', function() {
+           modalScope.modalError = '';
+         });
+         modalScope.validateAndAddToModel = function(thing) {
+             if (validateThing(thing)) {
+               $scope.addThing(thing);
+               modalInstance.$element.find('form')[0].reset();
+               modalInstance.hide();
+             } else {
+                 modalScope.modalError = true;
+             }
+         };
+      }
 
       $scope.rmThing = function (thing) {
         $scope.model = $scope.model.filter(function (one) {
@@ -41,6 +69,10 @@ function myThingPickerDirective () {
         remapAddables(newVal, $scope.model);
       });
 
+      function validateThing(thing) {
+        var isAlreadyExists = $scope.model.indexOf(thing);
+        return isAlreadyExists === -1;
+      }
 
       function remapAddables (available, avoidable) {
         $scope.addDropdown = (available||[]).reduce(function (out, thing) {
@@ -72,7 +104,6 @@ function myThingPickerDirective () {
           return out;
         }, {});
       }
-
 
     }
   };
