@@ -11,19 +11,20 @@
 
     <fieldset data-title="{{tab.title}}" ng-repeat="tab in tabs" bs-pane>
 
-      <div ng-include="'/partials/templates/'+tab.partial"></div>
+      <div 
+        ng-include="'/partials/templates/'+tab.partial"
+        onload="onTabLoaded($index)"
+      ></div>
 
       <hr />
 
       <div class="form-group">
         <div class="col-xs-2">
           <p class="form-control-static" ng-hide="debugJson.visible">
-            <a href="" ng-click="debugJson.visible = !debugJson.visible">
+            <a href="" ng-click="debugJson.visible = true">
               <small>
-                <span class="fa fa-fw" ng-class="{
-                  'fa-toggle-left': !debugJson.visible,
-                  'fa-toggle-down': debugJson.visible
-                }"></span>json preview
+                <span class="fa fa-fw fa-toggle-left"></span>
+                json preview
               </small>
             </a>
           </p>

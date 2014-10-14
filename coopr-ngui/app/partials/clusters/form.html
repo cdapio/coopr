@@ -6,7 +6,7 @@
       <input id="inputClusterName" type="text" name="name" class="form-control" 
         placeholder="Name" 
         my-focus="inputClusterName"
-        ng-disabled="model.id"
+        ng-disabled="editing"
         ng-pattern="/^[\w\.\-]+$/"
         maxlength="255"
         ng-model="model.name" required/>
@@ -18,7 +18,7 @@
     <label for="inputClusterTemplate" class="col-xs-2 control-label">Template</label>
     <div class="col-xs-5">
       <select id="inputClusterTemplate" name="template" class="form-control"
-        ng-disabled="model.id"
+        ng-disabled="editing"
         ng-model="model.clusterTemplate"
         ng-options="ctpl.name as ctpl.description for ctpl in availableTemplates" required>
       </select>
@@ -27,7 +27,7 @@
     <label for="inputClusterNumMachines" class="col-xs-2 control-label"># of nodes</label>
     <div class="col-xs-3">
       <input id="inputClusterNumMachines" type="number" name="numMachines" class="form-control"
-        ng-disabled="model.id"
+        ng-disabled="editing"
         ng-model="model.numMachines"
         ng-pattern="/^\d+$/"
         min="{{chosenTemplate.constraints.size.min}}" 
@@ -62,12 +62,10 @@
       <button type="submit" class="btn btn-primary" 
         ng-disabled="submitting || clusterForm.$invalid">
         <span class="fa fa-save"></span>
-        <span ng-show="model.id">Update</span>
-        <span ng-hide="model.id">Create</span>
+        <span ng-show="editing">Update</span>
+        <span ng-hide="editing">Create</span>
       </button>
     </div>
   </div>
 
 </form>
-
-<pre>{{model | json}}</pre>

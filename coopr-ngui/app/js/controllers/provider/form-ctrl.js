@@ -3,7 +3,7 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('ProviderFormCtrl', 
-function ($scope, $state, $q, myApi, CrudFormBase) {
+function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   /* type {Array} */
@@ -20,13 +20,14 @@ function ($scope, $state, $q, myApi, CrudFormBase) {
   } else {
 
     $scope.model = new myApi.Provider();
-    $scope.model.provisioner = {};
+    $scope.model.initialize();
 
     // No need to watch if not editing becuase this field is disabled.
     $scope.$watch('model.providertype', function (newVal) {
       $scope.selectedProvider = findProvider(newVal);
     });
 
+    myFocusManager.focus('inputProviderName');
   }
 
   // Wait for both to complete before setting selected provider and showing fields.
