@@ -66,8 +66,6 @@ gulp.task('css:app', function() {
  */
 gulp.task('js:lib', function() {
   return gulp.src([
-      // './bower_components/es5-shim/es5-shim.js',
-
       './bower_components/angular/angular.js',
 
       './bower_components/angular-sanitize/angular-sanitize.js',
