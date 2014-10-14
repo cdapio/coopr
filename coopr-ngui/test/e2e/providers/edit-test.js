@@ -42,11 +42,12 @@ describe('shows provider update page', function() {
     ).toMatch(/\/#\/providers\/edit\/google$/);
 
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
-    expect(formfields.first().element(by.css('input'))).toBe('apifoo');
-    expect(formfields.get(1).element(by.css('input'))).toBe('12');
-    expect(formfields.get(2).element(by.css('input'))).toBe('idfoo');
-    expect(formfields.get(3).element(by.css('input'))).toBe('sshfoo');
-    expect(formfields.get(4).element(by.css('input'))).toBe('resourcefoo');
+    expect(formfields.first().element(by.css('input')).getAttribute('value')).toBe('apifoo');
+    expect(formfields.get(1).element(by.css('input')).getAttribute('value')).toBe('emailfoo');
+    expect(formfields.get(2).element(by.css('input')).getAttribute('value')).toBe('12');
+    expect(formfields.get(3).element(by.css('input')).getAttribute('value')).toBe('idfoo');
+    expect(formfields.get(4).element(by.css('input')).getAttribute('value')).toBe('sshfoo');
+    expect(formfields.get(5).element(by.css('input')).getAttribute('value')).toBe('resourcefoo');
 
     // !TODO call /reset to get default data back to normal once default data has been implemented.
     // browser.get('/#/reset');

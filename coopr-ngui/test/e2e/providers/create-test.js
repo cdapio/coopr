@@ -55,7 +55,7 @@ describe('providers list page tests login', function () {
 
 
     it('should delete provider upon clicking delete', function () {
-      providersList.last().element(by.partialButtonText('Delete')).click();
+      providersList.last().element(by.css('.delete-btn')).click();
       ptor.switchTo().alert().accept();
       providersList = element.all(by.repeater('item in list'));
       expect(providersList.count()).toEqual(7);
