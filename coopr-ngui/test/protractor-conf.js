@@ -4,7 +4,6 @@ var config = {
   specs: [
     'e2e/*.js',
     'e2e/*/*.js',
-    // 'e2e/providers/create-test.js'
   ],
 
   capabilities: {
