@@ -1,6 +1,6 @@
 'use strict';
 
-describe('providers list page tests login', function () {
+describe('login page tests', function () {
   
   it('should log in', function () {
     browser.get('/#/login');

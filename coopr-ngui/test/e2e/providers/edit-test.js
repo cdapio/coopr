@@ -20,37 +20,39 @@ describe('shows provider update page', function() {
     expect(zone).toEqual('5');
   });
 
-  it('should submit provider update form', function () {
-    formfields.first().element(by.css('input')).clear().sendKeys('apifoo');
-    formfields.get(1).element(by.css('input')).clear().sendKeys('emailfoo');
-    formfields.get(2).element(by.css('input')).clear().sendKeys(12);
-    formfields.get(3).element(by.css('input')).clear().sendKeys('idfoo');
-    formfields.get(4).element(by.css('input')).clear().sendKeys('sshfoo');
-    formfields.get(5).element(by.css('input')).clear().sendKeys('resourcefoo');
-    element(by.partialButtonText('Update')).click();
+  // !TODO Add these tests once reset endpoint becomes available.
+
+  // it('should submit provider update form', function () {
+  //   formfields.first().element(by.css('input')).clear().sendKeys('apifoo');
+  //   formfields.get(1).element(by.css('input')).clear().sendKeys('emailfoo');
+  //   formfields.get(2).element(by.css('input')).clear().sendKeys(12);
+  //   formfields.get(3).element(by.css('input')).clear().sendKeys('idfoo');
+  //   formfields.get(4).element(by.css('input')).clear().sendKeys('sshfoo');
+  //   formfields.get(5).element(by.css('input')).clear().sendKeys('resourcefoo');
+  //   element(by.partialButtonText('Update')).click();
     
-    expect(
-      browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/providers$/);    
-  });
+  //   expect(
+  //     browser.getLocationAbsUrl()
+  //   ).toMatch(/\/#\/providers$/);
+  // });
 
-  it('should show new provider data', function () {
-    browser.get('/#/providers/edit/google');
+  // it('should show new provider data', function () {
+  //   browser.get('/#/providers/edit/google');
     
-    expect(
-      browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/providers\/edit\/google$/);
+  //   expect(
+  //     browser.getLocationAbsUrl()
+  //   ).toMatch(/\/#\/providers\/edit\/google$/);
 
-    formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
-    expect(formfields.first().element(by.css('input')).getAttribute('value')).toBe('apifoo');
-    expect(formfields.get(1).element(by.css('input')).getAttribute('value')).toBe('emailfoo');
-    expect(formfields.get(2).element(by.css('input')).getAttribute('value')).toBe('12');
-    expect(formfields.get(3).element(by.css('input')).getAttribute('value')).toBe('idfoo');
-    expect(formfields.get(4).element(by.css('input')).getAttribute('value')).toBe('sshfoo');
-    expect(formfields.get(5).element(by.css('input')).getAttribute('value')).toBe('resourcefoo');
+  //   formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
+  //   expect(formfields.first().element(by.css('input')).getAttribute('value')).toBe('apifoo');
+  //   expect(formfields.get(1).element(by.css('input')).getAttribute('value')).toBe('emailfoo');
+  //   expect(formfields.get(2).element(by.css('input')).getAttribute('value')).toBe('12');
+  //   expect(formfields.get(3).element(by.css('input')).getAttribute('value')).toBe('idfoo');
+  //   expect(formfields.get(4).element(by.css('input')).getAttribute('value')).toBe('sshfoo');
+  //   expect(formfields.get(5).element(by.css('input')).getAttribute('value')).toBe('resourcefoo');
 
-    // !TODO call /reset to get default data back to normal once default data has been implemented.
-    // browser.get('/#/reset');
-  });
+  //   // !TODO call /reset to get default data back to normal once default data has been implemented.
+  //   // browser.get('/#/reset');
+  // });
 
 });
