@@ -6,9 +6,11 @@ var module = angular.module(PKG.name+'.controllers');
  * CrudListBase
  * a base to be extended by list controllers
  */
-module.factory('CrudListBase', function CrudListBaseFactory() {
+module.factory('CrudListBase', function CrudListBaseFactory ($injector) {
   return function CrudListBase () {
-    var scope = this;
+    var $state = $injector.get('$state'),
+        $alert = $injector.get('$alert'),
+        scope = this;
 
     // we already fetched the list in the parent view
     scope.$watch('subnavList', function (list) {
@@ -25,6 +27,14 @@ module.factory('CrudListBase', function CrudListBaseFactory() {
     scope.doDelete = function (model) {
       model.$delete(function () {
         scope.fetchSubnavList();
+
+        $alert({
+          title: $state.current.data.modelName, 
+          content: 'delete succeeded!', 
+          type: 'success', 
+          duration: 3
+        });
+
       });
     };
 

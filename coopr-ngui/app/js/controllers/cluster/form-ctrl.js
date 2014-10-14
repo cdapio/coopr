@@ -1,10 +1,11 @@
 /**
  * ClusterFormCtrl
- * handles both "edit" and "create" views
+ * handles both "reconfigure" and "create" views
  */
 
 angular.module(PKG.name+'.controllers').controller('ClusterFormCtrl', 
-function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
+function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHelpers) {
+  CrudFormBase.apply($scope);
 
   var id = $state.params.id;
 
@@ -145,7 +146,7 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
 
     var promise;
 
-    if(id) { // reconfiguring
+    if($scope.editing) { // reconfiguring
       promise = myApi.ClusterConfig.update({clusterId:id}, {
         config: model.config
       }).$promise;
@@ -158,6 +159,14 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
       .then(function () {
         $scope.fetchSubnavList();
         $state.go('^.list');
+
+        $alert({
+          title: 'Cluster', 
+          content: ($scope.editing ? 'reconfiguration' : 'creation') + ' succeeded!', 
+          type: 'success', 
+          duration: 3
+        });
+
       })
       .finally(function () {
         $scope.submitting = false;
