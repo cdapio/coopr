@@ -15,7 +15,7 @@
  */
 package co.cask.coopr.spec.template;
 
-import co.cask.coopr.spec.BaseAdminEntity;
+import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Link;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -29,14 +29,14 @@ import java.util.Set;
  * will be used to determine which services to place on which nodes, and what hardware and images to use.  A cluster
  * template also specifies the full set of configuration key values that are needed on the cluster.
  */
-public final class ClusterTemplate extends BaseAdminEntity {
+public final class ClusterTemplate extends BaseEntity {
   private final ClusterDefaults clusterDefaults;
   private final Constraints constraints;
   private final Compatibilities compatibilities;
   private final Administration administration;
   private final Set<Link> links;
 
-  private ClusterTemplate(BaseAdminEntity.Builder baseBuilder, ClusterDefaults clusterDefaults,
+  private ClusterTemplate(BaseEntity.Builder baseBuilder, ClusterDefaults clusterDefaults,
                           Compatibilities compatibilities, Constraints constraints, Administration administration,
                           Set<Link> links) {
     super(baseBuilder);
@@ -105,7 +105,7 @@ public final class ClusterTemplate extends BaseAdminEntity {
   /**
    * Builder for creating cluster templates.
    */
-  public static class Builder extends BaseAdminEntity.Builder<ClusterTemplate> {
+  public static class Builder extends BaseEntity.Builder<ClusterTemplate> {
     private ClusterDefaults clusterDefaults;
     private Constraints constraints = Constraints.EMPTY_CONSTRAINTS;
     private Compatibilities compatibilities = Compatibilities.EMPTY_COMPATIBILITIES;

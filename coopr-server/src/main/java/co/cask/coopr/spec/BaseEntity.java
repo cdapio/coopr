@@ -18,15 +18,21 @@ package co.cask.coopr.spec;
 import com.google.common.base.Objects;
 
 /**
- * A base for admin defined entities, which all require a name and optionally support
- * an icon, description, and label.
+ * A base for entities that require a name and optionally support an icon, description, and label.
  */
-public abstract class BaseAdminEntity extends NamedEntity {
+public class BaseEntity extends NamedEntity {
   protected final String label;
   protected final String description;
   protected final String icon;
 
-  public BaseAdminEntity(Builder builder) {
+  private BaseEntity(String name, String label, String description, String icon) {
+    super(name);
+    this.label = label;
+    this.description = description;
+    this.icon = icon;
+  }
+
+  protected BaseEntity(Builder builder) {
     super(builder.name);
     this.label = builder.label;
     this.description = builder.description;
@@ -61,9 +67,19 @@ public abstract class BaseAdminEntity extends NamedEntity {
   }
 
   /**
+   * Create an admin entity from another admin entity.
+   *
+   * @param other entity to create from
+   * @return admin entity created from the given entity
+   */
+  public static BaseEntity from(BaseEntity other) {
+    return new BaseEntity(other.name, other.label, other.getDescription(), other.icon);
+  }
+
+  /**
    * Base builder for creating admin entities.
    */
-  public abstract static class Builder<T extends BaseAdminEntity> {
+  public abstract static class Builder<T extends BaseEntity> {
     protected String name;
     protected String label;
     protected String description;
@@ -105,11 +121,11 @@ public abstract class BaseAdminEntity extends NamedEntity {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof BaseAdminEntity)) {
+    if (!(o instanceof BaseEntity)) {
       return false;
     }
 
-    BaseAdminEntity that = (BaseAdminEntity) o;
+    BaseEntity that = (BaseEntity) o;
 
     return super.equals(that) &&
       Objects.equal(label, that.label) &&

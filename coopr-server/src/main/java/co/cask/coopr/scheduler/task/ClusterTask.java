@@ -245,6 +245,16 @@ public class ClusterTask {
     attempts.add(new TaskAttempt(attempts.size() + 1));
   }
 
+  /**
+   * Return whether or not the task failed before it could create any resources, such as a node or a disk.
+   *
+   * @return true if the task failed before it could create any resources, false if not
+   */
+  public boolean failedBeforeCreate() {
+    int code = getStatusCode();
+    return clusterAction == ClusterAction.CLUSTER_CREATE && code > 199 && code < 300;
+  }
+
   @Override
   public String toString() {
     return Objects.toStringHelper(this)

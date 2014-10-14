@@ -1,0 +1,39 @@
+
+<div class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" ng-show="title">
+        <button type="button" class="close" ng-click="$hide()">&times;</button>
+        <h4 class="modal-title" ng-bind="title"></h4>
+      </div>
+      <div class="modal-body">
+
+        <form name="newThingForm"
+            ng-submit="validateAndAddToModel(newThingName)"
+            ng-class="{'has-error': newThingName.$invalid || modalError}"
+            novalidate>
+
+          <div class="form-group" >
+              <p class="help-block" ng-show="modalError">
+              {{thingName}} '{{newThingName}}' already exists!
+              </p>
+              <div class="input-group">
+                <label for="newThingName" class="input-group-addon"> {{thingName}}</label>
+                <input type="text"
+                        name="newThingName"
+                        id="newThingName"
+                        ng-model="newThingName"
+                        class="form-control"
+                        required
+                         />
+              </div>
+          </div>
+          <button ng-disabled="newThingForm.$invalid"
+                  type="submit"
+                  class="btn btn-primary pull-right">Add</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>

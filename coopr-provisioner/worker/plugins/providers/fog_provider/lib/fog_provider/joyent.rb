@@ -53,6 +53,9 @@ class FogProviderJoyent < Provider
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
+    rescue Excon::Errors::Unauthorized
+      @result['status'] = 201
+      log.error('Provider credentials invalid/unauthorized')
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.create: #{e.inspect}"
