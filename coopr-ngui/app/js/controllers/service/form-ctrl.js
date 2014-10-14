@@ -10,6 +10,7 @@ function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
   else { // creating
     $scope.model = new myApi.Service();
     $scope.model.initialize();
+    myFocusManager.focus('inputServiceName');
   }
 
 

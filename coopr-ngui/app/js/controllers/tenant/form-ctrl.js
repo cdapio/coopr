@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('TenantFormCtrl', 
-function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
+function ($scope, $state, $alert, $q, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -17,6 +17,8 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
     $scope.model.initialize();
 
     promise = $q.when($scope.model);
+
+    myFocusManager.focus('inputTenantName');
   }
 
   $q.all({

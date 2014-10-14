@@ -1,5 +1,5 @@
 angular.module(PKG.name+'.controllers').controller('HardwareFormCtrl',
-function ($scope, $state, myApi, CrudFormBase) {
+function ($scope, $state, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   $scope.allProviders = myApi.Provider.query();
@@ -14,5 +14,6 @@ function ($scope, $state, myApi, CrudFormBase) {
   else { // creating
     $scope.model = new myApi.HardwareType();
     $scope.model.initialize();
+    myFocusManager.focus('inputHardwareName');
   }
 });

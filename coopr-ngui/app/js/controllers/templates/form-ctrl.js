@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('TemplateFormCtrl', 
-function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
+function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -40,6 +40,12 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
     {title: 'Defaults',       partial: 'form-tabs/defaults.html'},
     {title: 'Constraints',    partial: 'form-tabs/constraints.html'},
   ];
+
+  $scope.onTabLoaded = function (tabIndex) {
+    if(tabIndex === 0 && !$scope.editing) {
+      myFocusManager.focus('inputTemplateName');
+    }
+  };
 
   $scope.nextTab = function () {
     $scope.tabs.activeTab++;

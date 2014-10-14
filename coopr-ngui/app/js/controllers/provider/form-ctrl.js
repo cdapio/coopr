@@ -3,7 +3,7 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('ProviderFormCtrl', 
-function ($scope, $state, $q, myApi, CrudFormBase) {
+function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   /* type {Array} */
@@ -27,6 +27,7 @@ function ($scope, $state, $q, myApi, CrudFormBase) {
       $scope.selectedProvider = findProvider(newVal);
     });
 
+    myFocusManager.focus('inputProviderName');
   }
 
   // Wait for both to complete before setting selected provider and showing fields.

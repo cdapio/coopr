@@ -6,21 +6,21 @@
  */
 
 angular.module(PKG.name+'.services').service('myFocusManager', 
-function myFocusManagerService ($rootScope, $log) {
+function myFocusManagerService ($rootScope, $log, $timeout) {
 
   var last = null;
 
   this.is = $rootScope.$new(true);
 
   function set (k, v) {
-    $log.log('[myFocusManager]', v, k);
-    var o = {},
-        scope = this.is;
-    scope.$apply(function() {
+    var scope = this.is;
+    $timeout(function() {
+      $log.log('[myFocusManager]', v, k);
       scope[last] = false;
+      var o = {};
       o[v] = Date.now();
       scope[k] = o;
-      last = k;
+      last = k;      
     });
   }
 
