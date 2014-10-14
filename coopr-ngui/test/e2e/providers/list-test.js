@@ -22,7 +22,7 @@ describe('providers list page tests login', function () {
     describe('buttons', function () {
       
       it('should link to the right pages', function () {
-        var edithref = providers.first().element(by.css('.edit-btn')).getAttribute('href');
+        var edithref = providers.first().element(by.partialButtonText('Edit')).getAttribute('href');
         expect(edithref).toMatch(/\/#\/providers\/edit\/aws-us-east-1$/);
       });
     

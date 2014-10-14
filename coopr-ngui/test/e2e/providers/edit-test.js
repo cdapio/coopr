@@ -1,7 +1,6 @@
 'use strict';
 
 describe('shows provider update page', function() {
-  var ptor = protractor.getInstance();
   var formfields;
   
   it('should navigate to provider edit page and show fields.', function() {
@@ -35,22 +34,22 @@ describe('shows provider update page', function() {
     ).toMatch(/\/#\/providers$/);    
   });
 
-  // it('should show new provider data', function () {
-  //   browser.get('/#/providers/edit/google');
+  it('should show new provider data', function () {
+    browser.get('/#/providers/edit/google');
     
-  //   expect(
-  //     browser.getLocationAbsUrl()
-  //   ).toMatch(/\/#\/providers\/edit\/google$/);
+    expect(
+      browser.getLocationAbsUrl()
+    ).toMatch(/\/#\/providers\/edit\/google$/);
 
-  //   formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
-  //   expect(formfields.first().element(by.css('input'))).toBe('apifoo');
-  //   expect(formfields.get(1).element(by.css('input'))).toBe('12');
-  //   expect(formfields.get(2).element(by.css('input'))).toBe('idfoo');
-  //   expect(formfields.get(3).element(by.css('input'))).toBe('sshfoo');
-  //   expect(formfields.get(4).element(by.css('input'))).toBe('resourcefoo');
+    formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
+    expect(formfields.first().element(by.css('input'))).toBe('apifoo');
+    expect(formfields.get(1).element(by.css('input'))).toBe('12');
+    expect(formfields.get(2).element(by.css('input'))).toBe('idfoo');
+    expect(formfields.get(3).element(by.css('input'))).toBe('sshfoo');
+    expect(formfields.get(4).element(by.css('input'))).toBe('resourcefoo');
 
-  //   // !TODO call /reset to get default data back to normal once default data has been implemented.
-  //   // browser.get('/#/reset');
-  // });
+    // !TODO call /reset to get default data back to normal once default data has been implemented.
+    // browser.get('/#/reset');
+  });
 
 });
