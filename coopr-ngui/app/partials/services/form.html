@@ -37,8 +37,13 @@
     </label>
     <div class="col-xs-10">
 
-      <!-- freetext thingpicker goes here -->
-      <pre>{{model.dependencies.provides | json}}</pre>
+      <my-thing-picker
+        data-model="model.dependencies.provides"
+        data-allow-rm="true"
+        data-thing-name="feature"
+        data-list-inline="true"
+        data-freetext-mode="true"
+      ></my-thing-picker>
 
     </div>
   </div>
