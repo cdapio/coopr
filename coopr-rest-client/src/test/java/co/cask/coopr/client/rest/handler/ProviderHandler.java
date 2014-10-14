@@ -16,28 +16,27 @@
 
 package co.cask.coopr.client.rest.handler;
 
-import co.cask.coopr.client.Entities;
-import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.Entities;
+import co.cask.coopr.spec.Provider;
+import com.google.common.collect.Lists;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Cluster Templates test handler.
  */
-public class ClusterTemplatesHandler extends AbstractAdminHandler<ClusterTemplate> {
+public class ProviderHandler extends AbstractAdminHandler<Provider> {
 
-  private static final String GET_ALL_URL = "/v2/clustertemplates";
+  private static final String GET_ALL_URL = "/v2/providers";
 
   @Override
-  public List<ClusterTemplate> getAll() {
-    return Arrays.asList(Entities.ClusterTemplateExample.HADOOP_DISTRIBUTED, Entities.ClusterTemplateExample.HDFS,
-                          Entities.ClusterTemplateExample.REACTOR, Entities.ClusterTemplateExample.REACTOR2);
+  public List<Provider> getAll() {
+    return Lists.newArrayList(Entities.ProviderExample.JOYENT, Entities.ProviderExample.RACKSPACE);
   }
 
   @Override
-  public ClusterTemplate getSingle() {
-    return  Entities.ClusterTemplateExample.HADOOP_DISTRIBUTED;
+  public Provider getSingle() {
+    return Entities.ProviderExample.JOYENT;
   }
 
   @Override

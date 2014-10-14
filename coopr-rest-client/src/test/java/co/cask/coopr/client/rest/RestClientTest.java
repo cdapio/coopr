@@ -17,7 +17,12 @@
 package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.ClientManager;
-import co.cask.coopr.client.rest.handler.ClusterTemplatesHandler;
+import co.cask.coopr.client.rest.handler.ClusterHandler;
+import co.cask.coopr.client.rest.handler.ClusterTemplateHandler;
+import co.cask.coopr.client.rest.handler.HardwareTypeHandler;
+import co.cask.coopr.client.rest.handler.ImageTypeHandler;
+import co.cask.coopr.client.rest.handler.ProviderHandler;
+import co.cask.coopr.client.rest.handler.ServiceHandler;
 import org.apache.http.localserver.LocalTestServer;
 import org.junit.After;
 import org.junit.Before;
@@ -36,13 +41,22 @@ public class RestClientTest {
 
   private LocalTestServer localTestServer;
 
-  private ClusterTemplatesHandler clusterTemplatesHandler = new ClusterTemplatesHandler();
+  private ClusterTemplateHandler clusterTemplatesHandler = new ClusterTemplateHandler();
+  private ProviderHandler providerHandler = new ProviderHandler();
+  private ServiceHandler serviceHandler = new ServiceHandler();
+  private HardwareTypeHandler hardwareTypeHandler = new HardwareTypeHandler();
+  private ImageTypeHandler imageTypeHandler = new ImageTypeHandler();
+  private ClusterHandler clusterHandler = new ClusterHandler();
 
   @Before
   public void setUp() throws Exception {
     localTestServer = new LocalTestServer(null, null);
-    localTestServer.register("/v2/clustertemplates", clusterTemplatesHandler);
-    localTestServer.register("/v2/clustertemplates/*", clusterTemplatesHandler);
+    localTestServer.register("/v2/clustertemplates*", clusterTemplatesHandler);
+    localTestServer.register("/v2/providers*", providerHandler);
+    localTestServer.register("/v2/services*", serviceHandler);
+    localTestServer.register("/v2/hardwaretypes*", hardwareTypeHandler);
+    localTestServer.register("/v2/imagetypes*", imageTypeHandler);
+    localTestServer.register("/v2/clusters*", clusterHandler);
     localTestServer.start();
     testServerHost = localTestServer.getServiceAddress().getHostName();
     testServerPort = localTestServer.getServiceAddress().getPort();

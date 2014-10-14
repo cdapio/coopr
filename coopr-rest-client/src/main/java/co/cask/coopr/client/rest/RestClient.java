@@ -21,7 +21,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -38,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,34 +121,34 @@ public class RestClient {
     }
   }
 
-  protected <T> List<T> getAll(String urlSuffix, TypeToken<List<T>> typeToken) throws IOException {
-    return getAll(URI.create(String.format("%s/%s", baseUrl, urlSuffix)), typeToken);
+  protected <T> List<T> getAll(String urlSuffix, Type type) throws IOException {
+    return getAll(URI.create(String.format("%s/%s", baseUrl, urlSuffix)), type);
   }
 
-  protected <T> List<T> getAll(URI url, TypeToken<List<T>> typeToken) throws IOException {
+  protected <T> List<T> getAll(URI url, Type type) throws IOException {
     HttpGet getRequest = new HttpGet(url);
     CloseableHttpResponse httpResponse = execute(getRequest);
     List<T> resultList;
     try {
       RestClient.analyzeResponseCode(httpResponse);
-      resultList = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), typeToken.getType());
+      resultList = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
     } finally {
       httpResponse.close();
     }
     return resultList != null ? resultList : new ArrayList<T>();
   }
 
-  protected <T> T getSingle(String urlSuffix, String name, TypeToken<T> typeToken) throws IOException {
-    return getSingle(URI.create(String.format("%s/%s/%s", baseUrl, urlSuffix, name)), typeToken);
+  protected <T> T getSingle(String urlSuffix, String name, Type type) throws IOException {
+    return getSingle(URI.create(String.format("%s/%s/%s", baseUrl, urlSuffix, name)), type);
   }
 
-  protected <T> T getSingle(URI url, TypeToken<T> typeToken) throws IOException {
+  protected <T> T getSingle(URI url, Type type) throws IOException {
     HttpGet getRequest = new HttpGet(url);
     CloseableHttpResponse httpResponse = execute(getRequest);
     T result;
     try {
       RestClient.analyzeResponseCode(httpResponse);
-      result = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), typeToken.getType());
+      result = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
     } finally {
       httpResponse.close();
     }

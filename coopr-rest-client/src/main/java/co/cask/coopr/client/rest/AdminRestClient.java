@@ -46,12 +46,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<ClusterTemplate> getAllClusterTemplates() throws IOException {
-    return getAll(CLUSTER_TEMPLATES_URL_SUFFIX, new TypeToken<List<ClusterTemplate>>() { });
+    return getAll(CLUSTER_TEMPLATES_URL_SUFFIX, new TypeToken<List<ClusterTemplate>>() { }.getType());
   }
 
   @Override
   public ClusterTemplate getClusterTemplate(String name) throws IOException {
-    return getSingle(CLUSTER_TEMPLATES_URL_SUFFIX, name, new TypeToken<ClusterTemplate>() { });
+    return getSingle(CLUSTER_TEMPLATES_URL_SUFFIX, name, ClusterTemplate.class);
   }
 
   @Override
@@ -61,12 +61,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<Provider> getAllProviders() throws IOException {
-    return getAll(PROVIDERS_URL_SUFFIX, new TypeToken<List<Provider>>() { });
+    return getAll(PROVIDERS_URL_SUFFIX, new TypeToken<List<Provider>>() { }.getType());
   }
 
   @Override
   public Provider getProvider(String name) throws IOException {
-    return getSingle(PROVIDERS_URL_SUFFIX, name, new TypeToken<Provider>() { });
+    return getSingle(PROVIDERS_URL_SUFFIX, name, Provider.class);
   }
 
   @Override
@@ -76,12 +76,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<Service> getAllServices() throws IOException {
-    return getAll(SERVICES_URL_SUFFIX, new TypeToken<List<Service>>() { });
+    return getAll(SERVICES_URL_SUFFIX, new TypeToken<List<Service>>() { }.getType());
   }
 
   @Override
   public Service getService(String name) throws IOException {
-    return getSingle(SERVICES_URL_SUFFIX, name, new TypeToken<Service>() { });
+    return getSingle(SERVICES_URL_SUFFIX, name, Service.class);
   }
 
   @Override
@@ -91,12 +91,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<HardwareType> getAllHardwareTypes() throws IOException {
-    return getAll(HARDWARE_TYPES_URL_SUFFIX, new TypeToken<List<HardwareType>>() { });
+    return getAll(HARDWARE_TYPES_URL_SUFFIX, new TypeToken<List<HardwareType>>() { }.getType());
   }
 
   @Override
   public HardwareType getHardwareType(String name) throws IOException {
-    return getSingle(HARDWARE_TYPES_URL_SUFFIX, name, new TypeToken<HardwareType>() { });
+    return getSingle(HARDWARE_TYPES_URL_SUFFIX, name, HardwareType.class);
   }
 
   @Override
@@ -106,12 +106,12 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   @Override
   public List<ImageType> getAllImageTypes() throws IOException {
-    return getAll(IMAGE_TYPES_URL_SUFFIX, new TypeToken<List<ImageType>>() { });
+    return getAll(IMAGE_TYPES_URL_SUFFIX, new TypeToken<List<ImageType>>() { }.getType());
   }
 
   @Override
   public ImageType getImageType(String name) throws IOException {
-    return getSingle(IMAGE_TYPES_URL_SUFFIX, name, new TypeToken<ImageType>() { });
+    return getSingle(IMAGE_TYPES_URL_SUFFIX, name, ImageType.class);
   }
 
   @Override

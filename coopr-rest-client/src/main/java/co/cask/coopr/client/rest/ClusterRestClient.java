@@ -32,7 +32,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
@@ -64,12 +63,12 @@ public class ClusterRestClient extends RestClient implements ClusterClient {
 
   @Override
   public List<ClusterSummary> getClusters() throws IOException {
-    return getAll(CLUSTERS_URL_SUFFIX, new TypeToken<List<ClusterSummary>>() { });
+    return getAll(CLUSTERS_URL_SUFFIX, new TypeToken<List<ClusterSummary>>() { }.getType());
   }
 
   @Override
   public ClusterDetails getCluster(String clusterId) throws IOException {
-    return getSingle(CLUSTERS_URL_SUFFIX, clusterId, new TypeToken<ClusterDetails>() { });
+    return getSingle(CLUSTERS_URL_SUFFIX, clusterId, ClusterDetails.class);
   }
 
   @Override
@@ -110,13 +109,12 @@ public class ClusterRestClient extends RestClient implements ClusterClient {
 
   @Override
   public ClusterStatusResponse getClusterStatus(String clusterId) throws IOException {
-    return getSingle(buildFullURL(String.format("/clusters/%s/status", clusterId)),
-                     new TypeToken<ClusterStatusResponse>() { });
+    return getSingle(buildFullURL(String.format("/clusters/%s/status", clusterId)), ClusterStatusResponse.class);
   }
 
   @Override
   public JsonObject getClusterConfig(String clusterId) throws IOException {
-    return getSingle(buildFullURL(String.format("/clusters/%s/config", clusterId)), new TypeToken<JsonObject>() { });
+    return getSingle(buildFullURL(String.format("/clusters/%s/config", clusterId)), JsonObject.class);
   }
 
   @Override
@@ -134,7 +132,8 @@ public class ClusterRestClient extends RestClient implements ClusterClient {
 
   @Override
   public List<String> getClusterServices(String clusterId) throws IOException {
-    return getAll(buildFullURL(String.format("/clusters/%s/services", clusterId)), new TypeToken<List<String>>() { });
+    return getAll(buildFullURL(String.format("/clusters/%s/services", clusterId)),
+                  new TypeToken<List<String>>() { }.getType());
   }
 
   @Override
