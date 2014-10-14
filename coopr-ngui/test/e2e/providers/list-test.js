@@ -43,13 +43,6 @@ describe('providers list page tests login', function () {
         var edithref = providers.first().element(by.css('.edit-btn')).getAttribute('href');
         expect(edithref).toBe('http://localhost:8080/#/providers/edit/aws-us-east-1');
       });
-
-      it('should delete provider upon clicking delete', function () {
-        providers.first().element(by.css('.delete-btn')).click();
-        ptor.switchTo().alert().accept();
-        providers = element.all(by.repeater('item in list'));
-        expect(providers.count()).toEqual(providersCount - 1);
-      });
     
     });
 
