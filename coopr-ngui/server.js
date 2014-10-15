@@ -24,7 +24,8 @@ morgan.token('cooprcred', function(req, res){
 
 var httpLabel = color.green('http'),
     corsLabel = color.pink('cors'),
-    httpLogger = morgan(httpLabel+' :method :url :status'),
+    httpStaticLogger = morgan(httpLabel+' :method :url :status'),
+    httpIndexLogger = morgan(httpLabel+' :method '+color.hilite(':url')+' :status'),
     corsLogger = morgan(corsLabel+' :method :url :cooprcred :status', {
       skip: function(req, res) { return req.method === 'OPTIONS' }
     });
@@ -37,8 +38,6 @@ console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 
 var express = require('express'),
     app = express();
-
-app.use(httpLogger);
 
 // serve the config file
 app.get('/config.js', function (req, res) {
@@ -59,14 +58,20 @@ app.get('/config.js', function (req, res) {
 });
 
 // serve static assets
-app.get(/\/(bundle|fonts|partials)\/.*/, express.static(__dirname + '/dist', {
-  index: false
-}));
+app.get(/\/(bundle|fonts|partials)\/.*/, [
+  httpStaticLogger,
+  express.static(__dirname + '/dist', {
+    index: false
+  })
+]);
 
 // any other path, serve index.html
-app.all('*', function (req, res) {
-  res.sendFile(__dirname + '/dist/index.html');
-});
+app.all('*', [
+  httpIndexLogger,
+  function (req, res) {
+    res.sendFile(__dirname + '/dist/index.html');
+  }
+]);
 
 app.listen(COOPR_UI_PORT, '0.0.0.0', function () {
   console.log(httpLabel+' listening on port %s', COOPR_UI_PORT);
