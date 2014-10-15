@@ -45,7 +45,7 @@ before_script:
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then mvn clean package assembly:single -DskipTests; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain; fi >/dev/null 2>&1 &'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain; fi >/dev/null 2>&1 &'
-  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then export COOPR_SERVER_HOME=`pwd` && export COOPR_USE_DUMMY_PROVISIONER=true && sh config/defaults/load-defaults.sh'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then export COOPR_SERVER_HOME=`pwd` && export COOPR_USE_DUMMY_PROVISIONER=true && ./config/defaults/load-defaults.sh'
   - 'cd .. && sleep 5' # give server time to start
 
 script:
