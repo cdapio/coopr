@@ -97,8 +97,7 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
         $alert({
           title: 'Lease extended until:', 
           content: moment($scope.leaseExtendDate).format('LLL'), 
-          type: 'success', 
-          duration: 3
+          type: 'success'
         });
         $scope.leaseExtendMs = 0;
         update();
