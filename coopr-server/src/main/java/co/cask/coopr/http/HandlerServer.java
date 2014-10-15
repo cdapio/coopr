@@ -58,7 +58,8 @@ public class HandlerServer extends AbstractIdleService {
 
     if (enableSSL) {
       String keyStoreFilePath = conf.get(Constants.SSL_KEYSTORE_PATH);
-      Preconditions.checkArgument(keyStoreFilePath != null);
+      Preconditions.checkArgument(keyStoreFilePath != null,
+                                  String.format("%s is not specified.", Constants.SSL_KEYSTORE_PATH));
       File keyStore = new File(keyStoreFilePath);
       builder.enableSSL(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD), conf.get(Constants.SSL_KEYPASSWORD));
     }

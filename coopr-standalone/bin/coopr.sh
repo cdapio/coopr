@@ -161,11 +161,8 @@ if [ ! -z $ssl ] && [ $ssl = "true" ]; then
 fi
 export COOPR_SERVER_URI=$COOPR_PROTOCOL://localhost:55054
 
-line=`awk '/server.disable.certificate.check/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-site.xml`
-line=$((line+1))
-disable_cert_check=`sed -n "${line}p" ${COOPR_SERVER_CONF}coopr-site.xml | awk -F"<|>" '{print $3}'`
-if [ ! -z $disable_cert_check ] && [ $disable_cert_check = "true" ]; then
-  CURL_PARAMETER="--insecure"
+if [ $COOPR_PROTOCOL = "https" ]; then
+  export CURL_PARAMETER="--insecure"
 fi
 
 # Load default configuration
