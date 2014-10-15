@@ -368,41 +368,20 @@ public class ClusterService {
   }
 
   /**
-   * Pause job
+   * Request to pause a cluster job that is currently running.
+   * Throws a {@link MissingClusterException} if no cluster owned by the user is found.
+   *
+   * @param clusterId Id of the cluster.
+   * @param account Account of the user that is trying to pause a cluster job.
+   * @throws IOException if there was some error writing to stores.
    */
   public void requestPauseJob(String clusterId, Account account) throws IOException, MissingClusterException {
     LOG.debug("request to pause job for cluster: {}", clusterId);
-    ClusterStoreView view = clusterStoreService.getView(account);
-    // First read cluster without locking
-    Cluster cluster = getCluster(clusterId, account);
-    LOG.debug("cluster info: {}", String.valueOf(cluster));
-    if (cluster.getStatus() != Cluster.Status.PENDING) {
-      return;
-    }
-
-    // Get latest job
-    ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-    LOG.debug("latest job info: {}", String.valueOf(clusterJob));
-
-    // If job not running, nothing to pause
-    if (clusterJob.getJobStatus() == ClusterJob.Status.FAILED ||
-      clusterJob.getJobStatus() == ClusterJob.Status.COMPLETE) {
-      // Reschedule the job.
-      jobQueues.add(account.getTenantId(), new Element(clusterJob.getJobId()));
-      return;
-    }
-
-    // Job can be paused only when CLUSTER_CREATE is RUNNING
-    if (!(clusterJob.getClusterAction() == ClusterAction.CLUSTER_CREATE &&
-      clusterJob.getJobStatus() == ClusterJob.Status.RUNNING)) {
-      throw new IllegalStateException("Cannot be paused at this time.");
-    }
-
     ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
     lock.acquire();
     try {
-      cluster = view.getCluster(clusterId);
-      LOG.debug("cluster info: {}", String.valueOf(cluster));
+      Cluster cluster = getCluster(clusterId, account);
+      LOG.debug("cluster info: {}", cluster);
       if (cluster == null) {
         throw new MissingClusterException("cluster " + clusterId + " not found.");
       }
@@ -411,8 +390,8 @@ public class ClusterService {
         return;
       }
 
-      clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-      LOG.debug("latest job info: {}", String.valueOf(clusterJob));
+      ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      LOG.debug("latest job info: {}", clusterJob);
 
       // If job already done, return.
       if (clusterJob.getJobStatus() == ClusterJob.Status.COMPLETE ||
@@ -423,47 +402,26 @@ public class ClusterService {
       clusterJob.setJobStatus(ClusterJob.Status.PAUSED);
       clusterJob.setStatusMessage("Paused by user.");
       clusterStore.writeClusterJob(clusterJob);
-      // Reschedule the job.
-      jobQueues.add(account.getTenantId(), new Element(clusterJob.getJobId()));
     } finally {
       lock.release();
     }
   }
 
   /**
-   * Resume job
+   * Request to resume a cluster job that was previously paused.
+   * Throws a {@link MissingClusterException} if no cluster owned by the user is found.
+   *
+   * @param clusterId Id of the cluster.
+   * @param account Account of the user that is trying to resume a cluster job.
+   * @throws IOException if there was some error writing to stores.
    */
   public void requestResumeJob(String clusterId, Account account) throws IOException, MissingClusterException {
     LOG.debug("request to resume job for cluster: {}", clusterId);
-    ClusterStoreView view = clusterStoreService.getView(account);
-    // First read cluster without locking
-    Cluster cluster = getCluster(clusterId, account);
-    LOG.debug("cluster info: {}", String.valueOf(cluster));
-    if (cluster.getStatus() != Cluster.Status.PENDING) {
-      return;
-    }
-
-    // Get latest job
-    ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-    LOG.debug("latest job info: {}", String.valueOf(clusterJob));
-
-    // If job is not paused, nothing to resume
-    if (clusterJob.getJobStatus() != ClusterJob.Status.PAUSED) {
-      // Reschedule the job.
-      jobQueues.add(account.getTenantId(), new Element(clusterJob.getJobId()));
-      return;
-    }
-
-    // Job can be resumed only when CLUSTER_CREATE
-    if (clusterJob.getClusterAction() != ClusterAction.CLUSTER_CREATE) {
-      throw new IllegalStateException("Cannot be resumed at this time.");
-    }
-
     ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
     lock.acquire();
     try {
-      cluster = view.getCluster(clusterId);
-      LOG.debug("cluster info: {}", String.valueOf(cluster));
+      Cluster cluster = getCluster(clusterId, account);
+      LOG.debug("cluster info: {}", cluster);
       if (cluster == null) {
         throw new MissingClusterException("cluster " + clusterId + " not found.");
       }
@@ -472,8 +430,8 @@ public class ClusterService {
         return;
       }
 
-      clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-      LOG.debug("latest job info: {}", String.valueOf(clusterJob));
+      ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      LOG.debug("latest job info: {}", clusterJob);
 
       // If job is not paused, return.
       if (clusterJob.getJobStatus() != ClusterJob.Status.PAUSED) {
