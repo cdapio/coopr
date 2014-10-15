@@ -41,11 +41,6 @@ public class RestClientTest {
 
   public static final String TEST_USER_ID = "test";
   public static final String TEST_TENANT_ID = "supertest";
-  public static final String HADOOP_DISTRIBUTED_NAME = "hadoop-distributed";
-  public static final String JOYENT_PROVIDER_NAME = "joyent";
-  public static final String DATA_NODE_SERVICE_NAME = "datanode";
-  public static final String LARGE_HARDWARE_TYPE_NAME = "large";
-  public static final String CENTOS_6_IMAGE_TYPE_NAME = "centos6";
 
   protected ClientManager clientManager;
   protected String testServerHost;
