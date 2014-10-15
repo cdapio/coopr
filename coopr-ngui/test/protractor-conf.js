@@ -19,6 +19,7 @@ var config = {
 
   onPrepare: function() {
     browser.driver.manage().window().maximize();
+    browser.driver.executeScript("window.name='PROTRACTOR';");
   }
 };
 

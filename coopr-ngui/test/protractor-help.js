@@ -30,7 +30,6 @@ function login(tenant, username, password) {
 
 
 function logout() {
-  console.log('[logout]');
 
   function ddIsOpen() {
     return element(

@@ -163,8 +163,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHel
         $alert({
           title: 'Cluster', 
           content: ($scope.editing ? 'reconfiguration' : 'creation') + ' succeeded!', 
-          type: 'success', 
-          duration: 3
+          type: 'success'
         });
 
       })
