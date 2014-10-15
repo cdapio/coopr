@@ -3,21 +3,20 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('TenantListCtrl', 
-function ($scope, $timeout, $q, myApi, CrudListBase) {
+function ($scope, $interval, $q, myApi, CrudListBase) {
   CrudListBase.apply($scope);
 
-  var timeoutPromise;
+  var promise = $interval(updateTicker, 5000);
+  updateTicker();
 
   $scope.$on('$destroy', function () {
-    $timeout.cancel(timeoutPromise);
+    $interval.cancel(promise);
   });
-
-  updateTicker();
 
   /* ----------------------------------------------------------------------- */
 
   function updateTicker() {
-    $q.all({
+    return $q.all({
       tasks: myApi.Metric.getTaskQueue().$promise,
       workers: myApi.Provisioner.getWorkerCapacity().$promise
     })
@@ -29,7 +28,6 @@ function ($scope, $timeout, $q, myApi, CrudListBase) {
       $scope.workersTotal = result.workers.total;
       $scope.workersAvailable = result.workers.free;
 
-      timeoutPromise = $timeout(updateTicker, 5000);
     });
   }
 
