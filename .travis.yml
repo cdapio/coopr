@@ -23,6 +23,8 @@ env:
   global:
     - secure: DHoIe2FobpAM/4ZKZX3acpBN/UPQn1FK+OJG87IuvCJ2xQbXMOimIL5l52/PgEbea9wQC+qxOaXhFkDS0SMq+AWw0Haa+b0xUG+D9SdRsMfipBmhHowKNAxRkVp1DE563cibpUv03DbS+XWL1xWv0xrc+ooPKdzZm2jWwAlW1AI=
     - secure: DIURQkS/L8U3TTXTtmhhDLdNJAfB2NqUMb6+K5EYwFS/C37tNPTl1ip23j/KC4PRboJtFNgVqQFo9ErsYY7xk6md6+JCB6Tl/4CzSvtZ6Z9xVssFPdKA6dOryelG6beckGoxfWxSw4zIcx2aODVIkMLR+/86Y+9XJ6pJbkfeGEo=
+    - COOPR_SERVER_HOME=`pwd`
+    - COOPR_USE_DUMMY_PROVISIONER=true
 addons:
   sauce_connect: true
 
@@ -45,7 +47,7 @@ before_script:
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then mvn clean package assembly:single -DskipTests; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain; fi >/dev/null 2>&1 &'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain; fi >/dev/null 2>&1 &'
-  - 'export COOPR_SERVER_HOME=`pwd` && export COOPR_USE_DUMMY_PROVISIONER=true && ./config/defaults/load-defaults.sh'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then ./config/defaults/load-defaults.sh; fi'
   - 'cd .. && sleep 5' # give server time to start
 
 script:
