@@ -9,12 +9,9 @@ describe('login', function() {
   it('should show a form', function() {
     browser.get('/#/login');
 
-    element.all(by.css('main form input')).then(function(inputs) {
-      expect( // at least 3 input fields: tenant, username, password
-        inputs.length >= 3
-      ).toBe(true);
-
-    });
+    expect( 
+      element.all(by.css('main form input')).count()
+    ).toBe(4); // tenant, username, password, remember
 
   });
 
