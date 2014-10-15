@@ -4,7 +4,7 @@ var config = {
   specs: [
     // Including a login to run before any other tests run because jasmine doesn't support beforeall
     'protractor-login.js',
-    'e2e/**/*.js',
+    'e2e/**/*.js'
   ],
 
   capabilities: {
