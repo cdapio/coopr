@@ -50,7 +50,7 @@ function logout() {
       element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
 
       browser.wait(function() {
-        return element(
+        return element( 
           by.cssContainingText('#alerts .alert-info', 'You are now logged out')
         ).isPresent();
       }, 5000);
