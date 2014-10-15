@@ -2,7 +2,7 @@ var config = {
   allScriptsTimeout: 11000,
 
   specs: [
-    'e2e/login.js'
+    'e2e/**/*.js'
   ],
 
   capabilities: {
