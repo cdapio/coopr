@@ -22,9 +22,9 @@ morgan.token('cooprcred', function(req, res){
   return color.pink(req.headers['coopr-userid'] + '/' + req.headers['coopr-tenantid']); 
 });
 
-var httpLabel = color.green('http-server'),
-    corsLabel = color.pink('cors-proxy'),
-    httpLogger = morgan(httpLabel+' :method :url', {immediate: true}),
+var httpLabel = color.green('http'),
+    corsLabel = color.pink('cors'),
+    httpLogger = morgan(httpLabel+' :method :url :status'),
     corsLogger = morgan(corsLabel+' :method :url :cooprcred :status', {
       skip: function(req, res) { return req.method === 'OPTIONS' }
     });
@@ -34,51 +34,44 @@ console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 /**
  * HTTP server
  */
-require('http-server')
-  .createServer({
-    root: __dirname + '/dist',
-    before: [
-      httpLogger,
-      function (req, res) {
-        var reqUrl = req.url.match(/^\/config\.(js.*)/);
 
-        if(!reqUrl) {
-          // all other paths are passed to ecstatic
-          return res.emit('next');
-        }
+var express = require('express'),
+    app = express();
 
-        var data = JSON.stringify({
-          // the following will be available in angular via the "MY_CONFIG" injectable
+app.use(httpLogger);
 
-          COOPR_SERVER_URI: COOPR_SERVER_URI,
-          COOPR_CORS_PORT: COOPR_CORS_PORT,
-          authorization: req.headers.authorization
+// serve the config file
+app.get('/config.js', function (req, res) {
+  var data = JSON.stringify({
+    // the following will be available in angular via the "MY_CONFIG" injectable
 
-        });
+    COOPR_SERVER_URI: COOPR_SERVER_URI,
+    COOPR_CORS_PORT: COOPR_CORS_PORT,
+    authorization: req.headers.authorization
 
-        var contentType;
-
-        if(reqUrl[1] === 'json') {
-          contentType = 'application/json';
-        }
-        else { // want JS
-          contentType = 'text/javascript';
-          data = 'angular.module("'+pkg.name+'.config", [])' + 
-                    '.constant("MY_CONFIG",'+data+');';
-        }
-
-        res.writeHead(200, { 
-          'Content-Type': contentType,
-          'Cache-Control': 'no-store, must-revalidate'
-        });
-
-        res.end(data);
-      }
-    ]
-  })
-  .listen(COOPR_UI_PORT, '0.0.0.0', function () {
-    console.log(httpLabel+' listening on port %s', COOPR_UI_PORT);
   });
+  res.header({ 
+    'Content-Type': 'text/javascript',
+    'Cache-Control': 'no-store, must-revalidate'
+  });
+  res.send('angular.module("'+pkg.name+'.config", [])' + 
+            '.constant("MY_CONFIG",'+data+');');
+});
+
+// serve static assets
+app.get(/\/(bundle|fonts|partials)\/.*/, express.static(__dirname + '/dist', {
+  index: false
+}));
+
+// any other path, serve index.html
+app.all('*', function (req, res) {
+  res.sendFile(__dirname + '/dist/index.html');
+});
+
+app.listen(COOPR_UI_PORT, '0.0.0.0', function () {
+  console.log(httpLabel+' listening on port %s', COOPR_UI_PORT);
+});
+
 
 
 /**
