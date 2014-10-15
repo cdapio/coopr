@@ -12,7 +12,7 @@
     "font-awesome": "4.2.0",
     "angular-strap": "2.1.1",
 
-    "angular-ui-router": "0.2.12",
+    "angular-ui-router": "0.2.11",
     "angular-loading-bar": "0.6.0",
     "ngstorage": "0.3.0",
     "angular-moment": "0.8.2"
