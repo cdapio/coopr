@@ -2,13 +2,23 @@
  * helper functions for e2e tests
  */
 
-function login(tenant, username, password) {
+module.exports = {
 
-  function isLoggedIn () {
-    return element(
-      by.css('header .dropdown-toggle .fa-user')
-    ).isPresent();
-  };
+  isLoggedIn: isLoggedIn,
+
+  logout: logout,
+
+  login: login,
+
+  loginAsAdmin: function() {
+    login('superadmin', 'admin', 'admin');
+  }
+
+};
+
+// ----------------------------------------------------------------------------
+
+function login(tenant, username, password) {
 
   isLoggedIn()
     .then(function (needLogout) {
@@ -30,12 +40,6 @@ function login(tenant, username, password) {
 
 function logout() {
 
-  function ddIsOpen() {
-    return element(
-      by.css('header .dropdown.open .dropdown-menu')
-    ).isPresent();
-  }
-
   ddIsOpen()
     .then(function (dd) {
       if(!dd) {
@@ -53,16 +57,15 @@ function logout() {
     });
 }
 
-// ----------------------------------------------------------------------------
-
-module.exports = {
-
-  logout: logout,
-
-  login: login,
-
-  loginAsAdmin: function() {
-    login('superadmin', 'admin', 'admin');
-  }
-
+function isLoggedIn () {
+  return element(
+    by.css('header .dropdown-toggle .fa-user')
+  ).isPresent();
 };
+
+function ddIsOpen() {
+  return element(
+    by.css('header .dropdown.open .dropdown-menu')
+  ).isPresent();
+}
+

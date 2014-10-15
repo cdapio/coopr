@@ -6,22 +6,27 @@ var helper = require('../protractor-help');
 
 describe('login', function() {
 
-  it('should show a form', function() {
+  it('should show a form that works', function() {
     browser.get('/#/login');
 
     expect( 
       element.all(by.css('main form input')).count()
     ).toBe(4); // tenant, username, password, remember
 
+    helper.loginAsAdmin();
+
+    expect( 
+      element(
+        by.cssContainingText('#alerts .alert-success', 'Welcome')
+      ).isPresent()
+    ).toBe(true);
+
   });
 
 
+  describe('once logged in', function() {
 
-  describe('when logged in', function() {
-    beforeEach(helper.loginAsAdmin);
-    afterEach(helper.logout);
-
-    it('should redirect home', function() {
+    it('/login should redirect home', function() {
       browser.get('/#/login');
 
       expect(
@@ -31,6 +36,19 @@ describe('login', function() {
       expect(
         browser.getLocationAbsUrl()
       ).toMatch(/\/#\/$/);
+    });
+
+
+
+    it('can log out', function() {
+      helper.logout();
+
+      expect( 
+        element(
+          by.cssContainingText('#alerts .alert-info', 'You are now logged out')
+        ).isPresent()
+      ).toBe(true);
+
     });
 
   });
