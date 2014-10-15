@@ -119,6 +119,15 @@ class FogProviderGoogle < Provider
       log.debug "Waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
+      hostname =
+        if server.dns_name
+          server.dns_name
+        elsif server.public_ip_address
+          Resolv.getname(server.public_ip_address)
+        else
+          @task['config']['hostname']
+        end
+
       bootstrap_ip =
         if server.public_ip_address
           server.public_ip_address
@@ -141,6 +150,7 @@ class FogProviderGoogle < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
       }
+      @result['hostname'] = hostname
 
       # do we need sudo bash?
       sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
