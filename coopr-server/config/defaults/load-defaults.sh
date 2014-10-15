@@ -15,10 +15,6 @@ then
   dirs="$dirs plugins/providertypes plugins/automatortypes"
 fi
 
-if [ $COOPR_SERVER_URI = "https://localhost:55054" ]; then
-  CURL_PARAMETER="--insecure"
-fi
-
 for d in ${dirs} ; do
   cd ${MAINDIR}
   [[ -d ${d} ]] && cd ${d} || continue
