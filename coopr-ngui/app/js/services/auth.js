@@ -121,6 +121,11 @@ module.factory('myAuthPromise', function myAuthPromiseFactory (MYAUTH_ROLE, $tim
   return function myAuthPromise (c) {
     var deferred = $q.defer();
 
+
+
+    /*
+      fake login / replacement pending backend support
+     */
     $timeout(function(){
       if (!c.password || !c.tenant || !c.username) {
         deferred.reject();
@@ -135,7 +140,9 @@ module.factory('myAuthPromise', function myAuthPromiseFactory (MYAUTH_ROLE, $tim
           deferred.resolve(c);
         }
       }
-    }, 500);
+    }, window.name==='PROTRACTOR' ? 10 : 1500);
+
+
 
     return deferred.promise;
   };
