@@ -13,7 +13,6 @@ function login(tenant, username, password) {
   isLoggedIn()
     .then(function (needLogout) {
       if(needLogout) {
-        console.log('needLogout', needLogout)
         logout();
       }
 
