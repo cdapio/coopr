@@ -17,7 +17,7 @@ describe('shows provider update page', function() {
     var size = formfields.get(2).element(by.css('input')).getAttribute('value');
     expect(size).toEqual('10');
     var zone = formfields.get(6).element(by.css('select')).getAttribute('value');
-    expect(zone).toEqual('5'); 
+    expect(zone).toEqual('5');
   });
 
   // !TODO Add these tests once reset endpoint becomes available.
