@@ -24,36 +24,29 @@ describe('tenants section', function() {
   });
 
 
-  describe('when logged in', function() {
+  it('while logged in....', function() {
+    helper.loginAsAdmin();
 
-    beforeEach(helper.loginAsAdmin);
-    afterEach(helper.logout);
-    // beforeAll/afterAll not in Jasmine yet... but soon?
-    // cf https://github.com/angular/protractor/issues/103
+    browser.get('/#/tenants');
+
+    expect(
+      element(by.css('body')).getAttribute('class')
+    ).toContain('state-tenants-list');
 
 
-    it('/tenants renders list view', function() {
-      browser.get('/#/tenants');
 
-      expect(
-        element(by.css('body')).getAttribute('class')
-      ).toContain('state-tenants-list');
+    browser.get('/#/tenants/edit/superadmin');
 
-    });
+    expect(
+      element(by.css('body')).getAttribute('class')
+    ).toContain('state-tenants-edit');
 
-    it('/tenants/edit/superadmin renders edit view', function() {
-      browser.get('/#/tenants/edit/superadmin');
+    expect(
+      element(by.model('model.name')).getAttribute('value')
+    ).toBe('superadmin');
 
-      expect(
-        element(by.css('body')).getAttribute('class')
-      ).toContain('state-tenants-edit');
 
-      expect(
-        element(by.model('model.name')).getAttribute('value')
-      ).toBe('superadmin');
-
-    });
-
+    helper.logout();
   });
 });
 
