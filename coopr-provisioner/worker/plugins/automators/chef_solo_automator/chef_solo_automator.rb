@@ -232,7 +232,7 @@ class ChefSoloAutomator < Automator
     log.debug "ChefSoloAutomator bootstrap completed successfully: #{@result}"
     @result
   ensure
-    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
+    File.delete(@ssh_file) if @ssh_file && File.exist?(@ssh_file)
   end
 
   def runchef(inputmap)
@@ -293,7 +293,7 @@ class ChefSoloAutomator < Automator
     log.debug "Chef-solo run completed successfully for task #{@task['taskId']}: #{@result}"
     @result
   ensure
-    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
+    File.delete(@ssh_file) if @ssh_file && File.exist?(@ssh_file)
   end
 
   def install(inputmap)
