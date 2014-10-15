@@ -2,9 +2,7 @@ var config = {
   allScriptsTimeout: 11000,
 
   specs: [
-    // Including a login to run before any other tests run because jasmine doesn't support beforeall
-    'protractor-login.js',
-    'e2e/**/*.js'
+    'e2e/login.js'
   ],
 
   capabilities: {
@@ -21,6 +19,7 @@ var config = {
 
   onPrepare: function() {
     browser.driver.manage().window().maximize();
+    browser.driver.executeScript("window.name='PROTRACTOR';");
   }
 };
 
