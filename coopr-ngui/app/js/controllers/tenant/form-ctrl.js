@@ -35,8 +35,7 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase, myFocusManager) {
       $alert({
         title: 'No workers available!', 
         content: 'You will need to free some workers for this tenant.', 
-        type: 'warning', 
-        duration: 3
+        type: 'warning'
       });
     }
 

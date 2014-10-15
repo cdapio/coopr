@@ -23,7 +23,10 @@ function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT,
   $scope.$on('$viewContentLoaded', function() { 
     if(myAuth.isAuthenticated()) {
       $state.go('home');
-      $alert({content:'You are already logged in!', type:'warning', duration:5});
+      $alert({
+        content: 'You are already logged in!',
+        type: 'warning'
+      });
     }
     else {
       focusLoginField();

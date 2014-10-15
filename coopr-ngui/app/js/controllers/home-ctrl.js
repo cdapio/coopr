@@ -23,8 +23,7 @@ function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
       .then(function (result) {
         $alert({
           title: 'Import complete!', 
-          type: 'success', 
-          duration: 3 
+          type: 'success'
         });
         getData();
       })
@@ -32,8 +31,7 @@ function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
         $alert({
           title: 'import error!', 
           content: err, 
-          type: 'danger', 
-          duration: 3 
+          type: 'danger'
         });
       });
   };
