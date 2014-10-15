@@ -3,22 +3,20 @@
  */
 
 function login(tenant, username, password) {
-  var ptor = protractor.getInstance();
 
   function isLoggedIn () {
     return element(
       by.css('header .dropdown-toggle .fa-user')
-    ).isDisplayed();
+    ).isPresent();
   };
 
   isLoggedIn()
     .then(function (needLogout) {
       if(needLogout) {
+        console.log('needLogout', needLogout)
         logout();
       }
-    })
-    .then(function () {
-      // console.log('logging in...');
+
       browser.get('/#/login');
 
       element(by.id('loginTenant')).clear().sendKeys(tenant);
@@ -32,27 +30,27 @@ function login(tenant, username, password) {
 
 
 function logout() {
-  // console.log('logging out...');
-  var ptor = protractor.getInstance();
+  console.log('[logout]');
 
   function ddIsOpen() {
-    return ptor.isElementPresent(
+    return element(
       by.css('header .dropdown.open .dropdown-menu')
-    );
+    ).isPresent();
   }
 
   ddIsOpen()
-    .then(function (openDropdown) {
-      element(by.css('header .navbar-right .dropdown-toggle')).click();
-      browser.wait(ddIsOpen, 5000);
-    })
-    .then(function () {
-      element(by.cssContainingText('.dropdown-menu a', 'Logout')).click();
+    .then(function (dd) {
+      if(!dd) {
+        element(by.css('header .navbar-right .dropdown-toggle')).click();
+        browser.wait(ddIsOpen, 5000);        
+      }
+
+      element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
 
       browser.wait(function() {
-        return ptor.isElementPresent(
+        return element(
           by.cssContainingText('#alerts .alert-info', 'You are now logged out')
-        );
+        ).isPresent();
       }, 5000);
     });
 }

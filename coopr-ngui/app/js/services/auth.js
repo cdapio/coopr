@@ -135,7 +135,7 @@ module.factory('myAuthPromise', function myAuthPromiseFactory (MYAUTH_ROLE, $tim
           deferred.resolve(c);
         }
       }
-    }, 1500);
+    }, 500);
 
     return deferred.promise;
   };
