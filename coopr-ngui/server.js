@@ -7,6 +7,7 @@
 var pkg = require('./package.json'),
     morgan = require('morgan'),
     express = require('express'),
+    serveFavicon = require('serve-favicon'),
     corsAnywhere = require('cors-anywhere'),
 
     COOPR_UI_PORT = parseInt(process.env.COOPR_UI_PORT || 8080, 10),
@@ -40,7 +41,7 @@ console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 
 var app = express();
 
-app.use(require('serve-favicon')(__dirname + '/dist/img/favicon.png'));
+app.use(serveFavicon(__dirname + '/dist/img/favicon.png'));
 
 // serve the config file
 app.get('/config.js', function (req, res) {
