@@ -30,3 +30,12 @@ if node['php'].key?('modules')
     end
   end
 end
+
+cookbook_file "#{node['apache']['docroot_dir']}/index.html"
+  action :create_if_missing
+  owner node['apache']['user']
+  group node['apache']['group']
+  mode '0644'
+  only_if node['platform_family'] == 'rhel'
+end
+
