@@ -107,7 +107,16 @@ class FogProviderJoyent < Provider
         ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
         # Check for /dev/vdb
         begin
+          vdb1 = true
           vdb = true
+          # test for vdb1
+          begin
+            ssh_exec!(ssh, 'test -e /dev/vdb1 && echo yes', 'Checking for /dev/vdb1')
+            ssh_exec!(ssh, 'if grep "vdb1 /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb1 mounted already')
+          rescue
+            vdb1 = false
+            log.debug 'Device /dev/vdb1 already mounted at /data'
+          end
           # confirm /dev/vdb exists
           ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
           # confirm it is not already mounted
