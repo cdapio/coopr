@@ -31,7 +31,7 @@ if node['php'].key?('modules')
   end
 end
 
-cookbook_file "#{node['apache']['docroot_dir']}/index.html"
+cookbook_file "#{node['apache']['docroot_dir']}/index.html" do
   action :create_if_missing
   owner node['apache']['user']
   group node['apache']['group']
