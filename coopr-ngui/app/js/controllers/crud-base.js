@@ -31,8 +31,7 @@ module.factory('CrudListBase', function CrudListBaseFactory ($injector) {
         $alert({
           title: $state.current.data.modelName, 
           content: 'delete succeeded!', 
-          type: 'success', 
-          duration: 3
+          type: 'success'
         });
 
       });
@@ -83,8 +82,7 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
           $alert({
             title: $state.current.data.modelName, 
             content: method.substring(1) + ' succeeded!', 
-            type: 'success', 
-            duration: 3
+            type: 'success'
           });
 
         })

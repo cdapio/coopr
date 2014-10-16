@@ -1,5 +1,6 @@
-'use strict';
-
+/**
+ * e2e tests for generic redirects
+ */
 
 describe('redirects', function() {
 
@@ -12,7 +13,7 @@ describe('redirects', function() {
 
     expect(
       element(by.css('main .jumbotron')).getText()
-    ).toMatch("Page not found");
+    ).toContain("Page not found");
 
   });
 
