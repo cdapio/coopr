@@ -1,7 +1,9 @@
 angular.module(PKG.name)
   .config(function ($stateProvider, $urlRouterProvider, $locationProvider, MYAUTH_ROLE) {
 
-    $locationProvider.html5Mode(true);
+    $locationProvider
+      .html5Mode(true)
+      .hashPrefix('!');
 
     /**
      * Redirects and Otherwise

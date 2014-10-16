@@ -39,6 +39,8 @@ console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 var express = require('express'),
     app = express();
 
+app.use(require('serve-favicon')(__dirname + '/dist/img/favicon.png'));
+
 // serve the config file
 app.get('/config.js', function (req, res) {
   var data = JSON.stringify({
@@ -58,11 +60,19 @@ app.get('/config.js', function (req, res) {
 });
 
 // serve static assets
-app.get(/\/(bundle|fonts|partials)\/.*/, [
+app.get(/\/(bundle|fonts|partials|img)\/.*/, [
   httpStaticLogger,
   express.static(__dirname + '/dist', {
     index: false
   })
+]);
+
+app.get('/robots.txt', [
+  httpStaticLogger,
+  function (req, res) {
+    res.type('text/plain');
+    res.send('User-agent: *\nDisallow: /');
+  }
 ]);
 
 // any other path, serve index.html
