@@ -36,6 +36,6 @@ cookbook_file "#{node['apache']['docroot_dir']}/index.html" do
   owner node['apache']['user']
   group node['apache']['group']
   mode '0644'
-  only_if node['platform_family'] == 'rhel'
+  only_if { node['platform_family'] == 'rhel' }
 end
 
