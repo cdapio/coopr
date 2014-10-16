@@ -71,7 +71,6 @@ public class RestClientTest {
 
       final SSLContext serverSSLContext = SSLContexts.custom()
         .useProtocol("TLS")
-        .loadTrustMaterial(keystore)
         .loadKeyMaterial(keystore, "secret".toCharArray())
         .build();
       localTestServer = new LocalTestServer(serverSSLContext);

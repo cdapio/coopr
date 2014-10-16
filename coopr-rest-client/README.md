@@ -1,7 +1,7 @@
 coopr-rest-client
 ==================
 
-The Rest Client Java API is for managing main Coopr system entities via external custom Java applications.
+The Rest Client Java API is for managing Coopr from Java applications.
 
 ## Supported Actions
 
