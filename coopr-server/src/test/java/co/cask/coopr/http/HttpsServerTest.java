@@ -1,13 +1,23 @@
+/*
+ * Copyright © 2012-2014 Cask Data, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package co.cask.coopr.http;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
@@ -17,21 +27,16 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
+/**
+ *
+ */
 public class HttpsServerTest extends ServiceTestBase {
-
 
 
   @BeforeClass
@@ -66,11 +71,10 @@ public class HttpsServerTest extends ServiceTestBase {
     Future<HttpResponse> future = Executors.newSingleThreadExecutor().submit(new Callable<HttpResponse>() {
       public HttpResponse call() throws Exception {
         return doGet(String.format("http://%s:%d/status", HOSTNAME,
-                                     handlerServer.getBindAddress().getPort()));
+                                   handlerServer.getBindAddress().getPort()));
       }
     });
-    HttpResponse response = future.get(5000, TimeUnit.MILLISECONDS);
-    Assert.assertNull(response);
+    future.get(5000, TimeUnit.MILLISECONDS);
   }
 
   public static HttpResponse doGet(String url) throws Exception {
@@ -78,32 +82,5 @@ public class HttpsServerTest extends ServiceTestBase {
       .setConnectionManager(new BasicHttpClientConnectionManager(getRegistryWithDisabledCertCheck())).build();
     HttpGet get = new HttpGet(url);
     return client.execute(get);
-  }
-
-  private static Registry<ConnectionSocketFactory> getRegistryWithDisabledCertCheck()
-    throws KeyManagementException, NoSuchAlgorithmException {
-    SSLContext sslContext = SSLContext.getInstance("TLS");
-    sslContext.init(null, new TrustManager[]{new X509TrustManager() {
-      @Override
-      public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-        return null;
-      }
-
-      @Override
-      public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
-        throws CertificateException {
-      }
-
-      @Override
-      public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
-        throws CertificateException {
-      }
-    }}, new SecureRandom());
-    SSLConnectionSocketFactory sf =
-      new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-    return RegistryBuilder
-      .<ConnectionSocketFactory>create().register("https", sf)
-      .register("http", PlainConnectionSocketFactory.getSocketFactory())
-      .build();
   }
 }
