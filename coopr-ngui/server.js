@@ -6,6 +6,8 @@
 
 var pkg = require('./package.json'),
     morgan = require('morgan'),
+    express = require('express'),
+    corsAnywhere = require('cors-anywhere'),
 
     COOPR_UI_PORT = parseInt(process.env.COOPR_UI_PORT || 8080, 10),
     COOPR_CORS_PORT = parseInt(process.env.COOPR_CORS_PORT || 8081, 10),
@@ -36,8 +38,7 @@ console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
  * HTTP server
  */
 
-var express = require('express'),
-    app = express();
+var app = express();
 
 app.use(require('serve-favicon')(__dirname + '/dist/img/favicon.png'));
 
@@ -84,7 +85,7 @@ app.all('*', [
 ]);
 
 app.listen(COOPR_UI_PORT, '0.0.0.0', function () {
-  console.log(httpLabel+' listening on port %s', COOPR_UI_PORT);
+  console.info(httpLabel+' listening on port %s', COOPR_UI_PORT);
 });
 
 
@@ -92,8 +93,7 @@ app.listen(COOPR_UI_PORT, '0.0.0.0', function () {
 /**
  * CORS proxy
  */
-require('cors-anywhere')
-  .createServer({
+corsAnywhere.createServer({
     requireHeader: ['x-requested-with'],
     removeHeaders: ['cookie', 'cookie2']
   })
@@ -101,5 +101,5 @@ require('cors-anywhere')
     corsLogger(req, res, function noop() {} );
   })
   .listen(COOPR_CORS_PORT, '0.0.0.0', function() {
-    console.log(corsLabel+' listening on port %s', COOPR_CORS_PORT);
+    console.info(corsLabel+' listening on port %s', COOPR_CORS_PORT);
   });
