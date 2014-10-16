@@ -120,9 +120,7 @@ class FogProviderGoogle < Provider
       server.wait_for(600) { ready? }
 
       hostname =
-        if server.dns_name
-          server.dns_name
-        elsif server.public_ip_address
+        if server.public_ip_address
           Resolv.getname(server.public_ip_address)
         else
           @task['config']['hostname']
@@ -131,8 +129,6 @@ class FogProviderGoogle < Provider
       bootstrap_ip =
         if server.public_ip_address
           server.public_ip_address
-        else
-          Resolv.getaddress(server.dns_name) unless server.dns_name.nil?
         end
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
