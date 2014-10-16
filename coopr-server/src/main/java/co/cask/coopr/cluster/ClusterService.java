@@ -369,11 +369,11 @@ public class ClusterService {
 
   /**
    * Request to pause a cluster job that is currently running.
-   * Throws a {@link MissingClusterException} if no cluster owned by the user is found.
    *
    * @param clusterId Id of the cluster.
    * @param account Account of the user that is trying to pause a cluster job.
    * @throws IOException if there was some error writing to stores.
+   * @throws MissingClusterException if no cluster owned by the user is found.
    */
   public void requestPauseJob(String clusterId, Account account) throws IOException, MissingClusterException {
     LOG.debug("request to pause job for cluster: {}", clusterId);
@@ -409,11 +409,11 @@ public class ClusterService {
 
   /**
    * Request to resume a cluster job that was previously paused.
-   * Throws a {@link MissingClusterException} if no cluster owned by the user is found.
    *
    * @param clusterId Id of the cluster.
    * @param account Account of the user that is trying to resume a cluster job.
    * @throws IOException if there was some error writing to stores.
+   * @throws MissingClusterException if no cluster owned by the user is found.
    */
   public void requestResumeJob(String clusterId, Account account) throws IOException, MissingClusterException {
     LOG.debug("request to resume job for cluster: {}", clusterId);
