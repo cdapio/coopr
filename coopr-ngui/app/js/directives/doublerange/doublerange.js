@@ -20,19 +20,20 @@ function myDoublerangeDirective ($log) {
 
       scope.html5 = attrs.html5 && attrs.html5!=='false';
 
+      // the almost-max value for the max slider in html5 mode
+      scope.maxThreshold = parseInt(attrs.maxThreshold, 10) || 100;
+
+      // the real max value
+      function maxoutValue() {
+        var max = parseInt(scope.inputMax, 10);
+        return isNaN(max) ? INTEGER_MAX : max;
+      } 
+
+      // the checkbox to go beyond the threshold
+      scope.maxout = (maxoutValue() === scope.model.max) || null; 
+
+
       if(scope.html5) {
-
-        // the almost-max value for the max slider in html5 mode
-        scope.maxThreshold = parseInt(attrs.maxThreshold, 10) || 100;
-
-        // the real max value
-        function maxoutValue() {
-          var max = parseInt(scope.inputMax, 10);
-          return isNaN(max) ? INTEGER_MAX : max;
-        } 
-
-        // the checkbox to go beyond the threshold
-        scope.maxout = (maxoutValue() === scope.model.max) || null; 
 
         scope.$watch('maxout', function (newVal) {
           if(newVal === null) {
