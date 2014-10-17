@@ -22,19 +22,24 @@ function myDoublerangeDirective ($log) {
 
       if(scope.html5) {
 
-        // the max value for the max slider in html5 mode
+        // the almost-max value for the max slider in html5 mode
         scope.maxThreshold = parseInt(attrs.maxThreshold, 10) || 100;
 
-        // the checkbox to have the max value go beyond threshold
-        scope.maxout = null; 
+        // the real max value
+        function maxoutValue() {
+          var max = parseInt(scope.inputMax, 10);
+          return isNaN(max) ? INTEGER_MAX : max;
+        } 
+
+        // the checkbox to go beyond the threshold
+        scope.maxout = (maxoutValue() == scope.model.max) || null; 
 
         scope.$watch('maxout', function (newVal) {
           if(newVal === null) {
             return; 
           }
           if(newVal) { // checkbox checked
-            var max = parseInt(scope.inputMax, 10);
-            scope.model.max = isNaN(max) ? INTEGER_MAX : max;
+            scope.model.max = maxoutValue();
           }
           else { // checkbox unchecked
             scope.model.max = Math.max(

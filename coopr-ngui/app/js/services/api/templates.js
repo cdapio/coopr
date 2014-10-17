@@ -27,7 +27,10 @@ function ($resource, myApiPrefix) {
           cantcoexist: []
         },
         services: {},
-        size: {}
+        size: {
+          min: 1,
+          max: 2147483647
+        }
       },
       administration: {
         leaseduration: {}
