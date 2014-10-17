@@ -1,0 +1,3 @@
+[submodule "coopr-templates"]
+	path = coopr-templates
+	url = git@github.com:caskdata/coopr-templates.git
