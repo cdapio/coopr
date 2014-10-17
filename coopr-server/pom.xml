@@ -37,12 +37,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.twill</groupId>
-            <artifactId>twill-zookeeper</artifactId>
-            <version>0.2.0-incubating</version>
-        </dependency>
-
-        <dependency>
             <groupId>co.cask.http</groupId>
             <artifactId>netty-http</artifactId>
             <version>0.4.1</version>
@@ -64,12 +58,6 @@
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jdbc</artifactId>
             <version>7.0.50</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-multibindings</artifactId>
-            <version>3.0</version>
         </dependency>
 
         <dependency>

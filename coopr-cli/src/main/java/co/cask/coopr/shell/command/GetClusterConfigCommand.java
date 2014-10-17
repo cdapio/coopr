@@ -46,7 +46,7 @@ public class GetClusterConfigCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("get cluster config <%s>", CLUSTER_ID_KEY);
+    return String.format("get cluster-config <%s>", CLUSTER_ID_KEY);
   }
 
   @Override

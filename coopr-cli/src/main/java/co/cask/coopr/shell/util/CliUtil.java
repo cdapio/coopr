@@ -17,11 +17,14 @@
 package co.cask.coopr.shell.util;
 
 import co.cask.common.cli.Arguments;
+import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
@@ -70,10 +73,14 @@ public class CliUtil {
     if (arguments.hasArgument(argKey)) {
       String arg = arguments.get(argKey);
       Gson gson = new Gson();
-      if (arg.startsWith(FILE_PREFIX)) {
-        String argFilePath = arg.substring(FILE_PREFIX.length());
-        Reader reader = new FileReader(argFilePath);
-        return gson.fromJson(reader, type);
+      if (arg.startsWith(ARG_WRAPPER) && arg.endsWith(ARG_WRAPPER)) {
+        arg = arg.substring(1, arg.length() - 1);
+        if (arg.startsWith(FILE_PREFIX)) {
+          String argFilePath = arg.substring(FILE_PREFIX.length());
+          return gson.fromJson(new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8), type);
+        } else {
+          throw new IllegalArgumentException(String.format("Argument must starts with %s prefix", FILE_PREFIX));
+        }
       } else {
         if (!(arg.startsWith(JSON_WRAPPER) && arg.endsWith(JSON_WRAPPER))) {
           throw new IllegalArgumentException("Json must be contained in single quotes");

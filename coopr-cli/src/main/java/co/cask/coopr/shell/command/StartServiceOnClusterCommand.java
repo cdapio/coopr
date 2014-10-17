@@ -56,7 +56,7 @@ public class StartServiceOnClusterCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("start service <%s> on cluster <%s>[ with provider fields <%s>]",
+    return String.format("start service <%s> on cluster <%s> [with provider fields <%s>]",
                          SERVICE_ID_KEY, CLUSTER_ID_KEY, PROVIDER_FIELDS_KEY);
   }
 

@@ -46,7 +46,7 @@ public class GetClusterTemplateCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("get cluster template <%s>", NAME_KEY);
+    return String.format("get template <%s>", NAME_KEY);
   }
 
   @Override

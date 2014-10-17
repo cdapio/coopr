@@ -60,7 +60,7 @@ public class CreateClusterCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("create cluster <%s> with template <%s> of size <%s>[ using settings <%s>]",
+    return String.format("create cluster <%s> with template <%s> of size <%s> [using settings <%s>]",
                          NAME_KEY, TEMPLATE_KEY, SIZE_KEY, SETTINGS_KEY);
   }
 

@@ -46,7 +46,7 @@ public class DeleteClusterTemplateCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("delete cluster template <%s>", NAME_KEY);
+    return String.format("delete template <%s>", NAME_KEY);
   }
 
   @Override

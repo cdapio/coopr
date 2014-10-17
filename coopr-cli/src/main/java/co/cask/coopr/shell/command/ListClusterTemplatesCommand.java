@@ -43,7 +43,7 @@ public class ListClusterTemplatesCommand implements Command {
 
   @Override
   public String getPattern() {
-    return "list cluster templates";
+    return "list templates";
   }
 
   @Override

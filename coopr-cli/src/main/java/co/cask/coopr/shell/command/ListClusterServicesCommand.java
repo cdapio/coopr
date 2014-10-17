@@ -46,7 +46,7 @@ public class ListClusterServicesCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("list cluster services <%s>", CLUSTER_ID_KEY);
+    return String.format("list services <%s>", CLUSTER_ID_KEY);
   }
 
   @Override

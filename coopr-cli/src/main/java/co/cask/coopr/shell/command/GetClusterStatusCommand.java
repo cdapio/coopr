@@ -46,7 +46,7 @@ public class GetClusterStatusCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("get cluster status <%s>", CLUSTER_ID_KEY);
+    return String.format("get cluster-status <%s>", CLUSTER_ID_KEY);
   }
 
   @Override

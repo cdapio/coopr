@@ -54,7 +54,7 @@ public class DeleteClusterCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("delete cluster <%s>[ with provider fields <%s>]", CLUSTER_ID_KEY, PROVIDER_FIELDS_KEY);
+    return String.format("delete cluster <%s> [with provider fields <%s>]", CLUSTER_ID_KEY, PROVIDER_FIELDS_KEY);
   }
 
   @Override
