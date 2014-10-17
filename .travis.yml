@@ -37,12 +37,14 @@ before_install:
   - 'export CHROME_BIN=chromium-browser'
   - 'export DISPLAY=:99.0'
   - 'sh -e /etc/init.d/xvfb start'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd coopr-server; fi'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then mvn clean package assembly:single -DskipTests; fi'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd ..; fi'
 
 before_script:
   - 'cd coopr-ngui && npm run build'
   - 'npm start > /dev/null &'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd ../coopr-server; fi'
-  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then mvn clean package assembly:single -DskipTests; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain; fi >/dev/null 2>&1 &'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp target/*:src/test/resources co.cask.coopr.runtime.MockProvisionerMain; fi >/dev/null 2>&1 &'
   - 'cd .. && sleep 5' # give server time to start

@@ -26,7 +26,7 @@ function login(tenant, username, password) {
         logout();
       }
 
-      browser.get('/#/login');
+      browser.get('/login');
 
       element(by.id('loginTenant')).clear().sendKeys(tenant);
       element(by.id('loginUsername')).clear().sendKeys(username);
