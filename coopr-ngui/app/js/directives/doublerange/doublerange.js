@@ -20,44 +20,58 @@ function myDoublerangeDirective ($log) {
 
       scope.html5 = attrs.html5 && attrs.html5!=='false';
 
-      if(scope.html5) {
+      // the max value for the max slider in html5 mode
+      scope.maxThreshold = parseInt(attrs.maxThreshold, 10) || 100;
 
-        // the max value for the max slider in html5 mode
-        scope.maxThreshold = parseInt(attrs.maxThreshold, 10) || 100;
+      scope.maxout = null; // bool or null
+      scope.$watch('maxout', function (newVal) {
+        if(newVal) {
+          var max = parseInt(scope.inputMax, 10);
+          scope.model.max = isNaN(max) ? INTEGER_MAX : max;
+        }
+        else if(!angular.isUndefined(newVal) && scope.html5) {
+          scope.model.max = Math.max(
+            Math.ceil(scope.maxThreshold/2), 
+            scope.model.min+1
+          );
+        }
+      });
 
-        // the checkbox to have the max value go beyond threshold
-        scope.maxout = null; 
 
-        scope.$watch('maxout', function (newVal) {
-          if(newVal === null) {
-            return; 
-          }
-          if(newVal) { // checkbox checked
-            var max = parseInt(scope.inputMax, 10);
-            scope.model.max = isNaN(max) ? INTEGER_MAX : max;
-          }
-          else { // checkbox unchecked
-            scope.model.max = Math.max(
-              Math.ceil(scope.maxThreshold/2), 
-              scope.model.min+1
-            );
-          }
-        });
+      // changes coming in
+      scope.$watchCollection('model', function (newVal, oldVal) {
+        scope.range = angular.copy(newVal);
 
-        scope.$watch('model.max', function (newVal, oldVal) {
-          if(newVal < oldVal) { 
+        if(newVal && newVal.max) {
+          // watch out for max out!
+          if(newVal.max < oldVal.max) { 
             if(scope.maxout) {
               scope.maxout = false;
             }
           }
-          else if(attrs.maxThreshold) {
-            if(newVal >= scope.maxThreshold) {
-              scope.maxout = true;
-            }
+          else if(newVal.max >= scope.maxThreshold) {
+            scope.maxout = true;
           }
-        });
+        }
 
-      }
+      });
+
+
+      // changes going out
+      scope.$watchCollection('range', function (newVal) {
+        if(scope.model) {
+          // hack around input[type=range] getting string values
+          var min = parseInt(newVal.min, 10),
+              max = parseInt(newVal.max, 10);
+          if(!isNaN(min)) {
+            scope.model.min = min;
+          }
+          if(!isNaN(max)) {
+            scope.model.max = max;
+          }
+        }
+      });
+
 
 
       scope.getConstraint = function (constraint, range) {
@@ -84,7 +98,7 @@ function myDoublerangeDirective ($log) {
             return Math.max(min, scope.model ? scope.model.min : min);
           }
           else { // constraint === 'max'
-            if(!scope.html5 || !attrs.maxThreshold || scope.maxout) {
+            if(scope.maxout || !scope.html5) {
               return max;
             }
             else {

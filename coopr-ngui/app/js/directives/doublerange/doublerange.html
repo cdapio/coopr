@@ -21,7 +21,7 @@
           min="{{ getConstraint('min', 'min') }}"
           max="{{ getConstraint('max', 'min') }}"
           ng-class="{ 'form-control': !html5 }" 
-          ng-model="model.min"
+          ng-model="range.min"
         />
 
       </span>
@@ -48,7 +48,7 @@
           max="{{ getConstraint('max', 'max') }}"
           ng-class="{ 'form-control': !html5 }" 
           ng-disabled="html5 && maxout"
-          ng-model="model.max"
+          ng-model="range.max"
         />
 
       </span>
