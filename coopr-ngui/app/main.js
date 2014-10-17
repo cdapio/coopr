@@ -86,8 +86,14 @@ angular
   .config(function ($alertProvider) {
     angular.extend($alertProvider.defaults, {
       animation: 'am-fade-and-scale',
-      container: '#alerts > .container'
+      container: '#alerts > .container',
+      duration: 3
     });
+
+    // speed up integration tests
+    if(window.name==='PROTRACTOR') {
+      $alertProvider.defaults.duration = false;
+    }
   })
 
   .config(function ($compileProvider) {
@@ -100,13 +106,13 @@ angular
     cfpLoadingBarProvider.includeSpinner = false;
   })
 
+
   .run(function ($rootScope, $alert, MYAPI_EVENT) {
     $rootScope.$on(MYAPI_EVENT.error, function (event, rejection) {
       $alert({
         title: 'API error '+rejection.status, 
         content: rejection.data || 'could not connect to the server', 
-        type: 'danger', 
-        duration: 3
+        type: 'danger'
       });
     });
   });

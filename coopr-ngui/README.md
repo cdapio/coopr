@@ -45,7 +45,7 @@ generate a minified build of static assets, in the `coopr-ngui/dist/` folder
 
 * `cd coopr-ngui`
 * `npm run build` ( == `npm install && bower install && gulp build`)
-* `gulp minify`
+* `gulp minify && gulp rev` (minified and revision-tagged static assets)
 
 now to run the server, possibly on a different host:
 

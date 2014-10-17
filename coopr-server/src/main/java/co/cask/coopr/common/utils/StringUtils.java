@@ -15,16 +15,58 @@
  */
 package co.cask.coopr.common.utils;
 
+import com.google.common.base.Splitter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 /**
  * Utility for strings.
  */
 public class StringUtils {
+  private static final Pattern labelPattern = Pattern.compile("^[a-zA-Z0-9\\-]{0,62}[a-zA-Z0-9]$");
+
+  /**
+   * Strip all leading digits from a string. For example, "1234abc" becomes "abc". If the string is comprised
+   * entirely of digits, the empty string is returned.
+   *
+   * @param str string to strip
+   * @return string with leading digits stripped
+   */
+  public static String stripLeadingDigits(String str) {
+    for (int i = 0; i < str.length(); i++) {
+      if (!Character.isDigit(str.charAt(i))) {
+        return str.substring(i);
+      }
+    }
+    return "";
+  }
+
+  /**
+   * Check if the given DNS suffix is valid by checking that each label is at least 1 and at most 63 characters
+   * in length. Also check that each label has only characters, numbers, or '-', and that the entire suffix is
+   * at most 255 - 63 - 1 characters, since it will be appended to a single label later on to create a hostname.
+   * Also need to check that no label ends in a dash.
+   *
+   * @param suffix the suffix to check
+   * @return true is it is valid and false if it is not
+   */
+  public static boolean isValidDNSSuffix(String suffix) throws IllegalArgumentException {
+    if (suffix.length() > 191) {
+      return false;
+    }
+    for (String label : Splitter.on('.').split(suffix)) {
+      if (!labelPattern.matcher(label).matches()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /**
    * Returns an arraylist of strings.
    * @param str the comma seperated string values

@@ -15,53 +15,43 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.codec.json.AbstractCodec;
+import co.cask.coopr.spec.BaseEntity;
+import co.cask.coopr.spec.Link;
 import co.cask.coopr.spec.template.Administration;
 import co.cask.coopr.spec.template.ClusterDefaults;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.spec.template.Compatibilities;
 import co.cask.coopr.spec.template.Constraints;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
+import java.util.Set;
 
 /**
  * Codec for serializing/deserializing a {@link ClusterTemplate}.
  */
-public class ClusterTemplateCodec extends AbstractCodec<ClusterTemplate> {
+public class ClusterTemplateCodec extends AbstractBaseEntityCodec<ClusterTemplate> {
+  private static final Type LINKS_TYPE = new com.google.common.reflect.TypeToken<Set<Link>>() {}.getType();
 
   @Override
-  public JsonElement serialize(ClusterTemplate clusterTemplate, Type type, JsonSerializationContext context) {
-    JsonObject jsonObj = new JsonObject();
-
-    jsonObj.add("name", context.serialize(clusterTemplate.getName()));
-    jsonObj.add("icon", context.serialize(clusterTemplate.getIcon()));
-    jsonObj.add("description", context.serialize(clusterTemplate.getDescription()));
+  protected void addChildFields(ClusterTemplate clusterTemplate, JsonObject jsonObj, JsonSerializationContext context) {
     jsonObj.add("defaults", context.serialize(clusterTemplate.getClusterDefaults()));
     jsonObj.add("compatibility", context.serialize(clusterTemplate.getCompatibilities()));
-    jsonObj.add("constraints", context.serialize(clusterTemplate.getConstraints(), Constraints.class));
-    jsonObj.add("administration", context.serialize(clusterTemplate.getAdministration(), Administration.class));
-
-    return jsonObj;
+    jsonObj.add("constraints", context.serialize(clusterTemplate.getConstraints()));
+    jsonObj.add("administration", context.serialize(clusterTemplate.getAdministration()));
+    jsonObj.add("links", context.serialize(clusterTemplate.getLinks()));
   }
 
   @Override
-  public ClusterTemplate deserialize(JsonElement json, Type type, JsonDeserializationContext context)
-    throws JsonParseException {
-    JsonObject jsonObj = json.getAsJsonObject();
-
+  protected BaseEntity.Builder<ClusterTemplate> getBuilder(JsonObject jsonObj,
+                                                                JsonDeserializationContext context) {
     return ClusterTemplate.builder()
-      .setName(context.<String>deserialize(jsonObj.get("name"), String.class))
-      .setIcon(context.<String>deserialize(jsonObj.get("icon"), String.class))
-      .setDescription(context.<String>deserialize(jsonObj.get("description"), String.class))
       .setClusterDefaults(context.<ClusterDefaults>deserialize(jsonObj.get("defaults"), ClusterDefaults.class))
       .setCompatibilities(context.<Compatibilities>deserialize(jsonObj.get("compatibility"), Compatibilities.class))
       .setConstraints(context.<Constraints>deserialize(jsonObj.get("constraints"), Constraints.class))
       .setAdministration(context.<Administration>deserialize(jsonObj.get("administration"), Administration.class))
-      .build();
+      .setLinks(context.<Set<Link>>deserialize(jsonObj.get("links"), LINKS_TYPE));
   }
 }

@@ -15,13 +15,11 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.codec.json.AbstractCodec;
+import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.Provider;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
@@ -30,33 +28,20 @@ import java.util.Map;
 /**
  * Codec for serializing/deserializing a {@link Provider}.
  */
-public class ProviderCodec extends AbstractCodec<Provider> {
+public class ProviderCodec extends AbstractBaseEntityCodec<Provider> {
+  private static final Type PROVISIONER_FIELDS_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
 
   @Override
-  public JsonElement serialize(Provider provider, Type type, JsonSerializationContext context) {
-    JsonObject jsonObj = new JsonObject();
-
-    jsonObj.add("name", context.serialize(provider.getName()));
-    jsonObj.add("icon", context.serialize(provider.getIcon()));
-    jsonObj.add("description", context.serialize(provider.getDescription()));
+  protected void addChildFields(Provider provider, JsonObject jsonObj, JsonSerializationContext context) {
     jsonObj.add("providertype", context.serialize(provider.getProviderType()));
     jsonObj.add("provisioner", context.serialize(provider.getProvisionerFields()));
-
-    return jsonObj;
   }
 
   @Override
-  public Provider deserialize(JsonElement json, Type type, JsonDeserializationContext context)
-    throws JsonParseException {
-    JsonObject jsonObj = json.getAsJsonObject();
-
-    String name = context.deserialize(jsonObj.get("name"), String.class);
-    String icon = context.deserialize(jsonObj.get("icon"), String.class);
-    String description = context.deserialize(jsonObj.get("description"), String.class);
-    String providerType = context.deserialize(jsonObj.get("providertype"), String.class);
-    Map<String, Object> provisionerFields = context.deserialize(jsonObj.get("provisioner"),
-                                                                new TypeToken<Map<String, Object>>() {}.getType());
-
-    return new Provider(name, icon, description, providerType, provisionerFields);
+  protected BaseEntity.Builder<Provider> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
+    return Provider.builder()
+      .setProviderType(context.<String>deserialize(jsonObj.get("providertype"), String.class))
+      .setProvisionerFields(context.<Map<String, Object>>deserialize(
+        jsonObj.get("provisioner"), PROVISIONER_FIELDS_TYPE));
   }
 }

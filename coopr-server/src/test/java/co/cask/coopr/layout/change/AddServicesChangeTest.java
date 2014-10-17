@@ -214,7 +214,7 @@ public class AddServicesChangeTest extends BaseSolverTest {
       .setCreateTime(cluster.getCreateTime())
       .setProvider(cluster.getProvider())
       .setClusterTemplate(cluster.getClusterTemplate())
-      .setNodes(cluster.getNodes())
+      .setNodes(cluster.getNodeIDs())
       .setServices(services)
       .build();
   }

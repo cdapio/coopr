@@ -172,5 +172,5 @@ CREATE TABLE IF NOT EXISTS sensitiveFields (
     tenant_id VARCHAR(64),
     cluster_id VARCHAR(255),
     fields MEDIUMBLOB,
-    PRIMARY KEY (tenant_id, user_id)
+    PRIMARY KEY (tenant_id, cluster_id)
 ) ENGINE = InnoDB;

@@ -15,6 +15,7 @@
  */
 package co.cask.coopr.spec.plugin;
 
+import co.cask.coopr.spec.BaseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +28,10 @@ import java.util.Map;
 public class ProviderType extends AbstractPluginSpecification {
   private static final Logger LOG = LoggerFactory.getLogger(ProviderType.class);
 
-  public ProviderType(String name, String icon, String description,
+  private ProviderType(BaseEntity.Builder baseBuilder,
                       Map<ParameterType, ParametersSpecification> parameters,
                       Map<String, ResourceTypeSpecification> resourceTypes) {
-    super(name, icon, description, parameters, resourceTypes);
+    super(baseBuilder, parameters, resourceTypes);
   }
 
   /**
@@ -68,5 +69,24 @@ public class ProviderType extends AbstractPluginSpecification {
       }
     }
     return builder.build();
+  }
+
+  /**
+   * Get a builder for creating provider types.
+   *
+   * @return builder for creating provider types
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for creating provider types.
+   */
+  public static class Builder extends AbstractPluginSpecification.Builder<ProviderType> {
+    @Override
+    public ProviderType build() {
+      return new ProviderType(this, parameters, resourceTypes);
+    }
   }
 }

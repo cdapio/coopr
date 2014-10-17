@@ -1,6 +1,7 @@
 package co.cask.coopr.cluster;
 
 import co.cask.coopr.scheduler.task.ClusterJob;
+import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.NamedEntity;
 import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.template.ClusterTemplate;
@@ -23,8 +24,8 @@ public class ClusterSummary {
   private final Cluster.Status status;
   // provider and template are named entities to keep the structure of a provider and template consistent
   // between different api calls, when the full provider or template may be returned.
-  private final NamedEntity provider;
-  private final NamedEntity clusterTemplate;
+  private final BaseEntity provider;
+  private final BaseEntity clusterTemplate;
   private final Set<String> services;
   private final ClusterJobProgress progress;
 
@@ -36,10 +37,10 @@ public class ClusterSummary {
     this.createTime = cluster.getCreateTime();
     this.expireTime = cluster.getExpireTime();
     Provider provider = cluster.getProvider();
-    this.provider = provider == null ? null : new NamedEntity(provider.getName());
+    this.provider = provider == null ? null : BaseEntity.from(provider);
     ClusterTemplate clusterTemplate = cluster.getClusterTemplate();
-    this.clusterTemplate = clusterTemplate == null ? null : new NamedEntity(clusterTemplate.getName());
-    this.numNodes = cluster.getNodes().size();
+    this.clusterTemplate = clusterTemplate == null ? null : BaseEntity.from(clusterTemplate);
+    this.numNodes = cluster.getNodeIDs().size();
     this.status = cluster.getStatus();
     this.services = ImmutableSet.copyOf(cluster.getServices());
     this.progress = new ClusterJobProgress(clusterJob);

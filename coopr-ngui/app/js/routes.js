@@ -1,5 +1,8 @@
 angular.module(PKG.name)
-  .config(function ($stateProvider, $urlRouterProvider, MYAUTH_ROLE) {
+  .config(function ($stateProvider, $urlRouterProvider, $locationProvider, MYAUTH_ROLE) {
+
+    $locationProvider
+      .html5Mode(true);
 
     /**
      * Redirects and Otherwise
@@ -119,8 +122,8 @@ angular.module(PKG.name)
         authorizedRoles: MYAUTH_ROLE.admin
       }))
         .state(crud('Service', 'list', 'CrudListCtrl'))
-        .state(crud('Service', 'edit'))
-        .state(crud('Service', 'create'))
+        .state(crud('Service', 'edit', 'ServiceFormCtrl'))
+        .state(crud('Service', 'create', 'ServiceFormCtrl'))
 
 
       /*
@@ -205,20 +208,20 @@ angular.module(PKG.name)
     }
 
   })
-  .run(function ($rootScope, $state, $alert, $timeout, myAuth, MYAUTH_EVENT, MYAUTH_ROLE) {
+  .run(function ($rootScope, $state, $alert, myAuth, MYAUTH_EVENT, MYAUTH_ROLE) {
 
     $rootScope.$on(MYAUTH_EVENT.loginSuccess, function () {
-      $alert({title:'Welcome!', content:'Your tenant is "'+myAuth.currentUser.tenant+'".', type:'success', duration:3});
+      $alert({title:'Welcome!', content:'Your tenant is "'+myAuth.currentUser.tenant+'".', type:'success'});
       $state.go(myAuth.currentUser.hasRole(MYAUTH_ROLE.admin) ? 'home' : 'clusters.list');
     });
 
     $rootScope.$on(MYAUTH_EVENT.logoutSuccess, function () {
-      $alert({title:'Bye!', content:'You are now logged out.', type:'info', duration:3});
+      $alert({title:'Bye!', content:'You are now logged out.', type:'info'});
       $state.go('home');
     });
 
     $rootScope.$on(MYAUTH_EVENT.notAuthorized, function () {
-      $alert({title:'Authentication error!', content:'You are not allowed to access the requested page.', type:'warning', duration:3});
+      $alert({title:'Authentication error!', content:'You are not allowed to access the requested page.', type:'warning'});
       $state.go('home');
     });
 
@@ -229,7 +232,7 @@ angular.module(PKG.name)
       ],
       function (v) {
         $rootScope.$on(v, function (event) {
-          $alert({title:event.name, type:'danger', duration:3});
+          $alert({title:event.name, type:'danger'});
           if(!$state.is('login')) {
             $state.go('login');
           }

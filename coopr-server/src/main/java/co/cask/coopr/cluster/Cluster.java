@@ -146,7 +146,7 @@ public final class Cluster extends NamedEntity {
    *
    * @return Set of node ids in the cluster.
    */
-  public Set<String> getNodes() {
+  public Set<String> getNodeIDs() {
     return nodes;
   }
 

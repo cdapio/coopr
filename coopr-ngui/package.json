@@ -1,6 +1,6 @@
 {
   "name": "coopr-ngui",
-  "version": "0.2.0",
+  "version": "1.1.0",
   "description": "Front-end for Coopr",
   "repository": {
     "type": "git",
@@ -8,18 +8,16 @@
   },
   "scripts": {
     "start": "node ./server.js",
-
     "build": "npm install && ./node_modules/bower/bin/bower install && node ./node_modules/gulp/bin/gulp.js build",
-
-    "test": "node ./node_modules/karma/bin/karma start test/karma-conf.js",    
+    "test": "node ./node_modules/karma/bin/karma start test/karma-conf.js",
     "test-single-run": "node ./node_modules/karma/bin/karma start test/karma-conf.js --no-auto-watch --single-run",
-
     "update-webdriver": "webdriver-manager update",
     "preprotractor": "npm run update-webdriver",
     "protractor": "protractor test/protractor-conf.js"
   },
   "devDependencies": {
     "bower": "^1.3.10",
+    "del": "^0.1.3",
     "gulp": "^3.8.7",
     "gulp-angular-templatecache": "^1.3.0",
     "gulp-autoprefixer": "^1.0.0",
@@ -28,11 +26,12 @@
     "gulp-jshint": "^1.8.4",
     "gulp-less": "^1.3.3",
     "gulp-livereload": "^2.1.0",
-    "gulp-load-plugins": "^0.6.0",
+    "gulp-load-plugins": "^0.7.0",
     "gulp-minify-css": "^0.3.8",
     "gulp-ng-annotate": "^0.3.0",
     "gulp-plumber": "^0.6.4",
-    "gulp-rimraf": "^0.1.0",
+    "gulp-replace": "^0.4.0",
+    "gulp-rev": "^1.1.0",
     "gulp-size": "^1.0.0",
     "gulp-uglify": "^1.0.1",
     "gulp-util": "^3.0.0",
@@ -44,8 +43,9 @@
     "protractor": "^1.1.1"
   },
   "dependencies": {
-    "morgan": "^1.3.1",
     "cors-anywhere": "^0.2.0",
-    "http-server": "^0.7.0"
+    "express": "^4.9.7",
+    "morgan": "^1.3.1",
+    "serve-favicon": "^2.1.5"
   }
 }

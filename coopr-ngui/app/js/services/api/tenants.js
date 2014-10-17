@@ -1,27 +1,38 @@
 angular.module(PKG.name+'.services').factory('myApi_tenants',
 function ($resource, myApiPrefix) {
 
-  return {
-
-    Tenant: $resource(myApiPrefix + 'tenants/:name',
-      { name: '@name' },
-      { 
-        save: {
-          method: 'POST',
-          url: myApiPrefix + 'tenants',
-          params: {name: null},
-          transformRequest: function (data) {
-            return angular.toJson({tenant: data});
-          }
-        },
-        update: {
-          method: 'PUT',
-          transformRequest: function (data) {
-            return angular.toJson({tenant: data});
-          }
+  var Tenant = $resource(myApiPrefix + 'tenants/:name',
+    { name: '@name' },
+    { 
+      save: {
+        method: 'POST',
+        url: myApiPrefix + 'tenants',
+        params: {name: null},
+        transformRequest: function (data) {
+          return angular.toJson({tenant: data});
+        }
+      },
+      update: {
+        method: 'PUT',
+        transformRequest: function (data) {
+          return angular.toJson({tenant: data});
         }
       }
-    ),
+    }
+  );
+
+
+  Tenant.prototype.initialize = function() {
+    angular.extend(this, {
+      maxNodes: 0,
+      maxClusters: 0,
+      workers: 1
+    });
+  };
+
+  return {
+
+    Tenant: Tenant,
 
     Metric: $resource(myApiPrefix + 'metrics/:type',
       { },

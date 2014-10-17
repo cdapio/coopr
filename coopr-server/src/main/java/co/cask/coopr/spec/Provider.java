@@ -26,33 +26,17 @@ import java.util.Map;
  * like openstack, aws, rackspace, or joyent that can provision machines.
  * Providers are referenced by {@link ImageType} and {@link HardwareType}.
  */
-public final class Provider extends NamedIconEntity {
-  private final String description;
+public final class Provider extends BaseEntity {
   private final String providerType;
   private final Map<String, Object> provisionerFields;
 
-  public Provider(String name, String logolink, String description,
-                  String providerType, Map<String, Object> provisionerFields) {
-    super(name, logolink);
+  private Provider(BaseEntity.Builder baseBuilder,
+                   String providerType, Map<String, Object> provisionerFields) {
+    super(baseBuilder);
     Preconditions.checkArgument(providerType != null, "invalid provider type.");
-    this.description = description;
     this.providerType = providerType;
     this.provisionerFields = provisionerFields == null ?
       Maps.<String, Object>newHashMap() : Maps.newHashMap(provisionerFields);
-  }
-
-  public Provider(String name, String description,
-                  String providerType, Map<String, Object> provisionerFields) {
-    this(name, null, description, providerType, provisionerFields);
-  }
-
-  /**
-   * Get the description of the provider.
-   *
-   * @return Description of provider.
-   */
-  public String getDescription() {
-    return description;
   }
 
   /**
@@ -85,6 +69,38 @@ public final class Provider extends NamedIconEntity {
     }
   }
 
+  /**
+   * Get a builder for creating a provider.
+   *
+   * @return Builder for creating a provider.
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * Builder for creating a provider.
+   */
+  public static class Builder extends BaseEntity.Builder<Provider> {
+    private String providerType;
+    private Map<String, Object> provisionerFields;
+
+    public Builder setProviderType(String providerType) {
+      this.providerType = providerType;
+      return this;
+    }
+
+    public Builder setProvisionerFields(Map<String, Object> provisionerFields) {
+      this.provisionerFields = provisionerFields;
+      return this;
+    }
+
+    @Override
+    public Provider build() {
+      return new Provider(this, providerType, provisionerFields);
+    }
+  }
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof Provider)) {
@@ -92,20 +108,18 @@ public final class Provider extends NamedIconEntity {
     }
     Provider other = (Provider) o;
     return super.equals(other) &&
-      Objects.equal(description, other.description) &&
       Objects.equal(providerType, other.providerType) &&
       Objects.equal(provisionerFields, other.provisionerFields);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(super.hashCode(), description, providerType, provisionerFields);
+    return Objects.hashCode(super.hashCode(), providerType, provisionerFields);
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("description", description)
       .add("providerType", providerType)
       .add("provisionerFields", provisionerFields)
       .toString();

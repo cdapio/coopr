@@ -36,8 +36,9 @@
 
     <li class="dropdown">
       <a href="" class="dropdown-toggle">
-        <span ng-show="currentUser">
-          <span class="fa fa-user"></span>
+        <span ng-if="currentUser">
+<!-- presence of .fa-user icon is used in e2e tests to determine login state -->
+          <span class="fa fa-user"></span> 
           {{currentUser.username | myCapitalizeFilter}}
         </span>
         <span ng-hide="currentUser">

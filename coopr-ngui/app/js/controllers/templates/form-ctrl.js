@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('TemplateFormCtrl', 
-function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
+function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -16,24 +16,8 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
   }
   else {
     $scope.model = new myApi.Template();
-    angular.extend($scope.model, {
-      compatibility: {
-        services: ['base'],
-        imagetypes: [],
-        hardwaretypes: []
-      },
-      defaults: {
-        config: {},
-        services: ['base']
-      },
-      constraints: {
-        layout: {
-          mustcoexist: [],
-          cantcoexist: []          
-        },
-        services: {}
-      }
-    });
+    $scope.model.initialize();
+
     promise = $q.when($scope.model);
   }
 
@@ -56,6 +40,12 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
     {title: 'Defaults',       partial: 'form-tabs/defaults.html'},
     {title: 'Constraints',    partial: 'form-tabs/constraints.html'},
   ];
+
+  $scope.onTabLoaded = function (tabIndex) {
+    if(tabIndex === 0 && !$scope.editing) {
+      myFocusManager.focus('inputTemplateName');
+    }
+  };
 
   $scope.nextTab = function () {
     $scope.tabs.activeTab++;
@@ -83,8 +73,6 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase) {
   $scope.leaseDuration = {};
 
   promise.then(function (model) {
-    model.administration = model.administration || {leaseduration:{}};
-
     angular.forEach(['initial', 'max', 'step'], function (one) {
       $scope.leaseDuration[one] = myHelpers.parseMilliseconds( model.administration.leaseduration[one] || 0 );
 

@@ -1,13 +1,8 @@
 package co.cask.coopr.store.cluster;
 
 import co.cask.coopr.cluster.Cluster;
-import co.cask.coopr.cluster.ClusterSummary;
-import co.cask.coopr.cluster.Node;
-import co.cask.coopr.scheduler.task.ClusterJob;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A view of the cluster store as seen by a given account.

@@ -15,13 +15,11 @@
  */
 package co.cask.coopr.codec.json.current;
 
-import co.cask.coopr.codec.json.AbstractCodec;
+import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.spec.ImageType;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
@@ -30,31 +28,18 @@ import java.util.Map;
 /**
  * Codec for serializing/deserializing a {@link ImageType}.
  */
-public class ImageTypeCodec extends AbstractCodec<ImageType> {
+public class ImageTypeCodec extends AbstractBaseEntityCodec<ImageType> {
+  private static final Type PROVIDERMAP_TYPE = new TypeToken<Map<String, Map<String, String>>>() {}.getType();
 
   @Override
-  public JsonElement serialize(ImageType imageType, Type type, JsonSerializationContext context) {
-    JsonObject jsonObj = new JsonObject();
-
-    jsonObj.add("name", context.serialize(imageType.getName()));
-    jsonObj.add("icon", context.serialize(imageType.getIcon()));
-    jsonObj.add("description", context.serialize(imageType.getDescription()));
+  protected void addChildFields(ImageType imageType, JsonObject jsonObj, JsonSerializationContext context) {
     jsonObj.add("providermap", context.serialize(imageType.getProviderMap()));
-
-    return jsonObj;
   }
 
   @Override
-  public ImageType deserialize(JsonElement json, Type type, JsonDeserializationContext context)
-    throws JsonParseException {
-    JsonObject jsonObj = json.getAsJsonObject();
-
-    String name = context.deserialize(jsonObj.get("name"), String.class);
-    String icon = context.deserialize(jsonObj.get("icon"), String.class);
-    String description = context.deserialize(jsonObj.get("description"), String.class);
-    Map<String, Map<String, String>> providerMap =
-      context.deserialize(jsonObj.get("providermap"), new TypeToken<Map<String, Map<String, String>>>() {}.getType());
-
-    return new ImageType(name, icon, description, providerMap);
+  protected BaseEntity.Builder<ImageType> getBuilder(JsonObject jsonObj, JsonDeserializationContext context) {
+    return ImageType.builder()
+      .setProviderMap(context.<Map<String, Map<String, String>>>deserialize(
+        jsonObj.get("providermap"), PROVIDERMAP_TYPE));
   }
 }

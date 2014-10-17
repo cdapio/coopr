@@ -85,6 +85,10 @@ class FogProviderGoogle < Provider
       @result['result']['ssh-auth']['user'] = sshuser
       @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource)
       @result['status'] = 0
+    # We assume that no work was done when we get Unauthorized
+    rescue Excon::Errors::Unauthorized
+      @result['status'] = 201
+      log.error('Provider credentials invalid/unauthorized')
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.create: #{e.inspect}"
@@ -115,11 +119,16 @@ class FogProviderGoogle < Provider
       log.debug "Waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
+      hostname =
+        if server.public_ip_address
+          Resolv.getname(server.public_ip_address)
+        else
+          @task['config']['hostname']
+        end
+
       bootstrap_ip =
         if server.public_ip_address
           server.public_ip_address
-        else
-          Resolv.getaddress(server.dns_name) unless server.dns_name.nil?
         end
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
@@ -137,6 +146,7 @@ class FogProviderGoogle < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
       }
+      @result['hostname'] = hostname
 
       # do we need sudo bash?
       sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
@@ -154,6 +164,7 @@ class FogProviderGoogle < Provider
       log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials}"
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+        ssh_exec!(ssh, "#{sudo} hostname #{hostname}", "Setting hostname to #{hostname}")
       end
 
       # search for data disk

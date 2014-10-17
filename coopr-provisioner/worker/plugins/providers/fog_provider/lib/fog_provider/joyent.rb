@@ -53,6 +53,9 @@ class FogProviderJoyent < Provider
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
       @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
+    rescue Excon::Errors::Unauthorized
+      @result['status'] = 201
+      log.error('Provider credentials invalid/unauthorized')
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.create: #{e.inspect}"
@@ -104,19 +107,47 @@ class FogProviderJoyent < Provider
         ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
         # Check for /dev/vdb
         begin
-          vdb = true
-          # confirm /dev/vdb exists
-          ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
-          # confirm it is not already mounted
-          #   ubuntu: we remount from /mnt to /data
-          #   centos: vdb1 already mounted at /data
-          ssh_exec!(ssh, 'if grep "vdb.* /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
-        rescue
+          vdb1 = true
           vdb = false
+          # test for vdb1
+          begin
+            ssh_exec!(ssh, 'test -e /dev/vdb1', 'Checking for /dev/vdb1')
+            ssh_exec!(ssh, 'if grep "vdb1 /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb1 mounted already')
+          rescue
+            vdb1 = false
+            begin
+              vdb = true
+              ssh_exec!(ssh, 'test -e /dev/vdb', 'Checking for /dev/vdb')
+            rescue
+              vdb = false
+            end
+          end
         end
-        if vdb
-          ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
-          ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
+
+        log.debug 'Found the following:'
+        log.debug "- vdb1 = #{vdb1}"
+        log.debug "- vdb  = #{vdb}"
+
+        # confirm it is not already mounted
+        #   ubuntu: we remount from /mnt to /data
+        #   centos: vdb1 already mounted at /data
+        if vdb1
+          # TODO: check that vdb1 is mounted at /data, for now assume it is
+          log.debug 'Assuming /dev/vdb1 is mounted at /data, if this is not the case, file an issue'
+        elsif vdb
+          begin
+            ssh_exec!(ssh, 'if grep "vdb /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
+            # disk isn't mounted at /data, could be mounted elsewhere
+            begin
+              ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
+            rescue
+              log.debug 'Mounting /dev/vdb failed'
+              raise 'Failed to mount /dev/vdb at /data'
+            end
+            ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
+          rescue
+            log.debug 'Disk /dev/vdb already mounted at /data'
+          end
         end
       end
       # Return 0

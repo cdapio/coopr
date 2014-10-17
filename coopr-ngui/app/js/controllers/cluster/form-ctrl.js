@@ -1,10 +1,11 @@
 /**
  * ClusterFormCtrl
- * handles both "edit" and "create" views
+ * handles both "reconfigure" and "create" views
  */
 
 angular.module(PKG.name+'.controllers').controller('ClusterFormCtrl', 
-function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
+function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHelpers) {
+  CrudFormBase.apply($scope);
 
   var id = $state.params.id;
 
@@ -43,9 +44,9 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
       $scope.model.numMachines = Math.min(
         Math.max(
           $scope.model.numMachines,
-          chosen.constraints.size.min
+          chosen.constraints ? chosen.constraints.size.min : 1
         ), 
-        chosen.constraints.size.max
+        chosen.constraints ? chosen.constraints.size.max : Infinity
       );
 
       $scope.availableHardware = allHardware.filter(function (item) {
@@ -145,7 +146,7 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
 
     var promise;
 
-    if(id) { // reconfiguring
+    if($scope.editing) { // reconfiguring
       promise = myApi.ClusterConfig.update({clusterId:id}, {
         config: model.config
       }).$promise;
@@ -158,6 +159,13 @@ function ($scope, $state, $q, myApi, myFocusManager, myHelpers) {
       .then(function () {
         $scope.fetchSubnavList();
         $state.go('^.list');
+
+        $alert({
+          title: 'Cluster', 
+          content: ($scope.editing ? 'reconfiguration' : 'creation') + ' succeeded!', 
+          type: 'success'
+        });
+
       })
       .finally(function () {
         $scope.submitting = false;

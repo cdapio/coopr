@@ -71,29 +71,29 @@ public class ClusterServiceTest extends BaseTest {
     account = new Account("user9", tenant.getId());
     // write relevant entities
     EntityStoreView entityStoreView = entityStoreService.getView(new Account(Constants.ADMIN_USER, tenant.getId()));
-    providerType = new ProviderType(
-      "providertype",
-      null,
-      "some description",
-      ImmutableMap.of(
+    providerType = ProviderType.builder()
+      .setParameters(ImmutableMap.of(
         ParameterType.ADMIN, new ParametersSpecification(
-          ImmutableMap.of(
-            "region", FieldSchema.builder().setLabel("region").setType("text").setOverride(true).build(),
-            "url", FieldSchema.builder().setLabel("url").setType("text").setOverride(true).setSensitive(true).build()),
-          ImmutableSet.<Set<String>>of()
-        ),
-        ParameterType.USER, new ParametersSpecification(
-          ImmutableMap.of(
-            "keyname", FieldSchema.builder().setLabel("keyname").setType("text").setSensitive(false).build(),
-            "key", FieldSchema.builder().setLabel("key").setType("text").setSensitive(true).build()),
-          ImmutableSet.<Set<String>>of(ImmutableSet.of("keyname", "key"))
-        )
+        ImmutableMap.of(
+          "region", FieldSchema.builder().setLabel("region").setType("text").setOverride(true).build(),
+          "url", FieldSchema.builder().setLabel("url").setType("text").setOverride(true).setSensitive(true).build()),
+        ImmutableSet.<Set<String>>of()
       ),
-      null
-    );
+        ParameterType.USER, new ParametersSpecification(
+        ImmutableMap.of(
+          "keyname", FieldSchema.builder().setLabel("keyname").setType("text").setSensitive(false).build(),
+          "key", FieldSchema.builder().setLabel("key").setType("text").setSensitive(true).build()),
+        ImmutableSet.<Set<String>>of(ImmutableSet.of("keyname", "key"))
+      )
+      ))
+      .setName("providertype")
+      .build();
     entityStoreService.getView(Account.SUPERADMIN).writeProviderType(providerType);
-    provider = new Provider("provider", "description", providerType.getName(),
-                            ImmutableMap.<String, Object>of("region", "iad", "url", "http://abc.com/api"));
+    provider = Provider.builder()
+      .setProviderType(providerType.getName())
+      .setProvisionerFields(ImmutableMap.<String, Object>of("region", "iad", "url", "http://abc.com/api"))
+      .setName("provider")
+      .build();
     entityStoreView.writeProvider(provider);
     entityStoreView.writeHardwareType(hardwareType);
     entityStoreView.writeImageType(imageType);
@@ -326,11 +326,14 @@ public class ClusterServiceTest extends BaseTest {
     // some user fields already specified from the initial cluster create operation, but another user field will
     // not exist because it is a sensitive field and was thus never persisted.
     // create a provider that already has the 'keyname' user field specified.
-    Provider provider1 = new Provider("provider", "description", providerType.getName(),
-                                      ImmutableMap.<String, Object>of(
-                                        "region", "iad",
-                                        "url", "http://abc.com/api",
-                                        "keyname", "mykey"));
+    Provider provider1 = Provider.builder()
+      .setProviderType(providerType.getName())
+      .setProvisionerFields(ImmutableMap.<String, Object>of(
+        "region", "iad",
+        "url", "http://abc.com/api",
+        "keyname", "mykey"))
+      .setName("provider")
+      .build();
     // write the cluster to the store
     String clusterId = "123";
     Cluster cluster = Cluster.builder()
