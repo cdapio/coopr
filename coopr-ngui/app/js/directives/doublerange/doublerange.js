@@ -56,8 +56,8 @@ function myDoublerangeDirective ($log) {
               scope.maxout = false;
             }
           }
-          else if(attrs.maxThreshold) {
-            if(newVal >= scope.maxThreshold) {
+          else {
+            if(newVal >= (attrs.maxThreshold ? scope.maxThreshold : maxoutValue())) {
               scope.maxout = true;
             }
           }
