@@ -65,37 +65,35 @@ function myDoublerangeDirective ($log) {
 
       }
 
-
-      scope.getConstraint = function (constraint, range) {
-        var min = parseInt(scope.inputMin, 10),
-            max = parseInt(scope.inputMax, 10);
-
+      scope.getLowerConstraint = function (range) {
+        var min = parseInt(scope.inputMin, 10);
         if(isNaN(min)) {
           min = 0;
         }
+
+        if(range === 'min') {
+          return min;
+        }
+        else {  // range === 'max'
+          return Math.max(min, scope.model ? scope.model.min : min);
+        }
+      };
+
+      scope.getUpperConstraint = function (range) {
+        var max = parseInt(scope.inputMax, 10);
         if(isNaN(max)) {
           max = INTEGER_MAX;
         }
 
         if(range === 'min') {
-          if(constraint === 'min') {
-            return min;
-          }
-          else { // constraint === 'max'
-            return Math.min(max, scope.model ? scope.model.max : max);
-          }
+          return Math.min(max, scope.model ? scope.model.max : max);
         }
         else {  // range === 'max'
-          if(constraint === 'min') {
-            return Math.max(min, scope.model ? scope.model.min : min);
+          if(!scope.html5 || !attrs.maxThreshold || scope.maxout) {
+            return max;
           }
-          else { // constraint === 'max'
-            if(!scope.html5 || !attrs.maxThreshold || scope.maxout) {
-              return max;
-            }
-            else {
-              return scope.maxThreshold;
-            }
+          else {
+            return scope.maxThreshold;
           }
         }
       };
