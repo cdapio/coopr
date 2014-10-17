@@ -136,17 +136,20 @@ class FogProviderJoyent < Provider
           log.debug 'Assuming /dev/vdb1 is mounted at /data, if this is not the case, file an issue'
         elsif vdb
           begin
+            mounted = false
             ssh_exec!(ssh, 'if grep "vdb /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
+          rescue
+            mounted = true
+          end
+          # If mounted = true, we're done
+          unless mounted
             # disk isn't mounted at /data, could be mounted elsewhere
             begin
               ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
             rescue
-              log.debug 'Mounting /dev/vdb failed'
               raise 'Failed to mount /dev/vdb at /data'
             end
             ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
-          rescue
-            log.debug 'Disk /dev/vdb already mounted at /data'
           end
         end
       end
