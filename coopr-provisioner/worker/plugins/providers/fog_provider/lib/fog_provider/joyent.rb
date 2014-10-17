@@ -145,7 +145,28 @@ class FogProviderJoyent < Provider
           unless mounted
             # disk isn't mounted at /data, could be mounted elsewhere
             begin
-              ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
+              # Are we mounted?
+              ssh_exec!(ssh, 'mount | grep ^/dev/vdb 2>&1 >/dev/null', 'Checking if /dev/vdb is unmounted')
+              unmount = true
+            rescue
+              log.debug 'Disk /dev/vdb is not mounted'
+            end
+            if unmount
+              begin
+                ssh_exec!(ssh, "#{sudo} umount /dev/vdb", 'Unmounting /dev/vdb')
+              rescue
+                raise 'Failure unmounting data disk /dev/vdb'
+              end
+            end
+            # Disk is unmounted, format it
+            begin
+              ssh_exec!(ssh, "#{sudo} /sbin/mkfs.ext4 /dev/vdb", 'Formatting filesystem at /dev/vdb')
+            rescue
+              raise 'Failure formatting data disk /dev/vdb'
+            end
+            # Mount it
+            begin
+              ssh_exec!(ssh, "#{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
             rescue
               raise 'Failed to mount /dev/vdb at /data'
             end
