@@ -32,7 +32,7 @@ function myDoublerangeDirective ($log) {
         } 
 
         // the checkbox to go beyond the threshold
-        scope.maxout = (maxoutValue() == scope.model.max) || null; 
+        scope.maxout = (maxoutValue() === scope.model.max) || null; 
 
         scope.$watch('maxout', function (newVal) {
           if(newVal === null) {
