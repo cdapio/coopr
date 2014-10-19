@@ -20,90 +20,80 @@ function myDoublerangeDirective ($log) {
 
       scope.html5 = attrs.html5 && attrs.html5!=='false';
 
-      // the max value for the max slider in html5 mode
+      // the almost-max value for the max slider in html5 mode
       scope.maxThreshold = parseInt(attrs.maxThreshold, 10) || 100;
 
-      scope.maxout = null; // bool or null
-      scope.$watch('maxout', function (newVal) {
-        if(newVal) {
-          var max = parseInt(scope.inputMax, 10);
-          scope.model.max = isNaN(max) ? INTEGER_MAX : max;
-        }
-        else if(!angular.isUndefined(newVal) && scope.html5) {
-          scope.model.max = Math.max(
-            Math.ceil(scope.maxThreshold/2), 
-            scope.model.min+1
-          );
-        }
-      });
+      // the real max value
+      function maxoutValue() {
+        var max = parseInt(scope.inputMax, 10);
+        return isNaN(max) ? INTEGER_MAX : max;
+      } 
+
+      // the checkbox to go beyond the threshold
+      scope.maxout = (maxoutValue() === scope.model.max) || null; 
 
 
-      // changes coming in
-      scope.$watchCollection('model', function (newVal, oldVal) {
-        scope.range = angular.copy(newVal);
+      if(scope.html5) {
 
-        if(newVal && newVal.max) {
-          // watch out for max out!
-          if(newVal.max < oldVal.max) { 
+        scope.$watch('maxout', function (newVal) {
+          if(newVal === null) {
+            return; 
+          }
+          if(newVal) { // checkbox checked
+            scope.model.max = maxoutValue();
+          }
+          else { // checkbox unchecked
+            scope.model.max = Math.max(
+              Math.ceil(scope.maxThreshold/2), 
+              scope.model.min+1
+            );
+          }
+        });
+
+        scope.$watch('model.max', function (newVal, oldVal) {
+          if(newVal < oldVal) { 
             if(scope.maxout) {
               scope.maxout = false;
             }
           }
-          else if(newVal.max >= scope.maxThreshold) {
-            scope.maxout = true;
+          else {
+            if(newVal >= (attrs.maxThreshold ? scope.maxThreshold : maxoutValue())) {
+              scope.maxout = true;
+            }
           }
-        }
+        });
 
-      });
+      }
 
-
-      // changes going out
-      scope.$watchCollection('range', function (newVal) {
-        if(scope.model) {
-          // hack around input[type=range] getting string values
-          var min = parseInt(newVal.min, 10),
-              max = parseInt(newVal.max, 10);
-          if(!isNaN(min)) {
-            scope.model.min = min;
-          }
-          if(!isNaN(max)) {
-            scope.model.max = max;
-          }
-        }
-      });
-
-
-
-      scope.getConstraint = function (constraint, range) {
-        var min = parseInt(scope.inputMin, 10),
-            max = parseInt(scope.inputMax, 10);
-
+      scope.getLowerConstraint = function (range) {
+        var min = parseInt(scope.inputMin, 10);
         if(isNaN(min)) {
           min = 0;
         }
+
+        if(range === 'min') {
+          return min;
+        }
+        else {  // range === 'max'
+          return Math.max(min, scope.model ? scope.model.min : min);
+        }
+      };
+
+      scope.getUpperConstraint = function (range) {
+        var max = parseInt(scope.inputMax, 10);
         if(isNaN(max)) {
           max = INTEGER_MAX;
         }
 
         if(range === 'min') {
-          if(constraint === 'min') {
-            return min;
-          }
-          else { // constraint === 'max'
-            return Math.min(max, scope.model ? scope.model.max : max);
-          }
+          return Math.min(max, scope.model ? scope.model.max : max);
         }
         else {  // range === 'max'
-          if(constraint === 'min') {
-            return Math.max(min, scope.model ? scope.model.min : min);
+          if(!scope.html5 || !attrs.maxThreshold || scope.maxout) {
+            return max;
           }
-          else { // constraint === 'max'
-            if(scope.maxout || !scope.html5) {
-              return max;
-            }
-            else {
-              return scope.maxThreshold;
-            }
+          else {
+            return scope.maxThreshold;
           }
         }
       };
