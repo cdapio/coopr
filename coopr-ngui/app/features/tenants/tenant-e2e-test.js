@@ -2,7 +2,7 @@
  * e2e tests for the /tenants section
  */
 
-var helper = require('../../protractor-help');
+var helper = require('../../../test/protractor-help');
 
 
 describe('tenants section', function() {

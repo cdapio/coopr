@@ -2,6 +2,7 @@ var config = {
   allScriptsTimeout: 11000,
 
   specs: [
+    '../app/**/*-e2e-test.js',
     'e2e/**/*.js'
   ],
 

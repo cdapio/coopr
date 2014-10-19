@@ -19,15 +19,15 @@ describe('redirects', function() {
 
   it('should show a real 404 for static paths', function() {
     // there is no angular here, so we have to use the driver directly
-    browser.driver.get(browser.baseUrl + 'bundle/foo.bar');
+    browser.driver.get(browser.baseUrl + 'assets/bundle/foo.bar');
 
     expect(
       browser.driver.getCurrentUrl()
-    ).toMatch(/\/bundle\/foo.bar$/);
+    ).toMatch(/\/assets\/bundle\/foo.bar$/);
 
     expect(
       browser.driver.getPageSource()
-    ).toContain('Cannot GET /bundle/foo.bar');
+    ).toContain('Cannot GET /assets/bundle/foo.bar');
 
   });
 
