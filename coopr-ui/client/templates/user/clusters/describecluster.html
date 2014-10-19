@@ -66,8 +66,12 @@
                           <div class="progress-bar [[status.class]]" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: [[status.progressPercent]]%;">
                           </div>
                         </div>
-                        <div class="col-sm-2">
-                          <span ng-if="status.progressPercent !== '100'" class="btn-spl btn-danger" ng-click="abort()">Abort</span>
+                        <div class="col-sm-2" ng-if="status.progressPercent !== '100'">
+                          <span class="btn-spl btn-danger" ng-click="abort()">Abort</span>
+                          <span ng-if="status.actionstatus !== 'paused'"
+                                class="btn-spl btn-warning" ng-click="pause()">Pause</span>
+                          <span ng-if="status.actionstatus == 'paused'"
+                                class="btn-spl btn-warning" ng-click="resume()">Resume</span>
                         </div>
                       </div>
                     </td>
