@@ -42,7 +42,9 @@ console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 
 var app = express();
 
-app.use(serveFavicon(__dirname + '/dist/img/favicon.png'));
+try { app.use(serveFavicon(__dirname + '/dist/assets/img/favicon.png')); }
+catch(e) { console.error("Favicon missing! Did you run `gulp build`?"); }
+
 
 // serve the config file
 app.get('/config.js', function (req, res) {
@@ -63,9 +65,9 @@ app.get('/config.js', function (req, res) {
 });
 
 // serve static assets
-app.all(/\/(bundle|fonts|partials|img)\/.*/, [
+app.use('/assets', [
   httpStaticLogger,
-  express.static(__dirname + '/dist', {
+  express.static(__dirname + '/dist/assets', {
     index: false
   }),
   function(req, res) {

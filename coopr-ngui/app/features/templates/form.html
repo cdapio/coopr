@@ -12,7 +12,7 @@
     <fieldset data-title="{{tab.title}}" ng-repeat="tab in tabs" bs-pane>
 
       <div 
-        ng-include="'/partials/templates/'+tab.partial"
+        ng-include="'/assets/features/templates/'+tab.partial"
         onload="onTabLoaded($index)"
       ></div>
 
