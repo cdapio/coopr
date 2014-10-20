@@ -17,6 +17,7 @@
 package co.cask.coopr.client.rest.handler;
 
 import co.cask.coopr.Entities;
+import co.cask.coopr.client.rest.PluginRestTest;
 import co.cask.coopr.client.rest.RestClientTest;
 import co.cask.coopr.provisioner.plugin.ResourceMeta;
 import co.cask.coopr.provisioner.plugin.ResourceStatus;
@@ -89,16 +90,29 @@ public class PluginTestHandler implements HttpRequestHandler {
 
       } else if (url.matches(GET_AUTOMATOR_TYPE) || url.matches(GET_PROVIDER_TYPE) && HttpMethod.GET.equals(method)) {
         if (url.matches(GET_AUTOMATOR_TYPE)) {
-          responseBody = GSON.toJson(Entities.AutomatorTypeExample.CHEF);
+          if (url.contains(PluginRestTest.CHEF_PLUGIN)) {
+            responseBody = GSON.toJson(Entities.AutomatorTypeExample.CHEF);
+          } else {
+            statusCode = HttpStatus.SC_NOT_FOUND;
+          }
         } else {
-          responseBody = GSON.toJson(Entities.ProviderTypeExample.JOYENT);
+          if (url.contains(PluginRestTest.JOYENT_PLUGIN)) {
+            responseBody = GSON.toJson(Entities.ProviderTypeExample.JOYENT);
+          } else {
+            statusCode = HttpStatus.SC_NOT_FOUND;
+          }
         }
       } else if (url.matches(GET_AUTOMATOR_TYPE_RESOURCES) || url.matches(GET_PROVIDER_TYPE_RESOURCES)
         && HttpMethod.GET.equals(method)) {
+        if (url.contains(PluginRestTest.REACTOR_RESOURCE)) {
+          ResourceMeta reactor1 = new ResourceMeta(PluginRestTest.REACTOR_RESOURCE, 1, ResourceStatus.ACTIVE);
+          ResourceMeta reactor2 = new ResourceMeta(PluginRestTest.REACTOR_RESOURCE, 2, ResourceStatus.ACTIVE);
+          responseBody = GSON.toJson(ImmutableMap.of(PluginRestTest.REACTOR_RESOURCE,
+                                                     ImmutableSet.of(reactor1, reactor2)));
+        } else {
+          statusCode = HttpStatus.SC_NOT_FOUND;
+        }
 
-        ResourceMeta reactor1 = new ResourceMeta("reactor", 1, ResourceStatus.ACTIVE);
-        ResourceMeta reactor2 = new ResourceMeta("reactor", 2, ResourceStatus.ACTIVE);
-        responseBody = GSON.toJson(ImmutableMap.of("reactor", ImmutableSet.of(reactor1, reactor2)));
       } else if (url.matches(STAGE_AUTOMATOR_TYPE_RESOURCES) || url.matches(STAGE_PROVIDER_TYPE_RESOURCES)
         && HttpMethod.POST.equals(method)) {
         // Send 200 OK
