@@ -5,7 +5,11 @@
  *  the expression in "my-confirmable" attribute will be evaluated 
  *  after the user accepts the confirmation dialog. Eg:
  *
- * <a ng-click="myConfirm()" my-confirmable="doDelete(model)">delete</a>
+ * <a ng-click="myConfirm()" 
+ *       my-confirmable="doDelete(model)"
+ *       data-confirmable-title="Hold on..."
+ *       data-confirmable-content="Are you absolutely sure?"
+ * >delete</a>
  */
 
 angular.module(PKG.name+'.directives').directive('myConfirmable', 
@@ -28,8 +32,8 @@ function myConfirmableDirective ($modal) {
         modal = $modal({
           scope: modalScope,
           template: 'confirmable/confirm-modal.html',
-          title: attrs.myConfirmableTitle || 'Confirmation',
-          content: attrs.myConfirmableContent || 'Are you sure?',
+          title: attrs.confirmableTitle || 'Confirmation',
+          content: attrs.confirmableContent || 'Are you sure?',
           placement: 'center', 
           show: true
         });
