@@ -7,6 +7,7 @@
     "url": "http://github.com/caskdata/coopr.git"
   },
   "scripts": {
+    "build": "npm install",
     "update-webdriver": "webdriver-manager update",
     "preprotractor": "npm run update-webdriver",
     "protractor": "protractor test/protractor-conf.js"
