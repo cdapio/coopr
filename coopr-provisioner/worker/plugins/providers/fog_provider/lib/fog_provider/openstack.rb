@@ -48,7 +48,7 @@ class FogProviderOpenstack < Provider
         key_name: @ssh_keypair
       }
 
-      create_options.merge!({:nics => @network_ids.split(',').map { |nic| nic_id = { 'net_id' => nic.strip }}}) if @network_ids
+      create_options.merge!(nics: @network_ids.split(',').map { |nic| nic_id = { 'net_id' => nic.strip } }) if @network_ids
 
       server = connection.servers.create(create_options)
 
