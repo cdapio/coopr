@@ -40,14 +40,19 @@ class FogProviderOpenstack < Provider
       # Create the server
       log.debug "Creating #{hostname} on Openstack using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
+      create_options = {
+        flavor_ref: flavor,
+        image_ref: image,
+        name: hostname,
+        security_groups: @security_groups,
+        key_name: @ssh_keypair
+      }
+
+      #@create_options[:server_def].merge!({:nics => locate_config_value(:network_ids).map { |nic| nic_id = { 'net_id' => nic }}}) if locate_config_value(:network_ids)
+      create_options.merge!({:nics => @network_ids.map { |nic| nic_id = { 'net_id' => nic }}}) if @network_ids
+
       begin
-        server = connection.servers.create(
-          flavor_ref: flavor,
-          image_ref: image,
-          name: hostname,
-          security_groups: @security_groups,
-          key_name: @ssh_keypair
-        )
+        server = connection.servers.create(create_options)
       end
       # Process results
       @result['result']['providerid'] = server.id.to_s
