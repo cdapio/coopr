@@ -130,11 +130,4 @@ public class TenantRestClientTest extends RestClientTest {
   public void shutDown() throws Exception {
     super.shutDown();
   }
-
-  private ClientManager createClientManager(String userId) {
-    return RestClientManager.builder(testServerHost, testServerPort)
-      .userId(userId)
-      .tenantId(TEST_TENANT_ID)
-      .build();
-  }
 }
