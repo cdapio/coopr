@@ -160,6 +160,35 @@ cluster operations complete successfully. The full list of cluster operations ar
 CLUSTER_CREATE, CLUSTER_DELETE, CLUSTER_CONFIGURE, CLUSTER_CONFIGURE_WITH_RESTART, STOP_SERVICES, START_SERVICES, 
 RESTART_SERVICES, and ADD_SERVICES. 
 
+Running Server with SSL
+^^^^^^^^^^^^^^^^^^^^^^^
+
+To enable running server with TLS, add this property to ``coopr-site.xml``:
+
+==========================================  ==============
+   Property                                   Value
+==========================================  ==============
+server.ssl.enabled                            true
+==========================================  ==============
+
+Also, add these properties to ``coopr-security.xml``:
+
+=============================================     =====================     =======================================
+   Property                                        Default Value                Description
+=============================================     =====================     =======================================
+server.ssl.keystore.path                           None                      Keystore file location.
+server.ssl.keystore.password                       None                      Keystore password
+server.ssl.cert.password                           None                      Keystore key password
+=============================================     =====================     =======================================
+
+To configure the server to use mutual authentication with SSL, add these properties to ``coopr-security.xml``:
+
+=============================================     =====================     =======================================
+   Property                                        Default Value                Description
+=============================================     =====================     =======================================
+server.ssl.trust.keystore.path                     None                      Truststore file location.
+server.ssl.trust.keystore.password                 None                      Truststore password
+
 Configuration
 ^^^^^^^^^^^^^
 
@@ -294,3 +323,6 @@ A full list of available configuration settings and their default values are giv
    * - server.plugin.store.localfilestore.data.dir
      - /var/coopr/data/plugins/resources
      - data directory to store plugin resources when using the local file plugin store
+   * - server.ssl.enabled
+     - false
+     - Enable running server with SSL
