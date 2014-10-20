@@ -40,9 +40,10 @@ before_install:
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd coopr-server; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then mvn clean package assembly:single -DskipTests; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd ..; fi'
+  - 'cd coopr-ngui && npm run build && cd ..'
 
 before_script:
-  - 'cd coopr-ngui && npm run build'
+  - 'cd coopr-ngui'
   - 'npm start > /dev/null &'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd ../coopr-server; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp target/*:src/test/resources co.cask.coopr.runtime.ServerMain; fi >/dev/null 2>&1 &'
