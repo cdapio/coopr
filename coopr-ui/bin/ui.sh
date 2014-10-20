@@ -36,6 +36,8 @@ APP_NAME="coopr-ui"
 PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
+COOPR_REJECT_UNAUTH=${COOPR_REJECT_UNAUTH:-false}
+
 check_before_start() {
   if [ ! -d "${PID_DIR}" ] ; then
     mkdir -p "${PID_DIR}"
@@ -55,6 +57,7 @@ start ( ) {
   echo "Starting UI ..."
   nohup nice -1 ${COOPR_NODE} ${UI_PATH}/server.js --env=${ENVIRONMENT} \
     --cooprhost=${COOPR_SERVER_URI} --port=${COOPR_UI_PORT} \
+    --rejectUnauth=${COOPR_REJECT_UNAUTH} \
     >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
   echo $! > "${pid}"
 }
