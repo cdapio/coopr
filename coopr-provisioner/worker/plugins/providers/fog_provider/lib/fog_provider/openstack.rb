@@ -48,12 +48,10 @@ class FogProviderOpenstack < Provider
         key_name: @ssh_keypair
       }
 
-      #@create_options[:server_def].merge!({:nics => locate_config_value(:network_ids).map { |nic| nic_id = { 'net_id' => nic }}}) if locate_config_value(:network_ids)
-      create_options.merge!({:nics => @network_ids.map { |nic| nic_id = { 'net_id' => nic }}}) if @network_ids
+      create_options.merge!({:nics => @network_ids.split(',').map { |nic| nic_id = { 'net_id' => nic.strip }}}) if @network_ids
 
-      begin
-        server = connection.servers.create(create_options)
-      end
+      server = connection.servers.create(create_options)
+
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
