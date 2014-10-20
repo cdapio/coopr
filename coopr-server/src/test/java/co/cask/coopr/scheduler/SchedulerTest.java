@@ -46,6 +46,7 @@ import org.junit.Test;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -187,6 +188,65 @@ public class SchedulerTest extends ServiceTestBase {
       jobScheduler.run();
       jobScheduler.run();
     }
+  }
+  @Test(timeout = 20000)
+  public void testJobPause() throws Exception {
+    String tenantId = cluster.getAccount().getTenantId();
+    ClusterScheduler clusterScheduler = injector.getInstance(ClusterScheduler.class);
+    CallbackScheduler callbackScheduler = injector.getInstance(CallbackScheduler.class);
+
+    clusterQueues.add(tenantId, new Element(cluster.getId(), ClusterAction.CLUSTER_CREATE.name()));
+    clusterScheduler.run();
+    waitForCallback(callbackScheduler);
+    Assert.assertEquals(1, jobQueues.size(tenantId));
+    String consumerId = "testJobScheduler";
+    Element jobQueueElement = jobQueues.take(tenantId, consumerId);
+    String jobId = jobQueueElement.getValue();
+    jobQueues.add(tenantId, new Element(jobId));
+    JobScheduler jobScheduler = injector.getInstance(JobScheduler.class);
+    jobScheduler.run();
+    // complete two tasks
+    TakeTaskRequest takeRequest = new TakeTaskRequest("consumer1", PROVISIONER_ID, tenantId);
+    SchedulableTask task = TestHelper.takeTask(getServerUrl(), takeRequest);
+
+    JsonObject result = new JsonObject();
+    Map<String, String> ipAddresses = ImmutableMap.of("access", "123.456.789.123");
+    FinishTaskRequest finishRequest =
+      new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId, task.getTaskId(),
+                            null, null, 0, null, ipAddresses, result);
+    TestHelper.finishTask(getServerUrl(), finishRequest);
+
+    task = TestHelper.takeTask(getServerUrl(), takeRequest);
+    result = new JsonObject();
+    ipAddresses = ImmutableMap.of("access", "456.789.123.123");
+    finishRequest = new FinishTaskRequest("consumer1", PROVISIONER_ID, tenantId,
+                                          task.getTaskId(), null, null, 0, null, ipAddresses, result);
+    TestHelper.finishTask(getServerUrl(), finishRequest);
+
+    TestHelper.takeTask(getServerUrl(), takeRequest);
+
+    job = clusterStore.getClusterJob(JobId.fromString(jobId));
+    Set currentStage =  job.getCurrentStage();
+    // pause job
+    job.setJobStatus(ClusterJob.Status.PAUSED);
+    clusterStore.writeClusterJob(job);
+    // start job Scheduler with job pause status
+    jobScheduler.run();
+    job = clusterStore.getClusterJob(JobId.fromString(jobId));
+    Set newStage =  job.getCurrentStage();
+    //check if stage is not changed
+    Assert.assertTrue(newStage.equals(currentStage));
+    job = clusterStore.getClusterJob(JobId.fromString(jobId));
+    //return job to running state
+    job.setJobStatus(ClusterJob.Status.RUNNING);
+    clusterStore.writeClusterJob(job);
+    jobQueues.add(tenantId, new Element(jobId));
+    jobScheduler.run();
+    job = clusterStore.getClusterJob(JobId.fromString(jobId));
+    newStage =  job.getCurrentStage();
+    //check if job is continue
+    Assert.assertFalse(newStage.equals(currentStage));
+
   }
 
   @Test(timeout = 20000)

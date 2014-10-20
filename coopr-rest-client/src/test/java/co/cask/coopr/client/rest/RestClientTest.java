@@ -22,8 +22,10 @@ import co.cask.coopr.client.rest.handler.ClusterTemplateHandler;
 import co.cask.coopr.client.rest.handler.HardwareTypeHandler;
 import co.cask.coopr.client.rest.handler.ImageTypeHandler;
 import co.cask.coopr.client.rest.handler.ProviderHandler;
+import co.cask.coopr.client.rest.handler.ProvisionerHandler;
 import co.cask.coopr.client.rest.handler.ServiceHandler;
 import org.apache.http.conn.ssl.SSLContexts;
+import co.cask.coopr.client.rest.handler.TenantHandler;
 import org.apache.http.localserver.LocalTestServer;
 import org.junit.After;
 import org.junit.Assert;
@@ -55,6 +57,8 @@ public class RestClientTest {
   private HardwareTypeHandler hardwareTypeHandler = new HardwareTypeHandler();
   private ImageTypeHandler imageTypeHandler = new ImageTypeHandler();
   private ClusterHandler clusterHandler = new ClusterHandler();
+  private ProvisionerHandler provisionerHandler = new ProvisionerHandler();
+  private TenantHandler tenantHandler = new TenantHandler();
 
   @Before
   public void setUp() throws Exception {
@@ -84,6 +88,8 @@ public class RestClientTest {
     localTestServer.register("/v2/hardwaretypes*", hardwareTypeHandler);
     localTestServer.register("/v2/imagetypes*", imageTypeHandler);
     localTestServer.register("/v2/clusters*", clusterHandler);
+    localTestServer.register("/v2/provisioners*", provisionerHandler);
+    localTestServer.register("/v2/tenants*", tenantHandler);
     localTestServer.start();
     testServerHost = localTestServer.getServiceAddress().getHostName();
     testServerPort = localTestServer.getServiceAddress().getPort();

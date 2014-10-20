@@ -18,19 +18,21 @@ package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.TenantClient;
 import co.cask.coopr.spec.TenantSpecification;
-import org.apache.commons.lang3.NotImplementedException;
+import com.google.gson.reflect.TypeToken;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
  * The {@link co.cask.coopr.client.TenantClient} interface implementation based on the Rest requests to
  * the Coopr Rest API.
- *
- * TODO: Implementation
  */
 public class TenantRestClient extends RestClient implements TenantClient {
+
+  private static final String TENANT_URL_SUFFIX = "tenants";
+  private static final Type TENANTS_LIST_TYPE = new TypeToken<List<TenantSpecification>>() { }.getType();
 
   public TenantRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
     super(config, httpClient);
@@ -38,16 +40,16 @@ public class TenantRestClient extends RestClient implements TenantClient {
 
   @Override
   public List<TenantSpecification> getTenants() throws IOException {
-    throw new NotImplementedException("This method is not implemented yet.");
+    return getAll(TENANT_URL_SUFFIX, TENANTS_LIST_TYPE);
   }
 
   @Override
   public TenantSpecification getTenant(String tenantName) throws IOException {
-    throw new NotImplementedException("This method is not implemented yet.");
+    return getSingle(TENANT_URL_SUFFIX, tenantName, TenantSpecification.class);
   }
 
   @Override
   public void deleteTenant(String tenantName) throws IOException {
-    throw new NotImplementedException("This method is not implemented yet.");
+    delete(TENANT_URL_SUFFIX, tenantName);
   }
 }
