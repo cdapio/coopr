@@ -1342,6 +1342,24 @@ site.app.post('/user/clusters/abort/:id', function (req, res) {
   site.sendRequestAndHandleResponse(options, user, res);
 });
 
+site.app.post('/user/clusters/pause/:id', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/pause',
+    method: 'POST'
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/resume/:id', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/resume',
+    method: 'POST'
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
 site.app.get('/user/clusters/status/:id', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {

@@ -45,7 +45,7 @@
         <dependency>
             <groupId>co.cask.http</groupId>
             <artifactId>netty-http</artifactId>
-            <version>0.4.1</version>
+            <version>0.5.0</version>
         </dependency>
 
         <dependency>
