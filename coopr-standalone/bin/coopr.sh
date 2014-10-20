@@ -163,6 +163,7 @@ export COOPR_SERVER_URI=$COOPR_PROTOCOL://localhost:55054
 
 if [ $COOPR_PROTOCOL = "https" ]; then
   export CURL_PARAMETER="--insecure"
+  export COOPR_REJECT_UNAUTH=false
 fi
 
 # Load default configuration
