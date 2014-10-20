@@ -18,6 +18,7 @@ package co.cask.coopr.shell.command.set;
 
 import co.cask.common.cli.Command;
 import co.cask.coopr.shell.command.AddServicesOnClusterCommand;
+import co.cask.coopr.shell.command.ConnectCommand;
 import co.cask.coopr.shell.command.CreateClusterCommand;
 import co.cask.coopr.shell.command.DeleteClusterCommand;
 import co.cask.coopr.shell.command.DeleteClusterTemplateCommand;
@@ -59,7 +60,8 @@ public class CommandSet {
 
   public static co.cask.common.cli.CommandSet<Command> getCliCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
-      (Command) injector.getInstance(ExitCommand.class)
+      injector.getInstance(ConnectCommand.class),
+      injector.getInstance(ExitCommand.class)
     );
     List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
       getAdminCommandSet(injector),

@@ -31,4 +31,12 @@ public class Constants {
   public static final String SERVICE_ID_KEY = "service-id";
   public static final String CLUSTER_CONFIG_KEY = "cluster-config";
   public static final String EXPIRE_TIME_KEY = "expire-time";
+  public static final String HOST_KEY = "host";
+  public static final String PORT_KEY = "port";
+  public static final String SSL_KEY = "ssl";
+  public static final String USER_ID_KEY = "user-id";
+  public static final String TENANT_ID_KEY = "tenant-id";
+  public static final String DEFAULT_USER_ID = "admin";
+  public static final String DEFAULT_TENANT_ID = "superadmin";
+  public static final String EV_HOSTNAME = "COOPR_HOST";
 }

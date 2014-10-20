@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.Socket;
 
 /**
  * Utility class for processing arguments.
@@ -89,5 +90,44 @@ public class CliUtil {
       }
     }
     return null;
+  }
+
+  /**
+   * Retrieves argument with specified key from {@link Arguments}.
+   *
+   * @param arguments the {@link Arguments}
+   * @param argKey the argument key
+   * @param defaultValue the default value
+   * @return argument by key or default value, in case argument does not exists
+   */
+  public static String getArgument(Arguments arguments, String argKey, String defaultValue) {
+    if (arguments.hasArgument(argKey)) {
+      return checkArgument(arguments.get(argKey));
+    }
+    return defaultValue;
+  }
+
+  /**
+   * Check if specified port on specified host is available.
+   *
+   * @param host the host
+   * @param port the port
+   * @return {@code true} if specified port on specified host is available, otherwise {@code false}
+   */
+  public static boolean isAvailable(String host, int port) {
+    Socket socket = null;
+    try {
+      socket = new Socket(host, port);
+      return true;
+    } catch (Exception ignored) {
+    } finally {
+      if (socket != null) {
+        try {
+          socket.close();
+        } catch (IOException ignored) {
+        }
+      }
+    }
+    return false;
   }
 }
