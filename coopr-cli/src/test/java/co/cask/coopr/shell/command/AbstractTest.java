@@ -20,6 +20,7 @@ import co.cask.common.cli.CLI;
 import co.cask.common.cli.Command;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
+import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.command.set.CommandSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -36,6 +37,7 @@ import java.util.Collections;
  */
 public abstract class AbstractTest {
 
+  protected static final CLIConfig CLI_CONFIG = Mockito.mock(CLIConfig.class);
   protected static final AdminClient ADMIN_CLIENT = Mockito.mock(AdminClient.class);
   protected static final ClusterClient CLUSTER_CLIENT = Mockito.mock(ClusterClient.class);
 
@@ -48,6 +50,7 @@ public abstract class AbstractTest {
       new AbstractModule() {
         @Override
         protected void configure() {
+          bind(CLIConfig.class).toInstance(CLI_CONFIG);
           bind(AdminClient.class).toInstance(ADMIN_CLIENT);
           bind(ClusterClient.class).toInstance(CLUSTER_CLIENT);
         }
