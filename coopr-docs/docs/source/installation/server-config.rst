@@ -163,31 +163,44 @@ RESTART_SERVICES, and ADD_SERVICES.
 Running Server with SSL
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-To enable running server with TLS, add this property to ``coopr-site.xml``:
+To enable running server with SSL, add this property to ``coopr-site.xml``::
 
-==========================================  ==============
-   Property                                   Value
-==========================================  ==============
-server.ssl.enabled                            true
-==========================================  ==============
+    <property>
+      <name>server.ssl.enabled</name>
+      <value>true</value>
+      <description>whether or not to run the server over SSL</description>
+    </property>
 
-Also, add these properties to ``coopr-security.xml``:
+Also, add these properties to ``coopr-security.xml``::
 
-=============================================     =====================     =======================================
-   Property                                        Default Value                Description
-=============================================     =====================     =======================================
-server.ssl.keystore.path                           None                      Keystore file location.
-server.ssl.keystore.password                       None                      Keystore password
-server.ssl.cert.password                           None                      Keystore key password
-=============================================     =====================     =======================================
+    <property>
+      <name>server.ssl.keystore.path</name>
+      <value>/path</value>
+      <description>Keystore file location</description>
+    </property>
+    <property>
+      <name>server.ssl.keystore.password</name>
+      <value>Keystore password</value>
+      <description>Keystore password</description>
+    </property>
+    <property>
+      <name>server.ssl.cert.password</name>
+      <value>Keystore key password</value>
+      <description>Keystore key password</description>
+    </property>
 
-To configure the server to use mutual authentication with SSL, add these properties to ``coopr-security.xml``:
+To configure the server to use mutual authentication with SSL, add these properties to ``coopr-security.xml``::
 
-=============================================     =====================     =======================================
-   Property                                        Default Value                Description
-=============================================     =====================     =======================================
-server.ssl.trust.keystore.path                     None                      Truststore file location.
-server.ssl.trust.keystore.password                 None                      Truststore password
+    <property>
+      <name>server.ssl.trust.keystore.path</name>
+      <value>/path</value>
+      <description>Truststore file location</description>
+    </property>
+    <property>
+      <name>server.ssl.trust.keystore.password</name>
+      <value>Truststore password</value>
+      <description>Truststore password</description>
+    </property>
 
 Configuration
 ^^^^^^^^^^^^^
