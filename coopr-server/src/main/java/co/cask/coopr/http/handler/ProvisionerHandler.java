@@ -25,6 +25,7 @@ import co.cask.coopr.provisioner.plugin.ResourceService;
 import co.cask.coopr.provisioner.plugin.ResourceType;
 import co.cask.coopr.scheduler.task.MissingEntityException;
 import co.cask.coopr.store.tenant.TenantStore;
+import co.cask.http.ChunkResponder;
 import co.cask.http.HttpResponder;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMultimap;
@@ -37,16 +38,16 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
 /**
  * Handles requests from provisioners to register themselves, send heartbeats, delete themselves, and get plugin
@@ -125,7 +126,7 @@ public final class ProvisionerHandler extends AbstractAuthHandler {
   @POST
   @Path("/provisioners/{provisioner-id}/heartbeat")
   public void handleHeartbeat(HttpRequest request, HttpResponder responder,
-                             @PathParam("provisioner-id") String provisionerId) {
+                              @PathParam("provisioner-id") String provisionerId) {
     ProvisionerHeartbeat heartbeat;
     Reader reader = new InputStreamReader(new ChannelBufferInputStream(request.getContent()), Charsets.UTF_8);
     try {
@@ -240,16 +241,16 @@ public final class ProvisionerHandler extends AbstractAuthHandler {
         responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting resource.");
       }
       try {
-        responder.sendChunkStart(HttpResponseStatus.OK, ImmutableMultimap.<String, String>of());
+        ChunkResponder chunkResponder = responder.sendChunkStart(HttpResponseStatus.OK, ImmutableMultimap.<String, String>of());
         while (true) {
           byte[] chunkBytes = new byte[Constants.PLUGIN_RESOURCE_CHUNK_SIZE];
           int bytesRead = inputStream.read(chunkBytes, 0, Constants.PLUGIN_RESOURCE_CHUNK_SIZE);
           if (bytesRead == -1) {
             break;
           }
-          responder.sendChunk(ChannelBuffers.wrappedBuffer(chunkBytes, 0, bytesRead));
+          chunkResponder.sendChunk(ChannelBuffers.wrappedBuffer(chunkBytes, 0, bytesRead));
         }
-        responder.sendChunkEnd();
+        chunkResponder.close();
       } finally {
         inputStream.close();
       }

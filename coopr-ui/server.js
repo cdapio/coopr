@@ -35,6 +35,7 @@ var PORT = argv.port || 8100;
 var CLIENT_ADDR = argv.cooprhost || 'http://127.0.0.1:55054';
 var BOX_ADDR = CLIENT_ADDR + '/v2';
 var CLIENT_DIR = env === 'production' ? 'client-built' : 'client';
+var REJECT_UNAUTH = argv.rejectUnauth === 'true';
 
 console.info('Environment:', env, BOX_ADDR, CLIENT_DIR);
 
@@ -191,6 +192,7 @@ site.getEntity = function (path, user) {
     var options = {
       url: BOX_ADDR + path,
       method: 'GET',
+      rejectUnauthorized: REJECT_UNAUTH,
       headers: {
         'Coopr-UserID': user && user.id,
         'Coopr-TenantID': user && user.tenant,
@@ -377,7 +379,7 @@ site.app.get('/pipeApiCall', function (req, res) {
   var options = {
     uri: BOX_ADDR + req.query.path,
     method: 'GET',
-
+    rejectUnauthorized: REJECT_UNAUTH
   };
   res.setHeader('Content-type', 'application/json');
   site.sendRequestAndHandleResponse(options, user, res);
@@ -427,6 +429,7 @@ site.app.post('/import', function (req, res) {
           var options = {
             url: BOX_ADDR + '/import',
             method: 'POST',
+            rejectUnauthorized: REJECT_UNAUTH,
             headers: {
               'Coopr-UserID': user.id,
               'Coopr-TenantID': user.tenant,
@@ -456,6 +459,7 @@ site.app.get('/export', function (req, res) {
   var options = {
     url: BOX_ADDR + '/export',
     method: 'GET',
+    rejectUnauthorized: REJECT_UNAUTH,
     headers: {
       'Coopr-UserID': user.id,
       'Coopr-TenantID': user.tenant,
@@ -537,6 +541,7 @@ site.app.post('/setskin', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/profiles/' + user,
     method: 'PUT',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: packageBody
   };
   request(options, function (err, response, body) {
@@ -609,6 +614,7 @@ site.app.post('/tenants/create', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/tenants',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -619,6 +625,7 @@ site.app.post('/tenants/update', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/tenants/' + req.body.tenant.name,
     method: 'PUT',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -628,7 +635,8 @@ site.app.post('/tenants/delete/:name', function (req, res) {
   var user = site.checkAuth(req, res, true, 'superadmin');
   var options = {
     uri: BOX_ADDR + '/tenants/' + req.params.name,
-    method: 'DELETE'
+    method: 'DELETE',
+    rejectUnauthorized: REJECT_UNAUTH
   };
   site.sendRequestAndHandleResponse(options, user, res);
 });
@@ -691,6 +699,7 @@ site.app.post('/clustertemplates/create', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/clustertemplates',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -701,6 +710,7 @@ site.app.post('/clustertemplates/update', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/clustertemplates/' + req.body.name,
     method: 'PUT',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -710,7 +720,8 @@ site.app.post('/clustertemplates/delete/:id', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + '/clustertemplates/' + req.params.id,
-    method: 'DELETE'
+    method: 'DELETE',
+    rejectUnauthorized: REJECT_UNAUTH
   };
   site.sendRequestAndHandleResponse(options, user, res);
 });
@@ -793,6 +804,7 @@ site.app.post('/hardwaretypes/create', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/hardwaretypes',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -803,6 +815,7 @@ site.app.post('/hardwaretypes/update', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/hardwaretypes/' + req.body.name,
     method: 'PUT',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -812,7 +825,8 @@ site.app.post('/hardwaretypes/delete/:id', function (req, res) {
   var user = site.checkAuth(req, res, true);
   var options = {
     uri: BOX_ADDR + '/hardwaretypes/' + req.params.id,
-    method: 'DELETE'
+    method: 'DELETE',
+    rejectUnauthorized: REJECT_UNAUTH
   };
   site.sendRequestAndHandleResponse(options, user, res);
 });
@@ -890,6 +904,7 @@ site.app.post('/imagetypes/create', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/imagetypes',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -900,6 +915,7 @@ site.app.post('/imagetypes/update', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/imagetypes/' + req.body.name,
     method: 'PUT',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -909,7 +925,8 @@ site.app.post('/imagetypes/delete/:id', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + '/imagetypes/' + req.params.id,
-    method: 'DELETE'
+    method: 'DELETE',
+    rejectUnauthorized: REJECT_UNAUTH
   };
   site.sendRequestAndHandleResponse(options, user, res);
 });
@@ -989,6 +1006,7 @@ site.app.post('/providers/create', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/providers',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -999,6 +1017,7 @@ site.app.post('/providers/update', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/providers/' + req.body.name,
     method: 'PUT',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1009,7 +1028,8 @@ site.app.post('/providers/delete/:id', function (req, res) {
   var providerId = req.params.id;
   var options = {
     uri: BOX_ADDR + '/providers/' + req.params.id,
-    method: 'DELETE'
+    method: 'DELETE',
+    rejectUnauthorized: REJECT_UNAUTH
   };
   site.sendRequestAndHandleResponse(options, user, res);
 });
@@ -1083,6 +1103,7 @@ site.app.post('/services/create', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/services',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1093,6 +1114,7 @@ site.app.post('/services/update', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/services/' + req.body.name,
     method: 'PUT',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1102,7 +1124,8 @@ site.app.post('/services/delete/:id', function (req, res) {
   var user = site.checkAuth(req, res, true);
   var options = {
     uri: BOX_ADDR + '/services/' + req.params.id,
-    method: 'DELETE'
+    method: 'DELETE',
+    rejectUnauthorized: REJECT_UNAUTH
   };
   site.sendRequestAndHandleResponse(options, user, res);
 });
@@ -1226,6 +1249,7 @@ site.app.post('/user/clusters/cluster/:id/reconfigure', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id + '/config',
     method: 'PUT',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1236,6 +1260,7 @@ site.app.post('/user/clusters/cluster/:id', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id,
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1246,6 +1271,7 @@ site.app.post('/user/clusters/cluster/:id/services', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id + '/services',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1256,6 +1282,7 @@ site.app.post('/user/clusters/cluster/:id/services/:serviceid/start', function (
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id + '/services/' + req.params.serviceid + '/start',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1266,6 +1293,7 @@ site.app.post('/user/clusters/cluster/:id/services/:serviceid/stop', function (r
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id + '/services/' + req.params.serviceid + '/stop',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1276,6 +1304,7 @@ site.app.post('/user/clusters/cluster/:id/services/:serviceid/restart', function
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id + '/services/' + req.params.serviceid + '/restart',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1308,6 +1337,7 @@ site.app.post('/user/clusters/create', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/clusters',
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1319,6 +1349,7 @@ site.app.post('/user/clusters/update/:clusterId', function (req, res) {
   var options = {
     uri: BOX_ADDR + '/clusters/' + clusterId,
     method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH,
     json: req.body
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1328,7 +1359,8 @@ site.app.post('/user/clusters/delete/:id', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id,
-    method: 'DELETE'
+    method: 'DELETE',
+    rejectUnauthorized: REJECT_UNAUTH
   };
   site.sendRequestAndHandleResponse(options, user, res);
 });
@@ -1337,6 +1369,25 @@ site.app.post('/user/clusters/abort/:id', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id + '/abort',
+    method: 'POST',
+    rejectUnauthorized: REJECT_UNAUTH
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/pause/:id', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/pause',
+    method: 'POST'
+  };
+  site.sendRequestAndHandleResponse(options, user, res);
+});
+
+site.app.post('/user/clusters/resume/:id', function (req, res) {
+  var user = site.checkAuth(req, res);
+  var options = {
+    uri: BOX_ADDR + '/clusters/' + req.params.id + '/resume',
     method: 'POST'
   };
   site.sendRequestAndHandleResponse(options, user, res);
@@ -1346,7 +1397,8 @@ site.app.get('/user/clusters/status/:id', function (req, res) {
   var user = site.checkAuth(req, res);
   var options = {
     uri: BOX_ADDR + '/clusters/' + req.params.id + '/status',
-    method: 'GET'
+    method: 'GET',
+    rejectUnauthorized: REJECT_UNAUTH
   };
   site.sendRequestAndHandleResponse(options, user, res);
 });
@@ -1381,6 +1433,7 @@ site.app.post('/login', function (req, res) {
   var options = {
     url: BOX_ADDR + '/profiles/' + user,
     method: 'GET',
+    rejectUnauthorized: REJECT_UNAUTH,
     headers: {
       'Coopr-UserID': user,
       'Coopr-TenantID': tenant,

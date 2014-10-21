@@ -8,11 +8,11 @@ var helper = require('../../protractor-help');
 describe('tenants section', function() {
 
   it('should redir to login when logged out', function() {
-    browser.get('/#/tenants');
+    browser.get('/tenants');
 
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/login/);
+    ).toMatch(/\/login$/);
 
     expect(
       element(by.css('body')).getAttribute('class')
@@ -27,14 +27,14 @@ describe('tenants section', function() {
   it('while logged in....', function() {
     helper.loginAsAdmin();
 
-    browser.get('/#/tenants');
+    browser.get('/tenants');
 
     expect(
       element(by.css('body')).getAttribute('class')
     ).toContain('state-tenants-list');
 
 
-
+    // navigating via hashbang should work as well
     browser.get('/#/tenants/edit/superadmin');
 
     expect(

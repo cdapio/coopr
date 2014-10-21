@@ -86,6 +86,8 @@ public class ClusterHandler implements HttpRequestHandler {
           = GSON.fromJson(EntityUtils.toString(httpRequest.getEntity(), Charsets.UTF_8), ClusterCreateRequest.class);
         if (createRequest != null && createRequest.getName().equals(ClusterRestClientTest.EXPECTED_NEW_CLUSTER_NAME)) {
           responseBody = "{'id' : 'testCluster'}";
+        } else {
+          statusCode = HttpStatus.SC_BAD_REQUEST;
         }
       } else if (url.matches(SINGLE_URL_REGEX) && HttpMethod.GET.equals(method)) {
         responseBody = GSON.toJson(createClusterDetails());

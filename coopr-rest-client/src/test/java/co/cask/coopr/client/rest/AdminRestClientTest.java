@@ -18,7 +18,6 @@ package co.cask.coopr.client.rest;
 
 import co.cask.coopr.Entities;
 import co.cask.coopr.client.AdminClient;
-import co.cask.coopr.client.ClientManager;
 import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.client.rest.handler.TestStatusUserId;
 import co.cask.coopr.spec.HardwareType;
@@ -36,7 +35,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-
 
 public class AdminRestClientTest extends RestClientTest {
 
@@ -326,12 +324,5 @@ public class AdminRestClientTest extends RestClientTest {
   @After
   public void shutDown() throws Exception {
     super.shutDown();
-  }
-
-  private ClientManager createClientManager(String userId) {
-    return RestClientManager.builder(testServerHost, testServerPort)
-      .userId(userId)
-      .tenantId(TEST_TENANT_ID)
-      .build();
   }
 }
