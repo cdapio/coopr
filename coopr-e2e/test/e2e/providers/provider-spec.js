@@ -121,7 +121,7 @@ describe('providers test', function () {
   //   // browser.get('/#/reset');
   // });
   
-  it('should show a list of providers', function() {
+  it('should show a list of providers', function () {
     browser.get('/#/providers');
 
     expect(
