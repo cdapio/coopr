@@ -27,6 +27,7 @@ function login(tenant, username, password) {
       }
 
       browser.get('/login');
+      browser.waitForAngular();
 
       element(by.id('loginTenant')).clear().sendKeys(tenant);
       element(by.id('loginUsername')).clear().sendKeys(username);
@@ -40,6 +41,7 @@ function login(tenant, username, password) {
 
 function logout() {
   browser.get('/');
+  browser.waitForAngular();
 
   ddIsOpen()
     .then(function (dd) {
