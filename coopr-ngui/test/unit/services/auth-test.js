@@ -4,11 +4,9 @@ describe('service', function() {
   beforeEach(module('coopr-ngui.services'));
 
   describe('myAuth', function() {
-    var myAuth, $rootScope, $sessionStorage;
+    var myAuth;
     beforeEach(inject(function($injector) {
       myAuth = $injector.get('myAuth');
-      $rootScope = $injector.get('$rootScope');
-      $sessionStorage = $injector.get('$sessionStorage');
     }));
 
     it('has a currentUser property', function() {
@@ -21,11 +19,11 @@ describe('service', function() {
     });
 
     describe('login', function() {
-      var $rootScope, $sessionStorage, $timeout;
+      var $rootScope, $localStorage, $timeout;
       beforeEach(inject(function($injector) {
         $timeout = $injector.get('$timeout');
         $rootScope = $injector.get('$rootScope');
-        $sessionStorage = $injector.get('$sessionStorage');
+        $localStorage = $injector.get('$localStorage');
         spyOn($rootScope, '$broadcast').andCallThrough();
       }));
 
@@ -49,7 +47,7 @@ describe('service', function() {
 
         it('is persisted', function() {
           expect(myAuth.isAuthenticated()).toBe(true);
-          expect($sessionStorage.currentUser.username).toEqual('test');
+          expect($localStorage.currentUser.username).toEqual('test');
           expect($rootScope.currentUser.username).toEqual('test');
           expect($rootScope.currentUser.hasRole).toEqual(jasmine.any(Function));
           expect($rootScope.$broadcast).toHaveBeenCalledWith('myauth-login-success');
@@ -61,7 +59,7 @@ describe('service', function() {
             myAuth.logout();
 
             expect(myAuth.isAuthenticated()).toBe(false);
-            expect($sessionStorage.currentUser).toBeFalsy();
+            expect($localStorage.currentUser).toBeFalsy();
             expect($rootScope.currentUser).toBeFalsy();
             expect($rootScope.$broadcast).toHaveBeenCalledWith('myauth-logout-success');
           });

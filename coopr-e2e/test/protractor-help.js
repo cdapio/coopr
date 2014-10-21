@@ -39,12 +39,14 @@ function login(tenant, username, password) {
 
 
 function logout() {
+  browser.get('/');
 
   ddIsOpen()
     .then(function (dd) {
+
       if(!dd) {
         element(by.css('header .navbar-right .dropdown-toggle')).click();
-        browser.wait(ddIsOpen, 5000);        
+        browser.wait(ddIsOpen, 5000);
       }
 
       element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
