@@ -10,5 +10,4 @@
     <name>server.plugin.store.localfilestore.data.dir</name>
     <value>COOPR_DATA_DIR/plugins/resources</value>
   </property>
-
 </configuration>

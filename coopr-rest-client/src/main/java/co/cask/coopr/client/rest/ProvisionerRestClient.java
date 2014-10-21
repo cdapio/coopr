@@ -18,19 +18,21 @@ package co.cask.coopr.client.rest;
 
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.provisioner.Provisioner;
-import org.apache.commons.lang3.NotImplementedException;
+import com.google.gson.reflect.TypeToken;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
  * The {@link co.cask.coopr.client.ProvisionerClient} interface implementation based on the Rest requests to
  * the Coopr Rest API.
- *
- * TODO: Implementation
  */
 public class ProvisionerRestClient extends RestClient implements ProvisionerClient {
+
+  private static final String PROVISIONER_URL_SUFFIX = "provisioners";
+  private static final Type PROVISIONERS_LIST_TYPE = new TypeToken<List<Provisioner>>() { }.getType();
 
   public ProvisionerRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
     super(config, httpClient);
@@ -38,11 +40,11 @@ public class ProvisionerRestClient extends RestClient implements ProvisionerClie
 
   @Override
   public List<Provisioner> getAllProvisioners() throws IOException {
-    throw new NotImplementedException("This method is not implemented yet.");
+    return getAll(PROVISIONER_URL_SUFFIX, PROVISIONERS_LIST_TYPE);
   }
 
   @Override
   public Provisioner getProvisioner(String provisionerId) throws IOException {
-    throw new NotImplementedException("This method is not implemented yet.");
+    return getSingle(PROVISIONER_URL_SUFFIX, provisionerId, Provisioner.class);
   }
 }

@@ -7,7 +7,7 @@ var helper = require('../protractor-help');
 describe('login', function() {
 
   it('should show a form that works', function() {
-    browser.get('/#/login');
+    browser.get('/login');
 
     expect( 
       element.all(by.css('main form input')).count()
@@ -27,7 +27,7 @@ describe('login', function() {
   describe('once logged in', function() {
 
     it('/login should redirect home', function() {
-      browser.get('/#/login');
+      browser.get('/login');
 
       expect(
         $('body').getAttribute('class')
@@ -35,7 +35,7 @@ describe('login', function() {
 
       expect(
         browser.getLocationAbsUrl()
-      ).toMatch(/\/#\/$/);
+      ).not.toMatch(/\/login$/);
     });
 
 

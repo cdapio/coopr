@@ -107,19 +107,71 @@ class FogProviderJoyent < Provider
         ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
         # Check for /dev/vdb
         begin
-          vdb = true
-          # confirm /dev/vdb exists
-          ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
-          # confirm it is not already mounted
-          #   ubuntu: we remount from /mnt to /data
-          #   centos: vdb1 already mounted at /data
-          ssh_exec!(ssh, 'if grep "vdb /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
-        rescue
+          vdb1 = true
           vdb = false
+          # test for vdb1
+          begin
+            ssh_exec!(ssh, 'test -e /dev/vdb1', 'Checking for /dev/vdb1')
+            ssh_exec!(ssh, 'if grep "vdb1 /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb1 mounted already')
+          rescue
+            vdb1 = false
+            begin
+              vdb = true
+              ssh_exec!(ssh, 'test -e /dev/vdb', 'Checking for /dev/vdb')
+            rescue
+              vdb = false
+            end
+          end
         end
-        if vdb
-          ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
-          ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
+
+        log.debug 'Found the following:'
+        log.debug "- vdb1 = #{vdb1}"
+        log.debug "- vdb  = #{vdb}"
+
+        # confirm it is not already mounted
+        #   ubuntu: we remount from /mnt to /data
+        #   centos: vdb1 already mounted at /data
+        if vdb1
+          # TODO: check that vdb1 is mounted at /data, for now assume it is
+          log.debug 'Assuming /dev/vdb1 is mounted at /data, if this is not the case, file an issue'
+        elsif vdb
+          begin
+            mounted = false
+            ssh_exec!(ssh, 'if grep "vdb /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
+          rescue
+            mounted = true
+          end
+          # If mounted = true, we're done
+          unless mounted
+            # disk isn't mounted at /data, could be mounted elsewhere
+            begin
+              # Are we mounted?
+              ssh_exec!(ssh, 'mount | grep ^/dev/vdb 2>&1 >/dev/null', 'Checking if /dev/vdb is unmounted')
+              unmount = true
+            rescue
+              log.debug 'Disk /dev/vdb is not mounted'
+            end
+            if unmount
+              begin
+                ssh_exec!(ssh, "#{sudo} umount /dev/vdb", 'Unmounting /dev/vdb')
+              rescue
+                raise 'Failure unmounting data disk /dev/vdb'
+              end
+            end
+            # Disk is unmounted, format it
+            begin
+              ssh_exec!(ssh, "#{sudo} /sbin/mkfs.ext4 /dev/vdb", 'Formatting filesystem at /dev/vdb')
+            rescue
+              raise 'Failure formatting data disk /dev/vdb'
+            end
+            # Mount it
+            begin
+              ssh_exec!(ssh, "#{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
+            rescue
+              raise 'Failed to mount /dev/vdb at /data'
+            end
+            ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
+          end
         end
       end
       # Return 0

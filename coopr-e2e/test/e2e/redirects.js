@@ -4,12 +4,12 @@
 
 describe('redirects', function() {
 
-  it('should show a 404 when navigatin to /#/whatever', function() {
-    browser.get('/#/whatever');
+  it('should show a soft 404 when navigatin to /whatever', function() {
+    browser.get('/whatever');
 
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/whatever$/);
+    ).toMatch(/\/whatever$/);
 
     expect(
       element(by.css('main .jumbotron')).getText()
@@ -17,12 +17,26 @@ describe('redirects', function() {
 
   });
 
-  it('should go to login when navigated to /#/signin', function() {
-    browser.get('/#/signin');
+  it('should show a real 404 for static paths', function() {
+    // there is no angular here, so we have to use the driver directly
+    browser.driver.get(browser.baseUrl + 'bundle/foo.bar');
+
+    expect(
+      browser.driver.getCurrentUrl()
+    ).toMatch(/\/bundle\/foo.bar$/);
+
+    expect(
+      browser.driver.getPageSource()
+    ).toContain('Cannot GET /bundle/foo.bar');
+
+  });
+
+  it('should go to login when navigated to /signin', function() {
+    browser.get('/signin');
 
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/login$/);
+    ).toMatch(/\/login$/);
 
   });
 });
