@@ -42,12 +42,13 @@ describe('providers test', function () {
   it('should create a provider', function () {
     element(by.name('name')).sendKeys('Testprovider');
     element(by.css('#inputProviderDescription')).sendKeys('Test description');
+    element(by.cssContainingText('option', 'google')).click();
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
     formfields.first().element(by.css('input')).sendKeys('Test resource');
+    formfields.get(5).element(by.css('input')).sendKeys('Test username');
     formfields.get(1).element(by.css('input')).sendKeys('Test email');
     formfields.get(3).element(by.css('input')).sendKeys('Test project id');
     formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
-    formfields.get(5).element(by.css('input')).sendKeys('Test username');
     element(by.partialButtonText('Create')).click();
 
     expect(
