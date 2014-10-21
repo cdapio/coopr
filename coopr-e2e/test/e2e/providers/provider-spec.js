@@ -39,35 +39,35 @@ describe('providers test', function () {
     expect(zone).toEqual('5');
   });
 
-  it('should create a provider', function () {
-    element(by.name('name')).sendKeys('Testprovider');
-    element(by.css('#inputProviderDescription')).sendKeys('Test description');
-    element(by.cssContainingText('option', 'google')).click();
-    formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
-    formfields.first().element(by.css('input')).sendKeys('Test resource');
-    formfields.get(5).element(by.css('input')).sendKeys('Test username');
-    formfields.get(1).element(by.css('input')).sendKeys('Test email');
-    formfields.get(3).element(by.css('input')).sendKeys('Test project id');
-    formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
-    element(by.partialButtonText('Create')).click();
+  // it('should create a provider', function () {
+  //   element(by.name('name')).sendKeys('Testprovider');
+  //   element(by.css('#inputProviderDescription')).sendKeys('Test description');
+  //   element(by.cssContainingText('option', 'google')).click();
+  //   formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
+  //   formfields.first().element(by.css('input')).sendKeys('Test resource');
+  //   formfields.get(5).element(by.css('input')).sendKeys('Test username');
+  //   formfields.get(1).element(by.css('input')).sendKeys('Test email');
+  //   formfields.get(3).element(by.css('input')).sendKeys('Test project id');
+  //   formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
+  //   element(by.partialButtonText('Create')).click();
 
-    expect(
-      browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/providers$/);
+  //   expect(
+  //     browser.getLocationAbsUrl()
+  //   ).toMatch(/\/#\/providers$/);
 
-    providersList = element.all(by.repeater('item in list'));
-    expect(providersList.count()).toEqual(8);
-    var providerText = providersList.last().getText();
-    expect(providerText).toMatch('Testprovider Test description Edit\nDelete');
-  });
+  //   providersList = element.all(by.repeater('item in list'));
+  //   expect(providersList.count()).toEqual(8);
+  //   var providerText = providersList.last().getText();
+  //   expect(providerText).toMatch('Testprovider Test description Edit\nDelete');
+  // });
 
 
-  it('should delete provider upon clicking delete', function () {
-    providersList.last().element(by.css('.delete-btn')).click();
-    ptor.switchTo().alert().accept();
-    providersList = element.all(by.repeater('item in list'));
-    expect(providersList.count()).toEqual(7);
-  });
+  // it('should delete provider upon clicking delete', function () {
+  //   providersList.last().element(by.css('.delete-btn')).click();
+  //   ptor.switchTo().alert().accept();
+  //   providersList = element.all(by.repeater('item in list'));
+  //   expect(providersList.count()).toEqual(7);
+  // });
 
   it('should navigate to provider edit page and show fields.', function() {
     browser.get('/#/providers/edit/google');
