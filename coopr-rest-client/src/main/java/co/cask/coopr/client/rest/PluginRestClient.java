@@ -21,13 +21,8 @@ import co.cask.coopr.provisioner.plugin.ResourceMeta;
 import co.cask.coopr.provisioner.plugin.ResourceStatus;
 import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
-import com.google.common.base.Charsets;
 import com.google.common.reflect.TypeToken;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -35,7 +30,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * The {@link co.cask.coopr.client.PluginClient} interface implementation based on the Rest requests to
@@ -45,6 +39,9 @@ public class PluginRestClient extends RestClient implements PluginClient {
 
   private static final String AUTOMATOR_TYPE_STR = "automatortypes";
   private static final String PROVIDER_TYPE_STR = "providertypes";
+  private static final Type AUTOMATOR_TYPE_LIST = new TypeToken<List<AutomatorType>>() { }.getType();
+  private static final Type PROVIDER_TYPE_LIST = new TypeToken<List<ProviderType>>() { }.getType();
+  private static final Type RESOURCE_TYPE_MAP = new TypeToken<Map<String, Set<ResourceMeta>>>() { }.getType();
 
   public PluginRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
     super(config, httpClient);
@@ -53,8 +50,7 @@ public class PluginRestClient extends RestClient implements PluginClient {
   @Override
   public List<AutomatorType> getAllAutomatorTypes() throws IOException {
     URI getUri = buildFullURL(String.format("/plugins/%s", AUTOMATOR_TYPE_STR));
-    return getAll(getUri, new TypeToken<List<AutomatorType>>() {
-    }.getType());
+    return getAll(getUri, AUTOMATOR_TYPE_LIST);
   }
 
   @Override
@@ -66,8 +62,7 @@ public class PluginRestClient extends RestClient implements PluginClient {
   @Override
   public List<ProviderType> getAllProviderTypes() throws IOException {
     URI getUri = buildFullURL(String.format("/plugins/%s", PROVIDER_TYPE_STR));
-    return getAll(getUri, new TypeToken<List<ProviderType>>() {
-    }.getType());
+    return getAll(getUri, PROVIDER_TYPE_LIST);
   }
 
   @Override
@@ -79,35 +74,16 @@ public class PluginRestClient extends RestClient implements PluginClient {
   @Override
   public Map<String, Set<ResourceMeta>> getAutomatorTypeResources(String id, String resourceType, ResourceStatus status)
     throws IOException {
-    Type type = new TypeToken<Map<String, Set<ResourceMeta>>>() {
-    }.getType();
     return getPluginTypeMap(String.format("/plugins/%s/%s/%s/?status=%s", AUTOMATOR_TYPE_STR, id, resourceType,
-                                          status.toString()), type);
+                                          status.toString()), RESOURCE_TYPE_MAP);
   }
 
   @Override
   public Map<String, Set<ResourceMeta>> getProviderTypeResources(String id, String resourceType, ResourceStatus status)
     throws IOException {
-    Type type = new TypeToken<Map<String, Set<ResourceMeta>>>() {
-    }.getType();
     return getPluginTypeMap(String.format("/plugins/%s/%s/%s/?status=%s", PROVIDER_TYPE_STR, id, resourceType,
-                                          status.toString()), type);
+                                          status.toString()), RESOURCE_TYPE_MAP);
   }
-
-  private <T> Map<String, Set<T>> getPluginTypeMap(String url, Type type) throws IOException {
-    String fullUrl = String.format("%s%s", getBaseURL(), url);
-    HttpGet getRequest = new HttpGet(fullUrl);
-    CloseableHttpResponse httpResponse = execute(getRequest);
-    Map<String, Set<T>> resultMap;
-    try {
-      RestClient.analyzeResponseCode(httpResponse);
-      resultMap = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
-    } finally {
-      httpResponse.close();
-    }
-    return resultMap != null ? resultMap : new TreeMap<String, Set<T>>();
-  }
-
 
   @Override
   public void stageAutomatorTypeResource(String id, String resourceType, String resourceName, String version)
@@ -144,7 +120,7 @@ public class PluginRestClient extends RestClient implements PluginClient {
   @Override
   public void deleteAutomatorTypeResourceVersion(String id, String resourceType, String resourceName, String version)
     throws IOException {
-    delete(String.format("plugins/%s/%s/%s/%s/versions", PROVIDER_TYPE_STR, id, resourceName,
+    delete(String.format("plugins/%s/%s/%s/%s/versions", AUTOMATOR_TYPE_STR, id, resourceName,
                          resourceName), version);
   }
 
@@ -159,15 +135,5 @@ public class PluginRestClient extends RestClient implements PluginClient {
   public void syncPlugins() throws IOException {
     execPost(buildFullURL("/plugins/sync"));
 
-  }
-
-  private void execPost(URI uri) throws IOException {
-    HttpPost postRequest = new HttpPost(uri);
-    CloseableHttpResponse httpResponse = execute(postRequest);
-    try {
-      RestClient.analyzeResponseCode(httpResponse);
-    } finally {
-      httpResponse.close();
-    }
   }
 }

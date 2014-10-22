@@ -16,7 +16,6 @@
 
 package co.cask.coopr.client.rest;
 
-import co.cask.coopr.Entities;
 import co.cask.coopr.client.ClientManager;
 import co.cask.coopr.client.PluginClient;
 import co.cask.coopr.client.rest.exception.HttpFailureException;
@@ -25,14 +24,12 @@ import co.cask.coopr.provisioner.plugin.ResourceMeta;
 import co.cask.coopr.provisioner.plugin.ResourceStatus;
 import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
-import com.google.common.collect.ImmutableMap;
+import co.cask.http.NettyHttpService;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import org.apache.http.HttpStatus;
-import org.apache.http.localserver.LocalTestServer;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -42,60 +39,60 @@ import java.util.Set;
 
 public class PluginRestTest {
 
-  public static final String TEST_USER_ID = "test";
-  public static final String TEST_TENANT_ID = "supertest";
+  protected static ClientManager clientManager;
+  static PluginClient pluginRestClient;
+  private static PluginTestHandler handler;
+  private static String testServerHost;
+  private static int testServerPort;
+  private static NettyHttpService httpService;
 
-  public static final String CHEF_PLUGIN = "chef";
-  public static final String REACTOR_RESOURCE = "reactor";
-  public static final String TEST_RESOURCE_TYPE = "testType";
-  public static final String JOYENT_PLUGIN = "joyent";
-  public static final String VERSION = "v2";
+  @BeforeClass
+  public static void setupTestClass() throws Exception {
+    handler = new PluginTestHandler();
+    NettyHttpService.Builder builder = NettyHttpService.builder();
+    builder.addHttpHandlers(ImmutableSet.of(handler));
 
-  protected ClientManager clientManager;
-  protected String testServerHost;
-  protected int testServerPort;
-  private LocalTestServer localTestServer;
-  PluginClient pluginRestClient;
+    builder.setHost("localhost");
+    builder.setPort(0);
 
+    builder.setConnectionBacklog(200);
+    builder.setExecThreadPoolSize(10);
+    builder.setBossThreadPoolSize(1);
+    builder.setWorkerThreadPoolSize(1);
+    httpService = builder.build();
+    httpService.startAndWait();
 
-  @Before
-  public void setUp() throws Exception {
-    localTestServer = new LocalTestServer(null, null);
-    PluginTestHandler pluginHandler = new PluginTestHandler();
-    localTestServer.register("*", pluginHandler);
-    localTestServer.start();
-    testServerHost = localTestServer.getServiceAddress().getHostName();
-    testServerPort = localTestServer.getServiceAddress().getPort();
+    testServerPort = httpService.getBindAddress().getPort();
+    testServerHost = httpService.getBindAddress().getHostName();
     clientManager = RestClientManager.builder(testServerHost, testServerPort)
-      .userId(TEST_USER_ID)
-      .tenantId(TEST_TENANT_ID)
-      .build();
+                    .userId(PluginTestConstants.TEST_USER_ID)
+                    .tenantId(PluginTestConstants.TEST_TENANT_ID).build();
     pluginRestClient = clientManager.getPluginClient();
+
   }
 
-  @After
-  public void clearResources() throws Exception {
-    clientManager.close();
-    localTestServer.stop();
+  @AfterClass
+  public static void cleanupTestClass() {
+    httpService.stopAndWait();
   }
 
   @Test
   public void getAllAutomatorTypesSuccessTest() throws IOException {
     List<AutomatorType> allAutomatorTypes = pluginRestClient.getAllAutomatorTypes();
-    Assert.assertEquals(allAutomatorTypes, Lists.newArrayList(Entities.AutomatorTypeExample.CHEF,
-                                                              Entities.AutomatorTypeExample.PUPPET));
+    Assert.assertEquals(allAutomatorTypes, PluginTestConstants.AUTOMATOR_LISTS);
   }
 
   @Test
   public void getAutomatorTypesSuccessTest() throws IOException {
-    AutomatorType automatorType = pluginRestClient.getAutomatorType(CHEF_PLUGIN);
-    Assert.assertEquals(automatorType, Entities.AutomatorTypeExample.CHEF);
+    AutomatorType automatorType = pluginRestClient.getAutomatorType(PluginTestConstants.CHEF_PLUGIN);
+    Assert.assertEquals(automatorType, PluginTestConstants.AUTOMATOR_TYPE);
   }
 
   @Test
-  public void getAutomatorTypesBadRequestTest() throws IOException {
+  public void getAutomatorTypesNotExistTest() throws IOException {
     try {
-      AutomatorType automatorType = pluginRestClient.getAutomatorType("not_existing_plugin");
+      pluginRestClient.getAutomatorType(PluginTestConstants.NOT_EXISISTING_PLUGIN);
+      Assert.fail("Expected HttpFailureException");
     } catch (HttpFailureException e) {
       Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());
     }
@@ -104,17 +101,18 @@ public class PluginRestTest {
   @Test
   public void getAutomatorTypeResourcesSuccessTest() throws IOException {
     Map<String, Set<ResourceMeta>> resourcesMap =
-      pluginRestClient.getAutomatorTypeResources(CHEF_PLUGIN, REACTOR_RESOURCE, ResourceStatus.ACTIVE);
-    ResourceMeta reactor1 = new ResourceMeta(REACTOR_RESOURCE, 1, ResourceStatus.ACTIVE);
-    ResourceMeta reactor2 = new ResourceMeta(REACTOR_RESOURCE, 2, ResourceStatus.ACTIVE);
-    Assert.assertEquals(resourcesMap, ImmutableMap.of(REACTOR_RESOURCE, ImmutableSet.of(reactor1, reactor2)));
+      pluginRestClient.getAutomatorTypeResources(PluginTestConstants.CHEF_PLUGIN,
+                                                 PluginTestConstants.REACTOR_RESOURCE, ResourceStatus.ACTIVE);
+    Assert.assertEquals(resourcesMap, PluginTestConstants.TYPE_RESOURCES);
   }
 
   @Test
   public void getAutomatorTypeResourcesNotExistTest() throws IOException {
     try {
       Map<String, Set<ResourceMeta>> resourcesMap =
-        pluginRestClient.getAutomatorTypeResources(CHEF_PLUGIN, "not_existing_resource", ResourceStatus.ACTIVE);
+        pluginRestClient.getAutomatorTypeResources(PluginTestConstants.CHEF_PLUGIN,
+                                                   PluginTestConstants.NOT_EXISISTING_RESOURCE, ResourceStatus.ACTIVE);
+      Assert.fail("Expected HttpFailureException");
     } catch (HttpFailureException e) {
       Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());
     }
@@ -122,36 +120,43 @@ public class PluginRestTest {
 
   @Test
   public void stageAutomatorTypeResourceSuccessTest() throws IOException {
-    pluginRestClient.stageAutomatorTypeResource(CHEF_PLUGIN, TEST_RESOURCE_TYPE, REACTOR_RESOURCE, VERSION);
+    PluginClient pluginRestClient = clientManager.getPluginClient();
+    pluginRestClient.stageAutomatorTypeResource(PluginTestConstants.CHEF_PLUGIN, PluginTestConstants.TEST_RESOURCE_TYPE,
+                                                PluginTestConstants.REACTOR_RESOURCE, PluginTestConstants.VERSION);
   }
 
   @Test
   public void recallAutomatorTypeResourceSuccessTest() throws IOException {
-    pluginRestClient.recallAutomatorTypeResource(CHEF_PLUGIN, TEST_RESOURCE_TYPE, REACTOR_RESOURCE, VERSION);
+    pluginRestClient.recallAutomatorTypeResource(PluginTestConstants.CHEF_PLUGIN,
+                                                 PluginTestConstants.TEST_RESOURCE_TYPE,
+                                                 PluginTestConstants.REACTOR_RESOURCE, PluginTestConstants.VERSION);
   }
 
   @Test
   public void deleteAutomatorTypeResourceSuccessTest() throws IOException {
-    pluginRestClient.deleteAutomatorTypeResourceVersion(CHEF_PLUGIN, TEST_RESOURCE_TYPE, REACTOR_RESOURCE, VERSION);
+    pluginRestClient.deleteAutomatorTypeResourceVersion(PluginTestConstants.CHEF_PLUGIN,
+                                                        PluginTestConstants.TEST_RESOURCE_TYPE,
+                                                        PluginTestConstants.REACTOR_RESOURCE,
+                                                        PluginTestConstants.VERSION);
   }
 
   @Test
   public void getAllProviderTypesSuccessTest() throws IOException {
     List<ProviderType> allProviderTypes = pluginRestClient.getAllProviderTypes();
-    Assert.assertEquals(allProviderTypes, Lists.newArrayList(Entities.ProviderTypeExample.JOYENT,
-                                                             Entities.ProviderTypeExample.RACKSPACE));
+    Assert.assertEquals(allProviderTypes, PluginTestConstants.PROVIDER_LISTS);
   }
 
   @Test
   public void getProviderTypesSuccessTest() throws IOException {
-    ProviderType providerType = pluginRestClient.getProviderType(JOYENT_PLUGIN);
-    Assert.assertEquals(providerType, Entities.ProviderTypeExample.JOYENT);
+    ProviderType providerType = pluginRestClient.getProviderType(PluginTestConstants.JOYENT_PLUGIN);
+    Assert.assertEquals(providerType, PluginTestConstants.PROVIDER_TYPE);
   }
 
   @Test
-  public void getProviderTypesBadRequestTest() throws IOException {
+  public void getProviderTypesNotExistTest() throws IOException {
     try {
-      ProviderType providerType = pluginRestClient.getProviderType("not_exist");
+      pluginRestClient.getProviderType(PluginTestConstants.NOT_EXISISTING_PLUGIN);
+      Assert.fail("Expected HttpFailureException");
     } catch (HttpFailureException e) {
       Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());
     }
@@ -160,17 +165,18 @@ public class PluginRestTest {
   @Test
   public void getProviderTypeResourcesSuccessTest() throws IOException {
     Map<String, Set<ResourceMeta>> resourcesMap =
-      pluginRestClient.getProviderTypeResources(JOYENT_PLUGIN, REACTOR_RESOURCE, ResourceStatus.ACTIVE);
-    ResourceMeta reactor1 = new ResourceMeta(REACTOR_RESOURCE, 1, ResourceStatus.ACTIVE);
-    ResourceMeta reactor2 = new ResourceMeta(REACTOR_RESOURCE, 2, ResourceStatus.ACTIVE);
-    Assert.assertEquals(resourcesMap, ImmutableMap.of(REACTOR_RESOURCE, ImmutableSet.of(reactor1, reactor2)));
+      pluginRestClient.getProviderTypeResources(PluginTestConstants.JOYENT_PLUGIN,
+                                                PluginTestConstants.REACTOR_RESOURCE, ResourceStatus.ACTIVE);
+    Assert.assertEquals(resourcesMap, PluginTestConstants.TYPE_RESOURCES);
   }
 
   @Test
   public void getProviderTypeResourcesNotExistTest() throws IOException {
     try {
       Map<String, Set<ResourceMeta>> resourcesMap =
-        pluginRestClient.getProviderTypeResources(JOYENT_PLUGIN, "not_existing_resource", ResourceStatus.ACTIVE);
+        pluginRestClient.getProviderTypeResources(PluginTestConstants.JOYENT_PLUGIN,
+                                                  PluginTestConstants.NOT_EXISISTING_RESOURCE, ResourceStatus.ACTIVE);
+      Assert.fail("Expected HttpFailureException");
     } catch (HttpFailureException e) {
       Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());
     }
@@ -178,16 +184,24 @@ public class PluginRestTest {
 
   @Test
   public void stageProviderTypeResourceSuccessTest() throws IOException {
-    pluginRestClient.stageProviderTypeResource(JOYENT_PLUGIN, TEST_RESOURCE_TYPE, REACTOR_RESOURCE, VERSION);
+    pluginRestClient.stageProviderTypeResource(PluginTestConstants.JOYENT_PLUGIN,
+                                               PluginTestConstants.TEST_RESOURCE_TYPE,
+                                               PluginTestConstants.REACTOR_RESOURCE, PluginTestConstants.VERSION);
   }
 
   @Test
   public void recallProviderTypeResourceSuccessTest() throws IOException {
-    pluginRestClient.recallProviderTypeResource(JOYENT_PLUGIN, TEST_RESOURCE_TYPE, REACTOR_RESOURCE, VERSION);
+    pluginRestClient.recallProviderTypeResource(PluginTestConstants.JOYENT_PLUGIN,
+                                                PluginTestConstants.TEST_RESOURCE_TYPE,
+                                                PluginTestConstants.REACTOR_RESOURCE, PluginTestConstants.VERSION);
   }
 
   @Test
   public void deleteProviderTypeResourceSuccessTest() throws IOException {
-    pluginRestClient.deleteProviderTypeResourceVersion(JOYENT_PLUGIN, TEST_RESOURCE_TYPE, REACTOR_RESOURCE, VERSION);
+    PluginClient pluginRestClient = clientManager.getPluginClient();
+    pluginRestClient.deleteProviderTypeResourceVersion(PluginTestConstants.JOYENT_PLUGIN,
+                                                       PluginTestConstants.TEST_RESOURCE_TYPE,
+                                                       PluginTestConstants.REACTOR_RESOURCE,
+                                                       PluginTestConstants.VERSION);
   }
 }

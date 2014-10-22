@@ -16,121 +16,174 @@
 
 package co.cask.coopr.client.rest.handler;
 
-import co.cask.coopr.Entities;
-import co.cask.coopr.client.rest.PluginRestTest;
-import co.cask.coopr.client.rest.RestClientTest;
+import co.cask.coopr.client.rest.PluginTestConstants;
 import co.cask.coopr.provisioner.plugin.ResourceMeta;
-import co.cask.coopr.provisioner.plugin.ResourceStatus;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import co.cask.coopr.spec.plugin.AutomatorType;
+import co.cask.http.AbstractHttpHandler;
+import co.cask.http.HttpResponder;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.RequestLine;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpRequestHandler;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
-import java.io.IOException;
-import javax.ws.rs.HttpMethod;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 
-public class PluginTestHandler implements HttpRequestHandler {
-  private static final String GET_ALL_AUTOMATOR_TYPES = "/v2/plugins/automatortypes";
-  private static final String GET_AUTOMATOR_TYPE = "/v2/plugins/automatortypes/\\w+";
-  private static final String GET_AUTOMATOR_TYPE_RESOURCES = "/v2/plugins/automatortypes/\\w+/\\w+/\\?status=.*";
+public class PluginTestHandler extends AbstractHttpHandler {
+
+  private static final String GET_ALL_AUTOMATOR_TYPES = "v2/plugins/automatortypes";
+  private static final String GET_AUTOMATOR_TYPE = "v2/plugins/automatortypes/\\w+";
+  private static final String GET_AUTOMATOR_TYPE_RESOURCES = "v2/plugins/automatortypes/\\w+/\\w+";
+  private static final String GET_NOT_EXIST_AUTOMATOR_TYPE =
+                              "v2/plugins/automatortypes/" + PluginTestConstants.NOT_EXISISTING_PLUGIN;
+  private static final String GET_NOT_EXIST_PROVIDER_TYPE =
+                              "v2/plugins/providertypes/" + PluginTestConstants.NOT_EXISISTING_PLUGIN;
+  private static final String GET_NOT_EXIST_PROVIDER_RESOURCE =
+                              "v2/plugins/providertypes/\\w+/" + PluginTestConstants.NOT_EXISISTING_RESOURCE;
+  private static final String GET_NOT_EXIST_AUTOMATOR_RESOURCE =
+                              "v2/plugins/automatortypes/\\w+/" + PluginTestConstants.NOT_EXISISTING_RESOURCE;
   private static final String STAGE_AUTOMATOR_TYPE_RESOURCES =
-    "/v2/plugins/automatortypes/\\w+/\\w+/\\w+/versions/\\w+/stage";
+                              "v2/plugins/automatortypes/\\w+/\\w+/\\w+/versions/\\w+/stage";
   private static final String RECALL_AUTOMATOR_TYPE_RESOURCES =
-    "/v2/plugins/automatortypes/\\w+/\\w+/\\w+/versions/\\w+/recall";
+                              "v2/plugins/automatortypes/\\w+/\\w+/\\w+/versions/\\w+/recall";
   private static final String DELETE_AUTOMATOR_TYPE_RESOURCES_VERSION =
-    "/v2/plugins/automatortypes/\\w+/\\w+/\\w+/versions/.*";
+                              "v2/plugins/automatortypes/\\w+/\\w+/\\w+/versions/\\d*";
 
   private static final String GET_ALL_PROVIDER_TYPES = "/v2/plugins/providertypes";
   private static final String GET_PROVIDER_TYPE = "/v2/plugins/providertypes/\\w+";
-  private static final String GET_PROVIDER_TYPE_RESOURCES = "/v2/plugins/providertypes/\\w+/\\w+/\\?status=.*";
+  private static final String GET_PROVIDER_TYPE_RESOURCES = "/v2/plugins/providertypes/\\w+/\\w+/";
   private static final String STAGE_PROVIDER_TYPE_RESOURCES =
-    "/v2/plugins/providertypes/\\w+/\\w+/\\w+/versions/\\w+/stage";
+                              "/v2/plugins/providertypes/\\w+/\\w+/\\w+/versions/\\w+/stage";
   private static final String RECALL_PROVIDER_TYPE_RESOURCES =
-    "/v2/plugins/providertypes/\\w+/\\w+/\\w+/versions/\\w+/recall";
+                              "/v2/plugins/providertypes/\\w+/\\w+/\\w+/versions/\\w+/recall";
   private static final String DELETE_PROVIDER_TYPE_RESOURCES_VERSION =
-    "/v2/plugins/providertypes/\\w+/\\w+/\\w+/versions/.*";
+                              "/v2/plugins/providertypes/\\w+/\\w+/\\w+/versions/.*";
 
   private static final Gson GSON = new Gson();
   private static final String COOPR_TENANT_ID_HEADER_NAME = "Coopr-TenantID";
   private static final String COOPR_USER_ID_HEADER_NAME = "Coopr-UserID";
 
-  @Override
-  public void handle(HttpRequest request, HttpResponse response, HttpContext context)
-    throws HttpException, IOException {
-
-    RequestLine requestLine = request.getRequestLine();
-    String method = requestLine.getMethod();
-    String url = requestLine.getUri();
-    int statusCode = HttpStatus.SC_OK;
-    String responseBody = "";
-
-    String userId = request.getFirstHeader(COOPR_USER_ID_HEADER_NAME).getValue();
-    String tenantId = request.getFirstHeader(COOPR_TENANT_ID_HEADER_NAME).getValue();
-    if (userId.equals(RestClientTest.TEST_USER_ID) && tenantId.equals(RestClientTest.TEST_TENANT_ID)) {
-      if (url.equals(GET_ALL_AUTOMATOR_TYPES) || url.equals(GET_ALL_PROVIDER_TYPES) && HttpMethod.GET.equals(method)) {
-        if (url.equals(GET_ALL_AUTOMATOR_TYPES)) {
-          responseBody = GSON.toJson(Lists.newArrayList(
-            Entities.AutomatorTypeExample.CHEF,
-            Entities.AutomatorTypeExample.PUPPET));
-        } else {
-          responseBody = GSON.toJson(Lists.newArrayList(
-            Entities.ProviderTypeExample.JOYENT,
-            Entities.ProviderTypeExample.RACKSPACE));
-        }
-
-      } else if (url.matches(GET_AUTOMATOR_TYPE) || url.matches(GET_PROVIDER_TYPE) && HttpMethod.GET.equals(method)) {
-        if (url.matches(GET_AUTOMATOR_TYPE)) {
-          if (url.contains(PluginRestTest.CHEF_PLUGIN)) {
-            responseBody = GSON.toJson(Entities.AutomatorTypeExample.CHEF);
-          } else {
-            statusCode = HttpStatus.SC_NOT_FOUND;
-          }
-        } else {
-          if (url.contains(PluginRestTest.JOYENT_PLUGIN)) {
-            responseBody = GSON.toJson(Entities.ProviderTypeExample.JOYENT);
-          } else {
-            statusCode = HttpStatus.SC_NOT_FOUND;
-          }
-        }
-      } else if (url.matches(GET_AUTOMATOR_TYPE_RESOURCES) || url.matches(GET_PROVIDER_TYPE_RESOURCES)
-        && HttpMethod.GET.equals(method)) {
-        if (url.contains(PluginRestTest.REACTOR_RESOURCE)) {
-          ResourceMeta reactor1 = new ResourceMeta(PluginRestTest.REACTOR_RESOURCE, 1, ResourceStatus.ACTIVE);
-          ResourceMeta reactor2 = new ResourceMeta(PluginRestTest.REACTOR_RESOURCE, 2, ResourceStatus.ACTIVE);
-          responseBody = GSON.toJson(ImmutableMap.of(PluginRestTest.REACTOR_RESOURCE,
-                                                     ImmutableSet.of(reactor1, reactor2)));
-        } else {
-          statusCode = HttpStatus.SC_NOT_FOUND;
-        }
-
-      } else if (url.matches(STAGE_AUTOMATOR_TYPE_RESOURCES) || url.matches(STAGE_PROVIDER_TYPE_RESOURCES)
-        && HttpMethod.POST.equals(method)) {
-        // Send 200 OK
-      } else if (url.matches(RECALL_AUTOMATOR_TYPE_RESOURCES) || url.matches(RECALL_PROVIDER_TYPE_RESOURCES)
-        && HttpMethod.POST.equals(method)) {
-        // Send 200 OK
-      } else if (url.matches(DELETE_AUTOMATOR_TYPE_RESOURCES_VERSION)
-        || url.matches(DELETE_PROVIDER_TYPE_RESOURCES_VERSION) && HttpMethod.DELETE.equals(method)) {
-        // Send 200 OK
-      } else {
-        statusCode = HandlerUtils.getStatusCodeByTestStatusUserId(userId);
-      }
-
-      response.setStatusCode(statusCode);
-      if (!Strings.isNullOrEmpty(responseBody)) {
-        response.setEntity(new StringEntity(responseBody));
-      }
-
-    }
+  @GET
+  @Path(GET_ALL_AUTOMATOR_TYPES)
+  public void getAllAutomatorTypes(org.jboss.netty.handler.codec.http.HttpRequest request, HttpResponder responder)
+    throws Exception {
+    responder.sendJson(HttpResponseStatus.OK, PluginTestConstants.AUTOMATOR_LISTS, new TypeToken<List<AutomatorType>>()
+    { }.getType());
   }
+
+  @GET
+  @Path(GET_AUTOMATOR_TYPE)
+  public void getAutomatorType(org.jboss.netty.handler.codec.http.HttpRequest request, HttpResponder responder)
+    throws Exception {
+    responder.sendJson(HttpResponseStatus.OK, PluginTestConstants.AUTOMATOR_TYPE, new TypeToken<AutomatorType>() {
+    }.getType());
+  }
+
+  @GET
+  @Path(GET_NOT_EXIST_AUTOMATOR_TYPE)
+  public void getNotExistAutomatorType(org.jboss.netty.handler.codec.http.HttpRequest request, HttpResponder responder)
+    throws Exception {
+    responder.sendStatus(HttpResponseStatus.NOT_FOUND);
+  }
+
+  @GET
+  @Path(GET_AUTOMATOR_TYPE_RESOURCES)
+  public void getAutomatorTypeResources(org.jboss.netty.handler.codec.http.HttpRequest request, HttpResponder responder)
+    throws Exception {
+    responder.sendJson(HttpResponseStatus.OK, PluginTestConstants.TYPE_RESOURCES,
+                       new TypeToken<Map<String, Set<ResourceMeta>>>() { }.getType());
+  }
+
+  @GET
+  @Path(GET_NOT_EXIST_AUTOMATOR_RESOURCE)
+  public void getNotExistAutomatorTypeResources(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                                HttpResponder responder) throws Exception {
+    responder.sendStatus(HttpResponseStatus.NOT_FOUND);
+  }
+
+  @POST
+  @Path(STAGE_AUTOMATOR_TYPE_RESOURCES)
+  public void stageAutomatorTypeResources(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                          HttpResponder responder) throws Exception {
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  @POST
+  @Path(RECALL_AUTOMATOR_TYPE_RESOURCES)
+  public void recallAutomatorTypeResources(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                           HttpResponder responder) throws Exception {
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  @DELETE
+  @Path(DELETE_AUTOMATOR_TYPE_RESOURCES_VERSION)
+  public void deleteAutomatorTypeResourcesVersion(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                                  HttpResponder responder) throws Exception {
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  @GET
+  @Path(GET_ALL_PROVIDER_TYPES)
+  public void getAllProviderTypes(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                  HttpResponder responder) throws Exception {
+    responder.sendJson(HttpResponseStatus.OK, PluginTestConstants.PROVIDER_LISTS, new TypeToken<List<AutomatorType>>() {
+    }.getType());
+  }
+
+  @GET
+  @Path(GET_PROVIDER_TYPE)
+  public void getProviderType(org.jboss.netty.handler.codec.http.HttpRequest request,
+                              HttpResponder responder) throws Exception {
+    responder.sendJson(HttpResponseStatus.OK, PluginTestConstants.PROVIDER_TYPE, new TypeToken<AutomatorType>() {
+    }.getType());
+  }
+
+  @GET
+  @Path(GET_PROVIDER_TYPE_RESOURCES)
+  public void getProviderTypeResources(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                       HttpResponder responder) throws Exception {
+    responder.sendJson(HttpResponseStatus.OK, PluginTestConstants.TYPE_RESOURCES,
+                       new TypeToken<Map<String, Set<ResourceMeta>>>() {
+    }.getType());
+  }
+  @GET
+  @Path(GET_NOT_EXIST_PROVIDER_RESOURCE)
+  public void getNotExistProviderTypeResources(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                               HttpResponder responder) throws Exception {
+    responder.sendStatus(HttpResponseStatus.NOT_FOUND);
+  }
+
+  @GET
+  @Path(GET_NOT_EXIST_PROVIDER_TYPE)
+  public void getNotExistproviderType(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                      HttpResponder responder) throws Exception {
+    responder.sendStatus(HttpResponseStatus.NOT_FOUND);
+  }
+
+  @POST
+  @Path(STAGE_PROVIDER_TYPE_RESOURCES)
+  public void stageProviderTypeResources(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                         HttpResponder responder) throws Exception {
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  @POST
+  @Path(RECALL_PROVIDER_TYPE_RESOURCES)
+  public void recallProviderTypeResources(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                          HttpResponder responder) throws Exception {
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
+  @DELETE
+  @Path(DELETE_PROVIDER_TYPE_RESOURCES_VERSION)
+  public void deleteProviderTypeResourcesVersion(org.jboss.netty.handler.codec.http.HttpRequest request,
+                                                 HttpResponder responder) throws Exception {
+    responder.sendStatus(HttpResponseStatus.OK);
+  }
+
 }

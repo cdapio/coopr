@@ -28,6 +28,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -37,16 +38,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Provides way to execute http requests with Apache HttpClient {@link org.apache.http.client.HttpClient}.
  */
 public class RestClient {
 
+  public static final int CHAR_BUFFER_SIZE = 1024;
   private static final Logger LOG = LoggerFactory.getLogger(RestClient.class);
 
   private static final String HTTP_PROTOCOL = "http";
@@ -136,6 +142,46 @@ public class RestClient {
       httpResponse.close();
     }
     return resultList != null ? resultList : new ArrayList<T>();
+  }
+
+  protected <V, T> Map<V, Set<T>> getPluginTypeMap(String url, Type type) throws IOException {
+    String fullUrl = String.format("%s%s", getBaseURL(), url);
+    HttpGet getRequest = new HttpGet(fullUrl);
+    CloseableHttpResponse httpResponse = execute(getRequest);
+    Map<V, Set<T>> resultMap;
+    InputStreamReader reader = null;
+    try {
+      RestClient.analyzeResponseCode(httpResponse);
+      StringBuilder stringBuilder = new StringBuilder();
+      reader = new InputStreamReader(httpResponse.getEntity().getContent(), Charsets.UTF_8);
+      char[] buffer = new char[CHAR_BUFFER_SIZE];
+     int readedNumber;
+
+      while ((readedNumber = reader.read(buffer)) != -1) {
+        stringBuilder.append(buffer, 0, readedNumber);
+      }
+
+      resultMap = GSON.fromJson(stringBuilder.toString(), type);
+    } finally {
+      httpResponse.close();
+      if (reader != null) {
+       try {
+         reader.close();
+       }  catch (IOException e) {
+        }
+      }
+    }
+    return resultMap != null ? resultMap : new TreeMap<V, Set<T>>();
+  }
+
+  protected void execPost(URI uri) throws IOException {
+    HttpPost postRequest = new HttpPost(uri);
+    CloseableHttpResponse httpResponse = execute(postRequest);
+    try {
+      RestClient.analyzeResponseCode(httpResponse);
+    } finally {
+      httpResponse.close();
+    }
   }
 
   protected <T> T getSingle(String urlSuffix, String name, Type type) throws IOException {
