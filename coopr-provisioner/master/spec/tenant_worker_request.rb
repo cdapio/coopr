@@ -19,6 +19,7 @@
 
 require 'json'
 require 'rest_client'
+require_relative '../../bin/rest-helper'
 
 id = ARGV.shift
 num_workers = ARGV.shift
@@ -47,7 +48,7 @@ data['workers'] = num_workers.to_i
 
 begin
   json = JSON.generate(data)
-  resp = RestClient.put("http://localhost:55056/v2/tenants/#{id}", json)
+  resp = RestHelper.put("http://localhost:55056/v2/tenants/#{id}", json)
   if(resp.code == 200)
     puts "success: 200"
   else
