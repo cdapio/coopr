@@ -151,28 +151,26 @@ fi
 # Load default configuration
 load_defaults () {
   shift;
-  if [ ! -f ${COOPR_DATA_DIR}/.load_defaults ]; then
-    echo "Waiting for server to start before loading default configuration..."
-    wait_for_server
+  # We've already been loaded, do nothing and return 0
+  [ -f ${COOPR_DATA_DIR}/.load_defaults ] && return 0
 
-    echo "Loading default configuration..."
-    $COOPR_HOME/server/config/defaults/load-defaults.sh && \
-    touch $COOPR_DATA_DIR/.load_defaults
+  echo "Waiting for server to start before loading default configuration..."
+  wait_for_server
 
-    # register the default plugins with the server
-    provisioner register
+  echo "Loading default configuration..."
+  $COOPR_HOME/server/config/defaults/load-defaults.sh && touch $COOPR_DATA_DIR/.load_defaults
 
-    # load the initial plugin bundled data
-    stage_default_data
+  # register the default plugins with the server
+  provisioner register
 
-    # sync the initial data to the provisioner
-    sync_default_data
+  # load the initial plugin bundled data
+  stage_default_data
 
-    # add some workers to the superadmin tenant
-    request_superadmin_workers
-  else
-    return 0
-  fi
+  # sync the initial data to the provisioner
+  sync_default_data
+
+  # add some workers to the superadmin tenant
+  request_superadmin_workers
 }
 
 function stage_default_data () {
