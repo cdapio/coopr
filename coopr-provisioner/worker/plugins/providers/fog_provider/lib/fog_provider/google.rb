@@ -233,7 +233,12 @@ class FogProviderGoogle < Provider
       known_disks = @task['config']['disks']
 
       # fetch server object
-      server = connection.servers.get(providerid)
+      begin
+        server = connection.servers.get(providerid)
+      rescue ArgumentError => e
+        # ok, attempting to delete a server with an invalid name which cannot exist at the provider
+        log.debug("ArgumentError in when deleting server #{providerid}. Server must not exist: " + e.inspect)
+      end
 
       if known_disks.nil? && !server.nil?
         # this is the first delete attempt, persist the names of the currently attached disks
