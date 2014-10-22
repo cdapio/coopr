@@ -173,90 +173,85 @@ load_defaults () {
   request_superadmin_workers
 }
 
-function stage_default_data () {
-    echo "Waiting for plugins to be registered..."
-    wait_for_plugin_registration
+stage_default_data () {
+  echo "Waiting for plugins to be registered..."
+  wait_for_plugin_registration
 
-    cd ${COOPR_PROVISIONER_PLUGIN_DIR}
-    echo "Loading initial data..."
-    for script in $(ls -1 */*/load-bundled-data.sh) ; do
-      ${COOPR_PROVISIONER_PLUGIN_DIR}/${script}
-    done
+  cd ${COOPR_PROVISIONER_PLUGIN_DIR}
+  echo "Loading initial data..."
+  for script in $(ls -1 */*/load-bundled-data.sh) ; do
+    ${COOPR_PROVISIONER_PLUGIN_DIR}/${script}
+  done
 }
 
-function sync_default_data () {
-    echo "Syncing initial data..."
-    curl $CURL_PARAMETER --silent --request POST \
-      --header "Coopr-UserID:${COOPR_API_USER}" \
-      --header "Coopr-TenantID:${COOPR_TENANT}" \
-      --connect-timeout 5 \
-      $COOPR_SERVER_URI/v2/plugins/sync
+sync_default_data () {
+  echo "Syncing initial data..."
+  curl ${CURL_PARAMETER} --silent --request POST \
+    --header "Coopr-UserID:${COOPR_API_USER}" \
+    --header "Coopr-TenantID:${COOPR_TENANT}" \
+    --connect-timeout 5 \
+    ${COOPR_SERVER_URI}/v2/plugins/sync
 }
 
-function request_superadmin_workers () {
+request_superadmin_workers () {
+  [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ] && sleep 5 || wait_for_provisioner
 
-    if [ "x${COOPR_USE_DUMMY_PROVISIONER}" != "xtrue" ]; then
-        wait_for_provisioner
-    else
-        sleep 5
-    fi
-
-    echo "Requesting ${COOPR_NUM_WORKERS} workers for default tenant..."
-    curl $CURL_PARAMETER --silent --request PUT \
-      --header "Content-Type:application/json" \
-      --header "Coopr-UserID:${COOPR_API_USER}" \
-      --header "Coopr-TenantID:${COOPR_TENANT}" \
-      --connect-timeout 5 --data "{ \"tenant\":{\"workers\":${COOPR_NUM_WORKERS}, \"name\":\"superadmin\"} }" \
-      $COOPR_SERVER_URI/v2/tenants/superadmin
+  echo "Requesting ${COOPR_NUM_WORKERS} workers for default tenant..."
+  curl ${CURL_PARAMETER} --silent --request PUT \
+    --header "Content-Type:application/json" \
+    --header "Coopr-UserID:${COOPR_API_USER}" \
+    --header "Coopr-TenantID:${COOPR_TENANT}" \
+    --connect-timeout 5 --data "{ \"tenant\":{\"workers\":${COOPR_NUM_WORKERS}, \"name\":\"superadmin\"} }" \
+    ${COOPR_SERVER_URI}/v2/tenants/superadmin
 }
 
-function wait_for_server () {
-    RETRIES=0
-    until [[ $(curl $CURL_PARAMETER $COOPR_SERVER_URI/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
-        sleep 2
-        ((RETRIES++))
-    done
+wait_for_server () {
+  RETRIES=0
+  until [[ $(curl ${CURL_PARAMETER} ${COOPR_SERVER_URI}/status 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
+      sleep 2
+      let "RETRIES++"
+  done
 
-    if [ $RETRIES -gt 60 ]; then
-        die "ERROR: Server did not successfully start"
-    fi
+  if [ ${RETRIES} -gt 60 ]; then
+      die "Server did not successfully start"
+  fi
 }
 
-function wait_for_plugin_registration () {
-    RETRIES=0
-    until [[ $(curl $CURL_PARAMETER --silent --request GET \
-                 --output /dev/null --write-out "%{http_code}" \
-                 --header "Coopr-UserID:${COOPR_API_USER}" \
-                 --header "Coopr-TenantID:${COOPR_TENANT}" \
-                 $COOPR_SERVER_URI/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
-        sleep 2
-        ((RETRIES++))
-    done
+wait_for_plugin_registration () {
+  RETRIES=0
+  until [[ $(curl ${CURL_PARAMETER} --silent --request GET \
+    --output /dev/null --write-out "%{http_code}" \
+    --header "Coopr-UserID:${COOPR_API_USER}" \
+    --header "Coopr-TenantID:${COOPR_TENANT}" \
+    ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || ${RETRIES} -gt 60 ]]; do
+    sleep 2
+    let "RETRIES++"
+  done
 
-    if [ $RETRIES -gt 60 ]; then
-        die "ERROR: Provisioner did not successfully register plugins"
-    fi
+  if [ ${RETRIES} -gt 60 ]; then
+    die "Provisioner did not successfully register plugins"
+  fi
 }
 
-function wait_for_provisioner () {
-    RETRIES=0
-    until [[ $(curl http://localhost:55056/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
-        sleep 2
-        ((RETRIES++))
-    done
+wait_for_provisioner () {
+  RETRIES=0
+  until [[ $(curl http://localhost:55056/status 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
+    sleep 2
+    let "RETRIES++"
+  done
 
-    if [ $RETRIES -gt 60 ]; then
-        die "ERROR: Provisioner did not successfully start"
-    fi
+  if [ ${RETRIES} -gt 60 ]; then
+    die "Provisioner did not successfully start"
+  fi
 }
 
 function provisioner () {
-    if [ "x$1" == "xstart" ]
+    if [ "$1" == "start" ]
     then
         echo "Waiting for server to start before running provisioner..."
         wait_for_server
     fi
-    if [ "x${COOPR_USE_DUMMY_PROVISIONER}" == "xtrue" ]
+    if [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ]
     then
         $COOPR_HOME/server/bin/dummy-provisioner.sh $@
     else
@@ -264,22 +259,20 @@ function provisioner () {
     fi
 }
 
-function ui () {
-    if [ "x${COOPR_DISABLE_UI}" == "xtrue" ]
-    then
-        echo "UI disabled... skipping..."
-        return 0
-    fi
-    if [ "x${COOPR_USE_NGUI}" == "xtrue" ]
-    then
-        $COOPR_HOME/ngui/bin/ngui.sh $1
-    else
-        $COOPR_HOME/ui/bin/ui.sh $1
-    fi
+ui () {
+  if [ "${COOPR_DISABLE_UI}" == "true" ]; then
+    echo "UI disabled... skipping..."
+    return 0
+  fi
+  if [ "${COOPR_USE_NGUI}" == "true" ]; then
+    ${COOPR_HOME}/ngui/bin/ngui.sh ${1}
+  else
+    ${COOPR_HOME}/ui/bin/ui.sh ${1}
+  fi
 }
 
 function greeting () {
-    [ "x${COOPR_DISABLE_UI}" == "xtrue" ] && return 0
+    [ "${COOPR_DISABLE_UI}" == "true" ] && return 0
     echo
     echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
 }
