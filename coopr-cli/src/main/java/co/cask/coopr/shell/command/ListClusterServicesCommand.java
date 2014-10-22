@@ -40,7 +40,7 @@ public class ListClusterServicesCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String id = CliUtil.checkArgument(arguments.get(CLUSTER_ID_KEY));
+    String id = arguments.get(CLUSTER_ID_KEY);
     printStream.print(CliUtil.getPrettyJson(clusterClient.getClusterServices(id)));
   }
 

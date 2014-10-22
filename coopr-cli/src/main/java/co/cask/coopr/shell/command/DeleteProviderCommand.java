@@ -40,7 +40,7 @@ public class DeleteProviderCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String name = CliUtil.checkArgument(arguments.get(NAME_KEY));
+    String name = arguments.get(NAME_KEY);
     adminClient.deleteProvider(name);
   }
 

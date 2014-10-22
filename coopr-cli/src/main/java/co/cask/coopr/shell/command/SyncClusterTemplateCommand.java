@@ -40,7 +40,7 @@ public class SyncClusterTemplateCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String clusterId = CliUtil.checkArgument(arguments.get(CLUSTER_ID_KEY));
+    String clusterId = arguments.get(CLUSTER_ID_KEY);
     clusterClient.syncClusterTemplate(clusterId);
   }
 

@@ -49,8 +49,8 @@ public class CreateClusterCommand implements Command {
     if (builder == null) {
       builder = ClusterCreateRequest.builder();
     }
-    String name = CliUtil.checkArgument(arguments.get(NAME_KEY));
-    String template = CliUtil.checkArgument(arguments.get(TEMPLATE_KEY));
+    String name = arguments.get(NAME_KEY);
+    String template = arguments.get(TEMPLATE_KEY);
     int size = arguments.getInt(SIZE_KEY);
     builder.setName(name);
     builder.setClusterTemplateName(template);

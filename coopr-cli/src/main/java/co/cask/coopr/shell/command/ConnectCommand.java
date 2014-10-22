@@ -47,7 +47,7 @@ public class ConnectCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String host = CliUtil.checkArgument(arguments.get(HOST_KEY));
+    String host = arguments.get(HOST_KEY);
     boolean ssl = ssl(arguments);
     int port;
     if (arguments.hasArgument(PORT_KEY)) {
@@ -60,14 +60,14 @@ public class ConnectCommand implements Command {
     if (!CliUtil.isAvailable(host, port)) {
       throw new IOException(String.format("Host %s on port %d could not be reached", host, port));
     }
-    String userId = CliUtil.checkArgument(arguments.get(USER_ID_KEY));
-    String tenantId = CliUtil.checkArgument(arguments.get(TENANT_ID_KEY));
+    String userId = arguments.get(USER_ID_KEY);
+    String tenantId = arguments.get(TENANT_ID_KEY);
 
     cliConfig.setConnection(host, port, ssl, userId, tenantId);
   }
 
   private boolean ssl(Arguments arguments) {
-    return arguments.hasArgument(SSL_KEY) && CliUtil.checkArgument(arguments.get(SSL_KEY)).equalsIgnoreCase("enabled");
+    return arguments.hasArgument(SSL_KEY) && arguments.get(SSL_KEY).equalsIgnoreCase("enabled");
   }
 
   @Override

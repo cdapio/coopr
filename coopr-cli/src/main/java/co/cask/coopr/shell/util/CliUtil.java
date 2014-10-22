@@ -75,20 +75,11 @@ public class CliUtil {
     if (arguments.hasArgument(argKey)) {
       String arg = arguments.get(argKey);
       Gson gson = new Gson();
-      if (arg.startsWith(ARG_WRAPPER) && arg.endsWith(ARG_WRAPPER)) {
-        arg = arg.substring(1, arg.length() - 1);
-        if (arg.startsWith(FILE_PREFIX)) {
-          String argFilePath = arg.substring(FILE_PREFIX.length());
-          return gson.fromJson(new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8), type);
-        } else {
-          throw new IllegalArgumentException(String.format("Argument must starts with %s prefix", FILE_PREFIX));
-        }
-      } else {
-        if (!(arg.startsWith(JSON_WRAPPER) && arg.endsWith(JSON_WRAPPER))) {
-          throw new IllegalArgumentException("Json must be contained in single quotes");
-        }
-        return gson.fromJson(arg.substring(1, arg.length() - 1), type);
+      if (arg.startsWith(FILE_PREFIX)) {
+        String argFilePath = arg.substring(FILE_PREFIX.length());
+        return gson.fromJson(new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8), type);
       }
+      return gson.fromJson(arg, type);
     }
     return null;
   }

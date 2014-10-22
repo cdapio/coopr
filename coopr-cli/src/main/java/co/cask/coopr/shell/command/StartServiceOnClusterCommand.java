@@ -43,8 +43,8 @@ public class StartServiceOnClusterCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String clusterId = CliUtil.checkArgument(arguments.get(CLUSTER_ID_KEY));
-    String serviceId = CliUtil.checkArgument(arguments.get(SERVICE_ID_KEY));
+    String clusterId = arguments.get(CLUSTER_ID_KEY);
+    String serviceId = arguments.get(SERVICE_ID_KEY);
     ClusterOperationRequest clusterOperationRequest = CliUtil.getObjectFromJson(arguments, PROVIDER_FIELDS_KEY,
                                                                                 ClusterOperationRequest.class);
     if (clusterOperationRequest == null) {
