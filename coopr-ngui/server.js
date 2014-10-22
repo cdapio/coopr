@@ -14,6 +14,7 @@ var pkg = require('./package.json'),
     serveFavicon = require('serve-favicon'),
     corsAnywhere = require('cors-anywhere'),
 
+    COOPR_SSL = ('true' == process.env.COOPR_SSL) || false;
     COOPR_UI_PORT = parseInt(process.env.COOPR_UI_PORT || 8080, 10),
     COOPR_UI_SSL_PORT = parseInt(process.env.COOPR_UI_SSL_PORT || 8443, 10),
     COOPR_UI_KEY_FILE = process.env.COOPR_UI_KEY_FILE || 'cert/server.key',
@@ -107,7 +108,7 @@ app.get('/robots.txt', [
 app.all('*', [
     httpIndexLogger,
     function (req, res) {
-        if (sslStarted && !req.secure) {
+        if (COOPR_SSL && sslStarted && !req.secure) {
             res.redirect(['https://', req.hostname,
                 ':', COOPR_UI_SSL_PORT, req.originalUrl
             ].join(''));
@@ -120,10 +121,13 @@ app.all('*', [
 httpServer.listen(COOPR_UI_PORT, null, null, function () {
     console.info(httpLabel + ' listening on port %s', COOPR_UI_PORT);
 });
-httpsServer.listen(COOPR_UI_SSL_PORT, null, null, function () {
-    console.info(httpLabel + ' listening on port %s', COOPR_UI_SSL_PORT);
-    sslStarted = true;
-});
+
+if (COOPR_SSL) {
+    httpsServer.listen(COOPR_UI_SSL_PORT, null, null, function () {
+        console.info(httpLabel + ' listening on port %s', COOPR_UI_SSL_PORT);
+        sslStarted = true;
+    });
+}
 
 /**
  * CORS proxy

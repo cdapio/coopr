@@ -135,10 +135,10 @@ fi
 
 # Setup coopr configuration
 COOPR_PROTOCOL=http
-line=`awk '/server.ssl.enable/{print NR; exit}' ${COOPR_SERVER_CONF}/coopr-site.xml`
-let "line++"
-ssl=`sed -n "${line}p" ${COOPR_SERVER_CONF}/coopr-site.xml | awk -F"<|>" '{print $3}'`
-if [ ! -z ${ssl} ] && [ ${ssl} = "true" ]; then
+line=`awk '/server.ssl.enable/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-site.xml`
+line=$((line+1))
+export COOPR_SSL=`sed -n "${line}p" ${COOPR_SERVER_CONF}coopr-site.xml | awk -F"<|>" '{print $3}'`
+if [ ! -z $COOPR_SSL ] && [ $COOPR_SSL = "true" ]; then
   COOPR_PROTOCOL=https
 fi
 export COOPR_SERVER_URI=${COOPR_PROTOCOL}://localhost:55054
