@@ -33,7 +33,7 @@ function login(tenant, username, password) {
       element(by.id('loginPassword')).clear().sendKeys(password);
       element(by.partialButtonText('Submit')).click();
 
-      browser.wait(isLoggedIn, 30000);
+      browser.wait(isLoggedIn, 10000);
     });
 }
 
@@ -44,7 +44,7 @@ function logout() {
     .then(function (dd) {
       if(!dd) {
         element(by.css('header .navbar-right .dropdown-toggle')).click();
-        browser.wait(ddIsOpen, 30000);        
+        browser.wait(ddIsOpen, 10000);        
       }
 
       element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
@@ -53,7 +53,7 @@ function logout() {
         return element(
           by.cssContainingText('#alerts .alert-info', 'You are now logged out')
         ).isPresent();
-      }, 30000);
+      }, 10000);
     });
 }
 
