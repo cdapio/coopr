@@ -245,19 +245,19 @@ wait_for_provisioner () {
   fi
 }
 
-function provisioner () {
-    if [ "$1" == "start" ]
-    then
-        echo "Waiting for server to start before running provisioner..."
-        wait_for_server
-    fi
-    if [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ]
-    then
-        $COOPR_HOME/server/bin/dummy-provisioner.sh $@
-    else
-        $COOPR_HOME/provisioner/bin/provisioner.sh $1
-    fi
+provisioner () {
+  if [ "$1" == "start" ]; then
+    echo "Waiting for server to start before running provisioner..."
+    wait_for_server
+  fi
+  if [ "${COOPR_USE_DUMMY_PROVISIONER}" == "true" ]; then
+    ${COOPR_HOME}/server/bin/dummy-provisioner.sh ${@}
+  else
+    ${COOPR_HOME}/provisioner/bin/provisioner.sh ${1}
+  fi
 }
+
+server () { ${COOPR_HOME}/server/bin/server.sh ${1}; }
 
 ui () {
   if [ "${COOPR_DISABLE_UI}" == "true" ]; then
@@ -271,51 +271,22 @@ ui () {
   fi
 }
 
-function greeting () {
-    [ "${COOPR_DISABLE_UI}" == "true" ] && return 0
-    echo
-    echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
+greeting () {
+  [ "${COOPR_DISABLE_UI}" == "true" ] && return 0
+  echo
+  echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
 }
 
-function stop () {
-    provisioner stop
-    $COOPR_HOME/server/bin/server.sh stop
-    ui stop
-}
+stop () { provisioner stop; server stop; ui stop; }
 
-function start () {
-    $COOPR_HOME/server/bin/server.sh start && \
-    ui start && \
-    provisioner start && \
-    load_defaults && \
-    greeting
-}
+start () { server start && ui start && provisioner start && load_defaults && greeting; }
 
-case "$1" in
-  start)
-    start
-  ;;
-
-  stop)
-    stop
-  ;;
-
-  restart)
-    stop
-    start
-  ;;
-
-  status)
-    $COOPR_HOME/server/bin/server.sh status
-    ui status
-    provisioner status
-  ;;
-
-  *)
-    echo "Usage: $0 {start|stop|restart|status}"
-    exit 1
-  ;;
-
-
+# Main
+case ${1} in
+  start|stop) ${1} ;;
+  restart) stop; start ;;
+  status) for i in server ui provisioner ; do ${i} status ; done ;;
+  *) echo "Usage: $0 {start|stop|restart|status}"; exit 1 ;;
 esac
+
 exit $?
