@@ -98,7 +98,10 @@ class FogProviderOpenstack < Provider
         (server.addresses['public'] ||= []) << { 'version' => 4, 'addr' => floating_address }
       end
 
-      bootstrap_ip = primary_public_ip_address(server.addresses)
+      bootstrap_ip =
+        primary_public_ip_address(server.addresses) ||
+        primary_private_ip_address(server.addresses) ||
+        server.addresses.first[1][0]['addr']
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
         fail 'No IP address available for bootstrapping.'
