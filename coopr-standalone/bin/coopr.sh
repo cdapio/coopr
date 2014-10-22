@@ -24,88 +24,75 @@ export COOPR_API_USER=${COOPR_API_USER:-admin}
 export COOPR_TENANT=${COOPR_TENANT:-superadmin}
 export COOPR_NUM_WORKERS=${COOPR_NUM_WORKERS:-5}
 
-
 APP_NAME="coopr-standalone"
-APP_BASE_NAME=`basename "$0"`
 
-function program_is_installed {
-  # set to 0 initially
-  local return_=0
-  # set to 0 if not found
-  type $1 >/dev/null 2>&1 || { local return_=1; }
-  # return value
-  return $return_
-}
+program_is_installed ( ) { type ${1} >/dev/null 2>&1; }
 
-warn ( ) {
-    echo "$*"
-}
+warn ( ) { echo "WARN: ${*}"; }
 
-die ( ) {
-    echo
-    echo "$*"
-    echo
-    exit 1
-}
+die ( ) { echo ; echo "ERROR: ${*}" ; echo ; exit 1; }
 
 # Attempt to set APP_HOME
 # Resolve links: $0 may be a link
-PRG="$0"
+PRG=${0}
 # Need this for relative symlinks.
-while [ -h "$PRG" ] ; do
-    ls=`ls -ld "$PRG"`
-    link=`expr "$ls" : '.*-> \(.*\)$'`
-    if expr "$link" : '/.*' > /dev/null; then
-        PRG="$link"
+while [ -h ${PRG} ]; do
+    ls=`ls -ld ${PRG}`
+    link=`expr ${ls} : '.*-> \(.*\)$'`
+    if expr ${link} : '/.*' > /dev/null; then
+        PRG=${link}
     else
-        PRG=`dirname "$PRG"`"/$link"
+        PRG=`dirname ${PRG}`/${link}
     fi
 done
-SAVED="`pwd`"
-cd "`dirname \"$PRG\"`/.." >&-
-APP_HOME="`pwd -P`"
+SAVED=`pwd`
+cd `dirname ${PRG}`/.. >&-
+APP_HOME=`pwd -P`
 
 export PID_DIR=/var/tmp
-export COOPR_HOME=$APP_HOME
-export COOPR_SERVER_HOME=$APP_HOME/server
-export COOPR_SERVER_CONF=$COOPR_HOME/server/conf/
-export COOPR_PROVISIONER_CONF=$COOPR_HOME/provisioner/master/conf
-export PROVISIONER_SITE_CONF=$COOPR_PROVISIONER_CONF/provisioner-site.xml
-export COOPR_PROVISIONER_PLUGIN_DIR=$COOPR_HOME/provisioner/worker/plugins
-export COOPR_LOG_DIR=$COOPR_HOME/logs
-export COOPR_DATA_DIR=$COOPR_HOME/data
+
+# MAINDIR=$(cd $(dirname ${BASH_SOURCE[0]})/../.. && pwd)
+
+export COOPR_HOME=${APP_HOME}
+export COOPR_SERVER_HOME=${COOPR_HOME}/server
+export COOPR_SERVER_CONF=${COOPR_HOME}/server/conf
+export COOPR_PROVISIONER_CONF=${COOPR_HOME}/provisioner/master/conf
+export PROVISIONER_SITE_CONF=${COOPR_PROVISIONER_CONF}/provisioner-site.xml
+export COOPR_PROVISIONER_PLUGIN_DIR=${COOPR_HOME}/provisioner/worker/plugins
+export COOPR_LOG_DIR=${COOPR_HOME}/logs
+export COOPR_DATA_DIR=${COOPR_HOME}/data
 
 # Add embedded bin PATH, if it exists
-if [ -d ${COOPR_HOME}/embedded/bin ] ; then
+if [ -d ${COOPR_HOME}/embedded/bin ]; then
     export PATH=${COOPR_HOME}/embedded/bin:${PATH}
 fi
 
 # Create log dir
-mkdir -p $COOPR_LOG_DIR || die "Could not create dir $COOPR_LOG_DIR: $!"
+mkdir -p ${COOPR_LOG_DIR} || die "Could not create dir ${COOPR_LOG_DIR}: ${!}"
 
 # Create data dir
-mkdir -p $COOPR_DATA_DIR || die "Could not create dir $COOPR_DATA_DIR: $!"
-SED_COOPR_DATA_DIR=`echo $COOPR_DATA_DIR | sed 's:/:\\\/:g'`
-sed -i.old "s/COOPR_DATA_DIR/$SED_COOPR_DATA_DIR/g" $COOPR_SERVER_CONF/coopr-site.xml
-sed -i.old "s/COOPR_DATA_DIR/$SED_COOPR_DATA_DIR/g" $COOPR_PROVISIONER_CONF/provisioner-site.xml
+mkdir -p ${COOPR_DATA_DIR} || die "Could not create dir ${COOPR_DATA_DIR}: ${!}"
+SED_COOPR_DATA_DIR=`echo ${COOPR_DATA_DIR} | sed 's:/:\\\/:g'`
+sed -i.old "s/COOPR_DATA_DIR/${SED_COOPR_DATA_DIR}/g" ${COOPR_SERVER_CONF}/coopr-site.xml
+sed -i.old "s/COOPR_DATA_DIR/${SED_COOPR_DATA_DIR}/g" ${COOPR_PROVISIONER_CONF}/provisioner-site.xml
 
 # Determine the Java command to use to start the JVM.
-if [ -n "$JAVA_HOME" ] ; then
-    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+if [ -n "${JAVA_HOME}" ]; then
+    if [ -x "${JAVA_HOME}/jre/sh/java" ]; then
         # IBM's JDK on AIX uses strange locations for the executables
-        JAVACMD="$JAVA_HOME/jre/sh/java"
+        JAVACMD="${JAVA_HOME}/jre/sh/java"
     else
-        JAVACMD="$JAVA_HOME/bin/java"
+        JAVACMD="${JAVA_HOME}/bin/java"
     fi
-    if [ ! -x "$JAVACMD" ] ; then
-        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+    if [ ! -x "${JAVACMD}" ]; then
+        die "JAVA_HOME is set to an invalid directory: ${JAVA_HOME}
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
     fi
 else
     JAVACMD="java"
-    which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+    which java >/dev/null 2>&1 || die "JAVA_HOME is not set and no 'java' command could be found in your PATH.
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
@@ -113,84 +100,79 @@ fi
 
 # java version check
 JAVA_VERSION=`java -version 2>&1 | grep "java version" | awk '{print $3}' | awk -F '.' '{print $2}'`
-if [ $JAVA_VERSION -ne 6 ] && [ $JAVA_VERSION -ne 7 ]; then
+if [ ${JAVA_VERSION} -ne 6 ] && [ ${JAVA_VERSION} -ne 7 ]; then
   die "ERROR: Java version not supported
 Please install Java 6 or 7 - other versions of Java are not yet supported."
 fi
 
 # Check node installation
-program_is_installed node || die "Node.js is not installed
-Please install Node.js - the minimum version supported v0.10.26."
+program_is_installed node || die "Node.JS is not installed
+Please install Node.JS - the minimum version supported v0.10.26."
 
 # Check node version
 NODE_VERSION=`node -v 2>&1`
-NODE_VERSION_MAJOR=`echo $NODE_VERSION | awk -F '.' ' { print $2 } '`
-NODE_VERSION_MINOR=`echo $NODE_VERSION | awk -F '.' ' { print $3 } '`
-if [ $NODE_VERSION_MAJOR -lt 10 ]; then
-  die "ERROR: Node.js version is not supported
-The minimum version supported is v0.10.26."
-elif [ $NODE_VERSION_MAJOR -eq 10 ] && [ $NODE_VERSION_MINOR -lt 26 ]; then
-  die "ERROR: Node.js version is not supported
-The minimum version supported is v0.10.26."
+NODE_VERSION_MINOR=`echo ${NODE_VERSION} | awk -F '.' '{print $2}'`
+NODE_VERSION_PATCH=`echo ${NODE_VERSION} | awk -F '.' '{print $3}'`
+if [ ${NODE_VERSION_MINOR} -lt 10 ]; then
+  die "Node.JS version is not supported! The minimum version supported is v0.10.26."
+elif [ ${NODE_VERSION_MINOR} -eq 10 ] && [ ${NODE_VERSION_PATCH} -lt 26 ]; then
+  die "Node.JS version is not supported! The minimum version supported is v0.10.26."
 fi
 
 # Check ruby installation
-program_is_installed ruby || die "Ruby is not installed
-Please install ruby - the minimum version supported v1.9.0p0."
+program_is_installed ruby || die "Ruby not found! Please install Ruby - the minimum version supported v1.9.0p0"
 
 # Check ruby version
 RUBY_VERSION=`ruby -v 2>&1 | awk '{print $2}'`
-RUBY_VERSION_MAJOR=`echo $RUBY_VERSION | awk -F '.' ' { print $1 } '`
-RUBY_VERSION_MINOR=`echo $RUBY_VERSION | awk -F '.' ' { print $2 } '`
-RUBY_VERSION_PATCH=`echo $RUBY_VERSION | awk -F '.' ' { print $3 } '`
-if [ $RUBY_VERSION_MAJOR -lt 1 ]; then
-  die "ERROR: Ruby version is not supported
-The minimum version supported is v1.9.0p0"
-elif [ $RUBY_VERSION_MAJOR -eq 1 ] && [ $RUBY_VERSION_MINOR -lt 9 ]; then
-  die "ERROR: Ruby version is not supported
-The minimum version supported is v1.9.0p0"
+RUBY_VERSION_MAJOR=`echo ${RUBY_VERSION} | awk -F '.' '{print $1}'`
+RUBY_VERSION_MINOR=`echo ${RUBY_VERSION} | awk -F '.' '{print $2}'`
+RUBY_VERSION_PATCH=`echo ${RUBY_VERSION} | awk -F '.' '{print $3}'`
+if [ ${RUBY_VERSION_MAJOR} -lt 1 ]; then
+  die "Ruby version is not supported! The minimum version supported is v1.9.0p0"
+elif [ ${RUBY_VERSION_MAJOR} -eq 1 ] && [ ${RUBY_VERSION_MINOR} -lt 9 ]; then
+  die "Ruby version is not supported! The minimum version supported is v1.9.0p0"
 fi
 
 # Setup coopr configuration
 COOPR_PROTOCOL=http
-line=`awk '/server.ssl.enable/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-site.xml`
-line=$((line+1))
-ssl=`sed -n "${line}p" ${COOPR_SERVER_CONF}coopr-site.xml | awk -F"<|>" '{print $3}'`
-if [ ! -z $ssl ] && [ $ssl = "true" ]; then
+line=`awk '/server.ssl.enable/{print NR; exit}' ${COOPR_SERVER_CONF}/coopr-site.xml`
+let "line++"
+ssl=`sed -n "${line}p" ${COOPR_SERVER_CONF}/coopr-site.xml | awk -F"<|>" '{print $3}'`
+if [ ! -z ${ssl} ] && [ ${ssl} = "true" ]; then
   COOPR_PROTOCOL=https
 fi
-export COOPR_SERVER_URI=$COOPR_PROTOCOL://localhost:55054
+export COOPR_SERVER_URI=${COOPR_PROTOCOL}://localhost:55054
 
-if [ $COOPR_PROTOCOL = "https" ]; then
+if [ ${COOPR_PROTOCOL} = "https" ]; then
   export CURL_PARAMETER="--insecure"
   export COOPR_REJECT_UNAUTH=false
 fi
 
 # Load default configuration
-function load_defaults () {
-    shift;
-    if [ ! -f $COOPR_DATA_DIR/.load_defaults ]; then
-        echo "Waiting for server to start before loading default configuration..."
-        wait_for_server
+load_defaults () {
+  shift;
+  if [ ! -f ${COOPR_DATA_DIR}/.load_defaults ]; then
+    echo "Waiting for server to start before loading default configuration..."
+    wait_for_server
 
-        echo "Loading default configuration..."
-        $COOPR_HOME/server/config/defaults/load-defaults.sh && \
-        touch $COOPR_DATA_DIR/.load_defaults
+    echo "Loading default configuration..."
+    $COOPR_HOME/server/config/defaults/load-defaults.sh && \
+    touch $COOPR_DATA_DIR/.load_defaults
 
-        # register the default plugins with the server
-        provisioner register
+    # register the default plugins with the server
+    provisioner register
 
-        # load the initial plugin bundled data
-        stage_default_data
+    # load the initial plugin bundled data
+    stage_default_data
 
-        # sync the initial data to the provisioner
-        sync_default_data
+    # sync the initial data to the provisioner
+    sync_default_data
 
-        # add some workers to the superadmin tenant
-        request_superadmin_workers
-    else
-        return 0
-    fi
+    # add some workers to the superadmin tenant
+    request_superadmin_workers
+  else
+    return 0
+  fi
 }
 
 function stage_default_data () {
