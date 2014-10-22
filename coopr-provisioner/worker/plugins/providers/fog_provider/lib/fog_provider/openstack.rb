@@ -119,7 +119,8 @@ class FogProviderOpenstack < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
       }
-      # Additional checks
+      # do we need sudo bash?
+      sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
 
       # login with pseudotty and turn off sudo requiretty option
