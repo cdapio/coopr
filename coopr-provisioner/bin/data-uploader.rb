@@ -29,7 +29,7 @@ require 'zlib'
 
 # Parse command line options.
 options = {}
-OptionParser.new do |opts|
+op = OptionParser.new do |opts|
   opts.banner = "Usage: #{$PROGRAM_NAME} [options] <action> <local-path> <remote-target>"
   opts.on('-u', '--uri URI', 'Server URI, defaults to ENV[\'COOPR_SERVER_URI\'] else "http://localhost:55054"') do |u|
     options[:uri] = u
@@ -56,7 +56,8 @@ OptionParser.new do |opts|
   opts.separator 'Example:'
   opts.separator "  #{$PROGRAM_NAME} -u http://localhost:55054 -t superadmin -U admin sync ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop"
   opts.separator ''
-end.parse!(ARGV)
+end
+op.parse!(ARGV)
 
 server_uri = options[:uri] || ENV['COOPR_SERVER_URI'] || 'http://localhost:55054'
 options[:uri] = server_uri
