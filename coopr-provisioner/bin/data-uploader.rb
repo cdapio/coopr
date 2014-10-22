@@ -29,35 +29,41 @@ require 'zlib'
 
 # Parse command line options.
 options = {}
-op = OptionParser.new do |opts|
-  opts.banner = "Usage: #{$PROGRAM_NAME} [options] <action> <local-path> <remote-target>"
-  opts.on('-u', '--uri URI', 'Server URI, defaults to ENV[\'COOPR_SERVER_URI\'] else "http://localhost:55054"') do |u|
-    options[:uri] = u
-  end
-  opts.on('-t', '--tenant TENANT', 'Tenant, defaults to ENV[\'COOPR_TENANT\'] else "superadmin"') do |t|
-    options[:tenant] = t
-  end
-  opts.on('-U', '--user USER', 'User, defaults to ENV[\'COOPR_API_USER\'] else "admin"') do |u|
-    options[:user] = u
-  end
-  opts.on('-q', '--quiet', 'Suppress all non-error output') do
-    options[:quiet] = true
-  end
+begin
+  op = OptionParser.new do |opts|
+    opts.banner = "Usage: #{$PROGRAM_NAME} [options] <action> <local-path> <remote-target>"
+    opts.on('-u', '--uri URI', 'Server URI, defaults to ENV[\'COOPR_SERVER_URI\'] else "http://localhost:55054"') do |u|
+      options[:uri] = u
+    end
+    opts.on('-t', '--tenant TENANT', 'Tenant, defaults to ENV[\'COOPR_TENANT\'] else "superadmin"') do |t|
+      options[:tenant] = t
+    end
+    opts.on('-U', '--user USER', 'User, defaults to ENV[\'COOPR_API_USER\'] else "admin"') do |u|
+      options[:user] = u
+    end
+    opts.on('-q', '--quiet', 'Suppress all non-error output') do
+      options[:quiet] = true
+    end
 
-  opts.separator ''
-  opts.separator 'Required Arguments:'
-  opts.separator '         <action>: one of upload, stage, or sync:'
-  opts.separator '                     upload: uploads a single resource to the server'
-  opts.separator '                     stage: uploads and stages a single resource to the server'
-  opts.separator '                     sync: uploads and stages a single resource, then executes a sync on all staged resources'
-  opts.separator '     <local-path>: path to the local copy of the resource to upload'
-  opts.separator '  <remote-target>: api path defining the resource'
-  opts.separator ''
-  opts.separator 'Example:'
-  opts.separator "  #{$PROGRAM_NAME} -u http://localhost:55054 -t superadmin -U admin sync ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop"
-  opts.separator ''
+    opts.separator ''
+    opts.separator 'Required Arguments:'
+    opts.separator '         <action>: one of upload, stage, or sync:'
+    opts.separator '                     upload: uploads a single resource to the server'
+    opts.separator '                     stage: uploads and stages a single resource to the server'
+    opts.separator '                     sync: uploads and stages a single resource, then executes a sync on all staged resources'
+    opts.separator '     <local-path>: path to the local copy of the resource to upload'
+    opts.separator '  <remote-target>: api path defining the resource'
+    opts.separator ''
+    opts.separator 'Example:'
+    opts.separator "  #{$PROGRAM_NAME} -u http://localhost:55054 -t superadmin -U admin sync ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop"
+    opts.separator ''
+  end
+  op.parse!(ARGV)
+rescue OptionParser::InvalidArgument, OptionParser::InvalidOption
+  puts "Invalid Argument/Options: #{$!}"
+  puts op # prints usage
+  exit 1
 end
-op.parse!(ARGV)
 
 server_uri = options[:uri] || ENV['COOPR_SERVER_URI'] || 'http://localhost:55054'
 options[:uri] = server_uri
