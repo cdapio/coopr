@@ -1243,7 +1243,7 @@ All the tasks that were running before work was stopped, continue running until 
 HTTP Responses
 ^^^^^^^^^^^^^^
 .. list-table::
-:widths: 15 10
+   :widths: 15 10
    :header-rows: 1
 
      * - Status Code
@@ -1280,7 +1280,7 @@ To resume a cluster job that was paused, make a POST HTTP request to URI:
 HTTP Responses
 ^^^^^^^^^^^^^^
 .. list-table::
-:widths: 15 10
+   :widths: 15 10
    :header-rows: 1
 
        * - Status Code
