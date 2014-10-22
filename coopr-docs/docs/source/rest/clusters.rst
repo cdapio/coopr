@@ -1246,16 +1246,16 @@ HTTP Responses
    :widths: 15 10
    :header-rows: 1
 
-     * - Status Code
-       - Description
-     * - 200 (OK)
-       - Successful
-     * - 404 (NOT FOUND)
-       - If the cluster requested is not found.
-     * - 409 (CONFLICT)
-       - If the cluster is in the process of performing some other action.
-     * - 500 (INTERNAL_SERVER_ERROR)
-       - Internal server error
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - If the cluster is in the process of performing some other action.
+   * - 500 (INTERNAL_SERVER_ERROR)
+     - Internal server error
 
 Example
 ^^^^^^^
@@ -1283,16 +1283,16 @@ HTTP Responses
    :widths: 15 10
    :header-rows: 1
 
-       * - Status Code
-         - Description
-       * - 200 (OK)
-         - Successful
-       * - 404 (NOT FOUND)
-         - If the cluster requested is not found.
-       * - 409 (CONFLICT)
-         - If the cluster is in the process of performing some other action.
-       * - 500 (INTERNAL_SERVER_ERROR)
-         - Internal server error
+   * - Status Code
+     - Description
+   * - 200 (OK)
+     - Successful
+   * - 404 (NOT FOUND)
+     - If the cluster requested is not found.
+   * - 409 (CONFLICT)
+     - If the cluster is in the process of performing some other action.
+   * - 500 (INTERNAL_SERVER_ERROR)
+     - Internal server error
 
 Example
 ^^^^^^^
