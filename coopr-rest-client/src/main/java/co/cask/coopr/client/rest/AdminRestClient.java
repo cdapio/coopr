@@ -22,6 +22,7 @@ import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.impl.client.CloseableHttpClient;
 
@@ -49,6 +50,10 @@ public class AdminRestClient extends RestClient implements AdminClient {
 
   public AdminRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
     super(config, httpClient);
+  }
+
+  public AdminRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
+    super(config, httpClient, gson);
   }
 
   @Override

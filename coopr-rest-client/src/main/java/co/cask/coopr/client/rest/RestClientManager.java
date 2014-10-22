@@ -22,6 +22,7 @@ import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.client.PluginClient;
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.client.TenantClient;
+import com.google.gson.Gson;
 import org.apache.http.config.Registry;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -44,6 +45,7 @@ public class RestClientManager implements ClientManager {
   private static final String DEFAULT_VERSION = "v2";
   private static final boolean DEFAULT_SSL = false;
   private static final boolean DEFAULT_VERIFY_SSL_CERT = true;
+  private static final Gson DEFAULT_GSON_INSTANCE = new Gson();
 
   private final AdminClient adminClient;
   private final ClusterClient clusterClient;
@@ -68,11 +70,11 @@ public class RestClientManager implements ClientManager {
     }
     this.httpClient = HttpClients.custom().setConnectionManager(createConnectionManager()).build();
 
-    this.adminClient = new AdminRestClient(connectionConfig, httpClient);
-    this.clusterClient = new ClusterRestClient(connectionConfig, httpClient);
-    this.pluginClient = new PluginRestClient(connectionConfig, httpClient);
-    this.provisionerClient = new ProvisionerRestClient(connectionConfig, httpClient);
-    this.tenantClient = new TenantRestClient(connectionConfig, httpClient);
+    this.adminClient = new AdminRestClient(connectionConfig, httpClient, builder.gson);
+    this.clusterClient = new ClusterRestClient(connectionConfig, httpClient, builder.gson);
+    this.pluginClient = new PluginRestClient(connectionConfig, httpClient, builder.gson);
+    this.provisionerClient = new ProvisionerRestClient(connectionConfig, httpClient, builder.gson);
+    this.tenantClient = new TenantRestClient(connectionConfig, httpClient, builder.gson);
   }
 
   /**
@@ -139,6 +141,7 @@ public class RestClientManager implements ClientManager {
     private String version = DEFAULT_VERSION;
     private String userId;
     private String tenantId;
+    private Gson gson = DEFAULT_GSON_INSTANCE;
 
     public Builder(String host, int port) {
       this.host = host;
@@ -167,6 +170,11 @@ public class RestClientManager implements ClientManager {
 
     public Builder userId(String userId) {
       this.userId = userId;
+      return this;
+    }
+
+    public Builder gson(Gson gson) {
+      this.gson = gson;
       return this;
     }
 
