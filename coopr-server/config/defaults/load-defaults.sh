@@ -25,7 +25,7 @@ for d in ${dirs} ; do
       --header "Coopr-ApiKey:${COOPR_API_KEY}" \
       --header "Coopr-TenantID:${COOPR_TENANT}" \
       --connect-timeout ${TIMEOUT} --data @${f} \
-      ${COOPR_SERVER_URI}/v2/${d}/${f/.json/}
+      ${COOPR_SERVER_URI}/v2/${d}/${f/.json/} $CERT_PARAMETER
     ret=$?
     [[ ${ret} -ne 0 ]] && failed="${failed} ${d}/${f}"
   done

@@ -155,11 +155,23 @@ fi
 COOPR_PROTOCOL=http
 line=`awk '/server.ssl.enable/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-site.xml`
 line=$((line+1))
-ssl=`sed -n "${line}p" ${COOPR_SERVER_CONF}coopr-site.xml | awk -F"<|>" '{print $3}'`
-if [ ! -z $ssl ] && [ $ssl = "true" ]; then
+export COOPR_SSL=`sed -n "${line}p" ${COOPR_SERVER_CONF}coopr-site.xml | awk -F"<|>" '{print $3}'`
+if [ ! -z $COOPR_SSL ] && [ $COOPR_SSL = "true" ]; then
   COOPR_PROTOCOL=https
 fi
 export COOPR_SERVER_URI=$COOPR_PROTOCOL://localhost:55054
+
+cert_line=`awk '/server.ssl.trust.cert.path/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-security.xml`
+cert_line=$((cert_line+1))
+export TRUST_CERT_PATH=`sed -n "${cert_line}p" ${COOPR_SERVER_CONF}coopr-security.xml | awk -F"<|>" '{print $3}'`
+
+cert_pass_line=`awk '/server.ssl.trust.cert.password/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-security.xml`
+cert_pass_line=$((cert_pass_line+1))
+export TRUST_CERT_PASSWORD=`sed -n "${cert_pass_line}p" ${COOPR_SERVER_CONF}coopr-security.xml | awk -F"<|>" '{print $3}'`
+
+if [ ! -z TRUST_CERT_PATH ] && [ ! -z TRUST_CERT_PASsWORD ]; then
+  export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
+fi
 
 if [ $COOPR_PROTOCOL = "https" ]; then
   export CURL_PARAMETER="--insecure"
@@ -209,7 +221,7 @@ function sync_default_data () {
       --header "Coopr-UserID:${COOPR_API_USER}" \
       --header "Coopr-TenantID:${COOPR_TENANT}" \
       --connect-timeout 5 \
-      $COOPR_SERVER_URI/v2/plugins/sync
+      $COOPR_SERVER_URI/v2/plugins/sync $CERT_PARAMETER
 }
 
 function request_superadmin_workers () {
@@ -226,12 +238,12 @@ function request_superadmin_workers () {
       --header "Coopr-UserID:${COOPR_API_USER}" \
       --header "Coopr-TenantID:${COOPR_TENANT}" \
       --connect-timeout 5 --data "{ \"tenant\":{\"workers\":${COOPR_NUM_WORKERS}, \"name\":\"superadmin\"} }" \
-      $COOPR_SERVER_URI/v2/tenants/superadmin
+      $COOPR_SERVER_URI/v2/tenants/superadmin $CERT_PARAMETER
 }
 
 function wait_for_server () {
     RETRIES=0
-    until [[ $(curl $CURL_PARAMETER $COOPR_SERVER_URI/status 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
+    until [[ $(curl $CURL_PARAMETER $COOPR_SERVER_URI/status $CERT_PARAMETER 2> /dev/null | grep OK) || $RETRIES -gt 60 ]]; do
         sleep 2
         ((RETRIES++))
     done
@@ -247,7 +259,7 @@ function wait_for_plugin_registration () {
                  --output /dev/null --write-out "%{http_code}" \
                  --header "Coopr-UserID:${COOPR_API_USER}" \
                  --header "Coopr-TenantID:${COOPR_TENANT}" \
-                 $COOPR_SERVER_URI/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
+                 $COOPR_SERVER_URI/v2/plugins/automatortypes/chef-solo $CERT_PARAMETER 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
         sleep 2
         ((RETRIES++))
     done
@@ -300,7 +312,7 @@ function ui () {
 function greeting () {
     [ "x${COOPR_DISABLE_UI}" == "xtrue" ] && return 0
     echo
-    echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
+    echo "Go to http://localhost:8100. Have fun creating clusters!"
 }
 
 function stop () {
