@@ -23,14 +23,16 @@ import com.google.common.collect.Lists;
 import java.net.URI;
 import java.util.List;
 
+import static co.cask.coopr.shell.util.Constants.DEFAULT_PORT;
+import static co.cask.coopr.shell.util.Constants.DEFAULT_SSL;
+import static co.cask.coopr.shell.util.Constants.DEFAULT_SSL_PORT;
+import static co.cask.coopr.shell.util.Constants.DEFAULT_TENANT_ID;
+import static co.cask.coopr.shell.util.Constants.DEFAULT_USER_ID;
+
 /**
  * Configuration for the Coopr CLI.
  */
 public class CLIConfig {
-
-  private static final int DEFAULT_PORT = 55054;
-  private static final int DEFAULT_SSL_PORT = 55054;
-  private static final boolean DEFAULT_SSL = false;
 
   private RestClientManager clientManager;
   private String host;
@@ -42,18 +44,19 @@ public class CLIConfig {
   /**
    *
    * @param host the host of the Coopr server to interact with (e.g. "example.com")
+   * @param port the port for the Coopr server to interact with
    * @param userId the user id
    * @param tenantId the admin id
    */
-  public CLIConfig(String host, String userId, String tenantId) {
+  public CLIConfig(String host, Integer port, String userId, String tenantId) {
     this.host = Objects.firstNonNull(host, "localhost");
-    this.port = DEFAULT_PORT;
-    this.uri = URI.create(String.format("http://%s:%d", host, port));
+    this.port = Objects.firstNonNull(port, DEFAULT_PORT);
+    this.uri = URI.create(String.format("http://%s:%d", this.host, this.port));
     this.sslPort = DEFAULT_SSL_PORT;
-    RestClientManager.Builder builder = RestClientManager.builder(host, port);
+    RestClientManager.Builder builder = RestClientManager.builder(this.host, this.port);
     builder.ssl(DEFAULT_SSL);
-    builder.userId(userId);
-    builder.tenantId(tenantId);
+    builder.userId(Objects.firstNonNull(userId, DEFAULT_USER_ID));
+    builder.tenantId(Objects.firstNonNull(tenantId, DEFAULT_TENANT_ID));
     this.clientManager = builder.build();
     this.hostnameChangeListeners = Lists.newArrayList();
   }

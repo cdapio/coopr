@@ -20,12 +20,12 @@ import co.cask.common.cli.Arguments;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.Socket;
 
 /**
@@ -33,6 +33,7 @@ import java.net.Socket;
  */
 public class CliUtil {
 
+  private static final Logger LOG = LoggerFactory.getLogger(CliUtil.class);
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
   private static final String FILE_PREFIX = "file ";
   private static final String ARG_WRAPPER = "\"";
@@ -93,21 +94,6 @@ public class CliUtil {
   }
 
   /**
-   * Retrieves argument with specified key from {@link Arguments}.
-   *
-   * @param arguments the {@link Arguments}
-   * @param argKey the argument key
-   * @param defaultValue the default value
-   * @return argument by key or default value, in case argument does not exists
-   */
-  public static String getArgument(Arguments arguments, String argKey, String defaultValue) {
-    if (arguments.hasArgument(argKey)) {
-      return checkArgument(arguments.get(argKey));
-    }
-    return defaultValue;
-  }
-
-  /**
    * Check if specified port on specified host is available.
    *
    * @param host the host
@@ -124,7 +110,8 @@ public class CliUtil {
       if (socket != null) {
         try {
           socket.close();
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+          LOG.warn("Cannot close socket with host: {}, port: {}", host, port, e);
         }
       }
     }

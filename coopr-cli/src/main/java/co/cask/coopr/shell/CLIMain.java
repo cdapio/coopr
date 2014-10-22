@@ -22,7 +22,6 @@ import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.shell.command.HelpCommand;
 import co.cask.coopr.shell.command.set.CommandSet;
-import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
@@ -34,9 +33,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collections;
 
-import static co.cask.coopr.shell.util.Constants.DEFAULT_TENANT_ID;
-import static co.cask.coopr.shell.util.Constants.DEFAULT_USER_ID;
-import static co.cask.coopr.shell.util.Constants.EV_HOSTNAME;
+import static co.cask.coopr.shell.util.Constants.EV_HOST;
+import static co.cask.coopr.shell.util.Constants.EV_PORT;
+import static co.cask.coopr.shell.util.Constants.EV_TENANT_ID;
+import static co.cask.coopr.shell.util.Constants.EV_USER_ID;
 
 /**
  * Main class for the Coopr CLI.
@@ -84,9 +84,17 @@ public class CLIMain {
   }
 
   public static void main(String[] args) throws Exception {
-    String host = Objects.firstNonNull(System.getenv(EV_HOSTNAME), "localhost");
+    String host = System.getenv(EV_HOST);
+    String stringPort = System.getenv(EV_PORT);
+    String userId = System.getenv(EV_USER_ID);
+    String tenantId = System.getenv(EV_TENANT_ID);
+    Integer port = null;
+    try {
+      port = Integer.parseInt(stringPort);
+    } catch (NumberFormatException ignored) {
+    }
 
-    CLIConfig config = new CLIConfig(host, DEFAULT_USER_ID, DEFAULT_TENANT_ID);
+    CLIConfig config = new CLIConfig(host, port, userId, tenantId);
     CLIMain shell = new CLIMain(config);
     shell.cli.getReader().setPrompt("coopr (" + config.getURI() + ")> ");
 

@@ -60,8 +60,8 @@ public class ConnectCommand implements Command {
     if (!CliUtil.isAvailable(host, port)) {
       throw new IOException(String.format("Host %s on port %d could not be reached", host, port));
     }
-    String userId = CliUtil.getArgument(arguments, USER_ID_KEY, DEFAULT_USER_ID);
-    String tenantId = CliUtil.getArgument(arguments, TENANT_ID_KEY, DEFAULT_TENANT_ID);
+    String userId = CliUtil.checkArgument(arguments.get(USER_ID_KEY));
+    String tenantId = CliUtil.checkArgument(arguments.get(TENANT_ID_KEY));
 
     cliConfig.setConnection(host, port, ssl, userId, tenantId);
   }
@@ -72,8 +72,8 @@ public class ConnectCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("connect to <%s> [using port <%s>] [with ssl <%s>] [as <%s> <%s>]",
-                         HOST_KEY, PORT_KEY, SSL_KEY, USER_ID_KEY, TENANT_ID_KEY);
+    return String.format("connect to <%s> as <%s> <%s> [using port <%s>] [with ssl <%s>]",
+                         HOST_KEY, USER_ID_KEY, TENANT_ID_KEY, PORT_KEY, SSL_KEY);
   }
 
   @Override

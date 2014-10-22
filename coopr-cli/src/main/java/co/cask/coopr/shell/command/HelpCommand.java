@@ -23,7 +23,7 @@ import com.google.common.base.Supplier;
 
 import java.io.PrintStream;
 
-import static co.cask.coopr.shell.util.Constants.EV_HOSTNAME;
+import static co.cask.coopr.shell.util.Constants.EV_HOST;
 
 /**
  * Prints helper text for all commands.
@@ -40,7 +40,7 @@ public class HelpCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    printStream.println(EV_HOSTNAME + "=" + config.getHost());
+    printStream.println(EV_HOST + "=" + config.getHost());
     printStream.println();
     printStream.println(String.format("Available commands: \n%s: %s", getPattern(), getDescription()));
     for (Command command : getCommands.get()) {
