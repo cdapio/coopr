@@ -97,33 +97,33 @@ module Coopr
       def basic_validate
         # action required
         unless @options[:action] =~ /^(upload|stage|sync)$/i
-          fail 'missing or invalid action argument: must be one of "upload", "stage", or "sync"'
+          fail ArgumentError, 'missing or invalid action argument: must be one of "upload", "stage", or "sync"'
         end
         # path required
         if @options[:path].nil?
-          fail 'missing local-path argument'
+          fail ArgumentError, 'missing local-path argument'
         elsif !File.exist?(@options[:path])
-          fail "local-path argument supplied, but no such file or directory: #{@options[:path]}"
+          fail ArgumentError, "local-path argument supplied, but no such file or directory: #{@options[:path]}"
         end
         # api target required
         if @options[:target].nil?
-          fail 'missing remote-target argument'
+          fail ArgumentError, 'missing remote-target argument'
         else
           plugin_type, plugin_name, resource_type, resource_name = @options[:target].split('/')
           unless plugin_type =~ /^(automatortypes|providertypes)$/i
-            fail "invalid remote-target argument, must begin with 'automatortypes/' or 'providertypes/': #{@options[:target]}"
+            fail ArgumentError, "invalid remote-target argument, must begin with 'automatortypes/' or 'providertypes/': #{@options[:target]}"
           end
           @options[:plugin_type] = plugin_type
           if plugin_name.nil?
-            fail "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
+            fail ArgumentError, "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
           end
           @options[:plugin_name] = plugin_name
           if resource_type.nil?
-            fail "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
+            fail ArgumentError, "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
           end
           @options[:resource_type] = resource_type
           if resource_name.nil?
-            fail "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
+            fail ArgumentError, "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
           end
           @options[:resource_name] = resource_name
         end
@@ -308,6 +308,9 @@ begin
     ldr.stage
     ldr.sync
   end
+rescue ArgumentError => e
+  puts op # prints usage
+  exit 1
 rescue => e
   puts "Error: #{e.message} #{e.backtrace}"
   puts e.backtrace
