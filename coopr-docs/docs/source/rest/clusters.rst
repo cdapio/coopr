@@ -1231,3 +1231,80 @@ In order to delete the cluster, the client must re-supply those fields.
         http://<server>:<port>/<version>/clusters/00000083
 
 
+Pause a Cluster Job
+=============================
+To pause a cluster job that is currently running, make a POST HTTP request to URI:
+::
+
+ /clusters/{cluster-id}/pause
+
+All the tasks that were running before work was stopped, continue running until the end of execution.
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+:widths: 15 10
+   :header-rows: 1
+
+     * - Status Code
+       - Description
+     * - 200 (OK)
+       - Successful
+     * - 404 (NOT FOUND)
+       - If the cluster requested is not found.
+     * - 409 (CONFLICT)
+       - If the cluster is in the process of performing some other action.
+     * - 500 (INTERNAL_SERVER_ERROR)
+       - Internal server error
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'Coopr-UserID:<user-id>'
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
+        -X POST
+        -d '{
+               "expireTime": 1234567890
+           }'
+        http://<server>:<port>/<version>/clusters/<cluster-id>/pause
+
+Resume a Cluster Job
+=============================
+To resume a cluster job that was paused, make a POST HTTP request to URI:
+::
+
+ /clusters/{cluster-id}/pause
+
+HTTP Responses
+^^^^^^^^^^^^^^
+.. list-table::
+:widths: 15 10
+   :header-rows: 1
+
+       * - Status Code
+         - Description
+       * - 200 (OK)
+         - Successful
+       * - 404 (NOT FOUND)
+         - If the cluster requested is not found.
+       * - 409 (CONFLICT)
+         - If the cluster is in the process of performing some other action.
+       * - 500 (INTERNAL_SERVER_ERROR)
+         - Internal server error
+
+Example
+^^^^^^^
+.. code-block:: bash
+
+ $ curl -H 'Coopr-UserID:<user-id>'
+        -H 'Coopr-TenantID:<tenantid>'
+        -H 'Coopr-ApiKey:<apikey>'
+        -X POST
+        -d '{
+               "expireTime": 1234567890
+           }'
+        http://<server>:<port>/<version>/clusters/<cluster-id>/resume
+
+
