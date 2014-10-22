@@ -314,4 +314,5 @@ rescue ArgumentError => e
 rescue => e
   puts "Error: #{e.message} #{e.backtrace}"
   puts e.backtrace
+  exit 1
 end
