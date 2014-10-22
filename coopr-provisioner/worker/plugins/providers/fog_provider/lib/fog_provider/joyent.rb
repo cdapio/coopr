@@ -58,6 +58,11 @@ class FogProviderJoyent < Provider
       @result['status'] = 201
       @result['stderr'] = msg
       log.error(msg)
+    rescue Fog::Compute::Joyent::Errors::Conflict => e
+      msg = "Conflict: #{e.inspect}"
+      @result['status'] = 202
+      @result['stderr'] = msg
+      log.error(msg)
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.create: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.create: #{e.inspect}"
@@ -222,6 +227,10 @@ class FogProviderJoyent < Provider
       end
       # Return 0
       @result['status'] = 0
+    rescue Fog::Compute::Joyent::Errors::Conflict => e
+      msg = 'Unable to delete a VM that has not been allocated to a server yet'
+      log.error(msg)
+      @result['stderr'] = msg
     rescue => e
       log.error('Unexpected Error Occurred in FogProviderJoyent.delete: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.delete: #{e.inspect}"
