@@ -21,6 +21,8 @@ describe('providers test', function () {
       browser.getLocationAbsUrl()
     ).toMatch(/\/providers\/create$/);
 
+    browser.waitForAngular();
+
     element(by.cssContainingText('option', 'google')).click();
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
     expect(formfields.count()).toEqual(7);
@@ -50,6 +52,8 @@ describe('providers test', function () {
     formfields.get(3).element(by.css('input')).sendKeys('Test project id');
     formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
     element(by.partialButtonText('Create')).click();
+
+    browser.waitForAngular();
 
     expect(
       browser.getLocationAbsUrl()
@@ -134,6 +138,7 @@ describe('providers test', function () {
   });
 
   it('should link to the right pages', function () {
+    providersList = element.all(by.repeater('item in list'));
     var edithref = providersList.first().element(by.css('.edit-btn')).getAttribute('href');
     expect(edithref).toMatch(/\/providers\/edit\/aws-us-east-1$/);
   });
