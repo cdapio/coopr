@@ -1,7 +1,7 @@
 <configuration> 
 	<property>
 		<name>server.port</name>
-		<value>55001</value>
+		<value>55054</value>
 	</property>
  	<property>
    		<name>server.local.data.dir</name>

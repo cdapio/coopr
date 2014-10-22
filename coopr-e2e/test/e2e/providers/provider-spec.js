@@ -15,11 +15,13 @@ describe('providers test', function () {
   });
 
   it('should show the correct fields for provider type', function() {
-    browser.get('/#/providers/create');
+    browser.get('/providers/create');
 
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/providers\/create$/);
+    ).toMatch(/\/providers\/create$/);
+
+    browser.waitForAngular();
 
     element(by.cssContainingText('option', 'google')).click();
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
@@ -51,9 +53,11 @@ describe('providers test', function () {
     formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
     element(by.partialButtonText('Create')).click();
 
+    browser.waitForAngular();
+
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/providers$/);
+    ).toMatch(/\/providers$/);
 
     providersList = element.all(by.repeater('item in list'));
     expect(providersList.count()).toEqual(8);
@@ -69,12 +73,12 @@ describe('providers test', function () {
     expect(providersList.count()).toEqual(7);
   });
 
-  it('should navigate to provider edit page and show fields.', function() {
-    browser.get('/#/providers/edit/google');
+  it('should navigate to provider edit page and show fields.', function () {
+    browser.get('/providers/edit/google');
 
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/providers\/edit\/google$/);
+    ).toMatch(/\/providers\/edit\/google$/);
 
     expect(element(by.css('#inputProviderName')).getAttribute('value')).toBe('google');
     expect(element(by.css('#inputProviderDescription')).getAttribute('value')).toBe('Google Compute Engine');
@@ -83,7 +87,7 @@ describe('providers test', function () {
     var size = formfields.get(2).element(by.css('input')).getAttribute('value');
     expect(size).toEqual('10');
     var zone = formfields.get(6).element(by.css('select')).getAttribute('value');
-    expect(zone).toEqual('5'); 
+    expect(zone).toEqual('5');
   });
 
   // !TODO Add these tests once reset endpoint becomes available.
@@ -99,15 +103,15 @@ describe('providers test', function () {
     
   //   expect(
   //     browser.getLocationAbsUrl()
-  //   ).toMatch(/\/#\/providers$/);
+  //   ).toMatch(/\/providers$/);
   // });
 
   // it('should show new provider data', function () {
-  //   browser.get('/#/providers/edit/google');
+  //   browser.get('/providers/edit/google');
     
   //   expect(
   //     browser.getLocationAbsUrl()
-  //   ).toMatch(/\/#\/providers\/edit\/google$/);
+  //   ).toMatch(/\/providers\/edit\/google$/);
 
   //   formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
   //   expect(formfields.first().element(by.css('input')).getAttribute('value')).toBe('apifoo');
@@ -118,15 +122,15 @@ describe('providers test', function () {
   //   expect(formfields.get(5).element(by.css('input')).getAttribute('value')).toBe('resourcefoo');
 
   //   // !TODO call /reset to get default data back to normal once default data has been implemented.
-  //   // browser.get('/#/reset');
+  //   // browser.get('/reset');
   // });
   
-  it('should show a list of providers', function() {
-    browser.get('/#/providers');
+  it('should show a list of providers', function () {
+    browser.get('/providers');
 
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/#\/providers$/);
+    ).toMatch(/\/providers$/);
 
     providersList = element.all(by.repeater('item in list'));
     expect(providersList.count()).toEqual(7);
@@ -134,8 +138,9 @@ describe('providers test', function () {
   });
 
   it('should link to the right pages', function () {
+    providersList = element.all(by.repeater('item in list'));
     var edithref = providersList.first().element(by.css('.edit-btn')).getAttribute('href');
-    expect(edithref).toMatch(/\/#\/providers\/edit\/aws-us-east-1$/);
+    expect(edithref).toMatch(/\/providers\/edit\/aws-us-east-1$/);
   });
 
   it('should logout', function () {
@@ -143,5 +148,4 @@ describe('providers test', function () {
   });
 
 });
-
 
