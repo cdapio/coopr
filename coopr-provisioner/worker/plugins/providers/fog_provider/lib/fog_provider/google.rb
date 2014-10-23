@@ -87,10 +87,12 @@ class FogProviderGoogle < Provider
       @result['status'] = 0
     # We assume that no work was done when we get Unauthorized
     rescue Excon::Errors::Unauthorized
+      msg = 'Provider credentials invalid/unauthorized'
       @result['status'] = 201
-      log.error('Provider credentials invalid/unauthorized')
+      @result['stderr'] = msg
+      log.error(msg)
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderGoogle.create: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.create: #{e.inspect}"
     else
       log.debug "Create finished successfully: #{@result}"
@@ -207,7 +209,7 @@ class FogProviderGoogle < Provider
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderGoogle.confirm:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderGoogle.confirm: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.confirm: #{e.inspect}"
     else
       log.debug "Confirm finished successfully: #{@result}"
@@ -290,7 +292,7 @@ class FogProviderGoogle < Provider
       log.error('Unable to delete specified components: ' + e.inspect)
       @result['stderr'] = "Unable to delete specified components: ' + e.inspect"
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderGoogle.delete:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderGoogle.delete: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.delete: #{e.inspect}"
     else
       log.debug "Delete finished sucessfully: #{@result}"
