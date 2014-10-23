@@ -20,13 +20,16 @@ import co.cask.common.cli.Command;
 import co.cask.coopr.shell.command.AddServicesOnClusterCommand;
 import co.cask.coopr.shell.command.ConnectCommand;
 import co.cask.coopr.shell.command.CreateClusterCommand;
+import co.cask.coopr.shell.command.DeleteAutomatorTypeResourcesCommand;
 import co.cask.coopr.shell.command.DeleteClusterCommand;
 import co.cask.coopr.shell.command.DeleteClusterTemplateCommand;
 import co.cask.coopr.shell.command.DeleteHardwareTypeCommand;
 import co.cask.coopr.shell.command.DeleteImageTypeCommand;
 import co.cask.coopr.shell.command.DeleteProviderCommand;
+import co.cask.coopr.shell.command.DeleteProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.DeleteServiceCommand;
 import co.cask.coopr.shell.command.ExitCommand;
+import co.cask.coopr.shell.command.GetAutomatorTypeCommand;
 import co.cask.coopr.shell.command.GetClusterCommand;
 import co.cask.coopr.shell.command.GetClusterConfigCommand;
 import co.cask.coopr.shell.command.GetClusterStatusCommand;
@@ -34,20 +37,30 @@ import co.cask.coopr.shell.command.GetClusterTemplateCommand;
 import co.cask.coopr.shell.command.GetHardwareTypeCommand;
 import co.cask.coopr.shell.command.GetImageTypeCommand;
 import co.cask.coopr.shell.command.GetProviderCommand;
+import co.cask.coopr.shell.command.GetProviderTypeCommand;
 import co.cask.coopr.shell.command.GetServiceCommand;
+import co.cask.coopr.shell.command.ListAllAutomatorTypesCommand;
+import co.cask.coopr.shell.command.ListAllProviderTypesCommand;
+import co.cask.coopr.shell.command.ListAutomatorTypeResourcesCommand;
 import co.cask.coopr.shell.command.ListClusterServicesCommand;
 import co.cask.coopr.shell.command.ListClusterTemplatesCommand;
 import co.cask.coopr.shell.command.ListClustersCommand;
 import co.cask.coopr.shell.command.ListHardwareTypesCommand;
 import co.cask.coopr.shell.command.ListImageTypesCommand;
+import co.cask.coopr.shell.command.ListProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.ListProvidersCommand;
 import co.cask.coopr.shell.command.ListServicesCommand;
+import co.cask.coopr.shell.command.RecallAutomatorTypeResourcesCommand;
+import co.cask.coopr.shell.command.RecallProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.RestartServiceOnClusterCommand;
 import co.cask.coopr.shell.command.SetClusterConfigCommand;
 import co.cask.coopr.shell.command.SetClusterExpireTimeCommand;
+import co.cask.coopr.shell.command.StageAutomatorTypeResourcesCommand;
+import co.cask.coopr.shell.command.StageProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.StartServiceOnClusterCommand;
 import co.cask.coopr.shell.command.StopServiceOnClusterCommand;
 import co.cask.coopr.shell.command.SyncClusterTemplateCommand;
+import co.cask.coopr.shell.command.SyncPluginCommand;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Injector;
 
@@ -65,7 +78,8 @@ public class CommandSet {
     );
     List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
       getAdminCommandSet(injector),
-      getClusterCommandSet(injector)
+      getClusterCommandSet(injector),
+      getPluginCommandSet(injector)
     );
     return new co.cask.common.cli.CommandSet<Command>(commands, commandSets);
   }
@@ -107,6 +121,25 @@ public class CommandSet {
       injector.getInstance(StartServiceOnClusterCommand.class),
       injector.getInstance(StopServiceOnClusterCommand.class),
       injector.getInstance(SyncClusterTemplateCommand.class)
+    );
+    return new co.cask.common.cli.CommandSet<Command>(commands);
+  }
+
+  private static co.cask.common.cli.CommandSet<Command> getPluginCommandSet(Injector injector) {
+    List<Command> commands = ImmutableList.of(
+      injector.getInstance(DeleteAutomatorTypeResourcesCommand.class),
+      injector.getInstance(DeleteProviderTypeResourcesCommand.class),
+      injector.getInstance(GetAutomatorTypeCommand.class),
+      injector.getInstance(GetProviderTypeCommand.class),
+      injector.getInstance(ListAllAutomatorTypesCommand.class),
+      injector.getInstance(ListAllProviderTypesCommand.class),
+      injector.getInstance(ListAutomatorTypeResourcesCommand.class),
+      injector.getInstance(ListProviderTypeResourcesCommand.class),
+      injector.getInstance(RecallAutomatorTypeResourcesCommand.class),
+      injector.getInstance(RecallProviderTypeResourcesCommand.class),
+      injector.getInstance(StageAutomatorTypeResourcesCommand.class),
+      injector.getInstance(StageProviderTypeResourcesCommand.class),
+      injector.getInstance(SyncPluginCommand.class)
     );
     return new co.cask.common.cli.CommandSet<Command>(commands);
   }
