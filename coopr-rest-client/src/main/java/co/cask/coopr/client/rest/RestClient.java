@@ -55,14 +55,17 @@ public class RestClient {
   private static final String COOPR_TENANT_ID_HEADER_NAME = "Coopr-TenantID";
   private static final String COOPR_USER_ID_HEADER_NAME = "Coopr-UserID";
 
-  protected static final Gson GSON = new Gson();
-
+  private final Gson gson;
   private final RestClientConnectionConfig config;
   private final URI baseUrl;
   private final CloseableHttpClient httpClient;
   private final Header[] authHeaders;
 
   public RestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+    this(config, httpClient, new Gson());
+  }
+
+  public RestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
     Preconditions.checkArgument(!Strings.isNullOrEmpty(config.getUserId()), "User ID couldn't be null");
     Preconditions.checkArgument(!Strings.isNullOrEmpty(config.getTenantId()), "Tenant ID couldn't be null");
     this.config = config;
@@ -70,6 +73,7 @@ public class RestClient {
                                             config.getHost(), config.getPort(), config.getVersion()));
     this.httpClient = httpClient;
     this.authHeaders = getAuthHeaders();
+    this.gson = gson;
   }
 
   /**
@@ -131,7 +135,7 @@ public class RestClient {
     List<T> resultList;
     try {
       RestClient.analyzeResponseCode(httpResponse);
-      resultList = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
+      resultList = gson.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
     } finally {
       httpResponse.close();
     }
@@ -148,7 +152,7 @@ public class RestClient {
     T result;
     try {
       RestClient.analyzeResponseCode(httpResponse);
-      result = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
+      result = gson.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
     } finally {
       httpResponse.close();
     }
@@ -167,7 +171,7 @@ public class RestClient {
 
   protected <T> void addRequestBody(HttpEntityEnclosingRequestBase requestBase, T body) {
     if (body != null) {
-      StringEntity stringEntity = new StringEntity(GSON.toJson(body), Charsets.UTF_8);
+      StringEntity stringEntity = new StringEntity(gson.toJson(body), Charsets.UTF_8);
       requestBase.setEntity(stringEntity);
       LOG.debug("Added the json request body: {}.", stringEntity);
     }
@@ -193,5 +197,12 @@ public class RestClient {
    */
   public URI getBaseURL() {
     return baseUrl;
+  }
+
+  /**
+   * @return the configured gson object
+   */
+  public Gson getGson() {
+    return gson;
   }
 }

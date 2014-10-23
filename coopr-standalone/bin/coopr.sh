@@ -174,7 +174,7 @@ function load_defaults () {
         wait_for_server
 
         echo "Loading default configuration..."
-        $COOPR_HOME/server/config/defaults/load-defaults.sh && \
+        $COOPR_HOME/server/templates/bin/load-templates.sh && \
         touch $COOPR_DATA_DIR/.load_defaults
 
         # register the default plugins with the server
@@ -278,6 +278,7 @@ function provisioner () {
     fi
     if [ "x${COOPR_USE_DUMMY_PROVISIONER}" == "xtrue" ]
     then
+        $COOPR_HOME/server/templates/mock/load-mock.sh && \
         $COOPR_HOME/server/bin/dummy-provisioner.sh $@
     else
         $COOPR_HOME/provisioner/bin/provisioner.sh $1

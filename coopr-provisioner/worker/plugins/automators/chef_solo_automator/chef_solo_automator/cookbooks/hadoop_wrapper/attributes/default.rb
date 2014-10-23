@@ -1,3 +1,6 @@
+# variables
+jmx_base = '-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false'
+
 # Java
 default['java']['install_flavor'] = 'oracle'
 default['java']['jdk_version'] = 6
@@ -55,13 +58,13 @@ default['hadoop']['hadoop_metrics']['ugi.class'] = 'org.apache.hadoop.metrics.sp
 default['hadoop']['hadoop_metrics']['ugi.period'] = '60'
 # hadoop-env.sh
 # Enable JMX
-default['hadoop']['hadoop_env']['hadoop_jmx_base'] = '-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false'
-default['hadoop']['hadoop_env']['hadoop_namenode_opts'] = '$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8004'
-default['hadoop']['hadoop_env']['hadoop_secondarynamenode_opts'] = '$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8005'
-default['hadoop']['hadoop_env']['hadoop_datanode_opts'] = '$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8006'
+default['hadoop']['hadoop_env']['hadoop_jmx_base'] = jmx_base
+default['hadoop']['hadoop_env']['hadoop_namenode_opts'] = '$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote.port=8004'
+default['hadoop']['hadoop_env']['hadoop_secondarynamenode_opts'] = '$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote.port=8005'
+default['hadoop']['hadoop_env']['hadoop_datanode_opts'] = '$HADOOP_JMX_BASE -Dcom.sun.management.jmxremote.port=8006'
 default['hadoop']['hadoop_env']['hadoop_mapred_home'] = '/usr/lib/hadoop-mapreduce'
 # yarn-env.sh
-default['hadoop']['yarn_env']['yarn_opts'] = '-Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false'
+default['hadoop']['yarn_env']['yarn_opts'] = jmx_base
 default['hadoop']['yarn_env']['yarn_resourcemanager_opts'] = '$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=8008'
 default['hadoop']['yarn_env']['yarn_nodemanager_opts'] = '$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=8009'
 
@@ -70,6 +73,15 @@ default['hadoop']['yarn_env']['yarn_nodemanager_opts'] = '$YARN_NODEMANAGER_OPTS
 default['hbase']['hbase_site']['hbase.cluster.distributed'] = 'true'
 default['hbase']['hbase_site']['hbase.defaults.for.version.skip'] = 'false'
 default['hbase']['hbase_site']['hbase.regionserver.handler.count'] = '100'
+
+# hbase-env.sh
+# Enable JMX
+default['hbase']['hbase_env']['hbase_log_dir'] = '/var/log/hbase'
+default['hbase']['hbase_env']['common_gc_opts'] = '-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=1 -XX:GCLogFileSize=512M'
+default['hbase']['hbase_env']['hbase_jmx_base'] = jmx_base
+default['hbase']['hbase_env']['hbase_master_opts'] = '$COMMON_GC_OPTS $HBASE_MASTER_OPTS $HBASE_MASTER_HEAP $HBASE_JMX_BASE -Dcom.sun.management.jmxremote.port=10101'
+default['hbase']['hbase_env']['server_gc_opts'] = '-Xloggc:$HBASE_LOG_DIR/gc-master.log'
+default['hbase']['hbase_env']['hbase_regionserver_opts'] = '$COMMON_GC_OPTS -Xloggc:$HBASE_LOG_DIR/gc-regionserver.log $HBASE_REGIONSERVER_OPTS $HBASE_REGIONSERVER_HEAP $HBASE_JMX_BASE -Dcom.sun.management.jmxremote.port=10102'
 
 # ZooKeeper
 # zoo.cfg

@@ -146,7 +146,7 @@ class ShellAutomator < Automator
     log.debug "Result of shell command: #{@result}"
     @result
   ensure
-    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
+    File.delete(@ssh_file) if @ssh_file && File.exist?(@ssh_file)
   end
 
   def bootstrap(inputmap)
@@ -243,7 +243,7 @@ class ShellAutomator < Automator
     @result['status'] = 0
     log.debug "ShellAutomator bootstrap completed successfully: #{@result}"
   ensure
-    File.delete(@ssh_file) if File.exist?(@ssh_file) && @ssh_file
+    File.delete(@ssh_file) if @ssh_file && File.exist?(@ssh_file)
   end
 
   def install(inputmap)

@@ -54,10 +54,12 @@ class FogProviderJoyent < Provider
       @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue Excon::Errors::Unauthorized
+      msg = 'Provider credentials invalid/unauthorized'
       @result['status'] = 201
-      log.error('Provider credentials invalid/unauthorized')
+      @result['stderr'] = msg
+      log.error(msg)
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderJoyent.create: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.create: #{e.inspect}"
     else
       log.debug "Create finished successfully: #{@result}"
@@ -191,7 +193,7 @@ class FogProviderJoyent < Provider
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderJoyent.confirm:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderJoyent.confirm: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.confirm: #{e.inspect}"
     else
       log.debug "Confirm finished successfully: #{@result}"
@@ -221,7 +223,7 @@ class FogProviderJoyent < Provider
       # Return 0
       @result['status'] = 0
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderJoyent.delete:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderJoyent.delete: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.delete: #{e.inspect}"
     else
       log.debug "Delete finished sucessfully: #{@result}"
