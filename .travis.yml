@@ -49,15 +49,17 @@ before_script:
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd ..; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp coopr-server/target/*:coopr-e2e/config co.cask.coopr.runtime.ServerMain; fi >/dev/null 2>&1 &'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp coopr-server/target/*:coopr-e2e/config co.cask.coopr.runtime.MockProvisionerMain -p 55054; fi >/dev/null 2>&1 &'
-  - 'sleep 30' # give server generous time to start
-  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then bash coopr-server/templates/mock/load-mock.sh; fi'
+  - 'sleep 5' # give servers generous time to start
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd coopr-e2e; fi'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then npm run build; fi'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd ..; fi'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then coopr-server/templates/mock/load-mock.sh; fi'
 
 script:
   - 'cd coopr-ngui'
   - 'node ./node_modules/gulp/bin/gulp.js jshint'
   - 'npm run test-single-run'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd ../coopr-e2e; fi'
-  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then npm run build; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then npm run protractor; fi'
   - 'cd ..'
   - 'mvn test'

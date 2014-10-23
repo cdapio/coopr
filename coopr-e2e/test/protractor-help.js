@@ -40,6 +40,8 @@ function login(tenant, username, password) {
 
 function logout() {
 
+  browser.get('/');
+
   ddIsOpen()
     .then(function (dd) {
       if(!dd) {
