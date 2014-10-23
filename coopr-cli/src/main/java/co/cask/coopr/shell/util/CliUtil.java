@@ -37,20 +37,6 @@ public class CliUtil {
   private static final Logger LOG = LoggerFactory.getLogger(CliUtil.class);
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
   private static final String FILE_PREFIX = "file ";
-  private static final String ARG_WRAPPER = "\"";
-  private static final String JSON_WRAPPER = "'";
-
-  /**
-   * Checks whether the argument is in double quotes
-   *
-   * @param arg the argument
-   */
-  public static String checkArgument(String arg) {
-    if (!(arg.startsWith(ARG_WRAPPER) && arg.endsWith(ARG_WRAPPER))) {
-      throw new IllegalArgumentException("Arguments must be contained in double quotes");
-    }
-    return arg.substring(1, arg.length() - 1);
-  }
 
   /**
    * Converts specified object to pretty Json
@@ -81,7 +67,7 @@ public class CliUtil {
         Reader reader = null;
         try {
           reader = new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8);
-          return gson.fromJson(new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8), type);
+          return gson.fromJson(reader, type);
         } finally {
           if (reader != null) {
             try {
