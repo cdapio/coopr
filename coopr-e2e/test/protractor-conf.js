@@ -2,7 +2,8 @@ var config = {
   allScriptsTimeout: 11000,
 
   specs: [
-    'e2e/**/*.js'
+    // 'e2e/**/*.js'
+    'e2e/hardwares/hardware-spec.js'
   ],
 
   capabilities: {

@@ -14,14 +14,12 @@ describe('providers test', function () {
     helper.loginAsAdmin();
   });
 
-  it('should show the correct fields for provider type', function() {
+  it('should show the correct fields for provider type', function () {
     browser.get('/providers/create');
 
     expect(
       browser.getLocationAbsUrl()
     ).toMatch(/\/providers\/create$/);
-
-    browser.waitForAngular();
 
     element(by.cssContainingText('option', 'google')).click();
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
@@ -52,8 +50,6 @@ describe('providers test', function () {
     formfields.get(3).element(by.css('input')).sendKeys('Test project id');
     formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
     element(by.partialButtonText('Create')).click();
-
-    browser.waitForAngular();
 
     expect(
       browser.getLocationAbsUrl()
