@@ -19,6 +19,7 @@ package co.cask.coopr.client.rest;
 import co.cask.coopr.client.ClientManager;
 import co.cask.coopr.client.PluginClient;
 import co.cask.coopr.client.rest.exception.HttpFailureException;
+import co.cask.coopr.client.rest.handler.PluginTestConstants;
 import co.cask.coopr.client.rest.handler.PluginTestHandler;
 import co.cask.coopr.provisioner.plugin.ResourceMeta;
 import co.cask.coopr.provisioner.plugin.ResourceStatus;

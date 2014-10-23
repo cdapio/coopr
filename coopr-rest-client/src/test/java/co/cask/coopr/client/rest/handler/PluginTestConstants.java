@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package co.cask.coopr.client.rest;
+package co.cask.coopr.client.rest.handler;
 
 import co.cask.coopr.Entities;
 import co.cask.coopr.provisioner.plugin.ResourceMeta;

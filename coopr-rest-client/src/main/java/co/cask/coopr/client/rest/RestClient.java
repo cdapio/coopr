@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * Provides way to execute http requests with Apache HttpClient {@link org.apache.http.client.HttpClient}.
@@ -148,30 +147,20 @@ public class RestClient {
     String fullUrl = String.format("%s%s", getBaseURL(), url);
     HttpGet getRequest = new HttpGet(fullUrl);
     CloseableHttpResponse httpResponse = execute(getRequest);
-    Map<V, Set<T>> resultMap;
     InputStreamReader reader = null;
     try {
       RestClient.analyzeResponseCode(httpResponse);
-      StringBuilder stringBuilder = new StringBuilder();
       reader = new InputStreamReader(httpResponse.getEntity().getContent(), Charsets.UTF_8);
-      char[] buffer = new char[CHAR_BUFFER_SIZE];
-     int readedNumber;
-
-      while ((readedNumber = reader.read(buffer)) != -1) {
-        stringBuilder.append(buffer, 0, readedNumber);
-      }
-
-      resultMap = GSON.fromJson(stringBuilder.toString(), type);
+      return GSON.fromJson(reader, type);
     } finally {
       httpResponse.close();
       if (reader != null) {
-       try {
-         reader.close();
-       }  catch (IOException e) {
+        try {
+          reader.close();
+        } catch (IOException e) {
         }
       }
     }
-    return resultMap != null ? resultMap : new TreeMap<V, Set<T>>();
   }
 
   protected void execPost(URI uri) throws IOException {

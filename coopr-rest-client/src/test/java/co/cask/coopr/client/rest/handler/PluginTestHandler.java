@@ -16,7 +16,6 @@
 
 package co.cask.coopr.client.rest.handler;
 
-import co.cask.coopr.client.rest.PluginTestConstants;
 import co.cask.coopr.provisioner.plugin.ResourceMeta;
 import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.http.AbstractHttpHandler;
