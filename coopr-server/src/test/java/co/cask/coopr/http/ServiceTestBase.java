@@ -24,6 +24,7 @@ import co.cask.coopr.provisioner.Provisioner;
 import co.cask.coopr.provisioner.TenantProvisionerService;
 import co.cask.coopr.spec.Tenant;
 import co.cask.coopr.spec.TenantSpecification;
+import com.google.common.base.Strings;
 import com.google.common.io.Closeables;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -53,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import javax.net.ssl.KeyManager;
@@ -232,7 +234,7 @@ public class ServiceTestBase extends BaseTest {
     SSLContext sslContext = SSLContext.getInstance("TLS");
     try {
       KeyManager[] keyManagers = null;
-      if (keyStore != null && keyStorePassword != null) {
+      if (keyStore != null && !Strings.isNullOrEmpty(keyStorePassword)) {
         KeyStore ks = getKeyStore(keyStore, keyStorePassword);
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
         kmf.init(ks, keyStorePassword.toCharArray());
@@ -240,7 +242,7 @@ public class ServiceTestBase extends BaseTest {
       }
 
       TrustManager[] trustManagers = getTrustAllManager();
-      if (trustKeyStore != null && trustKeyStorePassword != null) {
+      if (trustKeyStore != null && !Strings.isNullOrEmpty(trustKeyStorePassword)) {
         KeyStore tks = getKeyStore(trustKeyStore, trustKeyStorePassword);
         TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
         tmf.init(tks);
@@ -278,15 +280,13 @@ public class ServiceTestBase extends BaseTest {
     try {
       ks = KeyStore.getInstance("JKS");
       ks.load(is, keyStorePassword.toCharArray());
+    } catch (RuntimeException ex) {
+        throw ex;
     } catch (Exception ex) {
-      if (ex instanceof RuntimeException) {
-        throw ((RuntimeException) ex);
-      }
       throw new IOException(ex);
     } finally {
       Closeables.closeQuietly(is);
     }
     return ks;
   }
-
 }

@@ -312,7 +312,7 @@ function ui () {
 function greeting () {
     [ "x${COOPR_DISABLE_UI}" == "xtrue" ] && return 0
     echo
-    echo "Go to http://localhost:8100. Have fun creating clusters!"
+    echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
 }
 
 function stop () {
