@@ -4,7 +4,7 @@ maintainer_email 'ops@cask.co'
 license          'All rights reserved'
 description      'Hadoop wrapper'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version '0.1.9'
+version '0.1.10'
 
 %w(apt java krb5_utils yum).each do |cb|
   depends cb
