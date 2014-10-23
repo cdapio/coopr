@@ -53,7 +53,7 @@ before_script:
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd coopr-e2e; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then npm run build; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd ..; fi'
-  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then coopr-server/templates/mock/load-mock.sh; fi'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then bash coopr-server/templates/mock/load-mock.sh; fi'
 
 script:
   - 'cd coopr-ngui'
