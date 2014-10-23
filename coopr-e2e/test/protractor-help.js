@@ -20,6 +20,8 @@ module.exports = {
 
 function login(tenant, username, password) {
 
+  browser.get('/');
+
   isLoggedIn()
     .then(function (needLogout) {
       if(needLogout) {
