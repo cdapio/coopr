@@ -27,9 +27,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class ProvisionerRestClientTest extends RestClientTest {
 
   private ProvisionerClient provisionerClient;
@@ -42,8 +39,8 @@ public class ProvisionerRestClientTest extends RestClientTest {
   @Test
   public void testGetAllProvisioners() throws IOException {
     List<Provisioner> result = provisionerClient.getAllProvisioners();
-    assertTrue(result.size() == 1);
-    assertEquals(PROVISIONER_ID, result.get(0).getId());
+    Assert.assertEquals(1, result.size());
+    Assert.assertEquals(PROVISIONER_ID, result.get(0).getId());
   }
 
   @Test
@@ -59,7 +56,7 @@ public class ProvisionerRestClientTest extends RestClientTest {
   @Test
   public void testGetProvisioner() throws IOException {
     Provisioner result = provisionerClient.getProvisioner(PROVISIONER_ID);
-    assertEquals(TEST_PROVISIONER, result);
+    Assert.assertEquals(TEST_PROVISIONER, result);
   }
 
   @Test

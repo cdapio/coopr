@@ -32,9 +32,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class AdminRestClientTest extends RestClientTest {
 
   private AdminClient adminClient;
@@ -47,16 +44,16 @@ public class AdminRestClientTest extends RestClientTest {
   @Test
   public void testGetAllClusterTemplates() throws IOException {
     List<ClusterTemplate> result = adminClient.getAllClusterTemplates();
-    assertTrue(result.contains(REACTOR_CLUSTER_TEMPLATE));
-    assertTrue(result.contains(HDFS_CLUSTER_TEMPLATE));
-    assertTrue(result.contains(HADOOP_DISTRIBUTED_CLUSTER_TEMPLATE));
-    assertTrue(result.size() == 3);
+    Assert.assertTrue(result.contains(REACTOR_CLUSTER_TEMPLATE));
+    Assert.assertTrue(result.contains(HDFS_CLUSTER_TEMPLATE));
+    Assert.assertTrue(result.contains(HADOOP_DISTRIBUTED_CLUSTER_TEMPLATE));
+    Assert.assertEquals(3, result.size());
   }
 
   @Test
   public void testGetClusterTemplate() throws IOException {
     ClusterTemplate result = adminClient.getClusterTemplate(REACTOR_CLUSTER_TEMPLATE.getName());
-    assertEquals(REACTOR_CLUSTER_TEMPLATE, result);
+    Assert.assertEquals(REACTOR_CLUSTER_TEMPLATE, result);
   }
 
   @Test
@@ -72,8 +69,8 @@ public class AdminRestClientTest extends RestClientTest {
   @Test
   public void testDeleteClusterTemplate() throws IOException {
     ClusterTemplate result = adminClient.getClusterTemplate(REACTOR_CLUSTER_TEMPLATE.getName());
-    assertTrue(result != null);
-    assertEquals(REACTOR_CLUSTER_TEMPLATE, result);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(REACTOR_CLUSTER_TEMPLATE, result);
     adminClient.deleteClusterTemplate(REACTOR_CLUSTER_TEMPLATE.getName());
     try {
       adminClient.getClusterTemplate(REACTOR_CLUSTER_TEMPLATE.getName());
@@ -87,15 +84,15 @@ public class AdminRestClientTest extends RestClientTest {
   @Test
   public void testGetAllProviders() throws IOException {
     List<Provider> result = adminClient.getAllProviders();
-    assertTrue(result.contains(Entities.ProviderExample.JOYENT));
-    assertTrue(result.contains(Entities.ProviderExample.RACKSPACE));
-    assertTrue(result.size() == 2);
+    Assert.assertTrue(result.contains(Entities.ProviderExample.JOYENT));
+    Assert.assertTrue(result.contains(Entities.ProviderExample.RACKSPACE));
+    Assert.assertEquals(2, result.size());
   }
 
   @Test
   public void testGetProvider() throws IOException {
     Provider result = adminClient.getProvider(Entities.JOYENT);
-    assertEquals(Entities.ProviderExample.JOYENT, result);
+    Assert.assertEquals(Entities.ProviderExample.JOYENT, result);
   }
 
   @Test
@@ -111,8 +108,8 @@ public class AdminRestClientTest extends RestClientTest {
   @Test
   public void testDeleteProvider() throws IOException {
     Provider result = adminClient.getProvider(Entities.JOYENT);
-    assertTrue(result != null);
-    assertEquals(Entities.ProviderExample.JOYENT, result);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(Entities.ProviderExample.JOYENT, result);
 
     adminClient.deleteProvider(Entities.JOYENT);
     try {
@@ -126,25 +123,25 @@ public class AdminRestClientTest extends RestClientTest {
   @Test
   public void testGetAllServices() throws IOException {
     List<Service> result = adminClient.getAllServices();
-    assertTrue(result.size() == 4);
-    assertTrue(result.contains(Entities.ServiceExample.DATANODE));
-    assertTrue(result.contains(Entities.ServiceExample.NAMENODE));
-    assertTrue(result.contains(Entities.ServiceExample.HOSTS));
-    assertTrue(result.contains(ZOOKEEPER));
+    Assert.assertEquals(4, result.size());
+    Assert.assertTrue(result.contains(Entities.ServiceExample.DATANODE));
+    Assert.assertTrue(result.contains(Entities.ServiceExample.NAMENODE));
+    Assert.assertTrue(result.contains(Entities.ServiceExample.HOSTS));
+    Assert.assertTrue(result.contains(ZOOKEEPER));
   }
 
 
   @Test
   public void testGetService() throws IOException {
     Service result = adminClient.getService(Entities.ServiceExample.NAMENODE.getName());
-    assertEquals(Entities.ServiceExample.NAMENODE, result);
+    Assert.assertEquals(Entities.ServiceExample.NAMENODE, result);
   }
 
   @Test
   public void testDeleteService() throws IOException {
     Service result = adminClient.getService(Entities.ServiceExample.HOSTS.getName());
-    assertTrue(result != null);
-    assertEquals(Entities.ServiceExample.HOSTS, result);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(Entities.ServiceExample.HOSTS, result);
 
     adminClient.deleteService(Entities.ServiceExample.HOSTS.getName());
     try {
@@ -158,24 +155,24 @@ public class AdminRestClientTest extends RestClientTest {
   @Test
   public void testGetAllHardwareTypes() throws IOException {
     List<HardwareType> result = adminClient.getAllHardwareTypes();
-    assertTrue(result.size() == 3);
-    assertTrue(result.contains(Entities.HardwareTypeExample.LARGE));
-    assertTrue(result.contains(Entities.HardwareTypeExample.MEDIUM));
-    assertTrue(result.contains(Entities.HardwareTypeExample.SMALL));
+    Assert.assertEquals(3, result.size());
+    Assert.assertTrue(result.contains(Entities.HardwareTypeExample.LARGE));
+    Assert.assertTrue(result.contains(Entities.HardwareTypeExample.MEDIUM));
+    Assert.assertTrue(result.contains(Entities.HardwareTypeExample.SMALL));
   }
 
 
   @Test
   public void testGetHardwareType() throws IOException {
     HardwareType result = adminClient.getHardwareType(Entities.HardwareTypeExample.LARGE.getName());
-    assertTrue(result.equals(Entities.HardwareTypeExample.LARGE));
+    Assert.assertEquals(Entities.HardwareTypeExample.LARGE, result);
   }
 
   @Test
   public void testDeleteHardwareType() throws IOException {
     HardwareType result = adminClient.getHardwareType(Entities.HardwareTypeExample.SMALL.getName());
-    assertTrue(result != null);
-    assertEquals(Entities.HardwareTypeExample.SMALL, result);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(Entities.HardwareTypeExample.SMALL, result);
 
     adminClient.deleteService(Entities.HardwareTypeExample.SMALL.getName());
     try {
@@ -189,22 +186,22 @@ public class AdminRestClientTest extends RestClientTest {
   @Test
   public void testGetAllImageTypes() throws IOException {
     List<ImageType> result = adminClient.getAllImageTypes();
-    assertTrue(result.size() == 2);
-    assertTrue(result.contains(Entities.ImageTypeExample.CENTOS_6));
-    assertTrue(result.contains(Entities.ImageTypeExample.UBUNTU_12));
+    Assert.assertEquals(2, result.size());
+    Assert.assertTrue(result.contains(Entities.ImageTypeExample.CENTOS_6));
+    Assert.assertTrue(result.contains(Entities.ImageTypeExample.UBUNTU_12));
   }
 
   @Test
   public void testGetImageType() throws IOException {
     ImageType result = adminClient.getImageType(Entities.ImageTypeExample.CENTOS_6.getName());
-    assertEquals(Entities.ImageTypeExample.CENTOS_6, result);
+    Assert.assertEquals(Entities.ImageTypeExample.CENTOS_6, result);
   }
 
   @Test
   public void testDeleteImageType() throws IOException {
     ImageType result = adminClient.getImageType(Entities.ImageTypeExample.CENTOS_6.getName());
-    assertTrue(result != null);
-    assertEquals(Entities.ImageTypeExample.CENTOS_6, result);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(Entities.ImageTypeExample.CENTOS_6, result);
 
     adminClient.deleteService(Entities.ImageTypeExample.CENTOS_6.getName());
     try {

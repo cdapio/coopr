@@ -27,9 +27,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class TenantRestClientTest extends RestClientTest {
 
   private TenantClient tenantClient;
@@ -43,8 +40,8 @@ public class TenantRestClientTest extends RestClientTest {
   public void testGetAllTenants() throws IOException {
     List<TenantSpecification> result = tenantClient.getTenants();
     // first is the tenant created in the RestClientTest and the second one is the default superadmin tenant
-    assertTrue(result.size() == 2);
-    assertTrue(result.contains(TEST_TENANT.getSpecification()));
+    Assert.assertEquals(2, result.size());
+    Assert.assertTrue(result.contains(TEST_TENANT.getSpecification()));
   }
 
   @Test
@@ -60,7 +57,7 @@ public class TenantRestClientTest extends RestClientTest {
   @Test
   public void testGetTenant() throws IOException {
     TenantSpecification result = tenantClient.getTenant(TENANT);
-    assertEquals(TEST_TENANT.getSpecification(), result);
+    Assert.assertEquals(TEST_TENANT.getSpecification(), result);
   }
 
   @Test
@@ -76,8 +73,8 @@ public class TenantRestClientTest extends RestClientTest {
   @Test
   public void testDeleteTenantSuccess() throws IOException {
     TenantSpecification result = tenantClient.getTenant(TENANT);
-    assertTrue(result != null);
-    assertEquals(TEST_TENANT.getSpecification(), result);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(TEST_TENANT.getSpecification(), result);
 
     tenantClient.deleteTenant(TENANT);
 

@@ -40,11 +40,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 public class ClusterRestClientTest extends RestClientTest {
 
   public static final String EXPECTED_NEW_CLUSTER_NAME = "new";
@@ -59,18 +54,18 @@ public class ClusterRestClientTest extends RestClientTest {
   @Test
   public void testGetClusters() throws IOException {
     List<ClusterSummary> result = clusterClient.getClusters();
-    assertTrue(result.size() == 2);
+    Assert.assertEquals(2, result.size());
     for (ClusterSummary clusterSummary : result) {
       if (FIRST_TEST_CLUSTER_ID.equals(clusterSummary.getId())) {
-        assertEquals(BaseEntity.from(FIRST_TEST_CLUSTER.getClusterTemplate()),
+        Assert.assertEquals(BaseEntity.from(FIRST_TEST_CLUSTER.getClusterTemplate()),
                      clusterSummary.getClusterTemplate());
-        assertEquals(FIRST_TEST_CLUSTER.getName(), clusterSummary.getName());
+        Assert.assertEquals(FIRST_TEST_CLUSTER.getName(), clusterSummary.getName());
       } else if (SECOND_TEST_CLUSTER_ID.equals(clusterSummary.getId())) {
-        assertEquals(BaseEntity.from(SECOND_TEST_CLUSTER.getClusterTemplate()),
+        Assert.assertEquals(BaseEntity.from(SECOND_TEST_CLUSTER.getClusterTemplate()),
                      clusterSummary.getClusterTemplate());
-        assertEquals(SECOND_TEST_CLUSTER.getName(), clusterSummary.getName());
+        Assert.assertEquals(SECOND_TEST_CLUSTER.getName(), clusterSummary.getName());
       } else {
-        fail("Unexpected ClusterSummery object found.");
+        Assert.fail("Unexpected ClusterSummery object found.");
       }
     }
   }
@@ -79,17 +74,19 @@ public class ClusterRestClientTest extends RestClientTest {
   @Test
   public void testGetCluster() throws IOException {
     ClusterDetails result = clusterClient.getCluster(FIRST_TEST_CLUSTER_ID);
-    assertEquals(ClusterAction.CLUSTER_CREATE, result.getProgress().getAction());
+    Assert.assertEquals(ClusterAction.CLUSTER_CREATE, result.getProgress().getAction());
   }
 
   @Test
   public void testDeleteCluster() throws IOException {
     ClusterDetails result = clusterClient.getCluster(SECOND_TEST_CLUSTER_ID);
-    assertTrue(result != null);
-    assertEquals(ClusterAction.CLUSTER_CREATE, result.getProgress().getAction());
+    Assert.assertNotNull(result);
+    Assert.assertEquals(ClusterAction.CLUSTER_CREATE, result.getProgress().getAction());
+
     clusterClient.deleteCluster(SECOND_TEST_CLUSTER_ID);
+
     result = clusterClient.getCluster(SECOND_TEST_CLUSTER_ID);
-    assertEquals(ClusterAction.CLUSTER_DELETE, result.getProgress().getAction());
+    Assert.assertEquals(ClusterAction.CLUSTER_DELETE, result.getProgress().getAction());
   }
 
   @Test
@@ -101,11 +98,11 @@ public class ClusterRestClientTest extends RestClientTest {
       .setDNSSuffix("ro.test.com")
       .build();
     String newClusterId = clusterClient.createCluster(createRequest);
-    assertFalse(Strings.isNullOrEmpty(newClusterId));
+    Assert.assertNotNull(newClusterId);
 
     ClusterDetails createdCluster = clusterClient.getCluster(newClusterId);
-    assertTrue(createdCluster != null);
-    assertEquals(ClusterAction.SOLVE_LAYOUT, createdCluster.getProgress().getAction());
+    Assert.assertNotNull(createdCluster);
+    Assert.assertEquals(ClusterAction.SOLVE_LAYOUT, createdCluster.getProgress().getAction());
   }
 
   @Test
@@ -127,15 +124,15 @@ public class ClusterRestClientTest extends RestClientTest {
   @Test
   public void testGetClusterStatus() throws IOException {
     ClusterStatusResponse result = clusterClient.getClusterStatus(FIRST_TEST_CLUSTER_ID);
-    assertEquals(Cluster.Status.ACTIVE, result.getStatus());
+    Assert.assertEquals(Cluster.Status.ACTIVE, result.getStatus());
   }
 
   @Test
   public void testGetClusterConfig() throws IOException {
     JsonObject jsonObject = clusterClient.getClusterConfig(FIRST_TEST_CLUSTER_ID);
-    assertEquals("value1", jsonObject.get("property1").getAsString());
-    assertEquals("value2", jsonObject.get("property2").getAsString());
-    assertEquals("value3", jsonObject.get("property3").getAsString());
+    Assert.assertEquals("value1", jsonObject.get("property1").getAsString());
+    Assert.assertEquals("value2", jsonObject.get("property2").getAsString());
+    Assert.assertEquals("value3", jsonObject.get("property3").getAsString());
   }
 
   @Test
@@ -147,10 +144,10 @@ public class ClusterRestClientTest extends RestClientTest {
     clusterClient.setClusterConfig(FIRST_TEST_CLUSTER_ID, clusterConfigureRequest);
 
     config = clusterClient.getClusterConfig(FIRST_TEST_CLUSTER_ID);
-    assertEquals("value1", config.get("property1").getAsString());
-    assertEquals("value2", config.get("property2").getAsString());
-    assertEquals("value3", config.get("property3").getAsString());
-    assertEquals("value4", config.get("property4").getAsString());
+    Assert.assertEquals("value1", config.get("property1").getAsString());
+    Assert.assertEquals("value2", config.get("property2").getAsString());
+    Assert.assertEquals("value3", config.get("property3").getAsString());
+    Assert.assertEquals("value4", config.get("property4").getAsString());
   }
 
   @Test
@@ -160,7 +157,7 @@ public class ClusterRestClientTest extends RestClientTest {
     Set<String> expectedResult = Sets.newHashSet(Entities.ServiceExample.DATANODE.getName(),
                                                  Entities.ServiceExample.NAMENODE.getName(),
                                                  Entities.ServiceExample.HOSTS.getName());
-    assertEquals(expectedResult, Sets.newHashSet(result));
+    Assert.assertEquals(expectedResult, Sets.newHashSet(result));
   }
 
   @Test
@@ -237,7 +234,7 @@ public class ClusterRestClientTest extends RestClientTest {
     clusterClient.addServicesOnCluster(FIRST_TEST_CLUSTER_ID, addServicesRequest);
 
     ClusterDetails result = clusterClient.getCluster(FIRST_TEST_CLUSTER_ID);
-    assertEquals(ClusterAction.ADD_SERVICES, result.getProgress().getAction());
+    Assert.assertEquals(ClusterAction.ADD_SERVICES, result.getProgress().getAction());
   }
 
   @Test
