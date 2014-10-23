@@ -1238,10 +1238,11 @@ To pause a cluster job that is currently running, make a POST HTTP request to UR
 
  /clusters/{cluster-id}/pause
 
-APausing a job prevents additional tasks from being started, but any tasks that are in progress when a job is paused
+A Pausing a job prevents additional tasks from being started, but any tasks that are in progress when a job is paused
 will continue to run until they are completed.
 Admins and cluster owners are allowed to pause a cluster job. If there is no job in progress,
 the request is a no-op and a 200 is returned.
+
 HTTP Responses
 ^^^^^^^^^^^^^^
 .. list-table::
