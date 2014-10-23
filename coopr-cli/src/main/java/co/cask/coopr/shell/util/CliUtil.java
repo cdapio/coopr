@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.Socket;
 
 /**
@@ -77,7 +78,19 @@ public class CliUtil {
       Gson gson = new Gson();
       if (arg.startsWith(FILE_PREFIX)) {
         String argFilePath = arg.substring(FILE_PREFIX.length());
-        return gson.fromJson(new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8), type);
+        Reader reader = null;
+        try {
+          reader = new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8);
+          return gson.fromJson(new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8), type);
+        } finally {
+          if (reader != null) {
+            try {
+              reader.close();
+            } catch (IOException e) {
+              LOG.warn("Cannot close stream for file: {}", argFilePath, e);
+            }
+          }
+        }
       }
       return gson.fromJson(arg, type);
     }
