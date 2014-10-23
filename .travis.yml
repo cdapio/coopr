@@ -50,7 +50,7 @@ before_script:
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp coopr-server/target/*:coopr-e2e/config co.cask.coopr.runtime.ServerMain; fi >/dev/null 2>&1 &'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then java -cp coopr-server/target/*:coopr-e2e/config co.cask.coopr.runtime.MockProvisionerMain -p 55054; fi >/dev/null 2>&1 &'
   - 'sleep 30' # give server generous time to start
-  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then bash coopr-server/config/defaults/load-defaults.sh; fi'
+  - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then bash coopr-server/templates/mock/load-mock.sh; fi'
 
 script:
   - 'cd coopr-ngui'
