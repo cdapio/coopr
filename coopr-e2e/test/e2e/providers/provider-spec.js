@@ -83,7 +83,7 @@ describe('providers test', function () {
     browser.get('/providers');
     providersList = element.all(by.repeater('item in list'));
     providersList.first().element(by.cssContainingText('.btn', 'Delete')).click();
-    ptor.switchTo().alert().accept();
+    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
     providersList = element.all(by.repeater('item in list'));
     expect(providersList.count()).toEqual(0);
   });
