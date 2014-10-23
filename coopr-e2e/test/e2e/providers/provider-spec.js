@@ -67,7 +67,7 @@ describe('providers test', function () {
 
 
   it('should delete provider upon clicking delete', function () {
-    providersList.last().element(by.css('.delete-btn')).click();
+    providersList.last().element(by.cssContainingText('.btn', 'Delete')).click();
     ptor.switchTo().alert().accept();
     providersList = element.all(by.repeater('item in list'));
     expect(providersList.count()).toEqual(7);
@@ -139,7 +139,7 @@ describe('providers test', function () {
 
   it('should link to the right pages', function () {
     providersList = element.all(by.repeater('item in list'));
-    var edithref = providersList.first().element(by.css('.edit-btn')).getAttribute('href');
+    var edithref = providersList.first().element(by.cssContainingText('.btn', 'Edit')).getAttribute('href');
     expect(edithref).toMatch(/\/providers\/edit\/aws-us-east-1$/);
   });
 
