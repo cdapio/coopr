@@ -68,7 +68,7 @@ describe('providers test', function () {
 
   it('should delete provider upon clicking delete', function () {
     providersList.last().element(by.cssContainingText('.btn', 'Delete')).click();
-    ptor.switchTo().alert().accept();
+    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
     providersList = element.all(by.repeater('item in list'));
     expect(providersList.count()).toEqual(7);
   });
