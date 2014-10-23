@@ -26,6 +26,7 @@ import co.cask.coopr.shell.command.DeleteHardwareTypeCommand;
 import co.cask.coopr.shell.command.DeleteImageTypeCommand;
 import co.cask.coopr.shell.command.DeleteProviderCommand;
 import co.cask.coopr.shell.command.DeleteServiceCommand;
+import co.cask.coopr.shell.command.DeleteTenantCommand;
 import co.cask.coopr.shell.command.ExitCommand;
 import co.cask.coopr.shell.command.GetClusterCommand;
 import co.cask.coopr.shell.command.GetClusterConfigCommand;
@@ -34,14 +35,18 @@ import co.cask.coopr.shell.command.GetClusterTemplateCommand;
 import co.cask.coopr.shell.command.GetHardwareTypeCommand;
 import co.cask.coopr.shell.command.GetImageTypeCommand;
 import co.cask.coopr.shell.command.GetProviderCommand;
+import co.cask.coopr.shell.command.GetProvisionerCommand;
 import co.cask.coopr.shell.command.GetServiceCommand;
+import co.cask.coopr.shell.command.GetTenantCommand;
 import co.cask.coopr.shell.command.ListClusterServicesCommand;
 import co.cask.coopr.shell.command.ListClusterTemplatesCommand;
 import co.cask.coopr.shell.command.ListClustersCommand;
 import co.cask.coopr.shell.command.ListHardwareTypesCommand;
 import co.cask.coopr.shell.command.ListImageTypesCommand;
 import co.cask.coopr.shell.command.ListProvidersCommand;
+import co.cask.coopr.shell.command.ListProvisionersCommand;
 import co.cask.coopr.shell.command.ListServicesCommand;
+import co.cask.coopr.shell.command.ListTenantsCommand;
 import co.cask.coopr.shell.command.RestartServiceOnClusterCommand;
 import co.cask.coopr.shell.command.SetClusterConfigCommand;
 import co.cask.coopr.shell.command.SetClusterExpireTimeCommand;
@@ -65,7 +70,9 @@ public class CommandSet {
     );
     List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
       getAdminCommandSet(injector),
-      getClusterCommandSet(injector)
+      getClusterCommandSet(injector),
+      getTenantCommandSet(injector),
+      getProvisionerCommandSet(injector)
     );
     return new co.cask.common.cli.CommandSet<Command>(commands, commandSets);
   }
@@ -107,6 +114,23 @@ public class CommandSet {
       injector.getInstance(StartServiceOnClusterCommand.class),
       injector.getInstance(StopServiceOnClusterCommand.class),
       injector.getInstance(SyncClusterTemplateCommand.class)
+    );
+    return new co.cask.common.cli.CommandSet<Command>(commands);
+  }
+
+  private static co.cask.common.cli.CommandSet<Command> getTenantCommandSet(Injector injector) {
+    List<Command> commands = ImmutableList.of(
+      injector.getInstance(DeleteTenantCommand.class),
+      injector.getInstance(GetTenantCommand.class),
+      injector.getInstance(ListTenantsCommand.class)
+    );
+    return new co.cask.common.cli.CommandSet<Command>(commands);
+  }
+
+  private static co.cask.common.cli.CommandSet<Command> getProvisionerCommandSet(Injector injector) {
+    List<Command> commands = ImmutableList.of(
+      injector.getInstance(GetProvisionerCommand.class),
+      injector.getInstance(ListProvisionersCommand.class)
     );
     return new co.cask.common.cli.CommandSet<Command>(commands);
   }
