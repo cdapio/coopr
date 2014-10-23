@@ -37,7 +37,8 @@ The Rest Client Java API is for managing Coopr from Java applications.
   - ssl: false (use HTTP protocol) 
   - version : 'v2' (Coopr server version, used as a part of the base URI [http(s)://localhost:55054/v2/...]) 
   - apiKey:  null (Need to specify to authenticate client requests)
-  - verifySSLCert: true (By default, SSL Certificate verification is enabled) 
+  - verifySSLCert: true (By default, SSL Certificate verification is enabled)
+  - gson: new Gson() (Gson instance with the default configurations) 
    
  ```
    ClientManager clientManager = RestClientManager.builder("localhost", 55054)

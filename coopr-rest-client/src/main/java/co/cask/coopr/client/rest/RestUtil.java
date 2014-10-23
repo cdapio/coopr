@@ -72,4 +72,6 @@ public final class RestUtil {
       .register("http", PlainConnectionSocketFactory.getSocketFactory())
       .build();
   }
+
+
 }
