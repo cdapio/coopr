@@ -101,6 +101,14 @@ class FogProviderJoyent < Provider
       # do we need sudo bash?
       sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
+      
+      # login with pseudotty and turn off sudo requiretty option
+      log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
+      Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+        cmd = "#{sudo} sed -i -e '/^Defaults[[:space:]]*requiretty/ s/^/#/' /etc/sudoers"
+        ssh_exec!(ssh, cmd, 'Disabling requiretty via pseudotty session', true)
+      end
+
       # Validate connectivity
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
@@ -136,17 +144,41 @@ class FogProviderJoyent < Provider
           log.debug 'Assuming /dev/vdb1 is mounted at /data, if this is not the case, file an issue'
         elsif vdb
           begin
+            mounted = false
             ssh_exec!(ssh, 'if grep "vdb /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
+          rescue
+            mounted = true
+          end
+          # If mounted = true, we're done
+          unless mounted
             # disk isn't mounted at /data, could be mounted elsewhere
             begin
-              ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
+              # Are we mounted?
+              ssh_exec!(ssh, 'mount | grep ^/dev/vdb 2>&1 >/dev/null', 'Checking if /dev/vdb is unmounted')
+              unmount = true
             rescue
-              log.debug 'Mounting /dev/vdb failed'
+              log.debug 'Disk /dev/vdb is not mounted'
+            end
+            if unmount
+              begin
+                ssh_exec!(ssh, "#{sudo} umount /dev/vdb", 'Unmounting /dev/vdb')
+              rescue
+                raise 'Failure unmounting data disk /dev/vdb'
+              end
+            end
+            # Disk is unmounted, format it
+            begin
+              ssh_exec!(ssh, "#{sudo} /sbin/mkfs.ext4 /dev/vdb", 'Formatting filesystem at /dev/vdb')
+            rescue
+              raise 'Failure formatting data disk /dev/vdb'
+            end
+            # Mount it
+            begin
+              ssh_exec!(ssh, "#{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
+            rescue
               raise 'Failed to mount /dev/vdb at /data'
             end
             ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
-          rescue
-            log.debug 'Disk /dev/vdb already mounted at /data'
           end
         end
       end

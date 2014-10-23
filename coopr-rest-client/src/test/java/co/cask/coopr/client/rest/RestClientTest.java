@@ -22,10 +22,19 @@ import co.cask.coopr.client.rest.handler.ClusterTemplateHandler;
 import co.cask.coopr.client.rest.handler.HardwareTypeHandler;
 import co.cask.coopr.client.rest.handler.ImageTypeHandler;
 import co.cask.coopr.client.rest.handler.ProviderHandler;
+import co.cask.coopr.client.rest.handler.ProvisionerHandler;
 import co.cask.coopr.client.rest.handler.ServiceHandler;
+import org.apache.http.conn.ssl.SSLContexts;
+import co.cask.coopr.client.rest.handler.TenantHandler;
 import org.apache.http.localserver.LocalTestServer;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.security.KeyStore;
+import javax.net.ssl.SSLContext;
 
 /**
  * Contains common fields for REST Client API unit tests.
@@ -38,6 +47,7 @@ public class RestClientTest {
   protected ClientManager clientManager;
   protected String testServerHost;
   protected int testServerPort;
+  protected boolean sslEnabled = false;
 
   private LocalTestServer localTestServer;
 
@@ -47,22 +57,51 @@ public class RestClientTest {
   private HardwareTypeHandler hardwareTypeHandler = new HardwareTypeHandler();
   private ImageTypeHandler imageTypeHandler = new ImageTypeHandler();
   private ClusterHandler clusterHandler = new ClusterHandler();
+  private ProvisionerHandler provisionerHandler = new ProvisionerHandler();
+  private TenantHandler tenantHandler = new TenantHandler();
 
   @Before
   public void setUp() throws Exception {
-    localTestServer = new LocalTestServer(null, null);
+    if (sslEnabled) {
+      URL keyStoreURL = getClass().getClassLoader().getResource("cert.jks");
+      Assert.assertNotNull(keyStoreURL);
+      final InputStream inStream = keyStoreURL.openStream();
+      KeyStore keystore = KeyStore.getInstance("jks");
+      try {
+        keystore.load(inStream, "secret".toCharArray());
+      } finally {
+        inStream.close();
+      }
+
+      final SSLContext serverSSLContext = SSLContexts.custom()
+        .useProtocol("TLS")
+        .loadKeyMaterial(keystore, "secret".toCharArray())
+        .build();
+      localTestServer = new LocalTestServer(serverSSLContext);
+    } else {
+      localTestServer = new LocalTestServer(null, null);
+    }
+
     localTestServer.register("/v2/clustertemplates*", clusterTemplatesHandler);
     localTestServer.register("/v2/providers*", providerHandler);
     localTestServer.register("/v2/services*", serviceHandler);
     localTestServer.register("/v2/hardwaretypes*", hardwareTypeHandler);
     localTestServer.register("/v2/imagetypes*", imageTypeHandler);
     localTestServer.register("/v2/clusters*", clusterHandler);
+    localTestServer.register("/v2/provisioners*", provisionerHandler);
+    localTestServer.register("/v2/tenants*", tenantHandler);
     localTestServer.start();
     testServerHost = localTestServer.getServiceAddress().getHostName();
     testServerPort = localTestServer.getServiceAddress().getPort();
-    clientManager = RestClientManager.builder(testServerHost, testServerPort)
-      .userId(TEST_USER_ID)
+    clientManager = createClientManager(TEST_USER_ID);
+  }
+
+  protected ClientManager createClientManager(String userId) {
+    return RestClientManager.builder(testServerHost, testServerPort)
+      .userId(userId)
       .tenantId(TEST_TENANT_ID)
+      .ssl(sslEnabled)
+      .verifySSLCert(!sslEnabled)
       .build();
   }
 

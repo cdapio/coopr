@@ -19,7 +19,7 @@ for d in ${dirs} ; do
   cd ${MAINDIR}
   [[ -d ${d} ]] && cd ${d} || continue
   for f in $(ls -1 *.json) ; do
-    curl --silent --request PUT \
+    curl $CURL_PARAMETER --request PUT \
       --header "Content-Type:application/json" \
       --header "Coopr-UserID:${COOPR_API_USER}" \
       --header "Coopr-ApiKey:${COOPR_API_KEY}" \

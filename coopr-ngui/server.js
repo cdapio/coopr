@@ -7,6 +7,7 @@
 var pkg = require('./package.json'),
     morgan = require('morgan'),
     express = require('express'),
+    finalhandler = require('finalhandler'),
     serveFavicon = require('serve-favicon'),
     corsAnywhere = require('cors-anywhere'),
 
@@ -62,11 +63,14 @@ app.get('/config.js', function (req, res) {
 });
 
 // serve static assets
-app.get(/\/(bundle|fonts|partials|img)\/.*/, [
+app.all(/\/(bundle|fonts|partials|img)\/.*/, [
   httpStaticLogger,
   express.static(__dirname + '/dist', {
     index: false
-  })
+  }),
+  function(req, res) {
+    finalhandler(req, res)(false); // 404 
+  }
 ]);
 
 app.get('/robots.txt', [

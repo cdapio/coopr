@@ -40,15 +40,18 @@ class FogProviderOpenstack < Provider
       # Create the server
       log.debug "Creating #{hostname} on Openstack using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
-      begin
-        server = connection.servers.create(
-          flavor_ref: flavor,
-          image_ref: image,
-          name: hostname,
-          security_groups: @security_groups,
-          key_name: @ssh_keypair
-        )
-      end
+      create_options = {
+        flavor_ref: flavor,
+        image_ref: image,
+        name: hostname,
+        security_groups: @security_groups,
+        key_name: @ssh_keypair
+      }
+
+      create_options.merge!(nics: @network_ids.split(',').map { |nic| nic_id = { 'net_id' => nic.strip } }) if @network_ids
+
+      server = connection.servers.create(create_options)
+
       # Process results
       @result['result']['providerid'] = server.id.to_s
       @result['result']['ssh-auth']['user'] = @task['config']['sshuser'] || 'root'
@@ -115,6 +118,14 @@ class FogProviderOpenstack < Provider
       }
       # Additional checks
       set_credentials(@task['config']['ssh-auth'])
+
+      # login with pseudotty and turn off sudo requiretty option
+      log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
+      Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+        cmd = "#{sudo} sed -i -e '/^Defaults[[:space:]]*requiretty/ s/^/#/' /etc/sudoers"
+        ssh_exec!(ssh, cmd, 'Disabling requiretty via pseudotty session', true)
+      end
+
       # Validate connectivity
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
