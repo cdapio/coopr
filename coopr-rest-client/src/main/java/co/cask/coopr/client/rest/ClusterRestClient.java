@@ -28,6 +28,7 @@ import co.cask.coopr.http.request.ClusterStatusResponse;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -59,6 +60,10 @@ public class ClusterRestClient extends RestClient implements ClusterClient {
 
   public ClusterRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
     super(config, httpClient);
+  }
+
+  public ClusterRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
+    super(config, httpClient, gson);
   }
 
   @Override
@@ -150,7 +155,7 @@ public class ClusterRestClient extends RestClient implements ClusterClient {
   @Override
   public void setClusterExpireTime(String clusterId, long expireTime) throws IOException {
     HttpPost postRequest = new HttpPost(buildFullURL(String.format("/clusters/%s", clusterId)));
-    StringEntity entity = new StringEntity(GSON.toJson(ImmutableMap.of(EXPIRE_TIME_ATTRIBUTE_NAME, expireTime)));
+    StringEntity entity = new StringEntity(getGson().toJson(ImmutableMap.of(EXPIRE_TIME_ATTRIBUTE_NAME, expireTime)));
     entity.setContentType(MediaType.APPLICATION_JSON);
     postRequest.setEntity(entity);
     LOG.debug("Set a cluster expiration timestamp to the new value {}.", expireTime);

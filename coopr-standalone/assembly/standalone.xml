@@ -37,8 +37,12 @@
             <outputDirectory>/server/bin</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../coopr-server/config/defaults</directory>
-            <outputDirectory>/server/config/defaults</outputDirectory>
+            <directory>${project.basedir}/../coopr-templates</directory>
+            <outputDirectory>/server/templates</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../coopr-server/templates/mock</directory>
+            <outputDirectory>/server/templates/mock</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/bin</directory>

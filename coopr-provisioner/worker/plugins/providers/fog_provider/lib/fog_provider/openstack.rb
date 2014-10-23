@@ -59,10 +59,12 @@ class FogProviderOpenstack < Provider
       @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue Excon::Errors::Unauthorized
+      msg = 'Provider credentials invalid/unauthorized'
       @result['status'] = 201
-      log.error('Provider credentials invalid/unauthorized')
+      @result['stderr'] = msg
+      log.error(msg)
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderOpenstack.create:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderOpenstack.create: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.create: #{e.inspect}"
     else
       log.debug "Create finished successfully: #{@result}"
@@ -119,7 +121,8 @@ class FogProviderOpenstack < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
       }
-      # Additional checks
+      # do we need sudo bash?
+      sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
 
       # login with pseudotty and turn off sudo requiretty option
@@ -142,7 +145,7 @@ class FogProviderOpenstack < Provider
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderOpenstack.confirm:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderOpenstack.confirm: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.confirm: #{e.inspect}"
     else
       log.debug "Confirm finished successfully: #{@result}"
@@ -170,7 +173,7 @@ class FogProviderOpenstack < Provider
       # Return 0
       @result['status'] = 0
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderOpenstack.delete:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderOpenstack.delete: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderOpenstack.delete: #{e.inspect}"
     else
       log.debug "Delete finished sucessfully: #{@result}"
