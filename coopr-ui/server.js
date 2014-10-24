@@ -182,6 +182,12 @@ site.app.use(function(err, req, res, next) {
   next();
 });
 
+
+var tlsEnabled = ('true' === process.env['COOPR_NODE_TLS_ENABLED']),
+    tlsKey = process.env['COOPR_NODE_TLS_KEY'],
+    tlsCrt = process.env['COOPR_NODE_TLS_CRT'],
+    tlsCA = process.env['COOPR_NODE_TLS_CA'];
+
 /**
  * Gets data for a given restful url.
  * @param  {String} path Request path.
@@ -199,6 +205,15 @@ site.getEntity = function (path, user) {
         'Coopr-ApiKey': DEFAULT_API_KEY
       }
     };
+
+      if(tlsEnabled) {
+          options.agentOptions = {
+              key: fs.readFileSync(tlsKey),
+              cert: fs.readFileSync(tlsCrt),
+              ca: fs.readFileSync(tlsCA)
+          };
+      }
+
     request(options, function (err, response, body) {
       if (err) {
         callback('Error: ' + JSON.stringify(err));
