@@ -2,7 +2,7 @@
 # Cookbook Name:: cdap
 # Attribute:: repo
 #
-# Copyright (C) 2013-2014 Continuuity, Inc.
+# Copyright © 2013-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,12 +18,7 @@
 #
 
 # URL to repository
-case node['platform_family']
-when 'debian'
-  default['cdap']['repo']['url'] = 'http://repository.cask.co/ubuntu/precise/amd64/releases'
-else
-  default['cdap']['repo']['url'] = 'http://repository.cask.co/centos/6/x86_64/releases'
-  default['cdap']['repo']['key_url'] = 'http://repository.cask.co/centos/6/x86_64/pubkey.gpg'
-end
-# Repository components to use
-default['cdap']['repo']['components'] = ['releases']
+default['cdap']['repo']['apt_repo_url'] = 'http://repository.cask.co/ubuntu/precise/amd64/releases'
+default['cdap']['repo']['apt_components'] = ['releases']
+default['cdap']['repo']['yum_repo_url'] = 'http://repository.cask.co/centos/6/x86_64/releases'
+default['cdap']['repo']['yum_repo_key_url'] = 'http://repository.cask.co/centos/6/x86_64/pubkey.gpg'
