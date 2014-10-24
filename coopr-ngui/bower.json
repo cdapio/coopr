@@ -10,7 +10,7 @@
 
     "bootstrap": "3.2.0",
     "font-awesome": "4.2.0",
-    "angular-strap": "2.1.1",
+    "angular-strap": "2.1.2",
 
     "angular-ui-router": "0.2.12-pre1",
     "angular-loading-bar": "0.6.0",
