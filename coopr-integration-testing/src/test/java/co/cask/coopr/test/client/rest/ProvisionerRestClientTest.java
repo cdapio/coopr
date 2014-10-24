@@ -19,6 +19,7 @@ package co.cask.coopr.test.client.rest;
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.provisioner.Provisioner;
+import co.cask.coopr.test.client.ClientTest;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,7 +28,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class ProvisionerRestClientTest extends RestClientTest {
+public class ProvisionerRestClientTest extends ClientTest {
 
   private ProvisionerClient provisionerClient;
 

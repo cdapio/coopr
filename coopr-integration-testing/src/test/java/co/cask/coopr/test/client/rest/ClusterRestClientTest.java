@@ -29,6 +29,7 @@ import co.cask.coopr.http.request.ClusterCreateRequest;
 import co.cask.coopr.http.request.ClusterStatusResponse;
 import co.cask.coopr.scheduler.ClusterAction;
 import co.cask.coopr.spec.BaseEntity;
+import co.cask.coopr.test.client.ClientTest;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
@@ -41,7 +42,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-public class ClusterRestClientTest extends RestClientTest {
+public class ClusterRestClientTest extends ClientTest {
 
   public static final String EXPECTED_NEW_CLUSTER_NAME = "new";
 
