@@ -16,25 +16,29 @@ module.exports = {
 
 };
 
+
 // ----------------------------------------------------------------------------
 
 function login(tenant, username, password) {
 
   browser.get('/');
+  browser.waitForAngular();
 
   isLoggedIn()
     .then(function (needLogout) {
+
       if(needLogout) {
         logout();
       }
 
       browser.get('/login');
+      browser.waitForAngular();
 
       element(by.id('loginTenant')).clear().sendKeys(tenant);
       element(by.id('loginUsername')).clear().sendKeys(username);
       element(by.id('loginPassword')).clear().sendKeys(password);
       element(by.partialButtonText('Submit')).click();
-      browser.waitForAngular();
+
       browser.wait(isLoggedIn, 10000);
     });
 }
@@ -43,23 +47,31 @@ function login(tenant, username, password) {
 function logout() {
 
   browser.get('/');
+  browser.waitForAngular();
 
-  ddIsOpen()
-    .then(function (dd) {
-      if(!dd) {
-        element(by.css('header .navbar-right .dropdown-toggle')).click();
-        browser.waitForAngular();
-        browser.wait(ddIsOpen, 10000);        
+  isLoggedIn()
+    .then(function(needLogout){
+      if(needLogout) {
+
+        ddIsOpen()
+          .then(function (dd) {
+            if(!dd) {
+              element(by.css('header .navbar-right .dropdown-toggle')).click();
+              browser.wait(ddIsOpen, 10000);        
+            }
+
+            element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
+
+            browser.wait(function() {
+              return element(
+                by.cssContainingText('#alerts .alert-info', 'You are now logged out')
+              ).isPresent();
+            }, 10000);
+          });
+
       }
-
-      element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
-      browser.waitForAngular();
-      browser.wait(function() {
-        return element(
-          by.cssContainingText('#alerts .alert-info', 'You are now logged out')
-        ).isPresent();
-      }, 10000);
     });
+
 }
 
 function isLoggedIn () {
