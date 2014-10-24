@@ -22,13 +22,14 @@ import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.ClusterDetails;
 import co.cask.coopr.cluster.ClusterSummary;
+import co.cask.coopr.cluster.Node;
 import co.cask.coopr.http.request.AddServicesRequest;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
 import co.cask.coopr.http.request.ClusterCreateRequest;
 import co.cask.coopr.http.request.ClusterStatusResponse;
 import co.cask.coopr.scheduler.ClusterAction;
 import co.cask.coopr.spec.BaseEntity;
-import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 import org.apache.http.HttpStatus;
@@ -70,11 +71,18 @@ public class ClusterRestClientTest extends RestClientTest {
     }
   }
 
-  //TODO : cluster == null ???
   @Test
   public void testGetCluster() throws IOException {
     ClusterDetails result = clusterClient.getCluster(FIRST_TEST_CLUSTER_ID);
+    Assert.assertNotNull(result);
     Assert.assertEquals(ClusterAction.CLUSTER_CREATE, result.getProgress().getAction());
+    for (Node node : result.getNodes()) {
+      Assert.assertTrue(FIRST_TEST_CLUSTER.getNodeIDs().contains(node.getId()));
+    }
+    // Node ids get overwritten by the full node objects in the result object
+    Cluster expectedResult = FIRST_TEST_CLUSTER;
+    expectedResult.setNodes(ImmutableSet.<String>of());
+    Assert.assertEquals(expectedResult, result.getCluster());
   }
 
   @Test
