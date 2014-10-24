@@ -25,6 +25,7 @@ function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
     // No need to watch if not editing becuase this field is disabled.
     $scope.$watch('model.providertype', function (newVal) {
       $scope.selectedProvider = findProvider(newVal);
+      $scope.model.providertype =  $scope.selectedProvider;
     });
 
     myFocusManager.focus('inputProviderName');
@@ -37,6 +38,8 @@ function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
   ])
   .then(function () {
     $scope.selectedProvider = findProvider($scope.model.providertype);
+    $scope.model.providertype =  $scope.selectedProvider;
+    console.log($scope.model.providertype)
   });
 
 

@@ -29,9 +29,11 @@
       <select id="inputProviderType" 
         class="form-control"
         ng-model="model.providertype"
-        ng-options="pType.name as pType.name for pType in providerTypes"
+        ng-options="pType.name for pType in providerTypes"
         ng-readonly="editing"
-      ></select>
+      >
+      <option></option>
+    </select>
     </div>
   </div>
 
