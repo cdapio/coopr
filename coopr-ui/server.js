@@ -128,12 +128,14 @@ site.app.use(express.cookieParser());
 site.app.use(express.bodyParser());
 site.app.use('/static', express.static(__dirname + '/' + CLIENT_DIR));
 
-site.app.use(function (req, res) {
+site.app.use(function (req, res, next) {
     if (SSL && !req.secure) {
         res.redirect(['https://', req.hostname,
             ':', site.SSLPORT, req.originalUrl
         ].join(''));
     }
+
+    next();
 });
 
 /**
