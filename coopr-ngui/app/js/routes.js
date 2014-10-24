@@ -152,7 +152,7 @@ angular.module(PKG.name)
       return {
         name: stateName,
         abstract: true,
-        templateUrl: '/partials/subnav.html',
+        templateUrl: '/assets/partials/subnav.html',
         controller: 'SubnavCtrl',
         url: '/' + stateName,
         data: angular.extend({
