@@ -130,7 +130,7 @@ site.app.use('/static', express.static(__dirname + '/' + CLIENT_DIR));
 
 site.app.use(function (req, res, next) {
     if (SSL && !req.secure) {
-        res.redirect(['https://', req.hostname,
+        res.redirect(['https://', req.hostname || req.host,
             ':', site.SSLPORT, req.originalUrl
         ].join(''));
     }
