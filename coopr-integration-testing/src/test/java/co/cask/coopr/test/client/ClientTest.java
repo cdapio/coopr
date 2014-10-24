@@ -103,6 +103,7 @@ public class ClientTest extends BaseTest {
   @AfterClass
   public static void cleanupServiceBase() throws IOException {
     adminClientManager.close();
+    superadminCientManager.close();
     handlerServer.stopAndWait();
   }
 
