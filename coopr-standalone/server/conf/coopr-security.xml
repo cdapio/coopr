@@ -49,4 +49,16 @@
         <name>server.nodejs.tls.ca</name>
         <value></value>
     </property>
+    <property>
+        <name>server.nodejs.ssl.path</name>
+        <value></value>
+    </property>
+    <property>
+        <name>server.nodejs.ssl.key</name>
+        <value></value>
+    </property>
+    <property>
+        <name>server.nodejs.ssl.crt</name>
+        <value></value>
+    </property>
 </configuration>

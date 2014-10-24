@@ -152,7 +152,13 @@ COOPR_PROTOCOL=http
 read_property server.ssl.enabled ${COOPR_SERVER_CONF}coopr-site.xml COOPR_SSL
 export COOPR_SSL
 if [ ! -z $COOPR_SSL ] && [ $COOPR_SSL = "true" ]; then
-  COOPR_PROTOCOL=https
+    COOPR_PROTOCOL=https
+
+    read_property server.nodejs.ssl.path ${COOPR_SERVER_CONF}coopr-security.xml COOPR_NODEJS_SSL_PATH
+    read_property server.nodejs.ssl.key ${COOPR_SERVER_CONF}coopr-security.xml COOPR_NODEJS_SSL_KEY
+    export COOPR_NODEJS_SSL_KEY=$COOPR_NODEJS_SSL_PATH"/"$COOPR_NODEJS_SSL_KEY
+    read_property server.nodejs.ssl.crt ${COOPR_SERVER_CONF}coopr-security.xml COOPR_NODEJS_SSL_CRT
+    export COOPR_NODEJS_SSL_CRT=$COOPR_NODEJS_SSL_PATH"/"$COOPR_NODEJS_SSL_CRT
 fi
 
 export COOPR_SERVER_URI=${COOPR_PROTOCOL}://localhost:55054
