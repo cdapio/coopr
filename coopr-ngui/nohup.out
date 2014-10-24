@@ -1,0 +1,135 @@
+
+> coopr-ngui@1.1.0 start /Users/rohit/Documents/caskco/coopr/coopr-ngui
+> node ./server.js
+
+[7mcoopr-ngui[27m v1.1.0 starting up...
+[40m[32mhttp[39m[49m listening on port 8080
+[40m[35mcors[39m[49m listening on port 8081
+[40m[32mhttp[39m[49m GET [7m/login[27m 200
+[40m[32mhttp[39m[49m GET /bundle/lib.css 200
+[40m[32mhttp[39m[49m GET /bundle/app.css 200
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 200
+[40m[32mhttp[39m[49m GET /bundle/app.js 200
+[40m[32mhttp[39m[49m GET /bundle/lib.js 200
+[40m[32mhttp[39m[49m GET /partials/login.html 200
+[40m[32mhttp[39m[49m GET [7m/login[27m 304
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/login.html 304
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 200
+[40m[35mcors[39m[49m GET /v2/clusters [40m[35madmin/superadmin[39m[49m 200
+[40m[32mhttp[39m[49m GET [7m/login[27m 304
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /partials/login.html 304
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 304
+[40m[35mcors[39m[49m GET /v2/clusters [40m[35madmin/superadmin[39m[49m 200
+[40m[32mhttp[39m[49m GET [7m/login[27m 304
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/login.html 304
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 304
+[40m[35mcors[39m[49m GET /v2/clusters [40m[35madmin/superadmin[39m[49m 200
+[40m[32mhttp[39m[49m GET [7m/providers/create[27m 200
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/subnav.html 200
+[40m[32mhttp[39m[49m GET /partials/providers/form.html 200
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 304
+[40m[35mcors[39m[49m GET /v2/providers [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m GET /v2/plugins/providertypes [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m POST /v2//providers?name=Testprovider [40m[35madmin/superadmin[39m[49m 200
+[40m[32mhttp[39m[49m GET /partials/providers/list.html 200
+[40m[35mcors[39m[49m GET /v2/providers [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m GET /v2/providers/Testprovider [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m GET /v2/plugins/providertypes [40m[35madmin/superadmin[39m[49m 200
+[40m[32mhttp[39m[49m GET [7m/providers[27m 200
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/subnav.html 304
+[40m[32mhttp[39m[49m GET /partials/providers/list.html 304
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 304
+[40m[35mcors[39m[49m GET /v2/providers [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m DELETE /v2/providers/Testprovider [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m GET /v2/providers [40m[35madmin/superadmin[39m[49m 200
+[40m[32mhttp[39m[49m GET [7m/providers[27m 304
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/subnav.html 304
+[40m[32mhttp[39m[49m GET /partials/providers/list.html 304
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 304
+[40m[35mcors[39m[49m GET /v2/providers [40m[35madmin/superadmin[39m[49m 200
+[40m[32mhttp[39m[49m GET [7m/whatever[27m 200
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/404.html 200
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 304
+[40m[32mhttp[39m[49m GET /bundle/foo.bar 404
+[40m[32mhttp[39m[49m GET [7m/signin[27m 200
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/login.html 304
+[40m[32mhttp[39m[49m GET [7m/tenants[27m 200
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/login.html 304
+[40m[32mhttp[39m[49m GET [7m/login[27m 304
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/login.html 304
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 304
+[40m[35mcors[39m[49m GET /v2/clusters [40m[35madmin/superadmin[39m[49m 200
+[40m[32mhttp[39m[49m GET [7m/tenants[27m 304
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/subnav.html 304
+[40m[32mhttp[39m[49m GET /partials/tenants/list.html 200
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 304
+[40m[35mcors[39m[49m GET /v2/provisioners [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m GET /v2/tenants [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m GET /v2/metrics/queues [40m[35madmin/superadmin[39m[49m 200
+[40m[32mhttp[39m[49m GET [7m/[27m 200
+[40m[32mhttp[39m[49m GET /bundle/lib.css 304
+[40m[32mhttp[39m[49m GET /bundle/app.css 304
+[40m[32mhttp[39m[49m GET /bundle/lib.js 304
+[40m[32mhttp[39m[49m GET /bundle/app.js 304
+[40m[32mhttp[39m[49m GET /bundle/tpl.js 304
+[40m[32mhttp[39m[49m GET /partials/subnav.html 304
+[40m[32mhttp[39m[49m GET /partials/tenants/form.html 200
+[40m[32mhttp[39m[49m GET /fonts/fontawesome-webfont.woff?v=4.2.0 304
+[40m[35mcors[39m[49m GET /v2/tenants [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m GET /v2/provisioners [40m[35madmin/superadmin[39m[49m 200
+[40m[35mcors[39m[49m GET /v2/tenants/superadmin [40m[35madmin/superadmin[39m[49m 200
