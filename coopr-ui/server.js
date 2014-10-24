@@ -219,11 +219,15 @@ site.getEntity = function (path, user) {
         };
 
         if (tlsEnabled) {
-            options.agentOptions = {
-                key: fs.readFileSync(tlsKey),
-                cert: fs.readFileSync(tlsCrt),
-                ca: fs.readFileSync(tlsCA)
-            };
+            try {
+                options.agentOptions = {
+                    key: fs.readFileSync(tlsKey),
+                    cert: fs.readFileSync(tlsCrt),
+                    ca: fs.readFileSync(tlsCA)
+                };
+            } catch(e) {
+                site.logger.error('TLS request: Certificates could not be read');
+            }
         }
 
         request(options, function (err, response, body) {
@@ -1554,12 +1558,16 @@ site.httpServer.listen(site.PORT, null, null, function () {
 });
 
 if (SSL) {
-    var COOPR_UI_KEY_FILE = process.env['COOPR_NODEJS_SSL_KEY'],
-        COOPR_UI_CERT_FILE = process.env['COOPR_NODEJS_SSL_CRT'],
-        sslCredentials = {
-            key: fs.readFileSync(COOPR_UI_KEY_FILE, 'utf-8'),
-            cert: fs.readFileSync(COOPR_UI_CERT_FILE, 'utf-8')
-        };
+    try {
+        var COOPR_UI_KEY_FILE = process.env['COOPR_NODEJS_SSL_KEY'],
+            COOPR_UI_CERT_FILE = process.env['COOPR_NODEJS_SSL_CRT'],
+            sslCredentials = {
+                key: fs.readFileSync(COOPR_UI_KEY_FILE, 'utf-8'),
+                cert: fs.readFileSync(COOPR_UI_CERT_FILE, 'utf-8')
+            };
+    } catch(e) {
+        site.logger.error('HTTPS server: Certificates could not be read');
+    }
 
     site.httpsServer = https.createServer(sslCredentials, site.app);
     site.httpsServer.listen(site.SSLPORT, null, null, function () {
