@@ -129,8 +129,6 @@ pushd $E2E_DIR && npm run loadmock || { die 'Problem loading mocks'; }
 popd && pushd $E2E_DIR
 npm run protractor
 
-
-echo -n "Stopping Servers"
 stop $mockpid
 stop $uipid
 stop $serverpid
