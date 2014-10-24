@@ -15,25 +15,15 @@
 # limitations under the License.
 #
 
-COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
-COOPR_HOME=${COOPR_HOME:-/opt/coopr} ; export COOPR_HOME
+export COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
+export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
 
-if [ -d /opt/coopr ]; then
-  DEFAULT_JVM_OPTS="-Xmx3072m"
-else
-  DEFAULT_JVM_OPTS="-Xmx1024m"
-fi
+### TODO: make this suck less (COOPR-545)
+[ -d /opt/coopr ] && DEFAULT_JVM_OPTS="-Xmx3072m" || DEFAULT_JVM_OPTS="-Xmx1024m"
 
-die ( ) {
-  echo
-  echo "$*"
-  echo
-  exit 1
-}
+die ( ) { echo; echo "ERROR: ${*}"; echo; exit 1; }
 
-splitJvmOpts ( ) {
-  JVM_OPTS=("$@")
-}
+splitJvmOpts ( ) { JVM_OPTS=("$@"); }
 
 APP_NAME="coopr-server"
 COOPR_SERVER_CONF=${COOPR_SERVER_CONF:-/etc/coopr/conf}
@@ -43,15 +33,15 @@ PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
 # Determine the Java command to use to start the JVM.
-if [ -n "$JAVA_HOME" ] ; then
-  if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+if [ -n ${JAVA_HOME} ] ; then
+  if [ -x "${JAVA_HOME}/jre/sh/java" ] ; then
     # IBM's JDK on AIX uses strange locations for the executables
-    JAVACMD="$JAVA_HOME/jre/sh/java"
+    JAVACMD="${JAVA_HOME}/jre/sh/java"
   else
-    JAVACMD="$JAVA_HOME/bin/java"
+    JAVACMD="${JAVA_HOME}/bin/java"
   fi
-  if [ ! -x "$JAVACMD" ] ; then
-    die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+  if [ ! -x "${JAVACMD}" ] ; then
+    die "JAVA_HOME is set to an invalid directory: ${JAVA_HOME}
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
@@ -64,27 +54,11 @@ Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
 fi
 
-source_function_library() {
-  # Source function library. used for "status" use case
-  if [ -f "/etc/rc.d/init.d/functions" ]; then
-    PLATFORM="RHEL"
-    . /etc/rc.d/init.d/functions
-  elif [ -f /lib/lsb/init-functions ] ; then
-    PLATFORM="UBUNTU"
-    . /lib/lsb/init-functions
-  else
-    echo "Platform is unsupported."
-    exit 0
-  fi
-}
-
 check_before_start() {
-  if [ ! -d "${PID_DIR}" ] ; then
-    mkdir -p "${PID_DIR}"
-  fi
-  if [ -f "${pid}" ] ; then
-    if kill -0 `cat $pid` > /dev/null 2>&1; then
-      echo "$0 running as process `cat $pid`. Stop it first or use the restart function."
+  [ -d ${PID_DIR} ] || mkdir -p ${PID_DIR}
+  if [ -f ${pid} ] ; then
+    if kill -0 `cat ${pid}` > /dev/null 2>&1; then
+      echo "${0} running as process `cat ${pid}`. Stop it first or use the restart function."
       exit 0
     fi
   fi
@@ -95,26 +69,26 @@ start ( ) {
   check_before_start
 
   echo "Starting Server ..."
-  nohup nice -1 "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" ${MAIN_CLASS} \
+  nohup nice -1 ${JAVACMD} ${JVM_OPTS} -classpath ${CLASSPATH} ${MAIN_CLASS} \
     >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
-  echo $! > $pid
+  echo ${!} > ${pid}
 }
 
 stop ( ) {
   echo -n "Stopping Server ..."
-  if [ -f "${pid}" ] ; then
-    pidToKill=`cat $pid`
+  if [ -f ${pid} ] ; then
+    pidToKill=`cat ${pid}`
     # kill -0 == see if the PID exists
-    if kill -0 $pidToKill > /dev/null 2>&1; then
-      kill $pidToKill > /dev/null 2>&1
-      while kill -0 $pidToKill > /dev/null 2>&1 ; do
+    if kill -0 ${pidToKill} > /dev/null 2>&1; then
+      kill ${pidToKill} > /dev/null 2>&1
+      while kill -0 ${pidToKill} > /dev/null 2>&1 ; do
         echo -n .
         sleep 1
       done
-      rm -f "${pid}"
+      rm -f ${pid}
       ret=0
     else
-      ret=$?
+      ret=${?}
     fi
     echo
     if [ ${ret} -eq 0 ] ; then
@@ -123,15 +97,15 @@ stop ( ) {
       echo "ERROR: Failed stopping!"
     fi
   fi
-  return "${ret:-0}"
+  return ${ret:-0}
 }
 
 status() {
-  if [ -f $pid ]; then
-    pidToCheck=`cat $pid`
+  if [ -f ${pid} ]; then
+    pidToCheck=`cat ${pid}`
     # kill -0 == see if the PID exists
-    if kill -0 $pidToCheck > /dev/null 2>&1; then
-      echo "${APP_NAME} running as process $pidToCheck"
+    if kill -0 ${pidToCheck} > /dev/null 2>&1; then
+      echo "${APP_NAME} running as process ${pidToCheck}"
       return 0
     else
       echo "${APP_NAME} pidfile exists, but process does not appear to be running"
@@ -143,28 +117,11 @@ status() {
   fi
 }
 
-restart() {
-  stop
-  start
-}
+restart() { stop; start; }
 
 case ${1} in
-  start)
-    ${1}
-    ;;
-  stop)
-    ${1}
-    ;;
-  status)
-    ${1}
-    ;;
-  restart)
-    ${1}
-    ;;
-  *)
-    echo "Usage: $0 {start|stop|status|restart}"
-    exit 1
-    ;;
+  start|stop|status|restart) ${1} ;;
+  *) echo "Usage: $0 {start|stop|status|restart}"; exit 1 ;;
 esac
 
-exit $?
+exit ${?}
