@@ -24,29 +24,29 @@ describe('tenants section', function() {
   });
 
 
-  it('while logged in....', function() {
-    helper.loginAsAdmin();
+  // it('while logged in....', function() {
+  //   helper.loginAsAdmin();
 
-    browser.get('/tenants');
+  //   browser.get('/tenants');
 
-    expect(
-      element(by.css('body')).getAttribute('class')
-    ).toContain('state-tenants-list');
-
-
-    // navigating via hashbang should work as well
-    browser.get('/#/tenants/edit/superadmin');
-
-    expect(
-      element(by.css('body')).getAttribute('class')
-    ).toContain('state-tenants-edit');
-
-    expect(
-      element(by.model('model.name')).getAttribute('value')
-    ).toBe('superadmin');
+  //   expect(
+  //     element(by.css('body')).getAttribute('class')
+  //   ).toContain('state-tenants-list');
 
 
-    helper.logout();
-  });
+  //   // navigating via hashbang should work as well
+  //   browser.get('/#/tenants/edit/superadmin');
+
+  //   expect(
+  //     element(by.css('body')).getAttribute('class')
+  //   ).toContain('state-tenants-edit');
+
+  //   expect(
+  //     element(by.model('model.name')).getAttribute('value')
+  //   ).toBe('superadmin');
+
+
+  //   helper.logout();
+  // });
 });
 
