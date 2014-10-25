@@ -40,7 +40,6 @@ function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
   });
 
 
-
   function findProvider (pName) {
     var p = $scope.providerTypes.filter(function (item) {
       return item.name === pName;
