@@ -133,9 +133,10 @@ site.app.use(function (req, res, next) {
         res.redirect(['https://', req.hostname || req.host,
             ':', site.SSLPORT, req.originalUrl
         ].join(''));
+        res.end();
+    } else {
+        next();
     }
-
-    next();
 });
 
 /**
