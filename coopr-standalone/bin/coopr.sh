@@ -189,7 +189,9 @@ if [ ! -z keystore_path ] && [ ! -z keystore_password ]; then
     read_property server.nodejs.tls.key ${COOPR_SERVER_CONF}coopr-security.xml nodejs_tls_key
     read_property server.nodejs.tls.crt ${COOPR_SERVER_CONF}coopr-security.xml nodejs_tls_crt
     read_property server.nodejs.tls.ca ${COOPR_SERVER_CONF}coopr-security.xml nodejs_tls_ca
+    read_property server.nodejs.tls.password ${COOPR_SERVER_CONF}coopr-security.xml COOPR_NODE_TLS_PASSWORD
 
+    export COOPR_NODE_TLS_PASSWORD
     export COOPR_NODE_TLS_KEY=$nodejs_tls_path"/"$nodejs_tls_key
     export COOPR_NODE_TLS_CRT=$nodejs_tls_path"/"$nodejs_tls_crt
     export COOPR_NODE_TLS_CA=$nodejs_tls_path"/"$nodejs_tls_ca

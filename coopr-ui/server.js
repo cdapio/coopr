@@ -200,7 +200,8 @@ site.app.use(function (err, req, res, next) {
 var tlsEnabled = ('true' === process.env['COOPR_NODE_TLS_ENABLED']),
     tlsKey = process.env['COOPR_NODE_TLS_KEY'],
     tlsCrt = process.env['COOPR_NODE_TLS_CRT'],
-    tlsCA = process.env['COOPR_NODE_TLS_CA'];
+    tlsCA = process.env['COOPR_NODE_TLS_CA'],
+    tlsPassword = process.env['COOPR_NODE_TLS_PASSWORD'];
 
 /**
  * Gets data for a given restful url.
@@ -221,15 +222,28 @@ site.getEntity = function (path, user) {
         };
 
         if (tlsEnabled) {
+            var keyFile,
+                certFile,
+                caFile;
+
             try {
-                options.agentOptions = {
-                    key: fs.readFileSync(tlsKey),
-                    cert: fs.readFileSync(tlsCrt),
-                    ca: fs.readFileSync(tlsCA)
-                };
-            } catch(e) {
-                site.logger.error('TLS request: Certificates could not be read');
-            }
+                keyFile = fs.readFileSync(tlsKey);
+            } catch(e) {}
+
+            try {
+                certFile = fs.readFileSync(tlsCrt);
+            } catch(e) {}
+
+            try {
+                caFile = fs.readFileSync(tlsCA);
+            } catch(e) {}
+
+            options.agentOptions = {
+                key: keyFile,
+                cert: certFile,
+                ca: caFile,
+                passphrase: tlsPassword
+            };
         }
 
         request(options, function (err, response, body) {
@@ -1567,7 +1581,7 @@ if (SSL) {
                 key: fs.readFileSync(COOPR_UI_KEY_FILE, 'utf-8'),
                 cert: fs.readFileSync(COOPR_UI_CERT_FILE, 'utf-8')
             };
-    } catch(e) {
+    } catch (e) {
         site.logger.error('HTTPS server: Certificates could not be read');
     }
 

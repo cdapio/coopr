@@ -7,7 +7,7 @@
     -->
     <property>
         <name>server.ssl.keystore.path</name>
-        <value>/home/mak/cert.jks</value>
+        <value></value>
     </property>
     <property>
         <name>server.ssl.keystore.password</name>
@@ -47,6 +47,10 @@
     </property>
     <property>
         <name>server.nodejs.tls.ca</name>
+        <value></value>
+    </property>
+    <property>
+        <name>server.nodejs.tls.password</name>
         <value></value>
     </property>
     <property>
