@@ -155,7 +155,7 @@ public class RestClient {
     try {
       RestClient.analyzeResponseCode(httpResponse);
       reader = new InputStreamReader(httpResponse.getEntity().getContent(), Charsets.UTF_8);
-      return GSON.fromJson(reader, type);
+      return gson.fromJson(reader, type);
     } finally {
       httpResponse.close();
       if (reader != null) {
