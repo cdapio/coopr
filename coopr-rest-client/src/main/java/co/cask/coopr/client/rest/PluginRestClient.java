@@ -126,7 +126,7 @@ public class PluginRestClient extends RestClient implements PluginClient {
   @Override
   public void deleteAutomatorTypeResourceVersion(String id, String resourceType, String resourceName, String version)
     throws IOException {
-    delete(String.format("plugins/%s/%s/%s/%s/versions", AUTOMATOR_TYPE_STR, id, resourceName,
+    delete(String.format("plugins/%s/%s/%s/%s/versions", AUTOMATOR_TYPE_STR, id, resourceType,
                          resourceName), version);
   }
 
