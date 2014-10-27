@@ -18,9 +18,9 @@ package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
 import co.cask.common.cli.Command;
+import com.google.inject.Inject;
 
 import java.io.PrintStream;
-import com.google.inject.Inject;
 
 /**
  * Exits the cli.

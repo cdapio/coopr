@@ -19,9 +19,9 @@ package co.cask.coopr.shell.command;
 import co.cask.common.cli.Arguments;
 import co.cask.common.cli.Command;
 import co.cask.coopr.client.TenantClient;
+import com.google.inject.Inject;
 
 import java.io.PrintStream;
-import com.google.inject.Inject;
 
 import static co.cask.coopr.shell.util.Constants.NAME_KEY;
 
