@@ -31,7 +31,7 @@ function myThingPickerDirective () {
         modalInstance = $modal({
           scope: modalScope,
           title: 'Add '+ $scope.thingName,
-          template: 'thingpicker/freetextModal.html',
+          template: 'thingpicker/freetext-modal.html',
           placement: 'center',
           show: false
         });

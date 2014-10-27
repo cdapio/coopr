@@ -2,7 +2,7 @@
 # Cookbook Name:: cdap
 # Attribute:: java
 #
-# Copyright (C) 2013-2014 Continuuity, Inc.
+# Copyright © 2013-2014 Cask Data, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,5 +18,5 @@
 #
 
 default['java']['install_flavor'] = 'oracle'
-default['java']['jdk_version'] = 6
+default['java']['jdk_version'] = 7
 default['java']['oracle']['accept_oracle_download_terms'] = true

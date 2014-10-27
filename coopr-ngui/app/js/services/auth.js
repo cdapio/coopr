@@ -49,19 +49,19 @@ module.run(function ($rootScope, myAuth, MYAUTH_EVENT, MYAUTH_ROLE) {
 
 
 
-module.service('myAuth', function myAuthService (MYAUTH_EVENT, MyAuthUser, myAuthPromise, $rootScope, $sessionStorage, $localStorage) {
+module.service('myAuth', function myAuthService (MYAUTH_EVENT, MyAuthUser, myAuthPromise, $rootScope, $localStorage) {
 
   /**
    * currentUser is initially revived with data in storage (or null)
    */
-  this.currentUser = MyAuthUser.revive($sessionStorage.currentUser);
+  this.currentUser = MyAuthUser.revive($localStorage.currentUser);
 
   /**
    * private method to sync the user everywhere
    */
   var persist = angular.bind(this, function (u) {
     this.currentUser = u;
-    $sessionStorage.currentUser = u;
+    $localStorage.currentUser = u;
     $rootScope.currentUser = u;
   });
 
