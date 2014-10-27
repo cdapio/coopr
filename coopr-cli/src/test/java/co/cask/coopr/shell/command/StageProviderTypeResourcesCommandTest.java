@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 public class StageProviderTypeResourcesCommandTest extends AbstractTest {
 
   private static final String INPUT =
-    String.format("stage resource-type %s with name %s version %s from provider %s",
+    String.format("stage resource from provider %s of type %s and name %s and version %s",
                   TEST_PLUGIN_TYPE, TEST_RESOURCE_TYPE, TEST_RESOURCE_NAME, TEST_RESOURCE_VERSION);
 
   @Test

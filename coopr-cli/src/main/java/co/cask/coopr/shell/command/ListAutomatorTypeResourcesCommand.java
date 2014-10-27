@@ -45,15 +45,19 @@ public class ListAutomatorTypeResourcesCommand implements Command {
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
     String automatorTypeId = arguments.get(AUTOMATOR_TYPE_ID);
     String resourceType = arguments.get(RESOURCE_TYPE);
-    ResourceStatus status = ResourceStatus.valueOf(arguments.get(RESOURCE_STATUS).toUpperCase());
+    String statusStr = arguments.get(RESOURCE_STATUS, "");
+    ResourceStatus status = null;
+    if (!statusStr.isEmpty()) {
+      status = ResourceStatus.valueOf(arguments.get(RESOURCE_STATUS).toUpperCase());
+    }
     printStream.print(CliUtil.getPrettyJson(pluginClient.getAutomatorTypeResources(automatorTypeId,
                                                                                    resourceType, status)));
   }
 
   @Override
   public String getPattern() {
-    return String.format("list resource-type <%s> status <%s> from automator <%s>",
-                         RESOURCE_TYPE, RESOURCE_STATUS, AUTOMATOR_TYPE_ID);
+    return String.format("list resources from automator <%s> of type <%s> [and status <%s>]",
+                         AUTOMATOR_TYPE_ID, RESOURCE_TYPE, RESOURCE_STATUS);
   }
 
   @Override

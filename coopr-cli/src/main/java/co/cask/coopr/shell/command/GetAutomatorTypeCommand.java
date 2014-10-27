@@ -46,7 +46,7 @@ public class GetAutomatorTypeCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("get automatortypes <%s>", AUTOMATOR_TYPE_ID);
+    return String.format("get automatortype <%s>", AUTOMATOR_TYPE_ID);
   }
 
   @Override

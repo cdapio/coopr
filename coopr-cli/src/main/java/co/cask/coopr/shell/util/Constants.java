@@ -48,7 +48,7 @@ public class Constants {
   public static final String AUTOMATOR_TYPE_ID = "automator-id";
   public static final String PROVIDER_TYPE_ID = "provider-id";
   public static final String RESOURCE_TYPE = "resource-type";
-  public static final String RESOURCE_STATUS = "active";
+  public static final String RESOURCE_STATUS = "status";
   public static final String RESOURCE_VERSION = "resource-version";
   public static final String RESOURCE_NAME = "resource-name";
 }

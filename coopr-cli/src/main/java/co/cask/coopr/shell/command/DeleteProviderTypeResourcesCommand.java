@@ -52,12 +52,12 @@ public class DeleteProviderTypeResourcesCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("delete resource-type <%s> with name <%s> version <%s> from provider <%s>",
-                         RESOURCE_TYPE, RESOURCE_NAME, RESOURCE_VERSION, PROVIDER_TYPE_ID);
+    return String.format("delete resource from provider <%s> of type <%s> and name <%s> and version <%s>",
+                         PROVIDER_TYPE_ID, RESOURCE_TYPE, RESOURCE_NAME, RESOURCE_VERSION);
   }
 
   @Override
   public String getDescription() {
-    return "Delete provider type resource version.";
+    return "Delete a specific version of a provider type resource";
   }
 }

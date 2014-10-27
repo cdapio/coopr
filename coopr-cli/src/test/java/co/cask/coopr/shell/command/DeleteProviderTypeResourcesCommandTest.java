@@ -25,8 +25,8 @@ import org.mockito.Mockito;
 public class DeleteProviderTypeResourcesCommandTest extends AbstractTest {
 
   private static final String INPUT =
-    String.format("delete resource-type %s with name %s version %s from provider %s",
-                  TEST_RESOURCE_TYPE, TEST_RESOURCE_NAME, TEST_RESOURCE_VERSION, TEST_PLUGIN_TYPE);
+    String.format("delete resource from provider %s of type %s and name %s and version %s",
+                  TEST_PLUGIN_TYPE, TEST_RESOURCE_TYPE, TEST_RESOURCE_NAME, TEST_RESOURCE_VERSION);
 
   @Test
   public void testExecute() throws Exception {

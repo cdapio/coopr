@@ -46,7 +46,7 @@ public class GetProviderTypeCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("get providertypes <%s>", PROVIDER_TYPE_ID);
+    return String.format("get providertype <%s>", PROVIDER_TYPE_ID);
   }
 
   @Override

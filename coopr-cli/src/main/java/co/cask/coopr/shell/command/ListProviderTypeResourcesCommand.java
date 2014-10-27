@@ -43,17 +43,21 @@ public class ListProviderTypeResourcesCommand implements Command {
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String automatorTypeId = arguments.get(PROVIDER_TYPE_ID);
+    String providerTypeId = arguments.get(PROVIDER_TYPE_ID);
     String resourceType = arguments.get(RESOURCE_TYPE);
-    ResourceStatus status = ResourceStatus.valueOf(arguments.get(RESOURCE_STATUS).toUpperCase());
-    printStream.print(CliUtil.getPrettyJson(pluginClient.getProviderTypeResources(automatorTypeId,
+    String statusStr = arguments.get(RESOURCE_STATUS, "");
+    ResourceStatus status = null;
+    if (!statusStr.isEmpty()) {
+      status = ResourceStatus.valueOf(arguments.get(RESOURCE_STATUS).toUpperCase());
+    }
+    printStream.print(CliUtil.getPrettyJson(pluginClient.getProviderTypeResources(providerTypeId,
                                                                                   resourceType, status)));
   }
 
   @Override
   public String getPattern() {
-    return String.format("list resource-type <%s> status <%s> from provider <%s>",
-                         RESOURCE_TYPE, RESOURCE_STATUS, PROVIDER_TYPE_ID);
+    return String.format("list resources from provider <%s> of type <%s> [and status <%s>]",
+                         PROVIDER_TYPE_ID, RESOURCE_TYPE, RESOURCE_STATUS);
   }
 
   @Override

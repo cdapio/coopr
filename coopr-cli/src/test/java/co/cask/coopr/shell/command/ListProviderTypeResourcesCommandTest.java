@@ -26,8 +26,8 @@ import org.mockito.Mockito;
 public class ListProviderTypeResourcesCommandTest extends AbstractTest {
 
   private static final String INPUT =
-    String.format("list resource-type %s status Active from provider %s", TEST_RESOURCE_TYPE,
-                  TEST_PLUGIN_TYPE);
+    String.format("list resources from provider %s of type %s and status active", TEST_PLUGIN_TYPE, TEST_RESOURCE_TYPE);
+
 
   @Test
   public void testExecute() throws Exception {

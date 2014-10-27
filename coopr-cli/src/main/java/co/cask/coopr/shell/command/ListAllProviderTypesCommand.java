@@ -48,7 +48,7 @@ public class ListAllProviderTypesCommand implements Command {
 
   @Override
   public String getDescription() {
-    return "Lists all providers types";
+    return "Lists all provider types";
   }
 
 }

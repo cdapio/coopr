@@ -51,12 +51,12 @@ public class RecallAutomatorTypeResourcesCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("recall resource-type <%s> with name <%s> version <%s> from automator <%s>",
-                         RESOURCE_TYPE, RESOURCE_NAME, RESOURCE_VERSION, AUTOMATOR_TYPE_ID);
+    return String.format("recall resource from automator <%s> of type <%s> and name <%s> and version <%s>",
+                         AUTOMATOR_TYPE_ID, RESOURCE_TYPE, RESOURCE_NAME, RESOURCE_VERSION);
   }
 
   @Override
   public String getDescription() {
-    return "recall automator type resource version.";
+    return "Recall a specific version of an automator type resource";
   }
 }

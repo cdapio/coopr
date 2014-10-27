@@ -51,12 +51,12 @@ public class DeleteAutomatorTypeResourcesCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("delete resource-type <%s> with name <%s> version <%s> from automator <%s>",
-                         RESOURCE_TYPE, RESOURCE_NAME, RESOURCE_VERSION, AUTOMATOR_TYPE_ID);
+    return String.format("delete resource from automator <%s> of type <%s> and name <%s> and version <%s>",
+                         AUTOMATOR_TYPE_ID, RESOURCE_TYPE, RESOURCE_NAME, RESOURCE_VERSION);
   }
 
   @Override
   public String getDescription() {
-    return "Delete automator type resource version.";
+    return "Delete a specific version of an automator type resource";
   }
 }

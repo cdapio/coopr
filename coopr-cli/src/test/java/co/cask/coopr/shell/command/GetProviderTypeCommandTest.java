@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 public class GetProviderTypeCommandTest extends AbstractTest {
 
   private static final String INPUT =
-    String.format("get providertypes %s", TEST_PLUGIN_TYPE);
+    String.format("get providertype %s", TEST_PLUGIN_TYPE);
 
   @Test
   public void testExecute() throws Exception {

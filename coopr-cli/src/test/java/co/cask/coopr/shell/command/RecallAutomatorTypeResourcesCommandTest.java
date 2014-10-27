@@ -25,8 +25,8 @@ import org.mockito.Mockito;
 public class RecallAutomatorTypeResourcesCommandTest extends AbstractTest {
 
   private static final String INPUT =
-    String.format("recall resource-type %s with name %s version %s from automator %s",
-                  TEST_RESOURCE_TYPE, TEST_RESOURCE_NAME, TEST_RESOURCE_VERSION, TEST_PLUGIN_TYPE);
+    String.format("recall resource from automator %s of type %s and name %s and version %s",
+                  TEST_PLUGIN_TYPE, TEST_RESOURCE_TYPE, TEST_RESOURCE_NAME, TEST_RESOURCE_VERSION);
 
   @Test
   public void testExecute() throws Exception {
