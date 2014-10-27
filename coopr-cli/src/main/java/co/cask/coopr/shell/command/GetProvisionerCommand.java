@@ -20,9 +20,9 @@ import co.cask.common.cli.Arguments;
 import co.cask.common.cli.Command;
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.shell.util.CliUtil;
+import com.google.inject.Inject;
 
 import java.io.PrintStream;
-import com.google.inject.Inject;
 
 import static co.cask.coopr.shell.util.Constants.PROVISIONER_ID;
 
