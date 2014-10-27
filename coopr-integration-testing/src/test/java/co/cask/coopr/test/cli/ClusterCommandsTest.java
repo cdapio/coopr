@@ -18,8 +18,6 @@ package co.cask.coopr.test.cli;
 
 import co.cask.common.cli.exception.InvalidCommandException;
 import co.cask.coopr.Entities;
-import co.cask.coopr.client.ClusterClient;
-import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.ClusterDetails;
 import co.cask.coopr.cluster.ClusterSummary;
@@ -29,13 +27,12 @@ import co.cask.coopr.http.request.ClusterConfigureRequest;
 import co.cask.coopr.http.request.ClusterStatusResponse;
 import co.cask.coopr.scheduler.ClusterAction;
 import co.cask.coopr.spec.BaseEntity;
+import co.cask.coopr.test.Constants;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import org.apache.http.HttpStatus;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -50,23 +47,15 @@ public class ClusterCommandsTest extends AbstractTest {
   public static final String EXPECTED_NEW_CLUSTER_NAME = "new";
   public static final String NEW_CLUSTER_ID = "00000003";
 
-  private ClusterClient clusterClient;
-
   @BeforeClass
   public static void beforeClass()
     throws URISyntaxException, NoSuchFieldException, IllegalAccessException, IOException {
     createCli(ADMIN_ACCOUNT);
   }
 
-  @Before
-  public void setUpt() throws Exception {
-    clusterClient = adminClientManager.getClusterClient();
-  }
-
   @Test
   public void testListClusters() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = "list clusters";
-    execute(command);
+    execute(Constants.LIST_CLUSTERS_COMMAND);
     List<ClusterSummary> result = getListFromOutput(new TypeToken<List<ClusterSummary>>() {}.getType());
     Assert.assertEquals(2, result.size());
     for (ClusterSummary clusterSummary : result) {
@@ -86,7 +75,7 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testGetCluster() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("get cluster \"%s\"", FIRST_TEST_CLUSTER_ID);
+    String command = String.format(Constants.GET_CLUSTER_COMMAND, FIRST_TEST_CLUSTER_ID);
     execute(command);
     ClusterDetails result = getObjectFromOutput(ClusterDetails.class);
     Assert.assertNotNull(result);
@@ -102,8 +91,8 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testDeleteCluster() throws IOException, InvalidCommandException {
-    String getCommand = String.format("get cluster \"%s\"", SECOND_TEST_CLUSTER_ID);
-    String deleteCommand = String.format("delete cluster \"%s\"", SECOND_TEST_CLUSTER_ID);
+    String getCommand = String.format(Constants.GET_CLUSTER_COMMAND, SECOND_TEST_CLUSTER_ID);
+    String deleteCommand = String.format(Constants.DELETE_CLUSTER_COMMAND, SECOND_TEST_CLUSTER_ID);
 
     execute(getCommand);
     ClusterDetails result = getObjectFromOutput(ClusterDetails.class);
@@ -120,8 +109,8 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testCreateCluster() throws InvalidCommandException, UnsupportedEncodingException {
-    String getCommand = String.format("get cluster \"%s\"", NEW_CLUSTER_ID);
-    String command = String.format("create cluster \"%s\" with template \"%s\" of size %s",
+    String getCommand = String.format(Constants.GET_CLUSTER_COMMAND, NEW_CLUSTER_ID);
+    String command = String.format(Constants.CREATE_CLUSTER_COMMAND,
                                    EXPECTED_NEW_CLUSTER_NAME, Entities.ClusterTemplateExample.REACTOR.getName(), 10);
     execute(command);
 
@@ -133,7 +122,7 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testCreateClusterInvalidNumMachinesValue() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("create cluster \"%s\" with template \"%s\" of size %s",
+    String command = String.format(Constants.CREATE_CLUSTER_COMMAND,
                                    EXPECTED_NEW_CLUSTER_NAME, Entities.ClusterTemplateExample.REACTOR.getName(),
                                    Integer.MAX_VALUE);
     execute(command);
@@ -142,7 +131,7 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testGetClusterStatus() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("get cluster-status \"%s\"", FIRST_TEST_CLUSTER_ID);
+    String command = String.format(Constants.GET_CLUSTER_STATUS_COMMAND, FIRST_TEST_CLUSTER_ID);
     execute(command);
     ClusterStatusResponse result = getObjectFromOutput(ClusterStatusResponse.class);
     Assert.assertEquals(Cluster.Status.ACTIVE, result.getStatus());
@@ -150,7 +139,7 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testGetClusterConfig() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("get cluster-config \"%s\"", FIRST_TEST_CLUSTER_ID);
+    String command = String.format(Constants.GET_CLUSTER_CONFIG_COMMAND, FIRST_TEST_CLUSTER_ID);
     execute(command);
     JsonObject jsonObject = getObjectFromOutput(JsonObject.class);
     Assert.assertEquals("value1", jsonObject.get("property1").getAsString());
@@ -160,7 +149,7 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testSetClusterConfig() throws InvalidCommandException, UnsupportedEncodingException {
-    String getCommand = String.format("get cluster-config \"%s\"", FIRST_TEST_CLUSTER_ID);
+    String getCommand = String.format(Constants.GET_CLUSTER_CONFIG_COMMAND, FIRST_TEST_CLUSTER_ID);
 
     execute(getCommand);
     JsonObject config = getObjectFromOutput(JsonObject.class);
@@ -169,9 +158,8 @@ public class ClusterCommandsTest extends AbstractTest {
     OUTPUT_STREAM.reset();
 
     ClusterConfigureRequest clusterConfigureRequest = new ClusterConfigureRequest(null, config, false);
-    String setCommand = String.format("set config '%s' for cluster \"%s\"", getJsonFromObject(clusterConfigureRequest),
+    String setCommand = String.format(Constants.SET_CLUSTER_CONFIG_COMMAND, getJsonFromObject(clusterConfigureRequest),
                                       FIRST_TEST_CLUSTER_ID);
-    System.out.println(getJsonFromObject(clusterConfigureRequest));
     execute(setCommand);
     execute(getCommand);
 
@@ -184,7 +172,7 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testGetClusterServices() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("list services \"%s\"", SECOND_TEST_CLUSTER_ID);
+    String command = String.format(Constants.LIST_CLUSTER_SERVICES_COMMAND, SECOND_TEST_CLUSTER_ID);
     execute(command);
     List<String> result = getListFromOutput(new TypeToken<List<String>>() {}.getType());
 
@@ -204,7 +192,7 @@ public class ClusterCommandsTest extends AbstractTest {
   @Test
   public void testSyncClusterTemplateIncompatibilityServices()
     throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("sync cluster template \"%s\"", FIRST_TEST_CLUSTER_ID);
+    String command = String.format(Constants.SYNC_CLUSTER_TEMPLATE_COMMAND, FIRST_TEST_CLUSTER_ID);
     execute(command);
     checkError();
   }
@@ -212,28 +200,28 @@ public class ClusterCommandsTest extends AbstractTest {
   @Test
   public void testSyncClusterTemplateClusterWithoutNodes()
     throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("sync cluster template \"%s\"", THIRD_TEST_CLUSTER_ID);
+    String command = String.format(Constants.SYNC_CLUSTER_TEMPLATE_COMMAND, THIRD_TEST_CLUSTER_ID);
     execute(command);
     checkError();
   }
 
   @Test
   public void testSetClusterExpireTime() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("set expire time \"%s\" for cluster \"%s\"", 10, THIRD_TEST_CLUSTER_ID);
+    String command = String.format(Constants.SET_CLUSTER_EXPIRE_TIME_COMMAND, 10, THIRD_TEST_CLUSTER_ID);
     execute(command);
     checkEmptyOutput();
   }
 
   @Test
   public void testSetClusterExpireTimeInvalidValue() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("set expire time \"%s\" for cluster \"%s\"", -1, THIRD_TEST_CLUSTER_ID);
+    String command = String.format(Constants.SET_CLUSTER_EXPIRE_TIME_COMMAND, -1, THIRD_TEST_CLUSTER_ID);
     execute(command);
     checkError();
   }
 
   @Test
   public void testStartServiceOnCluster() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("start service \"%s\" on cluster \"%s\"",
+    String command = String.format(Constants.START_SERVICE_ON_CLUSTER_COMMAND,
                                    Entities.ServiceExample.DATANODE.getName(), SECOND_TEST_CLUSTER_ID);
     execute(command);
     checkEmptyOutput();
@@ -241,14 +229,14 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testStartServiceOnClusterUnknownService() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("start service \"%s\" on cluster \"%s\"", "test", SECOND_TEST_CLUSTER_ID);
+    String command = String.format(Constants.START_SERVICE_ON_CLUSTER_COMMAND, "test", SECOND_TEST_CLUSTER_ID);
     execute(command);
     checkError();
   }
 
   @Test
   public void testStopServiceOnCluster() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("stop service \"%s\" on cluster \"%s\"",
+    String command = String.format(Constants.STOP_SERVICE_ON_CLUSTER_COMMAND,
                                    Entities.ServiceExample.DATANODE.getName(), SECOND_TEST_CLUSTER_ID);
     execute(command);
     checkEmptyOutput();
@@ -256,7 +244,7 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testRestartServiceOnCluster() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("restart service \"%s\" on cluster \"%s\"",
+    String command = String.format(Constants.RESTART_SERVICE_ON_CLUSTER_COMMAND,
                                    Entities.ServiceExample.DATANODE.getName(), SECOND_TEST_CLUSTER_ID);
     execute(command);
     checkEmptyOutput();
@@ -264,9 +252,9 @@ public class ClusterCommandsTest extends AbstractTest {
 
   @Test
   public void testAddServicesOnClusterSuccess() throws InvalidCommandException, UnsupportedEncodingException {
-    String getClusterCommand = String.format("get cluster \"%s\"", FIRST_TEST_CLUSTER_ID);
+    String getClusterCommand = String.format(Constants.GET_CLUSTER_COMMAND, FIRST_TEST_CLUSTER_ID);
     AddServicesRequest addServicesRequest = new AddServicesRequest(null, Sets.newHashSet("zookeeper"));
-    String command = String.format("add services '%s' on cluster \"%s\"",
+    String command = String.format(Constants.ADD_SERVICES_ON_CLUSTER_COMMAND,
                                    getJsonFromObject(addServicesRequest), FIRST_TEST_CLUSTER_ID);
     execute(command);
 
@@ -281,7 +269,7 @@ public class ClusterCommandsTest extends AbstractTest {
   public void testAddServicesOnClusterNotExistingService()
     throws InvalidCommandException, UnsupportedEncodingException {
     AddServicesRequest addServicesRequest = new AddServicesRequest(null, Sets.newHashSet("test"));
-    String command = String.format("add services '%s' on cluster \"%s\"",
+    String command = String.format(Constants.ADD_SERVICES_ON_CLUSTER_COMMAND,
                                    getJsonFromObject(addServicesRequest), FIRST_TEST_CLUSTER_ID);
     execute(command);
     checkError();

@@ -25,7 +25,6 @@ import co.cask.coopr.shell.CLIMain;
 import co.cask.coopr.test.client.ClientTest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -46,7 +45,8 @@ public abstract class AbstractTest extends ClientTest {
   protected static final ByteArrayOutputStream OUTPUT_STREAM = new ByteArrayOutputStream();
 
   private static final PrintStream PRINT_STREAM = new PrintStream(OUTPUT_STREAM);
-  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+  private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+  private static final Gson GSON = new Gson();
 
   public static CLIMain shell;
   public static CLI<Command> cli;
@@ -67,17 +67,12 @@ public abstract class AbstractTest extends ClientTest {
     OUTPUT_STREAM.reset();
   }
 
-  @After
-  public void afterTest() {
-    OUTPUT_STREAM.reset();
-  }
-
   public static void execute(String command) throws InvalidCommandException {
     cli.execute(command, PRINT_STREAM);
   }
 
   public static void checkCommandOutput(Object expectedOutput) throws UnsupportedEncodingException {
-    Assert.assertEquals(GSON.toJson(expectedOutput), OUTPUT_STREAM.toString("UTF-8"));
+    Assert.assertEquals(PRETTY_GSON.toJson(expectedOutput), OUTPUT_STREAM.toString("UTF-8"));
   }
 
   public static void checkError() throws UnsupportedEncodingException {
@@ -89,14 +84,14 @@ public abstract class AbstractTest extends ClientTest {
   }
 
   public static <T> T getObjectFromOutput(Class<T> type) throws UnsupportedEncodingException {
-    return GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), type);
+    return PRETTY_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), type);
   }
 
   public static <T> List<T> getListFromOutput(Type listType) throws UnsupportedEncodingException {
-    return GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), listType);
+    return PRETTY_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), listType);
   }
 
   public static String getJsonFromObject(Object output) {
-    return new Gson().toJson(output);
+    return GSON.toJson(output);
   }
 }

@@ -18,6 +18,7 @@ package co.cask.coopr.test.cli;
 
 import co.cask.common.cli.exception.InvalidCommandException;
 import co.cask.coopr.Entities;
+import co.cask.coopr.test.Constants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -36,30 +37,29 @@ public class AdminCommandsTest extends AbstractTest {
 
   @Test
   public void testListTemplates() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = "list templates";
-    execute(command);
+    execute(Constants.LIST_TEMPLATES_COMMAND);
     checkCommandOutput(Arrays.asList(HADOOP_DISTRIBUTED_CLUSTER_TEMPLATE, REACTOR_CLUSTER_TEMPLATE,
                                      HDFS_CLUSTER_TEMPLATE));
   }
 
   @Test
   public void testGetClusterTemplate() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("get template \"%s\"", REACTOR_CLUSTER_TEMPLATE.getName());
+    String command = String.format(Constants.GET_TEMPLATE_COMMAND, REACTOR_CLUSTER_TEMPLATE.getName());
     execute(command);
     checkCommandOutput(REACTOR_CLUSTER_TEMPLATE);
   }
 
   @Test
   public void testGetClusterTemplateNotFound() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = "get template casandra";
+    String command = String.format(Constants.GET_TEMPLATE_COMMAND, "casandra");
     execute(command);
     checkError();
   }
 
   @Test
   public void testDeleteClusterTemplate() throws InvalidCommandException, UnsupportedEncodingException {
-    String getCommand = String.format("get template \"%s\"", REACTOR_CLUSTER_TEMPLATE.getName());
-    String deleteCommand = String.format("delete template \"%s\"", REACTOR_CLUSTER_TEMPLATE.getName());
+    String getCommand = String.format(Constants.GET_TEMPLATE_COMMAND, REACTOR_CLUSTER_TEMPLATE.getName());
+    String deleteCommand = String.format(Constants.DELETE_TEMPLATE_COMMAND, REACTOR_CLUSTER_TEMPLATE.getName());
 
     execute(getCommand);
     checkCommandOutput(REACTOR_CLUSTER_TEMPLATE);
@@ -72,29 +72,28 @@ public class AdminCommandsTest extends AbstractTest {
 
   @Test
   public void testListProviders() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = "list providers";
-    execute(command);
+    execute(Constants.LIST_PROVIDERS_COMMAND);
     checkCommandOutput(Arrays.asList(Entities.ProviderExample.JOYENT, Entities.ProviderExample.RACKSPACE));
   }
 
   @Test
   public void testGetProvider() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("get provider \"%s\"", Entities.JOYENT);
+    String command = String.format(Constants.GET_PROVIDER_COMMAND, Entities.JOYENT);
     execute(command);
     checkCommandOutput(Entities.ProviderExample.JOYENT);
   }
 
   @Test
   public void testGetProviderNotFound() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = "get provider test";
+    String command = String.format(Constants.GET_PROVIDER_COMMAND, "test");
     execute(command);
     checkError();
   }
 
   @Test
   public void testDeleteProvider() throws InvalidCommandException, UnsupportedEncodingException {
-    String getCommand = String.format("get provider \"%s\"", Entities.JOYENT);
-    String deleteCommand = String.format("delete provider \"%s\"", Entities.JOYENT);
+    String getCommand = String.format(Constants.GET_PROVIDER_COMMAND, Entities.JOYENT);
+    String deleteCommand = String.format(Constants.DELETE_PROVIDER_COMMAND, Entities.JOYENT);
 
     execute(getCommand);
     checkCommandOutput(Entities.ProviderExample.JOYENT);
@@ -107,8 +106,7 @@ public class AdminCommandsTest extends AbstractTest {
 
   @Test
   public void testListServices() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = "list services";
-    execute(command);
+    execute(Constants.LIST_SERVICES_COMMAND);
     checkCommandOutput(Arrays.asList(Entities.ServiceExample.DATANODE, Entities.ServiceExample.HOSTS,
                                      Entities.ServiceExample.NAMENODE, ZOOKEEPER));
   }
@@ -116,15 +114,15 @@ public class AdminCommandsTest extends AbstractTest {
 
   @Test
   public void testGetService() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("get service \"%s\"", Entities.ServiceExample.NAMENODE.getName());
+    String command = String.format(Constants.GET_SERVICE_COMMAND, Entities.ServiceExample.NAMENODE.getName());
     execute(command);
     checkCommandOutput(Entities.ServiceExample.NAMENODE);
   }
 
   @Test
   public void testDeleteService() throws InvalidCommandException, UnsupportedEncodingException {
-    String getCommand = String.format("get service \"%s\"", Entities.ServiceExample.HOSTS.getName());
-    String deleteCommand = String.format("delete service \"%s\"", Entities.ServiceExample.HOSTS.getName());
+    String getCommand = String.format(Constants.GET_SERVICE_COMMAND, Entities.ServiceExample.HOSTS.getName());
+    String deleteCommand = String.format(Constants.DELETE_SERVICE_COMMAND, Entities.ServiceExample.HOSTS.getName());
 
     execute(getCommand);
     checkCommandOutput(Entities.ServiceExample.HOSTS);
@@ -137,23 +135,24 @@ public class AdminCommandsTest extends AbstractTest {
 
   @Test
   public void testListHardwareTypes() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = "list hardware types";
-    execute(command);
+    execute(Constants.LIST_HARDWARE_TYPES_COMMAND);
     checkCommandOutput(Arrays.asList(Entities.HardwareTypeExample.LARGE, Entities.HardwareTypeExample.MEDIUM,
                                      Entities.HardwareTypeExample.SMALL));
   }
 
   @Test
   public void testGetHardwareType() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("get hardware type \"%s\"", Entities.HardwareTypeExample.LARGE.getName());
+    String command = String.format(Constants.GET_HARDWARE_TYPE_COMMAND, Entities.HardwareTypeExample.LARGE.getName());
     execute(command);
     checkCommandOutput(Entities.HardwareTypeExample.LARGE);
   }
 
   @Test
   public void testDeleteHardwareType() throws InvalidCommandException, UnsupportedEncodingException {
-    String getCommand = String.format("get hardware type \"%s\"", Entities.HardwareTypeExample.SMALL.getName());
-    String deleteCommand = String.format("delete hardware type \"%s\"", Entities.HardwareTypeExample.SMALL.getName());
+    String getCommand = String.format(Constants.GET_HARDWARE_TYPE_COMMAND,
+                                      Entities.HardwareTypeExample.SMALL.getName());
+    String deleteCommand = String.format(Constants.DELETE_HARDWARE_TYPE_COMMAND,
+                                         Entities.HardwareTypeExample.SMALL.getName());
 
     execute(getCommand);
     checkCommandOutput(Entities.HardwareTypeExample.SMALL);
@@ -166,22 +165,21 @@ public class AdminCommandsTest extends AbstractTest {
 
   @Test
   public void testListImageTypes() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = "list image types";
-    execute(command);
+    execute(Constants.LIST_IMAGE_TYPES_COMMAND);
     checkCommandOutput(Arrays.asList(Entities.ImageTypeExample.CENTOS_6, Entities.ImageTypeExample.UBUNTU_12));
   }
 
   @Test
   public void testGetImageType() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format("get image type \"%s\"", Entities.ImageTypeExample.CENTOS_6.getName());
+    String command = String.format(Constants.GET_IMAGE_TYPE_COMMAND, Entities.ImageTypeExample.CENTOS_6.getName());
     execute(command);
     checkCommandOutput(Entities.ImageTypeExample.CENTOS_6);
   }
 
   @Test
   public void testDeleteImageType() throws InvalidCommandException, UnsupportedEncodingException {
-    String getCommand = String.format("get image type \"%s\"", Entities.ImageTypeExample.CENTOS_6.getName());
-    String deleteCommand = String.format("delete image type \"%s\"", Entities.ImageTypeExample.CENTOS_6.getName());
+    String getCommand = String.format(Constants.GET_IMAGE_TYPE_COMMAND, Entities.ImageTypeExample.CENTOS_6.getName());
+    String deleteCommand = String.format(Constants.DELETE_IMAGE_TYPE_COMMAND, Entities.ImageTypeExample.CENTOS_6.getName());
 
     execute(getCommand);
     checkCommandOutput(Entities.ImageTypeExample.CENTOS_6);
