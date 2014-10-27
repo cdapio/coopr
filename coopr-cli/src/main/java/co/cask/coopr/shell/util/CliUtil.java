@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.Socket;
 
 /**
@@ -36,20 +37,6 @@ public class CliUtil {
   private static final Logger LOG = LoggerFactory.getLogger(CliUtil.class);
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
   private static final String FILE_PREFIX = "file ";
-  private static final String ARG_WRAPPER = "\"";
-  private static final String JSON_WRAPPER = "'";
-
-  /**
-   * Checks whether the argument is in double quotes
-   *
-   * @param arg the argument
-   */
-  public static String checkArgument(String arg) {
-    if (!(arg.startsWith(ARG_WRAPPER) && arg.endsWith(ARG_WRAPPER))) {
-      throw new IllegalArgumentException("Arguments must be contained in double quotes");
-    }
-    return arg.substring(1, arg.length() - 1);
-  }
 
   /**
    * Converts specified object to pretty Json
@@ -77,7 +64,19 @@ public class CliUtil {
       Gson gson = new Gson();
       if (arg.startsWith(FILE_PREFIX)) {
         String argFilePath = arg.substring(FILE_PREFIX.length());
-        return gson.fromJson(new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8), type);
+        Reader reader = null;
+        try {
+          reader = new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8);
+          return gson.fromJson(reader, type);
+        } finally {
+          if (reader != null) {
+            try {
+              reader.close();
+            } catch (IOException e) {
+              LOG.warn("Cannot close stream for file: {}", argFilePath, e);
+            }
+          }
+        }
       }
       return gson.fromJson(arg, type);
     }

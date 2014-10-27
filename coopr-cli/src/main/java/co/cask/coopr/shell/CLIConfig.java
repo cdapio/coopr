@@ -17,8 +17,12 @@
 package co.cask.coopr.shell;
 
 import co.cask.coopr.client.rest.RestClientManager;
+import co.cask.coopr.codec.json.guice.CodecModules;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 import java.net.URI;
 import java.util.List;
@@ -33,6 +37,10 @@ import static co.cask.coopr.shell.util.Constants.DEFAULT_USER_ID;
  * Configuration for the Coopr CLI.
  */
 public class CLIConfig {
+
+  private static final Injector injector = Guice.createInjector(
+    new CodecModules().getModule()
+  );
 
   private RestClientManager clientManager;
   private String host;
@@ -57,6 +65,7 @@ public class CLIConfig {
     builder.ssl(DEFAULT_SSL);
     builder.userId(Objects.firstNonNull(userId, DEFAULT_USER_ID));
     builder.tenantId(Objects.firstNonNull(tenantId, DEFAULT_TENANT_ID));
+    builder.gson(injector.getInstance(Gson.class));
     this.clientManager = builder.build();
     this.hostnameChangeListeners = Lists.newArrayList();
   }
@@ -89,6 +98,7 @@ public class CLIConfig {
     builder.ssl(DEFAULT_SSL);
     builder.userId(userId);
     builder.tenantId(tenantId);
+    builder.gson(injector.getInstance(Gson.class));
     this.clientManager = builder.build();
     for (HostnameChangeListener listener : hostnameChangeListeners) {
       listener.onHostnameChanged(host);

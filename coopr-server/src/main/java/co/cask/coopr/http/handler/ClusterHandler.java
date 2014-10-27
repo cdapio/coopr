@@ -399,6 +399,60 @@ public class ClusterHandler extends AbstractAuthHandler {
   }
 
   /**
+   * Pause the cluster operation that is currently running for the given cluster.
+   *
+   * @param request Request to pause the cluster operation.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster to pause.
+   */
+  @POST
+  @Path("/{cluster-id}/pause")
+  public void pauseClusterJob(HttpRequest request, HttpResponder responder,
+                              @PathParam("cluster-id") String clusterId) {
+    LOG.debug("Received a request to pause job on cluster {}", clusterId);
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    try {
+      clusterService.requestPauseJob(clusterId, account);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (MissingClusterException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error pausing cluster.");
+    }
+  }
+
+  /**
+   * Resume the cluster operation that is currently paused for the given cluster.
+   *
+   * @param request Request to resume the cluster operation.
+   * @param responder Responder for sending the response.
+   * @param clusterId Id of the cluster to resume.
+   */
+  @POST
+  @Path("/{cluster-id}/resume")
+  public void resumeClusterJob(HttpRequest request, HttpResponder responder,
+                              @PathParam("cluster-id") String clusterId) {
+    LOG.debug("Received a request to resume job on cluster {}", clusterId);
+    Account account = getAndAuthenticateAccount(request, responder);
+    if (account == null) {
+      return;
+    }
+
+    try {
+      clusterService.requestResumeJob(clusterId, account);
+      responder.sendStatus(HttpResponseStatus.OK);
+    } catch (MissingClusterException e) {
+      responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
+    } catch (IOException e) {
+      responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error pausing cluster.");
+    }
+  }
+
+  /**
    * Changes a cluster parameter like lease time.
    *
    * @param request Request to change cluster parameter.

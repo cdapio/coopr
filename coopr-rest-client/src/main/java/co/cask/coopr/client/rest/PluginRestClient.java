@@ -21,6 +21,7 @@ import co.cask.coopr.provisioner.plugin.ResourceMeta;
 import co.cask.coopr.provisioner.plugin.ResourceStatus;
 import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.impl.client.CloseableHttpClient;
 
@@ -39,6 +40,10 @@ public class PluginRestClient extends RestClient implements PluginClient {
 
   public PluginRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
     super(config, httpClient);
+  }
+
+  public PluginRestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
+    super(config, httpClient, gson);
   }
 
   @Override

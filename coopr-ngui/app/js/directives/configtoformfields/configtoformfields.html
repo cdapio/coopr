@@ -9,6 +9,7 @@
     <div class="checkbox" ng-if="fieldData.type === 'checkbox'">
       <label>
         <input type="checkbox"
+          name="{{name}}"
           ng-model="model[name]"
           ng-disabled="allowOverride && !fieldData.override"
         />
@@ -20,12 +21,14 @@
       class="form-control"
       type="{{fieldData.type}}" 
       placeholder="{{fieldData.tip}}" 
+      name="{{name}}"
       ng-model="model[name]"
       ng-disabled="allowOverride && !fieldData.override"
       ng-required="required[name]"
     />
 
     <select ng-if="fieldData.type === 'select'"
+      name="{{name}}"
       class="form-control"
       title="{{fieldData.tip}}"
       ng-model="model[name]"

@@ -249,6 +249,22 @@ ClusterView.app.controller('ClusterCtrl',
   };
 
   /**
+   * Pause current job.
+   */
+  $scope.pause = function () {
+    Helpers.submitPost('/user/clusters/pause/' + $scope.cluster.id,
+      '/user/clusters/cluster/' + $scope.cluster.id);
+  };
+
+  /**
+   * Resume current job.
+   */
+  $scope.resume = function () {
+    Helpers.submitPost('/user/clusters/resume/' + $scope.cluster.id,
+      '/user/clusters/cluster/' + $scope.cluster.id);
+  };
+
+  /**
    * Checks if an object is empty.
    */
   $scope.checkIfEmpty = function(obj) {
@@ -298,7 +314,8 @@ ClusterView.app.controller('ClusterProgressCtrl', ['$rootScope', '$scope', '$int
     progressPercent: '',
     statusText: '',
     class: '',
-    action: ''
+    action: '',
+    actionstatus: ''
   };
 
   // Get status first before going into interval.
@@ -362,6 +379,7 @@ ClusterView.getStatusFn = function (rootScope, scope, dataFactory, Globals) {
       if (!isNaN(progressPercent)) {
         scope.status.progressPercent = progressPercent.toFixed(0);
       }
+      scope.status.actionstatus = data.actionstatus;
       if (data.actionstatus in Helpers.FRIENDLY_STATUS) {
         scope.status.statusText = Helpers.FRIENDLY_STATUS[data.actionstatus];
         scope.status.class= Globals.STATUS_CLASSES[data.actionstatus];

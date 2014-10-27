@@ -43,6 +43,7 @@
               "ap-northeast-1",
               "ap-southeast-1",
               "ap-southeast-2",
+              "eu-central-1",
               "eu-west-1",
               "sa-east-1",
               "us-east-1",
@@ -368,6 +369,11 @@
             "type": "checkbox",
             "label": "Floating IP",
             "tip": "Request a floating IP address for each node"
+          },
+          "network_ids": {
+            "label": "Network IDs",
+            "type": "text",
+            "tip": "Comma separated list of the UUID(s) of the network(s) for the server to attach"
           }
         },
         "required": [
