@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package co.cask.coopr.test.client.rest;
+package co.cask.coopr.test.client;
 
 import co.cask.coopr.TestHelper;
 import co.cask.coopr.spec.ProvisionerAction;
@@ -23,8 +23,8 @@ import co.cask.coopr.spec.service.ServiceAction;
 import co.cask.coopr.spec.service.ServiceDependencies;
 import com.google.common.collect.ImmutableMap;
 
-public class RestClientTestEntities {
-  private RestClientTestEntities() {
+public class ClientTestEntities {
+  private ClientTestEntities() {
   }
 
   public static final Service ZOOKEEPER = Service.builder()

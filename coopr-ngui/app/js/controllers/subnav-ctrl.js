@@ -12,7 +12,6 @@ function ($scope, $state, myApi) {
 
   fetchSubnavList();
 
-
   /* ----------------------------------------------------------------------- */
 
   function fetchSubnavList () {

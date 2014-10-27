@@ -1,9 +1,23 @@
-/**
- * E2E tests for /providers.
- */
+// /**
+//  * E2E tests for /providers.
+//  */
 var helper = require('../../protractor-help');
 
-'use strict';
+
+describe('just a simple test', function() {
+
+ 
+  it('should show a page', function () {
+
+    browser.get('/');
+    expect(
+      element(by.css('body')).getAttribute('class')
+    ).toContain('state-home');
+
+  });
+
+});
+
 
 describe('providers test', function () {
   var ptor = protractor.getInstance();
@@ -63,7 +77,7 @@ describe('providers test', function () {
     expect(providersList.count()).toEqual(1);
     var providerText = providersList.first().getText();
     expect(providerText).toMatch('Testprovider Test description Edit\nDelete');
-    providersList.first().element(by.css('.edit-btn')).click();
+    providersList.first().element(by.cssContainingText('.btn', 'Edit')).click();
 
     // Edit
     expect(
@@ -82,8 +96,8 @@ describe('providers test', function () {
     // Delete
     browser.get('/providers');
     providersList = element.all(by.repeater('item in list'));
-    providersList.first().element(by.css('.delete-btn')).click();
-    ptor.switchTo().alert().accept();
+    providersList.first().element(by.cssContainingText('.btn', 'Delete')).click();
+    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
     providersList = element.all(by.repeater('item in list'));
     expect(providersList.count()).toEqual(0);
   });

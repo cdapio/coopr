@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package co.cask.coopr.test.client.rest;
+package co.cask.coopr.test.client;
 
 import co.cask.coopr.BaseTest;
 import co.cask.coopr.Entities;
@@ -48,7 +48,7 @@ import java.io.IOException;
 /**
  * The parent class starts Coopr Handler Server
  */
-public class RestClientTest extends BaseTest {
+public class ClientTest extends BaseTest {
 
   protected static final String TENANT_ID = "tenant1";
   protected static final String PROVISIONER_ID = "provisioner1";
@@ -67,7 +67,7 @@ public class RestClientTest extends BaseTest {
     new Provisioner(PROVISIONER_ID, "host1", 12345, 100, null, null);
   protected static final Tenant TEST_TENANT =
     new Tenant(TENANT_ID, new TenantSpecification(TENANT, 10, 100, 1000));
-  protected static final Service ZOOKEEPER = RestClientTestEntities.ZOOKEEPER;
+  protected static final Service ZOOKEEPER = ClientTestEntities.ZOOKEEPER;
   protected static final ClusterTemplate HADOOP_DISTRIBUTED_CLUSTER_TEMPLATE =
     Entities.ClusterTemplateExample.HADOOP_DISTRIBUTED;
   protected static final Cluster FIRST_TEST_CLUSTER =
@@ -103,6 +103,7 @@ public class RestClientTest extends BaseTest {
   @AfterClass
   public static void cleanupServiceBase() throws IOException {
     adminClientManager.close();
+    superadminCientManager.close();
     handlerServer.stopAndWait();
   }
 

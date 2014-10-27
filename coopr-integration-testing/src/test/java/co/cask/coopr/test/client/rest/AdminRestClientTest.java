@@ -24,6 +24,7 @@ import co.cask.coopr.spec.ImageType;
 import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
+import co.cask.coopr.test.client.ClientTest;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,7 +33,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class AdminRestClientTest extends RestClientTest {
+public class AdminRestClientTest extends ClientTest {
 
   private AdminClient adminClient;
 

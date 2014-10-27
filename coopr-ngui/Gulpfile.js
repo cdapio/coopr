@@ -26,7 +26,7 @@ gulp.task('css:lib', ['fonts'], function() {
     .pipe(plumber())
     .pipe(plug.if('*.less', plug.less()))
     .pipe(plug.concat('lib.css'))
-    .pipe(gulp.dest('./dist/bundle'));
+    .pipe(gulp.dest('./dist/assets/bundle'));
 });
 
 
@@ -38,7 +38,7 @@ gulp.task('fonts', function() {
       // './bower_components/bootstrap/dist/fonts/*',
       './bower_components/font-awesome/fonts/*'
     ])
-    .pipe(gulp.dest('./dist/fonts'));
+    .pipe(gulp.dest('./dist/assets/fonts'));
 });
 
 
@@ -56,7 +56,7 @@ gulp.task('css:app', function() {
     .pipe(plug.if('*.less', plug.less()))
     .pipe(plug.concat('app.css'))
     .pipe(plug.autoprefixer(["> 1%"], {cascade:true}))
-    .pipe(gulp.dest('./dist/bundle'));
+    .pipe(gulp.dest('./dist/assets/bundle'));
 });
 
 
@@ -98,7 +98,7 @@ gulp.task('js:lib', function() {
 
     ])
     .pipe(plug.concat('lib.js'))
-    .pipe(gulp.dest('./dist/bundle'));
+    .pipe(gulp.dest('./dist/assets/bundle'));
 });
 
 
@@ -122,7 +122,7 @@ gulp.task('js:app', function() {
        footer: '\n})('+PKG+');\n'
     }))
     .pipe(plug.concat('app.js'))
-    .pipe(gulp.dest('./dist/bundle'));
+    .pipe(gulp.dest('./dist/assets/bundle'));
 });
 
 
@@ -133,7 +133,7 @@ gulp.task('js:app', function() {
  */
 gulp.task('img', function() {
   return gulp.src('./app/img/**/*')
-    .pipe(gulp.dest('./dist/img'));
+    .pipe(gulp.dest('./dist/assets/img'));
 });
 
 
@@ -163,7 +163,7 @@ gulp.task('tpl', function() {
 
   )
     .pipe(plug.concat('tpl.js'))
-    .pipe(gulp.dest('./dist/bundle'));
+    .pipe(gulp.dest('./dist/assets/bundle'));
 });
 
 
@@ -173,7 +173,7 @@ gulp.task('tpl', function() {
  */
 gulp.task('html:partials', function() {
   return gulp.src('./app/partials/**/*.html')
-      .pipe(gulp.dest('./dist/partials'));
+      .pipe(gulp.dest('./dist/assets/partials'));
 });
 
 gulp.task('html:main', function() {
@@ -214,15 +214,15 @@ gulp.task('clean', function(cb) {
   minification
  */
 gulp.task('js:minify', ['js'], function() {
-  return gulp.src('./dist/bundle/{app,lib}.js')
+  return gulp.src('./dist/assets/bundle/{app,lib}.js')
     .pipe(plug.uglify())
-    .pipe(gulp.dest('./dist/bundle'));
+    .pipe(gulp.dest('./dist/assets/bundle'));
 });
 
 gulp.task('css:minify', ['css'], function() {
-  return gulp.src('./dist/bundle/*.css')
+  return gulp.src('./dist/assets/bundle/*.css')
     .pipe(plug.minifyCss({keepBreaks:true}))
-    .pipe(gulp.dest('./dist/bundle'));
+    .pipe(gulp.dest('./dist/assets/bundle'));
 });
 
 gulp.task('minify', ['js:minify', 'css:minify']);
@@ -235,17 +235,17 @@ gulp.task('minify', ['js:minify', 'css:minify']);
  */
 
 gulp.task('rev:manifest', ['minify', 'tpl'], function() {
-  return gulp.src(['./dist/bundle/{app,lib,tpl}.*'])
+  return gulp.src(['./dist/assets/bundle/{app,lib,tpl}.*'])
     .pipe(plug.rev())
     .pipe(plug.size({showFiles:true, gzip:true, total:true}))
-    .pipe(gulp.dest('./dist/bundle'))  // write rev'd assets to build dir
+    .pipe(gulp.dest('./dist/assets/bundle'))  // write rev'd assets to build dir
 
     .pipe(plug.rev.manifest({path:'manifest.json'}))
-    .pipe(gulp.dest('./dist')); // write manifest
+    .pipe(gulp.dest('./dist/assets/bundle')); // write manifest
 
 });
 gulp.task('rev:replace', ['html:main', 'rev:manifest'], function() {
-  var rev = require('./dist/manifest.json'),
+  var rev = require('./dist/assets/bundle/manifest.json'),
       out = gulp.src('./dist/*.html'),
       p = '/bundle/';
   for (var f in rev) {

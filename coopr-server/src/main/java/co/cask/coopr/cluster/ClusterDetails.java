@@ -58,6 +58,15 @@ public class ClusterDetails {
     }
   }
 
+  public ClusterDetails(Cluster cluster, List<Link> links, Set<Node> nodes, ClusterJobProgress progress,
+                        String message) {
+    this.cluster = cluster;
+    this.links = links;
+    this.nodes = nodes;
+    this.progress = progress;
+    this.message = message;
+  }
+
   /**
    * Get the cluster.
    *

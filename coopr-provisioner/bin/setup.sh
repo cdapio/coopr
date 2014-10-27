@@ -16,42 +16,42 @@ export COOPR_PROVISIONER_PLUGIN_DIR=${COOPR_HOME}/provisioner/worker/plugins
 # - loop through upload scripts
 # - sync
 
-function wait_for_plugin_registration () {
+wait_for_plugin_registration () {
   RETRIES=0
   until [[ $(curl --silent --request GET \
     --output /dev/null --write-out "%{http_code}" \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
-    ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || $RETRIES -gt 60 ]]; do
+    ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || ${RETRIES} -gt 60 ]]; do
     sleep 2
-    ((RETRIES++))
+    let "RETRIES++"
   done
 
-  if [ $RETRIES -gt 60 ]; then
+  if [ ${RETRIES} -gt 60 ]; then
     echo "ERROR: Provisioner did not successfully register plugins"
     return 1
   fi
 }
 
-# Register provisioner
-${COOPR_HOME}/provisioner/bin/provisioner.sh register
-__ret=$?
-[[ ${__ret} -ne 0 ]] && exit 1
+load_bundled_data ( ) {
+  __skriptz=$(ls -1 ${COOPR_HOME}/provisioner/worker/plugins/*/*/load-bundled-data.sh 2>&1)
+  if [ ${__skriptz} != "" ]; then
+    for __i in ${__skriptz}; do
+      ${__i} || return 1
+    done
+  else
+    echo "ERROR: Cannot find any load-bundled-data.sh scripts to execute"
+    return 1
+  fi
+  return 0
+}
 
+# Register provisioner
+${COOPR_HOME}/provisioner/bin/provisioner.sh register || exit 1
 wait_for_plugin_registration || exit 1
 
 # Load plugin-bundled data
-__skriptz=$(ls -1 ${COOPR_HOME}/provisioner/worker/plugins/*/*/load-bundled-data.sh 2>&1)
-if [ "${__skriptz}" != "" ] ; then
-  for __i in ${__skriptz} ; do
-    ${__i}
-    __ret=$?
-    [[ ${__ret} -ne 0 ]] && exit 1
-  done
-else
-  echo "Cannot find anything to execute"
-  exit 1
-fi
+load_bundled_data || exit 1
 
 # Request sync
 curl --silent --request POST \
@@ -61,6 +61,6 @@ curl --silent --request POST \
   --header "Coopr-TenantID:${COOPR_TENANT}" \
   --connect-timeout ${TIMEOUT} \
   ${COOPR_SERVER_URI}/v2/plugins/sync
-__ret=$?
+__ret=${?}
 [[ ${__ret} -ne 0 ]] && exit 1
 exit 0
