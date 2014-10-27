@@ -17,6 +17,10 @@
 package co.cask.coopr.test.client;
 
 import co.cask.coopr.TestHelper;
+import co.cask.coopr.provisioner.plugin.PluginType;
+import co.cask.coopr.provisioner.plugin.ResourceMeta;
+import co.cask.coopr.provisioner.plugin.ResourceStatus;
+import co.cask.coopr.provisioner.plugin.ResourceType;
 import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.service.ServiceAction;
@@ -48,4 +52,18 @@ public class ClientTestEntities {
       new ServiceAction("chef-solo",
                         TestHelper.actionMapOf("recipe[coopr_service_runner::default]", "stop data"))))
     .build();
+
+  public static final ResourceType COOKBOOKS_RESOURCE_TYPE
+    = new ResourceType(PluginType.AUTOMATOR, "chef-solo", "cookbooks");
+  public static final ResourceType KEYS_RESOURCE_TYPE
+    = new ResourceType(PluginType.PROVIDER, "joyent", "keys");
+  public static final ResourceMeta HADOOP_RESOURCE_META_V1 = new ResourceMeta("hadoop", 1, ResourceStatus.ACTIVE);
+  public static final ResourceMeta HADOOP_RESOURCE_META_V2 = new ResourceMeta("hadoop", 2, ResourceStatus.ACTIVE);
+  public static final ResourceMeta KAFKA_RESOURCE_META = new ResourceMeta("kafka", 1, ResourceStatus.ACTIVE);
+  public static final ResourceMeta MYSQL_RESOURCE_META = new ResourceMeta("mysql", 1, ResourceStatus.INACTIVE);
+
+  public static final ResourceMeta DEV_KEY_RESOURCE_META_V1 = new ResourceMeta("dev", 1, ResourceStatus.ACTIVE);
+  public static final ResourceMeta DEV_KEY_RESOURCE_META_V2 = new ResourceMeta("dev", 2, ResourceStatus.ACTIVE);
+  public static final ResourceMeta VIEW_KEY_RESOURCE_META = new ResourceMeta("view", 1, ResourceStatus.INACTIVE);
+  public static final ResourceMeta RESEARCH_KEY_RESOURCE_META = new ResourceMeta("research", 1, ResourceStatus.ACTIVE);
 }
