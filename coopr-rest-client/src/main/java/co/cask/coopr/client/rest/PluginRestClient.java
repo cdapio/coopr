@@ -133,7 +133,7 @@ public class PluginRestClient extends RestClient implements PluginClient {
   @Override
   public void deleteProviderTypeResourceVersion(String id, String resourceType, String resourceName, String version)
     throws IOException {
-    delete(String.format("plugins/%s/%s/%s/%s/versions", PROVIDER_TYPE_STR, id, resourceName,
+    delete(String.format("plugins/%s/%s/%s/%s/versions", PROVIDER_TYPE_STR, id, resourceType,
                          resourceName), version);
   }
 
