@@ -59,10 +59,12 @@ class FogProviderRackspace < Provider
       @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue Excon::Errors::Unauthorized
+      msg = 'Provider credentials invalid/unauthorized'
       @result['status'] = 201
-      log.error('Provider credentials invalid/unauthorized')
+      @result['stderr'] = msg
+      log.error(msg)
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderRackspace.create:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderRackspace.create: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderRackspace.create: #{e.inspect}"
     else
       log.debug "Create finished successfully: #{@result}"
@@ -111,6 +113,14 @@ class FogProviderRackspace < Provider
       # do we need sudo bash?
       sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
+
+      # login with pseudotty and turn off sudo requiretty option
+      log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
+      Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+        cmd = "#{sudo} sed -i -e '/^Defaults[[:space:]]*requiretty/ s/^/#/' /etc/sudoers"
+        ssh_exec!(ssh, cmd, 'Disabling requiretty via pseudotty session', true)
+      end
+
       # Validate connectivity and Mount data disk
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
@@ -125,7 +135,7 @@ class FogProviderRackspace < Provider
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderRackspace.confirm:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderRackspace.confirm: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderRackspace.confirm: #{e.inspect}"
     else
       log.debug "Confirm finished successfully: #{@result}"
@@ -153,7 +163,7 @@ class FogProviderRackspace < Provider
       # Return 0
       @result['status'] = 0
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderRackspace.delete:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderRackspace.delete: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderRackspace.delete: #{e.inspect}"
     else
       log.debug "Delete finished sucessfully: #{@result}"

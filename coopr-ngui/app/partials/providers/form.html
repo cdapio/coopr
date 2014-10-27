@@ -30,7 +30,7 @@
         class="form-control"
         ng-model="model.providertype"
         ng-options="pType.name as pType.name for pType in providerTypes"
-        ng-readonly="editing"
+        ng-disabled="editing"
       ></select>
     </div>
   </div>
