@@ -65,6 +65,13 @@
         <developerConnection>scm:git:git://github.com/caskdata/coopr.git</developerConnection>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>sonatype.snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
     <distributionManagement>
         <repository>
             <id>sonatype.release</id>
