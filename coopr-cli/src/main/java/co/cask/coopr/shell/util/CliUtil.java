@@ -17,9 +17,12 @@
 package co.cask.coopr.shell.util;
 
 import co.cask.common.cli.Arguments;
+import co.cask.coopr.codec.json.guice.CodecModules;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +38,11 @@ import java.net.Socket;
 public class CliUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(CliUtil.class);
-  private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+  private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
   private static final String FILE_PREFIX = "file ";
+  private static final Injector injector = Guice.createInjector(
+    new CodecModules().getModule()
+  );
 
   /**
    * Converts specified object to pretty Json
@@ -45,7 +51,7 @@ public class CliUtil {
    * @return the pretty Json String
    */
   public static String getPrettyJson(Object output) {
-    return GSON.toJson(output);
+    return PRETTY_GSON.toJson(output);
   }
 
   /**
@@ -61,7 +67,7 @@ public class CliUtil {
   public static <T> T getObjectFromJson(Arguments arguments, String argKey, Class<T> type) throws IOException {
     if (arguments.hasArgument(argKey)) {
       String arg = arguments.get(argKey);
-      Gson gson = new Gson();
+      Gson gson = injector.getInstance(Gson.class);
       if (arg.startsWith(FILE_PREFIX)) {
         String argFilePath = arg.substring(FILE_PREFIX.length());
         Reader reader = null;

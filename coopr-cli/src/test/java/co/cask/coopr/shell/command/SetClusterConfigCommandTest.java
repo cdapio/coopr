@@ -18,6 +18,7 @@ package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.exception.InvalidCommandException;
 import co.cask.coopr.http.request.ClusterConfigureRequest;
+import com.google.gson.JsonObject;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -28,11 +29,12 @@ import java.io.IOException;
  */
 public class SetClusterConfigCommandTest extends AbstractTest {
 
-  private static final String INPUT = "set config '{}' for cluster \"id\"";
+  private static final String INPUT = "set config '%s' for cluster \"id\"";
 
   @Test
   public void executeTest() throws IOException, InvalidCommandException {
-    CLI.execute(INPUT, System.out);
+    CLI.execute(String.format(INPUT, getJsonFromObject(new ClusterConfigureRequest(null, new JsonObject(), false))),
+                System.out);
 
     Mockito.verify(CLUSTER_CLIENT).setClusterConfig(Mockito.eq("id"), Mockito.any(ClusterConfigureRequest.class));
   }
