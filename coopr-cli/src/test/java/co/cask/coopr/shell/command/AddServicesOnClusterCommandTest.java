@@ -18,6 +18,7 @@ package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.exception.InvalidCommandException;
 import co.cask.coopr.http.request.AddServicesRequest;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -28,12 +29,12 @@ import java.io.IOException;
  */
 public class AddServicesOnClusterCommandTest extends AbstractTest {
 
-  private static final String INPUT = "add services '{}' on cluster \"test\"";
+  private static final String INPUT = "add services '%s' on cluster \"test\"";
 
   @Test
   public void executeTest() throws IOException, InvalidCommandException {
-    CLI.execute(INPUT, System.out);
-
+    CLI.execute(String.format(INPUT, getJsonFromObject(new AddServicesRequest(null, Sets.newHashSet("zookeeper")))),
+                System.out);
     Mockito.verify(CLUSTER_CLIENT).addServicesOnCluster(Mockito.eq("test"), Mockito.any(AddServicesRequest.class));
   }
 }

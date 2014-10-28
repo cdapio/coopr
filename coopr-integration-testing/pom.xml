@@ -74,6 +74,12 @@
           <artifactId>coopr-rest-client</artifactId>
           <version>${project.parent.version}</version>
         </dependency>
+
+        <dependency>
+          <groupId>co.cask</groupId>
+          <artifactId>coopr-cli</artifactId>
+          <version>${project.parent.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
