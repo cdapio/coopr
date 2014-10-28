@@ -142,7 +142,7 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
 
     $modal({
       title: nodeId,
-      contentTemplate: '/partials/clusters/detail-node.html', 
+      contentTemplate: '/assets/partials/clusters/detail-node.html', 
       placement: 'center',
       scope: modalScope,
       show: true
