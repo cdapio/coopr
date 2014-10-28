@@ -8,12 +8,14 @@ COOPR_API_KEY=${COOPR_API_KEY:-1234567890abcdef}
 COOPR_TENANT=${COOPR_TENANT:-superadmin}
 SHELL_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 
+RESOURCES_DIR=${SHELL_DIR}/resources
+
 COOPR_RUBY=${COOPR_RUBY:-${COOPR_HOME}/provisioner/embedded/bin/ruby}
 test -x ${COOPR_RUBY} || COOPR_RUBY="ruby"
 DATA_UPLOADER="${COOPR_RUBY} ${COOPR_HOME}/provisioner/bin/data-uploader.rb"
 
-SCRIPTS_DIR=${SHELL_DIR}/scripts
-ARCHIVES_DIR=${SHELL_DIR}/archives
+SCRIPTS_DIR=${RESOURCES_DIR}/scripts
+ARCHIVES_DIR=${RESOURCES_DIR}/archives
 
 # load scripts
 cd ${SCRIPTS_DIR}
