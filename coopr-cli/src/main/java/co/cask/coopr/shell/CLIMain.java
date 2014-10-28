@@ -20,6 +20,7 @@ import co.cask.common.cli.CLI;
 import co.cask.common.cli.Command;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
+import co.cask.coopr.client.PluginClient;
 import co.cask.coopr.shell.command.HelpCommand;
 import co.cask.coopr.shell.command.set.CommandSet;
 import com.google.common.base.Supplier;
@@ -53,6 +54,7 @@ public class CLIMain {
           bind(CLIConfig.class).toInstance(cliConfig);
           bind(AdminClient.class).toInstance(cliConfig.getClientManager().getAdminClient());
           bind(ClusterClient.class).toInstance(cliConfig.getClientManager().getClusterClient());
+          bind(PluginClient.class).toInstance(cliConfig.getClientManager().getPluginClient());
         }
       }
     );
