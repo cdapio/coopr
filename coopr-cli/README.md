@@ -1,7 +1,7 @@
 Coopr-CLI
 ==================
 
-The CLI is for managing Coopr from command line.
+ The CLI is used to manage Coopr from the command line.
 
 ## Supported Actions
 
@@ -13,21 +13,22 @@ The CLI is for managing Coopr from command line.
 
 ## Build
  
- To build the Coopr CLI jar, use:
+ To build the CLI, run the following command:
  
  ```mvn package``` or ``` mvn package -DskipTests```
 
 ## Start
 
- To start the Coopr CLI jar, use  (from Coopr project directory)
+ To start the CLI, run the following command:
  
- ```java -jar coopr-cli/target/coopr-cli-{version}.jar```
+ ```java -jar target/coopr-cli-{version}.jar```
  
  ```{version}``` - the version of Coopr    
        
 ## Example
    
- When Coopr CLI started, you would see ```coopr (http://localhost:55054)> ``` - CLI with default parameters: 
+ When the CLI starts, you will see ```coopr (http://localhost:55054)> ```. 
+ This is because the CLI is using its default parameters: 
  
   host - ```localhost```
   port - ```55054```
@@ -35,19 +36,19 @@ The CLI is for managing Coopr from command line.
   user - ```admin```
   tenant - ```superadmin```
   
- For reconnecting to another Coopr server use connect command:
+ To connect to another Coopr server, use the connect command:
  
- ```connect to <%s> as <%s> <%s> [using port <%s>] [with ssl <%s>]```
+ ```connect to <host> as <user> <tenant> [using port <port>] [with ssl <disabled | enabled>]```
  
  For example:
  
  ```connect to com.example as admin superadmin with ssl enabled```
  
- Use help command to see list of all commands:
+ Use the help command to see a list of all commands:
   
  ```help```
  
- Command example, list of the cluster templates available for the user: 
+ For example, to list all cluster templates available to the user:
  
  ```list templates```
  
