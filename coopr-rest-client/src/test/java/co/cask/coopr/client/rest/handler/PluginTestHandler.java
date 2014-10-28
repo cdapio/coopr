@@ -43,9 +43,11 @@ public class PluginTestHandler extends AbstractHttpHandler {
   private static final String GET_NOT_EXIST_PROVIDER_TYPE =
                               "v2/plugins/providertypes/" + PluginTestConstants.NOT_EXISISTING_PLUGIN;
   private static final String GET_NOT_EXIST_PROVIDER_RESOURCE =
-                              "v2/plugins/providertypes/\\w+/" + PluginTestConstants.NOT_EXISISTING_RESOURCE;
+                              "v2/plugins/providertypes/"+ PluginTestConstants.JOYENT_PLUGIN + "/" +
+                                PluginTestConstants.NOT_EXISISTING_RESOURCE;
   private static final String GET_NOT_EXIST_AUTOMATOR_RESOURCE =
-                              "v2/plugins/automatortypes/\\w+/" + PluginTestConstants.NOT_EXISISTING_RESOURCE;
+                              "v2/plugins/automatortypes/" + PluginTestConstants.CHEF_PLUGIN + "/" +
+                                PluginTestConstants.NOT_EXISISTING_RESOURCE;
   private static final String STAGE_AUTOMATOR_TYPE_RESOURCES =
                               "v2/plugins/automatortypes/\\w+/\\w+/\\w+/versions/\\w+/stage";
   private static final String RECALL_AUTOMATOR_TYPE_RESOURCES =

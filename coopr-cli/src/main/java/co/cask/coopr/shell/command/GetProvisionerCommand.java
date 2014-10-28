@@ -18,39 +18,39 @@ package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.Arguments;
 import co.cask.common.cli.Command;
-import co.cask.coopr.client.AdminClient;
+import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.shell.util.CliUtil;
 import com.google.inject.Inject;
 
 import java.io.PrintStream;
 
-import static co.cask.coopr.shell.util.Constants.NAME_KEY;
+import static co.cask.coopr.shell.util.Constants.PROVISIONER_ID;
 
 /**
- * Gets the image type.
+ * Gets the provisioner.
  */
-public class GetImageTypeCommand implements Command {
+public class GetProvisionerCommand implements Command {
 
-  private final AdminClient adminClient;
+  private final ProvisionerClient provisionerClient;
 
   @Inject
-  private GetImageTypeCommand(AdminClient adminClient) {
-    this.adminClient = adminClient;
+  private GetProvisionerCommand(ProvisionerClient provisionerClient) {
+    this.provisionerClient = provisionerClient;
   }
 
   @Override
   public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    String name = arguments.get(NAME_KEY);
-    printStream.print(CliUtil.getPrettyJson(adminClient.getImageType(name)));
+    String name = arguments.get(PROVISIONER_ID);
+    printStream.print(CliUtil.getPrettyJson(provisionerClient.getProvisioner(name)));
   }
 
   @Override
   public String getPattern() {
-    return String.format("get image type <%s>", NAME_KEY);
+    return String.format("get provisioner <%s>", PROVISIONER_ID);
   }
 
   @Override
   public String getDescription() {
-    return "Gets the image type";
+    return "Gets the provisioner";
   }
 }

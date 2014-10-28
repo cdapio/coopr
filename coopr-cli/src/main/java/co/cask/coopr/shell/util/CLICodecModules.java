@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,34 +14,20 @@
  * limitations under the License.
  */
 
-package co.cask.coopr.shell.command;
+package co.cask.coopr.shell.util;
 
-import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
-import com.google.inject.Inject;
-
-import java.io.PrintStream;
+import co.cask.coopr.codec.json.guice.CodecModules;
+import com.google.gson.GsonBuilder;
 
 /**
- * Exits the cli.
+ * CLI guice module for binding serialization/deserialization related classes.
  */
-public class ExitCommand implements Command {
-
-  @Inject
-  private ExitCommand() {}
+public class CLICodecModules extends CodecModules {
 
   @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    System.exit(0);
-  }
-
-  @Override
-  public String getPattern() {
-    return "exit";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Exits the cli";
+  protected GsonBuilder createCurrentBuilder() {
+    GsonBuilder builder = super.createCurrentBuilder();
+    builder.setPrettyPrinting().disableHtmlEscaping();
+    return builder;
   }
 }

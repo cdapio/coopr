@@ -3,7 +3,7 @@ jmx_base = '-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.ssl=fa
 
 # Java
 default['java']['install_flavor'] = 'oracle'
-default['java']['jdk_version'] = 6
+default['java']['jdk_version'] = 7
 default['java']['oracle']['accept_oracle_download_terms'] = true
 
 # Hadoop

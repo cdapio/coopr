@@ -16,32 +16,23 @@
 
 package co.cask.coopr.shell.command;
 
-import co.cask.common.cli.Arguments;
-import co.cask.common.cli.Command;
-import com.google.inject.Inject;
+import co.cask.common.cli.exception.InvalidCommandException;
+import org.junit.Test;
+import org.mockito.Mockito;
 
-import java.io.PrintStream;
+import java.io.IOException;
 
 /**
- * Exits the cli.
+ * {@link ListTenantsCommand} class test.
  */
-public class ExitCommand implements Command {
+public class ListTenantsCommandTest extends AbstractTest {
 
-  @Inject
-  private ExitCommand() {}
+  private static final String INPUT = "list tenants";
 
-  @Override
-  public void execute(Arguments arguments, PrintStream printStream) throws Exception {
-    System.exit(0);
-  }
+  @Test
+  public void executeTest() throws IOException, InvalidCommandException {
+    CLI.execute(INPUT, System.out);
 
-  @Override
-  public String getPattern() {
-    return "exit";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Exits the cli";
+    Mockito.verify(TENANT_CLIENT).getTenants();
   }
 }
