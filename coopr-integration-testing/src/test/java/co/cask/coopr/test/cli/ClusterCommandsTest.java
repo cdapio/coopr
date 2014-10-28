@@ -83,10 +83,7 @@ public class ClusterCommandsTest extends AbstractTest {
     for (Node node : result.getNodes()) {
       Assert.assertTrue(FIRST_TEST_CLUSTER.getNodeIDs().contains(node.getId()));
     }
-    // Node ids get overwritten by the full node objects in the result object
-    Cluster expectedResult = FIRST_TEST_CLUSTER;
-    expectedResult.setNodes(ImmutableSet.<String>of());
-    Assert.assertEquals(expectedResult, result.getCluster());
+    Assert.assertEquals(FIRST_TEST_CLUSTER, result.getCluster());
   }
 
   @Test
