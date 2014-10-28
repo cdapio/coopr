@@ -7,6 +7,8 @@ var helper = require('../protractor-help');
 describe('login', function() {
 
   it('should show a form that works', function() {
+    helper.logout();
+
     browser.get('/login');
 
     expect( 
@@ -30,7 +32,7 @@ describe('login', function() {
       browser.get('/login');
 
       expect(
-        $('body').getAttribute('class')
+        element(by.css('body')).getAttribute('class')
       ).toContain('state-home');
 
       expect(

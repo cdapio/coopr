@@ -13,6 +13,8 @@
             Reconfigure
         </a>
         <a href="" ng-click="myConfirm()" my-confirmable="doDelete(model)" 
+          data-confirmable-title="Delete cluster '{{model.name}}'"
+          data-confirmable-content="This action is not reversible, do you really want to proceed?"
           class="btn btn-danger btn-xs">
             <span class="fa fa-trash"></span>
             Delete

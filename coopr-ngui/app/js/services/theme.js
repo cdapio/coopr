@@ -5,8 +5,8 @@
 var module = angular.module(PKG.name+'.services');
 
 module.constant('MYTHEME_NAMES', [
-  'default',
-  'yellow'
+  // 'yellow',
+  'default'
 ]);
 
 module.constant('MYTHEME_EVENT', {

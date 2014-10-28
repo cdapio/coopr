@@ -50,7 +50,8 @@ Helpers.FRIENDLY_STATUS = {
   'failed': 'Failed',
   'not_submitted': 'Pending...',
   'creating': 'Building cluster...',
-  'running': 'Running...'
+  'running': 'Running...',
+  'paused': 'Paused'
 };
 
 Helpers.READABLE_ACTIONS = {
