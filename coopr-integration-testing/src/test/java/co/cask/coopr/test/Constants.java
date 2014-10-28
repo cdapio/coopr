@@ -44,7 +44,7 @@ public class Constants {
   public static final String GET_IMAGE_TYPE_COMMAND = "get image type \"%s\"";
   public static final String DELETE_IMAGE_TYPE_COMMAND = "delete image type \"%s\"";
 
-  //Cluster commands
+  // Cluster commands
   public static final String LIST_CLUSTERS_COMMAND = "list clusters";
   public static final String GET_CLUSTER_COMMAND = "get cluster \"%s\"";
   public static final String DELETE_CLUSTER_COMMAND = "delete cluster \"%s\"";
@@ -59,6 +59,15 @@ public class Constants {
   public static final String STOP_SERVICE_ON_CLUSTER_COMMAND = "stop service \"%s\" on cluster \"%s\"";
   public static final String RESTART_SERVICE_ON_CLUSTER_COMMAND = "restart service \"%s\" on cluster \"%s\"";
   public static final String ADD_SERVICES_ON_CLUSTER_COMMAND = "add services '%s' on cluster \"%s\"";
+
+  // Provisioner commands
+  public static final String LIST_PROVISIONERS_COMMAND = "list provisioners";
+  public static final String GET_PROVISIONER_COMMAND = "get provisioner \"%s\"";
+
+  // Tenant commands
+  public static final String LIST_TENANTS_COMMAND = "list tenants";
+  public static final String GET_TENANT_COMMAND = "get tenant \"%s\"";
+  public static final String DELETE_TENANT_COMMAND = "delete tenant \"%s\"";
 
   // URI
   public static final int PORT = getPort();
