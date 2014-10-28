@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 
 public class TenantCommndsTest extends AbstractTest {
 
@@ -40,7 +41,7 @@ public class TenantCommndsTest extends AbstractTest {
   @Test
   public void testListTenants() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_TENANTS_COMMAND);
-    List<TenantSpecification> result = getListFromOutput(new TypeToken<List<TenantSpecification>>() {}.getType());
+    Set<TenantSpecification> result = getSetFromOutput(new TypeToken<List<TenantSpecification>>() {}.getType());
     // first is the tenant created in the RestClientTest and the second one is the default superadmin tenant
     Assert.assertEquals(2, result.size());
     Assert.assertTrue(result.contains(TEST_TENANT.getSpecification()));
