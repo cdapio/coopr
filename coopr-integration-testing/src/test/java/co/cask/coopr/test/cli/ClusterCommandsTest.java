@@ -56,7 +56,7 @@ public class ClusterCommandsTest extends AbstractTest {
   @Test
   public void testListClusters() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_CLUSTERS_COMMAND);
-    Set<ClusterSummary> result = getSetFromOutput(new TypeToken<List<ClusterSummary>>() {}.getType());
+    Set<ClusterSummary> result = getSetFromOutput(new TypeToken<Set<ClusterSummary>>() {}.getType());
     Assert.assertEquals(2, result.size());
     for (ClusterSummary clusterSummary : result) {
       if (FIRST_TEST_CLUSTER_ID.equals(clusterSummary.getId())) {
@@ -174,7 +174,7 @@ public class ClusterCommandsTest extends AbstractTest {
   public void testGetClusterServices() throws InvalidCommandException, UnsupportedEncodingException {
     String command = String.format(Constants.LIST_CLUSTER_SERVICES_COMMAND, SECOND_TEST_CLUSTER_ID);
     execute(command);
-    Set<String> result = getSetFromOutput(new TypeToken<List<String>>() {}.getType());
+    Set<String> result = getSetFromOutput(new TypeToken<Set<String>>() {}.getType());
 
     Set<String> expectedResult = Sets.newHashSet(Entities.ServiceExample.DATANODE.getName(),
                                                  Entities.ServiceExample.NAMENODE.getName(),

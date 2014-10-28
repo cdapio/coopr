@@ -23,6 +23,7 @@ import co.cask.coopr.account.Account;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.CLIMain;
+import co.cask.coopr.shell.util.CLICodecModules;
 import co.cask.coopr.test.client.ClientTest;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -50,11 +51,8 @@ public abstract class AbstractTest extends ClientTest {
   protected static final ByteArrayOutputStream OUTPUT_STREAM = new ByteArrayOutputStream();
 
   private static final PrintStream PRINT_STREAM = new PrintStream(OUTPUT_STREAM);
-  private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-  private static final Injector injector = Guice.createInjector(
-    new CodecModules().getModule()
-  );
-  private static final Gson GSON = injector.getInstance(Gson.class);
+  private static final Gson GSON = Guice.createInjector(new CodecModules().getModule()).getInstance(Gson.class);
+  private static final Gson CLI_GSON = Guice.createInjector(new CLICodecModules().getModule()).getInstance(Gson.class);
 
   public static CLIMain shell;
   public static CLI<Command> cli;
@@ -80,7 +78,7 @@ public abstract class AbstractTest extends ClientTest {
   }
 
   public static void checkCommandOutput(Object expectedOutput) throws UnsupportedEncodingException {
-    Assert.assertEquals(PRETTY_GSON.toJson(expectedOutput), OUTPUT_STREAM.toString("UTF-8"));
+    Assert.assertEquals(CLI_GSON.toJson(expectedOutput), OUTPUT_STREAM.toString("UTF-8"));
   }
 
   public static void checkError() throws UnsupportedEncodingException {
@@ -92,11 +90,11 @@ public abstract class AbstractTest extends ClientTest {
   }
 
   public static <T> T getObjectFromOutput(Class<T> type) throws UnsupportedEncodingException {
-    return PRETTY_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), type);
+    return CLI_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), type);
   }
 
   public static <T> Set<T> getSetFromOutput(Type listType) throws UnsupportedEncodingException {
-    return Sets.newHashSet((List<T>) PRETTY_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), listType));
+    return CLI_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), listType);
   }
 
   public static String getJsonFromObject(Object output) {

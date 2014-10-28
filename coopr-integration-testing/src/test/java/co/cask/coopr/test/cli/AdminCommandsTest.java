@@ -47,7 +47,7 @@ public class AdminCommandsTest extends AbstractTest {
   @Test
   public void testListTemplates() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_TEMPLATES_COMMAND);
-    Set<ClusterTemplate> resultSet =  getSetFromOutput(new TypeToken<List<ClusterTemplate>>() {}.getType());
+    Set<ClusterTemplate> resultSet =  getSetFromOutput(new TypeToken<Set<ClusterTemplate>>() {}.getType());
     Set<ClusterTemplate> expectedSet = Sets.newHashSet(HADOOP_DISTRIBUTED_CLUSTER_TEMPLATE, REACTOR_CLUSTER_TEMPLATE,
                                                        HDFS_CLUSTER_TEMPLATE);
     Assert.assertEquals(expectedSet, resultSet);
@@ -78,7 +78,7 @@ public class AdminCommandsTest extends AbstractTest {
   @Test
   public void testListProviders() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_PROVIDERS_COMMAND);
-    Set<Provider> resultSet =  getSetFromOutput(new TypeToken<List<Provider>>() {}.getType());
+    Set<Provider> resultSet =  getSetFromOutput(new TypeToken<Set<Provider>>() {}.getType());
     Set<Provider> expectedSet = Sets.newHashSet(Entities.ProviderExample.JOYENT, Entities.ProviderExample.RACKSPACE);
     Assert.assertEquals(expectedSet, resultSet);
   }
@@ -108,7 +108,7 @@ public class AdminCommandsTest extends AbstractTest {
   @Test
   public void testListServices() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_SERVICES_COMMAND);
-    Set<Service> resultSet =  getSetFromOutput(new TypeToken<List<Service>>() {}.getType());
+    Set<Service> resultSet =  getSetFromOutput(new TypeToken<Set<Service>>() {}.getType());
     Set<Service> expectedSet = Sets.newHashSet(Entities.ServiceExample.DATANODE, Entities.ServiceExample.HOSTS,
                                                Entities.ServiceExample.NAMENODE, ZOOKEEPER);
     Assert.assertEquals(expectedSet, resultSet);
@@ -133,7 +133,7 @@ public class AdminCommandsTest extends AbstractTest {
   @Test
   public void testListHardwareTypes() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_HARDWARE_TYPES_COMMAND);
-    Set<HardwareType> resultSet =  getSetFromOutput(new TypeToken<List<HardwareType>>() {}.getType());
+    Set<HardwareType> resultSet =  getSetFromOutput(new TypeToken<Set<HardwareType>>() {}.getType());
     Set<HardwareType> expectedSet = Sets.newHashSet(Entities.HardwareTypeExample.LARGE,
                                                     Entities.HardwareTypeExample.MEDIUM,
                                                     Entities.HardwareTypeExample.SMALL);
@@ -160,7 +160,7 @@ public class AdminCommandsTest extends AbstractTest {
   @Test
   public void testListImageTypes() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_IMAGE_TYPES_COMMAND);
-    Set<ImageType> resultSet =  getSetFromOutput(new TypeToken<List<ImageType>>() {}.getType());
+    Set<ImageType> resultSet =  getSetFromOutput(new TypeToken<Set<ImageType>>() {}.getType());
     Set<ImageType> expectedSet = Sets.newHashSet(Entities.ImageTypeExample.CENTOS_6,
                                                  Entities.ImageTypeExample.UBUNTU_12);
     Assert.assertEquals(expectedSet, resultSet);

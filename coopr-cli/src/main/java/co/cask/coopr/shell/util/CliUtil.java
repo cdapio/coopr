@@ -38,11 +38,8 @@ import java.net.Socket;
 public class CliUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(CliUtil.class);
-  private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
   private static final String FILE_PREFIX = "file ";
-  private static final Injector injector = Guice.createInjector(
-    new CodecModules().getModule()
-  );
+  private static final Gson GSON = Guice.createInjector(new CLICodecModules().getModule()).getInstance(Gson.class);
 
   /**
    * Converts specified object to pretty Json
@@ -51,7 +48,7 @@ public class CliUtil {
    * @return the pretty Json String
    */
   public static String getPrettyJson(Object output) {
-    return PRETTY_GSON.toJson(output);
+    return GSON.toJson(output);
   }
 
   /**
@@ -67,13 +64,12 @@ public class CliUtil {
   public static <T> T getObjectFromJson(Arguments arguments, String argKey, Class<T> type) throws IOException {
     if (arguments.hasArgument(argKey)) {
       String arg = arguments.get(argKey);
-      Gson gson = injector.getInstance(Gson.class);
       if (arg.startsWith(FILE_PREFIX)) {
         String argFilePath = arg.substring(FILE_PREFIX.length());
         Reader reader = null;
         try {
           reader = new InputStreamReader(new FileInputStream(argFilePath), Charsets.UTF_8);
-          return gson.fromJson(reader, type);
+          return GSON.fromJson(reader, type);
         } finally {
           if (reader != null) {
             try {
@@ -84,7 +80,7 @@ public class CliUtil {
           }
         }
       }
-      return gson.fromJson(arg, type);
+      return GSON.fromJson(arg, type);
     }
     return null;
   }
