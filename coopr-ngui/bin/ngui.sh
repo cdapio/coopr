@@ -26,8 +26,7 @@ die ( ) { echo; echo "ERROR: ${*}"; echo; exit 1; }
 UI_PATH=${UI_PATH:-${COOPR_HOME}/ngui}
 ENVIRONMENT=${ENVIRONMENT:-production}
 
-COOPR_NODE=${COOPR_NODE:-${COOPR_HOME}/ui/embedded/bin/node}
-COOPR_NPM=${COOPR_NPM:-${COOPR_HOME}/ui/embedded/bin/npm}
+COOPR_NODE=${COOPR_NODE:-${COOPR_HOME}/ngui/embedded/bin/node}
 APP_NAME="coopr-ngui"
 PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
