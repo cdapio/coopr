@@ -6,15 +6,17 @@ COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
 COOPR_API_USER=${COOPR_API_USER:-admin}
 COOPR_API_KEY=${COOPR_API_KEY:-1234567890abcdef}
 COOPR_TENANT=${COOPR_TENANT:-superadmin}
-CHEF_SOLO_DIR=${COOPR_HOME}/provisioner/worker/plugins/automators/chef_solo_automator/chef_solo_automator
 
 COOPR_RUBY=${COOPR_RUBY:-"${COOPR_HOME}/provisioner/embedded/bin/ruby"}
+CHEF_SOLO_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
+
+RESOURCES_DIR=${CHEF_SOLO_DIR}/resources
 test -x ${COOPR_RUBY} || COOPR_RUBY="ruby"
 DATA_UPLOADER="${COOPR_RUBY} ${COOPR_HOME}/provisioner/bin/data-uploader.rb"
 
-COOKBOOKS_DIR=${CHEF_SOLO_DIR}/cookbooks
-ROLES_DIR=${CHEF_SOLO_DIR}/roles
-DATA_BAGS_DIR=${CHEF_SOLO_DIR}/data_bags
+COOKBOOKS_DIR=${RESOURCES_DIR}/cookbooks
+ROLES_DIR=${RESOURCES_DIR}/roles
+DATA_BAGS_DIR=${RESOURCES_DIR}/data_bags
 
 # load cookbooks
 cd ${COOKBOOKS_DIR}
