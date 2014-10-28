@@ -46,9 +46,9 @@ public class TenantRestClientTest extends ClientTest {
   }
 
   @Test
-   public void testGetAllProvisionersWithoutPermissions() throws IOException {
+   public void testGetAllTenantsWithoutPermissions() throws IOException {
     try {
-      adminClientManager.getTenantClient().getTenant(TENANT);
+      adminClientManager.getTenantClient().getTenants();
       Assert.fail("Expected HttpFailureException");
     } catch (HttpFailureException e) {
       Assert.assertEquals(HttpStatus.SC_FORBIDDEN, e.getStatusCode());

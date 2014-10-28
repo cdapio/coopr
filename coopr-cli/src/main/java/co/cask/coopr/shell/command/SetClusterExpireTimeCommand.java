@@ -19,13 +19,12 @@ package co.cask.coopr.shell.command;
 import co.cask.common.cli.Arguments;
 import co.cask.common.cli.Command;
 import co.cask.coopr.client.ClusterClient;
-import co.cask.coopr.shell.util.CliUtil;
-
-import java.io.PrintStream;
 import com.google.inject.Inject;
 
-import static co.cask.coopr.shell.util.Constants.EXPIRE_TIME_KEY;
+import java.io.PrintStream;
+
 import static co.cask.coopr.shell.util.Constants.CLUSTER_ID_KEY;
+import static co.cask.coopr.shell.util.Constants.EXPIRE_TIME_KEY;
 
 /**
  * Sets the cluster expire time.

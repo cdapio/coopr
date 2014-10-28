@@ -21,6 +21,8 @@ import co.cask.common.cli.Command;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.codec.json.guice.CodecModules;
+import co.cask.coopr.client.ProvisionerClient;
+import co.cask.coopr.client.TenantClient;
 import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.command.set.CommandSet;
 import com.google.gson.Gson;
@@ -42,6 +44,8 @@ public abstract class AbstractTest {
   protected static final CLIConfig CLI_CONFIG = Mockito.mock(CLIConfig.class);
   protected static final AdminClient ADMIN_CLIENT = Mockito.mock(AdminClient.class);
   protected static final ClusterClient CLUSTER_CLIENT = Mockito.mock(ClusterClient.class);
+  protected static final TenantClient TENANT_CLIENT = Mockito.mock(TenantClient.class);
+  protected static final ProvisionerClient PROVISIONER_CLIENT = Mockito.mock(ProvisionerClient.class);
 
   private static final Injector injector = Guice.createInjector(
     new CodecModules().getModule()
@@ -60,6 +64,8 @@ public abstract class AbstractTest {
           bind(CLIConfig.class).toInstance(CLI_CONFIG);
           bind(AdminClient.class).toInstance(ADMIN_CLIENT);
           bind(ClusterClient.class).toInstance(CLUSTER_CLIENT);
+          bind(TenantClient.class).toInstance(TENANT_CLIENT);
+          bind(ProvisionerClient.class).toInstance(PROVISIONER_CLIENT);
         }
       }
     );
