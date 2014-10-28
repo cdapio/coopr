@@ -12,16 +12,16 @@
 
       <span ng-class="{'input-group input-group-sm': !html5}">
         <span class="{{ html5 ? 'sr-only' : 'input-group-addon' }}">
-          Min:
+          Min
         </span>
 
         <input type="{{ html5 ? 'range' : 'number' }}"
           step="1"
           ng-pattern="/^-?\d+$/"
-          min="{{ getConstraint('min', 'min') }}"
-          max="{{ getConstraint('max', 'min') }}"
+          min="{{ getLowerConstraint('min') }}"
+          max="{{ getUpperConstraint('min') }}"
           ng-class="{ 'form-control': !html5 }" 
-          ng-model="range.min"
+          ng-model="model.min"
         />
 
       </span>
@@ -38,17 +38,17 @@
 
       <span ng-class="{'input-group input-group-sm': !html5}">
         <span class="{{ html5 ? 'sr-only' : 'input-group-addon' }}">
-          Max:
+          Max
         </span>
 
         <input type="{{ html5 ? 'range' : 'number' }}" 
           step="1"
           ng-pattern="/^-?\d+$/"
-          min="{{ getConstraint('min', 'max') }}"
-          max="{{ getConstraint('max', 'max') }}"
+          min="{{ getLowerConstraint('max') }}"
+          max="{{ getUpperConstraint('max') }}"
           ng-class="{ 'form-control': !html5 }" 
           ng-disabled="html5 && maxout"
-          ng-model="range.max"
+          ng-model="model.max"
         />
 
       </span>

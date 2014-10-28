@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('TenantFormCtrl', 
-function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
+function ($scope, $state, $alert, $q, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -14,9 +14,11 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
   }
   else {
     $scope.model = new myApi.Tenant();
+    $scope.model.initialize();
+
     promise = $q.when($scope.model);
-    $scope.model.maxClusters = 0;
-    $scope.model.maxNodes = 0;
+
+    myFocusManager.focus('inputTenantName');
   }
 
   $q.all({
@@ -33,8 +35,7 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase) {
       $alert({
         title: 'No workers available!', 
         content: 'You will need to free some workers for this tenant.', 
-        type: 'warning', 
-        duration: 3
+        type: 'warning'
       });
     }
 

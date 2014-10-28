@@ -87,10 +87,12 @@ class FogProviderGoogle < Provider
       @result['status'] = 0
     # We assume that no work was done when we get Unauthorized
     rescue Excon::Errors::Unauthorized
+      msg = 'Provider credentials invalid/unauthorized'
       @result['status'] = 201
-      log.error('Provider credentials invalid/unauthorized')
+      @result['stderr'] = msg
+      log.error(msg)
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderGoogle.create:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderGoogle.create: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.create: #{e.inspect}"
     else
       log.debug "Create finished successfully: #{@result}"
@@ -119,11 +121,16 @@ class FogProviderGoogle < Provider
       log.debug "Waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
+      hostname =
+        if server.public_ip_address
+          Resolv.getname(server.public_ip_address)
+        else
+          @task['config']['hostname']
+        end
+
       bootstrap_ip =
         if server.public_ip_address
           server.public_ip_address
-        else
-          Resolv.getaddress(server.dns_name) unless server.dns_name.nil?
         end
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
@@ -141,6 +148,7 @@ class FogProviderGoogle < Provider
         'access_v4' => bootstrap_ip,
         'bind_v4' => bind_ip
       }
+      @result['hostname'] = hostname
 
       # do we need sudo bash?
       sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
@@ -158,6 +166,7 @@ class FogProviderGoogle < Provider
       log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials}"
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
+        ssh_exec!(ssh, "#{sudo} hostname #{hostname}", "Setting hostname to #{hostname}")
       end
 
       # search for data disk
@@ -200,7 +209,7 @@ class FogProviderGoogle < Provider
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderGoogle.confirm:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderGoogle.confirm: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.confirm: #{e.inspect}"
     else
       log.debug "Confirm finished successfully: #{@result}"
@@ -226,7 +235,12 @@ class FogProviderGoogle < Provider
       known_disks = @task['config']['disks']
 
       # fetch server object
-      server = connection.servers.get(providerid)
+      begin
+        server = connection.servers.get(providerid)
+      rescue ArgumentError => e
+        # ok, attempting to delete a server with an invalid name which cannot exist at the provider
+        log.debug("ArgumentError in when deleting server #{providerid}. Server must not exist: " + e.inspect)
+      end
 
       if known_disks.nil? && !server.nil?
         # this is the first delete attempt, persist the names of the currently attached disks
@@ -278,7 +292,7 @@ class FogProviderGoogle < Provider
       log.error('Unable to delete specified components: ' + e.inspect)
       @result['stderr'] = "Unable to delete specified components: ' + e.inspect"
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderGoogle.delete:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderGoogle.delete: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderGoogle.delete: #{e.inspect}"
     else
       log.debug "Delete finished sucessfully: #{@result}"

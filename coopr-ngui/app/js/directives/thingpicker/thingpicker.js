@@ -2,22 +2,67 @@
  * myThingPicker
  */
 
-angular.module(PKG.name+'.directives').directive('myThingPicker', 
+angular.module(PKG.name+'.directives').directive('myThingPicker',
 function myThingPickerDirective () {
   return {
     restrict: 'E',
     templateUrl: 'thingpicker/thingpicker.html',
     replace: true,
-
     scope: {
       model: '=', // an array of names
       available: '=', // an array of strings, or of objects with name & description keys
       allowRm: '=', // allow removal boolean
       listInline: '@',
-      thingName: '@'
+      thingName: '@',
+      freetextMode: '@'
     },
 
-    controller: function ($scope, myApi) {
+    controller: function ($scope, myApi, $modal, myFocusManager) {
+
+      var modalInstance,
+          modalScope;
+
+      if ($scope.freetextMode) {
+        modalScope = $scope.$new();
+        modalScope.newThing = {
+          name: ''
+        };
+
+        modalInstance = $modal({
+          scope: modalScope,
+          title: 'Add '+ $scope.thingName,
+          template: 'thingpicker/freetextModal.html',
+          placement: 'center',
+          show: false
+        });
+
+        $scope.showModal = modalInstance.show;
+
+        modalScope.$watch('newThing.name', function() {
+          modalScope.modalError = false;
+        });
+
+        modalScope.$on('modal.show', function() {
+          myFocusManager.focus('inputNewThingName_'+$scope.thingName);
+        });
+
+        modalScope.$on('modal.hide', function() {
+          modalScope.newThing.name = '';
+        });
+
+        modalScope.validateAndAddToModel = function(name) {
+          if ($scope.model.indexOf(name) === -1) {
+            $scope.addThing(name);
+            modalInstance.hide();
+          } else {
+            modalScope.modalError = true;
+          }
+        };
+
+        $scope.$on('$destroy', function() {
+          modalInstance.destroy();
+        });
+      }
 
       $scope.rmThing = function (thing) {
         $scope.model = $scope.model.filter(function (one) {
@@ -72,7 +117,6 @@ function myThingPickerDirective () {
           return out;
         }, {});
       }
-
 
     }
   };

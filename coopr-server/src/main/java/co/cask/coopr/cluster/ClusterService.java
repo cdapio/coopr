@@ -368,6 +368,87 @@ public class ClusterService {
   }
 
   /**
+   * Request to pause a cluster job that is currently running.
+   *
+   * @param clusterId Id of the cluster.
+   * @param account Account of the user that is trying to pause a cluster job.
+   * @throws IOException if there was some error writing to stores.
+   * @throws MissingClusterException if no cluster owned by the user is found.
+   */
+  public void requestPauseJob(String clusterId, Account account) throws IOException, MissingClusterException {
+    LOG.debug("request to pause job for cluster: {}", clusterId);
+    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.acquire();
+    try {
+      Cluster cluster = getCluster(clusterId, account);
+      LOG.debug("cluster info: {}", cluster);
+      if (cluster == null) {
+        throw new MissingClusterException("cluster " + clusterId + " not found.");
+      }
+
+      if (cluster.getStatus() != Cluster.Status.PENDING) {
+        return;
+      }
+
+      ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      LOG.debug("latest job info: {}", clusterJob);
+
+      // If job already done, return.
+      if (clusterJob.getJobStatus() == ClusterJob.Status.COMPLETE ||
+        clusterJob.getJobStatus() == ClusterJob.Status.FAILED) {
+        return;
+      }
+
+      clusterJob.setJobStatus(ClusterJob.Status.PAUSED);
+      clusterJob.setStatusMessage("Paused by user.");
+      clusterStore.writeClusterJob(clusterJob);
+    } finally {
+      lock.release();
+    }
+  }
+
+  /**
+   * Request to resume a cluster job that was previously paused.
+   *
+   * @param clusterId Id of the cluster.
+   * @param account Account of the user that is trying to resume a cluster job.
+   * @throws IOException if there was some error writing to stores.
+   * @throws MissingClusterException if no cluster owned by the user is found.
+   */
+  public void requestResumeJob(String clusterId, Account account) throws IOException, MissingClusterException {
+    LOG.debug("request to resume job for cluster: {}", clusterId);
+    ZKInterProcessReentrantLock lock = lockService.getClusterLock(account.getTenantId(), clusterId);
+    lock.acquire();
+    try {
+      Cluster cluster = getCluster(clusterId, account);
+      LOG.debug("cluster info: {}", cluster);
+      if (cluster == null) {
+        throw new MissingClusterException("cluster " + clusterId + " not found.");
+      }
+
+      if (cluster.getStatus() != Cluster.Status.PENDING) {
+        return;
+      }
+
+      ClusterJob clusterJob = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
+      LOG.debug("latest job info: {}", clusterJob);
+
+      // If job is not paused, return.
+      if (clusterJob.getJobStatus() != ClusterJob.Status.PAUSED) {
+        return;
+      }
+
+      clusterJob.setJobStatus(ClusterJob.Status.RUNNING);
+      clusterJob.setStatusMessage("Resumed by user.");
+      clusterStore.writeClusterJob(clusterJob);
+      // Reschedule the job.
+      jobQueues.add(account.getTenantId(), new Element(clusterJob.getJobId()));
+    } finally {
+      lock.release();
+    }
+  }
+
+  /**
    * Put in a request to add services to an active cluster.
    * Throws a {@link MissingClusterException} if no cluster owned by the user is found and an
    * {@link IllegalStateException} if the cluster is not in a state where the action can be performed.

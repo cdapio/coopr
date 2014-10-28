@@ -54,10 +54,12 @@ class FogProviderJoyent < Provider
       @result['result']['ssh-auth']['identityfile'] = File.join(Dir.pwd, self.class.ssh_key_dir, @ssh_key_resource) unless @ssh_key_resource.nil?
       @result['status'] = 0
     rescue Excon::Errors::Unauthorized
+      msg = 'Provider credentials invalid/unauthorized'
       @result['status'] = 201
-      log.error('Provider credentials invalid/unauthorized')
+      @result['stderr'] = msg
+      log.error(msg)
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderJoyent.create:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderJoyent.create: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.create: #{e.inspect}"
     else
       log.debug "Create finished successfully: #{@result}"
@@ -101,25 +103,85 @@ class FogProviderJoyent < Provider
       # do we need sudo bash?
       sudo = 'sudo' unless @task['config']['ssh-auth']['user'] == 'root'
       set_credentials(@task['config']['ssh-auth'])
+      
+      # login with pseudotty and turn off sudo requiretty option
+      log.debug "Attempting to ssh to #{bootstrap_ip} as #{@task['config']['ssh-auth']['user']} with credentials: #{@credentials} and pseudotty"
+      Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
+        cmd = "#{sudo} sed -i -e '/^Defaults[[:space:]]*requiretty/ s/^/#/' /etc/sudoers"
+        ssh_exec!(ssh, cmd, 'Disabling requiretty via pseudotty session', true)
+      end
+
       # Validate connectivity
       Net::SSH.start(bootstrap_ip, @task['config']['ssh-auth']['user'], @credentials) do |ssh|
         ssh_exec!(ssh, 'ping -c1 www.opscode.com', 'Validating external connectivity and DNS resolution via ping')
         ssh_exec!(ssh, "#{sudo} hostname #{@task['config']['hostname']}", 'Temporarily setting hostname')
         # Check for /dev/vdb
         begin
-          vdb = true
-          # confirm /dev/vdb exists
-          ssh_exec!(ssh, 'test -e /dev/vdb && echo yes', 'Checking for /dev/vdb')
-          # confirm it is not already mounted
-          #   ubuntu: we remount from /mnt to /data
-          #   centos: vdb1 already mounted at /data
-          ssh_exec!(ssh, 'if grep "vdb /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
-        rescue
+          vdb1 = true
           vdb = false
+          # test for vdb1
+          begin
+            ssh_exec!(ssh, 'test -e /dev/vdb1', 'Checking for /dev/vdb1')
+            ssh_exec!(ssh, 'if grep "vdb1 /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb1 mounted already')
+          rescue
+            vdb1 = false
+            begin
+              vdb = true
+              ssh_exec!(ssh, 'test -e /dev/vdb', 'Checking for /dev/vdb')
+            rescue
+              vdb = false
+            end
+          end
         end
-        if vdb
-          ssh_exec!(ssh, "mount | grep ^/dev/vdb 2>&1 >/dev/null && #{sudo} umount /dev/vdb && #{sudo} /sbin/mkfs.ext4 /dev/vdb && #{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
-          ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
+
+        log.debug 'Found the following:'
+        log.debug "- vdb1 = #{vdb1}"
+        log.debug "- vdb  = #{vdb}"
+
+        # confirm it is not already mounted
+        #   ubuntu: we remount from /mnt to /data
+        #   centos: vdb1 already mounted at /data
+        if vdb1
+          # TODO: check that vdb1 is mounted at /data, for now assume it is
+          log.debug 'Assuming /dev/vdb1 is mounted at /data, if this is not the case, file an issue'
+        elsif vdb
+          begin
+            mounted = false
+            ssh_exec!(ssh, 'if grep "vdb /data " /proc/mounts ; then /bin/false ; fi', 'Checking if /dev/vdb mounted already')
+          rescue
+            mounted = true
+          end
+          # If mounted = true, we're done
+          unless mounted
+            # disk isn't mounted at /data, could be mounted elsewhere
+            begin
+              # Are we mounted?
+              ssh_exec!(ssh, 'mount | grep ^/dev/vdb 2>&1 >/dev/null', 'Checking if /dev/vdb is unmounted')
+              unmount = true
+            rescue
+              log.debug 'Disk /dev/vdb is not mounted'
+            end
+            if unmount
+              begin
+                ssh_exec!(ssh, "#{sudo} umount /dev/vdb", 'Unmounting /dev/vdb')
+              rescue
+                raise 'Failure unmounting data disk /dev/vdb'
+              end
+            end
+            # Disk is unmounted, format it
+            begin
+              ssh_exec!(ssh, "#{sudo} /sbin/mkfs.ext4 /dev/vdb", 'Formatting filesystem at /dev/vdb')
+            rescue
+              raise 'Failure formatting data disk /dev/vdb'
+            end
+            # Mount it
+            begin
+              ssh_exec!(ssh, "#{sudo} mkdir -p /data && #{sudo} mount -o _netdev /dev/vdb /data", 'Mounting /dev/vdb as /data')
+            rescue
+              raise 'Failed to mount /dev/vdb at /data'
+            end
+            ssh_exec!(ssh, "#{sudo} sed -i -e 's:/mnt:/data:' /etc/fstab", 'Updating /etc/fstab for /data')
+          end
         end
       end
       # Return 0
@@ -131,7 +193,7 @@ class FogProviderJoyent < Provider
       log.error("SSH Authentication failure for #{providerid}/#{bootstrap_ip}")
       @result['stderr'] = "SSH Authentication failure for #{providerid}/#{bootstrap_ip}: #{e.inspect}"
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderJoyent.confirm:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderJoyent.confirm: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.confirm: #{e.inspect}"
     else
       log.debug "Confirm finished successfully: #{@result}"
@@ -161,7 +223,7 @@ class FogProviderJoyent < Provider
       # Return 0
       @result['status'] = 0
     rescue => e
-      log.error('Unexpected Error Occurred in FogProviderJoyent.delete:' + e.inspect)
+      log.error('Unexpected Error Occurred in FogProviderJoyent.delete: ' + e.inspect)
       @result['stderr'] = "Unexpected Error Occurred in FogProviderJoyent.delete: #{e.inspect}"
     else
       log.debug "Delete finished sucessfully: #{@result}"

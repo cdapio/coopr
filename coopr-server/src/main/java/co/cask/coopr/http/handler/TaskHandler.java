@@ -66,7 +66,7 @@ public final class TaskHandler extends AbstractHttpHandler {
     try {
       String taskJson = taskQueueService.takeNextClusterTask(takeRequest);
       if (taskJson == null) {
-        responder.sendError(HttpResponseStatus.NO_CONTENT, "no tasks to take for worker " + takeRequest.getWorkerId());
+        responder.sendStatus(HttpResponseStatus.NO_CONTENT);
         return;
       }
       responder.sendString(HttpResponseStatus.OK, taskJson);

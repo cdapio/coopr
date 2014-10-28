@@ -368,6 +368,11 @@
             "type": "checkbox",
             "label": "Floating IP",
             "tip": "Request a floating IP address for each node"
+          },
+          "network_ids": {
+            "label": "Network IDs",
+            "type": "text",
+            "tip": "Comma separated list of the UUID(s) of the network(s) for the server to attach"
           }
         },
         "required": [

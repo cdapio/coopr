@@ -111,7 +111,7 @@ module Coopr
       rescue RuntimeError => e
         log.error "Exception raised in thread: #{e.inspect}, shutting down..."
         # if signal_handler thread alive, use it to shutdown gracefully
-        if @signal_thread.alive?
+        if @signal_thread && @signal_thread.alive?
           Process.kill('TERM', 0)
           @signal_thread.join
           [@heartbeat_thread, @sinatra_thread, @resource_thread].each do |t|

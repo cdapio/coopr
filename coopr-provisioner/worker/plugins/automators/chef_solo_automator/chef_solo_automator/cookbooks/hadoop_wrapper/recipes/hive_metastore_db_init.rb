@@ -55,6 +55,15 @@ if node['hive'].key?('hive_site') && node['hive']['hive_site'].key?('javax.jdo.o
       password db_pass
       action :create
     end
+    mysql_database_user "#{db_user}-localhost" do
+      connection mysql_connection_info
+      username db_user
+      password db_pass
+      database_name db_name
+      host 'localhost'
+      privileges [:all]
+      action :grant
+    end
     mysql_database 'import-hive-schema' do
       connection mysql_connection_info
       database_name db_name

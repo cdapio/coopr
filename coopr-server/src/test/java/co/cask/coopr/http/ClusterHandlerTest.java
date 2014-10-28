@@ -139,6 +139,75 @@ public class ClusterHandlerTest extends ServiceTestBase {
   }
 
   @Test
+  public void testPauseResumeCluster() throws Exception {
+    String clusterName = "cluster-for-pause-resume";
+    //Create cluster
+    String tenantId = USER1_ACCOUNT.getTenantId();
+    ClusterCreateRequest clusterCreateRequest = ClusterCreateRequest.builder()
+      .setName(clusterName)
+      .setClusterTemplateName(smallTemplate.getName())
+      .setNumMachines(2)
+      .build();
+    HttpResponse response = doPost("/clusters", gson.toJson(clusterCreateRequest), USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+
+    String clusterId = getIdFromResponse(response);
+
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.SOLVE_LAYOUT, 0, 0);
+
+    solverScheduler.run();
+
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.NOT_SUBMITTED,
+                          ClusterAction.CLUSTER_CREATE, 0, 0);
+
+    clusterScheduler.run();
+    callbackScheduler.run();
+
+    // Get the status - 0 tasks completed and RUNNING
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 6, 0);
+
+    TakeTaskRequest takeRequest = new TakeTaskRequest("workerX", PROVISIONER_ID, tenantId);
+    //Take 2 tasks and finish them
+    for (int i = 0; i < 2; i++) {
+      jobScheduler.run();  // run scheduler put in queue
+      jobScheduler.run();  // run scheduler take from queue
+
+      assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                            ClusterAction.CLUSTER_CREATE, 6, i);
+
+      SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+      JsonObject result = new JsonObject();
+      result.addProperty("ipaddress", "111.222.333." + i);
+      FinishTaskRequest finishRequest =
+        new FinishTaskRequest("workerX", PROVISIONER_ID, tenantId,
+                              task.getTaskId(), null, null, 0, null, null, result);
+
+      TestHelper.finishTask(getBaseUrl(), finishRequest);
+      assertResponseStatus(response, HttpResponseStatus.OK);
+    }
+    jobScheduler.run();
+    jobScheduler.run();
+
+    // Pause the job
+    response = doPost("/clusters/" + clusterId + "/pause", "", USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+
+    // Check that the job status is PAUSED
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.PAUSED,
+                          ClusterAction.CLUSTER_CREATE, 6, 2);
+
+    // Resume the job
+    response = doPost("/clusters/" + clusterId + "/resume", "", USER1_HEADERS);
+    assertResponseStatus(response, HttpResponseStatus.OK);
+
+    // Check that the job status is again RUNNING
+    assertStatusWithUser1(clusterId, Cluster.Status.PENDING, ClusterJob.Status.RUNNING,
+                          ClusterAction.CLUSTER_CREATE, 6, 2);
+  }
+
+  @Test
   public void testAddClusterWithOptionalArgs() throws Exception {
     String clusterName = "my-cluster";
     String tenantId = USER1_ACCOUNT.getTenantId();
