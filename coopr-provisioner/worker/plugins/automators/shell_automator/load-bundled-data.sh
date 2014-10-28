@@ -6,7 +6,7 @@ COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
 COOPR_API_USER=${COOPR_API_USER:-admin}
 COOPR_API_KEY=${COOPR_API_KEY:-1234567890abcdef}
 COOPR_TENANT=${COOPR_TENANT:-superadmin}
-SHELL_DIR=${COOPR_HOME}/provisioner/worker/plugins/automators/shell_automator
+SHELL_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 
 COOPR_RUBY=${COOPR_RUBY:-"${COOPR_HOME}/provisioner/embedded/bin/ruby"}
 test -x ${COOPR_RUBY} || COOPR_RUBY="ruby"
