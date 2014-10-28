@@ -60,6 +60,15 @@ public class Constants {
   public static final String RESTART_SERVICE_ON_CLUSTER_COMMAND = "restart service \"%s\" on cluster \"%s\"";
   public static final String ADD_SERVICES_ON_CLUSTER_COMMAND = "add services '%s' on cluster \"%s\"";
 
+  //Plugin commands
+  public static final String LIST_ALL_AUTOMATORS_COMMAND = "list all automatortypes";
+  public static final String LIST_ALL_PROVIDERS_COMMAND = "list all providertypes";
+  public static final String AUTOMATOR_TYPE_CHEF_NAME = "chef-solo";
+  public static final String LIST_ALL_AUTOMATOR_TYPE_RESOURSES_COMMAND =
+                             "list resources from automator \"%s\" of type \"%s\" and status \"%s\"";
+  public static final String LIST_ALL_PROVIDER_TYPE_RESOURSES_COMMAND =
+    "list resources from provider \"%s\" of type \"%s\" and status \"%s\"";
+
   // URI
   public static final int PORT = getPort();
   public static final String ROOT_URL = "http://localhost:" + PORT;

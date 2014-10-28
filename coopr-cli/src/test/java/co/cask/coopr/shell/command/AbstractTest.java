@@ -21,8 +21,10 @@ import co.cask.common.cli.Command;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.client.PluginClient;
+import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.command.set.CommandSet;
+import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -48,6 +50,11 @@ public abstract class AbstractTest {
   protected static final String TEST_RESOURCE_NAME = "test-resource-name";
   protected static final String TEST_RESOURCE_VERSION = "1";
 
+  private static final Injector injector = Guice.createInjector(
+    new CodecModules().getModule()
+  );
+  private static final Gson GSON = injector.getInstance(Gson.class);
+
   protected static CLI<Command> CLI;
 
   @BeforeClass
@@ -67,5 +74,9 @@ public abstract class AbstractTest {
 
     co.cask.common.cli.CommandSet<Command> commandSet = CommandSet.getCliCommandSet(injector);
     CLI = new CLI<Command>(commandSet, Collections.<String, Completer>emptyMap());
+  }
+
+  public static String getJsonFromObject(Object output) {
+    return GSON.toJson(output);
   }
 }

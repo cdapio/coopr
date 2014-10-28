@@ -31,6 +31,7 @@
         <module>coopr-server</module>
         <module>coopr-rest-client</module>
         <module>coopr-cli</module>
+      <module>coopr-integration-testing</module>
     </modules>
 
     <properties>
