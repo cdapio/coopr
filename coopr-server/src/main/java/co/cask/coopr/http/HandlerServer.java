@@ -19,6 +19,7 @@ import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.http.HttpHandler;
 import co.cask.http.NettyHttpService;
+import co.cask.http.SSLConfig;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
@@ -61,7 +62,16 @@ public class HandlerServer extends AbstractIdleService {
       Preconditions.checkArgument(keyStoreFilePath != null,
                                   String.format("%s is not specified.", Constants.SSL_KEYSTORE_PATH));
       File keyStore = new File(keyStoreFilePath);
-      builder.enableSSL(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD), conf.get(Constants.SSL_KEYPASSWORD));
+      SSLConfig.Builder sslConfigBuilder = SSLConfig.builder(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD))
+        .setCertificatePassword(conf.get(Constants.SSL_KEYPASSWORD));
+
+      String trustKeyStoreFilePath = conf.get(Constants.SSL_TRUST_KEYSTORE_PATH);
+      if (trustKeyStoreFilePath != null) {
+        sslConfigBuilder.setTrustKeyStore(new File(trustKeyStoreFilePath))
+          .setTrustKeyStorePassword(conf.get(Constants.SSL_TRUST_KEYPASSWORD));
+      }
+
+      builder.enableSSL(sslConfigBuilder.build());
     }
     this.httpService = builder.build();
   }
