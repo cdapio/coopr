@@ -60,7 +60,7 @@ public class HttpsServerTest extends ServiceTestBase {
 
   @Test
   public void testStatus() throws Exception {
-    HttpResponse response = doGet(String.format("https://%s:%d/status", HOSTNAME,
+    HttpResponse response = doSecureGet(String.format("https://%s:%d/status", HOSTNAME,
                                                 handlerServer.getBindAddress().getPort()));
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
     Assert.assertEquals("OK\n", EntityUtils.toString(response.getEntity()));
@@ -70,14 +70,14 @@ public class HttpsServerTest extends ServiceTestBase {
   public void testStatusFail() throws Exception {
     Future<HttpResponse> future = Executors.newSingleThreadExecutor().submit(new Callable<HttpResponse>() {
       public HttpResponse call() throws Exception {
-        return doGet(String.format("http://%s:%d/status", HOSTNAME,
+        return doSecureGet(String.format("http://%s:%d/status", HOSTNAME,
                                    handlerServer.getBindAddress().getPort()));
       }
     });
     future.get(5000, TimeUnit.MILLISECONDS);
   }
 
-  public static HttpResponse doGet(String url) throws Exception {
+  private static HttpResponse doSecureGet(String url) throws Exception {
     HttpClient client = HttpClients.custom()
       .setConnectionManager(new BasicHttpClientConnectionManager(getSimpleRegistry())).build();
     HttpGet get = new HttpGet(url);

@@ -161,15 +161,7 @@ if [ ! -z $COOPR_SSL ] && [ $COOPR_SSL = "true" ]; then
 fi
 export COOPR_SERVER_URI=$COOPR_PROTOCOL://localhost:55054
 
-cert_line=`awk '/server.ssl.trust.cert.path/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-security.xml`
-cert_line=$((cert_line+1))
-export TRUST_CERT_PATH=`sed -n "${cert_line}p" ${COOPR_SERVER_CONF}coopr-security.xml | awk -F"<|>" '{print $3}'`
-
-cert_pass_line=`awk '/server.ssl.trust.cert.password/{print NR; exit}' ${COOPR_SERVER_CONF}coopr-security.xml`
-cert_pass_line=$((cert_pass_line+1))
-export TRUST_CERT_PASSWORD=`sed -n "${cert_pass_line}p" ${COOPR_SERVER_CONF}coopr-security.xml | awk -F"<|>" '{print $3}'`
-
-if [ ! -z TRUST_CERT_PATH ] && [ ! -z TRUST_CERT_PASsWORD ]; then
+if [ ! -z $TRUST_CERT_PATH ] && [ ! -z $TRUST_CERT_PASSWORD ]; then
   export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
 fi
 
