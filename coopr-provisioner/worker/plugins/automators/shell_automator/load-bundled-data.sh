@@ -8,7 +8,7 @@ COOPR_API_KEY=${COOPR_API_KEY:-1234567890abcdef}
 COOPR_TENANT=${COOPR_TENANT:-superadmin}
 SHELL_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 
-COOPR_RUBY=${COOPR_RUBY:-"${COOPR_HOME}/provisioner/embedded/bin/ruby"}
+COOPR_RUBY=${COOPR_RUBY:-${COOPR_HOME}/provisioner/embedded/bin/ruby}
 test -x ${COOPR_RUBY} || COOPR_RUBY="ruby"
 DATA_UPLOADER="${COOPR_RUBY} ${COOPR_HOME}/provisioner/bin/data-uploader.rb"
 
