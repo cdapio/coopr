@@ -41,7 +41,7 @@ public class TenantCommndsTest extends AbstractTest {
   @Test
   public void testListTenants() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_TENANTS_COMMAND);
-    Set<TenantSpecification> result = getSetFromOutput(new TypeToken<List<TenantSpecification>>() {}.getType());
+    Set<TenantSpecification> result = getSetFromOutput(new TypeToken<Set<TenantSpecification>>() {}.getType());
     // first is the tenant created in the RestClientTest and the second one is the default superadmin tenant
     Assert.assertEquals(2, result.size());
     Assert.assertTrue(result.contains(TEST_TENANT.getSpecification()));

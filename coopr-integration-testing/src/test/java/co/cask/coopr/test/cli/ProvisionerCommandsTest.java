@@ -17,14 +17,18 @@
 package co.cask.coopr.test.cli;
 
 import co.cask.common.cli.exception.InvalidCommandException;
+import co.cask.coopr.provisioner.Provisioner;
 import co.cask.coopr.test.Constants;
+import com.google.common.collect.Sets;
+import com.google.gson.reflect.TypeToken;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
+import java.util.Set;
 
 public class ProvisionerCommandsTest extends AbstractTest {
 
@@ -37,7 +41,9 @@ public class ProvisionerCommandsTest extends AbstractTest {
   @Test
   public void testListProvisioners() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_PROVISIONERS_COMMAND);
-    checkCommandOutput(Arrays.asList(TEST_PROVISIONER));
+    Set<Provisioner> resultSet =  getSetFromOutput(new TypeToken<Set<Provisioner>>() {}.getType());
+    Set<Provisioner> expectedSet = Sets.newHashSet(TEST_PROVISIONER);
+    Assert.assertEquals(expectedSet, resultSet);
   }
 
   @Test
