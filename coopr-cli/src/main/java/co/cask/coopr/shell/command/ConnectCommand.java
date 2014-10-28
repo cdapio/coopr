@@ -25,8 +25,6 @@ import com.google.inject.Inject;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import static co.cask.coopr.shell.util.Constants.DEFAULT_TENANT_ID;
-import static co.cask.coopr.shell.util.Constants.DEFAULT_USER_ID;
 import static co.cask.coopr.shell.util.Constants.HOST_KEY;
 import static co.cask.coopr.shell.util.Constants.PORT_KEY;
 import static co.cask.coopr.shell.util.Constants.SSL_KEY;

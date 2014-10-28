@@ -80,15 +80,21 @@ public class PluginRestClient extends RestClient implements PluginClient {
   @Override
   public Map<String, Set<ResourceMeta>> getAutomatorTypeResources(String id, String resourceType, ResourceStatus status)
     throws IOException {
-    return getPluginTypeMap(String.format("/plugins/%s/%s/%s/?status=%s", AUTOMATOR_TYPE_STR, id, resourceType,
-                                          status.toString()), RESOURCE_TYPE_MAP);
+    String url = String.format("/plugins/%s/%s/%s", AUTOMATOR_TYPE_STR, id, resourceType);
+    if (status != null) {
+      url =  url + String.format("/?status=%s", status.name());
+    }
+    return getPluginTypeMap(url, RESOURCE_TYPE_MAP);
   }
 
   @Override
   public Map<String, Set<ResourceMeta>> getProviderTypeResources(String id, String resourceType, ResourceStatus status)
     throws IOException {
-    return getPluginTypeMap(String.format("/plugins/%s/%s/%s/?status=%s", PROVIDER_TYPE_STR, id, resourceType,
-                                          status.toString()), RESOURCE_TYPE_MAP);
+    String url = String.format("/plugins/%s/%s/%s", PROVIDER_TYPE_STR, id, resourceType);
+    if (status != null) {
+      url =  url + String.format("/?status=%s", status.name());
+    }
+    return getPluginTypeMap(url, RESOURCE_TYPE_MAP);
   }
 
   @Override

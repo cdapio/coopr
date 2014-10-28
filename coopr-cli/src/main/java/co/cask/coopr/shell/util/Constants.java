@@ -31,6 +31,7 @@ public class Constants {
   public static final String SERVICE_ID_KEY = "service-id";
   public static final String CLUSTER_CONFIG_KEY = "cluster-config";
   public static final String EXPIRE_TIME_KEY = "expire-time";
+  public static final String PROVISIONER_ID = "provisioner-id";
   public static final String HOST_KEY = "host";
   public static final String PORT_KEY = "port";
   public static final String SSL_KEY = "enabled/disabled";
@@ -45,4 +46,10 @@ public class Constants {
   public static final String EV_PORT = "COOPR_PORT";
   public static final String EV_USER_ID = "COOPR_USER";
   public static final String EV_TENANT_ID = "COOPR_TENANT";
+  public static final String AUTOMATOR_TYPE_ID = "automator-id";
+  public static final String PROVIDER_TYPE_ID = "provider-id";
+  public static final String RESOURCE_TYPE = "resource-type";
+  public static final String RESOURCE_STATUS = "status";
+  public static final String RESOURCE_VERSION = "resource-version";
+  public static final String RESOURCE_NAME = "resource-name";
 }
