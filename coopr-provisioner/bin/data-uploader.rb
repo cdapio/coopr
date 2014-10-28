@@ -23,7 +23,6 @@ require 'tmpdir'
 require 'fileutils'
 require 'rubygems/package'
 require 'zlib'
-require_relative 'rest-helper'
 
 # ./data-uploader [-u http://localhost:55054] [-t superadmin] [-U admin] upload|stage|sync \ 
 #   ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop
@@ -132,7 +131,7 @@ module Coopr
 
       def validate_server_connectivity
         uri = %W( #{@options[:uri]} status ).join('/')
-        resp = RestHelper.get(uri, @headers)
+        resp = RestClient.get(uri, @headers)
         unless resp.code == 200
           fail "non-ok response code #{resp.code} from server at: #{uri}"
         end
@@ -142,7 +141,7 @@ module Coopr
       def validate_server_target
         validate_server_connectivity
         uri = %W( #{@options[:uri]} v2/plugins #{@options[:plugin_type]} #{@options[:plugin_name]}).join('/')
-        resp = RestHelper.get(uri, @headers)
+        resp = RestClient.get(uri, @headers)
         if resp.code == 200
           resp_plugin = JSON.parse(resp.to_str)
           if resp_plugin.key?('resourceTypes') && resp_plugin['resourceTypes'].key?(@options[:resource_type])
@@ -217,7 +216,7 @@ module Coopr
 
       def upload_resource(payload)
         uri = %W( #{@options[:uri]} v2/plugins #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]}).join('/')
-        resp = RestHelper.post(uri, payload, @headers)
+        resp = RestClient.post(uri, payload, @headers)
         if resp.code == 200
           resp_obj = JSON.parse(resp.to_str)
           puts "upload successful for #{uri}, version: #{resp_obj['version']}" unless options[:quiet]
@@ -230,7 +229,7 @@ module Coopr
       def stage
         version = @upload_results['version']
         uri = %W( #{@options[:uri]} v2/plugins #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]} versions #{version} stage).join('/')
-        resp = RestHelper.post(uri, nil, @headers)
+        resp = RestClient.post(uri, nil, @headers)
         if resp.code == 200
           puts "stage successful for #{uri}" unless options[:quiet]
         else
@@ -241,7 +240,7 @@ module Coopr
       # syncing will act on all staged resources, not just the resource being staged
       def sync
         uri = %W( #{@options[:uri]} v2/plugins/sync).join('/')
-        resp = RestHelper.post(uri, nil, @headers)
+        resp = RestClient.post(uri, nil, @headers)
         if resp.code == 200
           puts 'sync successful' unless options[:quiet]
         else

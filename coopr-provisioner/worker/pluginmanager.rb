@@ -19,7 +19,6 @@ require 'rest_client'
 require_relative 'automator'
 require_relative 'provider'
 require_relative 'utils'
-require_relative '../bin/rest-helper'
 
 class PluginManager
   attr_accessor :providermap, :automatormap, :tasks, :load_errors, :register_errors
@@ -116,7 +115,7 @@ class PluginManager
     begin
       log.debug "registering provider/automator type: #{name}"
       json = JSON.generate(json_obj)
-      resp = RestHelper.put("#{uri}", json, :'Coopr-UserID' => "admin", :'Coopr-TenantID' => "superadmin")
+      resp = RestClient.put("#{uri}", json, :'Coopr-UserID' => "admin", :'Coopr-TenantID' => "superadmin")
       if(resp.code == 200)
         log.info "Successfully registered #{name}"
       else

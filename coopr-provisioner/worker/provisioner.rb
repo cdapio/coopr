@@ -27,7 +27,6 @@ require_relative 'utils.rb'
 require_relative 'pluginmanager.rb'
 require_relative 'provider.rb'
 require_relative 'automator.rb'
-require_relative '../bin/rest-helper'
 
 $stdout.sync = true
 
@@ -229,7 +228,7 @@ else
     response = nil
     task = nil
     begin
-      response = RestHelper.post "#{coopr_uri}/v2/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
+      response = RestClient.post "#{coopr_uri}/v2/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
     rescue => e
       log.error "Caught exception connecting to coopr server #{coopr_uri}/v2/tasks/take: #{e}"
       sleep 10
@@ -267,7 +266,7 @@ else
 
         log.debug "Task <#{task['taskId']}> completed, updating results <#{result}>"
         begin
-          response = RestHelper.post "#{coopr_uri}/v2/tasks/finish", result.to_json
+          response = RestClient.post "#{coopr_uri}/v2/tasks/finish", result.to_json
         rescue => e
           log.error "Caught exception posting back to coopr server #{coopr_uri}/v2/tasks/finish: #{e}"
         end
@@ -289,7 +288,7 @@ else
         end
         log.error "Task <#{task['taskId']}> failed, updating results <#{result}>"
         begin
-          response = RestHelper.post "#{coopr_uri}/v2/tasks/finish", result.to_json
+          response = RestClient.post "#{coopr_uri}/v2/tasks/finish", result.to_json
         rescue => e
           log.error "Caught exception posting back to server #{coopr_uri}/v2/tasks/finish: #{e}"
         end
