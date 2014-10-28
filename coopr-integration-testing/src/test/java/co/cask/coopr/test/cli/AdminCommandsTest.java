@@ -18,14 +18,23 @@ package co.cask.coopr.test.cli;
 
 import co.cask.common.cli.exception.InvalidCommandException;
 import co.cask.coopr.Entities;
+import co.cask.coopr.spec.HardwareType;
+import co.cask.coopr.spec.ImageType;
+import co.cask.coopr.spec.Provider;
+import co.cask.coopr.spec.service.Service;
+import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.test.Constants;
+import com.google.common.collect.Sets;
+import com.google.gson.reflect.TypeToken;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 public class AdminCommandsTest extends AbstractTest {
 
@@ -38,8 +47,10 @@ public class AdminCommandsTest extends AbstractTest {
   @Test
   public void testListTemplates() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_TEMPLATES_COMMAND);
-    checkCommandOutput(Arrays.asList(HADOOP_DISTRIBUTED_CLUSTER_TEMPLATE, REACTOR_CLUSTER_TEMPLATE,
-                                     HDFS_CLUSTER_TEMPLATE));
+    Set<ClusterTemplate> resultSet =  getSetFromOutput(new TypeToken<List<ClusterTemplate>>() {}.getType());
+    Set<ClusterTemplate> expectedSet = Sets.newHashSet(HADOOP_DISTRIBUTED_CLUSTER_TEMPLATE, REACTOR_CLUSTER_TEMPLATE,
+                                                       HDFS_CLUSTER_TEMPLATE);
+    Assert.assertEquals(expectedSet, resultSet);
   }
 
   @Test
@@ -61,19 +72,15 @@ public class AdminCommandsTest extends AbstractTest {
     String getCommand = String.format(Constants.GET_TEMPLATE_COMMAND, REACTOR_CLUSTER_TEMPLATE.getName());
     String deleteCommand = String.format(Constants.DELETE_TEMPLATE_COMMAND, REACTOR_CLUSTER_TEMPLATE.getName());
 
-    execute(getCommand);
-    checkCommandOutput(REACTOR_CLUSTER_TEMPLATE);
-
-    OUTPUT_STREAM.reset();
-    execute(deleteCommand);
-    execute(getCommand);
-    checkError();
+    testDelete(getCommand, REACTOR_CLUSTER_TEMPLATE, deleteCommand);
   }
 
   @Test
   public void testListProviders() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_PROVIDERS_COMMAND);
-    checkCommandOutput(Arrays.asList(Entities.ProviderExample.JOYENT, Entities.ProviderExample.RACKSPACE));
+    Set<Provider> resultSet =  getSetFromOutput(new TypeToken<List<Provider>>() {}.getType());
+    Set<Provider> expectedSet = Sets.newHashSet(Entities.ProviderExample.JOYENT, Entities.ProviderExample.RACKSPACE);
+    Assert.assertEquals(expectedSet, resultSet);
   }
 
   @Test
@@ -95,20 +102,16 @@ public class AdminCommandsTest extends AbstractTest {
     String getCommand = String.format(Constants.GET_PROVIDER_COMMAND, Entities.JOYENT);
     String deleteCommand = String.format(Constants.DELETE_PROVIDER_COMMAND, Entities.JOYENT);
 
-    execute(getCommand);
-    checkCommandOutput(Entities.ProviderExample.JOYENT);
-
-    OUTPUT_STREAM.reset();
-    execute(deleteCommand);
-    execute(getCommand);
-    checkError();
+    testDelete(getCommand, Entities.ProviderExample.JOYENT, deleteCommand);
   }
 
   @Test
   public void testListServices() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_SERVICES_COMMAND);
-    checkCommandOutput(Arrays.asList(Entities.ServiceExample.DATANODE, Entities.ServiceExample.HOSTS,
-                                     Entities.ServiceExample.NAMENODE, ZOOKEEPER));
+    Set<Service> resultSet =  getSetFromOutput(new TypeToken<List<Service>>() {}.getType());
+    Set<Service> expectedSet = Sets.newHashSet(Entities.ServiceExample.DATANODE, Entities.ServiceExample.HOSTS,
+                                               Entities.ServiceExample.NAMENODE, ZOOKEEPER);
+    Assert.assertEquals(expectedSet, resultSet);
   }
 
 
@@ -124,20 +127,17 @@ public class AdminCommandsTest extends AbstractTest {
     String getCommand = String.format(Constants.GET_SERVICE_COMMAND, Entities.ServiceExample.HOSTS.getName());
     String deleteCommand = String.format(Constants.DELETE_SERVICE_COMMAND, Entities.ServiceExample.HOSTS.getName());
 
-    execute(getCommand);
-    checkCommandOutput(Entities.ServiceExample.HOSTS);
-
-    OUTPUT_STREAM.reset();
-    execute(deleteCommand);
-    execute(getCommand);
-    checkError();
+    testDelete(getCommand, Entities.ServiceExample.HOSTS, deleteCommand);
   }
 
   @Test
   public void testListHardwareTypes() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_HARDWARE_TYPES_COMMAND);
-    checkCommandOutput(Arrays.asList(Entities.HardwareTypeExample.LARGE, Entities.HardwareTypeExample.MEDIUM,
-                                     Entities.HardwareTypeExample.SMALL));
+    Set<HardwareType> resultSet =  getSetFromOutput(new TypeToken<List<HardwareType>>() {}.getType());
+    Set<HardwareType> expectedSet = Sets.newHashSet(Entities.HardwareTypeExample.LARGE,
+                                                    Entities.HardwareTypeExample.MEDIUM,
+                                                    Entities.HardwareTypeExample.SMALL);
+    Assert.assertEquals(expectedSet, resultSet);
   }
 
   @Test
@@ -154,19 +154,16 @@ public class AdminCommandsTest extends AbstractTest {
     String deleteCommand = String.format(Constants.DELETE_HARDWARE_TYPE_COMMAND,
                                          Entities.HardwareTypeExample.SMALL.getName());
 
-    execute(getCommand);
-    checkCommandOutput(Entities.HardwareTypeExample.SMALL);
-
-    OUTPUT_STREAM.reset();
-    execute(deleteCommand);
-    execute(getCommand);
-    checkError();
+    testDelete(getCommand, Entities.HardwareTypeExample.SMALL, deleteCommand);
   }
 
   @Test
   public void testListImageTypes() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_IMAGE_TYPES_COMMAND);
-    checkCommandOutput(Arrays.asList(Entities.ImageTypeExample.CENTOS_6, Entities.ImageTypeExample.UBUNTU_12));
+    Set<ImageType> resultSet =  getSetFromOutput(new TypeToken<List<ImageType>>() {}.getType());
+    Set<ImageType> expectedSet = Sets.newHashSet(Entities.ImageTypeExample.CENTOS_6,
+                                                 Entities.ImageTypeExample.UBUNTU_12);
+    Assert.assertEquals(expectedSet, resultSet);
   }
 
   @Test
@@ -179,10 +176,16 @@ public class AdminCommandsTest extends AbstractTest {
   @Test
   public void testDeleteImageType() throws InvalidCommandException, UnsupportedEncodingException {
     String getCommand = String.format(Constants.GET_IMAGE_TYPE_COMMAND, Entities.ImageTypeExample.CENTOS_6.getName());
-    String deleteCommand = String.format(Constants.DELETE_IMAGE_TYPE_COMMAND, Entities.ImageTypeExample.CENTOS_6.getName());
+    String deleteCommand =
+      String.format(Constants.DELETE_IMAGE_TYPE_COMMAND, Entities.ImageTypeExample.CENTOS_6.getName());
 
+    testDelete(getCommand, Entities.ImageTypeExample.CENTOS_6, deleteCommand);
+  }
+
+  private void testDelete(String getCommand, Object expectedResult, String deleteCommand)
+    throws InvalidCommandException, UnsupportedEncodingException {
     execute(getCommand);
-    checkCommandOutput(Entities.ImageTypeExample.CENTOS_6);
+    checkCommandOutput(expectedResult);
 
     OUTPUT_STREAM.reset();
     execute(deleteCommand);

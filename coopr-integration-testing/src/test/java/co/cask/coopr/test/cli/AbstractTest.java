@@ -20,11 +20,15 @@ import co.cask.common.cli.CLI;
 import co.cask.common.cli.Command;
 import co.cask.common.cli.exception.InvalidCommandException;
 import co.cask.coopr.account.Account;
+import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.CLIMain;
 import co.cask.coopr.test.client.ClientTest;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -36,6 +40,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Abstract test for Coopr CLI
@@ -46,7 +51,10 @@ public abstract class AbstractTest extends ClientTest {
 
   private static final PrintStream PRINT_STREAM = new PrintStream(OUTPUT_STREAM);
   private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-  private static final Gson GSON = new Gson();
+  private static final Injector injector = Guice.createInjector(
+    new CodecModules().getModule()
+  );
+  private static final Gson GSON = injector.getInstance(Gson.class);
 
   public static CLIMain shell;
   public static CLI<Command> cli;
@@ -87,8 +95,8 @@ public abstract class AbstractTest extends ClientTest {
     return PRETTY_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), type);
   }
 
-  public static <T> List<T> getListFromOutput(Type listType) throws UnsupportedEncodingException {
-    return PRETTY_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), listType);
+  public static <T> Set<T> getSetFromOutput(Type listType) throws UnsupportedEncodingException {
+    return Sets.newHashSet((List<T>) PRETTY_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), listType));
   }
 
   public static String getJsonFromObject(Object output) {
