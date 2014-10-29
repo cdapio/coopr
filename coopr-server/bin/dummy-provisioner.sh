@@ -96,7 +96,7 @@ status() {
 restart() { shift; stop; start ${@}; }
 
 case ${1} in
-  start|restart) shift; ${1} ${@} ;;
+  start|restart) act=${1}; shift; ${act} ${@} ;;
   stop|status) ${1} ;;
   # no-op for dummy, assume they are loaded already
   register) : ;;
