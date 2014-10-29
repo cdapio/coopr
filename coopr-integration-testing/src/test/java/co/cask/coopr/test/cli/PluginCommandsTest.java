@@ -52,8 +52,9 @@ public class PluginCommandsTest extends AbstractTest {
     execute(Constants.LIST_ALL_AUTOMATORS_COMMAND);
     Set<AutomatorType> resultSet = getSetFromOutput(new TypeToken<Set<AutomatorType>>() { }.getType());
 
-    Set expectedSet = ImmutableSet.of(Entities.AutomatorTypeExample.CHEF, Entities.AutomatorTypeExample.PUPPET,
-                                      Entities.AutomatorTypeExample.SHELL);
+    Set<AutomatorType> expectedSet = ImmutableSet.of(Entities.AutomatorTypeExample.CHEF,
+                                                     Entities.AutomatorTypeExample.PUPPET,
+                                                     Entities.AutomatorTypeExample.SHELL);
     Assert.assertEquals(expectedSet, resultSet);
   }
 
@@ -61,7 +62,8 @@ public class PluginCommandsTest extends AbstractTest {
   public void testListAllProviders() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_ALL_PROVIDERS_COMMAND);
     Set<ProviderType> resultSet = getSetFromOutput(new TypeToken<Set<ProviderType>>() { }.getType());
-    Set expectedSet = ImmutableSet.of(Entities.ProviderTypeExample.JOYENT, Entities.ProviderTypeExample.RACKSPACE);
+    Set<ProviderType> expectedSet = ImmutableSet.of(Entities.ProviderTypeExample.JOYENT,
+                                                    Entities.ProviderTypeExample.RACKSPACE);
     Assert.assertEquals(expectedSet, resultSet);
   }
 
