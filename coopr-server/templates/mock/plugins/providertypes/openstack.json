@@ -1,0 +1,94 @@
+{
+  "description": "",
+  "name": "openstack",
+  "parameters": {
+    "admin": {
+      "fields": {
+        "api_password": {
+          "label": "Password",
+          "tip": "Your Openstack password",
+          "type": "password"
+        },
+        "api_user": {
+          "label": "Username",
+          "tip": "Your Openstack user name",
+          "type": "text"
+        },
+        "openstack_auth_url": {
+          "default": "http://EXAMPLE.DOMAIN.COM:5000/v2.0/tokens",
+          "label": "Auth URL",
+          "tip": "Your Openstack Keystone API URL",
+          "type": "text"
+        },
+        "openstack_ssl_verify_peer": {
+          "label": "Verify SSL peers",
+          "tip": "Verify peer SSL certificates",
+          "type": "checkbox"
+        },
+        "openstack_tenant": {
+          "label": "Tenant",
+          "tip": "Your Openstack tenant",
+          "type": "text"
+        },
+        "ssh_key_resource": {
+          "label": "SSH Key Resource Name",
+          "tip": "Name of the SSH private key resource uploaded to the server",
+          "type": "text"
+        },
+        "ssh_keypair": {
+          "label": "Key name",
+          "tip": "Your Openstack SSH public key name",
+          "type": "text"
+        }
+      },
+      "required": [
+        [
+          "api_user",
+          "api_password",
+          "openstack_tenant",
+          "openstack_auth_url",
+          "ssh_keypair",
+          "ssh_key_resource"
+        ]
+      ]
+    },
+    "user": {
+      "fields": {
+        "availability_zone": {
+          "label": "Availability Zone",
+          "tip": "Openstack Availability Zone",
+          "type": "text"
+        },
+        "floating_ip": {
+          "label": "Floating IP",
+          "tip": "Request a floating IP address for each node",
+          "type": "checkbox"
+        },
+        "security_groups": {
+          "default": "default",
+          "label": "Security Group",
+          "tip": "Openstack security groups (comma separated)",
+          "type": "text"
+        },
+        "user_data_resource": {
+          "label": "User Data Resource Name",
+          "type": "text",
+          "tip": "Name of the User Data file resource uploaded to the server"
+        }
+      },
+      "required": [
+        []
+      ]
+    }
+  },
+  "resourceTypes": {
+    "ssh_keys": {
+      "format": "file",
+      "permissions": "0400"
+    },
+    "user_data": {
+      "format": "file",
+      "permissions": "0755"
+    }
+  }
+}

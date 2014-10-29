@@ -24,6 +24,8 @@ import co.cask.coopr.provisioner.Provisioner;
 import co.cask.coopr.provisioner.TenantProvisionerService;
 import co.cask.coopr.spec.Tenant;
 import co.cask.coopr.spec.TenantSpecification;
+import com.google.common.base.Strings;
+import com.google.common.io.Closeables;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.apache.http.Header;
@@ -32,6 +34,11 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
@@ -40,6 +47,22 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 /**
  *
@@ -91,10 +114,10 @@ public class ServiceTestBase extends BaseTest {
     balancerQueue = injector.getInstance(
       Key.get(ElementsTrackingQueue.class, Names.named(Constants.Queue.WORKER_BALANCE)));
     provisionerQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.PROVISIONER)));
-    clusterQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
-    solverQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
-    jobQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.JOB)));
-    callbackQueues =  injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CALLBACK)));
+    clusterQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CLUSTER)));
+    solverQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
+    jobQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.JOB)));
+    callbackQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CALLBACK)));
     handlerServer = injector.getInstance(HandlerServer.class);
     handlerServer.startAndWait();
     port = handlerServer.getBindAddress().getPort();
@@ -186,5 +209,84 @@ public class ServiceTestBase extends BaseTest {
 
   public static String getBaseUrl() {
     return String.format("http://%s:%d%s", HOSTNAME, port, Constants.API_BASE);
+  }
+
+  public static Registry<ConnectionSocketFactory> getSimpleRegistry()
+    throws NoSuchAlgorithmException, KeyManagementException {
+    return getRegistry(null, null, null, null);
+  }
+
+  public static Registry<ConnectionSocketFactory> getRegistry(File keyStore, String keyStorePassword,
+                                                              File trustKeyStore, String trustKeyStorePassword)
+    throws KeyManagementException, NoSuchAlgorithmException {
+    SSLContext sslContext = getContext(keyStore, keyStorePassword, trustKeyStore, trustKeyStorePassword);
+    SSLConnectionSocketFactory sf =
+      new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+    return RegistryBuilder
+      .<ConnectionSocketFactory>create().register("https", sf)
+      .register("http", PlainConnectionSocketFactory.getSocketFactory())
+      .build();
+  }
+
+  private static SSLContext getContext(File keyStore, String keyStorePassword,
+                                       File trustKeyStore, String trustKeyStorePassword)
+    throws NoSuchAlgorithmException {
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+    try {
+      KeyManager[] keyManagers = null;
+      if (keyStore != null && !Strings.isNullOrEmpty(keyStorePassword)) {
+        KeyStore ks = getKeyStore(keyStore, keyStorePassword);
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+        kmf.init(ks, keyStorePassword.toCharArray());
+        keyManagers = kmf.getKeyManagers();
+      }
+
+      TrustManager[] trustManagers = getTrustAllManager();
+      if (trustKeyStore != null && !Strings.isNullOrEmpty(trustKeyStorePassword)) {
+        KeyStore tks = getKeyStore(trustKeyStore, trustKeyStorePassword);
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+        tmf.init(tks);
+        trustManagers = tmf.getTrustManagers();
+      }
+      sslContext.init(keyManagers, trustManagers, null);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Failed to initialize the client-side SSLContext", e);
+    }
+    return sslContext;
+  }
+
+  private static TrustManager[] getTrustAllManager() {
+    return new TrustManager[]{new X509TrustManager() {
+      @Override
+      public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+        return null;
+      }
+
+      @Override
+      public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
+        throws CertificateException {
+      }
+
+      @Override
+      public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates, String s)
+        throws CertificateException {
+      }
+    }};
+  }
+
+  private static KeyStore getKeyStore(File keyStore, String keyStorePassword) throws IOException {
+    KeyStore ks = null;
+    InputStream is = new FileInputStream(keyStore);
+    try {
+      ks = KeyStore.getInstance("JKS");
+      ks.load(is, keyStorePassword.toCharArray());
+    } catch (RuntimeException ex) {
+        throw ex;
+    } catch (Exception ex) {
+      throw new IOException(ex);
+    } finally {
+      Closeables.closeQuietly(is);
+    }
+    return ks;
   }
 }

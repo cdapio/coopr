@@ -38,7 +38,8 @@ public class ClusterJob {
     NOT_SUBMITTED,
     RUNNING,
     COMPLETE,
-    FAILED
+    FAILED,
+    PAUSED
   }
   private final String jobId;
   private final String clusterId;

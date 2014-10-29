@@ -28,6 +28,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -37,16 +38,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides way to execute http requests with Apache HttpClient {@link org.apache.http.client.HttpClient}.
  */
 public class RestClient {
 
+  public static final int CHAR_BUFFER_SIZE = 1024;
   private static final Logger LOG = LoggerFactory.getLogger(RestClient.class);
 
   private static final String HTTP_PROTOCOL = "http";
@@ -55,14 +60,17 @@ public class RestClient {
   private static final String COOPR_TENANT_ID_HEADER_NAME = "Coopr-TenantID";
   private static final String COOPR_USER_ID_HEADER_NAME = "Coopr-UserID";
 
-  protected static final Gson GSON = new Gson();
-
+  private final Gson gson;
   private final RestClientConnectionConfig config;
   private final URI baseUrl;
   private final CloseableHttpClient httpClient;
   private final Header[] authHeaders;
 
   public RestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient) {
+    this(config, httpClient, new Gson());
+  }
+
+  public RestClient(RestClientConnectionConfig config, CloseableHttpClient httpClient, Gson gson) {
     Preconditions.checkArgument(!Strings.isNullOrEmpty(config.getUserId()), "User ID couldn't be null");
     Preconditions.checkArgument(!Strings.isNullOrEmpty(config.getTenantId()), "Tenant ID couldn't be null");
     this.config = config;
@@ -70,6 +78,7 @@ public class RestClient {
                                             config.getHost(), config.getPort(), config.getVersion()));
     this.httpClient = httpClient;
     this.authHeaders = getAuthHeaders();
+    this.gson = gson;
   }
 
   /**
@@ -131,11 +140,41 @@ public class RestClient {
     List<T> resultList;
     try {
       RestClient.analyzeResponseCode(httpResponse);
-      resultList = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
+      resultList = gson.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
     } finally {
       httpResponse.close();
     }
     return resultList != null ? resultList : new ArrayList<T>();
+  }
+
+  protected <V, T> Map<V, Set<T>> getPluginTypeMap(String url, Type type) throws IOException {
+    String fullUrl = String.format("%s%s", getBaseURL(), url);
+    HttpGet getRequest = new HttpGet(fullUrl);
+    CloseableHttpResponse httpResponse = execute(getRequest);
+    InputStreamReader reader = null;
+    try {
+      RestClient.analyzeResponseCode(httpResponse);
+      reader = new InputStreamReader(httpResponse.getEntity().getContent(), Charsets.UTF_8);
+      return gson.fromJson(reader, type);
+    } finally {
+      httpResponse.close();
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e) {
+        }
+      }
+    }
+  }
+
+  protected void execPost(URI uri) throws IOException {
+    HttpPost postRequest = new HttpPost(uri);
+    CloseableHttpResponse httpResponse = execute(postRequest);
+    try {
+      RestClient.analyzeResponseCode(httpResponse);
+    } finally {
+      httpResponse.close();
+    }
   }
 
   protected <T> T getSingle(String urlSuffix, String name, Type type) throws IOException {
@@ -148,7 +187,7 @@ public class RestClient {
     T result;
     try {
       RestClient.analyzeResponseCode(httpResponse);
-      result = GSON.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
+      result = gson.fromJson(EntityUtils.toString(httpResponse.getEntity(), Charsets.UTF_8), type);
     } finally {
       httpResponse.close();
     }
@@ -167,7 +206,7 @@ public class RestClient {
 
   protected <T> void addRequestBody(HttpEntityEnclosingRequestBase requestBase, T body) {
     if (body != null) {
-      StringEntity stringEntity = new StringEntity(GSON.toJson(body), Charsets.UTF_8);
+      StringEntity stringEntity = new StringEntity(gson.toJson(body), Charsets.UTF_8);
       requestBase.setEntity(stringEntity);
       LOG.debug("Added the json request body: {}.", stringEntity);
     }
@@ -193,5 +232,12 @@ public class RestClient {
    */
   public URI getBaseURL() {
     return baseUrl;
+  }
+
+  /**
+   * @return the configured gson object
+   */
+  public Gson getGson() {
+    return gson;
   }
 }

@@ -97,7 +97,14 @@ public class ClustertemplatesInstancePage extends GenericPage {
       services.add(element.getAttribute(Constants.INNER_HTML));
     }
 
-    return new ClusterDefaults(services, provider, hardwaretype, imagetype, dnsSuffix, configJson);
+    return ClusterDefaults.builder()
+      .setServices(services)
+      .setProvider(provider)
+      .setHardwaretype(hardwaretype)
+      .setImagetype(imagetype)
+      .setDNSSuffix(dnsSuffix)
+      .setConfig(configJson)
+      .build();
   }
 
   public Compatibilities getCompatibility() {
@@ -113,7 +120,11 @@ public class ClustertemplatesInstancePage extends GenericPage {
     for (WebElement element : globalDriver.findElement(ALLOWED_IMAGETYPES).findElements(DEFAULT_SERVIE_ENTRY)) {
       imagetypes.add(element.getAttribute(Constants.INNER_HTML));
     }
-    return new Compatibilities(hardwaretypes, imagetypes, services);
+    return Compatibilities.builder()
+      .setHardwaretypes(hardwaretypes)
+      .setImagetypes(imagetypes)
+      .setServices(services)
+      .build();
   }
 
   public Map<String, ServiceConstraint> getServiceConstraints() {

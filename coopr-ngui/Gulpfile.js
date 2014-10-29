@@ -172,8 +172,13 @@ gulp.task('tpl', function() {
   Markup
  */
 gulp.task('html:partials', function() {
+<<<<<<< HEAD
   return gulp.src('./app/{partials,features}/**/*.html')
       .pipe(gulp.dest('./dist/assets'));
+=======
+  return gulp.src('./app/partials/**/*.html')
+      .pipe(gulp.dest('./dist/assets/partials'));
+>>>>>>> develop
 });
 
 gulp.task('html:main', function() {
@@ -235,7 +240,11 @@ gulp.task('minify', ['js:minify', 'css:minify']);
  */
 
 gulp.task('rev:manifest', ['minify', 'tpl'], function() {
+<<<<<<< HEAD
   return gulp.src(['./dist/assets/bundle/*'])
+=======
+  return gulp.src(['./dist/assets/bundle/{app,lib,tpl}.*'])
+>>>>>>> develop
     .pipe(plug.rev())
     .pipe(plug.size({showFiles:true, gzip:true, total:true}))
     .pipe(gulp.dest('./dist/assets/bundle'))  // write rev'd assets to build dir

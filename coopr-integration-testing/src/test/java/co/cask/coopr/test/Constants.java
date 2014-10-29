@@ -26,6 +26,49 @@ import java.net.ServerSocket;
  */
 public class Constants {
 
+  // CLI commands for integration tests
+  // Admin commands
+  public static final String LIST_TEMPLATES_COMMAND = "list templates";
+  public static final String GET_TEMPLATE_COMMAND = "get template \"%s\"";
+  public static final String DELETE_TEMPLATE_COMMAND = "delete template \"%s\"";
+  public static final String LIST_PROVIDERS_COMMAND = "list providers";
+  public static final String GET_PROVIDER_COMMAND = "get provider \"%s\"";
+  public static final String DELETE_PROVIDER_COMMAND = "delete provider \"%s\"";
+  public static final String LIST_SERVICES_COMMAND = "list services";
+  public static final String GET_SERVICE_COMMAND = "get service \"%s\"";
+  public static final String DELETE_SERVICE_COMMAND = "delete service \"%s\"";
+  public static final String LIST_HARDWARE_TYPES_COMMAND = "list hardware types";
+  public static final String GET_HARDWARE_TYPE_COMMAND = "get hardware type \"%s\"";
+  public static final String DELETE_HARDWARE_TYPE_COMMAND = "delete hardware type \"%s\"";
+  public static final String LIST_IMAGE_TYPES_COMMAND = "list image types";
+  public static final String GET_IMAGE_TYPE_COMMAND = "get image type \"%s\"";
+  public static final String DELETE_IMAGE_TYPE_COMMAND = "delete image type \"%s\"";
+
+  // Cluster commands
+  public static final String LIST_CLUSTERS_COMMAND = "list clusters";
+  public static final String GET_CLUSTER_COMMAND = "get cluster \"%s\"";
+  public static final String DELETE_CLUSTER_COMMAND = "delete cluster \"%s\"";
+  public static final String CREATE_CLUSTER_COMMAND = "create cluster \"%s\" with template \"%s\" of size %s";
+  public static final String GET_CLUSTER_STATUS_COMMAND = "get cluster-status \"%s\"";
+  public static final String GET_CLUSTER_CONFIG_COMMAND = "get cluster-config \"%s\"";
+  public static final String SET_CLUSTER_CONFIG_COMMAND = "set config '%s' for cluster \"%s\"";
+  public static final String LIST_CLUSTER_SERVICES_COMMAND = "list services \"%s\"";
+  public static final String SYNC_CLUSTER_TEMPLATE_COMMAND = "sync cluster template \"%s\"";
+  public static final String SET_CLUSTER_EXPIRE_TIME_COMMAND = "set expire time \"%s\" for cluster \"%s\"";
+  public static final String START_SERVICE_ON_CLUSTER_COMMAND = "start service \"%s\" on cluster \"%s\"";
+  public static final String STOP_SERVICE_ON_CLUSTER_COMMAND = "stop service \"%s\" on cluster \"%s\"";
+  public static final String RESTART_SERVICE_ON_CLUSTER_COMMAND = "restart service \"%s\" on cluster \"%s\"";
+  public static final String ADD_SERVICES_ON_CLUSTER_COMMAND = "add services '%s' on cluster \"%s\"";
+
+  // Provisioner commands
+  public static final String LIST_PROVISIONERS_COMMAND = "list provisioners";
+  public static final String GET_PROVISIONER_COMMAND = "get provisioner \"%s\"";
+
+  // Tenant commands
+  public static final String LIST_TENANTS_COMMAND = "list tenants";
+  public static final String GET_TENANT_COMMAND = "get tenant \"%s\"";
+  public static final String DELETE_TENANT_COMMAND = "delete tenant \"%s\"";
+
   // URI
   public static final int PORT = getPort();
   public static final String ROOT_URL = "http://localhost:" + PORT;

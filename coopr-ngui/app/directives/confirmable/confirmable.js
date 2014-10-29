@@ -5,28 +5,40 @@
  *  the expression in "my-confirmable" attribute will be evaluated 
  *  after the user accepts the confirmation dialog. Eg:
  *
- * <a ng-click="myConfirm()" my-confirmable="doDelete(model)">delete</a>
+ * <a ng-click="myConfirm()" 
+ *       my-confirmable="doDelete(model)"
+ *       data-confirmable-title="Hold on..."
+ *       data-confirmable-content="Are you absolutely sure?"
+ * >delete</a>
  */
 
 angular.module(PKG.name+'.directives').directive('myConfirmable', 
-function myConfirmableDirective ($window, $modal) {
+function myConfirmableDirective ($modal) {
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
 
       scope.myConfirm = function () {
 
-        // TODO: replace with a nice modal
+        var modal, modalScope;
 
-        if($window.confirm('Are you sure?')) {
-          confirmed();
-        }
+        modalScope = scope.$new(true);
+
+        modalScope.doConfirm = function() {
+          modal.hide();
+          scope.$eval(attrs.myConfirmable);
+        };
+
+        modal = $modal({
+          scope: modalScope,
+          template: 'confirmable/confirm-modal.html',
+          title: attrs.confirmableTitle || 'Confirmation',
+          content: attrs.confirmableContent || 'Are you sure?',
+          placement: 'center', 
+          show: true
+        });
 
       };
-
-      function confirmed() {
-        scope.$eval(attrs.myConfirmable);
-      }
 
     }
   };

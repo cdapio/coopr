@@ -45,7 +45,6 @@ var app = express();
 try { app.use(serveFavicon(__dirname + '/dist/assets/img/favicon.png')); }
 catch(e) { console.error("Favicon missing! Did you run `gulp build`?"); }
 
-
 // serve the config file
 app.get('/config.js', function (req, res) {
   var data = JSON.stringify({

@@ -15,35 +15,27 @@
 # limitations under the License.
 #
 
-COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
-COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
-COOPR_UI_PORT=${COOPR_UI_PORT:-8100}
-COOPR_HOME=${COOPR_HOME:-/opt/coopr} ; export COOPR_HOME
+export COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
+export COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
+export COOPR_UI_PORT=${COOPR_UI_PORT:-8100}
+export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
 
-die ( ) {
-  echo
-  echo "$*"
-  echo
-  exit 1
-}
+die ( ) { echo; echo "ERROR: ${*}"; echo; exit 1; }
 
 # Specifies UI Path
 UI_PATH=${UI_PATH:-${COOPR_HOME}/ngui}
 ENVIRONMENT=${ENVIRONMENT:-production}
 
-COOPR_NODE=${COOPR_NODE:-"${COOPR_HOME}/ui/embedded/bin/node"}
-COOPR_NPM=${COOPR_NPM:-"${COOPR_HOME}/ui/embedded/bin/npm"}
+COOPR_NODE=${COOPR_NODE:-${COOPR_HOME}/ngui/embedded/bin/node}
 APP_NAME="coopr-ngui"
 PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
 check_before_start() {
-  if [ ! -d "${PID_DIR}" ] ; then
-    mkdir -p "${PID_DIR}"
-  fi
-  if [ -f "${pid}" ] ; then
-    if kill -0 `cat $pid` > /dev/null 2>&1; then
-      echo "$0 running as process `cat $pid`. Stop it first or use the restart function."
+  [ -d ${PID_DIR} ] || mkdir -p ${PID_DIR}
+  if [ -f ${pid} ]; then
+    if kill -0 `cat ${pid}` > /dev/null 2>&1; then
+      echo "${0} running as process `cat ${pid}`. Stop it first or use the restart function."
       exit 0
     fi
   fi
@@ -55,44 +47,43 @@ start ( ) {
 
   echo "Starting Coopr NGUI ..."
 
-  export COOPR_UI_PORT
   nohup nice -1 ${COOPR_NODE} ${UI_PATH}/server.js \
     >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
-  echo $! > "${pid}"
+  echo ${!} > ${pid}
 }
 
 stop ( ) {
   echo -n "Stopping Coopr NGUI ..."
-  if [ -f "${pid}" ] ; then
-    pidToKill=`cat $pid`
+  if [ -f ${pid} ]; then
+    pidToKill=`cat ${pid}`
     # kill -0 == see if the PID exists
-    if kill -0 $pidToKill > /dev/null 2>&1; then
-      kill $pidToKill > /dev/null 2>&1
-      while kill -0 $pidToKill > /dev/null 2>&1 ; do
+    if kill -0 ${pidToKill} > /dev/null 2>&1; then
+      kill ${pidToKill} > /dev/null 2>&1
+      while kill -0 ${pidToKill} > /dev/null 2>&1 ; do
         echo -n .
         sleep 1
       done
-      rm -f "${pid}"
+      rm -f ${pid}
       ret=0
     else
-      ret=$?
+      ret=${?}
     fi
     echo
-    if [ ${ret} -eq 0 ] ; then
+    if [ ${ret} -eq 0 ]; then
       echo "Stopped successfully ..."
     else
       echo "ERROR: Failed stopping!"
     fi
   fi
-  return "${ret:-0}"
+  return ${ret:-0}
 }
 
 status() {
-  if [ -f $pid ]; then
-    pidToCheck=`cat $pid`
+  if [ -f ${pid} ]; then
+    pidToCheck=`cat ${pid}`
     # kill -0 == see if the PID exists
-    if kill -0 $pidToCheck > /dev/null 2>&1; then
-      echo "${APP_NAME} running as process $pidToCheck"
+    if kill -0 ${pidToCheck} > /dev/null 2>&1; then
+      echo "${APP_NAME} running as process ${pidToCheck}"
       return 0
     else
       echo "${APP_NAME} pidfile exists, but process does not appear to be running"
@@ -104,28 +95,11 @@ status() {
   fi
 }
 
-restart() {
-  stop
-  start
-}
+restart() { stop; start; }
 
 case ${1} in
-  start)
-    ${1}
-    ;;
-  stop)
-    ${1}
-    ;;
-  status)
-    ${1}
-    ;;
-  restart)
-    ${1}
-    ;;
-  *)
-    echo "Usage: $0 {start|stop|status|restart}"
-    exit 1
-    ;;
+  start|stop|status|restart) ${1} ;;
+  *) echo "Usage: $0 {start|stop|status|restart}"; exit 1 ;;
 esac
 
-exit $?
+exit ${?}
