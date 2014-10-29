@@ -67,22 +67,22 @@ public class Constants {
   public static final String GET_PROVIDER_TYPE_COMMAND = "get providertype %s";
   public static final String AUTOMATOR_TYPE_CHEF_NAME = "chef-solo";
   public static final String PROVIDER_TYPE_JOYENT_NAME = "joyent";
-  public static final String LIST_ALL_AUTOMATOR_TYPE_RESOURSES_COMMAND =
+  public static final String LIST_ALL_AUTOMATOR_TYPE_RESOURCES_COMMAND =
                              "list resources from automator %s of type %s and status %s";
-  public static final String LIST_ALL_PROVIDER_TYPE_RESOURSES_COMMAND =
+  public static final String LIST_ALL_PROVIDER_TYPE_RESOURCES_COMMAND =
                             "list resources from provider %s of type %s and status %s";
   public static final String STAGE_AUTOMATOR_TYPE_RESOURCE_COMMAND =
-                            "stage resource from automator %s of type %s and name %s and version %s";
+                            "stage resource from automator %s of type %s and name %s and version %d";
   public static final String STAGE_PROVIDER_TYPE_RESOURCE_COMMAND =
-                            "stage resource from provider %s of type %s and name %s and version %s";
+                            "stage resource from provider %s of type %s and name %s and version %d";
   public static final String RECALL_AUTOMATOR_TYPE_RESOURCE_COMMAND =
-    "recall resource from automator %s of type %s and name %s and version %s";
+    "recall resource from automator %s of type %s and name %s and version %d";
   public static final String RECALL_PROVIDER_TYPE_RESOURCE_COMMAND =
-    "recall resource from provider %s of type %s and name %s and version %s";
+    "recall resource from provider %s of type %s and name %s and version %d";
   public static final String DELETE_AUTOMATOR_TYPE_RESOURCE_COMMAND =
-    "delete resource from automator %s of type %s and name %s and version %s";
+    "delete resource from automator %s of type %s and name %s and version %d";
   public static final String DELETE_PROVIDER_TYPE_RESOURCE_COMMAND =
-    "delete resource from provider %s of type %s and name %s and version %s";
+    "delete resource from provider %s of type %s and name %s and version %d";
 
   // Provisioner commands
   public static final String LIST_PROVISIONERS_COMMAND = "list provisioners";

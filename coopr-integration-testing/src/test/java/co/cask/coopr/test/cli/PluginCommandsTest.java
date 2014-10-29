@@ -25,6 +25,8 @@ import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.coopr.spec.plugin.ProviderType;
 import co.cask.coopr.test.Constants;
 import co.cask.coopr.test.client.ClientTestEntities;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Assert;
@@ -37,7 +39,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Set;
 
-public class PluginCommandsTest extends AbstractTest{
+public class PluginCommandsTest extends AbstractTest {
 
   @BeforeClass
   public static void beforeClass()
@@ -48,54 +50,51 @@ public class PluginCommandsTest extends AbstractTest{
   @Test
   public void testListAllAutomators() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_ALL_AUTOMATORS_COMMAND);
-    Set<AutomatorType> resultSet = getSetFromOutput(new TypeToken<Set<AutomatorType>>() {
-    }.getType());
-    Assert.assertEquals(3, resultSet.size());
-    Assert.assertTrue(resultSet.contains(Entities.AutomatorTypeExample.CHEF));
-    Assert.assertTrue(resultSet.contains(Entities.AutomatorTypeExample.PUPPET));
-    Assert.assertTrue(resultSet.contains(Entities.AutomatorTypeExample.SHELL));
-    Assert.assertEquals(resultSet, resultSet);
+    Set<AutomatorType> resultSet = getSetFromOutput(new TypeToken<Set<AutomatorType>>() { }.getType());
+
+    Set expectedSet = ImmutableSet.of(Entities.AutomatorTypeExample.CHEF, Entities.AutomatorTypeExample.PUPPET,
+                                      Entities.AutomatorTypeExample.SHELL);
+    Assert.assertEquals(expectedSet, resultSet);
   }
 
   @Test
   public void testListAllProviders() throws InvalidCommandException, UnsupportedEncodingException {
     execute(Constants.LIST_ALL_PROVIDERS_COMMAND);
-    Set<ProviderType> resultSet = getSetFromOutput(new TypeToken<Set<ProviderType>>() {
-    }.getType());
-    Assert.assertEquals(2, resultSet.size());
-    Assert.assertTrue(resultSet.contains(Entities.ProviderTypeExample.JOYENT));
-    Assert.assertTrue(resultSet.contains(Entities.ProviderTypeExample.RACKSPACE));
-    Assert.assertEquals(resultSet, resultSet);
+    Set<ProviderType> resultSet = getSetFromOutput(new TypeToken<Set<ProviderType>>() { }.getType());
+    Set expectedSet = ImmutableSet.of(Entities.ProviderTypeExample.JOYENT, Entities.ProviderTypeExample.RACKSPACE);
+    Assert.assertEquals(expectedSet, resultSet);
   }
 
   @Test
   public void testListAutomatorTypeResourcesCommand() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format(Constants.LIST_ALL_AUTOMATOR_TYPE_RESOURSES_COMMAND,
+    String command = String.format(Constants.LIST_ALL_AUTOMATOR_TYPE_RESOURCES_COMMAND,
                                    Constants.AUTOMATOR_TYPE_CHEF_NAME,
                                    ClientTestEntities.COOKBOOKS_RESOURCE_TYPE.getTypeName(),
                                    ResourceStatus.ACTIVE.toString());
     execute(command);
-    Map<String, Set<ResourceMeta>> resultMap =
-      getMapFromOutput(new TypeToken<Map<String, Set<ResourceMeta>>>() {
-      }.getType());
-    Assert.assertEquals(2, resultMap.size());
-    Assert.assertTrue(resultMap.containsKey("hadoop"));
-    Assert.assertTrue(resultMap.containsKey("kafka"));
+    Map<String, Set<ResourceMeta>> resultMap = getMapFromOutput(new TypeToken<Map<String,
+                                                               Set<ResourceMeta>>>() { }.getType());
+    Map<String, ImmutableSet<ResourceMeta>> expectedMap =
+                ImmutableMap.of("hadoop", ImmutableSet.of(ClientTestEntities.HADOOP_RESOURCE_META_V1,
+                                                          ClientTestEntities.HADOOP_RESOURCE_META_V2),
+                                "kafka", ImmutableSet.of(ClientTestEntities.KAFKA_RESOURCE_META));
+    Assert.assertEquals(expectedMap, resultMap);
   }
 
   @Test
   public void testListAllTypeResourcesProviders() throws InvalidCommandException, UnsupportedEncodingException {
-    String command = String.format(Constants.LIST_ALL_PROVIDER_TYPE_RESOURSES_COMMAND,
+    String command = String.format(Constants.LIST_ALL_PROVIDER_TYPE_RESOURCES_COMMAND,
                                    Constants.PROVIDER_TYPE_JOYENT_NAME,
                                    ClientTestEntities.KEYS_RESOURCE_TYPE.getTypeName(),
                                    ResourceStatus.ACTIVE.toString());
     execute(command);
-    Map<String, Set<ResourceMeta>> resultMap =
-      getMapFromOutput(new TypeToken<Map<String, Set<ResourceMeta>>>() {
-      }.getType());
-    Assert.assertEquals(2, resultMap.size());
-    Assert.assertTrue(resultMap.containsKey("dev"));
-    Assert.assertTrue(resultMap.containsKey("research"));
+    Map<String, Set<ResourceMeta>> resultMap = getMapFromOutput(new TypeToken<Map<String,
+                                                                Set<ResourceMeta>>>() { }.getType());
+    Map<String, ImmutableSet<ResourceMeta>> expectedMap =
+                ImmutableMap.of("dev", ImmutableSet.of(ClientTestEntities.DEV_KEY_RESOURCE_META_V1,
+                                                       ClientTestEntities.DEV_KEY_RESOURCE_META_V2),
+                                "research", ImmutableSet.of(ClientTestEntities.RESEARCH_KEY_RESOURCE_META));
+    Assert.assertEquals(expectedMap, resultMap);
   }
 
   @Test
@@ -129,15 +128,14 @@ public class PluginCommandsTest extends AbstractTest{
     execute(String.format(Constants.STAGE_AUTOMATOR_TYPE_RESOURCE_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
                           ClientTestEntities.COOKBOOKS_RESOURCE_TYPE.getTypeName(),
                           ClientTestEntities.HADOOP_RESOURCE_META_V2.getName(),
-                          String.valueOf(ClientTestEntities.HADOOP_RESOURCE_META_V2.getVersion())));
+                          ClientTestEntities.HADOOP_RESOURCE_META_V2.getVersion()));
   }
 
   @Test
   public void testStageAutomatorTypeResourceUnknownVersionCommand() throws IOException, InvalidCommandException {
     execute(String.format(Constants.STAGE_AUTOMATOR_TYPE_RESOURCE_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
                           ClientTestEntities.COOKBOOKS_RESOURCE_TYPE.getTypeName(),
-                          ClientTestEntities.HADOOP_RESOURCE_META_V2.getName(),
-                          String.valueOf(12)));
+                          ClientTestEntities.HADOOP_RESOURCE_META_V2.getName(), 12));
     checkError();
   }
 
@@ -146,15 +144,14 @@ public class PluginCommandsTest extends AbstractTest{
     execute(String.format(Constants.STAGE_PROVIDER_TYPE_RESOURCE_COMMAND, Constants.PROVIDER_TYPE_JOYENT_NAME,
                           ClientTestEntities.KEYS_RESOURCE_TYPE.getTypeName(),
                           ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getName(),
-                          String.valueOf(ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getVersion())));
+                          ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getVersion()));
   }
 
   @Test
   public void testStageProviderTypeResourceUnknownVersionCommand() throws IOException, InvalidCommandException {
-    execute(String.format(Constants.STAGE_AUTOMATOR_TYPE_RESOURCE_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
+    execute(String.format(Constants.STAGE_PROVIDER_TYPE_RESOURCE_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
                           ClientTestEntities.KEYS_RESOURCE_TYPE.getTypeName(),
-                          ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getName(),
-                          String.valueOf(12)));
+                          ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getName(), 12));
     checkError();
   }
 
@@ -163,15 +160,14 @@ public class PluginCommandsTest extends AbstractTest{
     execute(String.format(Constants.RECALL_AUTOMATOR_TYPE_RESOURCE_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
                           ClientTestEntities.COOKBOOKS_RESOURCE_TYPE.getTypeName(),
                           ClientTestEntities.HADOOP_RESOURCE_META_V2.getName(),
-                          String.valueOf(ClientTestEntities.HADOOP_RESOURCE_META_V2.getVersion())));
+                          ClientTestEntities.HADOOP_RESOURCE_META_V2.getVersion()));
   }
 
   @Test
   public void testRecallAutomatorTypeResourceUnknownVersionCommand() throws IOException, InvalidCommandException {
     execute(String.format(Constants.RECALL_AUTOMATOR_TYPE_RESOURCE_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
                           ClientTestEntities.COOKBOOKS_RESOURCE_TYPE.getTypeName(),
-                          ClientTestEntities.HADOOP_RESOURCE_META_V2.getName(),
-                          String.valueOf(12)));
+                          ClientTestEntities.HADOOP_RESOURCE_META_V2.getName(), 12));
     checkError();
   }
 
@@ -180,22 +176,21 @@ public class PluginCommandsTest extends AbstractTest{
     execute(String.format(Constants.RECALL_PROVIDER_TYPE_RESOURCE_COMMAND, Constants.PROVIDER_TYPE_JOYENT_NAME,
                           ClientTestEntities.KEYS_RESOURCE_TYPE.getTypeName(),
                           ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getName(),
-                          String.valueOf(ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getVersion())));
+                          ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getVersion()));
   }
 
   @Test
   public void testRecallProviderTypeResourceUnknownVersionCommand() throws IOException, InvalidCommandException {
     execute(String.format(Constants.RECALL_AUTOMATOR_TYPE_RESOURCE_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
                           ClientTestEntities.KEYS_RESOURCE_TYPE.getTypeName(),
-                          ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getName(),
-                          String.valueOf(12)));
+                          ClientTestEntities.DEV_KEY_RESOURCE_META_V1.getName(), 12));
     checkError();
   }
 
   @Test
   public void testDeleteAutomatorTypeResourceCommand() throws IOException, InvalidCommandException {
 
-    execute(String.format(Constants.LIST_ALL_AUTOMATOR_TYPE_RESOURSES_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
+    execute(String.format(Constants.LIST_ALL_AUTOMATOR_TYPE_RESOURCES_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
                           ClientTestEntities.COOKBOOKS_RESOURCE_TYPE.getTypeName(),
                           ResourceStatus.INACTIVE.toString()));
 
@@ -210,9 +205,9 @@ public class PluginCommandsTest extends AbstractTest{
     execute(String.format(Constants.DELETE_AUTOMATOR_TYPE_RESOURCE_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
                           ClientTestEntities.COOKBOOKS_RESOURCE_TYPE.getTypeName(),
                           ClientTestEntities.MYSQL_RESOURCE_META.getName(),
-                          String.valueOf(ClientTestEntities.MYSQL_RESOURCE_META.getVersion())));
+                          ClientTestEntities.MYSQL_RESOURCE_META.getVersion()));
 
-    execute(String.format(Constants.LIST_ALL_AUTOMATOR_TYPE_RESOURSES_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
+    execute(String.format(Constants.LIST_ALL_AUTOMATOR_TYPE_RESOURCES_COMMAND, Constants.AUTOMATOR_TYPE_CHEF_NAME,
                           ClientTestEntities.COOKBOOKS_RESOURCE_TYPE.getTypeName(),
                           ResourceStatus.INACTIVE.toString()));
 
@@ -224,7 +219,7 @@ public class PluginCommandsTest extends AbstractTest{
   @Test
   public void testDeleteProviderTypeResourceCommand() throws IOException, InvalidCommandException {
 
-    execute(String.format(Constants.LIST_ALL_PROVIDER_TYPE_RESOURSES_COMMAND, Constants.PROVIDER_TYPE_JOYENT_NAME,
+    execute(String.format(Constants.LIST_ALL_PROVIDER_TYPE_RESOURCES_COMMAND, Constants.PROVIDER_TYPE_JOYENT_NAME,
                           ClientTestEntities.KEYS_RESOURCE_TYPE.getTypeName(),
                           ResourceStatus.INACTIVE));
 
@@ -239,9 +234,9 @@ public class PluginCommandsTest extends AbstractTest{
     execute(String.format(Constants.DELETE_PROVIDER_TYPE_RESOURCE_COMMAND, Constants.PROVIDER_TYPE_JOYENT_NAME,
                           ClientTestEntities.KEYS_RESOURCE_TYPE.getTypeName(),
                           ClientTestEntities.VIEW_KEY_RESOURCE_META.getName(),
-                          String.valueOf(ClientTestEntities.VIEW_KEY_RESOURCE_META.getVersion())));
+                          ClientTestEntities.VIEW_KEY_RESOURCE_META.getVersion()));
 
-    execute(String.format(Constants.LIST_ALL_PROVIDER_TYPE_RESOURSES_COMMAND, Constants.PROVIDER_TYPE_JOYENT_NAME,
+    execute(String.format(Constants.LIST_ALL_PROVIDER_TYPE_RESOURCES_COMMAND, Constants.PROVIDER_TYPE_JOYENT_NAME,
                           ClientTestEntities.KEYS_RESOURCE_TYPE.getTypeName(),
                           ResourceStatus.INACTIVE.toString()));
 

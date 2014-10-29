@@ -94,8 +94,8 @@ public abstract class AbstractTest extends ClientTest {
     return CLI_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), listType);
   }
 
-  public static <T, V> Map<T, Set<V>> getMapFromOutput(Type listType) throws UnsupportedEncodingException {
-    return CLI_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), listType);
+  public static <T, V> Map<T, Set<V>> getMapFromOutput(Type mapType) throws UnsupportedEncodingException {
+    return CLI_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), mapType);
   }
 
   public static String getJsonFromObject(Object output) {
