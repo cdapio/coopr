@@ -124,6 +124,17 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
   $scope.doActionsModal = doActionsModal;
 
 
+
+
+  $scope.doPauseDeploy = function() {
+    myApi.Cluster.pauseDeploy({id: $scope.model.id}).$promise.then(update);
+  };
+
+  $scope.doResumeDeploy = function() {
+    myApi.Cluster.resumeDeploy({id: $scope.model.id}).$promise.then(update);
+  };
+
+
   /* ----------------------------------------------------------------------- */
 
 
