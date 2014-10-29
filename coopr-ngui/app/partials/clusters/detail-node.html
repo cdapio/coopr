@@ -14,7 +14,7 @@
       <td>{{item.action}}</td>
       <td>{{item.service}}</td>
       <td>{{item.submitTime | amDateFormat:'lll'}}</td>
-      <td>{{item.statusTime - item.submitTime | amDurationFormat}}</td>
+      <td>{{(item.statusTime ? item.statusTime - item.submitTime : 0) | amDurationFormat}}</td>
 
       <td ng-if="item.status!=='failed'">
         <my-status-label data-value="item.status"></my-status-label>

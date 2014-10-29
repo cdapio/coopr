@@ -29,34 +29,41 @@ require 'zlib'
 
 # Parse command line options.
 options = {}
-OptionParser.new do |opts|
-  opts.banner = "Usage: #{$PROGRAM_NAME} [options] <action> <local-path> <remote-target>"
-  opts.on('-u', '--uri URI', 'Server URI, defaults to ENV[\'COOPR_SERVER_URI\'] else "http://localhost:55054"') do |u|
-    options[:uri] = u
-  end
-  opts.on('-t', '--tenant TENANT', 'Tenant, defaults to ENV[\'COOPR_TENANT\'] else "superadmin"') do |t|
-    options[:tenant] = t
-  end
-  opts.on('-U', '--user USER', 'User, defaults to ENV[\'COOPR_API_USER\'] else "admin"') do |u|
-    options[:user] = u
-  end
-  opts.on('-q', '--quiet', 'Suppress all non-error output') do
-    options[:quiet] = true
-  end
+begin
+  op = OptionParser.new do |opts|
+    opts.banner = "Usage: #{$PROGRAM_NAME} [options] <action> <local-path> <remote-target>"
+    opts.on('-u', '--uri URI', 'Server URI, defaults to ENV[\'COOPR_SERVER_URI\'] else "http://localhost:55054"') do |u|
+      options[:uri] = u
+    end
+    opts.on('-t', '--tenant TENANT', 'Tenant, defaults to ENV[\'COOPR_TENANT\'] else "superadmin"') do |t|
+      options[:tenant] = t
+    end
+    opts.on('-U', '--user USER', 'User, defaults to ENV[\'COOPR_API_USER\'] else "admin"') do |u|
+      options[:user] = u
+    end
+    opts.on('-q', '--quiet', 'Suppress all non-error output') do
+      options[:quiet] = true
+    end
 
-  opts.separator ''
-  opts.separator 'Required Arguments:'
-  opts.separator '         <action>: one of upload, stage, or sync:'
-  opts.separator '                     upload: uploads a single resource to the server'
-  opts.separator '                     stage: uploads and stages a single resource to the server'
-  opts.separator '                     sync: uploads and stages a single resource, then executes a sync on all staged resources'
-  opts.separator '     <local-path>: path to the local copy of the resource to upload'
-  opts.separator '  <remote-target>: api path defining the resource'
-  opts.separator ''
-  opts.separator 'Example:'
-  opts.separator "  #{$PROGRAM_NAME} -u http://localhost:55054 -t superadmin -U admin sync ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop"
-  opts.separator ''
-end.parse!(ARGV)
+    opts.separator ''
+    opts.separator 'Required Arguments:'
+    opts.separator '         <action>: one of upload, stage, or sync:'
+    opts.separator '                     upload: uploads a single resource to the server'
+    opts.separator '                     stage: uploads and stages a single resource to the server'
+    opts.separator '                     sync: uploads and stages a single resource, then executes a sync on all staged resources'
+    opts.separator '     <local-path>: path to the local copy of the resource to upload'
+    opts.separator '  <remote-target>: api path defining the resource'
+    opts.separator ''
+    opts.separator 'Example:'
+    opts.separator "  #{$PROGRAM_NAME} -u http://localhost:55054 -t superadmin -U admin sync ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop"
+    opts.separator ''
+  end
+  op.parse!(ARGV)
+rescue OptionParser::InvalidArgument, OptionParser::InvalidOption
+  puts "Invalid Argument/Options: #{$!}"
+  puts op # prints usage
+  exit 1
+end
 
 server_uri = options[:uri] || ENV['COOPR_SERVER_URI'] || 'http://localhost:55054'
 options[:uri] = server_uri
@@ -90,33 +97,33 @@ module Coopr
       def basic_validate
         # action required
         unless @options[:action] =~ /^(upload|stage|sync)$/i
-          fail 'missing or invalid action argument: must be one of "upload", "stage", or "sync"'
+          fail ArgumentError, 'missing or invalid action argument: must be one of "upload", "stage", or "sync"'
         end
         # path required
         if @options[:path].nil?
-          fail 'missing local-path argument'
+          fail ArgumentError, 'missing local-path argument'
         elsif !File.exist?(@options[:path])
-          fail "local-path argument supplied, but no such file or directory: #{@options[:path]}"
+          fail ArgumentError, "local-path argument supplied, but no such file or directory: #{@options[:path]}"
         end
         # api target required
         if @options[:target].nil?
-          fail 'missing remote-target argument'
+          fail ArgumentError, 'missing remote-target argument'
         else
           plugin_type, plugin_name, resource_type, resource_name = @options[:target].split('/')
           unless plugin_type =~ /^(automatortypes|providertypes)$/i
-            fail "invalid remote-target argument, must begin with 'automatortypes/' or 'providertypes/': #{@options[:target]}"
+            fail ArgumentError, "invalid remote-target argument, must begin with 'automatortypes/' or 'providertypes/': #{@options[:target]}"
           end
           @options[:plugin_type] = plugin_type
           if plugin_name.nil?
-            fail "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
+            fail ArgumentError, "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
           end
           @options[:plugin_name] = plugin_name
           if resource_type.nil?
-            fail "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
+            fail ArgumentError, "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
           end
           @options[:resource_type] = resource_type
           if resource_name.nil?
-            fail "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
+            fail ArgumentError, "invalid remote-target argument, must be of format 'plugin_type/plugin_name/resource_type/resource_name'': #{@options[:target]}"
           end
           @options[:resource_name] = resource_name
         end
@@ -301,7 +308,11 @@ begin
     ldr.stage
     ldr.sync
   end
+rescue ArgumentError => e
+  puts op # prints usage
+  exit 1
 rescue => e
   puts "Error: #{e.message} #{e.backtrace}"
   puts e.backtrace
+  exit 1
 end

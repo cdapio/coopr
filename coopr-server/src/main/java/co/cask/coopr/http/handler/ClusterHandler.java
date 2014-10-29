@@ -420,8 +420,6 @@ public class ClusterHandler extends AbstractAuthHandler {
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (MissingClusterException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
-    } catch (IllegalStateException e) {
-      responder.sendError(HttpResponseStatus.CONFLICT, "Cannot be paused at this time.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error pausing cluster.");
     }
@@ -449,8 +447,6 @@ public class ClusterHandler extends AbstractAuthHandler {
       responder.sendStatus(HttpResponseStatus.OK);
     } catch (MissingClusterException e) {
       responder.sendError(HttpResponseStatus.NOT_FOUND, "cluster " + clusterId + " not found.");
-    } catch (IllegalStateException e) {
-      responder.sendError(HttpResponseStatus.CONFLICT, "Cannot be resumed at this time.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error pausing cluster.");
     }

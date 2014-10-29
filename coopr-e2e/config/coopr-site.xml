@@ -1,0 +1,14 @@
+<configuration> 
+	<property>
+		<name>server.port</name>
+		<value>55054</value>
+	</property>
+ 	<property>
+   		<name>server.local.data.dir</name>
+		<value>./data</value>
+	</property>
+	<property>
+		<name>server.plugin.store.localfilestore.data.dir</name>
+		<value>./data/plugins/resources</value>
+	</property>
+</configuration>

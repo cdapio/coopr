@@ -22,7 +22,6 @@ import co.cask.coopr.spec.Provider;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -36,25 +35,29 @@ import java.util.Set;
  */
 public class ClusterCodec extends AbstractCodec<Cluster> {
 
+  private static final Type SET_STRING_TYPE = new TypeToken<Set<String>>() {}.getType();
+
+  private static final String ID_KEY = "id";
+  private static final String NAME_KEY = "name";
+  private static final String DESCRIPTION_KEY = "description";
+  private static final String ACCOUNT_KEY = "account";
+  private static final String CREATE_TIME_KEY = "createTime";
+  private static final String EXPIRE_TIME_KEY = "expireTime";
+  private static final String PROVIDER_KEY = "provider";
+  private static final String CLUSTER_TEMPLATE_KEY = "clusterTemplate";
+  private static final String NODES_KEY = "nodes";
+  private static final String SERVICES_KEY = "services";
+  private static final String LATEST_JOB_ID_KEY = "latestJobId";
+  private static final String STATUS_KEY = "status";
+  private static final String CONFIG_KEY = "config";
+
   @Override
   public Cluster deserialize(JsonElement json, Type type, JsonDeserializationContext context)
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    return Cluster.builder()
-      .setID(context.<String>deserialize(jsonObj.get("id"), String.class))
-      .setName(context.<String>deserialize(jsonObj.get("name"), String.class))
-      .setDescription(context.<String>deserialize(jsonObj.get("description"), String.class))
-      .setAccount(context.<Account>deserialize(jsonObj.get("account"), Account.class))
-      .setCreateTime(jsonObj.get("createTime").getAsLong())
-      .setExpireTime(context.<Long>deserialize(jsonObj.get("expireTime"), Long.class))
-      .setProvider(context.<Provider>deserialize(jsonObj.get("provider"), Provider.class))
-      .setClusterTemplate(context.<ClusterTemplate>deserialize(jsonObj.get("clusterTemplate"), ClusterTemplate.class))
-      .setNodes(context.<Set<String>>deserialize(jsonObj.get("nodes"), new TypeToken<Set<String>>() {}.getType()))
-      .setServices(context.<Set<String>>deserialize(jsonObj.get("services"), new TypeToken<Set<String>>() {}.getType()))
-      .setLatestJobID(context.<String>deserialize(jsonObj.get("latestJobId"), String.class))
-      .setStatus(context.<Cluster.Status>deserialize(jsonObj.get("status"), Cluster.Status.class))
-      .setConfig(context.<JsonObject>deserialize(jsonObj.get("config"), JsonObject.class))
+    return deserializeClusterWithoutNodes(jsonObj, context)
+      .setNodes(context.<Set<String>>deserialize(jsonObj.get(NODES_KEY), SET_STRING_TYPE))
       .build();
   }
 
@@ -67,20 +70,42 @@ public class ClusterCodec extends AbstractCodec<Cluster> {
 
     JsonObject jsonObj = new JsonObject();
 
-    jsonObj.add("id", context.serialize(cluster.getId()));
-    jsonObj.add("name", context.serialize(cluster.getName()));
-    jsonObj.add("description", context.serialize(cluster.getDescription()));
-    jsonObj.add("account", context.serialize(cluster.getAccount()));
-    jsonObj.add("createTime", context.serialize(cluster.getCreateTime()));
-    jsonObj.add("expireTime", context.serialize(cluster.getExpireTime()));
-    jsonObj.add("provider", context.serialize(cluster.getProvider()));
-    jsonObj.add("clusterTemplate", context.serialize(cluster.getClusterTemplate()));
-    jsonObj.add("nodes", context.serialize(cluster.getNodeIDs()));
-    jsonObj.add("services", context.serialize(cluster.getServices()));
-    jsonObj.add("latestJobId", context.serialize(cluster.getLatestJobId()));
-    jsonObj.add("status", context.serialize(cluster.getStatus()));
-    jsonObj.add("config", context.serialize(cluster.getConfig()));
+    jsonObj.add(ID_KEY, context.serialize(cluster.getId()));
+    jsonObj.add(NAME_KEY, context.serialize(cluster.getName()));
+    jsonObj.add(DESCRIPTION_KEY, context.serialize(cluster.getDescription()));
+    jsonObj.add(ACCOUNT_KEY, context.serialize(cluster.getAccount()));
+    jsonObj.add(CREATE_TIME_KEY, context.serialize(cluster.getCreateTime()));
+    jsonObj.add(EXPIRE_TIME_KEY, context.serialize(cluster.getExpireTime()));
+    jsonObj.add(PROVIDER_KEY, context.serialize(cluster.getProvider()));
+    jsonObj.add(CLUSTER_TEMPLATE_KEY, context.serialize(cluster.getClusterTemplate()));
+    jsonObj.add(NODES_KEY, context.serialize(cluster.getNodeIDs()));
+    jsonObj.add(SERVICES_KEY, context.serialize(cluster.getServices()));
+    jsonObj.add(LATEST_JOB_ID_KEY, context.serialize(cluster.getLatestJobId()));
+    jsonObj.add(STATUS_KEY, context.serialize(cluster.getStatus()));
+    jsonObj.add(CONFIG_KEY, context.serialize(cluster.getConfig()));
 
     return jsonObj;
+  }
+
+  public static Cluster deserializeCluster(JsonElement json, JsonDeserializationContext context) {
+    return deserializeClusterWithoutNodes(json.getAsJsonObject(), context).build();
+  }
+
+  private static Cluster.Builder deserializeClusterWithoutNodes(JsonObject jsonObj,
+                                                                JsonDeserializationContext context) {
+    return Cluster.builder()
+      .setID(context.<String>deserialize(jsonObj.get(ID_KEY), String.class))
+      .setName(context.<String>deserialize(jsonObj.get(NAME_KEY), String.class))
+      .setDescription(context.<String>deserialize(jsonObj.get(DESCRIPTION_KEY), String.class))
+      .setAccount(context.<Account>deserialize(jsonObj.get(ACCOUNT_KEY), Account.class))
+      .setCreateTime(jsonObj.get(CREATE_TIME_KEY).getAsLong())
+      .setExpireTime(context.<Long>deserialize(jsonObj.get(EXPIRE_TIME_KEY), Long.class))
+      .setProvider(context.<Provider>deserialize(jsonObj.get(PROVIDER_KEY), Provider.class))
+      .setClusterTemplate(context.<ClusterTemplate>deserialize(jsonObj.get(CLUSTER_TEMPLATE_KEY),
+                                                               ClusterTemplate.class))
+      .setServices(context.<Set<String>>deserialize(jsonObj.get(SERVICES_KEY), SET_STRING_TYPE))
+      .setLatestJobID(context.<String>deserialize(jsonObj.get(LATEST_JOB_ID_KEY), String.class))
+      .setStatus(context.<Cluster.Status>deserialize(jsonObj.get(STATUS_KEY), Cluster.Status.class))
+      .setConfig(context.<JsonObject>deserialize(jsonObj.get(CONFIG_KEY), JsonObject.class));
   }
 }
