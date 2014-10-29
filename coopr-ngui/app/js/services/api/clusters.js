@@ -10,6 +10,14 @@ function ($resource, myApiPrefix) {
           method: 'GET',
           url: myApiPrefix + 'clusters/:id/status'
         },
+        pauseDeploy: {
+          method: 'POST',
+          url: myApiPrefix + 'clusters/:id/pause'
+        },
+        resumeDeploy: {
+          method: 'POST',
+          url: myApiPrefix + 'clusters/:id/resume'
+        },
         startAllServices: {
           method: 'POST',
           url: myApiPrefix + 'clusters/:id/services/start'
