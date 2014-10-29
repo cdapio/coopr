@@ -34,6 +34,9 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHel
   ]).then(function () {
 
     $scope.$watch('model.clusterTemplate', function (name) {
+      if(!name) {
+        return;
+      }
 
       var chosen = $scope.availableTemplates.filter(function (tpl) {
         return tpl.name === name;

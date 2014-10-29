@@ -98,13 +98,33 @@
     <div class="col-xs-3">
       <label>Last Action</label>
     </div>
-    <div class="col-xs-9">
+    <div class="col-xs-7">
       <code>{{model.progress.action}}</code>
       <my-status-label data-value="model.progress.actionstatus"></my-status-label>
       <small ng-show="model.message">
         <br><br><mark>{{model.message}}</mark>
       </small>
     </div>
+    <div class="col-xs-2 text-right">
+
+      <a class="btn btn-sm btn-default" 
+        ng-click="doPauseDeploy()"
+        ng-show="model.progress.actionstatus==='running'"
+      >
+        <span class="fa fa-pause"></span>
+        <span class="hidden-xs hidden-sm">Pause Deploy</span>
+      </a>
+
+      <a class="btn btn-sm btn-default" 
+        ng-click="doResumeDeploy()"
+        ng-show="model.progress.actionstatus==='paused'"
+      >
+        <span class="fa fa-play"></span>
+        <span class="hidden-xs hidden-sm">Resume Deploy</span>
+      </a>
+
+    </div>
+
   </div></li>
 
   <li ng-if="model.status!='terminated'"><div class="row">
