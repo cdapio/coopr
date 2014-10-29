@@ -21,10 +21,5 @@
     <!--
       Your provisioner site level configuration goes here
     -->
-    <property>
-        <name>provisioner.server.uri</name>
-        <value>https://localhost:55054</value>
-        <description>URI of server to connect to</description>
-    </property>
 </configuration>
 

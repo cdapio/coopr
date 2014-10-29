@@ -139,25 +139,27 @@ fi
 #
 # Usage: read_property property_name /path/to/config/file variable_to_store_value
 #
-function read_property {
-    local __result_var=$3
-    local property_re='(?<=<name>'$1'</name>)[\s\S]+?(?=</property>)'
-    local property_value_re='(?<=<value>)[\s\S]+?(?=</value>)'
+read_property () {
+    property_re='(?<=<name>'$1'</name>)[\s\S]+?(?=</property>)'
+    property_value_re='(?<=<value>)[\s\S]+?(?=</value>)'
 
-    eval $__result_var=`grep -Pzoe $property_re $2 | grep -Pzoe $property_value_re`
+    echo `grep -Pzoe $property_re $2 | grep -Pzoe $property_value_re`
 }
 
 # Setup coopr configuration
 COOPR_PROTOCOL=http
-read_property server.ssl.enabled ${COOPR_SERVER_CONF}coopr-site.xml COOPR_SSL
+COOPR_SSL=`read_property server.ssl.enabled ${COOPR_SERVER_CONF}coopr-site.xml`
+if [ -z $COOPR_SSL ]; then
+    COOPR_SSL="false"
+fi
 export COOPR_SSL
-if [ ! -z $COOPR_SSL ] && [ $COOPR_SSL = "true" ]; then
+if [ $COOPR_SSL = "true" ]; then
     COOPR_PROTOCOL=https
 
-    read_property server.nodejs.ssl.path ${COOPR_SERVER_CONF}coopr-security.xml COOPR_NODEJS_SSL_PATH
-    read_property server.nodejs.ssl.key ${COOPR_SERVER_CONF}coopr-security.xml COOPR_NODEJS_SSL_KEY
+    COOPR_NODEJS_SSL_PATH=`read_property server.nodejs.ssl.path ${COOPR_SERVER_CONF}coopr-security.xml`
+    COOPR_NODEJS_SSL_KEY=`read_property server.nodejs.ssl.key ${COOPR_SERVER_CONF}coopr-security.xml`
     export COOPR_NODEJS_SSL_KEY=$COOPR_NODEJS_SSL_PATH"/"$COOPR_NODEJS_SSL_KEY
-    read_property server.nodejs.ssl.crt ${COOPR_SERVER_CONF}coopr-security.xml COOPR_NODEJS_SSL_CRT
+    COOPR_NODEJS_SSL_CRT=`read_property server.nodejs.ssl.crt ${COOPR_SERVER_CONF}coopr-security.xml`
     export COOPR_NODEJS_SSL_CRT=$COOPR_NODEJS_SSL_PATH"/"$COOPR_NODEJS_SSL_CRT
 fi
 
@@ -169,7 +171,7 @@ export TRUST_CERT_PATH
 read_property server.ssl.trust.cert.password ${COOPR_SERVER_CONF}coopr-security.xml TRUST_CERT_PASSWORD
 export TRUST_CERT_PASSWORD
 
-if [ ! -z TRUST_CERT_PATH ] && [ ! -z TRUST_CERT_PASsWORD ]; then
+if [ -n TRUST_CERT_PATH ] && [ -n TRUST_CERT_PASSWORD ]; then
   export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
 fi
 

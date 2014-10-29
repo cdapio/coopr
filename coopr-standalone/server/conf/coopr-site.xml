@@ -10,8 +10,4 @@
         <name>server.plugin.store.localfilestore.data.dir</name>
         <value>COOPR_DATA_DIR/plugins/resources</value>
     </property>
-    <property>
-        <name>server.ssl.enabled</name>
-        <value>true</value>
-    </property>
 </configuration>
