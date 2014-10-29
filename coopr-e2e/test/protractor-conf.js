@@ -2,7 +2,7 @@ var config = {
   allScriptsTimeout: 11000,
 
   specs: [
-    'e2e/providers/provider-spec.js'
+    'e2e/simple-test.js'
   ],
 
   capabilities: {
