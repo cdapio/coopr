@@ -3,29 +3,18 @@
 //  */
 var helper = require('../../protractor-help');
 
-
-describe('just a simple test', function() {
-
- 
-  it('should show a page', function () {
-
-    browser.get('/');
-    expect(
-      element(by.css('body')).getAttribute('class')
-    ).toContain('state-home');
-
-  });
-
-});
-
-
 describe('providers test', function () {
   var ptor = protractor.getInstance();
   var formfields;
   var providersList;
   
   it('should log in', function () {
-    helper.loginAsAdmin();
+    browser.get('/login');
+    element(by.id('loginTenant')).clear().sendKeys('superadmin');
+    element(by.id('loginUsername')).clear().sendKeys('admin');
+    element(by.id('loginPassword')).clear().sendKeys('admin');
+    element(by.partialButtonText('Submit')).click();
+    browser.waitForAngular();
   });
 
   it('should show the correct fields for provider type', function() {
@@ -86,7 +75,7 @@ describe('providers test', function () {
     expect(element(by.css('#inputProviderName')).getAttribute('value')).toBe('Testprovider');
     expect(
       element(by.css('#inputProviderDescription')).getAttribute('value')).toBe('Test description');
-    expect(element(by.css('#inputProviderType')).getAttribute('value')).toBe('1');
+    expect(element(by.css('#inputProviderType')).getAttribute('value')).toBe('');
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
     var size = formfields.get(2).element(by.css('input')).getAttribute('value');
     expect(size).toEqual('10');
@@ -114,7 +103,9 @@ describe('providers test', function () {
   });
 
   it('should logout', function () {
-    helper.logout();
+    element(by.css('header .navbar-right .dropdown-toggle')).click();
+    element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
+    browser.waitForAngular();
   });
 
 });
