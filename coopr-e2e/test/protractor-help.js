@@ -20,26 +20,24 @@ module.exports = {
 // ----------------------------------------------------------------------------
 
 function login(tenant, username, password) {
-
-  browser.get('/');
+  browser.get('/login');
   browser.waitForAngular();
 
   isLoggedIn()
     .then(function (needLogout) {
-
       if(needLogout) {
         logout();
       }
-
-      browser.get('/login');
-      browser.waitForAngular();
-
       element(by.id('loginTenant')).clear().sendKeys(tenant);
       element(by.id('loginUsername')).clear().sendKeys(username);
       element(by.id('loginPassword')).clear().sendKeys(password);
       element(by.partialButtonText('Submit')).click();
 
-      browser.wait(isLoggedIn, 10000);
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (url) {
+          return url === 'http://localhost:8080/';
+        });
+      });
     });
 }
 
@@ -47,10 +45,9 @@ function login(tenant, username, password) {
 function logout() {
 
   browser.get('/');
-  browser.waitForAngular();
 
   isLoggedIn()
-    .then(function(needLogout){
+    .then(function (needLogout) {
       if(needLogout) {
 
         ddIsOpen()
@@ -62,13 +59,12 @@ function logout() {
 
             element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
 
-            browser.wait(function() {
+            browser.wait(function () {
               return element(
                 by.cssContainingText('#alerts .alert-info', 'You are now logged out')
               ).isPresent();
             }, 10000);
           });
-
       }
     });
 
@@ -80,7 +76,7 @@ function isLoggedIn () {
   ).isPresent();
 };
 
-function ddIsOpen() {
+function ddIsOpen () {
   return element(
     by.css('header .dropdown.open .dropdown-menu')
   ).isPresent();
