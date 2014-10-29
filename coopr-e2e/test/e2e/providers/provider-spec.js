@@ -14,7 +14,7 @@ describe('providers test', function () {
     element(by.id('loginUsername')).clear().sendKeys('admin');
     element(by.id('loginPassword')).clear().sendKeys('admin');
     element(by.partialButtonText('Submit')).click();
-    browser.waitForAngular();
+    expect(element(by.css('header .dropdown-toggle .fa-user')).isPresent()).toBe(true);
   });
 
   it('should show the correct fields for provider type', function() {
@@ -106,7 +106,6 @@ describe('providers test', function () {
   it('should logout', function () {
     element(by.css('header .navbar-right .dropdown-toggle')).click();
     element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
-    browser.waitForAngular();
   });
 
 });
