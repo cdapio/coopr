@@ -60,6 +60,30 @@ public class Constants {
   public static final String RESTART_SERVICE_ON_CLUSTER_COMMAND = "restart service \"%s\" on cluster \"%s\"";
   public static final String ADD_SERVICES_ON_CLUSTER_COMMAND = "add services '%s' on cluster \"%s\"";
 
+  //Plugin commands
+  public static final String LIST_ALL_AUTOMATORS_COMMAND = "list all automatortypes";
+  public static final String LIST_ALL_PROVIDERS_COMMAND = "list all providertypes";
+  public static final String GET_AUTOMATOR_TYPE_COMMAND = "get automatortype %s";
+  public static final String GET_PROVIDER_TYPE_COMMAND = "get providertype %s";
+  public static final String AUTOMATOR_TYPE_CHEF_NAME = "chef-solo";
+  public static final String PROVIDER_TYPE_JOYENT_NAME = "joyent";
+  public static final String LIST_ALL_AUTOMATOR_TYPE_RESOURCES_COMMAND =
+                             "list resources from automator %s of type %s and status %s";
+  public static final String LIST_ALL_PROVIDER_TYPE_RESOURCES_COMMAND =
+                            "list resources from provider %s of type %s and status %s";
+  public static final String STAGE_AUTOMATOR_TYPE_RESOURCE_COMMAND =
+                            "stage resource from automator %s of type %s and name %s and version %d";
+  public static final String STAGE_PROVIDER_TYPE_RESOURCE_COMMAND =
+                            "stage resource from provider %s of type %s and name %s and version %d";
+  public static final String RECALL_AUTOMATOR_TYPE_RESOURCE_COMMAND =
+    "recall resource from automator %s of type %s and name %s and version %d";
+  public static final String RECALL_PROVIDER_TYPE_RESOURCE_COMMAND =
+    "recall resource from provider %s of type %s and name %s and version %d";
+  public static final String DELETE_AUTOMATOR_TYPE_RESOURCE_COMMAND =
+    "delete resource from automator %s of type %s and name %s and version %d";
+  public static final String DELETE_PROVIDER_TYPE_RESOURCE_COMMAND =
+    "delete resource from provider %s of type %s and name %s and version %d";
+
   // Provisioner commands
   public static final String LIST_PROVISIONERS_COMMAND = "list provisioners";
   public static final String GET_PROVISIONER_COMMAND = "get provisioner \"%s\"";

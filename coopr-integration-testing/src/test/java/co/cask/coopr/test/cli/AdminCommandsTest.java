@@ -33,7 +33,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Set;
 
 public class AdminCommandsTest extends AbstractTest {

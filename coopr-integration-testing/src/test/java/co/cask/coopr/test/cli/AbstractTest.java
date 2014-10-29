@@ -25,11 +25,8 @@ import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.CLIMain;
 import co.cask.coopr.shell.util.CLICodecModules;
 import co.cask.coopr.test.client.ClientTest;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.inject.Guice;
-import com.google.inject.Injector;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -40,7 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -95,6 +92,10 @@ public abstract class AbstractTest extends ClientTest {
 
   public static <T> Set<T> getSetFromOutput(Type listType) throws UnsupportedEncodingException {
     return CLI_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), listType);
+  }
+
+  public static <T, V> Map<T, Set<V>> getMapFromOutput(Type mapType) throws UnsupportedEncodingException {
+    return CLI_GSON.fromJson(OUTPUT_STREAM.toString("UTF-8"), mapType);
   }
 
   public static String getJsonFromObject(Object output) {

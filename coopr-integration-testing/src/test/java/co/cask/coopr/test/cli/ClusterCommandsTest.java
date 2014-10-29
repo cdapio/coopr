@@ -28,7 +28,6 @@ import co.cask.coopr.http.request.ClusterStatusResponse;
 import co.cask.coopr.scheduler.ClusterAction;
 import co.cask.coopr.spec.BaseEntity;
 import co.cask.coopr.test.Constants;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -39,7 +38,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Set;
 
 public class ClusterCommandsTest extends AbstractTest {
