@@ -87,6 +87,7 @@ describe('providers test', function () {
     providersList = element.all(by.repeater('item in list'));
     providersList.first().element(by.cssContainingText('.btn', 'Delete')).click();
     element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
+    browser.waitForAngular();
     providersList = element.all(by.repeater('item in list'));
     expect(providersList.count()).toEqual(0);
   });
