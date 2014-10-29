@@ -59,9 +59,9 @@ before_script:
 
 script:
   - 'cd coopr-ngui'
-  - 'node ./node_modules/gulp/bin/gulp.js jshint'
-  - 'npm run test-single-run'
+  # - 'node ./node_modules/gulp/bin/gulp.js jshint'
+  # - 'npm run test-single-run'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then cd ../coopr-e2e; fi'
   - 'if [ -n "$SAUCE_ACCESS_KEY" ]; then npm run protractor; fi'
-  - 'cd ..'
-  - 'mvn test'
+  # - 'cd ..'
+  # - 'mvn test'
