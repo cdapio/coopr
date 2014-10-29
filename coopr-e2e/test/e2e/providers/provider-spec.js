@@ -55,7 +55,7 @@ describe('providers test', function () {
     formfields.get(1).element(by.css('input')).sendKeys('Test email');
     formfields.get(3).element(by.css('input')).sendKeys('Test project id');
     formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
-    element(by.cssContainingText('.btn.btn-primary', 'Create')).click();
+    element(by.css('.action-btn')).click();
     expect(
       browser.getLocationAbsUrl()
     ).toMatch(/\/providers$/);
