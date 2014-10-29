@@ -11,17 +11,15 @@ describe('login', function() {
 
     browser.get('/login');
 
-    expect( 
+    expect(
       element.all(by.css('main form input')).count()
     ).toBe(4); // tenant, username, password, remember
 
     helper.loginAsAdmin();
 
-    expect( 
-      element(
-        by.cssContainingText('#alerts .alert-success', 'Welcome')
-      ).isPresent()
-    ).toBe(true);
+    expect(
+      browser.getCurrentUrl()
+    ).toMatch('http://localhost:8080/');
 
   });
 
@@ -45,11 +43,9 @@ describe('login', function() {
     it('can log out', function() {
       helper.logout();
 
-      expect( 
-        element(
-          by.cssContainingText('#alerts .alert-info', 'You are now logged out')
-        ).isPresent()
-      ).toBe(true);
+      expect(
+        element(by.css('.nav.navbar-nav.navbar-right .dropdown .dropdown-toggle')).getText()
+      ).toMatch(/Not authenticated/i);
 
     });
 
