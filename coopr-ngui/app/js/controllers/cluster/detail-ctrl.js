@@ -43,7 +43,7 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
     $scope.additionalServices = [];
 
     if(data.status === 'pending') {
-      timeoutPromise = $timeout(update, 1000);
+      timeoutPromise = $timeout(update, 10000);
     }
 
 

@@ -60,7 +60,7 @@ function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
         });
 
       },
-      1000);
+      10000);
     }
   }
 
