@@ -21,14 +21,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>coopr-integration-testing</artifactId>
+    <artifactId>integration-testing</artifactId>
     <packaging>jar</packaging>
     <name>UI testing</name>
-  <parent>
-    <artifactId>coopr-parent</artifactId>
-    <groupId>co.cask</groupId>
-    <version>0.9.9-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <groupId>co.cask</groupId>
+        <artifactId>coopr-parent</artifactId>
+        <version>0.9.9-SNAPSHOT</version>
+    </parent>
 
     <dependencies>
         <dependency>

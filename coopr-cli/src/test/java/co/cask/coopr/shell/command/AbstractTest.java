@@ -21,6 +21,8 @@ import co.cask.common.cli.Command;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.client.PluginClient;
+import co.cask.coopr.client.ProvisionerClient;
+import co.cask.coopr.client.TenantClient;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.shell.CLIConfig;
 import co.cask.coopr.shell.command.set.CommandSet;
@@ -49,6 +51,8 @@ public abstract class AbstractTest {
   protected static final String TEST_RESOURCE_TYPE = "test-resource-type";
   protected static final String TEST_RESOURCE_NAME = "test-resource-name";
   protected static final String TEST_RESOURCE_VERSION = "1";
+  protected static final TenantClient TENANT_CLIENT = Mockito.mock(TenantClient.class);
+  protected static final ProvisionerClient PROVISIONER_CLIENT = Mockito.mock(ProvisionerClient.class);
 
   private static final Injector injector = Guice.createInjector(
     new CodecModules().getModule()
@@ -68,6 +72,8 @@ public abstract class AbstractTest {
           bind(AdminClient.class).toInstance(ADMIN_CLIENT);
           bind(ClusterClient.class).toInstance(CLUSTER_CLIENT);
           bind(PluginClient.class).toInstance(PLUGIN_CLIENT);
+          bind(TenantClient.class).toInstance(TENANT_CLIENT);
+          bind(ProvisionerClient.class).toInstance(PROVISIONER_CLIENT);
         }
       }
     );

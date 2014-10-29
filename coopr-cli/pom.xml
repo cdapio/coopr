@@ -27,6 +27,10 @@
     <version>0.9.9-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <main.class>co.cask.coopr.shell.CLIMain</main.class>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>co.cask.common</groupId>
@@ -44,5 +48,33 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <goal>package</goal>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <transformers>
+            <transformer
+                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <mainClass>${main.class}</mainClass>
+            </transformer>
+          </transformers>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

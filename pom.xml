@@ -31,7 +31,6 @@
         <module>coopr-server</module>
         <module>coopr-rest-client</module>
         <module>coopr-cli</module>
-      <module>coopr-integration-testing</module>
     </modules>
 
     <properties>
@@ -65,6 +64,13 @@
         <url>scm:git:git://github.com/caskdata/coopr.git</url>
         <developerConnection>scm:git:git://github.com/caskdata/coopr.git</developerConnection>
     </scm>
+
+    <repositories>
+        <repository>
+            <id>sonatype.snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
 
     <distributionManagement>
         <repository>
