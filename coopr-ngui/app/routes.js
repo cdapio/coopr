@@ -26,7 +26,7 @@ angular.module(PKG.name)
       })
 
       .state('404', {
-        templateUrl: '/assets/partials/404.html'
+        templateUrl: '/assets/features/_home/404.html'
       })
 
       .state('login', {
