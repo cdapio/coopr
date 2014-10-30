@@ -14,11 +14,12 @@ var pkg = require('./package.json'),
     serveFavicon = require('serve-favicon'),
     corsAnywhere = require('cors-anywhere'),
 
+    COOPR_HOME = process.env.COOPR_HOME;
     COOPR_SSL = ('true' == process.env.COOPR_SSL);
     COOPR_UI_PORT = parseInt(process.env.COOPR_UI_PORT || 8080, 10),
     COOPR_UI_SSL_PORT = parseInt(process.env.COOPR_UI_SSL_PORT || 8443, 10),
-    COOPR_UI_KEY_FILE = process.env.COOPR_UI_KEY_FILE || 'cert/server.key',
-    COOPR_UI_CERT_FILE = process.env.COOPR_UI_CERT_FILE || 'cert/server.crt',
+    COOPR_UI_KEY_FILE = process.env.COOPR_UI_KEY_FILE || COOPR_HOME + 'cert/server.key',
+    COOPR_UI_CERT_FILE = process.env.COOPR_UI_CERT_FILE || COOPR_HOME + 'cert/server.crt',
     COOPR_CORS_PORT = parseInt(process.env.COOPR_CORS_PORT || 8081, 10),
     COOPR_SERVER_URI = process.env.COOPR_SERVER_URI || 'http://127.0.0.1:55054',
 
@@ -108,19 +109,15 @@ app.get('/robots.txt', [
 app.all('*', [
     httpIndexLogger,
     function (req, res) {
-        if (COOPR_SSL && sslStarted && !req.secure) {
-            res.redirect(['https://', req.hostname,
-                ':', COOPR_UI_SSL_PORT, req.originalUrl
-            ].join(''));
-        } else {
-            res.sendFile(__dirname + '/dist/index.html');
-        }
+        res.sendFile(__dirname + '/dist/index.html');
     }
 ]);
 
-httpServer.listen(COOPR_UI_PORT, null, null, function () {
-    console.info(httpLabel + ' listening on port %s', COOPR_UI_PORT);
-});
+if (!COOPR_SSL) {
+    httpServer.listen(COOPR_UI_PORT, null, null, function () {
+        console.info(httpLabel + ' listening on port %s', COOPR_UI_PORT);
+    });
+}
 
 if (COOPR_SSL) {
     httpsServer.listen(COOPR_UI_SSL_PORT, null, null, function () {

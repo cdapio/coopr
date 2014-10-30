@@ -128,17 +128,6 @@ site.app.use(express.cookieParser());
 site.app.use(express.bodyParser());
 site.app.use('/static', express.static(__dirname + '/' + CLIENT_DIR));
 
-site.app.use(function (req, res, next) {
-    if (SSL && !req.secure) {
-        res.redirect(['https://', req.hostname || req.host,
-            ':', site.SSLPORT, req.originalUrl
-        ].join(''));
-        res.end();
-    } else {
-        next();
-    }
-});
-
 /**
  * Parses through each request and sets cookie.
  */
@@ -1567,12 +1556,12 @@ site.app.use(function (req, res, next) {
 /*
  * Start express server on specified port and show message if successful.
  */
-/*site.app.listen(site.PORT);
- site.logger.info('Server started on port ', site.PORT);*/
-site.httpServer = http.createServer(site.app);
-site.httpServer.listen(site.PORT, null, null, function () {
-    site.logger.info('Server started on port ', site.PORT);
-});
+if (!SSL) {
+    site.httpServer = http.createServer(site.app);
+    site.httpServer.listen(site.PORT, null, null, function () {
+        site.logger.info('Server started on port ', site.PORT);
+    });
+}
 
 if (SSL) {
     try {
