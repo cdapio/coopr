@@ -35,7 +35,7 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusMa
     tabs
    */
   $scope.tabs = ['General','Compatibility','Defaults','Constraints'].map(function (t){
-    return {title:t, partial:'/assets/features/templates/form-tabs/'+t.toLowerCase()'.html'};
+    return {title:t, partial:'/assets/features/templates/form-tabs/'+t.toLowerCase()+'.html'};
   });
 
 
