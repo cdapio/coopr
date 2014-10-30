@@ -34,12 +34,10 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusMa
   /*
     tabs
    */
-  $scope.tabs = [
-    {title: 'General',        partial: 'form-tabs/general.html'},
-    {title: 'Compatibility',  partial: 'form-tabs/compatibility.html'},
-    {title: 'Defaults',       partial: 'form-tabs/defaults.html'},
-    {title: 'Constraints',    partial: 'form-tabs/constraints.html'},
-  ];
+  $scope.tabs = ['General','Compatibility','Defaults','Constraints'].map(function (t){
+    return {title:t, partial:'/assets/features/templates/form-tabs/'+t.toLowerCase()'.html'};
+  });
+
 
   $scope.onTabLoaded = function (tabIndex) {
     if(tabIndex === 0 && !$scope.editing) {
