@@ -1,8 +1,8 @@
 angular.module(PKG.name)
-  .config(function ($stateProvider, MYAUTH_ROLE, myHelpers) {
+  .config(function ($stateProvider, MYAUTH_ROLE, MYHELPERS) {
 
-    var crud = myHelpers.crud.mkState,
-        abstractSubnav = myHelpers.crud.abstractSubnav;
+    var crud = MYHELPERS.crud.mkState,
+        abstractSubnav = MYHELPERS.crud.abstractSubnav;
 
     /**
      * State Configurations

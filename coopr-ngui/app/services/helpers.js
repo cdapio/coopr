@@ -1,7 +1,7 @@
 /**
  * various utility functions
  */
-angular.module(PKG.name+'.services').constant('myHelpers', {
+angular.module(PKG.name+'.services').constant('MYHELPERS', {
 
   /**
    * Parses milliseconds and converts to days, hours and minutes.

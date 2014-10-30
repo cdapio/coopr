@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.controllers').controller('TemplateFormCtrl', 
-function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusManager) {
+function ($scope, $state, $window, myApi, $q, MYHELPERS, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -72,10 +72,10 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusMa
 
   promise.then(function (model) {
     angular.forEach(['initial', 'max', 'step'], function (one) {
-      $scope.leaseDuration[one] = myHelpers.parseMilliseconds( model.administration.leaseduration[one] || 0 );
+      $scope.leaseDuration[one] = MYHELPERS.parseMilliseconds( model.administration.leaseduration[one] || 0 );
 
       $scope.$watchCollection('leaseDuration.'+one, function (newVal) {
-        model.administration.leaseduration[one] = myHelpers.concatMilliseconds(newVal);
+        model.administration.leaseduration[one] = MYHELPERS.concatMilliseconds(newVal);
       });
     });
   });
