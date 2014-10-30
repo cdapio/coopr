@@ -153,7 +153,7 @@ gulp.task('tpl', function() {
       })),
 
     gulp.src([
-      './app/partials/home.html'
+      './app/features/_home/home.html'
     ])
       .pipe(plug.angularTemplatecache({
         module: pkg.name,

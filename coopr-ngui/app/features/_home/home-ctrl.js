@@ -46,7 +46,7 @@ function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
     $modal({
       scope: modalScope,
       title: 'JSON export', 
-      contentTemplate: '/assets/partials/export.html', 
+      contentTemplate: '/assets/features/_home/export.html', 
       placement: 'center', 
       show: true
     });

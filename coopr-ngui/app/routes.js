@@ -21,7 +21,7 @@ angular.module(PKG.name)
 
       .state('home', {
         url: '/',
-        templateUrl: '/assets/partials/home.html',
+        templateUrl: '/assets/features/_home/home.html',
         controller: 'HomeCtrl'
       })
 
@@ -31,7 +31,7 @@ angular.module(PKG.name)
 
       .state('login', {
         url: '/login',
-        templateUrl: '/assets/partials/login.html',
+        templateUrl: '/assets/features/login/login.html',
         controller: 'LoginCtrl'
       })
 
