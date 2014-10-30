@@ -152,7 +152,7 @@ angular.module(PKG.name)
       return {
         name: stateName,
         abstract: true,
-        templateUrl: '/assets/partials/subnav.html',
+        templateUrl: '/assets/features/_crud/subnav.html',
         controller: 'SubnavCtrl',
         url: '/' + stateName,
         data: angular.extend({
@@ -193,7 +193,7 @@ angular.module(PKG.name)
           tpl += action + '.html';
       }
       if(!ctrl) {
-        tpl = '/assets/partials/json.html';
+        tpl = '/assets/features/_crud/json.html';
         ctrl = 'Crud' + action.substr(0,1).toUpperCase() + action.substr(1) + 'Ctrl';
       }
       return {
