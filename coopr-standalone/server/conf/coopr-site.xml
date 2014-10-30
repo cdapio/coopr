@@ -2,12 +2,12 @@
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <!-- Copyright © 2012-2014 Cask Data, Inc. All Rights Reserved.  -->
 <configuration>
-    <property>
-        <name>server.local.data.dir</name>
-        <value>COOPR_DATA_DIR</value>
-    </property>
-    <property>
-        <name>server.plugin.store.localfilestore.data.dir</name>
-        <value>COOPR_DATA_DIR/plugins/resources</value>
-    </property>
+  <property>
+    <name>server.local.data.dir</name>
+    <value>COOPR_DATA_DIR</value>
+  </property>
+  <property>
+    <name>server.plugin.store.localfilestore.data.dir</name>
+    <value>COOPR_DATA_DIR/plugins/resources</value>
+  </property>
 </configuration>

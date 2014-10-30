@@ -14,7 +14,7 @@ var pkg = require('./package.json'),
     serveFavicon = require('serve-favicon'),
     corsAnywhere = require('cors-anywhere'),
 
-    COOPR_SSL = ('true' == process.env.COOPR_SSL) || false;
+    COOPR_SSL = ('true' == process.env.COOPR_SSL);
     COOPR_UI_PORT = parseInt(process.env.COOPR_UI_PORT || 8080, 10),
     COOPR_UI_SSL_PORT = parseInt(process.env.COOPR_UI_SSL_PORT || 8443, 10),
     COOPR_UI_KEY_FILE = process.env.COOPR_UI_KEY_FILE || 'cert/server.key',

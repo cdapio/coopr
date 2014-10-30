@@ -135,41 +135,34 @@ fi
 
 # $1 - Property name to read
 # $2 - Config file name to read from
-# $3 - variable for return value
 #
-# Usage: read_property property_name /path/to/config/file variable_to_store_value
+# Returns: value of a property as a string
+#
+# Usage: variable_to_store_value=`read_property property_name /path/to/config/file`
 #
 read_property () {
-    property_re='(?<=<name>'$1'</name>)[\s\S]+?(?=</property>)'
-    property_value_re='(?<=<value>)[\s\S]+?(?=</value>)'
+  property_re='(?<=<name>'$1'</name>)[\s\S]+?(?=</property>)'
+  property_value_re='(?<=<value>)[\s\S]+?(?=</value>)'
 
-    echo `grep -Pzoe $property_re $2 | grep -Pzoe $property_value_re`
+  echo `grep -Pzoe $property_re $2 | grep -Pzoe $property_value_re`
 }
 
 # Setup coopr configuration
 COOPR_PROTOCOL=http
-COOPR_SSL=`read_property server.ssl.enabled ${COOPR_SERVER_CONF}coopr-site.xml`
-if [ -z $COOPR_SSL ]; then
-    COOPR_SSL="false"
-fi
-export COOPR_SSL
-if [ $COOPR_SSL = "true" ]; then
-    COOPR_PROTOCOL=https
+export COOPR_SSL=`read_property server.ssl.enabled ${COOPR_SERVER_CONF}/coopr-site.xml`
+if [ -n $COOPR_SSL ] && [ $COOPR_SSL = "true" ]; then
+  COOPR_PROTOCOL=https
 
-    COOPR_NODEJS_SSL_PATH=`read_property server.nodejs.ssl.path ${COOPR_SERVER_CONF}coopr-security.xml`
-    COOPR_NODEJS_SSL_KEY=`read_property server.nodejs.ssl.key ${COOPR_SERVER_CONF}coopr-security.xml`
-    export COOPR_NODEJS_SSL_KEY=$COOPR_NODEJS_SSL_PATH"/"$COOPR_NODEJS_SSL_KEY
-    COOPR_NODEJS_SSL_CRT=`read_property server.nodejs.ssl.crt ${COOPR_SERVER_CONF}coopr-security.xml`
-    export COOPR_NODEJS_SSL_CRT=$COOPR_NODEJS_SSL_PATH"/"$COOPR_NODEJS_SSL_CRT
+  COOPR_NODEJS_SSL_PATH=`read_property server.nodejs.ssl.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+  COOPR_NODEJS_SSL_KEY_FILENAME=`read_property server.nodejs.ssl.key ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODEJS_SSL_KEY=$COOPR_NODEJS_SSL_PATH/$COOPR_NODEJS_SSL_KEY_FILENAME
+  COOPR_NODEJS_SSL_CRT_FILENAME=`read_property server.nodejs.ssl.crt ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODEJS_SSL_CRT=$COOPR_NODEJS_SSL_PATH/$COOPR_NODEJS_SSL_CRT_FILENAME
 fi
 
 export COOPR_SERVER_URI=${COOPR_PROTOCOL}://localhost:55054
-
-read_property server.ssl.trust.cert.path ${COOPR_SERVER_CONF}coopr-security.xml TRUST_CERT_PATH
-export TRUST_CERT_PATH
-
-read_property server.ssl.trust.cert.password ${COOPR_SERVER_CONF}coopr-security.xml TRUST_CERT_PASSWORD
-export TRUST_CERT_PASSWORD
+export TRUST_CERT_PATH=`read_property server.ssl.trust.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+export TRUST_CERT_PASSWORD=`read_property server.ssl.trust.cert.password ${COOPR_SERVER_CONF}/coopr-security.xml`
 
 if [ -n TRUST_CERT_PATH ] && [ -n TRUST_CERT_PASSWORD ]; then
   export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
@@ -180,23 +173,21 @@ if [ ${COOPR_PROTOCOL} = "https" ]; then
   export COOPR_REJECT_UNAUTH=false
 fi
 
-read_property server.ssl.trust.keystore.path ${COOPR_SERVER_CONF}coopr-security.xml keystore_path
-read_property server.ssl.trust.keystore.password ${COOPR_SERVER_CONF}coopr-security.xml keystore_password
+export keystore_path=`read_property server.ssl.trust.keystore.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+export keystore_password=`read_property server.ssl.trust.keystore.password ${COOPR_SERVER_CONF}/coopr-security.xml`
 
 COOPR_NODE_TLS_ENABLED="false"
-if [ ! -z keystore_path ] && [ ! -z keystore_password ]; then
-    COOPR_NODE_TLS_ENABLED="true"
+if [ -n keystore_path ] && [ -n keystore_password ]; then
+  COOPR_NODE_TLS_ENABLED="true"
 
-    read_property server.nodejs.tls.cert.path ${COOPR_SERVER_CONF}coopr-security.xml nodejs_tls_path
-    read_property server.nodejs.tls.key ${COOPR_SERVER_CONF}coopr-security.xml nodejs_tls_key
-    read_property server.nodejs.tls.crt ${COOPR_SERVER_CONF}coopr-security.xml nodejs_tls_crt
-    read_property server.nodejs.tls.ca ${COOPR_SERVER_CONF}coopr-security.xml nodejs_tls_ca
-    read_property server.nodejs.tls.password ${COOPR_SERVER_CONF}coopr-security.xml COOPR_NODE_TLS_PASSWORD
-
-    export COOPR_NODE_TLS_PASSWORD
-    export COOPR_NODE_TLS_KEY=$nodejs_tls_path"/"$nodejs_tls_key
-    export COOPR_NODE_TLS_CRT=$nodejs_tls_path"/"$nodejs_tls_crt
-    export COOPR_NODE_TLS_CA=$nodejs_tls_path"/"$nodejs_tls_ca
+  nodejs_tls_path=`read_property server.nodejs.tls.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+  nodejs_tls_key=`read_property server.nodejs.tls.key ${COOPR_SERVER_CONF}/coopr-security.xml`
+  nodejs_tls_crt=`read_property server.nodejs.tls.crt ${COOPR_SERVER_CONF}/coopr-security.xml`
+  nodejs_tls_ca=`read_property server.nodejs.tls.ca ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODE_TLS_PASSWORD=`read_property server.nodejs.tls.password ${COOPR_SERVER_CONF}coopr-security.xml`
+  export COOPR_NODE_TLS_KEY=$nodejs_tls_path/$nodejs_tls_key
+  export COOPR_NODE_TLS_CRT=$nodejs_tls_path/$nodejs_tls_crt
+  export COOPR_NODE_TLS_CA=$nodejs_tls_path/$nodejs_tls_ca
 fi
 export COOPR_NODE_TLS_ENABLED
 
