@@ -172,8 +172,8 @@ gulp.task('tpl', function() {
   Markup
  */
 gulp.task('html:partials', function() {
-  return gulp.src('./app/{partials,features}/**/*.html')
-      .pipe(gulp.dest('./dist/assets'));
+  return gulp.src('./app/features/**/*.html')
+      .pipe(gulp.dest('./dist/assets/features'));
 });
 
 gulp.task('html:main', function() {
@@ -283,8 +283,8 @@ gulp.task('watch', ['build'], function() {
 
   gulp.watch(['./app/**/*.js', '!./app/**/*-test.js'], ['js:app']);
   gulp.watch('./app/**/*.{less,css}', ['css:app']);
-  gulp.watch(['./app/directives/**/*.html', './app/partials/home.html'], ['tpl']);
-  gulp.watch('./app/{partials,features}/**/*.html', ['html:partials']);
+  gulp.watch(['./app/directives/**/*.html', './app/features/_home/home.html'], ['tpl']);
+  gulp.watch('./app/features/**/*.html', ['html:partials']);
   gulp.watch('./app/img/**/*', ['img']);
 
 });
