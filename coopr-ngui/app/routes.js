@@ -174,7 +174,7 @@ angular.module(PKG.name)
      */
     function crud (name, action, ctrl, data) {
       var path = name.toLowerCase() + 's',
-          tpl = '/assets/partials/' + path + '/',
+          tpl = '/assets/features/' + path + '/',
           url = '';
       switch(action) {
         case 'create':
