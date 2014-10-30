@@ -1,7 +1,7 @@
 {
   "name": "fog",
   "description": "Multi-cloud fog-based provider (AWS, Google, Openstack, Rackspace, Joyent)",
-  "providertypes": [ "aws", "google", "joyent", "openstack", "rackspace" ],
+  "providertypes": [ "aws", "google", "joyent", "openstack", "rackspace", "digitalocean" ],
   "aws" : {
     "name": "aws",
     "classname": "FogProviderAWS",
@@ -441,6 +441,63 @@
             "label": "Key Name",
             "type": "text",
             "tip": "Your Rackspace SSH key name"
+          },
+          "ssh_key_resource": {
+            "label": "SSH Key Resource Name",
+            "type": "text",
+            "tip": "Name of the SSH private key resource uploaded to the server"
+          }
+        },
+        "required": [
+          []
+        ]
+      }
+    }
+  },
+  "digitalocean": {
+    "name": "digitalocean",
+    "classname": "FogProviderDigitalOcean",
+    "resourceTypes": {
+        "ssh_keys": {
+            "format": "file",
+            "permissions": "0400"
+        }
+    },
+    "parameters": {
+      "admin": {
+        "fields": {
+          "api_user": {
+            "label": "Client ID",
+            "type": "text",
+            "tip": "Your DigitalOcean ClientID"
+          },
+          "api_password": {
+            "label": "API key",
+            "type": "password",
+            "tip": "Your DigitalOcean API key"
+          },
+          "digitalocean_region": {
+            "label": "Region",
+            "type": "select",
+            "options": [ "sfo1", "nyc2", "ams2", "sgp1", "lon1", "nyc3", "ams3" ],
+            "default": "sfo1",
+            "override": true,
+            "tip": "DigitalOcean region"
+          }
+        },
+        "required": [
+          [
+            "api_user",
+            "api_password",
+            "digitalocean_region"
+          ]
+        ]
+      },
+      "user": {
+          "ssh_keypair": {
+            "label": "Key Name",
+            "type": "text",
+            "tip": "Your DigitalOcean SSH key name"
           },
           "ssh_key_resource": {
             "label": "SSH Key Resource Name",
