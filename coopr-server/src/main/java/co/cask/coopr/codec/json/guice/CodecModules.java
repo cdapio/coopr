@@ -114,7 +114,7 @@ public class CodecModules {
   }
 
   // get a gson builder with type adapters that serialize/deserialize current versions of objects.
-  private GsonBuilder createCurrentBuilder() {
+  protected GsonBuilder createCurrentBuilder() {
     return new GsonBuilder()
       .registerTypeAdapter(AddServicesRequest.class, new AddServicesRequestCodec())
       .registerTypeAdapter(Administration.class, new AdministrationCodec())

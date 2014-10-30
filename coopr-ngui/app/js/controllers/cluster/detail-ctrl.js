@@ -43,7 +43,7 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
     $scope.additionalServices = [];
 
     if(data.status === 'pending') {
-      timeoutPromise = $timeout(update, 1000);
+      timeoutPromise = $timeout(update, 10000);
     }
 
 
@@ -124,6 +124,17 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
   $scope.doActionsModal = doActionsModal;
 
 
+
+
+  $scope.doPauseDeploy = function() {
+    myApi.Cluster.pauseDeploy({id: $scope.model.id}).$promise.then(update);
+  };
+
+  $scope.doResumeDeploy = function() {
+    myApi.Cluster.resumeDeploy({id: $scope.model.id}).$promise.then(update);
+  };
+
+
   /* ----------------------------------------------------------------------- */
 
 
@@ -142,7 +153,7 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
 
     $modal({
       title: nodeId,
-      contentTemplate: '/partials/clusters/detail-node.html', 
+      contentTemplate: '/assets/partials/clusters/detail-node.html', 
       placement: 'center',
       scope: modalScope,
       show: true

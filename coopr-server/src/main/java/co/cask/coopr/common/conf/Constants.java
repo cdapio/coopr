@@ -36,6 +36,8 @@ public class Constants {
   public static final String SSL_KEYSTORE_PATH = "server.ssl.keystore.path";
   public static final String SSL_KEYPASSWORD = "server.ssl.keystore.password";
   public static final String SSL_KEYSTORE_PASSWORD = "server.ssl.cert.password";
+  public static final String SSL_TRUST_KEYSTORE_PATH = "server.ssl.trust.keystore.path";
+  public static final String SSL_TRUST_KEYPASSWORD = "server.ssl.trust.keystore.password";
 
   public static final String JDBC_DRIVER = "server.jdbc.driver";
   public static final String JDBC_CONNECTION_STRING = "server.jdbc.connection.string";

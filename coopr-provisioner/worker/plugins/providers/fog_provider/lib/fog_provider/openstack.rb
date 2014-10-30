@@ -23,8 +23,9 @@ class FogProviderOpenstack < Provider
 
   # plugin defined resources
   @ssh_key_dir = 'ssh_keys'
+  @user_data_dir = 'user_data'
   class << self
-    attr_accessor :ssh_key_dir
+    attr_accessor :ssh_key_dir, :user_data_dir
   end
 
   def create(inputmap)
@@ -48,6 +49,7 @@ class FogProviderOpenstack < Provider
         key_name: @ssh_keypair
       }
 
+      create_options.merge!(user_data: open(File.join(Dir.pwd, self.class.user_data_dir, @user_data_resource)) { |f| f.read }) if @user_data_resource
       create_options.merge!(nics: @network_ids.split(',').map { |nic| nic_id = { 'net_id' => nic.strip } }) if @network_ids
 
       server = connection.servers.create(create_options)

@@ -168,6 +168,10 @@ if [ -n TRUST_CERT_PATH ] && [ -n TRUST_CERT_PASSWORD ]; then
   export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
 fi
 
+if [ ! -z ${TRUST_CERT_PATH} ] && [ ! -z ${TRUST_CERT_PASSWORD} ]; then
+  export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
+fi
+
 if [ ${COOPR_PROTOCOL} = "https" ]; then
   export CURL_PARAMETER="--insecure"
   export COOPR_REJECT_UNAUTH=false
@@ -233,7 +237,7 @@ sync_default_data () {
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
     --connect-timeout 5 \
-    ${COOPR_SERVER_URI}/v2/plugins/sync
+    ${COOPR_SERVER_URI}/v2/plugins/sync ${CERT_PARAMETER}
 }
 
 request_superadmin_workers () {
@@ -245,12 +249,12 @@ request_superadmin_workers () {
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
     --connect-timeout 5 --data "{ \"tenant\":{\"workers\":${COOPR_NUM_WORKERS}, \"name\":\"superadmin\"} }" \
-    ${COOPR_SERVER_URI}/v2/tenants/superadmin
+    ${COOPR_SERVER_URI}/v2/tenants/superadmin ${CERT_PARAMETER}
 }
 
 wait_for_server () {
   RETRIES=0
-  until [[ $(curl ${CURL_PARAMETER} ${COOPR_SERVER_URI}/status 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
+  until [[ $(curl ${CURL_PARAMETER} ${COOPR_SERVER_URI}/status ${CERT_PARAMETER} 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
       sleep 2
       let "RETRIES++"
   done
@@ -266,7 +270,7 @@ wait_for_plugin_registration () {
     --output /dev/null --write-out "%{http_code}" \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
-    ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || ${RETRIES} -gt 60 ]]; do
+    ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo ${CERT_PARAMETER} 2> /dev/null) -eq 200 || ${RETRIES} -gt 60 ]]; do
     sleep 2
     let "RETRIES++"
   done

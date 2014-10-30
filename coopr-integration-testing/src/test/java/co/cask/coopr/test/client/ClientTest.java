@@ -35,6 +35,7 @@ import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.template.ClusterTemplate;
 import co.cask.coopr.store.cluster.ClusterStoreView;
 import co.cask.coopr.store.entity.EntityStoreView;
+import co.cask.coopr.store.provisioner.PluginResourceTypeView;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -110,8 +111,28 @@ public class ClientTest extends BaseTest {
   public static void initData() throws IOException, IllegalAccessException {
     EntityStoreView adminView = entityStoreService.getView(ADMIN_ACCOUNT);
     EntityStoreView superadminView = entityStoreService.getView(SUPERADMIN_ACCOUNT);
+    // write provider types
     superadminView.writeProviderType(Entities.ProviderTypeExample.JOYENT);
     superadminView.writeProviderType(Entities.ProviderTypeExample.RACKSPACE);
+    // write automator types
+    superadminView.writeAutomatorType(Entities.AutomatorTypeExample.CHEF);
+    superadminView.writeAutomatorType(Entities.AutomatorTypeExample.PUPPET);
+    superadminView.writeAutomatorType(Entities.AutomatorTypeExample.SHELL);
+    //write resource types
+    PluginResourceTypeView cookbooksResourceTypeView =
+      metaStoreService.getResourceTypeView(SUPERADMIN_ACCOUNT, ClientTestEntities.COOKBOOKS_RESOURCE_TYPE);
+    cookbooksResourceTypeView.add(ClientTestEntities.HADOOP_RESOURCE_META_V1);
+    cookbooksResourceTypeView.add(ClientTestEntities.HADOOP_RESOURCE_META_V2);
+    cookbooksResourceTypeView.add(ClientTestEntities.KAFKA_RESOURCE_META);
+    cookbooksResourceTypeView.add(ClientTestEntities.MYSQL_RESOURCE_META);
+
+    PluginResourceTypeView keysResourceTypeView =
+      metaStoreService.getResourceTypeView(SUPERADMIN_ACCOUNT, ClientTestEntities.KEYS_RESOURCE_TYPE);
+    keysResourceTypeView.add(ClientTestEntities.DEV_KEY_RESOURCE_META_V1);
+    keysResourceTypeView.add(ClientTestEntities.DEV_KEY_RESOURCE_META_V2);
+    keysResourceTypeView.add(ClientTestEntities.VIEW_KEY_RESOURCE_META);
+    keysResourceTypeView.add(ClientTestEntities.RESEARCH_KEY_RESOURCE_META);
+
     // write providers
     adminView.writeProvider(Entities.ProviderExample.JOYENT);
     adminView.writeProvider(Entities.ProviderExample.RACKSPACE);

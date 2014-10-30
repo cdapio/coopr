@@ -299,6 +299,10 @@
         "ssh_keys": {
             "format": "file",
             "permissions": "0400"
+        },
+        "user_data": {
+            "format": "file",
+            "permissions": "0755"
         }
     },
     "parameters": { 
@@ -374,6 +378,11 @@
             "label": "Network IDs",
             "type": "text",
             "tip": "Comma separated list of the UUID(s) of the network(s) for the server to attach"
+          },
+          "user_data_resource": {
+            "label": "User Data Resource Name",
+            "type": "text",
+            "tip": "Name of the User Data file resource uploaded to the server"
           }
         },
         "required": [

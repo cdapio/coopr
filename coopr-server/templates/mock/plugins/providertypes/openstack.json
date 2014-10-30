@@ -69,6 +69,11 @@
           "label": "Security Group",
           "tip": "Openstack security groups (comma separated)",
           "type": "text"
+        },
+        "user_data_resource": {
+          "label": "User Data Resource Name",
+          "type": "text",
+          "tip": "Name of the User Data file resource uploaded to the server"
         }
       },
       "required": [
@@ -80,6 +85,10 @@
     "ssh_keys": {
       "format": "file",
       "permissions": "0400"
+    },
+    "user_data": {
+      "format": "file",
+      "permissions": "0755"
     }
   }
 }

@@ -21,9 +21,9 @@ import co.cask.common.cli.Command;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.http.request.ClusterOperationRequest;
 import co.cask.coopr.shell.util.CliUtil;
+import com.google.inject.Inject;
 
 import java.io.PrintStream;
-import com.google.inject.Inject;
 
 import static co.cask.coopr.shell.util.Constants.CLUSTER_ID_KEY;
 import static co.cask.coopr.shell.util.Constants.PROVIDER_FIELDS_KEY;

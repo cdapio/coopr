@@ -29,6 +29,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -72,8 +73,23 @@ public class ClusterDetailsCodec extends AbstractCodec<ClusterDetails> {
     Set<Node> nodes = context.deserialize(jsonObject.get(NODES_KEY), NODES_TYPE);
     List<Link> links = context.deserialize(jsonObject.get(LINKS_KEY), LINKS_TYPE);
     ClusterJobProgress progress = context.deserialize(jsonObject.get(PROGRESS_JOB_KEY), ClusterJobProgress.class);
-    String msg = context.<String>deserialize(jsonObject.get(MESSAGE_KEY), String.class);
+    String msg = context.deserialize(jsonObject.get(MESSAGE_KEY), String.class);
+    cluster.setNodes(getNodeIds(nodes));
 
     return new ClusterDetails(cluster, links, nodes, progress, msg);
+  }
+
+  /**
+   * Retrieves {@link Set} of nodes ids.
+   *
+   * @param nodes the nodes
+   * @return the {@link Set} of nodes ids
+   */
+  private Set<String> getNodeIds(Set<Node> nodes) {
+    Set<String> nodeIds = new HashSet<String>();
+    for (Node node : nodes) {
+      nodeIds.add(node.getId());
+    }
+    return nodeIds;
   }
 }
