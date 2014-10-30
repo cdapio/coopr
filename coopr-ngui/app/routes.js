@@ -21,17 +21,17 @@ angular.module(PKG.name)
 
       .state('home', {
         url: '/',
-        templateUrl: '/assets/partials/home.html',
+        templateUrl: '/assets/features/_home/home.html',
         controller: 'HomeCtrl'
       })
 
       .state('404', {
-        templateUrl: '/assets/partials/404.html'
+        templateUrl: '/assets/features/_home/404.html'
       })
 
       .state('login', {
         url: '/login',
-        templateUrl: '/assets/partials/login.html',
+        templateUrl: '/assets/features/login/login.html',
         controller: 'LoginCtrl'
       })
 
@@ -152,7 +152,7 @@ angular.module(PKG.name)
       return {
         name: stateName,
         abstract: true,
-        templateUrl: '/assets/partials/subnav.html',
+        templateUrl: '/assets/features/_crud/subnav.html',
         controller: 'SubnavCtrl',
         url: '/' + stateName,
         data: angular.extend({
@@ -174,7 +174,7 @@ angular.module(PKG.name)
      */
     function crud (name, action, ctrl, data) {
       var path = name.toLowerCase() + 's',
-          tpl = '/assets/partials/' + path + '/',
+          tpl = '/assets/features/' + path + '/',
           url = '';
       switch(action) {
         case 'create':
@@ -193,7 +193,7 @@ angular.module(PKG.name)
           tpl += action + '.html';
       }
       if(!ctrl) {
-        tpl = '/assets/partials/json.html';
+        tpl = '/assets/features/_crud/json.html';
         ctrl = 'Crud' + action.substr(0,1).toUpperCase() + action.substr(1) + 'Ctrl';
       }
       return {

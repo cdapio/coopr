@@ -47,10 +47,10 @@ gulp.task('fonts', function() {
  */
 gulp.task('css:app', function() {
   return gulp.src([
-      './app/js/directives/**/*.{less,css}',
+      './app/directives/**/*.{less,css}',
       './app/css/themes/*.less',
       './app/css/common.less',
-      './app/css/states.less'
+      './app/features/**/*.{less,css}'
     ])
     .pipe(plumber())
     .pipe(plug.if('*.less', plug.less()))
@@ -146,19 +146,19 @@ gulp.task('tpl', function() {
   return merge(
 
     gulp.src([
-      './app/js/directives/**/*.html'
+      './app/directives/**/*.html'
     ])
       .pipe(plug.angularTemplatecache({
         module: pkg.name + '.directives'
       })),
 
     gulp.src([
-      './app/partials/home.html'
+      './app/features/_home/home.html'
     ])
       .pipe(plug.angularTemplatecache({
         module: pkg.name,
         base: __dirname + '/app',
-        root: '/'
+        root: '/assets/'
       }))
 
   )
@@ -172,8 +172,8 @@ gulp.task('tpl', function() {
   Markup
  */
 gulp.task('html:partials', function() {
-  return gulp.src('./app/partials/**/*.html')
-      .pipe(gulp.dest('./dist/assets/partials'));
+  return gulp.src('./app/features/**/*.html')
+      .pipe(gulp.dest('./dist/assets/features'));
 });
 
 gulp.task('html:main', function() {
@@ -235,7 +235,7 @@ gulp.task('minify', ['js:minify', 'css:minify']);
  */
 
 gulp.task('rev:manifest', ['minify', 'tpl'], function() {
-  return gulp.src(['./dist/assets/bundle/{app,lib,tpl}.*'])
+  return gulp.src(['./dist/assets/bundle/*'])
     .pipe(plug.rev())
     .pipe(plug.size({showFiles:true, gzip:true, total:true}))
     .pipe(gulp.dest('./dist/assets/bundle'))  // write rev'd assets to build dir
@@ -247,7 +247,7 @@ gulp.task('rev:manifest', ['minify', 'tpl'], function() {
 gulp.task('rev:replace', ['html:main', 'rev:manifest'], function() {
   var rev = require('./dist/assets/bundle/manifest.json'),
       out = gulp.src('./dist/*.html'),
-      p = '/bundle/';
+      p = '/assets/bundle/';
   for (var f in rev) {
     out = out.pipe(plug.replace(p+f, p+rev[f]));
   };
@@ -283,8 +283,8 @@ gulp.task('watch', ['build'], function() {
 
   gulp.watch(['./app/**/*.js', '!./app/**/*-test.js'], ['js:app']);
   gulp.watch('./app/**/*.{less,css}', ['css:app']);
-  gulp.watch(['./app/js/directives/**/*.html', './app/partials/home.html'], ['tpl']);
-  gulp.watch('./app/partials/**/*.html', ['html:partials']);
+  gulp.watch(['./app/directives/**/*.html', './app/features/_home/home.html'], ['tpl']);
+  gulp.watch('./app/features/**/*.html', ['html:partials']);
   gulp.watch('./app/img/**/*', ['img']);
 
 });
