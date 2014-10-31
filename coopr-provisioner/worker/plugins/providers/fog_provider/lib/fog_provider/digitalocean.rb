@@ -38,6 +38,18 @@ class FogProviderDigitalOcean < Provider
         instance_variable_set('@' + k, v)
       end
 
+      region =
+        case @digitalocean_region
+        when 'nyc1' then 1
+        when 'ams1' then 2
+        when 'sfo1' then 3
+        when 'nyc2' then 4
+        when 'ams2' then 5
+        when 'sgp1' then 6
+        when 'lon1' then 7
+        when 'nyc3' then 8
+        when 'ams3' then 9
+        end
       # Create the server (droplet)
       log.debug "Creating #{hostname} on DigitalOcean using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
@@ -49,7 +61,6 @@ class FogProviderDigitalOcean < Provider
           region_id: region,
           key_name: @ssh_keypair
         )
-        server.persisted? || server.save
       end
 
       # Process results
@@ -85,7 +96,7 @@ class FogProviderDigitalOcean < Provider
       server = connection.servers.get(providerid)
 
       # Wait until the server is ready
-      fail "Server #{server.name} is in ERROR state" if server.state == 'ERROR'
+      fail "Server #{server.name} is in ERROR state" if server.state.downcase == 'error'
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
