@@ -1,4 +1,4 @@
-angular.module(PKG.name+'.controllers').controller('HardwareFormCtrl',
+angular.module(PKG.name+'.features').controller('HardwareFormCtrl',
 function ($scope, $state, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 

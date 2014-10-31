@@ -1,4 +1,4 @@
-angular.module(PKG.name)
+angular.module(PKG.name+'.features')
   .config(function ($stateProvider, $urlRouterProvider) {
 
     /**

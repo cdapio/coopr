@@ -3,7 +3,7 @@
  * handles both "edit" and "create" views
  */
 
-angular.module(PKG.name+'.controllers').controller('TemplateFormCtrl', 
+angular.module(PKG.name+'.features').controller('TemplateFormCtrl', 
 function ($scope, $state, $window, myApi, $q, MYHELPERS, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 

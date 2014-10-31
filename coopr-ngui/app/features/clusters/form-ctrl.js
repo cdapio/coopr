@@ -3,7 +3,7 @@
  * handles both "reconfigure" and "create" views
  */
 
-angular.module(PKG.name+'.controllers').controller('ClusterFormCtrl', 
+angular.module(PKG.name+'.features').controller('ClusterFormCtrl', 
 function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHELPERS) {
   CrudFormBase.apply($scope);
 
