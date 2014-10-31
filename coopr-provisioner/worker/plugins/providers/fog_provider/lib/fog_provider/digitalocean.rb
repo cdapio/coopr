@@ -18,18 +18,6 @@
 
 require_relative 'utils'
 
-##############################
-# digital ocean cloud terms
-# server = droplet
-# flavors = sizes
-# everything else is common
-##############################
-# TO CONNECT TO API:
-# provider name (DigitalOcean)
-# client id
-# API key
-##############################
-
 class FogProviderDigitalOcean < Provider
   include FogProvider
 
@@ -55,9 +43,10 @@ class FogProviderDigitalOcean < Provider
       log.debug 'Invoking server create'
       begin
         server = connection.servers.create(
-          flavor_id: flavor,
-          image_id: image,
           name: hostname,
+          image_id: image,
+          flavor_id: flavor,
+          region_id: region,
           key_name: @ssh_keypair
         )
         server.persisted? || server.save
@@ -100,7 +89,15 @@ class FogProviderDigitalOcean < Provider
       log.debug "waiting for server to come up: #{providerid}"
       server.wait_for(600) { ready? }
 
-      bootstrap_ip = ip_address(server, 'public')
+      bootstrap_ip =
+        if server.public_ip_address
+          server.public_ip_address
+        elsif server.private_ip_address
+          server.private_ip_address
+        else
+          # can we return nil here or is that automatic?
+        end
+
       if bootstrap_ip.nil?
         log.error 'No IP address available for bootstrapping.'
         fail 'No IP address available for bootstrapping.'
@@ -177,8 +174,7 @@ class FogProviderDigitalOcean < Provider
     end
   end
 
-  # Shared definitions (borrowed from knife-digitalocean gem, Apache 2.0 license)
-  # ***** Need to confirm these in the digitalocean knife plugin
+  # Shared definitions (borrowed from knife-digital_ocean gem, Apache 2.0 license)
 
   def connection
     # Create connection
@@ -187,42 +183,9 @@ class FogProviderDigitalOcean < Provider
       connection = Fog::Compute.new(
         provider: 'DigitalOcean',
         digitalocean_client_id: @api_user,
-        digitalocean_api_key: @api_password,
-        digital_ocean_region: @digitalocean_region,
-        digital_ocean_auth_url: auth_endpoint
+        digitalocean_api_key: @api_password
       )
     end
     # rubocop:enable UselessAssignment
   end
-
-  def auth_endpoint
-    url = @digitalocean_auth_url if @digitalocean_auth_url
-    return url if url
-    ### the following will need to be fixed
-    (@digitalocean_region == 'lon') ? ::Fog::DigitalOcean::UK_AUTH_ENDPOINT : ::Fog::DigitalOcean::US_AUTH_ENDPOINT
-  end
-
-  def ip_address(server, network = 'public')
-    if network == 'public' && v2_access_ip(server) != ''
-      v2_access_ip(server)
-    else
-      v2_ip_address(server, network)
-    end
-  end
-
-  # V1 or V2?
-  def v2_ip_address(server, network)
-    network_ips = server.addresses[network]
-    extract_ipv4_address(network_ips) if network_ips
-  end
-
-  def v2_access_ip(server)
-    server.access_ipv4_address.nil? ? '' : server.access_ipv4_address
-  end
-
-  def extract_ipv4_address(ip_addresses)
-    address = ip_addresses.select { |ip| ip['version'] == 4 }.first
-    address ? address['addr'] : ''
-  end 
-
 end
