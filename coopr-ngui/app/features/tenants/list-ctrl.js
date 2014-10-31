@@ -2,7 +2,7 @@
  * TenantListCtrl
  */
 
-angular.module(PKG.name+'.controllers').controller('TenantListCtrl', 
+angular.module(PKG.name+'.features').controller('TenantListCtrl',
 function ($scope, $interval, $q, myApi, CrudListBase) {
   CrudListBase.apply($scope);
 

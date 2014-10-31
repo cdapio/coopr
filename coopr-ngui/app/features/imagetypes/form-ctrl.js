@@ -1,4 +1,4 @@
-angular.module(PKG.name+'.controllers').controller('ImageFormCtrl',
+angular.module(PKG.name+'.features').controller('ImageFormCtrl',
 function ($scope, $state, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 

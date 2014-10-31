@@ -2,7 +2,7 @@
  * ClusterListCtrl
  */
 
-angular.module(PKG.name+'.controllers').controller('ClusterListCtrl', 
+angular.module(PKG.name+'.features').controller('ClusterListCtrl', 
 function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
 
   CrudListBase.apply($scope);

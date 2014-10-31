@@ -13,7 +13,7 @@ angular
       PKG.name+'.services'
     ]).name,
 
-    angular.module(PKG.name+'.controllers', [
+    angular.module(PKG.name+'.features', [
       PKG.name+'.services',
       PKG.name+'.filters',
       'mgcrea.ngStrap.alert',
@@ -51,6 +51,9 @@ angular
   })
 
 
+  .config(function ($locationProvider) {
+    $locationProvider.html5Mode(true);
+  })
 
 
   .config(function ($httpProvider) {
@@ -110,8 +113,8 @@ angular
   .run(function ($rootScope, $alert, MYAPI_EVENT) {
     $rootScope.$on(MYAPI_EVENT.error, function (event, rejection) {
       $alert({
-        title: 'API error '+rejection.status, 
-        content: rejection.data || 'could not connect to the server', 
+        title: 'API error '+rejection.status,
+        content: rejection.data || 'could not connect to the server',
         type: 'danger'
       });
     });
@@ -120,7 +123,7 @@ angular
 
   /**
    * BodyCtrl
-   * attached to the <body> tag, mostly responsible for 
+   * attached to the <body> tag, mostly responsible for
    *  setting the className based events from $state and myTheme
    */
   .controller('BodyCtrl', function ($scope, myTheme, MYTHEME_EVENT) {

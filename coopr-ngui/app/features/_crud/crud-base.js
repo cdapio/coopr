@@ -1,4 +1,4 @@
-var module = angular.module(PKG.name+'.controllers');
+var module = angular.module(PKG.name+'.features');
 
 
 

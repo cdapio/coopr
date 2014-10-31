@@ -2,7 +2,7 @@
  * SubnavCtrl
  */
 
-angular.module(PKG.name+'.controllers').controller('SubnavCtrl', 
+angular.module(PKG.name+'.features').controller('SubnavCtrl', 
 function ($scope, $state, myApi) {
 
   var path = $state.current.name.split('.')[0],

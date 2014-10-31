@@ -2,7 +2,7 @@
  * HomeCtrl
  */
 
-angular.module(PKG.name+'.controllers').controller('HomeCtrl', 
+angular.module(PKG.name+'.features').controller('HomeCtrl', 
 function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
 
   var filterFilter = $filter('filter');
