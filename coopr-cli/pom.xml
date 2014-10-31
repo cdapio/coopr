@@ -53,6 +53,60 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>copy-cli-scripts</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration combine.self="override">
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+              <delimiters>
+                <delimiter>@@</delimiter>
+              </delimiters>
+              <resources>
+                <resource>
+                  <directory>${project.parent.basedir}/coopr-cli/bin</directory>
+                  <targetPath>bin</targetPath>
+                  <includes>
+                    <include>coopr-cli.sh</include>
+                    <include>coopr-cli.bat</include>
+                  </includes>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <!-- Make CLI scripts executable -->
+          <execution>
+            <id>copy-cli-bash</id>
+            <phase>prepare-package</phase>
+            <configuration>
+              <target>
+                <chmod file="${project.build.directory}/bin/**" perm="755"/>
+                <!--<chmod file="${stage.opt.dir}/bin/cdap-cli.sh" perm="755"/>-->
+                <!--<chmod file="${stage.opt.dir}/bin/cdap-cli.bat" perm="755"/>-->
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>2.3</version>
         <configuration>

@@ -52,6 +52,10 @@
             <directory>${project.basedir}/server/conf</directory>
             <outputDirectory>/server/conf</outputDirectory>
         </fileSet>
+      <fileSet>
+        <directory>${project.basedir}/../coopr-cli/target/bin</directory>
+        <outputDirectory>/cli/bin</outputDirectory>
+      </fileSet>
     </fileSets>
     <files>
         <file>
@@ -66,5 +70,9 @@
             <source>${project.basedir}/../LICENSE</source>
             <outputDirectory>/</outputDirectory>
         </file>
+      <file>
+        <source>${project.basedir}/../coopr-cli/target/coopr-cli-${version}.jar</source>
+        <outputDirectory>/cli/lib</outputDirectory>
+      </file>
     </files>
 </assembly>
