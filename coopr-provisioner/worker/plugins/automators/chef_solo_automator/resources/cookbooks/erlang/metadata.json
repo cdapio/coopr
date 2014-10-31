@@ -1,6 +1,6 @@
 {
   "name": "erlang",
-  "version": "1.5.4",
+  "version": "1.5.6",
   "description": "Installs erlang, optionally install GUI tools.",
   "long_description": "",
   "maintainer": "Opscode, Inc.",
