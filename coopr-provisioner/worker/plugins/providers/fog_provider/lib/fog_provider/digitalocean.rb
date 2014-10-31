@@ -28,7 +28,7 @@ class FogProviderDigitalOcean < Provider
   end
 
   def create(inputmap)
-    flavor = inputmap['sizes']
+    flavor = inputmap['flavor']
     image = inputmap['image']
     hostname = inputmap['hostname']
     fields = inputmap['fields']
