@@ -64,7 +64,7 @@ class FogProviderDigitalOcean < Provider
           image_id: image,
           flavor_id: flavor,
           region_id: region,
-          ssh_key_ids: [ key_id ]
+          ssh_key_ids: [key_id]
         )
       end
 
