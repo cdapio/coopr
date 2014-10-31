@@ -32,11 +32,15 @@ class FogProviderDigitalOcean < Provider
     image = inputmap['image']
     hostname = inputmap['hostname']
     fields = inputmap['fields']
+
     begin
       # Our fields are fog symbols
       fields.each do |k, v|
         instance_variable_set('@' + k, v)
       end
+
+      # Get ssh key id
+      key_id = compute.ssh_keys.select { |k| k.name == @ssh_keypair }.first.id
 
       region =
         case @digitalocean_region
@@ -50,6 +54,7 @@ class FogProviderDigitalOcean < Provider
         when 'nyc3' then 8
         when 'ams3' then 9
         end
+
       # Create the server (droplet)
       log.debug "Creating #{hostname} on DigitalOcean using flavor: #{flavor}, image: #{image}"
       log.debug 'Invoking server create'
@@ -59,7 +64,7 @@ class FogProviderDigitalOcean < Provider
           image_id: image,
           flavor_id: flavor,
           region_id: region,
-          key_name: @ssh_keypair
+          ssh_key_ids: [ key_id ]
         )
       end
 
