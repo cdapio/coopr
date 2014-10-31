@@ -57,8 +57,8 @@ Use the plain-text data bag item:
 knife data bag from file sensu ssl.json
 ```
 
-Or, encrypted it with your data bag secret. See [Encrypt a Data
-Bag](http://docs.opscode.com/essentials_data_bags_encrypt.html) for
+Or, encrypt it with your data bag secret. See [Encrypt a Data
+Bag](https://docs.getchef.com/essentials_data_bags.html#encrypt-a-data-bag-item) for
 more information.
 
 ```
@@ -99,10 +99,6 @@ Enables and starts the Sensu client.
 ### sensu::api_service
 
 Enables and starts the Sensu API.
-
-### sensu::dashboard_service
-
-Enables and starts the Sensu dashboard.
 
 ## ATTRIBUTES
 
@@ -157,16 +153,6 @@ for Sensu to start/stop.
 `node.sensu.api.bind` - Sensu API bind address.
 
 `node.sensu.api.port` - Sensu API port.
-
-### Sensu Dashboard
-
-`node.sensu.dashboard.bind` - Sensu Dashboard bind address.
-
-`node.sensu.dashboard.port` - Sensu Dashboard port.
-
-`node.sensu.dashboard.user` - Sensu basic authentication username.
-
-`node.sensu.dashboard.password` - Sensu basic authentication password.
 
 ## LWRP'S
 
