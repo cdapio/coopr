@@ -156,7 +156,7 @@
           "api_user": {
             "label": "Client ID",
             "type": "text",
-            "tip": "Your DigitalOcean ClientID"
+            "tip": "Your DigitalOcean Client ID"
           },
           "api_password": {
             "label": "API key",
