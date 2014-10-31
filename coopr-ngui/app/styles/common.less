@@ -59,6 +59,11 @@ main.container {
   }
 }
 
+.modal-backdrop {
+  // see https://github.com/twbs/bootstrap/pull/14724
+  z-index: ( @zindex-modal - 1 );
+}
+
 fieldset.row {
   margin-bottom: 1px;
 }
