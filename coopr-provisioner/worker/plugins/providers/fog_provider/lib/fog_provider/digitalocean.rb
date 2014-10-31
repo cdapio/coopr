@@ -40,7 +40,7 @@ class FogProviderDigitalOcean < Provider
       end
 
       # Get ssh key id
-      key_id = compute.ssh_keys.select { |k| k.name == @ssh_keypair }.first.id
+      key_id = connection.ssh_keys.select { |k| k.name == @ssh_keypair }.first.id
 
       region =
         case @digitalocean_region
