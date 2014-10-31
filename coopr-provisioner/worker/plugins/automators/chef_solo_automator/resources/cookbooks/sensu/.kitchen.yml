@@ -4,11 +4,13 @@ driver:
   customize:
     memory: 512
 
+provisioner:
+  name: chef_zero
+
 platforms:
   - name: ubuntu-12.04
-  - name: ubuntu-13.10
-  - name: centos-5.9
-  - name: centos-6.4
+  - name: ubuntu-14.04
+  - name: centos-5.10
   - name: centos-6.5
   - name: windows-2012-r2
     driver:
@@ -42,3 +44,6 @@ suites:
       - recipe[sensu-test]
     excludes:
       - windows-2012-r2
+  - name: asset
+    run_list:
+      - recipe[sensu-test::asset]

@@ -2,7 +2,7 @@
  * LoginCtrl
  */
 
-angular.module(PKG.name+'.controllers').controller('LoginCtrl', 
+angular.module(PKG.name+'.features').controller('LoginCtrl', 
 function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT, myFocusManager) {
 
   $scope.credentials = myAuth.remembered();

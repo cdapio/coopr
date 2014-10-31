@@ -3,8 +3,8 @@
  * handles both "edit" and "create" views
  */
 
-angular.module(PKG.name+'.controllers').controller('TemplateFormCtrl', 
-function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusManager) {
+angular.module(PKG.name+'.features').controller('TemplateFormCtrl', 
+function ($scope, $state, $window, myApi, $q, MYHELPERS, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -34,12 +34,10 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusMa
   /*
     tabs
    */
-  $scope.tabs = [
-    {title: 'General',        partial: 'form-tabs/general.html'},
-    {title: 'Compatibility',  partial: 'form-tabs/compatibility.html'},
-    {title: 'Defaults',       partial: 'form-tabs/defaults.html'},
-    {title: 'Constraints',    partial: 'form-tabs/constraints.html'},
-  ];
+  $scope.tabs = ['General','Compatibility','Defaults','Constraints'].map(function (t){
+    return {title:t, partial:'/assets/features/templates/form-tabs/'+t.toLowerCase()+'.html'};
+  });
+
 
   $scope.onTabLoaded = function (tabIndex) {
     if(tabIndex === 0 && !$scope.editing) {
@@ -74,10 +72,10 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusMa
 
   promise.then(function (model) {
     angular.forEach(['initial', 'max', 'step'], function (one) {
-      $scope.leaseDuration[one] = myHelpers.parseMilliseconds( model.administration.leaseduration[one] || 0 );
+      $scope.leaseDuration[one] = MYHELPERS.parseMilliseconds( model.administration.leaseduration[one] || 0 );
 
       $scope.$watchCollection('leaseDuration.'+one, function (newVal) {
-        model.administration.leaseduration[one] = myHelpers.concatMilliseconds(newVal);
+        model.administration.leaseduration[one] = MYHELPERS.concatMilliseconds(newVal);
       });
     });
   });

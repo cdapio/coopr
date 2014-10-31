@@ -1,4 +1,4 @@
-angular.module(PKG.name+'.controllers').controller('ServiceFormCtrl',
+angular.module(PKG.name+'.features').controller('ServiceFormCtrl',
 function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 

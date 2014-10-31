@@ -3,7 +3,7 @@
  * handles both "edit" and "create" views
  */
 
-angular.module(PKG.name+'.controllers').controller('TenantFormCtrl', 
+angular.module(PKG.name+'.features').controller('TenantFormCtrl', 
 function ($scope, $state, $alert, $q, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
