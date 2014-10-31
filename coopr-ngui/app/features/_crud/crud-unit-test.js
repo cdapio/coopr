@@ -1,4 +1,4 @@
-'use strict';
+/*global jasmine, module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 
 describe('crud feature', function(){
   beforeEach(module('coopr-ngui.features'));
