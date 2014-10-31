@@ -482,7 +482,7 @@
             "options": [ "3", "4", "5", "6", "7", "8", "9" ],
             "default": "3",
             "override": true,
-            "tip": "DigitalOcean region"
+            "tip": "DigitalOcean Region: 3=sfo1 4=nyc2 5=ams2 6=sgp1 7=lon1 8=nyc3 9=ams3"
           }
         },
         "required": [
