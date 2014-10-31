@@ -170,17 +170,7 @@
             "default": "sfo1",
             "override": true,
             "tip": "DigitalOcean Region"
-          }
-        },
-        "required": [
-          [
-            "api_user",
-            "api_password",
-            "digitalocean_region"
-          ]
-        ]
-      },
-      "user": {
+          },
           "ssh_keypair": {
             "label": "Key Name",
             "type": "text",
@@ -193,6 +183,18 @@
           }
         },
         "required": [
+          [
+            "api_user",
+            "api_password",
+            "ssh_keypair",
+            "ssh_key_resource",
+            "digitalocean_region"
+          ]
+        ]
+      },
+      "user": {
+      },
+      "required": [
           []
         ]
       }
