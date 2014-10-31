@@ -3,6 +3,8 @@ console.time(PKG.name);
 angular
   .module(PKG.name, [
 
+    PKG.name+'.features',
+
     angular.module(PKG.name+'.services', [
       PKG.name+'.config',
       'ngResource',
@@ -11,14 +13,6 @@ angular
 
     angular.module(PKG.name+'.filters', [
       PKG.name+'.services'
-    ]).name,
-
-    angular.module(PKG.name+'.features', [
-      PKG.name+'.services',
-      PKG.name+'.filters',
-      'mgcrea.ngStrap.alert',
-      'angular-loading-bar',
-      'ui.router'
     ]).name,
 
     angular.module(PKG.name+'.directives', [

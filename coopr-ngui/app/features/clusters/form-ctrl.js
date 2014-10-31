@@ -3,7 +3,7 @@
  * handles both "reconfigure" and "create" views
  */
 
-angular.module(PKG.name+'.features').controller('ClusterFormCtrl', 
+angular.module(PKG.name+'.feature.clusters').controller('ClusterFormCtrl',
 function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHELPERS) {
   CrudFormBase.apply($scope);
 
@@ -48,7 +48,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
         Math.max(
           $scope.model.numMachines,
           chosen.constraints ? chosen.constraints.size.min : 1
-        ), 
+        ),
         chosen.constraints ? chosen.constraints.size.max : Infinity
       );
 
@@ -71,14 +71,14 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
 
       // set the template defaults on the model
       angular.extend($scope.model, chosen.defaults);
-    }); 
+    });
 
 
     $scope.$watch('model.provider', function (name) {
       $scope.chosenProvider = $scope.availableProviders.filter(function (p) {
         return p.name === name;
       })[0];
-    }); 
+    });
 
   });
 
@@ -103,7 +103,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
         }
 
       }
-    }); 
+    });
 
 
     myFocusManager.focus('inputClusterName');
@@ -164,8 +164,8 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
         $state.go('^.list');
 
         $alert({
-          title: 'Cluster', 
-          content: ($scope.editing ? 'reconfiguration' : 'creation') + ' succeeded!', 
+          title: 'Cluster',
+          content: ($scope.editing ? 'reconfiguration' : 'creation') + ' succeeded!',
           type: 'success'
         });
 

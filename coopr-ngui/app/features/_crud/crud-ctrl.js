@@ -1,4 +1,4 @@
-var module = angular.module(PKG.name+'.features');
+var module = angular.module(PKG.name+'.feature.crud');
 
 /**
  * CrudListCtrl

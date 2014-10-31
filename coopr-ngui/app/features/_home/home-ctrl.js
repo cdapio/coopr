@@ -2,7 +2,7 @@
  * HomeCtrl
  */
 
-angular.module(PKG.name+'.features').controller('HomeCtrl', 
+angular.module(PKG.name+'.feature.home').controller('HomeCtrl',
 function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
 
   var filterFilter = $filter('filter');
@@ -22,15 +22,15 @@ function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
       })
       .then(function (result) {
         $alert({
-          title: 'Import complete!', 
+          title: 'Import complete!',
           type: 'success'
         });
         getData();
       })
       ['catch'](function (err) {
         $alert({
-          title: 'import error!', 
-          content: err, 
+          title: 'import error!',
+          content: err,
           type: 'danger'
         });
       });
@@ -45,9 +45,9 @@ function ($scope, $filter, $modal, $alert, myAuth, myApi, myFileReader) {
 
     $modal({
       scope: modalScope,
-      title: 'JSON export', 
-      contentTemplate: '/assets/features/_home/export.html', 
-      placement: 'center', 
+      title: 'JSON export',
+      contentTemplate: '/assets/features/_home/export.html',
+      placement: 'center',
       show: true
     });
 

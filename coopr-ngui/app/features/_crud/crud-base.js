@@ -1,4 +1,4 @@
-var module = angular.module(PKG.name+'.features');
+var module = angular.module(PKG.name+'.feature.crud');
 
 
 
@@ -29,8 +29,8 @@ module.factory('CrudListBase', function CrudListBaseFactory ($injector) {
         scope.fetchSubnavList();
 
         $alert({
-          title: $state.current.data.modelName, 
-          content: 'delete succeeded!', 
+          title: $state.current.data.modelName,
+          content: 'delete succeeded!',
           type: 'success'
         });
 
@@ -65,7 +65,7 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
     };
 
     /* ----------------------------------------------------------------------- */
-  
+
     function doThenList(model, method) {
       scope.submitting = true;
 
@@ -80,8 +80,8 @@ module.factory('CrudFormBase', function CrudFormBaseFactory ($injector) {
           $state.go($state.current.name.split('.')[0] + '.list');
 
           $alert({
-            title: $state.current.data.modelName, 
-            content: method.substring(1) + ' succeeded!', 
+            title: $state.current.data.modelName,
+            content: method.substring(1) + ' succeeded!',
             type: 'success'
           });
 

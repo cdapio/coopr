@@ -2,7 +2,7 @@
  * ClusterListCtrl
  */
 
-angular.module(PKG.name+'.features').controller('ClusterListCtrl', 
+angular.module(PKG.name+'.feature.clusters').controller('ClusterListCtrl',
 function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
 
   CrudListBase.apply($scope);
@@ -11,7 +11,7 @@ function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
       filterFilter = $filter('filter'),
       tenMinutesAgo = moment().minutes(-10);
 
-  $scope.isActive = function (item) { 
+  $scope.isActive = function (item) {
     // any cluster created recently is considered "active" for display purposes
     return (moment(item.createTime)>tenMinutesAgo) || ['terminated','incomplete'].indexOf(item.status)===-1;
   };
