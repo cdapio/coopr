@@ -17,11 +17,11 @@
 #
 
 require_relative 'fog_provider/aws'
+require_relative 'fog_provider/digitalocean'
 require_relative 'fog_provider/google'
 require_relative 'fog_provider/joyent'
 require_relative 'fog_provider/openstack'
 require_relative 'fog_provider/rackspace'
-require_relative 'fog_provider/digitalocean'
 
 gem 'fog', '~> 1.21.0'
 
