@@ -16,8 +16,8 @@
 
 package co.cask.coopr.test.client.rest;
 
+import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.client.TenantClient;
-import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.spec.TenantSpecification;
 import co.cask.coopr.test.client.ClientTest;
 import org.apache.http.HttpStatus;

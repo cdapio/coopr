@@ -16,9 +16,9 @@
 
 package co.cask.coopr.test.client.rest;
 
+import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.Entities;
 import co.cask.coopr.client.ClusterClient;
-import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.ClusterDetails;
 import co.cask.coopr.cluster.ClusterSummary;
@@ -80,10 +80,7 @@ public class ClusterRestClientTest extends ClientTest {
     for (Node node : result.getNodes()) {
       Assert.assertTrue(FIRST_TEST_CLUSTER.getNodeIDs().contains(node.getId()));
     }
-    // Node ids get overwritten by the full node objects in the result object
-    Cluster expectedResult = FIRST_TEST_CLUSTER;
-    expectedResult.setNodes(ImmutableSet.<String>of());
-    Assert.assertEquals(expectedResult, result.getCluster());
+    Assert.assertEquals(FIRST_TEST_CLUSTER, result.getCluster());
   }
 
   @Test
