@@ -5,7 +5,7 @@ var gulp = require('gulp'),
     merge = require('merge-stream');
 
 function plumber() {
-  return plug.plumber({ errorHandler: function (err) {  
+  return plug.plumber({ errorHandler: function (err) {
     plug.util.beep();
     plug.util.log(plug.util.colors.red(err.toString()));
   } });
@@ -156,7 +156,7 @@ gulp.task('tpl', function() {
       './app/features/_home/home.html'
     ])
       .pipe(plug.angularTemplatecache({
-        module: pkg.name,
+        module: pkg.name + '.features',
         base: __dirname + '/app',
         root: '/assets/'
       }))

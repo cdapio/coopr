@@ -3,7 +3,6 @@ angular.module(PKG.name+'.feature.clusters', [
   PKG.name+'.filters',
   PKG.name+'.directives',
 
-
   PKG.name+'.feature.crud',
 
   'ui.router',
