@@ -191,12 +191,6 @@
             "digitalocean_region"
           ]
         ]
-      },
-      "user": {
-      },
-      "required": [
-          []
-        ]
       }
     }
   },
