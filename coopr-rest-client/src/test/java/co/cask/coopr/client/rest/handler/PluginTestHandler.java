@@ -21,7 +21,6 @@ import co.cask.coopr.spec.plugin.AutomatorType;
 import co.cask.http.AbstractHttpHandler;
 import co.cask.http.HttpResponder;
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.List;
@@ -64,10 +63,6 @@ public class PluginTestHandler extends AbstractHttpHandler {
                               "/v2/plugins/providertypes/\\w+/\\w+/\\w+/versions/\\w+/recall";
   private static final String DELETE_PROVIDER_TYPE_RESOURCES_VERSION =
                               "/v2/plugins/providertypes/\\w+/\\w+/\\w+/versions/.*";
-
-  private static final Gson GSON = new Gson();
-  private static final String COOPR_TENANT_ID_HEADER_NAME = "Coopr-TenantID";
-  private static final String COOPR_USER_ID_HEADER_NAME = "Coopr-UserID";
 
   @GET
   @Path(GET_ALL_AUTOMATOR_TYPES)
@@ -186,5 +181,4 @@ public class PluginTestHandler extends AbstractHttpHandler {
                                                  HttpResponder responder) throws Exception {
     responder.sendStatus(HttpResponseStatus.OK);
   }
-
 }

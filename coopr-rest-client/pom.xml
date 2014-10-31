@@ -31,6 +31,7 @@ limitations under the License.
 
   <properties>
     <http.client.version>4.3.3</http.client.version>
+    <cask.common.version>0.1.0-SNAPSHOT</cask.common.version>
   </properties>
 
   <dependencies>
@@ -38,6 +39,11 @@ limitations under the License.
       <groupId>co.cask</groupId>
       <artifactId>coopr</artifactId>
       <version>${project.parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>co.cask.common</groupId>
+      <artifactId>common-http</artifactId>
+      <version>${cask.common.version}</version>
     </dependency>
 
     <!-- For unit testing -->

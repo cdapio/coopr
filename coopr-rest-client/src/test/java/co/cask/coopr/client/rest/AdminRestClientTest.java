@@ -16,9 +16,9 @@
 
 package co.cask.coopr.client.rest;
 
+import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.Entities;
 import co.cask.coopr.client.AdminClient;
-import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.client.rest.handler.TestStatusUserId;
 import co.cask.coopr.spec.HardwareType;
 import co.cask.coopr.spec.ImageType;

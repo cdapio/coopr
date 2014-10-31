@@ -16,9 +16,9 @@
 
 package co.cask.coopr.client.rest;
 
+import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.Entities;
 import co.cask.coopr.client.ClusterClient;
-import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.client.rest.handler.TestStatusUserId;
 import co.cask.coopr.cluster.ClusterDetails;
 import co.cask.coopr.cluster.ClusterSummary;

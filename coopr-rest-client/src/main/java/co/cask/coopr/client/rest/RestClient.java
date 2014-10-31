@@ -16,7 +16,7 @@
 
 package co.cask.coopr.client.rest;
 
-import co.cask.coopr.client.rest.exception.HttpFailureException;
+import co.cask.common.http.exception.HttpFailureException;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -51,7 +51,6 @@ import java.util.Set;
  */
 public class RestClient {
 
-  public static final int CHAR_BUFFER_SIZE = 1024;
   private static final Logger LOG = LoggerFactory.getLogger(RestClient.class);
 
   private static final String HTTP_PROTOCOL = "http";
@@ -162,6 +161,7 @@ public class RestClient {
         try {
           reader.close();
         } catch (IOException e) {
+          LOG.error("Closing reader process failed.", e);
         }
       }
     }
