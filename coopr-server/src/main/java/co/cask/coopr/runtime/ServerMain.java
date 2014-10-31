@@ -20,6 +20,7 @@ import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.conf.guice.ConfigurationModule;
 import co.cask.coopr.common.daemon.DaemonMain;
+import co.cask.coopr.common.queue.QueueService;
 import co.cask.coopr.common.queue.guice.QueueModule;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.common.zookeeper.guice.ZookeeperModule;
@@ -82,6 +83,7 @@ public final class ServerMain extends DaemonMain {
   private TenantStore tenantStore;
   private UserStore userStore;
   private CredentialStore credentialStore;
+  private QueueService queueService;
 
   public static void main(final String[] args) throws Exception {
     new ServerMain().doMain(args);
@@ -132,8 +134,8 @@ public final class ServerMain extends DaemonMain {
                                       .build()));
 
     try {
-      // this is here because modules do things that need to connect to zookeeper...
-      // TODO: move everything that needs zk started out of the module
+      // this is here instead of in init because when it runs with in-process zookeeper, the zk client service
+      // cannot be created until the server is started (needs connection string)
       injector = Guice.createInjector(
         new ConfigurationModule(conf),
         new ZookeeperModule(zkClientService),
@@ -162,6 +164,8 @@ public final class ServerMain extends DaemonMain {
       userStore.startAndWait();
       credentialStore = injector.getInstance(CredentialStore.class);
       credentialStore.startAndWait();
+      queueService = injector.getInstance(QueueService.class);
+      queueService.startAndWait();
 
       // Register MBean
       ServerStats serverStats = injector.getInstance(ServerStats.class);
@@ -208,8 +212,8 @@ public final class ServerMain extends DaemonMain {
       }
     }
 
-    stopAll(handlerServer, userStore, resourceService, provisionerStore, tenantStore, clusterStoreService,
-            entityStoreService, idService, zkClientService, inMemoryZKServer);
+    stopAll(handlerServer, queueService, credentialStore, userStore, resourceService, provisionerStore, tenantStore,
+            clusterStoreService, entityStoreService, idService, zkClientService, inMemoryZKServer);
   }
 
   private void stopAll(Service... services) {

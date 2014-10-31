@@ -19,6 +19,7 @@ import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.conf.guice.ConfigurationModule;
+import co.cask.coopr.common.queue.QueueService;
 import co.cask.coopr.common.queue.guice.QueueModule;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.common.zookeeper.guice.ZookeeperModule;
@@ -90,6 +91,7 @@ public class BaseTest {
   protected static MockClusterCallback mockClusterCallback;
   protected static IdService idService;
   protected static CredentialStore credentialStore;
+  protected static QueueService queueService;
   protected static Gson gson;
 
   @ClassRule
@@ -171,6 +173,8 @@ public class BaseTest {
     sqlUserStore = injector.getInstance(SQLUserStore.class);
     sqlUserStore.startAndWait();
     userStore = sqlUserStore;
+    queueService = injector.getInstance(QueueService.class);
+    queueService.startAndWait();
   }
 
   @AfterClass

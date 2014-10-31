@@ -16,6 +16,10 @@
 
 package co.cask.coopr.common.queue;
 
+import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
+
 /**
  * Types of Queues.
  */
@@ -33,6 +37,7 @@ public enum QueueType {
   PROVISIONER("/clustermanager/nodeprovision"),
   // balancer queue holds tenants to rebalance workers for
   BALANCER("/clustermanager/balancer");
+  public static final Set<QueueType> GROUP_TYPES = ImmutableSet.of(SOLVER, CLUSTER, JOB, CALLBACK, PROVISIONER);
   private final String path;
 
   private QueueType(String path) {

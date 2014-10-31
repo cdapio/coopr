@@ -17,10 +17,11 @@ package co.cask.coopr.scheduler;
 
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.common.conf.Configuration;
-import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.GroupElement;
 import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueService;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.queue.TrackingQueue;
 import co.cask.coopr.scheduler.callback.CallbackContext;
 import co.cask.coopr.scheduler.callback.CallbackData;
@@ -36,6 +37,8 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
 
 /**
  * Polls a queue which contains {@link co.cask.coopr.scheduler.callback.CallbackData} for performing cluster
@@ -64,16 +67,15 @@ public class CallbackScheduler implements Runnable {
                             ClusterStoreService clusterStoreService,
                             UserStore userStore,
                             Gson gson,
-                            @Named(Constants.Queue.CALLBACK) QueueGroup callbackQueues,
-                            @Named(Constants.Queue.JOB) QueueGroup jobQueues) {
+                            QueueService queueService) {
     this.id = id;
     this.executorService = executorService;
     this.taskService = taskService;
     this.clusterCallback = clusterCallback;
     this.clusterCallback.initialize(conf);
     this.gson = gson;
-    this.callbackQueues = callbackQueues;
-    this.jobQueues = jobQueues;
+    this.callbackQueues = queueService.getQueueGroup(QueueType.CALLBACK);
+    this.jobQueues = queueService.getQueueGroup(QueueType.JOB);
     this.clusterStoreService = clusterStoreService;
     this.userStore = userStore;
   }
@@ -81,12 +83,9 @@ public class CallbackScheduler implements Runnable {
   @Override
   public void run() {
     try {
-      while (true) {
-        final GroupElement gElement = callbackQueues.take(id);
-        if (gElement == null) {
-          return;
-        }
-
+      Iterator<GroupElement> callbackIter = callbackQueues.takeIterator(id);
+      while (callbackIter.hasNext()) {
+        final GroupElement gElement = callbackIter.next();
         final Element element = gElement.getElement();
         final ListenableFuture future = executorService.submit(new CallbackRunner(gElement));
         future.addListener(new Runnable() {

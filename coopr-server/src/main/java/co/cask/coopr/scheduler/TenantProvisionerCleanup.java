@@ -27,14 +27,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * Time out provisioners and perform cleanup.
  */
-public class ProvisionerCleanup implements Runnable {
-  private static final Logger LOG = LoggerFactory.getLogger(ProvisionerCleanup.class);
+public class TenantProvisionerCleanup implements Runnable {
+  private static final Logger LOG = LoggerFactory.getLogger(TenantProvisionerCleanup.class);
   private final TenantProvisionerService tenantProvisionerService;
   private final long provisionerTimeoutSecs;
 
   @Inject
-  private ProvisionerCleanup(TenantProvisionerService tenantProvisionerService,
-                             Configuration conf) {
+  private TenantProvisionerCleanup(TenantProvisionerService tenantProvisionerService,
+                                   Configuration conf) {
     this.tenantProvisionerService = tenantProvisionerService;
     this.provisionerTimeoutSecs = conf.getLong(Constants.PROVISIONER_TIMEOUT_SECS);
   }

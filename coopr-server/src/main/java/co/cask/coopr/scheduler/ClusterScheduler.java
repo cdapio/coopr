@@ -17,10 +17,11 @@ package co.cask.coopr.scheduler;
 
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.Node;
-import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.GroupElement;
 import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueService;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.queue.TrackingQueue;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.scheduler.dag.TaskNode;
@@ -42,6 +43,7 @@ import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,23 +71,20 @@ public class ClusterScheduler implements Runnable {
                            ClusterStoreService clusterStoreService,
                            TaskService taskService,
                            IdService idService,
-                           @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues) {
+                           QueueService queueService) {
     this.id = id;
     this.clusterStore = clusterStoreService.getSystemView();
     this.taskService = taskService;
     this.idService = idService;
-    this.clusterQueues = clusterQueues;
+    this.clusterQueues = queueService.getQueueGroup(QueueType.CLUSTER);
   }
 
   @Override
   public void run() {
     try {
-      while (true) {
-        GroupElement gElement = clusterQueues.take(id);
-        if (gElement == null) {
-          return;
-        }
-
+      Iterator<GroupElement> clusterIter = clusterQueues.takeIterator(id);
+      while (clusterIter.hasNext()) {
+        GroupElement gElement = clusterIter.next();
         Element clusterElement = gElement.getElement();
         Cluster cluster = clusterStore.getCluster(clusterElement.getId());
         ClusterJob job = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));

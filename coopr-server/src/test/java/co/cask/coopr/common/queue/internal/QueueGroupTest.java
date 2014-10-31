@@ -89,14 +89,14 @@ public abstract class QueueGroupTest {
     String consumerId = "worker.0";
     queues.add(queueName, new Element("id", "val"));
 
-    GroupElement taken = queues.take(consumerId);
+    GroupElement taken = queues.takeIterator(consumerId).next();
     Assert.assertEquals(queueName, taken.getQueueName());
     Assert.assertEquals("id", taken.getElement().getId());
     Assert.assertEquals("val", taken.getElement().getValue());
   }
 
   @Test
-  public void testMultiQueueTakeWithoutQueueName() {
+  public void testMultiQueueTakeIterator() {
     QueueGroup queues = getQueueGroup(QueueType.PROVISIONER);
     queues.add("tenant1", new Element("id1", "val"));
     queues.add("tenant1", new Element("id2", "val"));
@@ -107,39 +107,29 @@ public abstract class QueueGroupTest {
     queues.add("tenant2", new Element("id4", "val"));
     queues.add("tenant2", new Element("id5", "val"));
 
-    GroupElement taken = queues.take("consumer");
-    Assert.assertEquals("tenant1", taken.getQueueName());
-    Assert.assertEquals("id1", taken.getElement().getId());
+    Iterator<GroupElement> iter = queues.takeIterator("consumer");
+    // don't have control over which tenant will be taken first, but the first 6 elements should be:
+    // id1, id1, id2, id2, id3, id3, with alternating tenants.
+    for (int i = 1; i <= 3; i++) {
+      GroupElement taken = iter.next();
+      String firstTenant = taken.getQueueName();
+      Assert.assertEquals("id" + i, taken.getElement().getId());
+      taken = iter.next();
+      String secondTenant = taken.getQueueName();
+      Assert.assertEquals("id" + i, taken.getElement().getId());
+      Assert.assertEquals(Sets.newHashSet("tenant1", "tenant2"), Sets.newHashSet(firstTenant, secondTenant));
+    }
 
-    taken = queues.take("consumer");
-    Assert.assertEquals("tenant2", taken.getQueueName());
-    Assert.assertEquals("id1", taken.getElement().getId());
-
-    taken = queues.take("consumer");
-    Assert.assertEquals("tenant1", taken.getQueueName());
-    Assert.assertEquals("id2", taken.getElement().getId());
-
-    taken = queues.take("consumer");
-    Assert.assertEquals("tenant2", taken.getQueueName());
-    Assert.assertEquals("id2", taken.getElement().getId());
-
-    taken = queues.take("consumer");
-    Assert.assertEquals("tenant1", taken.getQueueName());
-    Assert.assertEquals("id3", taken.getElement().getId());
-
-    taken = queues.take("consumer");
-    Assert.assertEquals("tenant2", taken.getQueueName());
-    Assert.assertEquals("id3", taken.getElement().getId());
-
-    taken = queues.take("consumer");
+    // at this point, tenant1 queue should be drained and the last 2 elements should be tenant2 id4, id5.
+    GroupElement taken = iter.next();
     Assert.assertEquals("tenant2", taken.getQueueName());
     Assert.assertEquals("id4", taken.getElement().getId());
 
-    taken = queues.take("consumer");
+    taken = iter.next();
     Assert.assertEquals("tenant2", taken.getQueueName());
     Assert.assertEquals("id5", taken.getElement().getId());
 
-    Assert.assertNull(queues.take("consumer"));
+    Assert.assertFalse(iter.hasNext());
   }
 
 
@@ -229,7 +219,7 @@ public abstract class QueueGroupTest {
     queues.add("tenant4", new Element("id4", "val"));
 
     Assert.assertTrue(queues.removeAll());
-    Assert.assertNull(queues.take("consumer"));
+    Assert.assertFalse(queues.takeIterator("consumer").hasNext());
     Assert.assertNull(queues.take("tenant1", "consumer"));
     Assert.assertNull(queues.take("tenant2", "consumer"));
     Assert.assertNull(queues.take("tenant3", "consumer"));
@@ -249,38 +239,6 @@ public abstract class QueueGroupTest {
     Assert.assertNotNull(queues.take("tenant1", "consumer"));
     Assert.assertNotNull(queues.take("tenant2", "consumer"));
     Assert.assertNotNull(queues.take("tenant4", "consumer"));
-  }
-
-  @Test
-  public void testHideQueue() {
-    QueueGroup queues = getQueueGroup(QueueType.PROVISIONER);
-    queues.add("tenant1", new Element("id1-1", "val"));
-    queues.add("tenant1", new Element("id1-2", "val"));
-    queues.add("tenant2", new Element("id2-1", "val"));
-    queues.add("tenant2", new Element("id2-2", "val"));
-    queues.add("tenant3", new Element("id3-1", "val"));
-    queues.add("tenant3", new Element("id3-2", "val"));
-
-    GroupElement taken = queues.take("consumer");
-    Assert.assertEquals("tenant1", taken.getQueueName());
-    Assert.assertEquals("id1-1", taken.getElement().getId());
-
-    taken = queues.take("consumer");
-    Assert.assertEquals("tenant2", taken.getQueueName());
-    Assert.assertEquals("id2-1", taken.getElement().getId());
-
-    // hide queue3, should not get elements anymore until its referenced directly
-    queues.removeQueue("tenant3");
-
-    taken = queues.take("consumer");
-    Assert.assertEquals("tenant1", taken.getQueueName());
-    Assert.assertEquals("id1-2", taken.getElement().getId());
-
-    taken = queues.take("consumer");
-    Assert.assertEquals("tenant2", taken.getQueueName());
-    Assert.assertEquals("id2-2", taken.getElement().getId());
-
-    Assert.assertNull(queues.take("consumer"));
   }
 
   @Test(timeout = 30000)
@@ -335,11 +293,11 @@ public abstract class QueueGroupTest {
             Throwables.propagate(e);
           }
           while (numTaken.get() < expectedNumElements) {
-            GroupElement taken = queues.take(consumerId);
-            while (taken != null) {
+            Iterator<GroupElement> iter = queues.takeIterator(consumerId);
+            while (iter.hasNext()) {
+              GroupElement taken = iter.next();
               numTaken.getAndIncrement();
               elements.put(Integer.valueOf(taken.getElement().getValue()), Integer.valueOf(taken.getQueueName()));
-              taken = queues.take(consumerId);
             }
             try {
               TimeUnit.MILLISECONDS.sleep(10);

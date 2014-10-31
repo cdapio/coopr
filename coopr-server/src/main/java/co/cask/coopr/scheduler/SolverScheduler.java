@@ -17,10 +17,11 @@ package co.cask.coopr.scheduler;
 
 import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.cluster.Node;
-import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.GroupElement;
 import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueService;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.queue.TrackingQueue;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.http.request.AddServicesRequest;
@@ -42,6 +43,7 @@ import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -70,8 +72,7 @@ public class SolverScheduler implements Runnable {
   @Inject
   private SolverScheduler(@Named("scheduler.id") String id, Solver solver,
                           ClusterStoreService clusterStoreService,
-                          @Named(Constants.Queue.SOLVER) QueueGroup solverQueues,
-                          @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues,
+                          QueueService queueService,
                           @Named("solver.executor.service") ListeningExecutorService executorService,
                           TaskService taskService, ServerStats serverStats, IdService idService, Gson gson) {
     this.id = id;
@@ -82,18 +83,16 @@ public class SolverScheduler implements Runnable {
     this.serverStats = serverStats;
     this.idService = idService;
     this.gson = gson;
-    this.solverQueues = solverQueues;
-    this.clusterQueues = clusterQueues;
+    this.solverQueues = queueService.getQueueGroup(QueueType.SOLVER);
+    this.clusterQueues = queueService.getQueueGroup(QueueType.CLUSTER);
   }
 
   @Override
   public void run() {
     try {
-      while (true) {
-        final GroupElement gElement = solverQueues.take(id);
-        if (gElement == null) {
-          return;
-        }
+      Iterator<GroupElement> solveIter = solverQueues.takeIterator(id);
+      while (solveIter.hasNext()) {
+        final GroupElement gElement = solveIter.next();
         final Element solveElement = gElement.getElement();
 
         final ListenableFuture<String> future = executorService.submit(new SolverRunner(gElement));

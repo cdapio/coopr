@@ -20,7 +20,9 @@ import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueService;
 import co.cask.coopr.common.queue.QueueMetrics;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.queue.TrackingQueue;
 import co.cask.coopr.http.request.FinishTaskRequest;
 import co.cask.coopr.http.request.TakeTaskRequest;
@@ -38,7 +40,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +66,7 @@ public class TaskQueueService {
   private final LoadingCache<String, QueueMetrics> queueMetricsCache;
 
   @Inject
-  private TaskQueueService(@Named(Constants.Queue.PROVISIONER) final QueueGroup taskQueues,
-                           @Named(Constants.Queue.JOB) QueueGroup jobQueues,
+  private TaskQueueService(QueueService queueService,
                            ClusterStoreService clusterStoreService,
                            TenantProvisionerService tenantProvisionerService,
                            TaskService taskService,
@@ -82,8 +82,8 @@ public class TaskQueueService {
     this.tenantProvisionerService = tenantProvisionerService;
     this.credentialStore = credentialStore;
     this.serverStats = serverStats;
-    this.taskQueues = taskQueues;
-    this.jobQueues = jobQueues;
+    this.taskQueues = queueService.getQueueGroup(QueueType.PROVISIONER);
+    this.jobQueues = queueService.getQueueGroup(QueueType.JOB);
     this.tenantStore = tenantStore;
     this.gson = gson;
     final int queueCacheSeconds = conf.getInt(Constants.Metrics.QUEUE_CACHE_SECONDS);
@@ -137,7 +137,6 @@ public class TaskQueueService {
    * @throws IOException if there was an error persisting task information.
    */
   public String takeNextClusterTask(TakeTaskRequest takeRequest) throws IOException, MissingEntityException {
-    serverStats.setQueueLength(taskQueues.size());
     String tenantId = takeRequest.getTenantId();
     String provisionerId = takeRequest.getProvisionerId();
     String workerId = takeRequest.getWorkerId();
@@ -188,6 +187,10 @@ public class TaskQueueService {
     }
 
     LOG.trace("task {} given to worker {}", clusterTask, workerId);
+    if (clusterTask != null) {
+      // no point in updating stats if no task was taken
+      serverStats.setQueueLength(getTotalQueueSize());
+    }
 
     return taskJson;
   }
@@ -201,8 +204,6 @@ public class TaskQueueService {
    * @throws IOException if there was an error persisting task information.
    */
   public void finishClusterTask(FinishTaskRequest finishRequest) throws MissingEntityException, IOException {
-    serverStats.setQueueLength(taskQueues.size());
-
     String workerId = finishRequest.getWorkerId();
     String queueName = finishRequest.getTenantId();
     String taskId = finishRequest.getTaskId();
@@ -234,6 +235,7 @@ public class TaskQueueService {
     }
 
     finishNodeAction(clusterTask, finishRequest);
+    serverStats.setQueueLength(getTotalQueueSize());
 
     // Schedule the job for processing
     jobQueues.add(queueName, new Element(clusterTask.getJobId()));
@@ -288,6 +290,15 @@ public class TaskQueueService {
         LOG.trace("Updated Node = {}", node);
       }
     }
+  }
+
+  // should rethink whether this is even a useful jmx stat.
+  private int getTotalQueueSize() throws IOException {
+    int totalSize = 0;
+    for (Tenant tenant : tenantStore.getAllTenants()) {
+      totalSize += taskQueues.size(tenant.getId());
+    }
+    return totalSize;
   }
 
 }

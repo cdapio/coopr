@@ -53,7 +53,7 @@ public class Scheduler extends AbstractIdleService {
   private final CallbackScheduler callbackScheduler;
   private final ClusterCleanup clusterCleanup;
   private final WorkerBalanceScheduler workerBalanceScheduler;
-  private final ProvisionerCleanup provisionerCleanup;
+  private final TenantProvisionerCleanup tenantProvisionerCleanup;
   private final Set<ScheduledFuture<?>> scheduledFutures;
   private final LeaderElection leaderElection;
 
@@ -64,7 +64,7 @@ public class Scheduler extends AbstractIdleService {
                     SolverScheduler solverScheduler,
                     CallbackScheduler callbackScheduler,
                     WorkerBalanceScheduler workerBalanceScheduler,
-                    ProvisionerCleanup provisionerCleanup,
+                    TenantProvisionerCleanup tenantProvisionerCleanup,
                     ClusterCleanup clusterCleanup,
                     ZKClient zkClient) {
     this.schedulerRunInterval = conf.getInt(Constants.SCHEDULER_INTERVAL_SECS);
@@ -81,7 +81,7 @@ public class Scheduler extends AbstractIdleService {
     this.workerBalanceScheduler = workerBalanceScheduler;
     this.clusterCleanup = clusterCleanup;
     this.scheduledFutures = Sets.newHashSet();
-    this.provisionerCleanup = provisionerCleanup;
+    this.tenantProvisionerCleanup = tenantProvisionerCleanup;
 
     this.leaderElection = new LeaderElection(zkClient, "/server-election", new ElectionHandler() {
       private final ExecutorService executor = Executors.newSingleThreadExecutor(
@@ -160,7 +160,7 @@ public class Scheduler extends AbstractIdleService {
     // if the server was down for a while, we don't want to time out provisioners right away but want to
     // give them a chance to get their heartbeats in.  So wait for a while before starting the timeout logic.
     scheduledFutures.add(
-      executorService.scheduleAtFixedRate(provisionerCleanup, provisionerCleanupRunInterval,
+      executorService.scheduleAtFixedRate(tenantProvisionerCleanup, provisionerCleanupRunInterval,
                                           provisionerCleanupRunInterval, TimeUnit.SECONDS)
     );
   }

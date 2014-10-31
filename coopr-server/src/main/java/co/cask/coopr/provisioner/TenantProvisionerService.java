@@ -5,6 +5,8 @@ import co.cask.coopr.cluster.Cluster;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
+import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueService;
 import co.cask.coopr.common.queue.TrackingQueue;
 import co.cask.coopr.common.zookeeper.LockService;
 import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
@@ -40,7 +42,6 @@ public class TenantProvisionerService {
   private static final Logger LOG  = LoggerFactory.getLogger(TenantProvisionerService.class);
   private final ProvisionerStore provisionerStore;
   private final TenantStore tenantStore;
-  private final LockService lockService;
   private final ZKInterProcessReentrantLock tenantLock;
   private final long provisionerTimeoutSecs;
   private final TrackingQueue balanceQueue;
@@ -48,6 +49,7 @@ public class TenantProvisionerService {
   private final ClusterStoreService clusterStoreService;
   private final ResourceService resourceService;
   private final EntityStoreService entityStoreService;
+  private final QueueService queueService;
 
   @Inject
   private TenantProvisionerService(ProvisionerStore provisionerStore,
@@ -58,10 +60,10 @@ public class TenantProvisionerService {
                                    ProvisionerRequestService provisionerRequestService,
                                    ResourceService resourceService,
                                    EntityStoreService entityStoreService,
+                                   QueueService queueService,
                                    Configuration conf) {
     this.provisionerStore = provisionerStore;
     this.tenantStore = tenantStore;
-    this.lockService = lockService;
     this.provisionerRequestService = provisionerRequestService;
     this.clusterStoreService = clusterStoreService;
     this.resourceService = resourceService;
@@ -74,6 +76,7 @@ public class TenantProvisionerService {
     this.tenantLock = lockService.getTenantProvisionerLock();
     this.provisionerTimeoutSecs = conf.getLong(Constants.PROVISIONER_TIMEOUT_SECS);
     this.balanceQueue = balanceQueue;
+    this.queueService = queueService;
   }
 
   /**
@@ -232,6 +235,9 @@ public class TenantProvisionerService {
                                           "Cannot delete it until workers are set to 0.");
       }
       tenantStore.deleteTenantByName(name);
+      for (QueueGroup queueGroup : queueService.getAllQueueGroups().values()) {
+        queueGroup.removeAll(tenant.getId());
+      }
     } finally {
       tenantLock.release();
     }

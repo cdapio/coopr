@@ -16,9 +16,10 @@
 package co.cask.coopr.cluster;
 
 import co.cask.coopr.account.Account;
-import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueGroup;
+import co.cask.coopr.common.queue.QueueService;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.common.zookeeper.LockService;
 import co.cask.coopr.common.zookeeper.lib.ZKInterProcessReentrantLock;
@@ -58,7 +59,6 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,9 +91,7 @@ public class ClusterService {
   public ClusterService(ClusterStoreService clusterStoreService,
                         EntityStoreService entityStoreService,
                         TenantProvisionerService tenantProvisionerService,
-                        @Named(Constants.Queue.CLUSTER) QueueGroup clusterQueues,
-                        @Named(Constants.Queue.SOLVER) QueueGroup solverQueues,
-                        @Named(Constants.Queue.JOB) QueueGroup jobQueues,
+                        QueueService queueService,
                         LockService lockService,
                         ServerStats serverStats,
                         Solver solver,
@@ -110,9 +108,9 @@ public class ClusterService {
     this.solver = solver;
     this.idService = idService;
     this.gson = gson;
-    this.clusterQueues = clusterQueues;
-    this.solverQueues = solverQueues;
-    this.jobQueues = jobQueues;
+    this.clusterQueues = queueService.getQueueGroup(QueueType.CLUSTER);
+    this.solverQueues = queueService.getQueueGroup(QueueType.SOLVER);
+    this.jobQueues = queueService.getQueueGroup(QueueType.JOB);
   }
 
   /**

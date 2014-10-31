@@ -144,7 +144,7 @@ public class TaskHandlerTest extends ServiceTestBase {
     Assert.assertEquals(lastAction.getStatus(), Node.Status.COMPLETE);
     Assert.assertEquals(provisionerResult, actualNode.getProvisionerResults());
 
-    Assert.assertNull(provisionerQueues.take("worker1"));
+    Assert.assertFalse(provisionerQueues.takeIterator("worker1").hasNext());
   }
 
   @Test

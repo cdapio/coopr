@@ -21,11 +21,10 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueGroup;
 import co.cask.coopr.common.queue.QueueMetrics;
+import co.cask.coopr.common.queue.QueueType;
 import co.cask.coopr.spec.Tenant;
 import co.cask.coopr.spec.TenantSpecification;
 import com.google.common.collect.Maps;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -44,7 +43,7 @@ public class TaskQueueServiceTest extends BaseTest {
   @BeforeClass
   public static void setupTestClass() {
     service = injector.getInstance(TaskQueueService.class);
-    provisionerQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.PROVISIONER)));
+    provisionerQueues = queueService.getQueueGroup(QueueType.PROVISIONER);
   }
 
   @After
