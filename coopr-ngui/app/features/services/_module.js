@@ -1,7 +1,8 @@
-angular.module(PKG.name+'.feature.home', [
+angular.module(PKG.name+'.feature.services', [
   PKG.name+'.services',
   PKG.name+'.filters',
   PKG.name+'.directives',
 
-  'angularMoment'
+  PKG.name+'.feature.crud'
+
 ]);

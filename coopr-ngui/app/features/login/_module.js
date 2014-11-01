@@ -1,7 +1,8 @@
-angular.module(PKG.name+'.feature.home', [
+angular.module(PKG.name+'.feature.login', [
   PKG.name+'.services',
   PKG.name+'.filters',
   PKG.name+'.directives',
 
-  'angularMoment'
+  'angular-loading-bar'
+
 ]);

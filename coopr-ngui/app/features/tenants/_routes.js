@@ -1,4 +1,4 @@
-angular.module(PKG.name+'.features')
+angular.module(PKG.name+'.feature.tenants')
   .config(function ($stateProvider, MYAUTH_ROLE, MYHELPERS) {
 
     var crud = MYHELPERS.crud.mkState,

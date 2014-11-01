@@ -1,4 +1,4 @@
-angular.module(PKG.name+'.features')
+angular.module(PKG.name+'.feature.services')
   .config(function ($stateProvider, MYAUTH_ROLE, MYHELPERS) {
 
     var crud = MYHELPERS.crud.mkState,
@@ -11,15 +11,14 @@ angular.module(PKG.name+'.features')
 
 
       /*
-        /#/providers/...
+        /#/services/...
        */
-
-      .state(abstractSubnav('Provider', {
+      .state(abstractSubnav('Service', {
         authorizedRoles: MYAUTH_ROLE.admin
       }))
-        .state(crud('Provider', 'list', 'CrudListCtrl'))
-        .state(crud('Provider', 'edit', 'ProviderFormCtrl'))
-        .state(crud('Provider', 'create', 'ProviderFormCtrl'))
+        .state(crud('Service', 'list', 'CrudListCtrl'))
+        .state(crud('Service', 'edit', 'ServiceFormCtrl'))
+        .state(crud('Service', 'create', 'ServiceFormCtrl'))
 
 
 

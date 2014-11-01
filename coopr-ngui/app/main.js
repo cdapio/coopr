@@ -7,8 +7,11 @@ angular
 
     angular.module(PKG.name+'.services', [
       PKG.name+'.config',
+      'ngAnimate',
+      'ngSanitize',
       'ngResource',
-      'ngStorage'
+      'ngStorage',
+      'ui.router'
     ]).name,
 
     angular.module(PKG.name+'.filters', [
@@ -28,11 +31,7 @@ angular
       'mgcrea.ngStrap.modal'
     ]).name,
 
-    'angular-loading-bar',
-    'angularMoment',
-    'ngAnimate',
-    'ngSanitize',
-    'ui.router'
+    'angular-loading-bar'
   ])
 
   .run(function ($rootScope, $state, $stateParams) {

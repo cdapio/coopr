@@ -1,4 +1,4 @@
-angular.module(PKG.name+'.features')
+angular.module(PKG.name+'.feature.imagetypes')
   .config(function ($stateProvider, MYAUTH_ROLE, MYHELPERS) {
 
     var crud = MYHELPERS.crud.mkState,
@@ -21,7 +21,7 @@ angular.module(PKG.name+'.features')
       }))
         .state(crud('ImageType', 'list', 'CrudListCtrl'))
         .state(crud('ImageType', 'edit', 'ImageFormCtrl'))
-        .state(crud('ImageType', 'create', 'ImageFormCtrl')) 
+        .state(crud('ImageType', 'create', 'ImageFormCtrl'))
 
 
 
