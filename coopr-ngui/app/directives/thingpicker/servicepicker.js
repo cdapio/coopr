@@ -6,7 +6,7 @@
  * share the style and template with myThingPicker
  */
 
-var module = angular.module(PKG.name+'.directives');
+var module = angular.module(PKG.name+'.commons');
 
 module.constant('MYSERVICEPICKER_EVENT', {
   manage: 'myservicepicker-manage'

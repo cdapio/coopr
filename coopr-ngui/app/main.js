@@ -3,32 +3,6 @@ console.time(PKG.name);
 angular
   .module(PKG.name, [
 
-    angular.module(PKG.name+'.services', [
-      PKG.name+'.config',
-      'ngAnimate',
-      'ngSanitize',
-      'ngResource',
-      'ngStorage',
-      'ui.router'
-    ]).name,
-
-    angular.module(PKG.name+'.filters', [
-      PKG.name+'.services'
-    ]).name,
-
-    angular.module(PKG.name+'.directives', [
-      PKG.name+'.services',
-      PKG.name+'.filters',
-      'mgcrea.ngStrap.alert',
-      'mgcrea.ngStrap.tooltip',
-      'mgcrea.ngStrap.popover',
-      'mgcrea.ngStrap.dropdown',
-      'mgcrea.ngStrap.collapse',
-      'mgcrea.ngStrap.button',
-      'mgcrea.ngStrap.tab',
-      'mgcrea.ngStrap.modal'
-    ]).name,
-
     angular.module(PKG.name+'.features', [
       PKG.name+'.feature.home',
       PKG.name+'.feature.clusters',
@@ -39,6 +13,32 @@ angular
       PKG.name+'.feature.services',
       PKG.name+'.feature.templates',
       PKG.name+'.feature.tenants'
+    ]).name,
+
+    angular.module(PKG.name+'.commons', [
+
+      angular.module(PKG.name+'.services', [
+        PKG.name+'.config',
+        'ngAnimate',
+        'ngSanitize',
+        'ngResource',
+        'ngStorage',
+        'ui.router'
+      ]).name,
+
+      angular.module(PKG.name+'.filters', [
+        PKG.name+'.services'
+      ]).name,
+
+      'mgcrea.ngStrap.alert',
+      'mgcrea.ngStrap.tooltip',
+      'mgcrea.ngStrap.popover',
+      'mgcrea.ngStrap.dropdown',
+      'mgcrea.ngStrap.collapse',
+      'mgcrea.ngStrap.button',
+      'mgcrea.ngStrap.tab',
+      'mgcrea.ngStrap.modal'
+
     ]).name,
 
     'angular-loading-bar'

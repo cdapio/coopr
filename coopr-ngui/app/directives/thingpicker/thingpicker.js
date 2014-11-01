@@ -2,7 +2,7 @@
  * myThingPicker
  */
 
-angular.module(PKG.name+'.directives').directive('myThingPicker',
+angular.module(PKG.name+'.commons').directive('myThingPicker',
 function myThingPickerDirective () {
   return {
     restrict: 'E',

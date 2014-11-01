@@ -9,7 +9,7 @@
  *    ></my-progress>
  */
 
-angular.module(PKG.name+'.directives').directive('myProgress', 
+angular.module(PKG.name+'.commons').directive('myProgress', 
 function myProgressDirective () {
   return {
     restrict: 'E',

@@ -149,7 +149,7 @@ gulp.task('tpl', function() {
       './app/directives/**/*.html'
     ])
       .pipe(plug.angularTemplatecache({
-        module: pkg.name + '.directives'
+        module: pkg.name + '.commons'
       })),
 
     gulp.src([

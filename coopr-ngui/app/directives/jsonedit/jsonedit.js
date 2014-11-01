@@ -6,7 +6,7 @@
  * <textarea my-json-edit="myObject" rows="8" class="form-control"></textarea>
  */
 
-angular.module(PKG.name+'.directives').directive('myJsonEdit', 
+angular.module(PKG.name+'.commons').directive('myJsonEdit', 
 function myJsonEditDirective () {
   return {
     restrict: 'A',

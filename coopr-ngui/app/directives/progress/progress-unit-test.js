@@ -1,7 +1,7 @@
 /*global module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 
 describe('directive myProgress', function() {
-  beforeEach(module(PKG.name + '.directives'));
+  beforeEach(module(PKG.name + '.commons'));
 
   var $compile, scope;
   beforeEach(inject(function(_$compile_, $rootScope){

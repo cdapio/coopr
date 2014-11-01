@@ -28,7 +28,7 @@
  *  />
  */
 
-angular.module(PKG.name+'.directives').directive('myConfigtoformfields', 
+angular.module(PKG.name+'.commons').directive('myConfigtoformfields', 
 function myConfigtoformfieldsDirective () {
   return {
     restrict: 'AE',

@@ -1,7 +1,7 @@
 /*global module, expect, inject, describe, it, before, beforeEach, after, afterEach, $*/
 
 describe("Unit tests for my-dropdown-combo-text directive", function(myApi) {
-  beforeEach(module(PKG.name + ".directives"));
+  beforeEach(module(PKG.name + ".commons"));
 
   var scope, directiveScope, element;
   beforeEach(inject(function($rootScope, $compile) {

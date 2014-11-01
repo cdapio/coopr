@@ -1,7 +1,5 @@
 angular.module(PKG.name+'.feature.login', [
-  PKG.name+'.services',
-  PKG.name+'.filters',
-  PKG.name+'.directives',
+  PKG.name+'.commons',
 
   'angular-loading-bar'
 

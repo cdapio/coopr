@@ -15,7 +15,7 @@
  *    <td>...
  */
 
-angular.module(PKG.name+'.directives').directive('mySortable',
+angular.module(PKG.name+'.commons').directive('mySortable',
 function mySortableDirective ($log) {
 
   return {
