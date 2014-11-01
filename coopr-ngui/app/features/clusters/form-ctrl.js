@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.feature.clusters').controller('ClusterFormCtrl',
-function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHELPERS) {
+function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHelpers) {
   CrudFormBase.apply($scope);
 
   var id = $state.params.id;
@@ -65,7 +65,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
       });
 
 
-      $scope.leaseDuration = MYHELPERS.parseMilliseconds(
+      $scope.leaseDuration = myHelpers.parseMilliseconds(
         chosen.administration.leaseduration.initial
       );
 
@@ -90,7 +90,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
      */
     $scope.$watchCollection('leaseDuration', function (timeObj) {
       if(timeObj) {
-        var ms = MYHELPERS.concatMilliseconds(timeObj),
+        var ms = myHelpers.concatMilliseconds(timeObj),
             max = $scope.chosenTemplate.administration.leaseduration.initial;
 
         if(!max || (ms <= max)) {
@@ -127,7 +127,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
           imagetype: data.nodes[0].properties.imagetype
         });
 
-        $scope.leaseDuration = MYHELPERS.parseMilliseconds(data.expireTime);
+        $scope.leaseDuration = myHelpers.parseMilliseconds(data.expireTime);
 
         myFocusManager.select('inputClusterConfig');
       })
