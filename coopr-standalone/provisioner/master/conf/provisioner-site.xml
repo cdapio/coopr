@@ -6,12 +6,12 @@
   </property>
   <property>
     <name>provisioner.data.dir</name>
-    <value>COOPR_DATA_DIR/provisioner/data</value>
+    <value>/Users/davidbajot/repos/coopr/coopr-standalone/data/provisioner/data</value>
     <description>Provisioner storage directory for plugin data resources</description>
   </property>
   <property>
     <name>provisioner.work.dir</name>
-    <value>COOPR_DATA_DIR/provisioner/work</value>
+    <value>/Users/davidbajot/repos/coopr/coopr-standalone/data/provisioner/work</value>
     <description>Provisioner working directory</description>
   </property>
 </configuration>
