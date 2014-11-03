@@ -9,7 +9,13 @@ var config = {
     'browserstack.user': process.env.BROWSER_STACK_USERNAME,
     'browserstack.key': process.env.BROWSER_STACK_ACCESS_KEY,
     'browserstack.local': 'true',
-
+    'browserstack.debug': 'true',
+    'browserstack.tunnel': 'true',
+    'browser' : 'Chrome',
+    'browser_version' : '36.0',
+    'os' : 'OS X',
+    'os_version' : 'Mavericks',
+    'resolution' : '1024x768',
     'browserName': 'Chrome'
   },
 
@@ -29,8 +35,6 @@ var config = {
 };
 
 if (process.env.TRAVIS) {
-  config.capabilities['browserstack.tunnel'] = 'true';
-  config.capabilities['browserstack.debug'] = 'true';
 
   if('BS_AUTOMATE_PROJECT' in process.env) {
     config.capabilities['project'] = process.env['BS_AUTOMATE_PROJECT'];  
