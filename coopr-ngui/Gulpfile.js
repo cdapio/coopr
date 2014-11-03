@@ -153,7 +153,7 @@ gulp.task('tpl', function() {
       })),
 
     gulp.src([
-      './app/features/_home/home.html'
+      './app/features/home/home.html'
     ])
       .pipe(plug.angularTemplatecache({
         module: pkg.name + '.features',
@@ -283,7 +283,7 @@ gulp.task('watch', ['build'], function() {
 
   gulp.watch(['./app/**/*.js', '!./app/**/*-test.js'], ['js:app']);
   gulp.watch('./app/**/*.{less,css}', ['css:app']);
-  gulp.watch(['./app/directives/**/*.html', './app/features/_home/home.html'], ['tpl']);
+  gulp.watch(['./app/directives/**/*.html', './app/features/home/home.html'], ['tpl']);
   gulp.watch('./app/features/**/*.html', ['html:partials']);
   gulp.watch('./app/img/**/*', ['img']);
 

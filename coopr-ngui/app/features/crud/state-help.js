@@ -13,7 +13,7 @@ angular.module(PKG.name+'.feature.crud').constant('CRUD_STATE_HELP', {
     return {
       name: stateName,
       abstract: true,
-      templateUrl: '/assets/features/_crud/subnav.html',
+      templateUrl: '/assets/features/crud/subnav.html',
       controller: 'SubnavCtrl',
       url: '/' + stateName,
       data: angular.extend({
@@ -54,7 +54,7 @@ angular.module(PKG.name+'.feature.crud').constant('CRUD_STATE_HELP', {
         tpl += action + '.html';
     }
     if(!ctrl) {
-      tpl = '/assets/features/_crud/json.html';
+      tpl = '/assets/features/crud/json.html';
       ctrl = 'Crud' + action.substr(0,1).toUpperCase() + action.substr(1) + 'Ctrl';
     }
     return {
