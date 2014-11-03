@@ -6,7 +6,7 @@
  * <my-password data-value="password"></my-password>
  */
 
-angular.module(PKG.name+'.directives').directive('myPassword', 
+angular.module(PKG.name+'.commons').directive('myPassword', 
 function myPasswordDirective (myFocusManager) {
   return {
     restrict: 'E',

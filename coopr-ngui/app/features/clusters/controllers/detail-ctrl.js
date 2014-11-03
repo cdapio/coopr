@@ -2,7 +2,7 @@
  * ClusterDetailCtrl
  */
 
-angular.module(PKG.name+'.features').controller('ClusterDetailCtrl', 
+angular.module(PKG.name+'.feature.clusters').controller('ClusterDetailCtrl',
 function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, myApi, $timeout, moment) {
 
   CrudFormBase.apply($scope);
@@ -89,14 +89,14 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
     $scope.leaseExtendHumanized = moment.duration(ms, 'ms').humanize();
   });
 
-  $scope.doLeaseExtend = function () {      
+  $scope.doLeaseExtend = function () {
     myApi.Cluster.save(
-      { id: $scope.model.id }, 
-      { expireTime: $scope.leaseExtendDate.valueOf() }, 
+      { id: $scope.model.id },
+      { expireTime: $scope.leaseExtendDate.valueOf() },
       function () {
         $alert({
-          title: 'Lease extended until:', 
-          content: moment($scope.leaseExtendDate).format('LLL'), 
+          title: 'Lease extended until:',
+          content: moment($scope.leaseExtendDate).format('LLL'),
           type: 'success'
         });
         $scope.leaseExtendMs = 0;
@@ -112,9 +112,9 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
 
 
   $scope.doSubmitServices = function (arrSvcs) {
-    myApi.ClusterService.save( 
-      { clusterId: $scope.model.id }, 
-      { services: arrSvcs }, 
+    myApi.ClusterService.save(
+      { clusterId: $scope.model.id },
+      { services: arrSvcs },
       update
     );
   };
@@ -153,7 +153,7 @@ function ($scope, MYSERVICEPICKER_EVENT, CrudFormBase, $state, $modal, $alert, m
 
     $modal({
       title: nodeId,
-      contentTemplate: '/assets/features/clusters/detail-node.html', 
+      contentTemplate: '/assets/features/clusters/detail-node.html',
       placement: 'center',
       scope: modalScope,
       show: true

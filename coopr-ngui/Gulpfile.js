@@ -5,7 +5,7 @@ var gulp = require('gulp'),
     merge = require('merge-stream');
 
 function plumber() {
-  return plug.plumber({ errorHandler: function (err) {  
+  return plug.plumber({ errorHandler: function (err) {
     plug.util.beep();
     plug.util.log(plug.util.colors.red(err.toString()));
   } });
@@ -112,6 +112,7 @@ gulp.task('js:app', function() {
     v: pkg.version
   });
   return gulp.src([
+      './app/features/*/module.js',
       './app/**/*.js',
       '!./app/**/*-test.js'
     ])
@@ -149,14 +150,14 @@ gulp.task('tpl', function() {
       './app/directives/**/*.html'
     ])
       .pipe(plug.angularTemplatecache({
-        module: pkg.name + '.directives'
+        module: pkg.name + '.commons'
       })),
 
     gulp.src([
-      './app/features/_home/home.html'
+      './app/features/home/home.html'
     ])
       .pipe(plug.angularTemplatecache({
-        module: pkg.name,
+        module: pkg.name + '.features',
         base: __dirname + '/app',
         root: '/assets/'
       }))
@@ -283,7 +284,7 @@ gulp.task('watch', ['build'], function() {
 
   gulp.watch(['./app/**/*.js', '!./app/**/*-test.js'], ['js:app']);
   gulp.watch('./app/**/*.{less,css}', ['css:app']);
-  gulp.watch(['./app/directives/**/*.html', './app/features/_home/home.html'], ['tpl']);
+  gulp.watch(['./app/directives/**/*.html', './app/features/home/home.html'], ['tpl']);
   gulp.watch('./app/features/**/*.html', ['html:partials']);
   gulp.watch('./app/img/**/*', ['img']);
 

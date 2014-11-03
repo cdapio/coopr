@@ -11,7 +11,7 @@
  * myFocusManager.focus('aNameForTheField');
  */
 
-angular.module(PKG.name+'.directives').directive('myFocus',
+angular.module(PKG.name+'.commons').directive('myFocus',
 function myFocusDirective (myFocusManager) {
   return {
 

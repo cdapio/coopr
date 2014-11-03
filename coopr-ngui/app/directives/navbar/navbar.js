@@ -2,7 +2,7 @@
  * myNavbar
  */
 
-angular.module(PKG.name+'.directives').directive('myNavbar',
+angular.module(PKG.name+'.commons').directive('myNavbar',
 function myNavbarDirective ($dropdown, myAuth, myTheme) {
   return {
     restrict: 'A',

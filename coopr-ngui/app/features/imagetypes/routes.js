@@ -1,8 +1,8 @@
-angular.module(PKG.name+'.features')
-  .config(function ($stateProvider, MYAUTH_ROLE, MYHELPERS) {
+angular.module(PKG.name+'.feature.imagetypes')
+  .config(function ($stateProvider, MYAUTH_ROLE, CRUD_STATE_HELP) {
 
-    var crud = MYHELPERS.crud.mkState,
-        abstractSubnav = MYHELPERS.crud.abstractSubnav;
+    var crud = CRUD_STATE_HELP.mkState,
+        abstractSubnav = CRUD_STATE_HELP.abstractSubnav;
 
     /**
      * State Configurations
@@ -21,7 +21,7 @@ angular.module(PKG.name+'.features')
       }))
         .state(crud('ImageType', 'list', 'CrudListCtrl'))
         .state(crud('ImageType', 'edit', 'ImageFormCtrl'))
-        .state(crud('ImageType', 'create', 'ImageFormCtrl')) 
+        .state(crud('ImageType', 'create', 'ImageFormCtrl'))
 
 
 

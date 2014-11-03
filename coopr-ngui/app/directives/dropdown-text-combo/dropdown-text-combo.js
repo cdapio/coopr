@@ -1,4 +1,4 @@
-angular.module(PKG.name+".directives")
+angular.module(PKG.name + ".commons")
   .directive("myDropdownTextCombo", function myDropdownTextComboDirective() {
     return {
       restrict: "E",

@@ -3,8 +3,8 @@
  * handles both "edit" and "create" views
  */
 
-angular.module(PKG.name+'.features').controller('TemplateFormCtrl', 
-function ($scope, $state, $window, myApi, $q, MYHELPERS, CrudFormBase, myFocusManager) {
+angular.module(PKG.name+'.features').controller('TemplateFormCtrl',
+function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -72,10 +72,10 @@ function ($scope, $state, $window, myApi, $q, MYHELPERS, CrudFormBase, myFocusMa
 
   promise.then(function (model) {
     angular.forEach(['initial', 'max', 'step'], function (one) {
-      $scope.leaseDuration[one] = MYHELPERS.parseMilliseconds( model.administration.leaseduration[one] || 0 );
+      $scope.leaseDuration[one] = myHelpers.parseMilliseconds( model.administration.leaseduration[one] || 0 );
 
       $scope.$watchCollection('leaseDuration.'+one, function (newVal) {
-        model.administration.leaseduration[one] = MYHELPERS.concatMilliseconds(newVal);
+        model.administration.leaseduration[one] = myHelpers.concatMilliseconds(newVal);
       });
     });
   });

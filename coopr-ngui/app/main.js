@@ -3,27 +3,33 @@ console.time(PKG.name);
 angular
   .module(PKG.name, [
 
-    angular.module(PKG.name+'.services', [
-      PKG.name+'.config',
-      'ngResource',
-      'ngStorage'
-    ]).name,
-
-    angular.module(PKG.name+'.filters', [
-      PKG.name+'.services'
-    ]).name,
-
     angular.module(PKG.name+'.features', [
-      PKG.name+'.services',
-      PKG.name+'.filters',
-      'mgcrea.ngStrap.alert',
-      'angular-loading-bar',
-      'ui.router'
+      PKG.name+'.feature.home',
+      PKG.name+'.feature.clusters',
+      PKG.name+'.feature.hardwaretypes',
+      PKG.name+'.feature.imagetypes',
+      PKG.name+'.feature.login',
+      PKG.name+'.feature.providers',
+      PKG.name+'.feature.services',
+      PKG.name+'.feature.templates',
+      PKG.name+'.feature.tenants'
     ]).name,
 
-    angular.module(PKG.name+'.directives', [
-      PKG.name+'.services',
-      PKG.name+'.filters',
+    angular.module(PKG.name+'.commons', [
+
+      angular.module(PKG.name+'.services', [
+        PKG.name+'.config',
+        'ngAnimate',
+        'ngSanitize',
+        'ngResource',
+        'ngStorage',
+        'ui.router'
+      ]).name,
+
+      angular.module(PKG.name+'.filters', [
+        PKG.name+'.services'
+      ]).name,
+
       'mgcrea.ngStrap.alert',
       'mgcrea.ngStrap.tooltip',
       'mgcrea.ngStrap.popover',
@@ -32,13 +38,10 @@ angular
       'mgcrea.ngStrap.button',
       'mgcrea.ngStrap.tab',
       'mgcrea.ngStrap.modal'
+
     ]).name,
 
-    'angular-loading-bar',
-    'angularMoment',
-    'ngAnimate',
-    'ngSanitize',
-    'ui.router'
+    'angular-loading-bar'
   ])
 
   .run(function ($rootScope, $state, $stateParams) {

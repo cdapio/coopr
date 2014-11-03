@@ -12,7 +12,7 @@
  * >delete</a>
  */
 
-angular.module(PKG.name+'.directives').directive('myConfirmable', 
+angular.module(PKG.name+'.commons').directive('myConfirmable', 
 function myConfirmableDirective ($modal) {
   return {
     restrict: 'A',

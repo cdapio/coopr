@@ -2,7 +2,7 @@
  * myProviderFields
  */
 
-angular.module(PKG.name+'.directives').directive('myProviderFields', 
+angular.module(PKG.name+'.commons').directive('myProviderFields', 
 function myProviderFieldsDirective () {
   return {
     restrict: 'E',

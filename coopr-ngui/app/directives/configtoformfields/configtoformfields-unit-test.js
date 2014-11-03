@@ -1,7 +1,7 @@
 /*global module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 
 describe('directive myConfigtoformfields', function() {
-  beforeEach(module(PKG.name + '.directives'));
+  beforeEach(module(PKG.name + '.commons'));
 
   var $compile, scope;
   beforeEach(inject(function(_$compile_, $rootScope){
@@ -30,8 +30,8 @@ describe('directive myConfigtoformfields', function() {
       }
     };
 
-    scope.config = config; 
-    scope.model = {}; 
+    scope.config = config;
+    scope.model = {};
 
     var el = $compile('<my-configtoformfields data-model="model" data-config="config" data-allow-override="true" />')(scope);
     scope.$digest();
@@ -69,8 +69,8 @@ describe('directive myConfigtoformfields', function() {
       required: [['bar']]
     };
 
-    scope.config = config; 
-    scope.model = {}; 
+    scope.config = config;
+    scope.model = {};
 
     var el = $compile('<my-configtoformfields data-model="model" data-config="config" />')(scope);
     scope.$digest();

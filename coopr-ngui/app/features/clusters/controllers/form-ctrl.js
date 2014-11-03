@@ -3,8 +3,8 @@
  * handles both "reconfigure" and "create" views
  */
 
-angular.module(PKG.name+'.features').controller('ClusterFormCtrl', 
-function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHELPERS) {
+angular.module(PKG.name+'.feature.clusters').controller('ClusterFormCtrl',
+function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHelpers) {
   CrudFormBase.apply($scope);
 
   var id = $state.params.id;
@@ -48,7 +48,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
         Math.max(
           $scope.model.numMachines,
           chosen.constraints ? chosen.constraints.size.min : 1
-        ), 
+        ),
         chosen.constraints ? chosen.constraints.size.max : Infinity
       );
 
@@ -65,20 +65,20 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
       });
 
 
-      $scope.leaseDuration = MYHELPERS.parseMilliseconds(
+      $scope.leaseDuration = myHelpers.parseMilliseconds(
         chosen.administration.leaseduration.initial
       );
 
       // set the template defaults on the model
       angular.extend($scope.model, chosen.defaults);
-    }); 
+    });
 
 
     $scope.$watch('model.provider', function (name) {
       $scope.chosenProvider = $scope.availableProviders.filter(function (p) {
         return p.name === name;
       })[0];
-    }); 
+    });
 
   });
 
@@ -90,7 +90,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
      */
     $scope.$watchCollection('leaseDuration', function (timeObj) {
       if(timeObj) {
-        var ms = MYHELPERS.concatMilliseconds(timeObj),
+        var ms = myHelpers.concatMilliseconds(timeObj),
             max = $scope.chosenTemplate.administration.leaseduration.initial;
 
         if(!max || (ms <= max)) {
@@ -103,7 +103,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
         }
 
       }
-    }); 
+    });
 
 
     myFocusManager.focus('inputClusterName');
@@ -127,7 +127,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
           imagetype: data.nodes[0].properties.imagetype
         });
 
-        $scope.leaseDuration = MYHELPERS.parseMilliseconds(data.expireTime);
+        $scope.leaseDuration = myHelpers.parseMilliseconds(data.expireTime);
 
         myFocusManager.select('inputClusterConfig');
       })
@@ -164,8 +164,8 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, MYHEL
         $state.go('^.list');
 
         $alert({
-          title: 'Cluster', 
-          content: ($scope.editing ? 'reconfiguration' : 'creation') + ' succeeded!', 
+          title: 'Cluster',
+          content: ($scope.editing ? 'reconfiguration' : 'creation') + ' succeeded!',
           type: 'success'
         });
 

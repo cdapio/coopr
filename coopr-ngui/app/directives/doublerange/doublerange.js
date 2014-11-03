@@ -4,7 +4,7 @@
  */
 var INTEGER_MAX = 2147483647;
 
-angular.module(PKG.name+'.directives').directive('myDoublerange', 
+angular.module(PKG.name+'.commons').directive('myDoublerange', 
 function myDoublerangeDirective ($log) {
   return {
     restrict: 'E',

@@ -1,7 +1,7 @@
 /*global jasmine, module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 
 describe('crud feature', function(){
-  beforeEach(module('coopr-ngui.features'));
+  beforeEach(module('coopr-ngui.feature.crud'));
 
 
   describe('CrudCreateCtrl', function() {

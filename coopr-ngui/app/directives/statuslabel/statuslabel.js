@@ -13,7 +13,7 @@
  *
  */
 
-angular.module(PKG.name+'.directives').directive('myStatusLabel', 
+angular.module(PKG.name+'.commons').directive('myStatusLabel', 
 function myStatusLabelDirective () {
   return {
     restrict: 'E',
