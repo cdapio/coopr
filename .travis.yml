@@ -61,7 +61,7 @@ before_script:
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd ..; fi'
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then bash coopr-server/templates/mock/load-mock.sh; fi'
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then curl http://www.browserstack.com/BrowserStackTunnel.jar > BrowserStackTunnel.jar; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then java -jar BrowserStackTunnel.jar $BROWSER_STACK_ACCESS_KEY localhost,8080,0 >/dev/null 2>&1 &; fi'
+  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then java -jar BrowserStackTunnel.jar $BROWSER_STACK_ACCESS_KEY localhost,8080,0; fi >/dev/null 2>&1 &'
   - 'sleep 10'
 
 script:
