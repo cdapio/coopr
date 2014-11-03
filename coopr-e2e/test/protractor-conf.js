@@ -8,7 +8,7 @@ var config = {
   capabilities: {
     'browserstack.user': process.env.BROWSER_STACK_USERNAME,
     'browserstack.key': process.env.BROWSER_STACK_ACCESS_KEY,
-    // 'browserstack.local': 'true',
+    'browserstack.local': 'true',
 
     'browserName': 'Chrome'
   },
