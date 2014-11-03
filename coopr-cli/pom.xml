@@ -95,8 +95,6 @@
             <configuration>
               <target>
                 <chmod file="${project.build.directory}/bin/**" perm="755"/>
-                <!--<chmod file="${stage.opt.dir}/bin/cdap-cli.sh" perm="755"/>-->
-                <!--<chmod file="${stage.opt.dir}/bin/cdap-cli.bat" perm="755"/>-->
               </target>
             </configuration>
             <goals>
