@@ -18,12 +18,12 @@ angular.module(PKG.name+'.feature.home')
 
       .state('home', {
         url: '/',
-        templateUrl: '/assets/features/_home/home.html',
+        templateUrl: '/assets/features/home/home.html',
         controller: 'HomeCtrl'
       })
 
       .state('404', {
-        templateUrl: '/assets/features/_home/404.html'
+        templateUrl: '/assets/features/home/404.html'
       })
 
       ;
