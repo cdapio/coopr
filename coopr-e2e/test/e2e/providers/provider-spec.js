@@ -3,29 +3,18 @@
 //  */
 var helper = require('../../protractor-help');
 
-
-describe('just a simple test', function() {
-
- 
-  it('should show a page', function () {
-
-    browser.get('/');
-    expect(
-      element(by.css('body')).getAttribute('class')
-    ).toContain('state-home');
-
-  });
-
-});
-
-
 describe('providers test', function () {
   var ptor = protractor.getInstance();
   var formfields;
   var providersList;
   
   it('should log in', function () {
-    helper.loginAsAdmin();
+    browser.get('/login');
+    element(by.id('loginTenant')).clear().sendKeys('superadmin');
+    element(by.id('loginUsername')).clear().sendKeys('admin');
+    element(by.id('loginPassword')).clear().sendKeys('admin');
+    element(by.partialButtonText('Submit')).click();
+    expect(element(by.css('header .dropdown-toggle .fa-user')).isPresent()).toBe(true);
   });
 
   it('should show the correct fields for provider type', function() {
@@ -66,6 +55,7 @@ describe('providers test', function () {
     formfields.get(1).element(by.css('input')).sendKeys('Test email');
     formfields.get(3).element(by.css('input')).sendKeys('Test project id');
     formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
+    browser.waitForAngular();
     element(by.partialButtonText('Create')).click();
     expect(
       browser.getLocationAbsUrl()
@@ -86,7 +76,7 @@ describe('providers test', function () {
     expect(element(by.css('#inputProviderName')).getAttribute('value')).toBe('Testprovider');
     expect(
       element(by.css('#inputProviderDescription')).getAttribute('value')).toBe('Test description');
-    expect(element(by.css('#inputProviderType')).getAttribute('value')).toBe('1');
+    expect(element(by.css('#inputProviderType')).getAttribute('value')).toBe('');
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
     var size = formfields.get(2).element(by.css('input')).getAttribute('value');
     expect(size).toEqual('10');
@@ -98,6 +88,7 @@ describe('providers test', function () {
     providersList = element.all(by.repeater('item in list'));
     providersList.first().element(by.cssContainingText('.btn', 'Delete')).click();
     element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
+    browser.waitForAngular();
     providersList = element.all(by.repeater('item in list'));
     expect(providersList.count()).toEqual(0);
   });
@@ -114,7 +105,8 @@ describe('providers test', function () {
   });
 
   it('should logout', function () {
-    helper.logout();
+    element(by.css('header .navbar-right .dropdown-toggle')).click();
+    element(by.css('.dropdown-menu a[ng-click^="logout"]')).click();
   });
 
 });

@@ -2,12 +2,20 @@ var config = {
   allScriptsTimeout: 11000,
 
   specs: [
-    'e2e/**/*.js'
+    'e2e/providers/provider-spec.js'
   ],
 
   capabilities: {
-    'browserName': 'chrome'
+
+    // Settings for the browser you want to test
+    'browserName' : 'Chrome',
+    'browser_version' : '36.0',
+    'os' : 'OS X',
+    'os_version' : 'Mavericks',
+    'resolution' : '1024x768'
   },
+
+  // seleniumAddress: 'http://hub.browserstack.com/wd/hub',
 
   baseUrl: 'http://localhost:8080/',
 
@@ -19,17 +27,16 @@ var config = {
 
   onPrepare: function() {
     browser.driver.manage().window().maximize();
-    browser.driver.executeScript("window.name='PROTRACTOR';");
   }
 };
 
 if (process.env.TRAVIS) {
-  config.sauceUser = process.env.SAUCE_USERNAME;
-  config.sauceKey = process.env.SAUCE_ACCESS_KEY;
-  config.capabilities['platform'] = 'OS X 10.9';
-  config.capabilities['tunnel-identifier'] = process.env.TRAVIS_JOB_NUMBER;
-  config.capabilities['build'] = process.env.TRAVIS_BUILD_NUMBER;
-  config.capabilities['name'] = "coopr-ngui build#"+process.env.TRAVIS_BUILD_NUMBER;
+  // config.sauceUser = process.env.SAUCE_USERNAME;
+  // config.sauceKey = process.env.SAUCE_ACCESS_KEY;
+  // config.capabilities['tunnel-identifier'] = process.env.TRAVIS_JOB_NUMBER;
+  // config.capabilities['build'] = process.env.TRAVIS_BUILD_NUMBER;
+  // config.capabilities['name'] = "coopr-ngui build#"+process.env.TRAVIS_BUILD_NUMBER;
+  // 'browser' : 'Chrome'
 }
 
 
