@@ -6,8 +6,11 @@ var config = {
   ],
 
   capabilities: {
+    'browserstack.user': process.env.BROWSER_STACK_USERNAME,
+    'browserstack.key': process.env.BROWSER_STACK_ACCESS_KEY,
+    // 'browserstack.local': 'true',
 
-    // Settings for the browser you want to test
+    'browserName': 'Chrome'
   },
 
   seleniumAddress: 'http://hub.browserstack.com/wd/hub',
@@ -25,7 +28,10 @@ var config = {
   }
 };
 
-if(process.env.TRAVIS) {
+if (process.env.TRAVIS) {
+  config.capabilities['browserstack.tunnel'] = 'true';
+  config.capabilities['browserstack.debug'] = 'true';
+
   if('BS_AUTOMATE_PROJECT' in process.env) {
     config.capabilities['project'] = process.env['BS_AUTOMATE_PROJECT'];  
   }
@@ -40,8 +46,6 @@ if(process.env.TRAVIS) {
   
   config.capabilities['platform'] = process.env['SELENIUM_PLATFORM'] ? process.env['SELENIUM_PLATFORM'] : 'ANY';
   config.capabilities['browser'] = process.env['SELENIUM_BROWSER'] ? process.env['SELENIUM_BROWSER'] : 'chrome';
-  config.capabilities['browserstack.user'] = process.env.BROWSER_STACK_USERNAME;
-  config.capabilities['browserstack.key'] = process.env.BROWSER_STACK_ACCESS_KEY;
   // config.sauceUser = process.env.SAUCE_USERNAME;
   // config.sauceKey = process.env.SAUCE_ACCESS_KEY;
   // config.capabilities['tunnel-identifier'] = process.env.TRAVIS_JOB_NUMBER;
