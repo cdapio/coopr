@@ -8,7 +8,6 @@ var config = {
   capabilities: {
 
     // Settings for the browser you want to test
-    'browserName' : 'Chrome'
   },
 
   seleniumAddress: 'http://hub.browserstack.com/wd/hub',
