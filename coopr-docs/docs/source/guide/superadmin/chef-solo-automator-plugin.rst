@@ -173,18 +173,20 @@ Since the Chef Solo Automator plugin is implemented using chef-solo, the followi
 Cookbooks should be fully attribute-driven. At this time the Chef Solo Automator does not support the chef-solo "environment" primitive. 
 Attributes normally specified in an environment can instead be populated in Coopr primitives such as cluster templates or service action data.
 
-In order to add cookbooks, roles, or data-bags for use by the provisioners, simply add them to the local chef directories for the Chef Solo Automator
-plugin. If using the default package install, these directories are currently:
-::
+**Cookbooks as plugin resources**
 
-    /opt/coopr/provisioner/daemon/plugins/automators/chef_solo_automator/chef_solo_automator/cookbooks
-    /opt/coopr/provisioner/daemon/plugins/automators/chef_solo_automator/chef_solo_automator/roles
-    /opt/coopr/provisioner/daemon/plugins/automators/chef_solo_automator/chef_solo_automator/data_bags
+The Chef Solo Automator utilizes the :doc:`Plugin Resources </guide/admin/plugin-resources>` capability of Coopr in order to manage cookbooks, data bags, and roles.  Each of these chef primitives can be uploaded to the Coopr server individually as resources.  Refer to the :doc:`Plugin Resources Guide </guide/admin/plugin-resources>` for more details on plugin resource management.
 
-Your cookbook should be readable by the 'coopr-provisioner' user (default: 'coopr'). The next provisioner which runs a
-bootstrap task will regenerate the local tarballs
-(for example ``/opt/coopr/provisioner/daemon/plugins/automators/chef_solo_automator/chef_solo_automator/cookbooks.tar.gz``) and it will be
-available for use when chef-solo runs on the remote box.
+Examples:
+
+	* /opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb -u http://localhost:55054 -t superadmin -U admin sync ./my/local/cookbooks/myapp automatortypes/chef-solo/cookbooks/myapp
+	* /opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb -u http://localhost:55054 -t superadmin -U admin sync ./my/local/data_bags/mydata_bag automatortypes/chef-solo/data_bags/my_data_bag
+	* /opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb -u http://localhost:55054 -t superadmin -U admin sync ./my/local/roles/my_role.rb automatortypes/chef-solo/cookbooks/my_role.rb
+
+.. note:: If you are uploading an archive of a directory, the top level directory of your unpacked archive must be named exactly the same as your resource name. For example, if you are uploading an archive of a directory named 'mycookbook', you *must* name your resource 'mycookbook' in order for it to be used correctly. This issue will be fixed in the next release. 
+
+
+**Invoking your Cookbook**
 
 In order to actually invoke your cookbook or role as part of a cluster provision, you will need to define a Coopr service
 definition with the following parameters:
