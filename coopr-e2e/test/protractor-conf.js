@@ -8,11 +8,7 @@ var config = {
   capabilities: {
 
     // Settings for the browser you want to test
-    'browserName' : 'Chrome',
-    'browser_version' : '36.0',
-    'os' : 'OS X',
-    'os_version' : 'Mavericks',
-    'resolution' : '1024x768'
+    'browserName' : 'Chrome'
   },
 
   seleniumAddress: 'http://hub.browserstack.com/wd/hub',
