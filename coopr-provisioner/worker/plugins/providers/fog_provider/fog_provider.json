@@ -167,7 +167,7 @@
             "label": "Region",
             "type": "select",
             "options": [ "sfo1", "nyc2", "ams2", "sgp1", "lon1", "nyc3", "ams3" ],
-            "default": "sfo1",
+            "default": "nyc2",
             "override": true,
             "tip": "DigitalOcean Region"
           },
