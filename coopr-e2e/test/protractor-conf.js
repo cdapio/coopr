@@ -31,8 +31,8 @@ var config = {
 };
 
 if (process.env.TRAVIS) {
-  config['browserstack.user'] = process.env.BROWSER_STACK_USERNAME;
-  config['browserstack.key'] = process.env.BROWSER_STACK_ACCESS_KEY;
+  config.capabilities['browserstack.user'] = process.env.BROWSER_STACK_USERNAME;
+  config.capabilities['browserstack.key'] = process.env.BROWSER_STACK_ACCESS_KEY;
   // config.sauceUser = process.env.SAUCE_USERNAME;
   // config.sauceKey = process.env.SAUCE_ACCESS_KEY;
   // config.capabilities['tunnel-identifier'] = process.env.TRAVIS_JOB_NUMBER;
