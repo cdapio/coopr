@@ -17,29 +17,15 @@
 #
 
 # Attempt to set APP_HOME
-# Resolve links: $0 may be a link
-PRG="$0"
-bin=`dirname "${BASH_SOURCE-$0}"`
-bin=`cd "$bin"; pwd`
-lib="$bin"/../lib
-script=`basename $0`
-
-# Need this for relative symlinks.
-while [ -h "$PRG" ] ; do
-    ls=`ls -ld "$PRG"`
-    link=`expr "$ls" : '.*-> \(.*\)$'`
-    if expr "$link" : '/.*' > /dev/null; then
-        PRG="$link"
-    else
-        PRG=`dirname "$PRG"`"/$link"
-    fi
-done
+bin=`dirname ${BASH_SOURCE-$0}`
+bin=`cd ${bin}; pwd`
+lib=${bin}/../lib
+script=`basename ${0}`
 
 if [ "$CLASSPATH" = "" ]; then
   CLASSPATH=${lib}/coopr-cli-@@version@@.jar
 else
   CLASSPATH=$CLASSPATH:${lib}/coopr-cli-@@version@@.jar
 fi
-echo "${CLASSPATH}"
-echo "$script"
-java -cp ${CLASSPATH} -Dscript=$script co.cask.coopr.shell.CLIMain "$@"
+
+java -cp ${CLASSPATH} -Dscript=$script co.cask.coopr.shell.CLIMain ${@}
