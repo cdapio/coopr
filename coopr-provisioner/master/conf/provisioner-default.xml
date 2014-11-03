@@ -63,7 +63,7 @@
   </property>
   <property>
     <name>provisioner.log.level</name>
-    <value>debug</value>
+    <value>info</value>
     <description>log level, one of debug, info, warn, error, fatal</description>
   </property>
 </configuration>
