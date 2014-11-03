@@ -181,13 +181,28 @@ key names, etc).</p>
 </div>
 <div class="section" id="adding-your-own-scripts">
 <h2>Adding your own Scripts<a class="headerlink" href="#adding-your-own-scripts" title="Permalink to this headline">¶</a></h2>
+<p>The Shell Automator utilizes the <a class="reference internal" href="../admin/plugin-resources.html"><em>Plugin Resources</em></a> capability of Coopr in order to manage shell scripts.  Each script can be uploaded to the Coopr server individually as resources.  Refer to the <a class="reference internal" href="../admin/plugin-resources.html"><em>Plugin Resources Guide</em></a> for more details on plugin resource management.</p>
+<p>Example:</p>
 <blockquote>
-<div><ol class="arabic simple">
-<li>add your script to the <tt class="docutils literal"><span class="pre">$COOPR_HOME/provisioner/daemon/plugins/automators/shell_automator/scripts</span></tt> directory.</li>
-<li>add/edit a service definition with an action of type &#8220;shell&#8221;</li>
-<li>specify the command to run, optional args, and during which stage it should run.</li>
-</ol>
+<div><ul class="simple">
+<li>/opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb -u <a class="reference external" href="http://localhost:55054">http://localhost:55054</a> -t superadmin -U admin sync ./my/local/scripts/my_script.sh automatortypes/shell/scripts/my_script.sh</li>
+</ul>
 </div></blockquote>
+<p>In order to actually invoke your script as part of a cluster provision, you will need to define a Coopr service
+definition with the following parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Category: any action (install, configure, start, stop, etc)</li>
+<li>Type: shell</li>
+<li>Script: the command to run, note your script will reside in the current working directory, so &#8220;my_script.sh&#8221; should suffice</li>
+<li>Arguments: optional arguments to the script</li>
+</ul>
+</div></blockquote>
+<p>Then simply add your service to a cluster template.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When your script runs, its current working directory will be within the provisioner&#8217;s work directory.  Any file paths referenced in your script should be absolute.</p>
+</div>
 </div>
 <div class="section" id="best-practices">
 <h2>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h2>
