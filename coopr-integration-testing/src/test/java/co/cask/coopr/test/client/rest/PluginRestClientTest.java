@@ -16,9 +16,9 @@
 
 package co.cask.coopr.test.client.rest;
 
+import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.Entities;
 import co.cask.coopr.client.PluginClient;
-import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.provisioner.plugin.ResourceMeta;
 import co.cask.coopr.provisioner.plugin.ResourceStatus;
 import co.cask.coopr.spec.plugin.AutomatorType;

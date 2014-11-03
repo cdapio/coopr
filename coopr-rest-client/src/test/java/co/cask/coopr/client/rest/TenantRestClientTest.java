@@ -16,9 +16,8 @@
 
 package co.cask.coopr.client.rest;
 
-import co.cask.coopr.client.ClientManager;
+import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.client.TenantClient;
-import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.client.rest.handler.TestStatusUserId;
 import co.cask.coopr.spec.TenantSpecification;
 import com.google.common.collect.Lists;

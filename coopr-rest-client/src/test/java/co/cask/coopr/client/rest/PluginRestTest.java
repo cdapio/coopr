@@ -16,9 +16,9 @@
 
 package co.cask.coopr.client.rest;
 
+import co.cask.common.http.exception.HttpFailureException;
 import co.cask.coopr.client.ClientManager;
 import co.cask.coopr.client.PluginClient;
-import co.cask.coopr.client.rest.exception.HttpFailureException;
 import co.cask.coopr.client.rest.handler.PluginTestConstants;
 import co.cask.coopr.client.rest.handler.PluginTestHandler;
 import co.cask.coopr.provisioner.plugin.ResourceMeta;
@@ -42,14 +42,11 @@ public class PluginRestTest {
 
   protected static ClientManager clientManager;
   static PluginClient pluginRestClient;
-  private static PluginTestHandler handler;
-  private static String testServerHost;
-  private static int testServerPort;
   private static NettyHttpService httpService;
 
   @BeforeClass
   public static void setupTestClass() throws Exception {
-    handler = new PluginTestHandler();
+    PluginTestHandler handler = new PluginTestHandler();
     NettyHttpService.Builder builder = NettyHttpService.builder();
     builder.addHttpHandlers(ImmutableSet.of(handler));
 
@@ -63,8 +60,8 @@ public class PluginRestTest {
     httpService = builder.build();
     httpService.startAndWait();
 
-    testServerPort = httpService.getBindAddress().getPort();
-    testServerHost = httpService.getBindAddress().getHostName();
+    int testServerPort = httpService.getBindAddress().getPort();
+    String testServerHost = httpService.getBindAddress().getHostName();
     clientManager = RestClientManager.builder(testServerHost, testServerPort)
                     .userId(PluginTestConstants.TEST_USER_ID)
                     .tenantId(PluginTestConstants.TEST_TENANT_ID).build();
@@ -110,9 +107,8 @@ public class PluginRestTest {
   @Test
   public void getAutomatorTypeResourcesNotExistTest() throws IOException {
     try {
-      Map<String, Set<ResourceMeta>> resourcesMap =
-        pluginRestClient.getAutomatorTypeResources(PluginTestConstants.CHEF_PLUGIN,
-                                                   PluginTestConstants.NOT_EXISISTING_RESOURCE, ResourceStatus.ACTIVE);
+      pluginRestClient.getAutomatorTypeResources(PluginTestConstants.CHEF_PLUGIN,
+                                                 PluginTestConstants.NOT_EXISISTING_RESOURCE, ResourceStatus.ACTIVE);
       Assert.fail("Expected HttpFailureException");
     } catch (HttpFailureException e) {
       Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());
@@ -174,9 +170,8 @@ public class PluginRestTest {
   @Test
   public void getProviderTypeResourcesNotExistTest() throws IOException {
     try {
-      Map<String, Set<ResourceMeta>> resourcesMap =
-        pluginRestClient.getProviderTypeResources(PluginTestConstants.JOYENT_PLUGIN,
-                                                  PluginTestConstants.NOT_EXISISTING_RESOURCE, ResourceStatus.ACTIVE);
+      pluginRestClient.getProviderTypeResources(PluginTestConstants.JOYENT_PLUGIN,
+                                                PluginTestConstants.NOT_EXISISTING_RESOURCE, ResourceStatus.ACTIVE);
       Assert.fail("Expected HttpFailureException");
     } catch (HttpFailureException e) {
       Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());
