@@ -11,11 +11,6 @@ var config = {
     'browserstack.local': 'true',
     'browserstack.debug': 'true',
     'browserstack.tunnel': 'true',
-    'browser' : 'Chrome',
-    'browser_version' : '36.0',
-    'os' : 'OS X',
-    'os_version' : 'Mavericks',
-    'resolution' : '1024x768',
     'browserName': 'Chrome'
   },
 
