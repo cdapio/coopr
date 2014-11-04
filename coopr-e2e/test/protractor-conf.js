@@ -11,7 +11,7 @@ var config = {
     'browserstack.local': 'true',
     'browserstack.tunnel': 'true',
     'os' : 'OS X',
-    'os_version' : '7',
+    'os_version' : 'Mavericks',
     'resolution' : '1024x768',
     'browserName': 'Chrome'
   },
