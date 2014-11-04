@@ -4,10 +4,10 @@
 <configuration>
   <property>
     <name>server.local.data.dir</name>
-    <value>/Users/davidbajot/repos/coopr/coopr-standalone/data</value>
+    <value>COOPR_DATA_DIR</value>
   </property>
   <property>
     <name>server.plugin.store.localfilestore.data.dir</name>
-    <value>/Users/davidbajot/repos/coopr/coopr-standalone/data/plugins/resources</value>
+    <value>COOPR_DATA_DIR/plugins/resources</value>
   </property>
 </configuration>
