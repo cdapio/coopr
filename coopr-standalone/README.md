@@ -5,6 +5,8 @@
    * XCode Command Line Developer Tools (Mac only)
 
 ## Build
+   * git submodule init (if you've never done it before)
+   * git submodule update (to make sure coopr-templates is updated)
    * mvn clean package assembly:single -DskipTests
 
 ## Install
