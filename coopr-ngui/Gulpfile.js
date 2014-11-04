@@ -27,7 +27,7 @@ gulp.task('css:lib', ['fonts'], function() {
         './bower_components/font-awesome/css/font-awesome.min.css'
       ]),
       gulp.src(mainBowerFiles({
-        filter: /cask\-angular\-[^\/]+\/.*\.(css|less)/
+        filter: /cask\-angular\-[^\/]+\/.*\.(css|less)$/
       }))
     )
     .pipe(plumber())
@@ -106,8 +106,8 @@ gulp.task('js:lib', function() {
       ]),
 
       gulp.src(mainBowerFiles({
-          filter: /cask\-angular\-[^\/]+\/.*\.js/
-        }))
+        filter: /cask\-angular\-[^\/]+\/.*\.js$/
+      }))
     )
     .pipe(plug.concat('lib.js'))
     .pipe(gulp.dest('./dist/assets/bundle'));
