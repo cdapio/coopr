@@ -19,7 +19,7 @@ describe('login', function() {
 
     expect( 
       element(
-        by.cssContainingText('#alerts .alert-success', 'Welcome')
+        by.css('header .dropdown-toggle .fa-user')
       ).isPresent()
     ).toBe(true);
 
@@ -47,9 +47,9 @@ describe('login', function() {
 
       expect( 
         element(
-          by.cssContainingText('#alerts .alert-info', 'You are now logged out')
+          by.css('header .dropdown-toggle .fa-user')
         ).isPresent()
-      ).toBe(true);
+      ).toBe(false);
 
     });
 

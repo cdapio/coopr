@@ -6,8 +6,17 @@ var config = {
   ],
 
   capabilities: {
+    'browserstack.user': process.env.BROWSER_STACK_USERNAME,
+    'browserstack.key': process.env.BROWSER_STACK_ACCESS_KEY,
+    'browserstack.local': 'true',
+    'browserstack.tunnel': 'true',
+    'os' : 'OS X',
+    'os_version' : 'Mavericks',
+    'resolution' : '1024x768',
     'browserName': 'chrome'
   },
+
+  
 
   baseUrl: 'http://localhost:8080/',
 
@@ -19,17 +28,21 @@ var config = {
 
   onPrepare: function() {
     browser.driver.manage().window().maximize();
-    browser.driver.executeScript("window.name='PROTRACTOR';");
   }
 };
 
 if (process.env.TRAVIS) {
-  config.sauceUser = process.env.SAUCE_USERNAME;
-  config.sauceKey = process.env.SAUCE_ACCESS_KEY;
-  config.capabilities['platform'] = 'OS X 10.9';
-  config.capabilities['tunnel-identifier'] = process.env.TRAVIS_JOB_NUMBER;
-  config.capabilities['build'] = process.env.TRAVIS_BUILD_NUMBER;
-  config.capabilities['name'] = "coopr-ngui build#"+process.env.TRAVIS_BUILD_NUMBER;
+  
+  
+  config.seleniumAddress =  'http://hub.browserstack.com/wd/hub';
+  
+  if('BS_AUTOMATE_PROJECT' in process.env) {
+    config.capabilities['project'] = process.env['BS_AUTOMATE_PROJECT'];  
+  }
+
+  if('BS_AUTOMATE_BUILD' in process.env) {
+    config.capabilities['build'] = process.env['BS_AUTOMATE_BUILD'];  
+  }
 }
 
 

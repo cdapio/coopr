@@ -86,7 +86,6 @@ describe('providers test', function () {
     expect(element(by.css('#inputProviderName')).getAttribute('value')).toBe('Testprovider');
     expect(
       element(by.css('#inputProviderDescription')).getAttribute('value')).toBe('Test description');
-    expect(element(by.css('#inputProviderType')).getAttribute('value')).toBe('1');
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
     var size = formfields.get(2).element(by.css('input')).getAttribute('value');
     expect(size).toEqual('10');
