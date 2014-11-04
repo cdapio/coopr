@@ -11,11 +11,10 @@ var config = {
     'browserstack.local': 'true',
     'browserstack.debug': 'true',
     'browserstack.tunnel': 'true',
-    'browser_version' : '36.0',
-    'os' : 'OS X',
-    'os_version' : 'Mavericks',
+    'os' : 'WINDOWS',
+    'os_version' : '7',
     'resolution' : '1024x768',
-    'browserName': 'Chrome'
+    'browserName': 'Firefox'
   },
 
   seleniumAddress: 'http://hub.browserstack.com/wd/hub',
