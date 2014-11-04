@@ -58,12 +58,17 @@ console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
  */
 
 var app = express(),
+    sslCredentials = null,
+    httpServer = http.createServer(app),
+    httpsServer = null;
+
+if (COOPR_SSL) {
     sslCredentials = {
         key: fs.readFileSync(COOPR_UI_KEY_FILE, 'utf-8'),
         cert: fs.readFileSync(COOPR_UI_CERT_FILE, 'utf-8')
-    },
-    httpServer = http.createServer(app),
+    };
     httpsServer = https.createServer(sslCredentials, app);
+}
 
 try { app.use(serveFavicon(__dirname + '/dist/assets/img/favicon.png')); }
 catch(e) { console.error("Favicon missing! Did you run `gulp build`?"); }
