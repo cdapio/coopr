@@ -36,7 +36,6 @@ function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
     $scope.model.$promise
   ])
   .then(function () {
-    console.log($scope.model);
     $scope.selectedProvider = findProvider($scope.model.providertype);
   });
 
