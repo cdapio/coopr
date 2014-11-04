@@ -14,7 +14,8 @@ var config = {
     'os' : 'WINDOWS',
     'os_version' : '7',
     'resolution' : '1024x768',
-    'browserName': 'Firefox'
+    'browserName': 'Firefox',
+    'browser': 'Firefox'
   },
 
   seleniumAddress: 'http://hub.browserstack.com/wd/hub',
