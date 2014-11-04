@@ -2,6 +2,7 @@ var gulp = require('gulp'),
     plug = require('gulp-load-plugins')(),
     pkg = require('./package.json'),
     del = require('del'),
+    mainBowerFiles = require('main-bower-files'),
     merge = require('merge-stream');
 
 function plumber() {
@@ -16,13 +17,19 @@ function plumber() {
   library CSS
  */
 gulp.task('css:lib', ['fonts'], function() {
-  return gulp.src([
-      './app/styles/bootstrap.less',
-      './bower_components/angular/angular-csp.css',
-      './bower_components/angular-loading-bar/build/loading-bar.min.css',
-      './bower_components/angular-motion/dist/angular-motion.min.css',
-      './bower_components/font-awesome/css/font-awesome.min.css'
-    ])
+
+  return merge(
+      gulp.src([
+        './app/styles/bootstrap.less',
+        './bower_components/angular/angular-csp.css',
+        './bower_components/angular-loading-bar/build/loading-bar.min.css',
+        './bower_components/angular-motion/dist/angular-motion.min.css',
+        './bower_components/font-awesome/css/font-awesome.min.css'
+      ]),
+      gulp.src(mainBowerFiles({
+        filter: /cask\-angular\-[^\/]+\/.*\.(css|less)/
+      }))
+    )
     .pipe(plumber())
     .pipe(plug.if('*.less', plug.less()))
     .pipe(plug.concat('lib.css'))
@@ -65,38 +72,43 @@ gulp.task('css:app', function() {
   library javascript
  */
 gulp.task('js:lib', function() {
-  return gulp.src([
-      './bower_components/angular/angular.js',
+  return merge(
+      gulp.src([
+        './bower_components/angular/angular.js',
 
-      './bower_components/angular-sanitize/angular-sanitize.js',
-      './bower_components/angular-animate/angular-animate.js',
-      './bower_components/angular-resource/angular-resource.js',
+        './bower_components/angular-sanitize/angular-sanitize.js',
+        './bower_components/angular-animate/angular-animate.js',
+        './bower_components/angular-resource/angular-resource.js',
 
-      './bower_components/angular-ui-router/release/angular-ui-router.js',
+        './bower_components/angular-ui-router/release/angular-ui-router.js',
 
-      './bower_components/angular-strap/dist/modules/dimensions.js',
-      './bower_components/angular-strap/dist/modules/button.js',
-      './bower_components/angular-strap/dist/modules/tab.js',
-      './bower_components/angular-strap/dist/modules/tab.tpl.js',
-      './bower_components/angular-strap/dist/modules/tooltip.js',
-      './bower_components/angular-strap/dist/modules/tooltip.tpl.js',
-      './bower_components/angular-strap/dist/modules/dropdown.js',
-      './bower_components/angular-strap/dist/modules/dropdown.tpl.js',
-      './bower_components/angular-strap/dist/modules/modal.js',
-      './bower_components/angular-strap/dist/modules/modal.tpl.js',
-      './bower_components/angular-strap/dist/modules/alert.js',
-      './bower_components/angular-strap/dist/modules/alert.tpl.js',
-      './bower_components/angular-strap/dist/modules/popover.js',
-      './bower_components/angular-strap/dist/modules/popover.tpl.js',
-      './bower_components/angular-strap/dist/modules/collapse.js',
+        './bower_components/angular-strap/dist/modules/dimensions.js',
+        './bower_components/angular-strap/dist/modules/button.js',
+        './bower_components/angular-strap/dist/modules/tab.js',
+        './bower_components/angular-strap/dist/modules/tab.tpl.js',
+        './bower_components/angular-strap/dist/modules/tooltip.js',
+        './bower_components/angular-strap/dist/modules/tooltip.tpl.js',
+        './bower_components/angular-strap/dist/modules/dropdown.js',
+        './bower_components/angular-strap/dist/modules/dropdown.tpl.js',
+        './bower_components/angular-strap/dist/modules/modal.js',
+        './bower_components/angular-strap/dist/modules/modal.tpl.js',
+        './bower_components/angular-strap/dist/modules/alert.js',
+        './bower_components/angular-strap/dist/modules/alert.tpl.js',
+        './bower_components/angular-strap/dist/modules/popover.js',
+        './bower_components/angular-strap/dist/modules/popover.tpl.js',
+        './bower_components/angular-strap/dist/modules/collapse.js',
 
-      './bower_components/moment/moment.js',
-      './bower_components/angular-moment/angular-moment.js',
+        './bower_components/moment/moment.js',
+        './bower_components/angular-moment/angular-moment.js',
 
-      './bower_components/ngstorage/ngStorage.js',
-      './bower_components/angular-loading-bar/build/loading-bar.js'
+        './bower_components/ngstorage/ngStorage.js',
+        './bower_components/angular-loading-bar/build/loading-bar.js'
+      ]),
 
-    ])
+      gulp.src(mainBowerFiles({
+          filter: /cask\-angular\-[^\/]+\/.*\.js/
+        }))
+    )
     .pipe(plug.concat('lib.js'))
     .pipe(gulp.dest('./dist/assets/bundle'));
 });
