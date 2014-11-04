@@ -2,7 +2,7 @@
  * Provider form controller for both edit and create views.
  */
 
-angular.module(PKG.name+'.features').controller('ProviderFormCtrl', 
+angular.module(PKG.name+'.features').controller('ProviderFormCtrl',
 function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
   CrudFormBase.apply($scope);
 
@@ -36,6 +36,7 @@ function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
     $scope.model.$promise
   ])
   .then(function () {
+    console.log($scope.model);
     $scope.selectedProvider = findProvider($scope.model.providertype);
   });
 
