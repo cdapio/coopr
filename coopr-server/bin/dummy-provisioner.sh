@@ -47,7 +47,6 @@ start ( ) {
 stop ( ) {
   echo "Stopping Dummy Provisioner ..."
   if [ -f ${pid} ] ; then
-    echo "  Stopping provisioner ${p} ..."
     pidToKill=`cat ${pid}`
     # kill -0 == see if the PID exists
     if kill -0 ${pidToKill} > /dev/null 2>&1; then
@@ -57,7 +56,7 @@ stop ( ) {
         echo -n .
         sleep 1
         let "count++"
-        if [ ${cnt} -ge 60 ]; then
+        if [ ${count} -ge 60 ]; then
           echo "  Provisioner (pid: ${pidToKill}) still running a task..."
           break
         fi
