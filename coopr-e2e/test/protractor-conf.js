@@ -9,6 +9,7 @@ var config = {
     'browserstack.user': process.env.BROWSER_STACK_USERNAME,
     'browserstack.key': process.env.BROWSER_STACK_ACCESS_KEY,
     'browserstack.local': 'true',
+    'browserstack.debug': 'true',
     'browserstack.tunnel': 'true',
     'os' : 'OS X',
     'os_version' : 'Mavericks',
