@@ -1,5 +1,5 @@
 var config = {
-  allScriptsTimeout: 11000,
+  allScriptsTimeout: 60000,
 
   specs: [
     'e2e/**/*.js'
@@ -24,7 +24,7 @@ var config = {
   framework: 'jasmine',
 
   jasmineNodeOpts: {
-    defaultTimeoutInterval: 30000
+    defaultTimeoutInterval: 60000
   },
 
   onPrepare: function() {
@@ -33,7 +33,6 @@ var config = {
 };
 
 if (process.env.TRAVIS) {
-  
   
   config.seleniumAddress =  'http://hub.browserstack.com/wd/hub';
   
