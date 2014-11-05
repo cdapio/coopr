@@ -4,23 +4,7 @@
 var helper = require('../../protractor-help');
 
 
-describe('just a simple test', function() {
-
- 
-  it('should show a page', function () {
-
-    browser.get('/');
-    expect(
-      element(by.css('body')).getAttribute('class')
-    ).toContain('state-home');
-
-  });
-
-});
-
-
 describe('providers test', function () {
-  var ptor = protractor.getInstance();
   var formfields;
   var providersList;
   
