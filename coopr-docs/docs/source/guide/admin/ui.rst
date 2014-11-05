@@ -208,8 +208,8 @@ template can be modified and deleted accordingly.
 Managing Infrastructure Providers
 =================================
 
-Coopr provides functionality to provision servers across a number of infrastructure providers, including but not
-limited to Amazon Web Services, Rackspace, and Joyent. Coopr also supports OpenStack to enable integration with
+Coopr provides functionality to provision servers across a number of infrastructure providers, including but not limited to
+Amazon Web Services, Rackspace, DigitalOcean, and Joyent. Coopr also supports OpenStack to enable integration with
 custom infrastructures for both public and private cloud.
 
 The Providers interface allows administrators to add available cloud providers and manage their credentials.
@@ -319,6 +319,8 @@ identifier codes commonly used by providers.
         `Rackspace <http://docs.rackspace.com/servers/api/v2/cs-releasenotes/content/supported_flavors.html>`_
 
         `Joyent <http://serverbear.com/9798/joyent>`_
+
+        `DigitalOcean <https://developers.digitalocean.com/v1/sizes/>`_
 
 As these codes are subject to change, please ensure the values reflect correctly with the provider's system.
 

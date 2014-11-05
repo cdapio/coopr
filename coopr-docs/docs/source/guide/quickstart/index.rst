@@ -94,9 +94,9 @@ Configuring a Provider
 =========================
 
 To start provisioning machines, you must first specify an IaaS provider on which the clusters will be created. Click on the 
-'Providers' tab at the top of the screen. Several defaults are available on this page. There are providers for Amazon, Google,
-Joyent, Openstack, and Rackspace. Choose the provider you want to use for this tutorial, then click on it's name to navigate to 
-it's edit screen.
+'Providers' tab at the top of the screen. Several defaults are available on this page. There are providers for Amazon, DigitalOcean,
+Google, Joyent, Openstack, and Rackspace. Choose the provider you want to use for this tutorial, then click on it's name to navigate 
+to it's edit screen.
 
 Each provider type has fields specific to your own provider and account.
 These inputs may include settings such as username and API key, and can be obtained through the provider's own 
@@ -326,6 +326,35 @@ contact your OpenStack administrator to get this information.
     :width: 800px
     :alt: Configuring an OpenStack image type
     :figclass: align-center
+
+
+DigitalOcean
+^^^^^^^^^^^^
+
+DigitalOcean requires a client ID, API key and ssh key. For the ssh key, you will also need to enter an ssh key name.
+Enter values for all those fields.  If applicable, change the region from the default (currently nyc2).
+
+.. figure:: /_images/quickstart/providers_digitalocean.png
+    :align: center
+    :width: 800px
+    :alt: Configuring a DigitalOcean provider
+    :figclass: align-center
+
+Your DigitalOcean ssh key is a plugin resource, and must be uploaded to the Coopr server before it can be used by workers. 
+Coopr will take care of distributing the key to workers that need it. A UI for managing resources is coming in the next release. 
+Until then, you must use the REST API directly (see :doc:`Plugin Resource API </rest/plugins>`), or use the data upload tool included 
+in the provisioner package.
+
+For example, assume your key is located at '/keys/digitalocean/id_rsa' and you want to add it as a resource named 'coopr'.
+Enter 'coopr' into the ``SSH Key Resource Name``, then upload the resource.
+If you are using Coopr Standalone, run the following command from the unzipped standalone directory:
+
+.. code-block:: bash
+
+ $ ruby provisioner/bin/data-uploader.rb sync /keys/digitalocean/id_rsa providertypes/digitalocean/ssh_keys/coopr -u http://<server>:<port>
+ upload successful for ...
+ stage successful for ...
+ sync successful
 
 
 Provisioning your First Cluster
