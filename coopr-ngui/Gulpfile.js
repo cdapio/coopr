@@ -2,6 +2,7 @@ var gulp = require('gulp'),
     plug = require('gulp-load-plugins')(),
     pkg = require('./package.json'),
     del = require('del'),
+    mainBowerFiles = require('main-bower-files'),
     merge = require('merge-stream');
 
 function plumber() {
@@ -16,13 +17,16 @@ function plumber() {
   library CSS
  */
 gulp.task('css:lib', ['fonts'], function() {
+
   return gulp.src([
       './app/styles/bootstrap.less',
       './bower_components/angular/angular-csp.css',
       './bower_components/angular-loading-bar/build/loading-bar.min.css',
       './bower_components/angular-motion/dist/angular-motion.min.css',
       './bower_components/font-awesome/css/font-awesome.min.css'
-    ])
+    ].concat(mainBowerFiles({
+      filter: /cask\-angular\-[^\/]+\/.*\.(css|less)$/
+    })))
     .pipe(plumber())
     .pipe(plug.if('*.less', plug.less()))
     .pipe(plug.concat('lib.css'))
@@ -96,7 +100,11 @@ gulp.task('js:lib', function() {
       './bower_components/ngstorage/ngStorage.js',
       './bower_components/angular-loading-bar/build/loading-bar.js'
 
-    ])
+    ].concat([
+      './bower_components/cask-angular-*/*/module.js'
+    ], mainBowerFiles({
+        filter: /cask\-angular\-[^\/]+\/.*\.js$/
+    })))
     .pipe(plug.concat('lib.js'))
     .pipe(gulp.dest('./dist/assets/bundle'));
 });

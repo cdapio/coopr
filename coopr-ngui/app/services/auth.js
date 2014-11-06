@@ -140,7 +140,7 @@ module.factory('myAuthPromise', function myAuthPromiseFactory (MYAUTH_ROLE, $tim
           deferred.resolve(c);
         }
       }
-    }, window.name==='PROTRACTOR' ? 10 : 1500);
+    }, 1500);
 
 
 
@@ -184,7 +184,7 @@ module.factory('MyAuthUser', function MyAuthUserFactory (MYAUTH_ROLE) {
   };
 
   /**
-   * do i haz one of given roles? 
+   * do i haz one of given roles?
    * @param  {String|Array} authorizedRoles
    * @return {Boolean}
    */
