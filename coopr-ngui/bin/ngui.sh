@@ -15,10 +15,13 @@
 # limitations under the License.
 #
 
+export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
 export COOPR_SERVER_URI=${COOPR_SERVER_URI:-http://localhost:55054}
 export COOPR_LOG_DIR=${COOPR_LOG_DIR:-/var/log/coopr}
 export COOPR_UI_PORT=${COOPR_UI_PORT:-8100}
-export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
+export COOPR_UI_SSL_PORT=${COOPR_UI_SSL_PORT:-8443}
+export COOPR_UI_KEY_FILE=${COOPR_UI_KEY_FILE:-${COOPR_HOME}/cert/server.key}
+export COOPR_UI_CERT_FILE=${COOPR_UI_CERT_FILE:-${COOPR_HOME}/cert/server.crt}
 
 die ( ) { echo; echo "ERROR: ${*}"; echo; exit 1; }
 

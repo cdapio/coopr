@@ -133,15 +133,40 @@ elif [ ${RUBY_VERSION_MAJOR} -eq 1 ] && [ ${RUBY_VERSION_MINOR} -lt 9 ]; then
   die "Ruby version is not supported! The minimum version supported is v1.9.0p0"
 fi
 
+# $1 - Property name to read
+# $2 - Config file name to read from
+#
+# Returns: value of a property as a string
+#
+# Usage: variable_to_store_value=`read_property property_name /path/to/config/file`
+#
+read_property () {
+  property_re='(?<=<name>'$1'</name>)[\s\S]+?(?=</property>)'
+  property_value_re='(?<=<value>)[\s\S]+?(?=</value>)'
+
+  echo `grep -Pzoe $property_re $2 | grep -Pzoe $property_value_re`
+}
+
 # Setup coopr configuration
 COOPR_PROTOCOL=http
-line=`awk '/server.ssl.enable/{print NR; exit}' ${COOPR_SERVER_CONF}/coopr-site.xml`
-let "line++"
-export COOPR_SSL=`sed -n "${line}p" ${COOPR_SERVER_CONF}/coopr-site.xml | awk -F"<|>" '{print $3}'`
-if [ ! -z ${COOPR_SSL} ] && [ ${COOPR_SSL} = "true" ]; then
+export COOPR_SSL=`read_property server.ssl.enabled ${COOPR_SERVER_CONF}/coopr-site.xml`
+if [ -n $COOPR_SSL ] && [ $COOPR_SSL = "true" ]; then
   COOPR_PROTOCOL=https
+
+  COOPR_NODEJS_SSL_PATH=`read_property server.nodejs.ssl.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+  COOPR_NODEJS_SSL_KEY_FILENAME=`read_property server.nodejs.ssl.key ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODEJS_SSL_KEY=$COOPR_NODEJS_SSL_PATH/$COOPR_NODEJS_SSL_KEY_FILENAME
+  COOPR_NODEJS_SSL_CRT_FILENAME=`read_property server.nodejs.ssl.crt ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODEJS_SSL_CRT=$COOPR_NODEJS_SSL_PATH/$COOPR_NODEJS_SSL_CRT_FILENAME
 fi
+
 export COOPR_SERVER_URI=${COOPR_PROTOCOL}://localhost:55054
+export TRUST_CERT_PATH=`read_property server.ssl.trust.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+export TRUST_CERT_PASSWORD=`read_property server.ssl.trust.cert.password ${COOPR_SERVER_CONF}/coopr-security.xml`
+
+if [ -n TRUST_CERT_PATH ] && [ -n TRUST_CERT_PASSWORD ]; then
+  export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
+fi
 
 if [ ! -z ${TRUST_CERT_PATH} ] && [ ! -z ${TRUST_CERT_PASSWORD} ]; then
   export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
@@ -151,6 +176,24 @@ if [ ${COOPR_PROTOCOL} = "https" ]; then
   export CURL_PARAMETER="--insecure"
   export COOPR_REJECT_UNAUTH=false
 fi
+
+export keystore_path=`read_property server.ssl.trust.keystore.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+export keystore_password=`read_property server.ssl.trust.keystore.password ${COOPR_SERVER_CONF}/coopr-security.xml`
+
+COOPR_NODE_TLS_ENABLED="false"
+if [ -n keystore_path ] && [ -n keystore_password ]; then
+  COOPR_NODE_TLS_ENABLED="true"
+
+  nodejs_tls_path=`read_property server.nodejs.tls.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
+  nodejs_tls_key=`read_property server.nodejs.tls.key ${COOPR_SERVER_CONF}/coopr-security.xml`
+  nodejs_tls_crt=`read_property server.nodejs.tls.crt ${COOPR_SERVER_CONF}/coopr-security.xml`
+  nodejs_tls_ca=`read_property server.nodejs.tls.ca ${COOPR_SERVER_CONF}/coopr-security.xml`
+  export COOPR_NODE_TLS_PASSWORD=`read_property server.nodejs.tls.password ${COOPR_SERVER_CONF}coopr-security.xml`
+  export COOPR_NODE_TLS_KEY=$nodejs_tls_path/$nodejs_tls_key
+  export COOPR_NODE_TLS_CRT=$nodejs_tls_path/$nodejs_tls_crt
+  export COOPR_NODE_TLS_CA=$nodejs_tls_path/$nodejs_tls_ca
+fi
+export COOPR_NODE_TLS_ENABLED
 
 # Load default configuration
 load_defaults () {
