@@ -73,6 +73,9 @@ public class Constants {
   public static final String PROVISIONER_REQUEST_MS_BETWEEN_RETRIES = "server.provisioner.request.ms.between.retries";
   public static final String PROVISIONER_REQUEST_SOCKET_TIMEOUT_MS = "server.provisioner.request.socket.timeout.ms";
 
+  /**
+   * Config settings for the crendential store.
+   */
   public static final class CredentialStore {
     private static final String prefix = "server.credential.store.";
     public static final String ENCRYPT_ENABLED = prefix + "encrypt.enabled";

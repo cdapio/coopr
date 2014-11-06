@@ -37,7 +37,7 @@ public class ClusterConfigureRequestCodec implements JsonDeserializer<ClusterCon
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
     Map<String, Object> providerFields =
-      context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, String>>() {}.getType());
+      context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, String>>() { }.getType());
     Boolean restart = context.deserialize(jsonObj.get("restart"), Boolean.class);
     JsonObject config = context.deserialize(jsonObj.get("config"), JsonObject.class);
 

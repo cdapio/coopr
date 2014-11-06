@@ -28,6 +28,7 @@ import java.lang.reflect.Type;
 
 /**
  * Base codec for serializing and deserializing a {@link co.cask.coopr.spec.BaseEntity}.
+ * @param <T> type of base entity to serialize and deserialize.
  */
 public abstract class AbstractBaseEntityCodec<T extends BaseEntity> extends AbstractCodec<T> {
 

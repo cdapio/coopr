@@ -50,8 +50,8 @@ public class ServiceDependenciesCodec extends AbstractCodec<ServiceDependencies>
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    Set<String> provides = context.deserialize(jsonObj.get("provides"), new TypeToken<Set<String>>() {}.getType());
-    Set<String> conflicts = context.deserialize(jsonObj.get("conflicts"), new TypeToken<Set<String>>() {}.getType());
+    Set<String> provides = context.deserialize(jsonObj.get("provides"), new TypeToken<Set<String>>() { }.getType());
+    Set<String> conflicts = context.deserialize(jsonObj.get("conflicts"), new TypeToken<Set<String>>() { }.getType());
     ServiceStageDependencies install = context.deserialize(jsonObj.get("install"), ServiceStageDependencies.class);
     ServiceStageDependencies runtime = context.deserialize(jsonObj.get("runtime"), ServiceStageDependencies.class);
 

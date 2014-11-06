@@ -20,9 +20,9 @@ import co.cask.coopr.cluster.Node;
 import co.cask.coopr.macro.eval.Evaluator;
 import com.google.common.base.Objects;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * An expression represents a single macro. It has a type and a name that are used to lookup the substitute for the

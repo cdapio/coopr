@@ -18,5 +18,6 @@ package co.cask.coopr.store.node;
 /**
  * A full view of the node store for management purposes.
  */
-public interface NodeStore extends NodeStoreView {}
+public interface NodeStore extends NodeStoreView {
 
+}

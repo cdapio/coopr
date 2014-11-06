@@ -87,7 +87,7 @@ public abstract class EncryptedCredentialStore extends AbstractIdleService imple
         return Maps.newHashMap();
       }
       String resultStr = encryptionEnabled ? encryptor.decodeAndDecryptString(val) : new String(val, Charsets.UTF_8);
-      return GSON.fromJson(resultStr, new TypeToken<Map<String, Object>>() {}.getType());
+      return GSON.fromJson(resultStr, new TypeToken<Map<String, Object>>() { }.getType());
     } catch (GeneralSecurityException e) {
       LOG.error("Exception decrypting sensitive fields for tenant {} and cluster {}.", tenantId, clusterId, e);
       throw new IOException("Unable to decrypt sensitive fields", e);

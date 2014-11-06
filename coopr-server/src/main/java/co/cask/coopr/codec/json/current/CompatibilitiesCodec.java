@@ -50,11 +50,11 @@ public class CompatibilitiesCodec extends AbstractCodec<Compatibilities> {
 
     return Compatibilities.builder()
       .setHardwaretypes(context.<Set<String>>deserialize(jsonObj.get("hardwaretypes"),
-                                                         new TypeToken<Set<String>>() {}.getType()))
+                                                         new TypeToken<Set<String>>() { }.getType()))
       .setImagetypes(context.<Set<String>>deserialize(jsonObj.get("imagetypes"),
-                                                      new TypeToken<Set<String>>() {}.getType()))
+                                                      new TypeToken<Set<String>>() { }.getType()))
       .setServices(context.<Set<String>>deserialize(jsonObj.get("services"),
-                                                    new TypeToken<Set<String>>() {}.getType()))
+                                                    new TypeToken<Set<String>>() { }.getType()))
       .build();
   }
 }

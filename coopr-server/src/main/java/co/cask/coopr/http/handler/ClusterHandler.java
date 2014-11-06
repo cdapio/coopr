@@ -59,18 +59,18 @@ import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 /**
  * Handler for performing cluster operations.
@@ -118,7 +118,7 @@ public class ClusterHandler extends AbstractAuthHandler {
     try {
       Set<Cluster.Status> statusFilter = getStatusFilter(request);
       List<ClusterSummary> summaries = clusterService.getClusterSummaries(account, statusFilter);
-      responder.sendJson(HttpResponseStatus.OK, summaries, new TypeToken<List<ClusterSummary>>() {}.getType(), gson);
+      responder.sendJson(HttpResponseStatus.OK, summaries, new TypeToken<List<ClusterSummary>>() { }.getType(), gson);
     } catch (IllegalArgumentException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Invalid status requested.");
     } catch (IOException e) {
@@ -237,13 +237,13 @@ public class ClusterHandler extends AbstractAuthHandler {
     try {
       ClusterStoreView view = clusterStoreService.getView(account);
       Cluster cluster = view.getCluster(clusterId);
-      if (cluster == null){
+      if (cluster == null) {
         responder.sendError(HttpResponseStatus.NOT_FOUND, String.format("cluster %s not found", clusterId));
         return;
       }
 
       ClusterJob job = clusterStore.getClusterJob(JobId.fromString(cluster.getLatestJobId()));
-      if (job == null){
+      if (job == null) {
         responder.sendError(HttpResponseStatus.NOT_FOUND,
                             String.format("job %s not found for cluster %s", cluster.getLatestJobId(), clusterId));
         return;

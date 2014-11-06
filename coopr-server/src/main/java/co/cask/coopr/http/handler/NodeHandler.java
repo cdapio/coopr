@@ -34,16 +34,16 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Set;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Set;
 
 /**
  * Handler for performing node operations.
@@ -174,9 +174,9 @@ public class NodeHandler extends AbstractAuthHandler {
       responder.sendError(HttpResponseStatus.FORBIDDEN, "Exception updating node.");
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception updating node.");
-    } catch (JsonIOException e){
+    } catch (JsonIOException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Exception reading node from body.");
-    } catch (JsonSyntaxException e){
+    } catch (JsonSyntaxException e) {
       responder.sendError(HttpResponseStatus.BAD_REQUEST, "Exception reading node from body.");
     } finally {
       try {

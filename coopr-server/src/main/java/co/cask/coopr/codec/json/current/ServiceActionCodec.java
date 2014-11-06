@@ -49,7 +49,7 @@ public class ServiceActionCodec extends AbstractCodec<ServiceAction> {
 
     String actionType = context.deserialize(jsonObj.get("type"), String.class);
     Map<String, String> fields =
-      context.deserialize(jsonObj.get("fields"), new TypeToken<Map<String, String>>() {}.getType());
+      context.deserialize(jsonObj.get("fields"), new TypeToken<Map<String, String>>() { }.getType());
 
     return new ServiceAction(actionType, fields);
   }
