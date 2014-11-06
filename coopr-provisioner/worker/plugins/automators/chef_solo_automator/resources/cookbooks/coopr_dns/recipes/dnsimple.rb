@@ -21,6 +21,15 @@
   include_recipe recipe
 end
 
+case node['platform_family']
+when 'debian'
+  zpkg = 'libz-dev'
+when 'rhel'
+  zpkg = 'zlib-devel'
+end
+
+package zpkg
+
 # Get credentials
 if node['dnsimple']['username'] && node['dnsimple']['password']
   dnsimple = node['dnsimple']
