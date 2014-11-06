@@ -15,6 +15,7 @@
  */
 package co.cask.coopr.scheduler.task;
 
+import co.cask.coopr.account.Account;
 import co.cask.coopr.scheduler.ClusterAction;
 import co.cask.coopr.spec.ProvisionerAction;
 import com.google.common.base.Objects;
@@ -46,6 +47,8 @@ public class ClusterTask {
   private final ClusterAction clusterAction;
   private final String nodeId;
   private final String service;
+  private String clusterTemplate;
+  private Account account;
   private List<TaskAttempt> attempts;
 
   public ClusterTask(ProvisionerAction taskName, TaskId taskId, String nodeId, String service,
@@ -59,6 +62,13 @@ public class ClusterTask {
     this.service = service;
     this.attempts = Lists.newArrayList();
     addAttempt();
+  }
+
+  public ClusterTask(ProvisionerAction taskName, TaskId taskId, String nodeId, String service,
+                     ClusterAction clusterAction, String clusterTemplate, Account account) {
+    this(taskName, taskId, nodeId, service, clusterAction);
+    this.clusterTemplate = clusterTemplate;
+    this.account = account;
   }
   
   int currentAttemptIndex() {
@@ -235,6 +245,42 @@ public class ClusterTask {
    */
   List<TaskAttempt> getAttempts() {
     return attempts;
+  }
+
+  /**
+   * Retrieves template of the cluster this task is for.
+   *
+   * @return template of the cluster this task is for.
+   */
+  public String getClusterTemplate() {
+    return clusterTemplate;
+  }
+
+  /**
+   * Retrieves id of the user this task is created by.
+   *
+   * @return Id of the user this task is created by.
+   */
+  public String getUserId() {
+    return account.getUserId();
+  }
+
+  /**
+   * Retrieves id of the tenant this task is created by.
+   *
+   * @return Id of the tenant this task is created by.
+   */
+  public String getTenantId() {
+    return account.getTenantId();
+  }
+
+  /**
+   * Retrieves the account this task is created by.
+   *
+   * @return the account this task is created by.
+   */
+  public Account getAccount() {
+    return account;
   }
 
   /**
