@@ -18,18 +18,15 @@ function plumber() {
  */
 gulp.task('css:lib', ['fonts'], function() {
 
-  return merge(
-      gulp.src([
-        './app/styles/bootstrap.less',
-        './bower_components/angular/angular-csp.css',
-        './bower_components/angular-loading-bar/build/loading-bar.min.css',
-        './bower_components/angular-motion/dist/angular-motion.min.css',
-        './bower_components/font-awesome/css/font-awesome.min.css'
-      ]),
-      gulp.src(mainBowerFiles({
-        filter: /cask\-angular\-[^\/]+\/.*\.(css|less)$/
-      }))
-    )
+  return gulp.src([
+      './app/styles/bootstrap.less',
+      './bower_components/angular/angular-csp.css',
+      './bower_components/angular-loading-bar/build/loading-bar.min.css',
+      './bower_components/angular-motion/dist/angular-motion.min.css',
+      './bower_components/font-awesome/css/font-awesome.min.css'
+    ].concat(mainBowerFiles({
+      filter: /cask\-angular\-[^\/]+\/.*\.(css|less)$/
+    })))
     .pipe(plumber())
     .pipe(plug.if('*.less', plug.less()))
     .pipe(plug.concat('lib.css'))
@@ -108,7 +105,6 @@ gulp.task('js:lib', function() {
     ], mainBowerFiles({
         filter: /cask\-angular\-[^\/]+\/.*\.js$/
     })))
-
     .pipe(plug.concat('lib.js'))
     .pipe(gulp.dest('./dist/assets/bundle'));
 });
