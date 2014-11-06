@@ -69,8 +69,8 @@ and configuration of services. Each provisioner manages workers that take tasks 
 after execution completes. Additionally, the provisioner syncs resources on request from the Server, allowing administrators to
 manage what configuration and code should be used to perform various node and service actions. 
 
-Provisioners support a pluggable architecture for integrating different infrastructure providers (e.g. OpenStack, Rackspace, Amazon Web Services, Google App Engine, and Joyent) 
-and automators (e.g. Chef, Puppet, Shell scripts). Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Coopr's architecture simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent tasks to render scalability.
+Provisioners support a pluggable architecture for integrating different infrastructure providers (e.g. Amazon Web Services, DigitalOcean, Google Compute Engine,
+Joyent, OpenStack and Rackspace) and automators (e.g. Chef, Puppet, Shell scripts). Provisioners are not directly installed on the target host, but rather use SSHD to interact with the remote host, making Coopr's architecture simple and secure. Since multiple provisioners can work concurrently, this layer of provisioners support execution of thousands of concurrent tasks to render scalability.
 
 Provisioners spin up worker processes to execute the actual tasks that must be performed. Each worker will only execute tasks for
 a single tenant and will not execute tasks for other tenants even if it is idle. The server is responsible for telling provisioners
