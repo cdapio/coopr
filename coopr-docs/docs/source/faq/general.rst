@@ -108,9 +108,8 @@ plugin to interface with their existing systems.
 
 What providers are supported by Coopr?
 -------------------------------------------------
-Out of the box, Coopr supports Amazon Web Services (EC2), Google Compute Engine, Joyent, OpenStack (and compatible), Rackspace and
-DigitalOcean.  Plugins for HP Cloud, Cloudstack, BlueBox, CloudFoundry, IBM SoftLayer, and Terremark are planned. Contributions
-here are welcome and encouraged!
+Out of the box, Coopr supports Amazon Web Services (EC2), DigitalOcean, Google Compute Engine, Joyent, OpenStack (and compatible), and Rackspace.
+Plugins for HP Cloud, Cloudstack, BlueBox, CloudFoundry, IBM SoftLayer, and Terremark are planned. Contributions here are welcome and encouraged!
 
 Does Coopr make it easy for me to migrate from one cloud to another?
 --------------------------------------------------------------------------------
