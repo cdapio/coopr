@@ -30,15 +30,18 @@ import com.google.inject.Inject;
 import org.apache.commons.lang3.time.DateUtils;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.QueryStringDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,15 +85,14 @@ public class MetricHandler extends AbstractAuthHandler {
 
   @GET
   @Path("/nodes/usage")
-  public void getNodesUsage(HttpRequest request, HttpResponder responder,
-                            @QueryParam("tenant") String tenant, @QueryParam("user") String user,
-                            @QueryParam("cluster") String cluster, @QueryParam("clustertemplate") String template,
-                            @QueryParam("start") long start, @QueryParam("end") long end,
-                            @QueryParam("groupby") Periodicity periodicity) {
+  public void getNodesUsage(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
     }
+    List<String> names = Arrays.asList("tenant", "user", "cluster", "clustertemplate", "start", "end", "groupby");
+    Map<String, String> filters = getFilters(request, names);
+    String tenant = filters.get("tenant");
     if (!account.isSuperadmin()) {
       if (tenant == null) {
         tenant = account.getTenantId();
@@ -101,11 +103,27 @@ public class MetricHandler extends AbstractAuthHandler {
         return;
       }
     }
-    ClusterTaskQuery query = new ClusterTaskQuery(tenant, user, cluster, template, start, end);
+    Long start = null;
+    Long end = null;
+    try {
+      start = Long.parseLong(filters.get("start"));
+    } catch (NumberFormatException ignored) {
+    }
+    try {
+      end = Long.parseLong(filters.get("end"));
+    } catch (NumberFormatException ignored) {
+    }
+    ClusterTaskQuery query = new ClusterTaskQuery(tenant, filters.get("user"), filters.get("cluster"),
+                                                  filters.get("clustertemplate"), start, end);
     try {
       List<ClusterTask> tasks = clusterStore.getClusterTasks(query);
-      long startDate = start != 0 ? start : Collections.min(tasks, COMPARATOR).getSubmitTime();
-      long endDate = end != 0 ? end : Collections.max(tasks, COMPARATOR).getSubmitTime();
+      if (tasks.isEmpty()) {
+        responder.sendJson(HttpResponseStatus.OK, toJson(Collections.<Key, Long>emptyMap()));
+        return;
+      }
+      long startDate = start != null ? start : Collections.min(tasks, COMPARATOR).getSubmitTime();
+      long endDate = end != null ? end : Collections.max(tasks, COMPARATOR).getStatusTime();
+      String periodicity = filters.get("groupby");
       if (periodicity == null) {
         long seconds = 0;
         for (ClusterTask task : tasks) {
@@ -115,9 +133,7 @@ public class MetricHandler extends AbstractAuthHandler {
         map.put(new Key(startDate, endDate), seconds);
         responder.sendJson(HttpResponseStatus.OK, toJson(map));
       } else {
-        long period = getTimeStamp(periodicity);
-
-
+        long period = getTimeStamp(Periodicity.valueOf(periodicity));
         Map<Key, Long> periods = getPeriodMap(startDate, endDate, period);
         for (ClusterTask task : tasks) {
           Key current = getNearest(periods.keySet(), task.getSubmitTime());
@@ -216,6 +232,26 @@ public class MetricHandler extends AbstractAuthHandler {
     JsonObject object = new JsonObject();
     object.add("usage", array);
     return object;
+  }
+
+  /**
+   * Retrieves query parameters from {@code request}.
+   *
+   * @param request the request
+   * @param names list of query parameters names
+   * @return {@link Map} of query parameters
+   */
+  private Map<String, String> getFilters(HttpRequest request, List<String> names) {
+    Map<String, List<String>> queryParams = new QueryStringDecoder(request.getUri()).getParameters();
+    Map<String, String> filters = new HashMap<String, String>();
+    for (String name : names) {
+      List<String> values = queryParams.get(name);
+      if (values != null && !values.isEmpty()) {
+        filters.put(name, values.get(0));
+      }
+    }
+
+    return filters;
   }
 
   /**

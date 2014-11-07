@@ -126,19 +126,24 @@ public class SQLClusterStore implements ClusterStore {
     try {
       Connection conn = dbConnectionPool.getConnection();
       try {
-        StringBuilder builder = new StringBuilder("SELECT task FROM tasks WHERE status=")
-          .append(ClusterTask.Status.COMPLETE.name())
-          .append(addFilter("tenant_id=", query.getTenantId()))
-          .append(addFilter("user_id=", query.getUserId()))
-          .append(addFilter("cluster_id=", query.getClusterId()))
-          .append(addFilter("cluster_template_name=", query.getClusterTemplate()))
-          .append(addFilter("submit_time>=", query.getStartDate()))
-          .append(addFilter("status_time<=", query.getEndDate()));
-
+        StringBuilder builder = new StringBuilder("SELECT task FROM tasks WHERE status = ?")
+          .append(addFilter("tenant_id = ", query.getTenantId()))
+          .append(addFilter("user_id = ", query.getUserId()))
+          .append(addFilter("cluster_id = ", query.getClusterId()))
+          .append(addFilter("cluster_template_name = ", query.getClusterTemplate()))
+          .append(addFilter("submit_time >= ", query.getStartDate()))
+          .append(addFilter("status_time <= ", query.getEndDate()));
 
         PreparedStatement statement =
           conn.prepareStatement(builder.toString());
         try {
+          int index = initializeFilter(statement, ClusterTask.Status.COMPLETE.name(), 1);
+          index = initializeFilter(statement, query.getTenantId(), index);
+          index = initializeFilter(statement, query.getUserId(), index);
+          index = initializeFilter(statement, query.getClusterId(), index);
+          index = initializeFilter(statement, query.getClusterTemplate(), index);
+          index = initializeFilter(statement, query.getStartDate(), index);
+          initializeFilter(statement, query.getEndDate(), index);
           return dbQueryExecutor.getQueryList(statement, ClusterTask.class);
         } finally {
           statement.close();
@@ -152,11 +157,23 @@ public class SQLClusterStore implements ClusterStore {
     }
   }
 
-  private String addFilter(String key, String value) {
+  private String addFilter(String key, Object value) {
     if (value == null) {
       return "";
     }
-    return String.format(" AND %s%s", key, value);
+    return String.format(" AND %s?", key);
+  }
+
+  private int initializeFilter(PreparedStatement statement, Object value, int index) throws SQLException {
+    if (value == null) {
+      return index;
+    }
+    if (value instanceof Long) {
+      statement.setTimestamp(index, DBHelper.getTimestamp((Long) value));
+    } else {
+      statement.setString(index, value.toString());
+    }
+    return ++index;
   }
 
   @Override

@@ -27,8 +27,8 @@ public class ClusterTaskQuery {
   private final String userId;
   private final String clusterId;
   private final String clusterTemplate;
-  private final String startDate;
-  private final String endDate;
+  private final Long startDate;
+  private final Long endDate;
 
   public ClusterTaskQuery(String tenantId, String userId, String clusterId, String clusterTemplate,
                           Long startDate, Long endDate) {
@@ -36,8 +36,8 @@ public class ClusterTaskQuery {
     this.userId = userId;
     this.clusterId = clusterId;
     this.clusterTemplate = clusterTemplate;
-    this.startDate = startDate.toString();
-    this.endDate = endDate.toString();
+    this.startDate = startDate;
+    this.endDate = endDate;
   }
 
   public String getTenantId() {
@@ -56,11 +56,11 @@ public class ClusterTaskQuery {
     return clusterTemplate;
   }
 
-  public String getStartDate() {
+  public Long getStartDate() {
     return startDate;
   }
 
-  public String getEndDate() {
+  public Long getEndDate() {
     return endDate;
   }
 
