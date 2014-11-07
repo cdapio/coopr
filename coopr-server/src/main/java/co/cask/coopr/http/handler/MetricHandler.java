@@ -133,6 +133,13 @@ public class MetricHandler extends AbstractAuthHandler {
     }
   }
 
+  /**
+   * Retrieves next {@link Key} from {@code entrySet} for {@code current}.
+   *
+   * @param current the current {@link Key}
+   * @param entrySet the entry set of {@link Key}s
+   * @return next {@link Key}
+   */
   private Key getNext(Key current, Set<Key> entrySet) {
     for (Key value : entrySet) {
       if (value.getStart() == current.getEnd() + 1) {
@@ -142,6 +149,13 @@ public class MetricHandler extends AbstractAuthHandler {
     return null;
   }
 
+  /**
+   * Retrieves nearest smaller {@link Key} from {@code entrySet} for {@code key}.
+   *
+   * @param entrySet the entry set of {@link Key}s
+   * @param key the key
+   * @return nearest smaller {@link Key}
+   */
   private Key getNearest(Set<Key> entrySet, long key) {
     Key nearest = new Key(-1, -1);
     for (Key value : entrySet) {
@@ -152,6 +166,14 @@ public class MetricHandler extends AbstractAuthHandler {
     return nearest;
   }
 
+  /**
+   * Creates {@link Map} with specified keys, each key presents some date period.
+   *
+   * @param start start of date period
+   * @param end end of date period
+   * @param period date period length in milliseconds
+   * @return {@link Map} with specified keys, each key presents some date period.
+   */
   private Map<Key, Long> getPeriodMap(long start, long end, long period) {
     Map<Key, Long> periods = new LinkedHashMap<Key, Long>();
     long currentStart = start;
@@ -195,6 +217,9 @@ public class MetricHandler extends AbstractAuthHandler {
     return object;
   }
 
+  /**
+   * Class for presenting start and end date of time period.
+   */
   private class Key {
 
     private final long start;
