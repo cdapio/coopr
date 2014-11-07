@@ -129,9 +129,23 @@ key names, etc).
 Adding your own Scripts
 =======================
 
-	1. add your script to the ``$COOPR_HOME/provisioner/daemon/plugins/automators/shell_automator/scripts`` directory.
-	2. add/edit a service definition with an action of type "shell"
-	3. specify the command to run, optional args, and during which stage it should run.
+The Shell Automator utilizes the :doc:`Plugin Resources </guide/admin/plugin-resources>` capability of Coopr in order to manage shell scripts.  Each script can be uploaded to the Coopr server individually as resources.  Refer to the :doc:`Plugin Resources Guide </guide/admin/plugin-resources>` for more details on plugin resource management.
+
+Example:
+
+        * /opt/coopr/provisioner/embedded/bin/ruby /opt/coopr/provisioner/bin/data-uploader.rb -u http://localhost:55054 -t superadmin -U admin sync ./my/local/scripts/my_script.sh automatortypes/shell/scripts/my_script.sh
+
+In order to actually invoke your script as part of a cluster provision, you will need to define a Coopr service
+definition with the following parameters:
+
+        * Category: any action (install, configure, start, stop, etc)
+        * Type: shell
+        * Script: the command to run, note your script will reside in the current working directory, so "my_script.sh" should suffice
+	* Arguments: optional arguments to the script
+
+Then simply add your service to a cluster template.
+
+.. note:: When your script runs, its current working directory will be within the provisioner's work directory.  Any file paths referenced in your script should be absolute.
 
 
 Best Practices
