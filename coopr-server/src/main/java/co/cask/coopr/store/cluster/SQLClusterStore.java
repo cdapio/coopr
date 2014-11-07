@@ -131,7 +131,7 @@ public class SQLClusterStore implements ClusterStore {
           .append(addFilter("tenant_id=", query.getTenantId()))
           .append(addFilter("user_id=", query.getUserId()))
           .append(addFilter("cluster_id=", query.getClusterId()))
-          .append(addFilter("cluster_template=", query.getClusterTemplate()))
+          .append(addFilter("cluster_template_name=", query.getClusterTemplate()))
           .append(addFilter("submit_time>=", query.getStartDate()))
           .append(addFilter("status_time<=", query.getEndDate()));
 
@@ -156,7 +156,7 @@ public class SQLClusterStore implements ClusterStore {
     if (value == null) {
       return "";
     }
-    return String.format(" AND %s%s",key,value);
+    return String.format(" AND %s%s", key, value);
   }
 
   @Override
@@ -404,8 +404,7 @@ public class SQLClusterStore implements ClusterStore {
     @Override
     public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
-        "UPDATE tasks SET task=?, status=?, submit_time=?, status_time=?, cluster_template=?" +
-          ", user_id=?, tenant_id=?" +
+        "UPDATE tasks SET task=?, status=?, submit_time=?, status_time=?, cluster_template_name=?, user_id=?, tenant_id=?" +
           " WHERE task_num=? AND job_num=? AND cluster_id=?");
       statement.setBytes(1, dbQueryExecutor.toBytes(clusterTask, ClusterTask.class));
       statement.setString(2, clusterTask.getStatus().name());
@@ -423,8 +422,7 @@ public class SQLClusterStore implements ClusterStore {
     @Override
     public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
-        "INSERT INTO tasks (task_num, job_num, cluster_id, status, submit_time, task, cluster_template" +
-          ", user_id, tenant_id)" +
+        "INSERT INTO tasks (task_num, job_num, cluster_id, status, submit_time, task, cluster_template_name, user_id, tenant_id)" +
           " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
       statement.setLong(1, taskId.getTaskNum());
       statement.setLong(2, taskId.getJobNum());

@@ -52,7 +52,7 @@ public class ClusterTask {
   private List<TaskAttempt> attempts;
 
   public ClusterTask(ProvisionerAction taskName, TaskId taskId, String nodeId, String service,
-                     ClusterAction clusterAction) {
+                     ClusterAction clusterAction, String clusterTemplateName, Account account) {
     this.taskId = taskId.getId();
     this.jobId = String.valueOf(taskId.getJobId().getId());
     this.clusterId = taskId.getClusterId();
@@ -61,14 +61,9 @@ public class ClusterTask {
     this.nodeId = nodeId;
     this.service = service;
     this.attempts = Lists.newArrayList();
-    addAttempt();
-  }
-
-  public ClusterTask(ProvisionerAction taskName, TaskId taskId, String nodeId, String service,
-                     ClusterAction clusterAction, String clusterTemplateName, Account account) {
-    this(taskName, taskId, nodeId, service, clusterAction);
     this.clusterTemplateName = clusterTemplateName;
     this.account = account;
+    addAttempt();
   }
   
   int currentAttemptIndex() {

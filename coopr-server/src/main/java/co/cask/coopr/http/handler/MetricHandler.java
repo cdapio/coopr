@@ -20,6 +20,7 @@ import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.store.cluster.ClusterStore;
+import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterTaskQuery;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.http.HttpResponder;
@@ -74,9 +75,9 @@ public class MetricHandler extends AbstractAuthHandler {
    * Initializes a new instance of a MetricHandler.
    */
   @Inject
-  private MetricHandler(TenantStore tenantStore, ClusterStore clusterStore) {
+  private MetricHandler(TenantStore tenantStore, ClusterStoreService clusterStoreService) {
     super(tenantStore);
-    this.clusterStore = clusterStore;
+    this.clusterStore = clusterStoreService.getSystemView();
   }
 
   @GET
