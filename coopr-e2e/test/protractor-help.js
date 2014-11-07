@@ -20,9 +20,9 @@ module.exports = {
 function login(tenant, username, password) {
 
   browser.get('/login');
-  element(by.id('loginTenant')).clear().sendKeys('superadmin');
-  element(by.id('loginUsername')).clear().sendKeys('admin');
-  element(by.id('loginPassword')).clear().sendKeys('admin');
+  element(by.id('loginTenant')).clear().sendKeys(tenant);
+  element(by.id('loginUsername')).clear().sendKeys(username);
+  element(by.id('loginPassword')).clear().sendKeys(password);
   element(by.partialButtonText('Submit')).click();
   expect(element(by.css('header .dropdown-toggle .fa-user')).isPresent()).toBe(true);
 
