@@ -33,7 +33,6 @@ import co.cask.coopr.scheduler.task.SchedulableTask;
 import co.cask.coopr.scheduler.task.TaskConfig;
 import co.cask.coopr.scheduler.task.TaskId;
 import co.cask.coopr.scheduler.task.TaskService;
-import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;

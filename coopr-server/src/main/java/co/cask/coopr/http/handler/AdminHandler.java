@@ -46,12 +46,6 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -59,6 +53,12 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 /**
  * Handler for getting, adding, modifying, and deleting admin defined entities.
@@ -306,7 +306,7 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllProviders(),
-                         new TypeToken<Collection<Provider>>() {}.getType(), gson);
+                         new TypeToken<Collection<Provider>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting providers");
     }
@@ -328,7 +328,7 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllHardwareTypes(),
-                         new TypeToken<Collection<HardwareType>>() {}.getType(), gson);
+                         new TypeToken<Collection<HardwareType>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting hardware types");
     }
@@ -350,7 +350,7 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllImageTypes(),
-                         new TypeToken<Collection<ImageType>>() {}.getType(), gson);
+                         new TypeToken<Collection<ImageType>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting image types");
     }
@@ -372,7 +372,7 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllServices(),
-                         new TypeToken<Collection<Service>>() {}.getType(), gson);
+                         new TypeToken<Collection<Service>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting services");
     }
@@ -394,7 +394,7 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllProviderTypes(),
-                         new TypeToken<Collection<ProviderType>>() {}.getType(), gson);
+                         new TypeToken<Collection<ProviderType>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting provider types");
     }
@@ -416,7 +416,7 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllAutomatorTypes(),
-                         new TypeToken<Collection<AutomatorType>>() {}.getType(), gson);
+                         new TypeToken<Collection<AutomatorType>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting automator types");
     }
@@ -430,7 +430,7 @@ public class AdminHandler extends AbstractAuthHandler {
    */
   @GET
   @Path("/clustertemplates")
-  public void getClusterTemplate(HttpRequest request, HttpResponder responder){
+  public void getClusterTemplate(HttpRequest request, HttpResponder responder) {
     Account account = getAndAuthenticateAccount(request, responder);
     if (account == null) {
       return;
@@ -438,7 +438,7 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       responder.sendJson(HttpResponseStatus.OK, entityStoreService.getView(account).getAllClusterTemplates(),
-                         new TypeToken<Collection<ClusterTemplate>>() {}.getType(), gson);
+                         new TypeToken<Collection<ClusterTemplate>>() { }.getType(), gson);
     } catch (IOException e) {
       responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Exception getting cluster templates");
     }
@@ -1068,7 +1068,7 @@ public class AdminHandler extends AbstractAuthHandler {
 
     try {
       Map<String, JsonElement> inJson = getEntityFromRequest(request, responder,
-                                                             new TypeToken<Map<String, JsonElement>>() {}.getType());
+                                                             new TypeToken<Map<String, JsonElement>>() { }.getType());
       if (inJson == null) {
         return;
       }
@@ -1076,23 +1076,23 @@ public class AdminHandler extends AbstractAuthHandler {
       LOG.trace("Importing {}", inJson);
 
       newProviders = !inJson.containsKey(PROVIDERS) ? ImmutableList.<Provider>of() :
-        gson.<List<Provider>>fromJson(inJson.get(PROVIDERS), new TypeToken<List<Provider>>() {}.getType());
+        gson.<List<Provider>>fromJson(inJson.get(PROVIDERS), new TypeToken<List<Provider>>() { }.getType());
 
       newHardwareTypes = !inJson.containsKey(HARDWARE_TYPES) ? ImmutableList.<HardwareType>of() :
         gson.<List<HardwareType>>fromJson(inJson.get(HARDWARE_TYPES),
-                                                     new TypeToken<List<HardwareType>>() {}.getType());
+                                                     new TypeToken<List<HardwareType>>() { }.getType());
 
       newImageTypes = !inJson.containsKey(IMAGE_TYPES) ? ImmutableList.<ImageType>of() :
         gson.<List<ImageType>>fromJson(inJson.get(IMAGE_TYPES),
-                                                  new TypeToken<List<ImageType>>() {}.getType());
+                                                  new TypeToken<List<ImageType>>() { }.getType());
 
       newServices = !inJson.containsKey(SERVICES) ? ImmutableList.<Service>of() :
-        gson.<List<Service>>fromJson(inJson.get(SERVICES), new TypeToken<List<Service>>() {}.getType());
+        gson.<List<Service>>fromJson(inJson.get(SERVICES), new TypeToken<List<Service>>() { }.getType());
 
       newClusterTemplates = !inJson.containsKey(CLUSTER_TEMPLATES) ?
         ImmutableList.<ClusterTemplate>of() :
         gson.<List<ClusterTemplate>>fromJson(inJson.get(CLUSTER_TEMPLATES),
-                                                        new TypeToken<List<ClusterTemplate>>() {}.getType());
+                                                        new TypeToken<List<ClusterTemplate>>() { }.getType());
 
 
     } catch (JsonSyntaxException e) {

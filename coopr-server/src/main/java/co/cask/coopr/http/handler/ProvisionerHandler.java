@@ -241,7 +241,8 @@ public final class ProvisionerHandler extends AbstractAuthHandler {
         responder.sendError(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Error getting resource.");
       }
       try {
-        ChunkResponder chunkResponder = responder.sendChunkStart(HttpResponseStatus.OK, ImmutableMultimap.<String, String>of());
+        ChunkResponder chunkResponder = responder.sendChunkStart(
+          HttpResponseStatus.OK, ImmutableMultimap.<String, String>of());
         while (true) {
           byte[] chunkBytes = new byte[Constants.PLUGIN_RESOURCE_CHUNK_SIZE];
           int bytesRead = inputStream.read(chunkBytes, 0, Constants.PLUGIN_RESOURCE_CHUNK_SIZE);

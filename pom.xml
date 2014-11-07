@@ -91,7 +91,11 @@
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>2.11</version>
                     <configuration>
-                        <configLocation>src/main/resources/checkstyle.xml</configLocation>
+                        <configLocation>checkstyle.xml</configLocation>
+                        <suppressionsLocation>suppressions.xml</suppressionsLocation>
+                        <encoding>UTF-8</encoding>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
                     </configuration>
                 </plugin>
                 <plugin>

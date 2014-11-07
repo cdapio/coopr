@@ -210,7 +210,7 @@ public final class ZKClientExt {
     return ignoreError(zkClient.getChildren(path, watcher), KeeperException.NoNodeException.class);
   }
 
-  private static <T>ListenableFuture<T> ignoreError(final ListenableFuture<T> future,
+  private static <T> ListenableFuture<T> ignoreError(final ListenableFuture<T> future,
                                                     final Class<? extends KeeperException> ex) {
 
     final SettableFuture<T> futureWithIgnoredError = SettableFuture.create();

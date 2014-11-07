@@ -29,7 +29,7 @@ import java.util.Map;
  * Codec for serializing/deserializing a {@link HardwareType}.
  */
 public class HardwareTypeCodec extends AbstractBaseEntityCodec<HardwareType> {
-  private static final Type PROVIDERMAP_TYPE = new TypeToken<Map<String, Map<String, String>>>() {}.getType();
+  private static final Type PROVIDERMAP_TYPE = new TypeToken<Map<String, Map<String, String>>>() { }.getType();
 
   @Override
   protected void addChildFields(HardwareType hardwareType, JsonObject jsonObj, JsonSerializationContext context) {

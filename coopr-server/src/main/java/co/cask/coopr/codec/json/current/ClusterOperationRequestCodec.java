@@ -38,7 +38,7 @@ public class ClusterOperationRequestCodec implements JsonDeserializer<ClusterOpe
     JsonObject jsonObj = json.getAsJsonObject();
 
     Map<String, Object> providerFields =
-      context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, Object>>() {}.getType());
+      context.deserialize(jsonObj.get("providerFields"), new TypeToken<Map<String, Object>>() { }.getType());
     return new ClusterOperationRequest(providerFields);
   }
 }

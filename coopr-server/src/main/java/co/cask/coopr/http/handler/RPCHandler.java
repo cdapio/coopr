@@ -37,12 +37,12 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
 import java.util.Set;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 /**
  * Handler for RPCs.

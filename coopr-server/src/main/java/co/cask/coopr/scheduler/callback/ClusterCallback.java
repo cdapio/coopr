@@ -16,7 +16,6 @@
 package co.cask.coopr.scheduler.callback;
 
 import co.cask.coopr.common.conf.Configuration;
-import co.cask.coopr.store.cluster.ClusterStoreService;
 
 /**
  * Executes some code before a job starts and after a job completes. Callbacks must be idempotent. There is a

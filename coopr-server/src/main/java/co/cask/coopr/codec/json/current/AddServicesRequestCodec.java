@@ -38,8 +38,8 @@ public class AddServicesRequestCodec implements JsonDeserializer<AddServicesRequ
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
     Map<String, Object> providerFields = context.deserialize(jsonObj.get("providerFields"),
-                                                             new TypeToken<Map<String, String>>() {}.getType());
-    Set<String> services = context.deserialize(jsonObj.get("services"), new TypeToken<Set<String>>() {}.getType());
+                                                             new TypeToken<Map<String, String>>() { }.getType());
+    Set<String> services = context.deserialize(jsonObj.get("services"), new TypeToken<Set<String>>() { }.getType());
 
     return new AddServicesRequest(providerFields, services);
   }

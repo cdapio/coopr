@@ -16,13 +16,13 @@
 package co.cask.coopr.scheduler;
 
 import co.cask.coopr.cluster.Cluster;
+import co.cask.coopr.cluster.ClusterService;
 import co.cask.coopr.cluster.Node;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.common.queue.Element;
 import co.cask.coopr.common.queue.QueueGroup;
 import co.cask.coopr.common.queue.QueuedElement;
-import co.cask.coopr.cluster.ClusterService;
 import co.cask.coopr.http.request.ClusterOperationRequest;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.scheduler.task.NodeService;

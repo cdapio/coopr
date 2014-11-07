@@ -18,8 +18,8 @@ package co.cask.coopr.common.security;
 import com.google.common.base.Charsets;
 import org.apache.commons.codec.binary.Base64;
 
-import javax.crypto.Cipher;
 import java.security.GeneralSecurityException;
+import javax.crypto.Cipher;
 
 /**
  * Transforms plaintext to and from ciphertext, also providing utilities to encode/decode ciphertext in Base64 so the

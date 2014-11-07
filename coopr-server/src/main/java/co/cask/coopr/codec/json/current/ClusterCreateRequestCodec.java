@@ -49,10 +49,10 @@ public class ClusterCreateRequestCodec implements JsonDeserializer<ClusterCreate
       .setInitialLeaseDuration(context.<Long>deserialize(jsonObj.get("initialLeaseDuration"), Long.class))
       .setDNSSuffix(context.<String>deserialize(jsonObj.get("dnsSuffix"), String.class))
       .setConfig(context.<JsonObject>deserialize(jsonObj.get("config"), JsonObject.class))
-      .setServiceNames(context.<Set<String>>deserialize(jsonObj.get("services"),
-                                                        new TypeToken<Set<String>>() {}.getType()))
-      .setProviderFields(context.<Map<String, Object>>deserialize(jsonObj.get("providerFields"),
-                                                                  new TypeToken<Map<String, Object>>() {}.getType()))
+      .setServiceNames(context.<Set<String>>deserialize(
+        jsonObj.get("services"), new TypeToken<Set<String>>() { }.getType()))
+      .setProviderFields(context.<Map<String, Object>>deserialize(
+        jsonObj.get("providerFields"), new TypeToken<Map<String, Object>>() { }.getType()))
       .build();
   }
 }

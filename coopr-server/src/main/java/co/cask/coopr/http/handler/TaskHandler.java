@@ -30,9 +30,9 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import java.io.IOException;
 
 /**
  * Handles requests to take and finish tasks from provisioners.

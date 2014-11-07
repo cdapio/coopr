@@ -77,13 +77,13 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
 
     Provider provider = context.deserialize(jsonObj.remove("provider"), Provider.class);
     Map<String, NodeProperties> nodePropertiesMap =
-      context.deserialize(jsonObj.remove("nodes"), new TypeToken<Map<String, NodeProperties>>() {}.getType());
+      context.deserialize(jsonObj.remove("nodes"), new TypeToken<Map<String, NodeProperties>>() { }.getType());
     JsonObject clusterConfig = context.deserialize(jsonObj.remove("cluster"), JsonObject.class);
     TaskServiceAction taskServiceAction = context.deserialize(jsonObj.remove("service"), TaskServiceAction.class);
     // build node properties
     String hostname = context.deserialize(jsonObj.remove("hostname"), String.class);
     Map<String, String> ipaddresses = context.deserialize(jsonObj.remove("ipaddresses"),
-                                                          new TypeToken<Map<String, String>>() {}.getType());
+                                                          new TypeToken<Map<String, String>>() { }.getType());
     String imagetype = context.deserialize(jsonObj.remove("imagetype"), String.class);
     String hardwaretype = context.deserialize(jsonObj.remove("hardwaretype"), String.class);
     String flavor = context.deserialize(jsonObj.remove("flavor"), String.class);
@@ -91,9 +91,9 @@ public class TaskConfigCodec extends AbstractCodec<TaskConfig> {
     String sshUser = context.deserialize(jsonObj.remove("sshuser"), String.class);
     Integer nodeNum = context.deserialize(jsonObj.remove("nodenum"), Integer.class);
     Set<String> serviceNames =
-      context.deserialize(jsonObj.remove("services"), new TypeToken<Set<String>>() {}.getType());
+      context.deserialize(jsonObj.remove("services"), new TypeToken<Set<String>>() { }.getType());
     Set<String> automators =
-      context.deserialize(jsonObj.remove("automators"), new TypeToken<Set<String>>() {}.getType());
+      context.deserialize(jsonObj.remove("automators"), new TypeToken<Set<String>>() { }.getType());
     NodeProperties nodeProperties = NodeProperties.builder()
       .setHostname(hostname)
       .setIPAddresses(ipaddresses)

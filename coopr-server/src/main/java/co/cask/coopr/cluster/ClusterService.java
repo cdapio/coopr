@@ -217,8 +217,8 @@ public class ClusterService {
 
   /**
    * Put in a request to reconfigure services on an active cluster.
-   * Throws a {@link co.cask.coopr.scheduler.task.MissingClusterException} if no cluster owned by the user is found and an
-   * {@link IllegalStateException} if the cluster is not in a state where the action can be performed.
+   * Throws a {@link co.cask.coopr.scheduler.task.MissingClusterException} if no cluster owned by the user is found and
+   * an {@link IllegalStateException} if the cluster is not in a state where the action can be performed.
    *
    * @param clusterId Id of cluster to reconfigure.
    * @param account Account of the user that is trying to reconfigure the cluster.

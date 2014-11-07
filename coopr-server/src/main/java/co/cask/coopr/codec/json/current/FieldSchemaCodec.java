@@ -61,7 +61,7 @@ public class FieldSchemaCodec extends AbstractCodec<FieldSchema> {
       .setDefaultValue(context.<Object>deserialize(jsonObj.get("default"), Object.class))
       .setOverride(context.<Boolean>deserialize(jsonObj.get("override"), Boolean.class))
       .setSensitive(context.<Boolean>deserialize(jsonObj.get("sensitive"), Boolean.class))
-      .setOptions(context.<Set<String>>deserialize(jsonObj.get("options"), new TypeToken<Set<String>>() {}.getType()))
+      .setOptions(context.<Set<String>>deserialize(jsonObj.get("options"), new TypeToken<Set<String>>() { }.getType()))
       .build();
   }
 }

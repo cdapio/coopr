@@ -49,8 +49,8 @@ public class ServiceStageDependenciesCodec extends AbstractCodec<ServiceStageDep
     throws JsonParseException {
     JsonObject jsonObj = json.getAsJsonObject();
 
-    Set<String> requires = context.deserialize(jsonObj.get("requires"), new TypeToken<Set<String>>() {}.getType());
-    Set<String> uses = context.deserialize(jsonObj.get("uses"), new TypeToken<Set<String>>() {}.getType());
+    Set<String> requires = context.deserialize(jsonObj.get("requires"), new TypeToken<Set<String>>() { }.getType());
+    Set<String> uses = context.deserialize(jsonObj.get("uses"), new TypeToken<Set<String>>() { }.getType());
 
     return new ServiceStageDependencies(requires, uses);
   }

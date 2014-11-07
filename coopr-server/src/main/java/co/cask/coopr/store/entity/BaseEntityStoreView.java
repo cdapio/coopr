@@ -26,10 +26,10 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.gson.Gson;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import javax.annotation.Nullable;
 
 /**
  * Abstract {@link EntityStoreView} that represents entities as json.

@@ -35,8 +35,8 @@ import java.util.Set;
  * Codec for serializing/deserializing a {@link Service}.
  */
 public class ServiceCodec extends AbstractBaseEntityCodec<Service> {
-  private static final Type ACTIONS_TYPE = new TypeToken<Map<ProvisionerAction, ServiceAction>>() {}.getType();
-  private static final Type LINKS_TYPE = new TypeToken<Set<Link>>() {}.getType();
+  private static final Type ACTIONS_TYPE = new TypeToken<Map<ProvisionerAction, ServiceAction>>() { }.getType();
+  private static final Type LINKS_TYPE = new TypeToken<Set<Link>>() { }.getType();
 
   @Override
   protected void addChildFields(Service service, JsonObject jsonObj, JsonSerializationContext context) {

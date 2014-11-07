@@ -20,7 +20,6 @@ import co.cask.coopr.common.utils.StringUtils;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 
 import java.util.Set;

@@ -33,8 +33,10 @@ import java.util.Map;
  * Used so that the constructor is called to avoid null values where they do not make sense.
  */
 public class ProviderTypeCodec extends AbstractBaseEntityCodec<ProviderType> {
-  private static final Type PARAMETERS_TYPE = new TypeToken<Map<ParameterType, ParametersSpecification>>() {}.getType();
-  private static final Type RESOURCES_TYPE = new TypeToken<Map<String, ResourceTypeSpecification>>() {}.getType();
+  private static final Type PARAMETERS_TYPE =
+    new TypeToken<Map<ParameterType, ParametersSpecification>>() { }.getType();
+  private static final Type RESOURCES_TYPE =
+    new TypeToken<Map<String, ResourceTypeSpecification>>() { }.getType();
 
   @Override
   protected void addChildFields(ProviderType providerType, JsonObject jsonObj, JsonSerializationContext context) {

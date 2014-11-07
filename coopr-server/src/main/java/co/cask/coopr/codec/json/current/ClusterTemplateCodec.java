@@ -33,7 +33,7 @@ import java.util.Set;
  * Codec for serializing/deserializing a {@link ClusterTemplate}.
  */
 public class ClusterTemplateCodec extends AbstractBaseEntityCodec<ClusterTemplate> {
-  private static final Type LINKS_TYPE = new com.google.common.reflect.TypeToken<Set<Link>>() {}.getType();
+  private static final Type LINKS_TYPE = new com.google.common.reflect.TypeToken<Set<Link>>() { }.getType();
 
   @Override
   protected void addChildFields(ClusterTemplate clusterTemplate, JsonObject jsonObj, JsonSerializationContext context) {
