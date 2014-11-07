@@ -26,6 +26,7 @@ import co.cask.http.HttpResponder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import org.apache.commons.lang3.time.DateUtils;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.slf4j.Logger;
@@ -95,11 +96,8 @@ public class MetricHandler extends AbstractAuthHandler {
   }
 
   private static final Logger LOG = LoggerFactory.getLogger(MetricHandler.class);
-  /* milliseconds in one hour*/
-  private static final long HOUR = 3600000;
-  private static final long DAY = HOUR * 24;
-  private static final long WEEK = DAY * 7;
-  private static final long MONTH = DAY * 30;
+  private static final long WEEK = DateUtils.MILLIS_PER_DAY * 7;
+  private static final long MONTH = DateUtils.MILLIS_PER_DAY * 30;
   private static final long YEAR = MONTH * 12;
 
   private final ClusterStore clusterStore;
@@ -213,9 +211,9 @@ public class MetricHandler extends AbstractAuthHandler {
   private long getTimeStamp(Periodicity periodicity) {
     switch (periodicity) {
       case hour:
-        return HOUR;
+        return DateUtils.MILLIS_PER_HOUR;
       case day:
-        return DAY;
+        return DateUtils.MILLIS_PER_DAY;
       case week:
         return WEEK;
       case month:
