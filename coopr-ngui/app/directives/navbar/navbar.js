@@ -3,7 +3,7 @@
  */
 
 angular.module(PKG.name+'.commons').directive('myNavbar',
-function myNavbarDirective ($dropdown, myAuth, myTheme) {
+function myNavbarDirective ($dropdown, myAuth, caskTheme) {
   return {
     restrict: 'A',
     templateUrl: 'navbar/navbar.html',
@@ -19,7 +19,7 @@ function myNavbarDirective ($dropdown, myAuth, myTheme) {
 
       scope.logout = myAuth.logout;
 
-      scope.theme = myTheme;
+      scope.theme = caskTheme;
 
       scope.navbarAdminLinks = [
         { sref: 'templates',     label: 'Catalog',   icon: 'folder-open-o' },

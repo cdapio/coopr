@@ -23,11 +23,14 @@ angular
         'ngSanitize',
         'ngResource',
         'ngStorage',
-        'ui.router'
+        'ui.router',
+
+        'cask-angular-theme'
       ]).name,
 
       angular.module(PKG.name+'.filters', [
-        PKG.name+'.services'
+        PKG.name+'.services',
+        'cask-angular-capitalize'
       ]).name,
 
       'mgcrea.ngStrap.alert',
@@ -122,14 +125,14 @@ angular
   /**
    * BodyCtrl
    * attached to the <body> tag, mostly responsible for
-   *  setting the className based events from $state and myTheme
+   *  setting the className based events from $state and caskTheme
    */
-  .controller('BodyCtrl', function ($scope, myTheme, MYTHEME_EVENT) {
+  .controller('BodyCtrl', function ($scope, caskTheme, CASK_THEME_EVENT) {
 
-    var activeThemeClass = myTheme.getClassName();
+    var activeThemeClass = caskTheme.getClassName();
 
 
-    $scope.$on(MYTHEME_EVENT.changed, function (event, newClassName) {
+    $scope.$on(CASK_THEME_EVENT.changed, function (event, newClassName) {
       if(!event.defaultPrevented) {
         $scope.bodyClass = $scope.bodyClass.replace(activeThemeClass, newClassName);
         activeThemeClass = newClassName;
