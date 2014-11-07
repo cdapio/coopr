@@ -57,48 +57,16 @@ public class MetricHandler extends AbstractAuthHandler {
     year
   }
 
-  private class Key {
-
-    private final long start;
-    private final long end;
-
-    public Key(long start, long end) {
-      this.start = start;
-      this.end = end;
-    }
-
-    public long getStart() {
-      return start;
-    }
-
-    public long getEnd() {
-      return end;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      Key key = (Key) o;
-
-      return start == key.start;
-
-    }
-
-    @Override
-    public int hashCode() {
-      return (int) (start ^ (start >>> 32));
-    }
-  }
-
   private static final Logger LOG = LoggerFactory.getLogger(MetricHandler.class);
   private static final long WEEK = DateUtils.MILLIS_PER_DAY * 7;
   private static final long MONTH = DateUtils.MILLIS_PER_DAY * 30;
   private static final long YEAR = MONTH * 12;
+  private static final Comparator<ClusterTask> COMPARATOR = new Comparator<ClusterTask>() {
+    @Override
+    public int compare(ClusterTask o1, ClusterTask o2) {
+      return o1.getSubmitTime() > o2.getSubmitTime() ? 1 : -1;
+    }
+  };
 
   private final ClusterStore clusterStore;
 
@@ -135,18 +103,8 @@ public class MetricHandler extends AbstractAuthHandler {
     ClusterTaskQuery query = new ClusterTaskQuery(tenant, user, cluster, template, start, end);
     try {
       List<ClusterTask> tasks = clusterStore.getClusterTasks(query);
-      long startDate = start != 0 ? start : Collections.min(tasks, new Comparator<ClusterTask>() {
-        @Override
-        public int compare(ClusterTask o1, ClusterTask o2) {
-          return o1.getSubmitTime() > o2.getSubmitTime() ? 1 : -1;
-        }
-      }).getSubmitTime();
-      long endDate = end != 0 ? end : Collections.max(tasks, new Comparator<ClusterTask>() {
-        @Override
-        public int compare(ClusterTask o1, ClusterTask o2) {
-          return o1.getSubmitTime() > o2.getSubmitTime() ? 1 : -1;
-        }
-      }).getSubmitTime();
+      long startDate = start != 0 ? start : Collections.min(tasks, COMPARATOR).getSubmitTime();
+      long endDate = end != 0 ? end : Collections.max(tasks, COMPARATOR).getSubmitTime();
       if (periodicity == null) {
         long seconds = 0;
         for (ClusterTask task : tasks) {
@@ -235,5 +193,43 @@ public class MetricHandler extends AbstractAuthHandler {
     JsonObject object = new JsonObject();
     object.add("usage", array);
     return object;
+  }
+
+  private class Key {
+
+    private final long start;
+    private final long end;
+
+    public Key(long start, long end) {
+      this.start = start;
+      this.end = end;
+    }
+
+    public long getStart() {
+      return start;
+    }
+
+    public long getEnd() {
+      return end;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      Key key = (Key) o;
+
+      return start == key.start;
+
+    }
+
+    @Override
+    public int hashCode() {
+      return (int) (start ^ (start >>> 32));
+    }
   }
 }

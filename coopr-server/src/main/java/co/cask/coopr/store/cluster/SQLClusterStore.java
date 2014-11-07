@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -412,7 +411,7 @@ public class SQLClusterStore implements ClusterStore {
       statement.setString(2, clusterTask.getStatus().name());
       statement.setTimestamp(3, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
       statement.setTimestamp(4, DBHelper.getTimestamp(clusterTask.getStatusTime()));
-      statement.setString(5, clusterTask.getClusterTemplate());
+      statement.setString(5, clusterTask.getClusterTemplateName());
       statement.setString(6, clusterTask.getUserId());
       statement.setString(7, clusterTask.getTenantId());
       statement.setLong(8, taskId.getTaskNum());
@@ -433,7 +432,7 @@ public class SQLClusterStore implements ClusterStore {
       statement.setString(4, clusterTask.getStatus().name());
       statement.setTimestamp(5, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
       statement.setBytes(6, taskBytes);
-      statement.setString(7, clusterTask.getClusterTemplate());
+      statement.setString(7, clusterTask.getClusterTemplateName());
       statement.setString(8, clusterTask.getUserId());
       statement.setString(9, clusterTask.getTenantId());
       return statement;

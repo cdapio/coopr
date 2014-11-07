@@ -47,7 +47,7 @@ public class ClusterTask {
   private final ClusterAction clusterAction;
   private final String nodeId;
   private final String service;
-  private String clusterTemplate;
+  private String clusterTemplateName;
   private Account account;
   private List<TaskAttempt> attempts;
 
@@ -65,9 +65,9 @@ public class ClusterTask {
   }
 
   public ClusterTask(ProvisionerAction taskName, TaskId taskId, String nodeId, String service,
-                     ClusterAction clusterAction, String clusterTemplate, Account account) {
+                     ClusterAction clusterAction, String clusterTemplateName, Account account) {
     this(taskName, taskId, nodeId, service, clusterAction);
-    this.clusterTemplate = clusterTemplate;
+    this.clusterTemplateName = clusterTemplateName;
     this.account = account;
   }
   
@@ -248,12 +248,12 @@ public class ClusterTask {
   }
 
   /**
-   * Retrieves template of the cluster this task is for.
+   * Retrieves template name of the cluster this task is for.
    *
-   * @return template of the cluster this task is for.
+   * @return template name of the cluster this task is for.
    */
-  public String getClusterTemplate() {
-    return clusterTemplate;
+  public String getClusterTemplateName() {
+    return clusterTemplateName;
   }
 
   /**
