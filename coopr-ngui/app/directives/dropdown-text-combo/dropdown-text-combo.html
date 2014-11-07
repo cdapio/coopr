@@ -8,7 +8,7 @@
 
         <div class="input-group">
           <label for="my-ddtc-{{key}}-{{$index}}" class="input-group-addon">
-            {{field.placeholder || (field.name | myCapitalizeFilter)}}
+            {{field.placeholder || (field.name | caskCapitalizeFilter)}}
           </label>
           <input type="text"
                   id="my-ddtc-{{key}}-{{$index}}"

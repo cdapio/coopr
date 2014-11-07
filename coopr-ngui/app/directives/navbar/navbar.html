@@ -38,8 +38,8 @@
       <a href="" class="dropdown-toggle">
         <span ng-if="currentUser">
 <!-- presence of .fa-user icon is used in e2e tests to determine login state -->
-          <span class="fa fa-user"></span> 
-          {{currentUser.username | myCapitalizeFilter}}
+          <span class="fa fa-user"></span>
+          {{currentUser.username | caskCapitalizeFilter}}
         </span>
         <span ng-hide="currentUser">
           Not authenticated
