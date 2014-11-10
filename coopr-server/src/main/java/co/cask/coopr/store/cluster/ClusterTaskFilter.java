@@ -19,49 +19,60 @@ package co.cask.coopr.store.cluster;
 import com.google.common.base.Objects;
 
 /**
- * Class wrapper around querying task parameters.
+ * Class specifying filters to use when querying for cluster tasks.
  */
-public class ClusterTaskQuery {
+public class ClusterTaskFilter {
 
   private final String tenantId;
   private final String userId;
   private final String clusterId;
   private final String clusterTemplate;
-  private final Long startDate;
-  private final Long endDate;
 
-  public ClusterTaskQuery(String tenantId, String userId, String clusterId, String clusterTemplate,
-                          Long startDate, Long endDate) {
+  public ClusterTaskFilter(String tenantId, String userId, String clusterId, String clusterTemplate) {
     this.tenantId = tenantId;
     this.userId = userId;
     this.clusterId = clusterId;
     this.clusterTemplate = clusterTemplate;
-    this.startDate = startDate;
-    this.endDate = endDate;
   }
 
+  /**
+   * Retrieves tenant id of this filter.
+   * This field is ignored if its value is {@code null}.
+   *
+   * @return tenant id
+   */
   public String getTenantId() {
     return tenantId;
   }
 
+  /**
+   * Retrieves user id of this filter.
+   * This field is ignored if its value is {@code null}.
+   *
+   * @return user id
+   */
   public String getUserId() {
     return userId;
   }
 
+  /**
+   * Retrieves cluster id of this filter.
+   * This field is ignored if its value is {@code null}.
+   *
+   * @return cluster id
+   */
   public String getClusterId() {
     return clusterId;
   }
 
+  /**
+   * Retrieves cluster template of this filter.
+   * This field is ignored if its value is {@code null}.
+   *
+   * @return cluster template
+   */
   public String getClusterTemplate() {
     return clusterTemplate;
-  }
-
-  public Long getStartDate() {
-    return startDate;
-  }
-
-  public Long getEndDate() {
-    return endDate;
   }
 
   @Override
@@ -71,8 +82,6 @@ public class ClusterTaskQuery {
       .add("userId", userId)
       .add("clusterId", clusterId)
       .add("clusterTemplate", clusterTemplate)
-      .add("startDate", startDate)
-      .add("endDate", endDate)
       .toString();
   }
 }

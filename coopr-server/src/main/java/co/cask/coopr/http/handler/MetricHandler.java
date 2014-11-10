@@ -18,16 +18,16 @@ package co.cask.coopr.http.handler;
 
 import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
+import co.cask.coopr.http.util.MetricResponse;
+import co.cask.coopr.http.util.MetricUtil;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
-import co.cask.coopr.store.cluster.ClusterTaskQuery;
+import co.cask.coopr.store.cluster.ClusterTaskFilter;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.http.HttpResponder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
-import org.apache.commons.lang3.time.DateUtils;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.QueryStringDecoder;
@@ -37,15 +37,10 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Handler for performing metric operations.
@@ -53,36 +48,28 @@ import java.util.Set;
 @Path(Constants.API_BASE + "/metrics")
 public class MetricHandler extends AbstractAuthHandler {
 
-  private enum Periodicity {
-    hour,
-    day,
-    week,
-    month,
-    year
-  }
-
   private static final Logger LOG = LoggerFactory.getLogger(MetricHandler.class);
-  private static final long WEEK = DateUtils.MILLIS_PER_DAY * 7;
-  private static final long MONTH = DateUtils.MILLIS_PER_DAY * 30;
-  private static final long YEAR = MONTH * 12;
-  private static final Comparator<ClusterTask> COMPARATOR = new Comparator<ClusterTask>() {
-    @Override
-    public int compare(ClusterTask o1, ClusterTask o2) {
-      return o1.getSubmitTime() > o2.getSubmitTime() ? 1 : -1;
-    }
-  };
 
   private final ClusterStore clusterStore;
+  private final Gson gson;
 
   /**
    * Initializes a new instance of a MetricHandler.
    */
   @Inject
-  private MetricHandler(TenantStore tenantStore, ClusterStoreService clusterStoreService) {
+  private MetricHandler(TenantStore tenantStore, ClusterStoreService clusterStoreService, Gson gson) {
     super(tenantStore);
     this.clusterStore = clusterStoreService.getSystemView();
+    this.gson = gson;
   }
 
+  /**
+   * Retrieves statistics of nodes usage for given filter.
+   * The start and end times are inclusive.
+   *
+   * @param request the request for nodes usage
+   * @param responder the responder for sending the response
+   */
   @GET
   @Path("/nodes/usage")
   public void getNodesUsage(HttpRequest request, HttpResponder responder) {
@@ -103,135 +90,18 @@ public class MetricHandler extends AbstractAuthHandler {
         return;
       }
     }
-    Long start = null;
-    Long end = null;
+    ClusterTaskFilter filter = new ClusterTaskFilter(tenant, filters.get("user"), filters.get("cluster"),
+                                                  filters.get("clustertemplate"));
     try {
-      start = Long.parseLong(filters.get("start"));
-    } catch (NumberFormatException ignored) {
-    }
-    try {
-      end = Long.parseLong(filters.get("end"));
-    } catch (NumberFormatException ignored) {
-    }
-    ClusterTaskQuery query = new ClusterTaskQuery(tenant, filters.get("user"), filters.get("cluster"),
-                                                  filters.get("clustertemplate"), start, end);
-    try {
-      List<ClusterTask> tasks = clusterStore.getClusterTasks(query);
-      if (tasks.isEmpty()) {
-        responder.sendJson(HttpResponseStatus.OK, toJson(Collections.<Key, Long>emptyMap()));
-        return;
-      }
-      long startDate = start != null ? start : Collections.min(tasks, COMPARATOR).getSubmitTime();
-      long endDate = end != null ? end : Collections.max(tasks, COMPARATOR).getStatusTime();
-      String periodicity = filters.get("groupby");
-      if (periodicity == null) {
-        long seconds = 0;
-        for (ClusterTask task : tasks) {
-          seconds += task.getStatusTime() - task.getSubmitTime();
-        }
-        Map<Key, Long> map = new LinkedHashMap<Key, Long>();
-        map.put(new Key(startDate, endDate), seconds);
-        responder.sendJson(HttpResponseStatus.OK, toJson(map));
-      } else {
-        long period = getTimeStamp(Periodicity.valueOf(periodicity));
-        Map<Key, Long> periods = getPeriodMap(startDate, endDate, period);
-        for (ClusterTask task : tasks) {
-          Key current = getNearest(periods.keySet(), task.getSubmitTime());
-          while (current.getStart() + period < task.getStatusTime()) {
-            periods.put(current, periods.get(current) + period);
-            current = getNext(current, periods.keySet());
-          }
-          periods.put(current, periods.get(current) + task.getStatusTime() - current.getStart());
-        }
-        responder.sendJson(HttpResponseStatus.OK, toJson(periods));
-      }
+      List<ClusterTask> tasks = clusterStore.getClusterTasks(filter);
+      MetricResponse result = MetricUtil.getNodesUsage(tasks, filters);
+      responder.sendJson(HttpResponseStatus.OK, result, MetricResponse.class, gson);
+    } catch (IllegalArgumentException e) {
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                           String.format("Incorrect value for field groupby: %s", filters.get("groupby")));
     } catch (IOException e) {
-      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Unable to read data from the database");
     }
-  }
-
-  /**
-   * Retrieves next {@link Key} from {@code entrySet} for {@code current}.
-   *
-   * @param current the current {@link Key}
-   * @param entrySet the entry set of {@link Key}s
-   * @return next {@link Key}
-   */
-  private Key getNext(Key current, Set<Key> entrySet) {
-    for (Key value : entrySet) {
-      if (value.getStart() == current.getEnd() + 1) {
-        return value;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Retrieves nearest smaller {@link Key} from {@code entrySet} for {@code key}.
-   *
-   * @param entrySet the entry set of {@link Key}s
-   * @param key the key
-   * @return nearest smaller {@link Key}
-   */
-  private Key getNearest(Set<Key> entrySet, long key) {
-    Key nearest = new Key(-1, -1);
-    for (Key value : entrySet) {
-      if (value.getStart() <= key && nearest.getStart() < value.getStart()) {
-        nearest = value;
-      }
-    }
-    return nearest;
-  }
-
-  /**
-   * Creates {@link Map} with specified keys, each key presents some date period.
-   *
-   * @param start start of date period
-   * @param end end of date period
-   * @param period date period length in milliseconds
-   * @return {@link Map} with specified keys, each key presents some date period.
-   */
-  private Map<Key, Long> getPeriodMap(long start, long end, long period) {
-    Map<Key, Long> periods = new LinkedHashMap<Key, Long>();
-    long currentStart = start;
-    long nextStart = start - start%period + period;
-    nextStart = nextStart < end ? nextStart : end;
-    periods.put(new Key(currentStart, nextStart - 1), (long) 0);
-    while (nextStart < end) {
-      currentStart = nextStart;
-      nextStart = currentStart + period < end ? currentStart + period : end;
-      periods.put(new Key(currentStart, nextStart - 1), (long) 0);
-    }
-    return periods;
-  }
-
-  private long getTimeStamp(Periodicity periodicity) {
-    switch (periodicity) {
-      case hour:
-        return DateUtils.MILLIS_PER_HOUR;
-      case day:
-        return DateUtils.MILLIS_PER_DAY;
-      case week:
-        return WEEK;
-      case month:
-        return MONTH;
-      default:
-        return YEAR;
-    }
-  }
-
-  private JsonObject toJson(Map<Key, Long> periods) {
-    JsonArray array = new JsonArray();
-    for (Key key : periods.keySet()) {
-      JsonObject element = new JsonObject();
-      element.addProperty("start", key.getStart());
-      element.addProperty("end", key.getEnd());
-      element.addProperty("seconds", periods.get(key));
-      array.add(element);
-    }
-    JsonObject object = new JsonObject();
-    object.add("usage", array);
-    return object;
   }
 
   /**
@@ -252,46 +122,5 @@ public class MetricHandler extends AbstractAuthHandler {
     }
 
     return filters;
-  }
-
-  /**
-   * Class for presenting start and end date of time period.
-   */
-  private class Key {
-
-    private final long start;
-    private final long end;
-
-    public Key(long start, long end) {
-      this.start = start;
-      this.end = end;
-    }
-
-    public long getStart() {
-      return start;
-    }
-
-    public long getEnd() {
-      return end;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      Key key = (Key) o;
-
-      return start == key.start;
-
-    }
-
-    @Override
-    public int hashCode() {
-      return (int) (start ^ (start >>> 32));
-    }
   }
 }

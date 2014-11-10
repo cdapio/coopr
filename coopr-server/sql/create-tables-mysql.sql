@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     submit_time TIMESTAMP DEFAULT '0000-00-00 00:00:00',
     status_time TIMESTAMP DEFAULT '0000-00-00 00:00:00',
     status VARCHAR(32),
+    type VARCHAR(64),
     cluster_template_name VARCHAR(255),
     user_id VARCHAR(255),
     tenant_id VARCHAR(64),

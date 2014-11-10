@@ -252,24 +252,6 @@ public class ClusterTask {
   }
 
   /**
-   * Retrieves id of the user this task is created by.
-   *
-   * @return Id of the user this task is created by.
-   */
-  public String getUserId() {
-    return account.getUserId();
-  }
-
-  /**
-   * Retrieves id of the tenant this task is created by.
-   *
-   * @return Id of the tenant this task is created by.
-   */
-  public String getTenantId() {
-    return account.getTenantId();
-  }
-
-  /**
    * Retrieves the account this task is created by.
    *
    * @return the account this task is created by.

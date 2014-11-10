@@ -94,6 +94,7 @@ public class SQLClusterStoreService extends AbstractIdleService implements Clust
                                                        "submit_time TIMESTAMP, " +
                                                        "status_time TIMESTAMP, " +
                                                        "status VARCHAR(32), " +
+                                                       "type VARCHAR(64), " +
                                                        "cluster_template_name VARCHAR(255), " +
                                                        "user_id VARCHAR(255), " +
                                                        "tenant_id VARCHAR(64), " +

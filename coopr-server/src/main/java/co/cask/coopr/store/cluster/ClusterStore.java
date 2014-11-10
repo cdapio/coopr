@@ -53,7 +53,7 @@ public interface ClusterStore extends ClusterStoreView {
    * @return list of cluster tasks according to the {@code query} filters
    * @throws IOException if there was a problem getting the cluster task.
    */
-  List<ClusterTask> getClusterTasks(ClusterTaskQuery query) throws IOException;
+  List<ClusterTask> getClusterTasks(ClusterTaskFilter filter) throws IOException;
 
   /**
    * Write a cluster task to the store using its id.
