@@ -1,11 +1,11 @@
 /**
- * E2E tests for /providers.
+ * E2E tests for /imagetypes.
  */
 var helper = require('../../protractor-help');
 
 'use strict';
 
-describe('hardware types test', function () {
+describe('imagetypes types test', function () {
 
   var hardwareTypes;
 
@@ -13,40 +13,40 @@ describe('hardware types test', function () {
     helper.loginAsAdmin();
   });
   
-  it('should show no hardware types', function () {
+  it('should show no imagetype types', function () {
     hardwareTypes = element.all(by.repeater('item in list'));
     expect(hardwareTypes.count()).toEqual(0);
   });
 
-  it('should create a hardware type', function () {
-    browser.get('/hardwaretypes/create');
+  it('should create a imagetype type', function () {
+    browser.get('/imagetypes/create');
     
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/hardwaretypes\/create$/);
+    ).toMatch(/\/imagetypes\/create$/);
 
-    element(by.css('#inputHardwareName')).sendKeys('foo');
-    element(by.css('#inputHardwareDescription')).sendKeys('bar');
+    element(by.css('#inputImageName')).sendKeys('foo');
+    element(by.css('#inputImageDescription')).sendKeys('bar');
     element(by.partialButtonText('Create')).click();
 
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/hardwaretypes$/);
+    ).toMatch(/\/imagetypes$/);
   });
 
-  it('should verify a hardware type', function () {
-    browser.get('/hardwaretypes');
+  it('should verify a imagetype type', function () {
+    browser.get('/imagetypes');
     hardwareTypes = element.all(by.repeater('item in list'));
     expect(hardwareTypes.count()).toEqual(1);
 
-    browser.get('/hardwaretypes/edit/foo');
+    browser.get('/imagetypes/edit/foo');
 
-    expect(element(by.css('#inputHardwareName')).getAttribute('value')).toBe('foo');
-    expect(element(by.css('#inputHardwareDescription')).getAttribute('value')).toBe('bar');
+    expect(element(by.css('#inputImageName')).getAttribute('value')).toBe('foo');
+    expect(element(by.css('#inputImageDescription')).getAttribute('value')).toBe('bar');
   });
 
-  it('should delete hardwaretype', function () {
-    browser.get('/hardwaretypes');
+  it('should delete imagetype', function () {
+    browser.get('/imagetypes');
     hardwareTypes = element.all(by.repeater('item in list'));
     hardwareTypes.first().element(by.cssContainingText('.btn', 'Delete')).click();
     element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
