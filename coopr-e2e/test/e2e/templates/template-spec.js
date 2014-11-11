@@ -31,6 +31,7 @@ describe('templates test', function () {
     formfields.get(3).element(by.css('input')).sendKeys('Test project id');
     formfields.get(4).element(by.css('input')).sendKeys('Test keyname');
     element(by.partialButtonText('Create')).click();
+    browser.waitForAngular();
 
     browser.get('/templates/create');
     
@@ -52,7 +53,7 @@ describe('templates test', function () {
       browser.getLocationAbsUrl()
     ).toMatch(/\/templates\/create\/tab\/2$/);
 
-    element(by.cssContainingText('#inputTemplateDefaultProvider option', 'Testprovider')).click();
+    element(by.css('#inputTemplateDefaultProvider option:nth-child(2)')).click();
     element(by.cssContainingText('fieldset.active button.btn.btn-sm.btn-default', 'Next')).click();
 
     expect(
