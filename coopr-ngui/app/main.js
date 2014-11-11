@@ -30,8 +30,7 @@ angular
 
       angular.module(PKG.name+'.filters', [
         PKG.name+'.services',
-        'cask-angular-capitalize',
-        'cask-angular-confirmable'
+        'cask-angular-capitalize'
       ]).name,
 
       'mgcrea.ngStrap.alert',
@@ -45,7 +44,8 @@ angular
 
     ]).name,
 
-    'angular-loading-bar'
+    'angular-loading-bar',
+    'cask-angular-confirmable'
   ])
 
   .run(function ($rootScope, $state, $stateParams) {
