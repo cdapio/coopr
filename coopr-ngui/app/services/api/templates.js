@@ -6,6 +6,11 @@ function ($resource, myApiPrefix) {
     { 
       update: {
         method: 'PUT'
+      },
+      save: {
+        method: 'POST',
+        url: myApiPrefix + 'clustertemplates',
+        params: {name: null}
       }
     }
   );
