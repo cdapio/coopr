@@ -265,9 +265,9 @@ wait_for_server () {
       die "Server did not successfully start"
   fi
 
-  if [ -n $SECURITY_ENABLED ] && [[ $SECURITY_ENABLED = "true" ]]; then
+  if [ "${SECURITY_ENABLED}" == "true" ]; then
     AUTH_SERVER_URI=${COOPR_PROTOCOL}://localhost:55059
-    export ACCESS_TOKEN=$(curl -u ${COOPR_API_USER}:${COOPR_API_USER_PASS} ${AUTH_SERVER_URI}/token | grep -Po '"access_token":.*?[^\\]"' | awk -F '\"' '{print $4}')
+    export ACCESS_TOKEN=$(curl -u ${COOPR_API_USER}:${COOPR_API_USER_PASS} ${AUTH_SERVER_URI}/token 2> /dev/null | sed '1s/.*access_token":"\([^"]*\).*/\1/')
   fi
 }
 
@@ -281,6 +281,7 @@ wait_for_plugin_registration () {
     ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo ${CERT_PARAMETER} 2> /dev/null) -eq 200 || ${RETRIES} -gt 60 ]]; do
     sleep 2
     let "RETRIES++"
+    echo "Authorization:Bearer ${ACCESS_TOKEN}"
   done
 
   if [ ${RETRIES} -gt 60 ]; then
