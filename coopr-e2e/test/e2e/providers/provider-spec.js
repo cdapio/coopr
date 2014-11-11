@@ -4,23 +4,7 @@
 var helper = require('../../protractor-help');
 
 
-describe('just a simple test', function() {
-
- 
-  it('should show a page', function () {
-
-    browser.get('/');
-    expect(
-      element(by.css('body')).getAttribute('class')
-    ).toContain('state-home');
-
-  });
-
-});
-
-
 describe('providers test', function () {
-  var ptor = protractor.getInstance();
   var formfields;
   var providersList;
   
@@ -86,7 +70,6 @@ describe('providers test', function () {
     expect(element(by.css('#inputProviderName')).getAttribute('value')).toBe('Testprovider');
     expect(
       element(by.css('#inputProviderDescription')).getAttribute('value')).toBe('Test description');
-    expect(element(by.css('#inputProviderType')).getAttribute('value')).toBe('1');
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
     var size = formfields.get(2).element(by.css('input')).getAttribute('value');
     expect(size).toEqual('10');
