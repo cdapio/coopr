@@ -30,7 +30,8 @@ angular
 
       angular.module(PKG.name+'.filters', [
         PKG.name+'.services',
-        'cask-angular-capitalize'
+        'cask-angular-capitalize',
+        'cask-angular-confirmable'
       ]).name,
 
       'mgcrea.ngStrap.alert',
@@ -162,4 +163,3 @@ angular
 
     console.timeEnd(PKG.name);
   });
-
