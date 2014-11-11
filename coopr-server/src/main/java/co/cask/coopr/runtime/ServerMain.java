@@ -16,7 +16,6 @@
 package co.cask.coopr.runtime;
 
 import co.cask.cdap.common.conf.CConfiguration;
-import co.cask.cdap.common.conf.SConfiguration;
 import co.cask.cdap.common.guice.ConfigModule;
 import co.cask.cdap.common.guice.DiscoveryRuntimeModule;
 import co.cask.cdap.common.guice.IOModule;
