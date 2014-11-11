@@ -281,7 +281,6 @@ wait_for_plugin_registration () {
     ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo ${CERT_PARAMETER} 2> /dev/null) -eq 200 || ${RETRIES} -gt 60 ]]; do
     sleep 2
     let "RETRIES++"
-    echo "Authorization:Bearer ${ACCESS_TOKEN}"
   done
 
   if [ ${RETRIES} -gt 60 ]; then
