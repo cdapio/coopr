@@ -52,7 +52,7 @@ describe('templates test', function () {
       browser.getLocationAbsUrl()
     ).toMatch(/\/templates\/create\/tab\/2$/);
 
-    element(by.cssContainingText('option', 'Testprovider')).click();
+    element(by.cssContainingText('#inputTemplateDefaultProvider option', 'Testprovider')).click();
     element(by.cssContainingText('fieldset.active button.btn.btn-sm.btn-default', 'Next')).click();
 
     expect(
