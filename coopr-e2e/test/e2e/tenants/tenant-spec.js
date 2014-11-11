@@ -6,26 +6,13 @@ var helper = require('../../protractor-help');
 
 
 describe('tenants section', function() {
-
-  it('should redir to login when logged out', function() {
-    browser.get('/tenants');
-
-    expect(
-      browser.getLocationAbsUrl()
-    ).toMatch(/\/login$/);
-
-    expect(
-      element(by.css('body')).getAttribute('class')
-    ).toContain('state-login');
-
-    expect(
-      element(by.css('body')).getAttribute('class')
-    ).not.toContain('state-tenants-list');
+  
+  it('should log in', function () {
+    helper.loginAsAdmin();
   });
 
 
-  it('while logged in....', function() {
-    helper.loginAsAdmin();
+  it('should show tenant info', function() {
 
     browser.get('/tenants');
 
@@ -45,8 +32,11 @@ describe('tenants section', function() {
       element(by.model('model.name')).getAttribute('value')
     ).toBe('superadmin');
 
+  });
 
+  it('should logout', function () {
     helper.logout();
   });
+
 });
 
