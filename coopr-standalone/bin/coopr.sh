@@ -141,16 +141,18 @@ fi
 # Usage: variable_to_store_value=`read_property property_name /path/to/config/file`
 #
 read_property () {
-  property_re='(?<=<name>'$1'</name>)[\s\S]+?(?=</property>)'
-  property_value_re='(?<=<value>)[\s\S]+?(?=</value>)'
+  case `uname -s` in
+    "Darwin") sed_params="-nE" ;;
+    "Linux") sed_params="-nr" ;;
+  esac
 
-  echo `grep -Pzoe $property_re $2 | grep -Pzoe $property_value_re`
+  echo `grep -A 1 $1 $2 | sed $sed_params 's|.*<value>(.*)</value>.*|\1|p'`
 }
 
 # Setup coopr configuration
 COOPR_PROTOCOL=http
 export COOPR_SSL=`read_property server.ssl.enabled ${COOPR_SERVER_CONF}/coopr-site.xml`
-if [ -n $COOPR_SSL ] && [ $COOPR_SSL = "true" ]; then
+if [ "${COOPR_SSL}" == "true" ]; then
   COOPR_PROTOCOL=https
 
   COOPR_NODEJS_SSL_PATH=`read_property server.nodejs.ssl.path ${COOPR_SERVER_CONF}/coopr-security.xml`
@@ -168,11 +170,7 @@ if [ -n TRUST_CERT_PATH ] && [ -n TRUST_CERT_PASSWORD ]; then
   export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
 fi
 
-if [ ! -z ${TRUST_CERT_PATH} ] && [ ! -z ${TRUST_CERT_PASSWORD} ]; then
-  export CERT_PARAMETER="--cert ${TRUST_CERT_PATH}:${TRUST_CERT_PASSWORD}"
-fi
-
-if [ ${COOPR_PROTOCOL} = "https" ]; then
+if [ "${COOPR_PROTOCOL}" == "https" ]; then
   export CURL_PARAMETER="--insecure"
   export COOPR_REJECT_UNAUTH=false
 fi
@@ -188,7 +186,7 @@ if [ -n keystore_path ] && [ -n keystore_password ]; then
   nodejs_tls_key=`read_property server.nodejs.tls.key ${COOPR_SERVER_CONF}/coopr-security.xml`
   nodejs_tls_crt=`read_property server.nodejs.tls.crt ${COOPR_SERVER_CONF}/coopr-security.xml`
   nodejs_tls_ca=`read_property server.nodejs.tls.ca ${COOPR_SERVER_CONF}/coopr-security.xml`
-  export COOPR_NODE_TLS_PASSWORD=`read_property server.nodejs.tls.password ${COOPR_SERVER_CONF}coopr-security.xml`
+  export COOPR_NODE_TLS_PASSWORD=`read_property server.nodejs.tls.password ${COOPR_SERVER_CONF}/coopr-security.xml`
   export COOPR_NODE_TLS_KEY=$nodejs_tls_path/$nodejs_tls_key
   export COOPR_NODE_TLS_CRT=$nodejs_tls_path/$nodejs_tls_crt
   export COOPR_NODE_TLS_CA=$nodejs_tls_path/$nodejs_tls_ca
