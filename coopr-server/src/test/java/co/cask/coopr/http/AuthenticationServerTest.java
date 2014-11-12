@@ -38,9 +38,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URL;
 
+/**
+ * Test the External Authentication service integration
+ */
 public class AuthenticationServerTest extends ServiceTestBase {
   private static final String AUTH_TEST_CONFIG = "coopr-test-auth.xml";
+  private static final String TEST_REALM_PROPERTIES = "test-realm.properties";
 
   private static ExternalAuthenticationServer externalAuthenticationServer;
   private static String authURL;
@@ -50,6 +55,10 @@ public class AuthenticationServerTest extends ServiceTestBase {
   public static void setup() {
     conf.addResource(AUTH_TEST_CONFIG);
     cConfiguration.addResource(AUTH_TEST_CONFIG);
+    URL file = AuthenticationServerTest.class.getClassLoader().getResource(TEST_REALM_PROPERTIES);
+    if (file != null) {
+      cConfiguration.set(Constants.Security.BASIC_REALM_FILE, file.getFile());
+    }
     authURL = String.format("http://%s:%d/token",
                             cConfiguration.get(Constants.Security.AUTH_SERVER_ADDRESS),
                             cConfiguration.getInt(Constants.Security.AUTH_SERVER_PORT));

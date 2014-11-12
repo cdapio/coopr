@@ -32,8 +32,4 @@
     <name>security.authentication.handlerClassName</name>
     <value>co.cask.cdap.security.server.BasicAuthenticationHandler</value>
   </property>
-  <property>
-    <name>security.authentication.basic.realmfile</name>
-    <value>./coopr-server/src/test/resources/test-realm.properties</value>
-  </property>
 </configuration>
