@@ -67,6 +67,6 @@ script:
   - 'node ./node_modules/gulp/bin/gulp.js jshint'
   - 'npm run test-single-run'
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd ../coopr-e2e; fi'
-  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then npm run protractor; fi'
+  - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then travis_retry npm run protractor; fi'
   - 'cd ..'
   - 'mvn test'
