@@ -48,6 +48,29 @@ public class TimeSeries {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    TimeSeries that = (TimeSeries) o;
+
+    return end == that.end && start == that.start && data.equals(that.data);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = (int) (start ^ (start >>> 32));
+    result = 31 * result + (int) (end ^ (end >>> 32));
+    result = 31 * result + data.hashCode();
+    return result;
+  }
+
+  @Override
   public String toString() {
     return Objects.toStringHelper(this)
       .add("start", start)

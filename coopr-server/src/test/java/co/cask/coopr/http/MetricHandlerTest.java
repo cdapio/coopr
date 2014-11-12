@@ -135,7 +135,9 @@ public class MetricHandlerTest extends ServiceTestBase {
     interval.increaseValue(16);
     expectedList.add(interval);
 
-    check(new TimeSeries(5, 22, expectedList), actual);
+    Assert.assertEquals(new TimeSeries(5, 22, expectedList), actual);
+
+//    check(new TimeSeries(5, 22, expectedList), actual);
   }
 
   @Test
@@ -243,22 +245,24 @@ public class MetricHandlerTest extends ServiceTestBase {
       addInterval(expectedList, i * millisPerHour, 2 * millisPerHour);
     }
 
-    check(new TimeSeries(5 * millisPerHour, 22 * millisPerHour, expectedList), actual);
+    Assert.assertEquals(new TimeSeries(5 * millisPerHour, 22 * millisPerHour, expectedList), actual);
+
+//    check(new TimeSeries(5 * millisPerHour, 22 * millisPerHour, expectedList), actual);
   }
 
-  private void check(TimeSeries expected, TimeSeries actual) {
-    Assert.assertEquals(expected.getStart(), actual.getStart());
-    Assert.assertEquals(expected.getEnd(), actual.getEnd());
-    List<Interval> expectedList = expected.getData();
-    List<Interval> actualList = actual.getData();
-    Assert.assertEquals(expectedList.size(), actualList.size());
-    int index = 0;
-    for (Interval expectedInterval : expectedList) {
-      Interval actualInterval = actualList.get(index++);
-      Assert.assertEquals(expectedInterval.getTime(), actualInterval.getTime());
-      Assert.assertEquals(expectedInterval.getValue(), actualInterval.getValue());
-    }
-  }
+//  private void check(TimeSeries expected, TimeSeries actual) {
+//    Assert.assertEquals(expected.getStart(), actual.getStart());
+//    Assert.assertEquals(expected.getEnd(), actual.getEnd());
+//    List<Interval> expectedList = expected.getData();
+//    List<Interval> actualList = actual.getData();
+//    Assert.assertEquals(expectedList.size(), actualList.size());
+//    int index = 0;
+//    for (Interval expectedInterval : expectedList) {
+//      Interval actualInterval = actualList.get(index++);
+//      Assert.assertEquals(expectedInterval.getTime(), actualInterval.getTime());
+//      Assert.assertEquals(expectedInterval.getValue(), actualInterval.getValue());
+//    }
+//  }
 
   private void addInterval(List<Interval> intervals, long start, long seconds) {
     Interval interval = new Interval(start);

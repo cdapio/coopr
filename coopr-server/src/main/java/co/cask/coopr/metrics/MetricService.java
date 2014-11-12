@@ -63,7 +63,7 @@ public class MetricService {
    * Calculate statistics of nodes usage for given {@link ClusterTaskFilter}.
    * The start and end times are inclusive.
    * Loads all tasks with CREATE or DELETE {@link ProvisionerAction}. Then, for each node, calculates node live time:
-   * finished time of CREATE task - finished time of DELETE task or finished time of CREATE task - current time.
+   * finished time of CREATE task to finished time of DELETE task or finished time of CREATE task to current time.
    * If required, then overlays {@code filter}'s start and end date.
    *
    * @param filter the filter
@@ -147,13 +147,15 @@ public class MetricService {
    * @return nearest smaller {@link Interval}
    */
   private int getNearestIndex(List<Interval> intervals, long key) {
-    Interval nearest = new Interval(-1);
+    int index = -1;
     for (Interval value : intervals) {
-      if (value.getTime() <= key && nearest.getTime() < value.getTime()) {
-        nearest = value;
+      if (value.getTime() <= key) {
+        index++;
+      } else {
+        break;
       }
     }
-    return intervals.indexOf(nearest);
+    return index;
   }
 
   /**

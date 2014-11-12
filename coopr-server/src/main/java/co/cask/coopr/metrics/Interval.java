@@ -48,14 +48,16 @@ public class Interval {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     Interval interval = (Interval) o;
 
-    return time == interval.time;
-
+    return time == interval.time && value == interval.value;
   }
 
   @Override
   public int hashCode() {
-    return (int) (time ^ (time >>> 32));
+    int result = (int) (time ^ (time >>> 32));
+    result = 31 * result + (int) (value ^ (value >>> 32));
+    return result;
   }
 }

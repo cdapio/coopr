@@ -94,11 +94,11 @@ public class MetricHandler extends AbstractAuthHandler {
     Long end = null;
     try {
       start = Long.parseLong(filters.get("start"));
-    } catch (NumberFormatException ignored) {
-    }
-    try {
       end = Long.parseLong(filters.get("end"));
-    } catch (NumberFormatException ignored) {
+    } catch (NumberFormatException e) {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST,
+                           String.format("Incorrect value for start %s or end %s timestamp",
+                                         filters.get("start"), filters.get("end")));
     }
     ClusterTaskFilter filter = new ClusterTaskFilter(tenant, filters.get("user"), filters.get("cluster"),
                                                      filters.get("clustertemplate"), start, end,
