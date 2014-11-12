@@ -39,7 +39,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,13 +50,10 @@ public class AuthenticationServerTest extends ServiceTestBase {
   private static ExternalAuthenticationServer externalAuthenticationServer;
   private static String authURL;
   private static int testServerPort;
-  private static Map<String, String> authProps;
 
   @BeforeClass
   public static void setup() {
-    setAuthPropsToConfig();
-    setAuthPropsToCConfig();
-
+    initAuthTestProps();
     handlerServer = injector.getInstance(HandlerServer.class);
     handlerServer.startAndWait();
     externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
@@ -68,36 +64,18 @@ public class AuthenticationServerTest extends ServiceTestBase {
                             externalAuthenticationServer.getSocketAddress().getPort());
   }
 
-  private static void setAuthPropsToConfig() {
-    for (Map.Entry<String, String> prop : getAuthProps().entrySet()) {
-      conf.set(prop.getKey(), prop.getValue());
-    }
-  }
-
-  private static void setAuthPropsToCConfig() {
-    for (Map.Entry<String, String> prop : getAuthProps().entrySet()) {
-      cConfiguration.set(prop.getKey(), prop.getValue());
-    }
-  }
-
-  private static Map<String, String> getAuthProps() {
-    if (authProps == null) {
-      authProps = initAuthTestProps();
-    }
-    return authProps;
-  }
-
-  private static Map<String, String> initAuthTestProps() {
-    Map<String, String> testProps = new HashMap<String, String>();
-    testProps.put(Constants.Security.CFG_SECURITY_ENABLED, "true");
-    testProps.put(Constants.Security.AUTH_SERVER_ADDRESS, "127.0.0.1");
-    testProps.put(Constants.Security.AUTH_SERVER_PORT, "55059");
-    testProps.put(Constants.Security.AUTH_HANDLER_CLASS, "co.cask.cdap.security.server.BasicAuthenticationHandler");
+  private static void initAuthTestProps() {
+    conf.setBoolean(Constants.Security.CFG_SECURITY_ENABLED, true);
+    conf.set(Constants.Security.AUTH_SERVER_ADDRESS, "127.0.0.1");
+    conf.setInt(Constants.Security.AUTH_SERVER_PORT, 55059);
+    conf.set(Constants.Security.AUTH_HANDLER_CLASS, "co.cask.cdap.security.server.BasicAuthenticationHandler");
     URL realmTestFile = AuthenticationServerTest.class.getClassLoader().getResource(TEST_REALM_PROPERTIES);
     if (realmTestFile != null) {
-      testProps.put(Constants.Security.BASIC_REALM_FILE, realmTestFile.getFile());
+      conf.set(Constants.Security.BASIC_REALM_FILE, realmTestFile.getFile());
     }
-    return testProps;
+    for (Map.Entry<String, String> props : conf) {
+      cConfiguration.set(props.getKey(), props.getValue());
+    }
   }
 
   @AfterClass

@@ -67,8 +67,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.Map.Entry;
 
@@ -102,43 +100,26 @@ public class BaseTest {
   protected static CredentialStore credentialStore;
   protected static Gson gson;
   protected static CConfiguration cConfiguration;
-  private static Map<String, String> testProps;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
 
   public static Configuration createTestConf() {
     Configuration conf = Configuration.create();
-    for (Entry<String, String> prop: getTestProps().entrySet()) {
-      conf.set(prop.getKey(), prop.getValue());
-    }
+    conf.setInt(Constants.PORT, 0);
+    conf.set(Constants.HOST, HOSTNAME);
+    conf.setInt(Constants.SCHEDULER_INTERVAL_SECS, 1);
+    conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
+    conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:coopr;create=true");
     return conf;
   }
 
   public static CConfiguration createTestCConf() {
     CConfiguration cConf = CConfiguration.create();
-    cConf.addResource(DEFAULT_COOPR_CONFIG);
-    for (Entry<String, String> prop: getTestProps().entrySet()) {
+    for (Entry<String, String> prop: conf) {
       cConf.set(prop.getKey(), prop.getValue());
     }
     return cConf;
-  }
-
-  private static Map<String, String> initTestProps() {
-    Map<String, String> testProps = new HashMap<String, String>();
-    testProps.put(Constants.PORT, "0");
-    testProps.put(Constants.HOST, HOSTNAME);
-    testProps.put(Constants.SCHEDULER_INTERVAL_SECS, "1");
-    testProps.put(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
-    testProps.put(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:coopr;create=true");
-    return testProps;
-  }
-
-  private static Map<String, String> getTestProps() {
-    if (testProps == null) {
-      testProps = initTestProps();
-    }
-    return testProps;
   }
 
   @BeforeClass
