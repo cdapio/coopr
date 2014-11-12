@@ -59,14 +59,14 @@ public class AuthenticationServerTest extends ServiceTestBase {
     if (file != null) {
       cConfiguration.set(Constants.Security.BASIC_REALM_FILE, file.getFile());
     }
-    authURL = String.format("http://%s:%d/token",
-                            cConfiguration.get(Constants.Security.AUTH_SERVER_ADDRESS),
-                            cConfiguration.getInt(Constants.Security.AUTH_SERVER_PORT));
     handlerServer = injector.getInstance(HandlerServer.class);
     handlerServer.startAndWait();
     externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
     externalAuthenticationServer.startAndWait();
     testServerPort = handlerServer.getBindAddress().getPort();
+    authURL = String.format("http://%s:%d/token",
+                            externalAuthenticationServer.getSocketAddress().getHostName(),
+                            externalAuthenticationServer.getSocketAddress().getPort());
   }
 
   @AfterClass
