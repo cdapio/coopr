@@ -33,6 +33,7 @@ angular
         'cask-angular-capitalize'
       ]).name,
 
+      'cask-angular-confirmable',
       'mgcrea.ngStrap.alert',
       'mgcrea.ngStrap.tooltip',
       'mgcrea.ngStrap.popover',
@@ -44,8 +45,7 @@ angular
 
     ]).name,
 
-    'angular-loading-bar',
-    'cask-angular-confirmable'
+    'angular-loading-bar'
   ])
 
   .run(function ($rootScope, $state, $stateParams) {
