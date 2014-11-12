@@ -1,9 +1,26 @@
-## Authentication support
-Authentication in COOPR Server is carried out using **Authentication Server** - the authentication server integrates 
-with different authentication backends (LDAP, JASPI plugins) using a plugin API. Clients must first authenticate 
-with the authentication server through this configured backend. Once authenticated, clients are issued an access token 
+..
+   Copyright © 2012-2014 Cask Data, Inc.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+.. index::
+single: Authentication support
+
+Authentication in COOPR Server is carried out using **Authentication Server** - the authentication server integrates
+with different authentication backends (LDAP, JASPI plugins) using a plugin API. Clients must first authenticate
+with the authentication server through this configured backend. Once authenticated, clients are issued an access token
 representing their identity.
-  
+
 Enabling Security
 -----------------
 To enable security in COOPR Server, add these properties to ``coopr-site.xml``:
@@ -11,7 +28,7 @@ To enable security in COOPR Server, add these properties to ``coopr-site.xml``:
 ==========================================  ==============  ==============
    Property                                   Value           Default
 ==========================================  ==============  ==============
-security.enabled                              true            false   
+security.enabled                              true            false
 security.auth.server.address                  <hostname>      localhost
 security.auth.server.bind.port                <port>          55059
 ==========================================  ==============  ==============
@@ -107,7 +124,7 @@ by the ``LoginModule``.
 Custom Authentication
 ---------------------
 To provide a custom authentication mechanism you may create your own ``AuthenticationHandler`` by overriding
-``AbstractAuthenticationHandler`` and implementing the abstract methods:
+``AbstractAuthenticationHandler`` and implementing the abstract methods ::
 
   public class CustomAuthenticationHandler extends AbstractAuthenticationHandler {
 
@@ -135,21 +152,21 @@ To provide a custom authentication mechanism you may create your own ``Authentic
 
 Testing Security
 ----------------
-From here on out we will use:
+From here on out we will use::
 
-  ```<base-url>```
+  <base-url>
 
-to represent the base URL that clients can use for the HTTP REST API:
+to represent the base URL that clients can use for the HTTP REST API::
 
-  ```http://<host>:<port>```
+  http://<host>:<port>
 
-and:
+and::
 
-  ```<base-auth-url>```
+  <base-auth-url>
 
-to represent the base URL that clients can use for obtaining access tokens:
+to represent the base URL that clients can use for obtaining access tokens::
 
-  ```http://<host>:<auth-port>```
+  http://<host>:<auth-port>
 
 where ``<host>`` is the host name of the COOPR server, ``<port>`` is the port that is set as the ``server.port``
 in ``coopr-site.xml`` (default: ``55054``), and ``<auth-port>`` is the port that is set as the
@@ -158,18 +175,18 @@ in ``coopr-site.xml`` (default: ``55054``), and ``<auth-port>`` is the port that
 To ensure that you've configured security correctly, run these simple tests to verify that the
 security components are working as expected:
 
-- After configuring COOPR as described above, restart COOPR and attempt to use a service:
+- After configuring COOPR as described above, restart COOPR and attempt to use a service::
 
-```curl <base-url>/status```
+  curl <base-url>/status
 
-- This should return a 401 Unauthorized response. Submit a username and password to obtain an ``AccessToken``:
+- This should return a 401 Unauthorized response. Submit a username and password to obtain an ``AccessToken``::
 
-```curl -u username:password <base-auth-url>/token```
+  curl -u username:password <base-auth-url>/token
 
 - This should return a 200 OK response with the ``AccessToken`` string in the response body.
   Reattempt the first command, but this time include the ``AccessToken`` as a header in the command::
 
-```curl -H "Authorization: Bearer <AccessToken>" <base-url>/status```
+  curl -H "Authorization: Bearer <AccessToken>" <base-url>/status
 
 - This should return a 200 OK response.
 
@@ -177,28 +194,30 @@ Obtaining an Access Token
 -------------------------
 Obtain a new access token by calling::
 
-   ```GET <base-auth-url>/token```
+   GET <base-auth-url>/token
 
-The required header and request parameters may vary according to the external authentication mechanism 
-that has been configured.  For username and password based mechanisms, the ``Authorization`` header may be used:
+The required header and request parameters may vary according to the external authentication mechanism
+that has been configured.  For username and password based mechanisms, the ``Authorization`` header may be used::
 
    Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
 
-**HTTP Responses**
+HTTP Responses
+++++++++++++++
 
   * ``200 OK`` - Authentication was successful and an access token will be returned
   * ``401 Unauthorized`` - Authentication failed
 
-**Success Response Fields**
+Success Response Fields
++++++++++++++++++++++++
 
-  * ``access_token`` - The Access Token issued for the client. The serialized token contents are base-64 encoded 
+  * ``access_token`` - The Access Token issued for the client. The serialized token contents are base-64 encoded
   for safe transport over HTTP.
   * ``token_type`` - In order to conform with the OAuth 2.0 Bearer Token Usage specification (`RFC 6750`__), this
   value must be "Bearer".
   * ``expires_in`` - Token validity lifetime in seconds.
 
 Example
--------
++++++++
 Sample request::
 
    GET <base-auth-url>/token HTTP/1.1
