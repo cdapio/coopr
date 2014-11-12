@@ -91,7 +91,7 @@ public class AuthenticationServerTest extends ServiceTestBase {
     Map<String, String> testProps = new HashMap<String, String>();
     testProps.put(Constants.Security.CFG_SECURITY_ENABLED, "true");
     testProps.put(Constants.Security.AUTH_SERVER_ADDRESS, "127.0.0.1");
-    testProps.put(Constants.Security.AUTH_SERVER_PORT, "55059");
+    testProps.put(Constants.Security.AUTH_SERVER_PORT, "50059");
     testProps.put(Constants.Security.AUTH_HANDLER_CLASS, "co.cask.cdap.security.server.BasicAuthenticationHandler");
     URL realmTestFile = AuthenticationServerTest.class.getClassLoader().getResource(TEST_REALM_PROPERTIES);
     if (realmTestFile != null) {
