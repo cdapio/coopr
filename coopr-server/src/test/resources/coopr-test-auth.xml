@@ -26,7 +26,7 @@
   </property>
   <property>
       <name>security.auth.server.bind.port</name>
-      <value>5505</value>
+      <value>55059</value>
   </property>
   <property>
       <name>security.authentication.handlerClassName</name>
