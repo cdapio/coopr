@@ -20,28 +20,24 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.http.HttpHandler;
 import co.cask.http.NettyHttpService;
 import co.cask.http.SSLConfig;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.Set;
 
 /**
  * Netty service for running the server.
  */
-public class HandlerServer extends AbstractIdleService {
+abstract class HandlerServer extends AbstractIdleService {
 
   private static final Logger LOG = LoggerFactory.getLogger(HandlerServer.class);
   private final NettyHttpService httpService;
 
-  @Inject
-  private HandlerServer(Set<HttpHandler> handlers, Configuration conf) {
+  HandlerServer(Set<HttpHandler> handlers, Configuration conf, String portKey) {
     String host = conf.get(Constants.HOST);
-    int port = conf.getInt(Constants.PORT);
+    int port = conf.getInt(portKey);
     int numExecThreads = conf.getInt(Constants.NETTY_EXEC_NUM_THREADS);
     int numWorkerThreads = conf.getInt(Constants.NETTY_WORKER_NUM_THREADS);
     boolean enableSSL = conf.getBoolean(Constants.ENABLE_SSL);
@@ -58,23 +54,12 @@ public class HandlerServer extends AbstractIdleService {
     builder.setWorkerThreadPoolSize(numWorkerThreads);
 
     if (enableSSL) {
-      String keyStoreFilePath = conf.get(Constants.SSL_KEYSTORE_PATH);
-      Preconditions.checkArgument(keyStoreFilePath != null,
-                                  String.format("%s is not specified.", Constants.SSL_KEYSTORE_PATH));
-      File keyStore = new File(keyStoreFilePath);
-      SSLConfig.Builder sslConfigBuilder = SSLConfig.builder(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD))
-        .setCertificatePassword(conf.get(Constants.SSL_KEYPASSWORD));
-
-      String trustKeyStoreFilePath = conf.get(Constants.SSL_TRUST_KEYSTORE_PATH);
-      if (trustKeyStoreFilePath != null) {
-        sslConfigBuilder.setTrustKeyStore(new File(trustKeyStoreFilePath))
-          .setTrustKeyStorePassword(conf.get(Constants.SSL_TRUST_KEYPASSWORD));
-      }
-
-      builder.enableSSL(sslConfigBuilder.build());
+      builder.enableSSL(getSSLConfig(conf));
     }
     this.httpService = builder.build();
   }
+
+  abstract SSLConfig getSSLConfig(Configuration conf);
 
   @Override
   protected void startUp() throws Exception {

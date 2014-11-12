@@ -83,30 +83,30 @@ public class RPCHandlerTest extends ServiceTestBase {
   @Test
   public void testInvalidGetNodePropertiesReturns400() throws Exception {
     // not a json object
-    assertResponseStatus(doPost("/getNodeProperties", "body", USER1_HEADERS),
+    assertResponseStatus(doPostExternalAPI("/getNodeProperties", "body", USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // no cluster id
     JsonObject requestBody = new JsonObject();
-    assertResponseStatus(doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
+    assertResponseStatus(doPostExternalAPI("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // bad cluster id
     requestBody = new JsonObject();
     requestBody.add("clusterId", new JsonObject());
-    assertResponseStatus(doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
+    assertResponseStatus(doPostExternalAPI("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // bad properties
     requestBody = new JsonObject();
     requestBody.addProperty("properties", "prop1,prop2");
-    assertResponseStatus(doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
+    assertResponseStatus(doPostExternalAPI("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // bad services
     requestBody = new JsonObject();
     requestBody.addProperty("services", "service1,service2");
-    assertResponseStatus(doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
+    assertResponseStatus(doPostExternalAPI("/getNodeProperties", requestBody.toString(), USER1_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 
@@ -151,20 +151,20 @@ public class RPCHandlerTest extends ServiceTestBase {
     // test with nonexistant cluster
     JsonObject requestBody = new JsonObject();
     requestBody.addProperty("clusterId", "123" + cluster.getId());
-    HttpResponse response = doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
+    HttpResponse response = doPostExternalAPI("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     JsonObject responseBody = getJsonObjectBodyFromResponse(response);
     Assert.assertTrue(responseBody.entrySet().isEmpty());
 
     // test with unowned cluster
     requestBody.addProperty("clusterId", cluster.getId());
-    response = doPost("/getNodeProperties", requestBody.toString(), USER2_HEADERS);
+    response = doPostExternalAPI("/getNodeProperties", requestBody.toString(), USER2_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
     Assert.assertTrue(responseBody.entrySet().isEmpty());
 
     // test without any filters
-    response = doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
+    response = doPostExternalAPI("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
     JsonObject expected = new JsonObject();
@@ -176,7 +176,7 @@ public class RPCHandlerTest extends ServiceTestBase {
 
     // test with filter on service A
     requestBody.add("services", TestHelper.jsonArrayOf(svcA.getName()));
-    response = doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
+    response = doPostExternalAPI("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
     expected = new JsonObject();
@@ -188,7 +188,7 @@ public class RPCHandlerTest extends ServiceTestBase {
 
     // test with filter on service A and property list
     requestBody.add("properties", TestHelper.jsonArrayOf("hostname", "ipaddresses"));
-    response = doPost("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
+    response = doPostExternalAPI("/getNodeProperties", requestBody.toString(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     responseBody = getJsonObjectBodyFromResponse(response);
     expected = new JsonObject();

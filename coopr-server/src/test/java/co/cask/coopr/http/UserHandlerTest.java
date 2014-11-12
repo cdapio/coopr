@@ -49,13 +49,13 @@ public class UserHandlerTest extends ServiceTestBase {
     profile.add("attributes", attributes);
 
     // no profile yet, should 404
-    assertResponseStatus(doGet("/profile", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI("/profile", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
 
     // write profile
-    assertResponseStatus(doPut("/profile", profile.toString(), USER1_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPutExternalAPI("/profile", profile.toString(), USER1_HEADERS), HttpResponseStatus.OK);
 
     // get the profile
-    HttpResponse response = doGet("/profile", USER1_HEADERS);
+    HttpResponse response = doGetExternalAPI("/profile", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     JsonObject result = new Gson().fromJson(reader, JsonObject.class);
@@ -63,9 +63,9 @@ public class UserHandlerTest extends ServiceTestBase {
     reader.close();
 
     // delete the profile
-    assertResponseStatus(doDelete("/profile", USER1_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doDeleteExternalAPI("/profile", USER1_HEADERS), HttpResponseStatus.OK);
 
     // no profile anymore, should 404
-    assertResponseStatus(doGet("/profile", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI("/profile", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
   }
 }

@@ -41,7 +41,6 @@ public class HttpModule extends AbstractModule {
     handlerBinder.addBinding().to(AdminHandler.class);
     handlerBinder.addBinding().to(ClusterHandler.class);
     handlerBinder.addBinding().to(NodeHandler.class);
-    handlerBinder.addBinding().to(TaskHandler.class);
     handlerBinder.addBinding().to(StatusHandler.class);
     handlerBinder.addBinding().to(RPCHandler.class);
     handlerBinder.addBinding().to(SuperadminHandler.class);

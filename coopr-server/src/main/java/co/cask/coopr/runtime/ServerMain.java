@@ -23,7 +23,8 @@ import co.cask.coopr.common.daemon.DaemonMain;
 import co.cask.coopr.common.queue.guice.QueueModule;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.common.zookeeper.guice.ZookeeperModule;
-import co.cask.coopr.http.HandlerServer;
+import co.cask.coopr.http.ExternalHandlerServer;
+import co.cask.coopr.http.InternalHandlerServer;
 import co.cask.coopr.http.guice.HttpModule;
 import co.cask.coopr.management.ServerStats;
 import co.cask.coopr.management.guice.ManagementModule;
@@ -68,7 +69,8 @@ public final class ServerMain extends DaemonMain {
   private InMemoryZKServer inMemoryZKServer;
   private ZKClientService zkClientService;
   private Injector injector;
-  private HandlerServer handlerServer;
+  private ExternalHandlerServer externalHandlerServer;
+  private InternalHandlerServer internalHandlerServer;
   private Scheduler scheduler;
   private Configuration conf;
   private int solverNumThreads;
@@ -172,9 +174,15 @@ public final class ServerMain extends DaemonMain {
       LOG.error("Exception starting up.", e);
       System.exit(-1);
     }
-    handlerServer = injector.getInstance(HandlerServer.class);
-    handlerServer.startAndWait();
-    LOG.info("Handler service started on {}", handlerServer.getBindAddress());
+    internalHandlerServer = injector.getInstance(InternalHandlerServer.class);
+    internalHandlerServer.startAndWait();
+    LOG.info("Internal API handler service started on {}", internalHandlerServer.getBindAddress());
+    externalHandlerServer = injector.getInstance(ExternalHandlerServer.class);
+    externalHandlerServer.startAndWait();
+    LOG.info("External API handler service started on {}", externalHandlerServer.getBindAddress());
+//    handlerServer = injector.getInstance(HandlerServer.class);
+//    handlerServer.startAndWait();
+//    LOG.info("Handler service started on {}", handlerServer.getBindAddress());
 
     scheduler = injector.getInstance(Scheduler.class);
     scheduler.startAndWait();
@@ -208,8 +216,8 @@ public final class ServerMain extends DaemonMain {
       }
     }
 
-    stopAll(handlerServer, userStore, resourceService, provisionerStore, tenantStore, clusterStoreService,
-            entityStoreService, idService, zkClientService, inMemoryZKServer);
+    stopAll(internalHandlerServer, externalHandlerServer, userStore, resourceService, provisionerStore, tenantStore,
+            clusterStoreService, entityStoreService, idService, zkClientService, inMemoryZKServer);
   }
 
   private void stopAll(Service... services) {

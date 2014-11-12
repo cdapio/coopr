@@ -26,7 +26,8 @@ public class Constants {
 
   public static final String API_BASE = "/v2";
 
-  public static final String PORT = "server.port";
+  public static final String EXTERNAL_PORT = "server.port";
+  public static final String INTERNAL_PORT = "server.tasks.port";
   public static final String HOST = "server.host";
   public static final String ENABLE_SSL = "server.ssl.enabled";
   public static final String ZOOKEEPER_QUORUM = "server.zookeeper.quorum";

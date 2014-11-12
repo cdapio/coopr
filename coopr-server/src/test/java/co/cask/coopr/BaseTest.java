@@ -97,7 +97,7 @@ public class BaseTest {
 
   public static Configuration createTestConf() {
     Configuration conf = Configuration.create();
-    conf.set(Constants.PORT, "0");
+    conf.set(Constants.EXTERNAL_PORT, "0");
     conf.set(Constants.HOST, HOSTNAME);
     conf.set(Constants.SCHEDULER_INTERVAL_SECS, "1");
     conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");

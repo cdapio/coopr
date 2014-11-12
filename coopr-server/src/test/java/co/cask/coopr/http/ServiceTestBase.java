@@ -97,9 +97,12 @@ public class ServiceTestBase extends BaseTest {
     new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
     new BasicHeader(Constants.TENANT_HEADER, Constants.SUPERADMIN_TENANT)
   };
-  private static int port;
-  private static String base;
-  protected static HandlerServer handlerServer;
+  private static int externalPort;
+  private static int internalPort;
+  private static String externalBase;
+  private static String internalBase;
+  protected static ExternalHandlerServer externalHandlerServer;
+  protected static InternalHandlerServer internalHandlerServer;
   protected static ElementsTrackingQueue balancerQueue;
   protected static QueueGroup provisionerQueues;
   protected static QueueGroup clusterQueues;
@@ -118,11 +121,15 @@ public class ServiceTestBase extends BaseTest {
     solverQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.SOLVER)));
     jobQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.JOB)));
     callbackQueues = injector.getInstance(Key.get(QueueGroup.class, Names.named(Constants.Queue.CALLBACK)));
-    handlerServer = injector.getInstance(HandlerServer.class);
-    handlerServer.startAndWait();
-    port = handlerServer.getBindAddress().getPort();
+    internalHandlerServer = injector.getInstance(InternalHandlerServer.class);
+    internalHandlerServer.startAndWait();
+    internalPort = internalHandlerServer.getBindAddress().getPort();
+    externalHandlerServer = injector.getInstance(ExternalHandlerServer.class);
+    externalHandlerServer.startAndWait();
+    externalPort = externalHandlerServer.getBindAddress().getPort();
     tenantProvisionerService = injector.getInstance(TenantProvisionerService.class);
-    base = "http://" + HOSTNAME + ":" + port + Constants.API_BASE;
+    internalBase = "http://" + HOSTNAME + ":" + internalPort + Constants.API_BASE;
+    externalBase = "http://" + HOSTNAME + ":" + externalPort + Constants.API_BASE;
   }
 
   @Before
@@ -133,21 +140,41 @@ public class ServiceTestBase extends BaseTest {
 
   @AfterClass
   public static void cleanupServiceBase() {
-    handlerServer.stopAndWait();
+    internalHandlerServer.stopAndWait();
+    externalHandlerServer.stopAndWait();
   }
 
-  public static HttpResponse doGetWithoutVersion(String resource) throws Exception {
+  public static HttpResponse doGetWithoutVersionExternalAPI(String resource) throws Exception {
+    return doGetWithoutVersion(resource, externalPort);
+  }
+
+  public static HttpResponse doGetWithoutVersionInternalAPI(String resource) throws Exception {
+    return doGetWithoutVersion(resource, internalPort);
+  }
+
+  private static HttpResponse doGetWithoutVersion(String resource, int port) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
     HttpGet get = new HttpGet("http://" + HOSTNAME + ":" + port + resource);
     return client.execute(get);
   }
 
-
-  public static HttpResponse doGet(String resource) throws Exception {
-    return doGet(resource, null);
+  public static HttpResponse doGetExternalAPI(String resource) throws Exception {
+    return doGet(resource, null, externalBase);
   }
 
-  public static HttpResponse doGet(String resource, Header[] headers) throws Exception {
+  public static HttpResponse doGetInternalAPI(String resource) throws Exception {
+    return doGet(resource, null, internalBase);
+  }
+
+  public static HttpResponse doGetExternalAPI(String resource, Header[] headers) throws Exception {
+    return doGet(resource, headers, externalBase);
+  }
+
+  public static HttpResponse doGetInternalAPI(String resource, Header[] headers) throws Exception {
+    return doGet(resource, headers, internalBase);
+  }
+
+  private static HttpResponse doGet(String resource, Header[] headers, String base) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
     HttpGet get = new HttpGet(base + resource);
 
@@ -158,11 +185,23 @@ public class ServiceTestBase extends BaseTest {
     return client.execute(get);
   }
 
-  public static HttpResponse doPut(String resource, String body) throws Exception {
-    return doPut(resource, body, null);
+  public static HttpResponse doPutExternalAPI(String resource, String body) throws Exception {
+    return doPut(resource, body, null, externalBase);
   }
 
-  public static HttpResponse doPut(String resource, String body, Header[] headers) throws Exception {
+  public static HttpResponse doPutInternalAPI(String resource, String body) throws Exception {
+    return doPut(resource, body, null, internalBase);
+  }
+
+  public static HttpResponse doPutExternalAPI(String resource, String body, Header[] headers) throws Exception {
+    return doPut(resource, body, headers, externalBase);
+  }
+
+  public static HttpResponse doPutInternalAPI(String resource, String body, Header[] headers) throws Exception {
+    return doPut(resource, body, headers, internalBase);
+  }
+
+  private static HttpResponse doPut(String resource, String body, Header[] headers, String base) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPut put = new HttpPut(base + resource);
 
@@ -175,11 +214,23 @@ public class ServiceTestBase extends BaseTest {
     return client.execute(put);
   }
 
-  public static HttpResponse doPost(String resource, String body) throws Exception {
-    return doPost(resource, body, null);
+  public static HttpResponse doPostExternalAPI(String resource, String body) throws Exception {
+    return doPost(resource, body, null, externalBase);
   }
 
-  public static HttpResponse doPost(String resource, String body, Header[] headers) throws Exception {
+  public static HttpResponse doPostInternalAPI(String resource, String body) throws Exception {
+    return doPost(resource, body, null, internalBase);
+  }
+
+  public static HttpResponse doPostExternalAPI(String resource, String body, Header[] headers) throws Exception {
+    return doPost(resource, body, headers, externalBase);
+  }
+
+  public static HttpResponse doPostInternalAPI(String resource, String body, Header[] headers) throws Exception {
+    return doPost(resource, body, headers, internalBase);
+  }
+
+  private static HttpResponse doPost(String resource, String body, Header[] headers, String base) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPost post = new HttpPost(base + resource);
 
@@ -193,7 +244,15 @@ public class ServiceTestBase extends BaseTest {
     return client.execute(post);
   }
 
-  public static HttpResponse doDelete(String resource, Header[] headers) throws Exception {
+  public static HttpResponse doDeleteExternalAPI(String resource, Header[] headers) throws Exception {
+    return doDelete(resource, headers, externalBase);
+  }
+
+  public static HttpResponse doDeleteInternalAPI(String resource, Header[] headers) throws Exception {
+    return doDelete(resource, headers, internalBase);
+  }
+
+  private static HttpResponse doDelete(String resource, Header[] headers, String base) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
     HttpDelete delete = new HttpDelete(base + resource);
     if (headers != null) {
@@ -207,7 +266,15 @@ public class ServiceTestBase extends BaseTest {
                         expected.getCode(), response.getStatusLine().getStatusCode());
   }
 
-  public static String getBaseUrl() {
+  public static String getBaseUrlExternalAPI() {
+    return getBaseUrl(externalPort);
+  }
+
+  public static String getBaseUrlInternalAPI() {
+    return getBaseUrl(internalPort);
+  }
+
+  private static String getBaseUrl(int port) {
     return String.format("http://%s:%d%s", HOSTNAME, port, Constants.API_BASE);
   }
 
