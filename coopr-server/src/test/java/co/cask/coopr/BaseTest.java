@@ -15,6 +15,11 @@
  */
 package co.cask.coopr;
 
+import co.cask.cdap.common.conf.CConfiguration;
+import co.cask.cdap.common.guice.ConfigModule;
+import co.cask.cdap.common.guice.DiscoveryRuntimeModule;
+import co.cask.cdap.common.guice.IOModule;
+import co.cask.cdap.security.guice.SecurityModules;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
@@ -68,13 +73,15 @@ import java.util.concurrent.TimeUnit;
  * Base class with utilities for loading admin entities into a entityStore and starting zookeeper up.
  */
 public class BaseTest {
+  protected static final String TEST_CONFIGURATION_FILE = "coopr-test.xml";
+  protected static final String HOSTNAME = "127.0.0.1";
+
   private static InMemoryZKServer zkServer;
   private static SQLClusterStoreService sqlClusterStoreService;
   private static SQLProvisionerStore sqlProvisionerStore;
   private static SQLPluginMetaStoreService sqlMetaStoreService;
   private static SQLTenantStore sqlTenantStore;
   private static SQLUserStore sqlUserStore;
-  protected static final String HOSTNAME = "127.0.0.1";
   protected static Injector injector;
   protected static ZKClientService zkClientService;
   protected static EntityStoreService entityStoreService;
@@ -97,11 +104,7 @@ public class BaseTest {
 
   public static Configuration createTestConf() {
     Configuration conf = Configuration.create();
-    conf.set(Constants.PORT, "0");
-    conf.set(Constants.HOST, HOSTNAME);
-    conf.set(Constants.SCHEDULER_INTERVAL_SECS, "1");
-    conf.set(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
-    conf.set(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:coopr;create=true");
+    conf.addResource(TEST_CONFIGURATION_FILE);
     return conf;
   }
 
@@ -124,6 +127,9 @@ public class BaseTest {
     );
     zkClientService.startAndWait();
 
+    CConfiguration cConfiguration = CConfiguration.create();
+    cConfiguration.addResource(TEST_CONFIGURATION_FILE);
+
     mockClusterCallback = new MockClusterCallback();
     injector = Guice.createInjector(
       Modules.override(
@@ -133,7 +139,11 @@ public class BaseTest {
         new QueueModule(zkClientService),
         new HttpModule(),
         new SchedulerModule(conf, MoreExecutors.sameThreadExecutor(), MoreExecutors.sameThreadExecutor()),
-        new CodecModules().getModule()
+        new CodecModules().getModule(),
+        new IOModule(),
+        new DiscoveryRuntimeModule().getStandaloneModules(),
+        new SecurityModules().getStandaloneModules(),
+        new ConfigModule(cConfiguration)
       ).with(
         new AbstractModule() {
           @Override
