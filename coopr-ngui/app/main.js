@@ -33,6 +33,7 @@ angular
         'cask-angular-capitalize'
       ]).name,
 
+      'cask-angular-dropdown-text-combo',
       'mgcrea.ngStrap.alert',
       'mgcrea.ngStrap.tooltip',
       'mgcrea.ngStrap.popover',
@@ -162,4 +163,3 @@ angular
 
     console.timeEnd(PKG.name);
   });
-
