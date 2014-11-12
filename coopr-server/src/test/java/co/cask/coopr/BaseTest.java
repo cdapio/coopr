@@ -73,7 +73,8 @@ import java.util.concurrent.TimeUnit;
  * Base class with utilities for loading admin entities into a entityStore and starting zookeeper up.
  */
 public class BaseTest {
-  protected static final String TEST_CONFIGURATION_FILE = "coopr-test.xml";
+  protected static final String TEST_COOPR_CONFIG = "coopr-test.xml";
+  protected static final String DEFAULT_COOP_CONFIG = "coopr-default.xml";
   protected static final String HOSTNAME = "127.0.0.1";
 
   private static InMemoryZKServer zkServer;
@@ -98,13 +99,14 @@ public class BaseTest {
   protected static IdService idService;
   protected static CredentialStore credentialStore;
   protected static Gson gson;
+  protected static CConfiguration cConfiguration;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
 
   public static Configuration createTestConf() {
     Configuration conf = Configuration.create();
-    conf.addResource(TEST_CONFIGURATION_FILE);
+    conf.addResource(TEST_COOPR_CONFIG);
     return conf;
   }
 
@@ -127,8 +129,9 @@ public class BaseTest {
     );
     zkClientService.startAndWait();
 
-    CConfiguration cConfiguration = CConfiguration.create();
-    cConfiguration.addResource(TEST_CONFIGURATION_FILE);
+    cConfiguration = CConfiguration.create();
+    cConfiguration.addResource(DEFAULT_COOP_CONFIG);
+    cConfiguration.addResource(TEST_COOPR_CONFIG);
 
     mockClusterCallback = new MockClusterCallback();
     injector = Guice.createInjector(
