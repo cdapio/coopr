@@ -18,6 +18,7 @@ package co.cask.coopr.http;
 
 import co.cask.cdap.common.conf.Constants;
 import co.cask.cdap.security.server.ExternalAuthenticationServer;
+import co.cask.coopr.TestHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.http.Header;
@@ -52,7 +53,7 @@ public class AuthenticationServerTest extends ServiceTestBase {
   private static int testServerPort;
 
   @BeforeClass
-  public static void setup() {
+  public static void setup() throws IOException {
     initAuthTestProps();
     handlerServer = injector.getInstance(HandlerServer.class);
     handlerServer.startAndWait();
@@ -64,10 +65,10 @@ public class AuthenticationServerTest extends ServiceTestBase {
                             externalAuthenticationServer.getSocketAddress().getPort());
   }
 
-  private static void initAuthTestProps() {
+  private static void initAuthTestProps() throws IOException {
     conf.setBoolean(Constants.Security.CFG_SECURITY_ENABLED, true);
     conf.set(Constants.Security.AUTH_SERVER_ADDRESS, "127.0.0.1");
-    conf.setInt(Constants.Security.AUTH_SERVER_PORT, 55059);
+    conf.setInt(Constants.Security.AUTH_SERVER_PORT, TestHelper.getFreePort());
     conf.set(Constants.Security.AUTH_HANDLER_CLASS, "co.cask.cdap.security.server.BasicAuthenticationHandler");
     URL realmTestFile = AuthenticationServerTest.class.getClassLoader().getResource(TEST_REALM_PROPERTIES);
     if (realmTestFile != null) {
