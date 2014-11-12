@@ -90,26 +90,40 @@ public class MetricHandler extends AbstractAuthHandler {
         return;
       }
     }
-    Long start = null;
-    Long end = null;
+    Long startTime = null;
+    Long endTime = null;
     try {
-      start = Long.parseLong(filters.get("start"));
-      end = Long.parseLong(filters.get("end"));
+      String start = filters.get("start");
+      String end = filters.get("end");
+      if (start != null) {
+        startTime = Long.parseLong(start);
+      }
+      if (end != null) {
+        endTime = Long.parseLong(end);
+      }
     } catch (NumberFormatException e) {
       responder.sendString(HttpResponseStatus.BAD_REQUEST,
                            String.format("Incorrect value for start %s or end %s timestamp",
                                          filters.get("start"), filters.get("end")));
+      return;
+    }
+    MetricService.Periodicity periodicity = null;
+    try {
+      String groupBy = filters.get("groupby");
+      if (groupBy != null) {
+        periodicity = MetricService.Periodicity.valueOf(groupBy);
+      }
+    } catch (IllegalArgumentException e) {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST,
+                           String.format("Incorrect value for field groupby: %s", filters.get("groupby")));
+      return;
     }
     ClusterTaskFilter filter = new ClusterTaskFilter(tenant, filters.get("user"), filters.get("cluster"),
-                                                     filters.get("clustertemplate"), start, end,
-                                                     filters.get("groupby"));
+                                                     filters.get("clustertemplate"), startTime, endTime, periodicity);
     try {
       TimeSeries result = new MetricService(clusterStore).getNodesUsage(filter);
       responder.sendJson(HttpResponseStatus.OK, result, TimeSeries.class, gson);
-    } catch (IllegalArgumentException e) {
-      responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                           String.format("Incorrect value for field groupby: %s", filters.get("groupby")));
-    } catch (IOException e) {
+    }  catch (IOException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR, "Unable to read data from the database");
     }
   }

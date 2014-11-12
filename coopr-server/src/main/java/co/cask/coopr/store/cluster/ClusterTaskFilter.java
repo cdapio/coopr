@@ -16,6 +16,7 @@
 
 package co.cask.coopr.store.cluster;
 
+import co.cask.coopr.metrics.MetricService;
 import com.google.common.base.Objects;
 
 /**
@@ -29,10 +30,10 @@ public class ClusterTaskFilter {
   private final String clusterTemplate;
   private final Long start;
   private final Long end;
-  private final String periodicity;
+  private final MetricService.Periodicity periodicity;
 
   public ClusterTaskFilter(String tenantId, String userId, String clusterId, String clusterTemplate,
-                           Long start, Long end, String periodicity) {
+                           Long start, Long end, MetricService.Periodicity periodicity) {
     this.tenantId = tenantId;
     this.userId = userId;
     this.clusterId = clusterId;
@@ -86,7 +87,7 @@ public class ClusterTaskFilter {
    * Retrieves start date of this filter.
    * This field is ignored if its value is {@code null}.
    *
-   * @return cluster template
+   * @return start date
    */
   public Long getStart() {
     return start;
@@ -96,19 +97,19 @@ public class ClusterTaskFilter {
    * Retrieves end date of this filter.
    * This field is ignored if its value is {@code null}.
    *
-   * @return cluster template
+   * @return end date
    */
   public Long getEnd() {
     return end;
   }
 
   /**
-   * Retrieves periodicity of this filter.
+   * Retrieves {@link MetricService.Periodicity} of this filter.
    * This field is ignored if its value is {@code null}.
    *
-   * @return cluster template
+   * @return periodicity
    */
-  public String getPeriodicity() {
+  public MetricService.Periodicity getPeriodicity() {
     return periodicity;
   }
 

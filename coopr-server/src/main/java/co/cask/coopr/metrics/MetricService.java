@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class MetricService {
 
-  private enum Periodicity {
+  public enum Periodicity {
     hour,
     day,
     week,
@@ -84,12 +84,12 @@ public class MetricService {
       0 : createTasks.get(0).getStatusTime();
     long endDate = end != null ? end : deleteTasks.isEmpty() ?
       System.currentTimeMillis() : deleteTasks.get(deleteTasks.size() - 1).getStatusTime();
-    String periodicity = filter.getPeriodicity();
+    Periodicity periodicity = filter.getPeriodicity();
     long period;
     if (periodicity == null) {
       period = endDate;
     } else {
-      period = getTimeStamp(Periodicity.valueOf(periodicity));
+      period = getTimeStamp(periodicity);
     }
     final List<Interval> intervals = getIntervalList(startDate, endDate, period);
     for (ClusterTask createTask : createTasks) {
