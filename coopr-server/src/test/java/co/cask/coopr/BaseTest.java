@@ -67,14 +67,16 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.Map.Entry;
 
 /**
  * Base class with utilities for loading admin entities into a entityStore and starting zookeeper up.
  */
 public class BaseTest {
-  protected static final String TEST_COOPR_CONFIG = "coopr-test.xml";
-  protected static final String DEFAULT_COOP_CONFIG = "coopr-default.xml";
+  protected static final String DEFAULT_COOPR_CONFIG = "coopr-default.xml";
   protected static final String HOSTNAME = "127.0.0.1";
 
   private static InMemoryZKServer zkServer;
@@ -100,14 +102,43 @@ public class BaseTest {
   protected static CredentialStore credentialStore;
   protected static Gson gson;
   protected static CConfiguration cConfiguration;
+  private static Map<String, String> testProps;
 
   @ClassRule
   public static TemporaryFolder tmpFolder = new TemporaryFolder();
 
   public static Configuration createTestConf() {
     Configuration conf = Configuration.create();
-    conf.addResource(TEST_COOPR_CONFIG);
+    for (Entry<String, String> prop: getTestProps().entrySet()) {
+      conf.set(prop.getKey(), prop.getValue());
+    }
     return conf;
+  }
+
+  public static CConfiguration createTestCConf() {
+    CConfiguration cConf = CConfiguration.create();
+    cConf.addResource(DEFAULT_COOPR_CONFIG);
+    for (Entry<String, String> prop: getTestProps().entrySet()) {
+      cConf.set(prop.getKey(), prop.getValue());
+    }
+    return cConf;
+  }
+
+  private static Map<String, String> initTestProps() {
+    Map<String, String> testProps = new HashMap<String, String>();
+    testProps.put(Constants.PORT, "0");
+    testProps.put(Constants.HOST, HOSTNAME);
+    testProps.put(Constants.SCHEDULER_INTERVAL_SECS, "1");
+    testProps.put(Constants.JDBC_DRIVER, "org.apache.derby.jdbc.EmbeddedDriver");
+    testProps.put(Constants.JDBC_CONNECTION_STRING, "jdbc:derby:memory:coopr;create=true");
+    return testProps;
+  }
+
+  private static Map<String, String> getTestProps() {
+    if (testProps == null) {
+      testProps = initTestProps();
+    }
+    return testProps;
   }
 
   @BeforeClass
@@ -129,9 +160,7 @@ public class BaseTest {
     );
     zkClientService.startAndWait();
 
-    cConfiguration = CConfiguration.create();
-    cConfiguration.addResource(DEFAULT_COOP_CONFIG);
-    cConfiguration.addResource(TEST_COOPR_CONFIG);
+    cConfiguration = createTestCConf();
 
     mockClusterCallback = new MockClusterCallback();
     injector = Guice.createInjector(

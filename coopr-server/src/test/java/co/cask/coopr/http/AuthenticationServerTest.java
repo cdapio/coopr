@@ -39,26 +39,25 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Test the External Authentication service integration
  */
 public class AuthenticationServerTest extends ServiceTestBase {
-  private static final String AUTH_TEST_CONFIG = "coopr-test-auth.xml";
   private static final String TEST_REALM_PROPERTIES = "test-realm.properties";
 
   private static ExternalAuthenticationServer externalAuthenticationServer;
   private static String authURL;
   private static int testServerPort;
+  private static Map<String, String> authProps;
 
   @BeforeClass
   public static void setup() {
-    conf.addResource(AUTH_TEST_CONFIG);
-    cConfiguration.addResource(AUTH_TEST_CONFIG);
-    URL file = AuthenticationServerTest.class.getClassLoader().getResource(TEST_REALM_PROPERTIES);
-    if (file != null) {
-      cConfiguration.set(Constants.Security.BASIC_REALM_FILE, file.getFile());
-    }
+    setAuthPropsToConfig();
+    setAuthPropsToCConfig();
+
     handlerServer = injector.getInstance(HandlerServer.class);
     handlerServer.startAndWait();
     externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
@@ -67,6 +66,38 @@ public class AuthenticationServerTest extends ServiceTestBase {
     authURL = String.format("http://%s:%d/token",
                             externalAuthenticationServer.getSocketAddress().getHostName(),
                             externalAuthenticationServer.getSocketAddress().getPort());
+  }
+
+  private static void setAuthPropsToConfig() {
+    for (Map.Entry<String, String> prop : getAuthProps().entrySet()) {
+      conf.set(prop.getKey(), prop.getValue());
+    }
+  }
+
+  private static void setAuthPropsToCConfig() {
+    for (Map.Entry<String, String> prop : getAuthProps().entrySet()) {
+      cConfiguration.set(prop.getKey(), prop.getValue());
+    }
+  }
+
+  private static Map<String, String> getAuthProps() {
+    if (authProps == null) {
+      authProps = initAuthTestProps();
+    }
+    return authProps;
+  }
+
+  private static Map<String, String> initAuthTestProps() {
+    Map<String, String> testProps = new HashMap<String, String>();
+    testProps.put(Constants.Security.CFG_SECURITY_ENABLED, "true");
+    testProps.put(Constants.Security.AUTH_SERVER_ADDRESS, "127.0.0.1");
+    testProps.put(Constants.Security.AUTH_SERVER_PORT, "55059");
+    testProps.put(Constants.Security.AUTH_HANDLER_CLASS, "co.cask.cdap.security.server.BasicAuthenticationHandler");
+    URL realmTestFile = AuthenticationServerTest.class.getClassLoader().getResource(TEST_REALM_PROPERTIES);
+    if (realmTestFile != null) {
+      testProps.put(Constants.Security.BASIC_REALM_FILE, realmTestFile.getFile());
+    }
+    return testProps;
   }
 
   @AfterClass
