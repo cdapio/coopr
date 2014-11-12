@@ -187,11 +187,41 @@ site.app.use(function (err, req, res, next) {
 });
 
 
-var tlsEnabled = ('true' === process.env['COOPR_NODE_TLS_ENABLED']),
-    tlsKey = process.env['COOPR_NODE_TLS_KEY'],
-    tlsCrt = process.env['COOPR_NODE_TLS_CRT'],
-    tlsCA = process.env['COOPR_NODE_TLS_CA'],
-    tlsPassword = process.env['COOPR_NODE_TLS_PASSWORD'];
+var updateRequestOptionsWithTls = function (options) {
+    var tlsEnabled = ('true' === process.env['COOPR_NODE_TLS_ENABLED']),
+        tlsKey = process.env['COOPR_NODE_TLS_KEY'],
+        tlsCrt = process.env['COOPR_NODE_TLS_CRT'],
+        tlsCA = process.env['COOPR_NODE_TLS_CA'],
+        tlsPassword = process.env['COOPR_NODE_TLS_PASSWORD'];
+
+    if (tlsEnabled) {
+        var keyFile,
+            certFile,
+            caFile;
+
+        try {
+            keyFile = fs.readFileSync(tlsKey);
+        } catch(e) {}
+
+        try {
+            certFile = fs.readFileSync(tlsCrt);
+        } catch(e) {}
+
+        try {
+            caFile = fs.readFileSync(tlsCA);
+        } catch(e) {}
+
+        options.agentOptions = {
+            key: keyFile,
+            cert: certFile,
+            ca: caFile,
+            passphrase: tlsPassword
+        };
+    }
+
+    return options;
+}
+
 
 /**
  * Gets data for a given restful url.
@@ -211,30 +241,7 @@ site.getEntity = function (path, user) {
             }
         };
 
-        if (tlsEnabled) {
-            var keyFile,
-                certFile,
-                caFile;
-
-            try {
-                keyFile = fs.readFileSync(tlsKey);
-            } catch(e) {}
-
-            try {
-                certFile = fs.readFileSync(tlsCrt);
-            } catch(e) {}
-
-            try {
-                caFile = fs.readFileSync(tlsCA);
-            } catch(e) {}
-
-            options.agentOptions = {
-                key: keyFile,
-                cert: certFile,
-                ca: caFile,
-                passphrase: tlsPassword
-            };
-        }
+        options = updateRequestOptionsWithTls(options);
 
         request(options, function (err, response, body) {
             if (err) {
@@ -268,6 +275,9 @@ site.sendRequestAndHandleResponse = function (options, user, res) {
         'Coopr-TenantID': user.tenant,
         'Coopr-ApiKey': DEFAULT_API_KEY
     };
+
+    options = updateRequestOptionsWithTls(options);
+
     request(options, this.getGenericResponseHandler(res, options.method));
 };
 
@@ -474,6 +484,9 @@ site.app.post('/import', function (req, res) {
                         },
                         json: config
                     };
+
+                    options = updateRequestOptionsWithTls(options);
+
                     request(options, function (err, response, body) {
                         if (!err && response.statusCode == 200) {
                             res.redirect('/');
@@ -503,6 +516,9 @@ site.app.get('/export', function (req, res) {
             'Coopr-ApiKey': DEFAULT_API_KEY
         }
     };
+
+    options = updateRequestOptionsWithTls(options);
+
     request(options, function (err, response, body) {
         if (!err && response.statusCode == 200) {
             res.setHeader('Content-disposition', 'attachment; filename=export.json');
@@ -581,6 +597,9 @@ site.app.post('/setskin', function (req, res) {
         rejectUnauthorized: REJECT_UNAUTH,
         json: packageBody
     };
+
+    options = updateRequestOptionsWithTls(options);
+
     request(options, function (err, response, body) {
         if (!err) {
             myCookie.skin = req.body.skin;
@@ -1472,6 +1491,9 @@ site.app.post('/login', function (req, res) {
             'Coopr-ApiKey': DEFAULT_API_KEY
         }
     };
+
+    options = updateRequestOptionsWithTls(options);
+
     request(options, function (err, response, body) {
         if (body) {
             try {
