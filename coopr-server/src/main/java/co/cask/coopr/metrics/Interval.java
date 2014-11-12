@@ -14,36 +14,30 @@
  * limitations under the License.
  */
 
-package co.cask.coopr.http.util;
+package co.cask.coopr.metrics;
 
 /**
- * Class for presenting start and end date of time period and node live time.
+ * Class for presenting time - start date of time period, and some data point.
  */
 public class Interval {
 
-  private final long start;
-  private final long end;
-  private long seconds = 0;
+  private final long time;
+  private long value = 0;
 
-  public Interval(long start, long end) {
-    this.start = start;
-    this.end = end;
+  public Interval(long time) {
+    this.time = time;
   }
 
-  public long getStart() {
-    return start;
+  public long getTime() {
+    return time;
   }
 
-  public long getEnd() {
-    return end;
+  public long getValue() {
+    return value;
   }
 
-  public long getSeconds() {
-    return seconds;
-  }
-
-  public void increaseSeconds(long value) {
-    seconds += value;
+  public void increaseValue(long value) {
+    this.value += value;
   }
 
   @Override
@@ -56,12 +50,12 @@ public class Interval {
     }
     Interval interval = (Interval) o;
 
-    return start == interval.start;
+    return time == interval.time;
 
   }
 
   @Override
   public int hashCode() {
-    return (int) (start ^ (start >>> 32));
+    return (int) (time ^ (time >>> 32));
   }
 }

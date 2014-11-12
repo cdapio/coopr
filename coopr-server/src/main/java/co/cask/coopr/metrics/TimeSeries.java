@@ -14,31 +14,45 @@
  * limitations under the License.
  */
 
-package co.cask.coopr.http.util;
+package co.cask.coopr.metrics;
 
 import com.google.common.base.Objects;
 
 import java.util.List;
 
 /**
- * Class for presenting metric response.
+ * Class for presenting time series.
  */
-public class MetricResponse {
+public class TimeSeries {
 
-  private final List<Interval> usage;
+  private final long start;
+  private final long end;
+  private final List<Interval> data;
 
-  public MetricResponse(List<Interval> usage) {
-    this.usage = usage;
+  public TimeSeries(long start, long end, List<Interval> data) {
+    this.start = start;
+    this.end = end;
+    this.data = data;
   }
 
-  public List<Interval> getUsage() {
-    return usage;
+  public long getStart() {
+    return start;
+  }
+
+  public long getEnd() {
+    return end;
+  }
+
+  public List<Interval> getData() {
+    return data;
   }
 
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("usage", usage)
+      .add("start", start)
+      .add("end", end)
+      .add("data", data)
       .toString();
   }
 }

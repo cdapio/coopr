@@ -17,27 +17,23 @@
 package co.cask.coopr.http;
 
 import co.cask.coopr.account.Account;
-import co.cask.coopr.http.handler.MetricHandler;
-import co.cask.coopr.http.util.Interval;
+import co.cask.coopr.metrics.Interval;
+import co.cask.coopr.metrics.TimeSeries;
 import co.cask.coopr.scheduler.ClusterAction;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.scheduler.task.TaskId;
 import co.cask.coopr.spec.ProvisionerAction;
-import co.cask.coopr.store.cluster.ClusterStore;
 import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,27 +62,6 @@ public class MetricHandlerTest extends ServiceTestBase {
                                                                    "service1", C_ACTION, "template1", ACCOUNT2);
   private static final ClusterTask CLUSTER_TASK7 = new ClusterTask(P_CREATE, TaskId.fromString("2-2-3"), "node3",
                                                                    "service1", C_ACTION, "template1", ACCOUNT1);
-
-  private static ClusterStore clusterStore;
-
-  @BeforeClass
-  public static void init() throws NoSuchFieldException, IllegalAccessException {
-    MetricHandler metricHandler = injector.getInstance(MetricHandler.class);
-    Field field = metricHandler.getClass().getDeclaredField("clusterStore");
-    field.setAccessible(true);
-    clusterStore = (ClusterStore) field.get(metricHandler);
-  }
-
-  @Before
-  public void before() throws IOException {
-    clusterStore.deleteClusterTask(TaskId.fromString("1-1-1"));
-    clusterStore.deleteClusterTask(TaskId.fromString("1-1-2"));
-    clusterStore.deleteClusterTask(TaskId.fromString("1-1-3"));
-    clusterStore.deleteClusterTask(TaskId.fromString("1-1-4"));
-    clusterStore.deleteClusterTask(TaskId.fromString("2-2-1"));
-    clusterStore.deleteClusterTask(TaskId.fromString("2-2-2"));
-    clusterStore.deleteClusterTask(TaskId.fromString("2-2-3"));
-  }
 
   @Test
   public void sevenTaskNoGroupByTest() throws Exception {
@@ -152,15 +127,15 @@ public class MetricHandlerTest extends ServiceTestBase {
     HttpResponse response = doGet("/metrics/nodes/usage?start=5&end=22", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
-    List<Interval> actual = getJsonFromResponse(response);
+    TimeSeries actual = getResponseData(response);
 
-    List<Interval> expected = new ArrayList<Interval>(1);
-    Interval interval = new Interval(5, 22);
-    interval.increaseSeconds(17);
-    interval.increaseSeconds(16);
-    expected.add(interval);
+    List<Interval> expectedList = new ArrayList<Interval>(1);
+    Interval interval = new Interval(5);
+    interval.increaseValue(17);
+    interval.increaseValue(16);
+    expectedList.add(interval);
 
-    check(expected, actual);
+    check(new TimeSeries(5, 22, expectedList), actual);
   }
 
   @Test
@@ -247,54 +222,52 @@ public class MetricHandlerTest extends ServiceTestBase {
                                     "&end=" + (22 * millisPerHour) + "&groupby=hour", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
-    List<Interval> actual = getJsonFromResponse(response);
+    TimeSeries actual = getResponseData(response);
 
-    List<Interval> expected = new ArrayList<Interval>(17);
+    List<Interval> expectedList = new ArrayList<Interval>(17);
 
     //from 5 * millisPerHour to 9 * millisPerHour
     for (int i = 5; i < 9; i++) {
-      addInterval(expected, i * millisPerHour, (i + 1) * millisPerHour - 1, millisPerHour);
+      addInterval(expectedList, i * millisPerHour, millisPerHour);
     }
     //from 9 * millisPerHour to 17 * millisPerHour
     for (int i = 9; i < 17; i++) {
-      addInterval(expected, i * millisPerHour, (i + 1) * millisPerHour - 1, 2 * millisPerHour);
+      addInterval(expectedList, i * millisPerHour, 2 * millisPerHour);
     }
     //from 17 * millisPerHour to 20 * millisPerHour
     for (int i = 17; i < 20; i++) {
-      addInterval(expected, i * millisPerHour, (i + 1) * millisPerHour - 1, 3 * millisPerHour);
+      addInterval(expectedList, i * millisPerHour, 3 * millisPerHour);
     }
-    //from 20 * millisPerHour to 21 * millisPerHour
-    for (int i = 20; i < 21; i++) {
-      addInterval(expected, i * millisPerHour, (i + 1) * millisPerHour - 1, 2 * millisPerHour);
-    }
-    //from 21 * millisPerHour to 22 * millisPerHour
-    for (int i = 21; i < 22; i++) {
-      addInterval(expected, i * millisPerHour, (i + 1) * millisPerHour, 2 * millisPerHour);
+    //from 20 * millisPerHour to 22 * millisPerHour
+    for (int i = 20; i < 22; i++) {
+      addInterval(expectedList, i * millisPerHour, 2 * millisPerHour);
     }
 
-    check(expected, actual);
+    check(new TimeSeries(5 * millisPerHour, 22 * millisPerHour, expectedList), actual);
   }
 
-  private void check(List<Interval> expected, List<Interval> actual) {
-    Assert.assertEquals(expected.size(), actual.size());
+  private void check(TimeSeries expected, TimeSeries actual) {
+    Assert.assertEquals(expected.getStart(), actual.getStart());
+    Assert.assertEquals(expected.getEnd(), actual.getEnd());
+    List<Interval> expectedList = expected.getData();
+    List<Interval> actualList = actual.getData();
+    Assert.assertEquals(expectedList.size(), actualList.size());
     int index = 0;
-    for (Interval expectedInterval : expected) {
-      Interval actualInterval = actual.get(index++);
-      Assert.assertEquals(expectedInterval.getStart(), actualInterval.getStart());
-      Assert.assertEquals(expectedInterval.getEnd(), actualInterval.getEnd());
-      Assert.assertEquals(expectedInterval.getSeconds(), actualInterval.getSeconds());
+    for (Interval expectedInterval : expectedList) {
+      Interval actualInterval = actualList.get(index++);
+      Assert.assertEquals(expectedInterval.getTime(), actualInterval.getTime());
+      Assert.assertEquals(expectedInterval.getValue(), actualInterval.getValue());
     }
   }
 
-  private void addInterval(List<Interval> intervals, long start, long end, long seconds) {
-    Interval interval = new Interval(start, end);
-    interval.increaseSeconds(seconds);
+  private void addInterval(List<Interval> intervals, long start, long seconds) {
+    Interval interval = new Interval(start);
+    interval.increaseValue(seconds);
     intervals.add(interval);
   }
 
-  private List<Interval> getJsonFromResponse(HttpResponse response) throws IOException {
+  private TimeSeries getResponseData(HttpResponse response) throws IOException {
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonObject jsonObject = gson.fromJson(reader, JsonObject.class);
-    return gson.fromJson(jsonObject.getAsJsonArray("usage"), new TypeToken<List<Interval>>() {}.getType());
+    return gson.fromJson(reader, TimeSeries.class);
   }
 }

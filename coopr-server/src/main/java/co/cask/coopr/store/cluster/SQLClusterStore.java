@@ -131,7 +131,8 @@ public class SQLClusterStore implements ClusterStore {
           .append(addFilter("tenant_id = ", filter.getTenantId()))
           .append(addFilter("user_id = ", filter.getUserId()))
           .append(addFilter("cluster_id = ", filter.getClusterId()))
-          .append(addFilter("cluster_template_name = ", filter.getClusterTemplate()));
+          .append(addFilter("cluster_template_name = ", filter.getClusterTemplate()))
+          .append(" ORDER BY status_time ASC");
 
         PreparedStatement statement =
           conn.prepareStatement(builder.toString());
@@ -163,15 +164,11 @@ public class SQLClusterStore implements ClusterStore {
     return String.format(" AND %s?", key);
   }
 
-  private int initializeFilter(PreparedStatement statement, Object value, int index) throws SQLException {
+  private int initializeFilter(PreparedStatement statement, String value, int index) throws SQLException {
     if (value == null) {
       return index;
     }
-    if (value instanceof Long) {
-      statement.setTimestamp(index, DBHelper.getTimestamp((Long) value));
-    } else {
-      statement.setString(index, value.toString());
-    }
+    statement.setString(index, value);
     return ++index;
   }
 

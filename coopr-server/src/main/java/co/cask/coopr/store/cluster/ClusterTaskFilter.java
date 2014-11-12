@@ -27,12 +27,19 @@ public class ClusterTaskFilter {
   private final String userId;
   private final String clusterId;
   private final String clusterTemplate;
+  private final Long start;
+  private final Long end;
+  private final String periodicity;
 
-  public ClusterTaskFilter(String tenantId, String userId, String clusterId, String clusterTemplate) {
+  public ClusterTaskFilter(String tenantId, String userId, String clusterId, String clusterTemplate,
+                           Long start, Long end, String periodicity) {
     this.tenantId = tenantId;
     this.userId = userId;
     this.clusterId = clusterId;
     this.clusterTemplate = clusterTemplate;
+    this.start = start;
+    this.end = end;
+    this.periodicity = periodicity;
   }
 
   /**
@@ -75,6 +82,36 @@ public class ClusterTaskFilter {
     return clusterTemplate;
   }
 
+  /**
+   * Retrieves start date of this filter.
+   * This field is ignored if its value is {@code null}.
+   *
+   * @return cluster template
+   */
+  public Long getStart() {
+    return start;
+  }
+
+  /**
+   * Retrieves end date of this filter.
+   * This field is ignored if its value is {@code null}.
+   *
+   * @return cluster template
+   */
+  public Long getEnd() {
+    return end;
+  }
+
+  /**
+   * Retrieves periodicity of this filter.
+   * This field is ignored if its value is {@code null}.
+   *
+   * @return cluster template
+   */
+  public String getPeriodicity() {
+    return periodicity;
+  }
+
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
@@ -82,6 +119,9 @@ public class ClusterTaskFilter {
       .add("userId", userId)
       .add("clusterId", clusterId)
       .add("clusterTemplate", clusterTemplate)
+      .add("start", start)
+      .add("end", end)
+      .add("periodicity", periodicity)
       .toString();
   }
 }

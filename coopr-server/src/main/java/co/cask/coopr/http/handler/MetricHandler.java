@@ -18,14 +18,15 @@ package co.cask.coopr.http.handler;
 
 import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
-import co.cask.coopr.http.util.MetricResponse;
-import co.cask.coopr.http.util.MetricUtil;
+import co.cask.coopr.metrics.MetricService;
+import co.cask.coopr.metrics.TimeSeries;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterTaskFilter;
 import co.cask.coopr.store.tenant.TenantStore;
 import co.cask.http.HttpResponder;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -38,7 +39,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -90,12 +90,22 @@ public class MetricHandler extends AbstractAuthHandler {
         return;
       }
     }
-    ClusterTaskFilter filter = new ClusterTaskFilter(tenant, filters.get("user"), filters.get("cluster"),
-                                                  filters.get("clustertemplate"));
+    Long start = null;
+    Long end = null;
     try {
-      List<ClusterTask> tasks = clusterStore.getClusterTasks(filter);
-      MetricResponse result = MetricUtil.getNodesUsage(tasks, filters);
-      responder.sendJson(HttpResponseStatus.OK, result, MetricResponse.class, gson);
+      start = Long.parseLong(filters.get("start"));
+    } catch (NumberFormatException ignored) {
+    }
+    try {
+      end = Long.parseLong(filters.get("end"));
+    } catch (NumberFormatException ignored) {
+    }
+    ClusterTaskFilter filter = new ClusterTaskFilter(tenant, filters.get("user"), filters.get("cluster"),
+                                                     filters.get("clustertemplate"), start, end,
+                                                     filters.get("groupby"));
+    try {
+      TimeSeries result = new MetricService(clusterStore).getNodesUsage(filter);
+      responder.sendJson(HttpResponseStatus.OK, result, TimeSeries.class, gson);
     } catch (IllegalArgumentException e) {
       responder.sendString(HttpResponseStatus.INTERNAL_SERVER_ERROR,
                            String.format("Incorrect value for field groupby: %s", filters.get("groupby")));
@@ -113,7 +123,7 @@ public class MetricHandler extends AbstractAuthHandler {
    */
   private Map<String, String> getFilters(HttpRequest request, List<String> names) {
     Map<String, List<String>> queryParams = new QueryStringDecoder(request.getUri()).getParameters();
-    Map<String, String> filters = new HashMap<String, String>();
+    Map<String, String> filters = Maps.newHashMap();
     for (String name : names) {
       List<String> values = queryParams.get(name);
       if (values != null && !values.isEmpty()) {

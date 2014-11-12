@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package co.cask.coopr.http.util;
+package co.cask.coopr.metrics;
 
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.spec.ProvisionerAction;
+import co.cask.coopr.store.cluster.ClusterStore;
+import co.cask.coopr.store.cluster.ClusterTaskFilter;
 import org.apache.commons.lang3.time.DateUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -29,7 +33,7 @@ import java.util.Map;
 /**
  * Util for performing metric operations.
  */
-public class MetricUtil {
+public class MetricService {
 
   private enum Periodicity {
     hour,
@@ -49,33 +53,37 @@ public class MetricUtil {
     }
   };
 
+  private final ClusterStore clusterStore;
+
+  public MetricService(ClusterStore clusterStore) {
+    this.clusterStore = clusterStore;
+  }
+
   /**
-   * Calculate statistics of nodes usage for given filter.
+   * Calculate statistics of nodes usage for given {@link ClusterTaskFilter}.
    * The start and end times are inclusive.
+   * Loads all tasks with CREATE or DELETE {@link ProvisionerAction}. Then, for each node, calculates node live time:
+   * finished time of CREATE task - finished time of DELETE task or finished time of CREATE task - current time.
+   * If required, then overlays {@code filter}'s start and end date.
    *
-   * @param tasks the tasks
-   * @param filters the filters
-   * @return {@link Object} that presents node live time usage
+   * @param filter the filter
+   * @return {@link TimeSeries} that presents node live time usage
    */
-  public static MetricResponse getNodesUsage(List<ClusterTask> tasks, Map<String, String> filters) {
+  public TimeSeries getNodesUsage(ClusterTaskFilter filter) throws IOException {
+    List<ClusterTask> tasks = clusterStore.getClusterTasks(filter);
+    Long start = filter.getStart();
+    Long end = filter.getEnd();
     if (tasks.isEmpty()) {
-      return new MetricResponse(Collections.<Interval>emptyList());
-    }
-    Long start = null;
-    Long end = null;
-    try {
-      start = Long.parseLong(filters.get("start"));
-    } catch (NumberFormatException ignored) {
-    }
-    try {
-      end = Long.parseLong(filters.get("end"));
-    } catch (NumberFormatException ignored) {
+      return new TimeSeries(start != null ? start : 0, end != null ? end : System.currentTimeMillis(),
+                            Collections.<Interval>emptyList());
     }
     List<ClusterTask> createTasks = getTasksByName(tasks, ProvisionerAction.CREATE);
     List<ClusterTask> deleteTasks = getTasksByName(tasks, ProvisionerAction.DELETE);
-    long startDate = start != null ? start : Collections.min(createTasks, COMPARATOR).getStatusTime();
-    long endDate = end != null ? end : Collections.max(deleteTasks, COMPARATOR).getStatusTime();
-    String periodicity = filters.get("groupby");
+    long startDate = start != null ? start : createTasks.isEmpty() ?
+      0 : createTasks.get(0).getStatusTime();
+    long endDate = end != null ? end : deleteTasks.isEmpty() ?
+      System.currentTimeMillis() : deleteTasks.get(deleteTasks.size() - 1).getStatusTime();
+    String periodicity = filter.getPeriodicity();
     long period;
     if (periodicity == null) {
       period = endDate;
@@ -85,24 +93,24 @@ public class MetricUtil {
     final List<Interval> intervals = getIntervalList(startDate, endDate, period);
     for (ClusterTask createTask : createTasks) {
       long deleteTaskTime = getDeleteTaskTime(deleteTasks, createTask);
-      long localStart = createTask.getStatusTime() > startDate ? createTask.getStatusTime() : startDate;
-      long localEnd = deleteTaskTime < endDate ? deleteTaskTime : endDate;
+      long localStart = Math.max(createTask.getStatusTime(), startDate);
+      long localEnd = Math.min(deleteTaskTime, endDate);
       int currentIndex = getNearestIndex(intervals, localStart);
       Interval current = intervals.get(currentIndex);
-      while (current.getStart() + period < localEnd) {
-        long increaseTime = localStart < current.getStart() ? period : period + current.getStart() - localStart;
-        current.increaseSeconds(increaseTime);
+      while (current.getTime() + period < localEnd) {
+        long increaseTime = localStart < current.getTime() ? period : period + current.getTime() - localStart;
+        current.increaseValue(increaseTime);
         current = intervals.get(++currentIndex);
       }
-      long increaseTime = localStart < current.getStart() ? localEnd - current.getStart() : localEnd - localStart;
+      long increaseTime = localStart < current.getTime() ? localEnd - current.getTime() : localEnd - localStart;
       if (increaseTime > 0) {
-        current.increaseSeconds(increaseTime);
+        current.increaseValue(increaseTime);
       }
     }
-    return new MetricResponse(intervals);
+    return new TimeSeries(startDate, endDate, intervals);
   }
 
-  private static long getDeleteTaskTime(List<ClusterTask> deleteTasks, ClusterTask createTask) {
+  private long getDeleteTaskTime(List<ClusterTask> deleteTasks, ClusterTask createTask) {
     ClusterTask result = null;
     for (ClusterTask deleteTask : deleteTasks) {
       if (createTask.getClusterId().equals(deleteTask.getClusterId()) &&
@@ -120,7 +128,7 @@ public class MetricUtil {
     return result.getStatusTime();
   }
 
-  private static List<ClusterTask> getTasksByName(List<ClusterTask> tasks, ProvisionerAction name) {
+  private List<ClusterTask> getTasksByName(List<ClusterTask> tasks, ProvisionerAction name) {
     List<ClusterTask> result = new ArrayList<ClusterTask>();
     for (ClusterTask task : tasks) {
       if (task.getTaskName().equals(name)) {
@@ -137,10 +145,10 @@ public class MetricUtil {
    * @param key the key
    * @return nearest smaller {@link Interval}
    */
-  private static int getNearestIndex(List<Interval> intervals, long key) {
-    Interval nearest = new Interval(-1, -1);
+  private int getNearestIndex(List<Interval> intervals, long key) {
+    Interval nearest = new Interval(-1);
     for (Interval value : intervals) {
-      if (value.getStart() <= key && nearest.getStart() < value.getStart()) {
+      if (value.getTime() <= key && nearest.getTime() < value.getTime()) {
         nearest = value;
       }
     }
@@ -155,22 +163,21 @@ public class MetricUtil {
    * @param period date period length in milliseconds
    * @return {@link List} of {@code Interval}s
    */
-  private static List<Interval> getIntervalList(long start, long end, long period) {
+  private List<Interval> getIntervalList(long start, long end, long period) {
     List<Interval> intervals = new ArrayList<Interval>();
     long currentStart = start;
     long nextStart = start - start%period + period;
     nextStart = nextStart < end ? nextStart : end;
     while (nextStart < end) {
-      intervals.add(new Interval(currentStart, nextStart - 1));
+      intervals.add(new Interval(currentStart));
       currentStart = nextStart;
       nextStart = currentStart + period < end ? currentStart + period : end;
     }
-    intervals.add(new Interval(currentStart, nextStart));
-    System.out.println(intervals.size());
+    intervals.add(new Interval(currentStart));
     return intervals;
   }
 
-  private static long getTimeStamp(Periodicity periodicity) {
+  private long getTimeStamp(Periodicity periodicity) {
     switch (periodicity) {
       case hour:
         return DateUtils.MILLIS_PER_HOUR;
