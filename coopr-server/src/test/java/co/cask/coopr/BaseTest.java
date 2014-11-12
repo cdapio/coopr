@@ -74,7 +74,6 @@ import java.util.Map.Entry;
  * Base class with utilities for loading admin entities into a entityStore and starting zookeeper up.
  */
 public class BaseTest {
-  protected static final String DEFAULT_COOPR_CONFIG = "coopr-default.xml";
   protected static final String HOSTNAME = "127.0.0.1";
 
   private static InMemoryZKServer zkServer;
