@@ -170,8 +170,8 @@ gulp.task('tpl', function() {
         root: '/assets/'
       })),
 
-      gulp.src(mainBowerFiles({
-      filter: /cask\-angular\-[^\/]+\/tpl\.html\.js/
+    gulp.src(mainBowerFiles({
+      filter: /cask\-angular\-[^\/]+\/tpl\.html\.js$/
     }))
 
   )
