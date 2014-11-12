@@ -25,11 +25,11 @@
       <value>localhost</value>
   </property>
   <property>
-    <name>security.auth.server.bind.port</name>
-    <value>5505</value>
+      <name>security.auth.server.bind.port</name>
+      <value>5505</value>
   </property>
   <property>
-    <name>security.authentication.handlerClassName</name>
-    <value>co.cask.cdap.security.server.BasicAuthenticationHandler</value>
+      <name>security.authentication.handlerClassName</name>
+      <value>co.cask.cdap.security.server.BasicAuthenticationHandler</value>
   </property>
 </configuration>
