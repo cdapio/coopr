@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-
 require File.expand_path '../spec_helper.rb', __FILE__
 require File.dirname(__FILE__) + '/../lib/provisioner/cli.rb'
 
@@ -27,8 +26,8 @@ describe 'Provisioner::CLI' do
       '-r'
     ])
     expected = {
-      :configfile => '/tmp/config.xml',
-      :register => true
+      configfile: '/tmp/config.xml',
+      register: true
     }
     expect(options).to eq(expected)
   end

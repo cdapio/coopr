@@ -15,6 +15,5 @@
 # limitations under the License.
 #
 
-
 require 'rspec'
 require 'rack/test'

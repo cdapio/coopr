@@ -16,7 +16,6 @@
 # limitations under the License.
 #
 
-
 require 'tempfile'
 
 require_relative 'utils'
@@ -31,7 +30,7 @@ module Coopr
     def initialize(tenant)
       pid = Process.pid
       @name = "worker.#{tenant}.#{pid}"
-      #Logging.configure("#{File.dirname(__FILE__)}/#{@name}.log")
+      # Logging.configure("#{File.dirname(__FILE__)}/#{@name}.log")
       Logging.level = 0
       log.info "* worker #{name} starting"
       @sigterm = Coopr::SignalHandler.new('TERM')
@@ -41,20 +40,19 @@ module Coopr
       log.info("worker #{@name} starting up")
       loop {
         sleeptime = Random.rand(20)
-        #puts "worker #{@name} sleeping #{sleeptime}"
+        # puts "worker #{@name} sleeping #{sleeptime}"
         log.info "worker #{@name} sleeping #{sleeptime}"
         # While provisioning, don't allow the provisioner to terminate by disabling signal
         @sigterm.dont_interrupt {
           sleep sleeptime
         }
       }
-    end 
+    end
   end
 end
 
-if __FILE__ == $0
-  tenant = ARGV[0] || "superadmin"
+if __FILE__ == $PROGRAM_NAME
+  tenant = ARGV[0] || 'superadmin'
   worker = Coopr::Worker.new(tenant)
   worker.work
 end
-
