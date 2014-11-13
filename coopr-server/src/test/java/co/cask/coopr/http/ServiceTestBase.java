@@ -148,10 +148,6 @@ public class ServiceTestBase extends BaseTest {
     return doGetWithoutVersion(resource, externalPort);
   }
 
-  public static HttpResponse doGetWithoutVersionInternalAPI(String resource) throws Exception {
-    return doGetWithoutVersion(resource, internalPort);
-  }
-
   private static HttpResponse doGetWithoutVersion(String resource, int port) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
     HttpGet get = new HttpGet("http://" + HOSTNAME + ":" + port + resource);
@@ -162,16 +158,8 @@ public class ServiceTestBase extends BaseTest {
     return doGet(resource, null, externalBase);
   }
 
-  public static HttpResponse doGetInternalAPI(String resource) throws Exception {
-    return doGet(resource, null, internalBase);
-  }
-
   public static HttpResponse doGetExternalAPI(String resource, Header[] headers) throws Exception {
     return doGet(resource, headers, externalBase);
-  }
-
-  public static HttpResponse doGetInternalAPI(String resource, Header[] headers) throws Exception {
-    return doGet(resource, headers, internalBase);
   }
 
   private static HttpResponse doGet(String resource, Header[] headers, String base) throws Exception {
@@ -189,16 +177,8 @@ public class ServiceTestBase extends BaseTest {
     return doPut(resource, body, null, externalBase);
   }
 
-  public static HttpResponse doPutInternalAPI(String resource, String body) throws Exception {
-    return doPut(resource, body, null, internalBase);
-  }
-
   public static HttpResponse doPutExternalAPI(String resource, String body, Header[] headers) throws Exception {
     return doPut(resource, body, headers, externalBase);
-  }
-
-  public static HttpResponse doPutInternalAPI(String resource, String body, Header[] headers) throws Exception {
-    return doPut(resource, body, headers, internalBase);
   }
 
   private static HttpResponse doPut(String resource, String body, Header[] headers, String base) throws Exception {
@@ -226,10 +206,6 @@ public class ServiceTestBase extends BaseTest {
     return doPost(resource, body, headers, externalBase);
   }
 
-  public static HttpResponse doPostInternalAPI(String resource, String body, Header[] headers) throws Exception {
-    return doPost(resource, body, headers, internalBase);
-  }
-
   private static HttpResponse doPost(String resource, String body, Header[] headers, String base) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
     HttpPost post = new HttpPost(base + resource);
@@ -248,10 +224,6 @@ public class ServiceTestBase extends BaseTest {
     return doDelete(resource, headers, externalBase);
   }
 
-  public static HttpResponse doDeleteInternalAPI(String resource, Header[] headers) throws Exception {
-    return doDelete(resource, headers, internalBase);
-  }
-
   private static HttpResponse doDelete(String resource, Header[] headers, String base) throws Exception {
     DefaultHttpClient client = new DefaultHttpClient();
     HttpDelete delete = new HttpDelete(base + resource);
@@ -264,10 +236,6 @@ public class ServiceTestBase extends BaseTest {
   public static void assertResponseStatus(HttpResponse response, HttpResponseStatus expected) {
     Assert.assertEquals(response.getStatusLine().getReasonPhrase(),
                         expected.getCode(), response.getStatusLine().getStatusCode());
-  }
-
-  public static String getBaseUrlExternalAPI() {
-    return getBaseUrl(externalPort);
   }
 
   public static String getBaseUrlInternalAPI() {
