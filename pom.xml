@@ -178,7 +178,7 @@
                 <version>2.14.1</version>
                 <configuration>
                     <argLine>-Xmx512m</argLine>
-                    <!--<redirectTestOutputToFile>${surefire.redirectTestOutputToFile}</redirectTestOutputToFile>-->
+                    <redirectTestOutputToFile>${surefire.redirectTestOutputToFile}</redirectTestOutputToFile>
                     <systemPropertyVariables>
                         <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
                     </systemPropertyVariables>

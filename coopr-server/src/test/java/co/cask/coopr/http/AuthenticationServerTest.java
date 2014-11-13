@@ -60,7 +60,7 @@ public class AuthenticationServerTest extends ServiceTestBase {
     handlerServer.startAndWait();
     externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
     externalAuthenticationServer.startAndWait();
-    // Wait SLEEP_TIME_IN_SEC for the complete service start
+    // Wait *SLEEP_TIME_IN_SEC* for the complete service start
     Thread.sleep(1000 * SLEEP_TIME_IN_SEC);
     testServerPort = handlerServer.getBindAddress().getPort();
     authURL = String.format("http://%s:%d/token",
