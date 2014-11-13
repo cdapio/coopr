@@ -65,7 +65,6 @@ public class MutualAuthServerTest extends ServiceTestBase {
 
   @BeforeClass
   public static void setup() {
-    internalHandlerServer.stopAndWait();
     conf.setBoolean("server.ssl.enabled", true);
     String serverCertificate = HttpsServerTest.class.getClassLoader().getResource("cert.jks").getPath();
     conf.set("server.ssl.keystore.path", serverCertificate);
