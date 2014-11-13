@@ -26,8 +26,8 @@ describe 'Provisioner::CLI' do
       '-r'
     ])
     expected = {
-      configfile: '/tmp/config.xml',
-      register: true
+      :configfile => '/tmp/config.xml',
+      :register => true
     }
     expect(options).to eq(expected)
   end
