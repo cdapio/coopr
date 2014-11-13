@@ -64,7 +64,7 @@ public class MutualAuthServerTest extends ServiceTestBase {
 
   @BeforeClass
   public static void setup() {
-    conf.set(Constants.INTERNAL_PORT, "0");
+    internalHandlerServer.stopAndWait();
     conf.setBoolean("server.ssl.enabled", true);
     String serverCertificate = HttpsServerTest.class.getClassLoader().getResource("cert.jks").getPath();
     conf.set("server.ssl.keystore.path", serverCertificate);
@@ -110,25 +110,44 @@ public class MutualAuthServerTest extends ServiceTestBase {
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, TENANT_ID);
 
-    HttpResponse response = doSecureGet(String.format("https://%s:%d%s/tasks/take", HOSTNAME,
-                                                      internalHandlerServer.getBindAddress().getPort(),
-                                                      Constants.API_BASE), gson.toJson(takeRequest));
+    HttpResponse response = doSecurePost(String.format("https://%s:%d%s/tasks/take", HOSTNAME,
+                                                       internalHandlerServer.getBindAddress().getPort(),
+                                                       Constants.API_BASE), gson.toJson(takeRequest));
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
   }
 
   @Test(expected = TimeoutException.class)
   public void testTasksTakeFail() throws Exception {
+    String tenantId = USER1_ACCOUNT.getTenantId();
+    ClusterTask clusterTask = new ClusterTask(
+      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node_id", "service", ClusterAction.CLUSTER_CREATE);
+    clusterStore.writeClusterTask(clusterTask);
+    ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
+    clusterStore.writeClusterJob(clusterJob);
+    TaskConfig taskConfig = new TaskConfig(
+      NodeProperties.builder().build(),
+      Entities.ProviderExample.JOYENT,
+      ImmutableMap.<String, NodeProperties>of(),
+      new TaskServiceAction("svcA", new ServiceAction("shell", ImmutableMap.<String, String>of())),
+      new JsonObject(),
+      new JsonObject()
+    );
+    SchedulableTask schedulableTask= new SchedulableTask(clusterTask, taskConfig);
+    provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(schedulableTask)));
+
+    final TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, TENANT_ID);
+
     Future<HttpResponse> future = Executors.newSingleThreadExecutor().submit(new Callable<HttpResponse>() {
       public HttpResponse call() throws Exception {
-        return doSecureGet(String.format("http://%s:%d%s/tasks/finish", HOSTNAME,
-                                         internalHandlerServer.getBindAddress().getPort(),
-                                         Constants.API_BASE), "test body");
+        return doSecurePost(String.format("http://%s:%d%s/tasks/finish", HOSTNAME,
+                                          internalHandlerServer.getBindAddress().getPort(),
+                                          Constants.API_BASE), gson.toJson(takeRequest));
       }
     });
     future.get(5000, TimeUnit.MILLISECONDS);
   }
 
-  private static HttpResponse doSecureGet(String url, String body) throws Exception {
+  private static HttpResponse doSecurePost(String url, String body) throws Exception {
     HttpClient client = HttpClients.custom()
       .setConnectionManager(new BasicHttpClientConnectionManager(getRegistry(clientKeyStore, CLIENT_KEY_STORE_PASSWORD,
                                                                              serverKeyStore,
@@ -137,6 +156,4 @@ public class MutualAuthServerTest extends ServiceTestBase {
     post.setEntity(new StringEntity(body));
     return client.execute(post);
   }
-
-
 }
