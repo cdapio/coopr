@@ -59,6 +59,7 @@ public class AuthenticationServerTest extends ServiceTestBase {
     handlerServer = injector.getInstance(HandlerServer.class);
     handlerServer.startAndWait();
     externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
+    // use start().get() instead of startAndWait() to be sure, that external auth service was running
     externalAuthenticationServer.start().get();
     testServerPort = handlerServer.getBindAddress().getPort();
     authURL = String.format("http://%s:%d/token",
