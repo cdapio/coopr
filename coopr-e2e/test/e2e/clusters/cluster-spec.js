@@ -19,7 +19,7 @@ describe('cluster types test', function () {
     clusters = element.all(by.repeater('item in list'));
     expect(clusters.count()).toEqual(0);
 
-    element(by.css('.create-a-cluster-btn')).click();
+    element(by.cssContainingText('a.btn.btn-primary', 'Create a cluster')).click();
     
     expect(
       browser.getLocationAbsUrl()
