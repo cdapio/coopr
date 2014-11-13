@@ -41,13 +41,13 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Test the External Authentication service integration
  */
 public class AuthenticationServerTest extends ServiceTestBase {
   private static final String TEST_REALM_PROPERTIES = "test-realm.properties";
+  private static final int SLEEP_TIME_IN_SEC = 10;
 
   private static ExternalAuthenticationServer externalAuthenticationServer;
   private static String authURL;
@@ -60,7 +60,8 @@ public class AuthenticationServerTest extends ServiceTestBase {
     handlerServer.startAndWait();
     externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
     externalAuthenticationServer.startAndWait();
-    Thread.sleep(1000 * 10);
+    // Wait SLEEP_TIME_IN_SEC for the complete service start
+    Thread.sleep(1000 * SLEEP_TIME_IN_SEC);
     testServerPort = handlerServer.getBindAddress().getPort();
     authURL = String.format("http://%s:%d/token",
                             externalAuthenticationServer.getSocketAddress().getHostName(),
