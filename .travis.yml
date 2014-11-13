@@ -52,4 +52,5 @@ script:
   - 'cd coopr-ngui'
   - 'node ./node_modules/gulp/bin/gulp.js jshint'
   - 'npm run test-single-run'
+  - 'cd ..'
   - 'mvn test'
