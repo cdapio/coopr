@@ -74,13 +74,13 @@ public class ClusterCleanupTest extends ServiceTestBase {
     String queueName = account.getTenantId();
 
     ClusterTask task1 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("2-1-1"), "node1", "service",
-                                        ClusterAction.CLUSTER_CREATE);
+                                        ClusterAction.CLUSTER_CREATE, "test", account);
     ClusterTask task2 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("2-2-2"), "node2", "service",
-                                        ClusterAction.CLUSTER_CREATE);
+                                        ClusterAction.CLUSTER_CREATE, "test", account);
     ClusterTask task3 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("2-3-3"), "node3", "service",
-                                        ClusterAction.CLUSTER_CREATE);
+                                        ClusterAction.CLUSTER_CREATE, "test", account);
     ClusterTask task4 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("2-4-4"), "node3", "service",
-                                        ClusterAction.CLUSTER_CREATE);
+                                        ClusterAction.CLUSTER_CREATE, "test", account);
 
     task1.setStatus(ClusterTask.Status.IN_PROGRESS);
     task2.setStatus(ClusterTask.Status.IN_PROGRESS);
@@ -209,7 +209,7 @@ public class ClusterCleanupTest extends ServiceTestBase {
     String queueName = account.getTenantId();
 
     ClusterTask task = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("3-1-1"), "node1", "service",
-                                       ClusterAction.CLUSTER_CREATE);
+                                       ClusterAction.CLUSTER_CREATE, "test", account);
     task.setStatus(ClusterTask.Status.IN_PROGRESS);
     Cluster cluster = Entities.ClusterExample.createCluster();
     TaskConfig taskConfig = TaskConfig.from(cluster, Entities.ClusterExample.NODE1, Entities.ServiceExample.NAMENODE,

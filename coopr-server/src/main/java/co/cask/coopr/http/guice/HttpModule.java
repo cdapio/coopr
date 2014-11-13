@@ -17,6 +17,7 @@ package co.cask.coopr.http.guice;
 
 import co.cask.coopr.http.handler.AdminHandler;
 import co.cask.coopr.http.handler.ClusterHandler;
+import co.cask.coopr.http.handler.MetricHandler;
 import co.cask.coopr.http.handler.NodeHandler;
 import co.cask.coopr.http.handler.PluginHandler;
 import co.cask.coopr.http.handler.ProvisionerHandler;
@@ -48,5 +49,6 @@ public class HttpModule extends AbstractModule {
     handlerBinder.addBinding().to(ProvisionerHandler.class);
     handlerBinder.addBinding().to(PluginHandler.class);
     handlerBinder.addBinding().to(UserHandler.class);
+    handlerBinder.addBinding().to(MetricHandler.class);
   }
 }
