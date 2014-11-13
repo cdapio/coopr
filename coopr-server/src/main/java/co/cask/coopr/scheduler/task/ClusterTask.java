@@ -61,6 +61,7 @@ public class ClusterTask {
     this.nodeId = nodeId;
     this.service = service;
     this.attempts = Lists.newArrayList();
+    //TODO: populate clusterTemplateName and account field for existing tasks: https://issues.cask.co/browse/COOPR-593
     this.clusterTemplateName = clusterTemplateName;
     this.account = account;
     addAttempt();

@@ -70,7 +70,7 @@ public class MetricService {
    * @return {@link TimeSeries} that presents node live time usage
    */
   public TimeSeries getNodesUsage(ClusterTaskFilter filter) throws IOException {
-    //TODO: implement this without keeping all tasks in memory.
+    //TODO: implement this functionality without keeping all tasks in memory.
     List<ClusterTask> tasks = clusterStore.getClusterTasks(filter);
     Long start = filter.getStart();
     Long end = filter.getEnd();
