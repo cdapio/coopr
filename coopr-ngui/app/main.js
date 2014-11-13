@@ -67,7 +67,7 @@ angular
     $httpProvider.interceptors.push(function () {
       return {
         request: function(config) {
-          config.timeout = 3000; // 3 seconds default
+          config.timeout = 10000; // 10 seconds default
           return config;
         }
       };
