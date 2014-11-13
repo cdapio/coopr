@@ -173,7 +173,8 @@ public abstract class ClusterStoreTest {
   public void testGetStoreDeleteTask() throws IOException {
     TaskId id = new TaskId(new JobId("1", 1), 1);
     ClusterTask task = new ClusterTask(ProvisionerAction.CONFIGURE, id,
-                                       "node1", "service", ClusterAction.CLUSTER_CREATE);
+                                       "node1", "service", ClusterAction.CLUSTER_CREATE,
+                                       "test", new Account("testUser", "testTenant"));
     Assert.assertNull(systemView.getClusterTask(id));
 
     systemView.writeClusterTask(task);
@@ -376,15 +377,15 @@ public abstract class ClusterStoreTest {
   @Test
   public void testGetRunningTasks() throws Exception {
     ClusterTask task1 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node1", "service",
-                                        ClusterAction.CLUSTER_CREATE);
+                                        ClusterAction.CLUSTER_CREATE, "test", new Account("testUser", "testTenant"));
     ClusterTask task2 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-2"), "node2", "service",
-                                        ClusterAction.CLUSTER_CREATE);
+                                        ClusterAction.CLUSTER_CREATE, "test", new Account("testUser", "testTenant"));
     ClusterTask task3 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-3"), "node3", "service",
-                                        ClusterAction.CLUSTER_CREATE);
+                                        ClusterAction.CLUSTER_CREATE, "test", new Account("testUser", "testTenant"));
     ClusterTask task4 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-4"), "node4", "service",
-                                        ClusterAction.CLUSTER_CREATE);
+                                        ClusterAction.CLUSTER_CREATE, "test", new Account("testUser", "testTenant"));
     ClusterTask task5 = new ClusterTask(ProvisionerAction.CREATE, TaskId.fromString("1-1-5"), "node5", "service",
-                                        ClusterAction.CLUSTER_CREATE);
+                                        ClusterAction.CLUSTER_CREATE, "test", new Account("testUser", "testTenant"));
 
     long currentTime = System.currentTimeMillis();
     task1.setSubmitTime(currentTime - 1000);
