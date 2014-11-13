@@ -20,10 +20,12 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.http.HttpHandler;
 import co.cask.http.NettyHttpService;
 import co.cask.http.SSLConfig;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.Set;
 
@@ -60,6 +62,16 @@ abstract class HandlerServer extends AbstractIdleService {
   }
 
   abstract SSLConfig getSSLConfig(Configuration conf);
+
+  SSLConfig.Builder getSSLConfigBuilderWithKeyStore(Configuration conf) {
+    String keyStoreFilePath = conf.get(Constants.SSL_KEYSTORE_PATH);
+    Preconditions.checkArgument(keyStoreFilePath != null,
+                                String.format("%s is not specified.", Constants.SSL_KEYSTORE_PATH));
+    File keyStore = new File(keyStoreFilePath);
+
+    return SSLConfig.builder(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD))
+      .setCertificatePassword(conf.get(Constants.SSL_KEYPASSWORD));
+  }
 
   @Override
   protected void startUp() throws Exception {

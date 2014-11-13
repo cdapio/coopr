@@ -41,19 +41,11 @@ public class InternalHandlerServer extends HandlerServer {
 
   @Override
   SSLConfig getSSLConfig(Configuration conf) {
-    String keyStoreFilePath = conf.get(Constants.SSL_KEYSTORE_PATH);
-    Preconditions.checkArgument(keyStoreFilePath != null,
-                                String.format("%s is not specified.", Constants.SSL_KEYSTORE_PATH));
-    File keyStore = new File(keyStoreFilePath);
-    SSLConfig.Builder sslConfigBuilder = SSLConfig.builder(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD))
-      .setCertificatePassword(conf.get(Constants.SSL_KEYPASSWORD));
-
     String trustKeyStoreFilePath = conf.get(Constants.SSL_TRUST_KEYSTORE_PATH);
     if (trustKeyStoreFilePath != null) {
-      sslConfigBuilder.setTrustKeyStore(new File(trustKeyStoreFilePath))
-        .setTrustKeyStorePassword(conf.get(Constants.SSL_TRUST_KEYPASSWORD));
+      return getSSLConfigBuilderWithKeyStore(conf).setTrustKeyStore(new File(trustKeyStoreFilePath))
+        .setTrustKeyStorePassword(conf.get(Constants.SSL_TRUST_KEYPASSWORD)).build();
     }
-
-    return sslConfigBuilder.build();
+    return getSSLConfigBuilderWithKeyStore(conf).build();
   }
 }

@@ -180,9 +180,6 @@ public final class ServerMain extends DaemonMain {
     externalHandlerServer = injector.getInstance(ExternalHandlerServer.class);
     externalHandlerServer.startAndWait();
     LOG.info("External API handler service started on {}", externalHandlerServer.getBindAddress());
-//    handlerServer = injector.getInstance(HandlerServer.class);
-//    handlerServer.startAndWait();
-//    LOG.info("Handler service started on {}", handlerServer.getBindAddress());
 
     scheduler = injector.getInstance(Scheduler.class);
     scheduler.startAndWait();
