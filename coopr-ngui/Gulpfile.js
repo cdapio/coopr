@@ -168,11 +168,7 @@ gulp.task('tpl', function() {
         module: pkg.name + '.features',
         base: __dirname + '/app',
         root: '/assets/'
-      })),
-
-    gulp.src(mainBowerFiles({
-      filter: /cask\-angular\-[^\/]+\/tpl\.html\.js$/
-    }))
+      }))
 
   )
     .pipe(plug.concat('tpl.js'))
