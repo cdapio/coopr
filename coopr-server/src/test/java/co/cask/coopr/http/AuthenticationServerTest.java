@@ -41,6 +41,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Test the External Authentication service integration
@@ -53,12 +54,12 @@ public class AuthenticationServerTest extends ServiceTestBase {
   private static int testServerPort;
 
   @BeforeClass
-  public static void setup() throws IOException {
+  public static void setup() throws IOException, ExecutionException, InterruptedException {
     initAuthTestProps();
     handlerServer = injector.getInstance(HandlerServer.class);
     handlerServer.startAndWait();
     externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
-    externalAuthenticationServer.startAndWait();
+    externalAuthenticationServer.start().get();
     testServerPort = handlerServer.getBindAddress().getPort();
     authURL = String.format("http://%s:%d/token",
                             externalAuthenticationServer.getSocketAddress().getHostName(),
