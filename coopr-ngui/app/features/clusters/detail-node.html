@@ -1,4 +1,4 @@
-<table class="table table-striped" my-sortable>
+<table class="table table-striped" cask-sortable>
   <thead>
     <tr ng-class="{'sort-enabled': node.actions.length>1}">
       <th>action</th>
@@ -21,10 +21,10 @@
       </td>
 
       <td ng-if="item.status==='failed'">
-        <span data-content="item.stdout" 
-              data-title="Log message" 
-              data-trigger="hover" 
-              data-container="body" 
+        <span data-content="item.stdout"
+              data-title="Log message"
+              data-trigger="hover"
+              data-container="body"
               bs-popover>
           <my-status-label data-value="item.status"></my-status-label>
         </span>
@@ -33,4 +33,3 @@
     </tr>
   </tbody>
 </table>
-

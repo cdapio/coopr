@@ -15,6 +15,7 @@
  */
 package co.cask.coopr.scheduler.task;
 
+import co.cask.coopr.account.Account;
 import co.cask.coopr.scheduler.ClusterAction;
 import co.cask.coopr.spec.ProvisionerAction;
 import com.google.common.base.Objects;
@@ -46,10 +47,12 @@ public class ClusterTask {
   private final ClusterAction clusterAction;
   private final String nodeId;
   private final String service;
+  private String clusterTemplateName;
+  private Account account;
   private List<TaskAttempt> attempts;
 
   public ClusterTask(ProvisionerAction taskName, TaskId taskId, String nodeId, String service,
-                     ClusterAction clusterAction) {
+                     ClusterAction clusterAction, String clusterTemplateName, Account account) {
     this.taskId = taskId.getId();
     this.jobId = String.valueOf(taskId.getJobId().getId());
     this.clusterId = taskId.getClusterId();
@@ -58,6 +61,9 @@ public class ClusterTask {
     this.nodeId = nodeId;
     this.service = service;
     this.attempts = Lists.newArrayList();
+    //TODO: populate clusterTemplateName and account field for existing tasks: https://issues.cask.co/browse/COOPR-593
+    this.clusterTemplateName = clusterTemplateName;
+    this.account = account;
     addAttempt();
   }
   
@@ -235,6 +241,24 @@ public class ClusterTask {
    */
   List<TaskAttempt> getAttempts() {
     return attempts;
+  }
+
+  /**
+   * Retrieves template name of the cluster this task is for.
+   *
+   * @return template name of the cluster this task is for.
+   */
+  public String getClusterTemplateName() {
+    return clusterTemplateName;
+  }
+
+  /**
+   * Retrieves the account this task is created by.
+   *
+   * @return the account this task is created by.
+   */
+  public Account getAccount() {
+    return account;
   }
 
   /**

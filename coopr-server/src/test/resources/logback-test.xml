@@ -40,6 +40,16 @@
         </filter>
     </appender>
 
+    <appender name="EXTERNAL_AUTH_AUDIT" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <pattern>%d{ISO8601} - %-5p [%t:%C{1}@%L] - %m%n</pattern>
+      </encoder>
+    </appender>
+
+    <logger name="external-auth-access" level="TRACE">
+      <appender-ref ref="EXTERNAL_AUTH_AUDIT" />
+    </logger>
+
     <root level="TRACE">
         <appender-ref ref="Console"/>
     </root>
