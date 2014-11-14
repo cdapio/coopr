@@ -120,6 +120,7 @@ gulp.task('js:app', function() {
     v: pkg.version
   });
   return gulp.src([
+      './app/*.js',
       './app/features/*/module.js',
       './app/**/*.js',
       '!./app/**/*-test.js'

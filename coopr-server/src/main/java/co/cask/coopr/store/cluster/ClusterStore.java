@@ -8,6 +8,7 @@ import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.scheduler.task.TaskId;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -44,6 +45,15 @@ public interface ClusterStore extends ClusterStoreView {
    * @throws IOException if there was a problem getting the cluster task.
    */
   ClusterTask getClusterTask(TaskId taskId) throws IOException;
+
+  /**
+   * Retrieves tasks according to the {@code query} filters.
+   *
+   * @param query the object wrapper around filters
+   * @return list of cluster tasks according to the {@code query} filters
+   * @throws IOException if there was a problem getting the cluster task.
+   */
+  List<ClusterTask> getClusterTasks(ClusterTaskFilter filter) throws IOException;
 
   /**
    * Write a cluster task to the store using its id.
