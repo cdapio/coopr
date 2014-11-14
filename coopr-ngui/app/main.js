@@ -33,6 +33,7 @@ angular
         'cask-angular-capitalize'
       ]).name,
 
+      'cask-angular-confirmable',
       'cask-angular-focus',
       'cask-angular-json-edit',
       'cask-angular-sortable',
