@@ -132,7 +132,7 @@
       <label>Progress</label>
     </div>
     <div class="col-xs-9">
-      <my-progress
+      <cask-progress
         data-type="bar"
         data-add-cls="{{{
           'active': 'info',
@@ -141,7 +141,7 @@
         }[model.status]}}"
         data-value="model.progress.stepscompleted"
         data-max="model.progress.stepstotal"
-      ></my-progress>
+      ></cask-progress>
     </div>
   </div></li>
 
@@ -250,9 +250,9 @@
                     <code>{{item.provisionerResults['ssh-auth'].user}}</code>
                   </td>
                   <td width="150">
-                    <my-password
+                    <cask-password
                       data-value="item.provisionerResults['ssh-auth'].password"
-                    ></my-password>
+                    ></cask-password>
                   </td>
                   <td class="text-right">
                     <a href="" ng-click="doActionsModal(item.id)"
