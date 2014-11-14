@@ -1,0 +1,19 @@
+<span class="input-group input-group-sm">
+  <a href=""
+    class="btn btn-default input-group-addon"
+    ng-class="{'active': show}"
+    ng-click="doToggle()"
+    >
+      <span class="fa"
+        ng-class="{'fa-toggle-on': show, 'fa-toggle-off': !show}"
+      ></span>
+  </a>
+  <input type="text" value="{{show ? value : ''}}"
+    placeholder="password"
+    ng-click="show || doToggle()"
+    class="form-control"
+    style="cursor:crosshair"
+    cask-focus="{{uid}}"
+    readonly
+    />
+</span>
