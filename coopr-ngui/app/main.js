@@ -33,6 +33,7 @@ angular
         'cask-angular-capitalize'
       ]).name,
 
+      'cask-angular-progress',
       'cask-angular-password',
       'cask-angular-dropdown-text-combo',
       'mgcrea.ngStrap.alert',
