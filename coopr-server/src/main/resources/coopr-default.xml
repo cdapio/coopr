@@ -37,7 +37,13 @@
     <property>
       <name>server.ssl.enabled</name>
       <value>false</value>
-      <description>Enable SSl</description>
+      <description>Enable SSl for external API</description>
+    </property>
+
+    <property>
+      <name>server.tasks.ssl.enabled</name>
+      <value>false</value>
+      <description>Enable SSl for internal API</description>
     </property>
 
     <property>

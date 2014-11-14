@@ -29,16 +29,23 @@ public class Constants {
   public static final String EXTERNAL_PORT = "server.port";
   public static final String INTERNAL_PORT = "server.tasks.port";
   public static final String HOST = "server.host";
-  public static final String ENABLE_SSL = "server.ssl.enabled";
+  public static final String EXTERNAL_ENABLE_SSL = "server.ssl.enabled";
+  public static final String INTERNAL_ENABLE_SSL = "server.tasks.ssl.enabled";
   public static final String ZOOKEEPER_QUORUM = "server.zookeeper.quorum";
   public static final String ZOOKEEPER_SESSION_TIMEOUT_MILLIS = "server.zookeeper.session.timeout.millis";
   public static final String ZOOKEEPER_NAMESPACE = "server.zookeeper.namespace";
 
-  public static final String SSL_KEYSTORE_PATH = "server.ssl.keystore.path";
-  public static final String SSL_KEYPASSWORD = "server.ssl.keystore.password";
-  public static final String SSL_KEYSTORE_PASSWORD = "server.ssl.cert.password";
-  public static final String SSL_TRUST_KEYSTORE_PATH = "server.ssl.trust.keystore.path";
-  public static final String SSL_TRUST_KEYPASSWORD = "server.ssl.trust.keystore.password";
+  public static final String EXTERNAL_SSL_KEYSTORE_PATH = "server.ssl.keystore.path";
+  public static final String EXTERNAL_SSL_KEYPASSWORD = "server.ssl.keystore.password";
+  public static final String EXTERNAL_SSL_KEYSTORE_PASSWORD = "server.ssl.cert.password";
+  public static final String EXTERNAL_SSL_TRUST_KEYSTORE_PATH = "server.ssl.trust.keystore.path";
+  public static final String EXTERNAL_SSL_TRUST_KEYPASSWORD = "server.ssl.trust.keystore.password";
+
+  public static final String INTERNAL_SSL_KEYSTORE_PATH = "server.tasks.ssl.keystore.path";
+  public static final String INTERNAL_SSL_KEYPASSWORD = "server.tasks.ssl.keystore.password";
+  public static final String INTERNAL_SSL_KEYSTORE_PASSWORD = "server.tasks.ssl.cert.password";
+  public static final String INTERNAL_SSL_TRUST_KEYSTORE_PATH = "server.tasks.ssl.trust.keystore.path";
+  public static final String INTERNAL_SSL_TRUST_KEYPASSWORD = "server.tasks.ssl.trust.keystore.password";
 
   public static final String JDBC_DRIVER = "server.jdbc.driver";
   public static final String JDBC_CONNECTION_STRING = "server.jdbc.connection.string";

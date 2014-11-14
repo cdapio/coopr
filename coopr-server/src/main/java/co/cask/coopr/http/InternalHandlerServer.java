@@ -23,15 +23,12 @@ import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.http.handler.TaskHandler;
 import co.cask.http.HttpHandler;
-import co.cask.http.SSLConfig;
-import com.google.common.base.Preconditions;
+import co.cask.http.NettyHttpService;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.HashSet;
 
 /**
  * Netty service for running the server that manages internal API.
@@ -40,20 +37,23 @@ public class InternalHandlerServer extends HandlerServer {
 
   @Inject
   private InternalHandlerServer(TaskHandler handler, Configuration conf,
-                                CConfiguration cConf, TokenValidator tokenValidator,
-                                AccessTokenTransformer accessTokenTransformer,
-                                DiscoveryServiceClient discoveryServiceClient) {
+                                final CConfiguration cConf,
+                                final TokenValidator tokenValidator,
+                                final AccessTokenTransformer accessTokenTransformer,
+                                final DiscoveryServiceClient discoveryServiceClient) {
     super(Sets.<HttpHandler>newHashSet(Arrays.asList(handler)), conf, Constants.INTERNAL_PORT,
           cConf, tokenValidator, accessTokenTransformer, discoveryServiceClient);
   }
 
   @Override
-  SSLConfig getSSLConfig(Configuration conf) {
-    String trustKeyStoreFilePath = conf.get(Constants.SSL_TRUST_KEYSTORE_PATH);
-    if (trustKeyStoreFilePath != null) {
-      return getSSLConfigBuilderWithKeyStore(conf).setTrustKeyStore(new File(trustKeyStoreFilePath))
-        .setTrustKeyStorePassword(conf.get(Constants.SSL_TRUST_KEYPASSWORD)).build();
+  void addSSLConfig(NettyHttpService.Builder builder, Configuration conf) {
+    boolean enableSSL = conf.getBoolean(Constants.INTERNAL_ENABLE_SSL);
+    if (enableSSL) {
+      builder.enableSSL(getSSLConfig(conf, Constants.INTERNAL_SSL_KEYSTORE_PATH,
+                                     Constants.INTERNAL_SSL_KEYSTORE_PASSWORD,
+                                     Constants.INTERNAL_SSL_KEYPASSWORD,
+                                     Constants.INTERNAL_SSL_TRUST_KEYSTORE_PATH,
+                                     Constants.INTERNAL_SSL_TRUST_KEYPASSWORD));
     }
-    return getSSLConfigBuilderWithKeyStore(conf).build();
   }
 }

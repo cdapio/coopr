@@ -65,16 +65,16 @@ public class MutualAuthServerTest extends ServiceTestBase {
 
   @BeforeClass
   public static void setup() {
-    conf.setBoolean("server.ssl.enabled", true);
+    conf.setBoolean("server.tasks.ssl.enabled", true);
     String serverCertificate = HttpsServerTest.class.getClassLoader().getResource("cert.jks").getPath();
-    conf.set("server.ssl.keystore.path", serverCertificate);
-    conf.set("server.ssl.keystore.password", SERVER_KEY_STORE_PASSWORD);
-    conf.set("server.ssl.cert.password", "secret");
+    conf.set("server.tasks.ssl.keystore.path", serverCertificate);
+    conf.set("server.tasks.ssl.keystore.password", SERVER_KEY_STORE_PASSWORD);
+    conf.set("server.tasks.ssl.cert.password", "secret");
     serverKeyStore = new File(serverCertificate);
 
     String clientCertificate = HttpsServerTest.class.getClassLoader().getResource("client.jks").getFile();
-    conf.set("server.ssl.trust.keystore.path", clientCertificate);
-    conf.set("server.ssl.trust.keystore.password", CLIENT_KEY_STORE_PASSWORD);
+    conf.set("server.tasks.ssl.trust.keystore.path", clientCertificate);
+    conf.set("server.tasks.ssl.trust.keystore.password", CLIENT_KEY_STORE_PASSWORD);
     clientKeyStore = new File(clientCertificate);
   }
 

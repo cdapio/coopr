@@ -22,12 +22,10 @@ import co.cask.cdap.security.auth.TokenValidator;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.http.HttpHandler;
-import co.cask.http.SSLConfig;
-import com.google.common.base.Preconditions;
+import co.cask.http.NettyHttpService;
 import com.google.inject.Inject;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 
-import java.io.File;
 import java.util.Set;
 
 /**
@@ -37,15 +35,23 @@ public class ExternalHandlerServer extends HandlerServer {
 
   @Inject
   private ExternalHandlerServer(Set<HttpHandler> handlers, Configuration conf,
-                                CConfiguration cConf, TokenValidator tokenValidator,
-                                AccessTokenTransformer accessTokenTransformer,
-                                DiscoveryServiceClient discoveryServiceClient) {
+                                final CConfiguration cConf,
+                                final TokenValidator tokenValidator,
+                                final AccessTokenTransformer accessTokenTransformer,
+                                final DiscoveryServiceClient discoveryServiceClient) {
     super(handlers, conf, Constants.EXTERNAL_PORT,
           cConf, tokenValidator, accessTokenTransformer, discoveryServiceClient);
   }
 
   @Override
-  SSLConfig getSSLConfig(Configuration conf) {
-    return getSSLConfigBuilderWithKeyStore(conf).build();
+  void addSSLConfig(NettyHttpService.Builder builder, Configuration conf) {
+    boolean enableSSL = conf.getBoolean(Constants.EXTERNAL_ENABLE_SSL);
+    if (enableSSL) {
+      builder.enableSSL(getSSLConfig(conf, Constants.EXTERNAL_SSL_KEYSTORE_PATH,
+                                     Constants.EXTERNAL_SSL_KEYSTORE_PASSWORD,
+                                     Constants.EXTERNAL_SSL_KEYPASSWORD,
+                                     Constants.EXTERNAL_SSL_TRUST_KEYSTORE_PATH,
+                                     Constants.EXTERNAL_SSL_TRUST_KEYPASSWORD));
+    }
   }
 }

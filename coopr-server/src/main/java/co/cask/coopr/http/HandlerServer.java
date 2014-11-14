@@ -59,7 +59,6 @@ abstract class HandlerServer extends AbstractIdleService {
     int port = conf.getInt(portKey);
     int numExecThreads = conf.getInt(Constants.NETTY_EXEC_NUM_THREADS);
     int numWorkerThreads = conf.getInt(Constants.NETTY_WORKER_NUM_THREADS);
-    boolean enableSSL = conf.getBoolean(Constants.ENABLE_SSL);
     final boolean securityEnabled = conf.getBoolean(co.cask.cdap.common.conf.Constants.Security.CFG_SECURITY_ENABLED);
     final String realm = conf.get(co.cask.cdap.common.conf.Constants.Security.CFG_REALM);
 
@@ -88,22 +87,30 @@ abstract class HandlerServer extends AbstractIdleService {
         }
       });
     }
-    if (enableSSL) {
-      builder.enableSSL(getSSLConfig(conf));
-    }
+
+    addSSLConfig(builder, conf);
     this.httpService = builder.build();
   }
 
-  abstract SSLConfig getSSLConfig(Configuration conf);
+  abstract void addSSLConfig(NettyHttpService.Builder builder, Configuration conf);
 
-  SSLConfig.Builder getSSLConfigBuilderWithKeyStore(Configuration conf) {
-    String keyStoreFilePath = conf.get(Constants.SSL_KEYSTORE_PATH);
+  SSLConfig getSSLConfig(Configuration conf, String keyStorePathKey,
+                                                      String keyStorePasswordKey, String keyPasswordKey,
+                                                      String trustKeyStorePathKey, String trustKeyPasswordKey) {
+    String keyStoreFilePath = conf.get(keyStorePathKey);
     Preconditions.checkArgument(keyStoreFilePath != null,
-                                String.format("%s is not specified.", Constants.SSL_KEYSTORE_PATH));
+                                String.format("%s is not specified.", keyStorePathKey));
     File keyStore = new File(keyStoreFilePath);
 
-    return SSLConfig.builder(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD))
-      .setCertificatePassword(conf.get(Constants.SSL_KEYPASSWORD));
+    SSLConfig.Builder builder = SSLConfig.builder(keyStore, conf.get(keyStorePasswordKey))
+      .setCertificatePassword(conf.get(keyPasswordKey));
+
+    String trustKeyStoreFilePath = conf.get(trustKeyStorePathKey);
+    if (trustKeyStoreFilePath == null) {
+      return builder.build();
+    }
+    return builder.setTrustKeyStore(new File(trustKeyStoreFilePath))
+      .setTrustKeyStorePassword(conf.get(trustKeyPasswordKey)).build();
   }
 
   @Override
