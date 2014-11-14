@@ -53,8 +53,8 @@
   </label>
   <div class="col-xs-10">
 
-    <input id="inputTemplateDefaultDns" type="text" class="form-control" 
-      placeholder="DNS Suffix" 
+    <input id="inputTemplateDefaultDns" type="text" class="form-control"
+      placeholder="DNS Suffix"
       my-focus="inputTemplateDns"
       ng-model="model.defaults.dnsSuffix" />
 
@@ -68,7 +68,7 @@
   <div class="col-xs-10">
 
     <textarea id="inputTemplateDefaultConfig" class="form-control" rows="10"
-      my-json-edit="model.defaults.config"
+      cask-json-edit="model.defaults.config"
       ></textarea>
 
   </div>
@@ -88,4 +88,3 @@
     ></my-service-picker>
   </div>
 </div>
-
