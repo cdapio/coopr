@@ -3,8 +3,8 @@
  * handles both "edit" and "create" views
  */
 
-angular.module(PKG.name+'.features').controller('TenantFormCtrl', 
-function ($scope, $state, $alert, $q, myApi, CrudFormBase, myFocusManager) {
+angular.module(PKG.name+'.features').controller('TenantFormCtrl',
+function ($scope, $state, $alert, $q, myApi, CrudFormBase, caskFocusManager) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -18,7 +18,7 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase, myFocusManager) {
 
     promise = $q.when($scope.model);
 
-    myFocusManager.focus('inputTenantName');
+    caskFocusManager.focus('inputTenantName');
   }
 
   $q.all({
@@ -33,8 +33,8 @@ function ($scope, $state, $alert, $q, myApi, CrudFormBase, myFocusManager) {
       $scope.maxWorkers = 0;
       $scope.model.workers = 0;
       $alert({
-        title: 'No workers available!', 
-        content: 'You will need to free some workers for this tenant.', 
+        title: 'No workers available!',
+        content: 'You will need to free some workers for this tenant.',
         type: 'warning'
       });
     }

@@ -33,6 +33,13 @@ angular
         'cask-angular-capitalize'
       ]).name,
 
+      'cask-angular-confirmable',
+      'cask-angular-focus',
+      'cask-angular-json-edit',
+      'cask-angular-sortable',
+      'cask-angular-progress',
+      'cask-angular-password',
+      'cask-angular-dropdown-text-combo',
       'mgcrea.ngStrap.alert',
       'mgcrea.ngStrap.tooltip',
       'mgcrea.ngStrap.popover',
@@ -67,7 +74,7 @@ angular
     $httpProvider.interceptors.push(function () {
       return {
         request: function(config) {
-          config.timeout = 3000; // 3 seconds default
+          config.timeout = 10000; // 10 seconds default
           return config;
         }
       };
@@ -162,4 +169,3 @@ angular
 
     console.timeEnd(PKG.name);
   });
-
