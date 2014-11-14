@@ -6,8 +6,8 @@
  * <my-password data-value="password"></my-password>
  */
 
-angular.module(PKG.name+'.commons').directive('myPassword', 
-function myPasswordDirective (myFocusManager) {
+angular.module(PKG.name+'.commons').directive('myPassword',
+function myPasswordDirective (caskFocusManager) {
   return {
     restrict: 'E',
     templateUrl: 'password/click2show.html',
@@ -23,7 +23,7 @@ function myPasswordDirective (myFocusManager) {
         var show = !scope.show;
         scope.show = show;
         if (show) {
-          myFocusManager.select(scope.uid);          
+          caskFocusManager.select(scope.uid);
         }
       };
 

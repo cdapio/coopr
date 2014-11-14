@@ -2,8 +2,8 @@
  * LoginCtrl
  */
 
-angular.module(PKG.name+'.features').controller('LoginCtrl', 
-function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT, myFocusManager) {
+angular.module(PKG.name+'.features').controller('LoginCtrl',
+function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT, caskFocusManager) {
 
   $scope.credentials = myAuth.remembered();
 
@@ -20,7 +20,7 @@ function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT,
       });
   };
 
-  $scope.$on('$viewContentLoaded', function() { 
+  $scope.$on('$viewContentLoaded', function() {
     if(myAuth.isAuthenticated()) {
       $state.go('home');
       $alert({
@@ -39,7 +39,7 @@ function ($scope, myAuth, $alert, $state, cfpLoadingBar, $timeout, MYAUTH_EVENT,
 
   function focusLoginField() {
     $timeout(function() {
-      myFocusManager.select($scope.credentials.username ? 'password' : 'username');
+      caskFocusManager.select($scope.credentials.username ? 'password' : 'username');
     }, 10); // the addtl timeout is so this triggers AFTER any potential focus() on an $alert
   }
 
