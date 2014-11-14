@@ -1,9 +1,7 @@
-require 'simplecov'
-SimpleCov.start do
-  add_filter '/spec/'
-end
-
-require 'rspec/autorun'
+# require 'simplecov'
+# SimpleCov.start do
+#   add_filter '/spec/'
+# end
 
 require_relative '../automator'
 require_relative '../pluginmanager'
