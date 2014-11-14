@@ -27,7 +27,7 @@ require_relative 'utils.rb'
 require_relative 'pluginmanager.rb'
 require_relative 'provider.rb'
 require_relative 'automator.rb'
-require_relative '../bin/rest-helper'
+require_relative '../master/lib/provisioner/rest-helper'
 
 $stdout.sync = true
 
@@ -67,6 +67,12 @@ OptionParser.new do |opts|
   opts.on('-o', '--once', 'Only poll and run a single task') do
     options[:once] = true
   end
+  opts.on('', '--certpath CERTPATH', 'Trust certificate path') do |c|
+    options[:certpath] = c
+  end
+  opts.on('', '--certpass CERTPASS', 'Trust certificate password') do |p|
+    options[:certpass] = p
+  end
 end.parse!
 
 coopr_uri = options[:uri]
@@ -102,7 +108,7 @@ Logging.level = options[:log_level]
 Logging.process_name = options[:name] if options[:name]
 
 # load plugins
-pluginmanager = PluginManager.new
+pluginmanager = PluginManager.new(options[:certpath], options[:certpass])
 
 # ensure we have at least one plugin of each type for task coverage
 if pluginmanager.providermap.empty? or pluginmanager.automatormap.empty?
@@ -112,6 +118,10 @@ end
 
 # the environment passed to plugins
 @plugin_env = options
+
+pem_path = options[:certpath]
+pem_pass = options[:certpass]
+@rest_helper = Coopr::RestHelper.new(pem_path, pem_pass)
 
 def _run_plugin(clazz, env, cwd, task)
   object = clazz.new(env, task)
@@ -229,7 +239,7 @@ else
     response = nil
     task = nil
     begin
-      response = RestHelper.post "#{coopr_uri}/v2/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
+      response = @rest_helper.post "#{coopr_uri}/v2/tasks/take", { 'provisionerId' => options[:provisioner], 'workerId' => myid, 'tenantId' => options[:tenant] }.to_json
     rescue => e
       log.error "Caught exception connecting to coopr server #{coopr_uri}/v2/tasks/take: #{e}"
       sleep 10
@@ -267,7 +277,7 @@ else
 
         log.debug "Task <#{task['taskId']}> completed, updating results <#{result}>"
         begin
-          response = RestHelper.post "#{coopr_uri}/v2/tasks/finish", result.to_json
+          response = @rest_helper.post "#{coopr_uri}/v2/tasks/finish", result.to_json
         rescue => e
           log.error "Caught exception posting back to coopr server #{coopr_uri}/v2/tasks/finish: #{e}"
         end
@@ -289,7 +299,7 @@ else
         end
         log.error "Task <#{task['taskId']}> failed, updating results <#{result}>"
         begin
-          response = RestHelper.post "#{coopr_uri}/v2/tasks/finish", result.to_json
+          response = @rest_helper.post "#{coopr_uri}/v2/tasks/finish", result.to_json
         rescue => e
           log.error "Caught exception posting back to server #{coopr_uri}/v2/tasks/finish: #{e}"
         end

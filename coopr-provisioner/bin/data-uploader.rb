@@ -23,7 +23,7 @@ require 'tmpdir'
 require 'fileutils'
 require 'rubygems/package'
 require 'zlib'
-require_relative 'rest-helper'
+require_relative '../master/lib/provisioner/rest-helper'
 
 # ./data-uploader [-u http://localhost:55054] [-t superadmin] [-U admin] upload|stage|sync \ 
 #   ./my/local/cookbooks/hadoop automatortypes/chef-solo/cookbooks/hadoop
@@ -44,6 +44,12 @@ begin
     end
     opts.on('-q', '--quiet', 'Suppress all non-error output') do
       options[:quiet] = true
+    end
+    opts.on('', '--certpath CERTPATH', 'Trust certificate path') do |c|
+      options[:certpath] = c
+    end
+    opts.on('', '--certpass CERTPASS', 'Trust certificate password') do |p|
+      options[:certpass] = p
     end
 
     opts.separator ''
@@ -79,14 +85,17 @@ options[:action] = ARGV.shift
 options[:path] = ARGV.shift
 options[:target] = ARGV.shift
 
-module Coopr 
+module Coopr
   module DataUploader
     # class representing the resource to be uploaded
     class Resource
       attr_accessor :options
       def initialize(options)
         @options = options
-        @headers = { :'Coopr-UserID' => options[:user], :'Coopr-TenantID' => options[:tenant] }
+        @headers = {:'Coopr-UserID' => options[:user], :'Coopr-TenantID' => options[:tenant]}
+        cert_path = options[:certpath] || ENV['TRUST_CERT_PATH']
+        cert_pass = options[:certpass] || ENV['TRUST_CERT_PASSWORD']
+        @rest_helper = Coopr::RestHelper.new(cert_path, cert_pass)
       end
 
       def validate
@@ -132,7 +141,7 @@ module Coopr
 
       def validate_server_connectivity
         uri = %W( #{@options[:uri]} status ).join('/')
-        resp = RestHelper.get(uri, @headers)
+        resp = @rest_helper.get(uri, @headers)
         unless resp.code == 200
           fail "non-ok response code #{resp.code} from server at: #{uri}"
         end
@@ -142,7 +151,7 @@ module Coopr
       def validate_server_target
         validate_server_connectivity
         uri = %W( #{@options[:uri]} v2/plugins #{@options[:plugin_type]} #{@options[:plugin_name]}).join('/')
-        resp = RestHelper.get(uri, @headers)
+        resp = @rest_helper.get(uri, @headers)
         if resp.code == 200
           resp_plugin = JSON.parse(resp.to_str)
           if resp_plugin.key?('resourceTypes') && resp_plugin['resourceTypes'].key?(@options[:resource_type])
@@ -163,16 +172,16 @@ module Coopr
       def validate_format
         # expected_format discovered by validate_server_target
         case @expected_format
-        when 'archive'
-          unless local_path_is_tgz?
-            unless local_path_is_directory?
-              fail "server resource registered as archive, but local-path argument is not a directory or .tgz archive: #{@options[:path]}"
+          when 'archive'
+            unless local_path_is_tgz?
+              unless local_path_is_directory?
+                fail "server resource registered as archive, but local-path argument is not a directory or .tgz archive: #{@options[:path]}"
+              end
             end
-          end
-        when 'file'
-          fail "server resource registered as file, but local-path argument is not a file: #{@options[:path]}" unless local_path_is_file?
-        else
-          fail "unknown expected format from server: #{@expected_format}"
+          when 'file'
+            fail "server resource registered as file, but local-path argument is not a file: #{@options[:path]}" unless local_path_is_file?
+          else
+            fail "unknown expected format from server: #{@expected_format}"
         end
         @options[:format] = @expected_format
       end
@@ -191,17 +200,17 @@ module Coopr
 
       def upload
         case @options[:format]
-        when 'archive'
-          if local_path_is_tgz?
+          when 'archive'
+            if local_path_is_tgz?
+              upload_file_resource
+            else
+              upload_archive_resource
+            end
+          when 'file'
             upload_file_resource
           else
-            upload_archive_resource
-          end
-        when 'file'
-          upload_file_resource
-        else
-          # this should get caught in validate
-          fail "unknown expected format: #{@options[:format]}"
+            # this should get caught in validate
+            fail "unknown expected format: #{@options[:format]}"
         end
       end
 
@@ -217,7 +226,7 @@ module Coopr
 
       def upload_resource(payload)
         uri = %W( #{@options[:uri]} v2/plugins #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]}).join('/')
-        resp = RestHelper.post(uri, payload, @headers)
+        resp = @rest_helper.post(uri, payload, @headers)
         if resp.code == 200
           resp_obj = JSON.parse(resp.to_str)
           puts "upload successful for #{uri}, version: #{resp_obj['version']}" unless options[:quiet]
@@ -230,7 +239,7 @@ module Coopr
       def stage
         version = @upload_results['version']
         uri = %W( #{@options[:uri]} v2/plugins #{@options[:plugin_type]} #{@options[:plugin_name]} #{@options[:resource_type]} #{@options[:resource_name]} versions #{version} stage).join('/')
-        resp = RestHelper.post(uri, nil, @headers)
+        resp = @rest_helper.post(uri, nil, @headers)
         if resp.code == 200
           puts "stage successful for #{uri}" unless options[:quiet]
         else
@@ -241,7 +250,7 @@ module Coopr
       # syncing will act on all staged resources, not just the resource being staged
       def sync
         uri = %W( #{@options[:uri]} v2/plugins/sync).join('/')
-        resp = RestHelper.post(uri, nil, @headers)
+        resp = @rest_helper.post(uri, nil, @headers)
         if resp.code == 200
           puts 'sync successful' unless options[:quiet]
         else
@@ -299,15 +308,15 @@ begin
   ldr.validate
 
   case ldr.options[:action]
-  when /upload/i
-    ldr.upload
-  when /stage/i
-    ldr.upload
-    ldr.stage
-  when /sync/i
-    ldr.upload
-    ldr.stage
-    ldr.sync
+    when /upload/i
+      ldr.upload
+    when /stage/i
+      ldr.upload
+      ldr.stage
+    when /sync/i
+      ldr.upload
+      ldr.stage
+      ldr.sync
   end
 rescue ArgumentError => e
   puts op # prints usage

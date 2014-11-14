@@ -30,6 +30,8 @@ module Coopr
   PROVISIONER_LOG_ROTATION_SHIFT_AGE = 'provisioner.log.rotation.shift.age'
   PROVISIONER_LOG_ROTATION_SHIFT_SIZE = 'provisioner.log.rotation.shift.size'
   PROVISIONER_LOG_LEVEL = 'provisioner.log.level'
+  TRUST_CERT_PATH = 'trust.cert.path'
+  TRUST_CERT_PASS = 'trust.cert.pass'
 
   # api version
   PROVISIONER_API_VERSION = 'v2'

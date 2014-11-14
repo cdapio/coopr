@@ -41,6 +41,8 @@ module Coopr
       cmd += " --tenant #{@tenant}" unless @tenant.nil?
       cmd += " --name #{@name}" unless @name.nil?
       cmd += " --register" if @register
+      cmd += " --certpath #{@config.get(TRUST_CERT_PATH)}" if @config.get(TRUST_CERT_PATH)
+      cmd += " --certpass #{@config.get(TRUST_CERT_PASS)}" if @config.get(TRUST_CERT_PASS)
       cmd
     end
 

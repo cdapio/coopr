@@ -24,7 +24,7 @@ require 'tmpdir'
 require 'fileutils'
 require 'rubygems/package'
 require 'zlib'
-require_relative '../../../bin/rest-helper'
+require_relative 'rest-helper'
 
 module Coopr 
   # class which manages data resources locally on the provisioner. can sync from server, and activate
@@ -40,6 +40,10 @@ module Coopr
       @datadir = %W( #{config.get(PROVISIONER_DATA_DIR)} #{tenant} ).join('/')
       @workdir = %W( #{config.get(PROVISIONER_WORK_DIR)} #{tenant} ).join('/')
       @active = {}
+
+      pem_path = config.get('trust.cert.path')
+      pem_pass = config.get('trust.cert.password')
+      @rest_helper = Coopr::RestHelper.new(pem_path, pem_pass)
     end
 
     # syncs and activates all resources, first determining which ones need to be fetched locally
@@ -148,7 +152,7 @@ module Coopr
       uri = %W( #{@config.get(PROVISIONER_SERVER_URI)} v2/tenants/#{@tenant} #{resource} versions #{version} ).join('/')
       log.debug "fetching resource at #{uri} for tenant #{@tenant}"
       begin
-        response = RestHelper.get(uri, { 'Coopr-UserID' => 'admin', 'Coopr-TenantID' => @tenant })
+        response = @rest_helper.get(uri, { 'Coopr-UserID' => 'admin', 'Coopr-TenantID' => @tenant })
       rescue => e
         log.error "unable to fetch resource: #{e.inspect}"
         return
