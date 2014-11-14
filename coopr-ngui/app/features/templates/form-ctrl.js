@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.features').controller('TemplateFormCtrl',
-function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusManager) {
+function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, caskFocusManager) {
   CrudFormBase.apply($scope);
 
   var promise;
@@ -41,7 +41,7 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusMa
 
   $scope.onTabLoaded = function (tabIndex) {
     if(tabIndex === 0 && !$scope.editing) {
-      myFocusManager.focus('inputTemplateName');
+      caskFocusManager.focus('inputTemplateName');
     }
   };
 
@@ -175,4 +175,3 @@ function ($scope, $state, $window, myApi, $q, myHelpers, CrudFormBase, myFocusMa
   }
 
 });
-
