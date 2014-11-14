@@ -1,5 +1,5 @@
 <div class="table-responsive">
-<table class="table table-striped" my-sortable>
+<table class="table table-striped" cask-sortable>
   <thead>
     <tr ng-class="{'sort-enabled': list.length>1}">
       <th>name</th>
@@ -24,24 +24,24 @@
       <td>{{item.numNodes}}</td>
 
       <td>
-        <my-status-label 
-          data-value="item.status" 
+        <my-status-label
+          data-value="item.status"
           data-display="{
             'pending': item.progress.actionstatus
           }"
         ></my-status-label>
       </td>
       <td>
-        <my-progress data-type="bar"
+        <cask-progress data-type="bar"
           data-add-cls="{{{
             'active': 'info',
             'pending': 'success striped',
             'incomplete': 'danger',
             'terminated': 'danger'
           }[item.status]}}"
-          data-value="item.progress.stepscompleted" 
+          data-value="item.progress.stepscompleted"
           data-max="item.progress.stepstotal"
-        ></my-progress>
+        ></cask-progress>
       </td>
 
       <td class="text-right">
@@ -68,7 +68,7 @@
 
 <div class="text-center am-fade-and-slide-top" ng-show="togglerVisible">
   <hr />
-  <button type="button" class="btn btn-default btn-xs" 
+  <button type="button" class="btn btn-default btn-xs"
       ng-model="filterIsOff"
       bs-checkbox>
     <span class="fa fa-ellipsis-v fa-fw"></span>

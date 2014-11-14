@@ -1,5 +1,5 @@
 angular.module(PKG.name+'.features').controller('ServiceFormCtrl',
-function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
+function ($scope, $state, $q, myApi, CrudFormBase, caskFocusManager) {
   CrudFormBase.apply($scope);
 
 
@@ -10,7 +10,7 @@ function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
   else { // creating
     $scope.model = new myApi.Service();
     $scope.model.initialize();
-    myFocusManager.focus('inputServiceName');
+    caskFocusManager.focus('inputServiceName');
   }
 
 
@@ -62,7 +62,7 @@ function ($scope, $state, $q, myApi, CrudFormBase, myFocusManager) {
       type: $scope.availableAutomators[0].name,
       fields: {}
     };
-    myFocusManager.focus('inputServiceAutomator_'+category);
+    caskFocusManager.focus('inputServiceAutomator_'+category);
   };
 
   $scope.rmAction = function (category) {

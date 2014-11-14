@@ -112,7 +112,8 @@ public class MutualAuthServerTest extends ServiceTestBase {
   private TakeTaskRequest getRequest() throws IOException {
     String tenantId = USER1_ACCOUNT.getTenantId();
     ClusterTask clusterTask = new ClusterTask(
-      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node_id", "service", ClusterAction.CLUSTER_CREATE);
+      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node_id", "service", ClusterAction.CLUSTER_CREATE,
+      "test", USER1_ACCOUNT);
     clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);

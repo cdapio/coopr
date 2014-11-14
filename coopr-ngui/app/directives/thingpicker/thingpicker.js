@@ -17,7 +17,7 @@ function myThingPickerDirective () {
       freetextMode: '@'
     },
 
-    controller: function ($scope, myApi, $modal, myFocusManager) {
+    controller: function ($scope, myApi, $modal, caskFocusManager) {
 
       var modalInstance,
           modalScope;
@@ -43,7 +43,7 @@ function myThingPickerDirective () {
         });
 
         modalScope.$on('modal.show', function() {
-          myFocusManager.focus('inputNewThingName_'+$scope.thingName);
+          caskFocusManager.focus('inputNewThingName_'+$scope.thingName);
         });
 
         modalScope.$on('modal.hide', function() {

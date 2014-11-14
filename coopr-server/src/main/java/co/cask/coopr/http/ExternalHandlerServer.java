@@ -16,12 +16,16 @@
 
 package co.cask.coopr.http;
 
+import co.cask.cdap.common.conf.CConfiguration;
+import co.cask.cdap.security.auth.AccessTokenTransformer;
+import co.cask.cdap.security.auth.TokenValidator;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.http.HttpHandler;
 import co.cask.http.SSLConfig;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import org.apache.twill.discovery.DiscoveryServiceClient;
 
 import java.io.File;
 import java.util.Set;
@@ -32,8 +36,12 @@ import java.util.Set;
 public class ExternalHandlerServer extends HandlerServer {
 
   @Inject
-  private ExternalHandlerServer(Set<HttpHandler> handlers, Configuration conf) {
-    super(handlers, conf, Constants.EXTERNAL_PORT);
+  private ExternalHandlerServer(Set<HttpHandler> handlers, Configuration conf,
+                                CConfiguration cConf, TokenValidator tokenValidator,
+                                AccessTokenTransformer accessTokenTransformer,
+                                DiscoveryServiceClient discoveryServiceClient) {
+    super(handlers, conf, Constants.EXTERNAL_PORT,
+          cConf, tokenValidator, accessTokenTransformer, discoveryServiceClient);
   }
 
   @Override

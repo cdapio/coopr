@@ -4,7 +4,7 @@
  */
 
 angular.module(PKG.name+'.feature.clusters').controller('ClusterFormCtrl',
-function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHelpers) {
+function ($scope, $state, $q, $alert, CrudFormBase, myApi, caskFocusManager, myHelpers) {
   CrudFormBase.apply($scope);
 
   var id = $state.params.id;
@@ -106,7 +106,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHel
     });
 
 
-    myFocusManager.focus('inputClusterName');
+    caskFocusManager.focus('inputClusterName');
 
 
 
@@ -129,7 +129,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, myFocusManager, myHel
 
         $scope.leaseDuration = myHelpers.parseMilliseconds(data.expireTime);
 
-        myFocusManager.select('inputClusterConfig');
+        caskFocusManager.select('inputClusterConfig');
       })
       .catch(function () {
         $state.go('404');

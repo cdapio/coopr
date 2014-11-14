@@ -34,6 +34,7 @@ import co.cask.coopr.scheduler.task.TaskServiceAction;
 import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.service.ServiceAction;
+import co.cask.coopr.spec.template.ClusterTemplate;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -62,7 +63,8 @@ public class TaskHandlerTest extends ServiceTestBase {
   public void testTakeTask() throws Exception {
     String tenantId = USER1_ACCOUNT.getTenantId();
     ClusterTask clusterTask = new ClusterTask(
-      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node_id", "service", ClusterAction.CLUSTER_CREATE);
+      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node_id", "service", ClusterAction.CLUSTER_CREATE,
+      "test", USER1_ACCOUNT);
     clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);
@@ -105,7 +107,8 @@ public class TaskHandlerTest extends ServiceTestBase {
     clusterStore.writeNode(node);
 
     ClusterTask clusterTask = new ClusterTask(
-      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE);
+      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE,
+      "test", USER1_ACCOUNT);
     clusterStore.writeClusterTask(clusterTask);
 
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
@@ -162,7 +165,8 @@ public class TaskHandlerTest extends ServiceTestBase {
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
 
     ClusterTask clusterTask = new ClusterTask(
-      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE);
+      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE,
+      "test", cluster.getAccount());
     clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);

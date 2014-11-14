@@ -16,6 +16,9 @@
 
 package co.cask.coopr.http;
 
+import co.cask.cdap.common.conf.CConfiguration;
+import co.cask.cdap.security.auth.AccessTokenTransformer;
+import co.cask.cdap.security.auth.TokenValidator;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.http.handler.TaskHandler;
@@ -24,6 +27,7 @@ import co.cask.http.SSLConfig;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import org.apache.twill.discovery.DiscoveryServiceClient;
 
 import java.io.File;
 import java.util.Arrays;
@@ -35,8 +39,12 @@ import java.util.HashSet;
 public class InternalHandlerServer extends HandlerServer {
 
   @Inject
-  private InternalHandlerServer(TaskHandler handler, Configuration conf) {
-    super(Sets.<HttpHandler>newHashSet(Arrays.asList(handler)), conf, Constants.INTERNAL_PORT);
+  private InternalHandlerServer(TaskHandler handler, Configuration conf,
+                                CConfiguration cConf, TokenValidator tokenValidator,
+                                AccessTokenTransformer accessTokenTransformer,
+                                DiscoveryServiceClient discoveryServiceClient) {
+    super(Sets.<HttpHandler>newHashSet(Arrays.asList(handler)), conf, Constants.INTERNAL_PORT,
+          cConf, tokenValidator, accessTokenTransformer, discoveryServiceClient);
   }
 
   @Override

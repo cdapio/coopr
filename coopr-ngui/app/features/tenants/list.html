@@ -27,7 +27,7 @@
 
 
 <div class="table-responsive">
-<table class="table table-striped" my-sortable>
+<table class="table table-striped" cask-sortable>
   <thead>
     <tr ng-class="{'sort-enabled': list.length>1}">
       <th>name</th>
@@ -47,7 +47,7 @@
             <span class="fa fa-edit"></span>
             Edit
         </a>
-        <a href="" ng-click="myConfirm()" my-confirmable="doDelete(item)" 
+        <a href="" ng-click="caskConfirm()" cask-confirmable="doDelete(item)" 
           data-confirmable-title="Delete '{{item.name}}'"
           data-confirmable-content="This action is not reversible, do you really want to proceed?"
           class="btn btn-danger btn-xs">
@@ -64,4 +64,3 @@
 <div ng-hide="(list.$promise && !list.$resolved) || list.length" class="well text-center">
   <p>Empty list!</p>
 </div>
-
