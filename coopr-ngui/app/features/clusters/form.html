@@ -3,8 +3,8 @@
   <div class="form-group">
     <label for="inputClusterName" class="col-xs-2 control-label">Name</label>
     <div class="col-xs-10">
-      <input id="inputClusterName" type="text" name="name" class="form-control" 
-        placeholder="Name" 
+      <input id="inputClusterName" type="text" name="name" class="form-control"
+        placeholder="Name"
         my-focus="inputClusterName"
         ng-disabled="editing"
         ng-pattern="/^[\w\.\-]+$/"
@@ -30,7 +30,7 @@
         ng-disabled="editing"
         ng-model="model.numMachines"
         ng-pattern="/^\d+$/"
-        min="{{chosenTemplate.constraints.size.min}}" 
+        min="{{chosenTemplate.constraints.size.min}}"
         max="{{chosenTemplate.constraints.size.max}}"
         required/>
 
@@ -44,7 +44,7 @@
     <label for="inputClusterConfig" class="col-xs-2 control-label">Config</label>
     <div class="col-xs-10">
       <textarea id="inputClusterConfig" class="form-control" name="config" rows="10"
-        my-json-edit="model.config"
+        cask-json-edit="model.config"
         my-focus="inputClusterConfig"
         ></textarea>
     </div>
@@ -59,7 +59,7 @@
       </p>
     </div>
     <div class="col-xs-10">
-      <button type="submit" class="btn btn-primary" 
+      <button type="submit" class="btn btn-primary"
         ng-disabled="submitting || clusterForm.$invalid">
         <span class="fa fa-save"></span>
         <span ng-show="editing">Update</span>
