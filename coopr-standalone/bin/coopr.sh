@@ -332,7 +332,11 @@ ui () {
 greeting () {
   [ "${COOPR_DISABLE_UI}" == "true" ] && return 0
   echo
-  echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
+  if [ "${COOPR_SSL}" == "true" ]; then
+    echo "Go to ${COOPR_PROTOCOL}://localhost:8443. Have fun creating clusters!"
+  else
+    echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
+  fi
 }
 
 stop () { provisioner stop; server stop; ui stop; }
