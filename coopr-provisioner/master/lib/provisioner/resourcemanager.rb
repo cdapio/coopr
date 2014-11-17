@@ -42,7 +42,7 @@ module Coopr
       @active = {}
 
       pem_path = config.get('trust.cert.path')
-      pem_pass = config.get('trust.cert.password')
+      pem_pass = config.get('trust.cert.pass')
       @rest_helper = Coopr::RestHelper.new(pem_path, pem_pass)
     end
 
