@@ -27,7 +27,6 @@ import co.cask.http.SSLConfig;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.inject.Inject;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.Channels;
@@ -42,7 +41,7 @@ import javax.annotation.Nullable;
 /**
  * Netty service for running the server.
  */
-public class HandlerServer extends AbstractIdleService {
+abstract class HandlerServer extends AbstractIdleService {
 
   private static final Logger LOG = LoggerFactory.getLogger(HandlerServer.class);
 
@@ -51,16 +50,15 @@ public class HandlerServer extends AbstractIdleService {
 
   private final NettyHttpService httpService;
 
-  @Inject
-  private HandlerServer(Set<HttpHandler> handlers, Configuration conf, final CConfiguration cConf,
-                        final TokenValidator tokenValidator,
-                        final AccessTokenTransformer accessTokenTransformer,
-                        final DiscoveryServiceClient discoveryServiceClient) {
+  HandlerServer(Set<HttpHandler> handlers, Configuration conf, String portKey,
+                final CConfiguration cConf,
+                final TokenValidator tokenValidator,
+                final AccessTokenTransformer accessTokenTransformer,
+                final DiscoveryServiceClient discoveryServiceClient) {
     String host = conf.get(Constants.HOST);
-    int port = conf.getInt(Constants.PORT);
+    int port = conf.getInt(portKey);
     int numExecThreads = conf.getInt(Constants.NETTY_EXEC_NUM_THREADS);
     int numWorkerThreads = conf.getInt(Constants.NETTY_WORKER_NUM_THREADS);
-    boolean enableSSL = conf.getBoolean(Constants.ENABLE_SSL);
     final boolean securityEnabled = conf.getBoolean(co.cask.cdap.common.conf.Constants.Security.CFG_SECURITY_ENABLED);
     final String realm = conf.get(co.cask.cdap.common.conf.Constants.Security.CFG_REALM);
 
@@ -90,23 +88,29 @@ public class HandlerServer extends AbstractIdleService {
       });
     }
 
-    if (enableSSL) {
-      String keyStoreFilePath = conf.get(Constants.SSL_KEYSTORE_PATH);
-      Preconditions.checkArgument(keyStoreFilePath != null,
-                                  String.format("%s is not specified.", Constants.SSL_KEYSTORE_PATH));
-      File keyStore = new File(keyStoreFilePath);
-      SSLConfig.Builder sslConfigBuilder = SSLConfig.builder(keyStore, conf.get(Constants.SSL_KEYSTORE_PASSWORD))
-        .setCertificatePassword(conf.get(Constants.SSL_KEYPASSWORD));
-
-      String trustKeyStoreFilePath = conf.get(Constants.SSL_TRUST_KEYSTORE_PATH);
-      if (trustKeyStoreFilePath != null) {
-        sslConfigBuilder.setTrustKeyStore(new File(trustKeyStoreFilePath))
-          .setTrustKeyStorePassword(conf.get(Constants.SSL_TRUST_KEYPASSWORD));
-      }
-
-      builder.enableSSL(sslConfigBuilder.build());
-    }
+    addSSLConfig(builder, conf);
     this.httpService = builder.build();
+  }
+
+  abstract void addSSLConfig(NettyHttpService.Builder builder, Configuration conf);
+
+  SSLConfig getSSLConfig(Configuration conf, String keyStorePathKey,
+                                                      String keyStorePasswordKey, String keyPasswordKey,
+                                                      String trustKeyStorePathKey, String trustKeyPasswordKey) {
+    String keyStoreFilePath = conf.get(keyStorePathKey);
+    Preconditions.checkArgument(keyStoreFilePath != null,
+                                String.format("%s is not specified.", keyStorePathKey));
+    File keyStore = new File(keyStoreFilePath);
+
+    SSLConfig.Builder builder = SSLConfig.builder(keyStore, conf.get(keyStorePasswordKey))
+      .setCertificatePassword(conf.get(keyPasswordKey));
+
+    String trustKeyStoreFilePath = conf.get(trustKeyStorePathKey);
+    if (trustKeyStoreFilePath == null) {
+      return builder.build();
+    }
+    return builder.setTrustKeyStore(new File(trustKeyStoreFilePath))
+      .setTrustKeyStorePassword(conf.get(trustKeyPasswordKey)).build();
   }
 
   @Override

@@ -90,7 +90,7 @@ public class NodeHandlerTest extends ServiceTestBase {
   @Test
   public void testDeleteNodeAsUser() throws Exception {
     Node node = postNodes(1, USER1_HEADERS).get(0);
-    HttpResponse response = doDelete("/nodes/" + node.getId(), USER1_HEADERS);
+    HttpResponse response = doDeleteExternalAPI("/nodes/" + node.getId(), USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.NO_CONTENT);
     List<JsonObject> nodes = getNodes(USER1_HEADERS);
     Assert.assertEquals(0, nodes.size());
@@ -103,7 +103,7 @@ public class NodeHandlerTest extends ServiceTestBase {
     propertiesBuilder.setHostname("my-updated-host");
     Node updatedNode = createNode(node.getId(),node.getClusterId(), node.getServices(), propertiesBuilder.build());
     String updatedNodeJsonString = getNodeAsJsonString(updatedNode);
-    HttpResponse response = doPut("/nodes/" + node.getId(), updatedNodeJsonString, USER1_HEADERS);
+    HttpResponse response = doPutExternalAPI("/nodes/" + node.getId(), updatedNodeJsonString, USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.NO_CONTENT);
     Node updatedNodeFromServer = convertNodeFromJson(getNode(USER1_HEADERS, updatedNode.getId()));
     Assert.assertEquals(node.getId(), updatedNodeFromServer.getId());
@@ -111,13 +111,13 @@ public class NodeHandlerTest extends ServiceTestBase {
   }
 
   private List<JsonObject> getNodes(final Header[] headers) throws Exception {
-    HttpResponse response = doGet("/nodes", headers);
+    HttpResponse response = doGetExternalAPI("/nodes", headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     return getJsonListFromResponse(response);
   }
 
   private JsonObject getNode(final Header[] headers, final String nodeId) throws Exception {
-    HttpResponse response = doGet("/nodes/" + nodeId, headers);
+    HttpResponse response = doGetExternalAPI("/nodes/" + nodeId, headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     return getJsonObjectFromResponse(response);
   }
@@ -125,7 +125,7 @@ public class NodeHandlerTest extends ServiceTestBase {
   private List<Node> postNodes(int numberOfNodes, Header[] headers) throws Exception {
     List<Node> nodes = createNodes(numberOfNodes);
     for (Node node : nodes) {
-      HttpResponse response = doPost("/nodes", gson.toJson(node), headers);
+      HttpResponse response = doPostExternalAPI("/nodes", gson.toJson(node), headers);
       assertResponseStatus(response, HttpResponseStatus.CREATED);
     }
     return nodes;

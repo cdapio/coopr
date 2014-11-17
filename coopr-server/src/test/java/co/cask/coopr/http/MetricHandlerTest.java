@@ -124,7 +124,7 @@ public class MetricHandlerTest extends ServiceTestBase {
     clusterStore.writeClusterTask(CLUSTER_TASK6);
     clusterStore.writeClusterTask(CLUSTER_TASK7);
 
-    HttpResponse response = doGet("/metrics/nodes/usage?start=5&end=22", USER1_HEADERS);
+    HttpResponse response = doGetExternalAPI("/metrics/nodes/usage?start=5&end=22", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     TimeSeries actual = getResponseData(response);
@@ -153,7 +153,7 @@ public class MetricHandlerTest extends ServiceTestBase {
 
     clusterStore.writeClusterTask(CLUSTER_TASK6);
 
-    HttpResponse response = doGet("/metrics/nodes/usage?start=5&end=22&tenant=tenant2", USER1_HEADERS);
+    HttpResponse response = doGetExternalAPI("/metrics/nodes/usage?start=5&end=22&tenant=tenant2", USER1_HEADERS);
 
     assertResponseStatus(response, HttpResponseStatus.METHOD_NOT_ALLOWED);
   }
@@ -220,7 +220,7 @@ public class MetricHandlerTest extends ServiceTestBase {
     clusterStore.writeClusterTask(CLUSTER_TASK6);
     clusterStore.writeClusterTask(CLUSTER_TASK7);
 
-    HttpResponse response = doGet("/metrics/nodes/usage?start=" + (5 * millisPerHour) +
+    HttpResponse response = doGetExternalAPI("/metrics/nodes/usage?start=" + (5 * millisPerHour) +
                                     "&end=" + (22 * millisPerHour) + "&groupby=hour", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 

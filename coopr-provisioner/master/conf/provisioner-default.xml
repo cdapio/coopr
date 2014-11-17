@@ -1,7 +1,7 @@
 <configuration>
   <property>
     <name>provisioner.server.uri</name>
-    <value>http://localhost:55054</value>
+    <value>http://localhost:55055</value>
     <description>URI of server to connect to</description>
   </property>
   <property>

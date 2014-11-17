@@ -56,13 +56,13 @@ public class AuthenticationServerTest extends ServiceTestBase {
   @BeforeClass
   public static void setup() throws IOException, InterruptedException {
     initAuthTestProps();
-    handlerServer = injector.getInstance(HandlerServer.class);
-    handlerServer.startAndWait();
+    externalHandlerServer = injector.getInstance(ExternalHandlerServer.class);
+    externalHandlerServer.startAndWait();
     externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
     externalAuthenticationServer.startAndWait();
     // Wait *SLEEP_TIME_IN_SEC* for the complete service start
     Thread.sleep(1000 * SLEEP_TIME_IN_SEC);
-    testServerPort = handlerServer.getBindAddress().getPort();
+    testServerPort = externalHandlerServer.getBindAddress().getPort();
     authURL = String.format("http://%s:%d/token",
                             externalAuthenticationServer.getSocketAddress().getHostName(),
                             externalAuthenticationServer.getSocketAddress().getPort());
@@ -84,7 +84,7 @@ public class AuthenticationServerTest extends ServiceTestBase {
 
   @AfterClass
   public static void shutDown() {
-    handlerServer.stopAndWait();
+    externalHandlerServer.stopAndWait();
     externalAuthenticationServer.stopAndWait();
   }
 
