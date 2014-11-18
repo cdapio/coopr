@@ -7,25 +7,21 @@ var helper = require('../../protractor-help');
 
 describe('imagetypes types test', function () {
 
-  var hardwareTypes;
+  var imageTypes,
+      image;
 
   it('should log in', function () {
     helper.loginAsAdmin();
   });
-  
-  it('should show no imagetype types', function () {
-    hardwareTypes = element.all(by.repeater('item in list'));
-    expect(hardwareTypes.count()).toEqual(0);
-  });
 
   it('should create a imagetype type', function () {
     browser.get('/imagetypes/create');
-    
+
     expect(
       browser.getLocationAbsUrl()
     ).toMatch(/\/imagetypes\/create$/);
-
-    element(by.css('#inputImageName')).sendKeys('foo');
+    image = Date.now() + '-image';
+    element(by.css('#inputImageName')).sendKeys(image);
     element(by.css('#inputImageDescription')).sendKeys('bar');
     element(by.partialButtonText('Create')).click();
 
@@ -35,23 +31,38 @@ describe('imagetypes types test', function () {
   });
 
   it('should verify a imagetype type', function () {
-    browser.get('/imagetypes');
-    hardwareTypes = element.all(by.repeater('item in list'));
-    expect(hardwareTypes.count()).toEqual(1);
+    browser.get('/imagetypes/edit/' + image);
 
-    browser.get('/imagetypes/edit/foo');
-
-    expect(element(by.css('#inputImageName')).getAttribute('value')).toBe('foo');
+    expect(element(by.css('#inputImageName')).getAttribute('value')).toBe(image);
     expect(element(by.css('#inputImageDescription')).getAttribute('value')).toBe('bar');
   });
 
   it('should delete imagetype', function () {
     browser.get('/imagetypes');
-    hardwareTypes = element.all(by.repeater('item in list'));
-    hardwareTypes.first().element(by.cssContainingText('.btn', 'Delete')).click();
-    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
-    hardwareTypes = element.all(by.repeater('item in list'));
-    expect(hardwareTypes.count()).toEqual(0);
+    var selectedImage;
+    var imageNames = element.all(by.repeater('item in list').column("item.name"));
+
+    imageCount = imageNames.count();
+    imageNames
+      .then(function(s) {
+        s.forEach(function(item, index) {
+          item.getText().then(function(text) {
+            if (text === image) {
+              selectedImage = item;
+            }
+          });
+        });
+      })
+      .then(function() {
+        selectedImage.element(by.xpath("ancestor::tr"))
+          .element(by.cssContainingText('.btn', 'Delete')).click();
+        element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
+      });
+    expect(imageCount.then(function(i) {
+      return i - 1;
+    })).toBe(
+      imageNames.count()
+    ); //Lame..
   });
 
 
@@ -60,5 +71,3 @@ describe('imagetypes types test', function () {
   });
 
 });
-
-
