@@ -8,6 +8,8 @@ module.exports = {
 
   login: login,
 
+  deleteAssetFromList: deleteAssetFromList,
+
   loginAsAdmin: function() {
     login('superadmin', 'admin', 'admin');
   }
@@ -26,6 +28,25 @@ function login(tenant, username, password) {
   element(by.partialButtonText('Submit')).click();
   expect(element(by.css('header .dropdown-toggle .fa-user')).isPresent()).toBe(true);
 
+}
+
+function deleteAssetFromList(list, name) {
+  var selectedItem;
+  list
+    .then(function(s) {
+      s.forEach(function(item, index) {
+        item.getText().then(function(text) {
+          if (text === name) {
+            selectedItem = item;
+          }
+        });
+      });
+    })
+    .then(function() {
+      selectedItem.element(by.xpath("ancestor::tr"))
+        .element(by.cssContainingText('.btn', 'Delete')).click();
+      element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
+    });
 }
 
 
