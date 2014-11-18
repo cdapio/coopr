@@ -124,6 +124,10 @@ echo $! > $mockpid
 sleep 10
 pushd $E2E_DIR && npm run loadmock || { die 'Problem loading mocks'; }
 
+curl https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip > BrowserStackLocal-linux-x64.zip \
+&& unzip BrowserStackLocal-linux-x64.zip \
+&& bash BrowserStackLocal $BROWSER_STACK_ACCESS_KEY localhost,8080,0 && sleep 10
+
 popd && pushd $E2E_DIR
 npm run protractor
 
