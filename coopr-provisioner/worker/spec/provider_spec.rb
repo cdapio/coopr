@@ -17,13 +17,13 @@ describe Provider do
     @task = instance_variable_get("@task_#{taskname}")
     context "when taskName is #{taskname}" do
       describe '#new' do
-        it "creates an instance of Provider" do
+        it 'creates an instance of Provider' do
           expect(instance_variable_get("@provider_#{taskname}")).to be_an_instance_of Provider
         end
-        it "creates task instance variable" do
+        it 'creates task instance variable' do
           expect(instance_variable_get("@provider_#{taskname}").task).to eql instance_variable_get("@task_#{taskname}")
         end
-        it "creates empty result hash" do
+        it 'creates empty result hash' do
           expect(instance_variable_get("@provider_#{taskname}").result).to be_empty
         end
       end
