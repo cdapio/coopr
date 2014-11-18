@@ -43,21 +43,7 @@ describe('imagetypes types test', function () {
     var imageNames = element.all(by.repeater('item in list').column("item.name"));
 
     imageCount = imageNames.count();
-    imageNames
-      .then(function(s) {
-        s.forEach(function(item, index) {
-          item.getText().then(function(text) {
-            if (text === image) {
-              selectedImage = item;
-            }
-          });
-        });
-      })
-      .then(function() {
-        selectedImage.element(by.xpath("ancestor::tr"))
-          .element(by.cssContainingText('.btn', 'Delete')).click();
-        element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
-      });
+    helper.deleteAssetFromList(imageNames, image);
     expect(imageCount.then(function(i) {
       return i - 1;
     })).toBe(

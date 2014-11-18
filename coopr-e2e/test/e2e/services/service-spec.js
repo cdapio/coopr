@@ -8,7 +8,7 @@ var helper = require('../../protractor-help');
 describe('services test', function () {
 
   var services,
-      serviceName;
+      service;
 
   it('should log in', function () {
     helper.loginAsAdmin();
@@ -21,8 +21,8 @@ describe('services test', function () {
       browser.getLocationAbsUrl()
     ).toMatch(/\/services\/create$/);
 
-    serviceName = Date.now() + '-service';
-    element(by.css('#inputServiceName')).sendKeys(serviceName);
+    service = Date.now() + '-service';
+    element(by.css('#inputServiceName')).sendKeys(service);
     element(by.css('#inputServiceDescription')).sendKeys('bar');
 
     element(by.cssContainingText('.my-thing-picker a.btn-warning:not([disabled])', 'add feature')).click();
@@ -58,8 +58,8 @@ describe('services test', function () {
   });
 
   it('should verify a service', function () {
-    browser.get('/services/edit/' + serviceName);
-    expect(element(by.css('#inputServiceName')).getAttribute('value')).toBe(serviceName);
+    browser.get('/services/edit/' + service);
+    expect(element(by.css('#inputServiceName')).getAttribute('value')).toBe(service);
     expect(element(by.css('#inputServiceDescription')).getAttribute('value')).toBe('bar');
     var provides = element.all(by.repeater('name in model'));
     expect(provides.count()).toEqual(2);
@@ -77,21 +77,7 @@ describe('services test', function () {
     var serviceNames = element.all(by.repeater('item in list').column("item.name"));
 
     servicesCount = serviceNames.count();
-    serviceNames
-      .then(function(s) {
-        s.forEach(function(item, index) {
-          item.getText().then(function(text) {
-            if (text === serviceName) {
-              selectedService = item;
-            }
-          });
-        });
-      })
-      .then(function() {
-        selectedService.element(by.xpath("ancestor::tr"))
-          .element(by.cssContainingText('.btn', 'Delete')).click();
-        element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
-      });
+    helper.deleteAssetFromList(serviceNames, service);
     expect(servicesCount.then(function(i) {
       return i - 1;
     })).toBe(

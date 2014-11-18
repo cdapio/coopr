@@ -45,21 +45,8 @@ describe('hardware types test', function () {
     hardwareNames = element.all(by.repeater('item in list').column("item.name"));
     hardwareCount = hardwareNames.count();
 
-    hardwareNames
-      .then(function(s) {
-        s.forEach(function(item, index) {
-          item.getText().then(function(text) {
-            if (text === hardware) {
-              selectedHardware = item;
-            }
-          });
-        });
-      })
-      .then(function() {
-        selectedHardware.element(by.xpath("ancestor::tr"))
-          .element(by.cssContainingText('.btn', 'Delete')).click();
-        element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
-      });
+    helper.deleteAssetFromList(hardwareNames, hardware);
+
     expect(hardwareCount.then(function(i) {
       return i - 1;
     })).toBe(
