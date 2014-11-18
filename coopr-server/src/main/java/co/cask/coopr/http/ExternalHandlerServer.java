@@ -24,6 +24,7 @@ import co.cask.coopr.common.conf.Constants;
 import co.cask.http.HttpHandler;
 import co.cask.http.NettyHttpService;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 
 import java.util.Set;
@@ -34,7 +35,7 @@ import java.util.Set;
 public class ExternalHandlerServer extends HandlerServer {
 
   @Inject
-  private ExternalHandlerServer(Set<HttpHandler> handlers, Configuration conf,
+  private ExternalHandlerServer(@Named("External") Set<HttpHandler> handlers, Configuration conf,
                                 final CConfiguration cConf,
                                 final TokenValidator tokenValidator,
                                 final AccessTokenTransformer accessTokenTransformer,
