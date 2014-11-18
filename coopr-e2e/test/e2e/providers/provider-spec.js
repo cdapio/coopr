@@ -6,8 +6,9 @@ var helper = require('../../protractor-help');
 
 describe('providers test', function () {
   var formfields;
-  var providersList;
-  
+  var providersList,
+      provider;
+
   it('should log in', function () {
     helper.loginAsAdmin();
   });
@@ -39,9 +40,10 @@ describe('providers test', function () {
     expect(zone).toEqual('5');
   });
 
-  it('should create, store and delete a provider', function () {
+  it('should create a provider', function () {
     // Create
-    element(by.name('name')).sendKeys('Testprovider');
+    provider = Date.now() + '-provider';
+    element(by.name('name')).sendKeys(provider);
     element(by.css('#inputProviderDescription')).sendKeys('Test description');
     element(by.cssContainingText('option', 'google')).click();
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
@@ -55,19 +57,20 @@ describe('providers test', function () {
       browser.getLocationAbsUrl()
     ).toMatch(/\/providers$/);
 
+  });
+
+  it('should edit a provider', function() {
+    var providerNames;
 
     // List
-    providersList = element.all(by.repeater('item in list'));
-    expect(providersList.count()).toEqual(1);
-    var providerText = providersList.first().getText();
-    expect(providerText).toMatch('Testprovider Test description Edit\nDelete');
-    providersList.first().element(by.cssContainingText('.btn', 'Edit')).click();
+    providerNames = element.all(by.repeater('item in list').column('item.name'));
+    helper.editAssetFromList(providerNames, provider);
 
     // Edit
     expect(
       browser.getLocationAbsUrl()
-    ).toMatch(/\/providers\/edit\/Testprovider$/);
-    expect(element(by.css('#inputProviderName')).getAttribute('value')).toBe('Testprovider');
+    ).toMatch(new RegExp('/providers/edit/'+ provider + '$' ));
+    expect(element(by.css('#inputProviderName')).getAttribute('value')).toBe(provider);
     expect(
       element(by.css('#inputProviderDescription')).getAttribute('value')).toBe('Test description');
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
@@ -75,25 +78,23 @@ describe('providers test', function () {
     expect(size).toEqual('10');
     var zone = formfields.get(6).element(by.css('select')).getAttribute('value');
     expect(zone).toEqual('5');
-
-    // Delete
-    browser.get('/providers');
-    providersList = element.all(by.repeater('item in list'));
-    providersList.first().element(by.cssContainingText('.btn', 'Delete')).click();
-    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
-    providersList = element.all(by.repeater('item in list'));
-    expect(providersList.count()).toEqual(0);
   });
-  
-  it('should show a list of providers', function () {
+
+  it('should delete a provider', function() {
+    var selectedService,
+        servicesCount;
     browser.get('/providers');
+      provider = "1416350481883-provider";
+    var providerNames = element.all(by.repeater('item in list').column("item.name"));
 
-    expect(
-      browser.getLocationAbsUrl()
-    ).toMatch(/\/providers$/);
+    providersCount = providerNames.count();
+    helper.deleteAssetFromList(providerNames, provider);
+    expect(providersCount.then(function(i) {
+      return i - 1;
+    })).toBe(
+      providerNames.count()
+    ); //Lame..
 
-    providersList = element.all(by.repeater('item in list'));
-    expect(providersList.count()).toEqual(0);
   });
 
   it('should logout', function () {
@@ -101,4 +102,3 @@ describe('providers test', function () {
   });
 
 });
-
