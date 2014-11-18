@@ -4,10 +4,11 @@ SOURCE="${BASH_SOURCE[0]}"
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 COOPR_HOME=${COOPR_HOME:-"$(dirname "$DIR")"};
+echo "Home is ${COOPR_HOME}"
 SERVER_PORT=55054
-SERVER_DIR="coopr-server"
-E2E_DIR="coopr-e2e"
-UI_DIR="coopr-ngui"
+SERVER_DIR="${COOPR_HOME}/coopr-server"
+E2E_DIR="${COOPR_HOME}/coopr-e2e"
+UI_DIR="${COOPR_HOME}/coopr-ngui"
 COOPR_SERVER_CONF=${COOPR_SERVER_CONF:-"$COOPR_HOME/$E2E_DIR/config"}
 CLASSPATH="${COOPR_HOME}/${SERVER_DIR}/target/*:${COOPR_SERVER_CONF}"
 MOCK_MAIN_CLASS="co.cask.coopr.runtime.MockProvisionerMain"
@@ -25,8 +26,6 @@ die ( ) {
   echo
   exit 1
 }
-
-echo $COOPR_HOME
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
