@@ -10,6 +10,8 @@ module.exports = {
 
   deleteAssetFromList: deleteAssetFromList,
 
+  editAssetFromList: editAssetFromList,
+
   loginAsAdmin: function() {
     login('superadmin', 'admin', 'admin');
   }
@@ -48,6 +50,25 @@ function deleteAssetFromList(list, name) {
       element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
     });
 }
+
+function editAssetFromList(list, name) {
+  var selectedItem;
+  list
+    .then(function(s) {
+      s.forEach(function(item, index) {
+        item.getText().then(function(text) {
+          if (text === name) {
+            selectedItem = item;
+          }
+        });
+      });
+    })
+    .then(function() {
+      selectedItem.element(by.xpath("ancestor::tr"))
+        .element(by.cssContainingText('.btn', 'Edit')).click();
+    });
+}
+
 
 
 function logout() {
