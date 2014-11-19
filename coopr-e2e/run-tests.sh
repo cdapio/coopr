@@ -152,7 +152,7 @@ echo $! > $uipid
 popd
 
 curl https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip > $COOPR_HOME/BrowserStackLocal-linux-x64.zip
-unzip $COOPR_HOME/BrowserStackLocal-linux-x64.zip -d $COOPR_HOME
+unzip $COOPR_HOME/BrowserStackLocal-linux-x64.zip -d $COOPR_HOME 2>&1 > /dev/null < /dev/null &
 sleep 5
 $COOPR_HOME/BrowserStackLocal $BROWSER_STACK_ACCESS_PASSWORD localhost,8080,0 2>&1 > /dev/null < /dev/null &
 echo $! > $browserstackpid
