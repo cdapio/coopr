@@ -33,7 +33,8 @@ describe('hardware types test', function () {
 
   it('should verify a hardware type', function () {
     browser.get('/hardwaretypes');
-    browser.get('/hardwaretypes/edit/' + hardware);
+    var hardwareNames = element.all(by.repeater('item in list').column("item.name"));
+    helper.editAssetFromList(hardwareNames, hardware);
 
     expect(element(by.css('#inputHardwareName')).getAttribute('value')).toBe(hardware);
     expect(element(by.css('#inputHardwareDescription')).getAttribute('value')).toBe('bar');

@@ -58,7 +58,11 @@ describe('services test', function () {
   });
 
   it('should verify a service', function () {
-    browser.get('/services/edit/' + service);
+    //browser.get('/services/edit/' + service);
+    browser.get('/services');
+
+    var serviceNames = element.all(by.repeater('item in list').column("item.name"));
+    helper.editAssetFromList(serviceNames, service);
     expect(element(by.css('#inputServiceName')).getAttribute('value')).toBe(service);
     expect(element(by.css('#inputServiceDescription')).getAttribute('value')).toBe('bar');
     var provides = element.all(by.repeater('name in model'));
@@ -71,10 +75,8 @@ describe('services test', function () {
 
   it('should delete service', function () {
     browser.get('/services');
-    var selectedService,
-        servicesCount;
-
-    var serviceNames = element.all(by.repeater('item in list').column("item.name"));
+    var servicesCount,
+        serviceNames = element.all(by.repeater('item in list').column("item.name"));
 
     servicesCount = serviceNames.count();
     helper.deleteAssetFromList(serviceNames, service);

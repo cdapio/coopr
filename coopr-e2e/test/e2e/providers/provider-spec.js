@@ -84,7 +84,6 @@ describe('providers test', function () {
     var selectedService,
         servicesCount;
     browser.get('/providers');
-      provider = "1416350481883-provider";
     var providerNames = element.all(by.repeater('item in list').column("item.name"));
 
     providersCount = providerNames.count();

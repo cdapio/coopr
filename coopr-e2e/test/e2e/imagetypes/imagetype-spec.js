@@ -31,7 +31,9 @@ describe('imagetypes types test', function () {
   });
 
   it('should verify a imagetype type', function () {
-    browser.get('/imagetypes/edit/' + image);
+    browser.get('/imagetypes');
+    var imageNames = element.all(by.repeater('item in list').column("item.name"));
+    helper.editAssetFromList(imageNames, image);
 
     expect(element(by.css('#inputImageName')).getAttribute('value')).toBe(image);
     expect(element(by.css('#inputImageDescription')).getAttribute('value')).toBe('bar');
