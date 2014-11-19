@@ -31,10 +31,10 @@ public class ClusterTaskFilter {
   private final Long start;
   private final Long end;
   private final MetricService.Periodicity periodicity;
-  private final MetricService.Timeunit timeunit;
+  private final MetricService.TimeUnit timeUnit;
 
   public ClusterTaskFilter(String tenantId, String userId, String clusterId, String clusterTemplate, Long start,
-                           Long end, MetricService.Periodicity periodicity, MetricService.Timeunit timeunit) {
+                           Long end, MetricService.Periodicity periodicity, MetricService.TimeUnit timeUnit) {
     this.tenantId = tenantId;
     this.userId = userId;
     this.clusterId = clusterId;
@@ -42,7 +42,7 @@ public class ClusterTaskFilter {
     this.start = start;
     this.end = end;
     this.periodicity = periodicity;
-    this.timeunit = timeunit;
+    this.timeUnit = timeUnit;
   }
 
   /**
@@ -116,13 +116,13 @@ public class ClusterTaskFilter {
   }
 
   /**
-   * Retrieves {@link MetricService.Timeunit} of this filter.
+   * Retrieves {@link co.cask.coopr.metrics.MetricService.TimeUnit} of this filter.
    * This field is ignored if its value is {@code null}.
    *
    * @return timeunit
    */
-  public MetricService.Timeunit getTimeunit() {
-    return timeunit;
+  public MetricService.TimeUnit getTimeUnit() {
+    return timeUnit;
   }
 
   @Override
@@ -135,7 +135,7 @@ public class ClusterTaskFilter {
       .add("start", start)
       .add("end", end)
       .add("periodicity", periodicity)
-      .add("timeunit", timeunit)
+      .add("timeunit", timeUnit)
       .toString();
   }
 }

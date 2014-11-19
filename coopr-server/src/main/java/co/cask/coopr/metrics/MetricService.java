@@ -25,10 +25,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Util for performing metric operations.
@@ -43,7 +40,7 @@ public class MetricService {
     year
   }
 
-  public enum Timeunit {
+  public enum TimeUnit {
     seconds,
     minutes,
     hours,
@@ -75,7 +72,7 @@ public class MetricService {
     List<ClusterTask> tasks = clusterStore.getClusterTasks(filter);
     Long start = filter.getStart();
     Long end = filter.getEnd();
-    long timeunit = getDivider(filter.getTimeunit() != null ? filter.getTimeunit() : Timeunit.seconds);
+    long timeunit = getDivider(filter.getTimeUnit() != null ? filter.getTimeUnit() : TimeUnit.seconds);
     if (tasks.isEmpty()) {
       long startTime = start != null ? start : 0;
       return validate(new TimeSeries(startTime, end != null ? end : System.currentTimeMillis(),
@@ -118,7 +115,7 @@ public class MetricService {
    * Validates {@code rawTimeSeries} using specified {@code timeunit}
    *
    * @param rawTimeSeries the raw {@link TimeSeries}
-   * @param timeunit the {@link MetricService.Timeunit}
+   * @param timeunit the {@link co.cask.coopr.metrics.MetricService.TimeUnit}
    * @return validated {@link TimeSeries}
    */
   private TimeSeries validate(TimeSeries rawTimeSeries, long timeunit) {
@@ -220,8 +217,8 @@ public class MetricService {
     }
   }
 
-  private long getDivider(Timeunit timeunit) {
-    switch (timeunit) {
+  private long getDivider(TimeUnit timeUnit) {
+    switch (timeUnit) {
       case seconds:
         return DateUtils.MILLIS_PER_SECOND;
       case minutes:

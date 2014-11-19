@@ -20,7 +20,6 @@ import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.metrics.MetricService;
 import co.cask.coopr.metrics.TimeSeries;
-import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterTaskFilter;
@@ -119,11 +118,11 @@ public class MetricHandler extends AbstractAuthHandler {
                            String.format("Incorrect value for field groupby: %s", filters.get("groupby")));
       return;
     }
-    MetricService.Timeunit timeunit = null;
+    MetricService.TimeUnit timeUnit = null;
     try {
-      String rawTimeunit = filters.get("timeunit");
-      if (rawTimeunit != null) {
-        timeunit = MetricService.Timeunit.valueOf(rawTimeunit);
+      String rawTimeUnit = filters.get("timeunit");
+      if (rawTimeUnit != null) {
+        timeUnit = MetricService.TimeUnit.valueOf(rawTimeUnit);
       }
     } catch (IllegalArgumentException e) {
       responder.sendString(HttpResponseStatus.BAD_REQUEST,
@@ -132,7 +131,7 @@ public class MetricHandler extends AbstractAuthHandler {
     }
     ClusterTaskFilter filter = new ClusterTaskFilter(tenant, filters.get("user"), filters.get("cluster"),
                                                      filters.get("clustertemplate"), startTime,
-                                                     endTime, periodicity, timeunit);
+                                                     endTime, periodicity, timeUnit);
     try {
       TimeSeries result = new MetricService(clusterStore).getNodesUsage(filter);
       responder.sendJson(HttpResponseStatus.OK, result, TimeSeries.class, gson);
