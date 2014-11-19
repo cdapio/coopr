@@ -52,10 +52,8 @@ module Coopr
       log.info "provisioner #{@provisioner_id} initialized"
       @registered = false
       Logging.process_name = @provisioner_id
-
-      pem_path = config.get('trust.cert.path')
-      pem_pass = config.get('trust.cert.pass')
-      @rest_helper = Coopr::RestHelper.new(pem_path, pem_pass)
+      Coopr::RestHelper.cert_path = config.get(TRUST_CERT_PATH)
+      Coopr::RestHelper.cert_pass = config.get(TRUST_CERT_PASS)
     end
 
     # invoked from bin/provisioner
@@ -63,7 +61,6 @@ module Coopr
       # read configuration
       config = Config.new(options)
       config.load
-
       # initialize logging
       Logging.configure(config.get(PROVISIONER_LOG_DIR) ? "#{config.get(PROVISIONER_LOG_DIR)}/provisioner.log" : nil)
       Logging.level = config.get(PROVISIONER_LOG_LEVEL)
@@ -198,7 +195,7 @@ module Coopr
           uri = "#{@server_uri}/v2/provisioners/#{provisioner_id}/heartbeat"
           begin
             json = heartbeat.to_json
-            resp = @rest_helper.post("#{uri}", json, :'Coopr-UserID' => "admin")
+            resp = Coopr::RestHelper.post("#{uri}", json, :'Coopr-UserID' => "admin")
             unless resp.code == 200
               if(resp.code == 404)
                 log.warn "Response code #{resp.code} when sending heartbeat, re-registering provisioner"
@@ -246,7 +243,7 @@ module Coopr
       log.info "Registering with server at #{uri}: #{data.to_json}"
 
       begin
-        resp = @rest_helper.put("#{uri}", data.to_json, :'Coopr-UserID' => "admin")
+        resp = Coopr::RestHelper.put("#{uri}", data.to_json, :'Coopr-UserID' => "admin")
         if(resp.code == 200)
           log.info "Successfully registered"
           @registered = true
@@ -274,7 +271,7 @@ module Coopr
       uri = "#{@server_uri}/v2/provisioners/#{@provisioner_id}"
       log.info "Unregistering with server at #{uri}"
       begin
-        resp = @rest_helper.delete("#{uri}", :'Coopr-UserID' => "admin")
+        resp = Coopr::RestHelper.delete("#{uri}", :'Coopr-UserID' => "admin")
         if(resp.code == 200)
           log.info "Successfully unregistered"
         else

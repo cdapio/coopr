@@ -10,7 +10,6 @@ group :dependencies do
   gem 'rest_client', '~> 1.7'
   gem 'sinatra', "~> 1.4"
   gem 'thin', "~> 1.6"
-  gem 'openssl'
 end
 
 group :test do

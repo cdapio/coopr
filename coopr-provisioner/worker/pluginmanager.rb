@@ -23,12 +23,11 @@ require_relative '../master/lib/provisioner/rest-helper'
 
 class PluginManager
   attr_accessor :providermap, :automatormap, :tasks, :load_errors, :register_errors
-  def initialize(pem_path, pem_pass)
+  def initialize()
     @load_errors = Array.new
     @register_errors = Array.new
     @providermap = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     @automatormap = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
-    @rest_helper = Coopr::RestHelper.new(pem_path, pem_pass)
     scan_plugins()
   end
 
@@ -117,7 +116,7 @@ class PluginManager
     begin
       log.debug "registering provider/automator type: #{name}"
       json = JSON.generate(json_obj)
-      resp = @rest_helper.put("#{uri}", json, :'Coopr-UserID' => "admin", :'Coopr-TenantID' => "superadmin")
+      resp = Coopr::RestHelper.put("#{uri}", json, :'Coopr-UserID' => "admin", :'Coopr-TenantID' => "superadmin")
       if(resp.code == 200)
         log.info "Successfully registered #{name}"
       else

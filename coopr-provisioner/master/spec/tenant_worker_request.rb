@@ -16,9 +16,7 @@
 # limitations under the License.
 #
 
-
 require 'json'
-require 'rest_client'
 require_relative '../lib/provisioner/rest-helper'
 
 id = ARGV.shift
@@ -47,18 +45,15 @@ data['workers'] = num_workers.to_i
 #    ]
 
 begin
-  @rest_helper = Coopr::RestHelper.new(nil, nil)
-
   json = JSON.generate(data)
-  resp = @rest_helper.put("http://localhost:55056/v2/tenants/#{id}", json)
-  if(resp.code == 200)
-    puts "success: 200"
+  resp = Coopr::RestHelper.put("http://localhost:55056/v2/tenants/#{id}", json)
+  if (resp.code == 200)
+    puts 'success: 200'
   else
     puts "response code: #{resp.code}"
   end
 rescue => e
-  puts "Caught exception"
+  puts 'Caught exception'
   puts e.inspect
   puts e.backtrace
 end
-
