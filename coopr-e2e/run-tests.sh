@@ -25,6 +25,7 @@ die ( ) {
   echo
   echo "$*"
   echo
+  cleanup
   exit 1
 }
 
@@ -84,6 +85,19 @@ check() {
     fi
   fi
 }
+
+cleanup() {
+  stop $mockpid
+  stop $uipid
+  stop $serverpid
+  stop $browserstackpid
+  rm -r $PID_DIR
+
+  # replace backup server file with main config
+  mv "${COOPR_SERVER_CONF}/coopr-site.xml.bak" "${COOPR_SERVER_CONF}/coopr-site.xml"
+}
+
+trap cleanup EXIT
 
 # Check if servers are running before starting.
 if [ ! -d "${PID_DIR}" ] ; then
@@ -148,15 +162,7 @@ pushd $E2E_DIR
 npm run build
 npm run protractor
 
-stop $mockpid
-stop $uipid
-stop $serverpid
-stop $browserstackpid
-rm -r $PID_DIR
-
-# replace backup server file with main config
-mv "${COOPR_SERVER_CONF}/coopr-site.xml.bak" "${COOPR_SERVER_CONF}/coopr-site.xml"
-
+cleanup
 
 exit $?
 
