@@ -20,12 +20,12 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * {@link SyncPluginCommand} class test.
+ * {@link SyncResourcesCommand} class test.
  */
-public class SyncPluginCommandTest extends AbstractTest {
+public class SyncResourcesCommandTest extends AbstractTest {
 
   private static final String INPUT =
-    String.format("sync plugins");
+    String.format("sync resources");
 
   @Test
   public void testExecute() throws Exception {
