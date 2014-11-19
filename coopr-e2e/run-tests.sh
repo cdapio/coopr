@@ -141,13 +141,14 @@ echo $! > $uipid
 
 popd
 
-curl https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip > BrowserStackLocal-linux-x64.zip \
-&& unzip BrowserStackLocal-linux-x64.zip
+curl https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip > $COOPR_HOME/BrowserStackLocal-linux-x64.zip \
+&& unzip $COOPR_HOME/BrowserStackLocal-linux-x64.zip
 $COOPR_HOME/BrowserStackLocal $BROWSER_STACK_ACCESS_KEY localhost,8080,0 2>&1 > /dev/null < /dev/null &
 echo $! > $browserstackpid
 sleep 10
 
 pushd $E2E_DIR
+npm run build
 npm run protractor
 
 stop $mockpid
