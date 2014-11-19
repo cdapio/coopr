@@ -114,7 +114,7 @@ sed -i.bak s/COOPR_SERVER_PORT/$SERVER_PORT/g "${COOPR_SERVER_CONF}/coopr-site.x
 
 
 echo "Building Server"
-# mvn clean package assembly:single -DskipTests
+mvn clean package assembly:single -DskipTests
 popd
 
 echo "Starting Server"
