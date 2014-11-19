@@ -32,7 +32,3 @@ wait for server to start
 * `cd coopr-e2e`
 * `npm run build`
 * `npm run protractor`
-
-### Alternatively there is a utility script that runs tests for you:
-* `cd coopr-e2e`
-* `./run-tests.sh`
