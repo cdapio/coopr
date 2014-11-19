@@ -26,9 +26,11 @@ import co.cask.http.HttpHandler;
 import co.cask.http.NettyHttpService;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * Netty service for running the server that manages internal API.
@@ -36,12 +38,12 @@ import java.util.Arrays;
 public class InternalHandlerServer extends HandlerServer {
 
   @Inject
-  private InternalHandlerServer(TaskHandler handler, Configuration conf,
+  private InternalHandlerServer(@Named("Internal") Set<HttpHandler> handlers, Configuration conf,
                                 final CConfiguration cConf,
                                 final TokenValidator tokenValidator,
                                 final AccessTokenTransformer accessTokenTransformer,
                                 final DiscoveryServiceClient discoveryServiceClient) {
-    super(Sets.<HttpHandler>newHashSet(Arrays.asList(handler)), conf, Constants.INTERNAL_PORT,
+    super(handlers, conf, Constants.INTERNAL_PORT,
           cConf, tokenValidator, accessTokenTransformer, discoveryServiceClient);
   }
 
