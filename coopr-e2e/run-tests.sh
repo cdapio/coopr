@@ -93,10 +93,6 @@ check $serverpid
 check $mockpid
 check $uipid
 
-if [[ $DIR == *$E2E_DIR* ]]; then
-  pushd ../
-fi
-
 
 pushd $SERVER_DIR
 
