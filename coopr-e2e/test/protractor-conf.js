@@ -7,7 +7,7 @@ var config = {
 
   capabilities: {
     'browserstack.user': process.env.BROWSER_STACK_USERNAME,
-    'browserstack.key': process.env.BROWSER_STACK_ACCESS_KEY,
+    'browserstack.key': process.env.BROWSER_STACK_ACCESS_KEY || process.env.BROWSER_STACK_ACCESS_PASSWORD,
     'browserstack.local': 'true',
     'browserstack.debug': 'true',
     'browserstack.tunnel': 'true',
