@@ -1,7 +1,7 @@
 <configuration> 
 	<property>
 		<name>server.port</name>
-		<value>55054</value>
+		<value>COOPR_SERVER_PORT</value>
 	</property>
  	<property>
    		<name>server.local.data.dir</name>

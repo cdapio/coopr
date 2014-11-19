@@ -32,7 +32,7 @@ var config = {
   }
 };
 
-if (process.env.TRAVIS) {
+if (process.env.PROTRACTOR_PRODUCTION) {
   
   config.seleniumAddress =  'http://hub.browserstack.com/wd/hub';
   

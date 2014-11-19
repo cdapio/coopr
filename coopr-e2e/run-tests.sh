@@ -5,20 +5,21 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 COOPR_HOME=${COOPR_HOME:-"$(dirname "$DIR")"};
 echo "Home is ${COOPR_HOME}"
-SERVER_PORT=55054
 SERVER_DIR="${COOPR_HOME}/coopr-server"
 E2E_DIR="${COOPR_HOME}/coopr-e2e"
 UI_DIR="${COOPR_HOME}/coopr-ngui"
-COOPR_SERVER_CONF=${COOPR_SERVER_CONF:-"$COOPR_HOME/$E2E_DIR/config"}
-CLASSPATH="${COOPR_HOME}/${SERVER_DIR}/target/*:${COOPR_SERVER_CONF}"
+COOPR_SERVER_CONF=${COOPR_SERVER_CONF:-"$E2E_DIR/config"}
+CLASSPATH="${SERVER_DIR}/target/*:${COOPR_SERVER_CONF}"
 MOCK_MAIN_CLASS="co.cask.coopr.runtime.MockProvisionerMain"
 MAIN_CLASS="co.cask.coopr.runtime.ServerMain"
 RAND_NUM=$(( $RANDOM % 99999))
 PID_DIR=${PID_DIR:-"/var/tmp/coopr-e2e"$RAND_NUM}
+export PROTRACTOR_PRODUCTION=true
 
 serverpid="${PID_DIR}/coopr-server.pid"
 mockpid="${PID_DIR}/mock-provisioner.pid"
 uipid="${PID_DIR}/ui.pid"
+browserstackpid="${PID_DIR}/browserstack.pid"
 
 die ( ) {
   echo
@@ -96,16 +97,24 @@ if [[ $DIR == *$E2E_DIR* ]]; then
   pushd ../
 fi
 
-pushd $UI_DIR
-echo "Starting UI"
-npm run build || die 'Problem building UI'
-nohup nice -1 node ./server.js 2>&1 > /dev/null < /dev/null &
-echo $! > $uipid
 
-popd && pushd $SERVER_DIR
+pushd $SERVER_DIR
+
+# find an open port
+for SERVER_PORT in $(seq 55000 65000);
+  do echo -ne "\035" | telnet 127.0.0.1 $SERVER_PORT > /dev/null 2>&1; [ $? -eq 1 ] && break;
+done
+
+# set COOPR server uri
+export COOPR_SERVER_URI="http://127.0.0.1:${SERVER_PORT}"
+echo "COOPR_SERVER_URI is ${COOPR_SERVER_URI}"
+
+# replace config file with new port
+sed -i.bak s/COOPR_SERVER_PORT/$SERVER_PORT/g "${COOPR_SERVER_CONF}/coopr-site.xml"
+
 
 echo "Building Server"
-mvn clean package assembly:single -DskipTests
+# mvn clean package assembly:single -DskipTests
 popd
 
 echo "Starting Server"
@@ -116,26 +125,40 @@ nohup nice -1 "$JAVACMD" -classpath "$CLASSPATH" ${MAIN_CLASS} \
 echo $! > $serverpid
 
 echo "Starting Mock Provisioner"
-nohup nice -1 "$JAVACMD" -classpath "$CLASSPATH" ${MOCK_MAIN_CLASS} -p "$SERVER_PORT" \
+nohup nice -1 "$JAVACMD" -classpath "$CLASSPATH" ${MOCK_MAIN_CLASS} -p "${SERVER_PORT}" \
   2>&1 > /dev/null < /dev/null &
 echo $! > $mockpid
 
 # give server generous time to start
 sleep 10
-pushd $E2E_DIR && npm run loadmock || { die 'Problem loading mocks'; }
+sh "${SERVER_DIR}/templates/mock/load-mock.sh" || { die 'Problem loading mocks'; }
+
+pushd $UI_DIR
+echo "Starting UI"
+npm run build || die 'Problem building UI'
+nohup nice -1 node ./server.js 2>&1 > /dev/null < /dev/null &
+echo $! > $uipid
+
+popd
 
 curl https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip > BrowserStackLocal-linux-x64.zip \
-&& unzip BrowserStackLocal-linux-x64.zip \
-&& bash BrowserStackLocal $BROWSER_STACK_ACCESS_KEY localhost,8080,0 && sleep 10
+&& unzip BrowserStackLocal-linux-x64.zip
+$COOPR_HOME/BrowserStackLocal $BROWSER_STACK_ACCESS_KEY localhost,8080,0 2>&1 > /dev/null < /dev/null &
+echo $! > $browserstackpid
+sleep 10
 
-popd && pushd $E2E_DIR
+pushd $E2E_DIR
 npm run protractor
 
 stop $mockpid
 stop $uipid
 stop $serverpid
-
+stop $browserstackpid
 rm -r $PID_DIR
+
+# replace backup server file with main config
+mv "${COOPR_SERVER_CONF}/coopr-site.xml.bak" "${COOPR_SERVER_CONF}/coopr-site.xml"
+
 
 exit $?
 
