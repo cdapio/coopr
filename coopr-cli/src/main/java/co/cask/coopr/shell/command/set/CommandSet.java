@@ -65,7 +65,7 @@ import co.cask.coopr.shell.command.StageProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.StartServiceOnClusterCommand;
 import co.cask.coopr.shell.command.StopServiceOnClusterCommand;
 import co.cask.coopr.shell.command.SyncClusterTemplateCommand;
-import co.cask.coopr.shell.command.SyncPluginCommand;
+import co.cask.coopr.shell.command.SyncResourcesCommand;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Injector;
 
@@ -146,7 +146,7 @@ public class CommandSet {
       injector.getInstance(RecallProviderTypeResourcesCommand.class),
       injector.getInstance(StageAutomatorTypeResourcesCommand.class),
       injector.getInstance(StageProviderTypeResourcesCommand.class),
-      injector.getInstance(SyncPluginCommand.class)
+      injector.getInstance(SyncResourcesCommand.class)
     );
     return new co.cask.common.cli.CommandSet<Command>(commands);
   }
