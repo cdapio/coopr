@@ -60,11 +60,9 @@ describe('providers test', function () {
   });
 
   it('should edit a provider', function() {
-    var providerNames;
 
-    // List
-    providerNames = element.all(by.repeater('item in list').column('item.name'));
-    helper.editAssetFromList(providerNames, provider);
+    element(by.cssContainingText('tr', provider))
+      .element(by.cssContainingText('.btn', 'Edit')).click();
 
     // Edit
     expect(
@@ -81,18 +79,12 @@ describe('providers test', function () {
   });
 
   it('should delete a provider', function() {
-    var selectedService,
-        servicesCount;
     browser.get('/providers');
-    var providerNames = element.all(by.repeater('item in list').column("item.name"));
+    element(by.cssContainingText('tr', provider))
+      .element(by.cssContainingText('.btn', 'Delete')).click();
+    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
 
-    providersCount = providerNames.count();
-    helper.deleteAssetFromList(providerNames, provider);
-    expect(providersCount.then(function(i) {
-      return i - 1;
-    })).toBe(
-      providerNames.count()
-    ); //Lame..
+    expect(element(by.cssContainingText('tr', provider)).isPresent()).toBe(false);
 
   });
 

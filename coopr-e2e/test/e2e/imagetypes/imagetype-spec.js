@@ -32,8 +32,8 @@ describe('imagetypes types test', function () {
 
   it('should verify a imagetype type', function () {
     browser.get('/imagetypes');
-    var imageNames = element.all(by.repeater('item in list').column("item.name"));
-    helper.editAssetFromList(imageNames, image);
+    element(by.cssContainingText('tr', image))
+      .element(by.cssContainingText('.btn', 'Edit')).click();
 
     expect(element(by.css('#inputImageName')).getAttribute('value')).toBe(image);
     expect(element(by.css('#inputImageDescription')).getAttribute('value')).toBe('bar');
@@ -41,16 +41,11 @@ describe('imagetypes types test', function () {
 
   it('should delete imagetype', function () {
     browser.get('/imagetypes');
-    var selectedImage;
-    var imageNames = element.all(by.repeater('item in list').column("item.name"));
+    element(by.cssContainingText('tr', image))
+      .element(by.cssContainingText('.btn', 'Delete')).click();
+    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
 
-    imageCount = imageNames.count();
-    helper.deleteAssetFromList(imageNames, image);
-    expect(imageCount.then(function(i) {
-      return i - 1;
-    })).toBe(
-      imageNames.count()
-    ); //Lame..
+    expect(element(by.cssContainingText('tr', image)).isPresent()).toBe(false);
   });
 
 

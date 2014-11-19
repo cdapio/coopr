@@ -73,30 +73,28 @@ describe('templates test', function () {
 
     // Delete provider created for test
     browser.get('/providers');
-    providerNames = element.all(by.repeater('item in list').column('item.name'));
-    helper.deleteAssetFromList(providerNames, provider)
+    element(by.cssContainingText('tr', provider))
+      .element(by.cssContainingText('.btn', 'Delete')).click();
+    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
+
+    expect(element(by.cssContainingText('tr', provider)).isPresent()).toBe(false);
   });
 
   it('should verify a template', function () {
     browser.get('/templates');
-    var templateNames = element.all(by.repeater('item in list').column('item.name'));
-    helper.editAssetFromList(templateNames, template);
-
+    element(by.cssContainingText('tr', template))
+      .element(by.cssContainingText('.btn', 'Edit')).click();
     expect(element(by.css('#inputTemplateName')).getAttribute('value')).toBe(template);
     expect(element(by.css('#inputTemplateDescription')).getAttribute('value')).toBe('bar');
   });
 
   it('should delete a template', function () {
     browser.get('/templates');
-    var templateNames = element.all(by.repeater('item in list').column('item.name'));
-    var templateCount = templateNames.count();
-    helper.deleteAssetFromList(templateNames, template);
+    element(by.cssContainingText('tr', template))
+      .element(by.cssContainingText('.btn', 'Delete')).click();
+    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
 
-    expect(templateCount.then(function(i) {
-      return i - 1;
-    })).toBe(
-      templateNames.count()
-    ); //Lame..
+    expect(element(by.cssContainingText('tr', template)).isPresent()).toBe(false);
   });
 
 

@@ -61,8 +61,8 @@ describe('services test', function () {
     //browser.get('/services/edit/' + service);
     browser.get('/services');
 
-    var serviceNames = element.all(by.repeater('item in list').column("item.name"));
-    helper.editAssetFromList(serviceNames, service);
+    element(by.cssContainingText('tr', service))
+      .element(by.cssContainingText('.btn', 'Edit')).click();
     expect(element(by.css('#inputServiceName')).getAttribute('value')).toBe(service);
     expect(element(by.css('#inputServiceDescription')).getAttribute('value')).toBe('bar');
     var provides = element.all(by.repeater('name in model'));
@@ -75,16 +75,11 @@ describe('services test', function () {
 
   it('should delete service', function () {
     browser.get('/services');
-    var servicesCount,
-        serviceNames = element.all(by.repeater('item in list').column("item.name"));
+    element(by.cssContainingText('tr', service))
+      .element(by.cssContainingText('.btn', 'Delete')).click();
+    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
 
-    servicesCount = serviceNames.count();
-    helper.deleteAssetFromList(serviceNames, service);
-    expect(servicesCount.then(function(i) {
-      return i - 1;
-    })).toBe(
-      serviceNames.count()
-    ); //Lame..
+    expect(element(by.cssContainingText('tr', service)).isPresent()).toBe(false);
   });
 
 

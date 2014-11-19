@@ -33,8 +33,9 @@ describe('hardware types test', function () {
 
   it('should verify a hardware type', function () {
     browser.get('/hardwaretypes');
-    var hardwareNames = element.all(by.repeater('item in list').column("item.name"));
-    helper.editAssetFromList(hardwareNames, hardware);
+
+    element(by.cssContainingText('tr', hardware))
+      .element(by.cssContainingText('.btn', 'Edit')).click();
 
     expect(element(by.css('#inputHardwareName')).getAttribute('value')).toBe(hardware);
     expect(element(by.css('#inputHardwareDescription')).getAttribute('value')).toBe('bar');
@@ -43,16 +44,12 @@ describe('hardware types test', function () {
   it('should delete hardwaretype', function () {
     browser.get('/hardwaretypes');
     var selectedHardware;
-    hardwareNames = element.all(by.repeater('item in list').column("item.name"));
-    hardwareCount = hardwareNames.count();
 
-    helper.deleteAssetFromList(hardwareNames, hardware);
+    element(by.cssContainingText('tr', hardware))
+      .element(by.cssContainingText('.btn', 'Delete')).click();
+    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
 
-    expect(hardwareCount.then(function(i) {
-      return i - 1;
-    })).toBe(
-      hardwareNames.count()
-    ); //Lame..
+    expect(element(by.cssContainingText('tr', hardware)).isPresent()).toBe(false);
   });
 
 
