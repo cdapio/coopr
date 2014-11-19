@@ -65,20 +65,21 @@ public class MetricHandlerTest extends ServiceTestBase {
 
   @Test
   public void sevenTaskNoGroupByTest() throws Exception {
-    long submitTimeTask1 = 1;
-    long statusTimeTask1 = 2;
-    long submitTimeTask2 = 13;
-    long statusTimeTask2 = 17;
-    long submitTimeTask3 = 7;
-    long statusTimeTask3 = 9;
-    long submitTimeTask4 = 15;
-    long statusTimeTask4 = 20;
-    long submitTimeTask5 = 19;
-    long statusTimeTask5 = 25;
-    long submitTimeTask6 = 7;
-    long statusTimeTask6 = 11;
-    long submitTimeTask7 = 3;
-    long statusTimeTask7 = 4;
+    long millisPerSecond = 1000;
+    long submitTimeTask1 = 1 * millisPerSecond;
+    long statusTimeTask1 = 2 * millisPerSecond;
+    long submitTimeTask2 = 13 * millisPerSecond;
+    long statusTimeTask2 = 17 * millisPerSecond;
+    long submitTimeTask3 = 7 * millisPerSecond;
+    long statusTimeTask3 = 9 * millisPerSecond;
+    long submitTimeTask4 = 15 * millisPerSecond;
+    long statusTimeTask4 = 20 * millisPerSecond;
+    long submitTimeTask5 = 19 * millisPerSecond;
+    long statusTimeTask5 = 25 * millisPerSecond;
+    long submitTimeTask6 = 7 * millisPerSecond;
+    long statusTimeTask6 = 11 * millisPerSecond;
+    long submitTimeTask7 = 3 * millisPerSecond;
+    long statusTimeTask7 = 4 * millisPerSecond;
 
     clusterStore.writeClusterTask(CLUSTER_TASK1);
     clusterStore.writeClusterTask(CLUSTER_TASK2);
@@ -136,8 +137,6 @@ public class MetricHandlerTest extends ServiceTestBase {
     expectedList.add(interval);
 
     Assert.assertEquals(new TimeSeries(5, 22, expectedList), actual);
-
-//    check(new TimeSeries(5, 22, expectedList), actual);
   }
 
   @Test
@@ -161,6 +160,7 @@ public class MetricHandlerTest extends ServiceTestBase {
   @Test
   public void sevenTaskGroupByTest() throws Exception {
     long millisPerHour = 3600000;
+    long millisPerMinute = 60000;
     long submitTimeTask1 = 1 * millisPerHour;
     long statusTimeTask1 = 2 * millisPerHour;
     long submitTimeTask2 = 13 * millisPerHour;
@@ -220,8 +220,9 @@ public class MetricHandlerTest extends ServiceTestBase {
     clusterStore.writeClusterTask(CLUSTER_TASK6);
     clusterStore.writeClusterTask(CLUSTER_TASK7);
 
-    HttpResponse response = doGetExternalAPI("/metrics/nodes/usage?start=" + (5 * millisPerHour) +
-                                    "&end=" + (22 * millisPerHour) + "&groupby=hour", USER1_HEADERS);
+    HttpResponse response = doGetExternalAPI("/metrics/nodes/usage?start=" + (5 * millisPerHour / millisPerMinute) +
+                                               "&end=" + (22 * millisPerHour / millisPerMinute) +
+                                               "&groupby=hour&timeunit=minutes", USER1_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     TimeSeries actual = getResponseData(response);
@@ -230,39 +231,24 @@ public class MetricHandlerTest extends ServiceTestBase {
 
     //from 5 * millisPerHour to 9 * millisPerHour
     for (int i = 5; i < 9; i++) {
-      addInterval(expectedList, i * millisPerHour, millisPerHour);
+      addInterval(expectedList, i * millisPerHour / millisPerMinute, millisPerHour / millisPerMinute);
     }
     //from 9 * millisPerHour to 17 * millisPerHour
     for (int i = 9; i < 17; i++) {
-      addInterval(expectedList, i * millisPerHour, 2 * millisPerHour);
+      addInterval(expectedList, i * millisPerHour / millisPerMinute, 2 * millisPerHour / millisPerMinute);
     }
     //from 17 * millisPerHour to 20 * millisPerHour
     for (int i = 17; i < 20; i++) {
-      addInterval(expectedList, i * millisPerHour, 3 * millisPerHour);
+      addInterval(expectedList, i * millisPerHour / millisPerMinute, 3 * millisPerHour / millisPerMinute);
     }
     //from 20 * millisPerHour to 22 * millisPerHour
     for (int i = 20; i < 22; i++) {
-      addInterval(expectedList, i * millisPerHour, 2 * millisPerHour);
+      addInterval(expectedList, i * millisPerHour / millisPerMinute, 2 * millisPerHour / millisPerMinute);
     }
 
-    Assert.assertEquals(new TimeSeries(5 * millisPerHour, 22 * millisPerHour, expectedList), actual);
-
-//    check(new TimeSeries(5 * millisPerHour, 22 * millisPerHour, expectedList), actual);
+    Assert.assertEquals(new TimeSeries(5 * millisPerHour / millisPerMinute,
+                                       22 * millisPerHour / millisPerMinute, expectedList), actual);
   }
-
-//  private void check(TimeSeries expected, TimeSeries actual) {
-//    Assert.assertEquals(expected.getStart(), actual.getStart());
-//    Assert.assertEquals(expected.getEnd(), actual.getEnd());
-//    List<Interval> expectedList = expected.getData();
-//    List<Interval> actualList = actual.getData();
-//    Assert.assertEquals(expectedList.size(), actualList.size());
-//    int index = 0;
-//    for (Interval expectedInterval : expectedList) {
-//      Interval actualInterval = actualList.get(index++);
-//      Assert.assertEquals(expectedInterval.getTime(), actualInterval.getTime());
-//      Assert.assertEquals(expectedInterval.getValue(), actualInterval.getValue());
-//    }
-//  }
 
   private void addInterval(List<Interval> intervals, long start, long seconds) {
     Interval interval = new Interval(start);

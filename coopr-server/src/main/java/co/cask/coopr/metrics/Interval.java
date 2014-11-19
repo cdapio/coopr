@@ -28,6 +28,11 @@ public class Interval {
     this.time = time;
   }
 
+  public Interval(long time, long value) {
+    this.time = time;
+    this.value = value;
+  }
+
   public long getTime() {
     return time;
   }

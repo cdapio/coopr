@@ -77,7 +77,8 @@ public class MetricHandler extends AbstractAuthHandler {
     if (account == null) {
       return;
     }
-    List<String> names = Arrays.asList("tenant", "user", "cluster", "clustertemplate", "start", "end", "groupby");
+    List<String> names = Arrays.asList("tenant", "user", "cluster",
+                                       "clustertemplate", "start", "end", "groupby", "timeunit");
     Map<String, String> filters = getFilters(request, names);
     String tenant = filters.get("tenant");
     if (!account.isSuperadmin()) {
@@ -118,8 +119,20 @@ public class MetricHandler extends AbstractAuthHandler {
                            String.format("Incorrect value for field groupby: %s", filters.get("groupby")));
       return;
     }
+    MetricService.Timeunit timeunit = null;
+    try {
+      String rawTimeunit = filters.get("timeunit");
+      if (rawTimeunit != null) {
+        timeunit = MetricService.Timeunit.valueOf(rawTimeunit);
+      }
+    } catch (IllegalArgumentException e) {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST,
+                           String.format("Incorrect value for field timeunit: %s", filters.get("timeunit")));
+      return;
+    }
     ClusterTaskFilter filter = new ClusterTaskFilter(tenant, filters.get("user"), filters.get("cluster"),
-                                                     filters.get("clustertemplate"), startTime, endTime, periodicity);
+                                                     filters.get("clustertemplate"), startTime,
+                                                     endTime, periodicity, timeunit);
     try {
       TimeSeries result = new MetricService(clusterStore).getNodesUsage(filter);
       responder.sendJson(HttpResponseStatus.OK, result, TimeSeries.class, gson);
