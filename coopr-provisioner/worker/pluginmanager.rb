@@ -60,7 +60,7 @@ class PluginManager
 
           raise "providertype \"#{providertype}\" does not define an implementor classname" unless jsondata[providertype].key?('classname')
           # require every .rb file in the plugin top-level directory
-          Dir["#{File.dirname(jsonfile)}/*.rb"].each {|file| require file }
+          Dir["#{File.dirname(jsonfile)}/*.rb"].each { |file| require file }
           # check ancestor to determine plugin type
           klass = Object.const_get(jsondata[providertype]['classname'])
           if klass.ancestors.include? Object.const_get('Provider')
@@ -77,7 +77,7 @@ class PluginManager
 
           raise "automatortype \"#{automatortype}\" does not define an implentor classname" unless jsondata[automatortype].key?('classname')
           # require every .rb file in the plugin top-level directory
-          Dir["#{File.dirname(jsonfile)}/*.rb"].each {|file| require file }
+          Dir["#{File.dirname(jsonfile)}/*.rb"].each { |file| require file }
           # check ancestor to determine plugin type
           klass = Object.const_get(jsondata[automatortype]['classname'])
           if klass.ancestors.include? Object.const_get('Automator')

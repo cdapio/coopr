@@ -1,5 +1,5 @@
 angular.module(PKG.name+'.features').controller('ImageFormCtrl',
-function ($scope, $state, myApi, CrudFormBase, myFocusManager) {
+function ($scope, $state, myApi, CrudFormBase, caskFocusManager) {
   CrudFormBase.apply($scope);
 
   $scope.allProviders = myApi.Provider.query();
@@ -17,6 +17,6 @@ function ($scope, $state, myApi, CrudFormBase, myFocusManager) {
   else { // creating
     $scope.model = new myApi.ImageType();
     $scope.model.initialize();
-    myFocusManager.focus('inputImageName');
+    caskFocusManager.focus('inputImageName');
   }
 });

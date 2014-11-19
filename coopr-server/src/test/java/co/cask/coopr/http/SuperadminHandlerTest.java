@@ -86,16 +86,16 @@ public class SuperadminHandlerTest extends ServiceTestBase {
 
   @Test
   public void testDeleteSuperadminForbidden() throws Exception {
-    assertResponseStatus(doDelete("/tenants/" + Constants.SUPERADMIN_TENANT, SUPERADMIN_HEADERS),
+    assertResponseStatus(doDeleteExternalAPI("/tenants/" + Constants.SUPERADMIN_TENANT, SUPERADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
   public void testNonSuperadminReturnsError() throws Exception {
-    assertResponseStatus(doGet("/tenants", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doGet("/tenants/123", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doPost("/tenants", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doPut("/tenants/123", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI("/tenants", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI("/tenants/123", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPostExternalAPI("/tenants", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doPutExternalAPI("/tenants/123", "", ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
   }
 
   @Test
@@ -103,7 +103,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     String name = "companyX";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
     TenantWriteRequest tenantWriteRequest = new TenantWriteRequest(requestedTenant);
-    HttpResponse response = doPost("/tenants", gson.toJson(tenantWriteRequest), SUPERADMIN_HEADERS);
+    HttpResponse response = doPostExternalAPI("/tenants", gson.toJson(tenantWriteRequest), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.OK);
@@ -121,9 +121,9 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     String name = "companyX";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
     TenantWriteRequest addRequest = new TenantWriteRequest(requestedTenant);
-    assertResponseStatus(doPost("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS),
                          HttpResponseStatus.OK);
-    assertResponseStatus(doPost("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS),
                          HttpResponseStatus.CONFLICT);
   }
 
@@ -131,7 +131,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
   public void testCreateTenantWithTooManyWorkersReturnsConflict() throws Exception {
     TenantSpecification requestedTenant = new TenantSpecification("companyX", 10000, 100, 1000);
     TenantWriteRequest addRequest = new TenantWriteRequest(requestedTenant);
-    HttpResponse response = doPost("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS);
+    HttpResponse response = doPostExternalAPI("/tenants", gson.toJson(addRequest), SUPERADMIN_HEADERS);
 
     // perform create request
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
@@ -148,7 +148,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     TenantSpecification updatedTenant = new TenantSpecification("companyX", 10, 100, 500);
     TenantWriteRequest writeRequest = new TenantWriteRequest(updatedTenant);
     HttpResponse response =
-      doPut("/tenants/" + updatedTenant.getName(), gson.toJson(writeRequest), SUPERADMIN_HEADERS);
+      doPutExternalAPI("/tenants/" + updatedTenant.getName(), gson.toJson(writeRequest), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     Assert.assertEquals(updatedTenant, tenantStore.getTenantByID(actualTenant.getId()).getSpecification());
@@ -165,7 +165,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     // perform request to write tenant
     TenantSpecification updatedFields = new TenantSpecification(name, 100000, 100, 500);
     TenantWriteRequest writeRequest = new TenantWriteRequest(updatedFields);
-    HttpResponse response = doPut("/tenants/" + name, gson.toJson(writeRequest), SUPERADMIN_HEADERS);
+    HttpResponse response = doPutExternalAPI("/tenants/" + name, gson.toJson(writeRequest), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.CONFLICT);
   }
 
@@ -175,7 +175,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     tenantProvisionerService.writeTenantSpecification(new TenantSpecification("companyX", 0, 100, 1000));
 
     // perform request to delete tenant
-    HttpResponse response = doDelete("/tenants/" + id, SUPERADMIN_HEADERS);
+    HttpResponse response = doDeleteExternalAPI("/tenants/" + id, SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     Assert.assertNull(tenantStore.getTenantByID(id));
@@ -190,7 +190,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     tenantProvisionerService.rebalanceTenantWorkers(id);
 
     // perform request to delete tenant
-    assertResponseStatus(doDelete("/tenants/" + name, SUPERADMIN_HEADERS), HttpResponseStatus.CONFLICT);
+    assertResponseStatus(doDeleteExternalAPI("/tenants/" + name, SUPERADMIN_HEADERS), HttpResponseStatus.CONFLICT);
   }
 
   @Test
@@ -200,7 +200,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     tenantProvisionerService.writeTenantSpecification(spec);
 
     // perform request to get tenant
-    HttpResponse response = doGet("/tenants/" + spec.getName(), SUPERADMIN_HEADERS);
+    HttpResponse response = doGetExternalAPI("/tenants/" + spec.getName(), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     Assert.assertEquals(spec, gson.fromJson(reader, TenantSpecification.class));
@@ -215,7 +215,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     tenantProvisionerService.writeTenantSpecification(spec2);
 
     // perform request to get tenant
-    HttpResponse response = doGet("/tenants", SUPERADMIN_HEADERS);
+    HttpResponse response = doGetExternalAPI("/tenants", SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent());
     Set<Tenant> actualTenants = gson.fromJson(reader, new TypeToken<Set<TenantSpecification>>() {}.getType());
@@ -225,23 +225,23 @@ public class SuperadminHandlerTest extends ServiceTestBase {
   @Test
   public void testBadRequestReturns400() throws Exception {
     // test malformed requests
-    assertResponseStatus(doPost("/tenants", "{}", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
-    assertResponseStatus(doPost("/tenants", "", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPostExternalAPI("/tenants", "{}", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPostExternalAPI("/tenants", "", SUPERADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
 
     // id in object does not match id in path
     TenantSpecification tenantSpecification = new TenantSpecification("name", 10, 10, 10);
-    assertResponseStatus(doPut("/tenants/10", gson.toJson(tenantSpecification), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPutExternalAPI("/tenants/10", gson.toJson(tenantSpecification), SUPERADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // missing id in object
     tenantSpecification = new TenantSpecification("name", 10, 10, 10);
-    assertResponseStatus(doPut("/tenants/10", gson.toJson(tenantSpecification), SUPERADMIN_HEADERS),
+    assertResponseStatus(doPutExternalAPI("/tenants/10", gson.toJson(tenantSpecification), SUPERADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 
   @Test
   public void testMissingObjectReturn404() throws Exception {
-    assertResponseStatus(doGet("/tenants/123", SUPERADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI("/tenants/123", SUPERADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
   }
 
   @Test
@@ -261,9 +261,9 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     tenantStore.writeTenant(
       new Tenant(ADMIN_ACCOUNT.getTenantId(), new TenantSpecification(TENANT, 500, 1000, 10000)));
     ProviderType type = Entities.ProviderTypeExample.RACKSPACE;
-    assertResponseStatus(doPut("/plugins/providertypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
+    assertResponseStatus(doPutExternalAPI("/plugins/providertypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doDelete("/plugins/providertypes/" + type.getName(), ADMIN_HEADERS),
+    assertResponseStatus(doDeleteExternalAPI("/plugins/providertypes/" + type.getName(), ADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
   }
 
@@ -272,9 +272,9 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     tenantStore.writeTenant(
       new Tenant(ADMIN_ACCOUNT.getTenantId(), new TenantSpecification(TENANT, 500, 1000, 10000)));
     AutomatorType type = Entities.AutomatorTypeExample.CHEF;
-    assertResponseStatus(doPut("/plugins/automatortypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
+    assertResponseStatus(doPutExternalAPI("/plugins/automatortypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doDelete("/plugins/automatortypes/" + type.getName(), ADMIN_HEADERS),
+    assertResponseStatus(doDeleteExternalAPI("/plugins/automatortypes/" + type.getName(), ADMIN_HEADERS),
                          HttpResponseStatus.FORBIDDEN);
   }
 
@@ -319,7 +319,7 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     String name = "company-dev";
     TenantSpecification requestedTenant = new TenantSpecification(name, 10, 100, 1000);
     TenantWriteRequest tenantWriteRequest = new TenantWriteRequest(requestedTenant, true);
-    HttpResponse response = doPost("/tenants", gson.toJson(tenantWriteRequest), SUPERADMIN_HEADERS);
+    HttpResponse response = doPostExternalAPI("/tenants", gson.toJson(tenantWriteRequest), SUPERADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
 
     // make sure tenant account has copied superadmin entities
@@ -346,28 +346,28 @@ public class SuperadminHandlerTest extends ServiceTestBase {
     String entity1Path = base + "/" + entity1.get("name").getAsString();
     String entity2Path = base + "/" + entity2.get("name").getAsString();
     // should start off with no entities
-    assertResponseStatus(doGet(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
 
     // add entity through PUT
-    assertResponseStatus(doPut(entity1Path, entity1.toString(), headers), HttpResponseStatus.OK);
+    assertResponseStatus(doPutExternalAPI(entity1Path, entity1.toString(), headers), HttpResponseStatus.OK);
     // check we can get it
-    HttpResponse response = doGet(entity1Path, headers);
+    HttpResponse response = doGetExternalAPI(entity1Path, headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     JsonObject result = new Gson().fromJson(reader, JsonObject.class);
     Assert.assertEquals(entity1, result);
 
     // add second entity through PUT
-    assertResponseStatus(doPut(entity2Path, entity2.toString(), headers), HttpResponseStatus.OK);
+    assertResponseStatus(doPutExternalAPI(entity2Path, entity2.toString(), headers), HttpResponseStatus.OK);
     // check we can get it
-    response = doGet(entity2Path, headers);
+    response = doGetExternalAPI(entity2Path, headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     result = new Gson().fromJson(reader, JsonObject.class);
     Assert.assertEquals(entity2, result);
 
     // get both entities
-    response = doGet(base, headers);
+    response = doGetExternalAPI(base, headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     JsonArray results = new Gson().fromJson(reader, JsonArray.class);
@@ -383,11 +383,11 @@ public class SuperadminHandlerTest extends ServiceTestBase {
       Assert.assertEquals(entity1, second);
     }
 
-    assertResponseStatus(doDelete(entity1Path, headers), HttpResponseStatus.OK);
-    assertResponseStatus(doDelete(entity2Path, headers), HttpResponseStatus.OK);
+    assertResponseStatus(doDeleteExternalAPI(entity1Path, headers), HttpResponseStatus.OK);
+    assertResponseStatus(doDeleteExternalAPI(entity2Path, headers), HttpResponseStatus.OK);
     // check both were deleted
-    assertResponseStatus(doGet(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doGet(entity2Path, headers), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI(entity2Path, headers), HttpResponseStatus.NOT_FOUND);
   }
 
   private void writePluginResource(Account account, ResourceType resourceType,

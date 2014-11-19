@@ -89,20 +89,20 @@ public class AdminHandlerTest extends ServiceTestBase {
   public void testNonAdminUserGetsForbiddenStatus() throws Exception {
     String[] resources = { "/providers", "/hardwaretypes", "/imagetypes", "/services", "/clustertemplates" };
     for (String resource : resources) {
-      assertResponseStatus(doGet(resource, USER1_HEADERS), HttpResponseStatus.OK);
-      assertResponseStatus(doGet(resource + "/id", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
-      assertResponseStatus(doPut(resource + "/id", "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
-      assertResponseStatus(doPost(resource, "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+      assertResponseStatus(doGetExternalAPI(resource, USER1_HEADERS), HttpResponseStatus.OK);
+      assertResponseStatus(doGetExternalAPI(resource + "/id", USER1_HEADERS), HttpResponseStatus.NOT_FOUND);
+      assertResponseStatus(doPutExternalAPI(resource + "/id", "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+      assertResponseStatus(doPostExternalAPI(resource, "body", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
     }
-    assertResponseStatus(doGet("/export", USER1_HEADERS), HttpResponseStatus.OK);
-    assertResponseStatus(doPost("/import", "{}", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGetExternalAPI("/export", USER1_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPostExternalAPI("/import", "{}", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
   public void testForbiddenIfNonadminGetsQueueMetrics() throws Exception {
     tenantStore.writeTenant(
       new Tenant(UUID.randomUUID().toString(), new TenantSpecification(USER1_ACCOUNT.getTenantId(), 10, 10, 100)));
-    assertResponseStatus(doGet("/metrics/queues", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doGetExternalAPI("/metrics/queues", USER1_HEADERS), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
@@ -220,10 +220,10 @@ public class AdminHandlerTest extends ServiceTestBase {
   }
 
   private void runImportExportTest(Map<String, JsonElement> importJson) throws Exception {
-    assertResponseStatus(doPost("/import", gson.toJson(importJson), ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doPostExternalAPI("/import", gson.toJson(importJson), ADMIN_HEADERS), HttpResponseStatus.OK);
 
     // verify using export
-    HttpResponse response = doGet("/export", ADMIN_HEADERS);
+    HttpResponse response = doGetExternalAPI("/export", ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     Map<String, JsonElement> exportJson = new Gson().fromJson(reader,
@@ -253,15 +253,15 @@ public class AdminHandlerTest extends ServiceTestBase {
   public void testInvalidProviderReturns400() throws Exception {
     // test an empty object
     JsonObject provider = new JsonObject();
-    assertResponseStatus(doPost("/providers", provider.toString(), ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI("/providers", provider.toString(), ADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
 
     // test invalid json
-    assertResponseStatus(doPost("/providers", "[dsfmqo", ADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPostExternalAPI("/providers", "[dsfmqo", ADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
 
     // test an invalid name
     provider.addProperty("name", "?");
-    assertResponseStatus(doPost("/providers", provider.toString(), ADMIN_HEADERS),
+    assertResponseStatus(doPostExternalAPI("/providers", provider.toString(), ADMIN_HEADERS),
                          HttpResponseStatus.BAD_REQUEST);
   }
 
@@ -270,39 +270,39 @@ public class AdminHandlerTest extends ServiceTestBase {
     String entity1Path = base + "/" + entity1.get("name").getAsString();
     String entity2Path = base + "/" + entity2.get("name").getAsString();
     // should start off with no entities
-    assertResponseStatus(doGet(entity1Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI(entity1Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
 
     // add a an entity through post
     Assert.assertEquals(HttpResponseStatus.OK.getCode(),
-                        doPost(base, entity1.toString(), ADMIN_HEADERS).getStatusLine().getStatusCode());
+                        doPostExternalAPI(base, entity1.toString(), ADMIN_HEADERS).getStatusLine().getStatusCode());
 
     // make sure entity was added correctly
-    HttpResponse response = doGet(entity1Path, ADMIN_HEADERS);
+    HttpResponse response = doGetExternalAPI(entity1Path, ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals("application/json", response.getEntity().getContentType().getValue());
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     JsonObject result = new Gson().fromJson(reader, JsonObject.class);
     Assert.assertEquals(entity1, result);
     // make sure you can't overwrite the entity through post
-    assertResponseStatus(doPost(base, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
+    assertResponseStatus(doPostExternalAPI(base, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.BAD_REQUEST);
 
     // delete entity
-    assertResponseStatus(doDelete(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doDeleteExternalAPI(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
 
     // make sure entity was deleted
-    assertResponseStatus(doGet(entity1Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
+    assertResponseStatus(doGetExternalAPI(entity1Path, ADMIN_HEADERS), HttpResponseStatus.NOT_FOUND);
 
     // add entity through PUT
-    assertResponseStatus(doPut(entity1Path, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.OK);
-    response = doGet(entity1Path, ADMIN_HEADERS);
+    assertResponseStatus(doPutExternalAPI(entity1Path, entity1.toString(), ADMIN_HEADERS), HttpResponseStatus.OK);
+    response = doGetExternalAPI(entity1Path, ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     result = new Gson().fromJson(reader, JsonObject.class);
     Assert.assertEquals(entity1, result);
 
     // add second entity through POST
-    assertResponseStatus(doPost(base, entity2.toString(), ADMIN_HEADERS), HttpResponseStatus.OK);
-    response = doGet(base, ADMIN_HEADERS);
+    assertResponseStatus(doPostExternalAPI(base, entity2.toString(), ADMIN_HEADERS), HttpResponseStatus.OK);
+    response = doGetExternalAPI(base, ADMIN_HEADERS);
     assertResponseStatus(response, HttpResponseStatus.OK);
     reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     JsonArray results = new Gson().fromJson(reader, JsonArray.class);
@@ -318,8 +318,8 @@ public class AdminHandlerTest extends ServiceTestBase {
       Assert.assertEquals(entity1, second);
     }
 
-    assertResponseStatus(doDelete(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
-    assertResponseStatus(doDelete(entity2Path, ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doDeleteExternalAPI(entity1Path, ADMIN_HEADERS), HttpResponseStatus.OK);
+    assertResponseStatus(doDeleteExternalAPI(entity2Path, ADMIN_HEADERS), HttpResponseStatus.OK);
   }
 
   private void assertQueueMetrics(String tenant, Map<String, QueueMetrics> expected) throws Exception {
@@ -328,7 +328,7 @@ public class AdminHandlerTest extends ServiceTestBase {
       new BasicHeader(Constants.API_KEY_HEADER, API_KEY),
       new BasicHeader(Constants.TENANT_HEADER, tenant)
     };
-    HttpResponse response = doGet("/metrics/queues", headers);
+    HttpResponse response = doGetExternalAPI("/metrics/queues", headers);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
     Map<String, QueueMetrics> result = gson.fromJson(reader, new TypeToken<Map<String, QueueMetrics>>() {}.getType());

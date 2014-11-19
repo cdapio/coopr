@@ -15,6 +15,12 @@
  */
 package co.cask.coopr.runtime;
 
+import co.cask.cdap.common.conf.CConfiguration;
+import co.cask.cdap.common.guice.ConfigModule;
+import co.cask.cdap.common.guice.DiscoveryRuntimeModule;
+import co.cask.cdap.common.guice.IOModule;
+import co.cask.cdap.security.guice.SecurityModules;
+import co.cask.cdap.security.server.ExternalAuthenticationServer;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.common.conf.Configuration;
 import co.cask.coopr.common.conf.Constants;
@@ -23,7 +29,8 @@ import co.cask.coopr.common.daemon.DaemonMain;
 import co.cask.coopr.common.queue.guice.QueueModule;
 import co.cask.coopr.common.zookeeper.IdService;
 import co.cask.coopr.common.zookeeper.guice.ZookeeperModule;
-import co.cask.coopr.http.HandlerServer;
+import co.cask.coopr.http.ExternalHandlerServer;
+import co.cask.coopr.http.InternalHandlerServer;
 import co.cask.coopr.http.guice.HttpModule;
 import co.cask.coopr.management.ServerStats;
 import co.cask.coopr.management.guice.ManagementModule;
@@ -68,7 +75,8 @@ public final class ServerMain extends DaemonMain {
   private InMemoryZKServer inMemoryZKServer;
   private ZKClientService zkClientService;
   private Injector injector;
-  private HandlerServer handlerServer;
+  private ExternalHandlerServer externalHandlerServer;
+  private InternalHandlerServer internalHandlerServer;
   private Scheduler scheduler;
   private Configuration conf;
   private int solverNumThreads;
@@ -82,6 +90,9 @@ public final class ServerMain extends DaemonMain {
   private TenantStore tenantStore;
   private UserStore userStore;
   private CredentialStore credentialStore;
+  // Authentication
+  private boolean securityEnabled;
+  private ExternalAuthenticationServer externalAuthenticationServer;
 
   public static void main(final String[] args) throws Exception {
     new ServerMain().doMain(args);
@@ -103,6 +114,7 @@ public final class ServerMain extends DaemonMain {
       }
 
       solverNumThreads = conf.getInt(Constants.SOLVER_NUM_THREADS);
+      securityEnabled = conf.getBoolean(co.cask.cdap.common.conf.Constants.Security.CFG_SECURITY_ENABLED);
     } catch (Exception e) {
       LOG.error("Exception initializing server", e);
     }
@@ -131,6 +143,10 @@ public final class ServerMain extends DaemonMain {
                                       .setDaemon(true)
                                       .build()));
 
+    CConfiguration cConfiguration = CConfiguration.create();
+    cConfiguration.addResource("coopr-default.xml");
+    cConfiguration.addResource("coopr-site.xml");
+
     try {
       // this is here because modules do things that need to connect to zookeeper...
       // TODO: move everything that needs zk started out of the module
@@ -143,7 +159,11 @@ public final class ServerMain extends DaemonMain {
         new HttpModule(),
         new ManagementModule(),
         new ProvisionerModule(),
-        new CodecModules().getModule()
+        new CodecModules().getModule(),
+        new IOModule(),
+        new DiscoveryRuntimeModule().getStandaloneModules(),
+        new SecurityModules().getStandaloneModules(),
+        new ConfigModule(cConfiguration)
       );
 
       idService = injector.getInstance(IdService.class);
@@ -162,6 +182,10 @@ public final class ServerMain extends DaemonMain {
       userStore.startAndWait();
       credentialStore = injector.getInstance(CredentialStore.class);
       credentialStore.startAndWait();
+      if (securityEnabled) {
+        externalAuthenticationServer = injector.getInstance(ExternalAuthenticationServer.class);
+        externalAuthenticationServer.startAndWait();
+      }
 
       // Register MBean
       ServerStats serverStats = injector.getInstance(ServerStats.class);
@@ -172,9 +196,12 @@ public final class ServerMain extends DaemonMain {
       LOG.error("Exception starting up.", e);
       System.exit(-1);
     }
-    handlerServer = injector.getInstance(HandlerServer.class);
-    handlerServer.startAndWait();
-    LOG.info("Handler service started on {}", handlerServer.getBindAddress());
+    internalHandlerServer = injector.getInstance(InternalHandlerServer.class);
+    internalHandlerServer.startAndWait();
+    LOG.info("Internal API handler service started on {}", internalHandlerServer.getBindAddress());
+    externalHandlerServer = injector.getInstance(ExternalHandlerServer.class);
+    externalHandlerServer.startAndWait();
+    LOG.info("External API handler service started on {}", externalHandlerServer.getBindAddress());
 
     scheduler = injector.getInstance(Scheduler.class);
     scheduler.startAndWait();
@@ -208,8 +235,9 @@ public final class ServerMain extends DaemonMain {
       }
     }
 
-    stopAll(handlerServer, userStore, resourceService, provisionerStore, tenantStore, clusterStoreService,
-            entityStoreService, idService, zkClientService, inMemoryZKServer);
+    stopAll(internalHandlerServer, externalHandlerServer, userStore, resourceService, provisionerStore, tenantStore,
+            clusterStoreService, entityStoreService, idService, zkClientService, inMemoryZKServer,
+            externalAuthenticationServer);
   }
 
   private void stopAll(Service... services) {

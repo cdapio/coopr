@@ -3,9 +3,9 @@
     Name
   </label>
   <div class="col-xs-10">
-    <input id="inputTemplateName" type="text" name="name" class="form-control" 
-      placeholder="Name" 
-      my-focus="inputTemplateName"
+    <input id="inputTemplateName" type="text" name="name" class="form-control"
+      placeholder="Name"
+      cask-focus="inputTemplateName"
       ng-readonly="editing"
       ng-pattern="/^[\w\.\-]+$/"
       maxlength="255"
@@ -18,8 +18,8 @@
     Description
   </label>
   <div class="col-xs-10">
-    <input id="inputTemplateDescription" type="text" name="description" class="form-control" 
-      placeholder="Description" 
+    <input id="inputTemplateDescription" type="text" name="description" class="form-control"
+      placeholder="Description"
       ng-model="model.description" />
   </div>
 </div>
@@ -42,7 +42,7 @@
           <label for="inputTemplateLeaseDays-{{leaseType}}" class="input-group-addon">
             Days
           </label>
-          <input id="inputTemplateLeaseDays-{{leaseType}}" class="form-control" type="number" 
+          <input id="inputTemplateLeaseDays-{{leaseType}}" class="form-control" type="number"
             ng-model="leaseDuration[leaseType].days"
             ng-pattern="/^\d+$/"
             min="0" required/>
@@ -53,7 +53,7 @@
           <label for="inputTemplateLeaseHours-{{leaseType}}"class="input-group-addon">
             Hours
           </label>
-          <input id="inputTemplateLeaseHours-{{leaseType}}" class="form-control" type="number" 
+          <input id="inputTemplateLeaseHours-{{leaseType}}" class="form-control" type="number"
             ng-model="leaseDuration[leaseType].hours"
             ng-pattern="/^\d+$/"
             min="0" max="23" required/>
@@ -64,7 +64,7 @@
           <label for="inputTemplateLeaseMinutes-{{leaseType}}" class="input-group-addon">
             Minutes
           </label>
-          <input id="inputTemplateLeaseMinutes-{{leaseType}}" class="form-control" type="number" 
+          <input id="inputTemplateLeaseMinutes-{{leaseType}}" class="form-control" type="number"
             ng-model="leaseDuration[leaseType].minutes"
             ng-pattern="/^\d+$/"
             min="0" max="59" required/>

@@ -105,7 +105,7 @@ module Coopr
 
     # un-register a child pid
     def forget_dead_worker(pid)
-      @workerpids.delete_if {|x| x == pid }
+      @workerpids.delete_if { |x| x == pid }
       @terminating_workers.delete(pid) if @terminating_workers.include?(pid)
       log.debug "new workerpids: #{@workerpids}"
     end

@@ -7,6 +7,7 @@ import co.cask.coopr.scheduler.task.ClusterJob;
 import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.scheduler.task.JobId;
 import co.cask.coopr.scheduler.task.TaskId;
+import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.store.DBConnectionPool;
 import co.cask.coopr.store.DBHelper;
 import co.cask.coopr.store.DBPut;
@@ -119,6 +120,56 @@ public class SQLClusterStore implements ClusterStore {
       LOG.error("Exception getting cluster task {}", taskId, e);
       throw new IOException("Exception getting cluster task " + taskId, e);
     }
+  }
+
+  @Override
+  public List<ClusterTask> getClusterTasks(ClusterTaskFilter filter) throws IOException {
+    try {
+      Connection conn = dbConnectionPool.getConnection();
+      try {
+        StringBuilder builder = new StringBuilder("SELECT task FROM tasks WHERE status = ? AND type IN (?,?)")
+          .append(addFilter("tenant_id = ", filter.getTenantId()))
+          .append(addFilter("user_id = ", filter.getUserId()))
+          .append(addFilter("cluster_id = ", filter.getClusterId()))
+          .append(addFilter("cluster_template_name = ", filter.getClusterTemplate()))
+          .append(" ORDER BY status_time ASC");
+
+        PreparedStatement statement =
+          conn.prepareStatement(builder.toString());
+        try {
+          int index = initializeFilter(statement, ClusterTask.Status.COMPLETE.name(), 1);
+          index = initializeFilter(statement, ProvisionerAction.CREATE.name(), index);
+          index = initializeFilter(statement, ProvisionerAction.DELETE.name(), index);
+          index = initializeFilter(statement, filter.getTenantId(), index);
+          index = initializeFilter(statement, filter.getUserId(), index);
+          index = initializeFilter(statement, filter.getClusterId(), index);
+          initializeFilter(statement, filter.getClusterTemplate(), index);
+          return dbQueryExecutor.getQueryList(statement, ClusterTask.class);
+        } finally {
+          statement.close();
+        }
+      } finally {
+        conn.close();
+      }
+    } catch (SQLException e) {
+      LOG.error("Exception getting cluster tasks by filters {}", filter, e);
+      throw new IOException("Exception getting cluster tasks by filters " + filter, e);
+    }
+  }
+
+  private String addFilter(String key, Object value) {
+    if (value == null) {
+      return "";
+    }
+    return String.format(" AND %s?", key);
+  }
+
+  private int initializeFilter(PreparedStatement statement, String value, int index) throws SQLException {
+    if (value == null) {
+      return index;
+    }
+    statement.setString(index, value);
+    return ++index;
   }
 
   @Override
@@ -366,29 +417,39 @@ public class SQLClusterStore implements ClusterStore {
     @Override
     public PreparedStatement createUpdateStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
-        "UPDATE tasks SET task=?, status=?, submit_time=?, status_time=?" +
+        "UPDATE tasks SET task=?, status=?, submit_time=?, status_time=?, type=?, " +
+          "cluster_template_name=?, user_id=?, tenant_id=?" +
           " WHERE task_num=? AND job_num=? AND cluster_id=?");
       statement.setBytes(1, dbQueryExecutor.toBytes(clusterTask, ClusterTask.class));
       statement.setString(2, clusterTask.getStatus().name());
       statement.setTimestamp(3, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
       statement.setTimestamp(4, DBHelper.getTimestamp(clusterTask.getStatusTime()));
-      statement.setLong(5, taskId.getTaskNum());
-      statement.setLong(6, taskId.getJobNum());
-      statement.setLong(7, clusterId);
+      statement.setString(5, clusterTask.getTaskName().name());
+      statement.setString(6, clusterTask.getClusterTemplateName());
+      statement.setString(7, clusterTask.getAccount().getUserId());
+      statement.setString(8, clusterTask.getAccount().getTenantId());
+      statement.setLong(9, taskId.getTaskNum());
+      statement.setLong(10, taskId.getJobNum());
+      statement.setLong(11, clusterId);
       return statement;
     }
 
     @Override
     public PreparedStatement createInsertStatement(Connection conn) throws SQLException {
       PreparedStatement statement = conn.prepareStatement(
-        "INSERT INTO tasks (task_num, job_num, cluster_id, status, submit_time, task)" +
-          " VALUES (?, ?, ?, ?, ?, ?)");
+        "INSERT INTO tasks (task_num, job_num, cluster_id, status, submit_time, task, type, " +
+          "cluster_template_name, user_id, tenant_id)" +
+          " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
       statement.setLong(1, taskId.getTaskNum());
       statement.setLong(2, taskId.getJobNum());
       statement.setLong(3, clusterId);
       statement.setString(4, clusterTask.getStatus().name());
       statement.setTimestamp(5, DBHelper.getTimestamp(clusterTask.getSubmitTime()));
       statement.setBytes(6, taskBytes);
+      statement.setString(7, clusterTask.getTaskName().name());
+      statement.setString(8, clusterTask.getClusterTemplateName());
+      statement.setString(9, clusterTask.getAccount().getUserId());
+      statement.setString(10, clusterTask.getAccount().getTenantId());
       return statement;
     }
   }

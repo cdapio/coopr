@@ -12,7 +12,7 @@
             <span class="fa fa-edit"></span>
             Reconfigure
         </a>
-        <a href="" ng-click="myConfirm()" my-confirmable="doDelete(model)" 
+        <a href="" ng-click="caskConfirm()" cask-confirmable="doDelete(model)" 
           data-confirmable-title="Delete cluster '{{model.name}}'"
           data-confirmable-content="This action is not reversible, do you really want to proceed?"
           class="btn btn-danger btn-xs">
@@ -30,7 +30,7 @@
           am-time-ago="model.createTime"
           bs-tooltip="model.createTime | amDateFormat:'LLL'"
         ></span>
-        by 
+        by
         <span class="text-info"
           bs-tooltip="model.account.userId + '/' + model.account.tenantId"
           ng-bind="model.account.userId"
@@ -71,7 +71,7 @@
             &nbsp;
           </p>
           <p>
-            <input type="range" 
+            <input type="range"
               min="0"
               step="60000"
               max="{{leaseMaxMs}}"
@@ -80,7 +80,7 @@
         </div>
         <div class="col-xs-3">
           <p ng-show="leaseExtendMs" class="am-fade-and-slide-bottom">
-            <a class="btn btn-primary btn-block" href="" 
+            <a class="btn btn-primary btn-block" href=""
                 ng-click="doLeaseExtend()">
               <span class="fa fa-clock-o"></span> extend lease
             </a>
@@ -107,7 +107,7 @@
     </div>
     <div class="col-xs-2 text-right">
 
-      <a class="btn btn-sm btn-default" 
+      <a class="btn btn-sm btn-default"
         ng-click="doPauseDeploy()"
         ng-show="model.progress.actionstatus==='running'"
       >
@@ -115,7 +115,7 @@
         <span class="hidden-xs hidden-sm">Pause Deploy</span>
       </a>
 
-      <a class="btn btn-sm btn-default" 
+      <a class="btn btn-sm btn-default"
         ng-click="doResumeDeploy()"
         ng-show="model.progress.actionstatus==='paused'"
       >
@@ -132,8 +132,8 @@
       <label>Progress</label>
     </div>
     <div class="col-xs-9">
-      <my-progress 
-        data-type="bar" 
+      <cask-progress
+        data-type="bar"
         data-add-cls="{{{
           'active': 'info',
           'pending': 'success striped',
@@ -141,7 +141,7 @@
         }[model.status]}}"
         data-value="model.progress.stepscompleted"
         data-max="model.progress.stepstotal"
-      ></my-progress>
+      ></cask-progress>
     </div>
   </div></li>
 
@@ -168,7 +168,7 @@
       <label>Services</label>
     </div>
     <div class="col-xs-9">
-      <my-service-picker 
+      <my-service-picker
         data-model="model.services"
         data-cluster-id="model.id"
       ></my-service-picker>
@@ -178,7 +178,7 @@
     <div class="col-xs-9 col-xs-offset-3">
       <hr>
       <p>
-        <my-service-picker 
+        <my-service-picker
           data-model="additionalServices"
           data-available="availableServices"
           data-allow-rm="'true'"
@@ -204,7 +204,7 @@
         <div class="panel-title row">
           <div class="col-xs-3">
             <a href="" bs-collapse-toggle>
-              <span class="label label-success" 
+              <span class="label label-success"
                   ng-bind="set.nodes.length"></span>
               <small>
                 <ng-pluralize count="set.nodes.length"
@@ -218,7 +218,7 @@
             </a>
           </div>
           <div class="col-xs-9">
-            <my-service-picker 
+            <my-service-picker
               data-model="set.services"
             ></my-service-picker>
           </div>
@@ -228,7 +228,7 @@
         <div class="panel-body">
 
           <div class="table-responsive">
-            <table class="table table-striped" my-sortable>
+            <table class="table table-striped" cask-sortable>
               <thead>
                 <tr ng-class="{'sort-enabled': set.nodes.length>1}">
                   <th data-predicate="properties.hostname">hostname</th>
@@ -250,9 +250,9 @@
                     <code>{{item.provisionerResults['ssh-auth'].user}}</code>
                   </td>
                   <td width="150">
-                    <my-password 
+                    <cask-password
                       data-value="item.provisionerResults['ssh-auth'].password"
-                    ></my-password>
+                    ></cask-password>
                   </td>
                   <td class="text-right">
                     <a href="" ng-click="doActionsModal(item.id)"

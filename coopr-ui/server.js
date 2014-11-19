@@ -41,6 +41,9 @@ var BOX_ADDR = CLIENT_ADDR + '/v2';
 var CLIENT_DIR = env === 'production' ? 'client-built' : 'client';
 var REJECT_UNAUTH = argv.rejectUnauth === 'true';
 
+var TLS_ENABLED_SETTING = 'tlsEnabled';
+var AGENT_OPTIONS_SETTING = 'agentOptions';
+
 console.info('Environment:', env, BOX_ADDR, CLIENT_DIR);
 
 /**
@@ -186,12 +189,55 @@ site.app.use(function (err, req, res, next) {
     next();
 });
 
+/**
+ * Read and cache TLS creds on app startup.
+ */
+var getAgentOptions = function () {
+    var agentOptions;
+    var tlsEnabled = ('true' === process.env['COOPR_NODE_TLS_ENABLED']),
+        tlsKey = process.env['COOPR_NODE_TLS_KEY'],
+        tlsCrt = process.env['COOPR_NODE_TLS_CRT'],
+        tlsCA = process.env['COOPR_NODE_TLS_CA'],
+        tlsPassword = process.env['COOPR_NODE_TLS_PASSWORD'];
 
-var tlsEnabled = ('true' === process.env['COOPR_NODE_TLS_ENABLED']),
-    tlsKey = process.env['COOPR_NODE_TLS_KEY'],
-    tlsCrt = process.env['COOPR_NODE_TLS_CRT'],
-    tlsCA = process.env['COOPR_NODE_TLS_CA'],
-    tlsPassword = process.env['COOPR_NODE_TLS_PASSWORD'];
+    site.app.set(TLS_ENABLED_SETTING, tlsEnabled);
+
+    if (tlsEnabled) {
+        var keyFile,
+            certFile,
+            caFile;
+
+        try {
+            keyFile = fs.readFileSync(tlsKey);
+        } catch(e) {}
+
+        try {
+            certFile = fs.readFileSync(tlsCrt);
+        } catch(e) {}
+
+        try {
+            caFile = fs.readFileSync(tlsCA);
+        } catch(e) {}
+
+        agentOptions = {
+            key: keyFile,
+            cert: certFile,
+            ca: caFile,
+            passphrase: tlsPassword
+        };
+    }
+
+    return agentOptions;
+};
+
+site.app.set(AGENT_OPTIONS_SETTING, getAgentOptions());
+
+var updateRequestOptionsWithTls = function (options) {
+    if (site.app.get(TLS_ENABLED_SETTING)) {
+        options.agentOptions = site.app.get(AGENT_OPTIONS_SETTING);
+    }
+    return options;
+};
 
 /**
  * Gets data for a given restful url.
@@ -211,30 +257,7 @@ site.getEntity = function (path, user) {
             }
         };
 
-        if (tlsEnabled) {
-            var keyFile,
-                certFile,
-                caFile;
-
-            try {
-                keyFile = fs.readFileSync(tlsKey);
-            } catch(e) {}
-
-            try {
-                certFile = fs.readFileSync(tlsCrt);
-            } catch(e) {}
-
-            try {
-                caFile = fs.readFileSync(tlsCA);
-            } catch(e) {}
-
-            options.agentOptions = {
-                key: keyFile,
-                cert: certFile,
-                ca: caFile,
-                passphrase: tlsPassword
-            };
-        }
+        options = updateRequestOptionsWithTls(options);
 
         request(options, function (err, response, body) {
             if (err) {
@@ -268,6 +291,9 @@ site.sendRequestAndHandleResponse = function (options, user, res) {
         'Coopr-TenantID': user.tenant,
         'Coopr-ApiKey': DEFAULT_API_KEY
     };
+
+    options = updateRequestOptionsWithTls(options);
+
     request(options, this.getGenericResponseHandler(res, options.method));
 };
 
@@ -474,6 +500,9 @@ site.app.post('/import', function (req, res) {
                         },
                         json: config
                     };
+
+                    options = updateRequestOptionsWithTls(options);
+
                     request(options, function (err, response, body) {
                         if (!err && response.statusCode == 200) {
                             res.redirect('/');
@@ -503,6 +532,9 @@ site.app.get('/export', function (req, res) {
             'Coopr-ApiKey': DEFAULT_API_KEY
         }
     };
+
+    options = updateRequestOptionsWithTls(options);
+
     request(options, function (err, response, body) {
         if (!err && response.statusCode == 200) {
             res.setHeader('Content-disposition', 'attachment; filename=export.json');
@@ -581,6 +613,9 @@ site.app.post('/setskin', function (req, res) {
         rejectUnauthorized: REJECT_UNAUTH,
         json: packageBody
     };
+
+    options = updateRequestOptionsWithTls(options);
+
     request(options, function (err, response, body) {
         if (!err) {
             myCookie.skin = req.body.skin;
@@ -1472,6 +1507,9 @@ site.app.post('/login', function (req, res) {
             'Coopr-ApiKey': DEFAULT_API_KEY
         }
     };
+
+    options = updateRequestOptionsWithTls(options);
+
     request(options, function (err, response, body) {
         if (body) {
             try {

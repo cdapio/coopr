@@ -21,6 +21,7 @@ export COOPR_DISABLE_UI=${COOPR_DISABLE_UI:-false}
 export COOPR_RUBY=${COOPR_RUBY:-ruby}
 export COOPR_USE_DUMMY_PROVISIONER=${COOPR_USE_DUMMY_PROVISIONER:-false}
 export COOPR_API_USER=${COOPR_API_USER:-admin}
+export COOPR_API_USER_PASS=${COOPR_API_USER_PASS:-password}
 export COOPR_TENANT=${COOPR_TENANT:-superadmin}
 export COOPR_NUM_WORKERS=${COOPR_NUM_WORKERS:-5}
 
@@ -162,6 +163,7 @@ if [ "${COOPR_SSL}" == "true" ]; then
   export COOPR_NODEJS_SSL_CRT=$COOPR_NODEJS_SSL_PATH/$COOPR_NODEJS_SSL_CRT_FILENAME
 fi
 
+export SECURITY_ENABLED=`read_property security.enabled ${COOPR_SERVER_CONF}/coopr-site.xml`
 export COOPR_SERVER_URI=${COOPR_PROTOCOL}://localhost:55054
 export TRUST_CERT_PATH=`read_property server.ssl.trust.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
 export TRUST_CERT_PASSWORD=`read_property server.ssl.trust.cert.password ${COOPR_SERVER_CONF}/coopr-security.xml`
@@ -234,6 +236,7 @@ sync_default_data () {
   curl ${CURL_PARAMETER} --silent --request POST \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
+    --header "Authorization:Bearer ${ACCESS_TOKEN}" \
     --connect-timeout 5 \
     ${COOPR_SERVER_URI}/v2/plugins/sync ${CERT_PARAMETER}
 }
@@ -246,19 +249,25 @@ request_superadmin_workers () {
     --header "Content-Type:application/json" \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
+    --header "Authorization:Bearer ${ACCESS_TOKEN}" \
     --connect-timeout 5 --data "{ \"tenant\":{\"workers\":${COOPR_NUM_WORKERS}, \"name\":\"superadmin\"} }" \
     ${COOPR_SERVER_URI}/v2/tenants/superadmin ${CERT_PARAMETER}
 }
 
 wait_for_server () {
   RETRIES=0
-  until [[ $(curl ${CURL_PARAMETER} ${COOPR_SERVER_URI}/status ${CERT_PARAMETER} 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
+  until [[ $(curl ${CURL_PARAMETER} ${COOPR_SERVER_URI}/status ${CERT_PARAMETER} 2> /dev/null | grep 'OK\|auth_uri') || ${RETRIES} -gt 60 ]]; do
       sleep 2
       let "RETRIES++"
   done
 
   if [ ${RETRIES} -gt 60 ]; then
       die "Server did not successfully start"
+  fi
+
+  if [ "${SECURITY_ENABLED}" == "true" ]; then
+    AUTH_SERVER_URI=${COOPR_PROTOCOL}://localhost:55059
+    export ACCESS_TOKEN=$(curl -u ${COOPR_API_USER}:${COOPR_API_USER_PASS} ${AUTH_SERVER_URI}/token 2> /dev/null | sed '1s/.*access_token":"\([^"]*\).*/\1/')
   fi
 }
 
@@ -268,6 +277,7 @@ wait_for_plugin_registration () {
     --output /dev/null --write-out "%{http_code}" \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
+    --header "Authorization:Bearer ${ACCESS_TOKEN}" \
     ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo ${CERT_PARAMETER} 2> /dev/null) -eq 200 || ${RETRIES} -gt 60 ]]; do
     sleep 2
     let "RETRIES++"
@@ -322,7 +332,11 @@ ui () {
 greeting () {
   [ "${COOPR_DISABLE_UI}" == "true" ] && return 0
   echo
-  echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
+  if [ "${COOPR_SSL}" == "true" ]; then
+    echo "Go to ${COOPR_PROTOCOL}://localhost:8443. Have fun creating clusters!"
+  else
+    echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
+  fi
 }
 
 stop () { provisioner stop; server stop; ui stop; }

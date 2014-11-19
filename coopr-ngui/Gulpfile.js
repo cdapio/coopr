@@ -120,6 +120,7 @@ gulp.task('js:app', function() {
     v: pkg.version
   });
   return gulp.src([
+      './app/*.js',
       './app/features/*/module.js',
       './app/**/*.js',
       '!./app/**/*-test.js'
@@ -168,7 +169,11 @@ gulp.task('tpl', function() {
         module: pkg.name + '.features',
         base: __dirname + '/app',
         root: '/assets/'
-      }))
+      })),
+
+    gulp.src(mainBowerFiles({
+      filter: /cask\-angular\-[^\/]+\/tpl\.html\.js/
+    }))
 
   )
     .pipe(plug.concat('tpl.js'))

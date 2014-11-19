@@ -33,6 +33,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.Map;
 
 /**
@@ -89,5 +91,20 @@ public class TestHelper {
       out.put("data", data);
     }
     return out;
+  }
+
+  /**
+   * Retrieves a free port
+   *
+   * @return int port value
+   * @throws IOException if an I/O error occurs when opening the socket.
+   */
+  public static int getFreePort() throws IOException {
+    ServerSocket server = new ServerSocket(0);
+    try {
+      return server.getLocalPort();
+    } finally {
+      server.close();
+    }
   }
 }

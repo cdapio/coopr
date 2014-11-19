@@ -34,6 +34,7 @@ import co.cask.coopr.scheduler.task.TaskServiceAction;
 import co.cask.coopr.spec.ProvisionerAction;
 import co.cask.coopr.spec.service.Service;
 import co.cask.coopr.spec.service.ServiceAction;
+import co.cask.coopr.spec.template.ClusterTemplate;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -62,7 +63,8 @@ public class TaskHandlerTest extends ServiceTestBase {
   public void testTakeTask() throws Exception {
     String tenantId = USER1_ACCOUNT.getTenantId();
     ClusterTask clusterTask = new ClusterTask(
-      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node_id", "service", ClusterAction.CLUSTER_CREATE);
+      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), "node_id", "service", ClusterAction.CLUSTER_CREATE,
+      "test", USER1_ACCOUNT);
     clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);
@@ -78,7 +80,7 @@ public class TaskHandlerTest extends ServiceTestBase {
     provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(schedulableTask)));
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, TENANT_ID);
-    HttpResponse response = doPost("/tasks/take", gson.toJson(takeRequest));
+    HttpResponse response = doPostInternalAPI("/tasks/take", gson.toJson(takeRequest));
     assertResponseStatus(response, HttpResponseStatus.OK);
     JsonObject responseJson = getResponseJson(response);
     Assert.assertEquals(clusterTask.getTaskId(), responseJson.get("taskId").getAsString());
@@ -87,14 +89,14 @@ public class TaskHandlerTest extends ServiceTestBase {
   @Test
   public void testTakeTaskForDeadProvisionerErrors() throws Exception {
     TakeTaskRequest takeRequest = new TakeTaskRequest("workerX", "nonexistant-provider", "tenantY");
-    assertResponseStatus(doPost("/tasks/take", gson.toJson(takeRequest)), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doPostInternalAPI("/tasks/take", gson.toJson(takeRequest)), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
   public void testFinishTaskForDeadProvisionerErrors() throws Exception {
     FinishTaskRequest finishRequest = new FinishTaskRequest("workerX", "nonexistant-provider", "tenantY", "taskId",
                                                             "stdout", "stderr", 0, null, null, null);
-    assertResponseStatus(doPost("/tasks/finish", gson.toJson(finishRequest)), HttpResponseStatus.FORBIDDEN);
+    assertResponseStatus(doPostInternalAPI("/tasks/finish", gson.toJson(finishRequest)), HttpResponseStatus.FORBIDDEN);
   }
 
   @Test
@@ -105,7 +107,8 @@ public class TaskHandlerTest extends ServiceTestBase {
     clusterStore.writeNode(node);
 
     ClusterTask clusterTask = new ClusterTask(
-      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE);
+      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE,
+      "test", USER1_ACCOUNT);
     clusterStore.writeClusterTask(clusterTask);
 
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
@@ -123,7 +126,7 @@ public class TaskHandlerTest extends ServiceTestBase {
     provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(schedulableTask)));
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, tenantId);
-    SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+    SchedulableTask task = TestHelper.takeTask(getBaseUrlInternalAPI(), takeRequest);
     Assert.assertEquals(clusterTask.getTaskId(), task.getTaskId());
 
     JsonObject provisionerResult = new JsonObject();
@@ -133,7 +136,7 @@ public class TaskHandlerTest extends ServiceTestBase {
     FinishTaskRequest finishRequest =
       new FinishTaskRequest("worker1", PROVISIONER_ID, tenantId, clusterTask.getTaskId(),
                             "some stdout", "some stderr", 0, null, null, provisionerResult);
-    TestHelper.finishTask(getBaseUrl(), finishRequest);
+    TestHelper.finishTask(getBaseUrlInternalAPI(), finishRequest);
 
     ClusterTask actualTask = clusterStore.getClusterTask(TaskId.fromString(clusterTask.getTaskId()));
     Assert.assertEquals(ClusterTask.Status.COMPLETE, actualTask.getStatus());
@@ -162,7 +165,8 @@ public class TaskHandlerTest extends ServiceTestBase {
     clusterStoreService.getView(cluster.getAccount()).writeCluster(cluster);
 
     ClusterTask clusterTask = new ClusterTask(
-      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE);
+      ProvisionerAction.CREATE, TaskId.fromString("1-1-1"), node.getId(), "service", ClusterAction.CLUSTER_CREATE,
+      "test", cluster.getAccount());
     clusterStore.writeClusterTask(clusterTask);
     ClusterJob clusterJob = new ClusterJob(JobId.fromString("1-1"), ClusterAction.CLUSTER_CREATE);
     clusterStore.writeClusterJob(clusterJob);
@@ -178,13 +182,13 @@ public class TaskHandlerTest extends ServiceTestBase {
     provisionerQueues.add(tenantId, new Element(clusterTask.getTaskId(), gson.toJson(schedulableTask)));
 
     TakeTaskRequest takeRequest = new TakeTaskRequest("worker1", PROVISIONER_ID, tenantId);
-    SchedulableTask task = TestHelper.takeTask(getBaseUrl(), takeRequest);
+    SchedulableTask task = TestHelper.takeTask(getBaseUrlInternalAPI(), takeRequest);
     Assert.assertEquals(clusterTask.getTaskId(), task.getTaskId());
 
     FinishTaskRequest finishRequest =
       new FinishTaskRequest("worker1", PROVISIONER_ID, tenantId, clusterTask.getTaskId(),
                             "some stdout", "some stderr", 1, null, null, null);
-    TestHelper.finishTask(getBaseUrl(), finishRequest);
+    TestHelper.finishTask(getBaseUrlInternalAPI(), finishRequest);
 
     ClusterTask actualTask = clusterStore.getClusterTask(TaskId.fromString(clusterTask.getTaskId()));
     Assert.assertEquals(ClusterTask.Status.FAILED, actualTask.getStatus());
