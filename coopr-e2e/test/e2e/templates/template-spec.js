@@ -7,21 +7,25 @@ var helper = require('../../protractor-help');
 
 describe('templates test', function () {
 
-  var templates;
+  var templates,
+      template,
+      provider;
 
   it('should log in', function () {
     helper.loginAsAdmin();
   });
-  
+
   it('should show no templates', function () {
     templates = element.all(by.repeater('item in list'));
     expect(templates.count()).toEqual(0);
   });
 
   it('should create a template', function () {
+    var providerNames;
+    provider = Date.now() + '-provider';
     // First create provider
     browser.get('/providers/create');
-    element(by.name('name')).sendKeys('Testprovider');
+    element(by.name('name')).sendKeys(provider);
     element(by.css('#inputProviderDescription')).sendKeys('Test description');
     element(by.cssContainingText('option', 'google')).click();
     var formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
@@ -34,12 +38,13 @@ describe('templates test', function () {
     browser.waitForAngular();
 
     browser.get('/templates/create');
-    
+
     expect(
       browser.getLocationAbsUrl()
     ).toMatch(/\/templates\/create\/tab\/0$/);
 
-    element(by.css('#inputTemplateName')).sendKeys('foo');
+    template = Date.now() + '-template';
+    element(by.css('#inputTemplateName')).sendKeys(template);
     element(by.css('#inputTemplateDescription')).sendKeys('bar');
     element(by.cssContainingText('fieldset.active button.btn.btn-sm.btn-default', 'Next')).click();
 
@@ -68,29 +73,30 @@ describe('templates test', function () {
 
     // Delete provider created for test
     browser.get('/providers');
-    providersList = element.all(by.repeater('item in list'));
-    providersList.first().element(by.cssContainingText('.btn', 'Delete')).click();
-    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
+    providerNames = element.all(by.repeater('item in list').column('item.name'));
+    helper.deleteAssetFromList(providerNames, provider)
   });
 
   it('should verify a template', function () {
     browser.get('/templates');
-    templates = element.all(by.repeater('item in list'));
-    expect(templates.count()).toEqual(1);
+    var templateNames = element.all(by.repeater('item in list').column('item.name'));
+    helper.editAssetFromList(templateNames, template);
 
-    browser.get('/templates/edit/foo');
-
-    expect(element(by.css('#inputTemplateName')).getAttribute('value')).toBe('foo');
+    expect(element(by.css('#inputTemplateName')).getAttribute('value')).toBe(template);
     expect(element(by.css('#inputTemplateDescription')).getAttribute('value')).toBe('bar');
   });
 
   it('should delete a template', function () {
     browser.get('/templates');
-    templates = element.all(by.repeater('item in list'));
-    templates.first().element(by.cssContainingText('.btn', 'Delete')).click();
-    element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
-    templates = element.all(by.repeater('item in list'));
-    expect(templates.count()).toEqual(0);
+    var templateNames = element.all(by.repeater('item in list').column('item.name'));
+    var templateCount = templateNames.count();
+    helper.deleteAssetFromList(templateNames, template);
+
+    expect(templateCount.then(function(i) {
+      return i - 1;
+    })).toBe(
+      templateNames.count()
+    ); //Lame..
   });
 
 
@@ -99,5 +105,3 @@ describe('templates test', function () {
   });
 
 });
-
-
