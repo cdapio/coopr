@@ -65,7 +65,7 @@ describe('templates test', function () {
       browser.getLocationAbsUrl()
     ).toMatch(/\/templates\/create\/tab\/3$/);
 
-    element(by.cssContainingText('form button[type=submit]', 'Create')).click();
+    element(by.cssContainingText('form button[type=submit]:not(.ng-hide)', 'Create')).click();
 
     expect(
       browser.getLocationAbsUrl()
