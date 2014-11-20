@@ -24,7 +24,7 @@ describe('auth service', function() {
         $timeout = $injector.get('$timeout');
         $rootScope = $injector.get('$rootScope');
         $localStorage = $injector.get('$localStorage');
-        spyOn($rootScope, '$broadcast').andCallThrough();
+        spyOn($rootScope, '$broadcast').and.callThrough();
       }));
 
       describe('with missing password', function() {

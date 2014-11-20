@@ -44,6 +44,8 @@ public class CLIConfig {
 
   private RestClientManager clientManager;
   private String host;
+  private String userId;
+  private String tenantId;
   private List<HostnameChangeListener> hostnameChangeListeners;
   private int port;
   private int sslPort;
@@ -59,12 +61,14 @@ public class CLIConfig {
   public CLIConfig(String host, Integer port, String userId, String tenantId) {
     this.host = Objects.firstNonNull(host, "localhost");
     this.port = Objects.firstNonNull(port, DEFAULT_PORT);
+    this.userId = Objects.firstNonNull(userId, DEFAULT_USER_ID);
+    this.tenantId = Objects.firstNonNull(tenantId, DEFAULT_TENANT_ID);
     this.uri = URI.create(String.format("http://%s:%d", this.host, this.port));
     this.sslPort = DEFAULT_SSL_PORT;
     RestClientManager.Builder builder = RestClientManager.builder(this.host, this.port);
     builder.ssl(DEFAULT_SSL);
-    builder.userId(Objects.firstNonNull(userId, DEFAULT_USER_ID));
-    builder.tenantId(Objects.firstNonNull(tenantId, DEFAULT_TENANT_ID));
+    builder.userId(this.userId);
+    builder.tenantId(this.tenantId);
     builder.gson(injector.getInstance(Gson.class));
     this.clientManager = builder.build();
     this.hostnameChangeListeners = Lists.newArrayList();
@@ -72,6 +76,14 @@ public class CLIConfig {
 
   public String getHost() {
     return host;
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public String getTenantId() {
+    return tenantId;
   }
 
   public int getPort() {
@@ -96,6 +108,8 @@ public class CLIConfig {
     this.uri = URI.create(String.format("%s://%s:%d", ssl ? "https" : "http", host, port));
     RestClientManager.Builder builder = RestClientManager.builder(host, port);
     builder.ssl(DEFAULT_SSL);
+    this.userId = userId;
+    this.tenantId = tenantId;
     builder.userId(userId);
     builder.tenantId(tenantId);
     builder.gson(injector.getInstance(Gson.class));

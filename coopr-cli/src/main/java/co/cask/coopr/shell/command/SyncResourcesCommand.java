@@ -24,14 +24,14 @@ import com.google.inject.Inject;
 import java.io.PrintStream;
 
 /**
- * Synchronize plugins
+ * Synchronize resources.
  */
-public class SyncPluginCommand implements Command {
+public class SyncResourcesCommand implements Command {
 
   private final PluginClient pluginClient;
 
   @Inject
-  public SyncPluginCommand(PluginClient pluginClient) {
+  public SyncResourcesCommand(PluginClient pluginClient) {
     this.pluginClient = pluginClient;
   }
 
@@ -42,11 +42,11 @@ public class SyncPluginCommand implements Command {
 
   @Override
   public String getPattern() {
-    return String.format("sync plugins");
+    return String.format("sync resources");
   }
 
   @Override
   public String getDescription() {
-    return "Synchronize plugins";
+    return "Synchronize resources";
   }
 }

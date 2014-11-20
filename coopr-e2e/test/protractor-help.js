@@ -28,7 +28,6 @@ function login(tenant, username, password) {
 
 }
 
-
 function logout() {
 
   element(by.css('header .navbar-right .dropdown-toggle')).click();
