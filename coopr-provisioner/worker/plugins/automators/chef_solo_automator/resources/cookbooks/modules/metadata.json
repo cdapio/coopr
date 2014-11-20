@@ -1,0 +1,31 @@
+{
+  "name": "modules",
+  "description": "Manage modules on linux",
+  "long_description": "modules-cookbook\n================\n\n= DESCRIPTION:\nChef cookbook to manage linux modules with /etc/modules and modprobe (linux 2.6 +)\n\n= REQUIREMENTS:\n\nLinux 2.6+\nUbuntu >9.10 (for the moment. use upstart and not init, any contribution is welcome)\n\n= ATTRIBUTES:\nnode['modules'] = A namespace for modules settings.\n\n= USAGE:\nThere are two ways of setting sysctl values:\n1. Set chef attributes, E.G.:\n   default['modules']['loop']\n2. With Ressource/Provider\n\nResource/Provider\n=================\n\nThis cookbook includes LWRPs for managing:\n* modules\n* modules_multi\n\nmodules\n--------\n\n# Actions\n\n- :save: save and load a module (default)\n- :load: load a module\n- :remove: remove a (previously saved or load) module.\n\n# Attribute Parameters\n\n- module\n- options\n- path\n\n\n# Examples\n\n```\nmodules \"8021q\" do\n  action :load\nend\n```\n\nmodules_multi\n------------\n\n#Actions\n\n- :save: save and load modules (default)\n- :remove: remove (previously saved or load) modules.\n\n# Attribute Parameters\n\n- modules\n- path\n\n# Examples\n",
+  "maintainer": "Guilhem Lettron",
+  "maintainer_email": "guilhem.lettron@youscribe.com",
+  "license": "Apache v2.0",
+  "platforms": {
+    "ubuntu": ">= 0.0.0",
+    "debian": ">= 0.0.0"
+  },
+  "dependencies": {
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "0.2.0"
+}
