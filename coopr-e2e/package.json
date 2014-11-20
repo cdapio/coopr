@@ -13,6 +13,7 @@
     "protractor": "protractor test/protractor-conf.js"
   },
   "devDependencies": {
+    "jasmine-spec-reporter": "^1.1.0",
     "protractor": "^1.1.1"
   }
 }

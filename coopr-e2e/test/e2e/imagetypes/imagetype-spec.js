@@ -7,25 +7,21 @@ var helper = require('../../protractor-help');
 
 describe('imagetypes types test', function () {
 
-  var hardwareTypes;
+  var imageTypes,
+      image;
 
   it('should log in', function () {
     helper.loginAsAdmin();
   });
-  
-  it('should show no imagetype types', function () {
-    hardwareTypes = element.all(by.repeater('item in list'));
-    expect(hardwareTypes.count()).toEqual(0);
-  });
 
   it('should create a imagetype type', function () {
     browser.get('/imagetypes/create');
-    
+
     expect(
       browser.getLocationAbsUrl()
     ).toMatch(/\/imagetypes\/create$/);
-
-    element(by.css('#inputImageName')).sendKeys('foo');
+    image = Date.now() + '-image';
+    element(by.css('#inputImageName')).sendKeys(image);
     element(by.css('#inputImageDescription')).sendKeys('bar');
     element(by.partialButtonText('Create')).click();
 
@@ -36,22 +32,20 @@ describe('imagetypes types test', function () {
 
   it('should verify a imagetype type', function () {
     browser.get('/imagetypes');
-    hardwareTypes = element.all(by.repeater('item in list'));
-    expect(hardwareTypes.count()).toEqual(1);
+    element(by.cssContainingText('tr', image))
+      .element(by.cssContainingText('.btn', 'Edit')).click();
 
-    browser.get('/imagetypes/edit/foo');
-
-    expect(element(by.css('#inputImageName')).getAttribute('value')).toBe('foo');
+    expect(element(by.css('#inputImageName')).getAttribute('value')).toBe(image);
     expect(element(by.css('#inputImageDescription')).getAttribute('value')).toBe('bar');
   });
 
   it('should delete imagetype', function () {
     browser.get('/imagetypes');
-    hardwareTypes = element.all(by.repeater('item in list'));
-    hardwareTypes.first().element(by.cssContainingText('.btn', 'Delete')).click();
+    element(by.cssContainingText('tr', image))
+      .element(by.cssContainingText('.btn', 'Delete')).click();
     element(by.css('.modal-dialog .modal-footer .btn-primary')).click();
-    hardwareTypes = element.all(by.repeater('item in list'));
-    expect(hardwareTypes.count()).toEqual(0);
+
+    expect(element(by.cssContainingText('tr', image)).isPresent()).toBe(false);
   });
 
 
@@ -60,5 +54,3 @@ describe('imagetypes types test', function () {
   });
 
 });
-
-

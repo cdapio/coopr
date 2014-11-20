@@ -17,31 +17,38 @@ var config = {
     'browserName': 'chrome'
   },
 
-  
+
 
   baseUrl: 'http://localhost:8080/',
 
   framework: 'jasmine',
 
   jasmineNodeOpts: {
-    defaultTimeoutInterval: 60000
+    defaultTimeoutInterval: 60000,
+    silent: true
   },
 
   onPrepare: function() {
     browser.driver.manage().window().maximize();
+    var SpecReporter = require('jasmine-spec-reporter');
+    // add jasmine spec reporter
+    jasmine.getEnv().addReporter(new SpecReporter({
+      displayStacktrace: true,
+      displayFailuresSummary: true
+    }));
   }
 };
 
 if (process.env.TRAVIS) {
-  
+
   config.seleniumAddress =  'http://hub.browserstack.com/wd/hub';
-  
+
   if('BS_AUTOMATE_PROJECT' in process.env) {
-    config.capabilities['project'] = process.env['BS_AUTOMATE_PROJECT'];  
+    config.capabilities['project'] = process.env['BS_AUTOMATE_PROJECT'];
   }
 
   if('BS_AUTOMATE_BUILD' in process.env) {
-    config.capabilities['build'] = process.env['BS_AUTOMATE_BUILD'];  
+    config.capabilities['build'] = process.env['BS_AUTOMATE_BUILD'];
   }
 }
 
