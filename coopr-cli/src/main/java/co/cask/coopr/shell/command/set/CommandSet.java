@@ -76,11 +76,7 @@ import java.util.List;
  */
 public class CommandSet {
 
-  public static co.cask.common.cli.CommandSet<Command> getCliCommandSet(Injector injector) {
-    List<Command> commands = ImmutableList.of(
-      injector.getInstance(ConnectCommand.class),
-      injector.getInstance(ExitCommand.class)
-    );
+  public static co.cask.common.cli.CommandSet<Command> getCliCommandSetForSuperadmin(Injector injector) {
     List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
       getAdminCommandSet(injector),
       getClusterCommandSet(injector),
@@ -88,7 +84,32 @@ public class CommandSet {
       getTenantCommandSet(injector),
       getProvisionerCommandSet(injector)
     );
-    return new co.cask.common.cli.CommandSet<Command>(commands, commandSets);
+    return new co.cask.common.cli.CommandSet<Command>(getCommonComands(injector), commandSets);
+  }
+
+  public static co.cask.common.cli.CommandSet<Command> getCliCommandSetForAdmin(Injector injector) {
+    List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
+      getAdminCommandSet(injector),
+      getClusterCommandSet(injector),
+      getPluginCommandSet(injector),
+      getProvisionerCommandSet(injector)
+    );
+    return new co.cask.common.cli.CommandSet<Command>(getCommonComands(injector), commandSets);
+  }
+
+  public static co.cask.common.cli.CommandSet<Command> getCliCommandSetForNonAdminUser(Injector injector) {
+    List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
+      getClusterCommandSet(injector),
+      getProvisionerCommandSet(injector)
+    );
+    return new co.cask.common.cli.CommandSet<Command>(getCommonComands(injector), commandSets);
+  }
+
+  private static List<Command> getCommonComands(Injector injector) {
+    return ImmutableList.of(
+      injector.getInstance(ConnectCommand.class),
+      injector.getInstance(ExitCommand.class)
+    );
   }
 
   private static co.cask.common.cli.CommandSet<Command> getAdminCommandSet(Injector injector) {

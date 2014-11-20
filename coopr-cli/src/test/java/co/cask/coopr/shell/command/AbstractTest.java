@@ -78,7 +78,7 @@ public abstract class AbstractTest {
       }
     );
 
-    co.cask.common.cli.CommandSet<Command> commandSet = CommandSet.getCliCommandSet(injector);
+    co.cask.common.cli.CommandSet<Command> commandSet = CommandSet.getCliCommandSetForSuperadmin(injector);
     CLI = new CLI<Command>(commandSet, Collections.<String, Completer>emptyMap());
   }
 

@@ -46,10 +46,10 @@ import static co.cask.coopr.shell.util.Constants.EV_USER_ID;
  */
 public class CLIMain {
 
-  private final CLI<Command> cli;
+  private CLI<Command> cli;
 
   public CLIMain(final CLIConfig cliConfig) throws URISyntaxException, IOException {
-    Injector injector = Guice.createInjector(
+    final Injector injector = Guice.createInjector(
       new AbstractModule() {
         @Override
         protected void configure() {
@@ -63,7 +63,21 @@ public class CLIMain {
       }
     );
 
-    final co.cask.common.cli.CommandSet<Command> commandSetWithoutHelp = CommandSet.getCliCommandSet(injector);
+    cli = getCli(cliConfig, injector);
+    cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
+
+    cliConfig.addHostnameChangeListener(new CLIConfig.HostChangeListener() {
+      @Override
+      public void onHostChanged() throws IOException {
+        cli = getCli(cliConfig, injector);
+        cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
+        cli.startInteractiveMode(System.out);
+      }
+    });
+  }
+
+  private CLI<Command> getCli(CLIConfig cliConfig, Injector injector) throws IOException {
+    final co.cask.common.cli.CommandSet<Command> commandSetWithoutHelp = getCommandSet(cliConfig, injector);
     HelpCommand helpCommand = new HelpCommand(new Supplier<Iterable<Command>>() {
       @Override
       public Iterable<Command> get() {
@@ -72,13 +86,19 @@ public class CLIMain {
     }, cliConfig);
     co.cask.common.cli.CommandSet<Command> commandSet = new co.cask.common.cli.CommandSet<Command>(
       ImmutableList.of((Command) helpCommand), ImmutableList.of(commandSetWithoutHelp));
-    this.cli = new CLI<Command>(commandSet, Collections.<String, Completer>emptyMap());
-    cliConfig.addHostnameChangeListener(new CLIConfig.HostnameChangeListener() {
-      @Override
-      public void onHostnameChanged(String newHostname) {
-        cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
-      }
-    });
+    return new CLI<Command>(commandSet, Collections.<String, Completer>emptyMap());
+  }
+
+  private co.cask.common.cli.CommandSet<Command> getCommandSet(CLIConfig cliConfig, Injector injector) {
+    co.cask.common.cli.CommandSet<Command> commandSet;
+    if (cliConfig.isSuperadmin()) {
+      commandSet = CommandSet.getCliCommandSetForSuperadmin(injector);
+    } else if (cliConfig.isAdmin()) {
+      commandSet = CommandSet.getCliCommandSetForAdmin(injector);
+    } else {
+      commandSet = CommandSet.getCliCommandSetForNonAdminUser(injector);
+    }
+    return commandSet;
   }
 
   private static String toString(String[] array) {
@@ -102,7 +122,6 @@ public class CLIMain {
 
     CLIConfig config = new CLIConfig(host, port, userId, tenantId);
     CLIMain shell = new CLIMain(config);
-    shell.cli.getReader().setPrompt("coopr (" + config.getURI() + ")> ");
 
     if (args.length == 0) {
       shell.cli.startInteractiveMode(System.out);
