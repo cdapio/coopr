@@ -1,0 +1,35 @@
+{
+  "name": "aufs",
+  "description": "Installs/Configures AUFS",
+  "long_description": "# chef-aufs [![Build Status](https://secure.travis-ci.org/bflad/chef-aufs.png?branch=master)](http://travis-ci.org/bflad/chef-aufs)\n\n## Description\n\nInstalls/Configures AUFS.\n\n## Requirements\n\n### Chef\n\n* Chef 11+\n\n### Platforms\n\n* Ubuntu 12.04, 12.10, 13.04, 13.10\n\n### Cookbooks\n\n[Opscode Cookbooks](https://github.com/opscode-cookbooks/)\n\n* [apt](https://github.com/opscode-cookbooks/apt)\n\nThird-Party Cookbooks\n\n* [modules](https://github.com/Youscribe/modules-cookbook)\n\n## Attributes\n\nNone currently.\n\n## Recipes\n\n* `recipe[aufs]` Installs/Configures AUFS\n* `recipe[aufs::module]` Loads AUFS Linux module\n* `recipe[aufs::package]` Installs AUFS via package\n\n## Usage\n\n### Default Installation\n\n* Add `recipe[aufs]` to your node's run list\n\n## Testing and Development\n\n* Quickly testing with Vagrant: [VAGRANT.md](VAGRANT.md)\n* Full development and testing workflow with Test Kitchen and friends: [TESTING.md](TESTING.md)\n\n## Contributing\n\nPlease see contributing information in: [CONTRIBUTING.md](CONTRIBUTING.md)\n\n## Maintainers\n\n* Brian Flad (<bflad417@gmail.com>)\n\n## License\n\nPlease see licensing information in: [LICENSE](LICENSE)\n",
+  "maintainer": "Brian Flad",
+  "maintainer_email": "bflad417@gmail.com",
+  "license": "Apache 2.0",
+  "platforms": {
+    "ubuntu": ">= 12.04"
+  },
+  "dependencies": {
+    "apt": ">= 0.0.0",
+    "modules": ">= 0.0.0"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+    "aufs": "Installs/Configures AUFS",
+    "aufs::module": "Loads AUFS Linux module",
+    "aufs::package": "Installs AUFS via package"
+  },
+  "version": "0.1.1"
+}
