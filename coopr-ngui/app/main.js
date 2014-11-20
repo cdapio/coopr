@@ -107,7 +107,7 @@ angular
     });
 
     // speed up integration tests
-    if(window.name.match(/PROTRACTOR/) {
+    if(window.name.match(/PROTRACTOR/)) {
       $alertProvider.defaults.duration = false;
     }
   })
