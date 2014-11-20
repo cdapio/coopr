@@ -35,7 +35,8 @@
     "gulp-wrapper": "^0.1.5",
     "karma": "^0.12.21",
     "karma-chrome-launcher": "^0.1.4",
-    "karma-jasmine": "^0.1.5",
+    "karma-jasmine": "^0.3.0",
+    "jasmine-core": "~2.0.0",
     "main-bower-files": "^2.1.0",
     "merge-stream": "^0.1.5"
   },
