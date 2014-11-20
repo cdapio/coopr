@@ -1,0 +1,29 @@
+{
+  "name": "polipo",
+  "description": "Install and configure polipo",
+  "long_description": "Install and configure polipo",
+  "maintainer": "Chris Roberts",
+  "maintainer_email": "code@hw-ops.com",
+  "license": "Apache 2.0",
+  "platforms": {
+  },
+  "dependencies": {
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "0.1.0"
+}
