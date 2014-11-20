@@ -48,7 +48,7 @@ public class CLIConfig {
   private String host;
   private String userId;
   private String tenantId;
-  private List<HostChangeListener> hostChangeListeners;
+  private List<ReconnectListener> reconnectListeners;
   private int port;
   private int sslPort;
   private URI uri;
@@ -73,7 +73,7 @@ public class CLIConfig {
     builder.tenantId(this.tenantId);
     builder.gson(injector.getInstance(Gson.class));
     this.clientManager = builder.build();
-    this.hostChangeListeners = Lists.newArrayList();
+    this.reconnectListeners = Lists.newArrayList();
   }
 
   public String getHost() {
@@ -124,13 +124,13 @@ public class CLIConfig {
     builder.tenantId(tenantId);
     builder.gson(injector.getInstance(Gson.class));
     this.clientManager = builder.build();
-    for (HostChangeListener listener : hostChangeListeners) {
-      listener.onHostChanged();
+    for (ReconnectListener listener : reconnectListeners) {
+      listener.onReconnect();
     }
   }
 
-  public void addHostnameChangeListener(HostChangeListener listener) {
-    this.hostChangeListeners.add(listener);
+  public void addReconnectListener(ReconnectListener listener) {
+    this.reconnectListeners.add(listener);
   }
 
   public URI getURI() {
@@ -138,9 +138,9 @@ public class CLIConfig {
   }
 
   /**
-   * Listener for Coopr host changes.
+   * Listener to reconnect to a Coopr instance.
    */
-  public interface HostChangeListener {
-    void onHostChanged() throws IOException;
+  public interface ReconnectListener {
+    void onReconnect() throws IOException;
   }
 }

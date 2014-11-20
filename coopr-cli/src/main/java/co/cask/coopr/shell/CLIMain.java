@@ -66,9 +66,9 @@ public class CLIMain {
     cli = getCli(cliConfig, injector);
     cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
 
-    cliConfig.addHostnameChangeListener(new CLIConfig.HostChangeListener() {
+    cliConfig.addReconnectListener(new CLIConfig.ReconnectListener() {
       @Override
-      public void onHostChanged() throws IOException {
+      public void onReconnect() throws IOException {
         cli = getCli(cliConfig, injector);
         cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
         cli.startInteractiveMode(System.out);
