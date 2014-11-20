@@ -1,3 +1,5 @@
+var SpecReporter = require('jasmine-spec-reporter');
+
 var config = {
   allScriptsTimeout: 60000,
 
@@ -30,7 +32,10 @@ var config = {
 
   onPrepare: function() {
     browser.driver.manage().window().maximize();
-    var SpecReporter = require('jasmine-spec-reporter');
+
+    // some test speed-ups in the code are made based on window name
+    browser.driver.executeScript("window.name=window.name+'_PROTRACTOR';");
+
     // add jasmine spec reporter
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,

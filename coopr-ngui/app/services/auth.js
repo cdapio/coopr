@@ -140,7 +140,7 @@ module.factory('myAuthPromise', function myAuthPromiseFactory (MYAUTH_ROLE, $tim
           deferred.resolve(c);
         }
       }
-    }, 1500);
+    }, window.name.match(/PROTRACTOR/) ? 50 : 1500);
 
 
 
