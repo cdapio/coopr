@@ -106,24 +106,6 @@ public class MetricService {
                           TimeUnit.MILLISECONDS.toSeconds(endDate), intervals);
   }
 
-  /**
-   * Validates {@code rawTimeSeries} using specified {@code timeUnit}
-   *
-   * @param rawTimeSeries the raw {@link TimeSeries}
-   * @param timeUnit the {@link TimeUnit}
-   * @return validated {@link TimeSeries}
-   */
-  private TimeSeries validate(TimeSeries rawTimeSeries, long timeUnit) {
-    long start = getAppropriateValue(rawTimeSeries.getStart(), timeUnit);
-    long end = getAppropriateValue(rawTimeSeries.getEnd(), timeUnit);
-    List<Interval> intervals = new ArrayList<Interval>();
-    for (Interval interval : rawTimeSeries.getData()) {
-      intervals.add(new Interval(getAppropriateValue(interval.getTime(), timeUnit),
-                                 getAppropriateValue(interval.getValue(), timeUnit)));
-    }
-    return new TimeSeries(start, end, intervals);
-  }
-
   private long getDeleteTaskTime(List<ClusterTask> deleteTasks, ClusterTask createTask) {
     ClusterTask result = null;
     for (ClusterTask deleteTask : deleteTasks) {
@@ -150,10 +132,6 @@ public class MetricService {
       }
     }
     return result;
-  }
-
-  private long getAppropriateValue(double rawValue, long divider) {
-    return Math.round(rawValue / divider);
   }
 
   /**
