@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Handler for performing metric operations.
@@ -118,11 +119,11 @@ public class MetricHandler extends AbstractAuthHandler {
                            String.format("Incorrect value for field groupby: %s", filters.get("groupby")));
       return;
     }
-    MetricService.TimeUnit timeUnit = null;
+    TimeUnit timeUnit = null;
     try {
       String rawTimeUnit = filters.get("timeunit");
       if (rawTimeUnit != null) {
-        timeUnit = MetricService.TimeUnit.valueOf(rawTimeUnit);
+        timeUnit = TimeUnit.valueOf(rawTimeUnit.toUpperCase());
       }
     } catch (IllegalArgumentException e) {
       responder.sendString(HttpResponseStatus.BAD_REQUEST,

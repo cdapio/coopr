@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Util for performing metric operations.
@@ -38,13 +39,6 @@ public class MetricService {
     week,
     month,
     year
-  }
-
-  public enum TimeUnit {
-    seconds,
-    minutes,
-    hours,
-    days
   }
 
   private static final long WEEK = DateUtils.MILLIS_PER_DAY * 7;
@@ -72,17 +66,17 @@ public class MetricService {
     List<ClusterTask> tasks = clusterStore.getClusterTasks(filter);
     Long start = filter.getStart();
     Long end = filter.getEnd();
-    long timeunit = getDivider(filter.getTimeUnit() != null ? filter.getTimeUnit() : TimeUnit.seconds);
+    TimeUnit timeUnit = filter.getTimeUnit() != null ? filter.getTimeUnit() : TimeUnit.SECONDS;
     if (tasks.isEmpty()) {
       long startTime = start != null ? start : 0;
-      return validate(new TimeSeries(startTime, end != null ? end : System.currentTimeMillis(),
-                            Arrays.asList(new Interval(startTime))), timeunit);
+      return new TimeSeries(startTime, end != null ? end : TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()),
+                            Arrays.asList(new Interval(startTime)));
     }
     List<ClusterTask> createTasks = getTasksByName(tasks, ProvisionerAction.CREATE);
     List<ClusterTask> deleteTasks = getTasksByName(tasks, ProvisionerAction.DELETE);
-    long startDate = start != null ? start * timeunit : createTasks.isEmpty() ?
+    long startDate = start != null ? TimeUnit.SECONDS.toMillis(start) : createTasks.isEmpty() ?
       0 : createTasks.get(0).getStatusTime();
-    long endDate = end != null ? end * timeunit : deleteTasks.isEmpty() ?
+    long endDate = end != null ? TimeUnit.SECONDS.toMillis(end) : deleteTasks.isEmpty() ?
       System.currentTimeMillis() : deleteTasks.get(deleteTasks.size() - 1).getStatusTime();
     Periodicity periodicity = filter.getPeriodicity();
     long period;
@@ -100,31 +94,32 @@ public class MetricService {
       Interval current = intervals.get(currentIndex);
       while (current.getTime() + period < localEnd) {
         long increaseTime = localStart < current.getTime() ? period : period + current.getTime() - localStart;
-        current.increaseValue(increaseTime);
+        current.increaseValue(timeUnit.convert(increaseTime, TimeUnit.MILLISECONDS));
         current = intervals.get(++currentIndex);
       }
       long increaseTime = localStart < current.getTime() ? localEnd - current.getTime() : localEnd - localStart;
       if (increaseTime > 0) {
-        current.increaseValue(increaseTime);
+        current.increaseValue(timeUnit.convert(increaseTime, TimeUnit.MILLISECONDS));
       }
     }
-    return validate(new TimeSeries(startDate, endDate, intervals), timeunit);
+    return new TimeSeries(TimeUnit.MILLISECONDS.toSeconds(startDate),
+                          TimeUnit.MILLISECONDS.toSeconds(endDate), intervals);
   }
 
   /**
-   * Validates {@code rawTimeSeries} using specified {@code timeunit}
+   * Validates {@code rawTimeSeries} using specified {@code timeUnit}
    *
    * @param rawTimeSeries the raw {@link TimeSeries}
-   * @param timeunit the {@link co.cask.coopr.metrics.MetricService.TimeUnit}
+   * @param timeUnit the {@link TimeUnit}
    * @return validated {@link TimeSeries}
    */
-  private TimeSeries validate(TimeSeries rawTimeSeries, long timeunit) {
-    long start = getAppropriateValue(rawTimeSeries.getStart(), timeunit);
-    long end = getAppropriateValue(rawTimeSeries.getEnd(), timeunit);
+  private TimeSeries validate(TimeSeries rawTimeSeries, long timeUnit) {
+    long start = getAppropriateValue(rawTimeSeries.getStart(), timeUnit);
+    long end = getAppropriateValue(rawTimeSeries.getEnd(), timeUnit);
     List<Interval> intervals = new ArrayList<Interval>();
     for (Interval interval : rawTimeSeries.getData()) {
-      intervals.add(new Interval(getAppropriateValue(interval.getTime(), timeunit),
-                                 getAppropriateValue(interval.getValue(), timeunit)));
+      intervals.add(new Interval(getAppropriateValue(interval.getTime(), timeUnit),
+                                 getAppropriateValue(interval.getValue(), timeUnit)));
     }
     return new TimeSeries(start, end, intervals);
   }
@@ -214,19 +209,6 @@ public class MetricService {
         return MONTH;
       default:
         return YEAR;
-    }
-  }
-
-  private long getDivider(TimeUnit timeUnit) {
-    switch (timeUnit) {
-      case seconds:
-        return DateUtils.MILLIS_PER_SECOND;
-      case minutes:
-        return DateUtils.MILLIS_PER_MINUTE;
-      case hours:
-        return DateUtils.MILLIS_PER_HOUR;
-      default:
-        return DateUtils.MILLIS_PER_DAY;
     }
   }
 }
