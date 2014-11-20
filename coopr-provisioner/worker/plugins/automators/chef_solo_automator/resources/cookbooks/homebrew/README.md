@@ -29,7 +29,9 @@ The only platform supported by Homebrew itself at the time of this writing is Ma
 Attributes
 ----------
 - `node['homebrew']['owner']` - The user that will own the Homebrew installation and packages. Setting this will override the default behavior which is to use the non-privileged user that has invoked the Chef run (or the `SUDO_USER` if invoked with sudo). The default is `nil`.
-
+- `node['homebrew']['auto-update']` - Whether the default recipe should automatically update homebrew each run or not. The default is `true` to maintain compatibility. Set to false or nil to disable. Note that disabling this feature may cause formula to not work.
+- `node['homebrew']['formulas']` - An Array of formula that should be installed using homebrew by default, used only in the `homebrew::install_formulas` recipe.
+- `node['homebrew']['casks']` - An Array of casks that should be installed using brew cask by default, used only in the `homebrew::install_casks` recipe.
 
 Resources and Providers
 -----------------------
@@ -53,6 +55,10 @@ homebrew_package 'mysql'
 
 package 'mysql' do
   provider Chef::Provider::Package::Homebrew
+end
+
+package 'wireshark' do
+  options '--with-qt --devel'
 end
 ```
 
@@ -78,6 +84,41 @@ homebrew_tap 'homebrew/dupes' do
   action :untap
 end
 ```
+
+## homebrew\_cask
+
+LWRP for `brew cask`, a Homebrew-style CLI workflow for the administration
+of Mac applications distributed as binaries. It's implemented as a homebrew
+"external command" called cask.
+
+[homebrew-cask on GitHub](https://github.com/caskroom/homebrew-cask)
+
+### Prerequisites
+
+You must have the homebrew-cask repository tapped.
+
+    homebrew_tap 'caskroom/cask'
+
+And then install the homebrew cask package before using this LWRP.
+
+    package "brew-cask" do
+      action :install
+    end
+
+You can include the `homebrew::cask` recipe to do this.
+
+### Examples
+
+    homebrew_cask "google-chrome"
+
+    homebrew_cask "google-chrome" do
+      action :uncask
+    end
+
+Default action is `:cask` which installs the Application binary . Use `:uncask` to
+uninstall a an Application.
+
+[View the list of available Casks](https://github.com/caskroom/homebrew-cask/tree/master/Casks)
 
 
 Usage
