@@ -47,7 +47,6 @@ public class HttpModule extends AbstractModule {
     internalHandlerBinder.addBinding().to(StatusHandler.class);
     internalHandlerBinder.addBinding().to(RPCHandler.class);
     internalHandlerBinder.addBinding().to(SuperadminHandler.class);
-    internalHandlerBinder.addBinding().to(ProvisionerHandler.class);
     internalHandlerBinder.addBinding().to(PluginHandler.class);
     internalHandlerBinder.addBinding().to(UserHandler.class);
     internalHandlerBinder.addBinding().to(MetricHandler.class);
@@ -55,8 +54,6 @@ public class HttpModule extends AbstractModule {
     Multibinder<HttpHandler> externalHandlerBinder =
       Multibinder.newSetBinder(binder(), HttpHandler.class, Names.named("Internal"));
     externalHandlerBinder.addBinding().to(TaskHandler.class);
-    externalHandlerBinder.addBinding().to(SuperadminHandler.class);
     externalHandlerBinder.addBinding().to(ProvisionerHandler.class);
-    externalHandlerBinder.addBinding().to(PluginHandler.class);
   }
 }
