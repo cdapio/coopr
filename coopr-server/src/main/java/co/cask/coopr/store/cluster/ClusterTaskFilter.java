@@ -44,7 +44,7 @@ public class ClusterTaskFilter {
     this.start = start;
     this.end = end;
     this.periodicity = periodicity;
-    this.timeUnit = timeUnit;
+    this.timeUnit = timeUnit != null ? timeUnit : TimeUnit.SECONDS;
   }
 
   /**
@@ -119,7 +119,7 @@ public class ClusterTaskFilter {
 
   /**
    * Retrieves {@link TimeUnit} of this filter.
-   * This field is ignored if its value is {@code null}.
+   * The default value for this field is {@link TimeUnit}.SECONDS.
    *
    * @return timeUnit
    */

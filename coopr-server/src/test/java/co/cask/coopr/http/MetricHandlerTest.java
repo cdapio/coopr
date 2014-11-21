@@ -131,7 +131,7 @@ public class MetricHandlerTest extends ServiceTestBase {
     TimeSeries actual = getResponseData(response);
 
     List<Interval> expectedList = new ArrayList<Interval>(1);
-    Interval interval = new Interval(5000);
+    Interval interval = new Interval(5);
     interval.increaseValue(17);
     interval.increaseValue(16);
     expectedList.add(interval);
@@ -232,19 +232,19 @@ public class MetricHandlerTest extends ServiceTestBase {
 
     //from 5 * millisPerHour to 9 * millisPerHour
     for (int i = 5; i < 9; i++) {
-      addInterval(expectedList, i * millisPerHour, millisPerHour / millisPerMinute);
+      addInterval(expectedList, i * millisPerHour / millisPerSecond, millisPerHour / millisPerMinute);
     }
     //from 9 * millisPerHour to 17 * millisPerHour
     for (int i = 9; i < 17; i++) {
-      addInterval(expectedList, i * millisPerHour, 2 * millisPerHour / millisPerMinute);
+      addInterval(expectedList, i * millisPerHour / millisPerSecond, 2 * millisPerHour / millisPerMinute);
     }
     //from 17 * millisPerHour to 20 * millisPerHour
     for (int i = 17; i < 20; i++) {
-      addInterval(expectedList, i * millisPerHour, 3 * millisPerHour / millisPerMinute);
+      addInterval(expectedList, i * millisPerHour / millisPerSecond, 3 * millisPerHour / millisPerMinute);
     }
     //from 20 * millisPerHour to 22 * millisPerHour
     for (int i = 20; i < 22; i++) {
-      addInterval(expectedList, i * millisPerHour, 2 * millisPerHour / millisPerMinute);
+      addInterval(expectedList, i * millisPerHour / millisPerSecond, 2 * millisPerHour / millisPerMinute);
     }
 
     Assert.assertEquals(new TimeSeries(5 * millisPerHour / millisPerSecond,

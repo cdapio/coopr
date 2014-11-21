@@ -27,15 +27,10 @@ public class Interval {
   private long value = 0;
 
   public Interval(long time) {
-    this.time = TimeUnit.MILLISECONDS.toSeconds(time);
+    this.time = time;
   }
 
-  public Interval(long time, long value) {
-    this.time = TimeUnit.MILLISECONDS.toSeconds(time);
-    this.value = value;
-  }
-
-  public long getTime() {
+  public long getTimeInMillis() {
     return TimeUnit.SECONDS.toMillis(time);
   }
 

@@ -66,7 +66,7 @@ public class MetricService {
     List<ClusterTask> tasks = clusterStore.getClusterTasks(filter);
     Long start = filter.getStart();
     Long end = filter.getEnd();
-    TimeUnit timeUnit = filter.getTimeUnit() != null ? filter.getTimeUnit() : TimeUnit.SECONDS;
+    TimeUnit timeUnit = filter.getTimeUnit();
     if (tasks.isEmpty()) {
       long startTime = start != null ? start : 0;
       return new TimeSeries(startTime, end != null ? end : TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()),
@@ -92,12 +92,12 @@ public class MetricService {
       long localEnd = Math.min(deleteTaskTime, endDate);
       int currentIndex = getNearestIndex(intervals, localStart);
       Interval current = intervals.get(currentIndex);
-      while (current.getTime() + period < localEnd) {
-        long increaseTime = localStart < current.getTime() ? period : period + current.getTime() - localStart;
+      while (current.getTimeInMillis() + period < localEnd) {
+        long increaseTime = localStart < current.getTimeInMillis() ? period : period + current.getTimeInMillis() - localStart;
         current.increaseValue(timeUnit.convert(increaseTime, TimeUnit.MILLISECONDS));
         current = intervals.get(++currentIndex);
       }
-      long increaseTime = localStart < current.getTime() ? localEnd - current.getTime() : localEnd - localStart;
+      long increaseTime = localStart < current.getTimeInMillis() ? localEnd - current.getTimeInMillis() : localEnd - localStart;
       if (increaseTime > 0) {
         current.increaseValue(timeUnit.convert(increaseTime, TimeUnit.MILLISECONDS));
       }
@@ -144,7 +144,7 @@ public class MetricService {
   private int getNearestIndex(List<Interval> intervals, long key) {
     int index = -1;
     for (Interval value : intervals) {
-      if (value.getTime() <= key) {
+      if (value.getTimeInMillis() <= key) {
         index++;
       } else {
         break;
@@ -167,11 +167,11 @@ public class MetricService {
     long nextStart = start - start%period + period;
     nextStart = nextStart < end ? nextStart : end;
     while (nextStart < end) {
-      intervals.add(new Interval(currentStart));
+      intervals.add(new Interval(TimeUnit.MILLISECONDS.toSeconds(currentStart)));
       currentStart = nextStart;
       nextStart = currentStart + period < end ? currentStart + period : end;
     }
-    intervals.add(new Interval(currentStart));
+    intervals.add(new Interval(TimeUnit.MILLISECONDS.toSeconds(currentStart)));
     return intervals;
   }
 
