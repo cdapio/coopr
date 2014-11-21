@@ -45,10 +45,10 @@ begin
     opts.on('-q', '--quiet', 'Suppress all non-error output') do
       options[:quiet] = true
     end
-    opts.on('--cert-path [CERTPATH]', 'Trust certificate path') do |c|
+    opts.on('--cert-path CERTPATH', 'Trust certificate path') do |c|
       options[:cert_path] = c
     end
-    opts.on('--cert-pass [CERTPASS]', 'Trust certificate password') do |p|
+    opts.on('--cert-pass CERTPASS', 'Trust certificate password') do |p|
       options[:cert_pass] = p
     end
 
