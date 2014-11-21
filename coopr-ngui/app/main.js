@@ -105,11 +105,6 @@ angular
       container: '#alerts > .container',
       duration: 3
     });
-
-    // speed up integration tests
-    if(window.name.match(/PROTRACTOR/)) {
-      $alertProvider.defaults.duration = false;
-    }
   })
 
   .config(function ($compileProvider) {
