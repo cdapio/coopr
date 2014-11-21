@@ -64,34 +64,21 @@ public class CLIMain {
       }
     );
 
-    cli = getCli(cliConfig, injector);
+    cli = new CLI<Command>(getCommandSet(cliConfig, injector), Collections.<String, Completer>emptyMap());
     cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
 
     cliConfig.addReconnectListener(new CLIConfig.ReconnectListener() {
       @Override
       public void onReconnect() throws IOException {
-        cli = getCli(cliConfig, injector);
+        cli.setCommands(getCommandSet(cliConfig, injector));
         cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
         cli.startInteractiveMode(System.out);
       }
     });
   }
 
-  private CLI<Command> getCli(CLIConfig cliConfig, Injector injector) throws IOException {
-    final CommandSet<Command> commandSetWithoutHelp = getCommandSet(cliConfig, injector);
-    HelpCommand helpCommand = new HelpCommand(new Supplier<Iterable<Command>>() {
-      @Override
-      public Iterable<Command> get() {
-        return commandSetWithoutHelp.getCommands();
-      }
-    }, cliConfig);
-    CommandSet<Command> commandSet = new CommandSet<Command>(
-      ImmutableList.of((Command) helpCommand), ImmutableList.of(commandSetWithoutHelp));
-    return new CLI<Command>(commandSet, Collections.<String, Completer>emptyMap());
-  }
-
   private CommandSet<Command> getCommandSet(CLIConfig cliConfig, Injector injector) {
-    CommandSet<Command> commandSet;
+    final CommandSet<Command> commandSet;
     if (cliConfig.isSuperadmin()) {
       commandSet = CooprCommandSets.getCommandSetForSuperadmin(injector);
     } else if (cliConfig.isAdmin()) {
@@ -99,7 +86,13 @@ public class CLIMain {
     } else {
       commandSet = CooprCommandSets.getCommandSetForNonAdminUser(injector);
     }
-    return commandSet;
+    HelpCommand helpCommand = new HelpCommand(new Supplier<Iterable<Command>>() {
+      @Override
+      public Iterable<Command> get() {
+        return commandSet.getCommands();
+      }
+    }, cliConfig);
+    return new CommandSet<Command>(ImmutableList.of((Command) helpCommand), ImmutableList.of(commandSet));
   }
 
   private static String toString(String[] array) {
