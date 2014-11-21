@@ -245,40 +245,6 @@ public class SuperadminHandlerTest extends ServiceTestBase {
   }
 
   @Test
-  public void testProviderTypes() throws Exception {
-    testNonPostRestAPIs("providertypes", gson.toJsonTree(Entities.ProviderTypeExample.JOYENT).getAsJsonObject(),
-                        gson.toJsonTree(Entities.ProviderTypeExample.RACKSPACE).getAsJsonObject(), SUPERADMIN_HEADERS);
-  }
-
-  @Test
-  public void testAutomatorTypes() throws Exception {
-    testNonPostRestAPIs("automatortypes", gson.toJsonTree(Entities.AutomatorTypeExample.CHEF).getAsJsonObject(),
-                        gson.toJsonTree(Entities.AutomatorTypeExample.SHELL).getAsJsonObject(), SUPERADMIN_HEADERS);
-  }
-
-  @Test
-  public void testEditProviderTypesMustBeSuperadmin() throws Exception {
-    tenantStore.writeTenant(
-      new Tenant(ADMIN_ACCOUNT.getTenantId(), new TenantSpecification(TENANT, 500, 1000, 10000)));
-    ProviderType type = Entities.ProviderTypeExample.RACKSPACE;
-    assertResponseStatus(doPutExternalAPI("/plugins/providertypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
-                         HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doDeleteExternalAPI("/plugins/providertypes/" + type.getName(), ADMIN_HEADERS),
-                         HttpResponseStatus.FORBIDDEN);
-  }
-
-  @Test
-  public void testEditAutomatorTypesMustBeSuperadmin() throws Exception {
-    tenantStore.writeTenant(
-      new Tenant(ADMIN_ACCOUNT.getTenantId(), new TenantSpecification(TENANT, 500, 1000, 10000)));
-    AutomatorType type = Entities.AutomatorTypeExample.CHEF;
-    assertResponseStatus(doPutExternalAPI("/plugins/automatortypes/" + type.getName(), gson.toJson(type), ADMIN_HEADERS),
-                         HttpResponseStatus.FORBIDDEN);
-    assertResponseStatus(doDeleteExternalAPI("/plugins/automatortypes/" + type.getName(), ADMIN_HEADERS),
-                         HttpResponseStatus.FORBIDDEN);
-  }
-
-  @Test
   public void testBootstrapTenant() throws Exception {
     // write superadmin entities
     EntityStoreView superadminView = entityStoreService.getView(Account.SUPERADMIN);
@@ -338,56 +304,6 @@ public class SuperadminHandlerTest extends ServiceTestBase {
                         metaStoreService.getResourceTypeView(account, type1).get(meta2.getName(), meta2.getVersion()));
     Assert.assertEquals("meta1 contents", readPluginResource(account, type1, meta1.getName(), meta1.getVersion()));
     Assert.assertEquals("meta2 contents", readPluginResource(account, type1, meta2.getName(), meta2.getVersion()));
-  }
-
-  private void testNonPostRestAPIs(String entityType, JsonObject entity1, JsonObject entity2,
-                                   Header[] headers) throws Exception {
-    String base = "/plugins/" + entityType;
-    String entity1Path = base + "/" + entity1.get("name").getAsString();
-    String entity2Path = base + "/" + entity2.get("name").getAsString();
-    // should start off with no entities
-    assertResponseStatus(doGetExternalAPI(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
-
-    // add entity through PUT
-    assertResponseStatus(doPutExternalAPI(entity1Path, entity1.toString(), headers), HttpResponseStatus.OK);
-    // check we can get it
-    HttpResponse response = doGetExternalAPI(entity1Path, headers);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    Reader reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-    Assert.assertEquals(entity1, result);
-
-    // add second entity through PUT
-    assertResponseStatus(doPutExternalAPI(entity2Path, entity2.toString(), headers), HttpResponseStatus.OK);
-    // check we can get it
-    response = doGetExternalAPI(entity2Path, headers);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    result = new Gson().fromJson(reader, JsonObject.class);
-    Assert.assertEquals(entity2, result);
-
-    // get both entities
-    response = doGetExternalAPI(base, headers);
-    assertResponseStatus(response, HttpResponseStatus.OK);
-    reader = new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8);
-    JsonArray results = new Gson().fromJson(reader, JsonArray.class);
-
-    Assert.assertEquals(2, results.size());
-    JsonObject first = results.get(0).getAsJsonObject();
-    JsonObject second = results.get(1).getAsJsonObject();
-    if (first.get("name").getAsString().equals(entity1.get("name").getAsString())) {
-      Assert.assertEquals(entity1, first);
-      Assert.assertEquals(entity2, second);
-    } else {
-      Assert.assertEquals(entity2, first);
-      Assert.assertEquals(entity1, second);
-    }
-
-    assertResponseStatus(doDeleteExternalAPI(entity1Path, headers), HttpResponseStatus.OK);
-    assertResponseStatus(doDeleteExternalAPI(entity2Path, headers), HttpResponseStatus.OK);
-    // check both were deleted
-    assertResponseStatus(doGetExternalAPI(entity1Path, headers), HttpResponseStatus.NOT_FOUND);
-    assertResponseStatus(doGetExternalAPI(entity2Path, headers), HttpResponseStatus.NOT_FOUND);
   }
 
   private void writePluginResource(Account account, ResourceType resourceType,

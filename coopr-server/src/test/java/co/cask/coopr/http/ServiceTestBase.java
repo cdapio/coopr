@@ -154,8 +154,8 @@ public class ServiceTestBase extends BaseTest {
     return client.execute(get);
   }
 
-  public static HttpResponse doGetExternalAPI(String resource) throws Exception {
-    return doGet(resource, null, externalBase);
+  public static HttpResponse doGetInternalAPI(String resource) throws Exception {
+    return doGet(resource, null, internalBase);
   }
 
   public static HttpResponse doGetExternalAPI(String resource, Header[] headers) throws Exception {
@@ -173,12 +173,16 @@ public class ServiceTestBase extends BaseTest {
     return client.execute(get);
   }
 
-  public static HttpResponse doPutExternalAPI(String resource, String body) throws Exception {
-    return doPut(resource, body, null, externalBase);
+  public static HttpResponse doPutInternalAPI(String resource, String body) throws Exception {
+    return doPut(resource, body, null, internalBase);
   }
 
   public static HttpResponse doPutExternalAPI(String resource, String body, Header[] headers) throws Exception {
     return doPut(resource, body, headers, externalBase);
+  }
+
+  public static HttpResponse doPutInternalAPI(String resource, String body, Header[] headers) throws Exception {
+    return doPut(resource, body, headers, internalBase);
   }
 
   private static HttpResponse doPut(String resource, String body, Header[] headers, String base) throws Exception {
@@ -192,10 +196,6 @@ public class ServiceTestBase extends BaseTest {
       put.setEntity(new StringEntity(body));
     }
     return client.execute(put);
-  }
-
-  public static HttpResponse doPostExternalAPI(String resource, String body) throws Exception {
-    return doPost(resource, body, null, externalBase);
   }
 
   public static HttpResponse doPostInternalAPI(String resource, String body) throws Exception {
