@@ -74,9 +74,9 @@ import java.util.List;
 /**
  * Command set utility class.
  */
-public class CommandSet {
+public class CooprCommandSets {
 
-  public static co.cask.common.cli.CommandSet<Command> getCliCommandSetForSuperadmin(Injector injector) {
+  public static co.cask.common.cli.CommandSet<Command> getCommandSetForSuperadmin(Injector injector) {
     List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
       getAdminCommandSet(injector),
       getClusterCommandSet(injector),
@@ -87,7 +87,7 @@ public class CommandSet {
     return new co.cask.common.cli.CommandSet<Command>(getCommonComands(injector), commandSets);
   }
 
-  public static co.cask.common.cli.CommandSet<Command> getCliCommandSetForAdmin(Injector injector) {
+  public static co.cask.common.cli.CommandSet<Command> getCommandSetForAdmin(Injector injector) {
     List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
       getAdminCommandSet(injector),
       getClusterCommandSet(injector),
@@ -97,7 +97,7 @@ public class CommandSet {
     return new co.cask.common.cli.CommandSet<Command>(getCommonComands(injector), commandSets);
   }
 
-  public static co.cask.common.cli.CommandSet<Command> getCliCommandSetForNonAdminUser(Injector injector) {
+  public static co.cask.common.cli.CommandSet<Command> getCommandSetForNonAdminUser(Injector injector) {
     List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
       getClusterCommandSet(injector),
       getProvisionerCommandSet(injector)

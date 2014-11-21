@@ -18,13 +18,14 @@ package co.cask.coopr.shell;
 
 import co.cask.common.cli.CLI;
 import co.cask.common.cli.Command;
+import co.cask.common.cli.CommandSet;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.client.PluginClient;
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.client.TenantClient;
 import co.cask.coopr.shell.command.HelpCommand;
-import co.cask.coopr.shell.command.set.CommandSet;
+import co.cask.coopr.shell.command.set.CooprCommandSets;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
@@ -77,26 +78,26 @@ public class CLIMain {
   }
 
   private CLI<Command> getCli(CLIConfig cliConfig, Injector injector) throws IOException {
-    final co.cask.common.cli.CommandSet<Command> commandSetWithoutHelp = getCommandSet(cliConfig, injector);
+    final CommandSet<Command> commandSetWithoutHelp = getCommandSet(cliConfig, injector);
     HelpCommand helpCommand = new HelpCommand(new Supplier<Iterable<Command>>() {
       @Override
       public Iterable<Command> get() {
         return commandSetWithoutHelp.getCommands();
       }
     }, cliConfig);
-    co.cask.common.cli.CommandSet<Command> commandSet = new co.cask.common.cli.CommandSet<Command>(
+    CommandSet<Command> commandSet = new CommandSet<Command>(
       ImmutableList.of((Command) helpCommand), ImmutableList.of(commandSetWithoutHelp));
     return new CLI<Command>(commandSet, Collections.<String, Completer>emptyMap());
   }
 
-  private co.cask.common.cli.CommandSet<Command> getCommandSet(CLIConfig cliConfig, Injector injector) {
-    co.cask.common.cli.CommandSet<Command> commandSet;
+  private CommandSet<Command> getCommandSet(CLIConfig cliConfig, Injector injector) {
+    CommandSet<Command> commandSet;
     if (cliConfig.isSuperadmin()) {
-      commandSet = CommandSet.getCliCommandSetForSuperadmin(injector);
+      commandSet = CooprCommandSets.getCommandSetForSuperadmin(injector);
     } else if (cliConfig.isAdmin()) {
-      commandSet = CommandSet.getCliCommandSetForAdmin(injector);
+      commandSet = CooprCommandSets.getCommandSetForAdmin(injector);
     } else {
-      commandSet = CommandSet.getCliCommandSetForNonAdminUser(injector);
+      commandSet = CooprCommandSets.getCommandSetForNonAdminUser(injector);
     }
     return commandSet;
   }

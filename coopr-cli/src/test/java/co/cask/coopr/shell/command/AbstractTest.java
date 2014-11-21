@@ -18,6 +18,7 @@ package co.cask.coopr.shell.command;
 
 import co.cask.common.cli.CLI;
 import co.cask.common.cli.Command;
+import co.cask.common.cli.CommandSet;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.client.PluginClient;
@@ -25,7 +26,7 @@ import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.client.TenantClient;
 import co.cask.coopr.codec.json.guice.CodecModules;
 import co.cask.coopr.shell.CLIConfig;
-import co.cask.coopr.shell.command.set.CommandSet;
+import co.cask.coopr.shell.command.set.CooprCommandSets;
 import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -78,7 +79,7 @@ public abstract class AbstractTest {
       }
     );
 
-    co.cask.common.cli.CommandSet<Command> commandSet = CommandSet.getCliCommandSetForSuperadmin(injector);
+    CommandSet<Command> commandSet = CooprCommandSets.getCommandSetForSuperadmin(injector);
     CLI = new CLI<Command>(commandSet, Collections.<String, Completer>emptyMap());
   }
 
