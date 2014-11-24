@@ -72,7 +72,6 @@ public class CLIMain {
       public void onReconnect() throws IOException {
         cli.setCommands(getCommandSet(cliConfig, injector));
         cli.getReader().setPrompt("coopr (" + cliConfig.getURI() + ")> ");
-        cli.startInteractiveMode(System.out);
       }
     });
   }
