@@ -34,7 +34,7 @@ describe('services test', function () {
     var provides = element.all(by.repeater('name in model'));
     expect(provides.count()).toEqual(2);
 
-    element(by.css('.btn.add-automator-action')).click();
+    element(by.cssContainingText('.btn', 'add automator action')).click();
     element.all(by.repeater('item in content')).get(1).click();
 
     var automators = element.all(by.repeater('(category, action) in model.provisioner.actions'));

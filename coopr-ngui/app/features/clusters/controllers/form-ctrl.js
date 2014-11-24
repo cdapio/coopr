@@ -165,7 +165,7 @@ function ($scope, $state, $q, $alert, CrudFormBase, myApi, caskFocusManager, myH
 
         $alert({
           title: 'Cluster',
-          content: ($scope.editing ? 'reconfiguration' : 'creation') + ' succeeded!',
+          content: $scope.editing ? 'reconfiguration succeeded!' : 'provisioning request submitted!',
           type: 'success'
         });
 

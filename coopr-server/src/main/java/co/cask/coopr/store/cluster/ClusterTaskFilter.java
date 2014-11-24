@@ -19,6 +19,8 @@ package co.cask.coopr.store.cluster;
 import co.cask.coopr.metrics.MetricService;
 import com.google.common.base.Objects;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Class specifying filters to use when querying for cluster tasks.
  */
@@ -31,9 +33,10 @@ public class ClusterTaskFilter {
   private final Long start;
   private final Long end;
   private final MetricService.Periodicity periodicity;
+  private final TimeUnit timeUnit;
 
-  public ClusterTaskFilter(String tenantId, String userId, String clusterId, String clusterTemplate,
-                           Long start, Long end, MetricService.Periodicity periodicity) {
+  public ClusterTaskFilter(String tenantId, String userId, String clusterId, String clusterTemplate, Long start,
+                           Long end, MetricService.Periodicity periodicity, TimeUnit timeUnit) {
     this.tenantId = tenantId;
     this.userId = userId;
     this.clusterId = clusterId;
@@ -41,6 +44,7 @@ public class ClusterTaskFilter {
     this.start = start;
     this.end = end;
     this.periodicity = periodicity;
+    this.timeUnit = timeUnit != null ? timeUnit : TimeUnit.SECONDS;
   }
 
   /**
@@ -113,6 +117,16 @@ public class ClusterTaskFilter {
     return periodicity;
   }
 
+  /**
+   * Retrieves {@link TimeUnit} of this filter.
+   * The default value for this field is {@link TimeUnit}.SECONDS.
+   *
+   * @return timeUnit
+   */
+  public TimeUnit getTimeUnit() {
+    return timeUnit;
+  }
+
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
@@ -123,6 +137,7 @@ public class ClusterTaskFilter {
       .add("start", start)
       .add("end", end)
       .add("periodicity", periodicity)
+      .add("timeUnit", timeUnit)
       .toString();
   }
 }
