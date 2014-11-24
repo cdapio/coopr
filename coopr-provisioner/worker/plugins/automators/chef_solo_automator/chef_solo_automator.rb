@@ -70,9 +70,9 @@ class ChefSoloAutomator < Automator
     @credentials = Hash.new
     @credentials[:paranoid] = false
     sshauth.each do |k, v|
-      if (k =~ /identityfile/)
+      if k =~ /identityfile/
         @credentials[:keys] = [ v ]
-      elsif (k =~ /password/)
+      elsif k =~ /password/
         @credentials[:password] = v
       end
     end
@@ -87,7 +87,7 @@ class ChefSoloAutomator < Automator
   def generate_chef_json_attributes(servicestring)
     servicedata = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
 
-    if (servicestring.nil? || servicestring == '')
+    if servicestring.nil? || servicestring == ''
       servicestring = '{}'
     end
     # service data is passed here as an escaped json string
@@ -96,17 +96,17 @@ class ChefSoloAutomator < Automator
 
     # cluster and nodes data is passed as expanded hash
     clusterdata = @task['config']['cluster']
-    if (clusterdata.nil? || clusterdata == '')
+    if clusterdata.nil? || clusterdata == ''
       clusterdata = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
     end
     nodesdata = @task['config']['nodes']
-    if (nodesdata.nil? || nodesdata == '')
+    if nodesdata.nil? || nodesdata == ''
       nodesdata = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
     end
 
     # services is a list of services on this node
     node_services_data = @task['config']['services']
-    if (node_services_data.nil? || node_services_data == '')
+    if node_services_data.nil? || node_services_data == ''
       node_services_data = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
     end
 
