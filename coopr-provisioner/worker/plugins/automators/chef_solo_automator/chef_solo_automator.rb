@@ -89,8 +89,8 @@ class ChefSoloAutomator < Automator
 
     servicedata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
 
-    if (servicestring.nil? || servicestring == "")
-      servicestring = "{}"
+    if (servicestring.nil? || servicestring == '')
+      servicestring = '{}'
     end
     # service data is passed here as an escaped json string
     servicedata.merge!(JSON.parse(servicestring))
@@ -98,17 +98,17 @@ class ChefSoloAutomator < Automator
 
     # cluster and nodes data is passed as expanded hash
     clusterdata = @task['config']['cluster']
-    if (clusterdata.nil? || clusterdata == "")
+    if (clusterdata.nil? || clusterdata == '')
       clusterdata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     end
     nodesdata = @task['config']['nodes']
-    if (nodesdata.nil? || nodesdata == "")
+    if (nodesdata.nil? || nodesdata == '')
       nodesdata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     end
 
     # services is a list of services on this node
     node_services_data = @task['config']['services']
-    if (node_services_data.nil? || node_services_data == "")
+    if (node_services_data.nil? || node_services_data == '')
       node_services_data = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
     end
 
@@ -154,24 +154,24 @@ class ChefSoloAutomator < Automator
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
 
-        ssh_exec!(ssh, "hostname", "Validating connectivity to #{hostname}")
+        ssh_exec!(ssh, 'hostname', "Validating connectivity to #{hostname}")
 
         # determine if curl is installed, else default to wget
         chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | #{sudo} bash"
         begin
-          ssh_exec!(ssh, "which curl", "Checking for curl")
+          ssh_exec!(ssh, 'which curl', 'Checking for curl')
         rescue CommandExecutionError
-          log.debug "curl not found, defaulting to wget"
+          log.debug 'curl not found, defaulting to wget'
           chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | #{sudo} bash"
         end
 
-        ssh_exec!(ssh, chef_install_cmd, "Installing chef")
+        ssh_exec!(ssh, chef_install_cmd, 'Installing chef')
 
-        ssh_exec!(ssh, "type chef-solo", "Chef install validation")
+        ssh_exec!(ssh, 'type chef-solo', 'Chef install validation')
 
-        ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_cache_dir}", "Create remote cache dir")
+        ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_cache_dir}", 'Create remote cache dir')
 
-        ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_chef_dir}", "Create remote Chef dir")
+        ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_chef_dir}", 'Create remote Chef dir')
 
         ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@@remote_cache_dir}", "Changing cache dir owner to #{sshauth['user']}")
         ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@@remote_chef_dir}", "Changing Chef dir owner to #{sshauth['user']}")
@@ -184,20 +184,20 @@ class ChefSoloAutomator < Automator
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
 
-        log.debug "Checking for scp installation"
+        log.debug 'Checking for scp installation'
         begin
-          ssh_exec!(ssh, "which scp")
+          ssh_exec!(ssh, 'which scp')
         rescue CommandExecutionError
-          log.warn "scp not found, attempting to install openssh-client"
+          log.warn 'scp not found, attempting to install openssh-client'
           scp_install_cmd = "#{sudo} yum -qy install openssh-clients"
           begin
-            ssh_exec!(ssh, "which yum")
+            ssh_exec!(ssh, 'which yum')
           rescue CommandExecutionError
             scp_install_cmd = "#{sudo} apt-get -qy install openssh-client"
           end
           ssh_exec!(ssh, scp_install_cmd, "installing openssh-client via #{scp_install_cmd}")
         else
-          log.debug "scp found on remote"
+          log.debug 'scp found on remote'
         end
       end
     rescue Net::SSH::AuthenticationFailed => e
@@ -215,7 +215,7 @@ class ChefSoloAutomator < Automator
       rescue Net::SSH::AuthenticationFailed => e
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
-      log.debug "Upload complete"
+      log.debug 'Upload complete'
 
       # extract tarballs on remote machine to /var/chef
       begin
@@ -244,7 +244,7 @@ class ChefSoloAutomator < Automator
     # run_list as specified by user
     run_list = fields['run_list']
     # whitespace in the runlist is not allowed
-    run_list.gsub!(/\s+/, "")
+    run_list.gsub!(/\s+/, '')
 
     # additional json attributes defined for this service action
     json_attributes = fields['json_attributes']
@@ -261,19 +261,19 @@ class ChefSoloAutomator < Automator
 
     begin
       # write json attributes to a local tmp file
-      tmpjson = Tempfile.new("coopr")
+      tmpjson = Tempfile.new('coopr')
       tmpjson.write(jsondata)
       tmpjson.close
 
       # scp task.json to remote
-      log.debug "Copying json attributes to remote"
+      log.debug 'Copying json attributes to remote'
       begin
         Net::SCP.upload!(ipaddress, sshauth['user'], tmpjson.path, "#{@@remote_cache_dir}/#{@task['taskId']}.json", :ssh =>
           @credentials)
       rescue Net::SSH::AuthenticationFailed
         raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
       end
-      log.debug "Copy json attributes complete"
+      log.debug 'Copy json attributes complete'
 
     ensure
       tmpjson.close
@@ -283,7 +283,7 @@ class ChefSoloAutomator < Automator
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
 
-        ssh_exec!(ssh, "#{sudo} chef-solo -j #{@@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'", "Running Chef-solo")
+        ssh_exec!(ssh, "#{sudo} chef-solo -j #{@@remote_cache_dir}/#{@task['taskId']}.json -o '#{run_list}'", 'Running Chef-solo')
       end
     rescue Net::SSH::AuthenticationFailed
       raise $!, "SSH Authentication failure for #{ipaddress}: #{$!}", $!.backtrace
