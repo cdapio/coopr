@@ -37,7 +37,6 @@ class ChefSoloAutomator < Automator
 
   # create local tarballs of the cookbooks, roles, data_bags, etc to be scp'd to remote machine
   def generate_chef_primitive_tar(chef_primitive)
-
     chef_primitive_path = "#{chef_primitive}"
     chef_primitive_tar = "#{chef_primitive}.tar.gz"
 
@@ -86,7 +85,6 @@ class ChefSoloAutomator < Automator
 
   # generate the chef run json_attributes from the task metadata
   def generate_chef_json_attributes(servicestring)
-
     servicedata = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
 
     if (servicestring.nil? || servicestring == '')
@@ -325,5 +323,4 @@ class ChefSoloAutomator < Automator
     log.debug "ChefSoloAutomator performing remove task #{@task['taskId']}"
     runchef(inputmap)
   end
-
 end
