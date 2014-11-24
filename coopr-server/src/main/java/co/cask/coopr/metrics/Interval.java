@@ -16,8 +16,6 @@
 
 package co.cask.coopr.metrics;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Class for presenting time - start date of time period, and some data point.
  */
@@ -30,8 +28,8 @@ public class Interval {
     this.time = time;
   }
 
-  public long getTimeInMillis() {
-    return TimeUnit.SECONDS.toMillis(time);
+  public long getTime() {
+    return time;
   }
 
   public long getValue() {

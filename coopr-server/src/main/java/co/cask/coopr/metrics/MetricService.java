@@ -92,12 +92,14 @@ public class MetricService {
       long localEnd = Math.min(deleteTaskTime, endDate);
       int currentIndex = getNearestIndex(intervals, localStart);
       Interval current = intervals.get(currentIndex);
-      while (current.getTimeInMillis() + period < localEnd) {
-        long increaseTime = localStart < current.getTimeInMillis() ? period : period + current.getTimeInMillis() - localStart;
+      long currentTimeInMillis = TimeUnit.SECONDS.toMillis(current.getTime());
+      while (currentTimeInMillis + period < localEnd) {
+        long increaseTime = localStart < currentTimeInMillis ? period : period + currentTimeInMillis - localStart;
         current.increaseValue(timeUnit.convert(increaseTime, TimeUnit.MILLISECONDS));
         current = intervals.get(++currentIndex);
+        currentTimeInMillis = TimeUnit.SECONDS.toMillis(current.getTime());
       }
-      long increaseTime = localStart < current.getTimeInMillis() ? localEnd - current.getTimeInMillis() : localEnd - localStart;
+      long increaseTime = localStart < currentTimeInMillis ? localEnd - currentTimeInMillis : localEnd - localStart;
       if (increaseTime > 0) {
         current.increaseValue(timeUnit.convert(increaseTime, TimeUnit.MILLISECONDS));
       }
@@ -144,7 +146,7 @@ public class MetricService {
   private int getNearestIndex(List<Interval> intervals, long key) {
     int index = -1;
     for (Interval value : intervals) {
-      if (value.getTimeInMillis() <= key) {
+      if (TimeUnit.SECONDS.toMillis(value.getTime()) <= key) {
         index++;
       } else {
         break;
