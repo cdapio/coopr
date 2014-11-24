@@ -17,6 +17,7 @@ wait_for_plugin_registration () {
     --output /dev/null --write-out "%{http_code}" \
     --header "Coopr-UserID:${COOPR_API_USER}" \
     --header "Coopr-TenantID:${COOPR_TENANT}" \
+    ${CERT_PARAMETER} \
     ${COOPR_SERVER_URI}/v2/plugins/automatortypes/chef-solo 2> /dev/null) -eq 200 || ${RETRIES} -gt 60 ]]; do
     sleep 2
     let "RETRIES++"
@@ -55,6 +56,7 @@ curl --silent --request POST \
   --header "Coopr-ApiKey:${COOPR_API_KEY}" \
   --header "Coopr-TenantID:${COOPR_TENANT}" \
   --connect-timeout ${TIMEOUT} \
+  ${CERT_PARAMETER} \
   ${COOPR_SERVER_URI}/v2/plugins/sync
 __ret=${?}
 [[ ${__ret} -ne 0 ]] && exit 1
