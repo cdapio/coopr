@@ -25,10 +25,8 @@ import org.apache.commons.lang3.time.DateUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Util for performing metric operations.
@@ -46,12 +44,6 @@ public class MetricService {
   private static final long WEEK = DateUtils.MILLIS_PER_DAY * 7;
   private static final long MONTH = DateUtils.MILLIS_PER_DAY * 30;
   private static final long YEAR = MONTH * 12;
-  private static final Comparator<ClusterTask> COMPARATOR = new Comparator<ClusterTask>() {
-    @Override
-    public int compare(ClusterTask o1, ClusterTask o2) {
-      return o1.getStatusTime() > o2.getStatusTime() ? 1 : -1;
-    }
-  };
 
   private final ClusterStore clusterStore;
 
@@ -74,15 +66,17 @@ public class MetricService {
     List<ClusterTask> tasks = clusterStore.getClusterTasks(filter);
     Long start = filter.getStart();
     Long end = filter.getEnd();
+    TimeUnit timeUnit = filter.getTimeUnit();
     if (tasks.isEmpty()) {
-      return new TimeSeries(start != null ? start : 0, end != null ? end : System.currentTimeMillis(),
-                            Collections.<Interval>emptyList());
+      long startTime = start != null ? start : 0;
+      return new TimeSeries(startTime, end != null ? end : TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()),
+                            Arrays.asList(new Interval(startTime)));
     }
     List<ClusterTask> createTasks = getTasksByName(tasks, ProvisionerAction.CREATE);
     List<ClusterTask> deleteTasks = getTasksByName(tasks, ProvisionerAction.DELETE);
-    long startDate = start != null ? start : createTasks.isEmpty() ?
+    long startDate = start != null ? TimeUnit.SECONDS.toMillis(start) : createTasks.isEmpty() ?
       0 : createTasks.get(0).getStatusTime();
-    long endDate = end != null ? end : deleteTasks.isEmpty() ?
+    long endDate = end != null ? TimeUnit.SECONDS.toMillis(end) : deleteTasks.isEmpty() ?
       System.currentTimeMillis() : deleteTasks.get(deleteTasks.size() - 1).getStatusTime();
     Periodicity periodicity = filter.getPeriodicity();
     long period;
@@ -98,17 +92,20 @@ public class MetricService {
       long localEnd = Math.min(deleteTaskTime, endDate);
       int currentIndex = getNearestIndex(intervals, localStart);
       Interval current = intervals.get(currentIndex);
-      while (current.getTime() + period < localEnd) {
-        long increaseTime = localStart < current.getTime() ? period : period + current.getTime() - localStart;
-        current.increaseValue(increaseTime);
+      long currentTimeInMillis = TimeUnit.SECONDS.toMillis(current.getTime());
+      while (currentTimeInMillis + period < localEnd) {
+        long increaseTime = localStart < currentTimeInMillis ? period : period + currentTimeInMillis - localStart;
+        current.increaseValue(timeUnit.convert(increaseTime, TimeUnit.MILLISECONDS));
         current = intervals.get(++currentIndex);
+        currentTimeInMillis = TimeUnit.SECONDS.toMillis(current.getTime());
       }
-      long increaseTime = localStart < current.getTime() ? localEnd - current.getTime() : localEnd - localStart;
+      long increaseTime = localStart < currentTimeInMillis ? localEnd - currentTimeInMillis : localEnd - localStart;
       if (increaseTime > 0) {
-        current.increaseValue(increaseTime);
+        current.increaseValue(timeUnit.convert(increaseTime, TimeUnit.MILLISECONDS));
       }
     }
-    return new TimeSeries(startDate, endDate, intervals);
+    return new TimeSeries(TimeUnit.MILLISECONDS.toSeconds(startDate),
+                          TimeUnit.MILLISECONDS.toSeconds(endDate), intervals);
   }
 
   private long getDeleteTaskTime(List<ClusterTask> deleteTasks, ClusterTask createTask) {
@@ -149,7 +146,7 @@ public class MetricService {
   private int getNearestIndex(List<Interval> intervals, long key) {
     int index = -1;
     for (Interval value : intervals) {
-      if (value.getTime() <= key) {
+      if (TimeUnit.SECONDS.toMillis(value.getTime()) <= key) {
         index++;
       } else {
         break;
@@ -172,11 +169,11 @@ public class MetricService {
     long nextStart = start - start%period + period;
     nextStart = nextStart < end ? nextStart : end;
     while (nextStart < end) {
-      intervals.add(new Interval(currentStart));
+      intervals.add(new Interval(TimeUnit.MILLISECONDS.toSeconds(currentStart)));
       currentStart = nextStart;
       nextStart = currentStart + period < end ? currentStart + period : end;
     }
-    intervals.add(new Interval(currentStart));
+    intervals.add(new Interval(TimeUnit.MILLISECONDS.toSeconds(currentStart)));
     return intervals;
   }
 

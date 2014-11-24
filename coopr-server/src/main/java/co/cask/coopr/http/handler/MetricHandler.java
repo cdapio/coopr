@@ -20,7 +20,6 @@ import co.cask.coopr.account.Account;
 import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.metrics.MetricService;
 import co.cask.coopr.metrics.TimeSeries;
-import co.cask.coopr.scheduler.task.ClusterTask;
 import co.cask.coopr.store.cluster.ClusterStore;
 import co.cask.coopr.store.cluster.ClusterStoreService;
 import co.cask.coopr.store.cluster.ClusterTaskFilter;
@@ -41,6 +40,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Handler for performing metric operations.
@@ -77,7 +77,8 @@ public class MetricHandler extends AbstractAuthHandler {
     if (account == null) {
       return;
     }
-    List<String> names = Arrays.asList("tenant", "user", "cluster", "clustertemplate", "start", "end", "groupby");
+    List<String> names = Arrays.asList("tenant", "user", "cluster",
+                                       "clustertemplate", "start", "end", "groupby", "timeunit");
     Map<String, String> filters = getFilters(request, names);
     String tenant = filters.get("tenant");
     if (!account.isSuperadmin()) {
@@ -118,8 +119,20 @@ public class MetricHandler extends AbstractAuthHandler {
                            String.format("Incorrect value for field groupby: %s", filters.get("groupby")));
       return;
     }
+    TimeUnit timeUnit = null;
+    try {
+      String rawTimeUnit = filters.get("timeunit");
+      if (rawTimeUnit != null) {
+        timeUnit = TimeUnit.valueOf(rawTimeUnit.toUpperCase());
+      }
+    } catch (IllegalArgumentException e) {
+      responder.sendString(HttpResponseStatus.BAD_REQUEST,
+                           String.format("Incorrect value for field timeunit: %s", filters.get("timeunit")));
+      return;
+    }
     ClusterTaskFilter filter = new ClusterTaskFilter(tenant, filters.get("user"), filters.get("cluster"),
-                                                     filters.get("clustertemplate"), startTime, endTime, periodicity);
+                                                     filters.get("clustertemplate"), startTime,
+                                                     endTime, periodicity, timeUnit);
     try {
       TimeSeries result = new MetricService(clusterStore).getNodesUsage(filter);
       responder.sendJson(HttpResponseStatus.OK, result, TimeSeries.class, gson);

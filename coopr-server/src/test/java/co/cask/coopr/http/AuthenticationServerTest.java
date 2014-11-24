@@ -69,7 +69,7 @@ public class AuthenticationServerTest extends ServiceTestBase {
   }
 
   private static void initAuthTestProps() throws IOException {
-    conf.setBoolean(Constants.Security.CFG_SECURITY_ENABLED, true);
+    conf.setBoolean(Constants.Security.ENABLED, true);
     conf.set(Constants.Security.AUTH_SERVER_ADDRESS, "127.0.0.1");
     conf.setInt(Constants.Security.AUTH_SERVER_PORT, TestHelper.getFreePort());
     conf.set(Constants.Security.AUTH_HANDLER_CLASS, "co.cask.cdap.security.server.BasicAuthenticationHandler");

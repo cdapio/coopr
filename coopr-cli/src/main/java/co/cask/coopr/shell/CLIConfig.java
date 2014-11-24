@@ -18,12 +18,14 @@ package co.cask.coopr.shell;
 
 import co.cask.coopr.client.rest.RestClientManager;
 import co.cask.coopr.codec.json.guice.CodecModules;
+import co.cask.coopr.common.conf.Constants;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -46,7 +48,7 @@ public class CLIConfig {
   private String host;
   private String userId;
   private String tenantId;
-  private List<HostnameChangeListener> hostnameChangeListeners;
+  private List<ReconnectListener> reconnectListeners;
   private int port;
   private int sslPort;
   private URI uri;
@@ -71,7 +73,7 @@ public class CLIConfig {
     builder.tenantId(this.tenantId);
     builder.gson(injector.getInstance(Gson.class));
     this.clientManager = builder.build();
-    this.hostnameChangeListeners = Lists.newArrayList();
+    this.reconnectListeners = Lists.newArrayList();
   }
 
   public String getHost() {
@@ -94,11 +96,19 @@ public class CLIConfig {
     return sslPort;
   }
 
+  public boolean isAdmin() {
+    return Constants.ADMIN_USER.equals(userId);
+  }
+
+  public boolean isSuperadmin() {
+    return Constants.ADMIN_USER.equals(userId) && Constants.SUPERADMIN_TENANT.equals(tenantId);
+  }
+
   public RestClientManager getClientManager() {
     return clientManager;
   }
 
-  public void setConnection(String host, int port, boolean ssl, String userId, String tenantId) {
+  public void setConnection(String host, int port, boolean ssl, String userId, String tenantId) throws IOException {
     this.host = host;
     if (ssl) {
       this.sslPort = port;
@@ -114,13 +124,13 @@ public class CLIConfig {
     builder.tenantId(tenantId);
     builder.gson(injector.getInstance(Gson.class));
     this.clientManager = builder.build();
-    for (HostnameChangeListener listener : hostnameChangeListeners) {
-      listener.onHostnameChanged(host);
+    for (ReconnectListener listener : reconnectListeners) {
+      listener.onReconnect();
     }
   }
 
-  public void addHostnameChangeListener(HostnameChangeListener listener) {
-    this.hostnameChangeListeners.add(listener);
+  public void addReconnectListener(ReconnectListener listener) {
+    this.reconnectListeners.add(listener);
   }
 
   public URI getURI() {
@@ -128,9 +138,9 @@ public class CLIConfig {
   }
 
   /**
-   * Listener for hostname changes.
+   * Listener to reconnect to a Coopr instance.
    */
-  public interface HostnameChangeListener {
-    void onHostnameChanged(String newHost);
+  public interface ReconnectListener {
+    void onReconnect() throws IOException;
   }
 }

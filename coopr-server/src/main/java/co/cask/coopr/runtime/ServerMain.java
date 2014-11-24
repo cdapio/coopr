@@ -114,7 +114,7 @@ public final class ServerMain extends DaemonMain {
       }
 
       solverNumThreads = conf.getInt(Constants.SOLVER_NUM_THREADS);
-      securityEnabled = conf.getBoolean(co.cask.cdap.common.conf.Constants.Security.CFG_SECURITY_ENABLED);
+      securityEnabled = conf.getBoolean(co.cask.cdap.common.conf.Constants.Security.ENABLED);
     } catch (Exception e) {
       LOG.error("Exception initializing server", e);
     }
