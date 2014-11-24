@@ -10,11 +10,12 @@ function ($stateParams, $scope, $filter, $timeout, moment, myApi, CrudListBase) 
   var timeoutPromise,
       filterFilter = $filter('filter');
 
-  if($stateParams.status) {
-    console.log($stateParams);
-    $scope.list = myApi.Cluster.query($stateParams, updatePending);
+  if($stateParams.status === 'terminated') {
+    myApi.Cluster.query($stateParams, function (list) {
+      $scope.list = list;
+    });
   }
-  else { // we can re-use the "list" that comes from SubnavCtrl
+  else { // we can re-use the list that comes from SubnavCtrl
     $scope.$watchCollection('list', updatePending);
   }
 
@@ -28,7 +29,7 @@ function ($stateParams, $scope, $filter, $timeout, moment, myApi, CrudListBase) 
     if(filterFilter($scope.list, {status:'pending'}).length) {
       timeoutPromise = $timeout(function () {
 
-        myApi.Cluster.query($stateParams, function (list) {
+        myApi.Cluster.query(function (list) {
           // $scope.list = list works, but then we lose the animation of progress bars
           // instead we only modify the properties that interest us
           angular.forEach($scope.list, function (cluster) {

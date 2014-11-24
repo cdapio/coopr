@@ -58,7 +58,7 @@
 
 <div ng-hide="(list.$promise && !list.$resolved) || list.length" class="well text-center">
 
-  <p>You don't have any clusters!</p>
+  <p>No clusters to display in this view!</p>
   <p><a class="btn btn-primary" role="button" ui-sref="clusters.create">
     Create a cluster
   </a></p>
@@ -66,12 +66,18 @@
 </div>
 
 
-<!-- <div class="text-center am-fade-and-slide-top" ng-show="togglerVisible">
-  <hr />
-  <button type="button" class="btn btn-default btn-xs"
-      ng-model="filterIsOff"
-      bs-checkbox>
-    <span class="fa fa-ellipsis-v fa-fw"></span>
-    show all clusters
-  </button>
-</div> -->
+<div class="text-center small">
+
+  <a ng-hide="$stateParams.status === 'terminated'"
+     ui-sref="clusters.list({status: 'terminated'})"
+     ui-sref-opts="{reload: true}">
+    view terminated clusters
+  </a>
+
+  <a ng-hide="$stateParams.status !== 'terminated'"
+     ui-sref="clusters.list({status:null})"
+     ui-sref-opts="{reload: true}">
+    view active clusters
+  </a>
+
+</div>
