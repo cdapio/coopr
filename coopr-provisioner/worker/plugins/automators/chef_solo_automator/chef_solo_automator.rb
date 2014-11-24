@@ -316,7 +316,7 @@ class ChefSoloAutomator < Automator
           log.debug "curl not found, defaulting to wget"
           chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | #{sudo} bash"
         end
-        ssh_exec!(ssh, chef_install_cmd, "Installing chef")
+        ssh_exec!(ssh, chef_install_cmd, "Installing Chef")
       end
     rescue
       fail 'Failed to install Chef'
