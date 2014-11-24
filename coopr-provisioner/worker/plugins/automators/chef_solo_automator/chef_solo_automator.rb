@@ -87,7 +87,7 @@ class ChefSoloAutomator < Automator
   # generate the chef run json_attributes from the task metadata
   def generate_chef_json_attributes(servicestring)
 
-    servicedata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
+    servicedata = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
 
     if (servicestring.nil? || servicestring == '')
       servicestring = '{}'
@@ -99,17 +99,17 @@ class ChefSoloAutomator < Automator
     # cluster and nodes data is passed as expanded hash
     clusterdata = @task['config']['cluster']
     if (clusterdata.nil? || clusterdata == '')
-      clusterdata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
+      clusterdata = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
     end
     nodesdata = @task['config']['nodes']
     if (nodesdata.nil? || nodesdata == '')
-      nodesdata = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
+      nodesdata = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
     end
 
     # services is a list of services on this node
     node_services_data = @task['config']['services']
     if (node_services_data.nil? || node_services_data == '')
-      node_services_data = Hash.new{ |h,k| h[k] = Hash.new(&h.default_proc) }
+      node_services_data = Hash.new { |h, k| h[k] = Hash.new(&h.default_proc) }
     end
 
     # merge data together into expected layout for json_attributes
@@ -128,7 +128,7 @@ class ChefSoloAutomator < Automator
     # generate the json
     cooprdatajson = JSON.generate(servicedata)
     log.debug "Generated JSON attributes: #{cooprdatajson}"
-    
+
     cooprdatajson
   end
 
