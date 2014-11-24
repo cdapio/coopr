@@ -3,35 +3,20 @@
  */
 
 angular.module(PKG.name+'.feature.clusters').controller('ClusterListCtrl',
-function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
+function ($stateParams, $scope, $filter, $timeout, moment, myApi, CrudListBase) {
 
   CrudListBase.apply($scope);
 
   var timeoutPromise,
-      filterFilter = $filter('filter'),
-      tenMinutesAgo = moment().minutes(-10);
+      filterFilter = $filter('filter');
 
-  $scope.isActive = function (item) {
-    // any cluster created recently is considered "active" for display purposes
-    return (moment(item.createTime)>tenMinutesAgo) || ['terminated','incomplete'].indexOf(item.status)===-1;
-  };
-
-  $scope.$watchCollection('list', function (list) {
-    if (list.length) {
-
-      var activeCount = filterFilter(list, $scope.isActive).length,
-          filteredCount = list.length - activeCount;
-
-      // show the toggle only if there are both visible and filterable items.
-      $scope.togglerVisible = (activeCount && filteredCount);
-
-      if(!activeCount) { // if there are no active items, don't filter.
-        $scope.filterIsOff = true;
-      }
-
-      updatePending();
-    }
-  });
+  if($stateParams.status) {
+    console.log($stateParams);
+    $scope.list = myApi.Cluster.query($stateParams, updatePending);
+  }
+  else { // we can re-use the "list" that comes from SubnavCtrl
+    $scope.$watchCollection('list', updatePending);
+  }
 
   $scope.$on('$destroy', function () {
     $timeout.cancel(timeoutPromise);
@@ -43,7 +28,7 @@ function ($scope, $filter, $timeout, moment, myApi, CrudListBase) {
     if(filterFilter($scope.list, {status:'pending'}).length) {
       timeoutPromise = $timeout(function () {
 
-        myApi.Cluster.query(function (list) {
+        myApi.Cluster.query($stateParams, function (list) {
           // $scope.list = list works, but then we lose the animation of progress bars
           // instead we only modify the properties that interest us
           angular.forEach($scope.list, function (cluster) {

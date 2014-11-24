@@ -4,6 +4,9 @@ angular.module(PKG.name+'.feature.clusters')
     var crud = CRUD_STATE_HELP.mkState,
         abstractSubnav = CRUD_STATE_HELP.abstractSubnav;
 
+
+    var clusterListState = crud('Cluster', 'list', 'ClusterListCtrl');
+
     /**
      * State Configurations
      */
@@ -17,7 +20,9 @@ angular.module(PKG.name+'.feature.clusters')
       .state(abstractSubnav('Cluster', {
         authorizedRoles: MYAUTH_ROLE.all
       }))
-        .state(crud('Cluster', 'list', 'ClusterListCtrl'))
+        .state(angular.extend(clusterListState, {
+          url: clusterListState.url + '?status'
+        }))
         .state(crud('Cluster', 'edit', 'ClusterFormCtrl', { title: 'Reconfigure cluster' }))
         .state(crud('Cluster', 'create', 'ClusterFormCtrl', { title: 'Create a cluster' }))
         .state(crud('Cluster', 'detail', 'ClusterDetailCtrl'))
@@ -26,6 +31,5 @@ angular.module(PKG.name+'.feature.clusters')
           })
 
       ;
-
 
   });
