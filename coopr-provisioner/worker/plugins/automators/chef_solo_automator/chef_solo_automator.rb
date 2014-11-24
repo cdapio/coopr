@@ -204,7 +204,7 @@ class ChefSoloAutomator < Automator
 
     # upload tarballs to target machine
     @@chef_primitives.each do |chef_primitive|
-      next unless File.exists?("#{chef_primitive}.tar.gz")
+      next unless File.exist?("#{chef_primitive}.tar.gz")
 
       log.debug "Uploading #{chef_primitive} from #{chef_primitive}.tar.gz to #{ipaddress}:#{@@remote_cache_dir}/#{chef_primitive}.tar.gz"
       begin
