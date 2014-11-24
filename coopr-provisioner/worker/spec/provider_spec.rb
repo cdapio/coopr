@@ -1,4 +1,4 @@
-require 'spec_helper'
+require_relative 'spec_helper'
 require 'json'
 
 describe Provider do
@@ -7,9 +7,10 @@ describe Provider do
 
   # Set these up once
   before :all do
+    env = Hash.new
     %w(create confirm delete).each do |taskname|
       instance_variable_set("@task_#{taskname}", JSON.parse(response.gsub('BOOTSTRAP', taskname)))
-      instance_variable_set("@provider_#{taskname}", Provider.new(instance_variable_get("@task_#{taskname}")))
+      instance_variable_set("@provider_#{taskname}", Provider.new(env, instance_variable_get("@task_#{taskname}")))
     end
   end
 
