@@ -240,7 +240,7 @@ class ChefSoloAutomator < Automator
     ipaddress = inputmap['ipaddress']
     fields = inputmap['fields']
 
-    raise "required parameter \"run_list\" not found in input: #{fields}" if fields['run_list'].nil?
+    fail "required parameter \"run_list\" not found in input: #{fields}" if fields['run_list'].nil?
     # run_list as specified by user
     run_list = fields['run_list']
     # whitespace in the runlist is not allowed
