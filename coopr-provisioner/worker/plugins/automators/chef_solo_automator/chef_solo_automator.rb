@@ -148,7 +148,7 @@ class ChefSoloAutomator < Automator
       generate_chef_primitive_tar(chef_primitive)
     end
 
-    install_chef
+    install_chef(inputmap)
 
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
