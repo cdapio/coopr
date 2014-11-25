@@ -147,6 +147,7 @@ class ChefSoloAutomator < Automator
       generate_chef_primitive_tar(chef_primitive)
     end
 
+    log.debug "Attempting ssh into ip: #{ipaddress}, user: #{sshauth['user']}"
     install_chef(inputmap)
 
     begin
