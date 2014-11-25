@@ -48,7 +48,7 @@ class ChefSoloAutomator < Automator
 
     # limit tarball regeneration to once per 10min
     # rubocop:disable GuardClause
-    if !File.exist?(chef_primitive_tar) or ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
+    if !File.exist?(chef_primitive_tar) || ((Time.now - File.stat(chef_primitive_tar).mtime).to_i > 600)
       log.debug "Generating #{chef_primitive_tar} from #{chef_primitive_path}"
       `tar -chzf "#{chef_primitive_tar}.new" #{chef_primitive}`
       `mv "#{chef_primitive_tar}.new" "#{chef_primitive_tar}"`
@@ -148,29 +148,12 @@ class ChefSoloAutomator < Automator
     end
 
     log.debug "Attempting ssh into ip: #{ipaddress}, user: #{sshauth['user']}"
+    install_chef(inputmap)
 
     begin
       Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
-
-        ssh_exec!(ssh, 'hostname', "Validating connectivity to #{hostname}")
-
-        # determine if curl is installed, else default to wget
-        chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | #{sudo} bash"
-        begin
-          ssh_exec!(ssh, 'which curl', 'Checking for curl')
-        rescue CommandExecutionError
-          log.debug 'curl not found, defaulting to wget'
-          chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | #{sudo} bash"
-        end
-
-        ssh_exec!(ssh, chef_install_cmd, 'Installing chef')
-
-        ssh_exec!(ssh, 'type chef-solo', 'Chef install validation')
-
         ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_cache_dir}", 'Create remote cache dir')
-
         ssh_exec!(ssh, "#{sudo} mkdir -p #{@@remote_chef_dir}", 'Create remote Chef dir')
-
         ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@@remote_cache_dir}", "Changing cache dir owner to #{sshauth['user']}")
         ssh_exec!(ssh, "#{sudo} chown -R #{sshauth['user']} #{@@remote_chef_dir}", "Changing Chef dir owner to #{sshauth['user']}")
       end
@@ -292,6 +275,56 @@ class ChefSoloAutomator < Automator
     @result
   ensure
     File.delete(@ssh_file) if @ssh_file && File.exist?(@ssh_file)
+  end
+
+  def install_chef(inputmap)
+    sshauth = inputmap['sshauth']
+    ipaddress = inputmap['ipaddress']
+
+    # do we need sudo bash?
+    sudo = 'sudo' unless sshauth['user'] == 'root'
+
+    write_ssh_file
+    @ssh_file = @task['config']['ssh-auth']['identityfile'] unless @ssh_keyfile.nil?
+    set_credentials(sshauth)
+
+    begin
+      Net::SSH.start(ipaddress, sshauth['user'], @credentials) do |ssh|
+        begin
+          # determine if Chef is installed
+          ssh_exec!(ssh, 'which chef-solo', 'Checking if chef-solo is present')
+          return
+        rescue CommandExecutionError
+          # no chef-solo, install it
+          log.debug 'Installing Chef'
+        end
+
+        # try installing via package manager
+        begin
+          ssh_exec!(ssh, "which yum && #{sudo} yum -qy install chef", 'Attempting Chef install via YUM')
+          return
+        rescue CommandExecutionError
+          begin
+            ssh_exec!(ssh, "which apt-get && #{sudo} apt-get -qy install chef", 'Attempting Chef install via apt-get')
+            return
+          rescue
+            log.debug 'No Chef packages found for installation'
+          end
+        end
+
+        # determine if curl is installed, else default to wget
+        chef_install_cmd = "curl -L https://www.opscode.com/chef/install.sh | #{sudo} bash"
+        begin
+          ssh_exec!(ssh, "which curl", "Checking for curl")
+        rescue CommandExecutionError
+          log.debug "curl not found, defaulting to wget"
+          chef_install_cmd = "wget -qO - https://www.opscode.com/chef/install.sh | #{sudo} bash"
+        end
+        ssh_exec!(ssh, chef_install_cmd, "Installing Chef")
+      end
+    rescue
+      fail 'Failed to install Chef'
+    end
   end
 
   def install(inputmap)
