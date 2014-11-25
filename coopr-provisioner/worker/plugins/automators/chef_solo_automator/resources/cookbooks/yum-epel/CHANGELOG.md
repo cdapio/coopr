@@ -2,6 +2,10 @@ yum-epel Cookbook CHANGELOG
 ======================
 This file is used to list changes made in each version of the yum-epel cookbook.
 
+v0.5.3 (2014-10-28)
+-------------------
+- Revert Use HTTPS for GPG keys and mirror lists
+
 v0.5.2 (2014-10-28)
 -------------------
 - Use HTTPS for GPG keys and mirror lists
