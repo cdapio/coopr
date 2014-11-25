@@ -39,21 +39,21 @@ public class HttpModule extends AbstractModule {
   @Override
   protected void configure() {
 
-    Multibinder<HttpHandler> internalHandlerBinder =
-      Multibinder.newSetBinder(binder(), HttpHandler.class, Names.named("External"));
-    internalHandlerBinder.addBinding().to(AdminHandler.class);
-    internalHandlerBinder.addBinding().to(ClusterHandler.class);
-    internalHandlerBinder.addBinding().to(NodeHandler.class);
-    internalHandlerBinder.addBinding().to(StatusHandler.class);
-    internalHandlerBinder.addBinding().to(RPCHandler.class);
-    internalHandlerBinder.addBinding().to(SuperadminHandler.class);
-    internalHandlerBinder.addBinding().to(PluginHandler.class);
-    internalHandlerBinder.addBinding().to(UserHandler.class);
-    internalHandlerBinder.addBinding().to(MetricHandler.class);
-
     Multibinder<HttpHandler> externalHandlerBinder =
+      Multibinder.newSetBinder(binder(), HttpHandler.class, Names.named("External"));
+    externalHandlerBinder.addBinding().to(AdminHandler.class);
+    externalHandlerBinder.addBinding().to(ClusterHandler.class);
+    externalHandlerBinder.addBinding().to(NodeHandler.class);
+    externalHandlerBinder.addBinding().to(StatusHandler.class);
+    externalHandlerBinder.addBinding().to(RPCHandler.class);
+    externalHandlerBinder.addBinding().to(SuperadminHandler.class);
+    externalHandlerBinder.addBinding().to(PluginHandler.class);
+    externalHandlerBinder.addBinding().to(UserHandler.class);
+    externalHandlerBinder.addBinding().to(MetricHandler.class);
+
+    Multibinder<HttpHandler> internalHandlerBinder =
       Multibinder.newSetBinder(binder(), HttpHandler.class, Names.named("Internal"));
-    externalHandlerBinder.addBinding().to(TaskHandler.class);
-    externalHandlerBinder.addBinding().to(ProvisionerHandler.class);
+    internalHandlerBinder.addBinding().to(TaskHandler.class);
+    internalHandlerBinder.addBinding().to(ProvisionerHandler.class);
   }
 }
