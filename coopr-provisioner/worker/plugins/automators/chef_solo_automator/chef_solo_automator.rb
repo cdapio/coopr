@@ -304,8 +304,12 @@ class ChefSoloAutomator < Automator
           ssh_exec!(ssh, "which yum && #{sudo} yum -qy install chef", 'Attempting Chef install via YUM')
           return
         rescue CommandExecutionError
-          ssh_exec!(ssh, "which apt-get && #{sudo} apt-get -qy install chef", 'Attempting Chef install via apt-get')
-          return
+          begin
+            ssh_exec!(ssh, "which apt-get && #{sudo} apt-get -qy install chef", 'Attempting Chef install via apt-get')
+            return
+          rescue
+            log.debug 'No Chef packages found for installation'
+          end
         end
 
         # determine if curl is installed, else default to wget
