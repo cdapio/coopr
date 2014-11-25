@@ -1,11 +1,16 @@
-angular.module(PKG.name+'.services').factory('myApi_clusters', 
+angular.module(PKG.name+'.services').factory('myApi_clusters',
 function ($resource, myApiPrefix) {
 
   return {
 
     Cluster: $resource(myApiPrefix + 'clusters/:id',
       { id: '@id' },
-      { 
+      {
+        query: {
+          method: 'GET',
+          isArray: true,
+          params: { status: 'pending,active,incomplete,inconsistent' }
+        },
         getStatus: {
           method: 'GET',
           url: myApiPrefix + 'clusters/:id/status'
@@ -52,7 +57,7 @@ function ($resource, myApiPrefix) {
 
     ClusterService: $resource(myApiPrefix + 'clusters/:clusterId/services/:name',
       { name: '@name' },
-      { 
+      {
         start: {
           method: 'POST',
           url: myApiPrefix + 'clusters/:clusterId/services/:name/start'
