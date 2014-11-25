@@ -24,6 +24,8 @@ module Coopr
 
     def initialize(config)
       @config = config || {}
+      @cert_path = config.get(TRUST_CERT_PATH)
+      @cert_pass = config.get(TRUST_CERT_PASS)
     end
 
     def cmd
@@ -41,6 +43,8 @@ module Coopr
       cmd += " --tenant #{@tenant}" unless @tenant.nil?
       cmd += " --name #{@name}" unless @name.nil?
       cmd += " --register" if @register
+      cmd += " --cert-path #{@cert_path}" if @cert_path
+      cmd += " --cert-pass #{@cert_pass}" if @cert_pass
       cmd
     end
 

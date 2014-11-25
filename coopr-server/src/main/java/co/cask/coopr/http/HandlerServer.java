@@ -59,7 +59,7 @@ abstract class HandlerServer extends AbstractIdleService {
     int port = conf.getInt(portKey);
     int numExecThreads = conf.getInt(Constants.NETTY_EXEC_NUM_THREADS);
     int numWorkerThreads = conf.getInt(Constants.NETTY_WORKER_NUM_THREADS);
-    final boolean securityEnabled = conf.getBoolean(co.cask.cdap.common.conf.Constants.Security.CFG_SECURITY_ENABLED);
+    final boolean securityEnabled = conf.getBoolean(co.cask.cdap.common.conf.Constants.Security.ENABLED);
     final String realm = conf.get(co.cask.cdap.common.conf.Constants.Security.CFG_REALM);
 
     NettyHttpService.Builder builder = NettyHttpService.builder();

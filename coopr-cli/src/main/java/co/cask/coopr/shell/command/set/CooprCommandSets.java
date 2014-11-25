@@ -17,6 +17,7 @@
 package co.cask.coopr.shell.command.set;
 
 import co.cask.common.cli.Command;
+import co.cask.common.cli.CommandSet;
 import co.cask.coopr.shell.command.AddServicesOnClusterCommand;
 import co.cask.coopr.shell.command.ConnectCommand;
 import co.cask.coopr.shell.command.CreateClusterCommand;
@@ -74,24 +75,45 @@ import java.util.List;
 /**
  * Command set utility class.
  */
-public class CommandSet {
+public class CooprCommandSets {
 
-  public static co.cask.common.cli.CommandSet<Command> getCliCommandSet(Injector injector) {
-    List<Command> commands = ImmutableList.of(
-      injector.getInstance(ConnectCommand.class),
-      injector.getInstance(ExitCommand.class)
-    );
-    List<co.cask.common.cli.CommandSet<Command>> commandSets = ImmutableList.of(
+  public static CommandSet<Command> getCommandSetForSuperadmin(Injector injector) {
+    List<CommandSet<Command>> commandSets = ImmutableList.of(
       getAdminCommandSet(injector),
       getClusterCommandSet(injector),
       getPluginCommandSet(injector),
       getTenantCommandSet(injector),
       getProvisionerCommandSet(injector)
     );
-    return new co.cask.common.cli.CommandSet<Command>(commands, commandSets);
+    return new CommandSet<Command>(getCommonComands(injector), commandSets);
   }
 
-  private static co.cask.common.cli.CommandSet<Command> getAdminCommandSet(Injector injector) {
+  public static CommandSet<Command> getCommandSetForAdmin(Injector injector) {
+    List<CommandSet<Command>> commandSets = ImmutableList.of(
+      getAdminCommandSet(injector),
+      getClusterCommandSet(injector),
+      getPluginCommandSet(injector),
+      getProvisionerCommandSet(injector)
+    );
+    return new CommandSet<Command>(getCommonComands(injector), commandSets);
+  }
+
+  public static CommandSet<Command> getCommandSetForNonAdminUser(Injector injector) {
+    List<CommandSet<Command>> commandSets = ImmutableList.of(
+      getClusterCommandSet(injector),
+      getProvisionerCommandSet(injector)
+    );
+    return new CommandSet<Command>(getCommonComands(injector), commandSets);
+  }
+
+  private static List<Command> getCommonComands(Injector injector) {
+    return ImmutableList.of(
+      injector.getInstance(ConnectCommand.class),
+      injector.getInstance(ExitCommand.class)
+    );
+  }
+
+  private static CommandSet<Command> getAdminCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
       injector.getInstance(DeleteClusterTemplateCommand.class),
       injector.getInstance(DeleteHardwareTypeCommand.class),
@@ -109,10 +131,10 @@ public class CommandSet {
       injector.getInstance(ListProvidersCommand.class),
       injector.getInstance(ListServicesCommand.class)
     );
-    return new co.cask.common.cli.CommandSet<Command>(commands);
+    return new CommandSet<Command>(commands);
   }
 
-  private static co.cask.common.cli.CommandSet<Command> getClusterCommandSet(Injector injector) {
+  private static CommandSet<Command> getClusterCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
       injector.getInstance(AddServicesOnClusterCommand.class),
       injector.getInstance(CreateClusterCommand.class),
@@ -129,10 +151,10 @@ public class CommandSet {
       injector.getInstance(StopServiceOnClusterCommand.class),
       injector.getInstance(SyncClusterTemplateCommand.class)
     );
-    return new co.cask.common.cli.CommandSet<Command>(commands);
+    return new CommandSet<Command>(commands);
   }
 
-  private static co.cask.common.cli.CommandSet<Command> getPluginCommandSet(Injector injector) {
+  private static CommandSet<Command> getPluginCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
       injector.getInstance(DeleteAutomatorTypeResourcesCommand.class),
       injector.getInstance(DeleteProviderTypeResourcesCommand.class),
@@ -148,23 +170,23 @@ public class CommandSet {
       injector.getInstance(StageProviderTypeResourcesCommand.class),
       injector.getInstance(SyncResourcesCommand.class)
     );
-    return new co.cask.common.cli.CommandSet<Command>(commands);
+    return new CommandSet<Command>(commands);
   }
 
-  private static co.cask.common.cli.CommandSet<Command> getTenantCommandSet(Injector injector) {
+  private static CommandSet<Command> getTenantCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
       injector.getInstance(DeleteTenantCommand.class),
       injector.getInstance(GetTenantCommand.class),
       injector.getInstance(ListTenantsCommand.class)
     );
-    return new co.cask.common.cli.CommandSet<Command>(commands);
+    return new CommandSet<Command>(commands);
   }
 
-  private static co.cask.common.cli.CommandSet<Command> getProvisionerCommandSet(Injector injector) {
+  private static CommandSet<Command> getProvisionerCommandSet(Injector injector) {
     List<Command> commands = ImmutableList.of(
       injector.getInstance(GetProvisionerCommand.class),
       injector.getInstance(ListProvisionersCommand.class)
     );
-    return new co.cask.common.cli.CommandSet<Command>(commands);
+    return new CommandSet<Command>(commands);
   }
 }
