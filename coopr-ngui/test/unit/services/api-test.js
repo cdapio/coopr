@@ -38,7 +38,7 @@ describe('api resources', function() {
       it('testing query()', function() {
         $httpBackend.expectGET(/v2\/clusters$/).respond([{foo:'bar'}]);
 
-        var list = myApi.Cluster.query();
+        var list = myApi.Cluster.query({status:null});
         $httpBackend.flush();
         expect(list[0].foo).toEqual('bar');
       });
@@ -57,7 +57,7 @@ describe('api resources', function() {
           return headers['Authorization'] === MY_CONFIG.authorization;
         }).respond(201, '');
 
-        myApi.Cluster.query();
+        myApi.Cluster.query({status:null});
         $httpBackend.flush();
       });
 
@@ -66,7 +66,7 @@ describe('api resources', function() {
           return !!headers['X-Requested-With'];
         }).respond(201, '');
 
-        myApi.Cluster.query();
+        myApi.Cluster.query({status:null});
         $httpBackend.flush();
       });
 
@@ -76,7 +76,7 @@ describe('api resources', function() {
         }).respond(201, '');
 
         myAuth.currentUser = {username:'test'};
-        myApi.Cluster.query();
+        myApi.Cluster.query({status:null});
         $httpBackend.flush();
         myAuth.currentUser = null;
       });
