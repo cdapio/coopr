@@ -15,6 +15,7 @@
  */
 package co.cask.coopr.http.guice;
 
+import co.cask.coopr.common.conf.Constants;
 import co.cask.coopr.http.handler.AdminHandler;
 import co.cask.coopr.http.handler.ClusterHandler;
 import co.cask.coopr.http.handler.MetricHandler;
@@ -40,7 +41,7 @@ public class HttpModule extends AbstractModule {
   protected void configure() {
 
     Multibinder<HttpHandler> externalHandlerBinder =
-      Multibinder.newSetBinder(binder(), HttpHandler.class, Names.named("External"));
+      Multibinder.newSetBinder(binder(), HttpHandler.class, Names.named(Constants.HandlersNames.EXTERNAL));
     externalHandlerBinder.addBinding().to(AdminHandler.class);
     externalHandlerBinder.addBinding().to(ClusterHandler.class);
     externalHandlerBinder.addBinding().to(NodeHandler.class);
@@ -52,7 +53,7 @@ public class HttpModule extends AbstractModule {
     externalHandlerBinder.addBinding().to(MetricHandler.class);
 
     Multibinder<HttpHandler> internalHandlerBinder =
-      Multibinder.newSetBinder(binder(), HttpHandler.class, Names.named("Internal"));
+      Multibinder.newSetBinder(binder(), HttpHandler.class, Names.named(Constants.HandlersNames.INTERNAL));
     internalHandlerBinder.addBinding().to(TaskHandler.class);
     internalHandlerBinder.addBinding().to(ProvisionerHandler.class);
   }
