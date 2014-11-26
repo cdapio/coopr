@@ -53,6 +53,6 @@ now to run the server, possibly on a different host:
 * `npm install --production` (will skip devDependencies)
 * `export COOPR_UI_PORT=8100`
 * `export COOPR_CORS_PORT=8101`
-* `export COOPR_SERVER_URI=http://hostname:port/v2/`
+* `export COOPR_SERVER_URI=http://hostname:port/`
 * `npm start` or `node server.js`
 
