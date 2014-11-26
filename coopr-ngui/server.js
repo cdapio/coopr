@@ -28,8 +28,7 @@ var pkg = require('./package.json'),
         pink: function (v) {
             return '\x1B[40m\x1B[35m' + v + '\x1B[39m\x1B[49m';
         }
-    },
-    sslStarted = false;
+    };
 
 
 morgan.token('cooprcred', function (req, res) {
