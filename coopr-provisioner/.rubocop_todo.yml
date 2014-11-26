@@ -25,7 +25,7 @@ Lint/UselessAssignment:
 
 # Offense count: 28
 Metrics/AbcSize:
-  Max: 89
+  Max: 96
 
 # Offense count: 5
 # Configuration parameters: CountComments.
@@ -44,7 +44,7 @@ Metrics/LineLength:
 # Offense count: 36
 # Configuration parameters: CountComments.
 Metrics/MethodLength:
-  Max: 49
+  Max: 51
 
 # Offense count: 8
 Metrics/PerceivedComplexity:
