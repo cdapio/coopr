@@ -256,7 +256,7 @@ public class PluginHandlerTest extends ServiceTestBase {
       "versions",
       meta.getVersion()
     );
-    response = doGetExternalAPI(path);
+    response = doGetInternalAPI(path);
     assertResponseStatus(response, HttpResponseStatus.OK);
     Assert.assertEquals(contents, bodyToString(response));
   }

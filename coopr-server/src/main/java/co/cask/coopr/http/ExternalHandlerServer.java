@@ -35,7 +35,7 @@ import java.util.Set;
 public class ExternalHandlerServer extends HandlerServer {
 
   @Inject
-  private ExternalHandlerServer(@Named("External") Set<HttpHandler> handlers, Configuration conf,
+  private ExternalHandlerServer(@Named(Constants.HandlersNames.EXTERNAL) Set<HttpHandler> handlers, Configuration conf,
                                 final CConfiguration cConf,
                                 final TokenValidator tokenValidator,
                                 final AccessTokenTransformer accessTokenTransformer,

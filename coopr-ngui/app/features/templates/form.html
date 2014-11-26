@@ -11,7 +11,7 @@
 
     <fieldset data-title="{{tab.title}}" ng-repeat="tab in tabs" bs-pane>
 
-      <div 
+      <div
         ng-include="tab.partial"
         onload="onTabLoaded($index)"
       ></div>
@@ -31,7 +31,7 @@
         </div>
         <div class="col-xs-10">
 
-          <button type="button" class="btn btn-sm btn-default pull-right" 
+          <button type="button" class="btn btn-sm btn-default pull-right"
             ng-disabled="templateForm.$invalid"
             ng-hide="$last"
             ng-click="nextTab()">
@@ -39,7 +39,7 @@
               <span class="fa fa-long-arrow-right"></span>
           </button>
 
-          <button type="submit" class="btn btn-primary" 
+          <button type="submit" class="btn btn-primary"
             ng-show="$last"
             ng-disabled="submitting || templateForm.$invalid">
               <span class="fa fa-save"></span>

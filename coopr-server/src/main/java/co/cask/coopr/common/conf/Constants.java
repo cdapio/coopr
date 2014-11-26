@@ -171,6 +171,14 @@ public class Constants {
     public static final String TASK_NAMESPACE = "/locks/tasks";
   }
 
+  /**
+   * Handlers names constants.
+   */
+  public static final class HandlersNames {
+      public static final String EXTERNAL = "External";
+      public static final String INTERNAL = "Internal";
+  }
+
   public static final int PLUGIN_RESOURCE_CHUNK_SIZE = 1024 * 64;
   public static final String USER_HEADER = "Coopr-UserID";
   public static final String API_KEY_HEADER = "Coopr-ApiKey";

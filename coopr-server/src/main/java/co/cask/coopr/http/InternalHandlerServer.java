@@ -38,7 +38,7 @@ import java.util.Set;
 public class InternalHandlerServer extends HandlerServer {
 
   @Inject
-  private InternalHandlerServer(@Named("Internal") Set<HttpHandler> handlers, Configuration conf,
+  private InternalHandlerServer(@Named(Constants.HandlersNames.INTERNAL) Set<HttpHandler> handlers, Configuration conf,
                                 final CConfiguration cConf,
                                 final TokenValidator tokenValidator,
                                 final AccessTokenTransformer accessTokenTransformer,

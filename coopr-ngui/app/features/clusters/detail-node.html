@@ -21,7 +21,7 @@
       </td>
 
       <td ng-if="item.status==='failed'">
-        <span data-content="item.stdout"
+        <span data-content="{{item.stdout || item.stderr}}"
               data-title="Log message"
               data-trigger="hover"
               data-container="body"
