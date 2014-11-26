@@ -37,7 +37,7 @@ then, each in their own tab:
 * `cd coopr-ngui`
 * `npm run build` ( == `npm install && bower install && gulp build`)
 * `npm run test-single-run` (unit tests)
-* `npm run protractor` (end-to-end tests, needs `npm start` running in parallel)
+* `cd ../coopr-e2e && npm install && npm run protractor` (end-to-end tests, needs `npm start` running in parallel)
 
 ### for production:
 
@@ -45,7 +45,7 @@ generate a minified build of static assets, in the `coopr-ngui/dist/` folder
 
 * `cd coopr-ngui`
 * `npm run build` ( == `npm install && bower install && gulp build`)
-* `gulp minify && gulp rev` (minified and revision-tagged static assets)
+* `gulp distribute` (makes minified and revision-tagged static assets)
 
 now to run the server, possibly on a different host:
 
