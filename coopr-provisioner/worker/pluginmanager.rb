@@ -40,8 +40,13 @@ class PluginManager
 
   # scan plugins directory for json plugin definitions, load plugins 
   def scan_plugins
-    # enforces directory structure from top-level: ./plugins/['providers']/[plugin-name]/*.json
-    Dir["#{File.expand_path(File.dirname(__FILE__))}/plugins/*/*/*.json"].each do |jsonfile| 
+    # Allow both the old and new directory layouts
+    # old: ./plugins/['providers']/[plugin-name]/*.json new: ./plugins/[plugin-name]/*.json
+    (Dir["#{File.expand_path(File.dirname(__FILE__))}/plugins/*/*/*.json"] +
+     Dir["#{File.expand_path(File.dirname(__FILE__))}/plugins/*/*.json"] # +
+    # Add this back once we figure out how to pass the work_dir to PluginManager
+    # Dir["#{@plugin_env[:work_dir]}/plugins/*/*.json"]
+    ).each do |jsonfile|
       begin
         log.debug "pluginmanager scanning #{jsonfile}"
         jsondata =  JSON.parse( IO.read(jsonfile) )
