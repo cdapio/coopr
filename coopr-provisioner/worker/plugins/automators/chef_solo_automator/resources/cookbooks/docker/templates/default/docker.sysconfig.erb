@@ -1,7 +1,7 @@
 # Docker Upstart and SysVinit configuration file
 
 # Customize location of Docker binary (especially for development testing).
-DOCKER="<%= Helpers::Docker.executable(node) %>"
+DOCKER="<%= Docker::Helpers.executable(node) %>"
 
 <% if node['docker']['logfile'] -%>
 DOCKER_LOGFILE=<%= node['docker']['logfile'] %>
@@ -21,6 +21,9 @@ DOCKER_RAMDISK=<%= node['docker']['ramdisk'] %>
 # If you need Docker to use an HTTP proxy, it can also be specified here.
 <% if node['docker']['http_proxy'] -%>
 export HTTP_PROXY=<%= node['docker']['http_proxy'] %>
+<% end -%>
+<% if node['docker']['no_proxy'] -%>
+export NO_PROXY=<%= node['docker']['no_proxy'] %>
 <% end -%>
 
 # This is also a handy place to tweak where Docker's temporary files go.

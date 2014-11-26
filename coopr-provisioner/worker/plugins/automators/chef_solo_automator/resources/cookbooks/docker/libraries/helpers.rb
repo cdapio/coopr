@@ -1,34 +1,10 @@
 require 'chef/mixin/shell_out'
 include Chef::Mixin::ShellOut
 
-# Helpers module
-module Helpers
-  def binary_installed?(bin)
-    !shell_out("which #{bin}").error?
-  end
-
-  #
-  # Pairs with the dep_check recipe.
-  #
-  # Parameters:
-  # @execption - DockerCookbook exception to throw
-  # @action - symbol representing which action to take
-  # @msg - string of message to print
-  #
-  def alert_on_error(exception, action, msg)
-    case action
-    when :warn
-      Chef::Log.warn <<-MSG
-WARNING: #{exception}
-#{msg}
-      MSG
-    when :fatal
-      fail exception, msg
-    end
-  end
-
-  # Helpers::Docker module
-  module Docker
+# Docker module
+module Docker
+  # Docker::Helpers module
+  module Helpers
     # Exception to signify that the Docker daemon is not yet ready to handle
     # docker commands.
     class DockerNotReady < StandardError
@@ -51,7 +27,7 @@ EOH
 
     # Daemon service name
     def self.docker_service(node)
-      return 'docker.io' if Helpers::Docker.using_docker_io_package?(node)
+      return 'docker.io' if Docker::Helpers.using_docker_io_package?(node)
       'docker'
     end
 
@@ -61,7 +37,7 @@ EOH
       when 'debian'
         '/etc/default/docker'
       when 'ubuntu'
-        if Helpers::Docker.using_docker_io_package?(node)
+        if Docker::Helpers.using_docker_io_package?(node)
           '/etc/default/docker.io'
         else
           '/etc/default/docker'
@@ -75,7 +51,7 @@ EOH
     def self.docker_upstart_conf_file(node)
       case node['platform']
       when 'ubuntu'
-        if Helpers::Docker.using_docker_io_package?(node)
+        if Docker::Helpers.using_docker_io_package?(node)
           '/etc/init/docker.io.conf'
         else
           '/etc/init/docker.conf'
@@ -87,18 +63,18 @@ EOH
 
     # Path to docker executable
     def self.executable(node)
-      return '/usr/bin/docker.io' if Helpers::Docker.using_docker_io_package?(node)
+      return '/usr/bin/docker.io' if Docker::Helpers.using_docker_io_package?(node)
       "#{node['docker']['install_dir']}/docker"
     end
 
     # Boolean to determine whether or not we are using the docker.io package
     def self.using_docker_io_package?(node)
       node['docker']['install_type'] == 'package' &&
-      node['docker']['package']['name'] == 'docker.io'
+        node['docker']['package']['name'] == 'docker.io'
     end
 
     def self.daemon_cli_args(node)
-      daemon_options = Helpers::Docker.cli_args(
+      daemon_options = Docker::Helpers.cli_args(
         'api-enable-cors' => node['docker']['api_enable_cors'],
         'bip' => node['docker']['bip'],
         'bridge' => node['docker']['bridge'],
@@ -114,7 +90,7 @@ EOH
         'iptables' => node['docker']['iptables'],
         'mtu' => node['docker']['mtu'],
         'pidfile' => node['docker']['pidfile'],
-        'restart' => node['docker']['container_init_type'] ? false : nil,
+        'restart' => node['docker']['restart'],
         'selinux-enabled' => node['docker']['selinux_enabled'],
         'storage-driver' => node['docker']['storage_driver'],
         'storage-opt' => Array(node['docker']['storage_opt']),
@@ -271,6 +247,30 @@ EOM
       cmd = execute_cmd(cmd, timeout)
       cmd.error!
       cmd
+    end
+
+    def binary_installed?(bin)
+      !shell_out("which #{bin}").error?
+    end
+
+    #
+    # Pairs with the dep_check recipe.
+    #
+    # Parameters:
+    # @execption - DockerCookbook exception to throw
+    # @action - symbol representing which action to take
+    # @msg - string of message to print
+    #
+    def alert_on_error(exception, action, msg)
+      case action
+      when :warn
+        Chef::Log.warn <<-MSG
+WARNING: #{exception}
+#{msg}
+        MSG
+      when :fatal
+        fail exception, msg
+      end
     end
   end
 end

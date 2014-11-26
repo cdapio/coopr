@@ -1,7 +1,7 @@
-include Helpers::Docker
+include Docker::Helpers
 
 def load_current_resource
-  @current_resource = Chef::Resource::DockerContainer.new(new_resource)
+  @current_resource = Chef::Resource::DockerContainer.new(new_resource.name)
   wait_until_ready!
   docker_containers.each do |ps|
     next unless container_matches?(ps)
@@ -13,6 +13,11 @@ def load_current_resource
     break
   end
   @current_resource
+end
+
+def initialize(new_resource, run_context)
+  super
+  @service = service_init if service?
 end
 
 action :commit do
@@ -54,6 +59,7 @@ action :remove do
   if running?
     stop
     new_resource.updated_by_last_action(true)
+    sleep 1
   end
   if exists?
     remove
@@ -132,30 +138,33 @@ def container_matches?(ps)
 end
 
 def container_command_matches_if_exists?(command)
-  return true if new_resource.command.nil?
-  # try the exact command but also the command with the ' and " stripped out, since docker will
-  # sometimes strip out quotes.
-  subcommand = new_resource.command.gsub(/['"]/, '')
-  command.include?(new_resource.command) || command.include?(subcommand)
+  if new_resource.command
+    # try the exact command but also the command with the ' and " stripped out, since docker will
+    # sometimes strip out quotes.
+    subcommand = new_resource.command.gsub(/['"]/, '')
+    command.include?(new_resource.command) || command.include?(subcommand)
+  else
+    true
+  end
 end
 
 def container_id_matches?(id)
-  return false unless id
+  return false unless id && new_resource.id
   id.start_with?(new_resource.id)
 end
 
 def container_image_matches?(image)
-  return false unless image
+  return false unless image && new_resource.image
   image.include?(new_resource.image)
 end
 
 def container_name_matches?(names)
   return false unless names
-  new_resource.container_name && new_resource.container_name == names
+  new_resource.container_name && names.split(',').include?(new_resource.container_name)
 end
 
 def container_name_matches_if_exists?(names)
-  return false if new_resource.container_name && new_resource.container_name != names
+  return container_name_matches?(names) if new_resource.container_name
   true
 end
 
@@ -225,6 +234,10 @@ def docker_containers
       end
       ps[name.to_s] = line[start..finish - 1].strip
     end
+    # Filter out technical names (eg. 'my-app/db'), which appear in ps['names']
+    # when a container has at least another container linking to it. If these
+    # names are not filtered they will pollute current_resource.container_name.
+    ps['names'] = ps['names'].split(',').grep(/\A[^\/]+\Z/).join(',') # technical names always contain a '/'
     ps
   end
 end
@@ -292,9 +305,12 @@ end
 def remove_link
   return false if new_resource.link.nil? || new_resource.link.empty?
   rm_args = cli_args(
-    'link' => new_resource.link
+    'link' => true
   )
-  docker_cmd!("rm #{rm_args} #{current_resource.id}")
+  link_args = Array(new_resource.link).map do |link|
+    container_name + '/' + link
+  end
+  docker_cmd!("rm #{rm_args} #{link_args.join(' ')}")
 end
 
 def remove_volume
@@ -348,7 +364,7 @@ def run
   dr = docker_cmd!("run #{run_args} #{new_resource.image} #{new_resource.command}")
   dr.error!
   new_resource.id(dr.stdout.chomp)
-  service_create if service?
+  service_run if service?
 end
 # rubocop:enable MethodLength
 
@@ -360,11 +376,14 @@ def service?
   new_resource.init_type
 end
 
-def service_action(actions)
+def service_init
+  service_create
+
   if new_resource.init_type == 'runit'
     runit_service service_name do
       run_template_name 'docker-container'
-      action actions
+      supports :restart => true, :reload => true, :status => true
+      action :nothing
     end
   else
     service service_name do
@@ -374,22 +393,29 @@ def service_action(actions)
       when 'upstart'
         provider Chef::Provider::Service::Upstart
       end
-      supports :status => true, :restart => true, :reload => true
-      action actions
+      supports :restart => true, :reload => true, :status => true
+      action :nothing
     end
   end
 end
 
 def service_create
   case new_resource.init_type
-  when 'runit'
-    service_create_runit
   when 'systemd'
     service_create_systemd
   when 'sysv'
     service_create_sysv
   when 'upstart'
     service_create_upstart
+  end
+end
+
+def service_run
+  case new_resource.init_type
+  when 'runit'
+    service_create_runit
+  else
+    service_start_and_enable
   end
 end
 
@@ -401,7 +427,8 @@ def service_create_runit
       'service_name' => service_name
     )
     run_template_name service_template
-  end
+    action :nothing
+  end.run_action(:enable)
 end
 
 def service_create_systemd
@@ -420,7 +447,8 @@ def service_create_systemd
       :sockets => sockets
     )
     not_if port.empty?
-  end
+    action :nothing
+  end.run_action(:create)
 
   template "/usr/lib/systemd/system/#{service_name}.service" do
     source service_template
@@ -432,9 +460,8 @@ def service_create_systemd
       :cmd_timeout => new_resource.cmd_timeout,
       :service_name => service_name
     )
-  end
-
-  service_action([:start, :enable])
+    action :nothing
+  end.run_action(:create)
 end
 
 def service_create_sysv
@@ -448,14 +475,21 @@ def service_create_sysv
       :cmd_timeout => new_resource.cmd_timeout,
       :service_name => service_name
     )
-  end
+    action :nothing
+  end.run_action(:create)
 
-  service_action([:start, :enable])
+  # link "/etc/rc.d/init.d/#{service_name}" do
+  #   to "/etc/init.d/#{service_name}"
+  #   only_if { platform_family?('rhel') }
+  #   action :nothing
+  # end.run_action(:create)
 end
 
 def service_create_upstart
   # The upstart init script requires inotifywait, which is in inotify-tools
-  package 'inotify-tools'
+  package 'inotify-tools' do
+    action :nothing
+  end.run_action(:install)
 
   template "/etc/init/#{service_name}.conf" do
     source service_template
@@ -467,9 +501,8 @@ def service_create_upstart
       :cmd_timeout => new_resource.cmd_timeout,
       :service_name => service_name
     )
-  end
-
-  service_action([:start, :enable])
+    action :nothing
+  end.run_action(:create)
 end
 
 def service_name
@@ -496,7 +529,7 @@ def service_remove_runit
 end
 
 def service_remove_systemd
-  service_action([:stop, :disable])
+  service_stop_and_disable
 
   %w(service socket).each do |f|
     file "/usr/lib/systemd/system/#{service_name}.#{f}" do
@@ -506,7 +539,7 @@ def service_remove_systemd
 end
 
 def service_remove_sysv
-  service_action([:stop, :disable])
+  service_stop_and_disable
 
   file "/etc/init.d/#{service_name}" do
     action :delete
@@ -514,7 +547,7 @@ def service_remove_sysv
 end
 
 def service_remove_upstart
-  service_action([:stop, :disable])
+  service_stop_and_disable
 
   file "/etc/init/#{service_name}" do
     action :delete
@@ -522,15 +555,25 @@ def service_remove_upstart
 end
 
 def service_restart
-  service_action([:restart])
+  @service.run_action(:restart)
 end
 
 def service_start
-  service_action([:start])
+  @service.run_action(:start)
 end
 
 def service_stop
-  service_action([:stop])
+  @service.run_action(:stop)
+end
+
+def service_start_and_enable
+  @service.run_action(:enable)
+  @service.run_action(:start)
+end
+
+def service_stop_and_disable
+  @service.run_action(:stop)
+  @service.run_action(:disable)
 end
 
 def service_template

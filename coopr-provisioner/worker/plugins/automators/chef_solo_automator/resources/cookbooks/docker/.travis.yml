@@ -1,8 +1,0 @@
-language: ruby
-bundler_args: --without integration
-rvm:
-  - 1.9.3
-before_script:
-  - bundle exec berks install
-script:
-  - bundle exec rake travis

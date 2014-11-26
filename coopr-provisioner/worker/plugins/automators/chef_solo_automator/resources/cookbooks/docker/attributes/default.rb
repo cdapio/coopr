@@ -23,7 +23,7 @@ default['docker']['init_type'] = value_for_platform(
   'default' => 'upstart'
 )
 default['docker']['install_type'] = value_for_platform(
-  %w(centos debian fedora mac_os_x redhat ubuntu) => {
+  %w(centos debian fedora mac_os_x redhat ubuntu amazon) => {
     'default' => 'package'
   },
   'default' => 'binary'
@@ -46,7 +46,8 @@ default['docker']['alert_on_error_action'] = :fatal
 
 default['docker']['binary']['dependency_packages'] = value_for_platform_family(
   'debian' => %w(procps xz-utils),
-  'rhel' => %w(procps xz)
+  'rhel' => %w(procps xz),
+  'default' => %w()
 )
 default['docker']['binary']['version'] = node['docker']['version'] || 'latest'
 default['docker']['binary']['checksum'] =
@@ -105,7 +106,9 @@ default['docker']['package']['repo_url'] = value_for_platform(
   },
   'default' => nil
 )
-default['docker']['package']['repo_key'] = 'https://get.docker.io/gpg'
+default['docker']['package']['repo_keyserver'] = 'keyserver.ubuntu.com'
+# Found at https://get.docker.io/ubuntu/
+default['docker']['package']['repo_key'] = 'A88D21E9'
 
 ## Source installation attributes
 
@@ -146,6 +149,7 @@ default['docker']['icc'] = nil
 default['docker']['ip'] = nil
 default['docker']['iptables'] = nil
 default['docker']['mtu'] = nil
+default['docker']['no_proxy'] = nil
 default['docker']['options'] = nil
 default['docker']['pidfile'] = nil
 default['docker']['ramdisk'] = false
@@ -179,3 +183,7 @@ default['docker']['image_cmd_timeout'] = 300
 ## docker_registry attributes
 
 default['docker']['registry_cmd_timeout'] = 60
+
+# Other attributes
+
+default['docker']['restart'] = false if node['docker']['container_init_type']

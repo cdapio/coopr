@@ -1,4 +1,4 @@
-::Chef::Recipe.send(:include, Helpers)
+::Chef::Recipe.send(:include, Docker::Helpers)
 
 action = node['docker']['alert_on_error_action']
 
@@ -35,7 +35,7 @@ following cookbooks prior to docker in your run_list.
 
 when 'debian'
   # check kernel.release >= 3.8
-  unless ::Chef::VersionConstraint.new('>= 3.8').include?(node['kernel']['release'].match(/\d+.\d+.\d+/)[0])
+  unless ::Chef::VersionConstraint.new('>= 3.8').include?(node['kernel']['release'].match(/\d+.\d+/)[0])
     alert_on_error DockerCookbook::Exceptions::InvalidKernelVersion, action, <<-MSG
 Due to a bug in LXC, Docker works best on the 3.8 Linux kernel. You are currently running #{node['kernel']['release']}.
 It is recommended that you upgrade your kernel to at least 3.8.
@@ -82,7 +82,7 @@ More Info: http://docs.docker.io/installation/rhel/
   end
 
 when 'fedora'
-  if node['docker']['install_type'] == 'binary'
+  if node['docker']['install_type'] == 'binary' && node['docker']['exec_driver'] == 'lxc'
     alert_on_error DockerCookbook::Exceptions::InvalidPlatformVersion, action, <<-MSG
 LXC on Fedora is incredibly unstable. It is recommended to use native Docker on Fedora.
     MSG
