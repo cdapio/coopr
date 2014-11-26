@@ -1,7 +1,7 @@
 'use strict';
 
 describe('auth service', function() {
-  beforeEach(module('coopr-ngui.services'));
+  beforeEach(module('coopr-ui.services'));
 
   describe('myAuth', function() {
     var myAuth;

@@ -1,7 +1,7 @@
 'use strict';
 
 describe('api resources', function() {
-  beforeEach(module('coopr-ngui.services'));
+  beforeEach(module('coopr-ui.services'));
 
   describe('myApi', function() {
     var myApi, myAuth, MY_CONFIG, $rootScope, $httpBackend;

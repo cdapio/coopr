@@ -14,7 +14,6 @@ export COOPR_JAVA_OPTS="-XX:+UseConcMarkSweepGC -Dderby.stream.error.field=Derby
 export ENVIRONMENT=local
 export COOPR_NODE=${COOPR_NODE:-node}
 export COOPR_NPM=${COOPR_NPM:-npm}
-export COOPR_USE_NGUI=${COOPR_USE_NGUI:-false}
 export COOPR_DISABLE_UI=${COOPR_DISABLE_UI:-false}
 
 # Provisioner environment
@@ -322,11 +321,7 @@ ui () {
     echo "UI disabled... skipping..."
     return 0
   fi
-  if [ "${COOPR_USE_NGUI}" == "true" ]; then
-    ${COOPR_HOME}/ngui/bin/ngui.sh ${1}
-  else
-    ${COOPR_HOME}/ui/bin/ui.sh ${1}
-  fi
+  ${COOPR_HOME}/ui/bin/ui.sh ${1}
 }
 
 greeting () {

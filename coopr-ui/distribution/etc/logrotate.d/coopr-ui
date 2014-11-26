@@ -1,4 +1,4 @@
-/var/log/coopr/coopr-ngui*.log {
+/var/log/coopr/coopr-ui*.log {
     rotate 7
     daily
     missingok
