@@ -1,0 +1,38 @@
+{
+  "name": "sysctl",
+  "description": "Configures sysctl parameters",
+  "long_description": "# sysctl [![Build Status](https://travis-ci.org/onehealth-cookbooks/sysctl.png?branch=master)](https://travis-ci.org/onehealth-cookbooks/sysctl)\n\nDescription\n===========\n\nSet [sysctl](http://en.wikipedia.org/wiki/Sysctl) system control parameters via Chef\n\n\nPlatforms\n=========\n\n* Debian/Ubuntu\n* RHEL/CentOS\n* Scientific Linux\n* PLD Linux (not tested)\n\nUsage\n=======\n\nThere are two main ways to interact with the cookbook. This is via chef [attributes](http://docs.opscode.com/essentials_cookbook_attribute_files.html) or via the provided [LWRP](http://docs.opscode.com/lwrp.html).\n\n# Cookbook Attributes\n\n* `node['sysctl']['params']` - A namespace for setting sysctl parameters.\n* `node['sysctl']['conf_dir']` - Specifies the sysctl.d directory to be used. Defaults to `/etc/sysctl.d` on the Debian and RHEL platform families, otherwise `nil`\n* `node['sysctl']['allow_sysctl_conf']` - Defaults to false.  Using `conf_dir` is highly recommended. On some platforms that is not supported. For those platforms, set this to `true` and the cookbook will rewrite the `/etc/sysctl.conf` file directly with the params provided. Be sure to save any local edits of `/etc/sysctl.conf` before enabling this to avoid losing them.\n\nNote: if `node['sysctl']['conf_dir']` is set to nil and `node['sysctl']['allow_sysctl_conf']` is not set, no config will be written\n\n# Setting Sysctl Parameters\n\n## Using Attributes\n\nSetting variables in the `node['sysctl']['params']` hash will allow you to easily set common kernel parameters across a lot of nodes.\nAll you need to do to have them loaded is to include `sysctl::apply` anywhere in your run list of the node. It is recommended to do this early in the run list, so any recipe that gets applied afterwards that may depend on the set parameters will find them to be set.\n\nThe attributes method is easiest to implement if you manage the kernel parameters at the system level opposed to a per cookbook level approach.\nThe configuration will be written out when `sysctl::apply` gets run, which allows the parameters set to be persisted during a reboot.\n\n### Examples\n\nSet vm.swapiness to 20 via attributes\n\n```` ruby\n    node.default['sysctl']['params']['vm']['swappiness'] = 20\n\n    include_recipe 'sysctl::apply'\n````\n\n## Using LWRPs\n\nThe `sysctl_param` LWRP can be called from wrapper and application cookbooks to immediately set the kernel parameter and cue the kernel parameter to be written out to the configuration file.\n\n### sysctl_param\n\nActions\n\n- apply (default)\n- remove\n- nothing\n\nAttributes\n\n- key\n- value\n\n### Examples\n\nSet vm.swapiness to 20 via sysctl_param LWRP\n\n```` ruby\n    sysctl_param 'vm.swappiness' do\n      value 20\n    end\n````\nRemove sysctl parameter and set net.ipv4.tcp_fin_timeout back to default\n\n```` ruby\n    sysctl_param 'net.ipv4.tcp_fin_timeout' do\n      value 30\n      action :remove\n    end\n````\n\n# Reading Sysctl Parameters\n\n## Ohai Plugin\n\nThe cookbook also includes an Ohai 7 plugin that can be installed by adding `sysctl::ohai_plugin` to your run_list. This will populate `node['sys']` with automatic attributes that mirror the layout of `/proc/sys`.\n\nTo see ohai plugin output manually, you can run `ohai -d /etc/chef/ohai_plugins sys` on the command line.\n\n# Development\n\nWe have written unit tests using [chefspec](http://code.sethvargo.com/chefspec/) and integration tests in [serverspec](http://serverspec.org/) executed via [test-kitchen](http://kitchen.ci).\nMuch of the tooling around this cookbook is exposed via guard and test kitchen, so it is highly recommended to learn more about those tools.\n\n## Vagrant Plugin Dependencies\n\nThe integration tests can be run via test-kitchen using vagrant, but it depends on the following vagrant plugins:\n\n```\nvagrant plugin install vagrant-omnibus\n```\n\nTested with \n* Vagrant (version 1.6.1)\n* vagrant-omnibus (1.4.1)\n\n## Running tests\n\nThe following commands will run the tests:\n\n```\nbundle install\nbundle exec rubocop\nbundle exec foodcritic .\nbundle exec rspec\nbundle exec kitchen test default-ubuntu-1404\nbundle exec kitchen test default-centos-65\n```\n\nThe above will do ruby style ([rubocop](https://github.com/bbatsov/rubocop)) and cookbook style ([foodcritic](http://www.foodcritic.io/)) checks followed rspec unit tests ensuring proper cookbook operation.Integration tests will be run next on two separate linux platforms (Ubuntu 14.04 LTS Precise 64-bit and CentOS 6.5). Please run the tests on any pull requests that you are about to submit and write tests for defects or new features to ensure backwards compatibility and a stable cookbook that we can all rely upon.\n\n## Running tests continuously with guard\n\nThis cookbook is also setup to run the checks while you work via the [guard gem](http://guardgem.org/).\n\n```\nbundle install\nbundle exec guard start\n```\n\n## ChefSpec LWRP Matchers\n\nThe cookbook exposes a chefspec matcher to be used by wrapper cookbooks to test the cookbooks LWRP. See `library/matchers.rb` for basic usage.\n\n# Links\n\nThere are a lot of different documents that talk about system control parameters, the hope here is to point to some of the most useful ones to provide more guidance as to what the possible kernel parameters are and what they mean.\n\n* [Linux Kernel Sysctl](https://www.kernel.org/doc/Documentation/sysctl/)\n* [Linux Kernel IP Sysctl](http://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt)\n* [THE /proc FILESYSTEM (Jun 2009)](http://www.kernel.org/doc/Documentation/filesystems/proc.txt)\n* [RHEL 5 VM/Page Cache Tuning Presentation (2009) pdf](http://people.redhat.com/dshaks/Larry_Shak_Perf_Summit1_2009_final.pdf)\n* [Arch Linux SysCtl Tutorial (Feb 2013)](http://gotux.net/arch-linux/sysctl-config/)\n* [Old RedHat System Tuning Overview (2001!)](http://people.redhat.com/alikins/system_tuning.html)\n* [Tuning TCP For The Web at Velocity 2013 (video)](http://vimeo.com/70369211), [slides](http://cdn.oreillystatic.com/en/assets/1/event/94/Tuning%20TCP%20For%20The%20Web%20Presentation.pdf)\n* [Adventures in Linux TCP Tuning (Nov 2013)](http://thesimplecomputer.info/adventures-in-linux-tcp-tuning-page2/)\n* [Part 1: Lessons learned tuning TCP and Nginx in EC2 (Jan 2014)](http://engineering.chartbeat.com/2014/01/02/part-1-lessons-learned-tuning-tcp-and-nginx-in-ec2/)\n",
+  "maintainer": "OneHealth Solutions, Inc.",
+  "maintainer_email": "cookbooks@onehealth.com",
+  "license": "Apache v2.0",
+  "platforms": {
+    "ubuntu": ">= 12.04",
+    "debian": ">= 7.0",
+    "centos": ">= 5.9",
+    "scientific": ">= 6.4",
+    "redhat": ">= 0.0.0",
+    "pld": ">= 0.0.0"
+  },
+  "dependencies": {
+    "ohai": ">= 0.0.0"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+    "jn_sysctl": ">= 0.0.0",
+    "el-sysctl": ">= 0.0.0"
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "0.6.0"
+}

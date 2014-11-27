@@ -1,0 +1,58 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_solo
+  data_bags_path: "data_bags"
+  roles_path: "roles"
+  environments_path: "environments"
+  require_chef_omnibus: true
+
+platforms:
+- name: ubuntu-14.04
+- name: ubuntu-12.04
+- name: ubuntu-10.04
+- name: debian-7.1.0
+- name: centos-6.5
+- name: centos-5.10
+- name: scientific-6.4
+  driver:
+    box: lyte-scientific-6-minimal
+    box_url: http://lyte.id.au/vagrant/sl6-64-lyte.box
+- name: canonical-ubuntu-14.04
+  driver:
+    box: canonical-ubuntu-14.04
+    box_url: https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box
+- name: fedora-18
+- name: fedora-20
+
+suites:
+- name: default
+  run_list:
+    - recipe[sysctl_test]
+    - recipe[sysctl_test::tcp_wmem]
+    - recipe[sysctl::ohai_plugin]
+  attributes:
+    sysctl:
+      params:
+        vm:
+          swappiness: 19
+        net:
+          ipv4:
+            tcp_fin_timeout: 29
+- name: lwrps
+  run_list:
+    - recipe[sysctl_test]
+    - recipe[sysctl_test::tcp_wmem]
+- name: attributes
+  run_list:
+    - recipe[sysctl::apply]
+  attributes:
+    sysctl:
+      params:
+        vm:
+          swappiness: 19
+        net:
+          ipv4:
+            tcp_fin_timeout: 29

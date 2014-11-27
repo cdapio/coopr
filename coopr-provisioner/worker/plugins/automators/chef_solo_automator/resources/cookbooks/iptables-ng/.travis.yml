@@ -1,0 +1,7 @@
+language: ruby
+rvm:
+  - 2.0
+  - 2.1
+script:
+  - bundle exec rubocop
+  - bundle exec foodcritic -f any .

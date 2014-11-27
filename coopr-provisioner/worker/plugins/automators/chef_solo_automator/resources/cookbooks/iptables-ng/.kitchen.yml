@@ -1,0 +1,118 @@
+---
+driver:
+  name: vagrant
+
+driver_config:
+  customize:
+    memory: 512
+
+provisioner:
+  name: chef_zero
+
+platforms:
+- name: ubuntu-14.10
+- name: ubuntu-14.04
+- name: ubuntu-12.04
+- name: debian-7.2.0
+- name: debian-6.0.8
+- name: centos-7.0
+- name: centos-6.5
+- name: centos-5.10
+
+suites:
+  - name: lwrp_chain_create_default
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_chain_create_default]
+  - name: lwrp_chain_create_custom
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_chain_create_custom]
+  - name: lwrp_chain_create_if_missing
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_chain_create_if_missing]
+  - name: lwrp_chain_create_empty
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_chain_create_empty]
+
+  - name: lwrp_rule_create_default
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_rule_create_default]
+  - name: lwrp_rule_create_custom
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_rule_create_custom]
+  - name: lwrp_rule_create_custom_chain
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_rule_create_custom_chain]
+  - name: lwrp_rule_create_if_missing
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_rule_create_if_missing]
+  - name: lwrp_rule_delete
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_rule_delete]
+  - name: lwrp_rule_check_order
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::lwrp_rule_check_order]
+
+  - name: recipe_default
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::recipe_default]
+    attributes:
+      iptables-ng:
+        rules:
+          filter:
+            INPUT:
+              ssh:
+                rule: '--protocol tcp --dport 22 --match state --state NEW --jump ACCEPT'
+              ipv4_only:
+                rule: '--protocol tcp --source 1.2.3.4 --dport 123 --jump ACCEPT'
+                ip_version: 4
+            OUTPUT:
+                testrule:
+                  rule: '--protocol icmp --jump ACCEPT'
+            FORWARD:
+              default: 'DROP [0:0]'
+          nat:
+            POSTROUTING:
+              nat_test:
+                rule: '--protocol tcp -j ACCEPT'
+          mangle:
+            FORWARD:
+              default: 'DROP [0:0]'
+
+  - name: recipe_install
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::recipe_install]
+
+  - name: attribute_enabled_tables
+    run_list:
+    - recipe[minitest-handler]
+    - recipe[iptables_ng_test::attribute_enabled_tables]
+    attributes:
+      iptables-ng:
+        enabled_tables: [ 'filter' ]
+        rules:
+          filter:
+            INPUT:
+              ssh:
+                rule: '--protocol tcp --dport 22 --match state --state NEW --jump ACCEPT'
+              ipv4_only:
+                rule: '--protocol tcp --source 1.2.3.4 --dport 123 --jump ACCEPT'
+                ip_version: 4
+          nat:
+            POSTROUTING:
+              nat_test:
+                rule: '--protocol tcp -j ACCEPT'
+          mangle:
+            FORWARD:
+              default: 'DROP [0:0]'
