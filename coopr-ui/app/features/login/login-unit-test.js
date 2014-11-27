@@ -1,4 +1,4 @@
-*global jasmine, module, expect, inject, describe, it, before, beforeEach, after, afterEach */
+/*global jasmine, module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 
 describe('login feature', function(){
   beforeEach(module('coopr-ui.features'));
