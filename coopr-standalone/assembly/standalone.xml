@@ -14,8 +14,8 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../coopr-ngui</directory>
-            <outputDirectory>/ngui</outputDirectory>
+            <directory>${project.basedir}/../coopr-ui</directory>
+            <outputDirectory>/ui</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../coopr-server/target</directory>

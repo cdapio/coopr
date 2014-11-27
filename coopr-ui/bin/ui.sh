@@ -26,11 +26,12 @@ export COOPR_UI_CERT_FILE=${COOPR_UI_CERT_FILE:-${COOPR_HOME}/cert/server.crt}
 die ( ) { echo; echo "ERROR: ${*}"; echo; exit 1; }
 
 # Specifies UI Path
-UI_PATH=${UI_PATH:-${COOPR_HOME}/ngui}
+UI_PATH=${UI_PATH:-${COOPR_HOME}/ui}
 ENVIRONMENT=${ENVIRONMENT:-production}
 
-COOPR_NODE=${COOPR_NODE:-${COOPR_HOME}/ngui/embedded/bin/node}
-APP_NAME="coopr-ngui"
+COOPR_NODE=${COOPR_NODE:-${COOPR_HOME}/ui/embedded/bin/node}
+COOPR_NPM=${COOPR_NPM:-${COOPR_HOME}/ui/embedded/bin/npm}
+APP_NAME="coopr-ui"
 PID_DIR=${PID_DIR:-/var/run/coopr}
 pid="${PID_DIR}/${APP_NAME}.pid"
 
@@ -44,11 +45,18 @@ check_before_start() {
   fi
 }
 
+create_dist() {
+  [ -d dist ] || {
+    ${COOPR_NPM} install -g bower gulp && ${COOPR_NPM} run build && gulp distribute && ${COOPR_NPM} install --production
+  }
+}
+
 start ( ) {
   cd ${UI_PATH}
   check_before_start
 
-  echo "Starting Coopr NGUI ..."
+  echo "Starting Coopr UI ..."
+  create_dist
 
   nohup nice -1 ${COOPR_NODE} ${UI_PATH}/server.js \
     >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 < /dev/null &
@@ -56,7 +64,7 @@ start ( ) {
 }
 
 stop ( ) {
-  echo -n "Stopping Coopr NGUI ..."
+  echo -n "Stopping Coopr UI ..."
   if [ -f ${pid} ]; then
     pidToKill=`cat ${pid}`
     # kill -0 == see if the PID exists
