@@ -1,0 +1,5 @@
+site 'http://community.opscode.com/api/v1'
+
+cookbook 'lxc', path: './'
+cookbook 'apt'
+cookbook 'lxc-test', path: 'test/cookbooks/lxc-test'

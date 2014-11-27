@@ -1,0 +1,104 @@
+#!/usr/bin/env ruby
+
+# This is just to fix precise in LTS
+
+require 'fileutils'
+
+LXC_TEMPLATE='/usr/lib/lxc/templates/lxc-ubuntu'
+
+def report(action)
+  print "#{action}... "
+  yield
+  puts "done"
+end
+
+# Set paths
+repo_root = ENV['REPO_PATH'] || '/opt/debootstrap-repos'
+precise_root = File.join(repo_root, 'precise')
+pool = File.join(precise_root, 'pool')
+component = File.join(precise_root, 'dists/precise/main/binary-amd64')
+conf = File.join(repo_root, 'debrepos.conf')
+
+# Build paths
+report 'Creating required directories' do
+  FileUtils.mkdir_p(component)
+  FileUtils.mkdir_p(pool)
+  FileUtils.ln_s(pool, File.join(component, pool))
+end
+
+# define required packages
+report 'Fetching required package list' do
+  packages = %x{debootstrap --print-debs --include="vim,ssh" precise /tmp/precise-bootstrap}.strip
+end
+
+# download packages
+report 'Downloading packages' do
+  Dir.chdir(pool)
+  unless(system("apt-get download #{packages}"))
+    $stderr.puts 'Package download failed!'
+    exit 1
+  end
+end
+
+# Create conf file
+report 'Creating configuration file' do
+  File.open(conf, 'w') do |f|
+    f.puts %(
+Dir {
+  ArchiveDir #{precise_root};
+}
+Default
+{
+  Packages::Compress ". gzip";
+  Sources::Compress ". gzip";
+  Contents::Compress ". gzip";
+}
+bindirectory "pool"
+{
+  Packages "dists/precise/main/binary-amd64/Packages";
+  Contents "dists/precise/main/binary-amd64/Contents";
+}
+    )
+  end
+end
+
+# generate
+report 'Generating archive' do
+  Dir.chdir(repo_root)
+  unless(system("apt-ftparchive generate #{File.basename(conf)}"))
+    $stderr.puts 'Archive generation failed!'
+    exit 1
+  end
+end
+
+report 'Adding release files' do
+  [precise_root, component].each do |d|
+    Dir.chdir(d)
+    con = %x{apt-ftparchive release .}
+    File.open(File.join(d, 'Release'), 'w') do |file|
+      file.puts "Components main\n#{con}\n"
+    end
+  end
+end
+
+if(File.exists?(LXC_TEMPLATE))
+  report 'Updating ubuntu lxc template' do
+    contents = File.readlines(LXC_TEMPLATE)
+    contents.map! do |line|
+      if(line =~ /^\s*debootstrap.+\$MIRROR\s*$/)
+        'debootstrap --no-check-gpg --verbose --components=main --arch=$arch --include=$packages $release $cache/partial-$arch $LOCAL_REPO'
+      else
+        line
+      end
+    end
+    File.open(LXC_TEMPLATE, 'w') do |file|
+      file.puts contents.join("\n")
+    end
+  end
+end
+
+puts "\nSUCCESS: Local updated precise repository created for debootstrap"
+puts "  USAGE: debootstrap precise store_dir file://#{precise_root}"
+if(File.exists?(LXC_TEMPLATE))
+  puts "LXC USAGE: LOCAL_REPO=\"file://#{precise_root}\" lxc-create -n ctn-name -t ubuntu"
+end

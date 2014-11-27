@@ -1,0 +1,23 @@
+LineLength:
+  Max: 200
+
+HashSyntax:
+  EnforcedStyle: ruby19
+
+CaseIndentation:
+  IndentWhenRelativeTo: end
+
+MethodLength:
+  Max: 50
+
+Documentation:
+  Enabled: false
+
+ClassAndModuleChildren:
+  Enabled: false
+
+SingleSpaceBeforeFirstArg:
+  Enabled: false
+
+AbcSize:
+  Enabled: false
