@@ -99,7 +99,7 @@ public class CLIMain {
     for (String element : array) {
       builder.append(element).append(" ");
     }
-    return builder.toString();
+    return builder.toString().trim();
   }
 
   public static void main(String[] args) throws Exception {
