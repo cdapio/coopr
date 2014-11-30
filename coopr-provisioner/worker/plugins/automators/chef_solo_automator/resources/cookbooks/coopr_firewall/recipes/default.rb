@@ -18,7 +18,11 @@
 #
 
 if node.key?('coopr_firewall')
-  include_recipe 'coopr_firewall::iptables'
+  if node['coopr_firewall'].key?('unmanaged') && node['coopr_firewall']['unmanaged'].to_s == 'true'
+    Chef::Log.info("Not managing host firewall per node['coopr_firewall']['unmanaged'] attribute")
+  else
+    include_recipe 'coopr_firewall::iptables'
+  end
 else
   include_recipe 'coopr_firewall::disable'
 end
