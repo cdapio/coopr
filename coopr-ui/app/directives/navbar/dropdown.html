@@ -34,7 +34,9 @@
   <li role="presentation" class="divider"></li>
 
   <li role="presentation" class="dropdown-header" ng-show="currentUser">
-    {{currentUser.username}}/{{currentUser.tenant}}
+    <span ng-bind="currentUser.username"></span>
+      /
+    <span ng-bind="currentUser.tenant"></span>
   </li>
 
   <li role="presentation" ng-show="currentUser.hasRole('superadmin')" ui-sref-active="disabled">

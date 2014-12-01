@@ -16,7 +16,7 @@
       <li ng-repeat="link in navbarAdminLinks" ng-class="{active: $state.includes(link.sref)}">
         <a ui-sref="{{link.sref + '.list'}}">
           <span ng-class="link.icon && 'fa fa-' + link.icon"></span>
-          {{link.label}}
+          <span ng-bind="link.label"></span>
         </a>
       </li>
     </ul>
@@ -39,7 +39,7 @@
         <span ng-if="currentUser">
 <!-- presence of .fa-user icon is used in e2e tests to determine login state -->
           <span class="fa fa-user"></span>
-          {{currentUser.username | caskCapitalizeFilter}}
+          <span ng-bind="currentUser.username | caskCapitalizeFilter"></span>
         </span>
         <span ng-hide="currentUser">
           Not authenticated
