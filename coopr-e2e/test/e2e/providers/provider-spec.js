@@ -20,7 +20,9 @@ describe('providers test', function () {
       browser.getLocationAbsUrl()
     ).toMatch(/\/providers\/create$/);
 
-    browser.waitForAngular();
+    browser.driver.wait(function() {
+      return browser.driver.isElementPresent(by.cssContainingText('option', 'google'));
+    });
 
     element(by.cssContainingText('option', 'google')).click();
     formfields = element.all(by.repeater('(name,fieldData) in config.fields'));
