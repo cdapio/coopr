@@ -9,6 +9,7 @@
     "swig": "0.13.5",
     "winston": "0.7.1",
     "express-useragent": "0.0.7-1",
-    "request": "~2.33.0"
+    "request": "~2.33.0",
+    "cdap-auth-manager": "http://path/to/library"
   }
 }
