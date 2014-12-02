@@ -1,8 +1,20 @@
 hadoop CHANGELOG
 ===============
 
+v1.8.0 (Nov 24, 2014)
+-------------------
+- Opportunistic creation of `hive.exec.local.scratchdir` ( Issue: #117 )
+- Only use `hadoop::repo` for Hive ( Issue: #120 )
+- More Oozie tests ( Issue: #121 )
+- Only test `hadoop::default` in Vagrant ( Issue: #122 )
+- Avro libraries/tools support ( Issue: #123 [COOK-6](https://issues.cask.co/browse/COOK-6) )
+- Parquet support ( Issue: #124 [COOK-7](https://issues.cask.co/browse/COOK-7) )
+- Improve version matching for HDP 2.1 ( Issue: #125 )
+- Initial Spark support ( Issue: #126 )
+
 v1.7.1 (Nov 5, 2014)
 --------------------
+- Initial Oozie tests ( Issue: #118 )
 - Hotfix symlink log dirs ( Issue: #119 )
 
 v1.7.0 (Nov 5, 2014)
@@ -14,11 +26,11 @@ v1.7.0 (Nov 5, 2014)
 
 v1.6.1 (Oct 16, 2014)
 ---------------------
-- Update Bigtop to `0.8.0` release ( Issues: #106 #107 ) (COOK-1)
+- Update Bigtop to `0.8.0` release ( Issues: #106 #107 [COOK-1](https://issues.cask.co/browse/COOK-1) )
 
 v1.6.0 (Oct 16, 2014)
 ---------------------
-- Add Bigtop support ( Issue: #105 ) (COOK-1)
+- Add Bigtop support ( Issue: #105 [COOK-1](https://issues.cask.co/browse/COOK-1) )
 
 v1.5.0 (Sep 25, 2014)
 ---------------------

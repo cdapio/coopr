@@ -18,10 +18,6 @@
             <outputDirectory>/ngui</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../coopr-ui</directory>
-            <outputDirectory>/ui</outputDirectory>
-        </fileSet>
-        <fileSet>
             <directory>${project.basedir}/../coopr-server/target</directory>
             <outputDirectory>/server/lib</outputDirectory>
             <includes>
