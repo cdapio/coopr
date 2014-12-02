@@ -13,9 +13,9 @@ Coopr-CLI
 
 ## Build
  
- To build the CLI, run the following command:
+ To build the CLI, run the following command, from the parent directory:
  
- ```mvn package``` or ``` mvn package -DskipTests```
+ ```mvn clean package -pl coopr-cli -am``` or ``` mvn clean package -DskipTests -pl coopr-cli -am```
 
 ## Start
 
