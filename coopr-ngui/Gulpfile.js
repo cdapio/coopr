@@ -132,6 +132,11 @@ gulp.task('js:app', function() {
        footer: '\n})('+PKG+');\n'
     }))
     .pipe(plug.concat('app.js'))
+    .pipe(plug.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1'))
+    .pipe(plug.wrapper({
+       header: '(function(window, document, undefined) {\n\'use strict\';\n',
+       footer: '\n})(window, document);\n'
+    }))
     .pipe(gulp.dest('./dist/assets/bundle'));
 });
 
