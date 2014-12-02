@@ -1,7 +1,7 @@
 /*global jasmine, module, expect, inject, describe, it, before, beforeEach, after, afterEach */
 
 describe('login feature', function(){
-  beforeEach(module('coopr-ngui.features'));
+  beforeEach(module('coopr-ui.features'));
 
   describe('LoginCtrl', function() {
     var $scope;

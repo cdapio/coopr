@@ -1,5 +1,5 @@
 {
-  "name": "coopr-ngui",
+  "name": "coopr-ui",
   "private": true,
   "dependencies": {
     "angular": "1.3.5",

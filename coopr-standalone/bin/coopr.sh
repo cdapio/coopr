@@ -321,7 +321,7 @@ ui () {
     echo "UI disabled... skipping..."
     return 0
   fi
-  ${COOPR_HOME}/ngui/bin/ngui.sh ${1}
+  ${COOPR_HOME}/ui/bin/ui.sh ${1}
 }
 
 greeting () {

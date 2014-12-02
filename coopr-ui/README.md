@@ -18,7 +18,7 @@ Global dependencies:
 
 Local dependencies:
 
-* `cd ../ngui`
+* `cd ../ui`
 * `npm install && bower install`
 
 then, each in their own tab:
@@ -34,22 +34,22 @@ then, each in their own tab:
 
 ### for testing:
 
-* `cd coopr-ngui`
+* `cd coopr-ui`
 * `npm run build` ( == `npm install && bower install && gulp build`)
 * `npm run test-single-run` (unit tests)
 * `cd ../coopr-e2e && npm install && npm run protractor` (end-to-end tests, needs `npm start` running in parallel)
 
 ### for production:
 
-generate a minified build of static assets, in the `coopr-ngui/dist/` folder
+generate a minified build of static assets, in the `coopr-ui/dist/` folder
 
-* `cd coopr-ngui`
+* `cd coopr-ui`
 * `npm run build` ( == `npm install && bower install && gulp build`)
 * `gulp distribute` (makes minified and revision-tagged static assets)
 
 now to run the server, possibly on a different host:
 
-* `cd coopr-ngui`
+* `cd coopr-ui`
 * `npm install --production` (will skip devDependencies)
 * `export COOPR_UI_PORT=8100`
 * `export COOPR_CORS_PORT=8101`

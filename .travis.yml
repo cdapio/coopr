@@ -44,7 +44,7 @@ before_install:
   - 'sh -e /etc/init.d/xvfb start'
 
 before_script:
-  - 'cd coopr-ngui && npm run build'
+  - 'cd coopr-ui && npm run build'
   - 'npm start > /dev/null &'
   - 'cd ..'
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd coopr-server; fi'
@@ -69,7 +69,7 @@ install:
 script:
   - 'cd coopr-provisioner && bundle exec rake'
   - 'cd ..'
-  - 'cd coopr-ngui'
+  - 'cd coopr-ui'
   - 'node ./node_modules/gulp/bin/gulp.js jshint'
   - 'npm run test-single-run'
   - 'if [ -n "$BROWSER_STACK_ACCESS_KEY" ]; then cd ../coopr-e2e; fi'
