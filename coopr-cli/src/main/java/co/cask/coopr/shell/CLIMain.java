@@ -26,6 +26,7 @@ import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.client.TenantClient;
 import co.cask.coopr.shell.command.HelpCommand;
 import co.cask.coopr.shell.command.set.CooprCommandSets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
@@ -94,14 +95,6 @@ public class CLIMain {
     return new CommandSet<Command>(ImmutableList.of((Command) helpCommand), ImmutableList.of(commandSet));
   }
 
-  private static String toString(String[] array) {
-    StringBuilder builder = new StringBuilder();
-    for (String element : array) {
-      builder.append(element).append(" ");
-    }
-    return builder.toString();
-  }
-
   public static void main(String[] args) throws Exception {
     String host = System.getenv(EV_HOST);
     String stringPort = System.getenv(EV_PORT);
@@ -119,7 +112,7 @@ public class CLIMain {
     if (args.length == 0) {
       shell.cli.startInteractiveMode(System.out);
     } else {
-      shell.cli.execute(toString(args), System.out);
+      shell.cli.execute(Joiner.on(" ").join(args), System.out);
     }
   }
 }
