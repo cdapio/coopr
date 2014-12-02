@@ -12,12 +12,14 @@ var pkg = require('./package.json'),
     express = require('express'),
     finalhandler = require('finalhandler'),
     serveFavicon = require('serve-favicon'),
-    corsAnywhere = require('cors-anywhere'),
+    corsAnywhere = require('cors-anywhere');
 
-    COOPR_HOME = process.env.COOPR_HOME;
-    COOPR_SSL = ('true' == process.env.COOPR_SSL);
-    COOPR_UI_PORT = parseInt(process.env.COOPR_UI_PORT || 8080, 10),
-    COOPR_UI_SSL_PORT = parseInt(process.env.COOPR_UI_SSL_PORT || 8443, 10),
+var COOPR_HOME = process.env.COOPR_HOME || (__dirname + '/../'),
+    COOPR_SSL = ('true' === process.env.COOPR_SSL),
+    COOPR_UI_PORT = ( COOPR_SSL
+      ? parseInt(process.env.COOPR_UI_SSL_PORT || 8443, 10)
+      : parseInt(process.env.COOPR_UI_PORT || 8080, 10)
+    ),
     COOPR_UI_KEY_FILE = process.env.COOPR_UI_KEY_FILE || COOPR_HOME + 'cert/server.key',
     COOPR_UI_CERT_FILE = process.env.COOPR_UI_CERT_FILE || COOPR_HOME + 'cert/server.crt',
     COOPR_CORS_PORT = parseInt(process.env.COOPR_CORS_PORT || 8081, 10),
@@ -33,8 +35,7 @@ var pkg = require('./package.json'),
         pink: function (v) {
             return '\x1B[40m\x1B[35m' + v + '\x1B[39m\x1B[49m';
         }
-    },
-    sslStarted = false;
+    };
 
 
 morgan.token('cooprcred', function (req, res) {
@@ -54,21 +55,10 @@ var httpLabel = color.green('http'),
 console.log(color.hilite(pkg.name) + ' v' + pkg.version + ' starting up...');
 
 /**
- * HTTP server
+ * Express application
  */
 
-var app = express(),
-    sslCredentials = null,
-    httpServer = http.createServer(app),
-    httpsServer = null;
-
-if (COOPR_SSL) {
-    sslCredentials = {
-        key: fs.readFileSync(COOPR_UI_KEY_FILE, 'utf-8'),
-        cert: fs.readFileSync(COOPR_UI_CERT_FILE, 'utf-8')
-    };
-    httpsServer = https.createServer(sslCredentials, app);
-}
+var app = express();
 
 try { app.use(serveFavicon(__dirname + '/dist/assets/img/favicon.png')); }
 catch(e) { console.error("Favicon missing! Did you run `gulp build`?"); }
@@ -98,7 +88,7 @@ app.use('/assets', [
     index: false
   }),
   function(req, res) {
-    finalhandler(req, res)(false); // 404 
+    finalhandler(req, res)(false); // 404
   }
 ]);
 
@@ -118,18 +108,25 @@ app.all('*', [
     }
 ]);
 
-if (!COOPR_SSL) {
-    httpServer.listen(COOPR_UI_PORT, null, null, function () {
-        console.info(httpLabel + ' listening on port %s', COOPR_UI_PORT);
-    });
+
+/**
+ * HTTP(S) server
+ */
+var server;
+if (COOPR_SSL) {
+    server = https.createServer({
+        key: fs.readFileSync(COOPR_UI_KEY_FILE, 'utf-8'),
+        cert: fs.readFileSync(COOPR_UI_CERT_FILE, 'utf-8')
+    }, app);
+}
+else {
+    server = http.createServer(app);
 }
 
-if (COOPR_SSL) {
-    httpsServer.listen(COOPR_UI_SSL_PORT, null, null, function () {
-        console.info(httpLabel + ' listening on port %s', COOPR_UI_SSL_PORT);
-        sslStarted = true;
-    });
-}
+server.listen(COOPR_UI_PORT, null, null, function () {
+    console.info(httpLabel + ' listening on port %s', COOPR_UI_PORT);
+});
+
 
 /**
  * CORS proxy
@@ -139,8 +136,7 @@ corsAnywhere.createServer({
     removeHeaders: ['cookie', 'cookie2']
 })
     .on('request', function (req, res) {
-        corsLogger(req, res, function noop() {
-        });
+        corsLogger(req, res, function noop() {});
     })
     .listen(COOPR_CORS_PORT, '0.0.0.0', function () {
         console.info(corsLabel + ' listening on port %s', COOPR_CORS_PORT);
