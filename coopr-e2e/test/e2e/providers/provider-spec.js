@@ -3,7 +3,7 @@
 //  */
 var helper = require('../../protractor-help');
 
-xdescribe('providers test', function () { // test disabled, not reliable on CI.
+xdescribe('providers test', function () { // disabled, not reliable on CI.
   var formfields;
   var providersList,
       provider;
