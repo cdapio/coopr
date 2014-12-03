@@ -163,7 +163,7 @@ if [ "${COOPR_SSL}" == "true" ]; then
 fi
 
 export SECURITY_ENABLED=`read_property security.enabled ${COOPR_SERVER_CONF}/coopr-site.xml`
-export COOPR_SERVER_URI=${COOPR_SERVER_URI:-${COOPR_PROTOCOL}://localhost:55054}
+export COOPR_SERVER_URI=${COOPR_SERVER_URI:-${COOPR_PROTOCOL}://127.0.0.1:55054}
 export TRUST_CERT_PATH=`read_property server.ssl.trust.cert.path ${COOPR_SERVER_CONF}/coopr-security.xml`
 export TRUST_CERT_PASSWORD=`read_property server.ssl.trust.cert.password ${COOPR_SERVER_CONF}/coopr-security.xml`
 
@@ -265,7 +265,7 @@ wait_for_server () {
   fi
 
   if [ "${SECURITY_ENABLED}" == "true" ]; then
-    AUTH_SERVER_URI=${COOPR_PROTOCOL}://localhost:55059
+    AUTH_SERVER_URI=${COOPR_PROTOCOL}://127.0.0.1:55059
     export ACCESS_TOKEN=$(curl -u ${COOPR_API_USER}:${COOPR_API_USER_PASS} ${AUTH_SERVER_URI}/token 2> /dev/null | sed '1s/.*access_token":"\([^"]*\).*/\1/')
   fi
 }
@@ -289,7 +289,7 @@ wait_for_plugin_registration () {
 
 wait_for_provisioner () {
   RETRIES=0
-  until [[ $(curl http://localhost:55056/status 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
+  until [[ $(curl http://127.0.0.1:55056/status 2> /dev/null | grep OK) || ${RETRIES} -gt 60 ]]; do
     sleep 2
     let "RETRIES++"
   done
@@ -328,9 +328,9 @@ greeting () {
   [ "${COOPR_DISABLE_UI}" == "true" ] && return 0
   echo
   if [ "${COOPR_SSL}" == "true" ]; then
-    echo "Go to ${COOPR_PROTOCOL}://localhost:8443. Have fun creating clusters!"
+    echo "Go to ${COOPR_PROTOCOL}://127.0.0.1:8443. Have fun creating clusters!"
   else
-    echo "Go to ${COOPR_PROTOCOL}://localhost:8100. Have fun creating clusters!"
+    echo "Go to ${COOPR_PROTOCOL}://127.0.0.1:8100. Have fun creating clusters!"
   fi
 }
 
