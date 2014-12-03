@@ -19,15 +19,14 @@ package co.cask.coopr.shell;
 import co.cask.common.cli.CLI;
 import co.cask.common.cli.Command;
 import co.cask.common.cli.CommandSet;
+import co.cask.common.cli.command.HelpCommand;
 import co.cask.coopr.client.AdminClient;
 import co.cask.coopr.client.ClusterClient;
 import co.cask.coopr.client.PluginClient;
 import co.cask.coopr.client.ProvisionerClient;
 import co.cask.coopr.client.TenantClient;
-import co.cask.coopr.shell.command.HelpCommand;
 import co.cask.coopr.shell.command.set.CooprCommandSets;
 import com.google.common.base.Joiner;
-import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -78,7 +77,12 @@ public class CLIMain {
   }
 
   private CommandSet<Command> getCommandSet(CLIConfig cliConfig, Injector injector) {
-    final CommandSet<Command> commandSet;
+    String helpHeader = new StringBuilder(EV_HOST).append("=").append(cliConfig.getHost())
+      .append(System.getProperty("line.separator"))
+      .append(EV_USER_ID).append("=").append(cliConfig.getUserId())
+      .append(System.getProperty("line.separator"))
+      .append(EV_TENANT_ID).append("=").append(cliConfig.getTenantId()).toString();
+    CommandSet<Command> commandSet;
     if (cliConfig.isSuperadmin()) {
       commandSet = CooprCommandSets.getCommandSetForSuperadmin(injector);
     } else if (cliConfig.isAdmin()) {
@@ -86,12 +90,7 @@ public class CLIMain {
     } else {
       commandSet = CooprCommandSets.getCommandSetForNonAdminUser(injector);
     }
-    HelpCommand helpCommand = new HelpCommand(new Supplier<Iterable<Command>>() {
-      @Override
-      public Iterable<Command> get() {
-        return commandSet.getCommands();
-      }
-    }, cliConfig);
+    HelpCommand helpCommand = new HelpCommand(commandSet, helpHeader);
     return new CommandSet<Command>(ImmutableList.of((Command) helpCommand), ImmutableList.of(commandSet));
   }
 
