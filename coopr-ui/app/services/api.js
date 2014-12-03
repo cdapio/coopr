@@ -74,20 +74,15 @@ module.config(function ($httpProvider, MYAPI_EVENT, MY_CONFIG) {
           if(myAuth.currentUser) {
             angular.extend(config.headers, {
               'Coopr-UserID': myAuth.currentUser.username,
-              'Coopr-TenantID': myAuth.currentUser.tenant
-            });
-          }
-
-          if(MY_CONFIG.authorization) {
-            angular.extend(config.headers, {
-              'Authorization': MY_CONFIG.authorization
+              'Coopr-TenantID': myAuth.currentUser.tenant,
+              'Authorization': myAuth.currentUser.authorization
             });
           }
 
           $log.log('[myApi]', config.method, config.url.substr(myApiPrefix.length));
         }
         return config;
-      },
+     },
 
      'responseError': function(rejection) {
         if(isApi(rejection.config.url)) {
