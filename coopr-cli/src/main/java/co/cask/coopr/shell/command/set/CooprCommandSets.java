@@ -18,6 +18,8 @@ package co.cask.coopr.shell.command.set;
 
 import co.cask.common.cli.Command;
 import co.cask.common.cli.CommandSet;
+import co.cask.common.cli.command.ExitCommand;
+import co.cask.common.cli.command.QuitCommand;
 import co.cask.coopr.shell.command.AddServicesOnClusterCommand;
 import co.cask.coopr.shell.command.ConnectCommand;
 import co.cask.coopr.shell.command.CreateClusterCommand;
@@ -30,7 +32,6 @@ import co.cask.coopr.shell.command.DeleteProviderCommand;
 import co.cask.coopr.shell.command.DeleteProviderTypeResourcesCommand;
 import co.cask.coopr.shell.command.DeleteServiceCommand;
 import co.cask.coopr.shell.command.DeleteTenantCommand;
-import co.cask.coopr.shell.command.ExitCommand;
 import co.cask.coopr.shell.command.GetAutomatorTypeCommand;
 import co.cask.coopr.shell.command.GetClusterCommand;
 import co.cask.coopr.shell.command.GetClusterConfigCommand;
@@ -109,7 +110,8 @@ public class CooprCommandSets {
   private static List<Command> getCommonComands(Injector injector) {
     return ImmutableList.of(
       injector.getInstance(ConnectCommand.class),
-      injector.getInstance(ExitCommand.class)
+      injector.getInstance(ExitCommand.class),
+      injector.getInstance(QuitCommand.class)
     );
   }
 
