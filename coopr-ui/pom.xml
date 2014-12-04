@@ -17,39 +17,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>coopr-ui</artifactId>
-  <name>Coopr UI</name>
-  <parent>
-    <artifactId>coopr-parent</artifactId>
-    <groupId>co.cask</groupId>
-    <version>0.9.9-SNAPSHOT</version>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>coopr-ui</artifactId>
+    <name>Coopr UI</name>
+    <parent>
+        <artifactId>coopr-parent</artifactId>
+        <groupId>co.cask</groupId>
+        <version>0.9.9-SNAPSHOT</version>
+    </parent>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.3.2</version>
-        <executions>
-          <execution>
-	    <id>local</id>
-	    <phase>process-resources</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <executable>sh</executable>
-          <workingDirectory>.</workingDirectory>
-          <arguments>
-            <argument>./build-ui.sh</argument>
-          </arguments>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.3.2</version>
+                <executions>
+                    <execution>
+                        <id>local</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>sh</executable>
+                    <workingDirectory>.</workingDirectory>
+                    <arguments>
+                        <argument>./build-ui.sh</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
