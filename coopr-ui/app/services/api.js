@@ -1,28 +1,10 @@
-/**
- * myApi
- * wraps all calls to the REST API
- * @return {Object} with one property xxxx per myApi_xxxx file 
- */
-
 var module = angular.module(PKG.name+'.services');
 
-module.factory('myApiPrefix', function myApiPrefixFactory ($location, MY_CONFIG) {
+module.value('myApiVersion', 2);
 
-  // to work with CORS proxy, we expect that the URI will include a port
-  //  ... first we need to remove the protocol from the URI 
-  var restPath = MY_CONFIG.COOPR_SERVER_URI.replace(/^(https?:\/\/)?/i, '');
-  if(restPath.substr(-1)!=='/') {
-    restPath += '/'; // then we ensure it ends with a slash
-  }
-  restPath += 'v2/'; // and add the version
-
-  /* end result should look something like:
-
-       http :// host.foo.com : 8081 / otherhost.foo.com:55054/v2/
-  */
-  return $location.protocol() + '://' + $location.host() + 
-            ':' + MY_CONFIG.COOPR_CORS_PORT + '/' + restPath;
-            
+module.factory('myApiPrefix', function myApiPrefixFactory ($location, myApiVersion) {
+  return $location.protocol() + '://' + $location.host() +
+            ':' + $location.port() + '/proxy/v' + myApiVersion + '/';
 });
 
 
@@ -31,6 +13,11 @@ module.constant('MYAPI_EVENT', {
 });
 
 
+/**
+ * myApi
+ * wraps all calls to the REST API
+ * @return {Object} with one property xxxx per myApi_xxxx file
+ */
 module.factory('myApi', function(
     myApi_clusters,
     myApi_hardwaretypes,
@@ -43,7 +30,7 @@ module.factory('myApi', function(
     myApi_importexport
   ){
 
-  return angular.extend({}, 
+  return angular.extend({},
     myApi_clusters,
     myApi_hardwaretypes,
     myApi_imagetypes,
