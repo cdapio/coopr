@@ -35,6 +35,7 @@
         <module>../coopr-server</module>
         <module>../coopr-rest-client</module>
         <module>../coopr-cli</module>
+	<module>../coopr-ui</module>
     </modules>
 
     <properties>
