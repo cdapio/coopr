@@ -7,14 +7,9 @@ export COOPR_API_USER=${COOPR_API_USER:-admin}
 export COOPR_API_KEY=${COOPR_API_KEY:-1234567890abcdef}
 export COOPR_TENANT=${COOPR_TENANT:-superadmin}
 export COOPR_HOME=${COOPR_HOME:-/opt/coopr}
-export COOPR_RUBY=${COOPR_RUBY:-"${COOPR_HOME}/provisioner/embedded/bin/ruby"}
+export COOPR_RUBY=${COOPR_RUBY:-${COOPR_HOME}/provisioner/embedded/bin/ruby}
 
 export COOPR_PROVISIONER_PLUGIN_DIR=${COOPR_HOME}/provisioner/worker/plugins
-
-# TODO: steps
-# - register
-# - loop through upload scripts
-# - sync
 
 wait_for_plugin_registration () {
   RETRIES=0
