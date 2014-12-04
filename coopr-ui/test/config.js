@@ -3,5 +3,5 @@ window.PKG = {
 };
 
 angular.module("coopr-ui.config", []).constant("MY_CONFIG", {
-  "autorization": "respect my authoritah"
+  "authorization": "respect my authoritah"
 });
