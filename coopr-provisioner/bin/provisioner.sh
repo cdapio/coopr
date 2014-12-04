@@ -53,7 +53,7 @@ start ( ) {
 register ( ) {
   echo "Registering provisioner plugins with configured server"
   nice -1 ${COOPR_RUBY} ${PROVISIONER_PATH}/bin/provisioner ${PROVISIONER_CONF_OPT} --register \
-    >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1 &
+    >> ${COOPR_LOG_DIR}/${APP_NAME}.log 2>&1
 }
 
 stop ( ) {
